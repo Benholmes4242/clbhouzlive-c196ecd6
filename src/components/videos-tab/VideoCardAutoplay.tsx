@@ -1,9 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
 
-const perf = (tag: string, ...args: any[]) => {
-  console.log(`[PERF:${tag}] ${Date.now() % 100000}`, ...args);
-};
-
 // Module-level single-player tracker — NOT React state/context
 let activeAutoplayRef: { pause: () => void } | null = null;
 
@@ -74,12 +70,9 @@ export function VideoCardAutoplay({ hlsUrl, posterUrl, isEligible, cardIndex }: 
 
         hls.loadSource(hlsUrl);
         hls.attachMedia(video);
-        perf('VIDEOS', 'ATTACH tileIndex:', cardIndex, hlsUrl.slice(-30));
 
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          perf('VIDEOS', 'MANIFEST_PARSED tileIndex:', cardIndex);
           hls.currentLevel = 0;
-          perf('VIDEOS', '<<< PLAYING tileIndex:', cardIndex);
           video.play().catch((e) => console.warn('[VideoCardAutoplay] play() rejected:', e.message));
         });
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
@@ -90,7 +83,6 @@ export function VideoCardAutoplay({ hlsUrl, posterUrl, isEligible, cardIndex }: 
       }
 
       video.addEventListener('canplay', () => {
-        perf('VIDEOS', 'CAN PLAY tileIndex:', cardIndex, 'readyState:', video.readyState);
         if (posterOverlayRef.current) {
           posterOverlayRef.current.style.opacity = '0';
         }
