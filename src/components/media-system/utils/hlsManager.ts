@@ -245,8 +245,7 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
               perf('HLS', 'preCreate level playlist fetch ERROR:', String(err).slice(0, 100));
             });
         }
-
-      resolve();
+      }
 
       resolve();
     });
