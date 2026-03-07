@@ -218,6 +218,10 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
     // Clean up previous observer
     observerRef.current?.disconnect();
 
+    console.log('[EXPLORE:DEBUG] posts video check:', 
+      posts.slice(0,30).map((p,i) => ({ i, type: p.mediaItems?.[0]?.type, hasHls: !!p.mediaItems?.[0]?.hlsUrl }))
+    );
+
     const visibilityMap = new Map<number, number>();
 
     const observer = new IntersectionObserver(
@@ -239,6 +243,12 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
             bestIdx = idx;
           }
         }
+
+        console.log('[EXPLORE:DEBUG] visibilityMap:', 
+          [...visibilityMap.entries()].filter(([idx]) => idx % 6 === 0),
+          'bestIdx:', bestIdx, 'bestRatio:', bestRatio,
+          'currentIndex:', currentIndexRef.current
+        );
 
         // Detach if current tile is <20% visible
         if (currentIndexRef.current !== null) {
