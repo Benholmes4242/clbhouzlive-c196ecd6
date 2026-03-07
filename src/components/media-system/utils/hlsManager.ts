@@ -1,6 +1,9 @@
 import type HlsType from 'hls.js';
 import { createCachedLoader } from './cachedHlsLoader';
 
+const perf = (tag: string, ...args: any[]) => {
+  console.log(`[PERF:${tag}] ${Date.now() % 100000}`, ...args);
+};
 
 export const HLS_CONFIG: Record<string, unknown> = {
   enableWorker: true,
@@ -76,6 +79,7 @@ export async function attachMedia(
 ): Promise<void> {
   // Always detach first
   detachMedia(video);
+  perf('HLS', 'attachMedia START url:', hlsUrl?.slice(-40));
 
   if (supportsNativeHls()) {
     return new Promise<void>((resolve, reject) => {
@@ -87,6 +91,7 @@ export async function attachMedia(
       const onMeta = () => {
         clearTimeout(timeout);
         video.removeEventListener('loadedmetadata', onMeta);
+        perf('HLS', 'loadedmetadata readyState:', video.readyState);
         resolve();
       };
       video.addEventListener('loadedmetadata', onMeta);
@@ -110,6 +115,7 @@ export async function attachMedia(
 
     hls.on((Hls as any).Events.MANIFEST_PARSED, () => {
       clearTimeout(timeout);
+      perf('HLS', 'MANIFEST_PARSED levels:', hls.levels?.length);
       resolve();
     });
 
@@ -121,6 +127,7 @@ export async function attachMedia(
       }
     });
 
+    perf('HLS', 'loadSource called');
     hls.loadSource(hlsUrl);
     hls.attachMedia(video);
   });
@@ -215,8 +222,10 @@ export function promotePreCreated(
   video: HTMLVideoElement,
   onError?: (type: string, details: string) => void
 ): InstanceType<typeof HlsType> | null {
+  perf('HLS', 'promotePreCreated START');
   const hls = preCreatedInstances.get(hlsUrl);
   if (!hls) {
+    perf('HLS', 'promotePreCreated result:', false);
     return null;
   }
 
@@ -232,6 +241,7 @@ export function promotePreCreated(
   }
 
   hls.attachMedia(video);
+  perf('HLS', 'promotePreCreated result:', true);
   return hls;
 }
 
