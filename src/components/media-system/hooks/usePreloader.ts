@@ -56,17 +56,29 @@ export function usePreloader(posts: FeedPost[]) {
 
     const currentUrl = posts[activeIndex]?.mediaItems[0]?.hlsUrl;
     const nextUrl = posts[activeIndex + 1]?.mediaItems[0]?.hlsUrl;
+    const nextNextUrl = posts[activeIndex + 2]?.mediaItems[0]?.hlsUrl;
     const prevUrl = posts[activeIndex - 1]?.mediaItems[0]?.hlsUrl;
+    const prevPrevUrl = posts[activeIndex - 2]?.mediaItems[0]?.hlsUrl;
 
     if (nextUrl) {
       adjacentUrls.push(nextUrl);
       perf('PRELOAD', 'pre-create N+1 url:', nextUrl.slice(-50));
       queuePreCreate(nextUrl);
     }
+    if (nextNextUrl) {
+      adjacentUrls.push(nextNextUrl);
+      perf('PRELOAD', 'pre-create N+2 url:', nextNextUrl.slice(-50));
+      queuePreCreate(nextNextUrl);
+    }
     if (prevUrl) {
       adjacentUrls.push(prevUrl);
       perf('PRELOAD', 'pre-create N-1 url:', prevUrl.slice(-50));
       queuePreCreate(prevUrl);
+    }
+    if (prevPrevUrl) {
+      adjacentUrls.push(prevPrevUrl);
+      perf('PRELOAD', 'pre-create N-2 url:', prevPrevUrl.slice(-50));
+      queuePreCreate(prevPrevUrl);
     }
 
     const keepUrls = new Set(adjacentUrls);
