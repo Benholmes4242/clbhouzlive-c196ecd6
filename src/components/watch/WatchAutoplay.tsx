@@ -4,8 +4,15 @@ import type { FeedPost } from '@/components/media-system/types/media';
 const VIDEO_POOL_SIZE = 2;
 const AUTOPLAY_THRESHOLD = 0.5;
 
-const isDesignatedTile = (idx: number) => idx % 6 === 0 || idx % 6 === 2;
-const slotForTile = (idx: number) => idx % 6 === 0 ? 0 : 1;
+const isDesignatedTile = (idx: number) => {
+  const row = Math.floor(idx / 3);
+  const col = idx % 3;
+  return row % 2 === 0 && col !== 1; // even rows, left & right columns only
+};
+const slotForTile = (idx: number) => {
+  const col = idx % 3;
+  return col === 0 ? 0 : col === 2 ? 1 : -1;
+};
 
 const perf = (tag: string, ...args: any[]) => {
   console.log(`[PERF:${tag}] ${Date.now() % 100000}`, ...args);
