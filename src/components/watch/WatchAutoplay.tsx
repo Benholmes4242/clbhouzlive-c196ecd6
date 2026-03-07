@@ -86,12 +86,21 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       video.play().catch(() => {});
     });
 
+    // Clean any previous listener before adding new one
+    if ((video as any)._onPlaying) {
+      video.removeEventListener('playing', (video as any)._onPlaying);
+      (video as any)._onPlaying = null;
+    }
     const onPlaying = () => {
       perf('WATCH', '<<< PLAYING tileIndex:', tileIdx, 'slot:', slot);
     };
     (video as any)._onPlaying = onPlaying;
     video.addEventListener('playing', onPlaying, { once: true });
 
+    if ((video as any)._onCanPlay) {
+      video.removeEventListener('canplay', (video as any)._onCanPlay);
+      (video as any)._onCanPlay = null;
+    }
     const onCanPlay = () => {
       perf('WATCH', 'CAN PLAY tileIndex:', tileIdx, 'readyState:', video.readyState);
       const poster = tileEl.querySelector('img');
@@ -166,6 +175,8 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
         top2.splice(1, 1); // drop the second — same row
       }
     }
+
+    perf('WATCH', 'reconcile top2:', top2, 'assigned:', [...assignedTileRef.current]);
 
     for (let slot = 0; slot < VIDEO_POOL_SIZE; slot++) {
       const currentTile = assignedTileRef.current[slot];
