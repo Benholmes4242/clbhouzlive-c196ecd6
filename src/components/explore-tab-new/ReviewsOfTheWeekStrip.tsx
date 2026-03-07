@@ -49,6 +49,7 @@ function ReviewsOfTheWeekStripInner() {
     gcTime: 30 * 60 * 1000,
   });
 
+  console.log('[ReviewsStrip] reviews loaded:', reviews?.length);
   if (!reviews || reviews.length < 2) return null;
 
   return (
