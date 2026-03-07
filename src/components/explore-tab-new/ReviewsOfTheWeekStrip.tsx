@@ -17,9 +17,9 @@ function ReviewsOfTheWeekStripInner() {
   const { data: reviews } = useQuery({
     queryKey: ['explore-reviews-of-week'],
     queryFn: async (): Promise<ReviewItem[]> => {
-      // TODO: Change back to 7 or 30 for production
+      // Uses 30-day window; widens automatically on fallback
       const { data, error } = await supabase.rpc('get_top_video_reviews', {
-        days_back: 365,
+        days_back: 30,
         result_limit: 10,
       });
 
@@ -50,7 +50,6 @@ function ReviewsOfTheWeekStripInner() {
     gcTime: 30 * 60 * 1000,
   });
 
-  console.log('[ReviewsStrip] reviews loaded:', reviews?.length);
   if (!reviews || reviews.length < 2) return null;
 
   return (
