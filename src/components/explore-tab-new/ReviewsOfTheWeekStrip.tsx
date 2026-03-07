@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { GolferAvatar } from '@/components/golfers/GolferAvatar';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -97,11 +98,13 @@ function ReviewsOfTheWeekStripInner() {
 
             {/* Creator avatar */}
             {review.avatar_url && (
-              <img
-                src={review.avatar_url}
-                alt=""
-                className="absolute top-2 left-2 w-6 h-6 rounded-full border border-white/50 object-cover"
-              />
+              <div className="absolute top-2 left-2">
+                <GolferAvatar
+                  name={review.username}
+                  photoUrl={review.avatar_url}
+                  size={24}
+                />
+              </div>
             )}
           </button>
         ))}
