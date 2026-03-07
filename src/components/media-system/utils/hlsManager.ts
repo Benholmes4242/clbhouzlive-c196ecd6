@@ -198,7 +198,6 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
     perf('HLS', 'preCreate SKIP (already exists) url:', hlsUrl.slice(-50));
     return;
   }
-  if (supportsNativeHls()) return; // native doesn't need pre-creation
 
   const Hls = await getHls();
   if (!Hls || !Hls.isSupported()) return;
@@ -217,6 +216,7 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
       if (data.fatal) {
         perf('HLS', 'preCreate ERROR url:', hlsUrl.slice(-50), data.details);
         preCreatedInstances.delete(hlsUrl);
+        perf('HLS', 'preCreated MAP DELETE key:', hlsUrl, 'mapSize:', preCreatedInstances.size);
         try { hls.destroy(); } catch { /* ignore */ }
         resolve(); // resolve anyway to not block
       }
@@ -224,6 +224,7 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
 
     hls.loadSource(hlsUrl);
     preCreatedInstances.set(hlsUrl, hls);
+    perf('HLS', 'preCreated MAP ADD key:', hlsUrl, 'mapSize:', preCreatedInstances.size);
 
     // Safety timeout — don't wait forever
     setTimeout(() => resolve(), 5000);
@@ -240,6 +241,7 @@ export function destroyStalePreCreated(keepUrls: Set<string>): void {
       perf('HLS', 'preCreate DESTROY stale url:', url.slice(-50));
       try { hls.destroy(); } catch { /* ignore */ }
       preCreatedInstances.delete(url);
+      perf('HLS', 'preCreated MAP DELETE key:', url, 'mapSize:', preCreatedInstances.size);
     }
   }
 }
@@ -261,6 +263,7 @@ export function promotePreCreated(
   }
 
   preCreatedInstances.delete(hlsUrl);
+  perf('HLS', 'preCreated MAP DELETE key:', hlsUrl, 'mapSize:', preCreatedInstances.size);
   hlsInstances.set(video, hls);
 
   // Wire up error forwarding
@@ -278,8 +281,9 @@ export function promotePreCreated(
 
 /** Destroy all pre-created instances. */
 export function destroyPreCreated(): void {
-  preCreatedInstances.forEach((hls) => {
+  preCreatedInstances.forEach((hls, url) => {
     try { hls.destroy(); } catch { /* ignore */ }
+    preCreatedInstances.delete(url);
+    perf('HLS', 'preCreated MAP DELETE key:', url, 'mapSize:', preCreatedInstances.size);
   });
-  preCreatedInstances.clear();
 }
