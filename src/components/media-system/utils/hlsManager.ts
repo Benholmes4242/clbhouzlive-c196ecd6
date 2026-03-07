@@ -227,9 +227,15 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
         const levelUrl = data.levels?.[0]?.url;
         if (levelUrl) {
           perf('HLS', 'preCreate pre-warm: fetching level playlist', hlsUrl.slice(-50));
+          perf('HLS', 'preCreate level playlist URL:', levelUrl.slice(-80));
           fetch(levelUrl, { mode: 'cors', credentials: 'omit' })
-            .then(r => r.text())
+            .then(r => {
+              perf('HLS', 'preCreate level playlist fetch status:', String(r.status));
+              return r.text();
+            })
             .then(text => {
+              perf('HLS', 'preCreate level playlist text length:', String(text.length));
+              perf('HLS', 'preCreate level playlist first 200 chars:', text.slice(0, 200).replace(/\n/g, '|'));
               // Parse first segment URL from the m3u8 text
               const lines = text.split('\n');
               const segLine = lines.find(l => l.trim() && !l.startsWith('#'));
@@ -241,7 +247,9 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
                 fetch(segUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
               }
             })
-            .catch(() => {});
+            .catch(err => {
+              perf('HLS', 'preCreate level playlist fetch ERROR:', String(err).slice(0, 100));
+            });
         }
       }
 
