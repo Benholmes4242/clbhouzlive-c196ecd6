@@ -884,7 +884,7 @@ export function PostWizard({
                         border: '1px solid rgba(245,158,11,0.08)',
                         position: 'relative',
                         overflow: 'hidden',
-                        minHeight: '160px',
+                        minHeight: 160,
                       }}
                     >
                       {/* Shimmer animation overlay */}
@@ -965,15 +965,8 @@ export function PostWizard({
                   </p>
                 )}
 
-              </div>
-
-                {/* Flex spacer — absorbs dead space on tall screens, collapses to 0 when content overflows */}
-                <div className="flex-1 min-h-0" />
-
-                {/* Tag rows */}
-                <div className="px-4 pb-4">
-                  <div className="max-w-[680px] mx-auto">
-                    <div className="flex flex-col gap-3">
+                {/* Tag rows — inside the inner wrapper */}
+                <div className="flex flex-col gap-3 pb-4">
                   {/* Course Row */}
                   <button
                     onClick={() => { dismissCourseTooltip(); setShowCourseSearch(true); }}
@@ -1127,8 +1120,8 @@ export function PostWizard({
                     <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'hsl(var(--muted-foreground) / 0.3)' }} />
                   </button>
                 </div>
+
               </div>
-            </div>
             </div>
 
             {/* Change 5: Simplified Bottom Toolbar — 3 icons only */}
