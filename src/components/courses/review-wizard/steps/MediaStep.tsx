@@ -186,7 +186,7 @@ export function MediaStep({
 
       {/* Media content */}
       {media.length > 0 ? (
-        <div className="flex-1 flex flex-col min-h-0 px-4 pt-3">
+        <div className="flex-1 flex flex-col justify-center px-4">
           {/* Horizontal scrolling thumbnail strip */}
           <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
             {composerMedia.map((item, index) => (
@@ -234,11 +234,8 @@ export function MediaStep({
           </p>
         </div>
       ) : (
-        /* Empty state — dashed amber tile */
-        <div 
-          className="flex-1 flex flex-col items-center justify-center p-5"
-          style={{ background: 'transparent' }}
-        >
+        /* Empty state — amber canvas */
+        <div className="flex-1 flex flex-col items-center justify-center px-6">
           {permissionDenied ? (
             <PermissionDeniedCard
               type={permissionDenied}
@@ -249,7 +246,7 @@ export function MediaStep({
             />
           ) : (
             <motion.div 
-              className="w-full max-w-sm flex flex-col items-center"
+              className="w-full flex flex-col items-center flex-1"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
@@ -257,29 +254,46 @@ export function MediaStep({
               <button
                 onClick={handlePickMedia}
                 disabled={isPickerOpen}
-                className="w-full aspect-[16/10] rounded-2xl flex flex-col items-center justify-center gap-3 disabled:opacity-50"
+                className="w-full flex-1 rounded-[20px] flex flex-col items-center justify-center gap-3 relative overflow-hidden disabled:opacity-50 active:brightness-110"
                 style={{
-                  border: '2px dashed rgba(245, 158, 11, 0.3)',
-                  background: 'rgba(245, 158, 11, 0.02)',
+                  background: 'linear-gradient(145deg, rgba(245,158,11,0.03) 0%, rgba(245,158,11,0.08) 50%, rgba(245,158,11,0.03) 100%)',
+                  border: '1px solid rgba(245,158,11,0.08)',
+                  maxHeight: 400,
+                  minHeight: 200,
+                  transition: 'all 0.15s ease',
                 }}
               >
+                {/* Shimmer overlay */}
                 <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                  className="absolute inset-0 pointer-events-none"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(245,158,11,0.12), rgba(245,158,11,0.05))',
+                    background: 'linear-gradient(110deg, transparent 30%, rgba(245,158,11,0.04) 50%, transparent 70%)',
+                    animation: 'review-media-shimmer 6s ease-in-out infinite',
+                  }}
+                />
+
+                {/* Icon container */}
+                <div
+                  className="relative flex items-center justify-center"
+                  style={{
+                    width: 56, height: 56, borderRadius: 16,
+                    background: 'linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05))',
                   }}
                 >
                   {isPickerOpen ? (
-                    <Loader2 className="w-6 h-6 animate-spin" style={{ color: '#f59e0b' }} />
+                    <Loader2 className="w-7 h-7 animate-spin" style={{ color: '#f59e0b' }} />
                   ) : (
-                    <Images className="w-6 h-6" style={{ color: '#f59e0b' }} />
+                    <Images className="w-7 h-7" style={{ color: '#f59e0b' }} />
                   )}
                 </div>
-                <span className="text-sm font-semibold text-foreground">Add photo or video</span>
+
+                <span className="relative text-[15px] font-semibold text-foreground">
+                  Add photo or video
+                </span>
+                <span className="relative text-[13px] text-muted-foreground">
+                  Share up to {MAX_MEDIA_ITEMS} photos & videos
+                </span>
               </button>
-              <p className="text-xs text-muted-foreground/60 mt-3 text-center">
-                Share up to {MAX_MEDIA_ITEMS} photos & videos
-              </p>
             </motion.div>
           )}
         </div>
