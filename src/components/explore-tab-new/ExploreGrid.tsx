@@ -89,7 +89,7 @@ export default function ExploreGrid({
 
   return (
     <>
-      <div ref={gridRef} className="grid grid-cols-3 gap-[2px] px-[2px]">
+      <div ref={gridRef} className="grid grid-cols-2 gap-[2px] px-[2px]">
         {coursePosts.map((post, index) => {
           const tile = <ExploreTile key={post.id} post={post} index={index} />;
 
