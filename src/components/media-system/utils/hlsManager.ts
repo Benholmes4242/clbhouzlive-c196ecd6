@@ -210,18 +210,21 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
     hls.once((Hls as any).Events.MANIFEST_PARSED, (_event: unknown, data: any) => {
       // Force lowest quality for fast first segment
       hls.currentLevel = 0;
+      hls.startLoad(); // ensure level playlist fetch begins immediately
 
       // Pre-warm: fetch first segment so the SW caches it before ACTIVATE
       const level = data.levels?.[0];
       if (level?.details?.fragments?.length > 0) {
         const segUrl = level.details.fragments[0].url;
         if (segUrl) {
+          perf('HLS', 'preCreate pre-warm path: MANIFEST_PARSED direct fired', hlsUrl.slice(-50));
           perf('HLS', 'preCreate first seg pre-warm url:', segUrl.slice(-50));
           fetch(segUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
         }
       } else {
         // details may not be loaded yet — listen for LEVEL_LOADED
         hls.once((Hls as any).Events.LEVEL_LOADED, (_e: unknown, d: any) => {
+          perf('HLS', 'preCreate pre-warm path: LEVEL_LOADED fallback fired', hlsUrl.slice(-50));
           const frag = d.details?.fragments?.[0];
           if (frag?.url) {
             perf('HLS', 'preCreate first seg pre-warm url:', frag.url.slice(-50));
@@ -230,7 +233,6 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
         });
       }
 
-      perf('HLS', 'preCreate MANIFEST_PARSED, first seg pre-warm fired', hlsUrl.slice(-50));
       resolve();
     });
 
