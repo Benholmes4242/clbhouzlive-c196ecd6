@@ -6,12 +6,17 @@ const AUTOPLAY_THRESHOLD = 0.5;
 
 const isDesignatedTile = (idx: number) => {
   const row = Math.floor(idx / 3);
-  const col = idx % 3;
-  return row % 2 === 0 && col !== 1; // even rows, left & right columns only
+  const rowMod = row % 4;
+  if (rowMod === 0) return idx % 3 === 0; // left col only
+  if (rowMod === 2) return idx % 3 === 2; // right col only
+  return false;
 };
 const slotForTile = (idx: number) => {
-  const col = idx % 3;
-  return col === 0 ? 0 : col === 2 ? 1 : -1;
+  const row = Math.floor(idx / 3);
+  const rowMod = row % 4;
+  if (rowMod === 0) return 0;
+  if (rowMod === 2) return 1;
+  return -1;
 };
 
 const perf = (tag: string, ...args: any[]) => {
