@@ -166,3 +166,10 @@
   width: 40px;
   height: 40px;
 }
+
+/* Shimmer animation for review media empty state */
+@keyframes review-media-shimmer {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
