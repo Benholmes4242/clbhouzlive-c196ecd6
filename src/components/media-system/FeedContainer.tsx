@@ -12,7 +12,7 @@ import { FeedItem } from './FeedItem';
 import { PullToRefresh } from './PullToRefresh';
 import { useMediaStore } from './store/mediaStore';
 import { useVideoPoolContext } from './VideoPoolProvider';
-import { animateSpring, type SpringConfig } from './utils/spring';
+import { flingSpring, SPRING_CONFIGS } from './utils/spring';
 import { usePreloader, preloadByUrl } from './hooks/usePreloader';
 import type { FeedPost } from './types/media';
 import { haptic } from '@/utils/haptics';
@@ -21,9 +21,6 @@ const perf = (tag: string, ...args: any[]) => {
   console.log(`[PERF:${tag}] ${Date.now() % 100000}`, ...args);
 };
 
-
-// TikTok-feel: fast and crisp, no bounce (~200-250ms settle)
-const SNAP_SPRING: Partial<SpringConfig> = { tension: 400, friction: 35, precision: 0.5 };
 
 const FLING_VELOCITY_THRESHOLD = 0.4;   // px/ms — above this = fling
 const RUBBER_BAND_FACTOR = 0.35;
@@ -142,11 +139,13 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     return () => el.removeEventListener('touchend', onTouchEnd);
   }, [posts, pool]);
 
-  // Track whether early activation already fired during this drag
-  const earlyActivatedRef = useRef(false);
+  // ── Fix 10: prefers-reduced-motion ──
+  const prefersReducedMotion = useMemo(() => {
+    return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }, []);
 
-  // ── Navigate to index — fast spring with immediate activation ──
-  const goToIndex = useCallback((index: number, _velocity: number = 0) => {
+  // ── Navigate to index ──
+  const goToIndex = useCallback((index: number, velocity: number = 0) => {
     const clamped = Math.max(0, Math.min(posts.length - 1, index));
     const targetY = -clamped * itemHeight;
 
@@ -155,28 +154,39 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     lastRenderedPull.current = 0;
     setPullDistance(0);
 
-    // Preload if not already early-activated
-    if (clamped !== activeIndexRef.current && !earlyActivatedRef.current) {
+    // ── FIX 2: Start preloading target IMMEDIATELY (before spring) ──
+    if (clamped !== activeIndexRef.current) {
       const targetPost = posts[clamped];
       const targetUrl = targetPost?.mediaItems[0]?.hlsUrl;
       perf('SWIPE', 'preload target:', clamped, 'url:', targetUrl?.slice(-50));
       preloadByUrl(targetUrl);
     }
 
-    // Fire setActiveIndex IMMEDIATELY (before spring) so VideoPlayer activates in parallel
-    if (clamped !== activeIndexRef.current || !earlyActivatedRef.current) {
+    // Instant snap for reduced-motion users
+    if (prefersReducedMotion) {
+      offsetRef.current = targetY;
+      if (trackRef.current) {
+        trackRef.current.style.transform = `translateY(${targetY}px)`;
+      }
+      setOffsetY(targetY);
       activeIndexRef.current = clamped;
-      perf('SWIPE', 'setActiveIndex:', clamped, '(at spring START)');
       setActiveIndex(clamped);
+      useMediaStore.getState().setCarouselPosition(clamped, 0);
+      if (clamped >= posts.length - 3 && posts.length > 0) {
+        onNearEnd?.();
+      }
+      return;
     }
 
-    // Animate with fast clamped spring — settles in ~200-250ms
-    const fromY = offsetRef.current;
-    perf('SWIPE', 'spring START from:', fromY, 'to:', targetY);
-    const cancel = animateSpring(
-      fromY,
+    const config = Math.abs(velocity) > FLING_VELOCITY_THRESHOLD
+      ? SPRING_CONFIGS.fling
+      : SPRING_CONFIGS.snap;
+
+    cancelSpring.current = flingSpring(
+      offsetRef.current,
       targetY,
-      SNAP_SPRING,
+      velocity * 1000,
+      config,
       (value) => {
         offsetRef.current = value;
         if (trackRef.current) {
@@ -184,9 +194,13 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
         }
       },
       () => {
-        // Spring settled — sync React state
-        perf('SWIPE', 'spring SETTLED at:', targetY);
+        perf('SWIPE', 'SETTLED at:', clamped);
+        offsetRef.current = targetY;
         setOffsetY(targetY);
+        const prevIdx = activeIndexRef.current;
+        activeIndexRef.current = clamped;
+        perf('SWIPE', 'setActiveIndex:', clamped);
+        setActiveIndex(clamped);
         useMediaStore.getState().setCarouselPosition(clamped, 0);
         haptic('light');
 
@@ -195,8 +209,7 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
         }
       }
     );
-    cancelSpring.current = cancel;
-  }, [posts, itemHeight, setActiveIndex, onNearEnd]);
+  }, [posts, itemHeight, setActiveIndex, onNearEnd, prefersReducedMotion]);
 
   // ── Velocity from tracker ──
   const calculateVelocity = (): number => {
@@ -214,7 +227,6 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     cancelSpring.current?.();
     isDragging.current = true;
     isRefreshTriggered.current = false;
-    earlyActivatedRef.current = false;
     touchStartRef.current = { y: clientY, time: Date.now(), offsetY: offsetRef.current };
     velocityTracker.current = [{ y: clientY, time: Date.now() }];
   }, []);
@@ -265,32 +277,9 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
       trackRef.current.style.transform = `translateY(${newOffset}px)`;
     }
 
-    // ── Early activation at 30% drag threshold ──
-    if (!earlyActivatedRef.current) {
-      const dragRatio = Math.abs(deltaY) / itemHeight;
-      if (dragRatio >= 0.3) {
-        const currentIndex = activeIndexRef.current;
-        let earlyTarget = currentIndex;
-        if (deltaY < 0 && currentIndex < posts.length - 1) {
-          earlyTarget = currentIndex + 1;
-        } else if (deltaY > 0 && currentIndex > 0) {
-          earlyTarget = currentIndex - 1;
-        }
-        if (earlyTarget !== currentIndex) {
-          earlyActivatedRef.current = true;
-          const targetPost = posts[earlyTarget];
-          const targetUrl = targetPost?.mediaItems[0]?.hlsUrl;
-          perf('SWIPE', 'EARLY activate at 30%:', earlyTarget, 'url:', targetUrl?.slice(-50));
-          preloadByUrl(targetUrl);
-          setActiveIndex(earlyTarget);
-          activeIndexRef.current = earlyTarget;
-        }
-      }
-    }
-
     velocityTracker.current.push({ y: clientY, time: Date.now() });
     if (velocityTracker.current.length > 5) velocityTracker.current.shift();
-  }, [posts.length, itemHeight, onRefresh, setActiveIndex]);
+  }, [posts.length, itemHeight, onRefresh]);
 
   const endDrag = useCallback(() => {
     if (!isDragging.current) return;
