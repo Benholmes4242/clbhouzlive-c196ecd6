@@ -207,8 +207,30 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
 
   // Wait for MANIFEST_PARSED so the instance is truly ready for instant promotion
   return new Promise<void>((resolve) => {
-    hls.on((Hls as any).Events.MANIFEST_PARSED, () => {
-      perf('HLS', 'preCreate MANIFEST_PARSED url:', hlsUrl.slice(-50));
+    hls.once((Hls as any).Events.MANIFEST_PARSED, (_event: unknown, data: any) => {
+      // Force lowest quality for fast first segment
+      hls.currentLevel = 0;
+
+      // Pre-warm: fetch first segment so the SW caches it before ACTIVATE
+      const level = data.levels?.[0];
+      if (level?.details?.fragments?.length > 0) {
+        const segUrl = level.details.fragments[0].url;
+        if (segUrl) {
+          perf('HLS', 'preCreate first seg pre-warm url:', segUrl.slice(-50));
+          fetch(segUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
+        }
+      } else {
+        // details may not be loaded yet — listen for LEVEL_LOADED
+        hls.once((Hls as any).Events.LEVEL_LOADED, (_e: unknown, d: any) => {
+          const frag = d.details?.fragments?.[0];
+          if (frag?.url) {
+            perf('HLS', 'preCreate first seg pre-warm url:', frag.url.slice(-50));
+            fetch(frag.url, { mode: 'cors', credentials: 'omit' }).catch(() => {});
+          }
+        });
+      }
+
+      perf('HLS', 'preCreate MANIFEST_PARSED, first seg pre-warm fired', hlsUrl.slice(-50));
       resolve();
     });
 
