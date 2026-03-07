@@ -186,12 +186,16 @@ export function destroyAll(): void {
 }
 
 // ── Pre-created instances (for preloader) ──────────────────────────────
-const preCreatedInstances = new Map<string, InstanceType<typeof HlsType>>();
+interface PreCreatedEntry {
+  hls: InstanceType<typeof HlsType>;
+  dummyVideo: HTMLVideoElement;
+}
+const preCreatedInstances = new Map<string, PreCreatedEntry>();
 
 /**
- * Pre-create an HLS instance and load the source without attaching to
- * a video element. When the item becomes active we "promote" the instance
- * for near-instant playback.
+ * Pre-create an HLS instance, attach to a hidden dummy video so HLS.js
+ * actually buffers the first segment. On promote we detach from dummy
+ * and re-attach to the real pool element for near-instant playback.
  */
 export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
   if (preCreatedInstances.has(hlsUrl)) {
@@ -205,10 +209,18 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
   perf('HLS', 'preCreate START url:', hlsUrl.slice(-50));
   const hls = new (Hls as any)(getHlsConfig()) as InstanceType<typeof HlsType>;
 
-  // Wait for MANIFEST_PARSED so the instance is truly ready for instant promotion
+  // Create hidden dummy video for segment buffering
+  const dummyVideo = document.createElement('video');
+  dummyVideo.muted = true;
+  dummyVideo.playsInline = true;
+  dummyVideo.preload = 'auto';
+  // Don't append to DOM — stays offscreen
+
   return new Promise<void>((resolve) => {
     hls.on((Hls as any).Events.MANIFEST_PARSED, () => {
       perf('HLS', 'preCreate MANIFEST_PARSED url:', hlsUrl.slice(-50));
+      // Force lowest quality for preload to speed up segment fetch
+      hls.currentLevel = 0;
       resolve();
     });
 
@@ -218,28 +230,31 @@ export async function preCreateHlsInstance(hlsUrl: string): Promise<void> {
         preCreatedInstances.delete(hlsUrl);
         perf('HLS', 'preCreated MAP DELETE key:', hlsUrl, 'mapSize:', preCreatedInstances.size);
         try { hls.destroy(); } catch { /* ignore */ }
-        resolve(); // resolve anyway to not block
+        resolve();
       }
     });
 
     hls.loadSource(hlsUrl);
-    preCreatedInstances.set(hlsUrl, hls);
+    hls.attachMedia(dummyVideo); // Triggers actual segment downloads!
+    perf('HLS', 'preCreate ATTACHED to dummy, buffering...', hlsUrl.slice(-50));
+
+    preCreatedInstances.set(hlsUrl, { hls, dummyVideo });
     perf('HLS', 'preCreated MAP ADD key:', hlsUrl, 'mapSize:', preCreatedInstances.size);
 
-    // Safety timeout — don't wait forever
+    // Safety timeout
     setTimeout(() => resolve(), 5000);
   });
 }
 
 /**
  * Destroy pre-created instances whose URLs are NOT in the keepUrls set.
- * Called when activeIndex changes to clean up stale preloads.
  */
 export function destroyStalePreCreated(keepUrls: Set<string>): void {
-  for (const [url, hls] of preCreatedInstances) {
+  for (const [url, entry] of preCreatedInstances) {
     if (!keepUrls.has(url)) {
       perf('HLS', 'preCreate DESTROY stale url:', url.slice(-50));
-      try { hls.destroy(); } catch { /* ignore */ }
+      try { entry.hls.destroy(); } catch { /* ignore */ }
+      entry.dummyVideo.removeAttribute('src');
       preCreatedInstances.delete(url);
       perf('HLS', 'preCreated MAP DELETE key:', url, 'mapSize:', preCreatedInstances.size);
     }
@@ -247,8 +262,9 @@ export function destroyStalePreCreated(keepUrls: Set<string>): void {
 }
 
 /**
- * Promote a pre-created HLS instance by attaching it to a video element.
- * Returns the instance if promotion succeeded, null otherwise.
+ * Promote a pre-created HLS instance by detaching from its dummy video
+ * and re-attaching to the real pool video element.
+ * Segments already buffered on the dummy carry over via the HLS instance.
  */
 export function promotePreCreated(
   hlsUrl: string,
@@ -256,12 +272,13 @@ export function promotePreCreated(
   onError?: (type: string, details: string) => void
 ): InstanceType<typeof HlsType> | null {
   perf('HLS', 'promotePreCreated START url:', hlsUrl.slice(-50), 'preCreatedKeys:', [...preCreatedInstances.keys()].map(k => k.slice(-50)));
-  const hls = preCreatedInstances.get(hlsUrl);
-  if (!hls) {
+  const entry = preCreatedInstances.get(hlsUrl);
+  if (!entry) {
     perf('HLS', 'promotePreCreated result:', false);
     return null;
   }
 
+  const { hls, dummyVideo } = entry;
   preCreatedInstances.delete(hlsUrl);
   perf('HLS', 'preCreated MAP DELETE key:', hlsUrl, 'mapSize:', preCreatedInstances.size);
   hlsInstances.set(video, hls);
@@ -274,15 +291,31 @@ export function promotePreCreated(
     });
   }
 
+  // Detach from dummy, attach to real video — segments stay in HLS buffer
+  hls.detachMedia();
   hls.attachMedia(video);
+  perf('HLS', 'promote: detached dummy, attached real, readyState:', video.readyState);
+
+  // Clean up dummy
+  dummyVideo.removeAttribute('src');
+
+  // Log readyState after attach settles
+  const checkReady = () => {
+    const buffered = video.buffered.length > 0 ? video.buffered.end(0) : 0;
+    perf('HLS', 'promote: real video readyState:', video.readyState, 'buffered:', buffered);
+  };
+  video.addEventListener('loadeddata', checkReady, { once: true });
+  setTimeout(checkReady, 100); // fallback check
+
   perf('HLS', 'promotePreCreated result:', true);
   return hls;
 }
 
 /** Destroy all pre-created instances. */
 export function destroyPreCreated(): void {
-  preCreatedInstances.forEach((hls, url) => {
-    try { hls.destroy(); } catch { /* ignore */ }
+  preCreatedInstances.forEach((entry, url) => {
+    try { entry.hls.destroy(); } catch { /* ignore */ }
+    entry.dummyVideo.removeAttribute('src');
     preCreatedInstances.delete(url);
     perf('HLS', 'preCreated MAP DELETE key:', url, 'mapSize:', preCreatedInstances.size);
   });

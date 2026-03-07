@@ -12,7 +12,7 @@ import { FeedItem } from './FeedItem';
 import { PullToRefresh } from './PullToRefresh';
 import { useMediaStore } from './store/mediaStore';
 import { useVideoPoolContext } from './VideoPoolProvider';
-// spring utils no longer used — instant snap replaces spring animation
+import { animateSpring, type SpringConfig } from './utils/spring';
 import { usePreloader, preloadByUrl } from './hooks/usePreloader';
 import type { FeedPost } from './types/media';
 import { haptic } from '@/utils/haptics';
@@ -21,6 +21,9 @@ const perf = (tag: string, ...args: any[]) => {
   console.log(`[PERF:${tag}] ${Date.now() % 100000}`, ...args);
 };
 
+
+// TikTok-feel: fast and crisp, no bounce (~200-250ms settle)
+const SNAP_SPRING: Partial<SpringConfig> = { tension: 400, friction: 35, precision: 0.5 };
 
 const FLING_VELOCITY_THRESHOLD = 0.4;   // px/ms — above this = fling
 const RUBBER_BAND_FACTOR = 0.35;
@@ -139,12 +142,10 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     return () => el.removeEventListener('touchend', onTouchEnd);
   }, [posts, pool]);
 
-  // prefersReducedMotion no longer needed — all transitions are instant
-
   // Track whether early activation already fired during this drag
   const earlyActivatedRef = useRef(false);
 
-  // ── Navigate to index — INSTANT SNAP (no spring animation) ──
+  // ── Navigate to index — fast spring with immediate activation ──
   const goToIndex = useCallback((index: number, _velocity: number = 0) => {
     const clamped = Math.max(0, Math.min(posts.length - 1, index));
     const targetY = -clamped * itemHeight;
@@ -162,22 +163,39 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
       preloadByUrl(targetUrl);
     }
 
-    // Instant snap — no spring, no animation
-    perf('SWIPE', 'INSTANT SNAP to:', clamped);
-    offsetRef.current = targetY;
-    if (trackRef.current) {
-      trackRef.current.style.transform = `translateY(${targetY}px)`;
+    // Fire setActiveIndex IMMEDIATELY (before spring) so VideoPlayer activates in parallel
+    if (clamped !== activeIndexRef.current || !earlyActivatedRef.current) {
+      activeIndexRef.current = clamped;
+      perf('SWIPE', 'setActiveIndex:', clamped, '(at spring START)');
+      setActiveIndex(clamped);
     }
-    setOffsetY(targetY);
-    activeIndexRef.current = clamped;
-    perf('SWIPE', 'setActiveIndex:', clamped);
-    setActiveIndex(clamped);
-    useMediaStore.getState().setCarouselPosition(clamped, 0);
-    haptic('light');
 
-    if (clamped >= posts.length - 3 && posts.length > 0) {
-      onNearEnd?.();
-    }
+    // Animate with fast clamped spring — settles in ~200-250ms
+    const fromY = offsetRef.current;
+    perf('SWIPE', 'spring START from:', fromY, 'to:', targetY);
+    const cancel = animateSpring(
+      fromY,
+      targetY,
+      SNAP_SPRING,
+      (value) => {
+        offsetRef.current = value;
+        if (trackRef.current) {
+          trackRef.current.style.transform = `translateY(${value}px)`;
+        }
+      },
+      () => {
+        // Spring settled — sync React state
+        perf('SWIPE', 'spring SETTLED at:', targetY);
+        setOffsetY(targetY);
+        useMediaStore.getState().setCarouselPosition(clamped, 0);
+        haptic('light');
+
+        if (clamped >= posts.length - 3 && posts.length > 0) {
+          onNearEnd?.();
+        }
+      }
+    );
+    cancelSpring.current = cancel;
   }, [posts, itemHeight, setActiveIndex, onNearEnd]);
 
   // ── Velocity from tracker ──
