@@ -26,6 +26,47 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     return type === '2g' || type === 'slow-2g';
   }, []);
 
+  const prewarmTile = useCallback(async (hlsUrl: string, tileIdx: number) => {
+    try {
+      const masterText = await fetch(hlsUrl, { mode: 'cors', credentials: 'omit' }).then(r => r.text());
+      const masterLines = masterText.split('\n');
+      const streamIdx = masterLines.findIndex(l => l.startsWith('#EXT-X-STREAM-INF'));
+      const levelRelUrl = streamIdx >= 0 ? masterLines[streamIdx + 1]?.trim() : null;
+      if (!levelRelUrl || levelRelUrl.startsWith('#')) return;
+      const masterBase = hlsUrl.substring(0, hlsUrl.lastIndexOf('/') + 1);
+      const levelUrl = levelRelUrl.startsWith('http')
+        ? levelRelUrl
+        : new URL(levelRelUrl, masterBase).href;
+
+      const levelText = await fetch(levelUrl, { mode: 'cors', credentials: 'omit' }).then(r => r.text());
+      const lines = levelText.split('\n');
+      const base = levelUrl.substring(0, levelUrl.lastIndexOf('/') + 1);
+
+      // Pre-warm init segment
+      const mapLine = lines.find(l => l.startsWith('#EXT-X-MAP:URI="'));
+      if (mapLine) {
+        const mapUri = mapLine.match(/#EXT-X-MAP:URI="([^"]+)"/)?.[1];
+        if (mapUri) {
+          const initUrl = mapUri.startsWith('http') ? mapUri : new URL(mapUri, base).href;
+          perf('WATCH', 'pre-warm init tileIndex:', tileIdx, initUrl.slice(-40));
+          fetch(initUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
+        }
+      }
+
+      // Pre-warm first media segment
+      const segLine = lines.find(l => l.trim() && !l.startsWith('#'));
+      if (segLine) {
+        const segUrl = segLine.trim().startsWith('http')
+          ? segLine.trim()
+          : new URL(segLine.trim(), base).href;
+        perf('WATCH', 'pre-warm seg tileIndex:', tileIdx, segUrl.slice(-40));
+        fetch(segUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
+      }
+    } catch {
+      // silent
+    }
+  }, []);
+
   // Create persistent video pool
   useEffect(() => {
     if (isSlowNetwork()) return;
@@ -60,6 +101,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     tileEl.appendChild(video);
 
     const { default: Hls } = await import('hls.js');
+    const { createCachedLoader } = await import('@/components/media-system/utils/cachedHlsLoader');
     if (assignedTileRef.current[slot] !== tileIdx) return; // slot reassigned during async gap
 
     if (!Hls.isSupported()) {
@@ -73,6 +115,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       maxBufferLength: 5,
       maxMaxBufferLength: 10,
       enableWorker: true,
+      loader: createCachedLoader(Hls),
     });
     hlsPoolRef.current[slot] = hls;
     hls.loadSource(hlsUrl);
@@ -259,6 +302,38 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       ratioMapRef.current.clear();
     };
   }, [posts, gridRef, isSlowNetwork, reconcilePool, detachSlot]);
+
+  // Pre-warm observer — fetch manifests + first segments before tiles enter viewport
+  useEffect(() => {
+    if (isSlowNetwork()) return;
+    const grid = gridRef.current;
+    if (!grid || posts.length === 0) return;
+
+    const prewarmedSet = new Set<number>();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const el = entry.target as HTMLElement;
+          const idx = Number(el.dataset.watchIndex);
+          if (isNaN(idx) || prewarmedSet.has(idx)) continue;
+          const post = postsRef.current[idx];
+          const hlsUrl = post?.mediaItems?.[0]?.hlsUrl;
+          if (!hlsUrl) continue;
+          prewarmedSet.add(idx);
+          perf('WATCH', 'pre-warm START tileIndex:', idx);
+          prewarmTile(hlsUrl, idx);
+        }
+      },
+      { rootMargin: '800px' }
+    );
+
+    const tiles = grid.querySelectorAll('[data-watch-index]');
+    tiles.forEach(tile => observer.observe(tile));
+
+    return () => observer.disconnect();
+  }, [posts, gridRef, isSlowNetwork, prewarmTile]);
 
   return null;
 };
