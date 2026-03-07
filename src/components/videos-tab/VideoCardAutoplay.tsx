@@ -1,5 +1,9 @@
 import { useEffect, useRef, useCallback } from 'react';
 
+const perf = (tag: string, ...args: any[]) => {
+  console.log(`[PERF:${tag}] ${Date.now() % 100000}`, ...args);
+};
+
 // Module-level single-player tracker — NOT React state/context
 let activeAutoplayRef: { pause: () => void } | null = null;
 
@@ -7,9 +11,10 @@ interface VideoCardAutoplayProps {
   hlsUrl: string;
   posterUrl: string;
   isEligible: boolean;
+  cardIndex: number;
 }
 
-export function VideoCardAutoplay({ hlsUrl, posterUrl, isEligible }: VideoCardAutoplayProps) {
+export function VideoCardAutoplay({ hlsUrl, posterUrl, isEligible, cardIndex }: VideoCardAutoplayProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsRef = useRef<any>(null);
@@ -52,6 +57,7 @@ export function VideoCardAutoplay({ hlsUrl, posterUrl, isEligible }: VideoCardAu
 
     try {
       const { default: Hls } = await import('hls.js');
+      const { createCachedLoader } = await import('@/components/media-system/utils/cachedHlsLoader');
 
       // Check if component unmounted during import
       if (!videoRef.current) return;
@@ -62,23 +68,29 @@ export function VideoCardAutoplay({ hlsUrl, posterUrl, isEligible }: VideoCardAu
           maxBufferLength: 8,
           maxMaxBufferLength: 15,
           enableWorker: true,
+          loader: createCachedLoader(Hls),
         });
         hlsRef.current = hls;
 
         hls.loadSource(hlsUrl);
         hls.attachMedia(video);
+        perf('VIDEOS', 'ATTACH tileIndex:', cardIndex, hlsUrl.slice(-30));
 
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          perf('VIDEOS', 'MANIFEST_PARSED tileIndex:', cardIndex);
           hls.currentLevel = 0;
+          perf('VIDEOS', '<<< PLAYING tileIndex:', cardIndex);
           video.play().catch((e) => console.warn('[VideoCardAutoplay] play() rejected:', e.message));
         });
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         // Safari native HLS
         video.src = hlsUrl;
+        perf('VIDEOS', '<<< PLAYING tileIndex:', cardIndex);
         video.play().catch((e) => console.warn('[VideoCardAutoplay] play() rejected:', e.message));
       }
 
       video.addEventListener('canplay', () => {
+        perf('VIDEOS', 'CAN PLAY tileIndex:', cardIndex, 'readyState:', video.readyState);
         if (posterOverlayRef.current) {
           posterOverlayRef.current.style.opacity = '0';
         }
@@ -89,7 +101,7 @@ export function VideoCardAutoplay({ hlsUrl, posterUrl, isEligible }: VideoCardAu
     } catch {
       // hls.js import failed — silent fail, poster stays
     }
-  }, [hlsUrl, pause]);
+  }, [hlsUrl, pause, cardIndex]);
 
   useEffect(() => {
     if (!isEligible || !containerRef.current) {

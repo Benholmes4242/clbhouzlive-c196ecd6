@@ -14,6 +14,7 @@ interface VideoCardProps {
   post: FeedPost;
   isAutoplayEligible?: boolean;
   userId?: string;
+  cardIndex?: number;
 }
 
 function formatCompact(n: number): string {
@@ -32,7 +33,7 @@ function formatVideoDuration(totalSeconds: number): string {
   return `${m}:${pad(sec)}`;
 }
 
-export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligible = false, userId }: VideoCardProps) {
+export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligible = false, userId, cardIndex = 0 }: VideoCardProps) {
   const navigate = useNavigate();
   const firstVideo = post.mediaItems.find(m => m.type === 'video');
   const thumbnailUrl = firstVideo?.thumbnailUrl || '';
@@ -192,6 +193,7 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
               hlsUrl={hlsUrl}
               posterUrl={thumbnailUrl}
               isEligible={isAutoplayEligible}
+              cardIndex={cardIndex}
             />
           )}
           {duration > 0 && (
