@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { GolferAvatar } from '@/components/golfers/GolferAvatar';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
