@@ -24,7 +24,6 @@ async function prewarmVideo(hlsUrl: string, idx: number) {
       const mapUri = mapLine.match(/#EXT-X-MAP:URI="([^"]+)"/)?.[1];
       if (mapUri) {
         const initUrl = mapUri.startsWith('http') ? mapUri : new URL(mapUri, base).href;
-        console.log(`[PERF:VIDEOS] pre-warm init tileIndex: ${idx}`);
         fetch(initUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
       }
     }
@@ -32,7 +31,6 @@ async function prewarmVideo(hlsUrl: string, idx: number) {
     const segLine = lines.find(l => l.trim() && !l.startsWith('#'));
     if (segLine) {
       const segUrl = segLine.trim().startsWith('http') ? segLine.trim() : new URL(segLine.trim(), base).href;
-      console.log(`[PERF:VIDEOS] pre-warm seg tileIndex: ${idx}`);
       fetch(segUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
     }
   } catch {
@@ -132,7 +130,6 @@ export function VideosFeed({
       const hlsUrl = posts[i]?.mediaItems?.[0]?.hlsUrl;
       if (!hlsUrl) continue;
       prewarmedSetRef.current.add(i);
-      console.log(`[PERF:VIDEOS] pre-warm START tileIndex: ${i}`);
       prewarmVideo(hlsUrl, i);
     }
   }, [centerIndex, posts]);
