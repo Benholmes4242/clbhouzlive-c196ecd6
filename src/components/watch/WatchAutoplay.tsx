@@ -20,6 +20,8 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
   const videoPoolRef = useRef<HTMLVideoElement[]>([]);
   const hlsPoolRef = useRef<(any | null)[]>([null, null]);
   const activeMapRef = useRef<Map<number, number>>(new Map()); // slot → tileIdx
+  const prewarmObserverRef = useRef<IntersectionObserver | null>(null);
+  const autoplayObserverRef = useRef<IntersectionObserver | null>(null);
   const postsRef = useRef<FeedPost[]>(posts);
   postsRef.current = posts;
 
@@ -163,7 +165,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
   const detachSlot = useCallback((slot: number) => {
     const currentTile = activeMapRef.current.get(slot);
     perf('WATCH', 'DETACH slot:', slot, 'tileIndex:', currentTile);
-    if (currentTile === undefined) return;
+    if (currentTile === undefined || activeMapRef.current.get(slot) !== currentTile) return;
 
     const video = videoPoolRef.current[slot];
     if (!video) return;
@@ -214,7 +216,6 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
           const el = entry.target as HTMLElement;
           const idx = Number(el.dataset.watchIndex);
           if (isNaN(idx) || !isDesignatedTile(idx)) continue;
-
           const slot = slotForTile(idx);
           const post = postsRef.current[idx];
           const hlsUrl = post?.mediaItems?.[0]?.hlsUrl;
@@ -224,8 +225,8 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
             // attach if not already
             if (activeMap.get(slot) !== idx) {
               perf('WATCH', 'ATTACH START tileIndex:', idx, 'slot:', slot, 'ratio:', entry.intersectionRatio);
-              detachSlot(slot);
-              activeMap.set(slot, idx);
+              activeMap.set(slot, idx);    // claim slot first
+              detachSlot(slot);             // detach previous (won't wipe new entry)
               attachToTile(slot, idx, hlsUrl, el);
             }
           } else {
@@ -238,6 +239,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       },
       { threshold: [0, AUTOPLAY_THRESHOLD] }
     );
+    autoplayObserverRef.current = observer;
 
     const timer = setTimeout(() => {
       const tiles = grid.querySelectorAll('[data-watch-index]');
@@ -247,6 +249,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     return () => {
       clearTimeout(timer);
       observer.disconnect();
+      autoplayObserverRef.current = null;
       for (let slot = 0; slot < VIDEO_POOL_SIZE; slot++) {
         hlsPoolRef.current[slot]?.destroy();
         hlsPoolRef.current[slot] = null;
@@ -285,6 +288,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       },
       { rootMargin: '800px' }
     );
+    prewarmObserverRef.current = observer;
 
     // Defer to next tick so tiles are in DOM
     const timer = setTimeout(() => {
@@ -295,8 +299,22 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     return () => {
       clearTimeout(timer);
       observer.disconnect();
+      prewarmObserverRef.current = null;
     };
   }, [posts, gridRef, isSlowNetwork, prewarmTile]);
+
+  // Re-observe new tiles as infinite scroll loads
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+    const tiles = grid.querySelectorAll('[data-watch-index]');
+    if (prewarmObserverRef.current) {
+      tiles.forEach(tile => prewarmObserverRef.current!.observe(tile));
+    }
+    if (autoplayObserverRef.current) {
+      tiles.forEach(tile => autoplayObserverRef.current!.observe(tile));
+    }
+  }, [posts.length, gridRef]);
 
   return null;
 };
