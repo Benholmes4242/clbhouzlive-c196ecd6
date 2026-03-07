@@ -252,8 +252,6 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
 
         // Attach to best eligible if >=60% visible and different from current
         if (bestIdx >= 0 && bestRatio >= 0.6 && bestIdx !== currentIndexRef.current) {
-          detach();
-
           const tile = grid.querySelector(`[data-explore-index="${bestIdx}"]`) as HTMLElement | null;
           const post = posts[bestIdx];
           const eligibleMedia = post?.mediaItems?.[0];
