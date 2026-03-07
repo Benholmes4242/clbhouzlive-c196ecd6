@@ -19,10 +19,6 @@ const slotForTile = (idx: number) => {
   return -1;
 };
 
-const perf = (tag: string, ...args: any[]) => {
-  console.log(`[PERF:${tag}] ${Date.now() % 100000}`, ...args);
-};
-
 interface WatchAutoplayProps {
   posts: FeedPost[];
   gridRef: React.RefObject<HTMLDivElement>;
@@ -31,7 +27,7 @@ interface WatchAutoplayProps {
 const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
   const videoPoolRef = useRef<HTMLVideoElement[]>([]);
   const hlsPoolRef = useRef<(any | null)[]>([null, null]);
-  const activeMapRef = useRef<Map<number, number>>(new Map()); // slot → tileIdx
+  const activeMapRef = useRef<Map<number, number>>(new Map());
   const prewarmObserverRef = useRef<IntersectionObserver | null>(null);
   const autoplayObserverRef = useRef<IntersectionObserver | null>(null);
   const observedTilesRef = useRef<Set<number>>(new Set());
@@ -61,24 +57,20 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       const lines = levelText.split('\n');
       const base = levelUrl.substring(0, levelUrl.lastIndexOf('/') + 1);
 
-      // Pre-warm init segment
       const mapLine = lines.find(l => l.startsWith('#EXT-X-MAP:URI="'));
       if (mapLine) {
         const mapUri = mapLine.match(/#EXT-X-MAP:URI="([^"]+)"/)?.[1];
         if (mapUri) {
           const initUrl = mapUri.startsWith('http') ? mapUri : new URL(mapUri, base).href;
-          perf('WATCH', 'pre-warm init tileIndex:', tileIdx, initUrl.slice(-40));
           fetch(initUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
         }
       }
 
-      // Pre-warm first media segment
       const segLine = lines.find(l => l.trim() && !l.startsWith('#'));
       if (segLine) {
         const segUrl = segLine.trim().startsWith('http')
           ? segLine.trim()
           : new URL(segLine.trim(), base).href;
-        perf('WATCH', 'pre-warm seg tileIndex:', tileIdx, segUrl.slice(-40));
         fetch(segUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
       }
     } catch {
@@ -120,7 +112,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     tileEl.appendChild(video);
 
     const { default: Hls } = await import('hls.js');
-    if (activeMapRef.current.get(slot) !== tileIdx) return; // slot reassigned during async gap
+    if (activeMapRef.current.get(slot) !== tileIdx) return;
 
     if (!Hls.isSupported()) {
       video.src = hlsUrl;
@@ -142,7 +134,6 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       hls.currentLevel = 0;
       // @ts-ignore
       hls.autoLevelEnabled = false;
-      perf('WATCH', 'PLAY ATTEMPT tileIndex:', tileIdx, 'slot:', slot, 'readyState:', video.readyState);
       video.play().catch(() => {});
     });
 
@@ -150,9 +141,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       video.removeEventListener('playing', (video as any)._onPlaying);
       (video as any)._onPlaying = null;
     }
-    const onPlaying = () => {
-      perf('WATCH', '<<< PLAYING tileIndex:', tileIdx, 'slot:', slot);
-    };
+    const onPlaying = () => {};
     (video as any)._onPlaying = onPlaying;
     video.addEventListener('playing', onPlaying, { once: true });
 
@@ -161,7 +150,6 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       (video as any)._onCanPlay = null;
     }
     const onCanPlay = () => {
-      perf('WATCH', 'CAN PLAY tileIndex:', tileIdx, 'readyState:', video.readyState);
       const poster = tileEl.querySelector('img');
       if (poster) {
         poster.style.transition = 'opacity 200ms ease';
@@ -176,13 +164,11 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
   }, [isSlowNetwork]);
 
   const detachSlot = useCallback((slot: number, prevTile: number | undefined) => {
-    perf('WATCH', 'DETACH slot:', slot, 'tileIndex:', prevTile);
     if (prevTile === undefined) return;
 
     const video = videoPoolRef.current[slot];
     if (!video) return;
 
-    // Restore poster opacity
     const parent = video.parentElement;
     if (parent) {
       const poster = parent.querySelector('img');
@@ -235,7 +221,6 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
 
           if (entry.intersectionRatio >= AUTOPLAY_THRESHOLD) {
             if (activeMap.get(slot) !== idx) {
-              perf('WATCH', 'ATTACH START tileIndex:', idx, 'slot:', slot, 'ratio:', entry.intersectionRatio);
               const prevTile = activeMap.get(slot);
               activeMap.set(slot, idx);
               detachSlot(slot, prevTile);
@@ -243,7 +228,6 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
             }
           } else {
             if (activeMap.get(slot) === idx) {
-              perf('WATCH', 'BELOW THRESHOLD tileIndex:', idx, 'slot:', slot, 'ratio:', entry.intersectionRatio);
               activeMap.delete(slot);
               detachSlot(slot, idx);
             }
@@ -300,7 +284,6 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
           const hlsUrl = post?.mediaItems?.[0]?.hlsUrl;
           if (!hlsUrl) continue;
           prewarmedSetRef.current.add(idx);
-          perf('WATCH', 'pre-warm START tileIndex:', idx);
           prewarmTile(hlsUrl, idx);
         }
       },
@@ -308,7 +291,6 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     );
     prewarmObserverRef.current = observer;
 
-    // Defer to next tick so tiles are in DOM
     const timer = setTimeout(() => {
       const tiles = grid.querySelectorAll('[data-watch-index]');
       tiles.forEach((tile) => {
