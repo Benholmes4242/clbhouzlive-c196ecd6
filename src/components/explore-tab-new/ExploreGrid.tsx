@@ -50,7 +50,7 @@ export default function ExploreGrid({
   // Currently course name is only available on review posts (via source_review_id → course_ratings → golf_courses).
   // Non-review posts tagged at courses will need the get_explore_feed RPC updated to join post_tags for course names.
   const coursePosts = useMemo(() => {
-    return posts.filter(post => !!post.review?.courseName);
+    return posts.filter(post => !!(post.courseName || post.review?.courseName));
   }, [posts]);
 
   if (isLoading) {

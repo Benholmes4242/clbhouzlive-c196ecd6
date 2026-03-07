@@ -11,7 +11,7 @@ function ExploreTileInner({ post, index }: ExploreTileProps) {
   if (!media) return null;
 
   const posterSrc = media.thumbnailUrl || media.imageUrl || '';
-  const courseName = post.review?.courseName;
+  const courseName = post.courseName || post.review?.courseName;
   const rating = post.review?.rating;
 
   const handleTap = () => {

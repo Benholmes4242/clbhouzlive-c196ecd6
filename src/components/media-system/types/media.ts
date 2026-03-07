@@ -49,6 +49,7 @@ export interface FeedPost {
   isReview: boolean;
   isLikedByMe: boolean;
   isFollowedByMe: boolean;
+  courseName?: string; // Golf course name (from posts.course_id → golf_courses, available on all course-tagged posts)
 }
 
 export interface VideoSessionState {

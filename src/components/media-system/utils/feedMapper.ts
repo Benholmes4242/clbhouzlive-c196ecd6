@@ -80,6 +80,7 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
     likeCount: Number(row.like_count) || 0,
     commentCount: Number(row.comment_count) || 0,
     shareCount: Number(row.share_count) || 0,
+    courseName: row.review_course_name || undefined,
     review,
     isReview,
     isLikedByMe: !!row.is_liked_by_me,
