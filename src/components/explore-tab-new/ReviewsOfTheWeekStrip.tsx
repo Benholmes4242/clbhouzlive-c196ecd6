@@ -16,8 +16,9 @@ function ReviewsOfTheWeekStripInner() {
   const { data: reviews } = useQuery({
     queryKey: ['explore-reviews-of-week'],
     queryFn: async (): Promise<ReviewItem[]> => {
+      // TODO: Change back to 7 or 30 for production
       const { data, error } = await supabase.rpc('get_top_video_reviews', {
-        days_back: 7,
+        days_back: 365,
         result_limit: 10,
       });
 
@@ -48,6 +49,7 @@ function ReviewsOfTheWeekStripInner() {
     gcTime: 30 * 60 * 1000,
   });
 
+  console.log('[ReviewsStrip] reviews loaded:', reviews?.length);
   if (!reviews || reviews.length < 2) return null;
 
   return (
@@ -65,13 +67,19 @@ function ReviewsOfTheWeekStripInner() {
             }}
             className="shrink-0 w-[140px] aspect-[3/4] rounded-xl overflow-hidden relative bg-muted focus:outline-none"
           >
-            {review.thumbnail_url && (
+            {review.thumbnail_url ? (
               <img
                 src={review.thumbnail_url}
                 alt=""
                 loading="lazy"
                 className="absolute inset-0 w-full h-full object-cover"
               />
+            ) : (
+              <div className="absolute inset-0 w-full h-full bg-muted flex items-center justify-center p-2">
+                <span className="text-[10px] text-muted-foreground text-center font-medium leading-tight">
+                  {review.course_name}
+                </span>
+              </div>
             )}
 
             {/* Bottom gradient */}
