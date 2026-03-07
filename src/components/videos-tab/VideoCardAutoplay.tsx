@@ -78,7 +78,6 @@ export function VideoCardAutoplay({ hlsUrl, posterUrl, isEligible, cardIndex }: 
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         // Safari native HLS
         video.src = hlsUrl;
-        perf('VIDEOS', '<<< PLAYING tileIndex:', cardIndex);
         video.play().catch((e) => console.warn('[VideoCardAutoplay] play() rejected:', e.message));
       }
 
