@@ -5,6 +5,41 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { VideoCard } from './VideoCard';
 import { VideosFeedSkeleton } from './VideosFeedSkeleton';
 
+async function prewarmVideo(hlsUrl: string, idx: number) {
+  try {
+    const masterText = await fetch(hlsUrl, { mode: 'cors', credentials: 'omit' }).then(r => r.text());
+    const masterLines = masterText.split('\n');
+    const streamIdx = masterLines.findIndex(l => l.startsWith('#EXT-X-STREAM-INF'));
+    const levelRelUrl = streamIdx >= 0 ? masterLines[streamIdx + 1]?.trim() : null;
+    if (!levelRelUrl || levelRelUrl.startsWith('#')) return;
+    const masterBase = hlsUrl.substring(0, hlsUrl.lastIndexOf('/') + 1);
+    const levelUrl = levelRelUrl.startsWith('http') ? levelRelUrl : new URL(levelRelUrl, masterBase).href;
+
+    const levelText = await fetch(levelUrl, { mode: 'cors', credentials: 'omit' }).then(r => r.text());
+    const lines = levelText.split('\n');
+    const base = levelUrl.substring(0, levelUrl.lastIndexOf('/') + 1);
+
+    const mapLine = lines.find(l => l.startsWith('#EXT-X-MAP:URI="'));
+    if (mapLine) {
+      const mapUri = mapLine.match(/#EXT-X-MAP:URI="([^"]+)"/)?.[1];
+      if (mapUri) {
+        const initUrl = mapUri.startsWith('http') ? mapUri : new URL(mapUri, base).href;
+        console.log(`[PERF:VIDEOS] pre-warm init tileIndex: ${idx}`);
+        fetch(initUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
+      }
+    }
+
+    const segLine = lines.find(l => l.trim() && !l.startsWith('#'));
+    if (segLine) {
+      const segUrl = segLine.trim().startsWith('http') ? segLine.trim() : new URL(segLine.trim(), base).href;
+      console.log(`[PERF:VIDEOS] pre-warm seg tileIndex: ${idx}`);
+      fetch(segUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
+    }
+  } catch {
+    // silent
+  }
+}
+
 interface VideosFeedProps {
   posts: FeedPost[];
   isLoading: boolean;
@@ -29,6 +64,7 @@ export function VideosFeed({
   const fetchGuard = useRef(false);
   const [centerIndex, setCenterIndex] = useState(0);
   const cardRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  const prewarmedSetRef = useRef<Set<number>>(new Set());
   const centerObserverRef = useRef<IntersectionObserver | null>(null);
 
   const { ref: sentinelRef, inView } = useInView({
@@ -86,6 +122,21 @@ export function VideosFeed({
     };
   }, [posts.length]);
 
+  // Pre-warm upcoming videos when centerIndex changes
+  useEffect(() => {
+    if (!posts || posts.length === 0) return;
+
+    for (let i = centerIndex + 1; i <= centerIndex + 3; i++) {
+      if (i >= posts.length) break;
+      if (prewarmedSetRef.current.has(i)) continue;
+      const hlsUrl = posts[i]?.mediaItems?.[0]?.hlsUrl;
+      if (!hlsUrl) continue;
+      prewarmedSetRef.current.add(i);
+      console.log(`[PERF:VIDEOS] pre-warm START tileIndex: ${i}`);
+      prewarmVideo(hlsUrl, i);
+    }
+  }, [centerIndex, posts]);
+
   // Loading state
   if (isLoading && posts.length === 0) {
     return <VideosFeedSkeleton />;
@@ -123,7 +174,7 @@ export function VideosFeed({
     <div className="flex flex-col gap-0 pb-4">
       {posts.map((post, i) => (
         <div key={post.id} ref={setCardRef(i)} data-card-index={i}>
-          <VideoCard post={post} isAutoplayEligible={Math.abs(i - centerIndex) <= 2} userId={userId} />
+          <VideoCard post={post} isAutoplayEligible={Math.abs(i - centerIndex) <= 2} userId={userId} cardIndex={i} />
           {i < posts.length - 1 && <div className="h-[1px] bg-border" />}
         </div>
       ))}
