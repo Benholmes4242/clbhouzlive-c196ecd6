@@ -1,8 +1,11 @@
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, type RefObject } from 'react';
 import { useInView } from 'react-intersection-observer';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { ExploreTile } from './ExploreTile';
 import ExploreGridSkeleton from './ExploreGridSkeleton';
+import { ReviewsOfTheWeekStrip } from './ReviewsOfTheWeekStrip';
+
+const REVIEWS_STRIP_AFTER = 18; // Insert after 18th tile (index 17)
 
 interface ExploreGridProps {
   posts: FeedPost[];
@@ -12,6 +15,7 @@ interface ExploreGridProps {
   isFetchingNextPage: boolean;
   fetchNextPage: () => void;
   refetch: () => void;
+  gridRef?: RefObject<HTMLDivElement | null>;
 }
 
 export default function ExploreGrid({
@@ -22,6 +26,7 @@ export default function ExploreGrid({
   isFetchingNextPage,
   fetchNextPage,
   refetch,
+  gridRef,
 }: ExploreGridProps) {
   const fetchGuard = useRef(false);
 
@@ -73,12 +78,26 @@ export default function ExploreGrid({
     );
   }
 
+  const showReviewsStrip = posts.length >= REVIEWS_STRIP_AFTER;
+
   return (
     <>
-      <div className="grid grid-cols-3 gap-[2px] px-[2px]">
-        {posts.map((post, index) => (
-          <ExploreTile key={post.id} post={post} index={index} />
-        ))}
+      <div ref={gridRef} className="grid grid-cols-3 gap-[2px] px-[2px]">
+        {posts.map((post, index) => {
+          const tile = <ExploreTile key={post.id} post={post} index={index} />;
+
+          // Insert ReviewsOfTheWeekStrip after the 18th tile
+          if (showReviewsStrip && index === REVIEWS_STRIP_AFTER - 1) {
+            return (
+              <>
+                {tile}
+                <ReviewsOfTheWeekStrip key="__reviews_strip" />
+              </>
+            );
+          }
+
+          return tile;
+        })}
       </div>
 
       {/* Infinite scroll sentinel */}
