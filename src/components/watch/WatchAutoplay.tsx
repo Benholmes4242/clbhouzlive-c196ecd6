@@ -176,7 +176,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       }
     }
 
-    perf('WATCH', 'reconcile top2:', top2, 'assigned:', [...assignedTileRef.current]);
+    
 
     for (let slot = 0; slot < VIDEO_POOL_SIZE; slot++) {
       const currentTile = assignedTileRef.current[slot];
@@ -223,7 +223,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
           const idx = Number(el.dataset.watchIndex);
           if (isNaN(idx)) continue;
 
-          if (entry.intersectionRatio < 0.2) {
+          if (entry.intersectionRatio === 0) {
             ratioMapRef.current.delete(idx);
             // If this tile was assigned, detach it
             for (let slot = 0; slot < VIDEO_POOL_SIZE; slot++) {
@@ -232,10 +232,6 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
               }
             }
           } else {
-            const prev = ratioMapRef.current.get(idx);
-            if (!prev) {
-              perf('WATCH', '>>> VISIBLE tileIndex:', idx, 'ratio:', entry.intersectionRatio.toFixed(2));
-            }
             ratioMapRef.current.set(idx, entry.intersectionRatio);
           }
         }
