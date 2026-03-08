@@ -177,6 +177,25 @@ Deno.serve(async (req) => {
       console.error(`[RoundComplete] Bulk scorecards error:`, err);
     }
 
+    // ── 3. Check if tournament is closed and trigger prediction scoring ──
+    const { data: currentTournament } = await supabase
+      .from('sr_tournaments')
+      .select('status')
+      .eq('id', tournament.id)
+      .single();
+
+    if (currentTournament?.status === 'closed') {
+      console.log(`[RoundComplete] Tournament ${tournament.name} is closed — triggering prediction scoring`);
+      try {
+        await supabase.functions.invoke('score-predictions', {
+          body: { tournamentId: tournament.id },
+        });
+        console.log('[RoundComplete] Predictions scored');
+      } catch (err) {
+        console.warn('[RoundComplete] Prediction scoring failed:', (err as Error).message);
+      }
+    }
+
     const totalDuration = Date.now() - startTime;
 
     // Log completion
