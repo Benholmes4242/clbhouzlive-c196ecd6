@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useMediaStore } from '../store/mediaStore';
+import { useMediaStoreCompat } from '../store/useMediaStoreCompat';
 import { preCreateHlsInstance, destroyStalePreCreated, prewarmFirstSegment } from '../utils/hlsManager';
 import { parseMasterManifest, parseSegmentManifest } from '../utils/manifestParser';
 import { segmentCache } from '../utils/segmentCache';
