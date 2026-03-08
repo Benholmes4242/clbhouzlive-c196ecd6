@@ -311,6 +311,111 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_prediction_accuracy: {
+        Row: {
+          accuracy_grade: string | null
+          average_fit_score_actual: number | null
+          average_fit_score_predicted: number | null
+          average_pick_position: number | null
+          best_pick_player_id: string | null
+          best_pick_player_name: string | null
+          best_pick_position: number | null
+          claude_picks: Json | null
+          consensus_method: string | null
+          created_at: string | null
+          gemini_picks: Json | null
+          gpt_picks: Json | null
+          id: string
+          model_version: string | null
+          pick_results: Json
+          picks_in_top_10: number | null
+          picks_in_top_20: number | null
+          picks_in_top_5: number | null
+          picks_made_cut: number | null
+          picks_missed_cut: number | null
+          prediction_id: string | null
+          prompt_version: string | null
+          scored_at: string | null
+          season_year: number | null
+          tour_code: string | null
+          tournament_id: string | null
+          tournament_name: string | null
+        }
+        Insert: {
+          accuracy_grade?: string | null
+          average_fit_score_actual?: number | null
+          average_fit_score_predicted?: number | null
+          average_pick_position?: number | null
+          best_pick_player_id?: string | null
+          best_pick_player_name?: string | null
+          best_pick_position?: number | null
+          claude_picks?: Json | null
+          consensus_method?: string | null
+          created_at?: string | null
+          gemini_picks?: Json | null
+          gpt_picks?: Json | null
+          id?: string
+          model_version?: string | null
+          pick_results?: Json
+          picks_in_top_10?: number | null
+          picks_in_top_20?: number | null
+          picks_in_top_5?: number | null
+          picks_made_cut?: number | null
+          picks_missed_cut?: number | null
+          prediction_id?: string | null
+          prompt_version?: string | null
+          scored_at?: string | null
+          season_year?: number | null
+          tour_code?: string | null
+          tournament_id?: string | null
+          tournament_name?: string | null
+        }
+        Update: {
+          accuracy_grade?: string | null
+          average_fit_score_actual?: number | null
+          average_fit_score_predicted?: number | null
+          average_pick_position?: number | null
+          best_pick_player_id?: string | null
+          best_pick_player_name?: string | null
+          best_pick_position?: number | null
+          claude_picks?: Json | null
+          consensus_method?: string | null
+          created_at?: string | null
+          gemini_picks?: Json | null
+          gpt_picks?: Json | null
+          id?: string
+          model_version?: string | null
+          pick_results?: Json
+          picks_in_top_10?: number | null
+          picks_in_top_20?: number | null
+          picks_in_top_5?: number | null
+          picks_made_cut?: number | null
+          picks_missed_cut?: number | null
+          prediction_id?: string | null
+          prompt_version?: string | null
+          scored_at?: string | null
+          season_year?: number | null
+          tour_code?: string | null
+          tournament_id?: string | null
+          tournament_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_prediction_accuracy_prediction_id_fkey"
+            columns: ["prediction_id"]
+            isOneToOne: false
+            referencedRelation: "ai_predictions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_prediction_accuracy_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: true
+            referencedRelation: "sr_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_predictions: {
         Row: {
           confidence: number | null
@@ -2570,6 +2675,104 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      course_dna_profiles: {
+        Row: {
+          avg_cut_line: number | null
+          avg_winning_score: number | null
+          course_type: string | null
+          driving_accuracy_importance: number | null
+          driving_distance_importance: number | null
+          gir_importance: number | null
+          green_speed_factor: number | null
+          historical_winners: Json | null
+          id: string
+          last_updated: string | null
+          par_3_scoring_importance: number | null
+          par_4_scoring_importance: number | null
+          par_5_scoring_importance: number | null
+          putting_importance: number | null
+          rough_severity_factor: number | null
+          scoring_difficulty: number | null
+          scrambling_importance: number | null
+          sg_approach_importance: number | null
+          sg_around_green_importance: number | null
+          sg_off_tee_importance: number | null
+          sg_putting_importance: number | null
+          stat_correlations: Json | null
+          tournaments_analyzed: number | null
+          venue_id: string | null
+          venue_name: string
+          wind_exposure_factor: number | null
+          years_of_data: number | null
+        }
+        Insert: {
+          avg_cut_line?: number | null
+          avg_winning_score?: number | null
+          course_type?: string | null
+          driving_accuracy_importance?: number | null
+          driving_distance_importance?: number | null
+          gir_importance?: number | null
+          green_speed_factor?: number | null
+          historical_winners?: Json | null
+          id?: string
+          last_updated?: string | null
+          par_3_scoring_importance?: number | null
+          par_4_scoring_importance?: number | null
+          par_5_scoring_importance?: number | null
+          putting_importance?: number | null
+          rough_severity_factor?: number | null
+          scoring_difficulty?: number | null
+          scrambling_importance?: number | null
+          sg_approach_importance?: number | null
+          sg_around_green_importance?: number | null
+          sg_off_tee_importance?: number | null
+          sg_putting_importance?: number | null
+          stat_correlations?: Json | null
+          tournaments_analyzed?: number | null
+          venue_id?: string | null
+          venue_name: string
+          wind_exposure_factor?: number | null
+          years_of_data?: number | null
+        }
+        Update: {
+          avg_cut_line?: number | null
+          avg_winning_score?: number | null
+          course_type?: string | null
+          driving_accuracy_importance?: number | null
+          driving_distance_importance?: number | null
+          gir_importance?: number | null
+          green_speed_factor?: number | null
+          historical_winners?: Json | null
+          id?: string
+          last_updated?: string | null
+          par_3_scoring_importance?: number | null
+          par_4_scoring_importance?: number | null
+          par_5_scoring_importance?: number | null
+          putting_importance?: number | null
+          rough_severity_factor?: number | null
+          scoring_difficulty?: number | null
+          scrambling_importance?: number | null
+          sg_approach_importance?: number | null
+          sg_around_green_importance?: number | null
+          sg_off_tee_importance?: number | null
+          sg_putting_importance?: number | null
+          stat_correlations?: Json | null
+          tournaments_analyzed?: number | null
+          venue_id?: string | null
+          venue_name?: string
+          wind_exposure_factor?: number | null
+          years_of_data?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_dna_profiles_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "sr_courses"
             referencedColumns: ["id"]
           },
         ]
