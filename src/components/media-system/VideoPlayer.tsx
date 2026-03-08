@@ -126,7 +126,7 @@ export function VideoPlayer({
           assignedRef.current = null;
           setIsLoading(false);
           setHasError(true);
-          useMediaStore.getState().markError(feedIndex);
+          getStore().markError(feedIndex);
         },
         mp4Url
       );
