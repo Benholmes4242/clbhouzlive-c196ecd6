@@ -11,7 +11,7 @@ import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
 import { useTop100Overview } from '@/hooks/useTop100Overview';
-import { useActivityPostsV2 } from './activity/v2';
+import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { toast } from 'sonner';
 import { trackBusinessEvent } from '@/analytics/businessAnalytics';
