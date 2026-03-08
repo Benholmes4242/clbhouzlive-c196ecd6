@@ -435,10 +435,10 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           >
             {communityScore.toFixed(1)}
           </span>
-          <span className={cn(
-            "text-sm font-bold uppercase tracking-[0.05em]",
-            communityScore >= 9 ? "text-[#d97706]" : "text-muted-foreground"
-          )}>
+          <span
+            className="text-sm font-bold uppercase tracking-[0.05em]"
+            style={{ color: getRatingTheme(communityScore).accent }}
+          >
             {getScoreTier(communityScore).label}
           </span>
           <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">
