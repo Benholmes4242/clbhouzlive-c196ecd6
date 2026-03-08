@@ -2,6 +2,7 @@ import React from 'react';
 import { Heart, MessageCircle, Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { formatDistanceToNowStrict } from 'date-fns';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
