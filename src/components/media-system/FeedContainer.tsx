@@ -79,14 +79,16 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
         posts[0]?.id === prevPosts[0]?.id;
       
       if (!isAppend) {
-        // Full feed switch (tab change) — reset to top
-        const newOffset = 0;
+        // Full feed switch (tab change) — reset to initialIndex (or 0)
+        const startAt = initialIndex ?? 0;
+        const newOffset = -startAt * itemHeight;
         offsetRef.current = newOffset;
-        activeIndexRef.current = 0;
+        activeIndexRef.current = startAt;
         setOffsetY(newOffset);
         if (trackRef.current) {
-          trackRef.current.style.transform = `translateY(0px)`;
+          trackRef.current.style.transform = `translateY(${newOffset}px)`;
         }
+        setActiveIndex(startAt);
       }
       // For appends, preserve current position — do nothing
     }

@@ -5,6 +5,8 @@ import { VideoPoolProvider } from '@/components/media-system/VideoPoolProvider';
 import { FeedContainer } from '@/components/media-system/FeedContainer';
 import { usePreloader } from '@/components/media-system/hooks/usePreloader';
 import { useFullscreenFeed } from './hooks/useFullscreenFeed';
+import { FullscreenActionRail } from './FullscreenActionRail';
+import { FullscreenCreatorCapsule } from './FullscreenCreatorCapsule';
 import { useStore } from 'zustand';
 import { ChevronLeft } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -60,6 +62,7 @@ export function FullscreenFeedContent({ posts, startIndex }: FullscreenFeedConte
         <FeedWithPreloader posts={posts}>
           <FeedContainer
             posts={posts}
+            initialIndex={startIndex}
           />
         </FeedWithPreloader>
       </VideoPoolProvider>
@@ -79,6 +82,12 @@ export function FullscreenFeedContent({ posts, startIndex }: FullscreenFeedConte
       >
         <ChevronLeft className="w-5 h-5 text-white" />
       </button>
+
+      {/* Action rail — right side */}
+      <FullscreenActionRail posts={posts} store={store} />
+
+      {/* Creator capsule — bottom left */}
+      <FullscreenCreatorCapsule posts={posts} store={store} />
 
       {/* Scrubber — page-level */}
       {activeVideoRef && (
