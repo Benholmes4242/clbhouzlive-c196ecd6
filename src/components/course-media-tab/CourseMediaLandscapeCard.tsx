@@ -21,6 +21,7 @@ function abbreviateCount(n: number): string {
 interface CourseMediaLandscapeCardProps {
   post: FeedPost;
   index: number;
+  allPosts?: FeedPost[];
 }
 
 const HUD_GLASS = {
