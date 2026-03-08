@@ -67,7 +67,7 @@ const LinkedInProfileLayout: React.FC<LinkedInProfileLayoutProps> = ({
 
   // Data hooks
   const { data: top100Overview } = useTop100Overview(profile?.id);
-  const { items: posts } = useActivityPostsV2(profile?.id);
+  // Posts count handled by PostsCountSummary inside PostsTabContent
   const { data: achievements } = useUserAchievements(profile?.id);
   
   // Profile type
