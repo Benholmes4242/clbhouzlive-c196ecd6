@@ -20,6 +20,7 @@ interface PredictionScorecardRowProps {
   isCompleted?: boolean;
   isLast?: boolean;
   isBestCall?: boolean;
+  leaderScore?: number | null;
 }
 
 function getAccuracyBorderColor() {
