@@ -36,7 +36,10 @@ function ExploreTileInner({ post, index }: ExploreTileProps) {
 
       {/* Rating badge — top right */}
       {rating != null && rating > 0 && (
-        <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md bg-amber-500/90 text-white text-[11px] font-semibold leading-none flex items-center gap-[3px]">
+        <span
+          className="absolute top-2 right-2 rounded-full flex items-center gap-[3px] text-[11px] font-semibold text-white leading-none"
+          style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 4px 16px rgba(0,0,0,0.25)', padding: '3px 7px' }}
+        >
           <img src="/images/brand/clubhouz-mark-white.svg" alt="" className="w-[10px] h-[10px]" />
           {rating.toFixed(1)}
         </span>
