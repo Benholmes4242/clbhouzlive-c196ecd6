@@ -98,7 +98,7 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
     <>
       <article className="bg-card rounded-xl overflow-hidden shadow-sm border border-border/50">
         {/* Creator header */}
-        <div className="flex items-center gap-3 p-3">
+        <div className="flex items-center gap-3 px-3 pt-3 pb-2">
           <button
             onClick={() => navigate(`/profile/${post.userId}`)}
             className="flex items-center gap-3 min-w-0 flex-1"
