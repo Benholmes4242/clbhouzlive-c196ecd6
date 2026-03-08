@@ -112,10 +112,10 @@ export const courseDetailTokens = {
 // Tier gradient mapping for distribution bars - AMBER FOR OUTSTANDING ONLY, Gray for rest
 export const tierGradients: Record<string, string> = {
   Outstanding: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
-  Excellent: 'bg-[#A8A29E]',
-  'Very Good': 'bg-[#A8A29E]',
-  Good: 'bg-[#A8A29E]',
-  Fair: 'bg-[#A8A29E]',
+  Excellent: 'bg-[#1e293b]',
+  'Very Good': 'bg-[#475569]',
+  Good: 'bg-[#64748b]',
+  Fair: 'bg-[#94a3b8]',
 };
 
 export type TierKey = keyof typeof courseDetailTokens.tiers;
