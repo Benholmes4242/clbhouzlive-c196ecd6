@@ -170,6 +170,7 @@ const Top100GeocodingPage = lazy(() => import("./pages/admin/Top100GeocodingPage
 const AdminTestLabPage = lazy(() => import("./pages/admin/AdminTestLabPage"));
 const AdminTourPage = lazy(() => import("./pages/admin/AdminTourPage").then(m => ({ default: m.AdminTourPage })));
 const AdminTourPlayersPage = lazy(() => import("./pages/admin/AdminTourPlayersPage"));
+const CourseMediaTestPage = lazy(() => import("./pages/CourseMediaTestPage"));
 
 
 const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
