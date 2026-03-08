@@ -21,7 +21,7 @@ function formatCompact(n: number): string {
   return String(n);
 }
 
-const CompactTile: React.FC<{ post: FeedPost; globalIndex: number }> = ({ post, globalIndex }) => {
+const CompactTile: React.FC<{ post: FeedPost; globalIndex: number; allPosts?: FeedPost[] }> = ({ post, globalIndex, allPosts }) => {
   const firstMedia = post.mediaItems[0];
   const isVideo = firstMedia?.type === 'video';
   const thumbnailUrl = firstMedia?.thumbnailUrl || firstMedia?.imageUrl;
