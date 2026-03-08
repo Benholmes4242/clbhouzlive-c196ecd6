@@ -125,7 +125,7 @@ const CompactTile: React.FC<{ post: FeedPost; globalIndex: number; allPosts?: Fe
   );
 };
 
-export const CompactGridRow: React.FC<CompactGridRowProps> = ({ posts, startIndex }) => {
+export const CompactGridRow: React.FC<CompactGridRowProps> = ({ posts, startIndex, allPosts }) => {
   return (
     <div className="grid grid-cols-3 gap-[2px]">
       {posts.map((post, i) => (
@@ -133,6 +133,7 @@ export const CompactGridRow: React.FC<CompactGridRowProps> = ({ posts, startInde
           key={post.id}
           post={post}
           globalIndex={startIndex + i}
+          allPosts={allPosts}
         />
       ))}
     </div>

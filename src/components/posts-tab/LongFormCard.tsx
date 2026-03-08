@@ -22,7 +22,7 @@ function formatDuration(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-export const LongFormCard: React.FC<LongFormCardProps> = ({ post }) => {
+export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, postIndex }) => {
   const [expanded, setExpanded] = useState(false);
   const firstMedia = post.mediaItems[0];
   const thumbnailUrl = firstMedia?.thumbnailUrl || firstMedia?.imageUrl;
@@ -32,7 +32,15 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post }) => {
   return (
     <div
       className="bg-card rounded-xl overflow-hidden shadow-sm border border-border/50 mx-0 cursor-pointer"
-      onClick={() => { /* TODO: wire to player */ }}
+      onClick={() => {
+        if (allPosts && postIndex != null) {
+          useFullscreenFeed.getState().open({
+            posts: allPosts,
+            startIndex: postIndex,
+            sourceId: 'posts',
+          });
+        }
+      }}
     >
       {/* Media area — 16:9 */}
       <div className="relative aspect-video bg-muted">

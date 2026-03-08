@@ -16,7 +16,7 @@ interface ReviewCardProps {
   postIndex?: number;
 }
 
-export const ReviewCard: React.FC<ReviewCardProps> = ({ post }) => {
+export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postIndex }) => {
   const [expanded, setExpanded] = useState(false);
   const review = post.review;
   if (!review) return null;
@@ -31,7 +31,15 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post }) => {
   return (
     <div
       className="bg-card rounded-xl overflow-hidden shadow-sm border border-border/50 cursor-pointer"
-      onClick={() => { /* TODO: wire to review detail */ }}
+      onClick={() => {
+        if (allPosts && postIndex != null) {
+          useFullscreenFeed.getState().open({
+            posts: allPosts,
+            startIndex: postIndex,
+            sourceId: 'posts',
+          });
+        }
+      }}
     >
       {/* Amber accent stripe */}
       <div className="h-[3px] bg-amber-500" />

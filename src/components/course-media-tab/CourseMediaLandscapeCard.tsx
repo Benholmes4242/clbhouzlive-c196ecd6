@@ -49,7 +49,16 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
   return (
     <div
       style={{ gridColumn: '1 / -1' }}
-      className="bg-card"
+      className="bg-card cursor-pointer"
+      onClick={() => {
+        if (allPosts) {
+          useFullscreenFeed.getState().open({
+            posts: allPosts,
+            startIndex: index,
+            sourceId: 'course-media',
+          });
+        }
+      }}
       data-course-media-index={index}
     >
       {/* Creator header */}
