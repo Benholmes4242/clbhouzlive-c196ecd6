@@ -140,6 +140,54 @@ Deno.serve(async (req) => {
           console.warn(`[LiveSync] Pre-tournament tee times failed for ${upcoming.name}: ${e.message}`);
         }
       }
+
+      // ── Auto-regeneration: refresh stale predictions for imminent tournaments ──
+      for (const upcoming of upcomingTournaments) {
+        try {
+          const startDate = new Date(upcoming.start_date);
+          const now = new Date();
+          const hoursUntilStart = (startDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+          // Only auto-regenerate if tournament starts within 24 hours
+          if (hoursUntilStart > 24 || hoursUntilStart < 0) continue;
+
+          // Check if predictions exist and how old they are
+          const { data: existingPrediction } = await supabase
+            .from('ai_predictions')
+            .select('id, generated_at')
+            .eq('tournament_id', upcoming.id)
+            .maybeSingle();
+
+          if (!existingPrediction) {
+            console.log(`[LiveSync] No predictions for ${upcoming.name} (starts in ${Math.round(hoursUntilStart)}h) — triggering generation`);
+          } else {
+            const generatedAt = new Date(existingPrediction.generated_at);
+            const ageHours = (now.getTime() - generatedAt.getTime()) / (1000 * 60 * 60);
+
+            if (ageHours < 48) {
+              continue; // Predictions are fresh enough
+            }
+            console.log(`[LiveSync] Predictions for ${upcoming.name} are ${Math.round(ageHours)}h old (starts in ${Math.round(hoursUntilStart)}h) — triggering regeneration`);
+          }
+
+          // Trigger regeneration
+          const genUrl = `${supabaseUrl}/functions/v1/generate-predictions`;
+          await fetch(genUrl, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${supabaseServiceKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              tournamentId: upcoming.id,
+              forceRegenerate: true,
+            }),
+          });
+          console.log(`[LiveSync] Auto-regeneration triggered for ${upcoming.name}`);
+        } catch (e) {
+          console.warn(`[LiveSync] Auto-regeneration failed for ${upcoming.name}: ${e.message}`);
+        }
+      }
     }
 
     const { data: liveTournaments, error: queryError } = await supabase
