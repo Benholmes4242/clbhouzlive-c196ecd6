@@ -37,8 +37,8 @@ export const HeroEventPortal = memo(function HeroEventPortal({
   const imageUrl = event.venueName ? courseImages?.get(event.venueName)?.imageUrl : null;
 
   const statusConfig = {
-    live: { label: 'LIVE NOW', color: 'bg-red-500', pulse: true },
-    inprogress: { label: 'IN PROGRESS', color: 'bg-red-500', pulse: true },
+    live: { label: 'LIVE NOW', color: 'bg-[var(--th-accent-live)]', pulse: true },
+    inprogress: { label: 'IN PROGRESS', color: 'bg-[var(--th-accent-live)]', pulse: true },
     upcoming: { label: 'UPCOMING', color: 'bg-emerald-500', pulse: false },
     scheduled: { label: 'UPCOMING', color: 'bg-emerald-500', pulse: false },
     complete: { label: 'COMPLETE', color: 'bg-slate-500', pulse: false },
