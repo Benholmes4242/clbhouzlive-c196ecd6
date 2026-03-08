@@ -63,6 +63,8 @@ import ProfileAchievementsRail from '@/components/profile/ProfileAchievementsRai
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 import { ImageCropModal } from '@/components/business/ImageCropModal';
 import { ProfileTouchDebugProvider, useProfileTouchDebug } from '@/components/profile/debug/ProfileTouchDebugProvider';
+import { CreatorSection } from '@/components/creator-mode/CreatorSection';
+import { CreatorBadge } from '@/components/creator-mode/CreatorBadge';
 import { ProfileTouchDebugPanel } from '@/components/profile/debug/ProfileTouchDebugPanel';
 
 // Background color - uses CSS variable for theme support
