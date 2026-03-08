@@ -15,7 +15,7 @@ import { useTop100FriendsSnapshot } from '@/hooks/useTop100FriendsSnapshot';
 import { useNavigate } from 'react-router-dom';
 
 // Lazy load heavy/inactive components for better initial bundle size
-const CommunityFeed = lazy(() => import('@/components/community/CommunityFeed'));
+const NewFriendsTab = lazy(() => import('@/components/discover/NewFriendsTab'));
 const NewVideosTab = lazy(() => import('@/components/discover/NewVideosTab'));
 const NewExploreTab = lazy(() => import('@/components/discover/NewExploreTab'));
 const WatchTab = lazy(() => import('@/components/discover/WatchTab'));
