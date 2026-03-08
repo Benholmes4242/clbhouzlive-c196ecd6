@@ -516,6 +516,9 @@ function AppRoutes() {
         {/* Hub routes removed — redirects to clubhouse */}
         <Route path="/hub" element={<Navigate to="/clubhouse" replace />} />
         <Route path="/hub/*" element={<Navigate to="/clubhouse" replace />} />
+
+        {/* Course Media Tab test page */}
+        <Route path="/course-media-test/:courseId" element={<Suspense fallback={<GenericPageSkeleton />}><CourseMediaTestPage /></Suspense>} />
         
         <Route path="*" element={<Suspense fallback={<GenericPageSkeleton />}><NotFound /></Suspense>} />
       </Routes>
