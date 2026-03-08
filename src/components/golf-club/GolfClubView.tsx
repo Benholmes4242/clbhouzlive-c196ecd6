@@ -8,7 +8,7 @@ import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import CourseAboutTab from '@/components/courses/course-detail/CourseAboutTab';
 import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTab';
-import CourseMediaTab from '@/components/courses/course-detail/CourseMediaTab';
+import CourseMediaTabNew from '@/components/course-media-tab/CourseMediaTabNew';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import { CourseTabs } from '@/components/courses/course-detail/CourseTabs';
 import { formatCourseLocation } from '@/utils/courseLocation';
