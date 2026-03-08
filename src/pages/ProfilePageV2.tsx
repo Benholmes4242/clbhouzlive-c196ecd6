@@ -51,7 +51,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 // Tab content components
-import ActivityFeed from '@/components/profile/ActivityFeed';
+// PostsTabContent imported above
 import { ProfileCoursesTab } from '@/components/profile/ProfileCoursesTab';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import AchievementsPane from '@/components/profile/AchievementsPane';
