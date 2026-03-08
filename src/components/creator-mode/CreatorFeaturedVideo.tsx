@@ -11,7 +11,7 @@ interface CreatorFeaturedVideoProps {
 }
 
 export function CreatorFeaturedVideo({ post, isOwnProfile, onEditClick }: CreatorFeaturedVideoProps) {
-  // Remove debug log
+  
   // Visitor sees nothing when no featured post
   if (!post && !isOwnProfile) return null;
 
