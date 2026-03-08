@@ -1,6 +1,7 @@
 import { PlayCircle, Pencil, MapPin } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { formatDuration, a11yFullDuration } from '@/utils/formatDuration';
+import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { cn } from '@/lib/utils';
 
 interface CreatorFeaturedVideoProps {
@@ -31,6 +32,7 @@ export function CreatorFeaturedVideo({ post, isOwnProfile, onEditClick }: Creato
   const firstMedia = post.mediaItems[0];
   const thumbnailUrl = firstMedia?.thumbnailUrl ?? firstMedia?.imageUrl ?? '/placeholder.svg';
   const duration = firstMedia?.duration;
+  const cleanCaption = removeGolfCourseFromContent(post.caption);
 
   return (
     <div className="rounded-xl overflow-hidden bg-card border border-border/50 shadow-sm relative">
@@ -79,16 +81,16 @@ export function CreatorFeaturedVideo({ post, isOwnProfile, onEditClick }: Creato
 
       {/* Caption + course tag + engagement */}
       <div className="px-3 pt-2 pb-3">
-        {post.caption && (
-          <p className="text-sm font-semibold text-foreground line-clamp-1">{post.caption}</p>
+        {cleanCaption && (
+          <p className="text-sm font-semibold text-foreground line-clamp-1">{cleanCaption}</p>
         )}
         {post.courseName && (
-          <div className={cn("flex items-center gap-1", post.caption && "mt-2")}>
+          <div className={cn("flex items-center gap-1", cleanCaption && "mt-2")}>
             <MapPin className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
             <span className="text-xs text-muted-foreground truncate">{post.courseName}</span>
           </div>
         )}
-        <p className={cn("text-xs text-muted-foreground", (post.caption || post.courseName) && "mt-1")}>
+        <p className={cn("text-xs text-muted-foreground", (cleanCaption || post.courseName) && "mt-1")}>
           {post.likeCount > 0 && <span>{post.likeCount} likes</span>}
           {post.likeCount > 0 && post.commentCount > 0 && <span> · </span>}
           {post.commentCount > 0 && <span>{post.commentCount} comments</span>}
