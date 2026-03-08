@@ -227,7 +227,7 @@ export function VideoPlayer({
         } else {
           video.pause();
           setIsPlaying(false);
-          useMediaStore.getState().setUserPaused(true);
+          getStore().setUserPaused(true);
         }
         setShowPlayIcon(true);
         setTimeout(() => setShowPlayIcon(false), 800);
