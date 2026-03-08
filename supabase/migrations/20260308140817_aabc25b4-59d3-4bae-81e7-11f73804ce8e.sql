@@ -1,0 +1,1 @@
+ALTER TABLE ai_predictions ADD COLUMN IF NOT EXISTS consensus_data jsonb;

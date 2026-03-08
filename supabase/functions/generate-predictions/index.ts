@@ -1,16 +1,25 @@
 /**
- * Generate AI-powered tournament predictions using Claude + Perplexity
+ * Generate AI-powered tournament predictions using Consensus Engine V2
  * 
  * This edge function:
  * 1. Fetches the next scheduled PGA tournament
  * 2. Gathers player statistics and world rankings
  * 3. Fetches real-time research via Perplexity (expert picks, injuries, etc.)
- * 4. Calls Claude API for intelligent analysis with research context
- * 5. Stores predictions in the ai_predictions table
+ * 4. Extracts detailed stats + derives SG proxies
+ * 5. Calculates data-driven course fit scores from Course DNA profiles
+ * 6. Calculates venue history scores with trend analysis
+ * 7. Runs multi-model consensus (Claude + optional GPT-4 + Gemini)
+ * 8. Stores predictions with consensus metadata in ai_predictions
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { extractPlayerStats, deriveSGProxies, formatStatsForPrompt } from './detailedStats.ts';
+import { calculateCourseFitScores, formatCourseFitForPrompt } from './courseFitCalculator.ts';
+import { calculateVenueHistoryScores, formatVenueHistoryForPrompt } from './venueHistory.ts';
+import { runConsensus } from './consensusEngine.ts';
+import type { PlayerStats as EnrichedPlayerStats } from './detailedStats.ts';
+import type { CourseDNAProfile } from './courseFitCalculator.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -52,31 +61,7 @@ interface PlayerStats {
   putt_avg: number;
   sg_total: number;
   sg_tee_green: number;
-}
-
-interface PredictionOutput {
-  topContenders: {
-    rank: number;
-    playerId: string;
-    playerName: string;
-    photoUrl: string | null;
-    pgaTourId: string | null;
-    country: string;
-    worldRanking: number;
-    winProbability: number;
-    courseFitScore: number;
-    reasons: string[];
-    concern: string;
-  }[];
-  courseAnalysis: {
-    winnerProfile: string;
-    keyStats: string[];
-    insight: string;
-    skillsAnalysis?: string;
-    difficulty: string;
-  };
-  confidence: number;
-  reasoning: string;
+  raw_data: any;  // Full raw_data for detailed stat extraction
 }
 
 // =============================================
@@ -84,25 +69,22 @@ interface PredictionOutput {
 // =============================================
 
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Initialize clients
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY')!;
     const perplexityApiKey = Deno.env.get('PERPLEXITY_API_KEY_1') || Deno.env.get('PERPLEXITY_API_KEY');
 
-    if (!anthropicApiKey) {
+    if (!Deno.env.get('ANTHROPIC_API_KEY')) {
       throw new Error('ANTHROPIC_API_KEY is not configured');
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Parse request body (optional tournament ID)
+    // Parse request body
     let tournamentId: string | null = null;
     let forceRegenerate = false;
     try {
@@ -110,7 +92,7 @@ serve(async (req) => {
       tournamentId = body.tournamentId || null;
       forceRegenerate = body.forceRegenerate || false;
     } catch {
-      // No body provided, will fetch next tournament
+      // No body provided
     }
 
     // =============================================
@@ -126,12 +108,9 @@ serve(async (req) => {
         .eq('id', tournamentId)
         .single();
       
-      if (error || !data) {
-        throw new Error(`Tournament not found: ${tournamentId}`);
-      }
+      if (error || !data) throw new Error(`Tournament not found: ${tournamentId}`);
       tournament = data;
     } else {
-      // Get next scheduled PGA tournament by joining with sr_seasons
       const { data: seasons } = await supabase
         .from('sr_seasons')
         .select('id')
@@ -140,9 +119,7 @@ serve(async (req) => {
         .limit(1);
       
       const pgaSeasonId = seasons?.[0]?.id;
-      if (!pgaSeasonId) {
-        throw new Error('No PGA season found');
-      }
+      if (!pgaSeasonId) throw new Error('No PGA season found');
       
       const { data, error } = await supabase
         .from('sr_tournaments')
@@ -153,9 +130,7 @@ serve(async (req) => {
         .limit(1)
         .single();
       
-      if (error || !data) {
-        throw new Error('No upcoming tournament found');
-      }
+      if (error || !data) throw new Error('No upcoming tournament found');
       tournament = data;
     }
 
@@ -187,7 +162,6 @@ serve(async (req) => {
     // STEP 2: Fetch Confirmed Field + Player Data
     // =============================================
 
-    // Get PGA seasons ordered by year (newest first)
     const { data: seasons } = await supabase
       .from('sr_seasons')
       .select('id, year')
@@ -195,14 +169,11 @@ serve(async (req) => {
       .order('year', { ascending: false })
       .limit(3);
 
-    if (!seasons || seasons.length === 0) {
-      throw new Error('No PGA season found');
-    }
+    if (!seasons || seasons.length === 0) throw new Error('No PGA season found');
 
-    // --- 2A: Try to get confirmed field from tee times or leaderboard ---
+    // --- 2A: Try to get confirmed field ---
     let confirmedFieldPlayerIds: Set<string> | null = null;
 
-    // Try tee_time_players first (available 2-3 days before start)
     const { data: teeTimePlayers } = await supabase
       .from('sr_tee_time_players')
       .select('player_id, sr_tee_times!inner(tournament_id)')
@@ -212,7 +183,6 @@ serve(async (req) => {
       confirmedFieldPlayerIds = new Set(teeTimePlayers.map((t: any) => t.player_id));
       console.log(`[generate-predictions] Found ${confirmedFieldPlayerIds.size} confirmed entrants from tee times`);
     } else {
-      // Try leaderboard entries (available once tournament is in-progress or has field list)
       const { data: leaderboardEntries } = await supabase
         .from('sr_leaderboards')
         .select('player_id')
@@ -226,7 +196,7 @@ serve(async (req) => {
 
     const hasConfirmedField = confirmedFieldPlayerIds !== null && confirmedFieldPlayerIds.size > 0;
 
-    // --- Fetch player statistics ---
+    // --- Fetch player statistics (with raw_data for detailed extraction) ---
     let playerStats: any[] = [];
     let usedSeasonId: string | null = null;
     
@@ -255,9 +225,7 @@ serve(async (req) => {
       }
     }
 
-    if (playerStats.length === 0) {
-      throw new Error('Failed to fetch player statistics from any season');
-    }
+    if (playerStats.length === 0) throw new Error('Failed to fetch player statistics from any season');
 
     // Fetch world rankings
     const { data: rankings } = await supabase
@@ -268,17 +236,14 @@ serve(async (req) => {
 
     const rankingsMap = new Map(rankings?.map(r => [r.player_id, r]) || []);
 
-    // Combine stats with rankings, filtering to confirmed field when available
+    // Build player array with raw_data preserved
     const players: PlayerStats[] = playerStats
       .map(ps => {
         const player = ps.sr_players as any;
         const stats = (ps.raw_data as any)?.statistics || {};
         const ranking = rankingsMap.get(player.id);
 
-        // If we have confirmed field, only include players in the field
         if (hasConfirmedField && !confirmedFieldPlayerIds!.has(player.id)) return null;
-
-        // If no confirmed field, fall back to ranking cutoff
         if (!hasConfirmedField && (!ranking || ranking.rank > 150)) return null;
 
         return {
@@ -298,6 +263,7 @@ serve(async (req) => {
           putt_avg: stats.putt_avg || 0,
           sg_total: stats.strokes_gained_total || 0,
           sg_tee_green: stats.strokes_gained_tee_green || 0,
+          raw_data: ps.raw_data,
         };
       })
       .filter((p): p is PlayerStats => p !== null)
@@ -306,11 +272,12 @@ serve(async (req) => {
 
     console.log(`[generate-predictions] Fetched ${players.length} players (field ${hasConfirmedField ? 'confirmed' : 'estimated'})`);
 
-    // --- 2B: Fetch course history (past results at same venue) ---
+    // --- 2B: Fetch course history ---
     let courseHistoryData: { playerName: string; playerId: string; finishes: { year: number; position: number | null; score: number | null }[] }[] = [];
+    // Also build venue results for venueHistory calculator
+    let venueResults: Array<{ player_id: string; position: number | null; score: number | null; year: number; status: string | null }> = [];
 
     try {
-      // Find past tournaments at the same venue
       const { data: pastTournaments } = await supabase
         .from('sr_tournaments')
         .select('id, name, start_date')
@@ -318,7 +285,7 @@ serve(async (req) => {
         .eq('status', 'closed')
         .neq('id', tournament.id)
         .order('start_date', { ascending: false })
-        .limit(3);
+        .limit(5);
 
       if (pastTournaments && pastTournaments.length > 0) {
         const pastTournamentIds = pastTournaments.map(t => t.id);
@@ -326,21 +293,28 @@ serve(async (req) => {
 
         const { data: pastResults } = await supabase
           .from('sr_leaderboards')
-          .select('player_id, tournament_id, position, score')
+          .select('player_id, tournament_id, position, score, status')
           .in('tournament_id', pastTournamentIds)
           .in('player_id', Array.from(playerIdSet));
 
         if (pastResults && pastResults.length > 0) {
-          // Group by player
           const historyByPlayer = new Map<string, { year: number; position: number | null; score: number | null }[]>();
           for (const result of pastResults) {
             const pt = pastTournaments.find(t => t.id === result.tournament_id);
             const year = pt ? new Date(pt.start_date).getFullYear() : 0;
             if (!historyByPlayer.has(result.player_id)) historyByPlayer.set(result.player_id, []);
             historyByPlayer.get(result.player_id)!.push({ year, position: result.position, score: result.score });
+
+            // Also push to venueResults for the venue history calculator
+            venueResults.push({
+              player_id: result.player_id,
+              position: result.position,
+              score: result.score,
+              year,
+              status: (result as any).status || null,
+            });
           }
 
-          // Map to player names
           const playerNameMap = new Map(players.map(p => [p.player_id, `${p.first_name} ${p.last_name}`]));
           for (const [playerId, finishes] of historyByPlayer) {
             const name = playerNameMap.get(playerId);
@@ -355,7 +329,7 @@ serve(async (req) => {
       console.error('[generate-predictions] Course history fetch failed:', err);
     }
 
-    // --- 2C: Fetch recent form (last 4 results per player) ---
+    // --- 2C: Fetch recent form ---
     let recentFormData: { playerName: string; playerId: string; results: { tournament: string; position: number | null; score: number | null }[] }[] = [];
 
     try {
@@ -430,14 +404,8 @@ serve(async (req) => {
               body: JSON.stringify({
                 model: 'sonar',
                 messages: [
-                  {
-                    role: 'system',
-                    content: 'You are a golf research assistant. Provide concise, factual information. Focus on recent news, statistics, and expert opinions. Keep responses under 300 words. Be specific about player names and statistics.',
-                  },
-                  {
-                    role: 'user',
-                    content: query,
-                  },
+                  { role: 'system', content: 'You are a golf research assistant. Provide concise, factual information. Focus on recent news, statistics, and expert opinions. Keep responses under 300 words. Be specific about player names and statistics.' },
+                  { role: 'user', content: query },
                 ],
                 max_tokens: 500,
                 temperature: 0.2,
@@ -460,96 +428,192 @@ serve(async (req) => {
 
         const researchResults = await Promise.all(researchPromises);
         
-        const expertPicks = researchResults[0]?.trim() || 'No recent expert picks available.';
-        const courseHistoryResearch = researchResults[1]?.trim() || 'No recent course history available.';
-        const injuryNews = researchResults[2]?.trim() || 'No injury news available.';
-        const weatherForecast = researchResults[3]?.trim() || 'No weather forecast available.';
-        
         researchContext = `
 ## REAL-TIME RESEARCH (as of ${new Date().toISOString().split('T')[0]})
 
 ### Expert Picks & Betting Odds Movement
-${expertPicks}
+${researchResults[0]?.trim() || 'No recent expert picks available.'}
 
 ### Course History & Scoring Trends
-${courseHistoryResearch}
+${researchResults[1]?.trim() || 'No recent course history available.'}
 
 ### Injury News, Withdrawals & Field Updates
-${injuryNews}
+${researchResults[2]?.trim() || 'No injury news available.'}
 
 ### Weather Conditions Forecast
-${weatherForecast}
+${researchResults[3]?.trim() || 'No weather forecast available.'}
 `;
 
         console.log('[generate-predictions] Research context fetched successfully');
       } catch (err) {
         console.error('[generate-predictions] Perplexity research failed:', err);
-        // Continue without research - not critical
       }
     } else {
       console.log('[generate-predictions] Skipping Perplexity research (no API key configured)');
     }
 
     // =============================================
-    // STEP 4: Build & Call Claude API
+    // STEP 4: V2 Data Enrichment Pipeline
     // =============================================
 
-    const prompt = buildAnalysisPrompt(tournament, players, researchContext, hasConfirmedField, courseHistoryData, recentFormData);
+    console.log('[generate-predictions] Starting V2 data enrichment pipeline...');
 
-    console.log('[generate-predictions] Calling Claude API...');
+    // --- 4A: Fetch Course DNA profile ---
+    let courseDNA: any = null;
+    try {
+      const { data: dnaResult } = await supabase
+        .from('course_dna_profiles')
+        .select('*')
+        .eq('venue_name', tournament.venue_name)
+        .single();
+      
+      courseDNA = dnaResult;
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': anthropicApiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 6000,
-        messages: [
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
-      }),
+      if (!courseDNA) {
+        console.log('[generate-predictions] No course DNA profile — attempting on-the-fly build');
+        try {
+          await fetch(`${supabaseUrl}/functions/v1/build-course-dna`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${supabaseServiceKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ venueName: tournament.venue_name }),
+          });
+          const { data: freshDNA } = await supabase
+            .from('course_dna_profiles')
+            .select('*')
+            .eq('venue_name', tournament.venue_name)
+            .single();
+          courseDNA = freshDNA;
+        } catch (e) {
+          console.warn('[generate-predictions] On-the-fly course DNA build failed:', e);
+        }
+      }
+
+      if (courseDNA) {
+        console.log(`[generate-predictions] Course DNA: ${courseDNA.course_type} for ${courseDNA.venue_name}`);
+      }
+    } catch (err) {
+      console.warn('[generate-predictions] Course DNA fetch failed:', err);
+    }
+
+    // --- 4B: Extract detailed stats + derive SG proxies ---
+    const recentFormMap = new Map(recentFormData.map(r => [r.playerId, r.results.map(res => ({
+      tournament: res.tournament,
+      position: res.position || 999,
+      score: res.score || 0,
+    }))]));
+
+    const courseHistoryMap = new Map(courseHistoryData.map(c => [c.playerId, c.finishes.map(f => ({
+      year: f.year,
+      position: f.position || 999,
+      score: f.score || 0,
+    }))]));
+
+    let enrichedPlayers: EnrichedPlayerStats[] = players.map((player) => {
+      const extracted = extractPlayerStats(player.raw_data);
+      return {
+        playerId: player.player_id,
+        playerName: `${player.first_name} ${player.last_name}`,
+        ...extracted,
+        sgPuttingProxy: null,
+        sgApproachProxy: null,
+        sgOffTeeProxy: null,
+        sgAroundGreenProxy: null,
+        worldRank: player.world_rank || null,
+        priorRank: player.prior_rank || null,
+        rankMomentum: (player.prior_rank && player.world_rank)
+          ? player.prior_rank - player.world_rank : null,
+        recentResults: recentFormMap.get(player.player_id) || [],
+        venueHistory: courseHistoryMap.get(player.player_id) || [],
+      };
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('[generate-predictions] Claude API error:', response.status, errorText);
-      throw new Error(`Claude API error: ${response.status}`);
+    // Derive SG proxies from field averages
+    enrichedPlayers = deriveSGProxies(enrichedPlayers);
+    console.log(`[generate-predictions] Enriched ${enrichedPlayers.length} players with detailed stats + SG proxies`);
+
+    // --- 4C: Calculate course fit scores ---
+    let courseFitScores = new Map<string, any>();
+    let fitScoreMap = new Map<string, number>();
+
+    if (courseDNA) {
+      const dnaProfile: CourseDNAProfile = {
+        venueName: courseDNA.venue_name,
+        drivingDistanceImportance: courseDNA.driving_distance_importance || 0,
+        drivingAccuracyImportance: courseDNA.driving_accuracy_importance || 0,
+        girImportance: courseDNA.gir_importance || 0,
+        scramblingImportance: courseDNA.scrambling_importance || 0,
+        puttingImportance: courseDNA.putting_importance || 0,
+        sgOffTeeImportance: courseDNA.sg_off_tee_importance || 0,
+        sgApproachImportance: courseDNA.sg_approach_importance || 0,
+        sgAroundGreenImportance: courseDNA.sg_around_green_importance || 0,
+        sgPuttingImportance: courseDNA.sg_putting_importance || 0,
+        courseType: courseDNA.course_type || 'balanced',
+        avgWinningScore: courseDNA.avg_winning_score || null,
+      };
+
+      courseFitScores = calculateCourseFitScores(dnaProfile, enrichedPlayers);
+
+      for (const [playerId, result] of courseFitScores) {
+        fitScoreMap.set(playerId, result.fitScore);
+      }
+
+      console.log(`[generate-predictions] Calculated course fit for ${courseFitScores.size} players`);
+    } else {
+      console.log('[generate-predictions] No course DNA — skipping calculated fit scores');
     }
 
-    const claudeResponse = await response.json();
+    // --- 4D: Calculate venue history scores ---
+    const playerNameMap = new Map(players.map(p => [p.player_id, `${p.first_name} ${p.last_name}`]));
+    const venueHistoryScores = calculateVenueHistoryScores(venueResults, playerNameMap);
+    console.log(`[generate-predictions] Calculated venue history for ${venueHistoryScores.size} players`);
 
-    // Extract text response
-    const responseText = claudeResponse.content
-      ?.filter((block: any) => block.type === 'text')
-      ?.map((block: any) => block.text)
-      ?.join('') || '';
+    // --- 4E: Build enriched prompt sections ---
+    const fieldPlayerIds = players.map(p => p.player_id);
 
-    // Parse JSON from response
-    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      console.error('[generate-predictions] Failed to parse JSON:', responseText.substring(0, 500));
-      throw new Error('Failed to parse JSON from Claude response');
-    }
+    const courseFitSection = courseFitScores.size > 0
+      ? formatCourseFitForPrompt(courseFitScores, fieldPlayerIds, 30)
+      : 'No calculated course fit data available.';
 
-    const predictions: PredictionOutput = JSON.parse(jsonMatch[0]);
+    const venueHistorySection = venueHistoryScores.size > 0
+      ? formatVenueHistoryForPrompt(venueHistoryScores, fieldPlayerIds, 30)
+      : 'No venue history data available.';
 
-    console.log(`[generate-predictions] Generated ${predictions.topContenders.length} contenders`);
+    // Build per-player detailed stats for prompt
+    const detailedStatsSection = enrichedPlayers.slice(0, 40).map(p => {
+      return `${p.playerName}: ${formatStatsForPrompt(p)}`;
+    }).join('\n');
 
     // =============================================
-    // STEP 5: Enrich with Photo URLs & PGA Tour IDs
+    // STEP 5: Build Prompt & Run Consensus Engine
+    // =============================================
+
+    const prompt = buildAnalysisPrompt(
+      tournament, players, researchContext, hasConfirmedField,
+      courseHistoryData, recentFormData,
+      courseFitSection, venueHistorySection, detailedStatsSection,
+      courseDNA?.course_type || null,
+    );
+
+    console.log('[generate-predictions] Running consensus engine...');
+
+    const consensus = await runConsensus(
+      '', // system prompt is embedded in the user prompt
+      prompt,
+      fitScoreMap,
+    );
+
+    console.log(`[generate-predictions] Consensus complete: ${consensus.consensusMethod}, ${consensus.topContenders.length} contenders`);
+
+    // =============================================
+    // STEP 6: Enrich with Photo URLs & PGA Tour IDs + Override courseFitScore
     // =============================================
 
     const playerByIdMap = new Map(players.map(p => [p.player_id, p]));
     const playerByNameMap = new Map(players.map(p => [
-      `${p.first_name} ${p.last_name}`.toLowerCase(), 
-      p
+      `${p.first_name} ${p.last_name}`.toLowerCase(), p
     ]));
 
     function findPlayer(playerId: string, playerName: string): PlayerStats | undefined {
@@ -569,34 +633,65 @@ ${weatherForecast}
       return undefined;
     }
 
-    predictions.topContenders = predictions.topContenders.map(tc => {
+    const enrichedContenders = consensus.topContenders.map(tc => {
       const player = findPlayer(tc.playerId, tc.playerName);
       return {
-        ...tc,
+        rank: tc.rank,
         playerId: player?.player_id || tc.playerId,
-        photoUrl: player?.photo_url || tc.photoUrl,
-        pgaTourId: player?.pga_tour_id || tc.pgaTourId,
+        playerName: tc.playerName,
+        photoUrl: player?.photo_url || null,
+        pgaTourId: player?.pga_tour_id || null,
+        country: player?.country || 'USA',
+        worldRanking: player?.world_rank || 999,
+        winProbability: tc.winProbability,
+        // CRITICAL: Use CALCULATED fit score, not AI-guessed
+        courseFitScore: fitScoreMap.get(player?.player_id || tc.playerId) || tc.courseFitScore,
+        reasons: tc.reasons,
+        concern: '',
+        isDarkHorse: tc.isDarkHorse,
+        consensusScore: tc.consensusScore,
+        modelVotes: tc.modelVotes,
       };
     });
 
     // =============================================
-    // STEP 6: Store Predictions
+    // STEP 7: Store Predictions with Consensus Data
     // =============================================
 
-    // Split into display picks (top 5) and alternates (6-8)
-    const displayPicks = predictions.topContenders.slice(0, 5);
-    const alternates = predictions.topContenders.slice(5, 8);
+    const displayPicks = enrichedContenders.slice(0, 5);
+    const alternates = enrichedContenders.slice(5, 8);
 
     const { error: upsertError } = await supabase
       .from('ai_predictions')
       .upsert({
         tournament_id: tournament.id,
         predictions: displayPicks,
-        dark_horses: alternates, // Repurpose dark_horses column for alternates
-        course_analysis: predictions.courseAnalysis,
-        confidence: predictions.confidence,
-        model_version: 'claude-sonnet-4-20250514',
-        prompt_version: 'v3',  // Bumped for field filtering, course history, 8 picks
+        dark_horses: alternates,
+        course_analysis: consensus.courseAnalysis,
+        confidence: consensus.consensusConfidence,
+        model_version: 'consensus_v1',
+        prompt_version: 'v4',
+        consensus_data: {
+          method: consensus.consensusMethod,
+          agreementScore: consensus.agreementScore,
+          modelResults: consensus.modelResults.map(r => ({
+            model: r.model,
+            success: r.success,
+            latencyMs: r.latencyMs,
+            picksCount: r.picks.length,
+            picks: r.picks.map(p => ({ playerId: p.playerId, playerName: p.playerName, rank: p.rank })),
+            error: r.error,
+          })),
+          courseDNA: courseDNA ? {
+            courseType: courseDNA.course_type,
+            venueName: courseDNA.venue_name,
+          } : null,
+          enrichmentStats: {
+            playersEnriched: enrichedPlayers.length,
+            courseFitCalculated: courseFitScores.size,
+            venueHistoryCalculated: venueHistoryScores.size,
+          },
+        },
         research_context: researchContext ? { raw: researchContext, fetched_at: new Date().toISOString() } : null,
         generated_at: new Date().toISOString(),
         expires_at: new Date(tournament.start_date).toISOString(),
@@ -609,16 +704,10 @@ ${weatherForecast}
       throw upsertError;
     }
 
-    console.log('[generate-predictions] Predictions stored successfully');
-
-    // Log token usage
-    const usage = claudeResponse.usage;
-    if (usage) {
-      console.log(`[generate-predictions] Tokens - Input: ${usage.input_tokens}, Output: ${usage.output_tokens}`);
-    }
+    console.log('[generate-predictions] Predictions stored successfully with consensus data');
 
     // =============================================
-    // STEP 7: Return Response
+    // STEP 8: Return Response
     // =============================================
 
     return new Response(
@@ -626,31 +715,32 @@ ${weatherForecast}
         success: true,
         cached: false,
         hasResearch: !!researchContext,
+        consensusMethod: consensus.consensusMethod,
+        agreementScore: consensus.agreementScore,
+        modelsUsed: consensus.modelResults.map(r => ({ model: r.model, success: r.success })),
         tournament: {
           id: tournament.id,
           name: tournament.name,
           venue: tournament.venue_name,
         },
-        predictions: predictions,
+        predictions: {
+          topContenders: enrichedContenders,
+          courseAnalysis: consensus.courseAnalysis,
+          confidence: consensus.consensusConfidence,
+        },
         generatedAt: new Date().toISOString(),
       }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
     console.error('[generate-predictions] Error:', error);
-    
     return new Response(
       JSON.stringify({
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',
       }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
@@ -660,8 +750,6 @@ ${weatherForecast}
 // =============================================
 
 function isPredictionStale(prediction: any): boolean {
-  // Predictions are NEVER stale - once generated, they're final for that tournament
-  // Only regenerate via forceRegenerate (admin action)
   return false;
 }
 
@@ -675,54 +763,32 @@ function formatStoredPredictions(stored: any) {
   };
 }
 
-function determineCourseType(tournament: Tournament): { type: string; description: string } {
+function determineCourseType(tournament: Tournament, courseDNAType?: string | null): { type: string; description: string } {
+  if (courseDNAType) {
+    const typeMap: Record<string, { type: string; description: string }> = {
+      bombers_paradise: { type: "Bomber's Paradise", description: 'Length off the tee creates significant advantage. Favors long hitters who can overpower the course.' },
+      precision_track: { type: 'Precision Track', description: 'Tight fairways and small greens reward accuracy. Course management and iron play are critical.' },
+      scrambling_course: { type: "Scrambler's Course", description: 'Short game separates contenders. Scrambling and putting are paramount.' },
+      balanced: { type: 'Balanced Test', description: 'Rewards all aspects of the game. No single skill dominates.' },
+      putting_paradise: { type: 'Putting Paradise', description: 'Greens are the great equalizer. Elite putting separates winners from the pack.' },
+    };
+    if (typeMap[courseDNAType]) return typeMap[courseDNAType];
+  }
+
   const name = tournament.name.toLowerCase();
   const yardage = tournament.venue_yardage || 7200;
   const par = tournament.venue_par || 72;
 
-  // Check for majors
   if (name.includes('masters') || name.includes('u.s. open') || 
       name.includes('open championship') || name.includes('pga championship')) {
-    return {
-      type: 'Major Championship',
-      description: 'Demands excellence in all areas. Historically favors complete players with major experience and mental fortitude.'
-    };
+    return { type: 'Major Championship', description: 'Demands excellence in all areas. Historically favors complete players with major experience and mental fortitude.' };
   }
-
-  // Check for signature events
   if (name.includes('players') || name.includes('memorial') || name.includes('arnold palmer')) {
-    return {
-      type: 'Signature Event',
-      description: 'Elite field, premium course conditions. Rewards consistent ball-striking and course management.'
-    };
+    return { type: 'Signature Event', description: 'Elite field, premium course conditions. Rewards consistent ball-striking and course management.' };
   }
-
-  // Course type by characteristics
-  if (yardage >= 7400) {
-    return {
-      type: "Bomber's Paradise",
-      description: 'Length off the tee creates significant advantage. Favors long hitters who can overpower the course.'
-    };
-  }
-
-  if (yardage < 7100 || par <= 70) {
-    return {
-      type: 'Precision Track',
-      description: 'Tight fairways and small greens reward accuracy. Course management and iron play are critical.'
-    };
-  }
-
-  if (par <= 70) {
-    return {
-      type: "Scrambler's Course",
-      description: 'Par is a good score. Short game and scrambling ability separate contenders from pretenders.'
-    };
-  }
-
-  return {
-    type: 'Balanced Test',
-    description: 'Well-rounded course that rewards all aspects of the game. No single skill dominates.'
-  };
+  if (yardage >= 7400) return { type: "Bomber's Paradise", description: 'Length off the tee creates significant advantage.' };
+  if (yardage < 7100 || par <= 70) return { type: 'Precision Track', description: 'Tight fairways and small greens reward accuracy.' };
+  return { type: 'Balanced Test', description: 'Well-rounded course that rewards all aspects of the game.' };
 }
 
 function formatDate(dateStr: string): string {
@@ -735,12 +801,15 @@ function buildAnalysisPrompt(
   players: PlayerStats[],
   researchContext: string = '',
   hasConfirmedField: boolean = false,
-  courseHistoryData: { playerName: string; playerId: string; finishes: { year: number; position: number | null; score: number | null }[] }[] = [],
-  recentFormData: { playerName: string; playerId: string; results: { tournament: string; position: number | null; score: number | null }[] }[] = [],
+  courseHistoryData: any[] = [],
+  recentFormData: any[] = [],
+  courseFitSection: string = '',
+  venueHistorySection: string = '',
+  detailedStatsSection: string = '',
+  courseDNAType: string | null = null,
 ): string {
-  const courseType = determineCourseType(tournament);
+  const courseType = determineCourseType(tournament, courseDNAType);
   
-  // Format player data for the prompt
   const playerDataFormatted = players.slice(0, 60).map(p => ({
     id: p.player_id,
     name: `${p.first_name} ${p.last_name}`,
@@ -759,15 +828,14 @@ function buildAnalysisPrompt(
     }
   }));
 
-  // Build course history section
   let courseHistorySection = '';
   if (courseHistoryData.length > 0) {
-    const historyLines = courseHistoryData.slice(0, 30).map(p => {
-      const finishStr = p.finishes.map(f => `${f.year}: ${f.position ? `T${f.position}` : 'MC'} (${f.score ?? 'N/A'})`).join(', ');
+    const historyLines = courseHistoryData.slice(0, 30).map((p: any) => {
+      const finishStr = p.finishes.map((f: any) => `${f.year}: ${f.position ? `T${f.position}` : 'MC'} (${f.score ?? 'N/A'})`).join(', ');
       return `- ${p.playerName}: ${finishStr}`;
     }).join('\n');
     courseHistorySection = `
-## COURSE HISTORY AT ${tournament.venue_name.toUpperCase()} (Last 3 Years)
+## COURSE HISTORY AT ${tournament.venue_name.toUpperCase()} (Last 5 Years)
 
 ${historyLines}
 
@@ -775,11 +843,10 @@ ${historyLines}
 `;
   }
 
-  // Build recent form section
   let recentFormSection = '';
   if (recentFormData.length > 0) {
-    const formLines = recentFormData.slice(0, 25).map(p => {
-      const resultStr = p.results.map(r => `${r.tournament}: ${r.position ? `T${r.position}` : 'MC'}`).join(', ');
+    const formLines = recentFormData.slice(0, 25).map((p: any) => {
+      const resultStr = p.results.map((r: any) => `${r.tournament}: ${r.position ? `T${r.position}` : 'MC'}`).join(', ');
       return `- ${p.playerName}: ${resultStr}`;
     }).join('\n');
     recentFormSection = `
@@ -793,7 +860,7 @@ ${formLines}
 
   const fieldNote = hasConfirmedField
     ? '**Note**: The player pool below contains ONLY confirmed tournament entrants.'
-    : '**Note**: Confirmed field not yet available — pool is top players by world ranking. Some may not be in the field. Cross-reference with the withdrawal/field research above.';
+    : '**Note**: Confirmed field not yet available — pool is top players by world ranking. Some may not be in the field.';
 
   return `You are an expert PGA Tour analyst with deep knowledge of player statistics, course management, and tournament history. Your analysis is data-driven but also considers intangibles like pressure performance, course fit, and current form.
 
@@ -814,6 +881,15 @@ ${courseHistorySection}
 
 ${recentFormSection}
 
+## CALCULATED COURSE FIT SCORES (statistically derived from historical correlations — use as STRONG signal)
+${courseFitSection}
+
+## VENUE HISTORY SCORES (numerical composite with trend analysis)
+${venueHistorySection}
+
+## DETAILED PLAYER STATISTICS (with derived SG component estimates)
+${detailedStatsSection}
+
 ## FIELD DATA
 ${fieldNote}
 
@@ -829,42 +905,32 @@ For this course type (${courseType.type}), identify which strokes gained categor
 
 Each contender's reasons MUST reference specific strokes gained categories that match the course DNA.
 
+## IMPORTANT: The courseFitScore values above are STATISTICALLY CALCULATED from historical correlations at this venue. 
+Use them as a strong signal for your rankings. You may adjust ±10 points based on intangibles, but do not ignore them.
+
 ## ANALYSIS TASK
 
 Create a comprehensive prediction with **exactly 8 contenders ranked 1-8**.
 - Picks 1-5 are your top display picks.
-- Picks 6-8 are ranked alternates (in case of withdrawals).
+- Picks 6-8 are ranked alternates.
 
 Factor in ALL available data:
-1. **Course Fit**: Match player strokes gained profile to course demands
+1. **Calculated Course Fit**: Use the statistically derived fit scores above as primary signal
 2. **Course History**: Past performance at this specific venue (highest weight)
 3. **Current Form**: Recent results and world ranking movement
 4. **Real-Time Context**: Expert opinions, injuries, withdrawals, weather conditions
 5. **Statistical Excellence**: Leaders in key categories for this course type
-6. **Intangibles**: Major winners at this venue type, pressure performers
-
-For the "skillsAnalysis" in courseAnalysis, provide a detailed 2-3 sentence explanation that:
-1. Identifies the 2-3 most important skills for THIS specific course
-2. Explains WHY those skills matter (course characteristics like green size, fairway width, rough severity, wind)
-3. Describes what type of player profile historically succeeds here
-
-Good example: "At TPC Scottsdale, approach play is paramount - the small, firm greens demand precision with mid-irons from 150-180 yards. Putting becomes the separator on Sunday, as the slick, undulating surfaces reward exceptional distance control."
-Bad example: "Players who are good at golf will do well here."
+6. **Venue History Score**: Numerical venue history with trend analysis
 
 ## CRITICAL: NO GAMBLING LANGUAGE
 
-Do NOT reference betting odds, spreads, lines, prices, or any gambling-related language anywhere in your response. Focus exclusively on player form, statistics, course fit, and historical performance.
+Do NOT reference betting odds, spreads, lines, prices, or any gambling-related language.
 
 ## CRITICAL: TEXT LENGTH RULES
 
 Each contender MUST have exactly 3 reasons. Each reason MUST be a COMPLETE sentence of 50 characters or less.
-The 3 reasons should cover distinct insights:
-1. Recent form or momentum (e.g. "Won last week at Pebble Beach")
-2. Course fit or key stat (e.g. "71% GIR leads field in precision")
-3. Historical performance (e.g. "Three top-10s in last four starts")
 
 GOOD: "Won here in 2022 and 2023" (25 chars)
-GOOD: "Elite iron play, #2 in GIR this season" (39 chars)
 BAD: "Two-time Phoenix Open winner (2022, 2023) with exceptional course history" (too long)
 
 ## REQUIRED OUTPUT
@@ -894,24 +960,24 @@ Return a JSON object with this exact structure:
   "courseAnalysis": {
     "winnerProfile": "Description of typical winner at this venue",
     "keyStats": ["stat1", "stat2", "stat3"],
-    "insight": "One compelling insight about course history and who tends to win here",
+    "insight": "One compelling insight about course history",
     "skillsAnalysis": "Detailed 2-3 sentence explanation of key skills for this course.",
     "difficulty": "Easy/Moderate/Difficult"
   },
   "confidence": 0.75,
-  "reasoning": "Brief explanation of your methodology and key factors"
+  "reasoning": "Brief explanation of your methodology"
 }
 
 ## IMPORTANT RULES
 
 1. **Use exact player IDs from the data provided** - do not make up IDs
-2. **Provide exactly 8 top contenders** ranked 1-8 (5 display + 3 alternates)
+2. **Provide exactly 8 top contenders** ranked 1-8
 3. **Each contender MUST have exactly 3 reasons**
 4. **Win probabilities should sum to approximately 60-80%** for all 8
 5. **Be specific in reasons** - cite actual statistics and course history
 6. **Course fit scores should be 1-100**
 7. **Return ONLY valid JSON** - no markdown, no explanation outside the JSON
-8. **No gambling language** - no odds, betting, lines, spreads, or wagering terms
+8. **No gambling language**
 
 Provide your analysis now:`;
 }

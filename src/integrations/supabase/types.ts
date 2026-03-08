@@ -419,6 +419,7 @@ export type Database = {
       ai_predictions: {
         Row: {
           confidence: number | null
+          consensus_data: Json | null
           course_analysis: Json | null
           dark_horses: Json | null
           expires_at: string | null
@@ -432,6 +433,7 @@ export type Database = {
         }
         Insert: {
           confidence?: number | null
+          consensus_data?: Json | null
           course_analysis?: Json | null
           dark_horses?: Json | null
           expires_at?: string | null
@@ -445,6 +447,7 @@ export type Database = {
         }
         Update: {
           confidence?: number | null
+          consensus_data?: Json | null
           course_analysis?: Json | null
           dark_horses?: Json | null
           expires_at?: string | null
