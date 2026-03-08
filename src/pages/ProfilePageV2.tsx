@@ -148,7 +148,7 @@ const ProfilePageV2Content: React.FC = () => {
   
   const { data: profile, isLoading: profileLoading } = useUserProfile(profileUserId);
   const { data: top100Overview } = useTop100Overview(profileUserId);
-  const { items: posts } = useActivityPostsV2(profileUserId);
+  // Post count comes from usePersonalPostsCount below
   const { data: postsCount = 0, isLoading: postsCountLoading } = usePersonalPostsCount(profileUserId);
   const { data: achievements } = useProfileAchievements(profileUserId);
   
