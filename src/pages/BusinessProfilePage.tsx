@@ -218,7 +218,7 @@ const BusinessProfilePage: React.FC = () => {
   const isGolfClub = business?.category === 'Golf Club';
   
   const tabs = [
-    { id: 'content', label: 'Activity' },
+    { id: 'content', label: 'Posts' },
     { id: 'golfers', label: 'People' },
     { id: 'info', label: 'About' },
   ];
