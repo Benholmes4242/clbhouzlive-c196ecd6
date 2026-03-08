@@ -15,6 +15,7 @@ interface VideoCardProps {
   isAutoplayEligible?: boolean;
   userId?: string;
   cardIndex?: number;
+  allPosts?: FeedPost[];
 }
 
 function formatCompact(n: number): string {
