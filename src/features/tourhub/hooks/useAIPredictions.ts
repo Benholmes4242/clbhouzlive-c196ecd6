@@ -161,6 +161,7 @@ async function fetchActiveTournamentPredictions(): Promise<ActiveTournamentResul
     .eq('season_id', pgaSeasonId)
     .eq('status', 'inprogress')
     .order('start_date', { ascending: true })
+    .order('purse', { ascending: false })
     .limit(1)
     .maybeSingle();
 

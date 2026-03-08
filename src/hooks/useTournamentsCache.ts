@@ -64,7 +64,8 @@ async function fetchTournamentsCache(): Promise<TournamentsCache> {
       .from('sr_tournaments')
       .select(CACHE_SELECT)
       .or(`status.eq.inprogress,and(status.in.(created,scheduled),start_date.lte.${today},end_date.gte.${today})`)
-      .order('start_date', { ascending: true }),
+      .order('start_date', { ascending: true })
+      .order('purse', { ascending: false }),
 
     // Completed in last 7 days
     supabase
