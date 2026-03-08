@@ -8,20 +8,10 @@ import { Loader2, RefreshCw } from 'lucide-react';
 
 type PostKind = 'longform' | 'review' | 'compact';
 
-interface ClassifiedPost {
-  kind: PostKind;
-  post: FeedPost;
-  globalCompactIndex?: number;
-}
-
-interface FeedSegment {
-  kind: 'longform' | 'review';
-  post: FeedPost;
-} | {
-  kind: 'compact-group';
-  posts: FeedPost[];
-  startIndex: number;
-}
+type FeedSegment =
+  | { kind: 'longform'; post: FeedPost }
+  | { kind: 'review'; post: FeedPost }
+  | { kind: 'compact-group'; posts: FeedPost[]; startIndex: number };
 
 function classifyPost(post: FeedPost): PostKind {
   if (post.isReview && post.review) return 'review';
