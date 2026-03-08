@@ -60,19 +60,25 @@ export function CreatorPostPicker({
     setSaving(true);
     try {
       if (mode === 'featured') {
-        await supabase
+        const { error } = await supabase
           .from('user_profiles')
           .update({ featured_post_id: selectedFeatured })
           .eq('id', userId);
-        onSelectFeatured?.(selectedFeatured!);
+        if (error) throw error;
       } else {
-        await supabase
+        const { error } = await supabase
           .from('user_profiles')
           .update({ pinned_post_ids: selectedPinned } as any)
           .eq('id', userId);
+        if (error) throw error;
+      }
+      // Invalidate and wait for refetch BEFORE closing
+      await queryClient.invalidateQueries({ queryKey: ['creator-profile', userId] });
+      if (mode === 'featured') {
+        onSelectFeatured?.(selectedFeatured!);
+      } else {
         onSelectPinned?.(selectedPinned);
       }
-      queryClient.invalidateQueries({ queryKey: ['creator-profile', userId] });
       onClose();
     } catch (err) {
       console.error('Failed to save creator selection:', err);
