@@ -56,18 +56,10 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
     <div className="space-y-2">
       {distributionItems.map((item) => {
         const percentage = (item.count / maxCount) * 100;
-        const isOutstanding = item.key === 'OUTSTANDING';
         const hasCount = item.count > 0;
         
-        // Bar color logic:
-        // - Outstanding tier ALWAYS gets amber (when it has any count)
-        // - All other tiers with counts get neutral grey
-        // - Empty bars get light grey
-        const barColor = isOutstanding && hasCount
-          ? OUTSTANDING_COLOR 
-          : hasCount 
-            ? NEUTRAL_COLOR 
-            : EMPTY_COLOR;
+        // Use per-tier color from the central theme system
+        const barColor = hasCount ? item.color : EMPTY_COLOR;
 
         return (
           <div key={item.key} className="flex items-center gap-2">

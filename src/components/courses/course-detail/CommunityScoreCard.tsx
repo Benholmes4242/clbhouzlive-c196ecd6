@@ -242,10 +242,10 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         <div className="border-t border-border p-5 grid grid-cols-2 gap-4">
           {categories.map((cat) => {
             const score = cat.score || 0;
-            const isOutstandingCat = score >= 9;
-            const barColorClass = isOutstandingCat 
+            const tierData = getScoreTier(score);
+            const barColorClass = tierData.isOutstanding 
              ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]' 
-             : 'bg-[#A8A29E]';
+             : tierData.barFill;
             
             return (
               <div key={cat.id} className="space-y-1.5">
