@@ -34,11 +34,13 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts }) => {
       className="relative aspect-[4/5] overflow-hidden rounded-[4px] cursor-pointer active:scale-[0.97]"
       style={{ transition: 'transform 100ms ease' }}
       onClick={() => {
-        useFullscreenFeed.getState().open({
-          posts: allPosts,
-          startIndex: index,
-          sourceId: 'watch',
-        });
+        if (allPosts) {
+          useFullscreenFeed.getState().open({
+            posts: allPosts,
+            startIndex: index,
+            sourceId: 'watch',
+          });
+        }
       }}
     >
       {/* Poster or placeholder */}

@@ -50,7 +50,6 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
 
   const handleTap = () => {
     if (allPosts) {
-      const { useFullscreenFeed } = require('@/components/fullscreen-feed/hooks/useFullscreenFeed');
       useFullscreenFeed.getState().open({
         posts: allPosts,
         startIndex: cardIndex,
