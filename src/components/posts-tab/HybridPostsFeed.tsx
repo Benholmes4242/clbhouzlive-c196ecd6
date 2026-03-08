@@ -136,16 +136,19 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
     <div ref={gridRef} className="flex flex-col gap-3 pb-6">
       {segments.map((segment, i) => {
         if (segment.kind === 'longform') {
-          return <LongFormCard key={segment.post.id} post={segment.post} />;
+          const idx = posts.indexOf(segment.post);
+          return <LongFormCard key={segment.post.id} post={segment.post} allPosts={posts} postIndex={idx >= 0 ? idx : undefined} />;
         }
         if (segment.kind === 'review') {
-          return <ReviewCard key={segment.post.id} post={segment.post} />;
+          const idx = posts.indexOf(segment.post);
+          return <ReviewCard key={segment.post.id} post={segment.post} allPosts={posts} postIndex={idx >= 0 ? idx : undefined} />;
         }
         return (
           <CompactGridRow
             key={`compact-${i}`}
             posts={segment.posts}
             startIndex={segment.startIndex}
+            allPosts={posts}
           />
         );
       })}

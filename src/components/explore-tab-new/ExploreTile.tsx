@@ -1,12 +1,14 @@
 import { memo } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 
 interface ExploreTileProps {
   post: FeedPost;
   index: number;
+  allPosts?: FeedPost[];
 }
 
-function ExploreTileInner({ post, index }: ExploreTileProps) {
+function ExploreTileInner({ post, index, allPosts }: ExploreTileProps) {
   const media = post.mediaItems[0];
   if (!media) return null;
 
@@ -15,7 +17,13 @@ function ExploreTileInner({ post, index }: ExploreTileProps) {
   const rating = post.review?.rating;
 
   const handleTap = () => {
-    // Phase 5: will open fullscreen player
+    if (allPosts) {
+      useFullscreenFeed.getState().open({
+        posts: allPosts,
+        startIndex: index,
+        sourceId: 'explore',
+      });
+    }
   };
 
   return (

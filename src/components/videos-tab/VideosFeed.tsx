@@ -171,7 +171,7 @@ export function VideosFeed({
     <div className="flex flex-col gap-3 pb-4 pt-2">
       {posts.map((post, i) => (
         <div key={post.id} ref={setCardRef(i)} data-card-index={i}>
-          <VideoCard post={post} isAutoplayEligible={Math.abs(i - centerIndex) <= 2} userId={userId} cardIndex={i} />
+          <VideoCard post={post} isAutoplayEligible={Math.abs(i - centerIndex) <= 2} userId={userId} cardIndex={i} allPosts={posts} />
         </div>
       ))}
 

@@ -93,7 +93,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
       >
         {posts.map((post, i) => (
           <div key={post.id}>
-            <WatchTile post={post} index={i} />
+            <WatchTile post={post} index={i} allPosts={posts} />
           </div>
         ))}
         {posts.length > 8 && <SuggestedCreatorsStrip userId={userId} />}

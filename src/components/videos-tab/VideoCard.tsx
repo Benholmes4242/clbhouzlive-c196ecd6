@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, MessageCircle, Share2, MapPin } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { CommentsPage } from '@/components/clubhouse/cinematic/CommentsPage';
@@ -15,6 +16,7 @@ interface VideoCardProps {
   isAutoplayEligible?: boolean;
   userId?: string;
   cardIndex?: number;
+  allPosts?: FeedPost[];
 }
 
 function formatCompact(n: number): string {
@@ -33,7 +35,7 @@ function formatVideoDuration(totalSeconds: number): string {
   return `${m}:${pad(sec)}`;
 }
 
-export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligible = false, userId, cardIndex = 0 }: VideoCardProps) {
+export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligible = false, userId, cardIndex = 0, allPosts }: VideoCardProps) {
   const navigate = useNavigate();
   const firstVideo = post.mediaItems.find(m => m.type === 'video');
   const thumbnailUrl = firstVideo?.thumbnailUrl || '';
@@ -47,7 +49,13 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
   const [showComments, setShowComments] = useState(false);
 
   const handleTap = () => {
-    // Fullscreen player wired later
+    if (allPosts) {
+      useFullscreenFeed.getState().open({
+        posts: allPosts,
+        startIndex: cardIndex,
+        sourceId: 'videos',
+      });
+    }
   };
 
   const toggleLike = async () => {

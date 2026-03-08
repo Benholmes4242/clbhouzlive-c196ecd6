@@ -101,7 +101,7 @@ export default function ExploreGrid({
       <div ref={gridRef} className="grid grid-cols-2 gap-[2px] px-[2px]">
         {coursePosts.map((post, index) => (
           <Fragment key={post.id}>
-            <ExploreTile post={post} index={index} />
+            <ExploreTile post={post} index={index} allPosts={coursePosts} />
 
             {index === TRENDING_AFTER - 1 && (
               <TrendingCoursesStrip />

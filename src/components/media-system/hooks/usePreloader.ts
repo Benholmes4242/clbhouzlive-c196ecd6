@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useMediaStore } from '../store/mediaStore';
+import { useMediaStoreCompat } from '../store/useMediaStoreCompat';
 import { preCreateHlsInstance, destroyStalePreCreated, prewarmFirstSegment } from '../utils/hlsManager';
 import { parseMasterManifest, parseSegmentManifest } from '../utils/manifestParser';
 import { segmentCache } from '../utils/segmentCache';
@@ -29,7 +29,7 @@ function queuePreCreate(url: string): void {
  * Manifest text cache is shared with cachedHlsLoader for dedup.
  */
 export function usePreloader(posts: FeedPost[]) {
-  const activeIndex = useMediaStore((s) => s.activeIndex);
+  const activeIndex = useMediaStoreCompat((s) => s.activeIndex);
   const abortRef = useRef<AbortController | null>(null);
   const warmedManifests = useRef<Set<string>>(new Set());
   const warmedPosters = useRef<Set<string>>(new Set());

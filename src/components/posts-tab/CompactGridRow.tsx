@@ -1,10 +1,12 @@
 import React from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { Play, Star } from 'lucide-react';
+import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 
 interface CompactGridRowProps {
   posts: FeedPost[];
   startIndex: number;
+  allPosts?: FeedPost[];
 }
 
 function formatDuration(seconds: number): string {
@@ -19,7 +21,7 @@ function formatCompact(n: number): string {
   return String(n);
 }
 
-const CompactTile: React.FC<{ post: FeedPost; globalIndex: number }> = ({ post, globalIndex }) => {
+const CompactTile: React.FC<{ post: FeedPost; globalIndex: number; allPosts?: FeedPost[] }> = ({ post, globalIndex, allPosts }) => {
   const firstMedia = post.mediaItems[0];
   const isVideo = firstMedia?.type === 'video';
   const thumbnailUrl = firstMedia?.thumbnailUrl || firstMedia?.imageUrl;
@@ -31,7 +33,15 @@ const CompactTile: React.FC<{ post: FeedPost; globalIndex: number }> = ({ post, 
       className="relative aspect-[4/5] rounded-[4px] overflow-hidden bg-muted cursor-pointer"
       data-posts-tile-index={globalIndex}
       data-hls-url={firstMedia?.hlsUrl || ''}
-      onClick={() => { /* TODO: wire to player */ }}
+      onClick={() => {
+        if (allPosts) {
+          useFullscreenFeed.getState().open({
+            posts: allPosts,
+            startIndex: globalIndex,
+            sourceId: 'posts',
+          });
+        }
+      }}
     >
       {/* Poster image */}
       {thumbnailUrl && (
@@ -115,7 +125,7 @@ const CompactTile: React.FC<{ post: FeedPost; globalIndex: number }> = ({ post, 
   );
 };
 
-export const CompactGridRow: React.FC<CompactGridRowProps> = ({ posts, startIndex }) => {
+export const CompactGridRow: React.FC<CompactGridRowProps> = ({ posts, startIndex, allPosts }) => {
   return (
     <div className="grid grid-cols-3 gap-[2px]">
       {posts.map((post, i) => (
@@ -123,6 +133,7 @@ export const CompactGridRow: React.FC<CompactGridRowProps> = ({ posts, startInde
           key={post.id}
           post={post}
           globalIndex={startIndex + i}
+          allPosts={allPosts}
         />
       ))}
     </div>

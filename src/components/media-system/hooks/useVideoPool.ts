@@ -1,4 +1,4 @@
-import { useRef, useCallback, useEffect, useMemo, useState } from 'react';
+import { useRef, useCallback, useEffect, useMemo, useState, useContext } from 'react';
 import type { PoolElement, VideoSessionState } from '../types/media';
 import { POOL_CONFIG, TIMING } from '../types/media';
 import {
@@ -13,6 +13,7 @@ import { fadeOut, fadeIn } from '../utils/audioFade';
 import { segmentCache } from '../utils/segmentCache';
 import { useSessionCache } from './useSessionCache';
 import { useMediaStore } from '../store/mediaStore';
+import { MediaStoreContext } from '../store/MediaStoreContext';
 
 /**
  * Video Pool Manager — maintains 5 reusable <video> elements with
@@ -24,6 +25,9 @@ export function useVideoPool() {
   const hiddenContainerRef = useRef<HTMLDivElement | null>(null);
   const sessionCache = useSessionCache();
   const [ready, setReady] = useState(false);
+  const scopedStore = useContext(MediaStoreContext);
+  // Helper for imperative store access — scoped if available, global otherwise
+  const getStore = useCallback(() => scopedStore ? scopedStore.getState() : useMediaStore.getState(), [scopedStore]);
   
   const lastSwipeTime = useRef(0);
 
@@ -132,7 +136,7 @@ export function useVideoPool() {
       if (error instanceof DOMException) {
         if (error.name === 'NotAllowedError') {
           video.muted = true;
-          useMediaStore.getState().setMuted(true);
+          getStore().setMuted(true);
           try {
             await video.play();
             return true;
@@ -170,7 +174,7 @@ export function useVideoPool() {
         cached.lastUsedAt = Date.now();
         cached.assignedIndex = feedIndex;
         container.appendChild(cached.video);
-        cached.video.muted = useMediaStore.getState().isMuted;
+        cached.video.muted = getStore().isMuted;
         const ok = await safePlay(cached.video);
         if (ok) {
           onPlaying?.();
@@ -195,7 +199,7 @@ export function useVideoPool() {
 
       // Otherwise LRU by distance from active index
       if (!target) {
-        const activeIndex = useMediaStore.getState().activeIndex;
+        const activeIndex = getStore().activeIndex;
         let bestIdx = -1;
         let bestScore = -1;
 
@@ -223,7 +227,7 @@ export function useVideoPool() {
       const video = target.video;
 
       if (target.assignedUrl) {
-        const isMuted = useMediaStore.getState().isMuted;
+        const isMuted = getStore().isMuted;
 
         // Save session state
         sessionCache.save(target.assignedUrl, {
@@ -266,7 +270,7 @@ export function useVideoPool() {
       target.assignedUrl = hlsUrl;
       target.assignedIndex = feedIndex;
       target.lastUsedAt = Date.now();
-      video.muted = useMediaStore.getState().isMuted;
+      video.muted = getStore().isMuted;
 
       // Master load timeout
       let loadTimedOut = false;
@@ -389,7 +393,7 @@ export function useVideoPool() {
       }
 
       // NOW call safePlay
-      const isMutedNow = useMediaStore.getState().isMuted;
+      const isMutedNow = getStore().isMuted;
       if (!isMutedNow && !rapid) {
         video.volume = 0; // Start silent, fade in after play
       }
@@ -397,7 +401,7 @@ export function useVideoPool() {
 
       // Fade in audio if unmuted
       if (playOk && !isMutedNow && !rapid) {
-        fadeIn(video, useMediaStore.getState().volume); // Fire and forget
+        fadeIn(video, getStore().volume); // Fire and forget
       }
 
       // Safety ended listener (gapless loop hook is primary)
@@ -426,7 +430,7 @@ export function useVideoPool() {
 
       return video;
     },
-    [sessionCache, isRapidScrolling, safePlay, removeAllTrackedListeners, addTrackedListener]
+    [sessionCache, isRapidScrolling, safePlay, removeAllTrackedListeners, addTrackedListener, getStore]
   );
 
   // ── Release ───────────────────────────────────────────────────────

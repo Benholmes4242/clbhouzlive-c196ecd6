@@ -7,7 +7,7 @@ import { useRef, useState, useCallback } from 'react';
 import { VideoPlayer } from './VideoPlayer';
 import { ImageViewer } from './ImageViewer';
 import { CarouselIndicator } from './CarouselIndicator';
-import { useMediaStore } from './store/mediaStore';
+import { useMediaStoreCompat } from './store/useMediaStoreCompat';
 
 import { haptic } from '@/utils/haptics';
 import type { MediaItem } from './types/media';
@@ -32,8 +32,8 @@ export function MediaCarousel({
   mediaItems, feedIndex, isActive,
   onDoubleTapLike, onScrubStart, onScrubEnd,
 }: MediaCarouselProps) {
-  const activeMedia = useMediaStore((s) => s.carouselPositions.get(feedIndex) ?? 0);
-  const setCarouselPosition = useMediaStore((s) => s.setCarouselPosition);
+  const activeMedia = useMediaStoreCompat((s) => s.carouselPositions.get(feedIndex) ?? 0);
+  const setCarouselPosition = useMediaStoreCompat((s) => s.setCarouselPosition);
   const [translateX, setTranslateX] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const dirLock = useRef<DirLock>('none');

@@ -92,6 +92,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
               key={mediaKey}
               post={post}
               index={idx}
+              allPosts={posts}
             />
           );
         }
@@ -101,6 +102,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
             key={mediaKey}
             post={post}
             index={idx}
+            allPosts={posts}
           />
         );
       })}

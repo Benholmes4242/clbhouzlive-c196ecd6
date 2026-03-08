@@ -16,6 +16,7 @@ interface FriendsCardProps {
   isAutoplayEligible?: boolean;
   userId?: string;
   cardIndex?: number;
+  allPosts?: FeedPost[];
 }
 
 function formatCompact(n: number): string {
@@ -42,7 +43,7 @@ function getMediaAspectClass(post: FeedPost): string {
   return 'aspect-video';
 }
 
-export const FriendsCard = React.memo(function FriendsCard({ post, isAutoplayEligible = false, userId, cardIndex = 0 }: FriendsCardProps) {
+export const FriendsCard = React.memo(function FriendsCard({ post, isAutoplayEligible = false, userId, cardIndex = 0, allPosts }: FriendsCardProps) {
   const navigate = useNavigate();
   const firstMedia = post.mediaItems[0];
   const isVideo = firstMedia?.type === 'video';

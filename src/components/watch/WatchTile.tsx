@@ -1,6 +1,7 @@
 import React from 'react';
 import { Heart, Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
@@ -18,9 +19,10 @@ function abbreviateCount(n: number): string {
 interface WatchTileProps {
   post: FeedPost;
   index: number;
+  allPosts?: FeedPost[];
 }
 
-const WatchTile: React.FC<WatchTileProps> = ({ post, index }) => {
+const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts }) => {
   const media = post.mediaItems[0];
   const thumbnailUrl = media?.thumbnailUrl;
   const duration = media?.duration;
@@ -32,7 +34,13 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index }) => {
       className="relative aspect-[4/5] overflow-hidden rounded-[4px] cursor-pointer active:scale-[0.97]"
       style={{ transition: 'transform 100ms ease' }}
       onClick={() => {
-        // TODO: Wire to fullscreen player
+        if (allPosts) {
+          useFullscreenFeed.getState().open({
+            posts: allPosts,
+            startIndex: index,
+            sourceId: 'watch',
+          });
+        }
       }}
     >
       {/* Poster or placeholder */}

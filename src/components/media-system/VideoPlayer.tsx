@@ -4,9 +4,11 @@
  * Integrates gapless loop hook for seamless looping.
  * Supports double-tap-to-like, interactive scrubber, and MP4 fallback.
  */
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo, useContext } from 'react';
 import { useVideoPoolContext } from './VideoPoolProvider';
 import { useMediaStore } from './store/mediaStore';
+import { useMediaStoreCompat } from './store/useMediaStoreCompat';
+import { MediaStoreContext } from './store/MediaStoreContext';
 import { useGaplessLoop } from './hooks/useGaplessLoop';
 import { getHlsInstance } from './utils/hlsManager';
 import { LoadingSkeleton } from './LoadingSkeleton';
@@ -48,7 +50,10 @@ export function VideoPlayer({
   const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
   const [isBuffering, setIsBuffering] = useState(false);
   const pool = useVideoPoolContext();
-  const isMuted = useMediaStore((s) => s.isMuted);
+  const isMuted = useMediaStoreCompat((s) => s.isMuted);
+  const scopedStore = useContext(MediaStoreContext);
+  // Helper for imperative store access — scoped if available, global otherwise
+  const getStore = useCallback(() => scopedStore ? scopedStore.getState() : useMediaStore.getState(), [scopedStore]);
 
   // Double-tap detection
   const tapTimerRef = useRef<ReturnType<typeof setTimeout>>();
@@ -75,7 +80,7 @@ export function VideoPlayer({
         setHasError(false);
         videoRef.current = null;
         setVideoElement(null);
-        useMediaStore.getState().setActiveVideoElement(null, null);
+        getStore().setActiveVideoElement(null, null);
       }
       return;
     }
@@ -89,7 +94,7 @@ export function VideoPlayer({
     retryCountRef.current = 0;
     setIsLoading(true);
     setHasError(false);
-    useMediaStore.getState().setUserPaused(false);
+    getStore().setUserPaused(false);
 
     let cancelled = false;
 
@@ -121,7 +126,7 @@ export function VideoPlayer({
           assignedRef.current = null;
           setIsLoading(false);
           setHasError(true);
-          useMediaStore.getState().markError(feedIndex);
+          getStore().markError(feedIndex);
         },
         mp4Url
       );
@@ -135,7 +140,7 @@ export function VideoPlayer({
       videoEl = video;
       videoRef.current = video;
       setVideoElement(video);
-      useMediaStore.getState().setActiveVideoElement(video, videoRef);
+      getStore().setActiveVideoElement(video, videoRef);
       video.muted = isMuted;
 
       if (!video.paused && video.readyState >= 3) {
@@ -174,8 +179,8 @@ export function VideoPlayer({
 
     setHasError(false);
     setIsLoading(true);
-    useMediaStore.getState().clearError(feedIndex);
-    useMediaStore.getState().markRetrying(feedIndex);
+    getStore().clearError(feedIndex);
+    getStore().markRetrying(feedIndex);
 
     const container = containerRef.current;
     if (!container) return;
@@ -184,7 +189,7 @@ export function VideoPlayer({
       () => {
         setIsLoading(false);
         setIsPlaying(true);
-        useMediaStore.getState().clearRetrying(feedIndex);
+        getStore().clearRetrying(feedIndex);
         if (videoRef.current?.duration && isFinite(videoRef.current.duration)) {
           setVideoDuration(videoRef.current.duration);
         }
@@ -192,14 +197,14 @@ export function VideoPlayer({
       () => {
         setIsLoading(false);
         setHasError(true);
-        useMediaStore.getState().clearRetrying(feedIndex);
-        useMediaStore.getState().markError(feedIndex);
+        getStore().clearRetrying(feedIndex);
+        getStore().markError(feedIndex);
       },
       mp4Url
     ).then((video) => {
       if (video) {
         videoRef.current = video;
-        video.muted = useMediaStore.getState().isMuted;
+        video.muted = getStore().isMuted;
       }
     });
   }, [hlsUrl, feedIndex, pool, mp4Url]);
@@ -218,11 +223,11 @@ export function VideoPlayer({
         if (video.paused) {
           video.play().catch(() => {});
           setIsPlaying(true);
-          useMediaStore.getState().setUserPaused(false);
+          getStore().setUserPaused(false);
         } else {
           video.pause();
           setIsPlaying(false);
-          useMediaStore.getState().setUserPaused(true);
+          getStore().setUserPaused(true);
         }
         setShowPlayIcon(true);
         setTimeout(() => setShowPlayIcon(false), 800);

@@ -3,6 +3,7 @@ import { Heart, MessageCircle, Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
@@ -20,6 +21,7 @@ function abbreviateCount(n: number): string {
 interface CourseMediaLandscapeCardProps {
   post: FeedPost;
   index: number;
+  allPosts?: FeedPost[];
 }
 
 const HUD_GLASS = {
@@ -30,7 +32,7 @@ const HUD_GLASS = {
   boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
 };
 
-export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> = ({ post, index }) => {
+export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> = ({ post, index, allPosts }) => {
   const media = post.mediaItems[0];
   const isVideo = media?.type === 'video';
   const thumbnailUrl = isVideo ? media?.thumbnailUrl : (media?.imageUrl || media?.thumbnailUrl);
@@ -47,7 +49,16 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
   return (
     <div
       style={{ gridColumn: '1 / -1' }}
-      className="bg-card"
+      className="bg-card cursor-pointer"
+      onClick={() => {
+        if (allPosts) {
+          useFullscreenFeed.getState().open({
+            posts: allPosts,
+            startIndex: index,
+            sourceId: 'course-media',
+          });
+        }
+      }}
       data-course-media-index={index}
     >
       {/* Creator header */}

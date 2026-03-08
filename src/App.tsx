@@ -40,6 +40,7 @@ import { PostEventsBridge } from '@/events/PostEventsBridge';
 import { UploadToastsBridge } from '@/uploads/UploadToastsBridge';
 import UploadProgressBanner from '@/components/uploads/UploadProgressBanner';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
+import { FullscreenFeedOverlay } from '@/components/fullscreen-feed/FullscreenFeedOverlay';
 import { UploadResilienceProvider } from '@/contexts/UploadResilienceContext';
 import { useUploadGuard } from '@/hooks/useUploadGuard';
 import { FLAGS } from '@/config/flags';
@@ -714,6 +715,8 @@ const AppInner: React.FC = () => {
                                               <MiniPlayer />
                                               <GlobalQueueDrawer />
                                             </Suspense>
+                                            {/* Fullscreen Feed Overlay - portal-based, renders above everything */}
+                                            <FullscreenFeedOverlay />
                                           </UploadResilienceProvider>
                                         </AuthWrapper>
                                       </ErrorBoundary>

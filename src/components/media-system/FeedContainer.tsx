@@ -7,10 +7,12 @@
  * Performance: During drag/spring, transforms are applied directly to the DOM
  * via refs (no React state updates per frame). State is synced only on settle.
  */
-import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo, useContext } from 'react';
 import { FeedItem } from './FeedItem';
 import { PullToRefresh } from './PullToRefresh';
 import { useMediaStore } from './store/mediaStore';
+import { useMediaStoreCompat } from './store/useMediaStoreCompat';
+import { MediaStoreContext } from './store/MediaStoreContext';
 import { useVideoPoolContext } from './VideoPoolProvider';
 import { flingSpring, SPRING_CONFIGS } from './utils/spring';
 import { usePreloader, preloadByUrl } from './hooks/usePreloader';
@@ -55,8 +57,9 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
   const lastRenderedPull = useRef(0);
   const isRefreshTriggered = useRef(false);
 
-  const setActiveIndex = useMediaStore((s) => s.setActiveIndex);
-  const storeActiveIndex = useMediaStore((s) => s.activeIndex);
+  const setActiveIndex = useMediaStoreCompat((s) => s.setActiveIndex);
+  const storeActiveIndex = useMediaStoreCompat((s) => s.activeIndex);
+  const scopedStore = useContext(MediaStoreContext);
   const pool = useVideoPoolContext();
   const prevPostsRef = useRef(posts);
 
@@ -111,8 +114,9 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     if (!el) return;
 
     const onTouchEnd = () => {
-      if (useMediaStore.getState().userPaused) return;
-      const currentActiveIndex = useMediaStore.getState().activeIndex;
+      const storeState = scopedStore ? scopedStore.getState() : useMediaStore.getState();
+      if (storeState.userPaused) return;
+      const currentActiveIndex = storeState.activeIndex;
       const activePost = posts[currentActiveIndex];
       if (!activePost) return;
       const activeUrl = activePost.mediaItems?.[0]?.hlsUrl;
@@ -165,7 +169,8 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
       setOffsetY(targetY);
       activeIndexRef.current = clamped;
       setActiveIndex(clamped);
-      useMediaStore.getState().setCarouselPosition(clamped, 0);
+      const gs = scopedStore ? scopedStore.getState() : useMediaStore.getState();
+      gs.setCarouselPosition(clamped, 0);
       if (clamped >= posts.length - 3 && posts.length > 0) {
         onNearEnd?.();
       }
@@ -193,7 +198,8 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
         const prevIdx = activeIndexRef.current;
         activeIndexRef.current = clamped;
         setActiveIndex(clamped);
-        useMediaStore.getState().setCarouselPosition(clamped, 0);
+        const gs2 = scopedStore ? scopedStore.getState() : useMediaStore.getState();
+        gs2.setCarouselPosition(clamped, 0);
         haptic('light');
 
         if (clamped >= posts.length - 3 && posts.length > 0) {
