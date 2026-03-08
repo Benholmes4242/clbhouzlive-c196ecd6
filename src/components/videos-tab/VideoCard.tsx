@@ -34,7 +34,7 @@ function formatVideoDuration(totalSeconds: number): string {
   return `${m}:${pad(sec)}`;
 }
 
-export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligible = false, userId, cardIndex = 0 }: VideoCardProps) {
+export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligible = false, userId, cardIndex = 0, allPosts }: VideoCardProps) {
   const navigate = useNavigate();
   const firstVideo = post.mediaItems.find(m => m.type === 'video');
   const thumbnailUrl = firstVideo?.thumbnailUrl || '';
@@ -48,7 +48,14 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
   const [showComments, setShowComments] = useState(false);
 
   const handleTap = () => {
-    // Fullscreen player wired later
+    if (allPosts) {
+      const { useFullscreenFeed } = require('@/components/fullscreen-feed/hooks/useFullscreenFeed');
+      useFullscreenFeed.getState().open({
+        posts: allPosts,
+        startIndex: cardIndex,
+        sourceId: 'videos',
+      });
+    }
   };
 
   const toggleLike = async () => {

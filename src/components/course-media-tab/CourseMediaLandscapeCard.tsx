@@ -32,7 +32,7 @@ const HUD_GLASS = {
   boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
 };
 
-export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> = ({ post, index }) => {
+export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> = ({ post, index, allPosts }) => {
   const media = post.mediaItems[0];
   const isVideo = media?.type === 'video';
   const thumbnailUrl = isVideo ? media?.thumbnailUrl : (media?.imageUrl || media?.thumbnailUrl);

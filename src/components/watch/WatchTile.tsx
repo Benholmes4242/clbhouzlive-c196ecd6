@@ -22,7 +22,7 @@ interface WatchTileProps {
   allPosts: FeedPost[];
 }
 
-const WatchTile: React.FC<WatchTileProps> = ({ post, index }) => {
+const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts }) => {
   const media = post.mediaItems[0];
   const thumbnailUrl = media?.thumbnailUrl;
   const duration = media?.duration;
@@ -34,7 +34,11 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index }) => {
       className="relative aspect-[4/5] overflow-hidden rounded-[4px] cursor-pointer active:scale-[0.97]"
       style={{ transition: 'transform 100ms ease' }}
       onClick={() => {
-        // TODO: Wire to fullscreen player
+        useFullscreenFeed.getState().open({
+          posts: allPosts,
+          startIndex: index,
+          sourceId: 'watch',
+        });
       }}
     >
       {/* Poster or placeholder */}

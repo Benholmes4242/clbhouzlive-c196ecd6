@@ -25,7 +25,7 @@ const HUD_GLASS = {
   boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
 };
 
-export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index }) => {
+export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, allPosts }) => {
   const media = post.mediaItems[0];
   const isVideo = media?.type === 'video';
   const thumbnailUrl = isVideo ? media?.thumbnailUrl : (media?.imageUrl || media?.thumbnailUrl);
@@ -39,7 +39,13 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index })
       className="relative aspect-[4/5] overflow-hidden rounded-[4px] cursor-pointer active:scale-[0.97]"
       style={{ transition: 'transform 100ms ease' }}
       onClick={() => {
-        // TODO: Wire to fullscreen player
+        if (allPosts) {
+          useFullscreenFeed.getState().open({
+            posts: allPosts,
+            startIndex: index,
+            sourceId: 'course-media',
+          });
+        }
       }}
     >
       {/* Poster or placeholder */}
