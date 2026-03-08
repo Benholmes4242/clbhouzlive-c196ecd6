@@ -52,13 +52,12 @@ export const FriendsCard = React.memo(function FriendsCard({ post, isAutoplayEli
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
   const aspectClass = getMediaAspectClass(post);
 
-  const [expanded, setExpanded] = useState(false);
-  const [isLiked, setIsLiked] = useState(post.isLikedByMe);
-  const [likeCount, setLikeCount] = useState(post.likeCount);
-  const [showComments, setShowComments] = useState(false);
+  // Strip "📍 Played at..." from caption and extract course info
+  const cleanCaption = useMemo(() => removeGolfCourseFromContent(post.caption), [post.caption]);
+  const extractedCourse = useMemo(() => extractGolfCourseFromContent(post.caption), [post.caption]);
 
-  const courseName = post.review?.courseName || post.courseName;
-  const courseId = post.review?.courseId;
+  const courseName = post.review?.courseName || post.courseName || extractedCourse?.name;
+  const courseId = post.review?.courseId || (extractedCourse ? undefined : undefined);
 
   const toggleLike = async () => {
     if (!userId) return;
