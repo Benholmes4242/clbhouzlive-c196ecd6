@@ -6,7 +6,6 @@
 
 import { UniversalMediaItem, AR_LANDSCAPE_THRESHOLD, AR_PORTRAIT_THRESHOLD } from './types';
 import { ExploreContentItem } from '@/components/explore/types';
-import { ActivityGridItem } from '@/components/profile/ActivityGrid';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { resolveGolfCourse } from '@/utils/resolveGolfCourse';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl, generateStreamMp4Url } from '@/config/cloudflareStream';
