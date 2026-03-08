@@ -134,11 +134,9 @@ const Discover = () => {
                 }
                 if (key === 'following') {
                   return (
-                    <div className="md:container md:mx-auto md:px-0">
-                      <Suspense fallback={null}>
-                        <CommunityFeed />
-                      </Suspense>
-                    </div>
+                    <Suspense fallback={null}>
+                      <NewFriendsTab />
+                    </Suspense>
                   );
                 }
                 // 'videos'
