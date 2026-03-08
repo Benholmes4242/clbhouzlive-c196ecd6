@@ -160,22 +160,8 @@ const HeroProfileHeader = ({
   const { uploadImage, uploading: photoUploading } = useR2Upload();
   const { trackScrollDepth } = useProfileAnalytics(profile?.id);
   const { data: top100Overview, isLoading: top100Loading } = useTop100Overview(profile?.id);
-  const { items: posts, isLoading: postsLoading } = useActivityPostsV2(profile?.id);
-  
-  // Debug: Log posts loading
-  useEffect(() => {
-    logQueryState('useActivityPostsV2', {
-      isLoading: postsLoading,
-      isSuccess: posts.length > 0,
-    });
-    if (!postsLoading && posts.length > 0) {
-      logProfile('data', 'HeroProfileHeader', '📝 Posts loaded', {
-        count: posts.length,
-        firstPostId: posts[0]?.id,
-      });
-      profileTiming.end('HeroProfileHeader:render');
-    }
-  }, [posts, postsLoading]);
+  // Posts count from usePersonalPostsCount (fetched in parent) or simple count
+  const postsCountValue = 0; // Will be replaced by PostsCountSummary inside the tab
   
   // Immersive profile
   const {
