@@ -58,7 +58,7 @@ export function CreatorPostPicker({
 
   const handleSave = async () => {
     setSaving(true);
-    console.log('[PostPicker] saving mode:', mode, 'featured:', selectedFeatured, 'pinned:', selectedPinned);
+    
     try {
       if (mode === 'featured') {
         const { error } = await supabase
