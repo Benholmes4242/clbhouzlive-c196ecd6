@@ -8,7 +8,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
-import PickBadge from './components/PickBadge';
+
 import ActualPositionBadge from './components/ActualPositionBadge';
 import LivePositionDisplay from './components/LivePositionDisplay';
 import CountryFlag from '@/components/ui/country-flag';
