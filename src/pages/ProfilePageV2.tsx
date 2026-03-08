@@ -11,7 +11,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile.tsx';
 import { useTop100Overview } from '@/hooks/useTop100Overview';
-import { useActivityPostsV2 } from '@/components/profile/activity/v2';
+import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 import { usePersonalPostsCount } from '@/hooks/usePersonalPostsCount';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { useFollow } from '@/hooks/useFollow';
