@@ -189,7 +189,7 @@ export function VideoPlayer({
       () => {
         setIsLoading(false);
         setIsPlaying(true);
-        useMediaStore.getState().clearRetrying(feedIndex);
+        getStore().clearRetrying(feedIndex);
         if (videoRef.current?.duration && isFinite(videoRef.current.duration)) {
           setVideoDuration(videoRef.current.duration);
         }
