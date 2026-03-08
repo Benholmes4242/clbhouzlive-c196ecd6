@@ -179,8 +179,8 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                       </>
                     ) : (
                       <>
-                       <stop offset="0%" stopColor="#A8A29E" />
-                       <stop offset="100%" stopColor="#A8A29E" />
+                       <stop offset="0%" stopColor={getRatingTheme(communityAverage).accent} />
+                       <stop offset="100%" stopColor={getRatingTheme(communityAverage).accent} />
                       </>
                     )}
                   </linearGradient>
