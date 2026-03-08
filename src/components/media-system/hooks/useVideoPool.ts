@@ -227,7 +227,7 @@ export function useVideoPool() {
       const video = target.video;
 
       if (target.assignedUrl) {
-        const isMuted = useMediaStore.getState().isMuted;
+        const isMuted = getStore().isMuted;
 
         // Save session state
         sessionCache.save(target.assignedUrl, {
