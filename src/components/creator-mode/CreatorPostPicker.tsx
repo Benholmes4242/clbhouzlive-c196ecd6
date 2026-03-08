@@ -179,7 +179,7 @@ export function CreatorPostPicker({
         </div>
 
         {/* Save button — sticky footer */}
-        <div className="shrink-0 px-4 pt-2 border-t border-border" style={{ paddingBottom: 'calc(max(env(safe-area-inset-bottom, 0px), 16px) + 70px)' }}>
+        <div className="shrink-0 px-4 pt-2 border-t border-border" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}>
           <button
             type="button"
             onClick={handleSave}
