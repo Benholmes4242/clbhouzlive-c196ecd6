@@ -32,6 +32,7 @@ export function CreatorFeaturedVideo({ post, isOwnProfile, onEditClick }: Creato
   const firstMedia = post.mediaItems[0];
   const thumbnailUrl = firstMedia?.thumbnailUrl ?? firstMedia?.imageUrl ?? '/placeholder.svg';
   const duration = firstMedia?.duration;
+  const cleanCaption = removeGolfCourseFromContent(post.caption);
 
   return (
     <div className="rounded-xl overflow-hidden bg-card border border-border/50 shadow-sm relative">
