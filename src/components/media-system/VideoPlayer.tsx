@@ -80,7 +80,7 @@ export function VideoPlayer({
         setHasError(false);
         videoRef.current = null;
         setVideoElement(null);
-        useMediaStore.getState().setActiveVideoElement(null, null);
+        getStore().setActiveVideoElement(null, null);
       }
       return;
     }
