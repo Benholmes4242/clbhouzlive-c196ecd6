@@ -9,12 +9,11 @@ interface ScorePillProps {
 
 /**
  * Score pill component
- * Uses gray styling for Fair→Excellent, amber only for Outstanding.
- * Matches RatingPill visual standard.
+ * Uses slate blue scale for Fair→Excellent, amber for Outstanding.
  */
 export const ScorePill: React.FC<ScorePillProps> = ({ score, size = 'md' }) => {
   const tierData = getScoreTier(score);
-  const isOutstanding = tierData.tier === 'outstanding';
+  const isOutstanding = tierData.isOutstanding;
   
   const baseClasses =
     size === 'sm'
@@ -28,8 +27,13 @@ export const ScorePill: React.FC<ScorePillProps> = ({ score, size = 'md' }) => {
         baseClasses,
         isOutstanding 
           ? 'bg-[#f59e0b]/10 border-[#f59e0b]/30 text-[#d97706]'
-          : 'bg-[#A8A29E]/10 border-[#A8A29E]/20 text-[#78716C]'
+          : ''
       )}
+      style={!isOutstanding ? {
+        backgroundColor: `${tierData.accent}1A`,
+        borderColor: `${tierData.accent}33`,
+        color: tierData.accent,
+      } : undefined}
     >
       {score === 10 ? '10' : score.toFixed(1)}
     </span>

@@ -127,13 +127,14 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           </div>
         </div>
 
-        {/* Score badge - Amber for Outstanding (9+), Gray otherwise */}
-        <div className={cn(
-          "px-2.5 py-1 rounded-lg text-sm font-bold",
-          score >= 9 
-            ? 'bg-[#f59e0b] text-white'
-            : 'bg-[#A8A29E] text-white'
-        )}>
+        {/* Score badge - tier-specific slate blue, amber for Outstanding */}
+        <div
+          className={cn(
+            "px-2.5 py-1 rounded-lg text-sm font-bold text-white",
+            score >= 9 && 'bg-[#f59e0b]'
+          )}
+          style={score < 9 ? { backgroundColor: getScoreTier(score).accent } : undefined}
+        >
           {score.toFixed(1)}
         </div>
       </div>
