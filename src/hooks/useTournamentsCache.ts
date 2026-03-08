@@ -73,7 +73,8 @@ async function fetchTournamentsCache(): Promise<TournamentsCache> {
       .select(CACHE_SELECT)
       .in('status', ['closed', 'complete'])
       .gte('end_date', sevenDaysAgo)
-      .order('end_date', { ascending: false }),
+      .order('end_date', { ascending: false })
+      .order('purse', { ascending: false }),
 
     // Upcoming (broader window for coverage)
     supabase
@@ -82,6 +83,7 @@ async function fetchTournamentsCache(): Promise<TournamentsCache> {
       .in('status', ['scheduled', 'created'])
       .gt('start_date', today)
       .order('start_date', { ascending: true })
+      .order('purse', { ascending: false })
       .limit(30),
   ]);
 

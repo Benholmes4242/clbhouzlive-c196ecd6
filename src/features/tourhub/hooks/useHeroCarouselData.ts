@@ -232,7 +232,11 @@ export function useHeroCarouselData() {
 
       // Sort within categories
       liveSlides.sort((a, b) => TOUR_PRIORITY.indexOf(a.tournament.tourSlug) - TOUR_PRIORITY.indexOf(b.tournament.tourSlug));
-      completedSlides.sort((a, b) => new Date(b.tournament.endDate).getTime() - new Date(a.tournament.endDate).getTime());
+      completedSlides.sort((a, b) => {
+        const dateDiff = new Date(b.tournament.endDate).getTime() - new Date(a.tournament.endDate).getTime();
+        if (dateDiff !== 0) return dateDiff;
+        return (b.tournament.purse || 0) - (a.tournament.purse || 0);
+      });
       upcomingSlides.sort((a, b) => new Date(a.tournament.startDate).getTime() - new Date(b.tournament.startDate).getTime());
 
       return [...liveSlides, ...completedSlides, ...upcomingSlides].slice(0, 8);

@@ -182,6 +182,7 @@ async function fetchActiveTournamentPredictions(): Promise<ActiveTournamentResul
     .in('status', ['closed', 'complete'])
     .gte('end_date', threeDaysAgo)
     .order('end_date', { ascending: false })
+    .order('purse', { ascending: false })
     .limit(1)
     .maybeSingle();
 

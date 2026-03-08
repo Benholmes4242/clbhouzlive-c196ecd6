@@ -294,7 +294,8 @@ export function useRecentlyCompletedTournaments() {
         `)
         .in('status', ['closed', 'complete'])
         .gte('end_date', twoDaysAgoStr)
-        .order('end_date', { ascending: false });
+        .order('end_date', { ascending: false })
+        .order('purse', { ascending: false });
 
       if (error) throw error;
       if (!tournaments?.length) return [];
