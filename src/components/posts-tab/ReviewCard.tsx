@@ -12,6 +12,8 @@ function formatCompact(n: number): string {
 
 interface ReviewCardProps {
   post: FeedPost;
+  allPosts?: FeedPost[];
+  postIndex?: number;
 }
 
 export const ReviewCard: React.FC<ReviewCardProps> = ({ post }) => {
