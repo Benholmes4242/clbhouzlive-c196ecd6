@@ -176,7 +176,7 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
 
         {/* Video area */}
         <button
-          className="relative w-full aspect-video bg-muted cursor-pointer"
+          className="relative w-full aspect-[16/9.5] bg-muted cursor-pointer"
           onClick={handleTap}
           aria-label={`Play video by ${post.displayName}`}
         >
