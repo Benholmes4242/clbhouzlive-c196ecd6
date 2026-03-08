@@ -197,8 +197,8 @@ export function VideoPlayer({
       () => {
         setIsLoading(false);
         setHasError(true);
-        useMediaStore.getState().clearRetrying(feedIndex);
-        useMediaStore.getState().markError(feedIndex);
+        getStore().clearRetrying(feedIndex);
+        getStore().markError(feedIndex);
       },
       mp4Url
     ).then((video) => {
