@@ -241,7 +241,7 @@ const UnifiedMediaTile: React.FC<UnifiedMediaTileProps> = ({
       }}
       className={cn(
         aspectClass,
-        "w-full", // IMPORTANT: ensure tile has width even when wrapped (e.g., ActivityGridV2)
+        "w-full",
         "relative overflow-hidden bg-muted/30",
         isLandscape && "col-span-2"
       )}
