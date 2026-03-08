@@ -44,16 +44,19 @@ function mapMediaRow(row: any): MediaItem {
 }
 
 async function fetchPostById(postId: string): Promise<FeedPost | null> {
+  console.log('[fetchPostById] fetching postId:', postId);
   const { data, error } = await supabase
     .from('posts')
     .select(`
       id, content, created_at, user_id, actor_type, actor_id, status, source_review_id, course_id,
       post_media(id, media_type, media_url, poster_url, stream_id, duration_seconds, width, height, display_order),
-      user_profiles!inner(username, display_name, profile_photo_url, is_verified)
+      user_profiles(username, display_name, profile_photo_url, is_verified)
     `)
     .eq('id', postId)
     .eq('status', 'published')
-    .single();
+    .maybeSingle();
+
+  console.log('[fetchPostById] result:', { data: !!data, error: error?.message, postId });
 
   if (error || !data) return null;
 
