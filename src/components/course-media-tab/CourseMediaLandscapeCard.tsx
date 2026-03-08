@@ -57,6 +57,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
           alt={post.displayName || ''}
           size={28}
           fallback={post.displayName?.charAt(0)?.toUpperCase() || '?'}
+          hideRing
         />
         <div className="flex-1 min-w-0">
           <span className="text-sm font-semibold text-foreground truncate block">

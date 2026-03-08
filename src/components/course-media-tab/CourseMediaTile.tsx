@@ -96,6 +96,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index })
             alt=""
             size={20}
             fallback=""
+            hideRing
           />
         </div>
       )}
