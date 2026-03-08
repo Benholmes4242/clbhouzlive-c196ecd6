@@ -218,7 +218,11 @@ export function useHeroCarouselData() {
         const upcoming = upcomingByTour[tour];
 
         if (live.length > 0) {
-          liveSlides.push({ tournament: live[0], type: 'live' });
+          // Sort by purse descending so the biggest event leads; show ALL live events per tour
+          const sorted = [...live].sort((a, b) => (b.purse || 0) - (a.purse || 0));
+          for (const tournament of sorted) {
+            liveSlides.push({ tournament, type: 'live' });
+          }
         } else if (completed.length > 0) {
           completedSlides.push({ tournament: completed[0], type: 'completed' });
         } else if (upcoming.length > 0) {
