@@ -430,7 +430,7 @@ export function useVideoPool() {
 
       return video;
     },
-    [sessionCache, isRapidScrolling, safePlay, removeAllTrackedListeners, addTrackedListener]
+    [sessionCache, isRapidScrolling, safePlay, removeAllTrackedListeners, addTrackedListener, getStore]
   );
 
   // ── Release ───────────────────────────────────────────────────────
