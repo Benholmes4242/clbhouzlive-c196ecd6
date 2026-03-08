@@ -127,14 +127,14 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
           />
         )}
 
-        {/* Avatar — round */}
+        {/* Avatar — squircle */}
         <div className="relative flex-shrink-0">
           <div
             className="overflow-hidden bg-muted"
             style={{
               width: 40,
-              height: 40,
-              borderRadius: '50%',
+              height: 42,
+              borderRadius: '34%',
               border: `2px solid ${borderColor}`,
             }}
           >
