@@ -85,7 +85,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index })
             src="/images/brand/clubhouz-mark-white.svg"
             alt=""
             className="w-[10px] h-[10px] flex-shrink-0"
-            style={{ filter: 'sepia(1) saturate(5) hue-rotate(5deg) brightness(1.05)' }}
+            style={{ filter: 'brightness(0) invert(65%) sepia(95%) saturate(1000%) hue-rotate(15deg) brightness(105%) contrast(95%)' }}
           />
           <span className="text-[11px] font-semibold text-white">
             {reviewRating.toFixed(1)}
