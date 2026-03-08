@@ -244,12 +244,12 @@ export const BestPickSpotlight: React.FC<BestPickSpotlightProps> = ({
             marginBottom: hasTournamentStats || hasSeasonStats ? 16 : 0,
           }}
         >
-          {/* Avatar 48px circle */}
+          {/* Avatar 48px squircle */}
           <div
             style={{
               width: 48,
-              height: 48,
-              borderRadius: '50%',
+              height: 50,
+              borderRadius: '34%',
               overflow: 'hidden',
               flexShrink: 0,
               border: '2px solid rgba(255, 255, 255, 0.2)',
