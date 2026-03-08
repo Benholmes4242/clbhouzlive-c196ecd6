@@ -43,10 +43,11 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
   distribution,
 }) => {
   // Build distribution items
-  const distributionItems = TIER_CONFIG.map(({ key, dataKey, label }) => ({
+  const distributionItems = TIER_CONFIG.map(({ key, dataKey, label, sampleScore }) => ({
     key,
     label,
     count: distribution[dataKey],
+    color: getRatingTheme(sampleScore).accent,
   }));
 
   const maxCount = Math.max(...distributionItems.map(d => d.count), 1);
