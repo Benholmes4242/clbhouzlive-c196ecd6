@@ -204,21 +204,21 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
         </button>
 
         {/* Engagement row */}
-        <div className="flex items-center gap-5 px-3 py-2.5">
+        <div className="flex items-center gap-6 px-3 py-3">
         <button onClick={toggleLike} className="flex items-center gap-1 text-xs">
           <Heart
-            className={`h-4 w-4 transition-colors ${isLiked ? 'fill-like text-like' : 'text-muted-foreground'}`}
+            className={`h-[18px] w-[18px] transition-colors ${isLiked ? 'fill-like text-like' : 'text-muted-foreground'}`}
           />
           <span className={isLiked ? 'text-like' : 'text-muted-foreground'}>
             {formatCompact(likeCount)}
           </span>
         </button>
           <button onClick={() => setShowComments(true)} className="flex items-center gap-1 text-xs text-muted-foreground">
-            <MessageCircle className="h-4 w-4" />
+            <MessageCircle className="h-[18px] w-[18px]" />
             {formatCompact(post.commentCount)}
           </button>
           <button onClick={handleShare} className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Share2 className="h-4 w-4" />
+            <Share2 className="h-[18px] w-[18px]" />
             {formatCompact(post.shareCount)}
           </button>
         </div>

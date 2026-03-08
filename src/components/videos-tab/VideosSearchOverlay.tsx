@@ -93,7 +93,7 @@ export function VideosSearchOverlay({ isOpen, onClose, userId }: VideosSearchOve
           <div className="flex items-center gap-3 px-4 pt-[max(env(safe-area-inset-top,0px),12px)] pb-3">
             <button
               onClick={onClose}
-              className="p-2 -ml-2 rounded-full hover:bg-muted transition-colors"
+              className="p-3 -ml-3 rounded-full hover:bg-muted transition-colors"
               aria-label="Back"
             >
               <ArrowLeft size={22} className="text-foreground" />
