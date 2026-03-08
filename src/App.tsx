@@ -98,7 +98,7 @@ const Clubhouse = lazy(() => import("./pages/Clubhouse"));
 const WatchPage = lazy(() => import("./pages/WatchPage"));
 const AccountTypeOnboarding = lazy(() => import("./pages/onboarding/AccountTypeOnboarding"));
 const ProfileTestPage = lazy(() => import("./pages/ProfileTestPage"));
-const CreatorTestPage = lazy(() => import("./pages/CreatorTestPage"));
+
 const EditProfilePage = lazy(() => import("./pages/EditProfilePage"));
 const ProfileHandicapView = lazy(() => import("./pages/ProfileHandicapView"));
 const ProfileQuestView = lazy(() => import("./pages/ProfileQuestView"));
@@ -314,7 +314,7 @@ function AppRoutes() {
         <Route path="/profile/quest/replay" element={<Navigate to="/achievements" replace />} />
         <Route path="/edit-profile" element={<Suspense fallback={<ProfileSkeleton />}><EditProfilePage /></Suspense>} />
         <Route path="/profile-test" element={<Suspense fallback={<ProfileSkeleton />}><ProfileTestPage /></Suspense>} />
-        <Route path="/creator-test/:userId" element={<Suspense fallback={<ProfileSkeleton />}><CreatorTestPage /></Suspense>} />
+        
         <Route path="/profile/:username" element={<ProfileWrapped />} />
         <Route path="/profile/:username/reviews" element={<Suspense fallback={<ProfileSkeleton />}><UserReviewsPage /></Suspense>} />
         <Route path="/settings" element={<SettingsWrapped />} />

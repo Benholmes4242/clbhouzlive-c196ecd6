@@ -44,6 +44,7 @@ import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
 import { PeopleTab } from '@/components/business/PeopleTab';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
+import { CreatorSection } from '@/components/creator-mode/CreatorSection';
 
 type BusinessTab = 'content' | 'golfers' | 'info';
 
@@ -621,6 +622,11 @@ const BusinessProfilePage: React.FC = () => {
             />
           )}
         </section>
+
+        {/* Creator Section - renders only if business owner has creator mode */}
+        {user?.id && (
+          <CreatorSection userId={user.id} isOwnProfile={isOwner || false} />
+        )}
 
         {/* Segmented control tabs */}
         <section className="px-4 py-2 pointer-events-auto">

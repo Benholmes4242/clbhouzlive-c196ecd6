@@ -63,6 +63,8 @@ import ProfileAchievementsRail from '@/components/profile/ProfileAchievementsRai
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
 import { ImageCropModal } from '@/components/business/ImageCropModal';
 import { ProfileTouchDebugProvider, useProfileTouchDebug } from '@/components/profile/debug/ProfileTouchDebugProvider';
+import { CreatorSection } from '@/components/creator-mode/CreatorSection';
+import { CreatorBadge } from '@/components/creator-mode/CreatorBadge';
 import { ProfileTouchDebugPanel } from '@/components/profile/debug/ProfileTouchDebugPanel';
 
 // Background color - uses CSS variable for theme support
@@ -609,10 +611,13 @@ const ProfilePageV2Content: React.FC = () => {
       {/* Identity Stack - adjusted for left-aligned avatar */}
       {/* z-10 ensures content is above hero's z-1, pointer-events-auto ensures tappability */}
       <div className="pt-[68px] px-5 text-left relative z-10 pointer-events-auto">
-        {/* Name - smaller, more bold */}
-        <h1 className="text-[28px] font-bold text-foreground">
-          {displayName}
-        </h1>
+        {/* Name + Creator Badge */}
+        <div className="flex items-center gap-2">
+          <h1 className="text-[28px] font-bold text-foreground">
+            {displayName}
+          </h1>
+          {profile?.is_creator && <CreatorBadge />}
+        </div>
       </div>
 
       {/* Action Buttons - different for self vs other */}
@@ -968,6 +973,11 @@ const ProfilePageV2Content: React.FC = () => {
             isOwnProfile={isSelf}
             className="mb-4"
           />
+        )}
+
+        {/* Creator Section - featured video, pinned posts, weekly stats */}
+        {isPersonal && profileUserId && (
+          <CreatorSection userId={profileUserId} isOwnProfile={isSelf} />
         )}
 
         {/* Segmented control tabs - matches schedule page exactly */}
