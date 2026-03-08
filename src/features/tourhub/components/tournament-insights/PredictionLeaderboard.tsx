@@ -12,12 +12,14 @@ interface PredictionLeaderboardProps {
   allPicks: TrackedPrediction[];
   isCompleted?: boolean;
   bestCallPlayerId?: string;
+  tournamentLeaderScore?: number | null;
 }
 
 export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
   allPicks,
   isCompleted,
   bestCallPlayerId,
+  tournamentLeaderScore,
 }) => {
   if (allPicks.length === 0) return null;
 
@@ -28,10 +30,8 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
     return aPos - bPos;
   });
 
-  // Derive leader score from picks (position-1 player's score, or fallback to lowest score)
-  const leaderPick = sorted.find(p => p.actualPosition === 1);
-  const scoresAvailable = allPicks.filter(p => p.score !== null).map(p => p.score!);
-  const leaderScore: number | null = leaderPick?.score ?? (scoresAvailable.length > 0 ? Math.min(...scoresAvailable) : null);
+  // Use actual tournament leader score (from full leaderboard), NOT picks subset
+  const leaderScore: number | null = tournamentLeaderScore ?? null;
 
   return (
     <motion.div

@@ -88,12 +88,17 @@ async function fetchTrackerData(
   // Calculate accuracy metrics
   const accuracy = calculateAccuracy(trackedPredictions);
 
+  // Get the actual tournament leader's score (position 1 from full leaderboard, not just picks)
+  const leaderEntry = (leaderboard ?? []).find(lb => lb.position === 1 && lb.strokes > 0);
+  const tournamentLeaderScore: number | null = leaderEntry?.score ?? null;
+
   return {
     predictions: trackedPredictions,
     darkHorses: [],
     allPicks: trackedPredictions,
     accuracy,
     lastUpdated: new Date().toISOString(),
+    tournamentLeaderScore,
   };
 }
 

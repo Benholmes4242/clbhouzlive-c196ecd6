@@ -117,6 +117,7 @@ export interface PredictionTrackerData {
   allPicks: TrackedPrediction[];  // Top 5 + dark horses in one list
   accuracy: AccuracyMetrics;
   lastUpdated: string;
+  tournamentLeaderScore: number | null; // Actual position-1 score from full leaderboard
 }
 
 export interface NextTournamentPreview {
