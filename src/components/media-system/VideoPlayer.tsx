@@ -223,7 +223,7 @@ export function VideoPlayer({
         if (video.paused) {
           video.play().catch(() => {});
           setIsPlaying(true);
-          useMediaStore.getState().setUserPaused(false);
+          getStore().setUserPaused(false);
         } else {
           video.pause();
           setIsPlaying(false);
