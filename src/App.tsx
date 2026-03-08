@@ -518,6 +518,7 @@ function AppRoutes() {
         <Route path="/hub" element={<Navigate to="/clubhouse" replace />} />
         <Route path="/hub/*" element={<Navigate to="/clubhouse" replace />} />
         
+        <Route path="/posts-tab-test/:actorType/:actorId" element={<Suspense fallback={<GenericPageSkeleton />}><PostsTabTestPage /></Suspense>} />
         <Route path="*" element={<Suspense fallback={<GenericPageSkeleton />}><NotFound /></Suspense>} />
       </Routes>
 
