@@ -7,7 +7,7 @@ import { useRef, useState, useCallback } from 'react';
 import { VideoPlayer } from './VideoPlayer';
 import { ImageViewer } from './ImageViewer';
 import { CarouselIndicator } from './CarouselIndicator';
-import { useMediaStore } from './store/mediaStore';
+import { useMediaStoreCompat } from './store/useMediaStoreCompat';
 
 import { haptic } from '@/utils/haptics';
 import type { MediaItem } from './types/media';
