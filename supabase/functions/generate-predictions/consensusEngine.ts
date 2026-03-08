@@ -138,6 +138,13 @@ async function callGemini(
       }),
     },
   );
+
+  if (!res.ok) {
+    const errorBody = await res.text();
+    console.error(`[Consensus] Gemini HTTP ${res.status}:`, errorBody);
+    return { response: '', latencyMs: Date.now() - start };
+  }
+
   const data = await res.json();
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
   if (!text) {
