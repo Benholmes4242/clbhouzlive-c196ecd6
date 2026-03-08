@@ -13,6 +13,12 @@ function formatDuration(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
+function formatCompact(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return String(n);
+}
+
 const CompactTile: React.FC<{ post: FeedPost; globalIndex: number }> = ({ post, globalIndex }) => {
   const firstMedia = post.mediaItems[0];
   const isVideo = firstMedia?.type === 'video';
