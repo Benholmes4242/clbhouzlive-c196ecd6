@@ -14,6 +14,7 @@ function formatDuration(seconds?: number): string {
 interface CourseMediaTileProps {
   post: FeedPost;
   index: number;
+  allPosts?: FeedPost[];
 }
 
 const HUD_GLASS = {
