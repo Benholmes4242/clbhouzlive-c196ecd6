@@ -96,7 +96,7 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
 
   return (
     <>
-      <article className="bg-card rounded-xl overflow-hidden shadow-sm border border-border/50">
+      <article className="bg-card overflow-hidden border-b border-border/50">
         {/* Creator header */}
         <div className="flex items-center gap-3 px-3 pt-3 pb-2">
           <button
@@ -131,7 +131,7 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
 
         {/* Caption */}
         {post.caption && (
-          <div className="px-3 pb-1">
+          <div className="px-3 pb-2">
             <p className={`text-sm text-foreground ${expanded ? '' : 'line-clamp-2'}`}>
               {post.caption}
             </p>
