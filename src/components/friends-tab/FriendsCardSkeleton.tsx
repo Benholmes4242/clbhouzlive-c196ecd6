@@ -6,7 +6,7 @@ interface FriendsCardSkeletonProps {
 
 export function FriendsCardSkeleton({ variant = 'landscape' }: FriendsCardSkeletonProps) {
   return (
-    <div className="bg-card rounded-xl overflow-hidden shadow-sm border border-border/50">
+    <div className="bg-card overflow-hidden border-b border-border/50">
       {/* Creator header */}
       <div className="flex items-center gap-3 px-3 pt-3 pb-2">
         <Skeleton className="h-9 w-9 rounded-full shrink-0" />
