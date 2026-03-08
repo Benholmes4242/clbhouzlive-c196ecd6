@@ -314,7 +314,7 @@ function AppRoutes() {
         <Route path="/profile/quest/replay" element={<Navigate to="/achievements" replace />} />
         <Route path="/edit-profile" element={<Suspense fallback={<ProfileSkeleton />}><EditProfilePage /></Suspense>} />
         <Route path="/profile-test" element={<Suspense fallback={<ProfileSkeleton />}><ProfileTestPage /></Suspense>} />
-        <Route path="/creator-test/:userId" element={<Suspense fallback={<ProfileSkeleton />}><CreatorTestPage /></Suspense>} />
+        
         <Route path="/profile/:username" element={<ProfileWrapped />} />
         <Route path="/profile/:username/reviews" element={<Suspense fallback={<ProfileSkeleton />}><UserReviewsPage /></Suspense>} />
         <Route path="/settings" element={<SettingsWrapped />} />
