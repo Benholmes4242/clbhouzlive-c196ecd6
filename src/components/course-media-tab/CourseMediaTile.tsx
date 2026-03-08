@@ -1,6 +1,7 @@
 import React from 'react';
 import { Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
@@ -90,12 +91,11 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index })
       {/* Creator avatar — bottom-left */}
       {avatarUrl && (
         <div className="absolute bottom-1.5 left-1.5 z-10">
-          <img
+          <SquircleAvatar
             src={avatarUrl}
             alt=""
-            className="w-5 h-5 rounded-full object-cover"
-            style={{ border: '1px solid rgba(255, 255, 255, 0.8)' }}
-            loading="lazy"
+            size={20}
+            fallback=""
           />
         </div>
       )}

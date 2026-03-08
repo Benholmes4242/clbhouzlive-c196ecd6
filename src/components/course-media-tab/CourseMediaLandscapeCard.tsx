@@ -2,6 +2,7 @@ import React from 'react';
 import { Heart, MessageCircle, Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { formatDistanceToNowStrict } from 'date-fns';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
@@ -51,16 +52,12 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
     >
       {/* Creator header */}
       <div className="flex items-center gap-2 px-3 py-2">
-        {post.avatarUrl ? (
-          <img
-            src={post.avatarUrl}
-            alt=""
-            className="w-7 h-7 rounded-full object-cover"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-7 h-7 rounded-full bg-muted" />
-        )}
+        <SquircleAvatar
+          src={post.avatarUrl}
+          alt={post.displayName || ''}
+          size={28}
+          fallback={post.displayName?.charAt(0)?.toUpperCase() || '?'}
+        />
         <div className="flex-1 min-w-0">
           <span className="text-sm font-semibold text-foreground truncate block">
             {post.displayName}
