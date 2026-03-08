@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, MessageCircle, Share2, MapPin } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { CommentsPage } from '@/components/clubhouse/cinematic/CommentsPage';
