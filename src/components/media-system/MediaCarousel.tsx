@@ -32,8 +32,8 @@ export function MediaCarousel({
   mediaItems, feedIndex, isActive,
   onDoubleTapLike, onScrubStart, onScrubEnd,
 }: MediaCarouselProps) {
-  const activeMedia = useMediaStore((s) => s.carouselPositions.get(feedIndex) ?? 0);
-  const setCarouselPosition = useMediaStore((s) => s.setCarouselPosition);
+  const activeMedia = useMediaStoreCompat((s) => s.carouselPositions.get(feedIndex) ?? 0);
+  const setCarouselPosition = useMediaStoreCompat((s) => s.setCarouselPosition);
   const [translateX, setTranslateX] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const dirLock = useRef<DirLock>('none');

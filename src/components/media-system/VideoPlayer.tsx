@@ -51,7 +51,8 @@ export function VideoPlayer({
   const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
   const [isBuffering, setIsBuffering] = useState(false);
   const pool = useVideoPoolContext();
-  const isMuted = useMediaStore((s) => s.isMuted);
+  const isMuted = useMediaStoreCompat((s) => s.isMuted);
+  const scopedStore = useContext(MediaStoreContext);
 
   // Double-tap detection
   const tapTimerRef = useRef<ReturnType<typeof setTimeout>>();

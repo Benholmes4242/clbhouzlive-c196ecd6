@@ -58,8 +58,9 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
   const lastRenderedPull = useRef(0);
   const isRefreshTriggered = useRef(false);
 
-  const setActiveIndex = useMediaStore((s) => s.setActiveIndex);
-  const storeActiveIndex = useMediaStore((s) => s.activeIndex);
+  const setActiveIndex = useMediaStoreCompat((s) => s.setActiveIndex);
+  const storeActiveIndex = useMediaStoreCompat((s) => s.activeIndex);
+  const scopedStore = useContext(MediaStoreContext);
   const pool = useVideoPoolContext();
   const prevPostsRef = useRef(posts);
 
