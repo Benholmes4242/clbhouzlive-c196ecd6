@@ -32,17 +32,17 @@ export const getProfileType = (userType: string | null | undefined): ProfileType
  * Personal profile tabs - Activity, Courses, Top 100, Handicap
  */
 export const PERSONAL_TABS = [
-  { id: 'activity', label: 'Activity' },
+  { id: 'activity', label: 'Posts' },
   { id: 'courses', label: 'Courses' },
   { id: 'top100', label: 'Top 100' },
   { id: 'stats', label: 'Handicap' }
 ];
 
 /**
- * Business profile tabs - only Activity
+ * Business profile tabs - only Posts
  */
 export const BUSINESS_TABS = [
-  { id: 'activity', label: 'Activity' }
+  { id: 'activity', label: 'Posts' }
 ];
 
 /**
