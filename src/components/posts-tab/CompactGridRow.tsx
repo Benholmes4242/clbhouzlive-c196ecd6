@@ -6,6 +6,7 @@ import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscr
 interface CompactGridRowProps {
   posts: FeedPost[];
   startIndex: number;
+  globalIndices?: number[];
   allPosts?: FeedPost[];
 }
 
