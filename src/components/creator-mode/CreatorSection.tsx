@@ -15,6 +15,8 @@ export function CreatorSection({ userId, isOwnProfile }: CreatorSectionProps) {
   const { data, isLoading } = useCreatorProfile(userId);
   const [pickerMode, setPickerMode] = useState<'featured' | 'pinned' | null>(null);
 
+  console.log('[CreatorSection] render — isCreator:', data?.isCreator, 'featured:', data?.featuredPost?.id, 'pinned:', data?.pinnedPosts?.length);
+
   if (isLoading) return <CreatorSectionSkeleton />;
   if (!data?.isCreator) return null;
 
