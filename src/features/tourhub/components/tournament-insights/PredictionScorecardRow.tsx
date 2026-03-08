@@ -39,6 +39,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
   isCompleted,
   isLast = false,
   isBestCall = false,
+  leaderScore,
 }) => {
   const isCut = prediction.performanceStatus === 'cut';
   const isWD = prediction.performanceStatus === 'withdrawn';
@@ -47,7 +48,9 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
   const avatarUrl = getPlayerHeadshotUrl(prediction.playerName, 'pga');
   const borderColor = getAccuracyBorderColor();
 
-  const offLead = prediction.actualPosition !== null ? prediction.actualPosition - 1 : null;
+  const offLead = (prediction.score !== null && leaderScore !== null && leaderScore !== undefined)
+    ? prediction.score - leaderScore
+    : null;
 
   return (
     <motion.div
