@@ -170,6 +170,7 @@ const Top100GeocodingPage = lazy(() => import("./pages/admin/Top100GeocodingPage
 const AdminTestLabPage = lazy(() => import("./pages/admin/AdminTestLabPage"));
 const AdminTourPage = lazy(() => import("./pages/admin/AdminTourPage").then(m => ({ default: m.AdminTourPage })));
 const AdminTourPlayersPage = lazy(() => import("./pages/admin/AdminTourPlayersPage"));
+const CourseMediaTestPage = lazy(() => import("./pages/CourseMediaTestPage"));
 
 
 const ChannelProfile = lazy(() => import("./pages/ChannelProfile"));
@@ -515,6 +516,9 @@ function AppRoutes() {
         {/* Hub routes removed — redirects to clubhouse */}
         <Route path="/hub" element={<Navigate to="/clubhouse" replace />} />
         <Route path="/hub/*" element={<Navigate to="/clubhouse" replace />} />
+
+        {/* Course Media Tab test page */}
+        <Route path="/course-media-test/:courseId" element={<Suspense fallback={<GenericPageSkeleton />}><CourseMediaTestPage /></Suspense>} />
         
         <Route path="*" element={<Suspense fallback={<GenericPageSkeleton />}><NotFound /></Suspense>} />
       </Routes>
