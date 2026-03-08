@@ -1,6 +1,7 @@
 import { PlayCircle, Pencil, MapPin } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { formatDuration, a11yFullDuration } from '@/utils/formatDuration';
+import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { cn } from '@/lib/utils';
 
 interface CreatorFeaturedVideoProps {
