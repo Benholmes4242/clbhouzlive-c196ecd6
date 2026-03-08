@@ -79,7 +79,7 @@ const LinkedInProfileLayout: React.FC<LinkedInProfileLayoutProps> = ({
   const displayName = profile?.display_name || 'User';
   const username = profile?.username || 'user';
   const homeClub = profile?.home_club || '';
-  const postsCount = posts.length;
+  const postsCount = 0; // Handled by PostsCountSummary inside the tab
   const totalTop100Played = isPersonal ? (top100Overview?.total_rated ?? top100Overview?.total_played ?? 0) : 0;
   const roundsLogged = top100Overview?.total_rated ?? 0;
 
