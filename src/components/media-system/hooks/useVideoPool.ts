@@ -136,7 +136,7 @@ export function useVideoPool() {
       if (error instanceof DOMException) {
         if (error.name === 'NotAllowedError') {
           video.muted = true;
-          useMediaStore.getState().setMuted(true);
+          getStore().setMuted(true);
           try {
             await video.play();
             return true;
