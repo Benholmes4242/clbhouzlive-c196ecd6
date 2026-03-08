@@ -12,7 +12,10 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post }) => {
   const review = post.review;
   if (!review) return null;
 
-  const thumbnailUrl = review.courseImageUrl || post.mediaItems[0]?.thumbnailUrl || post.mediaItems[0]?.imageUrl;
+  const userMedia = post.mediaItems[0];
+  const thumbnailUrl = userMedia?.thumbnailUrl || userMedia?.imageUrl || review.courseImageUrl;
+  const isVideo = userMedia?.type === 'video';
+  const duration = userMedia?.duration;
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
   const location = [review.courseRegion, review.courseCountry].filter(Boolean).join(', ');
 
