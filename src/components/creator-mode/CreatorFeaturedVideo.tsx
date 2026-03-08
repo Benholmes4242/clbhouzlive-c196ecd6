@@ -1,4 +1,4 @@
-import { PlayCircle, Pencil } from 'lucide-react';
+import { PlayCircle, Pencil, MapPin } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { formatDuration, a11yFullDuration } from '@/utils/formatDuration';
 import { cn } from '@/lib/utils';
