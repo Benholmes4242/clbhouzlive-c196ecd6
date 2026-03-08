@@ -106,6 +106,18 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post }) => {
         </div>
       )}
 
+      {/* Engagement */}
+      <div className="flex items-center gap-4 px-3 pb-1 text-xs text-muted-foreground">
+        <span className="flex items-center gap-1">
+          <Heart className="h-3.5 w-3.5" />
+          {formatCompact(post.likeCount)}
+        </span>
+        <span className="flex items-center gap-1">
+          <MessageCircle className="h-3.5 w-3.5" />
+          {formatCompact(post.commentCount)}
+        </span>
+      </div>
+
       {/* Creator + time */}
       <div className="flex items-center gap-2 px-3 pb-3">
         {post.avatarUrl && (

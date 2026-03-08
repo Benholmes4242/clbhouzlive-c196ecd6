@@ -113,9 +113,21 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post }) => {
       </div>
 
       {/* Engagement */}
-      <div className="text-xs text-muted-foreground px-3 pb-3 flex items-center gap-2">
-        {post.likeCount > 0 && <span>♥ {post.likeCount}</span>}
-        {post.commentCount > 0 && <span>💬 {post.commentCount}</span>}
+      <div className="flex items-center gap-4 px-3 pb-3 text-xs text-muted-foreground">
+        <span className="flex items-center gap-1">
+          <Heart className="h-3.5 w-3.5" />
+          {formatCompact(post.likeCount)}
+        </span>
+        <span className="flex items-center gap-1">
+          <MessageCircle className="h-3.5 w-3.5" />
+          {formatCompact(post.commentCount)}
+        </span>
+        {post.shareCount > 0 && (
+          <span className="flex items-center gap-1">
+            <Share2 className="h-3.5 w-3.5" />
+            {formatCompact(post.shareCount)}
+          </span>
+        )}
       </div>
     </div>
   );

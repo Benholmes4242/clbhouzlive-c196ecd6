@@ -95,6 +95,22 @@ const CompactTile: React.FC<{ post: FeedPost; globalIndex: number }> = ({ post, 
           loading="lazy"
         />
       )}
+
+      {/* Engagement counts — bottom right */}
+      {(post.likeCount > 0 || post.commentCount > 0) && (
+        <div className="absolute bottom-1.5 right-1.5 flex items-center gap-1.5 z-10">
+          {post.likeCount > 0 && (
+            <span className="flex items-center gap-0.5 text-[10px] font-semibold text-white drop-shadow-md">
+              ♥ {formatCompact(post.likeCount)}
+            </span>
+          )}
+          {post.commentCount > 0 && (
+            <span className="flex items-center gap-0.5 text-[10px] font-semibold text-white drop-shadow-md">
+              💬 {formatCompact(post.commentCount)}
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 };
