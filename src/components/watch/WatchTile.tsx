@@ -19,7 +19,7 @@ function abbreviateCount(n: number): string {
 interface WatchTileProps {
   post: FeedPost;
   index: number;
-  allPosts: FeedPost[];
+  allPosts?: FeedPost[];
 }
 
 const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts }) => {
