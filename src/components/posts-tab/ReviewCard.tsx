@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { Star } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
