@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { Play } from 'lucide-react';
+import { Play, Heart, MessageCircle, Share2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+
+function formatCompact(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return String(n);
+}
 
 interface LongFormCardProps {
   post: FeedPost;
