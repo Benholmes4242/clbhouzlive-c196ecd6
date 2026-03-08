@@ -401,7 +401,7 @@ export function useVideoPool() {
 
       // Fade in audio if unmuted
       if (playOk && !isMutedNow && !rapid) {
-        fadeIn(video, useMediaStore.getState().volume); // Fire and forget
+        fadeIn(video, getStore().volume); // Fire and forget
       }
 
       // Safety ended listener (gapless loop hook is primary)
