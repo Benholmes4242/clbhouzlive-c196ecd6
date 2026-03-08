@@ -44,45 +44,52 @@ function mapMediaRow(row: any): MediaItem {
 }
 
 async function fetchPostById(postId: string): Promise<FeedPost | null> {
-  console.log('[fetchPostById] fetching postId:', postId);
-  const { data, error } = await supabase
+  // Fetch post + media (no user_profiles join to avoid ambiguous FK error)
+  const { data: postData, error: postError } = await supabase
     .from('posts')
     .select(`
       id, content, created_at, user_id, actor_type, actor_id, status, source_review_id, course_id,
-      post_media(id, media_type, media_url, poster_url, stream_id, duration_seconds, width, height, display_order),
-      user_profiles(username, display_name, profile_photo_url, is_verified)
+      post_media(id, media_type, media_url, poster_url, stream_id, duration_seconds, width, height, display_order)
     `)
     .eq('id', postId)
     .eq('status', 'published')
     .maybeSingle();
 
-  console.log('[fetchPostById] result:', { data: !!data, error: error?.message, postId });
+  if (postError || !postData) return null;
 
-  if (error || !data) return null;
+  // Fetch profile and engagement counts separately in parallel
+  const [{ data: profileData }, { count: likeCount }, { count: commentCount }] = await Promise.all([
+    supabase
+      .from('user_profiles')
+      .select('username, display_name, profile_photo_url, is_verified')
+      .eq('id', postData.user_id)
+      .maybeSingle(),
+    supabase.from('post_likes').select('*', { count: 'exact', head: true }).eq('post_id', postId),
+    supabase.from('post_comments').select('*', { count: 'exact', head: true }).eq('post_id', postId),
+  ]);
 
-  const profile = (data as any).user_profiles;
-  const media = ((data as any).post_media ?? [])
+  const media = ((postData as any).post_media ?? [])
     .sort((a: any, b: any) => (a.display_order ?? 0) - (b.display_order ?? 0))
     .map(mapMediaRow);
 
   return {
-    id: data.id,
-    userId: data.user_id,
-    actorType: (data.actor_type as 'personal' | 'business') ?? 'personal',
-    actorId: data.actor_id ?? data.user_id,
-    username: profile?.username ?? '',
-    displayName: profile?.display_name ?? '',
-    avatarUrl: profile?.profile_photo_url ?? '',
-    isVerified: profile?.is_verified ?? false,
+    id: postData.id,
+    userId: postData.user_id,
+    actorType: (postData.actor_type as 'personal' | 'business') ?? 'personal',
+    actorId: postData.actor_id ?? postData.user_id,
+    username: profileData?.username ?? '',
+    displayName: profileData?.display_name ?? '',
+    avatarUrl: profileData?.profile_photo_url ?? '',
+    isVerified: profileData?.is_verified ?? false,
     creatorRelation: 'none',
-    caption: data.content ?? '',
+    caption: postData.content ?? '',
     mediaItems: media,
-    createdAt: data.created_at,
-    likeCount: 0,
-    commentCount: 0,
+    createdAt: postData.created_at,
+    likeCount: likeCount ?? 0,
+    commentCount: commentCount ?? 0,
     shareCount: 0,
     review: null,
-    isReview: !!data.source_review_id,
+    isReview: !!postData.source_review_id,
     isLikedByMe: false,
     isFollowedByMe: false,
   };
