@@ -393,7 +393,7 @@ export function useVideoPool() {
       }
 
       // NOW call safePlay
-      const isMutedNow = useMediaStore.getState().isMuted;
+      const isMutedNow = getStore().isMuted;
       if (!isMutedNow && !rapid) {
         video.volume = 0; // Start silent, fade in after play
       }
