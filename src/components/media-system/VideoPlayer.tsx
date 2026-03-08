@@ -94,7 +94,7 @@ export function VideoPlayer({
     retryCountRef.current = 0;
     setIsLoading(true);
     setHasError(false);
-    useMediaStore.getState().setUserPaused(false);
+    getStore().setUserPaused(false);
 
     let cancelled = false;
 
