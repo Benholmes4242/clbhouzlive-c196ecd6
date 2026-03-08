@@ -77,12 +77,18 @@ export function CreatorFeaturedVideo({ post, isOwnProfile, onEditClick }: Creato
         )}
       </div>
 
-      {/* Caption + engagement */}
-      <div className="px-3 pt-2 pb-3 space-y-0.5">
+      {/* Caption + course tag + engagement */}
+      <div className="px-3 pt-2 pb-3">
         {post.caption && (
           <p className="text-sm font-semibold text-foreground line-clamp-1">{post.caption}</p>
         )}
-        <p className="text-xs text-muted-foreground">
+        {post.courseName && (
+          <div className={cn("flex items-center gap-1", post.caption && "mt-2")}>
+            <MapPin className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+            <span className="text-xs text-muted-foreground truncate">{post.courseName}</span>
+          </div>
+        )}
+        <p className={cn("text-xs text-muted-foreground", (post.caption || post.courseName) && "mt-1")}>
           {post.likeCount > 0 && <span>{post.likeCount} likes</span>}
           {post.likeCount > 0 && post.commentCount > 0 && <span> · </span>}
           {post.commentCount > 0 && <span>{post.commentCount} comments</span>}

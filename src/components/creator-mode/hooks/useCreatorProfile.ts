@@ -96,6 +96,7 @@ async function fetchPostById(postId: string): Promise<FeedPost | null> {
     isReview: !!postData.source_review_id,
     isLikedByMe: false,
     isFollowedByMe: false,
+    courseName: courseResult?.data?.name ?? undefined,
   };
 }
 
