@@ -1,7 +1,7 @@
 /**
  * Unified Media Item Adapter
  * 
- * Converts UnifiedMediaItem (used by ActivityGridV2, WatchGridV2) to normalized format
+ * Converts UnifiedMediaItem (used by WatchGridV2) to normalized format
  * for the Unified Fullscreen Player.
  * 
  * This adapter is useful when pages already have UnifiedMediaItem[] available
