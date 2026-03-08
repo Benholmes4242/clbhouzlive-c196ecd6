@@ -11,7 +11,7 @@ type PostKind = 'longform' | 'review' | 'compact';
 type FeedSegment =
   | { kind: 'longform'; post: FeedPost }
   | { kind: 'review'; post: FeedPost }
-  | { kind: 'compact-group'; posts: FeedPost[]; startIndex: number };
+  | { kind: 'compact-group'; posts: FeedPost[]; startIndex: number; globalIndices: number[] };
 
 function classifyPost(post: FeedPost): PostKind {
   if (post.isReview && post.review) return 'review';
