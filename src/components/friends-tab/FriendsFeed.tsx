@@ -168,7 +168,7 @@ export function FriendsFeed({
   }
 
   return (
-    <div className="flex flex-col pb-4 pt-2">
+    <div className="flex flex-col gap-3 pb-4 pt-2">
       {posts.map((post, i) => (
         <div key={post.id} ref={setCardRef(i)} data-card-index={i}>
           <FriendsCard post={post} isAutoplayEligible={Math.abs(i - centerIndex) <= 2} userId={userId} cardIndex={i} />
