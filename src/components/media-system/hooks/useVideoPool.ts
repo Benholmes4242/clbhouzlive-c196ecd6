@@ -199,7 +199,7 @@ export function useVideoPool() {
 
       // Otherwise LRU by distance from active index
       if (!target) {
-        const activeIndex = useMediaStore.getState().activeIndex;
+        const activeIndex = getStore().activeIndex;
         let bestIdx = -1;
         let bestScore = -1;
 
