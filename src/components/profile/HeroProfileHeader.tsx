@@ -31,7 +31,7 @@ import {
 import ProfileAvatarRing from './header/ProfileAvatarRing';
 
 // Tab content components
-import ActivityFeed from './ActivityFeed';
+// PostsTabContent imported above
 import { ProfileCoursesTab } from './ProfileCoursesTab';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import Top100PublicJourneyPanel from '@/components/top100/Top100PublicJourneyPanel';
