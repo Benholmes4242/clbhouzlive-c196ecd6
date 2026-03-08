@@ -44,6 +44,7 @@ import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
 import { PeopleTab } from '@/components/business/PeopleTab';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import { AvatarLightbox } from '@/components/shared/AvatarLightbox';
+import { CreatorSection } from '@/components/creator-mode/CreatorSection';
 
 type BusinessTab = 'content' | 'golfers' | 'info';
 
