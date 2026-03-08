@@ -48,7 +48,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
       </div>
 
       {/* Filter chips */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-center gap-2">
         {FILTERS.map(({ key, label }) => (
           <button
             key={key}

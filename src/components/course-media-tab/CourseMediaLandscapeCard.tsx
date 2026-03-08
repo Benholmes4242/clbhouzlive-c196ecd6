@@ -52,16 +52,12 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
     >
       {/* Creator header */}
       <div className="flex items-center gap-2 px-3 py-2">
-        {post.avatarUrl ? (
-          <img
-            src={post.avatarUrl}
-            alt=""
-            className="w-7 h-7 rounded-full object-cover"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-7 h-7 rounded-full bg-muted" />
-        )}
+        <SquircleAvatar
+          src={post.avatarUrl}
+          alt={post.displayName || ''}
+          size={28}
+          fallback={post.displayName?.charAt(0)?.toUpperCase() || '?'}
+        />
         <div className="flex-1 min-w-0">
           <span className="text-sm font-semibold text-foreground truncate block">
             {post.displayName}
