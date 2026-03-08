@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Check } from 'lucide-react';
 import { useCreatorPostPicker, type PickerPost } from './hooks/useCreatorPostPicker';
 import { useQueryClient } from '@tanstack/react-query';
