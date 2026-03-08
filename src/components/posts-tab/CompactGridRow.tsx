@@ -1,6 +1,7 @@
 import React from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { Play, Star } from 'lucide-react';
+import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 
 interface CompactGridRowProps {
   posts: FeedPost[];
