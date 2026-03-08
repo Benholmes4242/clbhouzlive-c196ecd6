@@ -14,6 +14,7 @@ function formatDuration(seconds: number): string {
 }
 
 export const LongFormCard: React.FC<LongFormCardProps> = ({ post }) => {
+  const [expanded, setExpanded] = useState(false);
   const firstMedia = post.mediaItems[0];
   const thumbnailUrl = firstMedia?.thumbnailUrl || firstMedia?.imageUrl;
   const duration = firstMedia?.duration;
