@@ -98,6 +98,7 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
               isCompleted={isCompleted}
               isLast={i === sorted.length - 1}
               isBestCall={isCompleted && prediction.playerId === bestCallPlayerId}
+              leaderScore={leaderScore}
             />
           </motion.div>
         ))}
