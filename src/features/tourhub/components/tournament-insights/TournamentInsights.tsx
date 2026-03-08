@@ -300,7 +300,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
     if (tracker) {
       return (
         <div className="space-y-4">
-          <PredictionLeaderboard allPicks={tracker.allPicks} isCompleted={false} />
+          <PredictionLeaderboard allPicks={tracker.allPicks} isCompleted={false} tournamentLeaderScore={tracker.tournamentLeaderScore} />
 
           {/* Course DNA toggle */}
           <div
