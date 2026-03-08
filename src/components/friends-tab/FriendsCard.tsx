@@ -144,12 +144,12 @@ export const FriendsCard = React.memo(function FriendsCard({ post, isAutoplayEli
         </div>
 
         {/* Caption */}
-        {post.caption && (
+        {cleanCaption && (
           <div className="px-3 pb-2">
             <p className={`text-sm text-foreground ${expanded ? '' : 'line-clamp-2'}`}>
-              {post.caption}
+              {cleanCaption}
             </p>
-            {!expanded && post.caption.length > 100 && (
+            {!expanded && cleanCaption.length > 100 && (
               <button
                 onClick={() => setExpanded(true)}
                 className="text-sm font-semibold text-muted-foreground mt-0.5"
@@ -157,7 +157,7 @@ export const FriendsCard = React.memo(function FriendsCard({ post, isAutoplayEli
                 more
               </button>
             )}
-            {expanded && post.caption.length > 100 && (
+            {expanded && cleanCaption.length > 100 && (
               <button
                 onClick={() => setExpanded(false)}
                 className="text-sm font-semibold text-muted-foreground mt-0.5"
