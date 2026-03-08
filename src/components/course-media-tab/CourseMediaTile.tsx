@@ -78,10 +78,15 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index })
       {/* Review rating — top-right */}
       {reviewRating != null && reviewRating > 0 && (
         <div
-          className="absolute top-1.5 right-1.5 z-10 rounded-full flex items-center gap-[2px]"
+          className="absolute top-1.5 right-1.5 z-10 rounded-full flex items-center gap-[3px]"
           style={{ ...HUD_GLASS, padding: '2px 6px' }}
         >
-          <span className="text-[10px]">⭐</span>
+          <img
+            src="/images/brand/clubhouz-mark-white.svg"
+            alt=""
+            className="w-[10px] h-[10px]"
+            style={{ filter: 'brightness(0) saturate(100%) invert(67%) sepia(74%) saturate(1000%) hue-rotate(360deg) brightness(101%) contrast(96%)' }}
+          />
           <span className="text-[11px] font-semibold text-white">
             {reviewRating.toFixed(1)}
           </span>
