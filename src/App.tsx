@@ -234,6 +234,7 @@ const BusinessActivityPage = lazy(() => import("./pages/BusinessActivityPage"));
 // ManageTeamPage removed — now handled via ManageTeamModal bottom sheet
 
 const NotFound = lazy(() => import("./pages/NotFound"));
+const PostsTabTestPage = lazy(() => import("./pages/PostsTabTestPage"));
 const CreateMomentPage = lazy(() => import("./pages/CreateMomentPage"));
 const PostDeepLinkPage = lazy(() => import("./pages/PostDeepLinkPage"));
 const CommentDeepLinkPage = lazy(() => import("./components/comments/CommentDeepLinkHandler"));
