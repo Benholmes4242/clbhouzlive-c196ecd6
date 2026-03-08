@@ -67,7 +67,7 @@ const LivePositionDisplay: React.FC<LivePositionDisplayProps> = ({
           minWidth: 32,
           textAlign: 'right',
           color: isLeading
-            ? '#16A34A'
+            ? 'var(--th-accent-live)'
             : (offLead !== null && offLead > 10)
               ? 'hsl(var(--destructive))'
               : 'hsl(var(--muted-foreground))',

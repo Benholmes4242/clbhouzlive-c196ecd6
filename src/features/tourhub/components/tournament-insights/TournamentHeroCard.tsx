@@ -1,6 +1,7 @@
 /**
  * TournamentHeroCard - Cinematic cover with venue image
  * Full-bleed with rounded bottom corners, state-colored badge
+ * Uses canonical HUD glass spec for overlays
  */
 
 import { memo } from 'react';
@@ -21,6 +22,15 @@ interface TournamentHeroCardProps {
   isCompleted?: boolean;
 }
 
+/** Canonical HUD glass spec */
+const HUD_GLASS = {
+  background: 'rgba(0, 0, 0, 0.35)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  border: '1px solid rgba(255, 255, 255, 0.1)',
+  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
+} as const;
+
 export const TournamentHeroCard = memo(function TournamentHeroCard({
   tournament,
   isLive = false,
@@ -29,37 +39,22 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
   const venueImageQuery = useVenueImage(tournament.courseName, null);
   const imageUrl = venueImageQuery.data?.imageUrl || tournament.heroImageUrl;
 
-  const pillStyle = {
-    fontSize: '11px',
-    fontWeight: 500 as const,
-    letterSpacing: '0.05em',
-    color: 'rgba(255, 255, 255, 0.85)',
-    background: 'rgba(0, 0, 0, 0.45)',
-    backdropFilter: 'blur(24px) saturate(180%)',
-    WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.35)',
-  };
-
-  // Badge config per state
+  // Badge config per state — all use HUD glass
   const getBadgeConfig = () => {
     if (isLive) {
       return {
         label: 'LIVE TOURNAMENT',
-        bg: 'rgba(220, 38, 38, 0.9)',
         showDot: true,
       };
     }
     if (isCompleted) {
       return {
         label: 'LATEST RESULTS',
-        bg: 'rgba(255, 255, 255, 0.15)',
         showDot: false,
       };
     }
     return {
       label: 'NEXT TOURNAMENT',
-      bg: 'rgba(255, 255, 255, 0.15)',
       showDot: false,
     };
   };
@@ -84,7 +79,7 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
         }}
       />
 
-      {/* Top Left Badge */}
+      {/* Top Left Badge — HUD glass */}
       <div className="absolute top-4 left-4">
         <span
           className="inline-flex items-center gap-1.5 uppercase font-bold"
@@ -93,22 +88,19 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
             fontWeight: 700,
             letterSpacing: '0.1em',
             color: 'rgba(255, 255, 255, 0.95)',
-            background: badge.bg,
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
+            ...HUD_GLASS,
             padding: '5px 12px',
             borderRadius: '8px',
           }}
         >
           {badge.showDot && (
             <span
+              className="live-dot-green"
               style={{
                 width: 6,
                 height: 6,
                 borderRadius: 3,
-                backgroundColor: 'white',
-                animation: 'pulse 1.5s infinite',
+                backgroundColor: 'var(--th-accent-live)',
                 flexShrink: 0,
               }}
             />
@@ -142,7 +134,7 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
           {tournament.courseName} • {tournament.dateRangeText}
         </p>
 
-        {/* Metadata Chips */}
+        {/* Metadata Chips — HUD glass */}
         <div className="flex flex-wrap gap-2">
           {[tournament.purseText, tournament.parText, tournament.yardageText]
             .filter(Boolean)
@@ -150,7 +142,15 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
               <span
                 key={i}
                 className="uppercase"
-                style={{ ...pillStyle, padding: '4px 10px', borderRadius: '6px' }}
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 500,
+                  letterSpacing: '0.05em',
+                  color: 'rgba(255, 255, 255, 0.85)',
+                  ...HUD_GLASS,
+                  padding: '4px 10px',
+                  borderRadius: '6px',
+                }}
               >
                 {text}
               </span>
@@ -159,7 +159,10 @@ export const TournamentHeroCard = memo(function TournamentHeroCard({
       </div>
 
       <style>{`
-        @keyframes pulse {
+        .live-dot-green {
+          animation: liveDotPulse 1.5s infinite;
+        }
+        @keyframes liveDotPulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.4; }
         }

@@ -52,7 +52,7 @@ const LiveStatusBar: React.FC<LiveStatusBarProps> = ({ allPicks }) => {
       {leaderName && (
         <span
           className="ml-auto"
-          style={{ fontSize: 12, fontWeight: 600, color: '#16A34A' }}
+          style={{ fontSize: 12, fontWeight: 600, color: 'var(--th-accent-live)' }}
         >
           {leaderName} leads at {formatScore(leaderScore ?? null)}
         </span>
