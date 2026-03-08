@@ -270,7 +270,7 @@ export function useVideoPool() {
       target.assignedUrl = hlsUrl;
       target.assignedIndex = feedIndex;
       target.lastUsedAt = Date.now();
-      video.muted = useMediaStore.getState().isMuted;
+      video.muted = getStore().isMuted;
 
       // Master load timeout
       let loadTimedOut = false;
