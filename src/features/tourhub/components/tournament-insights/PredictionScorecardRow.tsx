@@ -8,7 +8,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
-import PickBadge from './components/PickBadge';
+
 import ActualPositionBadge from './components/ActualPositionBadge';
 import LivePositionDisplay from './components/LivePositionDisplay';
 import CountryFlag from '@/components/ui/country-flag';
@@ -20,6 +20,7 @@ interface PredictionScorecardRowProps {
   isCompleted?: boolean;
   isLast?: boolean;
   isBestCall?: boolean;
+  leaderScore?: number | null;
 }
 
 function getAccuracyBorderColor() {
@@ -38,6 +39,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
   isCompleted,
   isLast = false,
   isBestCall = false,
+  leaderScore,
 }) => {
   const isCut = prediction.performanceStatus === 'cut';
   const isWD = prediction.performanceStatus === 'withdrawn';
@@ -46,7 +48,9 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
   const avatarUrl = getPlayerHeadshotUrl(prediction.playerName, 'pga');
   const borderColor = getAccuracyBorderColor();
 
-  const offLead = prediction.actualPosition !== null ? prediction.actualPosition - 1 : null;
+  const offLead = (prediction.score !== null && leaderScore !== null && leaderScore !== undefined)
+    ? prediction.score - leaderScore
+    : null;
 
   return (
     <motion.div
@@ -114,17 +118,13 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
       )}
 
       <div className="flex items-center gap-3">
-        {/* LEFT SECTION — differs between completed and live */}
-        {isCompleted ? (
-          /* Completed: Position badge on the left */
+        {/* LEFT SECTION — position badge for completed state only */}
+        {isCompleted && (
           <ActualPositionBadge
             position={prediction.actualPosition}
             isTied={prediction.actualPositionTied}
             performanceStatus={prediction.performanceStatus}
           />
-        ) : (
-          /* Live: Pick number badge on the left */
-          <PickBadge pickNumber={prediction.predictedRank} />
         )}
 
         {/* Avatar — round */}

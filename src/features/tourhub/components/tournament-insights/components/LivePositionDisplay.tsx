@@ -73,7 +73,7 @@ const LivePositionDisplay: React.FC<LivePositionDisplayProps> = ({
               : 'hsl(var(--muted-foreground))',
         }}
       >
-        {isLeading ? 'LEAD' : offLead !== null ? `-${offLead}` : '—'}
+        {isLeading ? 'LEAD' : offLead !== null ? `+${offLead}` : '—'}
       </span>
     </div>
   );
