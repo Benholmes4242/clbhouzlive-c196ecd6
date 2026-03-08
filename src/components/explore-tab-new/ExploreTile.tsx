@@ -1,9 +1,11 @@
 import { memo } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 
 interface ExploreTileProps {
   post: FeedPost;
   index: number;
+  allPosts?: FeedPost[];
 }
 
 function ExploreTileInner({ post, index }: ExploreTileProps) {
