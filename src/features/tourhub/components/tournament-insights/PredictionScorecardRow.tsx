@@ -118,17 +118,13 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
       )}
 
       <div className="flex items-center gap-3">
-        {/* LEFT SECTION — differs between completed and live */}
-        {isCompleted ? (
-          /* Completed: Position badge on the left */
+        {/* LEFT SECTION — position badge for completed state only */}
+        {isCompleted && (
           <ActualPositionBadge
             position={prediction.actualPosition}
             isTied={prediction.actualPositionTied}
             performanceStatus={prediction.performanceStatus}
           />
-        ) : (
-          /* Live: Pick number badge on the left */
-          <PickBadge pickNumber={prediction.predictedRank} />
         )}
 
         {/* Avatar — round */}

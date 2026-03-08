@@ -30,14 +30,14 @@ const LiveStatusBar: React.FC<LiveStatusBarProps> = ({ allPicks }) => {
         borderRadius: 16,
       }}
     >
-      {/* Pulsing red dot */}
+      {/* Pulsing live dot */}
       <span
         style={{
           width: 8,
           height: 8,
           borderRadius: 4,
-          backgroundColor: 'hsl(var(--destructive))',
-          boxShadow: '0 0 0 3px hsl(var(--destructive) / 0.2)',
+          backgroundColor: '#22C55E',
+          boxShadow: '0 0 0 3px rgba(34, 197, 94, 0.2)',
           animation: 'pulse 2s infinite',
           flexShrink: 0,
         }}
