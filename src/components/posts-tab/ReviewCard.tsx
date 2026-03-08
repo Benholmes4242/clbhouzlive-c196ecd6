@@ -52,6 +52,26 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post }) => {
             className="absolute inset-0 w-full h-full object-cover"
             loading="lazy"
           />
+          {isVideo && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.45)' }}>
+                <Play className="w-4 h-4 text-white fill-white ml-0.5" />
+              </div>
+            </div>
+          )}
+          {isVideo && duration != null && duration > 0 && (
+            <div
+              className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-medium text-white"
+              style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)' }}
+            >
+              {Math.floor(duration / 60)}:{Math.floor(duration % 60).toString().padStart(2, '0')}
+            </div>
+          )}
+          {post.mediaItems.length > 1 && (
+            <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-md">
+              1/{post.mediaItems.length}
+            </div>
+          )}
         </div>
       )}
 
