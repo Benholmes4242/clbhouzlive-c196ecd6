@@ -975,6 +975,11 @@ const ProfilePageV2Content: React.FC = () => {
           />
         )}
 
+        {/* Creator Section - featured video, pinned posts, weekly stats */}
+        {isPersonal && profileUserId && (
+          <CreatorSection userId={profileUserId} isOwnProfile={isSelf} />
+        )}
+
         {/* Segmented control tabs - matches schedule page exactly */}
         {/* Explicit touch-action and z-index to ensure tappability on mobile */}
         <section 
