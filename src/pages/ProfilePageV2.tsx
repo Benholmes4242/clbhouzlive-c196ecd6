@@ -611,10 +611,13 @@ const ProfilePageV2Content: React.FC = () => {
       {/* Identity Stack - adjusted for left-aligned avatar */}
       {/* z-10 ensures content is above hero's z-1, pointer-events-auto ensures tappability */}
       <div className="pt-[68px] px-5 text-left relative z-10 pointer-events-auto">
-        {/* Name - smaller, more bold */}
-        <h1 className="text-[28px] font-bold text-foreground">
-          {displayName}
-        </h1>
+        {/* Name + Creator Badge */}
+        <div className="flex items-center gap-2">
+          <h1 className="text-[28px] font-bold text-foreground">
+            {displayName}
+          </h1>
+          {profile?.is_creator && <CreatorBadge />}
+        </div>
       </div>
 
       {/* Action Buttons - different for self vs other */}
