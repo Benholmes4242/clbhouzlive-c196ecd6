@@ -36,8 +36,9 @@ function ExploreTileInner({ post, index }: ExploreTileProps) {
 
       {/* Rating badge — top right */}
       {rating != null && rating > 0 && (
-        <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md bg-amber-500/90 text-white text-[11px] font-semibold leading-none">
-          ⭐ {rating.toFixed(1)}
+        <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-md bg-amber-500/90 text-white text-[11px] font-semibold leading-none flex items-center gap-[3px]">
+          <img src="/images/brand/clubhouz-mark-white.svg" alt="" className="w-[10px] h-[10px]" style={{ filter: 'brightness(0) invert(1)' }} />
+          {rating.toFixed(1)}
         </span>
       )}
 
