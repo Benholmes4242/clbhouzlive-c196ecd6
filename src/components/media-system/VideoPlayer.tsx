@@ -204,7 +204,7 @@ export function VideoPlayer({
     ).then((video) => {
       if (video) {
         videoRef.current = video;
-        video.muted = useMediaStore.getState().isMuted;
+        video.muted = getStore().isMuted;
       }
     });
   }, [hlsUrl, feedIndex, pool, mp4Url]);
