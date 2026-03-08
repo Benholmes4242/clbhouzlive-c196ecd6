@@ -28,6 +28,11 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
     return aPos - bPos;
   });
 
+  // Derive leader score from picks (lowest score among position-1 players, or overall lowest)
+  const leaderPick = sorted.find(p => p.actualPosition === 1);
+  const leaderScore = leaderPick?.score
+    ?? Math.min(...allPicks.filter(p => p.score !== null).map(p => p.score!)) || null;
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
