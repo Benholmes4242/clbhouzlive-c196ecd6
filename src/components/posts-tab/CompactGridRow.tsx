@@ -33,7 +33,15 @@ const CompactTile: React.FC<{ post: FeedPost; globalIndex: number; allPosts?: Fe
       className="relative aspect-[4/5] rounded-[4px] overflow-hidden bg-muted cursor-pointer"
       data-posts-tile-index={globalIndex}
       data-hls-url={firstMedia?.hlsUrl || ''}
-      onClick={() => { /* TODO: wire to player */ }}
+      onClick={() => {
+        if (allPosts) {
+          useFullscreenFeed.getState().open({
+            posts: allPosts,
+            startIndex: globalIndex,
+            sourceId: 'posts',
+          });
+        }
+      }}
     >
       {/* Poster image */}
       {thumbnailUrl && (
