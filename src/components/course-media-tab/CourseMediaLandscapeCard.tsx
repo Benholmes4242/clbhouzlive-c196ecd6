@@ -3,6 +3,7 @@ import { Heart, MessageCircle, Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
