@@ -8,6 +8,7 @@ interface ReviewCardProps {
 }
 
 export const ReviewCard: React.FC<ReviewCardProps> = ({ post }) => {
+  const [expanded, setExpanded] = useState(false);
   const review = post.review;
   if (!review) return null;
 
