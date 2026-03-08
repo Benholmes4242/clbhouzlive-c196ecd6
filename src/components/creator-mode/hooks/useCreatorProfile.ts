@@ -57,8 +57,9 @@ async function fetchPostById(postId: string): Promise<FeedPost | null> {
 
   if (postError || !postData) return null;
 
-  // Fetch profile and engagement counts separately in parallel
-  const [{ data: profileData }, { count: likeCount }, { count: commentCount }] = await Promise.all([
+  // Fetch profile, engagement counts, and course name in parallel
+  const courseId = postData.course_id;
+  const [{ data: profileData }, { count: likeCount }, { count: commentCount }, courseResult] = await Promise.all([
     supabase
       .from('user_profiles')
       .select('username, display_name, profile_photo_url, is_verified')
@@ -66,6 +67,9 @@ async function fetchPostById(postId: string): Promise<FeedPost | null> {
       .maybeSingle(),
     supabase.from('post_likes').select('*', { count: 'exact', head: true }).eq('post_id', postId),
     supabase.from('post_comments').select('*', { count: 'exact', head: true }).eq('post_id', postId),
+    courseId
+      ? supabase.from('golf_courses').select('name').eq('id', courseId).maybeSingle()
+      : Promise.resolve({ data: null }),
   ]);
 
   const media = ((postData as any).post_media ?? [])
