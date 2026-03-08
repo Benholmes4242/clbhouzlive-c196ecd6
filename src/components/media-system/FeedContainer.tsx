@@ -27,6 +27,7 @@ const RENDER_WINDOW = 5;                // DOM virtualization: render ±5 items 
 
 interface FeedContainerProps {
   posts: FeedPost[];
+  initialIndex?: number;
   onNearEnd?: () => void;
   onRefresh?: () => Promise<void>;
   isRefreshing?: boolean;
@@ -36,16 +37,17 @@ interface FeedContainerProps {
   onFirstFrameReady?: () => void;
 }
 
-export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = false, hasNextPage = true, followOverrides, onFollowChange, onFirstFrameReady }: FeedContainerProps) {
+export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, isRefreshing = false, hasNextPage = true, followOverrides, onFollowChange, onFirstFrameReady }: FeedContainerProps) {
   const [itemHeight, setItemHeight] = useState(
     typeof window !== 'undefined' ? window.innerHeight : 800
   );
-  const [offsetY, setOffsetY] = useState(0);
+  const startOffset = -(initialIndex) * (typeof window !== 'undefined' ? window.innerHeight : 800);
+  const [offsetY, setOffsetY] = useState(startOffset);
 
-  const offsetRef = useRef(0);
+  const offsetRef = useRef(startOffset);
   const trackRef = useRef<HTMLDivElement>(null);
   const cancelSpring = useRef<(() => void) | null>(null);
-  const activeIndexRef = useRef(0);
+  const activeIndexRef = useRef(initialIndex);
   const touchStartRef = useRef({ y: 0, time: 0, offsetY: 0 });
   const velocityTracker = useRef<{ y: number; time: number }[]>([]);
   const isDragging = useRef(false);
