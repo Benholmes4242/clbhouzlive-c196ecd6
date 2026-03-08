@@ -102,10 +102,10 @@ export const courseDetailTokens = {
   // Score ring gradient colors - AMBER FOR OUTSTANDING ONLY, Gray for rest
   scoreRing: {
     outstanding: { from: '#f59e0b', to: '#fbbf24' }, // Amber gradient
-    excellent: { from: '#A8A29E', to: '#A8A29E' },   // Warm stone
-    veryGood: { from: '#A8A29E', to: '#A8A29E' },    // Warm stone
-    good: { from: '#A8A29E', to: '#A8A29E' },        // Warm stone
-    fair: { from: '#A8A29E', to: '#A8A29E' },        // Warm stone
+    excellent: { from: '#1e293b', to: '#1e293b' },   // Slate-800
+    veryGood: { from: '#475569', to: '#475569' },    // Slate-600
+    good: { from: '#64748b', to: '#64748b' },        // Slate-500
+    fair: { from: '#94a3b8', to: '#94a3b8' },        // Slate-400
   },
 } as const;
 
