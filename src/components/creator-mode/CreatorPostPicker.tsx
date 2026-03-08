@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Check } from 'lucide-react';
 import { useCreatorPostPicker, type PickerPost } from './hooks/useCreatorPostPicker';
 import { useQueryClient } from '@tanstack/react-query';
@@ -82,13 +83,13 @@ export function CreatorPostPicker({
 
   const pinnedIndex = (id: string) => selectedPinned.indexOf(id) + 1;
 
-  return (
+  return createPortal(
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 z-50 bg-black/40" onClick={onClose} />
+      <div className="fixed inset-0 z-[200] bg-black/40" onClick={onClose} />
 
       {/* Sheet */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background rounded-t-[20px] max-h-[85vh] flex flex-col">
+      <div className="fixed bottom-0 left-0 right-0 z-[200] bg-background rounded-t-[20px] max-h-[85vh] flex flex-col">
         {/* Drag handle */}
         <div className="pt-2.5 pb-1 flex justify-center">
           <div className="w-9 h-1 rounded-full bg-muted-foreground/30" />
@@ -178,7 +179,7 @@ export function CreatorPostPicker({
         </div>
 
         {/* Save button — sticky footer */}
-        <div className="shrink-0 px-4 pt-2 border-t border-border" style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}>
+        <div className="shrink-0 px-4 pt-2 border-t border-border" style={{ paddingBottom: 'calc(max(env(safe-area-inset-bottom, 0px), 16px) + 70px)' }}>
           <button
             type="button"
             onClick={handleSave}
@@ -189,6 +190,7 @@ export function CreatorPostPicker({
           </button>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
