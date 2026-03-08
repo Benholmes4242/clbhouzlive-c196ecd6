@@ -204,7 +204,7 @@ const HeroProfileHeader = ({
   const displayName = useMemo(() => profile?.display_name || 'User', [profile?.display_name]);
   const username = useMemo(() => profile?.username || 'user', [profile?.username]);
   const homeClub = useMemo(() => profile?.home_club || 'Home Club', [profile?.home_club]);
-  const postsCount = posts.length;
+  const postsCount = postsCountValue;
   const totalTop100Played = isPersonal ? (top100Overview?.total_rated ?? top100Overview?.total_played ?? 0) : 0;
 
   // Navigation handlers

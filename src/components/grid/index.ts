@@ -56,8 +56,6 @@ export {
 export {
   exploreItemToUniversal,
   exploreItemsToUniversal,
-  activityItemToUniversal,
-  activityItemsToUniversal,
   activityPostToUniversal,
   activityPostsToUniversal,
 } from './adapters';
