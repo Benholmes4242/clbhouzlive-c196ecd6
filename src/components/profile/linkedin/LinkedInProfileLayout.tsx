@@ -10,15 +10,15 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTop100Overview } from '@/hooks/useTop100Overview';
-import { useActivityPostsV2 } from '../activity/v2';
-import { useUserAchievements } from '@/hooks/useUserAchievements';
+import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import ProfileAvatarRing from '../header/ProfileAvatarRing';
 import { ProfileSocialButtons } from '../actions/ProfileSocialButtons';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 // Tab content components
-import ActivityFeed from '../ActivityFeed';
+// PostsTabContent imported above
+import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { ProfileCoursesTab } from '../ProfileCoursesTab';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import Top100PublicJourneyPanel from '@/components/top100/Top100PublicJourneyPanel';
@@ -67,7 +67,7 @@ const LinkedInProfileLayout: React.FC<LinkedInProfileLayoutProps> = ({
 
   // Data hooks
   const { data: top100Overview } = useTop100Overview(profile?.id);
-  const { items: posts } = useActivityPostsV2(profile?.id);
+  // Posts count handled by PostsCountSummary inside PostsTabContent
   const { data: achievements } = useUserAchievements(profile?.id);
   
   // Profile type
@@ -79,7 +79,7 @@ const LinkedInProfileLayout: React.FC<LinkedInProfileLayoutProps> = ({
   const displayName = profile?.display_name || 'User';
   const username = profile?.username || 'user';
   const homeClub = profile?.home_club || '';
-  const postsCount = posts.length;
+  const postsCount = 0; // Handled by PostsCountSummary inside the tab
   const totalTop100Played = isPersonal ? (top100Overview?.total_rated ?? top100Overview?.total_played ?? 0) : 0;
   const roundsLogged = top100Overview?.total_rated ?? 0;
 
@@ -140,13 +140,11 @@ const LinkedInProfileLayout: React.FC<LinkedInProfileLayoutProps> = ({
     switch (activeSection) {
       case 'activity':
         return (
-          <ActivityFeed
-            userId={profile?.id || ''}
+          <PostsTabContent
+            actorType="personal"
+            actorId={profile?.id || ''}
+            actorName={displayName}
             isOwnProfile={isOwnProfile}
-            profileDisplayName={profile?.display_name}
-            userHandicap={profile?.eg_handicap_index}
-            userProfilePhotoUrl={profile?.profile_photo_url}
-            onAchievementsClick={() => setActiveSection('achievements')}
           />
         );
       case 'courses':

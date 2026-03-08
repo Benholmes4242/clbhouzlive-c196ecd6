@@ -39,7 +39,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 // Tab content components
-import { BusinessActivityFeed } from '@/components/business/posts/BusinessActivityFeed';
+import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
 import { PeopleTab } from '@/components/business/PeopleTab';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
@@ -218,7 +218,7 @@ const BusinessProfilePage: React.FC = () => {
   const isGolfClub = business?.category === 'Golf Club';
   
   const tabs = [
-    { id: 'content', label: 'Activity' },
+    { id: 'content', label: 'Posts' },
     { id: 'golfers', label: 'People' },
     { id: 'info', label: 'About' },
   ];
@@ -227,12 +227,11 @@ const BusinessProfilePage: React.FC = () => {
     switch (activeTab) {
       case 'content':
         return (
-          <BusinessActivityFeed 
-            businessId={business?.id || ''}
-            businessName={business?.name || ''}
-            businessLogo={business?.logo_url}
-            followerCount={followersCount}
-            membership={membership ?? null} 
+          <PostsTabContent
+            actorType="business"
+            actorId={business?.id || ''}
+            actorName={business?.name || ''}
+            isOwnProfile={isOwner || false}
           />
         );
       case 'golfers':

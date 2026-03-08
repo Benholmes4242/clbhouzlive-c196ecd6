@@ -11,7 +11,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile.tsx';
 import { useTop100Overview } from '@/hooks/useTop100Overview';
-import { useActivityPostsV2 } from '@/components/profile/activity/v2';
+import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 import { usePersonalPostsCount } from '@/hooks/usePersonalPostsCount';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { useFollow } from '@/hooks/useFollow';
@@ -51,7 +51,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 // Tab content components
-import ActivityFeed from '@/components/profile/ActivityFeed';
+// PostsTabContent imported above
 import { ProfileCoursesTab } from '@/components/profile/ProfileCoursesTab';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import AchievementsPane from '@/components/profile/AchievementsPane';
@@ -148,7 +148,7 @@ const ProfilePageV2Content: React.FC = () => {
   
   const { data: profile, isLoading: profileLoading } = useUserProfile(profileUserId);
   const { data: top100Overview } = useTop100Overview(profileUserId);
-  const { items: posts } = useActivityPostsV2(profileUserId);
+  // Post count comes from usePersonalPostsCount below
   const { data: postsCount = 0, isLoading: postsCountLoading } = usePersonalPostsCount(profileUserId);
   const { data: achievements } = useProfileAchievements(profileUserId);
   
@@ -399,13 +399,11 @@ const ProfilePageV2Content: React.FC = () => {
     switch (activeSection) {
       case 'activity':
         return (
-          <ActivityFeed
-            userId={profile?.id || ''}
+          <PostsTabContent
+            actorType="personal"
+            actorId={profile?.id || ''}
+            actorName={displayName}
             isOwnProfile={isSelf}
-            profileDisplayName={profile?.display_name}
-            userHandicap={profile?.eg_handicap_index}
-            userProfilePhotoUrl={profile?.profile_photo_url}
-            onAchievementsClick={() => setActiveSection('achievements')}
           />
         );
       case 'courses':

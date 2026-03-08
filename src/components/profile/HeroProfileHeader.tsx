@@ -11,7 +11,7 @@ import { useImmersiveProfile } from '@/hooks/useImmersiveProfile';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
 import { useTop100Overview } from '@/hooks/useTop100Overview';
-import { useActivityPostsV2 } from './activity/v2';
+import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { toast } from 'sonner';
 import { trackBusinessEvent } from '@/analytics/businessAnalytics';
@@ -31,7 +31,7 @@ import {
 import ProfileAvatarRing from './header/ProfileAvatarRing';
 
 // Tab content components
-import ActivityFeed from './ActivityFeed';
+// PostsTabContent imported above
 import { ProfileCoursesTab } from './ProfileCoursesTab';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import Top100PublicJourneyPanel from '@/components/top100/Top100PublicJourneyPanel';
@@ -160,22 +160,8 @@ const HeroProfileHeader = ({
   const { uploadImage, uploading: photoUploading } = useR2Upload();
   const { trackScrollDepth } = useProfileAnalytics(profile?.id);
   const { data: top100Overview, isLoading: top100Loading } = useTop100Overview(profile?.id);
-  const { items: posts, isLoading: postsLoading } = useActivityPostsV2(profile?.id);
-  
-  // Debug: Log posts loading
-  useEffect(() => {
-    logQueryState('useActivityPostsV2', {
-      isLoading: postsLoading,
-      isSuccess: posts.length > 0,
-    });
-    if (!postsLoading && posts.length > 0) {
-      logProfile('data', 'HeroProfileHeader', '📝 Posts loaded', {
-        count: posts.length,
-        firstPostId: posts[0]?.id,
-      });
-      profileTiming.end('HeroProfileHeader:render');
-    }
-  }, [posts, postsLoading]);
+  // Posts count from usePersonalPostsCount (fetched in parent) or simple count
+  const postsCountValue = 0; // Will be replaced by PostsCountSummary inside the tab
   
   // Immersive profile
   const {
@@ -218,7 +204,7 @@ const HeroProfileHeader = ({
   const displayName = useMemo(() => profile?.display_name || 'User', [profile?.display_name]);
   const username = useMemo(() => profile?.username || 'user', [profile?.username]);
   const homeClub = useMemo(() => profile?.home_club || 'Home Club', [profile?.home_club]);
-  const postsCount = posts.length;
+  const postsCount = postsCountValue;
   const totalTop100Played = isPersonal ? (top100Overview?.total_rated ?? top100Overview?.total_played ?? 0) : 0;
 
   // Navigation handlers
@@ -340,13 +326,11 @@ const HeroProfileHeader = ({
       switch (activeSection) {
         case 'activity':
           return (
-            <ActivityFeed
-              userId={profile?.id || ''}
+            <PostsTabContent
+              actorType="personal"
+              actorId={profile?.id || ''}
+              actorName={displayName}
               isOwnProfile={isOwnProfile}
-              profileDisplayName={profile?.display_name}
-              userHandicap={profile?.eg_handicap_index}
-              userProfilePhotoUrl={profile?.profile_photo_url}
-              onAchievementsClick={() => onSectionChange?.('achievements')}
             />
           );
         case 'courses':

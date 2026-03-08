@@ -6,7 +6,6 @@
 
 import { UniversalMediaItem, AR_LANDSCAPE_THRESHOLD, AR_PORTRAIT_THRESHOLD } from './types';
 import { ExploreContentItem } from '@/components/explore/types';
-import { ActivityGridItem } from '@/components/profile/ActivityGrid';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { resolveGolfCourse } from '@/utils/resolveGolfCourse';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl, generateStreamMp4Url } from '@/config/cloudflareStream';
@@ -155,43 +154,7 @@ export function exploreItemsToUniversal(items: ExploreContentItem[]): UniversalM
     .map((item, index) => exploreItemToUniversal(item, index));
 }
 
-/**
- * Convert ActivityGridItem to UniversalMediaItem
- */
-export function activityItemToUniversal(
-  item: ActivityGridItem & { _stackCount?: number; _stackName?: string }, 
-  index: number
-): UniversalMediaItem {
-  return {
-    id: item.id,
-    postId: item.roundId || item.id,
-    type: item.type,
-    
-    // Media URLs
-    url: item.thumbnailUrl,
-    thumbnailUrl: item.thumbnailUrl,
-    playbackUrl: item.previewUrl,
-    mp4FallbackUrl: item.type === 'video' ? getMp4FallbackUrl(item.thumbnailUrl) : undefined,
-    
-    // Computed
-    sortIndex: index,
-    orientation: item.layoutHint === 'wide' ? 'landscape' : item.layoutHint === 'tall' ? 'portrait' : 'square',
-    tileVariant: 'portrait',
-    
-    // Stack info for grouped rounds (pass through as custom data)
-    additionalMediaCount: item._stackCount ? item._stackCount - 1 : undefined,
-    courseName: item._stackName || item.courseName,
-  };
-}
-
-/**
- * Convert array of ActivityGridItem to UniversalMediaItem[]
- */
-export function activityItemsToUniversal(
-  items: (ActivityGridItem & { _stackCount?: number; _stackName?: string })[]
-): UniversalMediaItem[] {
-  return items.map((item, index) => activityItemToUniversal(item, index));
-}
+// Legacy ActivityGridItem adapters removed — replaced by posts-tab system
 
 /**
  * Convert ActivityPost (Profile) to UniversalMediaItem
