@@ -75,7 +75,7 @@ export function CreatorPostPicker({
         if (error) throw error;
       }
       await queryClient.invalidateQueries({ queryKey: ['creator-profile', userId] });
-      console.log('[PostPicker] queries invalidated, closing picker');
+      
       if (mode === 'featured') {
         onSelectFeatured?.(selectedFeatured!);
       } else {
