@@ -6,6 +6,7 @@ import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscr
 interface CompactGridRowProps {
   posts: FeedPost[];
   startIndex: number;
+  allPosts?: FeedPost[];
 }
 
 function formatDuration(seconds: number): string {
