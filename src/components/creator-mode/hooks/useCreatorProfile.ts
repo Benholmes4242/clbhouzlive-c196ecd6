@@ -121,25 +121,16 @@ async function fetchWeeklyStats(userId: string): Promise<CreatorWeeklyStats> {
 }
 
 async function fetchCreatorProfile(userId: string): Promise<CreatorProfileData> {
-  console.log('[useCreatorProfile] fetching for userId:', userId);
-  // 1. Fetch creator flags
   const { data: profile, error } = await supabase
     .from('user_profiles')
     .select('is_creator, creator_only, featured_post_id, pinned_post_ids')
     .eq('id', userId)
     .single();
 
-  console.log('[useCreatorProfile] profile data:', {
-    is_creator: profile?.is_creator,
-    featured_post_id: profile?.featured_post_id,
-    pinned_post_ids: profile?.pinned_post_ids,
-  });
-
   if (error || !profile || !profile.is_creator) {
     return { isCreator: false, creatorOnly: false, featuredPost: null, pinnedPosts: [], weeklyStats: EMPTY_STATS };
   }
 
-  // 2. Parallel fetch featured post, pinned posts, and weekly stats
   const pinnedIds: string[] = Array.isArray(profile.pinned_post_ids) ? profile.pinned_post_ids : [];
 
   const [featuredPost, pinnedPostResults, weeklyStats] = await Promise.all([
@@ -149,8 +140,6 @@ async function fetchCreatorProfile(userId: string): Promise<CreatorProfileData> 
       : Promise.resolve([]),
     fetchWeeklyStats(userId),
   ]);
-
-  console.log('[useCreatorProfile] featuredPost:', featuredPost?.id, 'pinnedPosts:', pinnedPostResults.filter(p => p !== null).length);
 
   return {
     isCreator: true,
