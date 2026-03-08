@@ -57,7 +57,7 @@ export const VideoCardMenu = React.memo(function VideoCardMenu({ postId, userId,
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
-          className="p-2 -mr-2 rounded-full hover:bg-muted transition-colors"
+          className="p-3 -mr-3 rounded-full hover:bg-muted transition-colors"
           aria-label="More options"
         >
           <MoreHorizontal className="w-5 h-5 text-muted-foreground" />

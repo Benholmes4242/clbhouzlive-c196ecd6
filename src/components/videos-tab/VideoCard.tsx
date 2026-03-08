@@ -96,9 +96,9 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
 
   return (
     <>
-      <article className="bg-card overflow-hidden">
+      <article className="bg-card rounded-xl overflow-hidden shadow-sm border border-border/50">
         {/* Creator header */}
-        <div className="flex items-center gap-3 p-3">
+        <div className="flex items-center gap-3 px-3 pt-3 pb-2">
           <button
             onClick={() => navigate(`/profile/${post.userId}`)}
             className="flex items-center gap-3 min-w-0 flex-1"
@@ -131,7 +131,7 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
 
         {/* Caption */}
         {post.caption && (
-          <div className="px-3 pb-2">
+          <div className="px-3 pb-1">
             <p className={`text-sm text-foreground ${expanded ? '' : 'line-clamp-2'}`}>
               {post.caption}
             </p>
@@ -176,7 +176,7 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
 
         {/* Video area */}
         <button
-          className="relative w-full aspect-video bg-muted cursor-pointer"
+          className="relative w-full aspect-[16/9.5] bg-muted cursor-pointer"
           onClick={handleTap}
           aria-label={`Play video by ${post.displayName}`}
         >
@@ -204,21 +204,21 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
         </button>
 
         {/* Engagement row */}
-        <div className="flex items-center gap-5 px-3 py-2.5">
+        <div className="flex items-center gap-6 px-3 py-3">
         <button onClick={toggleLike} className="flex items-center gap-1 text-xs">
           <Heart
-            className={`h-4 w-4 transition-colors ${isLiked ? 'fill-like text-like' : 'text-muted-foreground'}`}
+            className={`h-[18px] w-[18px] transition-colors ${isLiked ? 'fill-like text-like' : 'text-muted-foreground'}`}
           />
           <span className={isLiked ? 'text-like' : 'text-muted-foreground'}>
             {formatCompact(likeCount)}
           </span>
         </button>
           <button onClick={() => setShowComments(true)} className="flex items-center gap-1 text-xs text-muted-foreground">
-            <MessageCircle className="h-4 w-4" />
+            <MessageCircle className="h-[18px] w-[18px]" />
             {formatCompact(post.commentCount)}
           </button>
           <button onClick={handleShare} className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Share2 className="h-4 w-4" />
+            <Share2 className="h-[18px] w-[18px]" />
             {formatCompact(post.shareCount)}
           </button>
         </div>

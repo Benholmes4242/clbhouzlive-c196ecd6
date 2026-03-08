@@ -168,11 +168,10 @@ export function VideosFeed({
   }
 
   return (
-    <div className="flex flex-col gap-0 pb-4">
+    <div className="flex flex-col gap-3 px-3 pb-4 pt-2">
       {posts.map((post, i) => (
         <div key={post.id} ref={setCardRef(i)} data-card-index={i}>
           <VideoCard post={post} isAutoplayEligible={Math.abs(i - centerIndex) <= 2} userId={userId} cardIndex={i} />
-          {i < posts.length - 1 && <div className="h-[1px] bg-border" />}
         </div>
       ))}
 
