@@ -54,9 +54,27 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post }) => {
 
       {/* Review text */}
       {post.caption && (
-        <p className="text-sm text-foreground line-clamp-3 px-3 py-2">
-          {post.caption}
-        </p>
+        <div className="px-3 py-2">
+          <p className={`text-sm text-foreground ${expanded ? '' : 'line-clamp-3'}`}>
+            {post.caption}
+          </p>
+          {!expanded && post.caption.length > 100 && (
+            <button
+              onClick={(e) => { e.stopPropagation(); setExpanded(true); }}
+              className="text-sm font-semibold text-muted-foreground mt-0.5"
+            >
+              more
+            </button>
+          )}
+          {expanded && post.caption.length > 100 && (
+            <button
+              onClick={(e) => { e.stopPropagation(); setExpanded(false); }}
+              className="text-sm font-semibold text-muted-foreground mt-0.5"
+            >
+              less
+            </button>
+          )}
+        </div>
       )}
 
       {/* Creator + time */}

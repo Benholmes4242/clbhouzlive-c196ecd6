@@ -66,9 +66,27 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post }) => {
 
       {/* Caption */}
       {post.caption && (
-        <p className="text-sm font-semibold text-foreground line-clamp-2 px-3 pt-2">
-          {post.caption}
-        </p>
+        <div className="px-3 pt-2">
+          <p className={`text-sm font-semibold text-foreground ${expanded ? '' : 'line-clamp-2'}`}>
+            {post.caption}
+          </p>
+          {!expanded && post.caption.length > 100 && (
+            <button
+              onClick={(e) => { e.stopPropagation(); setExpanded(true); }}
+              className="text-sm font-semibold text-muted-foreground mt-0.5"
+            >
+              more
+            </button>
+          )}
+          {expanded && post.caption.length > 100 && (
+            <button
+              onClick={(e) => { e.stopPropagation(); setExpanded(false); }}
+              className="text-sm font-semibold text-muted-foreground mt-0.5"
+            >
+              less
+            </button>
+          )}
+        </div>
       )}
 
       {/* Creator row */}
