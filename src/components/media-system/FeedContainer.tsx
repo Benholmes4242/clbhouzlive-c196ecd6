@@ -115,8 +115,9 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
     if (!el) return;
 
     const onTouchEnd = () => {
-      if (useMediaStore.getState().userPaused) return;
-      const currentActiveIndex = useMediaStore.getState().activeIndex;
+      const storeState = scopedStore ? scopedStore.getState() : useMediaStore.getState();
+      if (storeState.userPaused) return;
+      const currentActiveIndex = storeState.activeIndex;
       const activePost = posts[currentActiveIndex];
       if (!activePost) return;
       const activeUrl = activePost.mediaItems?.[0]?.hlsUrl;
