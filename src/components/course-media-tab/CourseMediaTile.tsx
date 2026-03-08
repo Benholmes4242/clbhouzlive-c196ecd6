@@ -1,6 +1,7 @@
 import React from 'react';
 import { Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
