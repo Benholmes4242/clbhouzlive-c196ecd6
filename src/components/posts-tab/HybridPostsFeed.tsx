@@ -11,7 +11,7 @@ type PostKind = 'longform' | 'review' | 'compact';
 type FeedSegment =
   | { kind: 'longform'; post: FeedPost }
   | { kind: 'review'; post: FeedPost }
-  | { kind: 'compact-group'; posts: FeedPost[]; startIndex: number };
+  | { kind: 'compact-group'; posts: FeedPost[]; startIndex: number; globalIndices: number[] };
 
 function classifyPost(post: FeedPost): PostKind {
   if (post.isReview && post.review) return 'review';
@@ -67,17 +67,18 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Build segments
+  // Build segments — track global indices for compact posts
   const segments = useMemo(() => {
-    const fullWidthPosts: FeedPost[] = [];
-    const compactPosts: FeedPost[] = [];
+    const fullWidthPosts: { post: FeedPost; globalIndex: number }[] = [];
+    const compactPosts: { post: FeedPost; globalIndex: number }[] = [];
 
-    for (const post of posts) {
+    for (let gi = 0; gi < posts.length; gi++) {
+      const post = posts[gi];
       const kind = classifyPost(post);
       if (kind === 'compact') {
-        compactPosts.push(post);
+        compactPosts.push({ post, globalIndex: gi });
       } else {
-        fullWidthPosts.push(post);
+        fullWidthPosts.push({ post, globalIndex: gi });
       }
     }
 
@@ -87,14 +88,20 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
 
     while (fwIndex < fullWidthPosts.length || compactIndex < compactPosts.length) {
       if (fwIndex < fullWidthPosts.length) {
-        const post = fullWidthPosts[fwIndex++];
+        const { post } = fullWidthPosts[fwIndex++];
         const kind = classifyPost(post);
         result.push({ kind: kind as 'longform' | 'review', post });
       }
 
       if (compactIndex < compactPosts.length) {
         const chunk = compactPosts.slice(compactIndex, compactIndex + 3);
-        result.push({ kind: 'compact-group', posts: chunk, startIndex: compactIndex });
+        // Use the global index of the first post in the chunk
+        result.push({
+          kind: 'compact-group',
+          posts: chunk.map((c) => c.post),
+          startIndex: chunk[0].globalIndex,
+          globalIndices: chunk.map((c) => c.globalIndex),
+        });
         compactIndex += chunk.length;
       }
     }
@@ -148,6 +155,7 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
             key={`compact-${i}`}
             posts={segment.posts}
             startIndex={segment.startIndex}
+            globalIndices={segment.globalIndices}
             allPosts={posts}
           />
         );

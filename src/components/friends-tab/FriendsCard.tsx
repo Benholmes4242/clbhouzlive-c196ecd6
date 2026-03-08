@@ -10,6 +10,7 @@ import { CommentsPage } from '@/components/clubhouse/cinematic/CommentsPage';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { FriendsCardAutoplay } from './FriendsCardAutoplay';
 import { FriendsCardMenu } from './FriendsCardMenu';
+import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 
 interface FriendsCardProps {
   post: FeedPost;
@@ -190,7 +191,18 @@ export const FriendsCard = React.memo(function FriendsCard({ post, isAutoplayEli
         )}
 
         {/* Media area — dynamic aspect ratio */}
-        <div className={`relative w-full ${aspectClass} bg-muted`}>
+        <div
+          className={`relative w-full ${aspectClass} bg-muted cursor-pointer`}
+          onClick={() => {
+            if (allPosts && cardIndex != null) {
+              useFullscreenFeed.getState().open({
+                posts: allPosts,
+                startIndex: cardIndex,
+                sourceId: 'friends',
+              });
+            }
+          }}
+        >
           {thumbnailUrl && (
             <img
               src={thumbnailUrl}
