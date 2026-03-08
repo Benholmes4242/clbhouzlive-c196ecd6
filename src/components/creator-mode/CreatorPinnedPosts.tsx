@@ -10,6 +10,7 @@ interface CreatorPinnedPostsProps {
 }
 
 export function CreatorPinnedPosts({ posts, isOwnProfile, onEditClick }: CreatorPinnedPostsProps) {
+  console.log('[PinnedPosts] count:', posts.length, 'isOwnProfile:', isOwnProfile);
   if (posts.length === 0 && !isOwnProfile) return null;
 
   if (posts.length === 0) {

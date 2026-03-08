@@ -58,22 +58,25 @@ export function CreatorPostPicker({
 
   const handleSave = async () => {
     setSaving(true);
+    console.log('[PostPicker] saving mode:', mode, 'featured:', selectedFeatured, 'pinned:', selectedPinned);
     try {
       if (mode === 'featured') {
         const { error } = await supabase
           .from('user_profiles')
           .update({ featured_post_id: selectedFeatured })
           .eq('id', userId);
+        console.log('[PostPicker] DB update result, error:', error);
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('user_profiles')
           .update({ pinned_post_ids: selectedPinned } as any)
           .eq('id', userId);
+        console.log('[PostPicker] DB update result, error:', error);
         if (error) throw error;
       }
-      // Invalidate and wait for refetch BEFORE closing
       await queryClient.invalidateQueries({ queryKey: ['creator-profile', userId] });
+      console.log('[PostPicker] queries invalidated, closing picker');
       if (mode === 'featured') {
         onSelectFeatured?.(selectedFeatured!);
       } else {
