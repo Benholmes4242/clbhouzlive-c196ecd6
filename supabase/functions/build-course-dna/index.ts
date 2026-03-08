@@ -119,22 +119,35 @@ serve(async (req) => {
 
         if (!playerStats?.length) continue;
 
-        // Build stat lookup
+        // Build stat lookup - handle both direct values and nested .avg format
         const statLookup = new Map<string, any>();
         for (const ps of playerStats) {
           const stats = ps.raw_data?.statistics || {};
+          
+          // Helper to extract stat value (handles both direct and nested formats)
+          const getStat = (key: string): number | null => {
+            const val = stats[key];
+            if (val === null || val === undefined) return null;
+            if (typeof val === 'number') return val;
+            if (typeof val === 'string') return parseFloat(val) || null;
+            if (typeof val === 'object' && val.avg !== undefined) {
+              return parseFloat(val.avg) || null;
+            }
+            return null;
+          };
+          
           statLookup.set(ps.player_id, {
-            driveAvg: parseFloat(stats.drive_avg?.avg) || null,
-            driveAcc: parseFloat(stats.drive_acc?.avg) || null,
-            girPct: parseFloat(stats.gir_pct?.avg) || null,
-            scramblingPct: parseFloat(stats.scrambling_pct?.avg) || null,
-            puttAvg: parseFloat(stats.putt_avg?.avg) || null,
-            sgTotal: parseFloat(stats.strokes_gained_total?.avg) || null,
-            sgTeeGreen: parseFloat(stats.strokes_gained_tee_green?.avg) || null,
-            sgOffTee: parseFloat(stats.strokes_gained_off_tee?.avg ?? stats.sg_off_tee) || null,
-            sgApproach: parseFloat(stats.strokes_gained_approach?.avg ?? stats.sg_approach) || null,
-            sgAroundGreen: parseFloat(stats.strokes_gained_around_green?.avg ?? stats.sg_around_green) || null,
-            sgPutting: parseFloat(stats.strokes_gained_putting?.avg ?? stats.sg_putting) || null,
+            driveAvg: getStat('drive_avg'),
+            driveAcc: getStat('drive_acc'),
+            girPct: getStat('gir_pct'),
+            scramblingPct: getStat('scrambling_pct'),
+            puttAvg: getStat('putt_avg'),
+            sgTotal: getStat('strokes_gained_total'),
+            sgTeeGreen: getStat('strokes_gained_tee_green'),
+            sgOffTee: getStat('strokes_gained_off_tee') ?? getStat('sg_off_tee'),
+            sgApproach: getStat('strokes_gained_approach') ?? getStat('sg_approach'),
+            sgAroundGreen: getStat('strokes_gained_around_green') ?? getStat('sg_around_green'),
+            sgPutting: getStat('strokes_gained_putting') ?? getStat('sg_putting'),
           });
         }
 
