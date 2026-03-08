@@ -83,6 +83,7 @@ async function fetchTournamentsCache(): Promise<TournamentsCache> {
       .in('status', ['scheduled', 'created'])
       .gt('start_date', today)
       .order('start_date', { ascending: true })
+      .order('purse', { ascending: false })
       .limit(30),
   ]);
 
