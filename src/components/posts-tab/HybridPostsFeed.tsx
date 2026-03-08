@@ -155,6 +155,7 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
             key={`compact-${i}`}
             posts={segment.posts}
             startIndex={segment.startIndex}
+            globalIndices={segment.globalIndices}
             allPosts={posts}
           />
         );
