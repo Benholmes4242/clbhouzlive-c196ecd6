@@ -52,7 +52,7 @@ const LivePositionDisplay: React.FC<LivePositionDisplayProps> = ({
         style={{
           fontSize: 17,
           fontWeight: 700,
-          color: isLeading ? '#16A34A' : 'hsl(var(--foreground))',
+          color: isLeading ? 'var(--th-accent-live)' : 'hsl(var(--foreground))',
           minWidth: 36,
           textAlign: 'center',
         }}
