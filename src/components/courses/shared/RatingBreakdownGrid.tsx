@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { getScoreTier } from '@/utils/getScoreTier';
 
 interface RatingCategory {
   label: string;
