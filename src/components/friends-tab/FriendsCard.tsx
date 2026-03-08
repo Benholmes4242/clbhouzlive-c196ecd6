@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, MessageCircle, Share2, MapPin, Star } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { supabase } from '@/integrations/supabase/client';
+import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { toast } from 'sonner';
 import { CommentsPage } from '@/components/clubhouse/cinematic/CommentsPage';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -56,7 +57,11 @@ export const FriendsCard = React.memo(function FriendsCard({ post, isAutoplayEli
   const [likeCount, setLikeCount] = useState(post.likeCount);
   const [showComments, setShowComments] = useState(false);
 
-  const courseName = post.review?.courseName || post.courseName;
+  // Strip "📍 Played at..." from caption and extract course info
+  const cleanCaption = useMemo(() => removeGolfCourseFromContent(post.caption), [post.caption]);
+  const extractedCourse = useMemo(() => extractGolfCourseFromContent(post.caption), [post.caption]);
+
+  const courseName = post.review?.courseName || post.courseName || extractedCourse?.name;
   const courseId = post.review?.courseId;
 
   const toggleLike = async () => {
@@ -139,12 +144,12 @@ export const FriendsCard = React.memo(function FriendsCard({ post, isAutoplayEli
         </div>
 
         {/* Caption */}
-        {post.caption && (
+        {cleanCaption && (
           <div className="px-3 pb-2">
             <p className={`text-sm text-foreground ${expanded ? '' : 'line-clamp-2'}`}>
-              {post.caption}
+              {cleanCaption}
             </p>
-            {!expanded && post.caption.length > 100 && (
+            {!expanded && cleanCaption.length > 100 && (
               <button
                 onClick={() => setExpanded(true)}
                 className="text-sm font-semibold text-muted-foreground mt-0.5"
@@ -152,7 +157,7 @@ export const FriendsCard = React.memo(function FriendsCard({ post, isAutoplayEli
                 more
               </button>
             )}
-            {expanded && post.caption.length > 100 && (
+            {expanded && cleanCaption.length > 100 && (
               <button
                 onClick={() => setExpanded(false)}
                 className="text-sm font-semibold text-muted-foreground mt-0.5"
