@@ -12,6 +12,8 @@ function formatCompact(n: number): string {
 
 interface LongFormCardProps {
   post: FeedPost;
+  allPosts?: FeedPost[];
+  postIndex?: number;
 }
 
 function formatDuration(seconds: number): string {
