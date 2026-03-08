@@ -179,8 +179,8 @@ export function VideoPlayer({
 
     setHasError(false);
     setIsLoading(true);
-    useMediaStore.getState().clearError(feedIndex);
-    useMediaStore.getState().markRetrying(feedIndex);
+    getStore().clearError(feedIndex);
+    getStore().markRetrying(feedIndex);
 
     const container = containerRef.current;
     if (!container) return;
