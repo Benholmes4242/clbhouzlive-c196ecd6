@@ -1,4 +1,4 @@
-import { useRef, useCallback, useEffect, useMemo, useState } from 'react';
+import { useRef, useCallback, useEffect, useMemo, useState, useContext } from 'react';
 import type { PoolElement, VideoSessionState } from '../types/media';
 import { POOL_CONFIG, TIMING } from '../types/media';
 import {
@@ -13,6 +13,7 @@ import { fadeOut, fadeIn } from '../utils/audioFade';
 import { segmentCache } from '../utils/segmentCache';
 import { useSessionCache } from './useSessionCache';
 import { useMediaStore } from '../store/mediaStore';
+import { MediaStoreContext } from '../store/MediaStoreContext';
 
 /**
  * Video Pool Manager — maintains 5 reusable <video> elements with
