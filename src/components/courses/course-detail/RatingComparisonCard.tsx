@@ -1,6 +1,7 @@
 import React from 'react';
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
+import { getRatingTheme } from '@/lib/globalAchievementMilestoneSystem';
 
 interface RatingComparisonProps {
   userRating: UserCourseRating;
