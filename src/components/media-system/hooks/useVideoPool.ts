@@ -174,7 +174,7 @@ export function useVideoPool() {
         cached.lastUsedAt = Date.now();
         cached.assignedIndex = feedIndex;
         container.appendChild(cached.video);
-        cached.video.muted = useMediaStore.getState().isMuted;
+        cached.video.muted = getStore().isMuted;
         const ok = await safePlay(cached.video);
         if (ok) {
           onPlaying?.();
