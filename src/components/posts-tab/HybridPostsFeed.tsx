@@ -100,6 +100,7 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
           kind: 'compact-group',
           posts: chunk.map((c) => c.post),
           startIndex: chunk[0].globalIndex,
+          globalIndices: chunk.map((c) => c.globalIndex),
         });
         compactIndex += chunk.length;
       }
