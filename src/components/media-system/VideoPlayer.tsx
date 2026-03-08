@@ -52,6 +52,8 @@ export function VideoPlayer({
   const pool = useVideoPoolContext();
   const isMuted = useMediaStoreCompat((s) => s.isMuted);
   const scopedStore = useContext(MediaStoreContext);
+  // Helper for imperative store access — scoped if available, global otherwise
+  const getStore = useCallback(() => scopedStore ? scopedStore.getState() : useMediaStore.getState(), [scopedStore]);
 
   // Double-tap detection
   const tapTimerRef = useRef<ReturnType<typeof setTimeout>>();
