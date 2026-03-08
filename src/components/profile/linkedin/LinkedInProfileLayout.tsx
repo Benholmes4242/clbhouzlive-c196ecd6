@@ -17,7 +17,8 @@ import { ProfileSocialButtons } from '../actions/ProfileSocialButtons';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 
 // Tab content components
-import ActivityFeed from '../ActivityFeed';
+// PostsTabContent imported above
+import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { ProfileCoursesTab } from '../ProfileCoursesTab';
 import Top100MyProgressPanel from '@/components/courses/Top100MyProgressPanel';
 import Top100PublicJourneyPanel from '@/components/top100/Top100PublicJourneyPanel';
