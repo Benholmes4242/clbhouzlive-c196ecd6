@@ -9,8 +9,8 @@ export function StatusChip({ status, className }: StatusChipProps) {
   return (
     <span className={cn(
       "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium uppercase tracking-wide",
-      // Live: red background with pulse animation
-      status === 'live' && "bg-red-500 text-white",
+      // Live: green background matching the live dot
+      status === 'live' && "bg-[var(--th-accent-live)] text-white",
       // Upcoming: light green tint
       status === 'upcoming' && "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
       // Completed: subtle grey

@@ -61,7 +61,7 @@ export const LiveUpcomingToggle: React.FC<LiveUpcomingToggleProps> = ({
                   width: 6,
                   height: 6,
                   borderRadius: 3,
-                  backgroundColor: 'hsl(var(--destructive))',
+                  backgroundColor: 'var(--th-accent-live)',
                   animation: 'liveDot 2s infinite',
                   flexShrink: 0,
                 }}
