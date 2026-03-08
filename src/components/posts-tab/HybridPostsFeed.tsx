@@ -69,37 +69,35 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
 
   // Build segments
   const segments = useMemo(() => {
-    const result: Array<
-      | { kind: 'longform'; post: FeedPost }
-      | { kind: 'review'; post: FeedPost }
-      | { kind: 'compact-group'; posts: FeedPost[]; startIndex: number }
-    > = [];
-
-    let compactBuffer: FeedPost[] = [];
-    let compactGlobalIndex = 0;
-    let compactBufferStart = 0;
-
-    const flushCompact = () => {
-      if (compactBuffer.length > 0) {
-        result.push({ kind: 'compact-group', posts: [...compactBuffer], startIndex: compactBufferStart });
-        compactBuffer = [];
-      }
-    };
+    const fullWidthPosts: FeedPost[] = [];
+    const compactPosts: FeedPost[] = [];
 
     for (const post of posts) {
       const kind = classifyPost(post);
       if (kind === 'compact') {
-        if (compactBuffer.length === 0) {
-          compactBufferStart = compactGlobalIndex;
-        }
-        compactBuffer.push(post);
-        compactGlobalIndex++;
+        compactPosts.push(post);
       } else {
-        flushCompact();
-        result.push({ kind, post });
+        fullWidthPosts.push(post);
       }
     }
-    flushCompact();
+
+    const result: FeedSegment[] = [];
+    let fwIndex = 0;
+    let compactIndex = 0;
+
+    while (fwIndex < fullWidthPosts.length || compactIndex < compactPosts.length) {
+      if (fwIndex < fullWidthPosts.length) {
+        const post = fullWidthPosts[fwIndex++];
+        const kind = classifyPost(post);
+        result.push({ kind: kind as 'longform' | 'review', post });
+      }
+
+      if (compactIndex < compactPosts.length) {
+        const chunk = compactPosts.slice(compactIndex, compactIndex + 3);
+        result.push({ kind: 'compact-group', posts: chunk, startIndex: compactIndex });
+        compactIndex += chunk.length;
+      }
+    }
 
     return result;
   }, [posts]);
