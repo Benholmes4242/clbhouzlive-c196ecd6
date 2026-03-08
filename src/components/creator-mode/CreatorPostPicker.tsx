@@ -71,7 +71,7 @@ export function CreatorPostPicker({
           .from('user_profiles')
           .update({ pinned_post_ids: selectedPinned } as any)
           .eq('id', userId);
-        console.log('[PostPicker] DB update result, error:', error);
+        
         if (error) throw error;
       }
       await queryClient.invalidateQueries({ queryKey: ['creator-profile', userId] });
