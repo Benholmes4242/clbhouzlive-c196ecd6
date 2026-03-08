@@ -110,9 +110,9 @@ export function CreatorPostPicker({
         </div>
 
         {/* Grid */}
-        <div className="flex-1 overflow-y-auto px-3 pb-3">
+        <div className="flex-1 min-h-0 overflow-y-auto px-3 pb-3">
           {isLoading ? (
-            <div className="grid grid-cols-3 gap-1.5">
+            <div className="grid grid-cols-3 gap-1.5 p-[2px]">
               {Array.from({ length: 9 }).map((_, i) => (
                 <Skeleton key={i} className="aspect-[4/5] rounded-lg" />
               ))}
@@ -122,7 +122,7 @@ export function CreatorPostPicker({
               {mode === 'featured' ? 'No videos to feature yet. Post a video first!' : 'No posts yet.'}
             </p>
           ) : (
-            <div className="grid grid-cols-3 gap-1.5">
+            <div className="grid grid-cols-3 gap-1.5 p-[2px]">
               {filteredPosts.map((post) => {
                 const isSelected =
                   mode === 'featured'
@@ -136,7 +136,7 @@ export function CreatorPostPicker({
                     onClick={() => handleTapPost(post.id)}
                     className={cn(
                       'relative aspect-[4/5] rounded-lg overflow-hidden bg-muted',
-                      isSelected && 'ring-2 ring-primary',
+                      isSelected && 'border-2 border-primary',
                     )}
                   >
                     {post.thumbnailUrl ? (
@@ -177,8 +177,8 @@ export function CreatorPostPicker({
           )}
         </div>
 
-        {/* Save button */}
-        <div className="px-4 pb-6 pt-2 border-t border-border" style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}>
+        {/* Save button — sticky footer */}
+        <div className="shrink-0 px-4 pt-2 border-t border-border" style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}>
           <button
             type="button"
             onClick={handleSave}
