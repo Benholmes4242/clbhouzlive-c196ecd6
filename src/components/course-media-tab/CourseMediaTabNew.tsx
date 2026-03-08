@@ -23,11 +23,17 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
     isFetchingNextPage,
     fetchNextPage,
     refetch,
+    resetSeen,
   } = useCourseMedia({
     userId: user?.id,
     courseId,
     filter: activeFilter,
   });
+
+  const handleFilterChange = (filter: CourseMediaFilter) => {
+    setActiveFilter(filter);
+    resetSeen();
+  };
 
   const gridRef = React.useRef<HTMLDivElement>(null);
 
@@ -36,7 +42,7 @@ const CourseMediaTabNew: React.FC<CourseMediaTabNewProps> = ({ courseId, courseN
       <CourseMediaHeader
         mediaCounts={mediaCounts}
         activeFilter={activeFilter}
-        onFilterChange={setActiveFilter}
+        onFilterChange={handleFilterChange}
         courseId={courseId}
       />
       <CourseMediaGrid

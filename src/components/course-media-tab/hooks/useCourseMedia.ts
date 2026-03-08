@@ -1,7 +1,7 @@
 import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
+import { mapRowToFeedPost } from '@/components/media-system/utils/feedMapper';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
 
 export type CourseMediaFilter = 'all' | 'photos' | 'videos';
@@ -52,7 +52,8 @@ export function useCourseMedia({ userId, courseId, filter }: UseCourseMediaParam
       }
 
       const rows = data as FeedRpcRow[];
-      const posts = groupMultiMedia(rows.map(mapRowToFeedPost));
+      // Each row = one media item = one tile. Do NOT group by post.
+      const posts = rows.map(mapRowToFeedPost);
 
       for (const post of posts) {
         if (!seenPostIds.current.includes(post.id)) {
@@ -73,12 +74,14 @@ export function useCourseMedia({ userId, courseId, filter }: UseCourseMediaParam
     gcTime: 10 * 60 * 1000,
   });
 
+  // Dedup by media_id since the same post can have multiple media items
   const allPosts = useMemo(() => {
-    const posts = query.data?.pages.flatMap((page) => page.posts) ?? [];
+    const items = query.data?.pages.flatMap((page) => page.posts) ?? [];
     const seen = new Set<string>();
-    return posts.filter(p => {
-      if (seen.has(p.id)) return false;
-      seen.add(p.id);
+    return items.filter(item => {
+      const mediaId = item.mediaItems[0]?.id || item.id;
+      if (seen.has(mediaId)) return false;
+      seen.add(mediaId);
       return true;
     });
   }, [query.data]);
