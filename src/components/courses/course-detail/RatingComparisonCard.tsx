@@ -1,6 +1,7 @@
 import React from 'react';
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
+import { getRatingTheme } from '@/lib/globalAchievementMilestoneSystem';
 
 interface RatingComparisonProps {
   userRating: UserCourseRating;
@@ -83,16 +84,15 @@ const RatingComparisonCard: React.FC<RatingComparisonProps> = ({ userRating, agg
             </div>
 
             {/* Dual bars - brand color for Outstanding (9+), grey gradient otherwise */}
-            <div className="relative h-2.5 w-full rounded-full bg-[#E7E5E4] overflow-hidden">
+            <div className="relative h-2.5 w-full rounded-full bg-muted overflow-hidden">
               {/* Community bar (background) */}
               {row.community !== null && (
                 <div
-                  className={`absolute inset-y-0 left-0 rounded-full ${
-                    row.community >= 9 
-                      ? 'bg-[#f59e0b]/30' 
-                      : 'bg-[#A8A29E]/30'
-                  }`}
-                  style={{ width: `${getPercentage(row.community)}%` }}
+                  className="absolute inset-y-0 left-0 rounded-full"
+                  style={{ 
+                    width: `${getPercentage(row.community)}%`,
+                    backgroundColor: `${getRatingTheme(row.community).accent}4D`
+                  }}
                 />
               )}
 
@@ -102,9 +102,12 @@ const RatingComparisonCard: React.FC<RatingComparisonProps> = ({ userRating, agg
                   className={`relative h-full rounded-full transition-[width] duration-500 ease-out ${
                     row.you >= 9 
                       ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]' 
-                      : 'bg-[#A8A29E]'
+                      : ''
                   }`}
-                  style={{ width: `${getPercentage(row.you)}%` }}
+                  style={{ 
+                    width: `${getPercentage(row.you)}%`,
+                    ...( row.you < 9 ? { backgroundColor: getRatingTheme(row.you).accent } : {})
+                  }}
                 />
               )}
             </div>

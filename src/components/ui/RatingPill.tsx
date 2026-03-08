@@ -17,69 +17,59 @@ interface RatingPillProps {
 /**
  * Unified Rating Pill Component
  * 
- * Uses slate styling for Fair→Excellent, gold only for Outstanding.
- * Phase 3A: Includes smooth tier change transitions.
- * 
- * @example
- * <RatingPill score={8.5} />
- * <RatingPill score={8.5} showRatingInPill />
- * <RatingPill tier="EXCELLENT" label="Custom Label" />
+ * Uses slate blue scale for Fair→Excellent, amber for Outstanding.
+ * Includes smooth tier change transitions.
  */
 export function RatingPill({ score, tier, label, showRatingInPill = false, className }: RatingPillProps) {
-  // Get theme from score or tier (for label only)
   const theme = tier 
     ? getRatingTheme(
         tier === 'OUTSTANDING' ? 9.5 :
         tier === 'EXCELLENT' ? 8.5 :
         tier === 'VERY_GOOD' ? 7.5 :
         tier === 'GOOD' ? 6.5 :
-        tier === 'FAIR' ? 5 :
         5
       )
     : getRatingTheme(score ?? 0);
 
   const displayLabel = label ?? theme.label;
-  const ratingValue = score ?? (tier === 'OUTSTANDING' ? 9.5 : tier === 'EXCELLENT' ? 8.5 : 7);
-  
-  // Determine if Outstanding (gold) or standard (slate)
   const isOutstanding = theme.key === 'OUTSTANDING';
   
-  // Phase 3A: Track tier changes for transition animation
+  // Track tier changes for transition animation
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [displayedLabel, setDisplayedLabel] = useState(displayLabel);
   const prevTierRef = useRef(theme.key);
   
   useEffect(() => {
-    // Only animate if tier actually changed (not just decimal value)
     if (prevTierRef.current !== theme.key) {
       setIsTransitioning(true);
-      
-      // After fade out, update label and fade in
       const timer = setTimeout(() => {
         setDisplayedLabel(displayLabel);
         setIsTransitioning(false);
       }, 120);
-      
       prevTierRef.current = theme.key;
       return () => clearTimeout(timer);
     } else {
-      // No tier change - update immediately
       setDisplayedLabel(displayLabel);
     }
   }, [theme.key, displayLabel]);
+
+  // Per-tier fill: use accent from theme as bg, white text
+  const pillBg = isOutstanding
+    ? 'bg-[#f59e0b] border-[#f59e0b]'
+    : `border-[${theme.accent}]`;
 
   return (
     <span
       className={cn(
         'inline-flex items-center justify-center',
         'rounded-sq-sm px-3 py-[6px] text-xs font-semibold uppercase tracking-[0.08em]',
-        'border rating-label-transition',
-        // UNIFIED: Amber for Outstanding (9+), Warm Stone for rest
-        isOutstanding 
-          ? 'bg-[#f59e0b] text-white border-[#f59e0b]'
-          : 'bg-[#A8A29E] text-white border-[#A8A29E]',
+        'border rating-label-transition text-white',
+        isOutstanding
+          ? 'bg-[#f59e0b] border-[#f59e0b]'
+          : '',
         className
       )}
+      style={!isOutstanding ? { backgroundColor: theme.accent, borderColor: theme.accent } : undefined}
       data-transitioning={isTransitioning}
     >
       {displayedLabel.toUpperCase()}

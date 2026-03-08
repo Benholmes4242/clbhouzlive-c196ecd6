@@ -1,4 +1,5 @@
 import React from 'react';
+import { getRatingTheme } from '@/lib/globalAchievementMilestoneSystem';
 
 export type RatingTierKey = 'OUTSTANDING' | 'EXCELLENT' | 'VERY_GOOD' | 'GOOD' | 'FAIR';
 
@@ -16,18 +17,15 @@ interface RatingTierDistributionProps {
   activeTier?: RatingTierKey;
 }
 
-// Tier configuration with labels
-const TIER_CONFIG: Array<{ key: RatingTierKey; dataKey: keyof RatingTierDistributionData; label: string }> = [
-  { key: 'OUTSTANDING', dataKey: 'outstanding', label: 'Outstanding' },
-  { key: 'EXCELLENT', dataKey: 'excellent', label: 'Excellent' },
-  { key: 'VERY_GOOD', dataKey: 'veryGood', label: 'Very Good' },
-  { key: 'GOOD', dataKey: 'good', label: 'Good' },
-  { key: 'FAIR', dataKey: 'fair', label: 'Fair' },
+// Tier configuration with labels and sample scores for color lookup
+const TIER_CONFIG: Array<{ key: RatingTierKey; dataKey: keyof RatingTierDistributionData; label: string; sampleScore: number }> = [
+  { key: 'OUTSTANDING', dataKey: 'outstanding', label: 'Outstanding', sampleScore: 9.5 },
+  { key: 'EXCELLENT', dataKey: 'excellent', label: 'Excellent', sampleScore: 8.5 },
+  { key: 'VERY_GOOD', dataKey: 'veryGood', label: 'Very Good', sampleScore: 7.5 },
+  { key: 'GOOD', dataKey: 'good', label: 'Good', sampleScore: 6.5 },
+  { key: 'FAIR', dataKey: 'fair', label: 'Fair', sampleScore: 5.0 },
 ];
 
-// UNIFIED COLOR SYSTEM - Amber for Outstanding only, Gray for rest
-const OUTSTANDING_COLOR = '#f59e0b'; // Amber-500
-const NEUTRAL_COLOR = '#A8A29E';     // Warm stone - better contrast
 const EMPTY_COLOR = '#f3f4f6';       // gray-100
 
 /**
@@ -45,10 +43,11 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
   distribution,
 }) => {
   // Build distribution items
-  const distributionItems = TIER_CONFIG.map(({ key, dataKey, label }) => ({
+  const distributionItems = TIER_CONFIG.map(({ key, dataKey, label, sampleScore }) => ({
     key,
     label,
     count: distribution[dataKey],
+    color: getRatingTheme(sampleScore).accent,
   }));
 
   const maxCount = Math.max(...distributionItems.map(d => d.count), 1);
@@ -57,18 +56,10 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
     <div className="space-y-2">
       {distributionItems.map((item) => {
         const percentage = (item.count / maxCount) * 100;
-        const isOutstanding = item.key === 'OUTSTANDING';
         const hasCount = item.count > 0;
         
-        // Bar color logic:
-        // - Outstanding tier ALWAYS gets amber (when it has any count)
-        // - All other tiers with counts get neutral grey
-        // - Empty bars get light grey
-        const barColor = isOutstanding && hasCount
-          ? OUTSTANDING_COLOR 
-          : hasCount 
-            ? NEUTRAL_COLOR 
-            : EMPTY_COLOR;
+        // Use per-tier color from the central theme system
+        const barColor = hasCount ? item.color : EMPTY_COLOR;
 
         return (
           <div key={item.key} className="flex items-center gap-2">

@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { getScoreTier } from '@/utils/getScoreTier';
 
 interface RatingCategory {
   label: string;
@@ -25,10 +26,10 @@ export const RatingBreakdownGrid: React.FC<RatingBreakdownGridProps> = ({
     <div className={cn('grid grid-cols-2 gap-x-4 gap-y-3', className)}>
       {visible.map((cat) => {
         const score = cat.value ?? 0;
-        const isOutstanding = score >= 9;
-        const barColorClass = isOutstanding
+        const tierData = getScoreTier(score);
+        const barColorClass = tierData.isOutstanding
           ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]'
-          : 'bg-[#A8A29E]';
+          : tierData.barFill;
 
         return (
           <div key={cat.label} className="flex flex-col gap-1">
@@ -38,7 +39,7 @@ export const RatingBreakdownGrid: React.FC<RatingBreakdownGridProps> = ({
                 {formatScore(cat.value)}
               </span>
             </div>
-            <div className="h-2 bg-[#E7E5E4] rounded-full overflow-hidden">
+            <div className="h-2 bg-muted rounded-full overflow-hidden">
               <div
                 className={cn('h-full rounded-full transition-all duration-300', barColorClass)}
                 style={{ width: `${(score / 10) * 100}%` }}

@@ -16,6 +16,7 @@ import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search, X, Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getRatingTheme } from '@/lib/globalAchievementMilestoneSystem';
 import { 
   SHOW_MOCK_REVIEWS, 
   ENABLE_MOCK_TOP100_REVIEWS, 
@@ -428,16 +429,16 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       {/* Compact rating context */}
       <section className="px-4 py-4">
         <div className="flex flex-col items-center gap-1">
-          <span className={cn(
-            "text-[40px] font-extrabold leading-none tabular-nums",
-            communityScore >= 9 ? "text-[#d97706]" : "text-[#78716C]"
-          )}>
+          <span
+            className="text-[40px] font-extrabold leading-none tabular-nums"
+            style={{ color: getRatingTheme(communityScore).accent }}
+          >
             {communityScore.toFixed(1)}
           </span>
-          <span className={cn(
-            "text-sm font-bold uppercase tracking-[0.05em]",
-            communityScore >= 9 ? "text-[#d97706]" : "text-muted-foreground"
-          )}>
+          <span
+            className="text-sm font-bold uppercase tracking-[0.05em]"
+            style={{ color: getRatingTheme(communityScore).accent }}
+          >
             {getScoreTier(communityScore).label}
           </span>
           <div className="flex items-center gap-2 text-sm text-muted-foreground mt-0.5">

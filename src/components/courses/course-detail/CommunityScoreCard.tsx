@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { cn } from '@/lib/utils';
+import { getRatingTheme } from '@/lib/globalAchievementMilestoneSystem';
+import { getScoreTier } from '@/utils/getScoreTier';
 
 import { RatingTierDistribution, RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';
 
@@ -179,8 +181,8 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                       </>
                     ) : (
                       <>
-                       <stop offset="0%" stopColor="#A8A29E" />
-                       <stop offset="100%" stopColor="#A8A29E" />
+                       <stop offset="0%" stopColor={getRatingTheme(communityAverage).accent} />
+                       <stop offset="100%" stopColor={getRatingTheme(communityAverage).accent} />
                       </>
                     )}
                   </linearGradient>
@@ -193,10 +195,8 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
               </div>
             </div>
             <span 
-              className={cn(
-                "mt-2 text-base font-semibold uppercase tracking-wide",
-                communityAverage >= 9 ? "text-[#d97706]" : "text-muted-foreground"
-              )}
+              className="mt-2 text-base font-semibold uppercase tracking-wide"
+              style={{ color: getRatingTheme(communityAverage).accent }}
             >
               {tierLabel}
             </span>
@@ -243,10 +243,10 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         <div className="border-t border-border p-5 grid grid-cols-2 gap-4">
           {categories.map((cat) => {
             const score = cat.score || 0;
-            const isOutstandingCat = score >= 9;
-            const barColorClass = isOutstandingCat 
+            const tierData = getScoreTier(score);
+            const barColorClass = tierData.isOutstanding 
              ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]' 
-             : 'bg-[#A8A29E]';
+             : tierData.barFill;
             
             return (
               <div key={cat.id} className="space-y-1.5">

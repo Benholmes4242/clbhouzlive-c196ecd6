@@ -119,31 +119,60 @@ export interface RatingTheme {
   gradient?: string;
 }
 
-// NEW: Slate/Amber color system
-const RATING_SLATE = '#CBD5E1';     // slate-300 for Fair→Excellent
+// NEW: Slate blue scale for Fair→Excellent, Amber for Outstanding
 const RATING_AMBER = '#f59e0b';    // amber-500 for Outstanding
 const RATING_AMBER_LIGHT = '#fbbf24'; // amber-400 for gradient end
 
-// All non-outstanding tiers use Slate styling
-const grayTheme = {
-  accent: '#A8A29E',
-  bgLight: '#A8A29E0D',  // 5% opacity
-  bgDark: '#A8A29E1A',   // 10% opacity
-  bgClass: 'bg-[#A8A29E]/10',
-  borderClass: 'border-[#A8A29E]/20',
-  textClass: 'text-[#78716C]',  // stone-500 for text
-  barFillClass: 'bg-[#A8A29E]', // warm stone for bars
+// Per-tier slate blue themes (progressively darker)
+const fairTheme = {
+  accent: '#94a3b8',
+  bgLight: '#94a3b80D',
+  bgDark: '#94a3b81A',
+  bgClass: 'bg-[#94a3b8]/10',
+  borderClass: 'border-[#94a3b8]/20',
+  textClass: 'text-[#94a3b8]',
+  barFillClass: 'bg-[#94a3b8]',
+};
+
+const goodTheme = {
+  accent: '#64748b',
+  bgLight: '#64748b0D',
+  bgDark: '#64748b1A',
+  bgClass: 'bg-[#64748b]/10',
+  borderClass: 'border-[#64748b]/20',
+  textClass: 'text-[#64748b]',
+  barFillClass: 'bg-[#64748b]',
+};
+
+const veryGoodTheme = {
+  accent: '#475569',
+  bgLight: '#4755690D',
+  bgDark: '#4755691A',
+  bgClass: 'bg-[#475569]/10',
+  borderClass: 'border-[#475569]/20',
+  textClass: 'text-[#475569]',
+  barFillClass: 'bg-[#475569]',
+};
+
+const excellentTheme = {
+  accent: '#1e293b',
+  bgLight: '#1e293b0D',
+  bgDark: '#1e293b1A',
+  bgClass: 'bg-[#1e293b]/10',
+  borderClass: 'border-[#1e293b]/20',
+  textClass: 'text-[#1e293b]',
+  barFillClass: 'bg-[#1e293b]',
 };
 
 // Outstanding uses Amber/Orange gradient styling
 const amberTheme = {
   accent: RATING_AMBER,
-  bgLight: '#f59e0b0D',  // 5% opacity
-  bgDark: '#f59e0b1A',   // 10% opacity
+  bgLight: '#f59e0b0D',
+  bgDark: '#f59e0b1A',
   bgClass: 'bg-[#f59e0b]/10',
   borderClass: 'border-[#f59e0b]/30',
-  textClass: 'text-[#d97706]',  // amber-600 for text
-  barFillClass: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]', // amber gradient
+  textClass: 'text-[#d97706]',
+  barFillClass: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
   gradient: 'linear-gradient(to right, #f59e0b, #fbbf24)',
 };
 
@@ -151,22 +180,22 @@ export const COURSE_RATING_THEMES: Record<RatingTier, RatingTheme> = {
   FAIR: {
     key: 'FAIR',
     label: 'Fair',
-    ...grayTheme,
+    ...fairTheme,
   },
   GOOD: {
     key: 'GOOD',
     label: 'Good',
-    ...grayTheme,
+    ...goodTheme,
   },
   VERY_GOOD: {
     key: 'VERY_GOOD',
     label: 'Very Good',
-    ...grayTheme,
+    ...veryGoodTheme,
   },
   EXCELLENT: {
     key: 'EXCELLENT',
     label: 'Excellent',
-    ...grayTheme,
+    ...excellentTheme,
   },
   OUTSTANDING: {
     key: 'OUTSTANDING',
