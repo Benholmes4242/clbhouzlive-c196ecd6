@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { Star, Play } from 'lucide-react';
+import { Star, Play, Heart, MessageCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+
+function formatCompact(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return String(n);
+}
 
 interface ReviewCardProps {
   post: FeedPost;
