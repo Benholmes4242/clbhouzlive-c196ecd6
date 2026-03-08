@@ -61,6 +61,8 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
         fetchNextPage={fetchNextPage}
         refetch={refetch}
         gridRef={gridRef}
+        activeRegion={activeRegion}
+        onRegionChange={handleRegionChange}
       />
 
       <ExploreAutoplay posts={posts} gridRef={gridRef} />

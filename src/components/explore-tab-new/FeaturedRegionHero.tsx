@@ -1,0 +1,110 @@
+import { memo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+
+interface FeaturedRegionHeroProps {
+  onRegionSelect: (slug: string) => void;
+  activeRegion: string | null;
+}
+
+interface FeaturedRegion {
+  id: string;
+  slug: string;
+  title: string;
+  subtitle: string | null;
+  hero_image_url: string | null;
+  courseCount: number;
+  recentReviewCount: number;
+}
+
+function FeaturedRegionHeroInner({ onRegionSelect, activeRegion }: FeaturedRegionHeroProps) {
+  const { data: region } = useQuery({
+    queryKey: ['explore-featured-region'],
+    queryFn: async (): Promise<FeaturedRegion | null> => {
+      const { data: regions, error } = await supabase
+        .from('explore_regions')
+        .select('id, slug, title, subtitle, hero_image_url')
+        .order('sort_order')
+        .limit(6);
+
+      if (error || !regions || regions.length === 0) {
+        console.error('[FeaturedRegionHero] fetch error:', error);
+        return null;
+      }
+
+      // Rotate based on day of week
+      const dayIndex = new Date().getDay() % regions.length;
+      const picked = regions[dayIndex];
+
+      if (!picked.hero_image_url) return null;
+
+      // Fetch course count for this region
+      const { count: courseCount } = await supabase
+        .from('explore_region_members')
+        .select('*', { count: 'exact', head: true })
+        .eq('region_id', picked.id);
+
+      // Fetch recent review count (posts with source_review_id in last 30 days)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      const { count: reviewCount } = await supabase
+        .from('posts')
+        .select('*', { count: 'exact', head: true })
+        .not('source_review_id', 'is', null)
+        .gte('created_at', thirtyDaysAgo.toISOString());
+
+      return {
+        id: picked.id,
+        slug: picked.slug,
+        title: picked.title,
+        subtitle: picked.subtitle,
+        hero_image_url: picked.hero_image_url,
+        courseCount: courseCount ?? 0,
+        recentReviewCount: reviewCount ?? 0,
+      };
+    },
+    staleTime: 30 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+  });
+
+  if (activeRegion !== null) return null;
+  if (!region || !region.hero_image_url) return null;
+
+  return (
+    <div className="mx-[2px] mb-[2px]">
+      <button
+        type="button"
+        onClick={() => onRegionSelect(region.slug)}
+        className="w-full rounded-xl overflow-hidden relative block focus:outline-none"
+      >
+        <img
+          src={region.hero_image_url}
+          alt={region.title}
+          className="aspect-[16/9] w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-4 text-left">
+          <h2 className="text-xl font-bold text-white">{region.title}</h2>
+          {region.subtitle && (
+            <p className="text-sm text-white/80 mt-0.5">{region.subtitle}</p>
+          )}
+          <div className="flex items-center gap-2 mt-1.5">
+            <span className="text-xs text-white/60">
+              {region.courseCount} courses
+            </span>
+            <span className="text-xs text-white/60">·</span>
+            <span className="text-xs text-white/60">
+              {region.recentReviewCount} reviews
+            </span>
+          </div>
+          <span className="inline-block mt-2.5 text-xs font-semibold text-white bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
+            Explore →
+          </span>
+        </div>
+      </button>
+    </div>
+  );
+}
+
+export const FeaturedRegionHero = memo(FeaturedRegionHeroInner);

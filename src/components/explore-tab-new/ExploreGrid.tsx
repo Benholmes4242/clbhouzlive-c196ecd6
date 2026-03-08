@@ -1,11 +1,16 @@
-import { useRef, useEffect, useCallback, useMemo, type RefObject } from 'react';
+import { useRef, useEffect, useCallback, useMemo, type RefObject, Fragment } from 'react';
 import { useInView } from 'react-intersection-observer';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { ExploreTile } from './ExploreTile';
 import ExploreGridSkeleton from './ExploreGridSkeleton';
+import { FeaturedRegionHero } from './FeaturedRegionHero';
+import { TrendingCoursesStrip } from './TrendingCoursesStrip';
+import { ExploreRegionsStrip } from './ExploreRegionsStrip';
 import { ReviewsOfTheWeekStrip } from './ReviewsOfTheWeekStrip';
 
-const REVIEWS_STRIP_AFTER = 18; // Insert after 18th tile (index 17)
+const TRENDING_AFTER = 6;       // After 6th tile (index 5)
+const REGIONS_AFTER = 18;       // After 18th tile (index 17)
+const REVIEWS_AFTER = 30;       // After 30th tile (index 29)
 
 interface ExploreGridProps {
   posts: FeedPost[];
@@ -16,6 +21,8 @@ interface ExploreGridProps {
   fetchNextPage: () => void;
   refetch: () => void;
   gridRef?: RefObject<HTMLDivElement | null>;
+  activeRegion: string | null;
+  onRegionChange: (slug: string | null) => void;
 }
 
 export default function ExploreGrid({
@@ -27,6 +34,8 @@ export default function ExploreGrid({
   fetchNextPage,
   refetch,
   gridRef,
+  activeRegion,
+  onRegionChange,
 }: ExploreGridProps) {
   const fetchGuard = useRef(false);
 
@@ -46,9 +55,6 @@ export default function ExploreGrid({
     if (inView) loadMore();
   }, [inView, loadMore]);
 
-  // Only show posts tagged to a golf course.
-  // Currently course name is only available on review posts (via source_review_id → course_ratings → golf_courses).
-  // Non-review posts tagged at courses will need the get_explore_feed RPC updated to join post_tags for course names.
   const coursePosts = useMemo(() => {
     return posts.filter(post => !!(post.courseName || post.review?.courseName));
   }, [posts]);
@@ -85,26 +91,34 @@ export default function ExploreGrid({
     );
   }
 
-  const showReviewsStrip = coursePosts.length >= REVIEWS_STRIP_AFTER;
-
   return (
     <>
+      <FeaturedRegionHero
+        onRegionSelect={(slug) => onRegionChange(slug)}
+        activeRegion={activeRegion}
+      />
+
       <div ref={gridRef} className="grid grid-cols-2 gap-[2px] px-[2px]">
-        {coursePosts.map((post, index) => {
-          const tile = <ExploreTile key={post.id} post={post} index={index} />;
+        {coursePosts.map((post, index) => (
+          <Fragment key={post.id}>
+            <ExploreTile post={post} index={index} />
 
-          // Insert ReviewsOfTheWeekStrip after the 18th tile
-          if (showReviewsStrip && index === REVIEWS_STRIP_AFTER - 1) {
-            return (
-              <>
-                {tile}
-                <ReviewsOfTheWeekStrip key="__reviews_strip" />
-              </>
-            );
-          }
+            {index === TRENDING_AFTER - 1 && (
+              <TrendingCoursesStrip />
+            )}
 
-          return tile;
-        })}
+            {index === REGIONS_AFTER - 1 && (
+              <ExploreRegionsStrip
+                onRegionSelect={(slug) => onRegionChange(slug)}
+                activeRegion={activeRegion}
+              />
+            )}
+
+            {index === REVIEWS_AFTER - 1 && coursePosts.length >= REVIEWS_AFTER && (
+              <ReviewsOfTheWeekStrip />
+            )}
+          </Fragment>
+        ))}
       </div>
 
       {/* Infinite scroll sentinel */}
