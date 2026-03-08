@@ -26,10 +26,10 @@ export const RatingBreakdownGrid: React.FC<RatingBreakdownGridProps> = ({
     <div className={cn('grid grid-cols-2 gap-x-4 gap-y-3', className)}>
       {visible.map((cat) => {
         const score = cat.value ?? 0;
-        const isOutstanding = score >= 9;
-        const barColorClass = isOutstanding
+        const tierData = getScoreTier(score);
+        const barColorClass = tierData.isOutstanding
           ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]'
-          : 'bg-[#A8A29E]';
+          : tierData.barFill;
 
         return (
           <div key={cat.label} className="flex flex-col gap-1">
