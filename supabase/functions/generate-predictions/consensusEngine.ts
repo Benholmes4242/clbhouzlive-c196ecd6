@@ -124,7 +124,7 @@ async function callGemini(
   const start = Date.now();
   const apiKey = Deno.env.get('GEMINI_API_KEY');
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -132,14 +132,18 @@ async function callGemini(
         contents: [{ parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
         generationConfig: {
           temperature: 0.7,
-          maxOutputTokens: 4096,
+          maxOutputTokens: 8192,
           responseMimeType: 'application/json',
         },
       }),
     },
   );
   const data = await res.json();
-  return { response: data.candidates?.[0]?.content?.parts?.[0]?.text || '', latencyMs: Date.now() - start };
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  if (!text) {
+    console.error('[Consensus] Gemini empty response. Status:', res.status, 'finishReason:', data.candidates?.[0]?.finishReason, 'blockReason:', data.promptFeedback?.blockReason);
+  }
+  return { response: text, latencyMs: Date.now() - start };
 }
 
 // ── Response Parser ────────────────────────────────────────────────────────────
