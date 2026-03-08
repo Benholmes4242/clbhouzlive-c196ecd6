@@ -407,6 +407,7 @@ export const TournamentInsights = memo(function TournamentInsights() {
           allPicks={remainingPicks}
           isCompleted={true}
           bestCallPlayerId={bestCall?.playerId}
+          tournamentLeaderScore={tracker?.tournamentLeaderScore}
         />
       </>
     );
