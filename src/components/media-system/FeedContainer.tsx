@@ -170,7 +170,8 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
       setOffsetY(targetY);
       activeIndexRef.current = clamped;
       setActiveIndex(clamped);
-      useMediaStore.getState().setCarouselPosition(clamped, 0);
+      const gs = scopedStore ? scopedStore.getState() : useMediaStore.getState();
+      gs.setCarouselPosition(clamped, 0);
       if (clamped >= posts.length - 3 && posts.length > 0) {
         onNearEnd?.();
       }
