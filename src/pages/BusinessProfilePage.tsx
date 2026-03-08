@@ -39,7 +39,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 // Tab content components
-import { BusinessActivityFeed } from '@/components/business/posts/BusinessActivityFeed';
+import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 import { BusinessProfileInfo } from '@/components/business/BusinessProfileInfo';
 import { PeopleTab } from '@/components/business/PeopleTab';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
