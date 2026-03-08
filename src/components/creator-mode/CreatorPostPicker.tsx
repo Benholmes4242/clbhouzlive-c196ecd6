@@ -65,7 +65,6 @@ export function CreatorPostPicker({
           .from('user_profiles')
           .update({ featured_post_id: selectedFeatured })
           .eq('id', userId);
-        console.log('[PostPicker] DB update result, error:', error);
         if (error) throw error;
       } else {
         const { error } = await supabase
