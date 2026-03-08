@@ -199,7 +199,8 @@ export function FeedContainer({ posts, onNearEnd, onRefresh, isRefreshing = fals
         const prevIdx = activeIndexRef.current;
         activeIndexRef.current = clamped;
         setActiveIndex(clamped);
-        useMediaStore.getState().setCarouselPosition(clamped, 0);
+        const gs2 = scopedStore ? scopedStore.getState() : useMediaStore.getState();
+        gs2.setCarouselPosition(clamped, 0);
         haptic('light');
 
         if (clamped >= posts.length - 3 && posts.length > 0) {
