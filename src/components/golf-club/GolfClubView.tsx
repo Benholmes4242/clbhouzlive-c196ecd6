@@ -218,7 +218,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
               value="media" 
               className={`mt-0 transition-opacity duration-200 ${activeTab === 'media' ? 'opacity-100' : 'hidden'}`}
             >
-              <CourseMediaTab courseId={course.id} courseName={course.name} />
+              <CourseMediaTabNew courseId={course.id} courseName={course.name} />
             </TabsContent>
           )}
         </Tabs>
