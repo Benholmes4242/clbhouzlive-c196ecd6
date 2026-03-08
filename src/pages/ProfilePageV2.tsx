@@ -399,13 +399,11 @@ const ProfilePageV2Content: React.FC = () => {
     switch (activeSection) {
       case 'activity':
         return (
-          <ActivityFeed
-            userId={profile?.id || ''}
+          <PostsTabContent
+            actorType="personal"
+            actorId={profile?.id || ''}
+            actorName={displayName}
             isOwnProfile={isSelf}
-            profileDisplayName={profile?.display_name}
-            userHandicap={profile?.eg_handicap_index}
-            userProfilePhotoUrl={profile?.profile_photo_url}
-            onAchievementsClick={() => setActiveSection('achievements')}
           />
         );
       case 'courses':

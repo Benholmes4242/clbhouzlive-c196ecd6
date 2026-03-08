@@ -227,12 +227,11 @@ const BusinessProfilePage: React.FC = () => {
     switch (activeTab) {
       case 'content':
         return (
-          <BusinessActivityFeed 
-            businessId={business?.id || ''}
-            businessName={business?.name || ''}
-            businessLogo={business?.logo_url}
-            followerCount={followersCount}
-            membership={membership ?? null} 
+          <PostsTabContent
+            actorType="business"
+            actorId={business?.id || ''}
+            actorName={business?.name || ''}
+            isOwnProfile={isOwner || false}
           />
         );
       case 'golfers':
