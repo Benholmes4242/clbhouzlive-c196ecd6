@@ -714,6 +714,8 @@ const AppInner: React.FC = () => {
                                               <MiniPlayer />
                                               <GlobalQueueDrawer />
                                             </Suspense>
+                                            {/* Fullscreen Feed Overlay - portal-based, renders above everything */}
+                                            <FullscreenFeedOverlay />
                                           </UploadResilienceProvider>
                                         </AuthWrapper>
                                       </ErrorBoundary>
