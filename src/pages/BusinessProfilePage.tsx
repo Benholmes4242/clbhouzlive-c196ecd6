@@ -623,6 +623,11 @@ const BusinessProfilePage: React.FC = () => {
           )}
         </section>
 
+        {/* Creator Section - renders only if business owner has creator mode */}
+        {user?.id && (
+          <CreatorSection userId={user.id} isOwnProfile={isOwner || false} />
+        )}
+
         {/* Segmented control tabs */}
         <section className="px-4 py-2 pointer-events-auto">
           <div className="flex items-center justify-center gap-1 w-full">
