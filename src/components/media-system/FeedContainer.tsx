@@ -7,13 +7,12 @@
  * Performance: During drag/spring, transforms are applied directly to the DOM
  * via refs (no React state updates per frame). State is synced only on settle.
  */
-import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo, useContext } from 'react';
 import { FeedItem } from './FeedItem';
 import { PullToRefresh } from './PullToRefresh';
 import { useMediaStore } from './store/mediaStore';
 import { useMediaStoreCompat } from './store/useMediaStoreCompat';
 import { MediaStoreContext } from './store/MediaStoreContext';
-import { useContext } from 'react';
 import { useVideoPoolContext } from './VideoPoolProvider';
 import { flingSpring, SPRING_CONFIGS } from './utils/spring';
 import { usePreloader, preloadByUrl } from './hooks/usePreloader';

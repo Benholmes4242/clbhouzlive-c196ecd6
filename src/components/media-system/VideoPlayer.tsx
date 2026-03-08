@@ -4,12 +4,11 @@
  * Integrates gapless loop hook for seamless looping.
  * Supports double-tap-to-like, interactive scrubber, and MP4 fallback.
  */
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo, useContext } from 'react';
 import { useVideoPoolContext } from './VideoPoolProvider';
 import { useMediaStore } from './store/mediaStore';
 import { useMediaStoreCompat } from './store/useMediaStoreCompat';
 import { MediaStoreContext } from './store/MediaStoreContext';
-import { useContext } from 'react';
 import { useGaplessLoop } from './hooks/useGaplessLoop';
 import { getHlsInstance } from './utils/hlsManager';
 import { LoadingSkeleton } from './LoadingSkeleton';
