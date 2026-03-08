@@ -140,7 +140,7 @@ export function VideoPlayer({
       videoEl = video;
       videoRef.current = video;
       setVideoElement(video);
-      useMediaStore.getState().setActiveVideoElement(video, videoRef);
+      getStore().setActiveVideoElement(video, videoRef);
       video.muted = isMuted;
 
       if (!video.paused && video.readyState >= 3) {
