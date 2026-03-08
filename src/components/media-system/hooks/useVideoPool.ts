@@ -25,6 +25,9 @@ export function useVideoPool() {
   const hiddenContainerRef = useRef<HTMLDivElement | null>(null);
   const sessionCache = useSessionCache();
   const [ready, setReady] = useState(false);
+  const scopedStore = useContext(MediaStoreContext);
+  // Helper for imperative store access — scoped if available, global otherwise
+  const getStore = useCallback(() => scopedStore ? scopedStore.getState() : useMediaStore.getState(), [scopedStore]);
   
   const lastSwipeTime = useRef(0);
 
