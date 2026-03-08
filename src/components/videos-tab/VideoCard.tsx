@@ -131,7 +131,7 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
 
         {/* Caption */}
         {post.caption && (
-          <div className="px-3 pb-2">
+          <div className="px-3 pb-1">
             <p className={`text-sm text-foreground ${expanded ? '' : 'line-clamp-2'}`}>
               {post.caption}
             </p>
