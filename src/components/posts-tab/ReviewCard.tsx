@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { Star, Play } from 'lucide-react';
+import { Star, Play, Heart, MessageCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+
+function formatCompact(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return String(n);
+}
 
 interface ReviewCardProps {
   post: FeedPost;
@@ -99,6 +105,18 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post }) => {
           )}
         </div>
       )}
+
+      {/* Engagement */}
+      <div className="flex items-center gap-4 px-3 pb-1 text-xs text-muted-foreground">
+        <span className="flex items-center gap-1">
+          <Heart className="h-3.5 w-3.5" />
+          {formatCompact(post.likeCount)}
+        </span>
+        <span className="flex items-center gap-1">
+          <MessageCircle className="h-3.5 w-3.5" />
+          {formatCompact(post.commentCount)}
+        </span>
+      </div>
 
       {/* Creator + time */}
       <div className="flex items-center gap-2 px-3 pb-3">

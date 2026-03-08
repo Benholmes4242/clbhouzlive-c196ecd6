@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { Play } from 'lucide-react';
+import { Play, Heart, MessageCircle, Share2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+
+function formatCompact(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return String(n);
+}
 
 interface LongFormCardProps {
   post: FeedPost;
@@ -107,9 +113,21 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post }) => {
       </div>
 
       {/* Engagement */}
-      <div className="text-xs text-muted-foreground px-3 pb-3 flex items-center gap-2">
-        {post.likeCount > 0 && <span>♥ {post.likeCount}</span>}
-        {post.commentCount > 0 && <span>💬 {post.commentCount}</span>}
+      <div className="flex items-center gap-4 px-3 pb-3 text-xs text-muted-foreground">
+        <span className="flex items-center gap-1">
+          <Heart className="h-3.5 w-3.5" />
+          {formatCompact(post.likeCount)}
+        </span>
+        <span className="flex items-center gap-1">
+          <MessageCircle className="h-3.5 w-3.5" />
+          {formatCompact(post.commentCount)}
+        </span>
+        {post.shareCount > 0 && (
+          <span className="flex items-center gap-1">
+            <Share2 className="h-3.5 w-3.5" />
+            {formatCompact(post.shareCount)}
+          </span>
+        )}
       </div>
     </div>
   );

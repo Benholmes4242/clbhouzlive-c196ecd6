@@ -13,6 +13,12 @@ function formatDuration(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
+function formatCompact(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return String(n);
+}
+
 const CompactTile: React.FC<{ post: FeedPost; globalIndex: number }> = ({ post, globalIndex }) => {
   const firstMedia = post.mediaItems[0];
   const isVideo = firstMedia?.type === 'video';
@@ -88,6 +94,22 @@ const CompactTile: React.FC<{ post: FeedPost; globalIndex: number }> = ({ post, 
           className="absolute bottom-1.5 left-1.5 w-5 h-5 rounded-full object-cover border border-white/20 z-3"
           loading="lazy"
         />
+      )}
+
+      {/* Engagement counts — bottom right */}
+      {(post.likeCount > 0 || post.commentCount > 0) && (
+        <div className="absolute bottom-1.5 right-1.5 flex items-center gap-1.5 z-10">
+          {post.likeCount > 0 && (
+            <span className="flex items-center gap-0.5 text-[10px] font-semibold text-white drop-shadow-md">
+              ♥ {formatCompact(post.likeCount)}
+            </span>
+          )}
+          {post.commentCount > 0 && (
+            <span className="flex items-center gap-0.5 text-[10px] font-semibold text-white drop-shadow-md">
+              💬 {formatCompact(post.commentCount)}
+            </span>
+          )}
+        </div>
       )}
     </div>
   );
