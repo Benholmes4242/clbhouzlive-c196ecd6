@@ -96,7 +96,7 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
 
   return (
     <>
-      <article className="bg-card overflow-hidden">
+      <article className="bg-card rounded-xl overflow-hidden shadow-sm border border-border/50">
         {/* Creator header */}
         <div className="flex items-center gap-3 p-3">
           <button
