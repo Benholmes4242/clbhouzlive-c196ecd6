@@ -48,7 +48,7 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 8
       <svg className="w-full h-full -rotate-90">
         <circle 
           cx={size / 2} cy={size / 2} r={radius} 
-          fill="none" stroke="hsl(var(--border))" strokeWidth="6" 
+          fill="none" stroke="transparent" strokeWidth="6" 
         />
         <circle 
           cx={size / 2} cy={size / 2} r={radius} 
