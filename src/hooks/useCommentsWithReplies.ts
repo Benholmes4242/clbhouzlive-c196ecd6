@@ -426,7 +426,8 @@ export function useCommentsWithReplies(postId: string | null) {
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId] });
+      // Force immediate refetch to replace optimistic data with real server data
+      queryClient.refetchQueries({ queryKey: ['post-comments-with-replies', postId] });
       queryClient.invalidateQueries({ queryKey: ['post-engagement', postId] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
