@@ -1,4 +1,5 @@
 import { useMemo, useEffect, useCallback } from 'react';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { createMediaStore } from '@/components/media-system/store/createMediaStore';
 import { MediaStoreProvider } from '@/components/media-system/store/MediaStoreContext';
 import { VideoPoolProvider } from '@/components/media-system/VideoPoolProvider';
