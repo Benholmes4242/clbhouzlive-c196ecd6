@@ -30,7 +30,7 @@ import {
 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { 
-  useSendGameInviteNotification, 
+  useSendGameNotification, 
   useSendRsvpNotification,
   formatGameDateForNotification,
   formatGameTimeForNotification,
@@ -347,7 +347,7 @@ function useCreateTestGame() {
 // Send game invite (uses production hook)
 function useSendTestInvite() {
   const queryClient = useQueryClient();
-  const sendGameInviteNotification = useSendGameInviteNotification();
+  const sendGameNotification = useSendGameNotification();
 
   return useMutation({
     mutationFn: async ({ 
@@ -385,12 +385,15 @@ function useSendTestInvite() {
       if (participantError) throw participantError;
 
       // Use production notification hook
-      await sendGameInviteNotification.mutateAsync({
+      await sendGameNotification.mutateAsync({
+        type: 'game_updated' as any,
+        recipientUserIds: [inviteeId],
         gameId,
-        invitedUserIds: [inviteeId],
-        courseName,
-        date: formatGameDateForNotification(startTime),
-        time: formatGameTimeForNotification(startTime),
+        data: {
+          course_name: courseName,
+          date: formatGameDateForNotification(startTime),
+          time: formatGameTimeForNotification(startTime),
+        },
       });
 
       return { courseName };

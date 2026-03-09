@@ -14,7 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useInviteSearch, InvitableUser } from '../../hooks/useInviteSearch';
 import { toast } from 'sonner';
 import { 
-  useSendGameInviteNotification, 
+  useSendGameNotification, 
   formatGameDateForNotification, 
   formatGameTimeForNotification 
 } from '../../hooks/useGameNotifications';
@@ -40,7 +40,7 @@ export function InviteToGameModal({
   const [invitedIds, setInvitedIds] = useState<Set<string>>(new Set());
   const [invitingId, setInvitingId] = useState<string | null>(null);
   const [gameData, setGameData] = useState<{ courseName: string; startTime: string } | null>(null);
-  const sendGameInviteNotification = useSendGameInviteNotification();
+  const sendGameNotification = useSendGameNotification();
 
   // Fetch game data if not provided via props (ensures notifications never silently fail)
   useEffect(() => {
@@ -130,12 +130,15 @@ export function InviteToGameModal({
         // Send game invite notification (always works - uses fetched data if props missing)
         if (gameData) {
           const startDate = new Date(gameData.startTime);
-          sendGameInviteNotification.mutate({
+          sendGameNotification.mutate({
+            type: 'game_updated' as any,
+            recipientUserIds: [user.id],
             gameId,
-            invitedUserIds: [user.id],
-            courseName: gameData.courseName,
-            date: formatGameDateForNotification(startDate),
-            time: formatGameTimeForNotification(startDate),
+            data: {
+              course_name: gameData.courseName,
+              date: formatGameDateForNotification(startDate),
+              time: formatGameTimeForNotification(startDate),
+            },
           });
         }
         
@@ -147,7 +150,7 @@ export function InviteToGameModal({
     } finally {
       setInvitingId(null);
     }
-  }, [gameId, gameData, onInviteSuccess, sendGameInviteNotification]);
+  }, [gameId, gameData, onInviteSuccess, sendGameNotification]);
 
   if (!isOpen) return null;
 
