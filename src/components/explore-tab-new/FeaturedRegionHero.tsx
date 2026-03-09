@@ -38,11 +38,22 @@ function FeaturedRegionHeroInner({ onRegionSelect, activeRegion }: FeaturedRegio
 
       // Allow regions without hero_image_url — gradient fallback in render
 
-      // Fetch course count for this region
-      const { count: courseCount } = await supabase
+      // Fetch countries in this region, then count actual golf courses
+      const { data: memberRows } = await supabase
         .from('explore_region_members')
-        .select('*', { count: 'exact', head: true })
+        .select('country')
         .eq('region_id', picked.id);
+
+      const countries = (memberRows ?? []).map((r: any) => r.country);
+
+      let courseCount = 0;
+      if (countries.length > 0) {
+        const { count } = await supabase
+          .from('golf_courses')
+          .select('*', { count: 'exact', head: true })
+          .in('country', countries);
+        courseCount = count ?? 0;
+      }
 
       // Fetch recent review count (posts with source_review_id in last 30 days)
       const thirtyDaysAgo = new Date();
