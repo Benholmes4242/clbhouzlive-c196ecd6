@@ -201,14 +201,14 @@ html.lightbox-open {
   /* ========================================
      SAFE AREA INSETS - iOS/Android notch & status bar
      ======================================== */
-  /* TOP safe area disabled - content goes edge-to-edge */
-  --sat: 0px;
+  /* Safe area inset — now resolves to actual env() value */
+  --sat: env(safe-area-inset-top, 0px);
   --sab: env(safe-area-inset-bottom, 0px);
   --sal: env(safe-area-inset-left, 0px);
   --sar: env(safe-area-inset-right, 0px);
 
   /* Back-compat aliases (used by useChromeAnchors) */
-  --safe-top: 0px;
+  --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: var(--sab);
 
   --radius-tile: 18px;
@@ -561,7 +561,7 @@ html.lightbox-open {
    Use on headerless pages to respect iOS notch/status bar
    ======================================== */
 .safe-top, .pt-safe {
-  padding-top: max(var(--sat), env(safe-area-inset-top, 0px));
+  padding-top: var(--sat);
 }
 
 .pb-safe {
@@ -828,10 +828,10 @@ html, body, #root {
   --modal-ease-out: cubic-bezier(.22,.61,.36,1);
   --modal-ease-in: cubic-bezier(.4,0,.2,1);
   
-  --safe-top: 0px; 
+  --safe-top: env(safe-area-inset-top, 0px); 
   --safe-bottom: 0px; /* NUKED: bottom safe area handled by nav's hardcoded 55px */ 
-  --safe-left: 0px; 
-  --safe-right: 0px;
+  --safe-left: env(safe-area-inset-left, 0px); 
+  --safe-right: env(safe-area-inset-right, 0px);
   
   /* Echo History safe-area alignment */
   --eh-safe-right: max(env(safe-area-inset-right), 16px);
@@ -4615,3 +4615,20 @@ em-emoji-picker input:focus {
 .fullscreen-comments-open .fixed.inset-0 { z-index: 10001 !important; }
 .fullscreen-comments-open .fixed.inset-x-0.bottom-0 { z-index: 10002 !important; }
 .fullscreen-comments-open .z-\[220\] { z-index: 10003 !important; }
+
+/* ========================================
+   SAFE AREA SHIELD — persistent element that never unmounts
+   Paints the status bar zone so React mount/unmount cycles can never create a gap.
+   Background-color is set dynamically by useMedianStatusBar.
+   ======================================== */
+#safe-area-shield {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: env(safe-area-inset-top, 47px);
+  z-index: 9999;
+  pointer-events: none;
+  background-color: #000000;
+  transition: none !important;
+}

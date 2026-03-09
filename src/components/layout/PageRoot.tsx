@@ -32,7 +32,7 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
 
     // Immersive pages pull themselves up into .app-shell's padding-top so heroes can bleed to viewport top
     const immersiveMargin = immersive
-      ? 'calc(-1 * max(var(--sat, env(safe-area-inset-top, 0px)), 47px))'
+      ? 'calc(-1 * var(--sat))'
       : undefined;
 
     return (
