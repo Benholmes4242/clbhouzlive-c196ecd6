@@ -15,8 +15,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 const tabTriggerClass = cn(
-  "min-h-[36px] px-4 rounded-full text-sm font-semibold transition-all active:scale-[0.97]",
-  "data-[state=active]:text-white data-[state=active]:shadow-none",
+  "min-h-[36px] px-4 rounded-full text-sm font-semibold transition-all active:scale-[0.97] border-0 shadow-none",
+  "data-[state=active]:text-white data-[state=active]:shadow-none data-[state=active]:bg-[hsl(215,16%,35%)]",
   "data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground"
 );
 
