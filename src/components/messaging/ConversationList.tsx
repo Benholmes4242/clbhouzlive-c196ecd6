@@ -69,17 +69,6 @@ function getConversationDisplay(
   };
 }
 
-// Delivery status indicator
-function DeliveryStatus({ isOwn, isRead }: { isOwn: boolean; isRead?: boolean }) {
-  if (!isOwn) return null;
-  
-  if (isRead) {
-    return <CheckCheck className="w-3.5 h-3.5 text-primary flex-shrink-0" />;
-  }
-  
-  return <Check className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />;
-}
-
 // Component to show typing indicator or message preview
 function ConversationTypingOrPreview({ conversationId, preview }: { conversationId: string; preview: string | null }) {
   const { typingUsers } = useTypingIndicator(conversationId);
