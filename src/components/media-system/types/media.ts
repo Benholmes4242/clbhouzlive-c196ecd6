@@ -50,6 +50,7 @@ export interface FeedPost {
   isLikedByMe: boolean;
   isFollowedByMe: boolean;
   courseName?: string; // Golf course name (from posts.course_id → golf_courses, available on all course-tagged posts)
+  courseId?: string; // Golf course ID (from posts.course_id → golf_courses, available on all course-tagged posts)
 }
 
 export interface VideoSessionState {
