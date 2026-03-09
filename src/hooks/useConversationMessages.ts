@@ -250,8 +250,28 @@ export function useConversationMessages(conversationId: string | null): UseConve
           filter: `conversation_id=eq.${conversationId}`,
         },
         () => {
-          // Refresh to get the new message with sender info
           refreshMessages();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        (payload) => {
+          const updated = payload.new as any;
+          if (updated.deleted_at) {
+            setMessages(prev => prev.filter(m => m.id !== updated.id));
+          } else {
+            setMessages(prev => prev.map(m =>
+              m.id === updated.id
+                ? { ...m, content: updated.content, is_edited: updated.is_edited, edited_at: updated.edited_at }
+                : m
+            ));
+          }
         }
       )
       .subscribe();

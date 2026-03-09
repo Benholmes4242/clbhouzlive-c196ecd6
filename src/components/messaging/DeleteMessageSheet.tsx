@@ -97,10 +97,10 @@
            )}
  
            {/* Cancel button */}
-           <button
-             onClick={() => onOpenChange(false)}
-             className="w-full py-4 text-center text-amber-600 font-semibold rounded-2xl hover:bg-amber-50 active:bg-amber-100/50 transition-colors mt-2"
-           >
+            <button
+              onClick={() => onOpenChange(false)}
+              className="w-full py-4 text-center text-primary font-semibold rounded-2xl hover:bg-primary/5 active:bg-primary/10 transition-colors mt-2"
+            >
              Cancel
            </button>
          </div>

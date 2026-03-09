@@ -109,7 +109,7 @@ export function ReportSheet({
                 <span className="text-xl">{reason.icon}</span>
                 <span className="font-medium text-[#1D1D1F]">{reason.label}</span>
                 {selectedReason === reason.id && (
-                  <div className="ml-auto w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center">
+                   <div className="ml-auto w-5 h-5 rounded-full bg-primary flex items-center justify-center">
                     <span className="text-white text-xs">✓</span>
                   </div>
                 )}
