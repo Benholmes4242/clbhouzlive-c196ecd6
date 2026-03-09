@@ -30,47 +30,60 @@ export function useAppLifecycle() {
       if (document.hidden) {
         backgroundTimeRef.current = Date.now();
         console.log('[AppLifecycle] App backgrounded at', new Date().toISOString());
-      } 
-      // Returning to foreground
-      else if (backgroundTimeRef.current && !isRehydratingRef.current) {
-        const backgroundDuration = Date.now() - backgroundTimeRef.current;
-        console.log('[AppLifecycle] App foregrounded after', backgroundDuration, 'ms');
-
-        // Force repaint to fix iOS compositing artifacts (grey safe area)
-        requestAnimationFrame(() => {
-          const root = document.getElementById('root');
-          if (root) {
-            root.style.transform = 'translateZ(0)';
-            requestAnimationFrame(() => {
-              root.style.transform = '';
-            });
-          }
-        });
-
-        // Determine rehydration level
-        let level: RehydrationLevel = 'none';
-        
-        if (backgroundDuration >= REHYDRATION_THRESHOLDS.FULL) {
-          level = 'full';
-          console.log('[AppLifecycle] Triggering FULL rehydration (>5min background)');
-        } else if (backgroundDuration >= REHYDRATION_THRESHOLDS.LIGHT) {
-          level = 'light';
-          console.log('[AppLifecycle] Triggering LIGHT rehydration (>30sec background)');
-        } else {
-          console.log('[AppLifecycle] No rehydration needed (<30sec background)');
-        }
-
-        if (level !== 'none') {
-          isRehydratingRef.current = true;
-          setState({
-            isRehydrating: true,
-            rehydrationLevel: level,
-            lastBackgroundDuration: backgroundDuration,
-          });
-        }
-
-        backgroundTimeRef.current = null;
+        return;
       }
+
+      // Returning to foreground
+      if (!backgroundTimeRef.current || isRehydratingRef.current) return;
+
+      const backgroundDuration = Date.now() - backgroundTimeRef.current;
+      console.log('[AppLifecycle] App foregrounded after', backgroundDuration, 'ms');
+
+      // Step 1: Immediately ensure shield is painted (no gap)
+      const shield = document.getElementById('safe-area-shield');
+      if (shield) {
+        // Force the shield to repaint by briefly toggling will-change
+        shield.style.willChange = 'transform';
+        requestAnimationFrame(() => {
+          shield.style.willChange = 'auto';
+        });
+      }
+
+      // Step 2: Force GPU compositing on #root to prevent iOS grey artifact
+      // Double-nested rAF gives shield and status bar time to repaint first
+      const root = document.getElementById('root');
+      if (root) {
+        root.style.transform = 'translateZ(0)';
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            root.style.transform = '';
+          });
+        });
+      }
+
+      // Step 3: Determine rehydration level
+      let level: RehydrationLevel = 'none';
+
+      if (backgroundDuration >= REHYDRATION_THRESHOLDS.FULL) {
+        level = 'full';
+        console.log('[AppLifecycle] Triggering FULL rehydration (>5min background)');
+      } else if (backgroundDuration >= REHYDRATION_THRESHOLDS.LIGHT) {
+        level = 'light';
+        console.log('[AppLifecycle] Triggering LIGHT rehydration (>30sec background)');
+      } else {
+        console.log('[AppLifecycle] No rehydration needed (<30sec background)');
+      }
+
+      if (level !== 'none') {
+        isRehydratingRef.current = true;
+        setState({
+          isRehydrating: true,
+          rehydrationLevel: level,
+          lastBackgroundDuration: backgroundDuration,
+        });
+      }
+
+      backgroundTimeRef.current = null;
     };
 
     // Also handle window blur/focus as fallback
