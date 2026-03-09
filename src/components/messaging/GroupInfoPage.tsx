@@ -57,7 +57,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
   onClose,
   onUpdate,
 }) => {
-  const navigate = useNavigate();
+  
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   
