@@ -8,13 +8,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { CommentsPage } from '@/components/clubhouse/cinematic/CommentsPage';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { VideoCardAutoplay } from './VideoCardAutoplay';
 import { VideoCardMenu } from './VideoCardMenu';
 import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
 interface VideoCardProps {
   post: FeedPost;
-  isAutoplayEligible?: boolean;
   userId?: string;
   cardIndex?: number;
   allPosts?: FeedPost[];
@@ -36,7 +34,7 @@ function formatVideoDuration(totalSeconds: number): string {
   return `${m}:${pad(sec)}`;
 }
 
-export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligible = false, userId, cardIndex = 0, allPosts }: VideoCardProps) {
+export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex = 0, allPosts }: VideoCardProps) {
   const navigate = useNavigate();
   const firstVideo = post.mediaItems.find(m => m.type === 'video');
   const thumbnailUrl = firstVideo?.thumbnailUrl || '';
@@ -190,6 +188,7 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
 
         {/* Video area */}
         <button
+          data-media-wrapper
           className="relative w-full aspect-[16/9.5] bg-muted cursor-pointer"
           onClick={handleTap}
           aria-label={`Play video by ${post.displayName}`}
@@ -200,14 +199,6 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
               alt=""
               className="absolute inset-0 w-full h-full object-cover"
               loading="lazy"
-            />
-          )}
-          {hlsUrl && isAutoplayEligible && (
-            <VideoCardAutoplay
-              hlsUrl={hlsUrl}
-              posterUrl={thumbnailUrl}
-              isEligible={isAutoplayEligible}
-              cardIndex={cardIndex}
             />
           )}
           {duration > 0 && (

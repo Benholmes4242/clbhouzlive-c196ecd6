@@ -1,42 +1,10 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Loader2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { VideoCard } from './VideoCard';
 import { VideosFeedSkeleton } from './VideosFeedSkeleton';
-
-async function prewarmVideo(hlsUrl: string, idx: number) {
-  try {
-    const masterText = await fetch(hlsUrl, { mode: 'cors', credentials: 'omit' }).then(r => r.text());
-    const masterLines = masterText.split('\n');
-    const streamIdx = masterLines.findIndex(l => l.startsWith('#EXT-X-STREAM-INF'));
-    const levelRelUrl = streamIdx >= 0 ? masterLines[streamIdx + 1]?.trim() : null;
-    if (!levelRelUrl || levelRelUrl.startsWith('#')) return;
-    const masterBase = hlsUrl.substring(0, hlsUrl.lastIndexOf('/') + 1);
-    const levelUrl = levelRelUrl.startsWith('http') ? levelRelUrl : new URL(levelRelUrl, masterBase).href;
-
-    const levelText = await fetch(levelUrl, { mode: 'cors', credentials: 'omit' }).then(r => r.text());
-    const lines = levelText.split('\n');
-    const base = levelUrl.substring(0, levelUrl.lastIndexOf('/') + 1);
-
-    const mapLine = lines.find(l => l.startsWith('#EXT-X-MAP:URI="'));
-    if (mapLine) {
-      const mapUri = mapLine.match(/#EXT-X-MAP:URI="([^"]+)"/)?.[1];
-      if (mapUri) {
-        const initUrl = mapUri.startsWith('http') ? mapUri : new URL(mapUri, base).href;
-        fetch(initUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
-      }
-    }
-
-    const segLine = lines.find(l => l.trim() && !l.startsWith('#'));
-    if (segLine) {
-      const segUrl = segLine.trim().startsWith('http') ? segLine.trim() : new URL(segLine.trim(), base).href;
-      fetch(segUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
-    }
-  } catch {
-    // silent
-  }
-}
+import { VideosAutoplay } from './VideosAutoplay';
 
 interface VideosFeedProps {
   posts: FeedPost[];
@@ -60,22 +28,11 @@ export function VideosFeed({
   userId,
 }: VideosFeedProps) {
   const fetchGuard = useRef(false);
-  const [centerIndex, setCenterIndex] = useState(0);
-  const cardRefs = useRef<Map<number, HTMLDivElement>>(new Map());
-  const prewarmedSetRef = useRef<Set<number>>(new Set());
-  const centerObserverRef = useRef<IntersectionObserver | null>(null);
+  const feedRef = useRef<HTMLDivElement>(null);
 
   const { ref: sentinelRef, inView } = useInView({
     rootMargin: '400px',
   });
-
-  const setCardRef = useCallback((index: number) => (el: HTMLDivElement | null) => {
-    if (el) {
-      cardRefs.current.set(index, el);
-    } else {
-      cardRefs.current.delete(index);
-    }
-  }, []);
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage && !fetchGuard.current) {
@@ -84,55 +41,6 @@ export function VideosFeed({
       setTimeout(() => { fetchGuard.current = false; }, 200);
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
-
-  useEffect(() => {
-    centerObserverRef.current?.disconnect();
-
-    const ratios = new Map<number, number>();
-
-    centerObserverRef.current = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const idx = Number(entry.target.getAttribute('data-card-index'));
-          if (!isNaN(idx)) {
-            ratios.set(idx, entry.intersectionRatio);
-          }
-        }
-        let bestIdx = 0;
-        let bestRatio = 0;
-        for (const [idx, ratio] of ratios) {
-          if (ratio > bestRatio) {
-            bestRatio = ratio;
-            bestIdx = idx;
-          }
-        }
-        setCenterIndex(bestIdx);
-      },
-      { threshold: [0, 0.25, 0.5, 0.75, 1] }
-    );
-
-    for (const [, el] of cardRefs.current) {
-      centerObserverRef.current.observe(el);
-    }
-
-    return () => {
-      centerObserverRef.current?.disconnect();
-    };
-  }, [posts.length]);
-
-  // Pre-warm upcoming videos when centerIndex changes
-  useEffect(() => {
-    if (!posts || posts.length === 0) return;
-
-    for (let i = centerIndex + 1; i <= centerIndex + 3; i++) {
-      if (i >= posts.length) break;
-      if (prewarmedSetRef.current.has(i)) continue;
-      const hlsUrl = posts[i]?.mediaItems?.[0]?.hlsUrl;
-      if (!hlsUrl) continue;
-      prewarmedSetRef.current.add(i);
-      prewarmVideo(hlsUrl, i);
-    }
-  }, [centerIndex, posts]);
 
   // Loading state
   if (isLoading && posts.length === 0) {
@@ -168,10 +76,11 @@ export function VideosFeed({
   }
 
   return (
-    <div className="flex flex-col gap-3 pb-4 pt-2">
+    <div ref={feedRef} className="flex flex-col gap-3 pb-4 pt-2">
+      <VideosAutoplay posts={posts} feedRef={feedRef} />
       {posts.map((post, i) => (
-        <div key={post.id} ref={setCardRef(i)} data-card-index={i}>
-          <VideoCard post={post} isAutoplayEligible={Math.abs(i - centerIndex) <= 2} userId={userId} cardIndex={i} allPosts={posts} />
+        <div key={post.id} data-card-index={i}>
+          <VideoCard post={post} userId={userId} cardIndex={i} allPosts={posts} />
         </div>
       ))}
 
