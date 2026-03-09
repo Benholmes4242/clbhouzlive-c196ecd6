@@ -130,12 +130,15 @@ export function InviteToGameModal({
         // Send game invite notification (always works - uses fetched data if props missing)
         if (gameData) {
           const startDate = new Date(gameData.startTime);
-          sendGameInviteNotification.mutate({
+          sendGameNotification.mutate({
+            type: 'game_updated' as any,
+            recipientUserIds: [user.id],
             gameId,
-            invitedUserIds: [user.id],
-            courseName: gameData.courseName,
-            date: formatGameDateForNotification(startDate),
-            time: formatGameTimeForNotification(startDate),
+            data: {
+              course_name: gameData.courseName,
+              date: formatGameDateForNotification(startDate),
+              time: formatGameTimeForNotification(startDate),
+            },
           });
         }
         
