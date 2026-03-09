@@ -1,0 +1,58 @@
+import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+
+export function useDeleteAccount(userId: string | undefined) {
+  const { toast } = useToast();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showBusinessWarning, setShowBusinessWarning] = useState(false);
+  const [ownedBusinessNames, setOwnedBusinessNames] = useState<string[]>([]);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const initiateDelete = async () => {
+    if (!userId) return;
+    const { data } = await supabase
+      .from('business_members')
+      .select('business_accounts(name)')
+      .eq('user_profile_id', userId)
+      .eq('role', 'owner');
+
+    const names = (data ?? [])
+      .map((m: any) => m.business_accounts?.name)
+      .filter(Boolean) as string[];
+
+    if (names.length > 0) {
+      setOwnedBusinessNames(names);
+      setShowBusinessWarning(true);
+    } else {
+      setShowDeleteConfirm(true);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!userId || deleteConfirmText !== 'DELETE') return;
+    setIsDeleting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('No session');
+      const { error } = await supabase.functions.invoke('delete-account', {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (error) throw error;
+      await supabase.auth.signOut();
+    } catch {
+      toast({ title: 'Error', description: 'Could not delete account. Please contact support.', variant: 'destructive' });
+      setIsDeleting(false);
+    }
+  };
+
+  return {
+    showDeleteConfirm, setShowDeleteConfirm,
+    showBusinessWarning, setShowBusinessWarning,
+    ownedBusinessNames,
+    deleteConfirmText, setDeleteConfirmText,
+    isDeleting,
+    initiateDelete, confirmDelete,
+  };
+}
