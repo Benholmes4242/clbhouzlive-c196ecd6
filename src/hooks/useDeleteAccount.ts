@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export function useDeleteAccount(userId: string | undefined) {
-  const { toast } = useToast();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showBusinessWarning, setShowBusinessWarning] = useState(false);
   const [ownedBusinessNames, setOwnedBusinessNames] = useState<string[]>([]);
@@ -42,7 +41,7 @@ export function useDeleteAccount(userId: string | undefined) {
       if (error) throw error;
       await supabase.auth.signOut();
     } catch {
-      toast({ title: 'Error', description: 'Could not delete account. Please contact support.', variant: 'destructive' });
+      toast.error('Could not delete account. Please contact support.');
       setIsDeleting(false);
     }
   };

@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 const INVALIDATE_KEYS = ['profile', 'user-profile', 'creator-features'];
 
 export function useCreatorSettings(userId: string | undefined, initialIsCreator: boolean, initialCreatorOnly: boolean) {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   const [isCreator, setIsCreator] = useState(initialIsCreator);
   const [creatorOnly, setCreatorOnly] = useState(initialCreatorOnly);
@@ -41,7 +40,7 @@ export function useCreatorSettings(userId: string | undefined, initialIsCreator:
       if (enable) setShowWelcome(true);
     } catch {
       setIsCreator(prev);
-      toast({ title: 'Error', description: 'Could not update creator mode.', variant: 'destructive' });
+      toast.error('Could not update creator mode.');
     } finally {
       setIsUpdating(false);
       setShowEnableConfirm(false);
@@ -63,7 +62,7 @@ export function useCreatorSettings(userId: string | undefined, initialIsCreator:
       invalidate();
     } catch {
       setCreatorOnly(prev);
-      toast({ title: 'Error', description: 'Could not update creator-only setting.', variant: 'destructive' });
+      toast.error('Could not update creator-only setting.');
     } finally {
       setIsUpdating(false);
       setShowCreatorOnlyConfirm(false);

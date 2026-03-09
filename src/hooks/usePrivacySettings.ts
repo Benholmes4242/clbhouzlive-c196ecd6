@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export function usePrivacySettings(userId: string | undefined, initialIsPublic: boolean, initialShowHandicap: boolean) {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
 
   const [isPublic, setIsPublic] = useState(initialIsPublic);
   const [showHandicap, setShowHandicap] = useState(initialShowHandicap);
@@ -32,7 +31,7 @@ export function usePrivacySettings(userId: string | undefined, initialIsPublic: 
       invalidate();
     } catch {
       setIsPublic(prev);
-      toast({ title: 'Error', description: 'Could not update privacy setting.', variant: 'destructive' });
+      toast.error('Could not update privacy setting.');
     } finally {
       setIsUpdatingPrivacy(false);
     }
@@ -52,7 +51,7 @@ export function usePrivacySettings(userId: string | undefined, initialIsPublic: 
       invalidate();
     } catch {
       setShowHandicap(prev);
-      toast({ title: 'Error', description: 'Could not update handicap setting.', variant: 'destructive' });
+      toast.error('Could not update handicap setting.');
     } finally {
       setIsUpdatingHandicap(false);
     }
