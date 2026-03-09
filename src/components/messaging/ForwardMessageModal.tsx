@@ -157,7 +157,7 @@ export function ForwardMessageModal({
                       hideRing
                     />
                   )}
-                  <span className="flex-1 text-left font-medium text-[#1D1D1F] truncate">
+                  <span className="flex-1 text-left font-medium text-foreground truncate">
                     {display.name}
                   </span>
                   {isForwarding && (
