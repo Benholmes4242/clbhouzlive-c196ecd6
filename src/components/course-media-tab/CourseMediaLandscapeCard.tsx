@@ -15,9 +15,12 @@ interface CourseMediaLandscapeCardProps {
   post: FeedPost;
   index: number;
   allPosts?: FeedPost[];
+  fetchNextPage?: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
 }
 
-export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> = ({ post, index, allPosts }) => {
+export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> = ({ post, index, allPosts, fetchNextPage, hasNextPage, isFetchingNextPage }) => {
   const media = post.mediaItems[0];
   const isVideo = media?.type === 'video';
   const thumbnailUrl = isVideo ? media?.thumbnailUrl : (media?.imageUrl || media?.thumbnailUrl);
@@ -33,6 +36,9 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
             posts: allPosts,
             startIndex: index,
             sourceId: 'course-media',
+            fetchNextPage,
+            hasNextPage,
+            isFetchingNextPage,
           });
         }
       }}
@@ -51,7 +57,6 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
         </div>
       )}
 
-      {/* Creator avatar — top-left */}
       {post.avatarUrl && (
         <div className="absolute top-1.5 left-1.5 z-10">
           <SquircleAvatar
@@ -64,7 +69,6 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
         </div>
       )}
 
-      {/* Duration badge */}
       {isVideo && duration != null && duration > 0 && (
         <div
           className="absolute bottom-2 right-2 z-10 rounded-[4px] liquid-glass flex items-center"
