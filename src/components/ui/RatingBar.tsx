@@ -44,7 +44,7 @@ export function RatingBar({
   return (
     <div
       className={cn(
-        'relative w-full h-1.5 bg-muted rounded-full overflow-hidden',
+        'relative w-full h-1.5 bg-transparent rounded-full overflow-hidden',
         className
       )}
     >
