@@ -6,6 +6,9 @@ export function FullscreenFeedOverlay() {
   const isOpen = useFullscreenFeed((s) => s.isOpen);
   const posts = useFullscreenFeed((s) => s.posts);
   const startIndex = useFullscreenFeed((s) => s.startIndex);
+  const fetchNextPage = useFullscreenFeed((s) => s.fetchNextPage);
+  const hasNextPage = useFullscreenFeed((s) => s.hasNextPage);
+  const isFetchingNextPage = useFullscreenFeed((s) => s.isFetchingNextPage);
 
   if (!isOpen || posts.length === 0) return null;
 
@@ -17,6 +20,9 @@ export function FullscreenFeedOverlay() {
       <FullscreenFeedContent
         posts={posts}
         startIndex={startIndex}
+        fetchNextPage={fetchNextPage}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
       />
     </div>,
     document.body

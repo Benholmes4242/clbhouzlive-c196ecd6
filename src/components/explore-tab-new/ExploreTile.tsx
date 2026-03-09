@@ -6,9 +6,12 @@ interface ExploreTileProps {
   post: FeedPost;
   index: number;
   allPosts?: FeedPost[];
+  fetchNextPage?: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
 }
 
-function ExploreTileInner({ post, index, allPosts }: ExploreTileProps) {
+function ExploreTileInner({ post, index, allPosts, fetchNextPage, hasNextPage, isFetchingNextPage }: ExploreTileProps) {
   const media = post.mediaItems[0];
   if (!media) return null;
 
@@ -22,6 +25,9 @@ function ExploreTileInner({ post, index, allPosts }: ExploreTileProps) {
         posts: allPosts,
         startIndex: index,
         sourceId: 'explore',
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
       });
     }
   };
@@ -42,7 +48,6 @@ function ExploreTileInner({ post, index, allPosts }: ExploreTileProps) {
         />
       )}
 
-      {/* Rating badge — top right */}
       {rating != null && rating > 0 && (
         <span
           className="absolute top-2 right-2 rounded-full liquid-glass flex items-center gap-1 text-[13px] font-semibold text-white leading-none"
@@ -53,7 +58,6 @@ function ExploreTileInner({ post, index, allPosts }: ExploreTileProps) {
         </span>
       )}
 
-      {/* Course name — bottom center on gradient */}
       {courseName && (
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 via-black/15 to-transparent px-2 py-2">
           <p className="text-center text-[11px] font-semibold text-white line-clamp-1">

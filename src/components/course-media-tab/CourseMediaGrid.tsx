@@ -4,6 +4,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { CourseMediaTile } from './CourseMediaTile';
 import { CourseMediaLandscapeCard } from './CourseMediaLandscapeCard';
 import { CourseMediaGridSkeleton } from './CourseMediaGridSkeleton';
+import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 
 interface CourseMediaGridProps {
   posts: FeedPost[];
@@ -52,6 +53,18 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  // Sync new posts into fullscreen overlay
+  const isFullscreenOpen = useFullscreenFeed(s => s.isOpen);
+  const fullscreenPostCount = useFullscreenFeed(s => s.posts.length);
+
+  useEffect(() => {
+    if (!isFullscreenOpen) return;
+    if (posts.length > fullscreenPostCount) {
+      const newPosts = posts.slice(fullscreenPostCount);
+      useFullscreenFeed.getState().appendPosts(newPosts);
+    }
+  }, [posts.length, isFullscreenOpen, fullscreenPostCount]);
+
   if (isLoading) return <CourseMediaGridSkeleton />;
 
   if (isError) {
@@ -78,7 +91,6 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
     );
   }
 
-  // Build grid items — landscape posts get rendered as full-width cards
   let tileIndex = 0;
 
   return (
@@ -93,6 +105,9 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
               post={post}
               index={idx}
               allPosts={posts}
+              fetchNextPage={fetchNextPage}
+              hasNextPage={hasNextPage}
+              isFetchingNextPage={isFetchingNextPage}
             />
           );
         }
@@ -103,6 +118,9 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
             post={post}
             index={idx}
             allPosts={posts}
+            fetchNextPage={fetchNextPage}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
           />
         );
       })}

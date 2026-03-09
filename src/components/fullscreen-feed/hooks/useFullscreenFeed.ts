@@ -6,8 +6,19 @@ interface FullscreenFeedState {
   posts: FeedPost[];
   startIndex: number;
   sourceId: string;
+  fetchNextPage?: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
 
-  open: (params: { posts: FeedPost[]; startIndex: number; sourceId: string }) => void;
+  open: (params: {
+    posts: FeedPost[];
+    startIndex: number;
+    sourceId: string;
+    fetchNextPage?: () => void;
+    hasNextPage?: boolean;
+    isFetchingNextPage?: boolean;
+  }) => void;
+  appendPosts: (newPosts: FeedPost[]) => void;
   close: () => void;
 }
 
@@ -16,9 +27,30 @@ export const useFullscreenFeed = create<FullscreenFeedState>((set) => ({
   posts: [],
   startIndex: 0,
   sourceId: '',
+  fetchNextPage: undefined,
+  hasNextPage: undefined,
+  isFetchingNextPage: undefined,
 
-  open: ({ posts, startIndex, sourceId }) =>
-    set({ isOpen: true, posts, startIndex, sourceId }),
+  open: ({ posts, startIndex, sourceId, fetchNextPage, hasNextPage, isFetchingNextPage }) =>
+    set({
+      isOpen: true,
+      posts,
+      startIndex,
+      sourceId,
+      fetchNextPage,
+      hasNextPage,
+      isFetchingNextPage,
+    }),
+  appendPosts: (newPosts) =>
+    set((state) => ({ posts: [...state.posts, ...newPosts] })),
   close: () =>
-    set({ isOpen: false, posts: [], startIndex: 0, sourceId: '' }),
+    set({
+      isOpen: false,
+      posts: [],
+      startIndex: 0,
+      sourceId: '',
+      fetchNextPage: undefined,
+      hasNextPage: undefined,
+      isFetchingNextPage: undefined,
+    }),
 }));

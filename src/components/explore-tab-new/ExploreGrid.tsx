@@ -7,9 +7,10 @@ import { FeaturedRegionHero } from './FeaturedRegionHero';
 import { TrendingCoursesStrip } from './TrendingCoursesStrip';
 import { ExploreRegionsStrip } from './ExploreRegionsStrip';
 import { ReviewsOfTheWeekStrip } from './ReviewsOfTheWeekStrip';
+import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 
-const TRENDING_AFTER = 6;       // After 6th tile (index 5)
-const REGIONS_AFTER = 18;       // After 18th tile (index 17)
+const TRENDING_AFTER = 6;
+const REGIONS_AFTER = 18;
 
 interface ExploreGridProps {
   posts: FeedPost[];
@@ -58,6 +59,18 @@ export default function ExploreGrid({
     return posts.filter(post => !!(post.courseName || post.review?.courseName));
   }, [posts]);
 
+  // Sync new posts into fullscreen overlay
+  const isFullscreenOpen = useFullscreenFeed(s => s.isOpen);
+  const fullscreenPostCount = useFullscreenFeed(s => s.posts.length);
+
+  useEffect(() => {
+    if (!isFullscreenOpen) return;
+    if (coursePosts.length > fullscreenPostCount) {
+      const newPosts = coursePosts.slice(fullscreenPostCount);
+      useFullscreenFeed.getState().appendPosts(newPosts);
+    }
+  }, [coursePosts.length, isFullscreenOpen, fullscreenPostCount]);
+
   if (isLoading) {
     return <ExploreGridSkeleton />;
   }
@@ -103,7 +116,14 @@ export default function ExploreGrid({
       <div ref={gridRef} className="grid grid-cols-2 gap-[2px] px-[2px]">
         {coursePosts.map((post, index) => (
           <div className="contents" key={post.id}>
-            <ExploreTile post={post} index={index} allPosts={coursePosts} />
+            <ExploreTile
+              post={post}
+              index={index}
+              allPosts={coursePosts}
+              fetchNextPage={fetchNextPage}
+              hasNextPage={hasNextPage}
+              isFetchingNextPage={isFetchingNextPage}
+            />
 
             {index === TRENDING_AFTER - 1 && (
               <TrendingCoursesStrip activeRegion={activeRegion} />

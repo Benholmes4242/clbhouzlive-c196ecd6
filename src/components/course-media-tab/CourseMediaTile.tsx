@@ -15,10 +15,13 @@ interface CourseMediaTileProps {
   post: FeedPost;
   index: number;
   allPosts?: FeedPost[];
+  fetchNextPage?: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
 }
 
 
-export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, allPosts }) => {
+export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, allPosts, fetchNextPage, hasNextPage, isFetchingNextPage }) => {
   const media = post.mediaItems[0];
   const isVideo = media?.type === 'video';
   const thumbnailUrl = isVideo ? media?.thumbnailUrl : (media?.imageUrl || media?.thumbnailUrl);
@@ -37,6 +40,9 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
             posts: allPosts,
             startIndex: index,
             sourceId: 'course-media',
+            fetchNextPage,
+            hasNextPage,
+            isFetchingNextPage,
           });
         }
       }}
@@ -55,7 +61,6 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
         </div>
       )}
 
-      {/* Bottom gradient */}
       <div
         className="absolute bottom-0 left-0 right-0 pointer-events-none"
         style={{
@@ -64,7 +69,6 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
         }}
       />
 
-      {/* Duration badge (videos) — bottom-right */}
       {isVideo && duration != null && duration > 0 && (
         <div
           className="absolute bottom-1.5 right-1.5 z-10 rounded-[4px] liquid-glass flex items-center"
@@ -76,7 +80,6 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
         </div>
       )}
 
-      {/* Review rating — top-right */}
       {reviewRating != null && reviewRating > 0 && (
         <div
           className="absolute top-1.5 right-1.5 z-10 rounded-full liquid-glass flex items-center gap-[3px]"
@@ -93,7 +96,6 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
         </div>
       )}
 
-      {/* Creator avatar — bottom-left */}
       {avatarUrl && (
         <div className="absolute bottom-1.5 left-1.5 z-10">
           <SquircleAvatar

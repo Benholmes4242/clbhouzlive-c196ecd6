@@ -5,6 +5,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { FriendsCard } from './FriendsCard';
 import { FriendsFeedSkeleton } from './FriendsFeedSkeleton';
 import { FriendsAutoplay } from './FriendsAutoplay';
+import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 
 interface FriendsFeedProps {
   posts: FeedPost[];
@@ -42,12 +43,22 @@ export function FriendsFeed({
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Loading state
+  // Sync new posts into fullscreen overlay
+  const isFullscreenOpen = useFullscreenFeed(s => s.isOpen);
+  const fullscreenPostCount = useFullscreenFeed(s => s.posts.length);
+
+  useEffect(() => {
+    if (!isFullscreenOpen) return;
+    if (posts.length > fullscreenPostCount) {
+      const newPosts = posts.slice(fullscreenPostCount);
+      useFullscreenFeed.getState().appendPosts(newPosts);
+    }
+  }, [posts.length, isFullscreenOpen, fullscreenPostCount]);
+
   if (isLoading && posts.length === 0) {
     return <FriendsFeedSkeleton />;
   }
 
-  // Error state
   if (isError && posts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
@@ -64,7 +75,6 @@ export function FriendsFeed({
     );
   }
 
-  // Empty state
   if (!isLoading && posts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
@@ -80,7 +90,15 @@ export function FriendsFeed({
       <FriendsAutoplay posts={posts} feedRef={feedContainerRef} />
       {posts.map((post, i) => (
         <div key={post.id} data-card-index={i}>
-          <FriendsCard post={post} userId={userId} cardIndex={i} allPosts={posts} />
+          <FriendsCard
+            post={post}
+            userId={userId}
+            cardIndex={i}
+            allPosts={posts}
+            fetchNextPage={fetchNextPage}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+          />
         </div>
       ))}
 

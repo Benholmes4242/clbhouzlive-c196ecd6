@@ -16,6 +16,9 @@ import { Scrubber } from '@/components/media-system/Scrubber';
 interface FullscreenFeedContentProps {
   posts: FeedPost[];
   startIndex: number;
+  fetchNextPage?: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
 }
 
 /** Wrapper to mount the preloader inside the scoped store context */
@@ -24,7 +27,7 @@ function FeedWithPreloader({ posts, children }: { posts: FeedPost[]; children: R
   return <>{children}</>;
 }
 
-export function FullscreenFeedContent({ posts, startIndex }: FullscreenFeedContentProps) {
+export function FullscreenFeedContent({ posts, startIndex, fetchNextPage, hasNextPage, isFetchingNextPage }: FullscreenFeedContentProps) {
   // Force transparent status bar regardless of which page launched the overlay
   useMedianStatusBar("dark", "transparent", true, false);
 
@@ -41,6 +44,12 @@ export function FullscreenFeedContent({ posts, startIndex }: FullscreenFeedConte
   const handleClose = useCallback(() => {
     useFullscreenFeed.getState().close();
   }, []);
+
+  const handleNearEnd = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage && fetchNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // Lock body scroll and force black background while overlay is open
   useEffect(() => {
@@ -70,6 +79,8 @@ export function FullscreenFeedContent({ posts, startIndex }: FullscreenFeedConte
           <FeedContainer
             posts={posts}
             initialIndex={startIndex}
+            onNearEnd={handleNearEnd}
+            hasNextPage={hasNextPage}
           />
         </FeedWithPreloader>
       </VideoPoolProvider>

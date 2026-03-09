@@ -20,9 +20,12 @@ interface WatchTileProps {
   post: FeedPost;
   index: number;
   allPosts?: FeedPost[];
+  fetchNextPage?: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
 }
 
-const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts }) => {
+const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, fetchNextPage, hasNextPage, isFetchingNextPage }) => {
   const media = post.mediaItems[0];
   const thumbnailUrl = media?.thumbnailUrl;
   const duration = media?.duration;
@@ -39,6 +42,9 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts }) => {
             posts: allPosts,
             startIndex: index,
             sourceId: 'watch',
+            fetchNextPage,
+            hasNextPage,
+            isFetchingNextPage,
           });
         }
       }}
@@ -57,7 +63,6 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts }) => {
         </div>
       )}
 
-      {/* Bottom gradient */}
       <div
         className="absolute bottom-0 left-0 right-0 pointer-events-none"
         style={{
@@ -66,7 +71,6 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts }) => {
         }}
       />
 
-      {/* Duration badge */}
       {duration != null && duration > 0 && (
         <div
           className="absolute bottom-1.5 right-1.5 z-10 rounded-[4px] flex items-center"
@@ -85,7 +89,6 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts }) => {
         </div>
       )}
 
-      {/* Engagement badge */}
       {engagement > 0 && (
         <div
           className="absolute bottom-1.5 left-1.5 z-10 rounded-[4px] flex items-center gap-[3px]"
