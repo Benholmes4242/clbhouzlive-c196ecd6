@@ -113,7 +113,7 @@ export function VideoCardAutoplay({ hlsUrl, posterUrl, isEligible, cardIndex }: 
           destroyHls();
         }
       },
-      { threshold: [0, 0.1, 0.5] }
+      { threshold: [0, 0.1, 0.9] }
     );
 
     observerRef.current.observe(el);
