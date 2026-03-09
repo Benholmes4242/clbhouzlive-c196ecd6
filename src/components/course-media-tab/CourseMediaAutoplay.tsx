@@ -270,8 +270,10 @@ export const CourseMediaAutoplay: React.FC<CourseMediaAutoplayProps> = ({ posts,
     if (!grid) return;
     const tiles = grid.querySelectorAll('[data-course-media-index]');
     tiles.forEach((tile) => {
-      const idx = Number((tile as HTMLElement).dataset.courseMediaIndex);
+      const idx = parseInt((tile as HTMLElement).dataset.courseMediaIndex ?? '', 10);
       if (isNaN(idx)) return;
+      const tileHlsUrl = postsRef.current[idx]?.mediaItems?.[0]?.hlsUrl;
+      if (!tileHlsUrl) return;
       if (autoplayObserverRef.current && !observedTilesRef.current.has(idx)) {
         observedTilesRef.current.add(idx);
         autoplayObserverRef.current.observe(tile);
