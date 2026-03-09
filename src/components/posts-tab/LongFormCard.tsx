@@ -91,7 +91,7 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
           {!expanded && post.caption.length > 100 && (
             <button
               onClick={(e) => { e.stopPropagation(); setExpanded(true); }}
-              className="text-sm font-semibold text-muted-foreground mt-0.5"
+              className="text-xs font-semibold text-muted-foreground mt-0.5"
             >
               See more
             </button>
