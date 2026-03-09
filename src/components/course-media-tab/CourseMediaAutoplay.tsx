@@ -178,7 +178,8 @@ export const CourseMediaAutoplay: React.FC<CourseMediaAutoplayProps> = ({ posts,
         for (const entry of entries) {
           const el = entry.target as HTMLElement;
           const idx = Number(el.dataset.courseMediaIndex);
-          if (isNaN(idx) || !isEligible(idx)) continue;
+          const tileHlsUrl = postsRef.current[idx]?.mediaItems?.[0]?.hlsUrl;
+          if (isNaN(idx) || !tileHlsUrl) continue;
 
           const post = postsRef.current[idx];
           const hlsUrl = post?.mediaItems?.[0]?.hlsUrl;
