@@ -1,139 +1,102 @@
-import React, { useState } from 'react';
-import { BottomSheet } from '@/components/ui/BottomSheet';
+import { useState } from 'react';
 import { X } from 'lucide-react';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { supabase } from '@/integrations/supabase/client';
+import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
-interface ReportProblemSheetProps {
+const CATEGORIES = ['Bug / Crash', 'Performance', 'Content Issue', 'Account Problem', 'Other'];
+
+interface Props {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
-  userId: string;
+  onClose: () => void;
+  userId: string | undefined;
 }
 
-/**
- * Collects device/browser context for debugging
- */
-function collectContext(): Record<string, unknown> {
-  return {
-    userAgent: navigator.userAgent,
-    platform: navigator.platform,
-    language: navigator.language,
-    screenSize: `${window.screen.width}x${window.screen.height}`,
-    viewportSize: `${window.innerWidth}x${window.innerHeight}`,
-    devicePixelRatio: window.devicePixelRatio,
-    url: window.location.href,
-    pathname: window.location.pathname,
-    timestamp: new Date().toISOString(),
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    online: navigator.onLine,
-    cookiesEnabled: navigator.cookieEnabled,
-  };
-}
-
-export function ReportProblemSheet({ open, onOpenChange, userId }: ReportProblemSheetProps) {
+export function ReportProblemSheet({ open, onClose, userId }: Props) {
+  const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    if (!description.trim()) {
-      toast.error('Please describe the problem');
-      return;
-    }
-
-    if (description.trim().length < 10) {
-      toast.error('Please provide more detail');
-      return;
-    }
-
+    if (!category || !description.trim()) return;
     setIsSubmitting(true);
-
     try {
-      const context = collectContext();
-
-      const { error } = await supabase
-        .from('support_tickets')
-        .insert({
-          user_id: userId,
-          type: 'bug_report',
-          description: description.trim(),
-          context: context as any, // Type will sync after migration
-        });
-
+      const { error } = await supabase.from('support_tickets').insert({
+        user_id: userId,
+        category,
+        description: description.trim(),
+        status: 'open',
+      });
       if (error) throw error;
-
-      toast.success('Report submitted', {
-        description: "We'll look into this as soon as possible.",
-      });
+      toast.success('Report submitted', { description: 'Our team will review your report shortly.' });
+      setCategory('');
       setDescription('');
-      onOpenChange(false);
-    } catch (err) {
-      console.error('[ReportProblem] submit error:', err);
-      toast.error("Couldn't send report", {
-        description: 'Please try again in a moment.',
-      });
+      onClose();
+    } catch {
+      toast.error('Could not submit report. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <BottomSheet open={open} onClose={() => onOpenChange(false)} ariaLabelledBy="report-problem-title">
-      <div className="flex flex-col max-h-[85vh]">
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#E4E6E9]">
-          <div className="w-8" />
-          <div className="flex-1 flex justify-center">
-            <div className="w-9 h-1 bg-[#D1D5DB] rounded-full" />
-          </div>
-          <button
-            onClick={() => onOpenChange(false)}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#F3F4F6] transition-colors"
-            aria-label="Close"
-          >
-            <X className="w-5 h-5 text-[#5E666D]" />
+    <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
+      <SheetContent
+        side="bottom"
+        className="rounded-t-[20px] bg-background border-0 px-5"
+        style={{ paddingBottom: 'calc(var(--sab) + 24px)' }}
+      >
+        <div className="w-10 h-1 rounded-full bg-muted mx-auto mt-3 mb-4" />
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-[20px] font-bold tracking-tight text-foreground">Report a Problem</h2>
+          <button onClick={onClose} className="flex items-center justify-center min-h-[44px] min-w-[44px] text-muted-foreground">
+            <X size={20} />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto px-4 py-4">
-          <h2 id="report-problem-title" className="text-lg font-semibold text-[#1F2428] mb-2">
-            Report a problem
-          </h2>
-          <p className="text-[13px] text-[#5E666D] mb-4">
-            Tell us what's not working and we'll investigate. Device info will be included automatically.
-          </p>
-
+        <div className="space-y-5">
           <div className="space-y-2">
-            <label htmlFor="problem-description" className="text-[13px] font-medium text-[#1F2428]">
-              What happened?
-            </label>
+            <Label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wide">Category</Label>
+            <div className="flex flex-wrap gap-2">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setCategory(cat)}
+                  className={`px-3 py-2 rounded-full text-[13px] font-medium border min-h-[36px] transition-colors ${
+                    category === cat
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'bg-muted text-muted-foreground border-border'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wide">Description</Label>
             <Textarea
-              id="problem-description"
-              placeholder="Describe the issue you're experiencing..."
+              placeholder="Describe the problem in as much detail as possible…"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="min-h-[120px] resize-none border-[#E4E6E9] focus:border-[#1F2428] focus:ring-0 text-[14px]"
-              maxLength={1000}
+              rows={5}
+              className="resize-none"
             />
-            <p className="text-[11px] text-[#97A1AA] text-right">
-              {description.length}/1000
-            </p>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="px-4 py-4 border-t border-[#E4E6E9]">
-          <Button
-            onClick={handleSubmit}
-            disabled={isSubmitting || !description.trim()}
-            className="w-full h-12 bg-[#1F2428] text-white hover:bg-[#2A3038] font-medium disabled:opacity-50"
-          >
-            {isSubmitting ? 'Sending...' : 'Send report'}
-          </Button>
-        </div>
-      </div>
-    </BottomSheet>
+        <Button
+          className="w-full mt-6 min-h-[44px]"
+          disabled={!category || !description.trim() || isSubmitting}
+          onClick={handleSubmit}
+        >
+          {isSubmitting ? 'Submitting…' : 'Submit Report'}
+        </Button>
+      </SheetContent>
+    </Sheet>
   );
 }
