@@ -10,7 +10,6 @@ import { ReviewsOfTheWeekStrip } from './ReviewsOfTheWeekStrip';
 
 const TRENDING_AFTER = 6;       // After 6th tile (index 5)
 const REGIONS_AFTER = 18;       // After 18th tile (index 17)
-const REVIEWS_AFTER = 30;       // After 30th tile (index 29)
 
 interface ExploreGridProps {
   posts: FeedPost[];
