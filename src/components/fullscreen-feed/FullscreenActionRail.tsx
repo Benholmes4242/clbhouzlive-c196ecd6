@@ -155,9 +155,14 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
         </button>
       )}
 
-      {/* Comments bottom sheet — portalled above z-[9999] overlay */}
-      {showComments && createPortal(
-        <div className="fixed inset-0 z-[10000]" style={{ pointerEvents: 'auto' }}>
+      {/* Comments bottom sheet — vaul z-index overridden to render above z-[9999] overlay */}
+      {showComments && (
+        <>
+          <style>{`
+            [vaul-drawer-wrapper] { z-index: auto !important; }
+            [vaul-overlay] { z-index: 10001 !important; }
+            [vaul-drawer] { z-index: 10002 !important; }
+          `}</style>
           <CommentsPage
             isOpen={showComments}
             onClose={() => setShowComments(false)}
@@ -174,8 +179,7 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
             isReview={activePost.isReview}
             reviewRating={activePost.review?.rating}
           />
-        </div>,
-        document.body
+        </>
       )}
     </>
   );
