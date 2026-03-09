@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useMessagingContext } from '@/contexts/MessagingContext';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useArchivedConversations } from '@/hooks/useArchivedConversations';
@@ -6,7 +6,7 @@ import { useTypingIndicator } from '@/hooks/useTypingIndicator';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { MessageCircle, Plus, Archive, ChevronDown, ChevronRight, Users, Check, CheckCheck, BellOff } from 'lucide-react';
+import { MessageCircle, Plus, Archive, ChevronDown, ChevronRight, Users, BellOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -67,17 +67,6 @@ function getConversationDisplay(
     avatarUrl: conversation.avatar_url,
     initials: name.substring(0, 2).toUpperCase(),
   };
-}
-
-// Delivery status indicator
-function DeliveryStatus({ isOwn, isRead }: { isOwn: boolean; isRead?: boolean }) {
-  if (!isOwn) return null;
-  
-  if (isRead) {
-    return <CheckCheck className="w-3.5 h-3.5 text-primary flex-shrink-0" />;
-  }
-  
-  return <Check className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />;
 }
 
 // Component to show typing indicator or message preview
@@ -300,8 +289,8 @@ export function ConversationList({
             {/* Avatar - Group icon or user photo */}
             <div className="relative flex-shrink-0">
               {isGroup && !avatarUrl ? (
-                <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-purple-500 to-purple-600">
-                  <Users className="w-5 h-5 text-white" />
+                <div className="w-12 h-12 rounded-full flex items-center justify-center bg-primary">
+                  <Users className="w-5 h-5 text-primary-foreground" />
                 </div>
               ) : (
                 <SquircleAvatar

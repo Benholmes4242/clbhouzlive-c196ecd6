@@ -64,7 +64,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingDescription, setIsEditingDescription] = useState(false);
   const [groupName, setGroupName] = useState(conversation.name || '');
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState(conversation.description || '');
   const [isAddMembersOpen, setIsAddMembersOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
@@ -512,18 +512,18 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         {participant.role === 'admin' && participant.user_id !== conversation.created_by ? (
-                          <DropdownMenuItem onClick={() => handleRemoveAdmin(participant.user_id!)}>
+                          <DropdownMenuItem onClick={() => participant.user_id && handleRemoveAdmin(participant.user_id)}>
                             <Shield size={16} className="mr-2" />
                             Dismiss as admin
                           </DropdownMenuItem>
                         ) : participant.role !== 'admin' && (
-                          <DropdownMenuItem onClick={() => handleMakeAdmin(participant.user_id!)}>
+                          <DropdownMenuItem onClick={() => participant.user_id && handleMakeAdmin(participant.user_id)}>
                             <ShieldCheck size={16} className="mr-2" />
                             Make group admin
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuItem
-                          onClick={() => handleRemoveMember(participant.user_id!)}
+                          onClick={() => participant.user_id && handleRemoveMember(participant.user_id)}
                           className="text-destructive"
                         >
                           <Trash2 size={16} className="mr-2" />
@@ -590,7 +590,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         isOpen={isAddMembersOpen}
         onClose={() => setIsAddMembersOpen(false)}
         conversationId={conversation.id}
-        existingMemberIds={conversation.participants.map(p => p.user_id)}
+        existingMemberIds={conversation.participants.map(p => p.user_id).filter((id): id is string => id !== null)}
         onMembersAdded={onUpdate}
       />
 

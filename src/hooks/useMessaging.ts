@@ -3,7 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
 import type { 
-  Conversation,
   ConversationWithDetails, 
   ParticipantWithProfile,
   ParticipantProfile,
@@ -15,7 +14,7 @@ export interface UseMessagingReturn {
   conversations: ConversationWithDetails[];
   loading: boolean;
   error: Error | null;
-  fetchConversations: () => Promise<void>;
+  fetchConversations: (isBackground?: boolean) => Promise<void>;
   getOrCreateDM: (otherUserId: string) => Promise<string | null>;
   createGroupChat: (name: string, participantIds: string[], avatarUrl?: string) => Promise<string | null>;
   markAsRead: (conversationId: string) => Promise<void>;
@@ -27,17 +26,19 @@ export function useMessaging(): UseMessagingReturn {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
   const [conversations, setConversations] = useState<ConversationWithDetails[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchConversations = useCallback(async () => {
+  const fetchConversations = useCallback(async (isBackground = false) => {
     if (!user) {
       setConversations([]);
-      setLoading(false);
+      setInitialLoading(false);
       return;
     }
 
-    setLoading(true);
+    if (!isBackground) {
+      setInitialLoading(true);
+    }
     setError(null);
 
     try {
@@ -52,7 +53,7 @@ export function useMessaging(): UseMessagingReturn {
 
       if (!participantData?.length) {
         setConversations([]);
-        setLoading(false);
+        setInitialLoading(false);
         return;
       }
 
@@ -100,7 +101,7 @@ export function useMessaging(): UseMessagingReturn {
 
       if (!conversationsData?.length) {
         setConversations([]);
-        setLoading(false);
+        setInitialLoading(false);
         return;
       }
 
@@ -203,7 +204,7 @@ export function useMessaging(): UseMessagingReturn {
       console.error('[useMessaging] Error fetching conversations:', err);
       setError(err instanceof Error ? err : new Error('Failed to fetch conversations'));
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
     }
   }, [user]);
 
@@ -221,7 +222,7 @@ export function useMessaging(): UseMessagingReturn {
       if (error) throw error;
       
       // Refresh conversations after creating/getting DM
-      await fetchConversations();
+      await fetchConversations(true);
       
       return data as string;
     } catch (err) {
@@ -247,7 +248,7 @@ export function useMessaging(): UseMessagingReturn {
       if (error) throw error;
       
       // Refresh conversations after creating group
-      await fetchConversations();
+      await fetchConversations(true);
       
       return data as string;
     } catch (err) {
@@ -397,13 +398,15 @@ export function useMessaging(): UseMessagingReturn {
         (payload) => {
           const incomingConvId = (payload.new as any)?.conversation_id;
           if (incomingConvId && conversationsRef.current.some(c => c.id === incomingConvId)) {
-            fetchConversations();
+            fetchConversations(true);
           }
         }
       )
       .subscribe();
 
-    // Subscribe to conversation metadata changes
+    // NOTE: No row-level filter available for conversation membership in Supabase realtime.
+    // This fires on any conversation change globally. fetchConversations is fast (~4 queries)
+    // and the conversations table has low write frequency, so this is acceptable.
     const conversationsChannel = supabase
       .channel('conversation-list-conversations')
       .on(
@@ -414,7 +417,7 @@ export function useMessaging(): UseMessagingReturn {
           table: 'conversations',
         },
         () => {
-          fetchConversations();
+          fetchConversations(true);
         }
       )
       .subscribe();
@@ -427,7 +430,7 @@ export function useMessaging(): UseMessagingReturn {
 
   return {
     conversations,
-    loading,
+    loading: initialLoading,
     error,
     fetchConversations,
     getOrCreateDM,
