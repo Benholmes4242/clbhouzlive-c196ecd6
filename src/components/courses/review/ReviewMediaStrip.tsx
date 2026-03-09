@@ -70,14 +70,11 @@ const ReviewMediaThumb: React.FC<{
         />
       )}
 
-      {/* Video play icon overlay — canonical dark glass */}
+      {/* Video play icon overlay — canonical dark glass, matches CourseMoments */}
       {isVideo && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className={cn(
-            "liquid-glass rounded-full flex items-center justify-center",
-            playBtnSize
-          )}>
-            <Play className={cn("text-white fill-white ml-0.5", playIconSize)} />
+          <div className="w-5 h-5 rounded-full liquid-glass flex items-center justify-center">
+            <Play className="w-2.5 h-2.5 text-white fill-white translate-x-[1px]" />
           </div>
         </div>
       )}
