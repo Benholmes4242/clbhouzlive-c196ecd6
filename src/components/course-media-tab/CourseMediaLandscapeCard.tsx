@@ -55,7 +55,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
       data-course-media-index={index}
     >
       {/* Creator header */}
-      <div className="flex items-center gap-2 px-3 py-1.5">
+      <div className="flex items-center gap-2 px-3 py-1.5.5">
         <SquircleAvatar
           src={post.avatarUrl}
           alt={post.displayName || ''}
@@ -105,7 +105,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
       )}
 
       {/* Engagement */}
-      <div className="flex items-center gap-4 px-3 py-2">
+      <div className="flex items-center gap-4 px-3 p1.5-2">
         {post.likeCount > 0 && (
           <div className="flex items-center gap-1 text-muted-foreground">
             <Heart className="w-3.5 h-3.5" />
