@@ -53,7 +53,7 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
   const cleanedCaption = useMemo(() => removeGolfCourseFromContent(post.caption), [post.caption]);
   const extractedCourse = useMemo(() => extractGolfCourseFromContent(post.caption), [post.caption]);
   const courseNameToShow = post.review?.courseName || post.courseName || extractedCourse?.name || null;
-  const courseIdToShow = post.review?.courseId || null;
+  const courseIdToShow = post.review?.courseId || post.courseId || null;
 
   const handleTap = () => {
     if (allPosts) {
