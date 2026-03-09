@@ -16,6 +16,9 @@ interface VideoCardProps {
   userId?: string;
   cardIndex?: number;
   allPosts?: FeedPost[];
+  fetchNextPage?: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
 }
 
 function formatCompact(n: number): string {
