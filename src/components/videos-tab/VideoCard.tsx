@@ -145,12 +145,12 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
         </div>
 
         {/* Caption */}
-        {post.caption && (
+        {cleanedCaption && (
           <div className="px-3 pb-2">
             <p className={`text-sm text-foreground ${expanded ? '' : 'line-clamp-2'}`}>
-              {post.caption}
+              {cleanedCaption}
             </p>
-            {!expanded && post.caption.length > 100 && (
+            {!expanded && cleanedCaption.length > 100 && (
               <button
                 onClick={() => setExpanded(true)}
                 className="text-sm font-semibold text-muted-foreground mt-0.5"
@@ -158,7 +158,7 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
                 more
               </button>
             )}
-            {expanded && post.caption.length > 100 && (
+            {expanded && cleanedCaption.length > 100 && (
               <button
                 onClick={() => setExpanded(false)}
                 className="text-sm font-semibold text-muted-foreground mt-0.5"
@@ -170,20 +170,20 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
         )}
 
         {/* Course tag */}
-        {post.review?.courseName && (
+        {courseNameToShow && (
           <div className="px-3 pb-2">
-            {post.review.courseId ? (
+            {courseIdToShow ? (
               <button
-                onClick={() => navigate(`/course/${post.review!.courseId}`)}
+                onClick={() => navigate(`/course/${courseIdToShow}`)}
                 className="flex items-center gap-1 hover:underline"
               >
                 <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground truncate">{post.review.courseName}</span>
+                <span className="text-xs text-muted-foreground truncate">{courseNameToShow}</span>
               </button>
             ) : (
               <div className="flex items-center gap-1">
                 <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground truncate">{post.review.courseName}</span>
+                <span className="text-xs text-muted-foreground truncate">{courseNameToShow}</span>
               </div>
             )}
           </div>
