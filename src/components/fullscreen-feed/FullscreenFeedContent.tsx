@@ -27,7 +27,7 @@ function FeedWithPreloader({ posts, children }: { posts: FeedPost[]; children: R
   return <>{children}</>;
 }
 
-export function FullscreenFeedContent({ posts, startIndex }: FullscreenFeedContentProps) {
+export function FullscreenFeedContent({ posts, startIndex, fetchNextPage, hasNextPage, isFetchingNextPage }: FullscreenFeedContentProps) {
   // Force transparent status bar regardless of which page launched the overlay
   useMedianStatusBar("dark", "transparent", true, false);
 
