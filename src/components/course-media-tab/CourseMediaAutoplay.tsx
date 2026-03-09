@@ -26,7 +26,7 @@ export const CourseMediaAutoplay: React.FC<CourseMediaAutoplayProps> = ({ posts,
     return type === '2g' || type === 'slow-2g';
   }, []);
 
-  const isEligible = (idx: number) => idx % AUTOPLAY_INTERVAL === 0;
+  
 
   const prewarmTile = useCallback(async (hlsUrl: string) => {
     try {
