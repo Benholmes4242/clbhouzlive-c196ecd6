@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useStore } from 'zustand';
 import { ChevronLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -71,15 +72,21 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
   const handleShare = useCallback(async () => {
     if (!activePost) return;
     const shareUrl = `${window.location.origin}/post/${activePost.id}`;
-    if (navigator.share) {
-      try {
+    try {
+      if (navigator.share) {
         await navigator.share({ title: activePost.caption || 'Check out this post', url: shareUrl });
-      } catch {
-        /* user cancelled */
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success('Link copied');
       }
-    } else {
-      await navigator.clipboard.writeText(shareUrl);
-      toast.success('Link copied');
+    } catch {
+      // User cancelled share or clipboard failed — try clipboard fallback
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success('Link copied');
+      } catch {
+        // silent
+      }
     }
   }, [activePost]);
 
@@ -149,23 +156,28 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
         </button>
       )}
 
-      {/* Comments bottom sheet */}
-      <CommentsPage
-        isOpen={showComments}
-        onClose={() => setShowComments(false)}
-        postId={activePost.id}
-        currentUserId={userId}
-        creatorName={activePost.displayName}
-        creatorAvatar={activePost.avatarUrl}
-        creatorUserId={activePost.userId}
-        caption={activePost.caption}
-        videoThumbnail={thumbnailUrl}
-        theme="dark"
-        courseId={activePost.review?.courseId}
-        courseName={activePost.review?.courseName}
-        isReview={activePost.isReview}
-        reviewRating={activePost.review?.rating}
-      />
+      {/* Comments bottom sheet — portalled above z-[9999] overlay */}
+      {showComments && createPortal(
+        <div className="fixed inset-0 z-[10000]" style={{ pointerEvents: 'auto' }}>
+          <CommentsPage
+            isOpen={showComments}
+            onClose={() => setShowComments(false)}
+            postId={activePost.id}
+            currentUserId={userId}
+            creatorName={activePost.displayName}
+            creatorAvatar={activePost.avatarUrl}
+            creatorUserId={activePost.userId}
+            caption={activePost.caption}
+            videoThumbnail={thumbnailUrl}
+            theme="dark"
+            courseId={activePost.review?.courseId}
+            courseName={activePost.review?.courseName}
+            isReview={activePost.isReview}
+            reviewRating={activePost.review?.rating}
+          />
+        </div>,
+        document.body
+      )}
     </>
   );
 }
