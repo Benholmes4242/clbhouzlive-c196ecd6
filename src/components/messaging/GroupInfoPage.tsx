@@ -70,6 +70,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [showSharedMedia, setShowSharedMedia] = useState(false);
   const [isMutedLocal, setIsMutedLocal] = useState(false);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
   const currentUserParticipant = conversation.participants.find(
     p => p.user_id === currentUserId
