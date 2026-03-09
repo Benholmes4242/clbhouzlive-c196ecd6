@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, MessageCircle, Share2, MapPin } from 'lucide-react';
@@ -10,6 +10,7 @@ import { CommentsPage } from '@/components/clubhouse/cinematic/CommentsPage';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VideoCardAutoplay } from './VideoCardAutoplay';
 import { VideoCardMenu } from './VideoCardMenu';
+import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
 interface VideoCardProps {
   post: FeedPost;
@@ -47,6 +48,12 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
   const [isLiked, setIsLiked] = useState(post.isLikedByMe);
   const [likeCount, setLikeCount] = useState(post.likeCount);
   const [showComments, setShowComments] = useState(false);
+
+  // Clean caption: strip "📍 Played at..." text and extract course if not already tagged
+  const cleanedCaption = useMemo(() => removeGolfCourseFromContent(post.caption), [post.caption]);
+  const extractedCourse = useMemo(() => extractGolfCourseFromContent(post.caption), [post.caption]);
+  const courseNameToShow = post.review?.courseName || post.courseName || extractedCourse?.name || null;
+  const courseIdToShow = post.review?.courseId || null;
 
   const handleTap = () => {
     if (allPosts) {
@@ -138,12 +145,12 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
         </div>
 
         {/* Caption */}
-        {post.caption && (
+        {cleanedCaption && (
           <div className="px-3 pb-2">
             <p className={`text-sm text-foreground ${expanded ? '' : 'line-clamp-2'}`}>
-              {post.caption}
+              {cleanedCaption}
             </p>
-            {!expanded && post.caption.length > 100 && (
+            {!expanded && cleanedCaption.length > 100 && (
               <button
                 onClick={() => setExpanded(true)}
                 className="text-sm font-semibold text-muted-foreground mt-0.5"
@@ -151,7 +158,7 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
                 more
               </button>
             )}
-            {expanded && post.caption.length > 100 && (
+            {expanded && cleanedCaption.length > 100 && (
               <button
                 onClick={() => setExpanded(false)}
                 className="text-sm font-semibold text-muted-foreground mt-0.5"
@@ -163,20 +170,20 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
         )}
 
         {/* Course tag */}
-        {post.review?.courseName && (
+        {courseNameToShow && (
           <div className="px-3 pb-2">
-            {post.review.courseId ? (
+            {courseIdToShow ? (
               <button
-                onClick={() => navigate(`/course/${post.review!.courseId}`)}
+                onClick={() => navigate(`/course/${courseIdToShow}`)}
                 className="flex items-center gap-1 hover:underline"
               >
                 <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground truncate">{post.review.courseName}</span>
+                <span className="text-xs text-muted-foreground truncate">{courseNameToShow}</span>
               </button>
             ) : (
               <div className="flex items-center gap-1">
                 <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground truncate">{post.review.courseName}</span>
+                <span className="text-xs text-muted-foreground truncate">{courseNameToShow}</span>
               </div>
             )}
           </div>
