@@ -43,11 +43,12 @@ export function FriendsHeader({
             <button
               key={id}
               onClick={() => onModeChange(id)}
-              className={`min-h-[36px] px-4 rounded-full text-sm font-semibold transition-colors shrink-0 ${
+              className={`min-h-[36px] px-4 rounded-full text-sm font-semibold transition-all duration-200 active:scale-[0.97] shrink-0 ${
                 isActive
-                  ? 'bg-foreground text-background shadow-sm'
+                  ? 'text-white'
                   : 'bg-muted text-muted-foreground'
               }`}
+              style={isActive ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
             >
               {label}
             </button>
