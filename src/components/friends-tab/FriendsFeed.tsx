@@ -63,6 +63,10 @@ export function FriendsFeed({
   const [centerIndex, setCenterIndex] = useState(0);
   const cardRefs = useRef<Map<number, HTMLDivElement>>(new Map());
   const prewarmedSetRef = useRef<Set<number>>(new Set());
+
+  useEffect(() => {
+    prewarmedSetRef.current = new Set();
+  }, [posts]);
   const centerObserverRef = useRef<IntersectionObserver | null>(null);
 
   const { ref: sentinelRef, inView } = useInView({
