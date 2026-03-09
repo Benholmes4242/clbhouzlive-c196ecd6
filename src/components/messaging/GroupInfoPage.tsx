@@ -41,14 +41,14 @@ interface GroupInfoPageProps {
 
 /* ── shared card style ── */
 const warmCard: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.7)',
-  border: '1px solid rgba(0,0,0,0.07)',
+  background: 'hsl(var(--background) / 0.7)',
+  border: '1px solid hsl(var(--border))',
   borderRadius: 14,
 };
 const insetDivider: React.CSSProperties = {
   height: 1,
   marginLeft: 56,
-  backgroundColor: 'rgba(0,0,0,0.05)',
+  backgroundColor: 'hsl(var(--muted))',
 };
 
 export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
@@ -262,7 +262,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
     <div
       className="fixed inset-0 z-50 flex flex-col overflow-hidden"
       style={{
-        backgroundColor: '#F8FAFC',
+        backgroundColor: 'hsl(var(--background))',
       }}
     >
       {/* ── Header ── */}
@@ -271,10 +271,10 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         style={{
           height: 'calc(56px + env(safe-area-inset-top, 0px))',
           paddingTop: 'env(safe-area-inset-top, 0px)',
-          background: 'rgba(248,250,252,0.9)',
+          background: 'hsl(var(--background) / 0.9)',
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
-          borderBottom: '1px solid rgba(0,0,0,0.06)',
+          borderBottom: '1px solid hsl(var(--border))',
         }}
       >
         <button
@@ -284,7 +284,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           <ChevronLeft size={22} className="text-foreground/60" />
         </button>
         <div className="flex-1 text-center">
-          <span className="text-[16px] font-semibold" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
+          <span className="text-[16px] font-semibold" style={{ color: 'hsl(var(--foreground))', fontFamily: "'DM Sans', sans-serif" }}>
             Group Info
           </span>
         </div>
@@ -299,7 +299,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           <div className="relative">
             <div
               className="rounded-full p-[3px]"
-              style={{ background: 'rgba(255,255,255,0.7)' }}
+              style={{ background: 'hsl(var(--background) / 0.7)' }}
             >
               <SquircleAvatar
                 size={112}
@@ -315,9 +315,9 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
                   className="absolute bottom-1 right-1 w-8 h-8 rounded-full flex items-center justify-center shadow-md active:scale-[0.95] transition-transform disabled:opacity-50"
-                  style={{ background: '#F59E0B' }}
+                  style={{ background: 'hsl(var(--primary))' }}
                 >
-                  <Camera size={16} className="text-white" />
+                  <Camera size={16} className="text-primary-foreground" />
                 </button>
                 <input
                   ref={fileInputRef}
@@ -345,7 +345,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
               </div>
             ) : (
               <>
-                <h2 className="text-xl font-semibold" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
+                <h2 className="text-xl font-semibold" style={{ color: 'hsl(var(--foreground))', fontFamily: "'DM Sans', sans-serif" }}>
                   {conversation.name}
                 </h2>
                 {isAdmin && (
@@ -360,7 +360,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
             )}
           </div>
 
-          <p className="text-[13px] font-medium mt-1" style={{ color: '#78716C' }}>
+          <p className="text-[13px] font-medium mt-1" style={{ color: 'hsl(var(--muted-foreground))' }}>
             {conversation.participants.length} members
           </p>
 
@@ -387,7 +387,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                   "w-full text-center text-[13px] font-normal rounded-lg p-2",
                   isAdmin && "active:scale-[0.99] transition-transform"
                 )}
-                style={{ color: description ? '#78716C' : '#A8A29E' }}
+                style={{ color: description ? 'hsl(var(--muted-foreground))' : 'hsl(var(--muted-foreground) / 0.6)' }}
               >
                 {description || (isAdmin ? 'Add group description' : 'No description')}
               </button>
@@ -402,10 +402,10 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
             className="w-full flex items-center justify-between px-4 py-[14px] active:opacity-80 transition-opacity"
           >
             <div className="flex items-center gap-3">
-              <Image size={20} style={{ color: '#78716C' }} />
-              <span className="text-[14px] font-medium" style={{ color: '#44403C' }}>Shared Media</span>
+              <Image size={20} style={{ color: 'hsl(var(--muted-foreground))' }} />
+              <span className="text-[14px] font-medium" style={{ color: 'hsl(var(--foreground))' }}>Shared Media</span>
             </div>
-            <ChevronRight size={16} style={{ color: '#A8A29E' }} />
+            <ChevronRight size={16} style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }} />
           </button>
 
           <div style={insetDivider} />
@@ -413,22 +413,22 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           <div className="flex items-center justify-between px-4 py-[14px]">
             <div className="flex items-center gap-3">
               {isMuted ? (
-                <BellOff size={20} style={{ color: '#78716C' }} />
+                <BellOff size={20} style={{ color: 'hsl(var(--muted-foreground))' }} />
               ) : (
-                <Bell size={20} style={{ color: '#78716C' }} />
+                <Bell size={20} style={{ color: 'hsl(var(--muted-foreground))' }} />
               )}
-              <span className="text-[14px] font-medium" style={{ color: '#44403C' }}>Notifications</span>
+              <span className="text-[14px] font-medium" style={{ color: 'hsl(var(--foreground))' }}>Notifications</span>
             </div>
             {/* Warm toggle */}
             <button
               onClick={handleToggleMute}
               className="relative w-[50px] h-[28px] rounded-full transition-colors duration-200"
               style={{
-                background: isMuted ? 'rgba(0,0,0,0.12)' : 'hsl(var(--primary))',
+                background: isMuted ? 'hsl(var(--muted))' : 'hsl(var(--primary))',
               }}
             >
               <div
-                className="absolute top-[2px] w-6 h-6 bg-white rounded-full shadow-sm transition-transform duration-200"
+                className="absolute top-[2px] w-6 h-6 bg-background rounded-full shadow-sm transition-transform duration-200"
                 style={{
                   transform: isMuted ? 'translateX(2px)' : 'translateX(22px)',
                 }}
@@ -442,7 +442,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           <div className="flex items-center justify-between mb-2 px-1">
             <span
               className="text-[9px] font-medium uppercase"
-              style={{ color: '#A8A29E', letterSpacing: '0.05em' }}
+              style={{ color: 'hsl(var(--muted-foreground) / 0.6)', letterSpacing: '0.05em' }}
             >
               {conversation.participants.length} Members
             </span>
@@ -472,11 +472,11 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-[14px] font-semibold truncate" style={{ color: '#1C1917' }}>
+                        <span className="text-[14px] font-semibold truncate" style={{ color: 'hsl(var(--foreground))' }}>
                           {participant.profile?.display_name || participant.profile?.username}
                         </span>
                         {participant.user_id === currentUserId && (
-                          <span className="text-[11px] font-medium flex-shrink-0" style={{ color: '#78716C' }}>
+                          <span className="text-[11px] font-medium flex-shrink-0" style={{ color: 'hsl(var(--muted-foreground))' }}>
                             You
                           </span>
                         )}
@@ -486,8 +486,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                           <span
                             className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-[1px] rounded-lg"
                             style={{
-                             color: '#D97706',
-                               background: 'rgba(217,119,6,0.08)',
+                             color: 'hsl(var(--primary))',
+                               background: 'hsl(var(--primary) / 0.08)',
                              }}
                           >
                             {participant.user_id === conversation.created_by ? (
@@ -507,7 +507,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button className="p-2 rounded-full active:opacity-70 transition-opacity">
-                          <MoreVertical size={18} style={{ color: '#A8A29E' }} />
+                          <MoreVertical size={18} style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }} />
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
@@ -544,41 +544,41 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
             onClick={handleArchive}
             className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"
           >
-            <Archive size={20} style={{ color: '#44403C' }} />
-            <span className="text-[14px] font-medium" style={{ color: '#44403C' }}>Archive Chat</span>
+            <Archive size={20} style={{ color: 'hsl(var(--foreground))' }} />
+            <span className="text-[14px] font-medium" style={{ color: 'hsl(var(--foreground))' }}>Archive Chat</span>
           </button>
 
           {!isCreator && (
             <>
-               <div style={{ height: 1, backgroundColor: 'rgba(217,119,6,0.06)' }} />
+               <div style={{ height: 1, backgroundColor: 'hsl(var(--primary) / 0.06)' }} />
               <button
                 onClick={handleLeaveGroup}
                 className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"
               >
-                <LogOut size={20} style={{ color: '#44403C' }} />
-                <span className="text-[14px] font-medium" style={{ color: '#44403C' }}>Exit Group</span>
+                <LogOut size={20} style={{ color: 'hsl(var(--foreground))' }} />
+                <span className="text-[14px] font-medium" style={{ color: 'hsl(var(--foreground))' }}>Exit Group</span>
               </button>
             </>
           )}
 
-           <div style={{ height: 1, backgroundColor: 'rgba(217,119,6,0.06)' }} />
+           <div style={{ height: 1, backgroundColor: 'hsl(var(--primary) / 0.06)' }} />
           <button
             onClick={() => setIsReportOpen(true)}
             className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"
           >
-            <Flag size={20} style={{ color: '#44403C' }} />
-            <span className="text-[14px] font-medium" style={{ color: '#44403C' }}>Report Group</span>
+            <Flag size={20} style={{ color: 'hsl(var(--foreground))' }} />
+            <span className="text-[14px] font-medium" style={{ color: 'hsl(var(--foreground))' }}>Report Group</span>
           </button>
 
           {isAdmin && (
             <>
-              <div style={{ height: 1, backgroundColor: 'rgba(217,119,6,0.06)' }} />
+              <div style={{ height: 1, backgroundColor: 'hsl(var(--primary) / 0.06)' }} />
               <button
                 onClick={handleDeleteGroup}
                 className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"
               >
-                <Trash2 size={20} style={{ color: '#DC2626' }} />
-                <span className="text-[14px] font-medium" style={{ color: '#DC2626' }}>Delete Group for Everyone</span>
+                <Trash2 size={20} style={{ color: 'hsl(var(--destructive))' }} />
+                <span className="text-[14px] font-medium" style={{ color: 'hsl(var(--destructive))' }}>Delete Group for Everyone</span>
               </button>
             </>
           )}
