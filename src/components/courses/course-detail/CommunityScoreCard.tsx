@@ -164,7 +164,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
           <div className="flex flex-col items-center">
             <div className="relative w-24 h-24">
               <svg className="w-24 h-24 -rotate-90">
-                <circle cx="48" cy="48" r="42" fill="none" stroke="hsl(var(--border))" strokeWidth="8" />
+                <circle cx="48" cy="48" r="42" fill="none" stroke="transparent" strokeWidth="8" />
                 <circle 
                   cx="48" cy="48" r="42" fill="none" 
                   stroke="url(#communityScoreGradient)" 
