@@ -213,9 +213,6 @@ const ActivityPage: React.FC = () => {
 
           {/* Header */}
           <div className="px-4 pt-4 pb-2 text-center">
-            <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground">
-              {activeActor?.type === 'business' ? activeActor.name : 'Clbhouz'}
-            </p>
             <h1
               onClick={handleRefresh}
               className={cn(
@@ -232,7 +229,7 @@ const ActivityPage: React.FC = () => {
           </div>
 
           {/* Tabs — Tier 1 dark fill pills */}
-          <div className="flex gap-2 px-4 pb-1">
+          <div className="flex justify-center gap-2 px-4 pb-1">
             {ACTIVITY_TABS.map((tab) => (
               <button
                 key={tab.id}

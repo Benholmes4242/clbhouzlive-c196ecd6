@@ -173,6 +173,7 @@ export const AvatarWithBadge: React.FC<AvatarWithBadgeProps> = ({ notification, 
         alt={displayName || 'User'}
         size={48}
         fallback={displayName?.charAt(0) || '?'}
+        hideRing
       />
       <span className="absolute -bottom-0.5 -right-0.5 h-5 w-5 rounded-full bg-background ring-2 ring-background shadow-sm flex items-center justify-center">
         {badgeIcon}
