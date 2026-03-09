@@ -155,13 +155,14 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
         </button>
       )}
 
-      {/* Comments bottom sheet — vaul z-index overridden to render above z-[9999] overlay */}
+      {/* Comments bottom sheet — CommentsPage portals to body at z-[100]/z-[101],
+           which is behind our z-[9999] overlay. Boost those layers above it. */}
       {showComments && (
         <>
           <style>{`
-            [vaul-drawer-wrapper] { z-index: auto !important; }
-            [vaul-overlay] { z-index: 10001 !important; }
-            [vaul-drawer] { z-index: 10002 !important; }
+            .fixed.inset-0.z-\\[100\\] { z-index: 10001 !important; }
+            .fixed.inset-x-0.bottom-0.z-\\[101\\] { z-index: 10002 !important; }
+            .z-\\[220\\] { z-index: 10003 !important; }
           `}</style>
           <CommentsPage
             isOpen={showComments}
