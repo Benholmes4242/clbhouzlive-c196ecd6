@@ -103,7 +103,7 @@ export const CommentsEmptyState: React.FC<CommentsEmptyStateProps> = ({ isDark, 
             className={cn(
               "w-[52px] h-[52px] rounded-full flex items-center justify-center text-xl transition-colors",
               isDark
-                ? "bg-white/5 hover:bg-white/10 border border-white/8"
+                ? "bg-white/5 hover:bg-white/10 border border-white/[0.04]"
                 : "bg-muted/50 hover:bg-muted border border-border/30"
             )}
           >
