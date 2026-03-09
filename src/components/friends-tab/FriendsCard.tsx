@@ -8,13 +8,11 @@ import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/uti
 import { toast } from 'sonner';
 import { CommentsPage } from '@/components/clubhouse/cinematic/CommentsPage';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { FriendsCardAutoplay } from './FriendsCardAutoplay';
 import { FriendsCardMenu } from './FriendsCardMenu';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 
 interface FriendsCardProps {
   post: FeedPost;
-  isAutoplayEligible?: boolean;
   userId?: string;
   cardIndex?: number;
   allPosts?: FeedPost[];
@@ -44,12 +42,11 @@ function getMediaAspectClass(post: FeedPost): string {
   return 'aspect-video';
 }
 
-export const FriendsCard = React.memo(function FriendsCard({ post, isAutoplayEligible = false, userId, cardIndex = 0, allPosts }: FriendsCardProps) {
+export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardIndex = 0, allPosts }: FriendsCardProps) {
   const navigate = useNavigate();
   const firstMedia = post.mediaItems[0];
   const isVideo = firstMedia?.type === 'video';
   const thumbnailUrl = firstMedia?.thumbnailUrl || firstMedia?.imageUrl || '';
-  const hlsUrl = firstMedia?.hlsUrl || '';
   const duration = firstMedia?.duration || 0;
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
   const aspectClass = getMediaAspectClass(post);
@@ -192,6 +189,7 @@ export const FriendsCard = React.memo(function FriendsCard({ post, isAutoplayEli
 
         {/* Media area — dynamic aspect ratio */}
         <div
+          data-media-wrapper
           className={`relative w-full ${aspectClass} bg-muted cursor-pointer`}
           onClick={() => {
             if (allPosts && cardIndex != null) {
@@ -209,14 +207,6 @@ export const FriendsCard = React.memo(function FriendsCard({ post, isAutoplayEli
               alt=""
               className="absolute inset-0 w-full h-full object-cover"
               loading="lazy"
-            />
-          )}
-          {isVideo && hlsUrl && isAutoplayEligible && (
-            <FriendsCardAutoplay
-              hlsUrl={hlsUrl}
-              posterUrl={thumbnailUrl}
-              isEligible={isAutoplayEligible}
-              cardIndex={cardIndex}
             />
           )}
           {/* Duration badge for videos */}
