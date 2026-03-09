@@ -150,7 +150,7 @@ export function ReportSheet({
 
           <button
             onClick={() => onOpenChange(false)}
-            className="w-full py-3 text-center text-[#8E8E93] font-medium"
+            className="w-full py-3 text-center text-muted-foreground font-medium"
           >
             Cancel
           </button>
