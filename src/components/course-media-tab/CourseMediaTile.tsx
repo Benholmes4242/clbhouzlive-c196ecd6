@@ -66,7 +66,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
 
       {/* Video indicator — play icon + optional duration, bottom-right */}
       {isVideo && (
-        <div className="absolute bottom-1.5 right-1.5 z-10 flex items-center gap-1">
+        <div className="absolute bottom-2 right-1.5 z-10 flex items-center gap-1">
           <div className="w-5 h-5 rounded-full liquid-glass flex items-center justify-center">
             <Play className="w-2.5 h-2.5 text-white fill-white translate-x-[0.5px]" />
           </div>
