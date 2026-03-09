@@ -26,7 +26,7 @@ export const PostsFeedSkeleton: React.FC = () => {
           <div className="h-4 bg-muted-foreground/10 rounded w-2/3" />
           <div className="h-3 bg-muted-foreground/10 rounded w-1/3" />
         </div>
-        <div className="aspect-[4/3] bg-muted-foreground/10 mx-3 rounded-lg" />
+        <div className="aspect-[4/3] bg-muted-foreground/10" />
         <div className="px-3 py-2">
           <div className="h-3 bg-muted-foreground/10 rounded w-full" />
         </div>
