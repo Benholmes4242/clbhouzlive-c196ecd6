@@ -1,7 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 
-const AUTOPLAY_INTERVAL = 6; // every 6th tile eligible
 const ATTACH_THRESHOLD = 0.6;
 const DETACH_THRESHOLD = 0.2;
 
@@ -27,7 +26,7 @@ export const CourseMediaAutoplay: React.FC<CourseMediaAutoplayProps> = ({ posts,
     return type === '2g' || type === 'slow-2g';
   }, []);
 
-  const isEligible = (idx: number) => idx % AUTOPLAY_INTERVAL === 0;
+  
 
   const prewarmTile = useCallback(async (hlsUrl: string) => {
     try {
@@ -179,15 +178,13 @@ export const CourseMediaAutoplay: React.FC<CourseMediaAutoplayProps> = ({ posts,
         for (const entry of entries) {
           const el = entry.target as HTMLElement;
           const idx = Number(el.dataset.courseMediaIndex);
-          if (isNaN(idx) || !isEligible(idx)) continue;
+          const tileHlsUrl = postsRef.current[idx]?.mediaItems?.[0]?.hlsUrl;
+          if (isNaN(idx) || !tileHlsUrl) continue;
 
-          const post = postsRef.current[idx];
-          const hlsUrl = post?.mediaItems?.[0]?.hlsUrl;
-          if (!hlsUrl) continue;
 
           if (entry.intersectionRatio >= ATTACH_THRESHOLD) {
             if (activeIndexRef.current !== idx) {
-              attachToTile(idx, hlsUrl, el);
+              attachToTile(idx, tileHlsUrl, el);
             }
           } else if (entry.intersectionRatio < DETACH_THRESHOLD) {
             if (activeIndexRef.current === idx) {
