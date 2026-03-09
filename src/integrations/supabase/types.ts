@@ -15126,7 +15126,11 @@ export type Database = {
         }[]
       }
       get_top_video_reviews: {
-        Args: { days_back?: number; result_limit?: number }
+        Args: {
+          days_back?: number
+          p_region_slug?: string
+          result_limit?: number
+        }
         Returns: {
           aspect_ratio: number
           avatar_url: string
