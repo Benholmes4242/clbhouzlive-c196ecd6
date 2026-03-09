@@ -36,7 +36,7 @@ function FeaturedRegionHeroInner({ onRegionSelect, activeRegion }: FeaturedRegio
       const dayIndex = new Date().getDay() % regions.length;
       const picked = regions[dayIndex];
 
-      if (!picked.hero_image_url) return null;
+      // Allow regions without hero_image_url — gradient fallback in render
 
       // Fetch course count for this region
       const { count: courseCount } = await supabase
