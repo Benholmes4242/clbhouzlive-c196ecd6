@@ -25,11 +25,14 @@
    if (!isOffline) return null;
  
    return (
-     <div className={cn(
-       "fixed top-0 left-0 right-0 z-50 py-2 px-4",
-       "bg-amber-500 text-white text-center text-sm font-medium",
-       "flex items-center justify-center gap-2"
-     )}>
+     <div 
+       className={cn(
+         "fixed left-0 right-0 z-50 py-2 px-4",
+         "bg-primary text-primary-foreground text-center text-sm font-medium",
+         "flex items-center justify-center gap-2"
+       )}
+       style={{ top: 'var(--sat, 0px)' }}
+     >
        <WifiOff className="w-4 h-4" />
        <span>Waiting for connection...</span>
      </div>

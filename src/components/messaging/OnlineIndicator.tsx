@@ -24,8 +24,8 @@ export function OnlineIndicator({
   };
 
   const statusColors = {
-    online: 'bg-green-500',
-    away: 'bg-yellow-500',
+    online: 'bg-primary',
+    away: 'bg-amber-500',
     offline: 'bg-muted-foreground/50',
   };
 
