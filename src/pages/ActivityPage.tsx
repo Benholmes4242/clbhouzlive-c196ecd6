@@ -35,7 +35,7 @@ const ActivityPage: React.FC = () => {
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { activeActor } = useActiveActor();
+  
   
   const hasMarkedSeen = useRef(false);
   const [sessionNewIds, setSessionNewIds] = useState<string[] | null>(null);
