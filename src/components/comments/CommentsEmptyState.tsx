@@ -43,9 +43,9 @@ export const CommentsEmptyState: React.FC<CommentsEmptyStateProps> = ({ isDark, 
           transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           className={cn(
             "relative w-16 h-16 rounded-full flex items-center justify-center",
-            isDark
-              ? "bg-gradient-to-br from-white/8 to-white/4 border border-white/8"
-              : "bg-muted/50 border border-border/30"
+              isDark
+                ? "bg-gradient-to-br from-white/8 to-white/4 border border-white/[0.04]"
+                : "bg-muted/50 border border-border/30"
           )}
         >
           <MessageCircle className={cn(
@@ -103,7 +103,7 @@ export const CommentsEmptyState: React.FC<CommentsEmptyStateProps> = ({ isDark, 
             className={cn(
               "w-[52px] h-[52px] rounded-full flex items-center justify-center text-xl transition-colors",
               isDark
-                ? "bg-white/5 hover:bg-white/10 border border-white/8"
+                ? "bg-white/5 hover:bg-white/10 border border-white/[0.04]"
                 : "bg-muted/50 hover:bg-muted border border-border/30"
             )}
           >

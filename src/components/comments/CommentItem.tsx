@@ -104,7 +104,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({
     return (
       <>
         {showDivider && (
-          <div className={cn("h-px ml-[58px] mr-[56px]", isDark ? "bg-white/8" : "bg-border/20")} />
+          <div className={cn("h-px ml-[58px] mr-[56px]", isDark ? "bg-white/[0.04]" : "bg-border/20")} />
         )}
         <div ref={commentRef} className={cn("flex items-center gap-3 py-3", isReply && "pl-[26px]")}>
           <div className={cn("w-8 h-8 rounded-full flex items-center justify-center", isDark ? "bg-white/8" : "bg-muted/60")}>

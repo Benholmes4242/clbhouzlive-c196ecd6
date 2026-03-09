@@ -24,7 +24,7 @@ export const CommentsHeader: React.FC<CommentsHeaderProps> = ({
     <div
       className={cn(
         "relative z-10 flex-shrink-0 border-b",
-        isDark ? "border-white/8" : "border-border/50"
+        isDark ? "border-white/[0.04]" : "border-border/50"
       )}
       style={isDark ? {
         background: 'rgba(13, 13, 13, 0.95)',
