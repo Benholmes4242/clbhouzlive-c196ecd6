@@ -48,9 +48,12 @@ export function SettingsSkeleton({
   );
 }
 
-function SkeletonRow({ isLast }: { isLast: boolean }) {
-  const titleWidth = 42 + Math.random() * 16;
-  const subtitleWidth = 55 + Math.random() * 17;
+function SkeletonRow({ isLast, index }: { isLast: boolean; index?: number }) {
+  const widths = [42, 58, 50, 46, 54, 48];
+  const subWidths = [55, 62, 58, 72, 65, 60];
+  const i = (index ?? 0) % widths.length;
+  const titleWidth = widths[i];
+  const subtitleWidth = subWidths[i];
 
   return (
     <div className="relative min-h-[60px] px-4 py-3 flex items-center gap-3">
