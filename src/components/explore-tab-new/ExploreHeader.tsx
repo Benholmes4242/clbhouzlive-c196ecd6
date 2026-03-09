@@ -53,11 +53,12 @@ function ExploreHeaderInner({
               key={region.slug ?? '__all'}
               type="button"
               onClick={() => onRegionChange(region.slug)}
-              className={`shrink-0 min-h-[36px] px-4 rounded-full text-sm font-medium transition-colors ${
+              className={`shrink-0 min-h-[36px] px-4 rounded-full text-sm font-semibold transition-colors ${
                 isActive
-                  ? 'bg-foreground text-background'
+                  ? 'text-white'
                   : 'bg-muted text-muted-foreground'
               }`}
+              style={isActive ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
             >
               {region.title}
             </button>
