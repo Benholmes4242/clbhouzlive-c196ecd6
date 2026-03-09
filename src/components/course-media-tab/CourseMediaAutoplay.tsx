@@ -184,7 +184,7 @@ export const CourseMediaAutoplay: React.FC<CourseMediaAutoplayProps> = ({ posts,
 
           if (entry.intersectionRatio >= ATTACH_THRESHOLD) {
             if (activeIndexRef.current !== idx) {
-              attachToTile(idx, hlsUrl, el);
+              attachToTile(idx, tileHlsUrl, el);
             }
           } else if (entry.intersectionRatio < DETACH_THRESHOLD) {
             if (activeIndexRef.current === idx) {
