@@ -76,8 +76,9 @@ function TrendingCoursesStripInner({ activeRegion }: TrendingCoursesStripProps) 
                 {course.sub_country || course.country}
               </p>
               {course.review_count > 0 && (
-                <span className="text-[10px] font-semibold text-amber-600 mt-0.5">
-                  ⭐ {course.review_count} {course.review_count === 1 ? 'review' : 'reviews'}
+                <span className="flex items-center gap-0.5 text-[10px] font-semibold text-amber-600 mt-0.5">
+                  <MdOutlineStarOutline className="w-3 h-3" />
+                  {course.review_count} {course.review_count === 1 ? 'review' : 'reviews'}
                 </span>
               )}
             </div>
