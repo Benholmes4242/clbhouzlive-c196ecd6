@@ -10,6 +10,7 @@ interface PostsTabContentProps {
   actorId: string;
   actorName?: string;
   isOwnProfile?: boolean;
+  hideReviewsCount?: boolean;
 }
 
 const PostsTabContent: React.FC<PostsTabContentProps> = ({

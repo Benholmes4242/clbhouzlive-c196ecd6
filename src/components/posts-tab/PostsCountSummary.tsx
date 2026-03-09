@@ -16,7 +16,7 @@ export const PostsCountSummary: React.FC<PostsCountSummaryProps> = ({ counts, is
   if (counts.reviews > 0) parts.push(`${counts.reviews} review${counts.reviews !== 1 ? 's' : ''}`);
 
   return (
-    <div className="text-xs text-muted-foreground px-4 py-2">
+    <div className="text-xs text-muted-foreground px-4 py-2 text-center">
       {parts.join(' · ')}
     </div>
   );
