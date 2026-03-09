@@ -198,7 +198,7 @@ export function VideosSearchOverlay({ isOpen, onClose, userId }: VideosSearchOve
                 ) : (
                   <div className="flex flex-col gap-4 px-4 pb-4">
                     {posts.map(post => (
-                      <VideoCard key={post.id} post={post} isAutoplayEligible={false} />
+                      <VideoCard key={post.id} post={post} />
                     ))}
                   </div>
                 )}
