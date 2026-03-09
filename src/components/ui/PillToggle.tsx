@@ -15,12 +15,8 @@ interface PillToggleProps {
 }
 
 /**
- * PillToggle - Tier 2 sub-filter with orange underline
- * 
- * Features:
- * - Orange underline on active tab
- * - No track/container background
- * - Smooth transitions + tap feedback
+ * PillToggle - Tier 2 sub-tab pill
+ * Active: #475569 filled pill, no track, no underline
  */
 export const PillToggle: React.FC<PillToggleProps> = ({ 
   options, 
@@ -32,23 +28,26 @@ export const PillToggle: React.FC<PillToggleProps> = ({
   const textClass = size === 'small' ? 'text-xs' : 'text-sm';
   
   return (
-    <div className={cn('flex items-center gap-1', className)}>
-      {options.map((option) => (
-        <button
-          key={option.id}
-          onClick={() => onSelect(option.id)}
-          className={cn(
-            textClass,
-            'relative px-3 py-2 min-h-[44px] whitespace-nowrap transition-all duration-200 active:scale-[0.97]',
-            'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:rounded-full after:transition-all after:duration-200',
-            selected === option.id 
-              ? 'text-foreground font-semibold after:bg-[hsl(var(--tab-orange))]' 
-              : 'text-muted-foreground font-medium hover:text-foreground after:bg-transparent'
-          )}
-        >
-          {option.label}
-        </button>
-      ))}
+    <div className={cn('flex items-center gap-2', className)}>
+      {options.map((option) => {
+        const isActive = selected === option.id;
+        return (
+          <button
+            key={option.id}
+            onClick={() => onSelect(option.id)}
+            className={cn(
+              textClass,
+              'px-4 min-h-[36px] rounded-full whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold',
+              isActive
+                ? 'text-white'
+                : 'text-muted-foreground bg-muted'
+            )}
+            style={isActive ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
+          >
+            {option.label}
+          </button>
+        );
+      })}
     </div>
   );
 };

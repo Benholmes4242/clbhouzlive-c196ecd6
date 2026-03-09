@@ -36,7 +36,7 @@ export function VideosHeader({
         <span>Search videos…</span>
       </button>
 
-      {/* Filter chips */}
+      {/* Filter chips — Tier 2 sub-tab pills */}
       <div className="flex items-center justify-center gap-2 mt-3 overflow-x-auto scrollbar-hide">
         {FILTERS.map(({ id, label }) => {
           const isActive = activeFilter === id;
@@ -46,9 +46,10 @@ export function VideosHeader({
               onClick={() => onFilterChange(id)}
               className={`min-h-[36px] px-4 rounded-full text-sm font-semibold transition-colors shrink-0 ${
                 isActive
-                  ? 'bg-foreground text-background shadow-sm'
+                  ? 'text-white'
                   : 'bg-muted text-muted-foreground'
               }`}
+              style={isActive ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
             >
               {label}
             </button>
