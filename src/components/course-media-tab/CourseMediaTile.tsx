@@ -64,24 +64,38 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
         }}
       />
 
-      {/* Video indicator — play icon + optional duration, bottom-right */}
-      {isVideo && (
-        <div className="absolute bottom-[5px] right-1.5 z-10 flex items-end gap-1">
-          <div className="w-5 h-5 rounded-full liquid-glass flex items-center justify-center">
-            <Play className="w-2.5 h-2.5 text-white fill-white translate-x-[1px]" />
-          </div>
-          {duration != null && duration > 0 && (
-            <div
-              className="rounded-[4px] liquid-glass flex items-center"
-              style={{ padding: '2px 5px' }}
-            >
-              <span className="text-[11px] font-semibold text-white tracking-[0.02em]">
-                {formatDuration(duration)}
-              </span>
+      {/* Bottom bar — avatar left, play icon right, vertically centered */}
+      <div className="absolute bottom-1.5 left-1.5 right-1.5 z-10 flex items-center justify-between">
+        {/* Avatar */}
+        {avatarUrl ? (
+          <SquircleAvatar
+            src={avatarUrl}
+            alt=""
+            size={20}
+            fallback=""
+            hideRing
+          />
+        ) : <div />}
+
+        {/* Video indicator — play icon + optional duration */}
+        {isVideo ? (
+          <div className="flex items-center gap-1">
+            <div className="w-5 h-5 rounded-full liquid-glass flex items-center justify-center">
+              <Play className="w-2.5 h-2.5 text-white fill-white translate-x-[1px]" />
             </div>
-          )}
-        </div>
-      )}
+            {duration != null && duration > 0 && (
+              <div
+                className="rounded-[4px] liquid-glass flex items-center"
+                style={{ padding: '2px 5px' }}
+              >
+                <span className="text-[11px] font-semibold text-white tracking-[0.02em]">
+                  {formatDuration(duration)}
+                </span>
+              </div>
+            )}
+          </div>
+        ) : null}
+      </div>
 
       {/* Review rating — top-right */}
       {reviewRating != null && reviewRating > 0 && (
@@ -97,19 +111,6 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
           <span className="text-[11px] font-semibold text-white">
             {reviewRating.toFixed(1)}
           </span>
-        </div>
-      )}
-
-      {/* Creator avatar — bottom-left */}
-      {avatarUrl && (
-        <div className="absolute bottom-1.5 left-1.5 right-1.5 z-10 flex items-center justify-between">
-          <SquircleAvatar
-            src={avatarUrl}
-            alt=""
-            size={20}
-            fallback=""
-            hideRing
-          />
         </div>
       )}
     </div>
