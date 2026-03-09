@@ -4,7 +4,6 @@ import { FiMapPin } from 'react-icons/fi';
 import { cn } from '@/lib/utils';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { NotificationCard, getNotificationButtonClass } from '@/components/ui/NotificationCard';
 

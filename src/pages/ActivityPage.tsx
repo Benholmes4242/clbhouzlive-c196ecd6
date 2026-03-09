@@ -12,7 +12,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
-import { useActiveActor } from '@/context/ActiveActorContext';
 import { ActivityPageSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
 import { AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
