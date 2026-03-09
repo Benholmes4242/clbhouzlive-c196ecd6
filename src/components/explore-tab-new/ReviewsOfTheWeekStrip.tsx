@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { GolferAvatar } from '@/components/golfers/GolferAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -93,11 +93,11 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
 
             {/* Course name + location */}
             <div className="absolute bottom-2 left-2 right-2">
-              <span className="text-[11px] font-semibold text-white line-clamp-1 block">
+              <span className="text-[11px] font-semibold text-white line-clamp-1 block truncate">
                 {review.course_name}
               </span>
               {review.course_location && (
-                <span className="text-[9px] text-white/60 line-clamp-1 block">
+                <span className="text-[9px] text-white/60 line-clamp-1 block truncate">
                   {review.course_location}
                 </span>
               )}
@@ -106,10 +106,11 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
             {/* Creator avatar */}
             {review.avatar_url && (
               <div className="absolute top-2 left-2">
-                <GolferAvatar
-                  name={review.username}
-                  photoUrl={review.avatar_url}
+                <SquircleAvatar
+                  src={review.avatar_url}
+                  alt={review.username}
                   size={24}
+                  hideRing
                 />
               </div>
             )}
