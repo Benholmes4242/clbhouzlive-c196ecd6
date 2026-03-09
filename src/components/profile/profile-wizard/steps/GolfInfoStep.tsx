@@ -8,6 +8,8 @@ import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 
 interface Props {
   form: ProfileFormData;
+  userId?: string;
+  hasRegisteredInterest?: boolean;
   onFieldChange: <K extends keyof ProfileFormData>(field: K, value: ProfileFormData[K]) => void;
   onAddClub: (club: Omit<ClubEntry, 'id'>) => void;
   onRemoveClub: (id: string) => void;
