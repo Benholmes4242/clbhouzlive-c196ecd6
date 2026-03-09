@@ -48,7 +48,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
       }}
     >
       {/* Accent stripe — uses canonical rating color */}
-      <div className="h-[1.5px]" style={{ backgroundColor: accentColor }} />
+      <div className="h-px" style={{ backgroundColor: accentColor }} />
 
       {/* Course info header */}
       <div className="flex items-center justify-between px-3 pt-2.5 pb-1">
