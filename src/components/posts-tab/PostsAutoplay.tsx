@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 
-const AUTOPLAY_INTERVAL = 6;
+
 const ATTACH_THRESHOLD = 0.6;
 const DETACH_THRESHOLD = 0.2;
 
