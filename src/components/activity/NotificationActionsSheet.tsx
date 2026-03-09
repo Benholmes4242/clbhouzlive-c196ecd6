@@ -1,11 +1,11 @@
 import React from 'react';
 import { Bell, BellOff, Trash2, BellMinus, UserX } from 'lucide-react';
 import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-} from '@/components/ui/drawer';
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
