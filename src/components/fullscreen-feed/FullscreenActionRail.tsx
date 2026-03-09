@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { createPortal } from 'react-dom';
 import { useStore } from 'zustand';
 import { ChevronLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
