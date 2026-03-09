@@ -208,14 +208,19 @@ export function ConversationList({
     }
   };
 
-  const handleDeleteConversation = async (conversationId: string) => {
-    if (!confirm('Delete this conversation? This cannot be undone.')) return;
-    
+  const [deletingConversationId, setDeletingConversationId] = useState<string | null>(null);
+
+  const handleDeleteConversation = (conversationId: string) => {
+    setDeletingConversationId(conversationId);
+  };
+
+  const handleDeleteConfirmed = async () => {
+    if (!deletingConversationId) return;
     try {
       const { error } = await supabase
         .from('conversation_participants')
         .delete()
-        .eq('conversation_id', conversationId)
+        .eq('conversation_id', deletingConversationId)
         .eq('user_id', user?.id);
         
       if (error) throw error;
@@ -224,6 +229,8 @@ export function ConversationList({
       toast.success('Conversation deleted');
     } catch {
       toast.error("Couldn't delete conversation");
+    } finally {
+      setDeletingConversationId(null);
     }
   };
 
