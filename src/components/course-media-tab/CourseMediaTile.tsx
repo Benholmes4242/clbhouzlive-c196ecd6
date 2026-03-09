@@ -102,7 +102,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
 
       {/* Creator avatar — bottom-left */}
       {avatarUrl && (
-        <div className="absolute bottom-1.5 left-1.5 z-10">
+        <div className="absolute bottom-1.5 left-1.5 right-1.5 z-10 flex items-center justify-between">
           <SquircleAvatar
             src={avatarUrl}
             alt=""
