@@ -4,6 +4,8 @@
 interface Props {
   title: string;
   icon?: React.ReactNode;
+  subtitle?: string;
+  sectionType?: string;
 }
 
 export function SectionHeader({ title, icon }: Props) {

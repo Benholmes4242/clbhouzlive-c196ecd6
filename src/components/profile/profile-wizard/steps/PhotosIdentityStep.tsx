@@ -1,7 +1,6 @@
 import { ProfileFormData } from '../types';
 import { HeaderPhotoCard } from '@/components/profile/edit-v2/HeaderPhotoCard';
 import { ProfilePhotoCard } from '@/components/profile/edit-v2/ProfilePhotoCard';
-import { IdentitySection } from './IdentityStepSection';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { DISPLAY_NAME_MAX, USERNAME_MAX } from '../types';
 
@@ -18,10 +17,12 @@ export function PhotosIdentityStep({
   return (
     <div className="space-y-4 px-4 pb-4">
       <HeaderPhotoCard
-        photoUrl={form.headerPhotoUrl}
-        onBlobReady={(blob, url) => {
-          onFieldChange('headerPhotoBlob', blob);
-          onFieldChange('headerPhotoUrl', url);
+        currentUrl={form.headerPhotoUrl}
+        onFileChange={(file) => {
+          onFieldChange('headerPhotoBlob', file);
+          if (file) {
+            onFieldChange('headerPhotoUrl', URL.createObjectURL(file));
+          }
         }}
         onRemove={() => {
           onFieldChange('headerPhotoBlob', null);
@@ -31,10 +32,12 @@ export function PhotosIdentityStep({
 
       <div className="-mt-10 ml-4 mb-2 z-10 relative">
         <ProfilePhotoCard
-          photoUrl={form.profilePhotoUrl}
-          onBlobReady={(blob, url) => {
-            onFieldChange('profilePhotoBlob', blob);
-            onFieldChange('profilePhotoUrl', url);
+          currentUrl={form.profilePhotoUrl}
+          onFileChange={(file) => {
+            onFieldChange('profilePhotoBlob', file);
+            if (file) {
+              onFieldChange('profilePhotoUrl', URL.createObjectURL(file));
+            }
           }}
         />
       </div>

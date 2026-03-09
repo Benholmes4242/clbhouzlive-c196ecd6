@@ -3,7 +3,7 @@ import { HomeClubCard } from '@/components/profile/edit-v2/HomeClubCard';
 import { AdditionalClubsList } from '@/components/profile/edit-v2/AdditionalClubsList';
 import { CollegeSelector } from '@/components/profile/edit-v2/CollegeSelector';
 import { HandicapInput } from '@/components/profile/edit-v2/HandicapInput';
-import { HandicapSyncInlineNotice } from '@/components/profile/edit-v2/HandicapSyncInlineNotice';
+import HandicapSyncInlineNotice from '@/components/profile/edit-v2/HandicapSyncInlineNotice';
 import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 
 interface Props {

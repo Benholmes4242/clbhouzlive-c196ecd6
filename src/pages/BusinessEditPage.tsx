@@ -26,7 +26,14 @@ import { PhoneInputWithDialCode, PhoneValue } from '@/components/business/PhoneI
 import { CountrySelector, getCountryCode, getCountryDisplayName } from '@/components/business/CountrySelector';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { DeleteBusinessDialog } from '@/components/business/DeleteBusinessDialog';
-import { SectionJumpStrip } from '@/components/profile/edit-v2/SectionJumpStrip';
+// SectionJumpStrip was removed; inline a simple replacement
+const SectionJumpStrip = ({ sections, activeSection, onSectionClick }: { sections: { id: string; label: string }[]; activeSection: string; onSectionClick: (id: string) => void }) => (
+  <div className="flex gap-2 overflow-x-auto py-2 px-1 no-scrollbar">
+    {sections.map(s => (
+      <button key={s.id} onClick={() => onSectionClick(s.id)} className={`whitespace-nowrap text-xs font-medium px-3 py-1.5 rounded-full transition-colors ${activeSection === s.id ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}>{s.label}</button>
+    ))}
+  </div>
+);
 import { MapPreview } from '@/components/map/MapPreview';
 import { ImageCropModal } from '@/components/business/ImageCropModal';
 import { BUSINESS_CATEGORIES_WITH_ICONS } from '@/constants/businessCategories';

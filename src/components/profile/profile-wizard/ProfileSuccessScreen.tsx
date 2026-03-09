@@ -8,6 +8,10 @@ import { CheckCircle2 } from 'lucide-react';
 interface Props {
   redirectTo?: string;
   message?: string;
+  title?: string;
+  subtitle?: string;
+  onViewProfile?: () => void;
+  onDone?: () => void;
 }
 
 export function ProfileSuccessScreen({ redirectTo, message }: Props) {

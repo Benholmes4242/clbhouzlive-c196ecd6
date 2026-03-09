@@ -94,14 +94,14 @@ export function useProfileSave(userId: string) {
         await supabase
           .from('user_home_clubs')
           .upsert(
-            { user_id: userId, club_id: form.primaryClubId },
-            { onConflict: 'user_id' }
+            { user_profile_id: userId, club_id: form.primaryClubId },
+            { onConflict: 'user_profile_id' }
           );
       } else {
         await supabase
           .from('user_home_clubs')
           .delete()
-          .eq('user_id', userId);
+          .eq('user_profile_id', userId);
       }
 
       // 5. Sync college follow
@@ -109,8 +109,8 @@ export function useProfileSave(userId: string) {
         await supabase
           .from('user_followed_colleges')
           .upsert(
-            { user_id: userId, college_id: form.collegeId },
-            { onConflict: 'user_id,college_id' }
+            { user_id: userId, normalized_name: form.collegeId },
+            { onConflict: 'user_id,normalized_name' }
           );
       }
 
