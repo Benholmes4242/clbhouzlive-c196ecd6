@@ -1,7 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 
-const AUTOPLAY_INTERVAL = 6;
 const ATTACH_THRESHOLD = 0.6;
 const DETACH_THRESHOLD = 0.2;
 
@@ -26,8 +25,6 @@ export const PostsAutoplay: React.FC<PostsAutoplayProps> = ({ posts, gridRef }) 
     const type = connection?.effectiveType || '4g';
     return type === '2g' || type === 'slow-2g';
   }, []);
-
-  const isEligible = (idx: number) => idx % AUTOPLAY_INTERVAL === 0;
 
   const prewarmTile = useCallback(async (hlsUrl: string) => {
     try {
@@ -177,10 +174,8 @@ export const PostsAutoplay: React.FC<PostsAutoplayProps> = ({ posts, gridRef }) 
         for (const entry of entries) {
           const el = entry.target as HTMLElement;
           const idx = Number(el.dataset.postsTileIndex);
-          if (isNaN(idx) || !isEligible(idx)) continue;
-
-          const hlsUrl = el.dataset.hlsUrl;
-          if (!hlsUrl) continue;
+          const hlsUrl = (el as HTMLElement).dataset.hlsUrl;
+          if (isNaN(idx) || !hlsUrl) continue;
 
           if (entry.intersectionRatio >= ATTACH_THRESHOLD) {
             if (activeIndexRef.current !== idx) {
@@ -201,6 +196,9 @@ export const PostsAutoplay: React.FC<PostsAutoplayProps> = ({ posts, gridRef }) 
       const tiles = grid.querySelectorAll('[data-posts-tile-index]');
       tiles.forEach((tile) => {
         const idx = Number((tile as HTMLElement).dataset.postsTileIndex);
+        if (isNaN(idx)) return;
+        const tileHlsUrl = (tile as HTMLElement).dataset.hlsUrl;
+        if (!tileHlsUrl) return;
         if (!observedTilesRef.current.has(idx)) {
           observedTilesRef.current.add(idx);
           observer.observe(tile);
@@ -268,6 +266,8 @@ export const PostsAutoplay: React.FC<PostsAutoplayProps> = ({ posts, gridRef }) 
     tiles.forEach((tile) => {
       const idx = Number((tile as HTMLElement).dataset.postsTileIndex);
       if (isNaN(idx)) return;
+      const tileHlsUrl = (tile as HTMLElement).dataset.hlsUrl;
+      if (!tileHlsUrl) return;
       if (autoplayObserverRef.current && !observedTilesRef.current.has(idx)) {
         observedTilesRef.current.add(idx);
         autoplayObserverRef.current.observe(tile);
