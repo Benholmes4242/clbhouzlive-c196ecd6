@@ -84,7 +84,7 @@ const RatingComparisonCard: React.FC<RatingComparisonProps> = ({ userRating, agg
             </div>
 
             {/* Dual bars - brand color for Outstanding (9+), grey gradient otherwise */}
-            <div className="relative h-2.5 w-full rounded-full bg-muted overflow-hidden">
+            <div className="relative h-2.5 w-full rounded-full bg-transparent overflow-hidden">
               {/* Community bar (background) */}
               {row.community !== null && (
                 <div
