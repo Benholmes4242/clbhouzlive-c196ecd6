@@ -79,7 +79,7 @@ export function SettingsPageV2() {
     navigate('/auth');
   };
 
-  if (isLoading) return <SettingsSkeleton />;
+  if (loading) return <SettingsSkeleton />;
 
   return (
     <div
