@@ -137,6 +137,7 @@ export function usePresence() {
       // Clean up presence channels
       presenceChannelsRef.current.forEach(ch => supabase.removeChannel(ch));
       presenceChannelsRef.current = [];
+      subscribedUsersRef.current.clear();
       
       updatePresence('offline');
     };

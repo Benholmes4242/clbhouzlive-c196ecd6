@@ -57,8 +57,10 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
   onClose,
   onUpdate,
 }) => {
-  
-  
+  const currentUserParticipant = conversation.participants.find(
+    p => p.user_id === currentUserId
+  );
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [isEditingName, setIsEditingName] = useState(false);
@@ -69,13 +71,11 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [showSharedMedia, setShowSharedMedia] = useState(false);
-  const [isMutedLocal, setIsMutedLocal] = useState(false);
+  const [isMutedLocal, setIsMutedLocal] = useState(
+    currentUserParticipant?.is_muted ?? false
+  );
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  
-  const currentUserParticipant = conversation.participants.find(
-    p => p.user_id === currentUserId
-  );
   const isAdmin = currentUserParticipant?.role === 'admin';
   const isCreator = conversation.created_by === currentUserId;
   const isMuted = currentUserParticipant?.is_muted || isMutedLocal;
