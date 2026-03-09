@@ -61,7 +61,7 @@ export function CollegeSelector({ collegeName, collegeId, onSelect }: Props) {
                   onClick={() => {
                     setQuery(college.college_name);
                     setIsOpen(false);
-                    onSelect(college.normalized_name, null);
+                    onSelect(college.normalized_name, college.id);
                   }}
                   className="w-full text-left px-4 py-3 text-[14px] text-foreground hover:bg-muted transition-colors min-h-[44px]"
                 >
