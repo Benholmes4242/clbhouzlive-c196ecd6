@@ -5,4 +5,8 @@ export { ProfileWizardNavigation } from './ProfileWizardNavigation';
 export { ProfileSuccessScreen } from './ProfileSuccessScreen';
 export { PersonalProfileWizard } from './PersonalProfileWizard';
 export { BusinessProfileWizard } from './BusinessProfileWizard';
+export { WizardHeader } from './WizardHeader';
+export { WizardProgress } from './WizardProgress';
+export { WizardNavigation } from './WizardNavigation';
+export { WizardSuccessScreen } from './WizardSuccessScreen';
 export * from './types';
