@@ -1,5 +1,5 @@
 import React from 'react';
-import { Film } from 'lucide-react';
+import { Film, Play } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
