@@ -208,7 +208,7 @@ html.lightbox-open {
   --sar: env(safe-area-inset-right, 0px);
 
   /* Back-compat aliases (used by useChromeAnchors) */
-  --safe-top: 0px;
+  --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: var(--sab);
 
   --radius-tile: 18px;
