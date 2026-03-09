@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
@@ -14,6 +14,12 @@ export interface MessageReactions {
 export function useMessageReactions(conversationId: string | null) {
   const { user } = useSupabaseSession();
   const [reactions, setReactions] = useState<MessageReactions>({});
+  const reactionsRef = useRef<MessageReactions>({});
+
+  // Keep ref in sync
+  useEffect(() => {
+    reactionsRef.current = reactions;
+  }, [reactions]);
 
   // Fetch reactions for all messages in a conversation
   const fetchReactions = useCallback(async () => {
@@ -56,32 +62,41 @@ export function useMessageReactions(conversationId: string | null) {
   const addReaction = useCallback(async (messageId: string, emoji: string) => {
     if (!user) return;
 
+    // Optimistically update
+    setReactions(prev => {
+      const newReactions = { ...prev };
+      if (!newReactions[messageId]) {
+        newReactions[messageId] = [];
+      }
+      const exists = newReactions[messageId].some(
+        r => r.emoji === emoji && r.user_id === user.id
+      );
+      if (!exists) {
+        newReactions[messageId] = [
+          ...newReactions[messageId],
+          { emoji, user_id: user.id }
+        ];
+      }
+      return newReactions;
+    });
+
     try {
       await supabase.rpc('add_message_reaction', { 
         p_message_id: messageId, 
         p_emoji: emoji 
       });
-
-      // Optimistically update
-      setReactions(prev => {
-        const newReactions = { ...prev };
-        if (!newReactions[messageId]) {
-          newReactions[messageId] = [];
-        }
-        // Check if already exists
-        const exists = newReactions[messageId].some(
-          r => r.emoji === emoji && r.user_id === user.id
-        );
-        if (!exists) {
-          newReactions[messageId] = [
-            ...newReactions[messageId],
-            { emoji, user_id: user.id }
-          ];
-        }
-        return newReactions;
-      });
     } catch (error) {
       console.error('Error adding reaction:', error);
+      // Roll back optimistic update
+      setReactions(prev => {
+        const rolled = { ...prev };
+        if (rolled[messageId]) {
+          rolled[messageId] = rolled[messageId].filter(
+            r => !(r.emoji === emoji && r.user_id === user.id)
+          );
+        }
+        return rolled;
+      });
     }
   }, [user]);
 
@@ -89,24 +104,36 @@ export function useMessageReactions(conversationId: string | null) {
   const removeReaction = useCallback(async (messageId: string, emoji: string) => {
     if (!user) return;
 
+    // Optimistically update
+    setReactions(prev => {
+      const newReactions = { ...prev };
+      if (newReactions[messageId]) {
+        newReactions[messageId] = newReactions[messageId].filter(
+          r => !(r.emoji === emoji && r.user_id === user.id)
+        );
+      }
+      return newReactions;
+    });
+
     try {
       await supabase.rpc('remove_message_reaction', { 
         p_message_id: messageId, 
         p_emoji: emoji 
       });
-
-      // Optimistically update
-      setReactions(prev => {
-        const newReactions = { ...prev };
-        if (newReactions[messageId]) {
-          newReactions[messageId] = newReactions[messageId].filter(
-            r => !(r.emoji === emoji && r.user_id === user.id)
-          );
-        }
-        return newReactions;
-      });
     } catch (error) {
       console.error('Error removing reaction:', error);
+      // Roll back optimistic update
+      setReactions(prev => {
+        const rolled = { ...prev };
+        if (!rolled[messageId]) rolled[messageId] = [];
+        const alreadyRestored = rolled[messageId].some(
+          r => r.emoji === emoji && r.user_id === user.id
+        );
+        if (!alreadyRestored) {
+          rolled[messageId] = [...rolled[messageId], { emoji, user_id: user.id }];
+        }
+        return rolled;
+      });
     }
   }, [user]);
 
@@ -146,7 +173,7 @@ export function useMessageReactions(conversationId: string | null) {
         },
         (payload) => {
           const messageId = (payload.new as any)?.message_id || (payload.old as any)?.message_id;
-          const currentMessageIds = new Set(Object.keys(reactions));
+          const currentMessageIds = new Set(Object.keys(reactionsRef.current));
           if (!messageId || currentMessageIds.has(messageId)) {
             fetchReactions();
           }
@@ -157,7 +184,7 @@ export function useMessageReactions(conversationId: string | null) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [conversationId, fetchReactions, reactions]);
+  }, [conversationId, fetchReactions]);
 
   return {
     reactions,

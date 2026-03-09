@@ -590,7 +590,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         isOpen={isAddMembersOpen}
         onClose={() => setIsAddMembersOpen(false)}
         conversationId={conversation.id}
-        existingMemberIds={conversation.participants.map(p => p.user_id)}
+        existingMemberIds={conversation.participants.map(p => p.user_id).filter((id): id is string => id !== null)}
         onMembersAdded={onUpdate}
       />
 
