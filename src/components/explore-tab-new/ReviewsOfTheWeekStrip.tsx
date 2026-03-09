@@ -9,38 +9,35 @@ interface ReviewItem {
   thumbnail_url: string | null;
   rating: number;
   course_name: string;
+  course_location: string | null;
   avatar_url: string | null;
   username: string;
 }
 
-function ReviewsOfTheWeekStripInner() {
+interface ReviewsOfTheWeekStripProps {
+  activeRegion?: string | null;
+}
+
+function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStripProps) {
   const { data: reviews } = useQuery({
-    queryKey: ['explore-reviews-of-week'],
+    queryKey: ['explore-reviews-of-week', activeRegion],
     queryFn: async (): Promise<ReviewItem[]> => {
-      // Uses 30-day window; widens automatically on fallback
-      const { data, error } = await supabase.rpc('get_top_video_reviews', {
-        days_back: 30,
-        result_limit: 10,
-      });
+      const params: Record<string, any> = { days_back: 30, result_limit: 10 };
+      if (activeRegion) params.p_region_slug = activeRegion;
+
+      const { data, error } = await supabase.rpc('get_top_video_reviews', params);
 
       if (error) {
-        // Fallback to 30 days
-        const { data: fallback, error: fbErr } = await supabase.rpc('get_top_video_reviews', {
-          days_back: 30,
-          result_limit: 10,
-        });
-        if (fbErr) {
-          console.error('[ReviewsOfTheWeek] RPC error:', fbErr);
-          return [];
-        }
-        return (fallback ?? []) as ReviewItem[];
+        console.error('[ReviewsOfTheWeek] RPC error:', error);
+        return [];
       }
 
       if (!data || data.length < 3) {
-        const { data: fallback } = await supabase.rpc('get_top_video_reviews', {
-          days_back: 30,
-          result_limit: 10,
-        });
+        // Widen to 90 days as fallback
+        const fallbackParams: Record<string, any> = { days_back: 90, result_limit: 10 };
+        if (activeRegion) fallbackParams.p_region_slug = activeRegion;
+
+        const { data: fallback } = await supabase.rpc('get_top_video_reviews', fallbackParams);
         return (fallback ?? data ?? []) as ReviewItem[];
       }
 
@@ -87,17 +84,24 @@ function ReviewsOfTheWeekStripInner() {
 
             {/* Rating badge */}
             <span
-              className="absolute bottom-8 left-2 rounded-full flex items-center gap-[3px] text-[11px] font-semibold text-white leading-none"
+              className="absolute bottom-10 left-2 rounded-full flex items-center gap-[3px] text-[11px] font-semibold text-white leading-none"
               style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 4px 16px rgba(0,0,0,0.25)', padding: '3px 7px' }}
             >
               <img src="/images/brand/clubhouz-mark-white.svg" alt="" className="w-[10px] h-[10px]" />
               {review.rating.toFixed(1)}
             </span>
 
-            {/* Course name */}
-            <span className="absolute bottom-2 left-2 right-2 text-[11px] font-semibold text-white line-clamp-1">
-              {review.course_name}
-            </span>
+            {/* Course name + location */}
+            <div className="absolute bottom-2 left-2 right-2">
+              <span className="text-[11px] font-semibold text-white line-clamp-1 block">
+                {review.course_name}
+              </span>
+              {review.course_location && (
+                <span className="text-[9px] text-white/60 line-clamp-1 block">
+                  {review.course_location}
+                </span>
+              )}
+            </div>
 
             {/* Creator avatar */}
             {review.avatar_url && (
