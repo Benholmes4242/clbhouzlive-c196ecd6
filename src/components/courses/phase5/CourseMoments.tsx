@@ -3,7 +3,7 @@
  * Phase 5: Emotional anchor, turns courses into chapters
  */
 import React, { useMemo, useCallback } from 'react';
-import { Camera } from 'lucide-react';
+import { Camera, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUserCourseMoments } from '@/hooks/useUserCourseMoments';
 import { Skeleton } from '@/components/ui/skeleton';
