@@ -11497,6 +11497,7 @@ export type Database = {
           business_type: Database["public"]["Enums"]["business_type"] | null
           business_website: string | null
           city: string
+          college_id: string | null
           college_normalized: string | null
           contact_person_name: string | null
           country: string
@@ -11604,6 +11605,7 @@ export type Database = {
           business_type?: Database["public"]["Enums"]["business_type"] | null
           business_website?: string | null
           city?: string
+          college_id?: string | null
           college_normalized?: string | null
           contact_person_name?: string | null
           country?: string
@@ -11711,6 +11713,7 @@ export type Database = {
           business_type?: Database["public"]["Enums"]["business_type"] | null
           business_website?: string | null
           city?: string
+          college_id?: string | null
           college_normalized?: string | null
           contact_person_name?: string | null
           country?: string
@@ -11810,6 +11813,13 @@ export type Database = {
             columns: ["home_club_id"]
             isOneToOne: false
             referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_profiles_college_id_fkey"
+            columns: ["college_id"]
+            isOneToOne: false
+            referencedRelation: "college_media"
             referencedColumns: ["id"]
           },
           {
