@@ -11,7 +11,7 @@ import type {
   MessageType
 } from '@/types/messaging';
 
-interface UseMessagingReturn {
+export interface UseMessagingReturn {
   conversations: ConversationWithDetails[];
   loading: boolean;
   error: Error | null;
