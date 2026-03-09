@@ -39,6 +39,7 @@ export function SettingsSkeleton({
               <SkeletonRow 
                 key={rowIdx} 
                 isLast={rowIdx === section.rows - 1}
+                index={rowIdx}
               />
             ))}
           </div>
