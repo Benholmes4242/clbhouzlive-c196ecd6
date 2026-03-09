@@ -55,7 +55,7 @@ function ExploreTileInner({ post, index, allPosts }: ExploreTileProps) {
 
       {/* Course name — bottom center on gradient */}
       {courseName && (
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent px-2 py-2">
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 via-black/15 to-transparent px-2 py-2">
           <p className="text-center text-[11px] font-semibold text-white line-clamp-1">
             {courseName}
           </p>
