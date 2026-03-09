@@ -561,7 +561,7 @@ html.lightbox-open {
    Use on headerless pages to respect iOS notch/status bar
    ======================================== */
 .safe-top, .pt-safe {
-  padding-top: max(var(--sat), env(safe-area-inset-top, 0px));
+  padding-top: var(--sat);
 }
 
 .pb-safe {
