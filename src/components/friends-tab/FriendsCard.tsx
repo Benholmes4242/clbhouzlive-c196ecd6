@@ -156,7 +156,7 @@ export const FriendsCard = React.memo(function FriendsCard({ post, isAutoplayEli
                 onClick={() => setExpanded(true)}
                 className="text-sm font-semibold text-muted-foreground mt-0.5"
               >
-                more
+                See more
               </button>
             )}
             {expanded && cleanCaption.length > 100 && (
