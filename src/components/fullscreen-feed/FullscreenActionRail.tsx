@@ -1,27 +1,26 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { Heart, MessageCircle, Share2, Volume2, VolumeX } from 'lucide-react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useStore } from 'zustand';
+import { ChevronLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { CommentsPage } from '@/components/clubhouse/cinematic/CommentsPage';
+import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
 import { toast } from 'sonner';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { MediaStore } from '@/components/media-system/store/createMediaStore';
-
-function formatCompact(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return String(n);
-}
 
 interface FullscreenActionRailProps {
   posts: FeedPost[];
   store: MediaStore;
 }
 
+/** Bottom offset for fullscreen (no tab bar) — aligns with CreatorCapsule bottomOffset */
+const FULLSCREEN_BOTTOM_OFFSET = 'calc(env(safe-area-inset-bottom, 0px) + 24px)';
+
 export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps) {
   const activeIndex = useStore(store, (s) => s.activeIndex);
   const isMuted = useStore(store, (s) => s.isMuted);
+  const carouselPositions = useStore(store, (s) => s.carouselPositions);
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
   const activePost = posts[activeIndex];
@@ -29,6 +28,7 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
   const [isLiked, setIsLiked] = useState(activePost?.isLikedByMe ?? false);
   const [likeCount, setLikeCount] = useState(activePost?.likeCount ?? 0);
   const [showComments, setShowComments] = useState(false);
+  const [chevronY, setChevronY] = useState<number | null>(null);
 
   // Reset like state when activeIndex changes
   useEffect(() => {
@@ -90,56 +90,64 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
   if (!activePost) return null;
 
   const thumbnailUrl = activePost.mediaItems[0]?.thumbnailUrl || '';
+  const isActiveVideo = activePost.mediaItems[0]?.type === 'video';
+  const activeMediaCount = activePost.mediaItems.length;
+  const currentMediaIndex = carouselPositions?.[activeIndex] ?? 0;
 
   return (
     <>
-      <div
-        className="fixed right-3 flex flex-col items-center gap-5 z-[10000]"
-        style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}
-      >
-        {/* Like */}
-        <button onClick={toggleLike} className="flex flex-col items-center gap-0.5">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(12px)' }}>
-            <Heart
-              className={`w-5 h-5 transition-colors ${isLiked ? 'fill-red-500 text-red-500' : 'text-white'}`}
-            />
-          </div>
-          <span className="text-[10px] font-medium text-white drop-shadow-md">
-            {formatCompact(likeCount)}
-          </span>
-        </button>
+      {/* CinematicActionRail — identical to Clubhouse */}
+      <CinematicActionRail
+        postId={activePost.id}
+        likesCount={likeCount}
+        commentsCount={activePost.commentCount}
+        hasLiked={isLiked}
+        isMuted={isMuted}
+        isVisible={true}
+        onLike={toggleLike}
+        onComment={() => setShowComments(true)}
+        onShare={handleShare}
+        onMuteToggle={toggleMute}
+        isVideo={isActiveVideo}
+        hasNextMedia={currentMediaIndex < activeMediaCount - 1}
+        hasPrevMedia={currentMediaIndex > 0}
+        onNextMedia={activeMediaCount > 1
+          ? () => store.getState().setCarouselPosition(activeIndex, currentMediaIndex + 1)
+          : undefined}
+        onPrevMedia={activeMediaCount > 1
+          ? () => store.getState().setCarouselPosition(activeIndex, currentMediaIndex - 1)
+          : undefined}
+        onChevronPositionChange={setChevronY}
+        bottomOffset={FULLSCREEN_BOTTOM_OFFSET}
+      />
 
-        {/* Comment */}
-        <button onClick={() => setShowComments(true)} className="flex flex-col items-center gap-0.5">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(12px)' }}>
-            <MessageCircle className="w-5 h-5 text-white" />
-          </div>
-          <span className="text-[10px] font-medium text-white drop-shadow-md">
-            {formatCompact(activePost.commentCount)}
-          </span>
+      {/* Left chevron — mirrors right chevron Y position (identical to Clubhouse) */}
+      {currentMediaIndex > 0 && chevronY !== null && (
+        <button
+          onClick={() => store.getState().setCarouselPosition(activeIndex, currentMediaIndex - 1)}
+          style={{
+            position: 'fixed',
+            left: 16,
+            top: chevronY - 22,
+            zIndex: 40,
+            width: 44,
+            height: 44,
+            borderRadius: '50%',
+            background: 'rgba(0, 0, 0, 0.35)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.10)',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+          }}
+          aria-label="Previous media"
+        >
+          <ChevronLeft className="w-5 h-5 text-white" />
         </button>
-
-        {/* Share */}
-        <button onClick={handleShare} className="flex flex-col items-center gap-0.5">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(12px)' }}>
-            <Share2 className="w-5 h-5 text-white" />
-          </div>
-          <span className="text-[10px] font-medium text-white drop-shadow-md">
-            {formatCompact(activePost.shareCount)}
-          </span>
-        </button>
-
-        {/* Mute */}
-        <button onClick={toggleMute} className="flex flex-col items-center">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(12px)' }}>
-            {isMuted ? (
-              <VolumeX className="w-5 h-5 text-white" />
-            ) : (
-              <Volume2 className="w-5 h-5 text-white" />
-            )}
-          </div>
-        </button>
-      </div>
+      )}
 
       {/* Comments bottom sheet */}
       <CommentsPage
