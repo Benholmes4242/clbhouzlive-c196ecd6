@@ -42,7 +42,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
   return (
     <div
       style={{ gridColumn: '1 / -1' }}
-      className="bg-card cursor-pointer"
+      className="bg-card cursor-pointer mt-[0px]"
       onClick={() => {
         if (allPosts) {
           useFullscreenFeed.getState().open({
