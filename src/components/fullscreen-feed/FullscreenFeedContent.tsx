@@ -8,6 +8,8 @@ import { usePreloader } from '@/components/media-system/hooks/usePreloader';
 import { useFullscreenFeed } from './hooks/useFullscreenFeed';
 import { FullscreenActionRail } from './FullscreenActionRail';
 import { FullscreenCreatorCapsule } from './FullscreenCreatorCapsule';
+import { useClubhouseLifecycle } from '@/components/clubhouse/hooks/useClubhouseLifecycle';
+import { useVideoAnalytics } from '@/components/media-system/hooks/useVideoAnalytics';
 import { useStore } from 'zustand';
 import { ChevronLeft } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -40,6 +42,12 @@ export function FullscreenFeedContent({ posts, startIndex, fetchNextPage, hasNex
   const activeVideoRef = useStore(store, (s) => s.activeVideoRef);
   const activePost = posts[activeIndex];
   const activeDuration = activePost?.mediaItems[0]?.duration ?? null;
+
+  // Lifecycle: visibility pause/resume, network reconnect, wake lock
+  useClubhouseLifecycle();
+
+  // Video analytics: impressions and watch time
+  useVideoAnalytics(activePost ?? null, !!activePost, activeVideoElement);
 
   const handleClose = useCallback(() => {
     useFullscreenFeed.getState().close();
