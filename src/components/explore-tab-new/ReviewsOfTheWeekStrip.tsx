@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { MdOutlineStarOutline } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useQuery } from '@tanstack/react-query';
