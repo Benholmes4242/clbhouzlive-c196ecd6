@@ -4,7 +4,6 @@ import { Play, Heart, MessageCircle, Share2 } from 'lucide-react';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 import { formatDistanceToNow } from 'date-fns';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { formatDistanceToNow } from 'date-fns';
 
 function formatCompact(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
