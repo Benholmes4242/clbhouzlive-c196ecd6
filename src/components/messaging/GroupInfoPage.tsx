@@ -197,17 +197,22 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
     }
   };
 
-  const handleLeaveGroup = async () => {
-    if (!confirm('Are you sure you want to leave this group?')) return;
+  const handleLeaveGroup = () => {
+    setShowLeaveDialog(true);
+  };
+
+  const handleLeaveConfirmed = async () => {
     try {
       const { error } = await supabase.rpc('leave_group', {
         p_conversation_id: conversation.id,
       });
       if (error) throw error;
       toast.success('You left the group');
-      navigate('/messages');
+      onClose();
     } catch (error: any) {
       toast.error('Failed to leave', { description: error.message });
+    } finally {
+      setShowLeaveDialog(false);
     }
   };
 
