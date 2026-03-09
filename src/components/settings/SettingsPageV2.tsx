@@ -47,14 +47,14 @@ function maskEmail(email: string): string {
 export function SettingsPageV2() {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const { profile, isLoading } = useProfileData();
+  const { profile, loading } = useProfileData();
 
   // Sync email RPC on mount
   useEffect(() => {
-    if (user?.id) {
-      supabase.rpc('sync_user_email', { p_user_id: user.id }).catch(() => {});
+    if (user?.id && user?.email) {
+      supabase.rpc('sync_user_email', { user_id_param: user.id, current_email: user.email }).then(() => {});
     }
-  }, [user?.id]);
+  }, [user?.id, user?.email]);
 
   const isOAuthUser = !user?.app_metadata?.providers?.includes('email');
   const isPersonalProfile = (profile as any)?.actor_type !== 'business';
