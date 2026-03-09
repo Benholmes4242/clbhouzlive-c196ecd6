@@ -121,7 +121,7 @@ export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
               </div>
 
               {/* Progress bar */}
-              <div className="h-1.5 rounded-full bg-surface-alt overflow-hidden">
+              <div className="h-1.5 rounded-full bg-transparent overflow-hidden">
                 <div
                   className="h-full bg-primary-accent rounded-full transition-all duration-300"
                   style={{ width: `${percentage}%` }}
