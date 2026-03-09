@@ -24,13 +24,6 @@ interface CourseMediaLandscapeCardProps {
   allPosts?: FeedPost[];
 }
 
-const HUD_GLASS = {
-  background: 'rgba(0, 0, 0, 0.35)',
-  backdropFilter: 'blur(20px)',
-  WebkitBackdropFilter: 'blur(20px)',
-  border: '1px solid rgba(255, 255, 255, 0.1)',
-  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
-};
 
 export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> = ({ post, index, allPosts }) => {
   const media = post.mediaItems[0];
@@ -96,8 +89,8 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
         {/* Duration badge */}
         {isVideo && duration != null && duration > 0 && (
           <div
-            className="absolute bottom-2 right-2 z-10 rounded-[4px] flex items-center"
-            style={{ ...HUD_GLASS, padding: '2px 6px' }}
+            className="absolute bottom-2 right-2 z-10 rounded-[4px] liquid-glass flex items-center"
+            style={{ padding: '2px 6px' }}
           >
             <span className="text-[11px] font-semibold text-white tracking-[0.02em]">
               {formatDuration(duration)}

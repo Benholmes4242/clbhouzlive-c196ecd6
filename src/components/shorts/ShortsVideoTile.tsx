@@ -14,6 +14,13 @@ import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/Un
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
 
+function formatDuration(seconds?: number): string {
+  if (!seconds) return '0:00';
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
 type Props = {
   id: string;
   hlsUrl: string;
@@ -21,6 +28,7 @@ type Props = {
   sortIndex: number;
   onClick?: () => void;
   filterId?: string | null;
+  duration?: number | null;
 };
 
 export default function ShortsVideoTile({
@@ -29,7 +37,8 @@ export default function ShortsVideoTile({
   posterUrl,
   sortIndex,
   onClick,
-  filterId
+  filterId,
+  duration
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<UnifiedVideoPlayerRef>(null);
@@ -89,6 +98,18 @@ export default function ShortsVideoTile({
           className="absolute inset-0 h-full w-full"
         />
       </div>
+
+      {/* Duration badge — canonical dark glass, bottom-right */}
+      {duration != null && duration > 0 && (
+        <div
+          className="absolute bottom-1.5 right-1.5 z-10 rounded-[4px] liquid-glass flex items-center"
+          style={{ padding: '2px 5px' }}
+        >
+          <span className="text-[11px] font-semibold text-white tracking-[0.02em]">
+            {formatDuration(duration)}
+          </span>
+        </div>
+      )}
 
       {/* Hover overlay - OUTSIDE filtered layer */}
       <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity group-active:opacity-10 group-hover:opacity-10 bg-black" />

@@ -17,13 +17,6 @@ interface CourseMediaTileProps {
   allPosts?: FeedPost[];
 }
 
-const HUD_GLASS = {
-  background: 'rgba(0, 0, 0, 0.35)',
-  backdropFilter: 'blur(20px)',
-  WebkitBackdropFilter: 'blur(20px)',
-  border: '1px solid rgba(255, 255, 255, 0.1)',
-  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
-};
 
 export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, allPosts }) => {
   const media = post.mediaItems[0];
@@ -74,8 +67,8 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
       {/* Duration badge (videos) — bottom-right */}
       {isVideo && duration != null && duration > 0 && (
         <div
-          className="absolute bottom-1.5 right-1.5 z-10 rounded-[4px] flex items-center"
-          style={{ ...HUD_GLASS, padding: '2px 5px' }}
+          className="absolute bottom-1.5 right-1.5 z-10 rounded-[4px] liquid-glass flex items-center"
+          style={{ padding: '2px 5px' }}
         >
           <span className="text-[11px] font-semibold text-white tracking-[0.02em]">
             {formatDuration(duration)}
@@ -86,8 +79,8 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
       {/* Review rating — top-right */}
       {reviewRating != null && reviewRating > 0 && (
         <div
-          className="absolute top-1.5 right-1.5 z-10 rounded-full flex items-center gap-[3px]"
-          style={{ ...HUD_GLASS, padding: '2px 6px' }}
+          className="absolute top-1.5 right-1.5 z-10 rounded-full liquid-glass flex items-center gap-[3px]"
+          style={{ padding: '2px 6px' }}
         >
           <img
             src="/images/brand/clubhouz-mark-white.svg"
