@@ -172,20 +172,19 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
         {/* Course tag */}
         {courseNameToShow && (
           <div className="px-3 pb-2">
-            {courseIdToShow ? (
-              <button
-                onClick={() => navigate(`/course/${courseIdToShow}`)}
-                className="flex items-center gap-1 hover:underline"
-              >
-                <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground truncate">{courseNameToShow}</span>
-              </button>
-            ) : (
-              <div className="flex items-center gap-1">
-                <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground truncate">{courseNameToShow}</span>
-              </div>
-            )}
+            <button
+              onClick={() => {
+                if (courseIdToShow) {
+                  navigate(`/courses/${courseIdToShow}`);
+                } else {
+                  navigate(`/courses?q=${encodeURIComponent(courseNameToShow)}`);
+                }
+              }}
+              className="flex items-center gap-1 hover:underline"
+            >
+              <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground truncate">{courseNameToShow}</span>
+            </button>
           </div>
         )}
 
