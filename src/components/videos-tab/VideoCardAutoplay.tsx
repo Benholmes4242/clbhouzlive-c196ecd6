@@ -107,13 +107,13 @@ export function VideoCardAutoplay({ hlsUrl, posterUrl, isEligible, cardIndex }: 
         const entry = entries[0];
         if (!entry) return;
 
-        if (entry.intersectionRatio >= 0.5 && !isPlayingRef.current) {
+        if (entry.intersectionRatio >= 0.9 && !isPlayingRef.current) {
           startPlayback();
         } else if (entry.intersectionRatio < 0.1 && isPlayingRef.current) {
           destroyHls();
         }
       },
-      { threshold: [0, 0.1, 0.5] }
+      { threshold: [0, 0.1, 0.9] }
     );
 
     observerRef.current.observe(el);
