@@ -1,10 +1,12 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import { useStore } from 'zustand';
 import { useNavigate } from 'react-router-dom';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { MediaStore } from '@/components/media-system/store/createMediaStore';
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
 import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useFollowMutation } from '@/components/media-system/hooks/useFollowMutation';
 
 interface FullscreenCreatorCapsuleProps {
   posts: FeedPost[];
@@ -14,7 +16,42 @@ interface FullscreenCreatorCapsuleProps {
 export function FullscreenCreatorCapsule({ posts, store }: FullscreenCreatorCapsuleProps) {
   const activeIndex = useStore(store, (s) => s.activeIndex);
   const navigate = useNavigate();
+  const { user } = useSupabaseSession();
+  const followMutation = useFollowMutation();
   const activePost = posts[activeIndex];
+
+  // Local follow override — resets when activeIndex changes
+  const [followOverride, setFollowOverride] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    setFollowOverride(null);
+  }, [activeIndex]);
+
+  const isOwnPost = user?.id === activePost?.userId;
+  const isFollowed = followOverride ?? activePost?.isFollowedByMe ?? false;
+
+  const handleFollow = useCallback(() => {
+    if (!user?.id || !activePost || isOwnPost) return;
+
+    const currentlyFollowed = followOverride ?? activePost.isFollowedByMe ?? false;
+    const newFollowed = !currentlyFollowed;
+    setFollowOverride(newFollowed);
+
+    followMutation.mutate(
+      {
+        targetUserId: activePost.userId,
+        targetActorType: activePost.actorType,
+        targetActorId: activePost.actorId,
+        currentUserId: user.id,
+        isFollowed: currentlyFollowed,
+      },
+      {
+        onError: () => {
+          setFollowOverride(currentlyFollowed);
+        },
+      },
+    );
+  }, [user?.id, activePost, isOwnPost, followOverride, followMutation]);
 
   // Build golfCourse prop — same logic as Clubhouse.tsx
   const golfCourse = useMemo(() => {
@@ -67,9 +104,10 @@ export function FullscreenCreatorCapsule({ posts, store }: FullscreenCreatorCaps
       }}
       caption={activePost.caption}
       golfCourse={golfCourse}
-      isFollowing={activePost.isFollowedByMe}
-      isOwnPost={false}
+      isFollowing={isFollowed}
+      isOwnPost={isOwnPost}
       isVisible={true}
+      onFollow={handleFollow}
       isReview={isActiveReview}
       reviewData={isActiveReview && activeReview ? {
         rating: activeReview.rating,
