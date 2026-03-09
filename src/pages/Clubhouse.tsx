@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
-import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
@@ -8,11 +7,8 @@ import { useNavigationHandlers } from '@/components/bottom-navigation/useNavigat
 import { useSnapModal } from '@/hooks/useSnapModal';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
-import { supabase } from '@/integrations/supabase/client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
-import { NewSeasonBanner } from '@/components/feed/NewSeasonBanner';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 
@@ -20,12 +16,12 @@ import { cn } from '@/lib/utils';
 import { Compass, ChevronLeft, Flag, EyeOff, Link as LinkIcon } from 'lucide-react';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
-import { logRouteClubhouse, logLoadingPostsShow, logLoadingPostsHide } from '@/utils/bootTimeline';
+import { logRouteClubhouse } from '@/utils/bootTimeline';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { useClubhouseSkeletonTiming } from '@/hooks/useClubhouseSkeletonTiming';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
-import { ClubhouseTabProvider, useClubhouseTab, type ClubhouseTab } from '@/contexts/ClubhouseTabContext';
+import { ClubhouseTabProvider, useClubhouseTab } from '@/contexts/ClubhouseTabContext';
 import { clubhouseDebug } from '@/debug/clubhouseDebug';
 import MobileVideoDebugPanel from '@/components/debug/MobileVideoDebugPanel';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
@@ -37,8 +33,6 @@ import { usePreloader } from '@/components/media-system/hooks/usePreloader';
 import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFeed';
 import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
 import { useMediaStore } from '@/components/media-system/store/mediaStore';
-import { useLikeMutation } from '@/components/media-system/hooks/useLikeMutation';
-import { useFollowMutation } from '@/components/media-system/hooks/useFollowMutation';
 import { MediaErrorBoundary } from '@/components/media-system/MediaErrorBoundary';
 import { useVideoAnalytics } from '@/components/media-system/hooks/useVideoAnalytics';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -48,12 +42,19 @@ import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicA
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
 import { CommentsPage } from '@/components/clubhouse/cinematic/CommentsPage';
 import { FullscreenReviewPost } from '@/components/posts/FullscreenReviewPost';
-import { Top100OverlayPills } from '@/components/clubhouse/Top100OverlayPills';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import { Scrubber } from '@/components/media-system/Scrubber';
-import { analyticsEvents } from '@/utils/analyticsEvents';
+
+// ── Decomposed hooks ──
+import { useClubhouseLifecycle } from '@/components/clubhouse/hooks/useClubhouseLifecycle';
+import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
+import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
+import { useClubhouseFollows } from '@/components/clubhouse/hooks/useClubhouseFollows';
+import { useClubhouseComments } from '@/components/clubhouse/hooks/useClubhouseComments';
+import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShare';
+import { useClubhouseFeedNav } from '@/components/clubhouse/hooks/useClubhouseFeedNav';
 
 /** Feed + preloader wrapper — preloader must be inside VideoPoolProvider */
 function FeedWithPreloader({
@@ -91,7 +92,6 @@ function FeedWithPreloader({
 }
 
 
-
 const ClubhouseContent = () => {
   // ============================================================================
   // ALL HOOKS MUST BE DECLARED FIRST - before any early returns
@@ -113,7 +113,6 @@ const ClubhouseContent = () => {
     return () => { document.body.classList.remove('route-clubhouse'); };
   }, []);
   
-  const location = useLocation();
   const navigate = useNavigate();
   const clubhouseRootRef = useRef<HTMLDivElement>(null);
   
@@ -122,14 +121,12 @@ const ClubhouseContent = () => {
   const activeTab = tabContext?.activeTab ?? 'foryou';
   const setActiveTab = tabContext?.setActiveTab ?? (() => {});
   const isBusinessActor = tabContext?.isBusinessActor ?? false;
-  const prevTabRef = useRef(activeTab);
   
   // Auth + actor context
   const { user } = useSupabaseSession();
   const { activeActor } = useActiveActor();
-  const queryClient = useQueryClient();
   
-  // ── Network status (Fix 9) ──
+  // ── Network status ──
   const { isOnline } = useNetworkStatus();
   
   // ── Feed hooks (both tabs stay mounted for instant switching) ──
@@ -140,8 +137,6 @@ const ClubhouseContent = () => {
   const posts = activeFeed.posts;
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? true;
-  
-  
   
   // Skeleton timing
   const { 
@@ -155,190 +150,45 @@ const ClubhouseContent = () => {
   const isMuted = useMediaStore((s) => s.isMuted);
   const toggleMute = useMediaStore((s) => s.toggleMute);
   
-  // ── Fix 7: Stable activePost memoization ──
+  // ── Lifecycle (visibility, network reconnect, wake lock) ──
+  useClubhouseLifecycle();
+  
+  // ── Active post derivation ──
   const activePostId = posts[activeIndex]?.id;
-  const activePost = useMemo(() => {
-    return posts.find(p => p.id === activePostId) ?? null;
-  }, [posts, activePostId]);
+  const { activePost, golfCourse, activeReview, isActiveReview, isActiveVideo } = useActivePostDerived(posts, activeIndex);
   
   // ── Optimistic like state ──
-  const likeMutation = useLikeMutation();
-  const [localLikeState, setLocalLikeState] = useState<Map<string, { isLiked: boolean; count: number }>>(new Map());
-  
-  const handleLike = useCallback((post: FeedPost | null) => {
-    if (!user?.id || !post || !activeActor) return;
-    
-    const current = localLikeState.get(post.id) ?? { isLiked: post.isLikedByMe, count: post.likeCount };
-    const newState = { isLiked: !current.isLiked, count: current.isLiked ? current.count - 1 : current.count + 1 };
-    
-    setLocalLikeState(prev => new Map(prev).set(post.id, newState));
-    
-    // Fix 12: Analytics
-    analyticsEvents.track('video_like', { post_id: post.id, action: current.isLiked ? 'unlike' : 'like' });
-    
-    likeMutation.mutate(
-      { 
-        postId: post.id, 
-        userId: user.id, 
-        actorId: activeActor.id ?? user.id, 
-        actorType: activeActor.type === 'business' ? 'business' : 'personal',
-        isLiked: current.isLiked,
-      },
-      { onError: () => setLocalLikeState(prev => new Map(prev).set(post.id, current)) }
-    );
-  }, [user?.id, activeActor, localLikeState, likeMutation]);
-  
-  const activeLikeState = localLikeState.get(activePost?.id ?? '') ?? {
-    isLiked: activePost?.isLikedByMe ?? false,
-    count: activePost?.likeCount ?? 0,
-  };
+  const { handleLike, getActiveLikeState, resetLikes } = useClubhouseLikes({ userId: user?.id, activeActor });
+  const activeLikeState = getActiveLikeState(activePost);
   
   // ── Optimistic follow state ──
-  const followMutation = useFollowMutation();
-  const [followOverrides, setFollowOverrides] = useState<Map<string, boolean>>(new Map());
-  
-  const handleFollow = useCallback((post: FeedPost | null) => {
-    if (!user?.id || !post) return;
-    
-    // Prevent self-follow
-    if (user.id === post.userId) return;
-    
-    const currentlyFollowed = followOverrides.has(post.userId) 
-      ? followOverrides.get(post.userId)! 
-      : post.isFollowedByMe;
-    
-    setFollowOverrides(prev => {
-      const next = new Map(prev);
-      next.set(post.userId, !currentlyFollowed);
-      return next;
-    });
-    
-    // Fix 12: Analytics
-    analyticsEvents.track('video_follow', { target_id: post.userId, action: currentlyFollowed ? 'unfollow' : 'follow' });
-    
-    followMutation.mutate(
-      {
-        targetUserId: post.userId,
-        targetActorType: post.actorType,
-        targetActorId: post.actorId,
-        currentUserId: user.id,
-        isFollowed: currentlyFollowed,
-      },
-      { onError: () => {
-        setFollowOverrides(prev => {
-          const next = new Map(prev);
-          next.set(post.userId, currentlyFollowed);
-          return next;
-        });
-      }}
-    );
-  }, [user?.id, followOverrides, followMutation]);
-  
-  const handleFollowChange = useCallback((userId: string, isFollowed: boolean) => {
-    setFollowOverrides(prev => {
-      const next = new Map(prev);
-      next.set(userId, isFollowed);
-      return next;
-    });
-  }, []);
-  
-  const isActivePostFollowed = activePost
-    ? (followOverrides.has(activePost.userId) 
-        ? followOverrides.get(activePost.userId)! 
-        : activePost.isFollowedByMe)
-    : false;
+  const { followOverrides, handleFollow, handleFollowChange, getFollowState, resetFollows } = useClubhouseFollows({ userId: user?.id });
+  const isActivePostFollowed = getFollowState(activePost);
   
   // ── Comments state ──
-  const [commentsOpen, setCommentsOpen] = useState(false);
+  const { commentsOpen, overlayVisible, openComments, closeComments, handleCommentPosted, getCommentCount, resetComments } = useClubhouseComments();
+  const activeCommentCount = getCommentCount(activePost);
   
-  // ── Fix 2: Comment count overrides ──
-  const [commentCountOverrides, setCommentCountOverrides] = useState<Map<string, number>>(new Map());
-  const activeCommentCount = commentCountOverrides.get(activePost?.id ?? '') ?? activePost?.commentCount ?? 0;
+  // ── Share / Report / Not Interested ──
+  const { moreOptionsOpen, setMoreOptionsOpen, handleShare, handleReport, handleNotInterested } = useClubhouseShare(user?.id);
   
-  const handleCommentPosted = useCallback(() => {
-    if (activePost) {
-      setCommentCountOverrides(prev => {
-        const next = new Map(prev);
-        const current = next.get(activePost.id) ?? activePost.commentCount;
-        next.set(activePost.id, current + 1);
-        return next;
-      });
-    }
-  }, [activePost]);
-  
-  // ── Fix 1: Pause/resume video when comments open/close ──
-  useEffect(() => {
-    const activeEl = useMediaStore.getState().activeVideoElement;
-    if (!activeEl) return;
-    
-    if (commentsOpen) {
-      if (!activeEl.paused) {
-        activeEl.pause();
-      }
-    } else {
-      const userPaused = useMediaStore.getState().userPaused;
-      if (!userPaused) {
-        activeEl.play().catch(() => {});
-      }
-    }
-  }, [commentsOpen]);
+  // ── Feed navigation (tab switch, infinite scroll, pull-to-refresh) ──
+  const { handleNearEnd, handleRefresh } = useClubhouseFeedNav({
+    activeTab,
+    activeFeed,
+    onTabSwitch: () => { resetLikes(); resetFollows(); resetComments(); },
+  });
   
   // ── Carousel media index for multi-media posts ──
   const carouselPositions = useMediaStore((s) => s.carouselPositions);
   const currentMediaIndex = carouselPositions.get(activeIndex) ?? 0;
   const activeMediaCount = activePost?.mediaItems?.length ?? 0;
   
-  // ── Share handler ──
-  const handleShare = useCallback((post: FeedPost | null) => {
-    if (!post) return;
-    analyticsEvents.track('video_share', { post_id: post.id });
-    if (navigator.share) {
-      navigator.share({
-        title: post.displayName,
-        text: post.caption || undefined,
-        url: `${window.location.origin}/post/${post.id}`,
-      }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(`${window.location.origin}/post/${post.id}`);
-      toast.success('Link copied');
-    }
-  }, []);
-  
   // ── Navigation to profile ──
   const handleViewProfile = useCallback(() => {
     if (!activePost) return;
     navigate(getProfilePathById(activePost.userId));
   }, [activePost, navigate]);
-  
-  // ── Tab switching: reset state ──
-  useEffect(() => {
-    if (prevTabRef.current !== activeTab) {
-      analyticsEvents.track('feed_tab_switch', { from: prevTabRef.current, to: activeTab });
-      clubhouseDebug.tabChange(prevTabRef.current, activeTab);
-      useMediaStore.getState().setActiveIndex(0);
-      setLocalLikeState(new Map());
-      setFollowOverrides(new Map());
-      setCommentCountOverrides(new Map());
-      setCommentsOpen(false);
-      prevTabRef.current = activeTab;
-    }
-  }, [activeTab]);
-  
-  // ── Infinite scroll ──
-  const handleNearEnd = useCallback(() => {
-    if (activeFeed.hasNextPage && !activeFeed.isFetchingNextPage) {
-      activeFeed.fetchNextPage();
-    }
-  }, [activeFeed]);
-  
-  // ── Pull to refresh ──
-  const handleRefresh = useCallback(async () => {
-    activeFeed.resetSeen();
-    setLocalLikeState(new Map());
-    setFollowOverrides(new Map());
-    setCommentCountOverrides(new Map());
-    await activeFeed.refetch();
-  }, [activeFeed]);
 
   // Navigation handlers
   const { handleTabClick } = useNavigationHandlers();
@@ -369,83 +219,12 @@ const ClubhouseContent = () => {
   const { data: seasonRecap } = useSeasonRecap(user?.id);
   const [showRecapModal, setShowRecapModal] = React.useState(false);
   const [chevronY, setChevronY] = useState<number | null>(null);
-  const [moreOptionsOpen, setMoreOptionsOpen] = useState(false);
 
   React.useEffect(() => {
     if (seasonRecap) {
       setShowRecapModal(true);
     }
   }, [seasonRecap]);
-
-  // ── Overlay visibility: hide during comments ──
-  const overlayVisible = !commentsOpen;
-
-  // ── Pause/resume on app background/foreground ──
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        const activeEl = useMediaStore.getState().activeVideoElement;
-        if (activeEl && !activeEl.paused) {
-          activeEl.pause();
-        }
-      } else {
-        const store = useMediaStore.getState();
-        const activeEl = store.activeVideoElement;
-        if (activeEl && activeEl.paused && !store.userPaused) {
-          activeEl.play().catch(() => {});
-        }
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, []);
-
-  // ── Fix: Auto-resume on network reconnect ──
-  useEffect(() => {
-    const handleOnline = () => {
-      const store = useMediaStore.getState();
-      const activeEl = store.activeVideoElement;
-      if (activeEl && activeEl.paused && !store.userPaused) {
-        activeEl.play().catch(() => {});
-      }
-    };
-    window.addEventListener('online', handleOnline);
-    return () => window.removeEventListener('online', handleOnline);
-  }, []);
-
-  // ── Fix 3: Screen Wake Lock ──
-  useEffect(() => {
-    let wakeLock: WakeLockSentinel | null = null;
-
-    const requestWakeLock = async () => {
-      try {
-        if ('wakeLock' in navigator) {
-          wakeLock = await (navigator as any).wakeLock.request('screen');
-        }
-      } catch {
-        // Wake lock request failed (e.g., low battery)
-      }
-    };
-
-    requestWakeLock();
-
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        requestWakeLock();
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    return () => {
-      if (wakeLock) {
-        wakeLock.release().catch(() => {});
-      }
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, []);
-  
-  // ── Is active post a video? ──
-  const isActiveVideo = (activePost?.mediaItems?.[0]?.hlsUrl || activePost?.mediaItems?.[0]?.mp4Url) ? true : false;
 
   // ── Active video element from store (for page-level scrubber) ──
   const activeVideoElement = useMediaStore((s) => s.activeVideoElement);
@@ -454,65 +233,14 @@ const ClubhouseContent = () => {
   // ── Is active post own? ──
   const isOwnPost = user?.id === activePost?.userId;
   
-  // ── Fix 12: Video analytics ──
+  // ── Video analytics ──
   useVideoAnalytics(activePost, !!activePost, activeVideoElement);
-  
-  // ── Memoized golfCourse prop for CreatorCapsule ──
-  const golfCourse = useMemo(() => {
-    if (!activePost) return undefined;
-    if (activePost.review) {
-      return {
-        id: activePost.review.courseId,
-        name: activePost.review.courseName,
-        courseCountry: activePost.review.courseCountry || null,
-      };
-    }
-    if (activePost.caption) {
-      const extracted = extractGolfCourseFromContent(activePost.caption);
-      if (extracted) {
-        return {
-          id: null as string | null,
-          name: extracted.name,
-          courseCountry: extracted.country || null,
-        };
-      }
-    }
-    return undefined;
-  }, [activePost?.id, activePost?.review, activePost?.caption]);
-
-  // ── Review data for FullscreenReviewPost ──
-  const activeReview = activePost?.review ?? null;
-  const isActiveReview = activePost?.isReview ?? false;
 
   // ── Review tap handler ──
   const handleReviewTap = useCallback(() => {
     if (!activeReview) return;
     navigate(`/courses/${activeReview.courseId}?tab=reviews&review=${activeReview.reviewId}`);
   }, [activeReview, navigate]);
-
-  // ── Report handler (Fix 8) ──
-  const handleReport = useCallback(async () => {
-    if (!user?.id || !activePost?.id) return;
-    const { error } = await (supabase as any)
-      .from('post_reports')
-      .insert({ post_id: activePost.id, reporter_id: user.id });
-    if (!error) {
-      toast.success('Report submitted');
-    }
-    setMoreOptionsOpen(false);
-  }, [user?.id, activePost?.id]);
-
-  // ── Not Interested handler (Fix 8) ──
-  const handleNotInterested = useCallback(async () => {
-    if (!user?.id || !activePost?.id) return;
-    const { error } = await (supabase as any)
-      .from('post_dismissals')
-      .insert({ post_id: activePost.id, user_id: user.id });
-    if (!error) {
-      toast('Noted — we will show fewer like this');
-    }
-    setMoreOptionsOpen(false);
-  }, [user?.id, activePost?.id]);
 
   // ============================================================================
   // EARLY RETURNS
@@ -558,7 +286,7 @@ const ClubhouseContent = () => {
         user={user}
       />
 
-      {/* Fix 9: Offline indicator */}
+      {/* Offline indicator */}
       {!isOnline && (
         <div style={{
           position: 'fixed',
@@ -678,7 +406,7 @@ const ClubhouseContent = () => {
             isMuted={isMuted}
             isVisible={overlayVisible}
             onLike={() => handleLike(activePost)}
-            onComment={() => setCommentsOpen(true)}
+            onComment={openComments}
             onShare={() => handleShare(activePost)}
             onMore={() => setMoreOptionsOpen(true)}
             onMuteToggle={toggleMute}
@@ -752,11 +480,11 @@ const ClubhouseContent = () => {
           <Drawer open={moreOptionsOpen} onOpenChange={setMoreOptionsOpen}>
             <DrawerContent className="bg-black/95 border-white/10">
               <div className="p-4 space-y-2">
-                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={handleReport}>
+                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => handleReport(activePost)}>
                   <Flag className="w-5 h-5 text-white/60" />
                   <span className="text-sm text-white">Report this post</span>
                 </button>
-                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={handleNotInterested}>
+                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => handleNotInterested(activePost)}>
                   <EyeOff className="w-5 h-5 text-white/60" />
                   <span className="text-sm text-white">Not interested</span>
                 </button>
@@ -775,7 +503,7 @@ const ClubhouseContent = () => {
           {/* Comments sheet — z-100+ */}
           <CommentsPage
             isOpen={commentsOpen}
-            onClose={() => setCommentsOpen(false)}
+            onClose={closeComments}
             postId={activePost.id}
             currentUserId={user?.id}
             creatorUserId={activePost.userId}
@@ -783,7 +511,7 @@ const ClubhouseContent = () => {
             creatorAvatar={activePost.avatarUrl}
             caption={activePost.caption}
             theme="dark"
-            onCommentPosted={handleCommentPosted}
+            onCommentPosted={() => handleCommentPosted(activePost)}
           />
         </>
       )}
