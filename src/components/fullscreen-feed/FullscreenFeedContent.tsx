@@ -44,7 +44,7 @@ export function FullscreenFeedContent({ posts, startIndex, fetchNextPage, hasNex
   const activeDuration = activePost?.mediaItems[0]?.duration ?? null;
 
   // Lifecycle: visibility pause/resume, network reconnect, wake lock
-  useClubhouseLifecycle();
+  useClubhouseLifecycle(() => store.getState());
 
   // Video analytics: impressions and watch time
   useVideoAnalytics(activePost ?? null, !!activePost, activeVideoElement);
