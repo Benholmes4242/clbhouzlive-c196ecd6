@@ -106,9 +106,9 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
             {/* Creator avatar */}
             {review.avatar_url && (
               <div className="absolute top-2 left-2">
-                <GolferAvatar
-                  name={review.username}
-                  photoUrl={review.avatar_url}
+                <SquircleAvatar
+                  src={review.avatar_url}
+                  alt={review.username}
                   size={24}
                   hideRing
                 />
