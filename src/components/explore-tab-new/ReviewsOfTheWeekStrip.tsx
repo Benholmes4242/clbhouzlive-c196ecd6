@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface ReviewItem {
   post_id: string;
   review_id: string;
+  course_id: string;
   thumbnail_url: string | null;
   rating: number;
   course_name: string;
