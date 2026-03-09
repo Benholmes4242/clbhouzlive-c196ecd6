@@ -124,7 +124,7 @@ export function ForwardMessageModal({
         {/* Conversation list */}
         <div className="flex-1 overflow-y-auto">
           {filteredConversations.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-[#8E8E93]">
+            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
               <MessageCircle className="w-10 h-10 mb-2 opacity-50" />
               <p>No conversations found</p>
             </div>
