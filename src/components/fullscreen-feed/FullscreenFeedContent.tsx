@@ -16,6 +16,9 @@ import { Scrubber } from '@/components/media-system/Scrubber';
 interface FullscreenFeedContentProps {
   posts: FeedPost[];
   startIndex: number;
+  fetchNextPage?: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
 }
 
 /** Wrapper to mount the preloader inside the scoped store context */
