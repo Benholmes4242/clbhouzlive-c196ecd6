@@ -96,9 +96,6 @@ export function SettingsPageV2() {
           <ChevronLeft size={24} strokeWidth={2.5} />
         </button>
       </div>
-      <div className="px-5 pb-4">
-        <h1 className="text-[28px] font-bold tracking-tight text-foreground">Settings</h1>
-      </div>
 
       <div className="px-4 pb-32 space-y-6">
 
