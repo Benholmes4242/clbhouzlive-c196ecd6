@@ -14,7 +14,7 @@ interface Props {
   onDone?: () => void;
 }
 
-export function ProfileSuccessScreen({ redirectTo, message }: Props) {
+export function ProfileSuccessScreen({ redirectTo, message, title, subtitle, onViewProfile, onDone }: Props) {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,12 +32,29 @@ export function ProfileSuccessScreen({ redirectTo, message }: Props) {
         </div>
         <div className="text-center">
           <p className="text-[22px] font-bold text-foreground tracking-tight">
-            {message ?? 'Profile saved'}
+            {title ?? message ?? 'Profile saved'}
           </p>
-          <p className="text-[14px] text-muted-foreground mt-1">
-            Redirecting…
-          </p>
+          {subtitle && (
+            <p className="text-[14px] text-muted-foreground mt-1">{subtitle}</p>
+          )}
+          {!subtitle && (
+            <p className="text-[14px] text-muted-foreground mt-1">Redirecting…</p>
+          )}
         </div>
+        {(onViewProfile || onDone) && (
+          <div className="flex gap-3 mt-4">
+            {onViewProfile && (
+              <button onClick={onViewProfile} className="px-4 py-2 text-sm font-medium rounded-xl bg-primary text-primary-foreground">
+                View Profile
+              </button>
+            )}
+            {onDone && (
+              <button onClick={onDone} className="px-4 py-2 text-sm font-medium rounded-xl bg-muted text-foreground">
+                Done
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
