@@ -45,6 +45,12 @@ export function FullscreenFeedContent({ posts, startIndex, fetchNextPage, hasNex
     useFullscreenFeed.getState().close();
   }, []);
 
+  const handleNearEnd = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage && fetchNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
   // Lock body scroll and force black background while overlay is open
   useEffect(() => {
     const prevOverflow = document.body.style.overflow;
