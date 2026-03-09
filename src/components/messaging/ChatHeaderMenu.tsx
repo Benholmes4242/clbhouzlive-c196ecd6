@@ -3,6 +3,7 @@
   * Uses Radix DropdownMenu for proper accessibility and z-index handling
   */
  
+ import { useState } from 'react';
  import { useNavigate } from 'react-router-dom';
  import { 
    MoreVertical, 
@@ -24,12 +25,21 @@
    DropdownMenuSeparator,
    DropdownMenuTrigger,
  } from '@/components/ui/dropdown-menu';
+ import {
+   AlertDialog,
+   AlertDialogAction,
+   AlertDialogCancel,
+   AlertDialogContent,
+   AlertDialogDescription,
+   AlertDialogFooter,
+   AlertDialogHeader,
+   AlertDialogTitle,
+ } from '@/components/ui/alert-dialog';
  import { supabase } from '@/integrations/supabase/client';
  import { toast } from 'sonner';
  import { haptic } from '@/utils/haptics';
  import { BlockUserDialog } from './BlockUserDialog';
  import { ReportSheet } from './ReportSheet';
- import { useState } from 'react';
  import type { ConversationWithDetails } from '@/types/messaging';
  
  interface ChatHeaderMenuProps {
@@ -61,6 +71,8 @@
    
    const [showBlockDialog, setShowBlockDialog] = useState(false);
    const [showReportSheet, setShowReportSheet] = useState(false);
+   const [showClearChatDialog, setShowClearChatDialog] = useState(false);
+   const [showLeaveGroupDialog, setShowLeaveGroupDialog] = useState(false);
    
    // Get current user's participant record
    const myParticipant = conversation.participants.find(p => p.user_id === currentUserId);
@@ -84,18 +96,14 @@
        if (error) throw error;
        
        toast.success(isMuted ? 'Unmuted' : 'Muted');
-     } catch (error) {
-       console.error('Error toggling mute:', error);
+     } catch {
        toast.error("Couldn't update");
      }
    };
  
-   const handleClearChat = async () => {
+   const handleClearChatConfirmed = async () => {
      haptic('medium');
-     if (!confirm('Clear all messages? This cannot be undone.')) return;
-     
      try {
-       // Mark all messages as deleted for this user (soft delete)
        const { error } = await supabase
          .from('messages')
          .update({ deleted_at: new Date().toISOString() })
@@ -104,9 +112,8 @@
        if (error) throw error;
        
        toast.success('Chat cleared');
-       window.location.reload(); // Refresh to show empty chat
-     } catch (error) {
-       console.error('Error clearing chat:', error);
+       navigate(0); // React Router reload
+     } catch {
        toast.error("Couldn't clear chat");
      }
    };
@@ -122,11 +129,10 @@
      setShowReportSheet(true);
    };
  
-   const handleLeaveGroup = async () => {
+   const handleLeaveGroupConfirmed = async () => {
      haptic('medium');
-     if (!confirm('Leave this group? You will no longer receive messages.')) return;
-     
      try {
+      // TODO: Add leave_group_conversation to generated Supabase types
       const { error } = await supabase.rpc('leave_group_conversation' as any, {
          p_conversation_id: conversation.id,
        });
@@ -135,8 +141,7 @@
        
        toast.success('Left group');
        onBack?.();
-     } catch (error) {
-       console.error('Error leaving group:', error);
+     } catch {
        toast.error("Couldn't leave group");
      }
    };
@@ -145,13 +150,13 @@
      <>
        <DropdownMenu>
        <DropdownMenuTrigger asChild>
-          <button className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center active:bg-amber-50 transition-colors focus:outline-none">
-            <MoreVertical className="w-5 h-5 text-amber-700" />
+          <button className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center active:bg-primary/5 transition-colors focus:outline-none">
+            <MoreVertical className="w-5 h-5 text-primary" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent 
           align="end" 
-          className="w-56 bg-white border border-amber-200/20 shadow-lg rounded-xl z-50"
+          className="w-56 bg-background border border-border shadow-lg rounded-xl z-50"
         >
          {isGroupChat ? (
            <>
@@ -200,8 +205,8 @@
              <DropdownMenuSeparator />
              
              <DropdownMenuItem 
-               onClick={handleLeaveGroup}
-               className="gap-3 py-3 cursor-pointer text-red-500 focus:text-red-500"
+               onClick={() => setShowLeaveGroupDialog(true)}
+               className="gap-3 py-3 cursor-pointer text-destructive focus:text-destructive"
              >
                <LogOut className="w-4 h-4" />
                Leave Group
@@ -209,7 +214,7 @@
              
              <DropdownMenuItem 
                onClick={handleReport}
-               className="gap-3 py-3 cursor-pointer text-red-500 focus:text-red-500"
+               className="gap-3 py-3 cursor-pointer text-destructive focus:text-destructive"
              >
                <Flag className="w-4 h-4" />
                Report Group
@@ -262,7 +267,7 @@
              <DropdownMenuSeparator />
              
              <DropdownMenuItem 
-               onClick={handleClearChat}
+               onClick={() => setShowClearChatDialog(true)}
                className="gap-3 py-3 cursor-pointer"
              >
                <Trash2 className="w-4 h-4" />
@@ -271,7 +276,7 @@
              
              <DropdownMenuItem 
                onClick={handleBlockUser}
-               className="gap-3 py-3 cursor-pointer text-red-500 focus:text-red-500"
+               className="gap-3 py-3 cursor-pointer text-destructive focus:text-destructive"
              >
                <Ban className="w-4 h-4" />
                Block User
@@ -279,7 +284,7 @@
              
              <DropdownMenuItem 
                onClick={handleReport}
-               className="gap-3 py-3 cursor-pointer text-red-500 focus:text-red-500"
+               className="gap-3 py-3 cursor-pointer text-destructive focus:text-destructive"
              >
                <Flag className="w-4 h-4" />
                Report
@@ -289,6 +294,48 @@
        </DropdownMenuContent>
        </DropdownMenu>
  
+       {/* Clear Chat AlertDialog */}
+       <AlertDialog open={showClearChatDialog} onOpenChange={setShowClearChatDialog}>
+         <AlertDialogContent>
+           <AlertDialogHeader>
+             <AlertDialogTitle>Clear all messages?</AlertDialogTitle>
+             <AlertDialogDescription>
+               This will permanently delete all messages in this conversation. This cannot be undone.
+             </AlertDialogDescription>
+           </AlertDialogHeader>
+           <AlertDialogFooter>
+             <AlertDialogCancel>Cancel</AlertDialogCancel>
+             <AlertDialogAction
+               onClick={handleClearChatConfirmed}
+               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+             >
+               Clear Chat
+             </AlertDialogAction>
+           </AlertDialogFooter>
+         </AlertDialogContent>
+       </AlertDialog>
+
+       {/* Leave Group AlertDialog */}
+       <AlertDialog open={showLeaveGroupDialog} onOpenChange={setShowLeaveGroupDialog}>
+         <AlertDialogContent>
+           <AlertDialogHeader>
+             <AlertDialogTitle>Leave group?</AlertDialogTitle>
+             <AlertDialogDescription>
+               You'll need to be re-added by a member to rejoin this group.
+             </AlertDialogDescription>
+           </AlertDialogHeader>
+           <AlertDialogFooter>
+             <AlertDialogCancel>Cancel</AlertDialogCancel>
+             <AlertDialogAction
+               onClick={handleLeaveGroupConfirmed}
+               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+             >
+               Leave
+             </AlertDialogAction>
+           </AlertDialogFooter>
+         </AlertDialogContent>
+       </AlertDialog>
+
        {/* Block User Dialog */}
        {otherUserId && (
          <BlockUserDialog

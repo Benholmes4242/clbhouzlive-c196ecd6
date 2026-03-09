@@ -79,8 +79,8 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
         setMedia(mediaItems);
         setCourses(courseItems);
         setLinks(linkItems);
-      } catch (error) {
-        console.error('Error fetching shared content:', error);
+      } catch {
+        // Silent fail — gallery is non-critical
       } finally {
         setLoading(false);
       }
@@ -90,7 +90,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
   }, [conversationId]);
 
   return (
-    <div className="fixed inset-0 bg-[#F8FAFC] z-50 flex flex-col">
+    <div className="fixed inset-0 bg-background z-50 flex flex-col" style={{ paddingTop: 'var(--sat, 0px)' }}>
       {/* Header */}
       <div className="flex items-center h-14 px-4 border-b border-border/40">
         <button
@@ -99,7 +99,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
         >
           <ChevronLeft className="w-6 h-6 text-foreground/60" />
         </button>
-        <h1 className="flex-1 text-center text-lg font-semibold">
+        <h1 className="flex-1 text-center text-lg font-semibold text-foreground">
           Media, Links, and Courses
         </h1>
         <div className="w-10" />
@@ -110,21 +110,21 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
         <TabsList className="mx-4 mt-4 grid grid-cols-3 h-10 bg-muted/60 rounded-full p-1">
           <TabsTrigger
             value="media"
-            className="rounded-full text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            className="rounded-full text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
           >
             <Image className="w-4 h-4 mr-1" />
             Media ({media.length})
           </TabsTrigger>
           <TabsTrigger
             value="courses"
-            className="rounded-full text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            className="rounded-full text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
           >
             <MapPin className="w-4 h-4 mr-1" />
             Courses ({courses.length})
           </TabsTrigger>
           <TabsTrigger
             value="links"
-            className="rounded-full text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            className="rounded-full text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
           >
             <Link className="w-4 h-4 mr-1" />
             Links ({links.length})
@@ -133,14 +133,14 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
 
         {loading ? (
           <div className="flex-1 flex items-center justify-center">
-            <Loader2 className="w-8 h-8 text-amber-300 animate-spin" />
+            <Loader2 className="w-8 h-8 text-primary/50 animate-spin" />
           </div>
         ) : (
           <>
-            <TabsContent value="media" className="flex-1 overflow-y-auto p-4">
+            <TabsContent value="media" className="flex-1 overflow-y-auto p-4" style={{ paddingBottom: 'var(--sab, 0px)' }}>
               {media.length === 0 ? (
-                <div className="text-center py-12 text-[#8E8E93]">
-                  <Image className="w-12 h-12 mx-auto mb-2 text-amber-300 opacity-50" />
+                <div className="text-center py-12 text-muted-foreground">
+                  <Image className="w-12 h-12 mx-auto mb-2 text-primary/30" />
                   <p>No media shared yet</p>
                 </div>
               ) : (
@@ -149,7 +149,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
                     <button
                       key={item.id}
                       onClick={() => setSelectedImage(item.url)}
-                      className="aspect-square rounded-lg overflow-hidden bg-amber-100/30"
+                      className="aspect-square rounded-lg overflow-hidden bg-muted/30"
                     >
                       {item.type === 'image' ? (
                         <img src={item.url} alt="" className="w-full h-full object-cover" />
@@ -162,10 +162,10 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
               )}
             </TabsContent>
 
-            <TabsContent value="courses" className="flex-1 overflow-y-auto p-4 space-y-3">
+            <TabsContent value="courses" className="flex-1 overflow-y-auto p-4 space-y-3" style={{ paddingBottom: 'var(--sab, 0px)' }}>
               {courses.length === 0 ? (
-                <div className="text-center py-12 text-[#8E8E93]">
-                  <MapPin className="w-12 h-12 mx-auto mb-2 text-amber-300 opacity-50" />
+                <div className="text-center py-12 text-muted-foreground">
+                  <MapPin className="w-12 h-12 mx-auto mb-2 text-primary/30" />
                   <p>No courses shared yet</p>
                 </div>
               ) : (
@@ -173,7 +173,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
                   <a
                     key={course.id}
                     href={course.url}
-                    className="flex items-center gap-3 p-3 rounded-2xl bg-amber-50/50 hover:bg-amber-100/50"
+                    className="flex items-center gap-3 p-3 rounded-2xl bg-primary/5 hover:bg-primary/10"
                   >
                     {course.thumbnail ? (
                       <img
@@ -182,15 +182,15 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
                         className="w-16 h-16 rounded-lg object-cover"
                       />
                     ) : (
-                      <div className="w-16 h-16 rounded-lg bg-amber-500 flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-lg bg-primary flex items-center justify-center">
                         <span className="text-2xl">⛳</span>
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-[#1D1D1F] truncate">
+                      <p className="font-medium text-foreground truncate">
                         {course.title || 'Golf Course'}
                       </p>
-                      <p className="text-sm text-[#8E8E93]">
+                      <p className="text-sm text-muted-foreground">
                         {new Date(course.createdAt).toLocaleDateString()}
                       </p>
                     </div>
@@ -199,10 +199,10 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
               )}
             </TabsContent>
 
-            <TabsContent value="links" className="flex-1 overflow-y-auto p-4 space-y-2">
+            <TabsContent value="links" className="flex-1 overflow-y-auto p-4 space-y-2" style={{ paddingBottom: 'var(--sab, 0px)' }}>
               {links.length === 0 ? (
-                <div className="text-center py-12 text-[#8E8E93]">
-                  <Link className="w-12 h-12 mx-auto mb-2 text-amber-300 opacity-50" />
+                <div className="text-center py-12 text-muted-foreground">
+                  <Link className="w-12 h-12 mx-auto mb-2 text-primary/30" />
                   <p>No links shared yet</p>
                 </div>
               ) : (
@@ -212,12 +212,12 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block p-3 rounded-2xl bg-amber-50/50 hover:bg-amber-100/50"
+                    className="block p-3 rounded-2xl bg-primary/5 hover:bg-primary/10"
                   >
-                    <p className="text-amber-600 truncate text-sm">
+                    <p className="text-primary truncate text-sm">
                       {link.url}
                     </p>
-                    <p className="text-xs text-[#8E8E93] mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       {new Date(link.createdAt).toLocaleDateString()}
                     </p>
                   </a>
@@ -237,6 +237,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
           <button
             onClick={() => setSelectedImage(null)}
             className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
+            style={{ marginTop: 'var(--sat, 0px)' }}
           >
             <ChevronLeft className="w-6 h-6 text-white rotate-180" />
           </button>

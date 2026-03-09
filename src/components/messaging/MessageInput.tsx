@@ -7,6 +7,7 @@ import { ShareContentModal } from './ShareContentModal';
 import { VoiceRecordButton } from './VoiceRecordButton';
  import { haptic } from '@/utils/haptics';
  import { EmojiPickerPopover } from './EmojiPickerPopover';
+import { toast } from 'sonner';
 import type { MessageWithSender, MessageType } from '@/types/messaging';
 
 interface MessageInputProps {
@@ -75,7 +76,7 @@ export function MessageInput({
       .upload(fileName, file);
 
     if (error) {
-      console.error('Error uploading media:', error);
+      toast.error('Failed to upload media');
       return null;
     }
 
@@ -152,7 +153,7 @@ export function MessageInput({
     const isVideo = file.type.startsWith('video/');
 
     if (!isImage && !isVideo) {
-      alert('Please select an image or video file');
+      toast.error('Unsupported file type', { description: 'Please select an image or video file.' });
       return;
     }
 
@@ -205,35 +206,34 @@ export function MessageInput({
 
   return (
     <div 
-      className="flex-none px-4 pb-8 pt-2"
+      className="flex-none px-4 pt-2 bg-background/95 border-t border-border/30"
       style={{
-        background: 'rgba(255,251,235,0.95)',
-        borderTop: '1px solid rgba(217,119,6,0.06)',
+        paddingBottom: 'calc(var(--sab, 0px) + 8px)',
       }}
     >
       {/* Reply preview */}
       {replyingTo && (
-        <div className="flex items-center justify-between gap-2 px-4 py-2 mb-2 bg-white rounded-[18px] shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
-          <div className="flex-1 min-w-0 pl-2 border-l-2 border-amber-500">
-            <span className="text-[12px] font-semibold text-amber-600">
+        <div className="flex items-center justify-between gap-2 px-4 py-2 mb-2 bg-background rounded-[18px] shadow-sm">
+          <div className="flex-1 min-w-0 pl-2 border-l-2 border-primary">
+            <span className="text-[12px] font-semibold text-primary">
               Replying to {replyToName}
             </span>
-            <p className="text-[13px] text-[#8E8E93] truncate">
+            <p className="text-[13px] text-muted-foreground truncate">
               {replyingTo.content}
             </p>
           </div>
           <button
             onClick={onCancelReply}
-            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-amber-50/50"
+            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted"
           >
-            <X className="w-4 h-4 text-[#8E8E93]" />
+            <X className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
       )}
 
       {/* Media preview */}
       {mediaPreview && (
-        <div className="mb-2 p-2 bg-white rounded-[18px] shadow-[0_1px_2px_rgba(0,0,0,0.06)]">
+        <div className="mb-2 p-2 bg-background rounded-[18px] shadow-sm">
           <div className="relative inline-block">
             {mediaPreview.type === 'image' ? (
               <img 
@@ -250,9 +250,9 @@ export function MessageInput({
             )}
             <button
               onClick={clearMediaPreview}
-              className="absolute -top-2 -right-2 w-6 h-6 bg-[#8E8E93] rounded-full flex items-center justify-center"
+              className="absolute -top-2 -right-2 w-6 h-6 bg-muted-foreground rounded-full flex items-center justify-center"
             >
-              <X className="w-3 h-3 text-white" />
+              <X className="w-3 h-3 text-background" />
             </button>
           </div>
         </div>
@@ -282,9 +282,9 @@ export function MessageInput({
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled || uploading}
-          className="w-10 h-10 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors flex-shrink-0"
+          className="w-10 h-10 rounded-full flex items-center justify-center active:bg-muted transition-colors flex-shrink-0"
         >
-          <Paperclip className="w-5 h-5" style={{ color: '#78716C' }} />
+          <Paperclip className="w-5 h-5 text-muted-foreground" />
         </button>
 
         {/* Golf content share button */}
@@ -292,19 +292,13 @@ export function MessageInput({
           onClick={() => setShowShareModal(true)}
           disabled={disabled || uploading}
           title="Share golf content"
-          className="w-10 h-10 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors flex-shrink-0"
+          className="w-10 h-10 rounded-full flex items-center justify-center active:bg-muted transition-colors flex-shrink-0"
         >
-          <MapPin className="w-5 h-5 text-amber-600" />
+          <MapPin className="w-5 h-5 text-primary" />
         </button>
 
         {/* Input container - pill style */}
-        <div 
-          className="flex-1 flex items-end gap-2 rounded-[22px] px-4 py-2"
-          style={{
-            background: 'rgba(255,255,255,0.8)',
-            border: '1px solid rgba(217,119,6,0.12)',
-          }}
-        >
+        <div className="flex-1 flex items-end gap-2 rounded-[22px] px-4 py-2 bg-background/80 border border-border/40">
            {/* Emoji picker */}
            <EmojiPickerPopover onEmojiSelect={handleEmojiSelect} />
           
@@ -317,17 +311,16 @@ export function MessageInput({
             placeholder="Message"
             disabled={disabled || uploading}
             rows={1}
-            className="flex-1 bg-transparent outline-none text-[13px] text-[#1D1D1F] placeholder:text-[#A8A29E] resize-none max-h-[120px] py-1"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
+            className="flex-1 bg-transparent outline-none text-[13px] text-foreground placeholder:text-muted-foreground resize-none max-h-[120px] py-1 font-dm-sans"
           />
           
            {/* Camera button (when no text/media) */}
            {!hasText && !mediaPreview && (
              <button 
                onClick={() => cameraInputRef.current?.click()}
-               className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 active:bg-[#F5F5F5]"
+               className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 active:bg-muted"
              >
-              <Camera className="w-5 h-5" style={{ color: '#A8A29E' }} />
+              <Camera className="w-5 h-5 text-muted-foreground" />
             </button>
           )}
         </div>
@@ -337,12 +330,12 @@ export function MessageInput({
           <button 
             onClick={handleSend}
             disabled={(!hasText && !mediaPreview) || disabled || uploading}
-            className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center transition-all flex-shrink-0 active:scale-95 disabled:opacity-50"
+            className="w-10 h-10 rounded-full bg-primary flex items-center justify-center transition-all flex-shrink-0 active:scale-95 disabled:opacity-50"
           >
             {uploading ? (
-              <Loader2 className="w-5 h-5 text-white animate-spin" />
+              <Loader2 className="w-5 h-5 text-primary-foreground animate-spin" />
             ) : (
-              <Send className="w-5 h-5 text-white" />
+              <Send className="w-5 h-5 text-primary-foreground" />
             )}
           </button>
         ) : onSendVoiceNote ? (
@@ -351,8 +344,8 @@ export function MessageInput({
             disabled={disabled || uploading}
           />
         ) : (
-          <button className="w-10 h-10 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-colors flex-shrink-0">
-            <Mic className="w-5 h-5 text-[#8E8E93]" />
+          <button className="w-10 h-10 rounded-full flex items-center justify-center active:bg-muted transition-colors flex-shrink-0">
+            <Mic className="w-5 h-5 text-muted-foreground" />
           </button>
         )}
       </div>

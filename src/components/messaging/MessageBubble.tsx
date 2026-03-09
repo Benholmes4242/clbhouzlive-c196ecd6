@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import {
@@ -49,12 +49,12 @@ function formatMessageTime(dateString: string): string {
 
 function ReadReceipt({ status }: { status: 'sent' | 'delivered' | 'read' }) {
   if (status === 'read') {
-    return <CheckCheck className="w-3.5 h-3.5 text-amber-500/60" />;
+    return <CheckCheck className="w-3.5 h-3.5 text-primary/60" />;
   }
   if (status === 'delivered') {
-    return <CheckCheck className="w-3.5 h-3.5" style={{ color: '#A8A29E' }} />;
+    return <CheckCheck className="w-3.5 h-3.5 text-muted-foreground" />;
   }
-  return <Check className="w-3.5 h-3.5" style={{ color: '#A8A29E' }} />;
+  return <Check className="w-3.5 h-3.5 text-muted-foreground" />;
 }
 
 export function MessageBubble({
@@ -74,21 +74,19 @@ export function MessageBubble({
   const [isPressed, setIsPressed] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
-  
+  const [hasFetchedSaved, setHasFetchedSaved] = useState(false);
 
-  // Check if message is saved on mount
-  useEffect(() => {
-    const checkIfSaved = async () => {
-      if (!message.id) return;
-      const { data, error } = await supabase.rpc('is_message_saved', {
-        p_message_id: message.id
-      });
-      if (!error && data) {
-        setIsSaved(true);
-      }
-    };
-    checkIfSaved();
-  }, [message.id]);
+  // Fetch saved state lazily when context menu opens
+  const fetchSavedState = async () => {
+    if (hasFetchedSaved || !message.id) return;
+    const { data, error } = await supabase.rpc('is_message_saved', {
+      p_message_id: message.id
+    });
+    if (!error && data) {
+      setIsSaved(true);
+    }
+    setHasFetchedSaved(true);
+  };
 
   // Handle system messages first
   if (message.message_type === 'system') {
@@ -142,12 +140,8 @@ export function MessageBubble({
             className={cn(
               "w-full max-w-[260px] rounded-[16px] overflow-hidden text-left transition-all backdrop-blur-[16px]",
               "hover:scale-[1.02] active:scale-[0.98]",
+              "bg-background/80 border border-border shadow-sm"
             )}
-            style={{
-              background: 'rgba(255,255,255,0.8)',
-              border: '1px solid rgba(217,119,6,0.08)',
-              boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
-            }}
           >
             {/* Course Image */}
             <div className="relative aspect-[16/10] w-full overflow-hidden rounded-t-[16px]">
@@ -179,7 +173,7 @@ export function MessageBubble({
 
             <div className="p-3">
               <div className="flex items-start justify-between gap-2">
-                <h4 className="font-semibold text-[15px] line-clamp-2 flex-1" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
+                <h4 className="font-semibold text-[15px] line-clamp-2 flex-1 text-foreground font-dm-sans">
                   {course.course_name}
                 </h4>
                 
@@ -192,21 +186,18 @@ export function MessageBubble({
               </div>
               
               {course.location && (
-                <div className="flex items-center gap-1 mt-1 text-[12px] font-normal" style={{ color: '#78716C' }}>
-                  <MapPin size={12} style={{ color: '#A8A29E' }} />
+                <div className="flex items-center gap-1 mt-1 text-[12px] font-normal text-muted-foreground">
+                  <MapPin size={12} className="text-muted-foreground" />
                   <span className="truncate">{course.location}</span>
                 </div>
               )}
               
-              <div 
-                className="mt-3 flex items-center justify-center gap-2 py-2 rounded-[10px] text-[13px] font-semibold w-full" 
-                style={{ background: 'rgba(245,158,11,0.08)', color: '#D97706', border: '1px solid rgba(217,119,6,0.12)' }}
-              >
+              <div className="mt-3 flex items-center justify-center gap-2 py-2 rounded-[10px] text-[13px] font-semibold w-full bg-primary/5 text-primary border border-primary/10">
                 <span>View Course</span>
                 <ExternalLink size={14} />
               </div>
               {/* Timestamp */}
-              <div className="flex items-center justify-end gap-1 mt-2 text-[11px] font-normal" style={{ color: '#A8A29E' }}>
+              <div className="flex items-center justify-end gap-1 mt-2 text-[11px] font-normal text-muted-foreground">
                 {message.is_edited && <span>edited</span>}
                 <span>{formatMessageTime(message.created_at)}</span>
                 {isOwnMessage && <ReadReceipt status={deliveryStatus} />}
@@ -227,7 +218,7 @@ export function MessageBubble({
     );
 
     return (
-      <ContextMenu>
+      <ContextMenu onOpenChange={(open) => { if (open) fetchSavedState(); }}>
         <ContextMenuTrigger asChild>{courseCardContent}</ContextMenuTrigger>
         <ContextMenuContent>
           <ContextMenuItem onClick={onReply} className="gap-2">
@@ -278,8 +269,7 @@ export function MessageBubble({
       const nowSaved = data === true;
       setIsSaved(nowSaved);
       toast.success(nowSaved ? "Saved to Caddie's Picks ⛳" : "Removed from Caddie's Picks");
-    } catch (error) {
-      console.error('Error toggling saved message:', error);
+    } catch {
       toast.error('Failed to save message');
     }
   };
@@ -313,29 +303,18 @@ export function MessageBubble({
             "px-[15px] py-[11px] break-words relative group backdrop-blur-[12px]",
             isPressed && "opacity-80",
             isOwnMessage 
-              ? "rounded-[16px_16px_4px_16px]"
-              : "rounded-[16px_16px_16px_4px]"
+              ? "rounded-[16px_16px_4px_16px] bg-foreground/[0.06]"
+              : "rounded-[16px_16px_16px_4px] bg-background/80 border border-border/40"
           )}
-          style={
-            isOwnMessage
-              ? {
-                  background: 'rgba(0,0,0,0.06)',
-                  border: 'none',
-                }
-              : {
-                  background: 'rgba(255,255,255,0.8)',
-                  border: '1px solid rgba(0,0,0,0.07)',
-                }
-          }
           onTouchCancel={() => setIsPressed(false)}
         >
           {/* Reply preview */}
           {replyToMessage && (
-            <div className="mb-2 pl-2 border-l-2 border-primary/40 bg-[#00000008] rounded-r-lg py-1.5 pr-2">
+            <div className="mb-2 pl-2 border-l-2 border-primary/40 bg-foreground/[0.03] rounded-r-lg py-1.5 pr-2">
               <p className="text-[12px] font-semibold text-primary/70">
                 {replyToMessage.sender?.display_name || replyToMessage.sender?.username || 'You'}
               </p>
-              <p className="text-[13px] text-[#8E8E93] truncate">
+              <p className="text-[13px] text-muted-foreground truncate">
                 {replyToMessage.content || 'Media'}
               </p>
             </div>
@@ -371,15 +350,15 @@ export function MessageBubble({
 
           {/* Message content */}
           {message.content && (
-            <p className="text-[14px] leading-relaxed whitespace-pre-wrap" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
+            <p className="text-[14px] leading-relaxed whitespace-pre-wrap text-foreground font-dm-sans">
               {message.content}
             </p>
           )}
 
           {/* Timestamp + Read receipt */}
           <div className="flex items-center gap-1 mt-1 justify-end">
-            {message.is_edited && <span className="text-[11px] font-normal" style={{ color: isOwnMessage ? 'rgba(180,83,9,0.6)' : '#A8A29E' }}>edited</span>}
-            <span className="text-[11px] font-normal" style={{ color: isOwnMessage ? 'rgba(180,83,9,0.6)' : '#A8A29E' }}>{formatMessageTime(message.created_at)}</span>
+            {message.is_edited && <span className="text-[11px] font-normal text-muted-foreground">edited</span>}
+            <span className="text-[11px] font-normal text-muted-foreground">{formatMessageTime(message.created_at)}</span>
             {isOwnMessage && <ReadReceipt status={deliveryStatus} />}
           </div>
         </div>
@@ -398,18 +377,18 @@ export function MessageBubble({
   );
 
   return (
-    <ContextMenu>
+    <ContextMenu onOpenChange={(open) => { if (open) fetchSavedState(); }}>
       <ContextMenuTrigger asChild>{bubbleContent}</ContextMenuTrigger>
-      <ContextMenuContent className="w-48 bg-white border border-amber-200/20 shadow-lg rounded-xl z-50">
+      <ContextMenuContent className="w-48 bg-background border border-border shadow-lg rounded-xl z-50">
         {/* Quick reactions row */}
-        <div className="flex items-center justify-around py-2 px-3 border-b border-amber-200/20">
+        <div className="flex items-center justify-around py-2 px-3 border-b border-border">
           {['👍', '🔥', '⛳', '😂', '❤️', '🏌️'].map((emoji) => (
             <button
               key={emoji}
               onClick={() => {
                 handleEmojiSelect(emoji);
               }}
-              className="w-8 h-8 flex items-center justify-center text-lg hover:bg-amber-50/50 rounded-full active:scale-90 transition-transform"
+              className="w-8 h-8 flex items-center justify-center text-lg hover:bg-primary/5 rounded-full active:scale-90 transition-transform"
             >
               {emoji}
             </button>
@@ -431,7 +410,7 @@ export function MessageBubble({
         )}
         
         <ContextMenuItem onClick={handleStar} className="gap-3 py-2.5 cursor-pointer">
-          <Star className={cn("h-4 w-4", isSaved && "fill-current text-yellow-500")} />
+          <Star className={cn("h-4 w-4", isSaved && "fill-current text-primary")} />
           {isSaved ? "Remove from Picks" : "Caddie's Pick ⛳"}
         </ContextMenuItem>
         
@@ -442,7 +421,7 @@ export function MessageBubble({
             <ContextMenuItem onClick={() => { haptic('light'); onEdit(); }} className="gap-3 py-2.5 cursor-pointer">
               <Pencil className="h-4 w-4" />Edit
             </ContextMenuItem>
-            <ContextMenuItem onClick={() => { haptic('medium'); onDelete(); }} className="gap-3 py-2.5 cursor-pointer text-red-500 focus:text-red-500">
+            <ContextMenuItem onClick={() => { haptic('medium'); onDelete(); }} className="gap-3 py-2.5 cursor-pointer text-destructive focus:text-destructive">
               <Trash2 className="h-4 w-4" />Delete
             </ContextMenuItem>
           </>

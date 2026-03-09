@@ -55,10 +55,10 @@ export function ChatSearchBar({
   }, [query]);
 
   return (
-    <div className="flex items-center gap-2 px-4 py-2 bg-white/80 border-b border-border/40">
+    <div className="flex items-center gap-2 px-4 py-2 bg-background/80 border-b border-border/40">
       {/* Search input */}
       <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8E8E93]" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -71,7 +71,7 @@ export function ChatSearchBar({
       {/* Match count and navigation */}
       {query.trim() && (
         <div className="flex items-center gap-1">
-          <span className="text-xs text-[#8E8E93] min-w-[60px] text-center">
+          <span className="text-xs text-muted-foreground min-w-[60px] text-center">
             {matches.length === 0
               ? 'No results'
               : `${currentMatchIndex + 1} of ${matches.length}`
@@ -88,7 +88,7 @@ export function ChatSearchBar({
                 : "opacity-30"
             )}
           >
-            <ChevronUp className="w-4 h-4 text-[#1D1D1F]" />
+            <ChevronUp className="w-4 h-4 text-foreground" />
           </button>
 
           <button
@@ -101,7 +101,7 @@ export function ChatSearchBar({
                 : "opacity-30"
             )}
           >
-            <ChevronDown className="w-4 h-4 text-[#1D1D1F]" />
+            <ChevronDown className="w-4 h-4 text-foreground" />
           </button>
         </div>
       )}
@@ -111,7 +111,7 @@ export function ChatSearchBar({
         onClick={onClose}
         className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-muted/50 active:bg-muted"
       >
-        <X className="w-4 h-4 text-[#8E8E93]" />
+        <X className="w-4 h-4 text-muted-foreground" />
       </button>
     </div>
   );

@@ -28,10 +28,10 @@ export function ConversationSearchBar({
       {/* Search Input - warm glass pill */}
       <div className="relative flex-1">
         <div className={cn(
-          "flex items-center gap-3 h-[40px] rounded-xl px-4 transition-all bg-white/70 border border-amber-200/30",
-          isFocused && "ring-1 ring-amber-200 border-amber-300"
+          "flex items-center gap-3 h-[40px] rounded-xl px-4 transition-all bg-background/70 border border-border",
+          isFocused && "ring-1 ring-ring border-ring"
         )}>
-          <Search className="w-4 h-4 flex-shrink-0" style={{ color: '#A8A29E' }} />
+          <Search className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search conversations…"
@@ -39,16 +39,14 @@ export function ConversationSearchBar({
             onChange={(e) => onChange(e.target.value)}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            className="flex-1 bg-transparent outline-none text-[13px] font-normal placeholder:font-normal"
-            style={{ color: '#1C1917' }}
+            className="flex-1 bg-transparent outline-none text-[13px] font-normal text-foreground placeholder:font-normal placeholder:text-muted-foreground"
           />
           {value && (
             <button
               onClick={handleClear}
-              className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-              style={{ backgroundColor: '#A8A29E' }}
+              className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 bg-muted-foreground"
             >
-              <X className="w-3 h-3 text-white" />
+              <X className="w-3 h-3 text-background" />
             </button>
           )}
         </div>
