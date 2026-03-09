@@ -20,7 +20,7 @@ export const PostsFeedSkeleton: React.FC = () => {
       </div>
 
       {/* Review skeleton */}
-      <div className="bg-muted rounded-xl overflow-hidden">
+      <div className="bg-muted overflow-hidden">
         <div className="h-[3px] bg-muted-foreground/10" />
         <div className="px-3 py-2 space-y-2">
           <div className="h-4 bg-muted-foreground/10 rounded w-2/3" />
