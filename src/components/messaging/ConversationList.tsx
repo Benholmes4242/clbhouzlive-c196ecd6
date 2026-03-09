@@ -5,6 +5,7 @@ import { useArchivedConversations } from '@/hooks/useArchivedConversations';
 import { useTypingIndicator } from '@/hooks/useTypingIndicator';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { MessageCircle, Plus, Archive, ChevronDown, ChevronRight, Users, Check, CheckCheck, BellOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -208,14 +209,19 @@ export function ConversationList({
     }
   };
 
-  const handleDeleteConversation = async (conversationId: string) => {
-    if (!confirm('Delete this conversation? This cannot be undone.')) return;
-    
+  const [deletingConversationId, setDeletingConversationId] = useState<string | null>(null);
+
+  const handleDeleteConversation = (conversationId: string) => {
+    setDeletingConversationId(conversationId);
+  };
+
+  const handleDeleteConfirmed = async () => {
+    if (!deletingConversationId) return;
     try {
       const { error } = await supabase
         .from('conversation_participants')
         .delete()
-        .eq('conversation_id', conversationId)
+        .eq('conversation_id', deletingConversationId)
         .eq('user_id', user?.id);
         
       if (error) throw error;
@@ -224,6 +230,8 @@ export function ConversationList({
       toast.success('Conversation deleted');
     } catch {
       toast.error("Couldn't delete conversation");
+    } finally {
+      setDeletingConversationId(null);
     }
   };
 
@@ -417,6 +425,30 @@ export function ConversationList({
           )}
         </div>
       )}
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog 
+        open={!!deletingConversationId} 
+        onOpenChange={(open) => !open && setDeletingConversationId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete conversation?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirmed}
+              className="bg-destructive text-destructive-foreground"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

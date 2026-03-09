@@ -131,7 +131,7 @@ export function useMessageReactions(conversationId: string | null) {
     fetchReactions();
   }, [fetchReactions]);
 
-  // Subscribe to realtime changes
+  // Subscribe to realtime changes — only refetch if the reaction is for a message in this conversation
   useEffect(() => {
     if (!conversationId) return;
 
@@ -144,9 +144,12 @@ export function useMessageReactions(conversationId: string | null) {
           schema: 'public',
           table: 'message_reactions',
         },
-        () => {
-          // Refetch on any change
-          fetchReactions();
+        (payload) => {
+          const messageId = (payload.new as any)?.message_id || (payload.old as any)?.message_id;
+          const currentMessageIds = new Set(Object.keys(reactions));
+          if (!messageId || currentMessageIds.has(messageId)) {
+            fetchReactions();
+          }
         }
       )
       .subscribe();
@@ -154,7 +157,7 @@ export function useMessageReactions(conversationId: string | null) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [conversationId, fetchReactions]);
+  }, [conversationId, fetchReactions, reactions]);
 
   return {
     reactions,

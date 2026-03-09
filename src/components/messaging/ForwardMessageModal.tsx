@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { useMessaging } from '@/hooks/useMessaging';
+import { useMessagingContext } from '@/contexts/MessagingContext';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
 import { haptic } from '@/utils/haptics';
@@ -37,7 +37,7 @@ export function ForwardMessageModal({
   mediaMetadata,
 }: ForwardMessageModalProps) {
   const { user } = useSupabaseSession();
-  const { conversations, sendMessage } = useMessaging();
+  const { conversations, sendMessage } = useMessagingContext();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [forwarding, setForwarding] = useState<string | null>(null);
@@ -111,12 +111,12 @@ export function ForwardMessageModal({
         {/* Search */}
         <div className="px-4 mb-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8E8E93]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search conversations..."
-              className="pl-10 h-10 rounded-full bg-amber-50/50 border border-amber-200/30"
+              className="pl-10 h-10 rounded-full bg-primary/5 border border-border"
             />
           </div>
         </div>
@@ -124,7 +124,7 @@ export function ForwardMessageModal({
         {/* Conversation list */}
         <div className="flex-1 overflow-y-auto">
           {filteredConversations.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-[#8E8E93]">
+            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
               <MessageCircle className="w-10 h-10 mb-2 opacity-50" />
               <p>No conversations found</p>
             </div>
@@ -140,13 +140,13 @@ export function ForwardMessageModal({
                   disabled={forwarding !== null}
                   className={cn(
                     "w-full flex items-center gap-3 px-4 py-3 transition-colors",
-                    "hover:bg-amber-50/50 active:bg-amber-100/30",
+                    "hover:bg-primary/5 active:bg-primary/10",
                     forwarding !== null && forwarding !== conv.id && "opacity-50"
                   )}
                 >
                   {display.isGroup ? (
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center flex-shrink-0">
-                      <Users className="w-5 h-5 text-white" />
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center flex-shrink-0">
+                      <Users className="w-5 h-5 text-primary-foreground" />
                     </div>
                   ) : (
                     <SquircleAvatar
@@ -157,11 +157,11 @@ export function ForwardMessageModal({
                       hideRing
                     />
                   )}
-                  <span className="flex-1 text-left font-medium text-[#1D1D1F] truncate">
+                  <span className="flex-1 text-left font-medium text-foreground truncate">
                     {display.name}
                   </span>
                   {isForwarding && (
-                    <Loader2 className="w-5 h-5 text-amber-500 animate-spin" />
+                    <Loader2 className="w-5 h-5 text-primary animate-spin" />
                   )}
                 </button>
               );

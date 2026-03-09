@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { 
   ChevronLeft, Camera, Pencil, UserPlus, LogOut, Archive,
   Shield, ShieldCheck, MoreVertical, Trash2, Image,
@@ -15,6 +14,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { ConversationWithDetails, ParticipantWithProfile } from '@/types/messaging';
@@ -48,7 +57,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
   onClose,
   onUpdate,
 }) => {
-  const navigate = useNavigate();
+  
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -61,6 +70,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [showSharedMedia, setShowSharedMedia] = useState(false);
   const [isMutedLocal, setIsMutedLocal] = useState(false);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
   const currentUserParticipant = conversation.participants.find(
     p => p.user_id === currentUserId
@@ -186,17 +197,22 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
     }
   };
 
-  const handleLeaveGroup = async () => {
-    if (!confirm('Are you sure you want to leave this group?')) return;
+  const handleLeaveGroup = () => {
+    setShowLeaveDialog(true);
+  };
+
+  const handleLeaveConfirmed = async () => {
     try {
       const { error } = await supabase.rpc('leave_group', {
         p_conversation_id: conversation.id,
       });
       if (error) throw error;
       toast.success('You left the group');
-      navigate('/messages');
+      onClose();
     } catch (error: any) {
       toast.error('Failed to leave', { description: error.message });
+    } finally {
+      setShowLeaveDialog(false);
     }
   };
 
@@ -208,23 +224,28 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
       });
       if (error) throw error;
       toast.success('Chat archived');
-      navigate('/messages');
+      onClose();
     } catch (error: any) {
       toast.error('Failed to archive');
     }
   };
 
-  const handleDeleteGroup = async () => {
-    if (!confirm('Delete this group for everyone? This cannot be undone.')) return;
+  const handleDeleteGroup = () => {
+    setShowDeleteDialog(true);
+  };
+
+  const handleDeleteConfirmed = async () => {
     try {
       const { error } = await supabase.rpc('delete_group', {
         p_conversation_id: conversation.id,
       });
       if (error) throw error;
       toast.success('Group deleted');
-      navigate('/messages');
+      onClose();
     } catch (error: any) {
       toast.error('Failed to delete group', { description: error.message });
+    } finally {
+      setShowDeleteDialog(false);
     }
   };
 
@@ -586,6 +607,48 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           onClose={() => setShowSharedMedia(false)}
         />
       )}
+
+      {/* Leave group confirmation */}
+      <AlertDialog open={showLeaveDialog} onOpenChange={setShowLeaveDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Leave group?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You'll need to be re-added by a member to rejoin.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleLeaveConfirmed}
+              className="bg-destructive text-destructive-foreground"
+            >
+              Leave
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete group confirmation */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete group for everyone?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This cannot be undone. All messages and media will be permanently deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirmed}
+              className="bg-destructive text-destructive-foreground"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
