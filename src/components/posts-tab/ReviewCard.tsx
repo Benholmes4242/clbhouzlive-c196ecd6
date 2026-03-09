@@ -3,6 +3,8 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { Star, Play, Heart, MessageCircle } from 'lucide-react';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 import { formatDistanceToNow } from 'date-fns';
+import { getScoreTier } from '@/utils/getScoreTier';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 function formatCompact(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -28,9 +30,13 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
   const location = [review.courseRegion, review.courseCountry].filter(Boolean).join(', ');
 
+  // Use canonical rating color palette
+  const tierData = getScoreTier(review.rating);
+  const accentColor = tierData.isOutstanding ? '#f59e0b' : tierData.accent;
+
   return (
     <div
-      className="bg-card rounded-xl overflow-hidden shadow-sm border border-border/50 cursor-pointer"
+      className="bg-card overflow-hidden cursor-pointer"
       onClick={() => {
         if (allPosts && postIndex != null) {
           useFullscreenFeed.getState().open({
@@ -41,8 +47,8 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
         }
       }}
     >
-      {/* Amber accent stripe */}
-      <div className="h-[3px] bg-amber-500" />
+      {/* Accent stripe — uses canonical rating color */}
+      <div className="h-[3px]" style={{ backgroundColor: accentColor }} />
 
       {/* Course info header */}
       <div className="flex items-center justify-between px-3 pt-2.5 pb-1">
@@ -52,17 +58,22 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
             <p className="text-xs text-muted-foreground truncate">{location}</p>
           )}
         </div>
-        <div className="flex items-center gap-1 ml-2 shrink-0 rounded-full bg-amber-500/15 px-2 py-0.5">
-          <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-          <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">
+        <div
+          className="flex items-center gap-1 ml-2 shrink-0 rounded-full px-2 py-0.5"
+          style={{
+            backgroundColor: `${accentColor}1A`,
+          }}
+        >
+          <Star className="w-3 h-3" style={{ color: accentColor, fill: accentColor }} />
+          <span className="text-xs font-semibold" style={{ color: accentColor }}>
             {review.rating.toFixed(1)}
           </span>
         </div>
       </div>
 
-      {/* Media thumbnail — 4:3 landscape */}
+      {/* Media thumbnail — full bleed 4:3 landscape */}
       {thumbnailUrl && (
-        <div className="relative aspect-[4/3] bg-muted mx-3 mt-1 rounded-lg overflow-hidden">
+        <div className="relative aspect-[4/3] bg-muted mt-1 overflow-hidden">
           <img
             src={thumbnailUrl}
             alt=""
@@ -103,7 +114,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
               onClick={(e) => { e.stopPropagation(); setExpanded(true); }}
               className="text-sm font-semibold text-muted-foreground mt-0.5"
             >
-              more
+              See more
             </button>
           )}
           {expanded && post.caption.length > 100 && (
@@ -132,11 +143,11 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
       {/* Creator + time */}
       <div className="flex items-center gap-2 px-3 pb-3">
         {post.avatarUrl && (
-          <img
+          <SquircleAvatar
             src={post.avatarUrl}
             alt=""
-            className="w-4 h-4 rounded-full object-cover"
-            loading="lazy"
+            size={16}
+            hideRing
           />
         )}
         <span className="text-xs text-muted-foreground truncate">
