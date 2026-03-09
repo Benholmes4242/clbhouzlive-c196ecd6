@@ -53,7 +53,7 @@ export function PersonalProfileWizard() {
     form, setField, isDirty, errors, isValid,
     addWebsite, removeWebsite, updateWebsite,
     addClub, removeClub,
-  } = useProfileForm(profile);
+  } = useProfileForm(profile, loading);
 
   const { save, isSaving } = useProfileSave(user?.id ?? '');
 
