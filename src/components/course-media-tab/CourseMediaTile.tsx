@@ -1,5 +1,5 @@
 import React from 'react';
-import { Film, Play } from 'lucide-react';
+import { Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
@@ -64,22 +64,15 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
         }}
       />
 
-      {/* Video indicator — play icon + optional duration, bottom-right */}
-      {isVideo && (
-        <div className="absolute bottom-2 right-1.5 z-10 flex items-center gap-1">
-          <div className="w-5 h-5 rounded-full liquid-glass flex items-center justify-center">
-            <Play className="w-2.5 h-2.5 text-white fill-white translate-x-[0.5px]" />
-          </div>
-          {duration != null && duration > 0 && (
-            <div
-              className="rounded-[4px] liquid-glass flex items-center"
-              style={{ padding: '2px 5px' }}
-            >
-              <span className="text-[11px] font-semibold text-white tracking-[0.02em]">
-                {formatDuration(duration)}
-              </span>
-            </div>
-          )}
+      {/* Duration badge (videos) — bottom-right */}
+      {isVideo && duration != null && duration > 0 && (
+        <div
+          className="absolute bottom-1.5 right-1.5 z-10 rounded-[4px] liquid-glass flex items-center"
+          style={{ padding: '2px 5px' }}
+        >
+          <span className="text-[11px] font-semibold text-white tracking-[0.02em]">
+            {formatDuration(duration)}
+          </span>
         </div>
       )}
 
