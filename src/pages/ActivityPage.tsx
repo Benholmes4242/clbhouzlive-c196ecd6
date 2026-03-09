@@ -208,27 +208,24 @@ const ActivityPage: React.FC = () => {
 
   return (
     <PageRoot>
-      <div className="flex flex-col min-h-full bg-background pt-[var(--sat)]">
+      <div className="flex flex-col min-h-full bg-[#F8FAFC] pt-[var(--sat)]">
         <div className="max-w-2xl mx-auto w-full flex flex-col flex-1">
 
           {/* Header */}
-          <div className="px-4 pt-4 pb-2">
-            <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground">
-              {activeActor?.type === 'business' ? activeActor.name : 'Clbhouz'}
+          <div className="px-4 pt-4 pb-2 text-center">
+            <p className="text-sm text-muted-foreground mb-0.5">
+              Updates from your golf network
             </p>
             <h1
               onClick={handleRefresh}
               className={cn(
-                "font-serif text-[28px] font-normal leading-tight text-foreground cursor-pointer transition-opacity",
+                "font-display text-[28px] font-semibold leading-tight text-foreground cursor-pointer transition-opacity",
                 isRefreshing && "opacity-50"
               )}
               aria-label="Activity - tap to refresh"
             >
               Activity
             </h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Updates from your golf network
-            </p>
           </div>
 
           {/* Tabs — Tier 1 dark fill pills */}
