@@ -18,7 +18,6 @@ const IMPORTANT_NOTIFICATION_TYPES = new Set([
   'game_request',
   'game_request_accepted',
   'game_request_declined',
-  'game_invite',
   'game_cancelled',
   'game_updated',
   'game_reminder_24h',
@@ -54,8 +53,6 @@ export function useNotificationRealtime() {
   useEffect(() => {
     if (!userId) return;
 
-    console.log('[useNotificationRealtime] Setting up subscription for user:', userId);
-
     const channel = supabase
       .channel(`notifications:${userId}`)
       .on(
@@ -68,11 +65,10 @@ export function useNotificationRealtime() {
         },
         (payload) => {
           const notification = payload.new as RealtimeNotification;
-          console.log('[useNotificationRealtime] New notification received:', notification.type);
 
           // Invalidate notification queries to refresh the list
           queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
-          queryClient.invalidateQueries({ queryKey: ['unread-count'] });
+          queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
           
           // Show toast for important notifications
           if (IMPORTANT_NOTIFICATION_TYPES.has(notification.type)) {
@@ -86,12 +82,9 @@ export function useNotificationRealtime() {
           }
         }
       )
-      .subscribe((status) => {
-        console.log('[useNotificationRealtime] Subscription status:', status);
-      });
+      .subscribe();
 
     return () => {
-      console.log('[useNotificationRealtime] Cleaning up subscription');
       supabase.removeChannel(channel);
     };
   }, [userId, queryClient]);
@@ -100,69 +93,52 @@ export function useNotificationRealtime() {
 function getToastAction(notification: RealtimeNotification) {
   const { entity_type, entity_id, data, type } = notification;
 
-  // Post-related: navigate to post deep link
   if (entity_type === 'post' && entity_id) {
     return {
       label: 'View',
-      onClick: () => {
-        appNavigate(`/post/${entity_id}`);
-      },
+      onClick: () => { appNavigate(`/post/${entity_id}`); },
     };
   }
 
-  // Game-related: navigate to game detail
   if (entity_type === 'game' && entity_id) {
     return {
       label: 'View',
-      onClick: () => {
-        appNavigate(`/game/${entity_id}`);
-      },
+      onClick: () => { appNavigate(`/game/${entity_id}`); },
     };
   }
 
-  // Trip-related: navigate to hub with trip param
   if (entity_type === 'trip' && entity_id) {
     return {
       label: 'View',
-      onClick: () => {
-        appNavigate(`/hub?trip=${entity_id}`);
-      },
+      onClick: () => { appNavigate(`/hub?trip=${entity_id}`); },
     };
   }
 
-  // Course review: navigate to course page
   if (type === 'friend_course_review' && data?.course_id) {
     return {
       label: 'View',
-      onClick: () => {
-        appNavigate(`/courses/${data.course_id}`);
-      },
+      onClick: () => { appNavigate(`/courses/${data.course_id}`); },
     };
   }
+
   if (data?.game_id) {
     return {
       label: 'View',
-      onClick: () => {
-        appNavigate(`/game/${data.game_id}`);
-      },
+      onClick: () => { appNavigate(`/game/${data.game_id}`); },
     };
   }
 
   if (data?.trip_id) {
     return {
       label: 'View',
-      onClick: () => {
-        appNavigate(`/hub?trip=${data.trip_id}`);
-      },
+      onClick: () => { appNavigate(`/hub?trip=${data.trip_id}`); },
     };
   }
 
   if (data?.post_id) {
     return {
       label: 'View',
-      onClick: () => {
-        appNavigate(`/post/${data.post_id}`);
-      },
+      onClick: () => { appNavigate(`/post/${data.post_id}`); },
     };
   }
 

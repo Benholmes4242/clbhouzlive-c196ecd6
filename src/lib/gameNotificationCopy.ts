@@ -27,13 +27,6 @@ export const GAME_NOTIFICATION_COPY = {
       `Your request to join ${courseName} was declined`,
   },
 
-  // D. Game Invites
-  game_invite: {
-    title: "You've been invited to a game",
-    getSubcopy: (courseName: string, date: string, time: string) => 
-      `${courseName} · ${date} · ${time}`,
-  },
-
   // E. Game Cancelled
   game_cancelled: {
     title: "Game cancelled",
@@ -139,7 +132,7 @@ export const GAME_NOTIFICATION_COPY = {
 // Types for notification payloads
 export interface GameNotificationPayload {
   type: 'game_request' | 'game_request_accepted' | 'game_request_declined' |
-        'game_invite' | 'game_cancelled' | 'rsvp_update' | 
+        'game_cancelled' | 'rsvp_update' | 
         'game_reminder_24h' | 'game_reminder_2h' | 'game_updated' | 'game_completed' | 
         'trip_request' | 'trip_request_accepted' | 'trip_request_declined' |
         'trip_invite' | 'trip_created' | 'trip_game_added' | 'trip_reminder' | 
@@ -169,7 +162,6 @@ export const GAME_NOTIFICATION_TYPES = new Set([
   'game_request',
   'game_request_accepted',
   'game_request_declined',
-  'game_invite',
   'game_cancelled',
   'rsvp_update',
   'game_reminder_24h',

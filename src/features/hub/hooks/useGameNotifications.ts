@@ -2,7 +2,6 @@
  * useGameNotifications - Hook for sending game/trip notifications
  * 
  * Handles:
- * - Invite notifications
  * - RSVP update notifications (friends only, going only)
  * - Reminder notifications
  * - Game update notifications (time/course changes only)
@@ -21,7 +20,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 
 export type GameNotificationType = 
-  | 'game_invite'
   | 'rsvp_update'
   | 'game_reminder_24h'
   | 'game_reminder_2h'
@@ -68,8 +66,6 @@ interface NotificationRecord {
 // Get title based on notification type
 function getNotificationTitle(type: GameNotificationType, data?: SendGameNotificationParams['data']): string {
   switch (type) {
-    case 'game_invite':
-      return "You've been invited to a game";
     case 'rsvp_update':
       return `${data?.player_name || 'Someone'} joined`;
     case 'game_reminder_24h':
@@ -96,7 +92,6 @@ function getNotificationTitle(type: GameNotificationType, data?: SendGameNotific
 }
 
 // Get message/subcopy based on notification type
-// Format: game = "Course · Date · Time", trip = "TripName · DateRange" or "TripName · Course"
 function getNotificationMessage(type: GameNotificationType, data?: SendGameNotificationParams['data']): string | null {
   // Trip notifications
   if (type.startsWith('trip_')) {
@@ -138,21 +133,18 @@ export function useSendGameNotification() {
         return { sent: 0 };
       }
 
-      // Get current user if actorUserId not provided
       let actor = actorUserId;
       if (!actor) {
         const { data: { user } } = await supabase.auth.getUser();
         actor = user?.id || null;
       }
 
-      // Filter out the actor from recipients (no self-notifications)
       const filteredRecipients = recipientUserIds.filter(id => id !== actor);
       
       if (filteredRecipients.length === 0) {
         return { sent: 0 };
       }
 
-      // Build notification records
       const notifications: NotificationRecord[] = filteredRecipients.map(userId => ({
         user_id: userId,
         recipient_actor_type: 'personal',
@@ -171,7 +163,6 @@ export function useSendGameNotification() {
         is_read: false,
       }));
 
-      // Insert notifications
       const { error } = await supabase
         .from('notifications')
         .insert(notifications);
@@ -184,7 +175,6 @@ export function useSendGameNotification() {
       return { sent: notifications.length };
     },
     onSuccess: () => {
-      // Invalidate activity feed queries
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
     },
     onError: (error) => {
@@ -207,9 +197,8 @@ export function useSendRsvpNotification() {
       playerName: string;
       courseName: string;
       date: string;
-      recipientUserIds: string[]; // Friends who are participants + host
+      recipientUserIds: string[];
     }) => {
-      // SUPPRESSION: Only notify for "going" status
       if (params.newStatus !== 'going') {
         return { sent: 0, suppressed: true, reason: 'Only going status triggers notifications' };
       }
@@ -226,36 +215,6 @@ export function useSendRsvpNotification() {
       });
 
       return { sent: params.recipientUserIds.length, suppressed: false };
-    },
-  });
-}
-
-/**
- * Hook for sending game invite notifications
- */
-export function useSendGameInviteNotification() {
-  const sendNotification = useSendGameNotification();
-
-  return useMutation({
-    mutationFn: async (params: {
-      gameId: string;
-      invitedUserIds: string[];
-      courseName: string;
-      date: string;
-      time: string;
-    }) => {
-      await sendNotification.mutateAsync({
-        type: 'game_invite',
-        recipientUserIds: params.invitedUserIds,
-        gameId: params.gameId,
-        data: {
-          course_name: params.courseName,
-          date: params.date,
-          time: params.time,
-        },
-      });
-
-      return { sent: params.invitedUserIds.length };
     },
   });
 }
@@ -301,7 +260,6 @@ export function useSendGameUpdateNotification() {
       newTime?: string;
       changeType: 'time' | 'course' | 'notes';
     }) => {
-      // SUPPRESSION: Only notify for time/course changes
       if (params.changeType === 'notes') {
         return { sent: 0, suppressed: true, reason: 'Notes changes do not trigger notifications' };
       }
@@ -326,7 +284,7 @@ export function useSendGameUpdateNotification() {
  */
 export function formatGameDateForNotification(date: Date | string): string {
   const d = typeof date === 'string' ? new Date(date) : date;
-  return format(d, 'EEE d MMM'); // e.g., "Tue 14 Jan"
+  return format(d, 'EEE d MMM');
 }
 
 /**
@@ -334,5 +292,5 @@ export function formatGameDateForNotification(date: Date | string): string {
  */
 export function formatGameTimeForNotification(date: Date | string): string {
   const d = typeof date === 'string' ? new Date(date) : date;
-  return format(d, 'HH:mm'); // e.g., "09:40"
+  return format(d, 'HH:mm');
 }

@@ -10,28 +10,17 @@ import { cn } from '@/lib/utils';
  * 2. Body row: subtext/reason (optional)
  * 3. Actions row: buttons (0–3)
  * 4. Meta row: timestamp
- * 
- * Light UI styling with consistent vertical rhythm
  */
 
 interface NotificationCardProps {
-  /** Avatar/icon element */
   avatar: React.ReactNode;
-  /** Main title/headline */
   title: React.ReactNode;
-  /** Optional subtext/body content */
   subtext?: React.ReactNode;
-  /** Action buttons (0-3) */
   actions?: React.ReactNode;
-  /** Timestamp text */
   timestamp: string;
-  /** Whether this notification is unread/new */
   isNew?: boolean;
-  /** Click handler for the main content area */
   onClick?: () => void;
-  /** Handler for opening the actions menu */
   onMenuClick?: () => void;
-  /** Additional className for the container */
   className?: string;
 }
 
@@ -50,7 +39,6 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
     <div
       className={cn(
         "flex items-start gap-3 px-4 py-3 transition-colors",
-        // Light UI: unread = faint brand orange wash, read = plain bg
         isNew 
           ? "bg-[#F7931E]/[0.04]" 
           : "bg-background hover:bg-muted/40",
@@ -76,14 +64,13 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
             onClick();
           }
         }}
-        className="flex-1 flex items-start gap-3 text-left min-w-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
+        className="flex-1 flex items-start gap-3 text-left min-w-0 min-h-[44px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
       >
-        {/* Avatar - decorative */}
+        {/* Avatar */}
         <div className="shrink-0" aria-hidden="true">{avatar}</div>
         
         {/* Content area */}
         <div className="flex-1 min-w-0 space-y-1">
-          {/* Header row: Title */}
           <p className={cn(
             "text-[0.875rem] leading-snug",
             isNew ? "text-foreground" : "text-foreground/90"
@@ -91,14 +78,12 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
             {title}
           </p>
           
-          {/* Body row: Subtext (optional) */}
           {subtext && (
             <div className="text-[0.75rem] text-muted-foreground">
               {subtext}
             </div>
           )}
           
-          {/* Actions row: Buttons (optional) */}
           {actions && (
             <div 
               className="mt-2 flex items-center flex-wrap gap-2"
@@ -109,12 +94,11 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
             </div>
           )}
           
-          {/* Meta row: Timestamp */}
           <p className="text-xs text-muted-foreground mt-1">{timestamp}</p>
         </div>
       </div>
 
-      {/* Kebab menu - Fix 9: 44pt tap target */}
+      {/* Kebab menu - 44pt tap target */}
       {onMenuClick && (
         <button
           type="button"
@@ -133,30 +117,28 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
 };
 
 /**
- * Shared button styles for notification actions
- * Use these classes to ensure consistent button styling across all notifications
+ * Shared button styles for notification actions — semantic tokens
  */
 export const notificationButtonStyles = {
-  // Base pill style - Fix 9: h-9 for 36px visible, wrap in 44px tap area
   base: "inline-flex items-center justify-center rounded-sq-xs border px-3 h-9 text-xs font-medium transition-colors gap-1.5 active:scale-[0.93]",
   
-  // Primary action (e.g., Accept) - Fix 8: green
-  primary: "border-green-500 bg-green-50 text-green-600 hover:bg-green-100",
+  // Primary — brand primary
+  primary: "border-primary/30 bg-primary/10 text-primary hover:bg-primary/20",
   
-  // Secondary/Ghost action (e.g., Decline)
+  // Secondary
   secondary: "border-border bg-background text-foreground/80 hover:bg-muted/50",
   
-  // Destructive action - Fix 8: red
-  destructive: "border-red-200 bg-red-50 text-red-500 hover:bg-red-100",
+  // Destructive — semantic destructive token
+  destructive: "border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20",
   
-  // Support/Orange accent
+  // Support — brand accent
   support: "border-primary bg-primary/10 text-primary hover:bg-primary/20",
   
   // Status pills (non-interactive)
-  statusSuccess: "border-green-400 bg-green-50 text-green-600",
-  statusError: "border-red-300 bg-red-50 text-red-500",
+  statusSuccess: "border-primary/30 bg-primary/10 text-primary",
+  statusError: "border-destructive/30 bg-destructive/10 text-destructive",
   statusMuted: "border-border bg-muted text-muted-foreground",
-  statusPending: "border-amber-500 bg-amber-500/10 text-amber-600",
+  statusPending: "border-amber-500/30 bg-amber-500/10 text-amber-600",
 };
 
 /**
