@@ -97,29 +97,12 @@ const CompactTile: React.FC<{ post: FeedPost; globalIndex: number; allPosts?: Fe
         </div>
       )}
 
-      {/* Creator avatar — bottom left */}
-      {post.avatarUrl && (
-        <img
-          src={post.avatarUrl}
-          alt=""
-          className="absolute bottom-1.5 left-1.5 w-5 h-5 rounded-full object-cover border border-white/20 z-3"
-          loading="lazy"
-        />
-      )}
-
-      {/* Engagement counts — bottom right */}
-      {(post.likeCount > 0 || post.commentCount > 0) && (
+      {/* Engagement counts — bottom right (likes only) */}
+      {post.likeCount > 0 && (
         <div className="absolute bottom-1.5 right-1.5 flex items-center gap-1.5 z-10">
-          {post.likeCount > 0 && (
-            <span className="flex items-center gap-0.5 text-[10px] font-semibold text-white drop-shadow-md">
-              ♥ {formatCompact(post.likeCount)}
-            </span>
-          )}
-          {post.commentCount > 0 && (
-            <span className="flex items-center gap-0.5 text-[10px] font-semibold text-white drop-shadow-md">
-              💬 {formatCompact(post.commentCount)}
-            </span>
-          )}
+          <span className="flex items-center gap-0.5 text-[10px] font-semibold text-white drop-shadow-md">
+            ♥ {formatCompact(post.likeCount)}
+          </span>
         </div>
       )}
     </div>

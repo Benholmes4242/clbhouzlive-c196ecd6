@@ -233,6 +233,7 @@ const BusinessProfilePage: React.FC = () => {
             actorId={business?.id || ''}
             actorName={business?.name || ''}
             isOwnProfile={isOwner || false}
+            hideReviewsCount
           />
         );
       case 'golfers':

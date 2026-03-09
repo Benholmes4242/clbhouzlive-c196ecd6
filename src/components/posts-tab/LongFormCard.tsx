@@ -3,6 +3,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { Play, Heart, MessageCircle, Share2 } from 'lucide-react';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 import { formatDistanceToNow } from 'date-fns';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 function formatCompact(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -92,7 +93,7 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
               onClick={(e) => { e.stopPropagation(); setExpanded(true); }}
               className="text-sm font-semibold text-muted-foreground mt-0.5"
             >
-              more
+              See more
             </button>
           )}
           {expanded && post.caption.length > 100 && (
@@ -109,11 +110,11 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
       {/* Creator row */}
       <div className="flex items-center gap-2 px-3 py-1">
         {post.avatarUrl && (
-          <img
+          <SquircleAvatar
             src={post.avatarUrl}
             alt=""
-            className="w-5 h-5 rounded-full object-cover"
-            loading="lazy"
+            size={20}
+            hideRing
           />
         )}
         <span className="text-xs text-muted-foreground truncate">

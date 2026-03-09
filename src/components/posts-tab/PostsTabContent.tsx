@@ -10,6 +10,7 @@ interface PostsTabContentProps {
   actorId: string;
   actorName?: string;
   isOwnProfile?: boolean;
+  hideReviewsCount?: boolean;
 }
 
 const PostsTabContent: React.FC<PostsTabContentProps> = ({
@@ -17,6 +18,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
   actorId,
   actorName,
   isOwnProfile = false,
+  hideReviewsCount = false,
 }) => {
   const { user } = useSupabaseSession();
   const gridRef = React.useRef<HTMLDivElement>(null);
@@ -38,7 +40,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
 
   return (
     <div className="flex flex-col min-h-0">
-      <PostsCountSummary counts={postCounts} isLoading={isLoading} />
+      <PostsCountSummary counts={postCounts} isLoading={isLoading} hideReviews={hideReviewsCount} />
       <HybridPostsFeed
         posts={posts}
         userId={user?.id}
