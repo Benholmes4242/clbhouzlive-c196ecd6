@@ -1,63 +1,59 @@
-/**
- * Profile Wizard Types
- * Shared types for personal and business profile wizards
- */
+// Personal wizard types
+export type WizardStep = 1 | 2 | 3;
+export type WizardDirection = 'forward' | 'back';
 
-export type PersonalWizardStep = 1 | 2 | 3;
+export interface WebsiteEntry {
+  id: string;
+  url: string;
+}
+
+export interface ClubEntry {
+  id: string;
+  name: string;
+  clubId?: string;
+}
+
+export interface ProfileFormData {
+  displayName: string;
+  username: string;
+  profilePhotoUrl: string | null;
+  headerPhotoUrl: string | null;
+  profilePhotoBlob: Blob | null;
+  headerPhotoBlob: Blob | null;
+  homeClubName: string;
+  primaryClubId: string | null;
+  additionalClubs: ClubEntry[];
+  collegeNormalized: string | null;
+  collegeId: string | null;
+  handicapIndex: string;
+  homeClubVisibility: string;
+  additionalClubsVisibility: string;
+  bio: string;
+  websites: WebsiteEntry[];
+  instagramHandle: string;
+  twitterHandle: string;
+  tiktokHandle: string;
+  youtubeHandle: string;
+  country: string;
+  city: string;
+  isPublic: boolean;
+}
+
+export const STEP_TITLES: Record<WizardStep, string> = {
+  1: 'Photos & Identity',
+  2: 'Golf Info',
+  3: 'About You',
+};
+
+export const BIO_MAX = 300;
+export const DISPLAY_NAME_MAX = 50;
+export const USERNAME_MAX = 30;
+
+// Business wizard types (backward compat)
 export type BusinessWizardStep = 1 | 2 | 3;
 
-export interface ProfileWizardHeaderProps {
-  title: string;
-  currentStep: number;
-  totalSteps: number;
-  onBack: () => void;
-  onClose: () => void;
-}
-
-export interface ProfileWizardNavigationProps {
-  currentStep: number;
-  totalSteps: number;
-  canProceed: boolean;
-  isSubmitting: boolean;
-  onBack: () => void;
-  onNext: () => void;
-  onSubmit: () => void;
-  submitLabel?: string;
-}
-
-export interface ProfileWizardProgressProps {
-  currentStep: number;
-  totalSteps: number;
-}
-
-// Personal profile step configs
-export const PERSONAL_STEP_CONFIG = {
-  1: {
-    title: 'Your Profile',
-    subtitle: 'Add your photo and name',
-  },
-  2: {
-    title: 'Golf Info',
-    subtitle: 'Your home club and handicap',
-  },
-  3: {
-    title: 'About You',
-    subtitle: 'Bio and privacy settings',
-  },
-} as const;
-
-// Business profile step configs
-export const BUSINESS_STEP_CONFIG = {
-  1: {
-    title: 'Business Info',
-    subtitle: 'Category and details',
-  },
-  2: {
-    title: 'Location & Contact',
-    subtitle: 'Where to find you',
-  },
-  3: {
-    title: 'Branding',
-    subtitle: 'Logo and cover photo',
-  },
-} as const;
+export const BUSINESS_STEP_CONFIG: Record<BusinessWizardStep, { title: string; description: string }> = {
+  1: { title: 'Business Info', description: 'Tell us about your business' },
+  2: { title: 'Location & Contact', description: 'Where can golfers find you?' },
+  3: { title: 'Branding', description: 'Make your page stand out' },
+};

@@ -1,59 +1,41 @@
-import React from 'react';
-import { Shield, Globe, Lock } from 'lucide-react';
-import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { SectionHeader } from './SectionHeader';
-import { cn } from '@/lib/utils';
+import { Globe, Lock } from 'lucide-react';
 
-interface PrivacySectionProps {
+interface Props {
   isPublic: boolean;
-  onChange: (isPublic: boolean) => void;
+  onChange: (v: boolean) => void;
 }
 
-export const PrivacySection: React.FC<PrivacySectionProps> = ({
-  isPublic,
-  onChange,
-}) => {
+export function PrivacySection({ isPublic, onChange }: Props) {
   return (
-    <div className="space-y-4">
-      <SectionHeader
-        icon={<Shield className="w-5 h-5" />}
-        title="Privacy"
-        subtitle="Control who can see your profile"
-        sectionType="privacy"
-      />
-
-      <div className={cn(
-        "flex items-center justify-between p-4 rounded-xl border transition-all",
-        isPublic 
-          ? "bg-primary/5 border-primary/20" 
-          : "bg-card border-border"
-      )}>
-        <div className="flex items-center gap-3">
-          {isPublic ? (
-            <Globe className="w-5 h-5 text-primary" />
-          ) : (
-            <Lock className="w-5 h-5 text-muted-foreground" />
-          )}
-          <div className="space-y-0.5">
-            <Label htmlFor="public-profile" className="text-sm font-semibold text-foreground cursor-pointer">
-              {isPublic ? 'Public Profile' : 'Private Profile'}
-            </Label>
-            <p className="text-xs text-muted-foreground max-w-xs">
-              {isPublic 
-                ? 'Anyone on Clbhouz can view your posts and golf journey.'
-                : 'Only approved followers can see your profile.'
-              }
-            </p>
-          </div>
+    <div
+      className="flex items-center justify-between min-h-[56px] cursor-pointer"
+      onClick={() => onChange(!isPublic)}
+    >
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
+          {isPublic
+            ? <Globe size={18} className="text-primary" />
+            : <Lock size={18} className="text-muted-foreground" />
+          }
         </div>
-        <Switch
-          id="public-profile"
-          checked={isPublic}
-          onCheckedChange={onChange}
-          className="data-[state=checked]:bg-primary data-[state=unchecked]:bg-muted"
-        />
+        <div>
+          <p className="text-[15px] font-medium text-foreground">
+            {isPublic ? 'Public Profile' : 'Private Profile'}
+          </p>
+          <p className="text-[12px] text-muted-foreground">
+            {isPublic
+              ? 'Anyone can view your profile and posts'
+              : 'Only approved followers can see your content'
+            }
+          </p>
+        </div>
       </div>
+      <Switch
+        checked={isPublic}
+        onCheckedChange={onChange}
+        onClick={(e) => e.stopPropagation()}
+      />
     </div>
   );
-};
+}

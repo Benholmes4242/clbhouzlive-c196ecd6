@@ -1,26 +1,22 @@
 /**
- * ProfileWizardProgress - Progress bar for profile wizards
- * Premium full-width progress indicator using brand amber
+ * Backward-compatible ProfileWizardProgress for business wizard
  */
-import { motion } from 'framer-motion';
-import { ProfileWizardProgressProps } from './types';
+interface Props {
+  currentStep: number;
+  totalSteps: number;
+}
 
-export function ProfileWizardProgress({
-  currentStep,
-  totalSteps,
-}: ProfileWizardProgressProps) {
-  const progress = (currentStep / totalSteps) * 100;
-
+export function ProfileWizardProgress({ currentStep, totalSteps }: Props) {
   return (
-    <div className="h-1 bg-muted/50 flex-shrink-0 overflow-hidden rounded-full">
-      <motion.div
-        className="h-full rounded-full bg-[#C1A84C]"
-        initial={{ width: 0 }}
-        animate={{ width: `${progress}%` }}
-        transition={{ duration: 0.3, ease: 'easeOut' }}
-      />
+    <div className="flex gap-1.5 px-4 pt-3 pb-2 bg-background">
+      {Array.from({ length: totalSteps }, (_, i) => i + 1).map((s) => (
+        <div
+          key={s}
+          className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+            s <= currentStep ? 'bg-primary' : 'bg-muted'
+          }`}
+        />
+      ))}
     </div>
   );
 }
-
-export default ProfileWizardProgress;

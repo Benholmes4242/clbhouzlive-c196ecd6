@@ -1,25 +1,20 @@
-/**
- * Backward-compatible ProfileWizardNavigation for business wizard
- */
+import { WizardStep } from './types';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 
 interface Props {
-  currentStep: number;
-  totalSteps: number;
-  canProceed: boolean;
-  isSubmitting: boolean;
-  onBack: () => void;
+  step: WizardStep;
+  isSaving: boolean;
+  isValid: boolean;
+  isDirty: boolean;
   onNext: () => void;
-  onSubmit: () => void;
-  submitLabel?: string;
+  onBack: () => void;
 }
 
-export function ProfileWizardNavigation({
-  currentStep, totalSteps, canProceed, isSubmitting,
-  onBack, onNext, onSubmit, submitLabel = 'Save',
+export function WizardNavigation({
+  step, isSaving, isValid, isDirty, onNext, onBack,
 }: Props) {
-  const isFinalStep = currentStep === totalSteps;
+  const isFinalStep = step === 3;
 
   return (
     <div
@@ -27,25 +22,25 @@ export function ProfileWizardNavigation({
       style={{ paddingBottom: 'calc(var(--sab) + 16px)' }}
     >
       <div className="flex gap-3">
-        {currentStep > 1 && (
+        {step > 1 && (
           <Button
             variant="outline"
             onClick={onBack}
-            disabled={isSubmitting}
+            disabled={isSaving}
             className="flex-1 min-h-[50px] rounded-xl text-[15px] font-semibold"
           >
             Back
           </Button>
         )}
         <Button
-          onClick={isFinalStep ? onSubmit : onNext}
-          disabled={!canProceed || isSubmitting}
+          onClick={onNext}
+          disabled={(isFinalStep && (!isValid || !isDirty)) || isSaving}
           className="flex-1 min-h-[50px] rounded-xl text-[15px] font-semibold"
         >
-          {isSubmitting ? (
+          {isSaving ? (
             <><Loader2 size={18} className="animate-spin mr-2" /> Saving…</>
           ) : isFinalStep ? (
-            submitLabel
+            isDirty ? 'Save Profile' : 'All Saved'
           ) : (
             'Continue'
           )}

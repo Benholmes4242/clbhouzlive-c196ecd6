@@ -1,19 +1,14 @@
-/**
- * Backward-compatible ProfileWizardHeader for business wizard
- */
 import { X, ChevronLeft } from 'lucide-react';
+import { WizardStep, STEP_TITLES } from './types';
 
 interface Props {
-  title: string;
-  currentStep: number;
-  totalSteps: number;
+  step: WizardStep;
+  isFirstStep: boolean;
   onBack: () => void;
   onClose: () => void;
 }
 
-export function ProfileWizardHeader({ title, currentStep, totalSteps, onBack, onClose }: Props) {
-  const isFirstStep = currentStep === 1;
-
+export function WizardHeader({ step, isFirstStep, onBack, onClose }: Props) {
   return (
     <div
       className="flex items-center justify-between px-4 bg-background border-b border-border"
@@ -32,10 +27,10 @@ export function ProfileWizardHeader({ title, currentStep, totalSteps, onBack, on
 
       <div className="text-center">
         <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground">
-          Step {currentStep} of {totalSteps}
+          Step {step} of 3
         </p>
         <p className="text-[16px] font-bold text-foreground leading-tight mt-0.5">
-          {title}
+          {STEP_TITLES[step]}
         </p>
       </div>
 
