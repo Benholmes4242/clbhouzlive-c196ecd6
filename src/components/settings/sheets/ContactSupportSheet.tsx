@@ -1,87 +1,60 @@
-import React from 'react';
-import { BottomSheet } from '@/components/ui/BottomSheet';
-import { X, Copy, ExternalLink } from 'lucide-react';
+import { X, Copy, Mail } from 'lucide-react';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
-interface ContactSupportSheetProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
 const SUPPORT_EMAIL = 'support@clbhouz.com';
 
-export function ContactSupportSheet({ open, onOpenChange }: ContactSupportSheetProps) {
-  const handleCopyEmail = async () => {
-    try {
-      await navigator.clipboard.writeText(SUPPORT_EMAIL);
-      toast.success('Email copied');
-    } catch (err) {
-      toast.error('Failed to copy');
-    }
+interface Props {
+  open: boolean;
+  onClose: () => void;
+}
+
+export function ContactSupportSheet({ open, onClose }: Props) {
+  const handleCopy = () => {
+    navigator.clipboard.writeText(SUPPORT_EMAIL);
+    toast.success('Support email copied to clipboard.');
   };
 
-  const handleOpenEmail = () => {
-    window.open(`mailto:${SUPPORT_EMAIL}`, '_blank');
+  const handleEmail = () => {
+    window.location.href = `mailto:${SUPPORT_EMAIL}`;
   };
 
   return (
-    <BottomSheet open={open} onClose={() => onOpenChange(false)} ariaLabelledBy="contact-support-title">
-      <div className="flex flex-col max-h-[85vh]">
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#E4E6E9]">
-          <div className="w-8" />
-          <div className="flex-1 flex justify-center">
-            <div className="w-9 h-1 bg-[#D1D5DB] rounded-full" />
-          </div>
-          <button
-            onClick={() => onOpenChange(false)}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#F3F4F6] transition-colors"
-            aria-label="Close"
-          >
-            <X className="w-5 h-5 text-[#5E666D]" />
+    <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
+      <SheetContent
+        side="bottom"
+        className="rounded-t-[20px] bg-background border-0 px-5"
+        style={{ paddingBottom: 'calc(var(--sab) + 24px)' }}
+      >
+        <div className="w-10 h-1 rounded-full bg-muted mx-auto mt-3 mb-4" />
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-[20px] font-bold tracking-tight text-foreground">Contact Support</h2>
+          <button onClick={onClose} className="flex items-center justify-center min-h-[44px] min-w-[44px] text-muted-foreground">
+            <X size={20} />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto px-4 py-4">
-          <h2 id="contact-support-title" className="text-lg font-semibold text-[#1F2428] mb-2">
-            Contact support
-          </h2>
-          <p className="text-[13px] text-[#5E666D] mb-6">
-            Get in touch with our team and we'll help you out.
-          </p>
+        <p className="text-[14px] text-muted-foreground mb-6 leading-relaxed">
+          Our support team is available Monday–Friday, 9am–5pm GMT. We aim to respond within 24 hours.
+        </p>
 
-          {/* Email display */}
-          <div className="bg-[#F8FAFC] border border-[#E4E6E9] rounded-lg p-4 mb-4">
-            <p className="text-[12px] text-[#97A1AA] mb-1">Support email</p>
-            <p className="text-[16px] font-medium text-[#1F2428]">{SUPPORT_EMAIL}</p>
-          </div>
-
-          <p className="text-[12px] text-[#97A1AA] text-center">
-            We typically respond within 24 hours.
-          </p>
+        <div className="flex items-center gap-3 p-4 rounded-2xl bg-muted mb-6">
+          <Mail size={20} className="text-muted-foreground shrink-0" />
+          <p className="text-[15px] font-medium text-foreground flex-1">{SUPPORT_EMAIL}</p>
+          <button
+            onClick={handleCopy}
+            className="flex items-center justify-center min-h-[44px] min-w-[44px] text-muted-foreground"
+            aria-label="Copy email"
+          >
+            <Copy size={18} />
+          </button>
         </div>
 
-        {/* Footer */}
-        <div className="px-4 py-4 border-t border-[#E4E6E9] space-y-3">
-          <Button
-            onClick={handleCopyEmail}
-            variant="outline"
-            className="w-full h-12 border-[#E4E6E9] text-[#1F2428] hover:bg-[#F3F4F6] font-medium"
-          >
-            <Copy className="w-4 h-4 mr-2" />
-            Copy email
-          </Button>
-          <Button
-            onClick={handleOpenEmail}
-            className="w-full h-12 bg-[#1F2428] text-white hover:bg-[#2A3038] font-medium"
-          >
-            <ExternalLink className="w-4 h-4 mr-2" />
-            Open email app
-          </Button>
-        </div>
-      </div>
-    </BottomSheet>
+        <Button className="w-full min-h-[44px]" onClick={handleEmail}>
+          Open in Mail
+        </Button>
+      </SheetContent>
+    </Sheet>
   );
 }

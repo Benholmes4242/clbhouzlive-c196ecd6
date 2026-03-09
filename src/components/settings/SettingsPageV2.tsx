@@ -1,25 +1,30 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  User, Mail, AtSign, Sparkles, EyeOff, ExternalLink, 
-  ShieldBan, Bell, Lock, HelpCircle, MessageSquare, 
-  Headphones, FileText, Shield, ScrollText, Trash2, ChevronLeft,
-  Smartphone, Eye, CheckCircle2
-} from 'lucide-react';
-import { PageRoot } from '@/components/layout/PageRoot';
+import { ChevronLeft, User, Mail, Lock, Bell, Shield, EyeOff, UserX, HelpCircle, Flag, MessageSquare, FileText, Trash2, LogOut, Eye } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useCreatorSettings } from '@/hooks/useCreatorSettings';
+import { usePrivacySettings } from '@/hooks/usePrivacySettings';
+import { useDeleteAccount } from '@/hooks/useDeleteAccount';
+import { useSettingsSheets } from '@/hooks/useSettingsSheets';
 import { supabase } from '@/integrations/supabase/client';
-import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { usePushNotifications } from '@/hooks/usePushNotifications';
-import { 
-  SettingsSection, 
-  SettingsChevronRow, 
+import {
+  SettingsSection,
+  SettingsChevronRow,
   SettingsToggleRow,
   SettingsSkeleton,
-  SettingsRow 
 } from './ui';
+import {
+  EmailChangeSheet,
+  PasswordChangeSheet,
+  BlockedUsersSheet,
+  NotificationsSheet,
+  HelpCentreSheet,
+  ReportProblemSheet,
+  ContactSupportSheet,
+  LegalSheet,
+} from './sheets';
+import { CreatorWelcomeDialog } from '@/components/creator/CreatorWelcomeDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,923 +36,364 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  EmailChangeSheet,
-  BlockedUsersSheet,
-  NotificationsSheet,
-  PasswordChangeSheet,
-  HelpCentreSheet,
-  ReportProblemSheet,
-  ContactSupportSheet,
-  LegalSheet,
-} from './sheets';
-import { CreatorWelcomeDialog } from '@/components/creator/CreatorWelcomeDialog';
 
-/**
- * SettingsPageV2 - World-class settings redesign
- * 
- * Light theme with global blue-grey background + slate text hierarchy.
- * Only functional controls are shown.
- */
+function maskEmail(email: string): string {
+  const [local, domain] = email.split('@');
+  if (!domain) return email;
+  const visible = local.slice(0, 2);
+  return `${visible}${'•'.repeat(Math.max(2, local.length - 2))}@${domain}`;
+}
+
 export function SettingsPageV2() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
-  const { profile, loading, error, fetchProfile } = useProfileData();
-  
-  // Push notifications
-  const { state: pushState, isRegistering: isPushRegistering, enable: enablePush, disable: disablePush } = usePushNotifications();
+  const { profile, isLoading } = useProfileData();
 
-  // Check if user signed up with OAuth (Google, Apple, etc.)
-  const isOAuthUser = React.useMemo(() => {
-    if (!user) return false;
-    const provider = user.app_metadata?.provider;
-    return provider && provider !== 'email';
-  }, [user]);
-
-  // Creator mode state
-  const [isCreator, setIsCreator] = React.useState(false);
-  const [creatorOnly, setCreatorOnly] = React.useState(false);
-  const [isUpdatingCreator, setIsUpdatingCreator] = React.useState(false);
-  const [showCreatorOnlyConfirm, setShowCreatorOnlyConfirm] = React.useState(false);
-  const [showDisableCreatorOnlyConfirm, setShowDisableCreatorOnlyConfirm] = React.useState(false);
-  const [showCreatorWelcome, setShowCreatorWelcome] = React.useState(false);
-  const [showDisableCreatorConfirm, setShowDisableCreatorConfirm] = React.useState(false);
-
-  // Privacy visibility states
-  const [isPublic, setIsPublic] = React.useState(true);
-  const [showHandicap, setShowHandicap] = React.useState(true);
-  const [isUpdatingPrivacy, setIsUpdatingPrivacy] = React.useState(false);
-  const [isUpdatingHandicap, setIsUpdatingHandicap] = React.useState(false);
-
-  // Delete account state
-  const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
-  const [showBusinessWarning, setShowBusinessWarning] = React.useState(false);
-  const [ownedBusinessNames, setOwnedBusinessNames] = React.useState<string[]>([]);
-  const [deleteConfirmText, setDeleteConfirmText] = React.useState('');
-  const [isDeleting, setIsDeleting] = React.useState(false);
-
-  // Bottom sheet states
-  const [showEmailSheet, setShowEmailSheet] = React.useState(false);
-  const [showBlockedSheet, setShowBlockedSheet] = React.useState(false);
-  const [showNotificationsSheet, setShowNotificationsSheet] = React.useState(false);
-  const [showPasswordSheet, setShowPasswordSheet] = React.useState(false);
-  const [showHelpSheet, setShowHelpSheet] = React.useState(false);
-  const [showReportSheet, setShowReportSheet] = React.useState(false);
-  const [showContactSheet, setShowContactSheet] = React.useState(false);
-  const [showLegalSheet, setShowLegalSheet] = React.useState<'terms' | 'privacy' | 'guidelines' | null>(null);
-
-  // Sync creator and privacy state from profile
-  React.useEffect(() => {
-    if (profile) {
-      setIsCreator((profile as any)?.is_creator || false);
-      setCreatorOnly((profile as any)?.creator_only || false);
-      setIsPublic((profile as any)?.is_public ?? true);
-      setShowHandicap((profile as any)?.show_handicap ?? true);
+  // Sync email RPC on mount
+  useEffect(() => {
+    if (user?.id) {
+      supabase.rpc('sync_user_email', { p_user_id: user.id }).catch(() => {});
     }
-  }, [profile]);
+  }, [user?.id]);
 
-  // Sync auth email to admin_profiles on settings page load
-  React.useEffect(() => {
-    if (!user?.id || !user?.email) return;
-    supabase.rpc('sync_user_email', {
-      user_id_param: user.id,
-      current_email: user.email,
-    }).then(({ error }) => {
-      if (error) console.warn('[SettingsSync] email sync failed:', error.message);
-    });
-  }, [user?.id, user?.email]);
+  const isOAuthUser = !user?.app_metadata?.providers?.includes('email');
+  const isPersonalProfile = (profile as any)?.actor_type !== 'business';
 
-  // Redirect if not logged in
-  React.useEffect(() => {
-    if (!loading && !user) {
-      navigate('/auth', { replace: true });
-    }
-  }, [user, loading, navigate]);
+  const creator = useCreatorSettings(
+    user?.id,
+    !!(profile as any)?.is_creator,
+    !!(profile as any)?.creator_only,
+  );
 
-  // Helper to mask email
-  const maskEmail = (email?: string) => {
-    if (!email) return '';
-    const [local, domain] = email.split('@');
-    if (!domain) return email;
-    const masked = local.charAt(0) + '••••••••';
-    return `${masked}@${domain}`;
+  const privacy = usePrivacySettings(
+    user?.id,
+    !!(profile as any)?.is_public,
+    !!(profile as any)?.show_handicap,
+  );
+
+  const deleteAccount = useDeleteAccount(user?.id);
+  const { sheets, open, close } = useSettingsSheets();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate('/auth');
   };
 
-  // Creator mode toggle attempt - show confirmation for disable
-  const handleCreatorToggleAttempt = (checked: boolean) => {
-    if (!checked && isCreator) {
-      // Show confirmation before disabling
-      setShowDisableCreatorConfirm(true);
-    } else {
-      handleCreatorToggle(checked);
-    }
-  };
-
-  // Creator mode toggle with optimistic updates
-  const handleCreatorToggle = async (checked: boolean) => {
-    if (!user) return;
-    
-    // Store previous values for rollback
-    const previousCreator = isCreator;
-    const previousCreatorOnly = creatorOnly;
-    const isFirstTimeEnabling = checked && !(profile as any)?.creator_enabled_at;
-    
-    setIsUpdatingCreator(true);
-    setIsCreator(checked);
-
-    // Optimistic cache updates for instant UI feedback
-    const optimisticUpdate = (old: any) => old ? { ...old, is_creator: checked, ...((!checked && creatorOnly) ? { creator_only: false } : {}) } : old;
-    queryClient.setQueryData(['profile', user.id], optimisticUpdate);
-    queryClient.setQueryData(['user-profile', user.id], optimisticUpdate);
-    queryClient.setQueryData(['creator-features', user.id], optimisticUpdate);
-
-    try {
-      const updates: Record<string, any> = { is_creator: checked };
-      if (!checked && creatorOnly) {
-        updates.creator_only = false;
-        setCreatorOnly(false);
-      }
-      
-      // If enabling for first time, set the timestamp
-      if (isFirstTimeEnabling) {
-        updates.creator_enabled_at = new Date().toISOString();
-      }
-
-      const { error } = await supabase
-        .from('user_profiles')
-        .update(updates)
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      // Invalidate all related queries to ensure fresh data
-      queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
-      queryClient.invalidateQueries({ queryKey: ['user-profile', user.id] });
-      queryClient.invalidateQueries({ queryKey: ['creator-features', user.id] });
-      
-      // Show appropriate feedback
-      if (checked) {
-        // Check if we should show the welcome dialog
-        if (isFirstTimeEnabling || !(profile as any)?.has_seen_creator_welcome) {
-          setShowCreatorWelcome(true);
-        } else {
-          toast.success('Creator Mode enabled');
-        }
-      } else {
-        toast.success('Creator Mode disabled');
-      }
-    } catch (err) {
-      console.error('[Settings] creator toggle error:', err);
-      
-      // Rollback optimistic updates on error
-      setIsCreator(previousCreator);
-      setCreatorOnly(previousCreatorOnly);
-      const rollbackUpdate = (old: any) => old ? { ...old, is_creator: previousCreator, creator_only: previousCreatorOnly } : old;
-      queryClient.setQueryData(['profile', user.id], rollbackUpdate);
-      queryClient.setQueryData(['user-profile', user.id], rollbackUpdate);
-      queryClient.setQueryData(['creator-features', user.id], rollbackUpdate);
-      
-      toast.error("Couldn't update setting");
-    } finally {
-      setIsUpdatingCreator(false);
-    }
-  };
-
-  // Handler for welcome dialog dismissal
-  const handleCreatorWelcomeDismiss = async () => {
-    setShowCreatorWelcome(false);
-    
-    // Mark as seen in database
-    if (user) {
-      await supabase
-        .from('user_profiles')
-        .update({ has_seen_creator_welcome: true })
-        .eq('id', user.id);
-      
-      // Update cache
-      queryClient.setQueryData(['profile', user.id], (old: any) => 
-        old ? { ...old, has_seen_creator_welcome: true } : old
-      );
-    }
-    
-    toast.success('Creator Mode enabled');
-  };
-
-  // Handler for "Go to Hub" button
-  const handleGoToHub = async () => {
-    setShowCreatorWelcome(false);
-    
-    // Mark as seen in database
-    if (user) {
-      await supabase
-        .from('user_profiles')
-        .update({ has_seen_creator_welcome: true })
-        .eq('id', user.id);
-      
-      queryClient.setQueryData(['profile', user.id], (old: any) => 
-        old ? { ...old, has_seen_creator_welcome: true } : old
-      );
-    }
-    
-    navigate('/hub');
-  };
-
-  // Creator-only toggle
-  const handleCreatorOnlyToggle = (checked: boolean) => {
-    if (checked) {
-      setShowCreatorOnlyConfirm(true);
-    } else {
-      setShowDisableCreatorOnlyConfirm(true);
-    }
-  };
-
-  const confirmCreatorOnly = async (enable: boolean) => {
-    if (!user) return;
-    
-    const previousValue = creatorOnly;
-    setIsUpdatingCreator(true);
-    setCreatorOnly(enable);
-
-    // Optimistic cache updates
-    const optimisticUpdate = (old: any) => old ? { ...old, creator_only: enable } : old;
-    queryClient.setQueryData(['profile', user.id], optimisticUpdate);
-    queryClient.setQueryData(['user-profile', user.id], optimisticUpdate);
-    queryClient.setQueryData(['creator-features', user.id], optimisticUpdate);
-
-    try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({ creator_only: enable })
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      // Invalidate all related queries
-      queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
-      queryClient.invalidateQueries({ queryKey: ['user-profile', user.id] });
-      queryClient.invalidateQueries({ queryKey: ['creator-features', user.id] });
-      toast.success(enable ? 'Creator-only mode enabled' : 'Personal profile restored');
-    } catch (err) {
-      console.error('[Settings] creator_only error:', err);
-      
-      // Rollback optimistic updates
-      setCreatorOnly(previousValue);
-      const rollbackUpdate = (old: any) => old ? { ...old, creator_only: previousValue } : old;
-      queryClient.setQueryData(['profile', user.id], rollbackUpdate);
-      queryClient.setQueryData(['user-profile', user.id], rollbackUpdate);
-      queryClient.setQueryData(['creator-features', user.id], rollbackUpdate);
-      
-      toast.error("Couldn't update setting");
-    } finally {
-      setIsUpdatingCreator(false);
-      setShowCreatorOnlyConfirm(false);
-      setShowDisableCreatorOnlyConfirm(false);
-    }
-  };
-
-  // Public profile toggle
-  const handlePublicToggle = async (checked: boolean) => {
-    if (!user) return;
-    setIsUpdatingPrivacy(true);
-    setIsPublic(checked);
-
-    try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({ is_public: checked })
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
-      queryClient.invalidateQueries({ queryKey: ['user-profile', user.id] });
-      queryClient.invalidateQueries({ queryKey: ['liveClubhouseBase'] });
-      toast.success(checked ? 'Profile is now public' : 'Profile is now private');
-    } catch (err) {
-      console.error('[Settings] public toggle error:', err);
-      setIsPublic(!checked);
-      toast.error("Couldn't update setting");
-    } finally {
-      setIsUpdatingPrivacy(false);
-    }
-  };
-
-  // Handicap visibility toggle
-  const handleHandicapToggle = async (checked: boolean) => {
-    if (!user) return;
-    setIsUpdatingHandicap(true);
-    setShowHandicap(checked);
-
-    try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({ show_handicap: checked })
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
-      queryClient.invalidateQueries({ queryKey: ['user-profile', user.id] });
-      toast.success(checked ? 'Handicap is now visible' : 'Handicap is now hidden');
-    } catch (err) {
-      console.error('[Settings] handicap toggle error:', err);
-      setShowHandicap(!checked);
-      toast.error("Couldn't update setting");
-    } finally {
-      setIsUpdatingHandicap(false);
-    }
-  };
-
-  // Pre-check for owned businesses before showing delete confirmation
-  const handleDeleteAttempt = async () => {
-    if (!user) return;
-    try {
-      // Check if user owns any businesses
-      const { data: ownerships } = await supabase
-        .from('business_members')
-        .select('business_id, business_accounts!inner(name)')
-        .eq('user_profile_id', user.id)
-        .eq('role', 'owner');
-
-      if (ownerships && ownerships.length > 0) {
-        const names = ownerships.map((o: any) => o.business_accounts?.name || 'Unknown business');
-        setOwnedBusinessNames(names);
-        setShowBusinessWarning(true);
-      } else {
-        setShowDeleteConfirm(true);
-      }
-    } catch (err) {
-      console.error('[Settings] business check error:', err);
-      // Proceed to delete confirmation even if check fails
-      setShowDeleteConfirm(true);
-    }
-  };
-
-  // Delete account
-  const handleDeleteAccount = async () => {
-    if (deleteConfirmText !== 'DELETE') {
-      toast.error("Please type 'DELETE' to confirm");
-      return;
-    }
-
-    setIsDeleting(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('No active session');
-
-      const { error } = await supabase.functions.invoke('delete-account', {
-        headers: { Authorization: `Bearer ${session.access_token}` }
-      });
-
-      if (error) throw error;
-
-      toast.success('Account deleted');
-      await supabase.auth.signOut();
-      navigate('/auth');
-    } catch (err) {
-      console.error('[Settings] delete account error:', err);
-      toast.error("Couldn't delete account", { description: "Please contact support" });
-    } finally {
-      setIsDeleting(false);
-      setShowDeleteConfirm(false);
-      setDeleteConfirmText('');
-    }
-  };
-
-  // Loading state
-  if (loading) {
-    return (
-      <PageRoot className="min-h-screen bg-background">
-        <SettingsHeader onBack={() => navigate(-1)} />
-        <div className="max-w-2xl mx-auto py-6 pb-32">
-          <SettingsSkeleton />
-        </div>
-      </PageRoot>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <PageRoot className="min-h-screen bg-background">
-        <SettingsHeader onBack={() => navigate(-1)} />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center space-y-4">
-            <span className="text-destructive text-base">Error loading settings</span>
-            <button 
-              onClick={() => window.location.reload()} 
-              className="block mx-auto text-sm text-muted-foreground hover:text-foreground"
-            >
-              Try refreshing the page
-            </button>
-          </div>
-        </div>
-      </PageRoot>
-    );
-  }
-
-  if (!user) return null;
-
-  const isPersonalProfile = profile?.profile_type !== 'business';
+  if (isLoading) return <SettingsSkeleton />;
 
   return (
-    <PageRoot className="min-h-screen w-full bg-background">
-      <SettingsHeader onBack={() => navigate(-1)} />
-      
-      <div className="w-full max-w-2xl mx-auto py-6 pb-32 space-y-8">
-        
-        {/* ========== ACCOUNT ========== */}
+    <div
+      className="min-h-screen bg-background"
+      style={{ paddingTop: 'var(--sat)' }}
+    >
+      {/* Header */}
+      <div className="flex items-center gap-2 px-4 pt-4 pb-2">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center justify-center min-h-[44px] min-w-[44px] -ml-2 text-foreground"
+          aria-label="Back"
+        >
+          <ChevronLeft size={24} strokeWidth={2.5} />
+        </button>
+      </div>
+      <div className="px-5 pb-4">
+        <h1 className="text-[28px] font-bold tracking-tight text-foreground">Settings</h1>
+      </div>
+
+      <div className="px-4 pb-32 space-y-6">
+
+        {/* Account */}
         <SettingsSection title="Account">
           <SettingsChevronRow
-            icon={<User className="w-5 h-5" />}
+            icon={<User size={18} />}
             title="Profile"
-            subtitle="Edit your name, bio, club and profile details."
-            onClick={() => navigate('/edit-profile')}
-            iconTheme="account"
-            isFirst
+            onClick={() => navigate('/profile')}
           />
           <SettingsChevronRow
-            icon={<Mail className="w-5 h-5" />}
+            icon={<Mail size={18} />}
             title="Email"
-            subtitle={maskEmail(user.email)}
-            onClick={() => setShowEmailSheet(true)}
-            iconTheme="account"
+            value={user?.email ? maskEmail(user.email) : undefined}
+            onClick={() => open('email')}
           />
-          <SettingsRow
-            icon={<AtSign className="w-5 h-5" />}
+          <SettingsChevronRow
+            icon={<User size={18} />}
             title="Username"
-            subtitle="Usernames can't be changed."
-            isLocked
-            isLast
-            iconTheme="account"
-            rightContent={
-              <span className="text-[13px] text-muted-foreground font-mono max-w-[45%] truncate block">
-                @{profile?.username || 'not set'}
-              </span>
-            }
+            value={`@${(profile as any)?.username ?? ''}`}
+            onClick={() => {}}
+            disabled
           />
         </SettingsSection>
 
-        {/* ========== IDENTITY & CREATOR ========== */}
+        {/* Identity & Creator — personal profiles only */}
         {isPersonalProfile && (
           <SettingsSection title="Identity & Creator">
             <SettingsToggleRow
-              icon={<Sparkles className="w-5 h-5" />}
+              icon={<Shield size={18} />}
               title="Creator Mode"
-              subtitle={isCreator ? '✓ Creator features active' : 'Unlock pinned posts, featured video, and analytics.'}
-              checked={isCreator}
-              onCheckedChange={handleCreatorToggleAttempt}
-              disabled={isUpdatingCreator}
-              iconTheme="creator"
-              isFirst
+              subtitle="Unlock creator tools and analytics"
+              checked={creator.isCreator}
+              disabled={creator.isUpdating}
+              onCheckedChange={(val) =>
+                val ? creator.setShowEnableConfirm(true) : creator.setShowDisableConfirm(true)
+              }
             />
-            
-            <SettingsToggleRow
-              icon={<EyeOff className="w-5 h-5" />}
-              title="Hide personal profile"
-              subtitle="Only followers see your full profile."
-              checked={creatorOnly}
-              onCheckedChange={(checked) => {
-                if (!isCreator) {
-                  toast('Turn on Creator Mode to unlock this.', { duration: 2000 });
-                  return;
+            {creator.isCreator && (
+              <SettingsToggleRow
+                icon={<EyeOff size={18} />}
+                title="Hide Personal Profile"
+                subtitle="Only your creator profile is visible"
+                checked={creator.creatorOnly}
+                disabled={creator.isUpdating}
+                onCheckedChange={(val) =>
+                  val
+                    ? creator.setShowCreatorOnlyConfirm(true)
+                    : creator.setShowDisableCreatorOnlyConfirm(true)
                 }
-                handleCreatorOnlyToggle(checked);
-              }}
-              disabled={!isCreator || isUpdatingCreator}
-              iconTheme="creator"
-              helperNote={isCreator && creatorOnly ? "Your personal profile is hidden." : undefined}
-            />
+              />
+            )}
             <SettingsChevronRow
-              icon={<ExternalLink className="w-5 h-5" />}
-              title="View profile"
-              subtitle="View your profile."
-              onClick={() => {
-                if (!isCreator) {
-                  toast('Turn on Creator Mode to unlock this.', { duration: 2000 });
-                  return;
-                }
-                navigate(`/profile/${user.id}`);
-              }}
-              disabled={!isCreator}
-              iconTheme="creator"
-              isLast
+              icon={<Eye size={18} />}
+              title="View Profile"
+              onClick={() => navigate(`/profile/${(profile as any)?.username}`)}
             />
           </SettingsSection>
         )}
 
-        {/* ========== PRIVACY & SAFETY ========== */}
+        {/* Privacy & Safety */}
         <SettingsSection title="Privacy & Safety">
           <SettingsToggleRow
-            icon={<Eye className="w-5 h-5" />}
-            title="Public profile"
-            subtitle="Appear in search results and recommendations. When off, only people with your link can find you."
-            checked={isPublic}
-            onCheckedChange={handlePublicToggle}
-            disabled={isUpdatingPrivacy}
-            iconTheme="privacy"
-            isFirst
+            icon={<Eye size={18} />}
+            title="Public Profile"
+            subtitle="Anyone can view your profile and posts"
+            checked={privacy.isPublic}
+            disabled={privacy.isUpdatingPrivacy}
+            onCheckedChange={privacy.togglePublic}
           />
           <SettingsToggleRow
-            icon={<Eye className="w-5 h-5" />}
-            title="Show my handicap publicly"
-            subtitle="Display handicap on your profile and in recommendations."
-            checked={showHandicap}
-            onCheckedChange={handleHandicapToggle}
-            disabled={isUpdatingHandicap}
-            iconTheme="privacy"
+            icon={<Shield size={18} />}
+            title="Show Handicap"
+            subtitle="Display your handicap index on your profile"
+            checked={privacy.showHandicap}
+            disabled={privacy.isUpdatingHandicap}
+            onCheckedChange={privacy.toggleHandicap}
           />
           <SettingsChevronRow
-            icon={<ShieldBan className="w-5 h-5" />}
-            title="Blocked users"
-            subtitle="Manage people you've blocked."
-            onClick={() => setShowBlockedSheet(true)}
-            iconTheme="privacy"
-            isLast
+            icon={<UserX size={18} />}
+            title="Blocked Users"
+            onClick={() => open('blocked')}
           />
         </SettingsSection>
 
-        {/* ========== NOTIFICATIONS ========== */}
+        {/* Notifications */}
         <SettingsSection title="Notifications">
-          <SettingsToggleRow
-            icon={<Smartphone className="w-5 h-5" />}
-            title="Push notifications"
-            subtitle={
-              pushState === 'unavailable' 
-                ? 'Available in the app.' 
-                : pushState === 'enabled' 
-                  ? 'Enabled on this device.' 
-                  : 'Get alerts when something important happens.'
-            }
-            checked={pushState === 'enabled'}
-            onCheckedChange={async (checked) => {
-              if (checked) {
-                await enablePush();
-              } else {
-                await disablePush();
-              }
-            }}
-            disabled={isPushRegistering || pushState === 'denied' || pushState === 'unavailable'}
-            isLoading={isPushRegistering}
-            iconTheme="notifications"
-            isFirst
-            helperNote={pushState === 'denied' ? 'Permission denied. Enable in device settings.' : undefined}
-          />
           <SettingsChevronRow
-            icon={<Bell className="w-5 h-5" />}
-            title="In-app notifications"
-            subtitle="Choose what you're notified about."
-            onClick={() => setShowNotificationsSheet(true)}
+            icon={<Bell size={18} />}
+            title="Notification Preferences"
             isBeta
-            iconTheme="notifications"
-            isLast
+            onClick={() => open('notifications')}
           />
         </SettingsSection>
 
-        {/* ========== SECURITY ========== */}
+        {/* Security */}
         <SettingsSection title="Security">
-          {isOAuthUser ? (
-            <SettingsRow
-              icon={<Lock className="w-5 h-5" />}
-              title="Password"
-              subtitle={`Signed in with ${user?.app_metadata?.provider || 'OAuth'}. Password managed by provider.`}
-              iconTheme="security"
-              isFirst
-              isLast
-            />
-          ) : (
-            <SettingsChevronRow
-              icon={<Lock className="w-5 h-5" />}
-              title="Password"
-              subtitle="Update your password."
-              onClick={() => setShowPasswordSheet(true)}
-              iconTheme="security"
-              isFirst
-              isLast
-            />
-          )}
+          <SettingsChevronRow
+            icon={<Lock size={18} />}
+            title="Change Password"
+            disabled={isOAuthUser}
+            onClick={() => !isOAuthUser && open('password')}
+          />
         </SettingsSection>
 
-        {/* ========== SUPPORT ========== */}
+        {/* Support */}
         <SettingsSection title="Support">
           <SettingsChevronRow
-            icon={<HelpCircle className="w-5 h-5" />}
-            title="Help centre"
-            subtitle="Answers to common questions."
-            onClick={() => setShowHelpSheet(true)}
-            iconTheme="support"
-            isFirst
+            icon={<HelpCircle size={18} />}
+            title="Help Centre"
+            onClick={() => open('help')}
           />
           <SettingsChevronRow
-            icon={<MessageSquare className="w-5 h-5" />}
-            title="Report a problem"
-            subtitle="Tell us what's not working."
-            onClick={() => setShowReportSheet(true)}
-            iconTheme="support"
+            icon={<Flag size={18} />}
+            title="Report a Problem"
+            onClick={() => open('report')}
           />
           <SettingsChevronRow
-            icon={<Headphones className="w-5 h-5" />}
-            title="Contact support"
-            subtitle="Get in touch with the team."
-            onClick={() => setShowContactSheet(true)}
-            iconTheme="support"
-            isLast
+            icon={<MessageSquare size={18} />}
+            title="Contact Support"
+            onClick={() => open('contact')}
           />
         </SettingsSection>
 
-        {/* ========== LEGAL ========== */}
+        {/* Legal */}
         <SettingsSection title="Legal">
           <SettingsChevronRow
-            icon={<FileText className="w-5 h-5" />}
+            icon={<FileText size={18} />}
             title="Terms of Service"
-            subtitle="Read the terms."
-            onClick={() => setShowLegalSheet('terms')}
-            iconTheme="legal"
-            isFirst
+            onClick={() => open('legal')}
           />
           <SettingsChevronRow
-            icon={<Shield className="w-5 h-5" />}
+            icon={<FileText size={18} />}
             title="Privacy Policy"
-            subtitle="How we handle your data."
-            onClick={() => setShowLegalSheet('privacy')}
-            iconTheme="legal"
+            onClick={() => open('legal')}
           />
           <SettingsChevronRow
-            icon={<ScrollText className="w-5 h-5" />}
+            icon={<FileText size={18} />}
             title="Community Guidelines"
-            subtitle="What's allowed on Clbhouz."
-            onClick={() => setShowLegalSheet('guidelines')}
-            iconTheme="legal"
-            isLast
+            onClick={() => open('legal')}
           />
         </SettingsSection>
 
-        {/* ========== DANGER ZONE ========== */}
-        <SettingsSection title="Danger Zone" variant="danger">
+        {/* Account Actions */}
+        <SettingsSection title="Account" variant="danger">
           <SettingsChevronRow
-            icon={<Trash2 className="w-5 h-5" />}
-            title="Delete account"
-            subtitle="Permanently remove your profile from Clbhouz."
-            onClick={handleDeleteAttempt}
+            icon={<LogOut size={18} />}
+            title="Sign Out"
+            onClick={handleSignOut}
             iconTheme="danger"
-            isFirst
-            isLast
+          />
+          <SettingsChevronRow
+            icon={<Trash2 size={18} />}
+            title="Delete Account"
+            onClick={deleteAccount.initiateDelete}
+            iconTheme="danger"
           />
         </SettingsSection>
 
-        {/* Version info */}
-        <p className="text-[11px] text-muted-foreground/60 text-center py-10 tracking-wide">
-          Clbhouz v1.0.0 (Beta)
-        </p>
       </div>
 
+      {/* Sheets */}
+      <EmailChangeSheet open={sheets.email} onClose={() => close('email')} />
+      <PasswordChangeSheet open={sheets.password} onClose={() => close('password')} />
+      <BlockedUsersSheet open={sheets.blocked} onClose={() => close('blocked')} userId={user?.id} />
+      <NotificationsSheet open={sheets.notifications} onClose={() => close('notifications')} userId={user?.id} />
+      <HelpCentreSheet open={sheets.help} onClose={() => close('help')} />
+      <ReportProblemSheet open={sheets.report} onClose={() => close('report')} userId={user?.id} />
+      <ContactSupportSheet open={sheets.contact} onClose={() => close('contact')} />
+      <LegalSheet open={sheets.legal} onClose={() => close('legal')} />
 
-      {/* ========== BOTTOM SHEETS ========== */}
-      <EmailChangeSheet 
-        open={showEmailSheet} 
-        onOpenChange={setShowEmailSheet}
-        currentEmail={user?.email || ''}
-      />
-      <BlockedUsersSheet 
-        open={showBlockedSheet} 
-        onOpenChange={setShowBlockedSheet}
-        userId={user?.id || ''}
-      />
-      <NotificationsSheet 
-        open={showNotificationsSheet} 
-        onOpenChange={setShowNotificationsSheet}
-        userId={user?.id || ''}
-      />
-      <PasswordChangeSheet 
-        open={showPasswordSheet} 
-        onOpenChange={setShowPasswordSheet}
-      />
-      <HelpCentreSheet 
-        open={showHelpSheet} 
-        onOpenChange={setShowHelpSheet}
-      />
-      <ReportProblemSheet 
-        open={showReportSheet} 
-        onOpenChange={setShowReportSheet}
-        userId={user?.id || ''}
-      />
-      <ContactSupportSheet 
-        open={showContactSheet} 
-        onOpenChange={setShowContactSheet}
-      />
-      <LegalSheet 
-        open={showLegalSheet !== null} 
-        onOpenChange={(open) => !open && setShowLegalSheet(null)}
-        type={showLegalSheet || 'terms'}
-      />
-
-      
-      {/* Enable creator-only confirmation */}
-      <AlertDialog open={showCreatorOnlyConfirm} onOpenChange={setShowCreatorOnlyConfirm}>
-        <AlertDialogContent className="bg-card border-border">
+      {/* Creator dialogs */}
+      <AlertDialog open={creator.showEnableConfirm} onOpenChange={creator.setShowEnableConfirm}>
+        <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-foreground flex items-center gap-2">
-              <EyeOff className="w-5 h-5" />
-              Hide your personal profile?
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-muted-foreground space-y-2">
-              <span className="block">When enabled, your profile will be hidden from non-followers.</span>
-              <span className="block text-muted-foreground/60 text-[12px]">You can switch back at any time.</span>
+            <AlertDialogTitle>Enable Creator Mode?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You'll unlock creator tools, analytics, and the ability to monetise your content on Clbhouz.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-transparent border border-border text-foreground hover:bg-muted/80 min-h-[48px] rounded-full active:scale-[0.97] transition-transform">
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={() => confirmCreatorOnly(true)}
-              disabled={isUpdatingCreator}
-              className="bg-[#334E3D] text-white hover:bg-[#334E3D]/90 min-h-[48px] rounded-full active:scale-[0.97] transition-transform"
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => creator.toggleCreatorMode(true)}>Enable</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={creator.showDisableConfirm} onOpenChange={creator.setShowDisableConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Disable Creator Mode?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your creator profile and analytics will be hidden. You can re-enable at any time.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => creator.toggleCreatorMode(false)}
             >
-              {isUpdatingCreator ? 'Enabling...' : 'Enable creator-only'}
+              Disable
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Disable creator-only confirmation */}
-      <AlertDialog open={showDisableCreatorOnlyConfirm} onOpenChange={setShowDisableCreatorOnlyConfirm}>
-        <AlertDialogContent className="bg-card border-border">
+      <AlertDialog open={creator.showCreatorOnlyConfirm} onOpenChange={creator.setShowCreatorOnlyConfirm}>
+        <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-foreground">
-              Show your personal profile again?
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-muted-foreground">
-              Your profile will become visible to everyone again.
+            <AlertDialogTitle>Hide Personal Profile?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your personal profile will be hidden. Only your creator profile will be visible to others.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-transparent border border-border text-foreground hover:bg-muted/80 min-h-[48px] rounded-full active:scale-[0.97] transition-transform">
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={() => confirmCreatorOnly(false)}
-              disabled={isUpdatingCreator}
-              className="bg-[#334E3D] text-white hover:bg-[#334E3D]/90 min-h-[48px] rounded-full active:scale-[0.97] transition-transform"
-            >
-              {isUpdatingCreator ? 'Updating...' : 'Show personal profile'}
-            </AlertDialogAction>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => creator.toggleCreatorOnly(true)}>Confirm</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Business ownership warning before delete */}
-      <AlertDialog open={showBusinessWarning} onOpenChange={setShowBusinessWarning}>
-        <AlertDialogContent className="bg-card border-border">
+      <AlertDialog open={creator.showDisableCreatorOnlyConfirm} onOpenChange={creator.setShowDisableCreatorOnlyConfirm}>
+        <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-amber-600 flex items-center gap-2">
-              <Trash2 className="w-5 h-5" />
-              You own a business profile
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-muted-foreground space-y-3">
-              <p>
-                You own <strong className="text-foreground">{ownedBusinessNames.join(', ')}</strong>. Deleting your account will deactivate {ownedBusinessNames.length === 1 ? 'this business' : 'these businesses'} if no other owner exists.
-              </p>
-              <p className="text-[12px] text-muted-foreground/60">
-                Consider transferring ownership first via Manage Team.
-              </p>
+            <AlertDialogTitle>Show Personal Profile?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your personal profile will become visible again alongside your creator profile.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-muted border-transparent text-foreground hover:bg-muted/80">
-              Transfer ownership first
-            </AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={() => {
-                setShowBusinessWarning(false);
-                setShowDeleteConfirm(true);
-              }}
-              className="bg-red-600 text-white hover:bg-red-700"
-            >
-              Delete anyway
-            </AlertDialogAction>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => creator.toggleCreatorOnly(false)}>Confirm</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Business warning dialog */}
+      <AlertDialog open={deleteAccount.showBusinessWarning} onOpenChange={deleteAccount.setShowBusinessWarning}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Transfer Business Ownership First</AlertDialogTitle>
+            <AlertDialogDescription>
+              You own the following business {deleteAccount.ownedBusinessNames.length === 1 ? 'account' : 'accounts'}:{' '}
+              <strong>{deleteAccount.ownedBusinessNames.join(', ')}</strong>.
+              Please transfer ownership before deleting your account.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => deleteAccount.setShowBusinessWarning(false)}>Got it</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       {/* Delete account confirmation */}
-      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-        <AlertDialogContent className="bg-card border-border">
+      <AlertDialog open={deleteAccount.showDeleteConfirm} onOpenChange={deleteAccount.setShowDeleteConfirm}>
+        <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-red-600 flex items-center gap-2">
-              <Trash2 className="w-5 h-5" />
-              Delete your account?
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-muted-foreground space-y-3">
-              <p>
-                This removes your profile from Clbhouz. Some content may remain anonymised.
-              </p>
-              <div className="space-y-2 pt-2">
-                <Label htmlFor="delete-confirm" className="text-muted-foreground">
-                  Type <strong className="text-foreground">DELETE</strong> to confirm:
-                </Label>
-                <Input
-                  id="delete-confirm"
-                  value={deleteConfirmText}
-                  onChange={(e) => setDeleteConfirmText(e.target.value)}
-                  placeholder="Type DELETE here"
-                  className="bg-muted border-border text-foreground font-mono placeholder:text-muted-foreground/50"
-                />
-              </div>
+            <AlertDialogTitle>Delete Account Permanently?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. All your data, posts, and connections will be permanently removed.
+              Type <strong>DELETE</strong> to confirm.
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="px-1 pb-2">
+            <Input
+              placeholder="Type DELETE to confirm"
+              value={deleteAccount.deleteConfirmText}
+              onChange={(e) => deleteAccount.setDeleteConfirmText(e.target.value)}
+              className="mt-2"
+            />
+          </div>
           <AlertDialogFooter>
-            <AlertDialogCancel 
-              className="bg-muted border-transparent text-foreground hover:bg-muted/80"
-              onClick={() => setDeleteConfirmText('')}
+            <AlertDialogCancel onClick={() => deleteAccount.setDeleteConfirmText('')}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={deleteAccount.deleteConfirmText !== 'DELETE' || deleteAccount.isDeleting}
+              onClick={deleteAccount.confirmDelete}
             >
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleDeleteAccount}
-              disabled={deleteConfirmText !== 'DELETE' || isDeleting}
-              className="bg-red-600 text-white hover:bg-red-700"
-            >
-              {isDeleting ? 'Deleting...' : 'Delete account'}
+              {deleteAccount.isDeleting ? 'Deleting…' : 'Delete My Account'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Disable Creator Mode confirmation */}
-      <AlertDialog open={showDisableCreatorConfirm} onOpenChange={setShowDisableCreatorConfirm}>
-        <AlertDialogContent className="bg-card border-border">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-foreground flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-amber-500" />
-              Disable Creator Mode?
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-muted-foreground space-y-2">
-              <span className="block">You'll lose access to Creator Insights, pinned posts, and featured video.</span>
-              <span className="block text-muted-foreground/60 text-[12px]">Your content will remain, but these features will be hidden.</span>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="bg-transparent border border-border text-foreground hover:bg-muted/80 min-h-[48px] rounded-full active:scale-[0.97] transition-transform">
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={() => {
-                setShowDisableCreatorConfirm(false);
-                handleCreatorToggle(false);
-              }}
-              disabled={isUpdatingCreator}
-              className="bg-foreground text-background hover:bg-foreground/90 min-h-[48px] rounded-full active:scale-[0.97] transition-transform"
-            >
-              {isUpdatingCreator ? 'Disabling...' : 'Disable Creator Mode'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Creator Welcome Dialog */}
+      {/* Creator welcome */}
       <CreatorWelcomeDialog
-        isOpen={showCreatorWelcome}
-        onClose={handleCreatorWelcomeDismiss}
-        onGoToHub={handleGoToHub}
+        isOpen={creator.showWelcome}
+        onClose={() => creator.setShowWelcome(false)}
+        onGoToHub={() => {
+          creator.setShowWelcome(false);
+          navigate('/hub');
+        }}
       />
-    </PageRoot>
-  );
-}
-
-// ========== SETTINGS HEADER (Matches Top100Hub pattern) ==========
-
-function SettingsHeader({ onBack }: { onBack: () => void }) {
-  return (
-    <header 
-      className="sticky top-0 z-50 bg-background"
-      style={{
-        paddingTop: 'max(env(safe-area-inset-top), 0px)',
-      }}
-    >
-      {/* Back link — matches tour player page pattern */}
-      <div className="px-4" style={{ padding: '12px 16px 8px 16px' }}>
-        <button
-          onClick={onBack}
-          className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity min-h-[44px]"
-        >
-          <ChevronLeft size={14} />
-          Back
-        </button>
-      </div>
-      
-      {/* Title centered below */}
-      <div className="mx-auto flex max-w-5xl flex-col gap-1 px-4 pb-8">
-        <h1 className="text-center text-[28px] font-bold tracking-tight text-foreground">
-          Settings
-        </h1>
-        <p className="text-center text-sm text-muted-foreground">
-          Manage your account, creator identity<br />and preferences.
-        </p>
-      </div>
-    </header>
+    </div>
   );
 }
 

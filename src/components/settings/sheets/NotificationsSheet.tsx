@@ -1,161 +1,142 @@
-import React, { useState, useEffect } from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Switch } from '@/components/ui/switch';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Switch } from '@/components/ui/switch';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 
-interface NotificationsSheetProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  userId: string;
-}
-
-interface NotificationPreferences {
-  new_followers: boolean;
+interface NotifPrefs {
   likes: boolean;
   comments: boolean;
-  shares: boolean;
-  tags: boolean;
-  course_activity: boolean;
-  golf_news: boolean;
+  follows: boolean;
+  messages: boolean;
+  mentions: boolean;
+  tour_updates: boolean;
 }
 
-const defaultPrefs: NotificationPreferences = {
-  new_followers: true,
+const DEFAULT_PREFS: NotifPrefs = {
   likes: true,
   comments: true,
-  shares: true,
-  tags: true,
-  course_activity: true,
-  golf_news: false,
+  follows: true,
+  messages: true,
+  mentions: true,
+  tour_updates: true,
 };
 
-const PREF_LABELS: { key: keyof NotificationPreferences; label: string }[] = [
-  { key: 'new_followers', label: 'New followers' },
-  { key: 'likes', label: 'Likes on your posts' },
-  { key: 'comments', label: 'Comments on your posts' },
-  { key: 'shares', label: 'Shares' },
-  { key: 'tags', label: 'Tags' },
-  { key: 'course_activity', label: 'Course activity' },
-  { key: 'golf_news', label: 'Golf news & events' },
-];
+const LABELS: Record<keyof NotifPrefs, string> = {
+  likes: 'Likes',
+  comments: 'Comments',
+  follows: 'New Followers',
+  messages: 'Messages',
+  mentions: 'Mentions',
+  tour_updates: 'Tour Updates',
+};
 
-export function NotificationsSheet({ open, onOpenChange, userId }: NotificationsSheetProps) {
+interface Props {
+  open: boolean;
+  onClose: () => void;
+  userId: string | undefined;
+}
+
+export function NotificationsSheet({ open, onClose, userId }: Props) {
   const queryClient = useQueryClient();
-  const [prefs, setPrefs] = useState<NotificationPreferences>(defaultPrefs);
-  const [isLoading, setIsLoading] = useState(true);
-  const [updating, setUpdating] = useState<string | null>(null);
+  const pushNotifications = usePushNotifications();
+  const [prefs, setPrefs] = useState<NotifPrefs>(DEFAULT_PREFS);
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Load preferences on open
-  useEffect(() => {
-    if (!open || !userId) return;
+  // Derive push enabled state from available API
+  const isPushEnabled = 'isSubscribed' in pushNotifications
+    ? (pushNotifications as any).isSubscribed
+    : (pushNotifications as any).state === 'enabled';
 
-    const loadPrefs = async () => {
-      setIsLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from('user_profiles')
-          .select('notification_preferences')
-          .eq('id', userId)
-          .single();
-
-        if (error) throw error;
-
-        if (data?.notification_preferences && typeof data.notification_preferences === 'object' && !Array.isArray(data.notification_preferences)) {
-          const savedPrefs = data.notification_preferences as Record<string, boolean>;
-          setPrefs({ 
-            new_followers: savedPrefs.new_followers ?? defaultPrefs.new_followers,
-            likes: savedPrefs.likes ?? defaultPrefs.likes,
-            comments: savedPrefs.comments ?? defaultPrefs.comments,
-            shares: savedPrefs.shares ?? defaultPrefs.shares,
-            tags: savedPrefs.tags ?? defaultPrefs.tags,
-            course_activity: savedPrefs.course_activity ?? defaultPrefs.course_activity,
-            golf_news: savedPrefs.golf_news ?? defaultPrefs.golf_news,
-          });
-        }
-      } catch (err) {
-        console.error('[NotificationsSheet] load error:', err);
-      } finally {
-        setIsLoading(false);
+  const handleTogglePush = () => {
+    if ('requestPermission' in pushNotifications && 'unsubscribe' in pushNotifications) {
+      if (isPushEnabled) {
+        (pushNotifications as any).unsubscribe();
+      } else {
+        (pushNotifications as any).requestPermission();
       }
-    };
+    } else if ('enable' in pushNotifications && 'disable' in pushNotifications) {
+      if (isPushEnabled) {
+        (pushNotifications as any).disable();
+      } else {
+        (pushNotifications as any).enable();
+      }
+    }
+  };
 
-    loadPrefs();
-  }, [open, userId]);
+  useEffect(() => {
+    if (!userId || !open) return;
+    supabase
+      .from('user_profiles')
+      .select('notification_preferences')
+      .eq('id', userId)
+      .single()
+      .then(({ data }) => {
+        if (data?.notification_preferences) {
+          setPrefs({ ...DEFAULT_PREFS, ...(data.notification_preferences as any) });
+        }
+      });
+  }, [userId, open]);
 
-  const handleToggle = async (key: keyof NotificationPreferences, value: boolean) => {
-    setUpdating(key);
-    
-    // Optimistic update
-    const prevPrefs = { ...prefs };
-    const newPrefs = { ...prefs, [key]: value };
-    setPrefs(newPrefs);
-
+  const updatePref = async (key: keyof NotifPrefs, value: boolean) => {
+    const updated = { ...prefs, [key]: value };
+    setPrefs(updated);
+    setIsSaving(true);
     try {
       const { error } = await supabase
         .from('user_profiles')
-        .update({ notification_preferences: newPrefs })
+        .update({ notification_preferences: updated as any })
         .eq('id', userId);
-
       if (error) throw error;
-
-      // Invalidate profile queries
-      queryClient.invalidateQueries({ queryKey: ['profile', userId] });
-    } catch (err) {
-      console.error('[NotificationsSheet] update error:', err);
-      // Rollback
-      setPrefs(prevPrefs);
-      toast.error('Failed to update preference');
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+    } catch {
+      setPrefs(prefs);
+      toast.error('Could not save notification preferences.');
     } finally {
-      setUpdating(null);
+      setIsSaving(false);
     }
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent 
-        side="bottom" 
-        className="rounded-t-3xl px-4 pb-8 bg-white max-w-full h-[90svh]"
+    <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
+      <SheetContent
+        side="bottom"
+        className="rounded-t-[20px] bg-background border-0 px-5"
+        style={{ paddingBottom: 'calc(var(--sab) + 24px)' }}
       >
-        {/* Grab handle */}
-        <div className="flex justify-center pt-3 pb-4">
-          <div className="w-10 h-1 rounded-full bg-[#e2e8f0] mx-auto" />
+        <div className="w-10 h-1 rounded-full bg-muted mx-auto mt-3 mb-4" />
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-[20px] font-bold tracking-tight text-foreground">Notifications</h2>
+          <button onClick={onClose} className="flex items-center justify-center min-h-[44px] min-w-[44px] text-muted-foreground">
+            <X size={20} />
+          </button>
         </div>
 
-        <SheetHeader className="pb-2">
-          <SheetTitle className="text-center text-[#1e293b] text-lg font-semibold">
-            In-app notifications
-          </SheetTitle>
-          <p className="text-center text-[12px] text-[#94a3b8]">
-            Preferences are saved. Push notifications are coming later.
-          </p>
-        </SheetHeader>
+        {/* Push toggle */}
+        <div className="flex items-center justify-between py-3 border-b border-border mb-3">
+          <div>
+            <p className="text-[15px] font-medium text-foreground">Push Notifications</p>
+            <p className="text-[13px] text-muted-foreground">Allow Clbhouz to send push alerts</p>
+          </div>
+          <Switch checked={isPushEnabled} onCheckedChange={handleTogglePush} />
+        </div>
 
-        <div className="pt-4">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-6 h-6 animate-spin text-[#64748b]" />
+        {/* In-app prefs */}
+        <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground mb-3">In-App</p>
+        <div className="space-y-1">
+          {(Object.keys(LABELS) as (keyof NotifPrefs)[]).map((key) => (
+            <div key={key} className="flex items-center justify-between min-h-[44px]">
+              <p className="text-[15px] text-foreground">{LABELS[key]}</p>
+              <Switch
+                checked={prefs[key]}
+                disabled={isSaving}
+                onCheckedChange={(val) => updatePref(key, val)}
+              />
             </div>
-          ) : (
-            <div className="space-y-1">
-              {PREF_LABELS.map(({ key, label }) => (
-                <div 
-                  key={key}
-                  className="flex items-center justify-between py-3 px-1"
-                >
-                  <span className="text-[15px] text-[#1e293b]">{label}</span>
-                  <Switch
-                    checked={prefs[key]}
-                    onCheckedChange={(value) => handleToggle(key, value)}
-                    disabled={updating === key}
-                    className="data-[state=checked]:bg-[#1e293b] data-[state=unchecked]:bg-[#e2e8f0]"
-                  />
-                </div>
-              ))}
-            </div>
-          )}
+          ))}
         </div>
       </SheetContent>
     </Sheet>

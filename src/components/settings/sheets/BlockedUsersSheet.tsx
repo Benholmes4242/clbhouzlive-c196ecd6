@@ -1,171 +1,109 @@
-import React from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { X, UserX } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
-import { Loader2, UserX } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { supabase } from '@/integrations/supabase/client';
 
-interface BlockedUsersSheetProps {
+interface Props {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
-  userId: string;
+  onClose: () => void;
+  userId: string | undefined;
 }
 
-interface BlockedUser {
-  blocked_id: string;
-  created_at: string;
-  profile: {
-    id: string;
-    display_name: string | null;
-    username: string | null;
-    profile_photo_url: string | null;
-  } | null;
-}
-
-export function BlockedUsersSheet({ open, onOpenChange, userId }: BlockedUsersSheetProps) {
+export function BlockedUsersSheet({ open, onClose, userId }: Props) {
   const queryClient = useQueryClient();
 
-  // Fetch blocked users
-  const { data: blockedUsers, isLoading } = useQuery({
+  const { data: blocked = [], isLoading } = useQuery({
     queryKey: ['blocked-users', userId],
     queryFn: async () => {
-      // First get blocked user IDs
-      const { data: blocks, error: blocksError } = await supabase
+      if (!userId) return [];
+      const { data, error } = await supabase
         .from('user_blocks')
-        .select('blocked_id, created_at')
-        .eq('blocker_id', userId)
-        .order('created_at', { ascending: false });
-
-      if (blocksError) throw blocksError;
-      if (!blocks?.length) return [];
-
-      // Then fetch profiles for those users
-      const blockedIds = blocks.map(b => b.blocked_id);
-      const { data: profiles, error: profilesError } = await supabase
-        .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url')
-        .in('id', blockedIds);
-
-      if (profilesError) throw profilesError;
-
-      // Combine the data
-      return blocks.map(block => ({
-        blocked_id: block.blocked_id,
-        created_at: block.created_at,
-        profile: profiles?.find(p => p.id === block.blocked_id) || null
-      })) as BlockedUser[];
+        .select('blocked_id, user_profiles!user_blocks_blocked_id_fkey(id, username, avatar_url, full_name)')
+        .eq('blocker_id', userId);
+      if (error) throw error;
+      return data ?? [];
     },
-    enabled: open && !!userId,
+    enabled: !!userId && open,
   });
 
-  // Unblock mutation
-  const unblockMutation = useMutation({
-    mutationFn: async (blockedId: string) => {
+  const handleUnblock = async (blockedId: string) => {
+    try {
       const { error } = await supabase
         .from('user_blocks')
         .delete()
         .eq('blocker_id', userId)
         .eq('blocked_id', blockedId);
-      
       if (error) throw error;
-    },
-    onMutate: async (blockedId) => {
-      // Optimistic update
-      await queryClient.cancelQueries({ queryKey: ['blocked-users', userId] });
-      const previous = queryClient.getQueryData(['blocked-users', userId]);
-      
-      queryClient.setQueryData(['blocked-users', userId], (old: BlockedUser[] | undefined) => 
-        old?.filter(u => u.blocked_id !== blockedId) || []
-      );
-      
-      return { previous };
-    },
-    onError: (err, blockedId, context) => {
-      // Rollback on error
-      queryClient.setQueryData(['blocked-users', userId], context?.previous);
-      toast.error('Failed to unblock user');
-    },
-    onSuccess: () => {
-      toast.success('User unblocked');
-    },
-    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['blocked-users', userId] });
-    },
-  });
+      toast.success('User has been unblocked.');
+    } catch {
+      toast.error('Could not unblock user.');
+    }
+  };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent 
-        side="bottom" 
-        className="rounded-t-[18px] px-4 pb-8 bg-white max-w-full"
-        style={{ maxHeight: '70vh' }}
+    <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
+      <SheetContent
+        side="bottom"
+        className="rounded-t-[20px] bg-background border-0 px-5 max-h-[80vh] overflow-y-auto"
+        style={{ paddingBottom: 'calc(var(--sab) + 24px)' }}
       >
-        {/* Grab handle */}
-        <div className="flex justify-center pt-3 pb-4">
-          <div className="w-9 h-1 rounded-full bg-[#E4E6E9]" />
+        <div className="w-10 h-1 rounded-full bg-muted mx-auto mt-3 mb-4" />
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-[20px] font-bold tracking-tight text-foreground">Blocked Users</h2>
+          <button onClick={onClose} className="flex items-center justify-center min-h-[44px] min-w-[44px] text-muted-foreground">
+            <X size={20} />
+          </button>
         </div>
 
-        <SheetHeader className="pb-4">
-          <SheetTitle className="text-center text-[#1F2428] text-lg font-semibold">
-            Blocked users
-          </SheetTitle>
-        </SheetHeader>
-
-        <div className="overflow-y-auto" style={{ maxHeight: 'calc(70vh - 120px)' }}>
-          {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-6 h-6 animate-spin text-[#5E666D]" />
-            </div>
-          ) : !blockedUsers?.length ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <UserX className="w-10 h-10 text-[#97A1AA] mb-3" />
-              <p className="text-[#5E666D] text-sm">You haven't blocked anyone.</p>
-            </div>
-          ) : (
-            <div className="space-y-1">
-              {blockedUsers.map((blocked) => (
-                <div 
-                  key={blocked.blocked_id}
-                  className="flex items-center justify-between py-3 px-2"
-                >
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <SquircleAvatar
-                      src={blocked.profile?.profile_photo_url}
-                      alt={blocked.profile?.display_name || 'User'}
-                      size={40}
-                      className="flex-shrink-0"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-[15px] font-medium text-[#1F2428] truncate">
-                        {blocked.profile?.display_name || 'Unknown User'}
-                      </p>
-                      {blocked.profile?.username && (
-                        <p className="text-[13px] text-[#5E666D] truncate">
-                          @{blocked.profile.username}
-                        </p>
-                      )}
-                    </div>
+        {isLoading ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-3 animate-pulse">
+                <div className="w-10 h-10 rounded-full bg-muted" />
+                <div className="flex-1 space-y-1.5">
+                  <div className="h-3.5 w-32 rounded bg-muted" />
+                  <div className="h-3 w-20 rounded bg-muted" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : blocked.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <UserX size={36} className="text-muted-foreground mb-3" />
+            <p className="text-[15px] font-medium text-foreground">No blocked users</p>
+            <p className="text-[13px] text-muted-foreground mt-1">Users you block will appear here.</p>
+          </div>
+        ) : (
+          <div className="space-y-1">
+            {blocked.map((item: any) => {
+              const p = item.user_profiles;
+              return (
+                <div key={item.blocked_id} className="flex items-center gap-3 py-2">
+                  <Avatar className="w-10 h-10">
+                    <AvatarImage src={p?.avatar_url} />
+                    <AvatarFallback>{p?.full_name?.[0] ?? '?'}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[15px] font-medium text-foreground truncate">{p?.full_name ?? 'Unknown'}</p>
+                    <p className="text-[13px] text-muted-foreground">@{p?.username ?? '—'}</p>
                   </div>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => unblockMutation.mutate(blocked.blocked_id)}
-                    disabled={unblockMutation.isPending}
-                    className="flex-shrink-0 text-[13px] h-8 px-3 border-[rgba(31,36,40,0.1)] text-[#5E666D] hover:text-[#1F2428]"
+                    className="min-h-[36px] shrink-0"
+                    onClick={() => handleUnblock(item.blocked_id)}
                   >
-                    {unblockMutation.isPending ? (
-                      <Loader2 className="w-3 h-3 animate-spin" />
-                    ) : (
-                      'Unblock'
-                    )}
+                    Unblock
                   </Button>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </SheetContent>
     </Sheet>
   );
