@@ -31,7 +31,7 @@ export const VideoPlayIndicator = ({
   return (
     <div 
       className={cn(
-        "absolute bottom-1 left-1 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center z-10",
+        "absolute bottom-1 left-1 rounded-full liquid-glass flex items-center justify-center z-10",
         classes.container,
         className
       )}

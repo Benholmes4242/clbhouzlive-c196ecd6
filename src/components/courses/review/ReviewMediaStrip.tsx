@@ -70,14 +70,14 @@ const ReviewMediaThumb: React.FC<{
         />
       )}
 
-      {/* Video play icon overlay — renders on top of both loaded and fallback states */}
+      {/* Video play icon overlay — canonical dark glass */}
       {isVideo && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+        <div className="absolute inset-0 flex items-center justify-center">
           <div className={cn(
-            "bg-white rounded-full flex items-center justify-center shadow-lg",
+            "liquid-glass rounded-full flex items-center justify-center",
             playBtnSize
           )}>
-            <Play className={cn("text-foreground fill-foreground ml-0.5", playIconSize)} />
+            <Play className={cn("text-white fill-white ml-0.5", playIconSize)} />
           </div>
         </div>
       )}
