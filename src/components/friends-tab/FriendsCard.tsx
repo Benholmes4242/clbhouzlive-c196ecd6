@@ -45,7 +45,7 @@ function getMediaAspectClass(post: FeedPost): string {
   return 'aspect-video';
 }
 
-export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardIndex = 0, allPosts }: FriendsCardProps) {
+export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardIndex = 0, allPosts, fetchNextPage, hasNextPage, isFetchingNextPage }: FriendsCardProps) {
   const navigate = useNavigate();
   const firstMedia = post.mediaItems[0];
   const isVideo = firstMedia?.type === 'video';
