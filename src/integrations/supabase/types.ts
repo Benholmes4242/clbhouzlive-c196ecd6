@@ -15318,6 +15318,20 @@ export type Database = {
         }
         Returns: Json
       }
+      get_trending_courses: {
+        Args: { p_days_back?: number; p_limit?: number; p_region_slug?: string }
+        Returns: {
+          country: string
+          course_id: string
+          course_name: string
+          global_rank: number
+          post_count: number
+          review_count: number
+          sub_country: string
+          thumbnail_image: string
+          trending_score: number
+        }[]
+      }
       get_trending_top100_moments: {
         Args: { days_param: number; limit_param: number }
         Returns: {

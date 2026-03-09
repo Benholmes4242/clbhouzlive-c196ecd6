@@ -106,7 +106,7 @@ export default function ExploreGrid({
             <ExploreTile post={post} index={index} allPosts={coursePosts} />
 
             {index === TRENDING_AFTER - 1 && (
-              <TrendingCoursesStrip />
+              <TrendingCoursesStrip activeRegion={activeRegion} />
             )}
 
             {index === REGIONS_AFTER - 1 && activeRegion === null && (
