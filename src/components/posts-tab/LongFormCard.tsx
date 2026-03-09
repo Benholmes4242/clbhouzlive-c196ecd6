@@ -32,7 +32,7 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
 
   return (
     <div
-      className="bg-card rounded-xl overflow-hidden shadow-sm border border-border/50 mx-0 cursor-pointer"
+      className="bg-card overflow-hidden border-b border-border/50 cursor-pointer"
       onClick={() => {
         if (allPosts && postIndex != null) {
           useFullscreenFeed.getState().open({
