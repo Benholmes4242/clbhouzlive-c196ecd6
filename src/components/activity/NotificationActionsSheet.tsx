@@ -1,11 +1,11 @@
 import React from 'react';
 import { Bell, BellOff, Trash2, BellMinus, UserX } from 'lucide-react';
 import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-} from '@/components/ui/drawer';
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -114,16 +114,16 @@ export const NotificationActionsSheet: React.FC<NotificationActionsSheetProps> =
   };
 
   return (
-    <Drawer open={open} onOpenChange={(v) => !v && onClose()}>
-      <DrawerContent>
-        <DrawerHeader className="text-left border-b border-border/40 pb-3" aria-label="Notification options">
-          <DrawerTitle className="text-[1rem] font-semibold">Notification options</DrawerTitle>
-        </DrawerHeader>
+    <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
+      <SheetContent side="bottom" className="rounded-t-[20px]">
+        <SheetHeader className="text-left border-b border-border/40 pb-3" aria-label="Notification options">
+          <SheetTitle className="text-[1rem] font-semibold">Notification options</SheetTitle>
+        </SheetHeader>
         
         <div className="p-2 space-y-1">
           <button
             onClick={handleToggleRead}
-            className="w-full flex items-center gap-3 px-4 py-3 text-left rounded-sq-sm hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="w-full flex items-center gap-3 px-4 min-h-[44px] text-left rounded-sq-sm hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             aria-label={isUnread ? 'Mark notification as read' : 'Mark notification as unread'}
           >
             {isUnread ? (
@@ -141,7 +141,7 @@ export const NotificationActionsSheet: React.FC<NotificationActionsSheetProps> =
 
           <button
             onClick={handleMuteType}
-            className="w-full flex items-center gap-3 px-4 py-3 text-left rounded-sq-sm hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="w-full flex items-center gap-3 px-4 min-h-[44px] text-left rounded-sq-sm hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             aria-label={`Mute ${notificationType.replace(/_/g, ' ')} notifications`}
           >
             <BellMinus className="h-5 w-5 text-muted-foreground" />
@@ -151,7 +151,7 @@ export const NotificationActionsSheet: React.FC<NotificationActionsSheetProps> =
           {actorId && notification.actor_type === 'user' && (
             <button
               onClick={handleMuteUser}
-              className="w-full flex items-center gap-3 px-4 py-3 text-left rounded-sq-sm hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              className="w-full flex items-center gap-3 px-4 min-h-[44px] text-left rounded-sq-sm hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               aria-label={`Mute notifications from ${actorName}`}
             >
               <UserX className="h-5 w-5 text-muted-foreground" />
@@ -161,7 +161,7 @@ export const NotificationActionsSheet: React.FC<NotificationActionsSheetProps> =
 
           <button
             onClick={handleDelete}
-            className="w-full flex items-center gap-3 px-4 py-3 text-left rounded-sq-sm hover:bg-destructive/10 transition-colors text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2"
+            className="w-full flex items-center gap-3 px-4 min-h-[44px] text-left rounded-sq-sm hover:bg-destructive/10 transition-colors text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2"
             aria-label="Delete notification"
           >
             <Trash2 className="h-5 w-5" />
@@ -170,7 +170,7 @@ export const NotificationActionsSheet: React.FC<NotificationActionsSheetProps> =
         </div>
 
         <div className="h-[env(safe-area-inset-bottom)]" />
-      </DrawerContent>
-    </Drawer>
+      </SheetContent>
+    </Sheet>
   );
 };
