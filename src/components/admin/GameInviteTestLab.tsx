@@ -385,12 +385,15 @@ function useSendTestInvite() {
       if (participantError) throw participantError;
 
       // Use production notification hook
-      await sendGameInviteNotification.mutateAsync({
+      await sendGameNotification.mutateAsync({
+        type: 'game_updated' as any,
+        recipientUserIds: [inviteeId],
         gameId,
-        invitedUserIds: [inviteeId],
-        courseName,
-        date: formatGameDateForNotification(startTime),
-        time: formatGameTimeForNotification(startTime),
+        data: {
+          course_name: courseName,
+          date: formatGameDateForNotification(startTime),
+          time: formatGameTimeForNotification(startTime),
+        },
       });
 
       return { courseName };

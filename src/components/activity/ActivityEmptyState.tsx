@@ -18,11 +18,6 @@ const TAB_EMPTY_STATES: Record<ActivityTabId, { icon: typeof BellOff; title: str
     title: 'No activity from friends',
     description: 'When your friends interact with you, their activity will appear here.',
   },
-  messages: {
-    icon: Mail,
-    title: 'No messages yet',
-    description: 'Direct messages and conversation updates will show here.',
-  },
   system: {
     icon: Sparkles,
     title: 'No system updates',
