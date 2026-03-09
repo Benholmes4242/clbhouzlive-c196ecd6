@@ -1,13 +1,14 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useStore } from 'zustand';
 import { ChevronLeft } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { CommentsPage } from '@/components/clubhouse/cinematic/CommentsPage';
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
 import { toast } from 'sonner';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { MediaStore } from '@/components/media-system/store/createMediaStore';
+import { useLikeMutation } from '@/components/media-system/hooks/useLikeMutation';
+import { useActiveActor } from '@/context/ActiveActorContext';
 
 interface FullscreenActionRailProps {
   posts: FeedPost[];
@@ -23,7 +24,10 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
   const carouselPositions = useStore(store, (s) => s.carouselPositions);
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
+  const { activeActor } = useActiveActor();
   const activePost = posts[activeIndex];
+
+  const likeMutation = useLikeMutation();
 
   const [isLiked, setIsLiked] = useState(activePost?.isLikedByMe ?? false);
   const [likeCount, setLikeCount] = useState(activePost?.likeCount ?? 0);
@@ -38,35 +42,32 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
     }
   }, [activeIndex, activePost?.id]);
 
-  const toggleLike = useCallback(async () => {
-    if (!userId || !activePost) return;
-    const newLiked = !isLiked;
+  const toggleLike = useCallback(() => {
+    if (!userId || !activePost || !activeActor) return;
+    const prevLiked = isLiked;
+    const prevCount = likeCount;
+    const newLiked = !prevLiked;
+
     setIsLiked(newLiked);
-    setLikeCount((prev) => (newLiked ? prev + 1 : Math.max(0, prev - 1)));
+    setLikeCount(newLiked ? prevCount + 1 : Math.max(0, prevCount - 1));
     navigator?.vibrate?.(10);
 
-    try {
-      if (newLiked) {
-        const { error } = await supabase.from('post_likes').insert({
-          post_id: activePost.id,
-          user_id: userId,
-          actor_id: userId,
-          actor_type: 'personal',
-        });
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('post_likes')
-          .delete()
-          .match({ post_id: activePost.id, user_id: userId });
-        if (error) throw error;
-      }
-    } catch (err) {
-      console.error('[FullscreenActionRail] Like toggle failed:', err);
-      setIsLiked(!newLiked);
-      setLikeCount((prev) => (newLiked ? Math.max(0, prev - 1) : prev + 1));
-    }
-  }, [userId, activePost, isLiked]);
+    likeMutation.mutate(
+      {
+        postId: activePost.id,
+        userId,
+        actorId: activeActor.id ?? userId,
+        actorType: activeActor.type === 'business' ? 'business' : 'personal',
+        isLiked: prevLiked,
+      },
+      {
+        onError: () => {
+          setIsLiked(prevLiked);
+          setLikeCount(prevCount);
+        },
+      },
+    );
+  }, [userId, activeActor, activePost, isLiked, likeCount, likeMutation]);
 
   const handleShare = useCallback(async () => {
     if (!activePost) return;
