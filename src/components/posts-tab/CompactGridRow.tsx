@@ -1,6 +1,6 @@
 import React from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { Play, Star } from 'lucide-react';
+import { Play, Star, Heart } from 'lucide-react';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 
 interface CompactGridRowProps {
@@ -66,18 +66,22 @@ const CompactTile: React.FC<{ post: FeedPost; globalIndex: number; allPosts?: Fe
         </div>
       )}
 
-      {/* Duration badge — bottom right */}
+      {/* Duration badge — bottom right (matches WatchTile) */}
       {isVideo && duration != null && duration > 0 && (
         <div
-          className="absolute bottom-1.5 right-1.5 px-1 py-px rounded text-[9px] font-medium text-white z-3"
+          className="absolute bottom-1.5 right-1.5 z-10 rounded-[4px] flex items-center"
           style={{
-            background: 'rgba(0,0,0,0.35)',
+            background: 'rgba(0, 0, 0, 0.35)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
+            padding: '2px 5px',
           }}
         >
-          {formatDuration(duration)}
+          <span className="text-[11px] font-semibold text-white tracking-[0.02em]">
+            {formatDuration(duration)}
+          </span>
         </div>
       )}
 
@@ -97,11 +101,22 @@ const CompactTile: React.FC<{ post: FeedPost; globalIndex: number; allPosts?: Fe
         </div>
       )}
 
-      {/* Like count — bottom left, amber when liked */}
+      {/* Like count — bottom left (matches WatchTile) */}
       {post.likeCount > 0 && (
-        <div className="absolute bottom-1.5 left-1.5 flex items-center gap-0.5 z-10">
-          <span className="flex items-center gap-0.5 text-[10px] font-semibold text-[#f59e0b] drop-shadow-md">
-            ♥ {formatCompact(post.likeCount)}
+        <div
+          className="absolute bottom-1.5 left-1.5 z-10 rounded-[4px] flex items-center gap-[3px]"
+          style={{
+            background: 'rgba(0, 0, 0, 0.35)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
+            padding: '2px 5px',
+          }}
+        >
+          <Heart className="w-[10px] h-[10px]" style={{ color: 'rgba(245, 158, 11, 0.9)', fill: 'rgba(245, 158, 11, 0.9)' }} />
+          <span className="text-[11px] font-medium text-white">
+            {formatCompact(post.likeCount)}
           </span>
         </div>
       )}
