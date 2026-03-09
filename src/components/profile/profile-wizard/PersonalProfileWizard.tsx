@@ -37,7 +37,7 @@ const slideVariants = {
   }),
 };
 
-const transition = { type: 'tween', duration: 0.22, ease: 'easeInOut' };
+const transition = { type: 'tween' as const, duration: 0.22, ease: 'easeInOut' as const };
 
 export function PersonalProfileWizard() {
   const navigate = useNavigate();
