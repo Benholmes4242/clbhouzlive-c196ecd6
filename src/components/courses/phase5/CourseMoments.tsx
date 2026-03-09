@@ -3,7 +3,7 @@
  * Phase 5: Emotional anchor, turns courses into chapters
  */
 import React, { useMemo, useCallback } from 'react';
-import { Camera } from 'lucide-react';
+import { Camera, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUserCourseMoments } from '@/hooks/useUserCourseMoments';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -108,9 +108,7 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-5 h-5 rounded-full liquid-glass flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white translate-x-[1px]" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
+                    <Play className="w-2.5 h-2.5 text-white fill-white translate-x-[1px]" />
                   </div>
                 </div>
               </>
