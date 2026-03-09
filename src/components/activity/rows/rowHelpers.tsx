@@ -168,13 +168,15 @@ export const AvatarWithBadge: React.FC<AvatarWithBadgeProps> = ({ notification, 
 
   return (
     <div className="relative shrink-0" style={{ width: 48, height: 50 }}>
-      <SquircleAvatar
-        src={avatarUrl}
-        alt={displayName || 'User'}
-        size={48}
-        fallback={displayName?.charAt(0) || '?'}
-        hideRing
-      />
+      <div style={{ border: '0.5px solid #D1D5DB', borderRadius: '34%', padding: 0, lineHeight: 0 }}>
+        <SquircleAvatar
+          src={avatarUrl}
+          alt={displayName || 'User'}
+          size={48}
+          fallback={displayName?.charAt(0) || '?'}
+          hideRing
+        />
+      </div>
       <span className="absolute -bottom-0.5 -right-0.5 h-5 w-5 rounded-full bg-background ring-2 ring-background shadow-sm flex items-center justify-center">
         {badgeIcon}
       </span>
