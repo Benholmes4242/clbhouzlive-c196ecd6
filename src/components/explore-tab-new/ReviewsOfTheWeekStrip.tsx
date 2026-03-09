@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { MdOutlineStarOutline } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useQuery } from '@tanstack/react-query';
@@ -59,8 +60,9 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
 
   return (
     <div className="py-4">
-      <h3 className="text-sm font-semibold text-foreground px-4 pb-3">
-        ⭐ Reviews of the Week
+      <h3 className="flex items-center gap-1.5 text-sm font-semibold text-foreground px-4 pb-3">
+        <MdOutlineStarOutline className="w-4 h-4 text-amber-500" />
+        Reviews of the Week
       </h3>
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide">
         {reviews.map((review) => (
