@@ -14,7 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useInviteSearch, InvitableUser } from '../../hooks/useInviteSearch';
 import { toast } from 'sonner';
 import { 
-  useSendGameInviteNotification, 
+  useSendGameNotification, 
   formatGameDateForNotification, 
   formatGameTimeForNotification 
 } from '../../hooks/useGameNotifications';
