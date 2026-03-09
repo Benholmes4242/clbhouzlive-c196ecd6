@@ -180,7 +180,7 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
             {/* Filter tabs - Tier 2 */}
             <div className="mb-4">
               <div 
-                className="grid w-full grid-cols-4 gap-1"
+                className="flex w-full justify-center gap-2"
                 role="tablist"
               >
                 {ACTIVITY_TABS.map((tab) => (
@@ -190,12 +190,12 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
                     aria-selected={activeTab === tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={cn(
-                      "relative py-2 min-h-[44px] text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97]",
-                      "after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:rounded-full after:transition-all after:duration-200",
+                      "px-4 min-h-[36px] rounded-full text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold",
                       activeTab === tab.id
-                        ? "text-foreground font-semibold after:bg-[hsl(var(--tab-orange))]"
-                        : "text-muted-foreground font-medium hover:text-foreground after:bg-transparent"
+                        ? "text-white"
+                        : "text-muted-foreground bg-muted"
                     )}
+                    style={activeTab === tab.id ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
                   >
                     {tab.label}
                   </button>

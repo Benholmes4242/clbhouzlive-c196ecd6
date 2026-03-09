@@ -44,19 +44,13 @@ export function PlayerFilterChips({ activeFilter, onFilterChange, counts }: Play
               aria-selected={isActive}
               onClick={() => onFilterChange(filter.value)}
               className={cn(
-                // Exact same styling as schedule page tabs
-                "relative text-sm px-3 py-2.5 font-medium",
-                "bg-transparent border-0 shadow-none rounded-none",
-                "transition-colors duration-200 ease-out",
+                "px-4 min-h-[36px] rounded-full text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold",
                 "inline-flex items-center justify-center gap-1",
-                // Orange underline using after pseudo-element
-                "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
-                "after:h-[3px] after:rounded-full after:bg-[hsl(var(--tab-orange))]",
-                "after:transition-all after:duration-200 after:ease-out",
-                isActive 
-                  ? "text-foreground after:w-full after:opacity-[0.85]" 
-                  : "text-muted-foreground hover:text-foreground after:w-0 after:opacity-0"
+                isActive
+                  ? "text-white"
+                  : "text-muted-foreground bg-muted"
               )}
+              style={isActive ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
             >
               {filter.label}
             </button>

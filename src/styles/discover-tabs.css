@@ -1,13 +1,11 @@
 /* Discover Tabs - Polished Design with Pill Container */
 
-/* Tokens - using primary (orange) for active states */
+/* Tokens - using design system */
 :root {
-  --tab-active-color: hsl(var(--foreground));
+  --tab-active-color: #ffffff;
   --tab-inactive-color: hsl(var(--muted-foreground));
   --tab-hover-color: hsl(var(--foreground) / 0.8);
-  --tab-underline-color: hsl(var(--primary));
-  --tab-active-bg: hsl(var(--background));
-  --tab-container-bg: hsl(var(--muted) / 0.5);
+  --tab-active-bg: hsl(var(--tab-main-active));
 }
 
 /* Header wrapper - sits directly on page canvas */
@@ -19,14 +17,12 @@
   padding-bottom: 12px;
 }
 
-/* Tab container - rounded pill background */
+/* Tab container - no track */
 .discover-tabs {
   display: flex;
-  gap: 0;
+  gap: 4px;
   position: relative;
   align-items: center;
-  background: var(--tab-container-bg);
-  border-radius: 12px;
   padding: 4px;
 }
 
@@ -44,28 +40,18 @@
 
 .discover-tab:hover:not(.active) {
   color: var(--tab-hover-color);
-  background: hsl(var(--background) / 0.5);
 }
 
-/* Active state - white pill with subtle shadow */
+/* Active state - #1e293b filled pill */
 .discover-tab.active {
   color: var(--tab-active-color);
   font-weight: 600;
   background: var(--tab-active-bg);
-  box-shadow: 0 1px 3px hsl(var(--foreground) / 0.08), 0 1px 2px hsl(var(--foreground) / 0.04);
 }
 
-/* Active indicator dot - orange accent below text */
+/* Remove old orange dot */
 .discover-tab.active::after {
-  content: '';
-  position: absolute;
-  bottom: 4px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
-  background: var(--tab-underline-color);
-  border-radius: 50%;
+  display: none;
 }
 
 /* Touch feedback */

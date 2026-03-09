@@ -15,14 +15,8 @@ interface SegmentedControlProps {
 }
 
 /**
- * SegmentedControl — Shared pill-toggle tab component.
- * Canonical styling sourced from Tours Overview (TourHubTabs).
- *
- * Container:  bg-muted  rounded-xl  p-1
- * Active tab: bg-card  text-foreground  shadow-sm  rounded-lg  border border-border  m-1
- * Inactive:   text-muted-foreground  transparent
- *
- * All colors use design tokens — no hardcoded hex values.
+ * SegmentedControl — Main tab component (Tier 1).
+ * Active: #1e293b rounded rectangle pill, no track.
  */
 const SegmentedControl: React.FC<SegmentedControlProps> = ({
   tabs,
@@ -32,7 +26,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
 }) => {
   return (
     <section className={cn('py-3 -mx-4 px-4 bg-background', className)}>
-      <div className="flex p-1 rounded-xl overflow-hidden">
+      <div className="flex gap-1">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
 
@@ -45,9 +39,10 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
               className={cn(
                 'flex-1 py-2.5 px-4 text-sm font-medium rounded-lg transition-all duration-150 active:scale-[0.97] flex items-center justify-center',
                 isActive
-                  ? 'm-1 bg-foreground text-background rounded-lg'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-card/50',
+                  ? 'text-white font-semibold'
+                  : 'text-muted-foreground hover:text-foreground',
               )}
+              style={isActive ? { backgroundColor: 'hsl(var(--tab-main-active))' } : undefined}
             >
               {tab.icon && <span className="mr-1.5">{tab.icon}</span>}
               {tab.label}

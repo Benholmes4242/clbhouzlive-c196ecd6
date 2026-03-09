@@ -1,5 +1,4 @@
 import React from 'react';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 
 export interface SegmentedTabOption {
@@ -15,33 +14,30 @@ interface SegmentedTabsProps {
 }
 
 /**
- * Global SegmentedTabs component — orange underline pattern
+ * Global SegmentedTabs — Tier 2 sub-tab pill
+ * Active: #475569 filled pill, no underline
  */
 export function SegmentedTabs({ options, value, onChange, className = '' }: SegmentedTabsProps) {
   return (
-    <Tabs value={value} onValueChange={onChange}>
-      <TabsList 
-        className={cn(
-          'flex items-center gap-1 bg-transparent border-0 p-0 h-auto',
-          className
-        )}
-      >
-        {options.map((option) => (
-          <TabsTrigger 
+    <div className={cn('flex items-center justify-center gap-2', className)}>
+      {options.map((option) => {
+        const isActive = value === option.value;
+        return (
+          <button
             key={option.value}
-            value={option.value}
-            className="relative text-sm px-3 py-2 min-h-[44px] font-medium bg-transparent border-0 shadow-none rounded-none
-              data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground data-[state=active]:font-semibold
-              text-muted-foreground hover:text-foreground
-              active:scale-[0.97] transition-all duration-200
-              after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:rounded-full after:transition-all after:duration-200
-              data-[state=active]:after:bg-[hsl(var(--tab-orange))]
-              data-[state=inactive]:after:bg-transparent"
+            onClick={() => onChange(option.value)}
+            className={cn(
+              'px-4 min-h-[36px] rounded-full text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold',
+              isActive
+                ? 'text-white'
+                : 'text-muted-foreground bg-muted'
+            )}
+            style={isActive ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
           >
             {option.label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
-    </Tabs>
+          </button>
+        );
+      })}
+    </div>
   );
 }

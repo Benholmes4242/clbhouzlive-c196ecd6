@@ -488,12 +488,14 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       <div className="px-5 pt-1 pb-4">
         {/* Sort tabs */}
         <Tabs value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)} className="w-full">
-          <TabsList className="bg-transparent border-0 px-0 py-0 gap-0 w-full flex justify-center">
+          <TabsList className="bg-transparent border-0 px-0 py-0 gap-2 w-full flex justify-center">
             {sortOptions.map((option) => (
               <TabsTrigger
                 key={option.value}
                 value={option.value}
-                className="relative text-sm px-3 py-2.5 font-medium min-h-[44px] bg-transparent border-0 shadow-none rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-all duration-200 ease-out active:scale-[0.97] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[3px] after:rounded-full after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
+                className="min-h-[36px] px-4 rounded-full text-sm font-semibold transition-all active:scale-[0.97] border-0 shadow-none
+                  data-[state=active]:text-white data-[state=active]:shadow-none data-[state=active]:bg-[hsl(215,16%,35%)]
+                  data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground"
               >
                 {option.label}
               </TabsTrigger>

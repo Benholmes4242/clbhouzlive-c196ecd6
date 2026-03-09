@@ -92,28 +92,26 @@ export function TopPlayersFeed({ players, maxEvents, maxCuts }: TopPlayersFeedPr
         </Link>
       </div>
 
-      {/* Sort Tabs - matching courses page style with orange underline */}
-      <div className="flex mb-5 overflow-x-auto">
-        {sortOptions.map(opt => (
-          <button
-            key={opt.value}
-            onClick={() => setSortBy(opt.value)}
-            className={cn(
-              "relative text-sm px-3 py-2.5 font-medium whitespace-nowrap",
-              "bg-transparent border-0 shadow-none rounded-none",
-              "transition-colors duration-200 ease-out",
-              // Orange underline using after pseudo-element
-              "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
-              "after:h-[3px] after:rounded-full after:bg-[hsl(var(--tab-orange))]",
-              "after:transition-all after:duration-200 after:ease-out",
-              sortBy === opt.value
-                ? 'text-foreground after:w-full after:opacity-[0.85]'
-                : 'text-muted-foreground hover:text-foreground after:w-0 after:opacity-0'
-            )}
-          >
-            {opt.label}
-          </button>
-        ))}
+      {/* Sort Tabs - pill style */}
+      <div className="flex gap-2 mb-5 overflow-x-auto">
+        {sortOptions.map(opt => {
+          const isActive = sortBy === opt.value;
+          return (
+            <button
+              key={opt.value}
+              onClick={() => setSortBy(opt.value)}
+              className={cn(
+                "px-4 min-h-[36px] rounded-full text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold shrink-0",
+                isActive
+                  ? "text-white"
+                  : "text-muted-foreground bg-muted"
+              )}
+              style={isActive ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Player List */}

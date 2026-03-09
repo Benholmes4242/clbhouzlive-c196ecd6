@@ -15,10 +15,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 const tabTriggerClass = cn(
-  "relative px-4 py-2 text-sm font-medium transition-colors",
-  "text-muted-foreground data-[state=active]:text-foreground",
-  "data-[state=active]:after:absolute data-[state=active]:after:bottom-0 data-[state=active]:after:left-0 data-[state=active]:after:right-0",
-  "data-[state=active]:after:h-[3px] data-[state=active]:after:rounded-full data-[state=active]:after:bg-[hsl(var(--tab-orange))]"
+  "min-h-[36px] px-4 rounded-full text-sm font-semibold transition-all active:scale-[0.97] border-0 shadow-none",
+  "data-[state=active]:text-white data-[state=active]:shadow-none data-[state=active]:bg-[hsl(215,16%,35%)]",
+  "data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground"
 );
 
 interface JourneyCourseCardProps {
