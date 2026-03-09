@@ -37,7 +37,7 @@ export function ForwardMessageModal({
   mediaMetadata,
 }: ForwardMessageModalProps) {
   const { user } = useSupabaseSession();
-  const { conversations, sendMessage } = useMessaging();
+  const { conversations, sendMessage } = useMessagingContext();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [forwarding, setForwarding] = useState<string | null>(null);
