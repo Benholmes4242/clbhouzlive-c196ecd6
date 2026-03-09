@@ -72,15 +72,21 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
   const handleShare = useCallback(async () => {
     if (!activePost) return;
     const shareUrl = `${window.location.origin}/post/${activePost.id}`;
-    if (navigator.share) {
-      try {
+    try {
+      if (navigator.share) {
         await navigator.share({ title: activePost.caption || 'Check out this post', url: shareUrl });
-      } catch {
-        /* user cancelled */
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success('Link copied');
       }
-    } else {
-      await navigator.clipboard.writeText(shareUrl);
-      toast.success('Link copied');
+    } catch {
+      // User cancelled share or clipboard failed — try clipboard fallback
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success('Link copied');
+      } catch {
+        // silent
+      }
     }
   }, [activePost]);
 
