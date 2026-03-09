@@ -44,7 +44,7 @@ export const CommentsEmptyState: React.FC<CommentsEmptyStateProps> = ({ isDark, 
           className={cn(
             "relative w-16 h-16 rounded-full flex items-center justify-center",
               isDark
-                ? "bg-gradient-to-br from-white/8 to-white/4 border border-white/[0.04]"
+                ? "bg-gradient-to-br from-white/8 to-white/4 border border-white/[0.06]"
                 : "bg-muted/50 border border-border/30"
           )}
         >
