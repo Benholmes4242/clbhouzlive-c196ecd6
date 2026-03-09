@@ -174,10 +174,8 @@ export const PostsAutoplay: React.FC<PostsAutoplayProps> = ({ posts, gridRef }) 
         for (const entry of entries) {
           const el = entry.target as HTMLElement;
           const idx = Number(el.dataset.postsTileIndex);
-          if (isNaN(idx) || !isEligible(idx)) continue;
-
-          const hlsUrl = el.dataset.hlsUrl;
-          if (!hlsUrl) continue;
+          const hlsUrl = (el as HTMLElement).dataset.hlsUrl;
+          if (isNaN(idx) || !hlsUrl) continue;
 
           if (entry.intersectionRatio >= ATTACH_THRESHOLD) {
             if (activeIndexRef.current !== idx) {
