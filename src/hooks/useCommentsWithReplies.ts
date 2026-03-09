@@ -364,14 +364,37 @@ export function useCommentsWithReplies(postId: string | null) {
       await queryClient.cancelQueries({ queryKey: ['post-comments-with-replies', postId] });
       const prev = queryClient.getQueryData(['post-comments-with-replies', postId]);
 
+      // Resolve real name + avatar for the optimistic comment
+      let optimisticName = 'You';
+      let optimisticAvatar: string | null = null;
+
+      if (actorType === 'business') {
+        const { data: biz } = await supabase
+          .from('business_accounts')
+          .select('name, logo_url')
+          .eq('id', actorId)
+          .single();
+        if (biz) { optimisticName = biz.name; optimisticAvatar = biz.logo_url; }
+      } else if (user?.id) {
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('display_name, profile_photo_url')
+          .eq('id', user.id)
+          .single();
+        if (profile) {
+          optimisticName = profile.display_name || 'You';
+          optimisticAvatar = profile.profile_photo_url || null;
+        }
+      }
+
       const optimisticId = `optimistic-${Date.now()}`;
       const optimisticComment: CommentWithReplies = {
         id: optimisticId,
         user_id: user?.id || '',
         actor_type: actorType as 'personal' | 'business',
         actor_id: actorId,
-        user_name: 'You',
-        avatar_url: null,
+        user_name: optimisticName,
+        avatar_url: optimisticAvatar,
         content,
         created_at: new Date().toISOString(),
         likes_count: 0,
@@ -403,7 +426,8 @@ export function useCommentsWithReplies(postId: string | null) {
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId] });
+      // Force immediate refetch to replace optimistic data with real server data
+      queryClient.refetchQueries({ queryKey: ['post-comments-with-replies', postId] });
       queryClient.invalidateQueries({ queryKey: ['post-engagement', postId] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
