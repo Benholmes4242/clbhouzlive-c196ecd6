@@ -3,7 +3,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { MessageCircle, Plus, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useMessaging } from '@/hooks/useMessaging';
+import { MessagingProvider, useMessagingContext } from '@/contexts/MessagingContext';
 import { ConversationList, ChatView, NewConversationModal, NotificationPrompt } from '@/components/messaging';
 import { ConversationSearchBar } from '@/components/messaging/ConversationSearchBar';
 import { OfflineBanner } from '@/components/messaging/OfflineBanner';
@@ -13,12 +13,11 @@ import { useInAppNotifications } from '@/hooks/useInAppNotifications';
 import { useDebouncedCallback } from '@/hooks/useDebouncedCallback';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 
-
-const MessagesPage = () => {
+function MessagesPageInner() {
   const navigate = useNavigate();
   const { conversationId: urlConversationId } = useParams<{ conversationId?: string }>();
   const { user } = useSupabaseSession();
-  const { loading } = useMessaging();
+  const { loading } = useMessagingContext();
   const isMobile = useIsMobile();
   
   useHideBottomNav();
@@ -49,7 +48,11 @@ const MessagesPage = () => {
   }, [searchParams, setSearchParams]);
   
   const [notificationPromptDismissed, setNotificationPromptDismissed] = useState(() => {
-    return localStorage.getItem('notification_prompt_dismissed') === 'true';
+    try {
+      return localStorage.getItem('notification_prompt_dismissed') === 'true';
+    } catch {
+      return false;
+    }
   });
 
   const showNotificationPrompt = !pushLoading && 
@@ -67,7 +70,11 @@ const MessagesPage = () => {
 
   const handleDismissNotificationPrompt = useCallback(() => {
     setNotificationPromptDismissed(true);
-    localStorage.setItem('notification_prompt_dismissed', 'true');
+    try {
+      localStorage.setItem('notification_prompt_dismissed', 'true');
+    } catch {
+      // Silently fail in WebView contexts
+    }
   }, []);
   
   const handleEnablePush = useCallback(async (): Promise<boolean> => {
@@ -101,7 +108,7 @@ const MessagesPage = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center relative" style={{ backgroundColor: '#F8FAFC' }}>
+      <div className="min-h-screen flex items-center justify-center relative bg-background">
         <div className="text-center relative z-10">
           <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-muted">
             <MessageCircle className="h-8 w-8 text-muted-foreground" />
@@ -120,7 +127,7 @@ const MessagesPage = () => {
 
   if (isMobile && selectedConversationId) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col" style={{ backgroundColor: '#F8FAFC' }}>
+      <div className="fixed inset-0 z-50 flex flex-col bg-background">
         <div className="relative z-10 flex flex-col h-full">
           <OfflineBanner />
           <ChatView 
@@ -135,7 +142,7 @@ const MessagesPage = () => {
   // Mobile: Conversation list
   if (isMobile) {
     return (
-      <div className="min-h-screen flex flex-col relative" style={{ backgroundColor: '#F8FAFC' }}>
+      <div className="min-h-screen flex flex-col relative bg-background">
         <div className="relative z-10 flex flex-col min-h-screen">
           <OfflineBanner />
           {/* Header */}
@@ -151,14 +158,14 @@ const MessagesPage = () => {
             }}
           >
             <button
-              onClick={() => navigate('/hub')}
+              onClick={() => navigate(-1)}
               className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
-              aria-label="Back to Hub"
+              aria-label="Back"
             >
               <ChevronLeft className="w-5 h-5 text-foreground/60" />
             </button>
 
-            <span className="text-[16px] font-semibold" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>Messages</span>
+            <span className="text-[16px] font-semibold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>Messages</span>
 
             <button 
               onClick={handleNewConversation}
@@ -210,7 +217,7 @@ const MessagesPage = () => {
 
   // Desktop: Side-by-side layout
   return (
-    <div className="min-h-screen relative" style={{ backgroundColor: '#F8FAFC' }}>
+    <div className="min-h-screen relative bg-background">
       <div className="relative z-10 h-screen max-w-6xl mx-auto px-4 py-4 flex flex-col">
         <header 
           className="flex-none px-4 flex items-center justify-between mb-4 rounded-2xl"
@@ -223,14 +230,14 @@ const MessagesPage = () => {
           }}
         >
           <button
-            onClick={() => navigate('/hub')}
+            onClick={() => navigate(-1)}
             className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
-            aria-label="Back to Hub"
+            aria-label="Back"
           >
             <ChevronLeft className="w-5 h-5 text-foreground/60" />
           </button>
 
-          <span className="text-[16px] font-semibold" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>Messages</span>
+          <span className="text-[16px] font-semibold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>Messages</span>
 
           <button 
             onClick={handleNewConversation}
@@ -279,13 +286,13 @@ const MessagesPage = () => {
             ) : (
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center">
-                  <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(255,255,255,0.5)' }}>
-                    <MessageCircle className="h-8 w-8 text-warm-stone-400" />
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-muted/50">
+                    <MessageCircle className="h-8 w-8 text-muted-foreground" />
                   </div>
-                  <h2 className="font-semibold text-lg mb-1" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
+                  <h2 className="font-semibold text-lg mb-1 text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                     Select a conversation
                   </h2>
-                  <p className="text-sm max-w-[240px] mx-auto" style={{ color: '#78716C' }}>
+                  <p className="text-sm max-w-[240px] mx-auto text-muted-foreground">
                     Choose a conversation from the list to start chatting
                   </p>
                 </div>
@@ -302,6 +309,14 @@ const MessagesPage = () => {
         />
       </div>
     </div>
+  );
+}
+
+const MessagesPage = () => {
+  return (
+    <MessagingProvider>
+      <MessagesPageInner />
+    </MessagingProvider>
   );
 };
 

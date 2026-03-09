@@ -53,6 +53,17 @@ function formatDateHeader(dateString: string): string {
   });
 }
 
+function formatRelativeTime(dateString: string): string {
+  const date = new Date(dateString);
+  const diffMs = Date.now() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return 'just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
+
 function groupMessagesByDate(messages: MessageWithSender[]): Map<string, MessageWithSender[]> {
   const groups = new Map<string, MessageWithSender[]>();
   

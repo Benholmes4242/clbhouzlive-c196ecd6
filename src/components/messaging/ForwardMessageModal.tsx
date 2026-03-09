@@ -77,14 +77,15 @@ export function ForwardMessageModal({
     setForwarding(conversationId);
 
     try {
-      const forwardedContent = `↪️ Forwarded:\n${messageContent}`;
-      
+      const isMedia = ['image', 'video', 'voice'].includes(messageType);
+      const content = isMedia ? messageContent || '' : `↪️ Forwarded:\n${messageContent}`;
+
       await sendMessage(
         conversationId,
-        forwardedContent,
-        messageType as any,
-        mediaUrl || null,
-        mediaMetadata || null,
+        content,
+        isMedia ? messageType as any : 'text',
+        isMedia ? (mediaUrl || null) : null,
+        isMedia ? (mediaMetadata || null) : null,
         null
       );
 
