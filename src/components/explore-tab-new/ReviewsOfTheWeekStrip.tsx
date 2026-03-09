@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { GolferAvatar } from '@/components/golfers/GolferAvatar';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
