@@ -229,7 +229,7 @@ const ActivityPage: React.FC = () => {
           </div>
 
           {/* Tabs — Tier 1 dark fill pills */}
-          <div className="flex gap-2 px-4 pb-1">
+          <div className="flex justify-center gap-2 px-4 pb-1">
             {ACTIVITY_TABS.map((tab) => (
               <button
                 key={tab.id}
