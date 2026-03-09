@@ -111,10 +111,9 @@ export function CreatorPostPicker({
           <button
             type="button"
             onClick={onClose}
-            className="h-[44px] w-[44px] flex items-center justify-center rounded-full bg-muted"
-            aria-label="Close"
+            className="h-[44px] w-[44px] flex items-center justify-center rounded-full bg-muted          aria-label="Close"
           >
-            <X className="h-4 w-4 text-[#7A7A7A]" />
+            <X className="h-4 w-4 text-[#7Amuted-foreground
           </button>
         </div>
 
