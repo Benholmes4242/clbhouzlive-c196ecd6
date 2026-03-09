@@ -266,6 +266,8 @@ export const PostsAutoplay: React.FC<PostsAutoplayProps> = ({ posts, gridRef }) 
     tiles.forEach((tile) => {
       const idx = Number((tile as HTMLElement).dataset.postsTileIndex);
       if (isNaN(idx)) return;
+      const tileHlsUrl = (tile as HTMLElement).dataset.hlsUrl;
+      if (!tileHlsUrl) return;
       if (autoplayObserverRef.current && !observedTilesRef.current.has(idx)) {
         observedTilesRef.current.add(idx);
         autoplayObserverRef.current.observe(tile);
