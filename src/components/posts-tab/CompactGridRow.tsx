@@ -66,18 +66,22 @@ const CompactTile: React.FC<{ post: FeedPost; globalIndex: number; allPosts?: Fe
         </div>
       )}
 
-      {/* Duration badge — bottom right */}
+      {/* Duration badge — bottom right (matches WatchTile) */}
       {isVideo && duration != null && duration > 0 && (
         <div
-          className="absolute bottom-1.5 right-1.5 px-1 py-px rounded text-[9px] font-medium text-white z-3"
+          className="absolute bottom-1.5 right-1.5 z-10 rounded-[4px] flex items-center"
           style={{
-            background: 'rgba(0,0,0,0.35)',
+            background: 'rgba(0, 0, 0, 0.35)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
+            padding: '2px 5px',
           }}
         >
-          {formatDuration(duration)}
+          <span className="text-[11px] font-semibold text-white tracking-[0.02em]">
+            {formatDuration(duration)}
+          </span>
         </div>
       )}
 
