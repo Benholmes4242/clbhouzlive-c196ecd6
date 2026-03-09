@@ -106,11 +106,11 @@ function FeaturedRegionHeroInner({ onRegionSelect, activeRegion }: FeaturedRegio
           )}
           <div className="flex items-center gap-2 mt-1.5">
             <span className="text-xs text-white/60">
-              {region.courseCount} courses
+              {region.courseCount} {region.courseCount === 1 ? 'course' : 'courses'}
             </span>
             <span className="text-xs text-white/60">·</span>
             <span className="text-xs text-white/60">
-              {region.recentReviewCount} reviews
+              {region.recentReviewCount} {region.recentReviewCount === 1 ? 'review' : 'reviews'}
             </span>
           </div>
           <span className="inline-block mt-2.5 text-xs font-semibold text-white bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">

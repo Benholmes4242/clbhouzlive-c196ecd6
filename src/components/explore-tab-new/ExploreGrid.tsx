@@ -97,7 +97,7 @@ export default function ExploreGrid({
         onRegionSelect={(slug) => onRegionChange(slug)}
         activeRegion={activeRegion}
       />
-      <ReviewsOfTheWeekStrip />
+      <ReviewsOfTheWeekStrip activeRegion={activeRegion} />
 
       {/* Grid */}
       <div ref={gridRef} className="grid grid-cols-2 gap-[2px] px-[2px]">
