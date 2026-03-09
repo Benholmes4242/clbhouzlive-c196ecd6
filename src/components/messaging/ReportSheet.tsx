@@ -136,7 +136,7 @@ export function ReportSheet({
           <Button
             onClick={handleSubmit}
             disabled={!selectedReason || (selectedReason === 'other' && !details.trim()) || submitting}
-            className="w-full h-12 rounded-full bg-red-500 hover:bg-red-600"
+            className="w-full h-12 rounded-full bg-destructive hover:bg-destructive/90"
           >
             {submitting ? (
               <>
