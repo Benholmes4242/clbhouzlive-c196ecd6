@@ -107,18 +107,12 @@ export function TopPlayersPreview() {
               key={opt.value}
               onClick={() => setSortBy(opt.value)}
               className={cn(
-                "w-full inline-flex items-center justify-center",
-                "relative text-sm px-3 py-2.5 font-medium whitespace-nowrap",
-                "bg-transparent border-0 shadow-none rounded-none",
-                "transition-colors duration-200 ease-out",
-                // Orange underline using after pseudo-element
-                "after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2",
-                "after:h-[2px] after:rounded-[1px] after:bg-[hsl(var(--tab-orange))]",
-                "after:transition-all after:duration-200 after:ease-out",
+                "px-4 min-h-[36px] rounded-full text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold",
                 isActive
-                  ? "text-foreground after:w-full after:opacity-[0.85]"
-                  : "text-muted-foreground hover:text-foreground after:w-0 after:opacity-0"
+                  ? "text-white"
+                  : "text-muted-foreground bg-muted"
               )}
+              style={isActive ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
             >
               {opt.label}
             </button>

@@ -23,7 +23,7 @@ export function LeaderboardSegmentedControl({
 }: LeaderboardSegmentedControlProps) {
   return (
     <div className="w-full overflow-x-auto pb-1 -mx-1 px-1">
-      <div className="flex items-center gap-1 min-w-max">
+      <div className="flex items-center gap-2 min-w-max">
         {SEGMENTS.map((seg) => {
           const isDisabled = disabledSegments.includes(seg.value);
           const isActive = value === seg.value;
@@ -35,13 +35,13 @@ export function LeaderboardSegmentedControl({
               disabled={isDisabled}
               onClick={() => !isDisabled && onChange(seg.value)}
               className={cn(
-                'relative px-3 py-2 min-h-[44px] text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97]',
-                'after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:rounded-full after:transition-all after:duration-200',
+                'px-4 min-h-[36px] rounded-full text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold',
                 isActive
-                  ? 'text-foreground font-semibold after:bg-[hsl(var(--tab-orange))]'
-                  : 'text-muted-foreground font-medium hover:text-foreground after:bg-transparent',
+                  ? 'text-white'
+                  : 'text-muted-foreground bg-muted',
                 isDisabled && 'opacity-40 cursor-not-allowed'
               )}
+              style={isActive ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
             >
               {seg.label}
             </button>

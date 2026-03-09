@@ -1,10 +1,9 @@
 /**
- * IntelligenceTabSwitcher - Canonical Tier 2 sub-tab style
- * Orange underline, 44px tap targets, no bottom border
+ * IntelligenceTabSwitcher - Tier 2 sub-tab pills
  */
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 type IntelligenceTab = 'courseDNA' | 'predictions';
 
@@ -30,28 +29,22 @@ const IntelligenceTabSwitcher: React.FC<IntelligenceTabSwitcherProps> = ({
       ];
 
   return (
-    <div className="flex items-center justify-center gap-1 mb-4">
+    <div className="flex items-center justify-center gap-2 mb-4">
       {options.map((opt) => {
         const isActive = activeTab === opt.value;
         return (
           <button
             key={opt.value}
             onClick={() => onTabChange(opt.value)}
-            className={`relative px-3 py-2 min-h-[44px] text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] ${
+            className={cn(
+              "px-4 min-h-[36px] rounded-full text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold",
               isActive
-                ? 'text-foreground font-semibold'
-                : 'text-muted-foreground font-medium hover:text-foreground'
-            }`}
-            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                ? "text-white"
+                : "text-muted-foreground bg-muted"
+            )}
+            style={isActive ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
           >
             {opt.label}
-            {isActive && (
-              <motion.div
-                layoutId="intelligence-tab-underline"
-                className="absolute bottom-0 left-0 right-0 h-[3px] rounded-full bg-[hsl(var(--tab-orange))]"
-                transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-              />
-            )}
           </button>
         );
       })}
