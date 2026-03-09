@@ -150,7 +150,7 @@ export function InviteToGameModal({
     } finally {
       setInvitingId(null);
     }
-  }, [gameId, gameData, onInviteSuccess, sendGameInviteNotification]);
+  }, [gameId, gameData, onInviteSuccess, sendGameNotification]);
 
   if (!isOpen) return null;
 

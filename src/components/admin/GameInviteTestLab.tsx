@@ -347,7 +347,7 @@ function useCreateTestGame() {
 // Send game invite (uses production hook)
 function useSendTestInvite() {
   const queryClient = useQueryClient();
-  const sendGameInviteNotification = useSendGameInviteNotification();
+  const sendGameNotification = useSendGameNotification();
 
   return useMutation({
     mutationFn: async ({ 
