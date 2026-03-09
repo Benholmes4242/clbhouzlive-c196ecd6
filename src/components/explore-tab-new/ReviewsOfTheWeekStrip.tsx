@@ -53,7 +53,7 @@ function ReviewsOfTheWeekStripInner() {
   if (!reviews || reviews.length < 2) return null;
 
   return (
-    <div className="py-4" style={{ gridColumn: '1 / -1' }}>
+    <div className="py-4">
       <h3 className="text-sm font-semibold text-foreground px-4 pb-3">
         ⭐ Reviews of the Week
       </h3>

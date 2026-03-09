@@ -10,7 +10,6 @@ import { ReviewsOfTheWeekStrip } from './ReviewsOfTheWeekStrip';
 
 const TRENDING_AFTER = 6;       // After 6th tile (index 5)
 const REGIONS_AFTER = 18;       // After 18th tile (index 17)
-const REVIEWS_AFTER = 30;       // After 30th tile (index 29)
 
 interface ExploreGridProps {
   posts: FeedPost[];
@@ -93,11 +92,14 @@ export default function ExploreGrid({
 
   return (
     <>
+      {/* Discovery modules above the grid */}
       <FeaturedRegionHero
         onRegionSelect={(slug) => onRegionChange(slug)}
         activeRegion={activeRegion}
       />
+      <ReviewsOfTheWeekStrip />
 
+      {/* Grid */}
       <div ref={gridRef} className="grid grid-cols-2 gap-[2px] px-[2px]">
         {coursePosts.map((post, index) => (
           <Fragment key={post.id}>
@@ -107,15 +109,11 @@ export default function ExploreGrid({
               <TrendingCoursesStrip />
             )}
 
-            {index === REGIONS_AFTER - 1 && (
+            {index === REGIONS_AFTER - 1 && activeRegion === null && (
               <ExploreRegionsStrip
                 onRegionSelect={(slug) => onRegionChange(slug)}
                 activeRegion={activeRegion}
               />
-            )}
-
-            {index === REVIEWS_AFTER - 1 && coursePosts.length >= REVIEWS_AFTER && (
-              <ReviewsOfTheWeekStrip />
             )}
           </Fragment>
         ))}
