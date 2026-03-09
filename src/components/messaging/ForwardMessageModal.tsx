@@ -145,8 +145,8 @@ export function ForwardMessageModal({
                   )}
                 >
                   {display.isGroup ? (
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center flex-shrink-0">
-                      <Users className="w-5 h-5 text-white" />
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center flex-shrink-0">
+                      <Users className="w-5 h-5 text-primary-foreground" />
                     </div>
                   ) : (
                     <SquircleAvatar
