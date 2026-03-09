@@ -198,7 +198,7 @@ export function FriendsSearchOverlay({ isOpen, onClose, userId }: FriendsSearchO
                 ) : (
                   <div className="flex flex-col gap-3 px-3 pb-4">
                     {posts.map(post => (
-                      <FriendsCard key={post.id} post={post} isAutoplayEligible={false} />
+                      <FriendsCard key={post.id} post={post} />
                     ))}
                   </div>
                 )}
