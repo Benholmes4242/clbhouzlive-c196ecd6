@@ -101,7 +101,7 @@ function DateSeparator({ date }: { date: string }) {
 
 export function ChatView({ conversationId, onBack }: ChatViewProps) {
   const { user } = useSupabaseSession();
-  const { conversations, markAsRead, fetchConversations } = useMessaging();
+  const { conversations, markAsRead, fetchConversations } = useMessagingContext();
   const { 
     messages, 
     loading, 
