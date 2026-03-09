@@ -180,7 +180,7 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
             {/* Filter tabs - Tier 2 */}
             <div className="mb-4">
               <div 
-                className="grid w-full grid-cols-4 gap-1"
+                className="flex w-full justify-center gap-2"
                 role="tablist"
               >
                 {ACTIVITY_TABS.map((tab) => (
