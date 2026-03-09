@@ -156,23 +156,28 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
         </button>
       )}
 
-      {/* Comments bottom sheet */}
-      <CommentsPage
-        isOpen={showComments}
-        onClose={() => setShowComments(false)}
-        postId={activePost.id}
-        currentUserId={userId}
-        creatorName={activePost.displayName}
-        creatorAvatar={activePost.avatarUrl}
-        creatorUserId={activePost.userId}
-        caption={activePost.caption}
-        videoThumbnail={thumbnailUrl}
-        theme="dark"
-        courseId={activePost.review?.courseId}
-        courseName={activePost.review?.courseName}
-        isReview={activePost.isReview}
-        reviewRating={activePost.review?.rating}
-      />
+      {/* Comments bottom sheet — portalled above z-[9999] overlay */}
+      {showComments && createPortal(
+        <div className="fixed inset-0 z-[10000]" style={{ pointerEvents: 'auto' }}>
+          <CommentsPage
+            isOpen={showComments}
+            onClose={() => setShowComments(false)}
+            postId={activePost.id}
+            currentUserId={userId}
+            creatorName={activePost.displayName}
+            creatorAvatar={activePost.avatarUrl}
+            creatorUserId={activePost.userId}
+            caption={activePost.caption}
+            videoThumbnail={thumbnailUrl}
+            theme="dark"
+            courseId={activePost.review?.courseId}
+            courseName={activePost.review?.courseName}
+            isReview={activePost.isReview}
+            reviewRating={activePost.review?.rating}
+          />
+        </div>,
+        document.body
+      )}
     </>
   );
 }
