@@ -213,8 +213,8 @@ const ActivityPage: React.FC = () => {
 
           {/* Header */}
           <div className="px-4 pt-4 pb-2 text-center">
-            <p className="text-sm text-muted-foreground mb-0.5">
-              Updates from your golf network
+            <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground">
+              {activeActor?.type === 'business' ? activeActor.name : 'Clbhouz'}
             </p>
             <h1
               onClick={handleRefresh}
@@ -226,6 +226,9 @@ const ActivityPage: React.FC = () => {
             >
               Activity
             </h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Updates from your golf network
+            </p>
           </div>
 
           {/* Tabs — Tier 1 dark fill pills */}
