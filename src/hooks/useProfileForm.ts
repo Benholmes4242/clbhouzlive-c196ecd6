@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { ProfileFormData, ClubEntry } from '@/components/profile/profile-wizard/types';
 import { nanoid } from 'nanoid';
 
@@ -36,9 +36,19 @@ function makeInitial(profile: any): ProfileFormData {
   };
 }
 
-export function useProfileForm(profile: any) {
-  const [form, setForm] = useState<ProfileFormData>(() => makeInitial(profile));
-  const [initialData] = useState<ProfileFormData>(() => makeInitial(profile));
+export function useProfileForm(profile: any, loading?: boolean) {
+  const [form, setForm] = useState<ProfileFormData>(() => makeInitial(null));
+  const [initialData, setInitialData] = useState<ProfileFormData>(() => makeInitial(null));
+  const hydrated = useRef(false);
+
+  useEffect(() => {
+    if (!loading && profile && !hydrated.current) {
+      hydrated.current = true;
+      const data = makeInitial(profile);
+      setForm(data);
+      setInitialData(data);
+    }
+  }, [loading, profile]);
 
   const setField = useCallback(<K extends keyof ProfileFormData>(
     field: K,
