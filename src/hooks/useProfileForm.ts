@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { ProfileFormData, ClubEntry } from '@/components/profile/profile-wizard/types';
 import { nanoid } from 'nanoid';
 
