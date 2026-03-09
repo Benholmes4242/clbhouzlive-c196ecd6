@@ -55,7 +55,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
       data-course-media-index={index}
     >
       {/* Creator header */}
-      <div className="flex items-center gap-2 px-3 py-2">
+      <div className="flex items-center gap-2 px-3 py-1.5">
         <SquircleAvatar
           src={post.avatarUrl}
           alt={post.displayName || ''}
