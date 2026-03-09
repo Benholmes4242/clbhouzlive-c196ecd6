@@ -45,17 +45,17 @@ function ExploreTileInner({ post, index, allPosts }: ExploreTileProps) {
       {/* Rating badge — top right */}
       {rating != null && rating > 0 && (
         <span
-          className="absolute top-2 right-2 rounded-full flex items-center gap-[3px] text-[11px] font-semibold text-white leading-none"
-          style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 4px 16px rgba(0,0,0,0.25)', padding: '3px 7px' }}
+          className="absolute top-2 right-2 rounded-full liquid-glass flex items-center gap-1 text-[13px] font-semibold text-white leading-none"
+          style={{ padding: '4px 9px' }}
         >
-          <img src="/images/brand/clubhouz-mark-white.svg" alt="" className="w-[10px] h-[10px]" />
+          <img src="/images/brand/clubhouz-mark-white.svg" alt="" className="w-3 h-3" />
           {rating.toFixed(1)}
         </span>
       )}
 
       {/* Course name — bottom center on gradient */}
       {courseName && (
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent px-2 py-2">
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 via-black/15 to-transparent px-2 py-2">
           <p className="text-center text-[11px] font-semibold text-white line-clamp-1">
             {courseName}
           </p>
