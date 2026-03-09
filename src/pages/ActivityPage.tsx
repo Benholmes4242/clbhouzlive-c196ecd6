@@ -213,9 +213,6 @@ const ActivityPage: React.FC = () => {
 
           {/* Header */}
           <div className="px-4 pt-4 pb-2 text-center">
-            <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground">
-              {activeActor?.type === 'business' ? activeActor.name : 'Clbhouz'}
-            </p>
             <h1
               onClick={handleRefresh}
               className={cn(
