@@ -516,7 +516,10 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                otherUserPresence?.status === 'online' ? (
                 <span style={{ color: '#22C55E' }}>online</span>
               ) : 
-               otherUserPresence?.status === 'away' ? 'away' : 'last seen recently'}
+               otherUserPresence?.status === 'away' ? 'away' : 
+               otherUserPresence?.last_seen_at 
+                 ? `last seen ${formatRelativeTime(otherUserPresence.last_seen_at)}`
+                 : 'offline'}
             </p>
           </div>
         </button>
