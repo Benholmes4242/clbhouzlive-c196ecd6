@@ -4,7 +4,6 @@ import { FiMapPin } from 'react-icons/fi';
 import { cn } from '@/lib/utils';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { NotificationCard, getNotificationButtonClass } from '@/components/ui/NotificationCard';
 
@@ -174,7 +173,6 @@ export const AvatarWithBadge: React.FC<AvatarWithBadgeProps> = ({ notification, 
         alt={displayName || 'User'}
         size={48}
         fallback={displayName?.charAt(0) || '?'}
-        ringColor={isSystemNotification ? undefined : getRingColorForTotalPlayed(notification.data?.actor_total_top100_played || 0)}
       />
       <span className="absolute -bottom-0.5 -right-0.5 h-5 w-5 rounded-full bg-background ring-2 ring-background shadow-sm flex items-center justify-center">
         {badgeIcon}

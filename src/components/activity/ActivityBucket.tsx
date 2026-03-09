@@ -39,7 +39,7 @@ export const ActivityBucket: React.FC<ActivityBucketProps> = ({
       <div
         className={cn(
           "sticky top-0 z-10 px-4 sm:px-5",
-          "py-2 bg-muted/50 backdrop-blur-sm border-b border-border"
+          "py-2 bg-[#F8FAFC]/80 backdrop-blur-sm border-b border-border"
         )}
       >
         <span className="text-sm font-semibold text-muted-foreground">
