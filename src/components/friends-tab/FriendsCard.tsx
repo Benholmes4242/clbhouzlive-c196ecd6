@@ -200,6 +200,9 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
                 posts: allPosts,
                 startIndex: cardIndex,
                 sourceId: 'friends',
+                fetchNextPage,
+                hasNextPage,
+                isFetchingNextPage,
               });
             }
           }}

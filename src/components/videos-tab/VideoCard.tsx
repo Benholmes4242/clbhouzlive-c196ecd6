@@ -62,6 +62,9 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
         posts: allPosts,
         startIndex: cardIndex,
         sourceId: 'videos',
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
       });
     }
   };
