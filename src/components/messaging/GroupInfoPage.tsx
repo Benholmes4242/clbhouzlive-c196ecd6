@@ -230,17 +230,22 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
     }
   };
 
-  const handleDeleteGroup = async () => {
-    if (!confirm('Delete this group for everyone? This cannot be undone.')) return;
+  const handleDeleteGroup = () => {
+    setShowDeleteDialog(true);
+  };
+
+  const handleDeleteConfirmed = async () => {
     try {
       const { error } = await supabase.rpc('delete_group', {
         p_conversation_id: conversation.id,
       });
       if (error) throw error;
       toast.success('Group deleted');
-      navigate('/messages');
+      onClose();
     } catch (error: any) {
       toast.error('Failed to delete group', { description: error.message });
+    } finally {
+      setShowDeleteDialog(false);
     }
   };
 
