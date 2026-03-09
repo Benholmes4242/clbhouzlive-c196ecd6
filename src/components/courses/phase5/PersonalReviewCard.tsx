@@ -48,7 +48,7 @@ const ScoreRing: React.FC<{ score: number; size?: number }> = ({ score, size = 8
       <svg className="w-full h-full -rotate-90">
         <circle 
           cx={size / 2} cy={size / 2} r={radius} 
-          fill="none" stroke="transparent" strokeWidth="6" 
+          fill="none" stroke="transparenteWidth="6" 
         />
         <circle 
           cx={size / 2} cy={size / 2} r={radius} 
@@ -140,7 +140,7 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
                     <span className="text-muted-foreground">{cat.label}</span>
                     <span className="font-medium text-foreground">{cat.score.toFixed(1)}</span>
                   </div>
-                  <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-secondatransparentd-full overflow-hidden">
                     <div 
                       className={`h-full ${barColorClass} rounded-full transition-all duration-500`}
                       style={{ width: `${(cat.score / 10) * 100}%` }}
