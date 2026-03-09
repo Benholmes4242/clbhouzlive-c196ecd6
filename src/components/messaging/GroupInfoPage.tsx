@@ -224,7 +224,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
       });
       if (error) throw error;
       toast.success('Chat archived');
-      navigate('/messages');
+      onClose();
     } catch (error: any) {
       toast.error('Failed to archive');
     }
