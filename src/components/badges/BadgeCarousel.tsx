@@ -86,22 +86,18 @@ const BadgeCarousel: React.FC<BadgeCarouselProps> = ({
           <TabsList className="flex items-center gap-1 w-full bg-transparent border-0 p-0 h-auto">
             <TabsTrigger 
               value="engagement" 
-              className="relative flex-1 text-sm min-h-[44px] font-medium bg-transparent border-0 shadow-none rounded-none
-                data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground data-[state=active]:font-semibold
-                text-muted-foreground hover:text-foreground active:scale-[0.97] transition-all duration-200
-                after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:rounded-full after:transition-all after:duration-200
-                data-[state=active]:after:bg-[hsl(var(--tab-orange))] data-[state=inactive]:after:bg-transparent"
+              className="min-h-[36px] px-4 rounded-full text-sm font-semibold transition-all active:scale-[0.97] border-0 shadow-none
+                data-[state=active]:text-white data-[state=active]:shadow-none data-[state=active]:bg-[hsl(215,16%,35%)]
+                data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground"
             >
               <Trophy className="h-4 w-4 mr-2" />
               Activity
             </TabsTrigger>
             <TabsTrigger 
               value="top100" 
-              className="relative flex-1 text-sm min-h-[44px] font-medium bg-transparent border-0 shadow-none rounded-none
-                data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground data-[state=active]:font-semibold
-                text-muted-foreground hover:text-foreground active:scale-[0.97] transition-all duration-200
-                after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:rounded-full after:transition-all after:duration-200
-                data-[state=active]:after:bg-[hsl(var(--tab-orange))] data-[state=inactive]:after:bg-transparent"
+              className="min-h-[36px] px-4 rounded-full text-sm font-semibold transition-all active:scale-[0.97] border-0 shadow-none
+                data-[state=active]:text-white data-[state=active]:shadow-none data-[state=active]:bg-[hsl(215,16%,35%)]
+                data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground"
             >
               <Target className="h-4 w-4 mr-2" />
               Top 100

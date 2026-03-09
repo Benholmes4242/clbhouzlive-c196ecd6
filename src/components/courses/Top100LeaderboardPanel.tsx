@@ -41,12 +41,14 @@ const Top100LeaderboardPanel = () => {
     <div className="w-full pb-6">
       <Tabs value={view} onValueChange={handleViewChange} className="w-full">
         <div className="px-3">
-          <TabsList className="bg-transparent border-0 px-0 py-0 gap-0 w-full flex justify-center">
+          <TabsList className="bg-transparent border-0 px-0 py-0 gap-2 w-full flex justify-center">
             {tabs.map((tab) => (
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}
-                className="relative text-sm px-3 py-2.5 font-medium bg-transparent border-0 shadow-none rounded-none min-h-[44px] data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out active:scale-[0.97] after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:h-[3px] after:rounded-full after:bg-[hsl(var(--tab-orange))] after:transition-all after:duration-200 after:ease-out data-[state=active]:after:w-full data-[state=inactive]:after:w-0 data-[state=inactive]:after:opacity-0 data-[state=active]:after:opacity-[0.85]"
+                className="min-h-[36px] px-4 rounded-full text-sm font-semibold transition-all active:scale-[0.97] border-0 shadow-none
+                  data-[state=active]:text-white data-[state=active]:shadow-none data-[state=active]:bg-[hsl(215,16%,35%)]
+                  data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground"
               >
                 {tab.label}
               </TabsTrigger>
