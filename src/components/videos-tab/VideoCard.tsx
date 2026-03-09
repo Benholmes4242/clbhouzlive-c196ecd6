@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, MessageCircle, Share2, MapPin } from 'lucide-react';
@@ -10,6 +10,7 @@ import { CommentsPage } from '@/components/clubhouse/cinematic/CommentsPage';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VideoCardAutoplay } from './VideoCardAutoplay';
 import { VideoCardMenu } from './VideoCardMenu';
+import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
 interface VideoCardProps {
   post: FeedPost;
