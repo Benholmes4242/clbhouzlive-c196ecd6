@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import type { ConversationParticipant, ParticipantProfile, ParticipantWithProfile } from '@/types/messaging';
 import { useConversationMessages } from '@/hooks/useConversationMessages';
-import { useMessaging } from '@/hooks/useMessaging';
+import { useMessagingContext } from '@/contexts/MessagingContext';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useTypingIndicator } from '@/hooks/useTypingIndicator';
 import { useMessageReactions } from '@/hooks/useMessageReactions';
@@ -53,6 +53,17 @@ function formatDateHeader(dateString: string): string {
   });
 }
 
+function formatRelativeTime(dateString: string): string {
+  const date = new Date(dateString);
+  const diffMs = Date.now() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return 'just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
+
 function groupMessagesByDate(messages: MessageWithSender[]): Map<string, MessageWithSender[]> {
   const groups = new Map<string, MessageWithSender[]>();
   
@@ -101,7 +112,7 @@ function DateSeparator({ date }: { date: string }) {
 
 export function ChatView({ conversationId, onBack }: ChatViewProps) {
   const { user } = useSupabaseSession();
-  const { conversations, markAsRead, fetchConversations } = useMessaging();
+  const { conversations, markAsRead, fetchConversations } = useMessagingContext();
   const { 
     messages, 
     loading, 
@@ -516,7 +527,10 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                otherUserPresence?.status === 'online' ? (
                 <span style={{ color: '#22C55E' }}>online</span>
               ) : 
-               otherUserPresence?.status === 'away' ? 'away' : 'last seen recently'}
+               otherUserPresence?.status === 'away' ? 'away' : 
+               otherUserPresence?.last_seen_at 
+                 ? `last seen ${formatRelativeTime(otherUserPresence.last_seen_at)}`
+                 : 'offline'}
             </p>
           </div>
         </button>

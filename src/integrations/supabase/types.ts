@@ -14458,6 +14458,14 @@ export type Database = {
         }[]
       }
       get_cloudflare_secrets: { Args: never; Returns: Json }
+      get_conversation_last_senders: {
+        Args: { p_conversation_ids: string[] }
+        Returns: {
+          conversation_id: string
+          created_at: string
+          sender_id: string
+        }[]
+      }
       get_countries_leaderboard: {
         Args: {
           p_current_user_id?: string

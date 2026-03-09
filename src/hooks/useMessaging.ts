@@ -11,7 +11,7 @@ import type {
   MessageType
 } from '@/types/messaging';
 
-interface UseMessagingReturn {
+export interface UseMessagingReturn {
   conversations: ConversationWithDetails[];
   loading: boolean;
   error: Error | null;
@@ -134,13 +134,11 @@ export function useMessaging(): UseMessagingReturn {
         }
       });
 
-      // Step 5: Fetch last message sender for each conversation to check if unread should count
+      // Step 5: Fetch last message sender for each conversation via RPC
       const { data: lastMessagesData } = await supabase
-        .from('messages')
-        .select('conversation_id, sender_id, created_at')
-        .in('conversation_id', conversationIds)
-        .is('deleted_at', null)
-        .order('created_at', { ascending: false });
+        .rpc('get_conversation_last_senders', {
+          p_conversation_ids: conversationIds,
+        });
 
       // Create a map of conversation_id -> last message sender_id
       const lastMessageSenderMap = new Map<string, { sender_id: string | null; created_at: string }>();

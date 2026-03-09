@@ -19,17 +19,6 @@ export function useMessageReactions(conversationId: string | null) {
   const fetchReactions = useCallback(async () => {
     if (!conversationId) return;
 
-    const { data, error } = await supabase
-      .from('message_reactions')
-      .select(`
-        id,
-        message_id,
-        user_id,
-        emoji
-      `)
-      .eq('message_id', conversationId); // This won't work, need to join with messages
-
-    // Actually fetch via messages in conversation
     const { data: messages } = await supabase
       .from('messages')
       .select('id')

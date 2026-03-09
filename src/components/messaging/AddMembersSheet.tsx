@@ -51,7 +51,7 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
     setIsSearching(true);
     try {
       const { data, error } = await supabase
-        .from('user_profiles')
+        .from('public_profiles')
         .select('id, username, display_name, profile_photo_url')
         .or(`username.ilike.%${debouncedSearch}%,display_name.ilike.%${debouncedSearch}%`)
         .not('id', 'in', `(${existingMemberIds.join(',')})`)

@@ -102,14 +102,14 @@ export function ReportSheet({
                 className={cn(
                   "w-full flex items-center gap-3 px-4 py-3 rounded-2xl border-2 transition-all text-left",
                   selectedReason === reason.id
-                    ? "border-amber-500 bg-amber-50"
-                    : "border-amber-200/20 hover:border-amber-200/40"
+                    ? "border-primary bg-primary/5"
+                    : "border-border/20 hover:border-border/40"
                 )}
               >
                 <span className="text-xl">{reason.icon}</span>
                 <span className="font-medium text-[#1D1D1F]">{reason.label}</span>
                 {selectedReason === reason.id && (
-                  <div className="ml-auto w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center">
+                   <div className="ml-auto w-5 h-5 rounded-full bg-primary flex items-center justify-center">
                     <span className="text-white text-xs">✓</span>
                   </div>
                 )}
@@ -136,7 +136,7 @@ export function ReportSheet({
           <Button
             onClick={handleSubmit}
             disabled={!selectedReason || (selectedReason === 'other' && !details.trim()) || submitting}
-            className="w-full h-12 rounded-full bg-red-500 hover:bg-red-600"
+            className="w-full h-12 rounded-full bg-destructive hover:bg-destructive/90"
           >
             {submitting ? (
               <>
@@ -150,7 +150,7 @@ export function ReportSheet({
 
           <button
             onClick={() => onOpenChange(false)}
-            className="w-full py-3 text-center text-[#8E8E93] font-medium"
+            className="w-full py-3 text-center text-muted-foreground font-medium"
           >
             Cancel
           </button>
