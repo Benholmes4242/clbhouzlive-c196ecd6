@@ -15,7 +15,7 @@ interface Props {
   onRemoveClub: (id: string) => void;
 }
 
-export function GolfInfoStep({ form, onFieldChange, onAddClub, onRemoveClub }: Props) {
+export function GolfInfoStep({ form, userId, hasRegisteredInterest, onFieldChange, onAddClub, onRemoveClub }: Props) {
   return (
     <div className="space-y-4 px-4 pb-4">
       <SectionCard>
