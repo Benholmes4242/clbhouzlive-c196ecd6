@@ -67,8 +67,8 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
       {/* Duration badge (videos) — bottom-right */}
       {isVideo && duration != null && duration > 0 && (
         <div
-          className="absolute bottom-1.5 right-1.5 z-10 rounded-[4px] flex items-center"
-          style={{ ...HUD_GLASS, padding: '2px 5px' }}
+          className="absolute bottom-1.5 right-1.5 z-10 rounded-[4px] liquid-glass flex items-center"
+          style={{ padding: '2px 5px' }}
         >
           <span className="text-[11px] font-semibold text-white tracking-[0.02em]">
             {formatDuration(duration)}
