@@ -107,7 +107,7 @@ export function VideoCardAutoplay({ hlsUrl, posterUrl, isEligible, cardIndex }: 
         const entry = entries[0];
         if (!entry) return;
 
-        if (entry.intersectionRatio >= 0.5 && !isPlayingRef.current) {
+        if (entry.intersectionRatio >= 0.9 && !isPlayingRef.current) {
           startPlayback();
         } else if (entry.intersectionRatio < 0.1 && isPlayingRef.current) {
           destroyHls();
