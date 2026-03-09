@@ -47,7 +47,7 @@ export function GolfInfoStep({ form, userId, hasRegisteredInterest, onFieldChang
           onChange={(v) => onFieldChange('handicapIndex', v)}
         />
         <div className="mt-3">
-          <HandicapSyncInlineNotice />
+          {userId && <HandicapSyncInlineNotice userId={userId} hasRegisteredInterest={hasRegisteredInterest ?? false} />}
         </div>
       </SectionCard>
 
