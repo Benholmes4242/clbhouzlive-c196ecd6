@@ -3,6 +3,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import WatchTile from './WatchTile';
 import WatchGridSkeleton from './WatchGridSkeleton';
 import SuggestedCreatorsStrip from './SuggestedCreatorsStrip';
+import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 
 interface WatchGridProps {
   posts: FeedPost[];
@@ -52,6 +53,18 @@ const WatchGrid: React.FC<WatchGridProps> = ({
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  // Sync new posts into fullscreen overlay
+  const isFullscreenOpen = useFullscreenFeed(s => s.isOpen);
+  const fullscreenPostCount = useFullscreenFeed(s => s.posts.length);
+
+  useEffect(() => {
+    if (!isFullscreenOpen) return;
+    if (posts.length > fullscreenPostCount) {
+      const newPosts = posts.slice(fullscreenPostCount);
+      useFullscreenFeed.getState().appendPosts(newPosts);
+    }
+  }, [posts.length, isFullscreenOpen, fullscreenPostCount]);
+
   if (isLoading && posts.length === 0) {
     return <WatchGridSkeleton />;
   }
@@ -93,7 +106,14 @@ const WatchGrid: React.FC<WatchGridProps> = ({
       >
         {posts.map((post, i) => (
           <div key={post.id}>
-            <WatchTile post={post} index={i} allPosts={posts} />
+            <WatchTile
+              post={post}
+              index={i}
+              allPosts={posts}
+              fetchNextPage={fetchNextPage}
+              hasNextPage={hasNextPage}
+              isFetchingNextPage={isFetchingNextPage}
+            />
           </div>
         ))}
         {posts.length > 8 && <SuggestedCreatorsStrip userId={userId} />}
