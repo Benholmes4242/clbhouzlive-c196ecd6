@@ -42,7 +42,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
   return (
     <div
       style={{ gridColumn: '1 / -1' }}
-      className="bg-card cursor-pointer"
+      className="bg-card cursor-pointer mt-[0px]"
       onClick={() => {
         if (allPosts) {
           useFullscreenFeed.getState().open({
@@ -55,7 +55,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
       data-course-media-index={index}
     >
       {/* Creator header */}
-      <div className="flex items-center gap-2 px-3 py-2">
+      <div className="flex items-center gap-2 px-3 py-1.5.5">
         <SquircleAvatar
           src={post.avatarUrl}
           alt={post.displayName || ''}
@@ -105,7 +105,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
       )}
 
       {/* Engagement */}
-      <div className="flex items-center gap-4 px-3 py-2">
+      <div className="flex items-center gap-4 px-3 p1.5-2">
         {post.likeCount > 0 && (
           <div className="flex items-center gap-1 text-muted-foreground">
             <Heart className="w-3.5 h-3.5" />
