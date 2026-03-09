@@ -1,10 +1,11 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useStore } from 'zustand';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Flag, EyeOff, Link2 } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { CommentsPage } from '@/components/clubhouse/cinematic/CommentsPage';
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import type { FeedPost } from '@/components/media-system/types/media';
 import type { MediaStore } from '@/components/media-system/store/createMediaStore';
 import { useLikeMutation } from '@/components/media-system/hooks/useLikeMutation';
@@ -32,15 +33,32 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
   const [isLiked, setIsLiked] = useState(activePost?.isLikedByMe ?? false);
   const [likeCount, setLikeCount] = useState(activePost?.likeCount ?? 0);
   const [showComments, setShowComments] = useState(false);
+  const [commentCountOverride, setCommentCountOverride] = useState<number | null>(null);
   const [chevronY, setChevronY] = useState<number | null>(null);
+  const [moreOptionsOpen, setMoreOptionsOpen] = useState(false);
 
-  // Reset like state when activeIndex changes
+  // Reset like state and comment count override when activeIndex changes
   useEffect(() => {
     if (activePost) {
       setIsLiked(activePost.isLikedByMe);
       setLikeCount(activePost.likeCount);
     }
+    setCommentCountOverride(null);
   }, [activeIndex, activePost?.id]);
+
+  // Add/remove body class for comments z-index boost
+  useEffect(() => {
+    if (showComments) {
+      document.body.classList.add('fullscreen-comments-open');
+    } else {
+      document.body.classList.remove('fullscreen-comments-open');
+    }
+    return () => {
+      document.body.classList.remove('fullscreen-comments-open');
+    };
+  }, [showComments]);
+
+  const displayedCommentCount = commentCountOverride ?? activePost?.commentCount ?? 0;
 
   const toggleLike = useCallback(() => {
     if (!userId || !activePost || !activeActor) return;
@@ -94,6 +112,44 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
     store.getState().toggleMute();
   }, [store]);
 
+  const handleReport = useCallback(async () => {
+    if (!userId || !activePost) return;
+    const { error } = await (supabase as any)
+      .from('post_reports')
+      .insert({ post_id: activePost.id, reporter_id: userId });
+    if (!error) {
+      toast.success('Report submitted');
+    }
+    setMoreOptionsOpen(false);
+  }, [userId, activePost]);
+
+  const handleNotInterested = useCallback(async () => {
+    if (!userId || !activePost) return;
+    const { error } = await (supabase as any)
+      .from('post_dismissals')
+      .insert({ post_id: activePost.id, user_id: userId });
+    if (!error) {
+      toast('Noted — we will show fewer like this');
+    }
+    setMoreOptionsOpen(false);
+  }, [userId, activePost]);
+
+  const handleCopyLink = useCallback(async () => {
+    if (!activePost) return;
+    const shareUrl = `${window.location.origin}/post/${activePost.id}`;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success('Link copied');
+    } catch {
+      // silent
+    }
+    setMoreOptionsOpen(false);
+  }, [activePost]);
+
+  const handleCommentPosted = useCallback(() => {
+    setCommentCountOverride((prev) => (prev ?? activePost?.commentCount ?? 0) + 1);
+  }, [activePost?.commentCount]);
+
   if (!activePost) return null;
 
   const thumbnailUrl = activePost.mediaItems[0]?.thumbnailUrl || '';
@@ -107,7 +163,7 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
       <CinematicActionRail
         postId={activePost.id}
         likesCount={likeCount}
-        commentsCount={activePost.commentCount}
+        commentsCount={displayedCommentCount}
         hasLiked={isLiked}
         isMuted={isMuted}
         isVisible={true}
@@ -115,6 +171,7 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
         onComment={() => setShowComments(true)}
         onShare={handleShare}
         onMuteToggle={toggleMute}
+        onMore={() => setMoreOptionsOpen(true)}
         isVideo={isActiveVideo}
         hasNextMedia={currentMediaIndex < activeMediaCount - 1}
         hasPrevMedia={currentMediaIndex > 0}
@@ -156,32 +213,70 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
         </button>
       )}
 
-      {/* Comments bottom sheet — CommentsPage portals to body at z-[100]/z-[101],
-           which is behind our z-[9999] overlay. Boost those layers above it. */}
+      {/* More Options drawer */}
+      {moreOptionsOpen && (
+        <div
+          className="fixed inset-0 z-[10004]"
+          onClick={() => setMoreOptionsOpen(false)}
+        >
+          <div className="absolute inset-0 bg-black/60" />
+          <div
+            className="absolute bottom-0 left-0 right-0 rounded-t-2xl overflow-hidden"
+            style={{
+              background: 'rgba(30, 30, 30, 0.95)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-10 h-1 rounded-full bg-white/20 mx-auto mt-3 mb-2" />
+            <div className="flex flex-col">
+              <button
+                onClick={handleReport}
+                className="flex items-center gap-3 px-5 py-3.5 text-left active:bg-white/5"
+              >
+                <Flag className="w-5 h-5 text-white/70" />
+                <span className="text-[15px] text-white">Report this post</span>
+              </button>
+              <button
+                onClick={handleNotInterested}
+                className="flex items-center gap-3 px-5 py-3.5 text-left active:bg-white/5"
+              >
+                <EyeOff className="w-5 h-5 text-white/70" />
+                <span className="text-[15px] text-white">Not interested</span>
+              </button>
+              <button
+                onClick={handleCopyLink}
+                className="flex items-center gap-3 px-5 py-3.5 text-left active:bg-white/5"
+              >
+                <Link2 className="w-5 h-5 text-white/70" />
+                <span className="text-[15px] text-white">Copy link</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Comments bottom sheet — z-index boosted via .fullscreen-comments-open class on body */}
       {showComments && (
-        <>
-          <style>{`
-            .fixed.inset-0.z-\\[100\\] { z-index: 10001 !important; }
-            .fixed.inset-x-0.bottom-0.z-\\[101\\] { z-index: 10002 !important; }
-            .z-\\[220\\] { z-index: 10003 !important; }
-          `}</style>
-          <CommentsPage
-            isOpen={showComments}
-            onClose={() => setShowComments(false)}
-            postId={activePost.id}
-            currentUserId={userId}
-            creatorName={activePost.displayName}
-            creatorAvatar={activePost.avatarUrl}
-            creatorUserId={activePost.userId}
-            caption={activePost.caption}
-            videoThumbnail={thumbnailUrl}
-            theme="dark"
-            courseId={activePost.review?.courseId}
-            courseName={activePost.review?.courseName}
-            isReview={activePost.isReview}
-            reviewRating={activePost.review?.rating}
-          />
-        </>
+        <CommentsPage
+          isOpen={showComments}
+          onClose={() => setShowComments(false)}
+          postId={activePost.id}
+          currentUserId={userId}
+          creatorName={activePost.displayName}
+          creatorAvatar={activePost.avatarUrl}
+          creatorUserId={activePost.userId}
+          caption={activePost.caption}
+          videoThumbnail={thumbnailUrl}
+          theme="dark"
+          courseId={activePost.review?.courseId}
+          courseName={activePost.review?.courseName}
+          isReview={activePost.isReview}
+          reviewRating={activePost.review?.rating}
+          onCommentPosted={handleCommentPosted}
+        />
       )}
     </>
   );
