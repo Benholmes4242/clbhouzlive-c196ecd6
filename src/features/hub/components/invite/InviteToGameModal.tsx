@@ -40,7 +40,7 @@ export function InviteToGameModal({
   const [invitedIds, setInvitedIds] = useState<Set<string>>(new Set());
   const [invitingId, setInvitingId] = useState<string | null>(null);
   const [gameData, setGameData] = useState<{ courseName: string; startTime: string } | null>(null);
-  const sendGameInviteNotification = useSendGameInviteNotification();
+  const sendGameNotification = useSendGameNotification();
 
   // Fetch game data if not provided via props (ensures notifications never silently fail)
   useEffect(() => {
