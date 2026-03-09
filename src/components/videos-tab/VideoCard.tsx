@@ -153,7 +153,7 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
             {!expanded && cleanedCaption.length > 100 && (
               <button
                 onClick={() => setExpanded(true)}
-                className="text-sm font-semibold text-muted-foreground mt-0.5"
+                className="text-xs font-semibold text-muted-foreground mt-0.5"
               >
                 See more
               </button>
