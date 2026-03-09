@@ -77,13 +77,14 @@ export function FullscreenFeedContent({ posts, startIndex }: FullscreenFeedConte
       {/* Close button — top-left */}
       <button
         onClick={handleClose}
-        className="fixed top-[env(safe-area-inset-top,12px)] left-3 z-[10000] w-9 h-9 rounded-full flex items-center justify-center"
+        className="fixed left-4 z-[10000] w-11 h-11 rounded-full flex items-center justify-center"
         style={{
-          background: 'rgba(0, 0, 0, 0.4)',
+          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
+          background: 'rgba(0, 0, 0, 0.35)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
-          marginTop: 12,
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
         }}
         aria-label="Close fullscreen"
       >
