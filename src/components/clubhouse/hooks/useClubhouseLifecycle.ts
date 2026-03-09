@@ -6,39 +6,46 @@ import { useMediaStore } from '@/components/media-system/store/mediaStore';
  * - Pause/resume on visibility change (app background/foreground)
  * - Auto-resume on network reconnect
  * - Screen Wake Lock acquisition
+ *
+ * Accepts an optional getStore resolver for scoped stores (e.g. fullscreen overlay).
+ * When omitted, falls back to the global useMediaStore.
  */
-export function useClubhouseLifecycle() {
+export function useClubhouseLifecycle(
+  getStore?: () => { activeVideoElement: HTMLVideoElement | null; userPaused: boolean }
+) {
+  const resolveStore = getStore ?? (() => useMediaStore.getState());
+
   // Pause/resume on visibility change (app background)
   useEffect(() => {
     const handleVisibilityChange = () => {
-      const store = useMediaStore.getState();
-      const activeEl = store.activeVideoElement;
+      const state = resolveStore();
+      const activeEl = state.activeVideoElement;
       if (!activeEl) return;
 
       if (document.hidden) {
         if (!activeEl.paused) activeEl.pause();
       } else {
-        if (activeEl.paused && !store.userPaused) {
+        if (activeEl.paused && !state.userPaused) {
           activeEl.play().catch(() => {});
         }
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, []);
+  }, [resolveStore]);
 
   // Auto-resume on network reconnect
   useEffect(() => {
     const handleOnline = () => {
-      const store = useMediaStore.getState();
-      const activeEl = store.activeVideoElement;
-      if (activeEl && activeEl.paused && !store.userPaused) {
+      const state = resolveStore();
+      const activeEl = state.activeVideoElement;
+      if (activeEl && activeEl.paused && !state.userPaused) {
         activeEl.play().catch(() => {});
       }
     };
     window.addEventListener('online', handleOnline);
     return () => window.removeEventListener('online', handleOnline);
-  }, []);
+  }, [resolveStore]);
 
   // Screen Wake Lock
   useEffect(() => {
