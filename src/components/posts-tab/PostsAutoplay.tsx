@@ -26,7 +26,7 @@ export const PostsAutoplay: React.FC<PostsAutoplayProps> = ({ posts, gridRef }) 
     return type === '2g' || type === 'slow-2g';
   }, []);
 
-  const isEligible = (idx: numallback(async (hlsUrl: string) => {
+  const prewarmTile = useCallback(async (hlsUrl: string) => {
     try {
       const masterText = await fetch(hlsUrl, { mode: 'cors', credentials: 'omit' }).then(r => r.text());
       const lines = masterText.split('\n');
