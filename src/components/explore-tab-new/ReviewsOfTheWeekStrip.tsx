@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface ReviewItem {
   post_id: string;
   review_id: string;
+  course_id: string;
   thumbnail_url: string | null;
   rating: number;
   course_name: string;
@@ -19,6 +21,8 @@ interface ReviewsOfTheWeekStripProps {
 }
 
 function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStripProps) {
+  const navigate = useNavigate();
+
   const { data: reviews } = useQuery({
     queryKey: ['explore-reviews-of-week', activeRegion],
     queryFn: async (): Promise<ReviewItem[]> => {
@@ -33,7 +37,6 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
       }
 
       if (!data || data.length < 3) {
-        // Widen to 90 days as fallback
         const fallbackParams: Record<string, any> = { days_back: 90, result_limit: 10 };
         if (activeRegion) fallbackParams.p_region_slug = activeRegion;
 
@@ -49,6 +52,11 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
 
   if (!reviews || reviews.length < 2) return null;
 
+  const handleReviewTap = (review: ReviewItem) => {
+    const url = `/courses/${review.course_id}?tab=reviews&review=${review.review_id}`;
+    navigate(url);
+  };
+
   return (
     <div className="py-4">
       <h3 className="text-sm font-semibold text-foreground px-4 pb-3">
@@ -59,9 +67,7 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
           <button
             key={review.review_id}
             type="button"
-            onClick={() => {
-              // Phase 5: open fullscreen player
-            }}
+            onClick={() => handleReviewTap(review)}
             className="shrink-0 w-[140px] aspect-[3/4] rounded-xl overflow-hidden relative bg-muted focus:outline-none"
           >
             {review.thumbnail_url ? (
