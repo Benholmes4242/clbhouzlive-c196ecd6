@@ -69,7 +69,7 @@ function FeaturedRegionHeroInner({ onRegionSelect, activeRegion }: FeaturedRegio
   });
 
   if (activeRegion !== null) return null;
-  if (!region || !region.hero_image_url) return null;
+  if (!region) return null;
 
   return (
     <div className="mx-[2px] mb-[2px]">
@@ -78,11 +78,15 @@ function FeaturedRegionHeroInner({ onRegionSelect, activeRegion }: FeaturedRegio
         onClick={() => onRegionSelect(region.slug)}
         className="w-full rounded-xl overflow-hidden relative block focus:outline-none"
       >
-        <img
-          src={region.hero_image_url}
-          alt={region.title}
-          className="aspect-[16/9] w-full object-cover"
-        />
+        {region.hero_image_url ? (
+          <img
+            src={region.hero_image_url}
+            alt={region.title}
+            className="aspect-[16/9] w-full object-cover"
+          />
+        ) : (
+          <div className="w-full aspect-[16/9] bg-gradient-to-br from-emerald-700 via-emerald-600 to-green-500" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-4 text-left">
           <h2 className="text-xl font-bold text-white">{region.title}</h2>

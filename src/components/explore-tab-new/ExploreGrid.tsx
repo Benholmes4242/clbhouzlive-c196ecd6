@@ -92,11 +92,14 @@ export default function ExploreGrid({
 
   return (
     <>
+      {/* Discovery modules above the grid */}
       <FeaturedRegionHero
         onRegionSelect={(slug) => onRegionChange(slug)}
         activeRegion={activeRegion}
       />
+      <ReviewsOfTheWeekStrip />
 
+      {/* Grid */}
       <div ref={gridRef} className="grid grid-cols-2 gap-[2px] px-[2px]">
         {coursePosts.map((post, index) => (
           <Fragment key={post.id}>
@@ -106,15 +109,11 @@ export default function ExploreGrid({
               <TrendingCoursesStrip />
             )}
 
-            {index === REGIONS_AFTER - 1 && (
+            {index === REGIONS_AFTER - 1 && activeRegion === null && (
               <ExploreRegionsStrip
                 onRegionSelect={(slug) => onRegionChange(slug)}
                 activeRegion={activeRegion}
               />
-            )}
-
-            {index === REVIEWS_AFTER - 1 && coursePosts.length >= REVIEWS_AFTER && (
-              <ReviewsOfTheWeekStrip />
             )}
           </Fragment>
         ))}
