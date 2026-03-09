@@ -5,6 +5,7 @@ import { useArchivedConversations } from '@/hooks/useArchivedConversations';
 import { useTypingIndicator } from '@/hooks/useTypingIndicator';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { MessageCircle, Plus, Archive, ChevronDown, ChevronRight, Users, Check, CheckCheck, BellOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';

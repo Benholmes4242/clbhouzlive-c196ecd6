@@ -374,11 +374,17 @@ export function useMessaging(): UseMessagingReturn {
     fetchConversations();
   }, [fetchConversations]);
 
+  // Keep a ref of conversation IDs to avoid stale closures in realtime callbacks
+  const conversationsRef = useRef<ConversationWithDetails[]>([]);
+  useEffect(() => {
+    conversationsRef.current = conversations;
+  }, [conversations]);
+
   // Set up realtime subscription for conversation updates
   useEffect(() => {
     if (!user) return;
 
-    // Subscribe to new messages to update conversation list in real-time
+    // Subscribe to new messages — only refetch if message belongs to a known conversation
     const messagesChannel = supabase
       .channel('conversation-list-messages')
       .on(
@@ -389,8 +395,10 @@ export function useMessaging(): UseMessagingReturn {
           table: 'messages',
         },
         (payload) => {
-          // Refresh conversations to update previews and order
-          fetchConversations();
+          const incomingConvId = (payload.new as any)?.conversation_id;
+          if (incomingConvId && conversationsRef.current.some(c => c.id === incomingConvId)) {
+            fetchConversations();
+          }
         }
       )
       .subscribe();

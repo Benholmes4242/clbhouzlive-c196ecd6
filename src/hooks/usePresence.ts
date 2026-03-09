@@ -115,17 +115,9 @@ export function usePresence() {
     const handleFocus = () => updatePresence('online');
     const handleBlur = () => updatePresence('away');
 
-    const handleBeforeUnload = () => {
-      navigator.sendBeacon?.(
-        `https://ybxkehyomcakqjvuhnna.supabase.co/rest/v1/rpc/update_presence`,
-        JSON.stringify({ p_status: 'offline' })
-      );
-    };
-
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('focus', handleFocus);
     window.addEventListener('blur', handleBlur);
-    window.addEventListener('beforeunload', handleBeforeUnload);
 
     updateIntervalRef.current = setInterval(() => {
       if (!document.hidden) {
@@ -137,7 +129,6 @@ export function usePresence() {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
       window.removeEventListener('blur', handleBlur);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
       
       if (updateIntervalRef.current) {
         clearInterval(updateIntervalRef.current);

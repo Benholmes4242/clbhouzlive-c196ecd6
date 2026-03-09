@@ -161,7 +161,7 @@ export function ForwardMessageModal({
                     {display.name}
                   </span>
                   {isForwarding && (
-                    <Loader2 className="w-5 h-5 text-amber-500 animate-spin" />
+                    <Loader2 className="w-5 h-5 text-primary animate-spin" />
                   )}
                 </button>
               );
