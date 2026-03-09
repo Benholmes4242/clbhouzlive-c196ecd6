@@ -30,7 +30,7 @@ import {
 } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 import { 
-  useSendGameInviteNotification, 
+  useSendGameNotification, 
   useSendRsvpNotification,
   formatGameDateForNotification,
   formatGameTimeForNotification,
