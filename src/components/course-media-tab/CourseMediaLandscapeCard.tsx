@@ -54,25 +54,18 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
       }}
       data-course-media-index={index}
     >
-      {/* Creator header */}
-      <div className="flex items-center gap-2 px-3 py-1.5.5">
-        <SquircleAvatar
-          src={post.avatarUrl}
-          alt={post.displayName || ''}
-          size={28}
-          fallback={post.displayName?.charAt(0)?.toUpperCase() || '?'}
-          hideRing
-        />
-        <div className="flex-1 min-w-0">
-          <span className="text-sm font-semibold text-foreground truncate block">
-            {post.displayName}
-          </span>
-        </div>
-        <span className="text-xs text-muted-foreground flex-shrink-0">{timeAgo}</span>
-      </div>
-
       {/* Media */}
       <div className="relative aspect-video overflow-hidden">
+        {/* Creator avatar — top-left inside card */}
+        <div className="absolute top-1.5 left-1.5 z-10">
+          <SquircleAvatar
+            src={post.avatarUrl}
+            alt=""
+            size={20}
+            fallback={post.displayName?.charAt(0)?.toUpperCase() || '?'}
+            hideRing
+          />
+        </div>
         {thumbnailUrl ? (
           <img
             src={thumbnailUrl}
