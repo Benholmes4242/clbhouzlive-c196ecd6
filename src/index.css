@@ -4615,3 +4615,20 @@ em-emoji-picker input:focus {
 .fullscreen-comments-open .fixed.inset-0 { z-index: 10001 !important; }
 .fullscreen-comments-open .fixed.inset-x-0.bottom-0 { z-index: 10002 !important; }
 .fullscreen-comments-open .z-\[220\] { z-index: 10003 !important; }
+
+/* ========================================
+   SAFE AREA SHIELD — persistent element that never unmounts
+   Paints the status bar zone so React mount/unmount cycles can never create a gap.
+   Background-color is set dynamically by useMedianStatusBar.
+   ======================================== */
+#safe-area-shield {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: env(safe-area-inset-top, 47px);
+  z-index: 9999;
+  pointer-events: none;
+  background-color: #000000;
+  transition: none !important;
+}
