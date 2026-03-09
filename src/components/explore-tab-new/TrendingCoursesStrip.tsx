@@ -4,33 +4,35 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
 interface TrendingCourse {
-  id: string;
-  name: string;
-  country: string | null;
+  course_id: string;
+  course_name: string;
+  country: string;
   sub_country: string | null;
-  thumbnail_image: string | null;
+  thumbnail_image: string;
   global_rank: number | null;
+  review_count: number;
+  post_count: number;
+  trending_score: number;
 }
 
-function TrendingCoursesStripInner() {
+interface TrendingCoursesStripProps {
+  activeRegion?: string | null;
+}
+
+function TrendingCoursesStripInner({ activeRegion }: TrendingCoursesStripProps) {
   const navigate = useNavigate();
 
   const { data: courses } = useQuery({
-    queryKey: ['explore-trending-courses'],
+    queryKey: ['trending-courses', activeRegion],
     queryFn: async (): Promise<TrendingCourse[]> => {
-      const { data, error } = await supabase
-        .from('golf_courses')
-        .select('id, name, country, sub_country, thumbnail_image, global_rank')
-        .not('thumbnail_image', 'is', null)
-        .not('global_rank', 'is', null)
-        .order('global_rank', { ascending: true })
-        .limit(15);
+      const params: Record<string, any> = { p_days_back: 30, p_limit: 15 };
+      if (activeRegion) params.p_region_slug = activeRegion;
 
+      const { data, error } = await supabase.rpc('get_trending_courses', params);
       if (error) {
-        console.error('[TrendingCourses] fetch error:', error);
+        console.error('[TrendingCourses] RPC error:', error);
         return [];
       }
-
       return (data ?? []) as TrendingCourse[];
     },
     staleTime: 10 * 60 * 1000,
@@ -54,28 +56,28 @@ function TrendingCoursesStripInner() {
       <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide">
         {courses.map((course) => (
           <button
-            key={course.id}
+            key={course.course_id}
             type="button"
-            onClick={() => navigate(`/course/${course.id}`)}
+            onClick={() => navigate(`/course/${course.course_id}`)}
             className="shrink-0 w-[140px] rounded-xl overflow-hidden bg-card border border-border/50 shadow-sm text-left focus:outline-none"
           >
             <img
-              src={course.thumbnail_image!}
-              alt={course.name}
+              src={course.thumbnail_image}
+              alt={course.course_name}
               loading="lazy"
               className="aspect-[4/3] w-full object-cover"
             />
             <div className="p-2">
               <p className="text-[12px] font-semibold text-foreground line-clamp-1">
-                {course.name}
+                {course.course_name}
               </p>
               <p className="text-[10px] text-muted-foreground line-clamp-1">
                 {course.sub_country || course.country}
               </p>
-              {course.global_rank && (
-                <p className="text-[10px] font-semibold text-amber-600 mt-0.5">
-                  #{course.global_rank}
-                </p>
+              {course.review_count > 0 && (
+                <span className="text-[10px] font-semibold text-amber-600 mt-0.5">
+                  ⭐ {course.review_count} {course.review_count === 1 ? 'review' : 'reviews'}
+                </span>
               )}
             </div>
           </button>
