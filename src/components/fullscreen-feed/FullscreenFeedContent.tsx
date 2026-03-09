@@ -79,6 +79,8 @@ export function FullscreenFeedContent({ posts, startIndex, fetchNextPage, hasNex
           <FeedContainer
             posts={posts}
             initialIndex={startIndex}
+            onNearEnd={handleNearEnd}
+            hasNextPage={hasNextPage}
           />
         </FeedWithPreloader>
       </VideoPoolProvider>
