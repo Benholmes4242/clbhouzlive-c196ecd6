@@ -95,7 +95,7 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
     <>
       <div
         className="fixed right-3 flex flex-col items-center gap-5 z-[10000]"
-        style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 100px)' }}
+        style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}
       >
         {/* Like */}
         <button onClick={toggleLike} className="flex flex-col items-center gap-0.5">

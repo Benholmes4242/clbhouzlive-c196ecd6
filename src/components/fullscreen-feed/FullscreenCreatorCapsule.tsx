@@ -79,7 +79,7 @@ export function FullscreenCreatorCapsule({ posts, store }: FullscreenCreatorCaps
         sourceReviewId: activeReview.reviewId,
       } : undefined}
       onReviewTap={handleReviewTap}
-      
+      bottomOffset="calc(env(safe-area-inset-bottom, 0px) + 24px)"
     />
   );
 }
