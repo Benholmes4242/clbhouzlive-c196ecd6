@@ -49,6 +49,12 @@ export const VideoCard = React.memo(function VideoCard({ post, isAutoplayEligibl
   const [likeCount, setLikeCount] = useState(post.likeCount);
   const [showComments, setShowComments] = useState(false);
 
+  // Clean caption: strip "📍 Played at..." text and extract course if not already tagged
+  const cleanedCaption = useMemo(() => removeGolfCourseFromContent(post.caption), [post.caption]);
+  const extractedCourse = useMemo(() => extractGolfCourseFromContent(post.caption), [post.caption]);
+  const courseNameToShow = post.review?.courseName || post.courseName || extractedCourse?.name || null;
+  const courseIdToShow = post.review?.courseId || null;
+
   const handleTap = () => {
     if (allPosts) {
       useFullscreenFeed.getState().open({
