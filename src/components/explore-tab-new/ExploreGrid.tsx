@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback, useMemo, type RefObject, Fragment } from 'react';
+import { useRef, useEffect, useCallback, useMemo, type RefObject } from 'react';
 import { useInView } from 'react-intersection-observer';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { ExploreTile } from './ExploreTile';
@@ -102,7 +102,7 @@ export default function ExploreGrid({
       {/* Grid */}
       <div ref={gridRef} className="grid grid-cols-2 gap-[2px] px-[2px]">
         {coursePosts.map((post, index) => (
-          <Fragment key={post.id}>
+          <div className="contents" key={post.id}>
             <ExploreTile post={post} index={index} allPosts={coursePosts} />
 
             {index === TRENDING_AFTER - 1 && (
@@ -115,7 +115,7 @@ export default function ExploreGrid({
                 activeRegion={activeRegion}
               />
             )}
-          </Fragment>
+          </div>
         ))}
       </div>
 
