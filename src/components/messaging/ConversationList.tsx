@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useMessagingContext } from '@/contexts/MessagingContext';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useArchivedConversations } from '@/hooks/useArchivedConversations';
