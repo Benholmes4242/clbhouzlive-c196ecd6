@@ -37,7 +37,7 @@ function formatVideoDuration(totalSeconds: number): string {
   return `${m}:${pad(sec)}`;
 }
 
-export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex = 0, allPosts }: VideoCardProps) {
+export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex = 0, allPosts, fetchNextPage, hasNextPage, isFetchingNextPage }: VideoCardProps) {
   const navigate = useNavigate();
   const firstVideo = post.mediaItems.find(m => m.type === 'video');
   const thumbnailUrl = firstVideo?.thumbnailUrl || '';
