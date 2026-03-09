@@ -83,7 +83,7 @@ const BadgeCarousel: React.FC<BadgeCarouselProps> = ({
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="engagement" className="w-full">
-          <TabsList className="flex items-center gap-1 w-full bg-transparent border-0 p-0 h-auto">
+          <TabsList className="flex items-center gap-2 w-full bg-transparent border-0 p-0 h-auto justify-center">
             <TabsTrigger 
               value="engagement" 
               className="min-h-[36px] px-4 rounded-full text-sm font-semibold transition-all active:scale-[0.97] border-0 shadow-none
