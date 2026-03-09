@@ -11532,6 +11532,7 @@ export type Database = {
           home_club_pending_name: string | null
           home_club_visibility: string
           id: string
+          instagram_handle: string
           is_business_verified: boolean | null
           is_creator: boolean
           is_official_club: boolean | null
@@ -11569,8 +11570,10 @@ export type Database = {
           show_additional_home_clubs: boolean
           show_handicap: boolean
           social_links: Json | null
+          tiktok_handle: string
           top100_visible: boolean | null
           tracker_visible: boolean | null
+          twitter_handle: string
           updated_at: string | null
           user_type: Database["public"]["Enums"]["user_type"] | null
           username: string | null
@@ -11583,6 +11586,7 @@ export type Database = {
           verified_business_notes: string | null
           website_url: string | null
           websites: string[] | null
+          youtube_handle: string
         }
         Insert: {
           additional_clubs_visibility?: string
@@ -11633,6 +11637,7 @@ export type Database = {
           home_club_pending_name?: string | null
           home_club_visibility?: string
           id: string
+          instagram_handle?: string
           is_business_verified?: boolean | null
           is_creator?: boolean
           is_official_club?: boolean | null
@@ -11670,8 +11675,10 @@ export type Database = {
           show_additional_home_clubs?: boolean
           show_handicap?: boolean
           social_links?: Json | null
+          tiktok_handle?: string
           top100_visible?: boolean | null
           tracker_visible?: boolean | null
+          twitter_handle?: string
           updated_at?: string | null
           user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
@@ -11684,6 +11691,7 @@ export type Database = {
           verified_business_notes?: string | null
           website_url?: string | null
           websites?: string[] | null
+          youtube_handle?: string
         }
         Update: {
           additional_clubs_visibility?: string
@@ -11734,6 +11742,7 @@ export type Database = {
           home_club_pending_name?: string | null
           home_club_visibility?: string
           id?: string
+          instagram_handle?: string
           is_business_verified?: boolean | null
           is_creator?: boolean
           is_official_club?: boolean | null
@@ -11771,8 +11780,10 @@ export type Database = {
           show_additional_home_clubs?: boolean
           show_handicap?: boolean
           social_links?: Json | null
+          tiktok_handle?: string
           top100_visible?: boolean | null
           tracker_visible?: boolean | null
+          twitter_handle?: string
           updated_at?: string | null
           user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
@@ -11785,6 +11796,7 @@ export type Database = {
           verified_business_notes?: string | null
           website_url?: string | null
           websites?: string[] | null
+          youtube_handle?: string
         }
         Relationships: [
           {
