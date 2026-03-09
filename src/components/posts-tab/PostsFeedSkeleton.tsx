@@ -4,7 +4,7 @@ export const PostsFeedSkeleton: React.FC = () => {
   return (
     <div className="flex flex-col gap-3 px-0 animate-pulse">
       {/* YouTube-style skeleton */}
-      <div className="bg-muted rounded-xl overflow-hidden">
+      <div className="bg-muted overflow-hidden">
         <div className="aspect-video bg-muted-foreground/10" />
         <div className="px-3 py-2 space-y-2">
           <div className="h-4 bg-muted-foreground/10 rounded w-3/4" />
@@ -20,13 +20,13 @@ export const PostsFeedSkeleton: React.FC = () => {
       </div>
 
       {/* Review skeleton */}
-      <div className="bg-muted rounded-xl overflow-hidden">
+      <div className="bg-muted overflow-hidden">
         <div className="h-[3px] bg-muted-foreground/10" />
         <div className="px-3 py-2 space-y-2">
           <div className="h-4 bg-muted-foreground/10 rounded w-2/3" />
           <div className="h-3 bg-muted-foreground/10 rounded w-1/3" />
         </div>
-        <div className="aspect-[4/3] bg-muted-foreground/10 mx-3 rounded-lg" />
+        <div className="aspect-[4/3] bg-muted-foreground/10" />
         <div className="px-3 py-2">
           <div className="h-3 bg-muted-foreground/10 rounded w-full" />
         </div>
