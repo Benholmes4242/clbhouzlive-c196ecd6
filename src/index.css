@@ -201,8 +201,8 @@ html.lightbox-open {
   /* ========================================
      SAFE AREA INSETS - iOS/Android notch & status bar
      ======================================== */
-  /* TOP safe area disabled - content goes edge-to-edge */
-  --sat: 0px;
+  /* Safe area inset — now resolves to actual env() value */
+  --sat: env(safe-area-inset-top, 0px);
   --sab: env(safe-area-inset-bottom, 0px);
   --sal: env(safe-area-inset-left, 0px);
   --sar: env(safe-area-inset-right, 0px);
