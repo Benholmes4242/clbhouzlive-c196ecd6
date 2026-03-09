@@ -109,7 +109,10 @@ function FeaturedRegionHeroInner({ onRegionSelect, activeRegion }: FeaturedRegio
                {region.courseCount} {region.courseCount === 1 ? 'course' : 'courses'}
              </span>
            </div>
-          <span className="inline-block mt-2.5 text-xs font-semibold text-white bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
+          <span
+            className="inline-block mt-2.5 text-xs font-semibold text-white rounded-full"
+            style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 4px 16px rgba(0,0,0,0.25)', padding: '6px 12px' }}
+          >
             Explore →
           </span>
         </div>
