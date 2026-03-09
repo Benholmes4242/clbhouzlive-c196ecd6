@@ -97,10 +97,10 @@ const CompactTile: React.FC<{ post: FeedPost; globalIndex: number; allPosts?: Fe
         </div>
       )}
 
-      {/* Engagement counts — bottom right (likes only) */}
+      {/* Like count — bottom left, amber when liked */}
       {post.likeCount > 0 && (
-        <div className="absolute bottom-1.5 right-1.5 flex items-center gap-1.5 z-10">
-          <span className="flex items-center gap-0.5 text-[10px] font-semibold text-white drop-shadow-md">
+        <div className="absolute bottom-1.5 left-1.5 flex items-center gap-0.5 z-10">
+          <span className="flex items-center gap-0.5 text-[10px] font-semibold text-[#f59e0b] drop-shadow-md">
             ♥ {formatCompact(post.likeCount)}
           </span>
         </div>
