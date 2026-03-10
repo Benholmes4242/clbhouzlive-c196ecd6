@@ -364,9 +364,10 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
       <div
         style={{
           position: 'absolute',
-          bottom: 20,
-          left: 16,
-          maxWidth: 'min(350px, calc(100% - 32px))',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 'min(350px, calc(100% - 32px))',
           minWidth: '280px',
           borderRadius: 12,
           background: 'rgba(0, 0, 0, 0.35)',
