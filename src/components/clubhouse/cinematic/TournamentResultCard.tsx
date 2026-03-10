@@ -98,7 +98,7 @@ function SmallAvatar({ src, name, size }: { src: string | null; name: string; si
 
   return (
     <div style={{
-      width: size, height: size, borderRadius: '50%', overflow: 'hidden', flexShrink: 0,
+      width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
       border: '1.5px solid rgba(255,255,255,0.2)',
       background: 'rgba(255,255,255,0.08)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
