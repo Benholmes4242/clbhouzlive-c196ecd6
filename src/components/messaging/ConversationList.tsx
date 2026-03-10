@@ -313,7 +313,7 @@ export function ConversationList({
                   )}
                   <span className={cn(
                     "text-[14px] truncate text-foreground",
-                    hasUnread ? "font-bold" : "font-semibold"
+                    hasUnread ? "font-semibold" : "font-semibold"
                   )}>
                     {name}
                   </span>
