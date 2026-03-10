@@ -92,16 +92,6 @@ export function useCreateInvite(businessId: string) {
 
       if (error) throw error;
 
-      // Create notification for invitee (if they have an account)
-      const { data: inviteeProfile } = await supabase
-        .from('user_profiles')
-        .select('id')
-        .eq('id', (await supabase.auth.getUser()).data.user?.id)
-        .single();
-
-      // Look up user by email via auth
-      // Note: We can't query auth.users directly, so notification will be handled by accept flow
-
       return data;
     },
     onSuccess: () => {
