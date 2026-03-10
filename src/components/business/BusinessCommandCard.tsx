@@ -49,7 +49,7 @@ function getCategoryDisplay(category: string | null | undefined): string {
 export function BusinessCommandCard({ membership, userId, index = 0, isActive = false }: BusinessCommandCardProps) {
   const navigate = useNavigate();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // CRITICAL: Close modals on unmount to prevent stuck overlay
