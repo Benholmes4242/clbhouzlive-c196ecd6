@@ -116,9 +116,9 @@ export function EditAccessSheet({
                 onClick={onSave}
                 disabled={saving || !hasChanges}
                 className={cn(
-                  "w-full",
+                  "w-full min-h-[50px] rounded-2xl text-[15px] font-semibold active:opacity-80 transition-opacity",
                   hasChanges
-                    ? "bg-[hsl(var(--primary))] text-primary-foreground active:scale-[0.97]"
+                    ? "bg-primary text-primary-foreground"
                     : "opacity-40 bg-muted text-muted-foreground cursor-not-allowed"
                 )}
               >

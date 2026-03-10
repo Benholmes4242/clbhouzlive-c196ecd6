@@ -203,7 +203,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
         queryClient.invalidateQueries({ queryKey: ['unread-notifications-count'] }),
       ]);
     } catch (e: any) {
-      console.error('Decline error:', e);
+      AppLog.error('AccessRequestsSection', 'Decline error:', e);
       toast.error(e?.message ?? 'Failed to decline request');
     } finally {
       setLoadingId(null);
