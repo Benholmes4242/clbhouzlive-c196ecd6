@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Clock, XCircle, ArrowRight, Loader2 } from 'lucide-react';
+import { ChevronLeft, Clock, XCircle, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { supabase } from '@/integrations/supabase/client';
@@ -56,10 +56,6 @@ const BusinessVerificationStatusPage = () => {
 
   const isLoading = isLoadingBusiness || isLoadingRequest;
 
-  const handleBack = () => {
-    navigate(-1);
-  };
-
   const handleViewProfile = () => {
     if (business?.slug) {
       navigate(`/business/${business.slug}`);
@@ -78,8 +74,11 @@ const BusinessVerificationStatusPage = () => {
 
   if (isLoading) {
     return (
-      <PageRoot className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      <PageRoot className="min-h-screen bg-background">
+        <div className="space-y-4 px-4 pt-4">
+          <div className="h-40 bg-muted animate-pulse rounded-2xl" />
+          <div className="h-24 bg-muted animate-pulse rounded-2xl" />
+        </div>
       </PageRoot>
     );
   }
@@ -93,16 +92,22 @@ const BusinessVerificationStatusPage = () => {
   return (
     <PageRoot className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border/40">
-        <div className="flex items-center gap-3 px-4 py-3">
+      <header
+        className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border/40"
+        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+      >
+        <div className="flex items-center px-4 h-14">
           <button
-            onClick={handleBack}
-            className="h-9 w-9 flex items-center justify-center rounded-sq-sm hover:bg-muted/50 transition-colors"
+            onClick={() => navigate(-1)}
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-muted-foreground active:text-foreground transition-colors"
             aria-label="Go back"
           >
-            <ArrowLeft className="h-5 w-5 text-foreground" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-semibold text-foreground">Verification status</h1>
+          <div className="flex-1 text-center">
+            <h1 className="text-[16px] font-semibold text-foreground">Verification Status</h1>
+          </div>
+          <div className="w-11" />
         </div>
       </header>
 
@@ -114,8 +119,8 @@ const BusinessVerificationStatusPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <div className="h-16 w-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
-              <Clock className="h-8 w-8 text-amber-600" />
+            <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+              <Clock className="h-8 w-8 text-primary" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">
               Verification pending
@@ -138,7 +143,7 @@ const BusinessVerificationStatusPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <div className="h-16 w-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
+            <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <VerifiedBadge size="xl" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">
@@ -149,7 +154,7 @@ const BusinessVerificationStatusPage = () => {
             </p>
             {(reviewedAt || business?.verified_at) && (
               <p className="text-xs text-muted-foreground/70 mb-8">
-                Verified on {format(new Date(reviewedAt || business?.verified_at!), 'MMM d, yyyy')}
+                Verified on {format(new Date(reviewedAt ?? business?.verified_at ?? ''), 'MMM d, yyyy')}
               </p>
             )}
             <Button
@@ -170,8 +175,8 @@ const BusinessVerificationStatusPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-              <XCircle className="h-8 w-8 text-slate-500" />
+            <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+              <XCircle className="h-8 w-8 text-muted-foreground" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">
               Verification not approved
@@ -219,7 +224,7 @@ const BusinessVerificationStatusPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4 opacity-50">
+            <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4 opacity-50">
               <VerifiedBadge size="xl" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">

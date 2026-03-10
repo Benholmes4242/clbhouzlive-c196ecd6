@@ -24,9 +24,9 @@ const BusinessVerificationSubmittedPage = () => {
           transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.1 }}
           className="mb-8"
         >
-          <div className="h-20 w-20 rounded-full bg-slate-100 flex items-center justify-center">
-            <div className="h-14 w-14 rounded-full bg-slate-600 flex items-center justify-center">
-              <Check className="h-8 w-8 text-white" strokeWidth={3} />
+          <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">
+            <div className="h-14 w-14 rounded-full bg-primary flex items-center justify-center">
+              <Check className="h-8 w-8 text-primary-foreground" strokeWidth={3} />
             </div>
           </div>
         </motion.div>

@@ -24,8 +24,7 @@ export function useBusinessVerificationRealtime(businessId: string | undefined) 
           table: 'business_accounts',
           filter: `id=eq.${businessId}`,
         },
-        (payload) => {
-          console.log('[Realtime] business_accounts updated:', payload);
+        () => {
           queryClient.invalidateQueries({ queryKey: ['business-account-verification-status', businessId] });
           queryClient.invalidateQueries({ queryKey: ['business-account', businessId] });
         }
@@ -38,8 +37,7 @@ export function useBusinessVerificationRealtime(businessId: string | undefined) 
           table: 'business_verification_requests',
           filter: `business_id=eq.${businessId}`,
         },
-        (payload) => {
-          console.log('[Realtime] business_verification_requests updated:', payload);
+        () => {
           queryClient.invalidateQueries({ queryKey: ['business-verification-request-status', businessId] });
         }
       )
@@ -68,8 +66,7 @@ export function useAdminVerificationQueueRealtime() {
           schema: 'public',
           table: 'business_verification_requests',
         },
-        (payload) => {
-          console.log('[Realtime] Admin queue updated:', payload);
+        () => {
           queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
           queryClient.invalidateQueries({ queryKey: ['admin-business-verifications-count'] });
         }
@@ -81,8 +78,7 @@ export function useAdminVerificationQueueRealtime() {
           schema: 'public',
           table: 'business_verification_reviews',
         },
-        (payload) => {
-          console.log('[Realtime] New verification review:', payload);
+        () => {
           queryClient.invalidateQueries({ queryKey: ['admin-business-verification-requests'] });
           queryClient.invalidateQueries({ queryKey: ['admin-verification-my-reviews'] });
         }
@@ -115,8 +111,7 @@ export function useVerificationNotificationsRealtime(userId: string | undefined)
           table: 'notifications',
           filter: `user_id=eq.${userId}`,
         },
-        (payload) => {
-          console.log('[Realtime] New notification:', payload);
+        () => {
           queryClient.invalidateQueries({ queryKey: ['notifications'] });
           queryClient.invalidateQueries({ queryKey: ['unread-notifications-count'] });
         }

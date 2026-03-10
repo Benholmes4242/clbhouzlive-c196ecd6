@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ChevronLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -33,15 +33,16 @@ const BusinessVerificationRequestPage = () => {
         .single();
 
       if (error) throw error;
-      
-      // Pre-fill website if available
-      if (data?.website) {
-        setWebsite(data.website);
-      }
-      
       return data;
     },
   });
+
+  // Pre-fill website when business data loads
+  useEffect(() => {
+    if (business?.website) {
+      setWebsite(business.website);
+    }
+  }, [business?.website]);
 
   // Check for existing pending request
   const { data: existingRequest, isLoading: isLoadingRequest } = useQuery({
@@ -62,6 +63,16 @@ const BusinessVerificationRequestPage = () => {
   });
 
   const isLoading = isLoadingBusiness || isLoadingRequest;
+
+  // Redirect if already pending or verified
+  useEffect(() => {
+    if (!isLoading && existingRequest?.status === 'pending') {
+      navigate(`/business/${id}/verification/status`, { replace: true });
+    }
+    if (!isLoading && business?.is_verified) {
+      navigate(`/business/${id}/verification/status`, { replace: true });
+    }
+  }, [isLoading, existingRequest, business, id, navigate]);
 
   const submitMutation = useMutation({
     mutationFn: async () => {
@@ -95,14 +106,10 @@ const BusinessVerificationRequestPage = () => {
       queryClient.invalidateQueries({ queryKey: ['business-verification-request'] });
       navigate(`/business/${id}/verification/submitted`);
     },
-    onError: (error: any) => {
-      toast.error(error.message || 'Failed to submit verification request');
+    onError: (error: unknown) => {
+      toast.error((error as Error).message || 'Failed to submit verification request');
     },
   });
-
-  const handleBack = () => {
-    navigate(-1);
-  };
 
   const handleSubmit = () => {
     submitMutation.mutate();
@@ -110,36 +117,35 @@ const BusinessVerificationRequestPage = () => {
 
   if (isLoading) {
     return (
-      <PageRoot className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      <PageRoot className="min-h-screen bg-background">
+        <div className="space-y-4 px-4 pt-4">
+          <div className="h-12 bg-muted animate-pulse rounded-xl" />
+          <div className="h-24 bg-muted animate-pulse rounded-xl" />
+          <div className="h-12 bg-muted animate-pulse rounded-xl" />
+        </div>
       </PageRoot>
     );
-  }
-
-  // If already pending or verified, redirect
-  if (existingRequest?.status === 'pending') {
-    navigate(`/business/${id}/verification/status`, { replace: true });
-    return null;
-  }
-
-  if (business?.is_verified) {
-    navigate(`/business/${id}/verification/status`, { replace: true });
-    return null;
   }
 
   return (
     <PageRoot className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border/40">
-        <div className="flex items-center gap-3 px-4 py-3">
+      <header
+        className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border/40"
+        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+      >
+        <div className="flex items-center px-4 h-14">
           <button
-            onClick={handleBack}
-            className="h-9 w-9 flex items-center justify-center rounded-sq-sm hover:bg-muted/50 transition-colors"
+            onClick={() => navigate(-1)}
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-muted-foreground active:text-foreground transition-colors"
             aria-label="Go back"
           >
-            <ArrowLeft className="h-5 w-5 text-foreground" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-semibold text-foreground">Request verification</h1>
+          <div className="flex-1 text-center">
+            <h1 className="text-[16px] font-semibold text-foreground">Request Verification</h1>
+          </div>
+          <div className="w-11" />
         </div>
       </header>
 
@@ -200,11 +206,14 @@ const BusinessVerificationRequestPage = () => {
       </main>
 
       {/* Footer CTAs */}
-      <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-border/40 bg-background/95 backdrop-blur">
+      <footer
+        className="fixed inset-x-0 bottom-0 z-20 border-t border-border/40 bg-background/95 backdrop-blur-xl"
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }}
+      >
         <div className="mx-auto flex w-full max-w-lg items-center justify-between gap-3 px-4 py-3">
           <button
             type="button"
-            onClick={handleBack}
+            onClick={() => navigate(-1)}
             disabled={submitMutation.isPending}
             className="flex-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2.5"
           >
