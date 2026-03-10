@@ -141,7 +141,11 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
    const [deletingMessage, setDeletingMessage] = useState<MessageWithSender | null>(null);
    const [forwardingMessage, setForwardingMessage] = useState<MessageWithSender | null>(null);
    const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null);
+   // TODO: messageRefs is declared but never populated — MessageBubble components
+   // need to register themselves via a callback ref for navigate-to-message to work.
+   // handleNavigateToMessage will silently fail to scroll until this is implemented.
    const messageRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+   const highlightTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   // Find current conversation from context
   const contextConversation = useMemo(() => 
