@@ -51,7 +51,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
     mountedRef.current = true;
 
     if (!MAP_CONFIG.TOKEN) {
-      console.warn('[MapPreview] VITE_MAPBOX_ACCESS_TOKEN not configured');
+      AppLog.warn('[MapPreview]', 'VITE_MAPBOX_ACCESS_TOKEN not configured');
       return;
     }
     if (!hasValidCoords) return;
