@@ -1,6 +1,8 @@
+/** @deprecated This hook is no longer used. Do not add new consumers. */
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { AppLog } from '@/lib/logger';
 import type { Message as NewMessage } from '@/types/messaging';
 
 // Legacy Message interface for backward compatibility
