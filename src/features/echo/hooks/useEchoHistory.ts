@@ -61,7 +61,7 @@ export function useEchoConversations(search?: string) {
         throw error;
       }
 
-      console.log('[useEchoConversations] Fetched conversations:', data?.length ?? 0);
+      
 
       // Get message counts using server-side RPC aggregate
       const conversationIds = (data ?? []).map(c => c.id);

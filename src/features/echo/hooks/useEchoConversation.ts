@@ -187,7 +187,7 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
       return;
     }
 
-    console.log('[sendMessage] Starting message send:', content.substring(0, 50));
+    
 
     const userMessage: EchoMessage = {
       id: nanoid(),
