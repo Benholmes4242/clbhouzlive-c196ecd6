@@ -64,7 +64,11 @@ export default function BusinessTeamPage() {
   };
 
   const handleRoleChange = async (member: BusinessMember, newRole: string) => {
-    await updateRole.mutateAsync({ memberUserId: member.user_profile_id, newRole });
+    try {
+      await updateRole.mutateAsync({ memberUserId: member.user_profile_id, newRole });
+    } catch {
+      toast.error('Failed to update role');
+    }
   };
 
   if (!businessId) return null;
