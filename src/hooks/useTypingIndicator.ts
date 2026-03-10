@@ -36,7 +36,7 @@ export function useTypingIndicator(conversationId: string | null) {
         p_conversation_id: conversationId 
       });
     } catch (error) {
-      console.error('Error setting typing indicator:', error);
+      AppLog.error('[useTypingIndicator]', 'Error setting typing indicator:', error);
     }
 
     // Auto-clear after timeout
