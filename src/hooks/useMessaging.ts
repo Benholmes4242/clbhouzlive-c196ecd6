@@ -253,7 +253,7 @@ export function useMessaging(): UseMessagingReturn {
       
       return data as string;
     } catch (err) {
-      console.error('[useMessaging] Error creating group chat:', err);
+      AppLog.error('[useMessaging]', 'Error creating group chat:', err);
       setError(err instanceof Error ? err : new Error('Failed to create group chat'));
       return null;
     }
