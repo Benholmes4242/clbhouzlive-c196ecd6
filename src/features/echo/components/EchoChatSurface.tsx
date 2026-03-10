@@ -245,7 +245,7 @@ export const EchoChatSurface = forwardRef<EchoChatSurfaceRef, EchoChatSurfacePro
               }}
               aria-label="Send"
             >
-              <Send className="w-4 h-4 text-white" />
+              <Send className="w-4 h-4 text-primary-foreground" />
             </button>
           )}
         </div>
