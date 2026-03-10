@@ -228,7 +228,7 @@ export const EchoChatSurface = forwardRef<EchoChatSurfaceRef, EchoChatSurfacePro
               style={{ background: 'hsl(var(--destructive))' }}
               aria-label="Stop"
             >
-              <StopCircle className="w-5 h-5 text-white" />
+              <StopCircle className="w-5 h-5 text-primary-foreground" />
             </button>
           ) : (
             <button
