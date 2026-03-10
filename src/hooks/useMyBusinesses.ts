@@ -15,6 +15,7 @@ export interface BusinessMembership {
     country: string | null;
     logo_url: string | null;
     is_verified: boolean;
+    is_deleted: boolean | null;
   };
 }
 
