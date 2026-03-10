@@ -233,9 +233,8 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
           }}>
             <div style={{
               width: 20, height: 20, borderRadius: '50%', background: '#F97316',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 11, fontWeight: 800, color: '#fff', lineHeight: 1,
-            }}>C</div>
+              flexShrink: 0,
+            }} />
             <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 0.8 }}>
               {meta.tour_name || getTourLabel(meta.tour_slug)}
             </span>
