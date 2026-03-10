@@ -558,7 +558,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
               <button
                 onClick={handleLoadMore}
                 disabled={loadingMore}
-                className="px-4 py-2 bg-white rounded-full text-[13px] font-medium text-[#8E8E93] shadow-[0_1px_2px_rgba(0,0,0,0.06)] active:bg-[#F5F5F5] transition-colors disabled:opacity-50"
+                className="px-4 py-2 bg-muted rounded-full text-[13px] font-medium text-muted-foreground active:bg-muted/70 transition-colors disabled:opacity-50"
               >
                 {loadingMore ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
