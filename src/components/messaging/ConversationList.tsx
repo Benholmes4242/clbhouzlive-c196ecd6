@@ -280,7 +280,7 @@ export function ConversationList({
               onSelectConversation(conversation.id);
             }}
             className={cn(
-              "w-full px-4 py-3.5 flex items-center gap-3 text-left transition-colors",
+              "w-full px-4 py-3.5 flex items-center gap-3 text-left transition-colors duration-150",
               "active:bg-primary/10",
               isSelected && "bg-primary/5",
               isArchived && "opacity-70"
