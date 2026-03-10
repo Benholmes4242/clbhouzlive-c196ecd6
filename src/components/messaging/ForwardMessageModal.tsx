@@ -18,7 +18,7 @@ import { toast } from 'sonner';
 import { haptic } from '@/utils/haptics';
 import { AppLog } from '@/lib/logger';
 import { cn } from '@/lib/utils';
-import type { ConversationWithDetails } from '@/types/messaging';
+import type { ConversationWithDetails, MessageType } from '@/types/messaging';
 
 interface ForwardMessageModalProps {
   open: boolean;
