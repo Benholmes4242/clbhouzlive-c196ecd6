@@ -259,8 +259,8 @@ export function useTeamManagement(
       toast.success('Changes saved');
       setEditingMember(null);
       invalidateTeam();
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to update');
+    } catch (e: unknown) {
+      toast.error((e as Error).message || 'Failed to update');
     } finally {
       setSaving(false);
     }
