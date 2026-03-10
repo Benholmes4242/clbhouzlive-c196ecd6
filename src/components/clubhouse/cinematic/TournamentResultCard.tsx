@@ -140,9 +140,6 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
   const hasImage = !!meta.course_image_url;
   const hasVenue = !!(meta.venue_name || meta.venue_city);
-  const hasScoreStats = meta.stat_birdies > 0 || meta.stat_pars > 0 || meta.stat_bogeys > 0;
-  const hasPerfStats = !!(meta.stat_driving_distance || meta.stat_fairways_pct || meta.stat_gir_pct || meta.stat_putts);
-  const showStats = hasScoreStats || hasPerfStats;
   const hasPodium = meta.podium_rows && meta.podium_rows.length > 0;
 
   // Heart pop state
@@ -169,15 +166,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
     return () => cancelAnimationFrame(raf);
   }, [isActive]);
 
-  // Performance stat items
-  const perfItems = useMemo(() => {
-    const items: { value: string; label: string; suffix: string }[] = [];
-    if (meta.stat_driving_distance) items.push({ value: String(meta.stat_driving_distance), label: 'Driver', suffix: 'yds' });
-    if (meta.stat_fairways_pct) items.push({ value: String(Math.round(meta.stat_fairways_pct)), label: 'Fairways', suffix: '%' });
-    if (meta.stat_gir_pct) items.push({ value: String(Math.round(meta.stat_gir_pct)), label: 'GIR', suffix: '%' });
-    if (meta.stat_putts) items.push({ value: meta.stat_putts.toFixed(2), label: 'Putts', suffix: '' });
-    return items;
-  }, [meta]);
+  // No longer needed — grid always renders all 8 chips
 
   const handleViewResults = useCallback(() => {
     if (onViewResults) onViewResults();
@@ -349,37 +338,30 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             </div>
           </div>
 
-          {/* ── Stats horizontal scroll ── */}
-          {showStats && (
-            <div style={{ padding: '12px 16px 0' }}>
-              <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 8 }}>
-                Tournament Stats
-              </div>
-              <div style={{
-                display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 12,
-                scrollbarWidth: 'none', msOverflowStyle: 'none',
-              }} className="[&::-webkit-scrollbar]:hidden">
-                {/* Score stat chips */}
-                {meta.stat_eagles > 0 && (
-                  <StatGlowChip value={meta.stat_eagles} label={meta.stat_eagles === 1 ? 'Eagle' : 'Eagles'} {...STAT_COLORS.eagles} />
-                )}
-                {meta.stat_birdies > 0 && (
-                  <StatGlowChip value={meta.stat_birdies} label="Birdies" {...STAT_COLORS.birdies} />
-                )}
-                {meta.stat_pars > 0 && (
-                  <StatGlowChip value={meta.stat_pars} label="Pars" {...STAT_COLORS.pars} />
-                )}
-                {meta.stat_bogeys > 0 && (
-                  <StatGlowChip value={meta.stat_bogeys} label="Bogeys" {...STAT_COLORS.bogeys} />
-                )}
-
-                {/* Performance stat chips */}
-                {perfItems.map(item => (
-                  <PerfChip key={item.label} value={item.value} label={item.label} suffix={item.suffix} />
-                ))}
-              </div>
+          {/* ── Stats 2×4 grid ── */}
+          <div style={{ padding: '12px 16px 0' }}>
+            <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 8 }}>
+              Tournament Stats
             </div>
-          )}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: 8,
+              paddingBottom: 12,
+            }}>
+              {/* Row 1 — tournament stats (always show, dim if 0) */}
+              <StatGlowChip value={meta.stat_eagles} label={meta.stat_eagles === 1 ? 'Eagle' : 'Eagles'} {...STAT_COLORS.eagles} dimmed={meta.stat_eagles === 0} />
+              <StatGlowChip value={meta.stat_birdies} label="Birdies" {...STAT_COLORS.birdies} dimmed={meta.stat_birdies === 0} />
+              <StatGlowChip value={meta.stat_pars} label="Pars" {...STAT_COLORS.pars} dimmed={meta.stat_pars === 0} />
+              <StatGlowChip value={meta.stat_bogeys} label="Bogeys" {...STAT_COLORS.bogeys} dimmed={meta.stat_bogeys === 0} />
+
+              {/* Row 2 — performance stats (placeholder if null) */}
+              <PerfChip value={meta.stat_driving_distance != null ? String(meta.stat_driving_distance) : null} label="DRIVER" suffix="yds" />
+              <PerfChip value={meta.stat_fairways_pct != null ? String(Math.round(meta.stat_fairways_pct)) : null} label="FAIRWAYS" suffix="%" />
+              <PerfChip value={meta.stat_gir_pct != null ? String(Math.round(meta.stat_gir_pct)) : null} label="GIR" suffix="%" />
+              <PerfChip value={meta.stat_putts != null ? meta.stat_putts.toFixed(2) : null} label="PUTTS" suffix="" />
+            </div>
+          </div>
 
           {/* ── Leaderboard rows ── */}
           {hasPodium && (
@@ -448,35 +430,43 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 };
 
 // ─── Score stat chip with glow ───
-function StatGlowChip({ value, label, color, bg, border, glow }: {
-  value: number; label: string; color: string; bg: string; border: string; glow: string;
+function StatGlowChip({ value, label, color, bg, border, glow, dimmed }: {
+  value: number; label: string; color: string; bg: string; border: string; glow: string; dimmed?: boolean;
 }) {
+  const opacity = dimmed ? 0.4 : 1;
   return (
     <div style={{
-      minWidth: 64, borderRadius: 12, padding: '10px 14px',
+      borderRadius: 12, padding: '10px 0',
       background: bg, border: `1px solid ${border}`,
-      boxShadow: `0 0 12px ${glow}`,
-      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flexShrink: 0,
+      boxShadow: dimmed ? 'none' : `0 0 12px ${glow}`,
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+      opacity,
     }}>
-      <span style={{ fontSize: 22, fontWeight: 800, color, lineHeight: 1 }}>{value}</span>
-      <span style={{ fontSize: 8.5, fontWeight: 700, color: 'rgba(255,255,255,0.45)', letterSpacing: 0.8, textTransform: 'uppercase' }}>{label}</span>
+      <span style={{ fontSize: 20, fontWeight: 800, color, lineHeight: 1 }}>{value}</span>
+      <span style={{ fontSize: 7.5, fontWeight: 700, color: 'rgba(255,255,255,0.45)', letterSpacing: 0.8, textTransform: 'uppercase' }}>{label}</span>
     </div>
   );
 }
 
 // ─── Performance stat chip (neutral) ───
-function PerfChip({ value, label, suffix }: { value: string; label: string; suffix: string }) {
+function PerfChip({ value, label, suffix }: { value: string | null; label: string; suffix: string }) {
+  const isNull = value === null;
   return (
     <div style={{
-      minWidth: 64, borderRadius: 12, padding: '10px 14px',
+      borderRadius: 12, padding: '10px 0',
       background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)',
-      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flexShrink: 0,
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+      opacity: isNull ? 0.4 : 1,
     }}>
-      <span style={{ fontSize: 18, fontWeight: 800, color: 'rgba(255,255,255,0.9)', lineHeight: 1 }}>
-        {value}
-        {suffix && <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>{suffix}</span>}
+      <span style={{ fontSize: 16, fontWeight: 800, color: 'rgba(255,255,255,0.9)', lineHeight: 1 }}>
+        {isNull ? '—' : (
+          <>
+            {value}
+            {suffix && <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>{suffix}</span>}
+          </>
+        )}
       </span>
-      <span style={{ fontSize: 8.5, fontWeight: 700, color: 'rgba(255,255,255,0.45)', letterSpacing: 0.8, textTransform: 'uppercase' }}>{label}</span>
+      <span style={{ fontSize: 7.5, fontWeight: 700, color: 'rgba(255,255,255,0.45)', letterSpacing: 0.8, textTransform: 'uppercase' }}>{label}</span>
     </div>
   );
 }

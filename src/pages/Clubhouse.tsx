@@ -25,6 +25,7 @@ import { ClubhouseTabProvider, useClubhouseTab } from '@/contexts/ClubhouseTabCo
 import { clubhouseDebug } from '@/debug/clubhouseDebug';
 import MobileVideoDebugPanel from '@/components/debug/MobileVideoDebugPanel';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
 // ── New Media System imports ──
 import { VideoPoolProvider } from '@/components/media-system/VideoPoolProvider';
@@ -172,6 +173,14 @@ const ClubhouseContent = () => {
   // ── Active post derivation ──
   const activePostId = posts[activeIndex]?.id;
   const { activePost, golfCourse, activeReview, isActiveReview, isActiveVideo } = useActivePostDerived(posts, activeIndex);
+  const isTournamentCardActive = activePost?.postType === 'tournament_result';
+
+  // Hide bottom nav when tournament card is active
+  const { setVisible: setBottomNavVisible } = useBottomNavigation();
+  useEffect(() => {
+    setBottomNavVisible(!isTournamentCardActive);
+    return () => setBottomNavVisible(true);
+  }, [isTournamentCardActive, setBottomNavVisible]);
   
   // ── Optimistic like state ──
   const { handleLike, getActiveLikeState, resetLikes } = useClubhouseLikes({ userId: user?.id, activeActor });
@@ -295,12 +304,18 @@ const ClubhouseContent = () => {
       />
 
       {/* Floating top bar: Tab Toggle + Search + Profile Pill — z-40 */}
-      <ClubhouseTopBar
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        isBusinessActor={isBusinessActor}
-        user={user}
-      />
+      <div style={{
+        opacity: isTournamentCardActive ? 0 : 1,
+        pointerEvents: isTournamentCardActive ? 'none' : 'auto',
+        transition: 'opacity 0.3s ease',
+      }}>
+        <ClubhouseTopBar
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          isBusinessActor={isBusinessActor}
+          user={user}
+        />
+      </div>
 
       {/* Offline indicator */}
       {!isOnline && (
