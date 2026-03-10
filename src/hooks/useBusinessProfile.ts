@@ -64,7 +64,7 @@ export function useBusinessProfile(idOrSlug: string | undefined) {
         .maybeSingle();
 
       if (error) {
-        console.error('[useBusinessProfile] error', error);
+        AppLog.error('[useBusinessProfile]', 'query error', error);
         throw error;
       }
 
