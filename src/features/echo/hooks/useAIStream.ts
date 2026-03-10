@@ -6,7 +6,7 @@
 import { useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-const EDGE_BASE = "https://ybxkehyomcakqjvuhnna.supabase.co/functions/v1";
+const EDGE_BASE = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`;
 
 interface StreamOptions {
   onChunk: (content: string) => void;
