@@ -24,8 +24,13 @@ export default function BusinessInvitePage() {
     e.preventDefault();
     if (!email.trim()) return;
 
-    await createInvite.mutateAsync({ email, role });
-    navigate(-1);
+    try {
+      await createInvite.mutateAsync({ email, role });
+      toast.success('Invite sent');
+      navigate(-1);
+    } catch {
+      toast.error('Failed to send invite');
+    }
   };
 
   if (!businessId) return null;

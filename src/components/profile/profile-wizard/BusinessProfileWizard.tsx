@@ -255,11 +255,13 @@ export function BusinessProfileWizard() {
 
       if (businessError) throw businessError;
 
-      await supabase.from('business_members').insert({
+      const { error: memberError } = await supabase.from('business_members').insert({
         business_id: businessData.id,
         user_profile_id: user.id,
         role: 'owner',
       });
+
+      if (memberError) throw memberError;
 
       await queryClient.invalidateQueries({ queryKey: ['my-businesses'] });
       setCreatedBusinessId(businessData.id);

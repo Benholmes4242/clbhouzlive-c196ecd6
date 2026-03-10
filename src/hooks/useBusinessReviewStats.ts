@@ -58,12 +58,14 @@ export function useBusinessReviewStats(businessId: string | undefined) {
       const courseIds = courses.map(c => c.id);
 
       // Get all ratings for these courses
-      const { data: ratings } = await supabase
+      const { data: ratings, error: ratingsError } = await supabase
         .from('course_ratings')
         .select('course_id, rating, design_score, condition_score, facilities_score, clubhouse_score, created_at')
         .in('course_id', courseIds)
-        .eq('is_mock', false);
+        .eq('is_mock', false)
+        .limit(5000);
 
+      if (ratingsError) throw ratingsError;
       if (!ratings?.length) return null;
 
       const totalReviews = ratings.length;

@@ -233,9 +233,6 @@ export default function BusinessTeamPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuItem className="text-sm">
-                          Resend invite
-                        </DropdownMenuItem>
                         <DropdownMenuItem 
                           className="text-destructive text-sm"
                           onClick={() => revokeInvite.mutate(invite.id)}

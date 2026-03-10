@@ -34,10 +34,13 @@ const MyBusinessesPage = () => {
   }, [businesses, activeActor]);
 
   // Redirect to auth if not logged in
-  if (!authLoading && !user) {
-    navigate('/auth');
-    return null;
-  }
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/auth');
+    }
+  }, [authLoading, user, navigate]);
+
+  if (!authLoading && !user) return null;
 
   const handleCreateBusiness = () => {
     setShowCreateModal(true);

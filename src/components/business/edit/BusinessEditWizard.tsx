@@ -300,8 +300,8 @@ export default function BusinessEditWizard() {
 
       const { error: updateError } = await supabase
         .from('business_accounts')
-        .update(updatePayload as any)
-        .eq('id', id);
+        .update(updatePayload as Record<string, unknown>)
+        .eq('id', id!);
 
       if (updateError) throw updateError;
 

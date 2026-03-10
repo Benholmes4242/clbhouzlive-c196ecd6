@@ -203,7 +203,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
       ]);
     } catch (e: unknown) {
       AppLog.error('AccessRequestsSection', 'Decline error:', e);
-      toast.error(e?.message ?? 'Failed to decline request');
+      toast.error((e as Error)?.message ?? 'Failed to decline request');
     } finally {
       setLoadingId(null);
     }
