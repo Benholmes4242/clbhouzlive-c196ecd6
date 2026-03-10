@@ -181,12 +181,13 @@ export const UserListPage: React.FC<UserListPageProps> = ({
   return (
     <PageRoot className="min-h-screen bg-background">
       <div className="w-full">
-        {/* Standard sub-page header */}
+        {/* Sticky header + search */}
         <div
-          className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border/50"
+          className="sticky top-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border"
           style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
         >
-          <div className="flex items-center justify-between px-4 pb-3 pt-2">
+          {/* Header row */}
+          <div className="flex items-center justify-between px-4 pb-2 pt-2">
             <button
               onClick={handleBack}
               className="flex items-center justify-center min-h-[44px] min-w-[44px] -ml-2 text-muted-foreground"
@@ -208,11 +209,9 @@ export const UserListPage: React.FC<UserListPageProps> = ({
             </div>
             <div className="w-11" />
           </div>
-        </div>
 
-        {/* Sticky search bar + tabs */}
-        <div className="sticky z-40 bg-background border-b border-border" style={{ top: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
-          <div className="px-4 py-3 space-y-3">
+          {/* Search + tabs */}
+          <div className="px-4 pb-3 space-y-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
