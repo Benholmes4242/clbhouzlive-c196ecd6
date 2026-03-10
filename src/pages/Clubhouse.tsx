@@ -308,7 +308,7 @@ const ClubhouseContent = () => {
       <div style={{
         opacity: isTournamentCardActive ? 0 : 1,
         pointerEvents: isTournamentCardActive ? 'none' : 'auto',
-        transition: 'opacity 0.3s ease',
+        transition: 'opacity 0.18s ease',
       }}>
         <ClubhouseTopBar
           activeTab={activeTab}
