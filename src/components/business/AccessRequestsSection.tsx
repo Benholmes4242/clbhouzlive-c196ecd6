@@ -153,7 +153,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
       ]);
     } catch (e: unknown) {
       AppLog.error('AccessRequestsSection', 'Approve error:', e);
-      toast.error(e?.message ?? 'Failed to approve request');
+      toast.error((e as Error)?.message ?? 'Failed to approve request');
     } finally {
       setLoadingId(null);
     }
