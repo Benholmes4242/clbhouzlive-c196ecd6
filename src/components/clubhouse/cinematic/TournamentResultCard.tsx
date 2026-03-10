@@ -250,7 +250,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
         {/* ── TOURNAMENT NAME (overlaid on image) ── */}
         <div style={{
-          position: 'relative', zIndex: 10, padding: '0 20px',
+          position: 'relative', zIndex: 10, padding: '0 20px 12px',
           animation: 'trcard-fadeUp 0.5s ease-out both',
           animationDelay: '100ms',
         }}>
