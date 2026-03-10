@@ -88,7 +88,8 @@
    const handleToggleMute = async () => {
      haptic('light');
      try {
-      const { error } = await supabase.rpc('toggle_conversation_mute' as any, {
+      // TODO: toggle_conversation_mute RPC needs to be added to Supabase generated types
+      const { error } = await (supabase.rpc as Function)('toggle_conversation_mute', {
          p_conversation_id: conversation.id,
          p_mute: !isMuted,
        });
