@@ -70,14 +70,14 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
             <div className="mt-2 flex items-center gap-1 justify-center md:justify-start">
               <span className={cn(
                 "text-xs font-medium",
-                reviewStats.reviewTrend >= 0 ? "text-emerald-600" : "text-red-500"
+                reviewStats.reviewTrend >= 0 ? "text-primary" : "text-destructive"
               )}>
                 {reviewStats.recentReviews} new this month
               </span>
               {reviewStats.reviewTrend !== 0 && (
                 <span className={cn(
                   "text-xs",
-                  reviewStats.reviewTrend > 0 ? "text-emerald-600" : "text-red-500"
+                  reviewStats.reviewTrend > 0 ? "text-primary" : "text-destructive"
                 )}>
                   ({reviewStats.reviewTrend > 0 ? '+' : ''}{reviewStats.reviewTrend}%)
                 </span>
