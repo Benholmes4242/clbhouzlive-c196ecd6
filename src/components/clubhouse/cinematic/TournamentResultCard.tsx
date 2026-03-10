@@ -8,6 +8,7 @@ import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import type { TournamentResultFeedPost, TournamentResultMeta, PodiumRow as PodiumRowType } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { CinematicActionRail } from './CinematicActionRail';
 
 // ─── Gradient fallback map ───
 const TOUR_GRADIENTS: Record<string, string> = {
