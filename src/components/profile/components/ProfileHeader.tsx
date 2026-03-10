@@ -1,6 +1,5 @@
 
 import React from 'react';
-import FollowerStats from '../FollowerStats';
 
 interface ProfileHeaderProps {
   displayName: string;
