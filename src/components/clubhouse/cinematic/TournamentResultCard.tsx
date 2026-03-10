@@ -76,14 +76,6 @@ function WinnerAvatar({ src, name, size }: { src: string | null; name: string; s
       ) : (
         <span style={{ fontSize: Math.round(size * 0.32), fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>{initials}</span>
       )}
-      {/* Trophy badge */}
-      <div style={{
-        position: 'absolute', bottom: -2, right: -2, width: 20, height: 20, borderRadius: '50%',
-        background: 'linear-gradient(135deg, #F59E0B, #D97706)',
-        border: '2px solid rgba(10,12,18,0.9)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 10, lineHeight: 1,
-      }}>🏆</div>
     </div>
   );
 }
