@@ -301,9 +301,40 @@ Deno.serve(async (req) => {
       console.error('[InjectPost] Winner photo resolution failed (non-blocking):', (err as Error).message);
     }
 
-    // ── STEP 10: Course image URL (soft failure) ────────────────────────
-    // No venue_images table currently — set to null
-    const courseImageUrl: string | null = null;
+    // ── STEP 10: Course image URL — match venue against golf_courses ───
+    let courseImageUrl: string | null = null;
+    try {
+      const venueName = tournament.venue_name ?? '';
+      if (venueName) {
+        // Strategy 1: exact name match
+        const { data: exactMatch } = await supabase
+          .from('golf_courses')
+          .select('thumbnail_image')
+          .ilike('name', venueName)
+          .not('thumbnail_image', 'is', null)
+          .limit(1)
+          .maybeSingle();
+
+        if (exactMatch?.thumbnail_image) {
+          courseImageUrl = exactMatch.thumbnail_image;
+        } else {
+          // Strategy 2: partial match on first 3 significant words
+          const venueWords = venueName.split(' ').slice(0, 3).join(' ');
+          const { data: partialMatch } = await supabase
+            .from('golf_courses')
+            .select('thumbnail_image')
+            .ilike('name', `%${venueWords}%`)
+            .not('thumbnail_image', 'is', null)
+            .limit(1)
+            .maybeSingle();
+
+          courseImageUrl = partialMatch?.thumbnail_image ?? null;
+        }
+      }
+    } catch (err) {
+      console.error('[InjectPost] Course image lookup failed (non-blocking):', (err as Error).message);
+      courseImageUrl = null;
+    }
 
     // ── STEP 11: INSERT into posts table ────────────────────────────────
     const { data: newPost, error: postError } = await supabase
