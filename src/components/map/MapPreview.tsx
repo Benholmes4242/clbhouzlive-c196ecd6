@@ -4,6 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Maximize2, MapPin } from 'lucide-react';
 import { createGlassyMarkerElement } from './MapMarker';
 import { MAP_CONFIG } from '@/config/maps';
+import { AppLog } from '@/lib/logger';
 
 interface MapPreviewProps {
   lat: number;
