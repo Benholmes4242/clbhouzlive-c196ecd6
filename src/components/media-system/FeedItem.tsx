@@ -54,6 +54,8 @@ export function FeedItem({
             const meta = (post as TournamentResultFeedPost).tournamentMeta;
             navigate(`/tourhub/tournament/${meta.tournament_id}`);
           }}
+          likeOverride={getLikeState ? getLikeState(post) : undefined}
+          commentCountOverride={getCommentCount ? getCommentCount(post) : undefined}
         />
       </div>
     );
