@@ -177,7 +177,7 @@ Deno.serve(async (req) => {
     const winnerEntry = winnerEntries[0];
     // deno-lint-ignore no-explicit-any
     const winnerPlayer = winnerEntry.player as any;
-    const winnerName = `${winnerPlayer.first_name || ''} ${winnerPlayer.last_name || ''}`.trim();
+    const winnerName = winnerPlayer.full_name || `${winnerPlayer.first_name || ''} ${winnerPlayer.last_name || ''}`.trim();
     const winnerScore = winnerEntry.score ?? 0;
     const winnerScoreDisplay = formatScoreDisplay(winnerScore);
 
