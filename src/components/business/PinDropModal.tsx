@@ -105,7 +105,7 @@ export const PinDropModal: React.FC<PinDropModalProps> = ({
         setReverseGeocodeResult(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
       }
     } catch (err) {
-      console.error('Reverse geocode error:', err);
+      AppLog.error('[PinDropModal]', 'Reverse geocode error:', err);
       setReverseGeocodeResult(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
     } finally {
       setIsReverseGeocoding(false);
