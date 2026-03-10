@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { AppLog } from '@/lib/logger';
 import type { MessageWithSender, ParticipantProfile, Message } from '@/types/messaging';
 
 interface UseConversationMessagesReturn {
