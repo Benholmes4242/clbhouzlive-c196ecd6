@@ -107,7 +107,7 @@ export function useMessages() {
 
       setConversations(conversationList);
     } catch (error) {
-      console.error('Error in fetchConversations:', error);
+      AppLog.error('[useMessages DEPRECATED]', 'Error in fetchConversations:', error);
     }
     
     setLoading(false);
