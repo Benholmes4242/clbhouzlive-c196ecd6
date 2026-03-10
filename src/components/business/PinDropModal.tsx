@@ -6,6 +6,7 @@ import { MapPin, Search, Loader2, X, Target } from 'lucide-react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { AddressValue } from './AddressAutocomplete';
+import { AppLog } from '@/lib/logger';
 
 // Mapbox public token
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2xiaG91eiIsImEiOiJjbTVyejIzMXcxemx2MmpzZDU3YjkxNjNkIn0.H_w9d-UAvvMRkJ_9DoVQ-A';
