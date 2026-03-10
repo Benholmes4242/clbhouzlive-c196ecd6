@@ -170,7 +170,7 @@ const BusinessVerificationStatusPage = () => {
             </p>
             {(reviewedAt || business?.verified_at) && (
               <p className="text-xs text-muted-foreground/70 mb-8">
-                Verified on {format(new Date(reviewedAt ?? business?.verified_at ?? Date.now()), 'MMM d, yyyy')}
+                Verified on {format(new Date((reviewedAt ?? business?.verified_at) as string), 'MMM d, yyyy')}
               </p>
             )}
             <Button

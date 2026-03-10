@@ -35,7 +35,7 @@ const BusinessVerificationRequestPage = () => {
         .from('business_accounts')
         .select('id, name, website, is_verified')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;

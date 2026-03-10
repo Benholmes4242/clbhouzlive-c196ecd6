@@ -38,6 +38,8 @@ export function useBusinessVerificationRequest(businessId: string | undefined) {
         throw error;
       }
 
+      // NOTE: BusinessVerificationRequest.status is cast from string — if new statuses
+      // are added to the DB, update the union type in this file to match.
       return data as BusinessVerificationRequest | null;
     },
     staleTime: 30_000, // 30 seconds
