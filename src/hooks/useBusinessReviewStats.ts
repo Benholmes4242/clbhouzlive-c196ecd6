@@ -47,11 +47,12 @@ export function useBusinessReviewStats(businessId: string | undefined) {
       if (!business?.club_id) return null;
 
       // Get all courses for this club
-      const { data: courses } = await supabase
+      const { data: courses, error: coursesError } = await supabase
         .from('golf_courses')
         .select('id, name')
         .eq('club_id', business.club_id);
 
+      if (coursesError) throw coursesError;
       if (!courses?.length) return null;
 
       const courseIds = courses.map(c => c.id);
