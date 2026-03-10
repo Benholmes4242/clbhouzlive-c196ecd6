@@ -106,8 +106,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
       toast.success('Description updated');
       setIsEditingDescription(false);
       onUpdate();
-    } catch (error: any) {
-      toast.error('Failed to update', { description: error.message });
+    } catch (e: unknown) {
+      toast.error('Failed to update', { description: (e as Error).message ?? 'An error occurred' });
     }
   };
 
