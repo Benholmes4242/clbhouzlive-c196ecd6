@@ -149,7 +149,7 @@ export function BusinessProfileWizard() {
           });
         }
       } catch (error) {
-        console.error('Error checking club:', error);
+        AppLog.error('[BusinessProfileWizard]', 'Error checking club:', error);
       }
     };
     checkClubBusiness();
