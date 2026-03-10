@@ -18,5 +18,5 @@ export function buildHistoryUrl(opts: {
   }
 
   const qs = params.toString();
-  return `/hub/echo/history${qs ? `?${qs}` : ''}`;
+  return `/echo${qs ? `?${qs}` : ''}`;
 }
