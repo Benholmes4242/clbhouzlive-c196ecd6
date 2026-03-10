@@ -15038,6 +15038,17 @@ export type Database = {
         Args: { target_user_id: string }
         Returns: Json
       }
+      get_relationship_statuses: {
+        Args: { p_current_user_id: string; p_target_user_ids: string[] }
+        Returns: {
+          friend_status: string
+          is_blocked: boolean
+          is_blocking: boolean
+          is_followed_by: boolean
+          is_following: boolean
+          target_user_id: string
+        }[]
+      }
       get_season_calendar: {
         Args: never
         Returns: {

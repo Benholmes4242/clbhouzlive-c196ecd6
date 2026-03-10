@@ -10,7 +10,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFollowUser } from '@/hooks/useFollowUser';
 import { useFriendActions } from '@/hooks/useFriendActions';
-import { useRelationshipStatus } from '@/hooks/useRelationshipStatus';
+import { useRelationshipStatuses, type RelationshipStatusRow } from '@/hooks/useRelationshipStatuses';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -34,7 +34,6 @@ interface UserListPageProps {
   title: string;
   subtitle: string;
   searchPlaceholder: string;
-  emptyText: string;
   users: SocialUser[];
   totalCount?: number;
   isLoading: boolean;
@@ -62,7 +61,6 @@ export const UserListPage: React.FC<UserListPageProps> = ({
   title,
   subtitle,
   searchPlaceholder,
-  emptyText: _emptyText, // kept for API compatibility
   users,
   totalCount,
   isLoading,
@@ -175,6 +173,10 @@ export const UserListPage: React.FC<UserListPageProps> = ({
       { id: 'following', label: `Following (${followingCount})` },
     ];
   }, [hasFollowingTab, totalCount, users.length, removedIds, followingTotalCount, followingUsers?.length]);
+
+  // Batch relationship status lookup — single RPC call for all visible users
+  const visibleUserIds = useMemo(() => filteredUsers.map(u => u.id), [filteredUsers]);
+  const { data: relationshipMap = {} } = useRelationshipStatuses(visibleUserIds);
 
   return (
     <PageRoot className="min-h-screen bg-background">
@@ -322,7 +324,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                   {isOwnProfile && (
                     <button
                       onClick={() => navigate('/golferstofollow')}
-                      className="px-5 py-2.5 bg-[#334E3D] text-white text-sm font-medium rounded-full hover:bg-[#2a4032] transition-colors active:scale-[0.97] min-h-[44px]"
+                      className="px-5 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-full hover:bg-primary/90 transition-colors active:scale-[0.97] min-h-[44px]"
                     >
                       Find golfers to follow
                     </button>
@@ -346,7 +348,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                   {isOwnProfile && (
                     <button
                       onClick={() => navigate('/golferstofollow')}
-                      className="px-5 py-2.5 bg-[#334E3D] text-white text-sm font-medium rounded-full hover:bg-[#2a4032] transition-colors active:scale-[0.97] min-h-[44px]"
+                      className="px-5 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-full hover:bg-primary/90 transition-colors active:scale-[0.97] min-h-[44px]"
                     >
                       Find golfers
                     </button>
@@ -370,7 +372,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                   {isOwnProfile && (
                     <button
                       onClick={() => navigate('/golferstofollow')}
-                      className="px-5 py-2.5 bg-[#334E3D] text-white text-sm font-medium rounded-full hover:bg-[#2a4032] transition-colors active:scale-[0.97] min-h-[44px]"
+                      className="px-5 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-full hover:bg-primary/90 transition-colors active:scale-[0.97] min-h-[44px]"
                     >
                       Find golfers to follow
                     </button>
@@ -392,6 +394,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
               displayTotal={displayTotal}
               showStatus={!isSearching}
               onUserRemoved={handleUserRemoved}
+              relationshipMap={relationshipMap}
             />
           )}
         </div>
@@ -414,6 +417,7 @@ interface InfiniteUserListProps {
   displayTotal: number;
   showStatus: boolean;
   onUserRemoved?: (userId: string) => void;
+  relationshipMap: Record<string, RelationshipStatusRow>;
 }
 
 const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
@@ -426,9 +430,11 @@ const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
   displayTotal,
   showStatus,
   onUserRemoved,
+  relationshipMap,
 }) => {
   const sentinelRef = useRef<HTMLDivElement>(null);
   const loadMoreLockRef = useRef(false);
+  const lockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Intersection observer for infinite scroll
   useEffect(() => {
@@ -444,7 +450,8 @@ const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
           loadMoreLockRef.current = true;
           onLoadMore();
           // Unlock after a short delay to prevent rapid-fire loads
-          setTimeout(() => {
+          if (lockTimerRef.current) clearTimeout(lockTimerRef.current);
+          lockTimerRef.current = setTimeout(() => {
             loadMoreLockRef.current = false;
           }, 500);
         }
@@ -453,7 +460,10 @@ const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
     );
 
     observer.observe(sentinel);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      if (lockTimerRef.current) clearTimeout(lockTimerRef.current);
+    };
   }, [hasNextPage, isFetchingNextPage, onLoadMore]);
 
   const modeDisplayName = mode === 'followers' ? 'followers' : mode === 'following' ? 'following' : 'friends';
@@ -469,6 +479,7 @@ const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
             currentUserId={currentUserId}
             mode={mode}
             onUserRemoved={onUserRemoved}
+            relationshipStatus={relationshipMap[socialUser.id]}
           />
         ))}
       </div>
@@ -497,9 +508,10 @@ interface UserRowFlatProps {
   currentUserId?: string;
   mode: ListMode;
   onUserRemoved?: (userId: string) => void;
+  relationshipStatus?: RelationshipStatusRow;
 }
 
-const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode, onUserRemoved }) => {
+const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode, onUserRemoved, relationshipStatus }) => {
   const navigate = useNavigate();
   const isSelf = currentUserId === user.id;
 
@@ -508,18 +520,14 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode, on
     currentUserId: currentUserId || '',
   });
 
-  const { data: relationship, isLoading: relationshipLoading } = useRelationshipStatus(
-    isSelf ? undefined : user.id
-  );
-
   const [optimisticFollow, setOptimisticFollow] = useState<boolean | null>(null);
   const [optimisticFriend, setOptimisticFriend] = useState<'none' | 'pending' | 'friends' | null>(null);
   const [showUnfriendDialog, setShowUnfriendDialog] = useState(false);
 
-  const isFollowing = optimisticFollow ?? relationship?.isFollowing ?? false;
+  const isFollowing = optimisticFollow ?? relationshipStatus?.is_following ?? false;
   const friendStatus: 'none' | 'pending' | 'friends' = optimisticFriend ?? (
-    relationship?.isFriend ? 'friends' :
-    relationship?.hasPendingFriendRequestToThem ? 'pending' : 'none'
+    relationshipStatus?.friend_status === 'friends' ? 'friends' :
+    relationshipStatus?.friend_status === 'pending_sent' ? 'pending' : 'none'
   );
 
   const handleRowClick = () => {
@@ -568,6 +576,8 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode, on
     }
   };
 
+  const relationshipReady = !!relationshipStatus || isSelf;
+
   return (
     <>
       <button
@@ -606,7 +616,7 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode, on
           )}
 
           {/* Action buttons */}
-          {!isSelf && currentUserId && !relationshipLoading && (
+          {!isSelf && currentUserId && relationshipReady && (
             <div className={cn("flex gap-2", !user.homeClub && "mt-2.5")} onClick={(e) => e.stopPropagation()}>
               {/* Follow/Following button */}
               <Button
@@ -652,10 +662,10 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode, on
                     className={cn(
                       "h-11 flex-1 font-medium active:scale-[0.95] transition-transform",
                       friendStatus === 'friends'
-                        ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-600"
+                        ? "border-primary/30 bg-primary/10 text-primary"
                         : friendStatus === 'pending'
                         ? "border-border bg-muted/50 text-muted-foreground"
-                        : "border-emerald-500/60 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                        : "border-primary/50 text-primary hover:bg-primary/10"
                     )}
                     disabled={friendLoading || friendStatus === 'friends' || friendStatus === 'pending'}
                     onClick={handleFriendAction}

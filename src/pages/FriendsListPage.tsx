@@ -29,7 +29,7 @@ const FriendsListPage = () => {
   } = usePaginatedFriends(profileUser?.id);
 
   const friends = data?.pages.flatMap((page) => page.users) ?? [];
-  const totalCount = data?.pages.reduce((acc, p) => acc + p.users.length, 0) ?? 0;
+  const totalCount = data?.pages[0]?.totalCount ?? data?.pages.reduce((acc, p) => acc + p.users.length, 0) ?? 0;
 
   // Track list view
   useEffect(() => {
@@ -64,7 +64,7 @@ const FriendsListPage = () => {
       title="Friends"
       subtitle={`Friends of @${profileUser.username}`}
       searchPlaceholder="Search friends by name or club"
-      emptyText={isOwnProfile ? "You haven't added any friends yet." : "No friends yet."}
+      
       users={friends}
       totalCount={totalCount}
       isLoading={friendsLoading}

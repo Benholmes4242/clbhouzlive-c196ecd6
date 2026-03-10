@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { AppLog } from '@/lib/logger';
 
 const PAGE_SIZE = 20;
 
@@ -11,10 +12,11 @@ async function fetchBlockedIds(userId: string): Promise<Set<string>> {
   const { data, error } = await supabase
     .from('user_blocks')
     .select('blocker_id, blocked_id')
-    .or(`blocker_id.eq.${userId},blocked_id.eq.${userId}`);
+    .or(`blocker_id.eq.${userId},blocked_id.eq.${userId}`)
+    .limit(1000); // guards against unbounded fetch; users with >1000 blocks are edge cases
 
   if (error) {
-    console.error('[useSocialLists] Failed to fetch blocks:', error);
+    AppLog.error('[useSocialLists]', 'Failed to fetch blocks:', error);
     return new Set();
   }
 
@@ -51,6 +53,7 @@ export type SocialUser = {
 type PageResult = {
   users: SocialUser[];
   hasMore: boolean;
+  totalCount: number;
 };
 
 function buildRange(pageParam: number) {
@@ -93,7 +96,7 @@ export function usePaginatedFollowers(userId: string | undefined) {
     enabled: !!userId,
     initialPageParam: 0,
     queryFn: async ({ pageParam }) => {
-      if (!userId) return { users: [], hasMore: false };
+      if (!userId) return { users: [], hasMore: false, totalCount: 0 };
 
       const [blockedIds, { from, to }] = await Promise.all([
         fetchBlockedIds(userId),
@@ -110,20 +113,20 @@ export function usePaginatedFollowers(userId: string | undefined) {
       if (error) throw error;
 
       const followerIds = (followRows || [])
-        .map((r: any) => r.follower_id)
-        .filter((id: string) => id && !blockedIds.has(id)) as string[];
-      if (followerIds.length === 0) return { users: [], hasMore: false };
+        .map((r: { follower_id: string }) => r.follower_id)
+        .filter((id: string) => id && !blockedIds.has(id));
+      if (followerIds.length === 0) return { users: [], hasMore: false, totalCount: count ?? 0 };
 
       const profilesById = await fetchProfilesByIds(followerIds);
       const users = followerIds
         .map((id) => profilesById.get(id))
-        .filter(Boolean)
-        .map((p) => toSocialUser(p!));
+        .filter((p): p is NonNullable<typeof p> => p != null)
+        .map(toSocialUser);
 
       const total = count ?? users.length;
       const hasMore = to + 1 < total;
 
-      return { users, hasMore };
+      return { users, hasMore, totalCount: total };
     },
     getNextPageParam: (lastPage, pages) =>
       lastPage.hasMore ? pages.length : undefined,
@@ -138,7 +141,7 @@ export function usePaginatedFollowing(userId: string | undefined) {
     enabled: !!userId,
     initialPageParam: 0,
     queryFn: async ({ pageParam }) => {
-      if (!userId) return { users: [], hasMore: false };
+      if (!userId) return { users: [], hasMore: false, totalCount: 0 };
 
       const [blockedIds, { from, to }] = await Promise.all([
         fetchBlockedIds(userId),
@@ -155,20 +158,20 @@ export function usePaginatedFollowing(userId: string | undefined) {
       if (error) throw error;
 
       const followingIds = (followRows || [])
-        .map((r: any) => r.following_id)
-        .filter((id: string) => id && !blockedIds.has(id)) as string[];
-      if (followingIds.length === 0) return { users: [], hasMore: false };
+        .map((r: { following_id: string }) => r.following_id)
+        .filter((id: string) => id && !blockedIds.has(id));
+      if (followingIds.length === 0) return { users: [], hasMore: false, totalCount: count ?? 0 };
 
       const profilesById = await fetchProfilesByIds(followingIds);
       const users = followingIds
         .map((id) => profilesById.get(id))
-        .filter(Boolean)
-        .map((p) => toSocialUser(p!));
+        .filter((p): p is NonNullable<typeof p> => p != null)
+        .map(toSocialUser);
 
       const total = count ?? users.length;
       const hasMore = to + 1 < total;
 
-      return { users, hasMore };
+      return { users, hasMore, totalCount: total };
     },
     getNextPageParam: (lastPage, pages) =>
       lastPage.hasMore ? pages.length : undefined,
@@ -183,7 +186,7 @@ export function usePaginatedFriends(userId: string | undefined) {
     enabled: !!userId,
     initialPageParam: 0,
     queryFn: async ({ pageParam }) => {
-      if (!userId) return { users: [], hasMore: false };
+      if (!userId) return { users: [], hasMore: false, totalCount: 0 };
 
       const [blockedIds, { from, to }] = await Promise.all([
         fetchBlockedIds(userId),
@@ -201,21 +204,23 @@ export function usePaginatedFriends(userId: string | undefined) {
       if (error) throw error;
 
       const friendIds = (rows || [])
-        .map((row: any) => (row.user_id === userId ? row.friend_id : row.user_id))
-        .filter((id: string) => id && !blockedIds.has(id)) as string[];
+        .map((row: { user_id: string; friend_id: string }) =>
+          row.user_id === userId ? row.friend_id : row.user_id
+        )
+        .filter((id: string) => id && !blockedIds.has(id));
 
-      if (friendIds.length === 0) return { users: [], hasMore: false };
+      if (friendIds.length === 0) return { users: [], hasMore: false, totalCount: count ?? 0 };
 
       const profilesById = await fetchProfilesByIds(friendIds);
       const users = friendIds
         .map((id) => profilesById.get(id))
-        .filter(Boolean)
-        .map((p) => toSocialUser(p!));
+        .filter((p): p is NonNullable<typeof p> => p != null)
+        .map(toSocialUser);
 
       const total = count ?? users.length;
       const hasMore = to + 1 < total;
 
-      return { users, hasMore };
+      return { users, hasMore, totalCount: total };
     },
     getNextPageParam: (lastPage, pages) =>
       lastPage.hasMore ? pages.length : undefined,

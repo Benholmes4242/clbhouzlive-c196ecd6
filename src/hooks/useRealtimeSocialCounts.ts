@@ -82,7 +82,7 @@ export function useRealtimeSocialCounts({
     // 1. Subscribe to user_follows (user → user)
     // ============================================
     const userFollowsChannel = supabase
-      .channel('realtime-user-follows')
+      .channel(`realtime-user-follows-${viewerUserId}`)
       .on(
         'postgres_changes',
         {
@@ -149,7 +149,7 @@ export function useRealtimeSocialCounts({
     // 2. Subscribe to business_follows (user → business)
     // ============================================
     const businessFollowsChannel = supabase
-      .channel('realtime-business-follows')
+      .channel(`realtime-business-follows-${viewerUserId}`)
       .on(
         'postgres_changes',
         {
@@ -198,7 +198,7 @@ export function useRealtimeSocialCounts({
     // 3. Subscribe to user_friends
     // ============================================
     const userFriendsChannel = supabase
-      .channel('realtime-user-friends')
+      .channel(`realtime-user-friends-${viewerUserId}`)
       .on(
         'postgres_changes',
         {

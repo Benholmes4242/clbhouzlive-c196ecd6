@@ -40,10 +40,10 @@ const FollowersListPage = () => {
   } = usePaginatedFollowing(profileUser?.id);
 
   const followers = data?.pages.flatMap((page) => page.users) ?? [];
-  const totalCount = data?.pages.reduce((acc, p) => acc + p.users.length, 0) ?? 0;
+  const totalCount = data?.pages[0]?.totalCount ?? data?.pages.reduce((acc, p) => acc + p.users.length, 0) ?? 0;
 
   const following = followingData?.pages.flatMap((page) => page.users) ?? [];
-  const followingTotalCount = followingData?.pages.reduce((acc, p) => acc + p.users.length, 0) ?? 0;
+  const followingTotalCount = followingData?.pages[0]?.totalCount ?? followingData?.pages.reduce((acc, p) => acc + p.users.length, 0) ?? 0;
 
   // Track list view
   useEffect(() => {
@@ -78,7 +78,7 @@ const FollowersListPage = () => {
       title="Followers"
       subtitle={`People who follow @${profileUser.username}`}
       searchPlaceholder="Search followers by name or club"
-      emptyText="No followers yet."
+      
       users={followers}
       totalCount={totalCount}
       isLoading={followersLoading}
