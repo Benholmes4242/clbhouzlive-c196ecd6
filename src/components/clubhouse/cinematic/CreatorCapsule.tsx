@@ -87,6 +87,8 @@ interface CreatorCapsuleProps {
   reviewData?: ExtractedReviewData;
   /** Callback when review capsule is tapped */
   onReviewTap?: () => void;
+  /** Post ID for crossfade animation on post change */
+  postId?: string;
 
   /** Optional slot rendered centered above the capsule (e.g. media navigation dots) */
   dotsSlot?: React.ReactNode;
