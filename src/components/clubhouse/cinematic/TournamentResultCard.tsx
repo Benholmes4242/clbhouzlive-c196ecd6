@@ -385,8 +385,8 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             <button onClick={onComment} style={{
               flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
               background: 'linear-gradient(135deg, rgba(249,115,22,0.22), rgba(234,88,12,0.15))',
-              border: '1px solid rgba(249,115,22,0.35)', borderRadius: 22, padding: '8px 16px',
-              color: '#FB923C', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+              border: '1px solid rgba(249,115,22,0.35)', borderRadius: 22, padding: '12px 16px',
+              color: '#FB923C', fontSize: 14, fontWeight: 700, cursor: 'pointer',
               animation: 'trcard-glowPulse 3s ease-in-out infinite',
             }}>
               <span style={{ fontSize: 14 }}>💬</span>
