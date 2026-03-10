@@ -223,10 +223,10 @@ function MessagesPageInner() {
           className="flex-none px-4 flex items-center justify-between mb-4 rounded-2xl"
           style={{
             height: '56px',
-            background: 'rgba(255,255,255,0.8)',
+            background: 'hsl(var(--background) / 0.9)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
-            border: '1px solid rgba(0,0,0,0.07)',
+            border: '1px solid hsl(var(--border))',
           }}
         >
           <button
