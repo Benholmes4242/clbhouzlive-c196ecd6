@@ -366,7 +366,7 @@ export function useMessaging(): UseMessagingReturn {
       
       return (data as number) || 0;
     } catch (err) {
-      console.error('[useMessaging] Error getting unread count:', err);
+      AppLog.error('[useMessaging]', 'Error getting unread count:', err);
       return 0;
     }
   }, [user]);
