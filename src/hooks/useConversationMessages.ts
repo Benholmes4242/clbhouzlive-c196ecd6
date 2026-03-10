@@ -204,7 +204,7 @@ export function useConversationMessages(conversationId: string | null): UseConve
 
       return true;
     } catch (err) {
-      console.error('[useConversationMessages] Error editing:', err);
+      AppLog.error('[useConversationMessages]', 'Error editing:', err);
       return false;
     }
   }, [user]);
