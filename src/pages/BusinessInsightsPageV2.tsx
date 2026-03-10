@@ -175,6 +175,8 @@ const BusinessInsightsPageV2 = () => {
   const [dateRange, setDateRange] = useState<DateRange>('28d');
   const { user } = useSupabaseSession();
 
+  useHideBottomNav();
+  useHideHeader();
   const { data: business, isLoading: businessLoading } = useBusinessProfile(id);
   const { data: membership, isLoading: membershipLoading, isFetched: membershipFetched } = useBusinessMembership(id);
 
