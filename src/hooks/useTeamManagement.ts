@@ -206,8 +206,8 @@ export function useTeamManagement(
       toast.success(`${user.display_name || user.username} added to team`);
       resetAddFlow();
       invalidateTeam();
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to add team member');
+    } catch (e: unknown) {
+      toast.error((e as Error).message || 'Failed to add team member');
     } finally {
       setAdding(false);
     }
