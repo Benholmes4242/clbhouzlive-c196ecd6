@@ -88,7 +88,6 @@ function createImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image();
     image.addEventListener('load', () => {
-      console.log('[Crop] Image loaded successfully:', image.naturalWidth, 'x', image.naturalHeight);
       resolve(image);
     });
     image.addEventListener('error', (error) => {
