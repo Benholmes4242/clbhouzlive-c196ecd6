@@ -106,7 +106,7 @@ export const EchoChatSurface = forwardRef<EchoChatSurfaceRef, EchoChatSurfacePro
           assistant: 'var(--hub-glass-bg)',
         },
         messageColor: {
-          user: 'white',
+          user: 'hsl(var(--primary-foreground))',
           assistant: 'var(--hub-text)',
         },
         iconBg: 'var(--hub-glass-bg)',
