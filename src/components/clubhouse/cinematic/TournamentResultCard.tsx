@@ -140,9 +140,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
   const hasImage = !!meta.course_image_url;
   const hasVenue = !!(meta.venue_name || meta.venue_city);
-  const hasScoreStats = meta.stat_birdies > 0 || meta.stat_pars > 0 || meta.stat_bogeys > 0;
-  const hasPerfStats = !!(meta.stat_driving_distance || meta.stat_fairways_pct || meta.stat_gir_pct || meta.stat_putts);
-  const showStats = hasScoreStats || hasPerfStats;
+  const hasPodium = meta.podium_rows && meta.podium_rows.length > 0;
   const hasPodium = meta.podium_rows && meta.podium_rows.length > 0;
 
   // Heart pop state
