@@ -56,17 +56,20 @@ function useDeleteEchoConversation() {
   
   return useMutation({
     mutationFn: async (conversationId: string) => {
-      await supabase
-        .from('echo_conversation_messages')
-        .delete()
-        .eq('conversation_id', conversationId);
-      
+      // Delete conversation first, then orphaned messages.
+      // If FK CASCADE is configured, messages are removed automatically.
       const { error } = await supabase
         .from('echo_conversations')
         .delete()
         .eq('id', conversationId);
       
       if (error) throw error;
+
+      // Clean up messages in case FK CASCADE is not set
+      await supabase
+        .from('echo_conversation_messages')
+        .delete()
+        .eq('conversation_id', conversationId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['echo', 'conversations'] });
