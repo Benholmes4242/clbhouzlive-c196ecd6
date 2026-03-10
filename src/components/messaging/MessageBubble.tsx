@@ -148,7 +148,7 @@ export function MessageBubble({
               {course.course_image_url ? (
                 <img src={course.course_image_url} alt={course.course_name} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center">
+                <div className="w-full h-full bg-primary/80 flex items-center justify-center">
                   <span className="text-4xl">⛳</span>
                 </div>
               )}
