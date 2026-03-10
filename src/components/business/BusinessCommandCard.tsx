@@ -102,7 +102,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
     e.stopPropagation();
     setDropdownOpen(false);
     requestAnimationFrame(() => {
-      navigate(`/business/${business.id}`);
+      navigate(`/business/${business.id}/team`);
     });
   };
 
