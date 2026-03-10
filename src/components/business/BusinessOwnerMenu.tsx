@@ -40,7 +40,6 @@ export function BusinessOwnerMenu({
   useEffect(() => {
     return () => {
       setDeleteDialogOpen(false);
-      setVerificationModalOpen(false);
     };
   }, []);
 
