@@ -117,8 +117,6 @@ export function ImageCropModal({
 
   const onCropCompleteInternal = useCallback(
     (croppedArea: Area, croppedAreaPixels: Area) => {
-      console.log('[Crop] onCropComplete - Percentage area:', croppedArea);
-      console.log('[Crop] onCropComplete - Pixel area:', croppedAreaPixels);
       setCroppedAreaPixels(croppedAreaPixels);
     },
     []
