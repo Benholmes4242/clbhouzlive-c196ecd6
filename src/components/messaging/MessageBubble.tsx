@@ -102,11 +102,9 @@ export function MessageBubble({
   const senderName = message.sender?.display_name || message.sender?.username || 'Unknown';
   const senderInitials = senderName.substring(0, 2).toUpperCase();
 
-  // Get read status
-  const messageAny = message as any;
-  const isRead = !!messageAny.read_at;
-  const isDelivered = !!messageAny.delivered_at;
-  const deliveryStatus: 'sent' | 'delivered' | 'read' = isRead ? 'read' : isDelivered ? 'delivered' : 'sent';
+  // TODO: Read receipts require read_at and delivered_at fields on the messages schema.
+  // Until these are added to the DB and Message type, delivery status is always 'sent'.
+  const deliveryStatus = 'sent' as const;
 
   // Handle course share as standalone card
   if (message.message_type === 'course_share' && message.media_metadata) {
