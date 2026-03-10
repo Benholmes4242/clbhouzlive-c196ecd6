@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
+import { AppLog } from '@/lib/logger';
 import type { 
   ConversationWithDetails, 
   ParticipantWithProfile,
