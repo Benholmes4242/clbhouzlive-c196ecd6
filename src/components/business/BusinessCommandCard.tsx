@@ -56,7 +56,6 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
   useEffect(() => {
     return () => {
       setShowDeleteDialog(false);
-      setShowVerificationModal(false);
     };
   }, []);
 
