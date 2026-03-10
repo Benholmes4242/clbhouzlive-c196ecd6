@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Search, GraduationCap, Loader2, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { AppLog } from '@/lib/logger';
 
 export interface SelectedCollege {
   id: string;
@@ -51,7 +52,7 @@ export function CollegeSearchDropdown({
         if (error) throw error;
         setResults(data || []);
       } catch (err) {
-        console.error('College search error:', err);
+        AppLog.error('[CollegeSearchDropdown]', 'College search error:', err);
         setResults([]);
       } finally {
         setIsLoading(false);
@@ -76,7 +77,7 @@ export function CollegeSearchDropdown({
   if (disabled) {
     return (
       <div className={cn(
-        "flex items-center gap-2 h-12 px-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl text-sm text-[#94a3b8]",
+        "flex items-center gap-2 h-12 px-4 bg-muted border border-border rounded-xl text-sm text-muted-foreground",
         className
       )}>
         <GraduationCap className="w-4 h-4" />
@@ -88,28 +89,28 @@ export function CollegeSearchDropdown({
   if (value) {
     return (
       <div className={cn(
-        "flex items-center gap-3 h-12 px-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl",
+        "flex items-center gap-3 h-12 px-4 bg-muted border border-border rounded-xl",
         className
       )}>
-        <div className="w-8 h-8 rounded-lg bg-white border border-[#e2e8f0] flex items-center justify-center overflow-hidden flex-shrink-0">
+        <div className="w-8 h-8 rounded-lg bg-background border border-border flex items-center justify-center overflow-hidden flex-shrink-0">
           {value.logo_url ? (
             <img src={value.logo_url} alt="" className="w-full h-full object-cover" />
           ) : (
-            <GraduationCap className="w-4 h-4 text-[#64748b]" />
+            <GraduationCap className="w-4 h-4 text-muted-foreground" />
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-[#1e293b] truncate">
+          <p className="text-sm font-medium text-foreground truncate">
             {value.college_name}
           </p>
           {value.country && (
-            <p className="text-xs text-[#64748b] truncate">{value.country}</p>
+            <p className="text-xs text-muted-foreground truncate">{value.country}</p>
           )}
         </div>
         <button
           type="button"
           onClick={() => onChange(null)}
-          className="p-1 text-[#94a3b8] hover:text-[#64748b] transition-colors"
+          className="p-1 text-muted-foreground hover:text-foreground transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
@@ -120,7 +121,7 @@ export function CollegeSearchDropdown({
   return (
     <div ref={containerRef} className={cn("relative", className)}>
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <input
           type="text"
           value={query}
@@ -130,16 +131,16 @@ export function CollegeSearchDropdown({
           }}
           onFocus={() => setIsOpen(true)}
           placeholder={placeholder}
-          className="w-full h-12 pl-11 pr-10 bg-white border border-[#e2e8f0] rounded-xl text-sm text-[#1e293b] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#e2e8f0] focus:border-[#e2e8f0]"
+          className="w-full h-12 pl-11 pr-10 bg-background border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-border"
         />
         {isLoading && (
-          <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8] animate-spin" />
+          <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground animate-spin" />
         )}
       </div>
 
       {/* Results dropdown */}
       {isOpen && results.length > 0 && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-[#e2e8f0] rounded-xl shadow-lg max-h-64 overflow-auto">
+        <div className="absolute z-50 w-full mt-1 bg-background border border-border rounded-xl shadow-lg max-h-64 overflow-auto">
           {results.map((college) => (
             <button
               key={college.id}
@@ -149,21 +150,21 @@ export function CollegeSearchDropdown({
                 setQuery('');
                 setIsOpen(false);
               }}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#f8fafc] transition-colors text-left"
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted transition-colors text-left"
             >
-              <div className="w-10 h-10 rounded-lg bg-[#f1f5f9] border border-[#e2e8f0] flex items-center justify-center overflow-hidden flex-shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-muted border border-border flex items-center justify-center overflow-hidden flex-shrink-0">
                 {college.logo_url ? (
                   <img src={college.logo_url} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <GraduationCap className="w-5 h-5 text-[#64748b]" />
+                  <GraduationCap className="w-5 h-5 text-muted-foreground" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-[#1e293b] truncate">
+                <p className="text-sm font-medium text-foreground truncate">
                   {college.college_name}
                 </p>
                 {college.country && (
-                  <p className="text-xs text-[#64748b] truncate">{college.country}</p>
+                  <p className="text-xs text-muted-foreground truncate">{college.country}</p>
                 )}
               </div>
             </button>
@@ -173,9 +174,9 @@ export function CollegeSearchDropdown({
 
       {/* No results */}
       {isOpen && query.length >= 2 && !isLoading && results.length === 0 && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-[#e2e8f0] rounded-xl shadow-lg p-4 text-center">
-          <p className="text-sm text-[#64748b]">No colleges found</p>
-          <p className="text-xs text-[#94a3b8] mt-1">Try a different search term</p>
+        <div className="absolute z-50 w-full mt-1 bg-background border border-border rounded-xl shadow-lg p-4 text-center">
+          <p className="text-sm text-muted-foreground">No colleges found</p>
+          <p className="text-xs text-muted-foreground/70 mt-1">Try a different search term</p>
         </div>
       )}
     </div>

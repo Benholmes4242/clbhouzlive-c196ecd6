@@ -12,10 +12,10 @@ export function useBusinessImageUpload(businessId: string | undefined) {
 
   const invalidateAllBusinessQueries = useCallback(async () => {
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ['business-profile'] }),
+      queryClient.invalidateQueries({ queryKey: ['business-profile', 'v3_course_fallback', businessId] }),
       queryClient.invalidateQueries({ queryKey: ['my-businesses'] }),
     ]);
-  }, [queryClient]);
+  }, [queryClient, businessId]);
 
   const uploadLogo = useCallback(async (file: File) => {
     if (!businessId) return;
