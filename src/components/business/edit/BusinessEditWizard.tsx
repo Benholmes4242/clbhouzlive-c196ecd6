@@ -3,7 +3,7 @@
  * Visual layer matches BusinessProfileWizard (create) and PersonalProfileWizard exactly.
  * All changes deferred to Save on Step 3.
  */
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertCircle } from 'lucide-react';
@@ -15,6 +15,7 @@ import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { AppLog } from '@/lib/logger';
 
 import {
   AlertDialog,
@@ -106,74 +107,79 @@ export default function BusinessEditWizard() {
     phone: PhoneValue | null;
   } | null>(null);
 
+  // Guard against re-initialising form on background refetches
+  const hasInitialized = useRef(false);
+
   // Populate form when business data loads
   useEffect(() => {
-    if (business) {
-      const newFormData = {
-        businessName: business.name || '',
-        businessCategory: business.category || '',
-        businessBio: business.description || '',
-        businessWebsite: business.website || '',
-        businessContactEmail: business.email || '',
+    if (!business) return;
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
+
+    const newFormData = {
+      businessName: business.name || '',
+      businessCategory: business.category || '',
+      businessBio: business.description || '',
+      businessWebsite: business.website || '',
+      businessContactEmail: business.email || '',
+    };
+    setFormData(newFormData);
+
+    let newAddress: AddressValue | null = null;
+    if (business.address_label || business.location) {
+      newAddress = {
+        label: business.address_label || business.location || '',
+        addressLine1: business.address_line1 || undefined,
+        addressLine2: business.address_line2 || undefined,
+        city: business.city || undefined,
+        region: business.region || undefined,
+        postcode: business.postcode || undefined,
+        country: business.country || undefined,
+        countryCode: business.country || undefined,
+        lat: business.lat || undefined,
+        lng: business.lng || undefined,
+        mapboxPlaceId: business.mapbox_place_id || undefined,
+        precision: business.location_precision || 'city',
       };
-      setFormData(newFormData);
-
-      let newAddress: AddressValue | null = null;
-      if (business.address_label || business.location) {
-        newAddress = {
-          label: business.address_label || business.location || '',
-          addressLine1: business.address_line1 || undefined,
-          addressLine2: business.address_line2 || undefined,
-          city: business.city || undefined,
-          region: business.region || undefined,
-          postcode: business.postcode || undefined,
-          country: business.country || undefined,
-          countryCode: business.country || undefined,
-          lat: business.lat || undefined,
-          lng: business.lng || undefined,
-          mapboxPlaceId: business.mapbox_place_id || undefined,
-          precision: business.location_precision || 'city',
-        };
-        setAddress(newAddress);
-      }
-
-      let newCountrySelection: string | null = null;
-      if (business.country) {
-        const countryNameMap: Record<string, string> = {
-          'United Kingdom': 'England',
-          'UK': 'England',
-          'GB': 'England',
-          'Ireland': 'Ireland',
-          'IE': 'Ireland',
-          'United States': 'United States',
-          'US': 'United States',
-          'USA': 'United States',
-          'Canada': 'Canada',
-          'CA': 'Canada',
-          'Australia': 'Australia',
-          'AU': 'Australia',
-        };
-        newCountrySelection = countryNameMap[business.country] || business.country;
-      }
-      setCountrySelection(newCountrySelection);
-
-      let newPhone: PhoneValue | null = null;
-      if (business.phone) {
-        newPhone = {
-          dialCode: '',
-          localNumber: business.phone.replace(/^\+\d+\s*/, ''),
-          fullNumber: business.phone,
-        };
-        setPhone(newPhone);
-      }
-
-      setInitialValues({
-        formData: newFormData,
-        address: newAddress,
-        countrySelection: newCountrySelection,
-        phone: newPhone,
-      });
+      setAddress(newAddress);
     }
+
+    let newCountrySelection: string | null = null;
+    if (business.country) {
+      const countryNameMap: Record<string, string> = {
+        'United Kingdom': 'England',
+        'UK': 'England',
+        'GB': 'England',
+        'Ireland': 'Ireland',
+        'IE': 'Ireland',
+        'United States': 'United States',
+        'US': 'United States',
+        'USA': 'United States',
+        'Canada': 'Canada',
+        'CA': 'Canada',
+        'Australia': 'Australia',
+        'AU': 'Australia',
+      };
+      newCountrySelection = countryNameMap[business.country] || business.country;
+    }
+    setCountrySelection(newCountrySelection);
+
+    let newPhone: PhoneValue | null = null;
+    if (business.phone) {
+      newPhone = {
+        dialCode: '',
+        localNumber: business.phone.replace(/^\+\d+\s*/, ''),
+        fullNumber: business.phone,
+      };
+      setPhone(newPhone);
+    }
+
+    setInitialValues({
+      formData: newFormData,
+      address: newAddress,
+      countrySelection: newCountrySelection,
+      phone: newPhone,
+    });
   }, [business]);
 
   // Auth redirect
@@ -298,10 +304,12 @@ export default function BusinessEditWizard() {
         });
       }
 
+      if (!id) throw new Error('Business ID is missing');
+
       const { error: updateError } = await supabase
         .from('business_accounts')
-        .update(updatePayload as Record<string, unknown>)
-        .eq('id', id!);
+        .update(updatePayload)
+        .eq('id', id);
 
       if (updateError) throw updateError;
 
@@ -315,7 +323,7 @@ export default function BusinessEditWizard() {
       toast.success('Changes saved');
       navigate(`/business/${id}`);
     } catch (error) {
-      console.error('Error updating business profile:', error);
+      AppLog.error('[BusinessEditWizard]', 'Error updating business profile:', error);
       toast.error('Unable to save your changes. Please try again.');
     } finally {
       setSaving(false);

@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Loader2, ZoomIn, RotateCcw } from 'lucide-react';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { AppLog } from '@/lib/logger';
+import { toast } from 'sonner';
 
 interface ImageCropModalProps {
   open: boolean;
@@ -27,10 +29,7 @@ async function getCroppedImg(
 ): Promise<File> {
   const image = await createImage(imageSrc);
   
-  // Debug logging
-  console.log('[Crop] Image natural dimensions:', image.naturalWidth, 'x', image.naturalHeight);
-  console.log('[Crop] Pixel crop area:', pixelCrop);
-  
+
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
 
@@ -44,7 +43,7 @@ async function getCroppedImg(
   const safeWidth = Math.min(pixelCrop.width, image.naturalWidth - safeX);
   const safeHeight = Math.min(pixelCrop.height, image.naturalHeight - safeY);
   
-  console.log('[Crop] Safe crop area:', { x: safeX, y: safeY, width: safeWidth, height: safeHeight });
+  
 
   // Set canvas size to the cropped area dimensions
   canvas.width = safeWidth;
@@ -72,7 +71,7 @@ async function getCroppedImg(
           reject(new Error('Canvas is empty'));
           return;
         }
-        console.log('[Crop] Output blob size:', blob.size, 'bytes');
+        
         const file = new File([blob], outputFileName, { type: 'image/jpeg' });
         resolve(file);
       },
@@ -86,11 +85,10 @@ function createImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image();
     image.addEventListener('load', () => {
-      console.log('[Crop] Image loaded successfully:', image.naturalWidth, 'x', image.naturalHeight);
       resolve(image);
     });
     image.addEventListener('error', (error) => {
-      console.error('[Crop] Image load error:', error);
+      AppLog.error('[ImageCropModal]', 'Image load error:', error);
       reject(error);
     });
     // Only set crossOrigin for non-blob URLs (blob URLs don't need it and it can cause issues)
@@ -116,8 +114,6 @@ export function ImageCropModal({
 
   const onCropCompleteInternal = useCallback(
     (croppedArea: Area, croppedAreaPixels: Area) => {
-      console.log('[Crop] onCropComplete - Percentage area:', croppedArea);
-      console.log('[Crop] onCropComplete - Pixel area:', croppedAreaPixels);
       setCroppedAreaPixels(croppedAreaPixels);
     },
     []
@@ -136,7 +132,8 @@ export function ImageCropModal({
       onCropComplete(croppedFile);
       onOpenChange(false);
     } catch (error) {
-      console.error('Error cropping image:', error);
+      AppLog.error('[ImageCropModal]', 'Error cropping image:', error);
+      toast.error('Failed to crop image. Please try again.');
     } finally {
       setIsProcessing(false);
     }
@@ -152,7 +149,7 @@ export function ImageCropModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="sm:max-w-lg p-0 overflow-hidden bg-black"
+        className="sm:max-w-lg p-0 overflow-hidden bg-background"
         aria-describedby={undefined}
       >
         <VisuallyHidden>
@@ -160,7 +157,7 @@ export function ImageCropModal({
         </VisuallyHidden>
         
         {/* Crop area */}
-        <div className="relative h-[350px] w-full bg-black">
+        <div className="relative h-[350px] w-full bg-background">
           <Cropper
             image={imageSrc}
             crop={crop}
@@ -175,7 +172,7 @@ export function ImageCropModal({
         </div>
 
         {/* Controls */}
-        <div className="bg-white px-4 py-4 space-y-4">
+        <div className="bg-card px-4 py-4 space-y-4">
           {/* Zoom slider */}
           <div className="flex items-center gap-3">
             <ZoomIn className="h-4 w-4 text-muted-foreground flex-shrink-0" />

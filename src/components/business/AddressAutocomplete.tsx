@@ -3,6 +3,7 @@ import { MapPin, Loader2, X, AlertCircle, AlertTriangle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { AppLog } from '@/lib/logger';
 
 export type LocationPrecision = 'address' | 'poi' | 'postcode' | 'city' | 'region' | 'country' | 'pin' | 'unknown';
 
@@ -132,7 +133,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         setSearchError(null);
       }
     } catch (err) {
-      console.error('Address search error:', err);
+      AppLog.error('[AddressAutocomplete]', 'Address search error:', err);
       setSearchError('Unable to search addresses. Please try again.');
       setSuggestions([]);
     } finally {
@@ -171,7 +172,9 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       lat: result.lat,
       lng: result.lng,
       mapboxPlaceId: result.place_id,
-      precision: result.precision as LocationPrecision,
+      precision: (['address', 'poi', 'postcode', 'city', 'region', 'country', 'pin', 'unknown'].includes(result.precision)
+        ? result.precision
+        : 'unknown') as LocationPrecision,
       countryCode: countryCode,
       // Use structured data from edge function
       city: result.city || undefined,
@@ -269,12 +272,12 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
       {/* Precision warning */}
       {showPrecisionWarning && (
-        <div className="mt-3 p-3 rounded-sq-sm bg-amber-50 border border-amber-200">
+        <div className="mt-3 p-3 rounded-sq-sm bg-muted border border-border">
           <div className="flex items-start gap-2">
-            <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="text-sm font-medium text-amber-800">That location is too general</p>
-              <p className="text-xs text-amber-700 mt-0.5">
+              <p className="text-sm font-medium text-foreground">That location is too general</p>
+              <p className="text-xs text-foreground mt-0.5">
                 Add a street address or postcode/ZIP to place your map pin accurately.
               </p>
               <div className="flex items-center gap-2 mt-2">
@@ -330,7 +333,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
               >
                 <MapPin className={cn(
                   "h-4 w-4 shrink-0 mt-0.5",
-                  isPrecise ? "text-emerald-600" : "text-muted-foreground"
+                  isPrecise ? "text-primary" : "text-muted-foreground"
                 )} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{result.primary}</p>

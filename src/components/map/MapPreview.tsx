@@ -4,6 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Maximize2, MapPin } from 'lucide-react';
 import { createGlassyMarkerElement } from './MapMarker';
 import { MAP_CONFIG } from '@/config/maps';
+import { AppLog } from '@/lib/logger';
 
 interface MapPreviewProps {
   lat: number;
@@ -50,7 +51,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
     mountedRef.current = true;
 
     if (!MAP_CONFIG.TOKEN) {
-      console.warn('[MapPreview] VITE_MAPBOX_ACCESS_TOKEN not configured');
+      AppLog.warn('[MapPreview]', 'VITE_MAPBOX_ACCESS_TOKEN not configured');
       return;
     }
     if (!hasValidCoords) return;
@@ -115,7 +116,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
         mapRef.current = null;
       }
     };
-  }, [lat, lng, zoom, markerColor, interactive, mapInitialized, hasValidCoords, colorful]);
+  }, [lat, lng, zoom, interactive, mapInitialized, hasValidCoords, colorful]);
 
   // Reset map when coordinates change
   useEffect(() => {

@@ -6,6 +6,7 @@ import { MapPin, Search, Loader2, X, Target } from 'lucide-react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { AddressValue } from './AddressAutocomplete';
+import { AppLog } from '@/lib/logger';
 
 // Mapbox public token
 const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2xiaG91eiIsImEiOiJjbTVyejIzMXcxemx2MmpzZDU3YjkxNjNkIn0.H_w9d-UAvvMRkJ_9DoVQ-A';
@@ -54,7 +55,7 @@ export const PinDropModal: React.FC<PinDropModalProps> = ({
 
     // Create draggable marker
     marker.current = new mapboxgl.Marker({
-      color: '#F7931E',
+      color: 'hsl(var(--primary))',
       draggable: true,
     })
       .setLngLat([center.lng, center.lat])
@@ -104,7 +105,7 @@ export const PinDropModal: React.FC<PinDropModalProps> = ({
         setReverseGeocodeResult(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
       }
     } catch (err) {
-      console.error('Reverse geocode error:', err);
+      AppLog.error('[PinDropModal]', 'Reverse geocode error:', err);
       setReverseGeocodeResult(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
     } finally {
       setIsReverseGeocoding(false);
@@ -130,7 +131,7 @@ export const PinDropModal: React.FC<PinDropModalProps> = ({
         setReverseGeocodeResult(data.features[0].place_name);
       }
     } catch (err) {
-      console.error('Search error:', err);
+      AppLog.error('[PinDropModal]', 'Search error:', err);
     } finally {
       setSearching(false);
     }
@@ -178,7 +179,7 @@ export const PinDropModal: React.FC<PinDropModalProps> = ({
         reverseGeocode(latitude, longitude);
       },
       (err) => {
-        console.error('Geolocation error:', err);
+        AppLog.error('[PinDropModal]', 'Geolocation error:', err);
       }
     );
   };
