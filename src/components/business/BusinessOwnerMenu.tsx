@@ -57,7 +57,7 @@ export function BusinessOwnerMenu({
   const isRejected = status === 'rejected';
 
   const handleRequestVerification = () => {
-    setVerificationModalOpen(true);
+    navigate(`/business/${businessId}/verification/wizard`);
   };
 
   return (

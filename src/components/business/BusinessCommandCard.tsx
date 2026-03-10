@@ -277,7 +277,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                     <DropdownMenuItem
                       onClick={(e) => {
                         e.stopPropagation();
-                        setShowVerificationModal(true);
+                        navigate(`/business/${business.id}/verification/wizard`);
                       }}
                       className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
                     >
