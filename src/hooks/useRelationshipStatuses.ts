@@ -26,7 +26,9 @@ export function useRelationshipStatuses(targetUserIds: string[]) {
     queryFn: async () => {
       if (!user || targetUserIds.length === 0) return {};
 
-      const { data, error } = await supabase.rpc('get_relationship_statuses' as string, {
+      // TODO: Run `supabase gen types` to add get_relationship_statuses to generated types.
+      // Using type assertion until types are regenerated.
+      const { data, error } = await (supabase.rpc as Function)('get_relationship_statuses', {
         p_current_user_id: user.id,
         p_target_user_ids: targetUserIds,
       });
