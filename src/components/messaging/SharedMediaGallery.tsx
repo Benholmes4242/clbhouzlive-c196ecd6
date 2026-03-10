@@ -41,13 +41,16 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
       setLoading(true);
 
       try {
+        // NOTE: Media gallery only scans the most recent 1000 messages.
+        // For very long conversations, older shared media will not appear.
         const { data: messages } = await supabase
           .from('messages')
           .select('id, content, message_type, media_url, media_metadata, created_at')
           .eq('conversation_id', conversationId)
           .is('deleted_at', null)
           .or('message_type.in.(image,video,course_share),media_url.neq.null')
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .limit(1000);
 
         const mediaItems: MediaItem[] = [];
         const courseItems: MediaItem[] = [];
@@ -59,11 +62,11 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
           } else if (msg.message_type === 'video' && msg.media_url) {
             mediaItems.push({ id: msg.id, type: 'video', url: msg.media_url, createdAt: msg.created_at });
           } else if (msg.message_type === 'course_share' && msg.media_metadata) {
-            const meta = msg.media_metadata as any;
+            const meta = msg.media_metadata as Record<string, unknown>;
             courseItems.push({
               id: msg.id, type: 'course',
-              url: `/courses/${meta.course_slug || meta.course_id}`,
-              title: meta.course_name, thumbnail: meta.course_image_url,
+              url: `/courses/${(meta.course_slug as string) || (meta.course_id as string)}`,
+              title: meta.course_name as string, thumbnail: meta.course_image_url as string,
               createdAt: msg.created_at,
             });
           }
