@@ -181,29 +181,32 @@ export const UserListPage: React.FC<UserListPageProps> = ({
   return (
     <PageRoot className="min-h-screen bg-background">
       <div className="w-full">
-        {/* Scrollable header - scrolls away */}
-        <div className="px-4 pt-6 pb-4 bg-background">
-          {/* Back button */}
-          <button
-            type="button"
-            onClick={handleBack}
-            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-all min-h-[44px] min-w-[44px] px-2 py-2 -ml-2 active:opacity-70"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Back
-          </button>
-
-          {/* Title block */}
-          <div className="text-center mt-1">
-            <h1 className="text-xl font-bold text-foreground mb-1">
-              {displayTitle}
-              {displayTotal > 0 && (
-                <span className="text-sm font-normal text-muted-foreground ml-2">
-                  ({displayTotal})
-                </span>
+        {/* Standard sub-page header */}
+        <div
+          className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border/50"
+          style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+        >
+          <div className="flex items-center justify-between px-4 pb-3 pt-2">
+            <button
+              onClick={handleBack}
+              className="flex items-center justify-center min-h-[44px] min-w-[44px] -ml-2 text-muted-foreground"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <div className="flex-1 text-center">
+              <h1 className="text-[16px] font-semibold text-foreground leading-tight">
+                {displayTitle}
+                {displayTotal > 0 && (
+                  <span className="text-[16px] font-semibold text-muted-foreground ml-1">
+                    {displayTotal.toLocaleString()}
+                  </span>
+                )}
+              </h1>
+              {displaySubtitle && (
+                <p className="text-[12px] text-muted-foreground mt-0.5">{displaySubtitle}</p>
               )}
-            </h1>
-            <p className="text-sm text-muted-foreground">{displaySubtitle}</p>
+            </div>
+            <div className="w-11" />
           </div>
         </div>
 
