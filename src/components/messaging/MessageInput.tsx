@@ -206,7 +206,7 @@ export function MessageInput({
 
   return (
     <div 
-      className="flex-none px-4 pt-2 bg-background/95 border-t border-border/30"
+      className="flex-none px-4 pt-2 bg-background/80 backdrop-blur-xl border-t border-border/20"
       style={{
         paddingBottom: 'calc(var(--sab, 0px) + 8px)',
       }}
@@ -311,7 +311,7 @@ export function MessageInput({
             placeholder="Message"
             disabled={disabled || uploading}
             rows={1}
-            className="flex-1 bg-transparent outline-none text-[13px] text-foreground placeholder:text-muted-foreground resize-none max-h-[120px] py-1 font-dm-sans"
+            className="flex-1 bg-transparent outline-none text-[14px] text-foreground placeholder:text-muted-foreground resize-none max-h-[120px] py-1 font-dm-sans"
           />
           
            {/* Camera button (when no text/media) */}

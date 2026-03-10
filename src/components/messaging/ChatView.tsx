@@ -95,7 +95,7 @@ function ChatSkeleton() {
 function DateSeparator({ date }: { date: string }) {
   return (
     <div className="flex justify-center py-5">
-      <span className="px-3 py-1 rounded-full bg-muted border border-border/40 text-muted-foreground text-[11px] font-medium tracking-wide font-dm-sans">
+      <span className="px-3 py-1 rounded-full bg-muted text-muted-foreground text-[11px] font-medium tracking-[0.04em] uppercase font-dm-sans">
         {formatDateHeader(date)}
       </span>
     </div>
@@ -472,11 +472,11 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
       <header 
         className="flex-shrink-0 px-[18px] flex items-center gap-3"
         style={{
-          height: 'calc(60px + max(env(safe-area-inset-top, 0px), 47px))',
+          height: 'calc(52px + max(env(safe-area-inset-top, 0px), 47px))',
           paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
           background: 'hsl(var(--background) / 0.9)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
           borderBottom: '1px solid hsl(var(--border))',
         }}
       >
@@ -558,7 +558,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
               <button
                 onClick={handleLoadMore}
                 disabled={loadingMore}
-                className="px-4 py-2 bg-muted rounded-full text-[13px] font-medium text-muted-foreground active:bg-muted/70 transition-colors disabled:opacity-50"
+                className="mx-auto flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-muted/60 text-muted-foreground text-[12px] font-medium active:bg-muted transition-colors disabled:opacity-50"
               >
                 {loadingMore ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

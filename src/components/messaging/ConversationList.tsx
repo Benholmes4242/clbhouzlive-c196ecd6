@@ -280,7 +280,7 @@ export function ConversationList({
               onSelectConversation(conversation.id);
             }}
             className={cn(
-              "w-full px-4 py-3.5 flex items-center gap-3 text-left transition-colors",
+              "w-full px-4 py-3.5 flex items-center gap-3 text-left transition-colors duration-150",
               "active:bg-primary/10",
               isSelected && "bg-primary/5",
               isArchived && "opacity-70"
@@ -309,11 +309,11 @@ export function ConversationList({
                 <div className="flex items-center gap-1.5 min-w-0 flex-1">
                   {/* Unread dot */}
                   {hasUnread && (
-                    <span className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
                   )}
                   <span className={cn(
                     "text-[14px] truncate text-foreground",
-                    hasUnread ? "font-bold" : "font-semibold"
+                    hasUnread ? "font-semibold" : "font-semibold"
                   )}>
                     {name}
                   </span>
@@ -323,7 +323,7 @@ export function ConversationList({
                 </div>
                 <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
                   <span className={cn(
-                    "text-[12px] font-normal",
+                    "text-[11px] font-normal",
                     hasUnread ? "text-primary" : "text-muted-foreground"
                   )}>
                     {formatRelativeTime(conversation.last_message_at)}

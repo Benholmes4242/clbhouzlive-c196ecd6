@@ -130,7 +130,7 @@ export function MessageBubble({
 
         <div className={cn("flex flex-col max-w-[280px]", isOwnMessage ? "items-end" : "items-start")}>
           {!isOwnMessage && showSenderInfo && (
-          <span className="text-[13px] font-semibold text-foreground/70 mb-1 px-1">
+          <span className="text-[12px] font-semibold text-primary/80 mb-1 px-1">
               {senderName}
             </span>
           )}
@@ -292,7 +292,7 @@ export function MessageBubble({
       <div className={cn("flex flex-col max-w-[75%]", isOwnMessage ? "items-end" : "items-start")}>
         {/* Sender name for groups */}
         {!isOwnMessage && showSenderInfo && (
-          <span className="text-[13px] font-semibold text-foreground/70 mb-0.5 px-1">
+          <span className="text-[12px] font-semibold text-primary/80 mb-0.5 px-1">
             {senderName}
           </span>
         )}
@@ -300,11 +300,11 @@ export function MessageBubble({
         {/* Message bubble */}
         <div
           className={cn(
-            "px-[15px] py-[11px] break-words relative group backdrop-blur-[12px]",
+            "px-[14px] py-[10px] break-words relative group backdrop-blur-[12px]",
             isPressed && "opacity-80",
             isOwnMessage 
-              ? "rounded-[16px_16px_4px_16px] bg-foreground/[0.06]"
-              : "rounded-[16px_16px_16px_4px] bg-background/80 border border-border/40"
+              ? "rounded-[18px_18px_4px_18px] bg-primary/[0.08] border border-primary/[0.12]"
+              : "rounded-[18px_18px_18px_4px] bg-background/80 border border-border/40"
           )}
           onTouchCancel={() => setIsPressed(false)}
         >
@@ -357,8 +357,8 @@ export function MessageBubble({
 
           {/* Timestamp + Read receipt */}
           <div className="flex items-center gap-1 mt-1 justify-end">
-            {message.is_edited && <span className="text-[11px] font-normal text-muted-foreground">edited</span>}
-            <span className="text-[11px] font-normal text-muted-foreground">{formatMessageTime(message.created_at)}</span>
+            {message.is_edited && <span className="text-[11px] font-normal text-muted-foreground/70">edited</span>}
+            <span className="text-[11px] font-normal text-muted-foreground/70">{formatMessageTime(message.created_at)}</span>
             {isOwnMessage && <ReadReceipt status={deliveryStatus} />}
           </div>
         </div>
