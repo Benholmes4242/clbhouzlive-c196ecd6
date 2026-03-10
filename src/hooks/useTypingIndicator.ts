@@ -62,7 +62,7 @@ export function useTypingIndicator(conversationId: string | null) {
         p_conversation_id: conversationId 
       });
     } catch (error) {
-      console.error('Error clearing typing indicator:', error);
+      AppLog.error('[useTypingIndicator]', 'Error clearing typing indicator:', error);
     }
   }, [conversationId, user]);
 
