@@ -183,7 +183,7 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
 
   const sendMessage = useCallback(async (content: string) => {
     if (isStreaming || !userId || rateLimitCooldown) {
-      console.warn('[sendMessage] Blocked:', { isStreaming, hasUserId: !!userId, rateLimitCooldown });
+      return;
       return;
     }
 
