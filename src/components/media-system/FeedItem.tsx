@@ -6,7 +6,8 @@ import { useRef } from 'react';
 import { VideoPlayer } from './VideoPlayer';
 import { ImageViewer } from './ImageViewer';
 import { MediaCarousel } from './MediaCarousel';
-import type { FeedPost } from './types/media';
+import type { FeedPost, TournamentResultFeedPost } from './types/media';
+import { TournamentResultCard } from '@/components/clubhouse/cinematic/TournamentResultCard';
 
 interface FeedItemProps {
   post: FeedPost;
