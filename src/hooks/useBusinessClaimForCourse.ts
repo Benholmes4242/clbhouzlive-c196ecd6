@@ -26,26 +26,28 @@ export function useBusinessClaimForCourse(courseId: string | undefined) {
       if (!courseId || !userId) return null;
 
       // Get course's club_id
-      const { data: course } = await supabase
+      const { data: course, error: courseError } = await supabase
         .from('golf_courses')
         .select('club_id')
         .eq('id', courseId)
-        .single();
+        .maybeSingle();
 
+      if (courseError) throw courseError;
       if (!course?.club_id) return null;
 
       // Find business claiming this club where user is owner/admin
-      const { data: business } = await supabase
+      const { data: business, error: businessError } = await supabase
         .from('business_accounts')
         .select('id, name, slug, logo_url, is_verified')
         .eq('club_id', course.club_id)
         .eq('is_deleted', false)
-        .single();
+        .maybeSingle();
 
+      if (businessError) throw businessError;
       if (!business) return null;
 
       // Check membership
-      const { data: membership } = await supabase
+      const { data: membership, error: memberError } = await supabase
         .from('business_members')
         .select('role')
         .eq('business_id', business.id)
@@ -53,6 +55,7 @@ export function useBusinessClaimForCourse(courseId: string | undefined) {
         .in('role', ['owner', 'admin'])
         .maybeSingle();
 
+      if (memberError) throw memberError;
       if (!membership) return null;
 
       return {

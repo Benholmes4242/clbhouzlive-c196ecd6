@@ -5,6 +5,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { AppLog } from '@/lib/logger';
+import { toast } from 'sonner';
 
 interface Course {
   id: string;
@@ -53,7 +55,8 @@ export const ClaimCoursesStep: React.FC<ClaimCoursesStepProps> = ({
         // Select all by default
         setSelectedIds(new Set((data || []).map(c => c.id)));
       } catch (error) {
-        console.error('Error fetching courses:', error);
+        AppLog.error('[ClaimCoursesStep]', 'Error fetching courses:', error);
+        toast.error('Failed to load courses. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -111,6 +114,10 @@ export const ClaimCoursesStep: React.FC<ClaimCoursesStepProps> = ({
         course_id: courseId,
       }));
 
+      // NOTE: This writes to business_claimed_courses but claim status is read via
+      // business_accounts.club_id in useCourseClaim and useBusinessClaimForCourse.
+      // The business_claimed_courses table is currently write-only from a read-path perspective.
+      // If the read path is ever migrated to use this table, ensure the data here is consistent.
       const { error } = await supabase
         .from('business_claimed_courses')
         .upsert(records, { onConflict: 'business_id,course_id' });
@@ -119,7 +126,8 @@ export const ClaimCoursesStep: React.FC<ClaimCoursesStepProps> = ({
 
       onComplete();
     } catch (error) {
-      console.error('Error claiming courses:', error);
+      AppLog.error('[ClaimCoursesStep]', 'Error claiming courses:', error);
+      toast.error('Failed to save claim. Please try again.');
     } finally {
       setSaving(false);
     }

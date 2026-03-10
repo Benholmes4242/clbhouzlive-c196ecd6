@@ -17,21 +17,24 @@ export function useCourseClaim(courseId: string | undefined) {
       if (!courseId) return null;
 
       // Get the course's club_id
-      const { data: course } = await supabase
+      const { data: course, error: courseError } = await supabase
         .from('golf_courses')
         .select('club_id')
         .eq('id', courseId)
-        .single();
+        .maybeSingle();
 
+      if (courseError) throw courseError;
       if (!course?.club_id) return null;
 
       // Find claiming business
-      const { data: businesses } = await supabase
+      const { data: businesses, error: businessError } = await supabase
         .from('business_accounts')
         .select('id, name, slug, is_verified, logo_url')
         .eq('club_id', course.club_id)
         .eq('is_deleted', false)
         .limit(1);
+
+      if (businessError) throw businessError;
 
       const business = businesses?.[0] ?? null;
 
