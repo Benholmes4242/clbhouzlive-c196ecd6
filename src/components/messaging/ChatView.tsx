@@ -230,7 +230,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             unread_count: 0,
           });
         } catch (err) {
-          console.error('[ChatView] Error fetching direct conversation:', err);
+          AppLog.error('[ChatView]', 'Error fetching direct conversation:', err);
         } finally {
           setLoadingDirect(false);
         }
