@@ -200,7 +200,7 @@ export const EchoChatSurface = forwardRef<EchoChatSurfaceRef, EchoChatSurfacePro
           style={{
             background: styles.inputBg,
             border: `1px solid ${styles.inputBorder}`,
-            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+            boxShadow: '0 1px 4px hsl(var(--border) / 0.5)',
           }}
         >
           <input
