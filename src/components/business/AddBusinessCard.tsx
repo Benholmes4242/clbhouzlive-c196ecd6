@@ -17,25 +17,24 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
         transition={{ duration: 0.3, ease: 'easeOut' }}
         className="flex flex-col items-center justify-center py-20 px-6 text-center"
       >
-        {/* Icon in brand amber circle */}
-        <div className="w-16 h-16 rounded-full bg-[#C1A84C]/10 flex items-center justify-center mb-4">
-          <Building2 className="w-7 h-7 text-[#C1A84C]" />
+        {/* Icon */}
+        <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-5">
+          <Building2 className="w-8 h-8 text-primary" />
         </div>
-        
-        <h3 className="text-lg font-bold text-foreground mb-1">
-          Create your first business profile
-        </h3>
-        
-        <p className="text-sm text-muted-foreground max-w-[280px] mb-6">
-          Represent a golf club, coach, brand, or venue on clbhouz.
+
+        <h2 className="text-[18px] font-bold text-foreground mb-2">
+          No business profiles yet
+        </h2>
+
+        <p className="text-[14px] text-muted-foreground max-w-[260px] mb-8">
+          Create a profile for your golf club, academy, or brand.
         </p>
-        
+
         <button
           onClick={onClick}
-          className="inline-flex items-center gap-2 bg-[#334E3D] text-white min-h-[48px] rounded-full px-8 text-sm font-medium active:scale-[0.97] transition-transform"
+          className="bg-primary text-primary-foreground min-h-[50px] rounded-2xl px-8 text-[15px] font-semibold active:opacity-80 transition-opacity"
         >
-          <Plus className="h-4 w-4" />
-          Create business profile
+          Create Business Profile
         </button>
       </motion.div>
     );
@@ -50,23 +49,23 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
     >
       <button
         onClick={onClick}
-        className="w-full flex items-center gap-3.5 p-4 bg-card border border-dashed border-border rounded-2xl active:scale-[0.98] transition-transform min-h-[44px]"
+        className="w-full flex items-center gap-3.5 p-4 bg-card border border-dashed border-border rounded-2xl active:bg-muted/50 transition-colors min-h-[44px]"
       >
         {/* Icon in muted circle */}
-        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
           <Plus className="w-5 h-5 text-muted-foreground" />
         </div>
-        
+
         <div className="flex-1 min-w-0 text-left">
-          <p className="text-sm font-semibold text-foreground">
+          <p className="text-[14px] font-semibold text-foreground">
             Add another business
           </p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Manage multiple clubs, coaches, or golf brands
+          <p className="text-[12px] text-muted-foreground mt-0.5">
+            Create a new business profile
           </p>
         </div>
 
-        <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+        <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
       </button>
     </motion.div>
   );
