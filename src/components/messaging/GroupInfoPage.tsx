@@ -147,7 +147,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
       if (error) throw error;
       toast.success(newMuted ? 'Notifications muted' : 'Notifications unmuted');
       onUpdate();
-    } catch (error: any) {
+    } catch (e: unknown) {
       setIsMutedLocal(!newMuted);
       toast.error('Failed to update');
     }
