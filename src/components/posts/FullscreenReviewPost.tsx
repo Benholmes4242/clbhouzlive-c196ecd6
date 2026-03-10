@@ -308,9 +308,9 @@ export function FullscreenReviewPost({
       
       {/* Premium Top Overlay Panel - Entire tile opens review sheet */}
       <motion.button
-        initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : -8 }}
+        initial={false}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: prefersReducedMotion ? 0 : 0.3, ease: 'easeOut', delay: 0.1 }}
+        transition={{ duration: 0 }}
         onClick={handleOpenReviewSheet}
         className={cn(
           "absolute left-4 right-4 z-20",
