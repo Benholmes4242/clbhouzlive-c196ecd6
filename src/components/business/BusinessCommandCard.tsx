@@ -20,7 +20,6 @@ import { useBusinessAccessRequestsRealtime } from '@/hooks/useBusinessAccessRequ
 import { cn } from '@/lib/utils';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { useBusinessVerificationRequest, deriveVerificationState } from '@/hooks/useBusinessVerificationRequest';
-import { useBusinessVerificationRequest, deriveVerificationState } from '@/hooks/useBusinessVerificationRequest';
 import { getCityCountry } from '@/lib/locationDisplay';
 import type { BusinessMembership } from '@/hooks/useMyBusinesses';
 
