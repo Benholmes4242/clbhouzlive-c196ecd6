@@ -304,10 +304,12 @@ export default function BusinessEditWizard() {
         });
       }
 
+      if (!id) throw new Error('Business ID is missing');
+
       const { error: updateError } = await supabase
         .from('business_accounts')
-        .update(updatePayload as Record<string, unknown>)
-        .eq('id', id!);
+        .update(updatePayload)
+        .eq('id', id);
 
       if (updateError) throw updateError;
 
