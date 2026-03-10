@@ -42,7 +42,7 @@ export function useEchoConversations(search?: string) {
         return [];
       }
 
-      console.log('[useEchoConversations] Fetching conversations for user:', user.id);
+      
 
       let q = supabase
         .from('echo_conversations')
