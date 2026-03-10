@@ -3,6 +3,7 @@
  * Pure video engine: no UI overlays. Overlay integration deferred to Clubhouse UI layer.
  */
 import { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { VideoPlayer } from './VideoPlayer';
 import { ImageViewer } from './ImageViewer';
 import { MediaCarousel } from './MediaCarousel';
