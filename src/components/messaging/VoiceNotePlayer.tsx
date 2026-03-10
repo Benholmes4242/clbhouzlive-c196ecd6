@@ -148,7 +148,7 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
         className={cn(
           "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-colors",
           isOwn 
-            ? "bg-white/20 hover:bg-white/30 text-[#F7931E]" 
+            ? "bg-background/20 hover:bg-background/30 text-primary" 
             : "bg-primary/10 hover:bg-primary/20 text-primary"
         )}
         aria-label={isPlaying ? 'Pause' : 'Play'}
