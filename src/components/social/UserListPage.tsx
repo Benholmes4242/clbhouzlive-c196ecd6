@@ -304,7 +304,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                   </p>
                   <button
                     onClick={handleClearSearch}
-                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                   >
                     Clear search
                   </button>

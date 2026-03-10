@@ -50,7 +50,7 @@ const StatItem: React.FC<StatItemProps> = ({
 
   if (isClickable && onClick) {
     return (
-      <button type="button" onClick={onClick} className={baseClasses}>
+      <button type="button" onClick={onClick} className={cn(baseClasses, "min-h-[44px] min-w-[44px]")}>
         {content}
       </button>
     );

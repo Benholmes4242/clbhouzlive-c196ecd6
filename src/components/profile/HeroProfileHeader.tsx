@@ -414,7 +414,7 @@ const HeroProfileHeader = ({
               loading="eager"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200" />
+            <div className="w-full h-full bg-gradient-to-br from-muted via-background to-muted" />
           )}
         </div>
 
