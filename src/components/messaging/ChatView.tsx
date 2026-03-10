@@ -385,7 +385,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
         { duration }
       );
     } catch (error) {
-      console.error('Error sending voice note:', error);
+      AppLog.error('[ChatView]', 'Error sending voice note:', error);
     }
   }, [user, sendMessage]);
 
