@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BadgeCheck, Shield, Users, Star } from 'lucide-react';
+import { ChevronLeft, BadgeCheck, Shield, Users, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PageRoot } from '@/components/layout/PageRoot';
 
@@ -13,23 +13,25 @@ const BusinessVerificationAboutPage = () => {
     navigate(`/business/${id}/verification/request`);
   };
 
-  const handleBack = () => {
-    navigate(-1);
-  };
-
   return (
     <PageRoot className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border/40">
-        <div className="flex items-center gap-3 px-4 py-3">
+      <header
+        className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border/40"
+        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+      >
+        <div className="flex items-center px-4 h-14">
           <button
-            onClick={handleBack}
-            className="h-9 w-9 flex items-center justify-center rounded-sq-sm hover:bg-muted/50 transition-colors"
+            onClick={() => navigate(-1)}
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-muted-foreground active:text-foreground transition-colors"
             aria-label="Go back"
           >
-            <ArrowLeft className="h-5 w-5 text-foreground" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-semibold text-foreground">Business verification</h1>
+          <div className="flex-1 text-center">
+            <h1 className="text-[16px] font-semibold text-foreground">Verified Business</h1>
+          </div>
+          <div className="w-11" />
         </div>
       </header>
 
@@ -40,8 +42,8 @@ const BusinessVerificationAboutPage = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <div className="h-16 w-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-            <BadgeCheck className="h-8 w-8 text-slate-600" />
+          <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+            <BadgeCheck className="h-8 w-8 text-muted-foreground" />
           </div>
           <h2 className="text-xl font-bold text-foreground mb-2">
             Get verified on clbhouz
@@ -62,8 +64,8 @@ const BusinessVerificationAboutPage = () => {
           
           <div className="space-y-3">
             <div className="flex items-start gap-3">
-              <div className="h-8 w-8 rounded-sq-sm bg-slate-100 flex items-center justify-center shrink-0">
-                <Shield className="h-4 w-4 text-slate-600" />
+              <div className="h-8 w-8 rounded-sq-sm bg-muted flex items-center justify-center shrink-0">
+                <Shield className="h-4 w-4 text-muted-foreground" />
               </div>
               <div>
                 <p className="text-sm font-medium text-foreground">Build trust</p>
@@ -74,8 +76,8 @@ const BusinessVerificationAboutPage = () => {
             </div>
             
             <div className="flex items-start gap-3">
-              <div className="h-8 w-8 rounded-sq-sm bg-slate-100 flex items-center justify-center shrink-0">
-                <Users className="h-4 w-4 text-slate-600" />
+              <div className="h-8 w-8 rounded-sq-sm bg-muted flex items-center justify-center shrink-0">
+                <Users className="h-4 w-4 text-muted-foreground" />
               </div>
               <div>
                 <p className="text-sm font-medium text-foreground">Stand out</p>
@@ -86,8 +88,8 @@ const BusinessVerificationAboutPage = () => {
             </div>
             
             <div className="flex items-start gap-3">
-              <div className="h-8 w-8 rounded-sq-sm bg-slate-100 flex items-center justify-center shrink-0">
-                <Star className="h-4 w-4 text-slate-600" />
+              <div className="h-8 w-8 rounded-sq-sm bg-muted flex items-center justify-center shrink-0">
+                <Star className="h-4 w-4 text-muted-foreground" />
               </div>
               <div>
                 <p className="text-sm font-medium text-foreground">Professional presence</p>
@@ -135,11 +137,14 @@ const BusinessVerificationAboutPage = () => {
       </main>
 
       {/* Footer CTAs */}
-      <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-border/40 bg-background/95 backdrop-blur">
+      <footer
+        className="fixed inset-x-0 bottom-0 z-20 border-t border-border/40 bg-background/95 backdrop-blur-xl"
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }}
+      >
         <div className="mx-auto flex w-full max-w-lg items-center justify-between gap-3 px-4 py-3">
           <button
             type="button"
-            onClick={handleBack}
+            onClick={() => navigate(-1)}
             className="flex-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2.5"
           >
             Not now
