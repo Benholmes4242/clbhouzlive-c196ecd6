@@ -227,7 +227,7 @@ export function useMessaging(): UseMessagingReturn {
       
       return data as string;
     } catch (err) {
-      console.error('[useMessaging] Error getting/creating DM:', err);
+      AppLog.error('[useMessaging]', 'Error getting/creating DM:', err);
       setError(err instanceof Error ? err : new Error('Failed to get or create DM'));
       return null;
     }
