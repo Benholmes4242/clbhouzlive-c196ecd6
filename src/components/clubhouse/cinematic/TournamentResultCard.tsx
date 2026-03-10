@@ -361,7 +361,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
           <div style={{
             borderTop: '1px solid rgba(255,255,255,0.07)',
             background: 'rgba(0,0,0,0.3)',
-            display: 'flex', gap: 8, padding: '12px 16px', alignItems: 'center',
+            display: 'flex', gap: 8, padding: '14px 20px', alignItems: 'center',
           }}>
             {/* Like button */}
             <button onClick={handleLike} style={{
