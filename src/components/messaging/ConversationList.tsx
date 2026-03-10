@@ -323,7 +323,7 @@ export function ConversationList({
                 </div>
                 <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
                   <span className={cn(
-                    "text-[12px] font-normal",
+                    "text-[11px] font-normal",
                     hasUnread ? "text-primary" : "text-muted-foreground"
                   )}>
                     {formatRelativeTime(conversation.last_message_at)}

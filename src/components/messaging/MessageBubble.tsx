@@ -357,8 +357,8 @@ export function MessageBubble({
 
           {/* Timestamp + Read receipt */}
           <div className="flex items-center gap-1 mt-1 justify-end">
-            {message.is_edited && <span className="text-[11px] font-normal text-muted-foreground">edited</span>}
-            <span className="text-[11px] font-normal text-muted-foreground">{formatMessageTime(message.created_at)}</span>
+            {message.is_edited && <span className="text-[11px] font-normal text-muted-foreground/70">edited</span>}
+            <span className="text-[11px] font-normal text-muted-foreground/70">{formatMessageTime(message.created_at)}</span>
             {isOwnMessage && <ReadReceipt status={deliveryStatus} />}
           </div>
         </div>

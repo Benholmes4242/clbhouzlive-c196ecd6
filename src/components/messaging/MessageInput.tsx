@@ -311,7 +311,7 @@ export function MessageInput({
             placeholder="Message"
             disabled={disabled || uploading}
             rows={1}
-            className="flex-1 bg-transparent outline-none text-[13px] text-foreground placeholder:text-muted-foreground resize-none max-h-[120px] py-1 font-dm-sans"
+            className="flex-1 bg-transparent outline-none text-[14px] text-foreground placeholder:text-muted-foreground resize-none max-h-[120px] py-1 font-dm-sans"
           />
           
            {/* Camera button (when no text/media) */}
