@@ -2,9 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 function average(items: Record<string, unknown>[], key: string): number | null {
-  const valid = items.filter(r => r[key] != null);
+  const valid = items.filter(r => r[key] != null && typeof r[key] === 'number');
   if (!valid.length) return null;
-  return Math.round((valid.reduce((sum, r) => sum + r[key], 0) / valid.length) * 10) / 10;
+  return Math.round((valid.reduce((sum, r) => sum + (r[key] as number), 0) / valid.length) * 10) / 10;
 }
 
 export interface BusinessReviewStats {
