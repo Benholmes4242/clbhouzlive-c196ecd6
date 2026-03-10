@@ -22,7 +22,6 @@ export interface BusinessInvite {
   invitee_email: string;
   role: 'admin' | 'editor' | 'analyst' | 'member';
   status: 'pending' | 'accepted' | 'revoked' | 'expired';
-  token: string;
   created_at: string;
   expires_at: string;
 }
