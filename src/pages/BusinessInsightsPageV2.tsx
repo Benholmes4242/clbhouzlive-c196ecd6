@@ -237,41 +237,36 @@ const BusinessInsightsPageV2 = () => {
   return (
     <PageRoot className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-md border-b border-border">
-        <div className="max-w-[1024px] mx-auto px-4 md:px-6 py-4">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
+        <div className="flex items-center px-4 h-14">
+          <button
+            onClick={() => navigate(-1)}
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-muted-foreground active:text-foreground transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <div className="flex-1 text-center">
+            <h1 className="text-[16px] font-semibold text-foreground">Insights</h1>
+          </div>
+          <div className="w-11" />
+        </div>
+        {/* Date range selector */}
+        <div className="flex justify-center pb-3">
+          <div className="inline-flex rounded-full border border-border bg-muted p-1">
+            {(['7d', '28d', '90d'] as DateRange[]).map((range) => (
               <button
-                onClick={() => navigate(`/business/${id}`)}
-                className="p-2 -ml-2 hover:bg-muted rounded-[10px] transition-colors active:scale-[0.97]"
+                key={range}
+                onClick={() => setDateRange(range)}
+                className={cn(
+                  "px-3 md:px-4 py-1.5 text-[0.8rem] rounded-full transition-colors",
+                  dateRange === range 
+                    ? "bg-primary text-primary-foreground font-medium" 
+                    : "text-muted-foreground hover:text-foreground"
+                )}
               >
-                <ArrowLeft className="h-5 w-5 text-muted-foreground" />
+                {rangeLabels[range]}
               </button>
-              <div className="min-w-0">
-                <h1 className="text-xl font-semibold text-foreground">Insights</h1>
-                <p className="text-[0.8rem] text-muted-foreground truncate">
-                  {business.name} {business.location && `· ${business.location.split(',')[0]}`}
-                </p>
-              </div>
-            </div>
-
-            {/* Date range selector */}
-            <div className="inline-flex rounded-full border border-border bg-muted p-1">
-              {(['7d', '28d', '90d'] as DateRange[]).map((range) => (
-                <button
-                  key={range}
-                  onClick={() => setDateRange(range)}
-                  className={cn(
-                    "px-3 md:px-4 py-1.5 text-[0.8rem] rounded-full transition-colors",
-                    dateRange === range 
-                      ? "bg-primary text-primary-foreground font-medium" 
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  {rangeLabels[range]}
-                </button>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
       </div>
