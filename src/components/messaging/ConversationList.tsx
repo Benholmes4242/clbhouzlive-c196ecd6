@@ -309,7 +309,7 @@ export function ConversationList({
                 <div className="flex items-center gap-1.5 min-w-0 flex-1">
                   {/* Unread dot */}
                   {hasUnread && (
-                    <span className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
                   )}
                   <span className={cn(
                     "text-[14px] truncate text-foreground",
