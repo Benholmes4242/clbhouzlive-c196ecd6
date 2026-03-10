@@ -25,6 +25,7 @@ import { ClubhouseTabProvider, useClubhouseTab } from '@/contexts/ClubhouseTabCo
 import { clubhouseDebug } from '@/debug/clubhouseDebug';
 import MobileVideoDebugPanel from '@/components/debug/MobileVideoDebugPanel';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
 // ── New Media System imports ──
 import { VideoPoolProvider } from '@/components/media-system/VideoPoolProvider';
