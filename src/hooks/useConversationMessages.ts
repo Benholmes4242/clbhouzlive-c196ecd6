@@ -263,7 +263,7 @@ export function useConversationMessages(conversationId: string | null): UseConve
           filter: `conversation_id=eq.${conversationId}`,
         },
         (payload) => {
-          const updated = payload.new as any;
+          const updated = payload.new as Record<string, unknown>;
           if (updated.deleted_at) {
             setMessages(prev => prev.filter(m => m.id !== updated.id));
           } else {
