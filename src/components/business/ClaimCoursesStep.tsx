@@ -5,6 +5,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { AppLog } from '@/lib/logger';
+import { toast } from 'sonner';
 
 interface Course {
   id: string;
