@@ -9,7 +9,6 @@ import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
 const BusinessVerificationSubmittedPage = () => {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
 
   useHideBottomNav();
   useHideHeader();
