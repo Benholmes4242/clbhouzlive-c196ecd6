@@ -306,9 +306,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
                 <span style={{
                   fontSize: 22, fontWeight: 800, lineHeight: 1,
-                  background: 'linear-gradient(135deg, #22C55E, #16A34A)',
-                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
+                  color: '#fff',
                 }}>
                   {meta.winner_score_display || 'E'}
                 </span>
@@ -499,7 +497,7 @@ function PodiumRunnerRow({ row, resolvePhoto }: { row: PodiumRowType; resolvePho
       )}
 
       {/* Score */}
-      <span style={{ fontSize: 14, fontWeight: 700, color: '#22C55E', flexShrink: 0 }}>
+      <span style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.9)', flexShrink: 0 }}>
         {player.score || 'E'}
       </span>
     </div>
