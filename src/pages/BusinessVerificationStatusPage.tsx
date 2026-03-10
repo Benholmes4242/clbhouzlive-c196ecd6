@@ -25,7 +25,7 @@ const BusinessVerificationStatusPage = () => {
   useVerificationNotificationsRealtime(user?.id);
 
   // Fetch business account
-  const { data: business, isLoading: isLoadingBusiness } = useQuery({
+  const { data: business, isLoading: isLoadingBusiness, error: businessError } = useQuery({
     queryKey: ['business-account-verification-status', id],
     enabled: !!id && !!user,
     queryFn: async () => {
