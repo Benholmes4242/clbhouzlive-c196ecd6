@@ -3,11 +3,11 @@
  * This file should be imported at the app level to prevent any Supabase storage usage
  */
 import { uploadToR2Only } from './r2OnlyUpload';
+import { AppLog } from '@/lib/logger';
 
-// Override console methods to warn about Supabase storage usage
-const originalError = console.error;
-const originalWarn = console.warn;
-
+// TODO: enforceR2GlobalPolicy permanently monkey-patches window.fetch globally.
+// This is never restored and will nest if called multiple times.
+// Needs dedicated refactor — do not call this function in production flows.
 export const enforceR2GlobalPolicy = () => {
   // Intercept any potential Supabase storage calls
   if (typeof window !== 'undefined') {
@@ -18,14 +18,14 @@ export const enforceR2GlobalPolicy = () => {
       
       // Block Supabase storage uploads
       if (url.includes('/storage/v1/object') && init?.method === 'POST') {
-        console.error('🚫 BLOCKED: Direct Supabase storage upload. Use uploadToR2Only() instead.');
+        AppLog.error('[enforceR2Policy]', 'BLOCKED: Direct Supabase storage upload. Use uploadToR2Only() instead.');
         throw new Error('Supabase storage uploads are not allowed. Use uploadToR2Only() instead.');
       }
       
       return originalFetch(input, init);
     };
     
-    console.log('🔒 R2-Only Policy Enforced: All image uploads must use Cloudflare R2');
+    AppLog.info('[enforceR2Policy]', 'R2-Only Policy Enforced: All image uploads must use Cloudflare R2');
   }
 };
 
