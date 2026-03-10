@@ -195,7 +195,7 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
         {/* Time display */}
         <div className={cn(
           "flex justify-between text-[10px]",
-          isOwn ? "text-[#F7931E]/70" : "text-muted-foreground"
+          isOwn ? "text-primary/70" : "text-muted-foreground"
         )}>
           <span>{formatTime(currentTime)}</span>
           <span>{formatTime(duration)}</span>

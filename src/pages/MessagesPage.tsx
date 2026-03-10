@@ -289,7 +289,7 @@ function MessagesPageInner() {
                   <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-muted/50">
                     <MessageCircle className="h-8 w-8 text-muted-foreground" />
                   </div>
-                  <h2 className="font-semibold text-lg mb-1 text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                  <h2 className="font-semibold text-lg mb-1 text-foreground font-dm-sans">
                     Select a conversation
                   </h2>
                   <p className="text-sm max-w-[240px] mx-auto text-muted-foreground">

@@ -53,7 +53,7 @@ export function MediaMessage({ type, url, className }: MediaMessageProps) {
           <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 border-none bg-transparent">
             <button
               onClick={() => setFullscreen(false)}
-              className="absolute top-2 right-2 z-10 p-2 rounded-full bg-black/50 text-white hover:bg-black/70"
+              className="absolute top-2 right-2 z-10 p-2 rounded-full bg-foreground/50 text-background hover:bg-foreground/70"
             >
               <X className="h-5 w-5" />
             </button>

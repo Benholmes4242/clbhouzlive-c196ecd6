@@ -616,12 +616,12 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           {showScrollToBottom && (
             <button
               onClick={scrollToBottom}
-              className="fixed bottom-28 right-4 w-9 h-9 rounded-full flex items-center justify-center z-20 active:scale-95 transition-transform"
-              style={{ background: 'rgba(255,255,255,0.8)', border: '1px solid rgba(217,119,6,0.12)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+              className="fixed bottom-28 right-4 w-9 h-9 rounded-full flex items-center justify-center z-20 active:scale-95 transition-transform border border-border"
+              style={{ background: 'hsl(var(--background) / 0.9)' }}
             >
-              <ChevronDown className="w-[18px] h-[18px] text-amber-600" />
+              <ChevronDown className="w-[18px] h-[18px] text-foreground/60" />
               {unreadBelowCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-amber-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-primary rounded-full text-[10px] font-bold text-primary-foreground flex items-center justify-center">
                   {unreadBelowCount > 99 ? '99+' : unreadBelowCount}
                 </span>
               )}
