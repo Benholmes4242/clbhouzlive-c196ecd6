@@ -3,6 +3,7 @@
  * Pure video engine: no UI overlays. Overlay integration deferred to Clubhouse UI layer.
  */
 import { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { VideoPlayer } from './VideoPlayer';
 import { ImageViewer } from './ImageViewer';
 import { MediaCarousel } from './MediaCarousel';
@@ -24,6 +25,7 @@ export function FeedItem({
   post, index, isActive, onFirstFrameReady,
 }: FeedItemProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   const isMultiMedia = post.mediaItems.length > 1;
   const media = post.mediaItems[0];
@@ -43,7 +45,10 @@ export function FeedItem({
           onLike={() => {}}
           onComment={() => {}}
           onShare={() => {}}
-          onViewResults={() => {}}
+          onViewResults={() => {
+            const meta = (post as TournamentResultFeedPost).tournamentMeta;
+            navigate(`/tourhub/tournament/${meta.tournament_id}`);
+          }}
         />
       </div>
     );
