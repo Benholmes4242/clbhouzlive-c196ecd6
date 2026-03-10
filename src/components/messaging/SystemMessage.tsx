@@ -42,7 +42,7 @@ export const SystemMessage: React.FC<SystemMessageProps> = ({
       case 'user_left':
         return <LogOut className={cn(iconClass, "text-muted-foreground")} />;
       case 'user_ejected':
-        return <UserMinus className={cn(iconClass, "text-[#FF3B30]")} />;
+        return <UserMinus className={cn(iconClass, "text-destructive")} />;
       case 'admin_promoted':
         return <Shield className={cn(iconClass, "text-primary/80")} />;
       case 'admin_demoted':

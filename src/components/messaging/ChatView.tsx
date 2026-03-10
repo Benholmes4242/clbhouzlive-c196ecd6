@@ -95,15 +95,7 @@ function ChatSkeleton() {
 function DateSeparator({ date }: { date: string }) {
   return (
     <div className="flex justify-center py-5">
-      <span 
-        className="px-[14px] py-[8px] rounded-full text-[11px] font-medium"
-        style={{
-          background: 'rgba(254,243,199,0.6)',
-          border: '1px solid rgba(217,119,6,0.12)',
-          color: '#B45309',
-          fontFamily: "'DM Sans', sans-serif",
-        }}
-      >
+      <span className="px-3 py-1 rounded-full bg-muted border border-border/40 text-muted-foreground text-[11px] font-medium tracking-wide font-dm-sans">
         {formatDateHeader(date)}
       </span>
     </div>
@@ -482,10 +474,10 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
         style={{
           height: 'calc(60px + max(env(safe-area-inset-top, 0px), 47px))',
           paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-          background: 'rgba(255,251,235,0.85)',
+          background: 'hsl(var(--background) / 0.9)',
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
-          borderBottom: '1px solid rgba(217,119,6,0.08)',
+          borderBottom: '1px solid hsl(var(--border))',
         }}
       >
         {/* Back button */}
@@ -493,7 +485,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           onClick={onBack}
           className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
         >
-          <ChevronLeft className="w-5 h-5 text-amber-700" />
+          <ChevronLeft className="w-5 h-5 text-foreground/60" />
         </button>
         
         {/* Avatar + Info */}
@@ -511,21 +503,21 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             />
             {/* Online indicator for DMs */}
             {!isGroupChat && otherUserPresence?.status === 'online' && (
-              <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#22C55E] rounded-full" style={{ borderWidth: 2, borderColor: 'rgba(255,253,248,0.8)' }} />
+              <div className="absolute bottom-0 right-0 w-3 h-3 bg-primary rounded-full border-2 border-background" />
             )}
           </div>
           
           <div className="flex-1 min-w-0 text-left">
-           <h2 className="text-[16px] font-semibold truncate" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
+           <h2 className="text-[16px] font-semibold truncate text-foreground font-dm-sans">
               {headerInfo.name}
             </h2>
-            <p className="text-[11px] truncate" style={{ color: '#A8A29E' }}>
+            <p className="text-[11px] truncate text-muted-foreground">
               {isTyping ? (
-                <span className="text-amber-500">typing...</span>
+                <span className="text-primary">typing...</span>
               ) : 
                isGroupChat && conversation ? `${conversation.participants.length} members` :
                otherUserPresence?.status === 'online' ? (
-                <span style={{ color: '#22C55E' }}>online</span>
+                <span className="text-primary">online</span>
               ) : 
                otherUserPresence?.status === 'away' ? 'away' : 
                otherUserPresence?.last_seen_at 
@@ -566,7 +558,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
               <button
                 onClick={handleLoadMore}
                 disabled={loadingMore}
-                className="px-4 py-2 bg-white rounded-full text-[13px] font-medium text-[#8E8E93] shadow-[0_1px_2px_rgba(0,0,0,0.06)] active:bg-[#F5F5F5] transition-colors disabled:opacity-50"
+                className="px-4 py-2 bg-muted rounded-full text-[13px] font-medium text-muted-foreground active:bg-muted/70 transition-colors disabled:opacity-50"
               >
                 {loadingMore ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -624,12 +616,12 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           {showScrollToBottom && (
             <button
               onClick={scrollToBottom}
-              className="fixed bottom-28 right-4 w-9 h-9 rounded-full flex items-center justify-center z-20 active:scale-95 transition-transform"
-              style={{ background: 'rgba(255,255,255,0.8)', border: '1px solid rgba(217,119,6,0.12)', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+              className="fixed bottom-28 right-4 w-9 h-9 rounded-full flex items-center justify-center z-20 active:scale-95 transition-transform border border-border"
+              style={{ background: 'hsl(var(--background) / 0.9)' }}
             >
-              <ChevronDown className="w-[18px] h-[18px] text-amber-600" />
+              <ChevronDown className="w-[18px] h-[18px] text-foreground/60" />
               {unreadBelowCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-amber-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-primary rounded-full text-[10px] font-bold text-primary-foreground flex items-center justify-center">
                   {unreadBelowCount > 99 ? '99+' : unreadBelowCount}
                 </span>
               )}

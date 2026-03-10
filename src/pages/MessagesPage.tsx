@@ -151,10 +151,10 @@ function MessagesPageInner() {
             style={{
               paddingTop: 'calc(54px + env(safe-area-inset-top, 0px))',
               height: 'calc(56px + 54px + env(safe-area-inset-top, 0px))',
-              background: 'rgba(248,250,252,0.9)',
+              background: 'hsl(var(--background) / 0.9)',
               backdropFilter: 'blur(24px)',
               WebkitBackdropFilter: 'blur(24px)',
-              borderBottom: '1px solid rgba(0,0,0,0.06)',
+              borderBottom: '1px solid hsl(var(--border))',
             }}
           >
             <button
@@ -165,7 +165,7 @@ function MessagesPageInner() {
               <ChevronLeft className="w-5 h-5 text-foreground/60" />
             </button>
 
-            <span className="text-[16px] font-semibold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>Messages</span>
+            <span className="text-[16px] font-semibold text-foreground font-dm-sans">Messages</span>
 
             <button 
               onClick={handleNewConversation}
@@ -223,10 +223,10 @@ function MessagesPageInner() {
           className="flex-none px-4 flex items-center justify-between mb-4 rounded-2xl"
           style={{
             height: '56px',
-            background: 'rgba(255,255,255,0.8)',
+            background: 'hsl(var(--background) / 0.9)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
-            border: '1px solid rgba(0,0,0,0.07)',
+            border: '1px solid hsl(var(--border))',
           }}
         >
           <button
@@ -237,7 +237,7 @@ function MessagesPageInner() {
             <ChevronLeft className="w-5 h-5 text-foreground/60" />
           </button>
 
-          <span className="text-[16px] font-semibold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>Messages</span>
+          <span className="text-[16px] font-semibold text-foreground font-dm-sans">Messages</span>
 
           <button 
             onClick={handleNewConversation}
@@ -256,9 +256,9 @@ function MessagesPageInner() {
           />
         )}
         
-        <div className="flex flex-1 rounded-[20px] overflow-hidden" style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.45)', boxShadow: '0 2px 16px rgba(0,0,0,0.03)' }}>
-          <div className="w-80 flex-shrink-0 flex flex-col" style={{ borderRight: '1px solid rgba(255,255,255,0.3)' }}>
-            <div className="p-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.3)' }}>
+        <div className="flex flex-1 rounded-[20px] overflow-hidden border border-border" style={{ background: 'hsl(var(--background) / 0.8)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
+          <div className="w-80 flex-shrink-0 flex flex-col border-r border-border">
+            <div className="p-4 border-b border-border">
               <ConversationSearchBar
                 value={searchInput}
                 onChange={handleSearchChange}
@@ -289,7 +289,7 @@ function MessagesPageInner() {
                   <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-muted/50">
                     <MessageCircle className="h-8 w-8 text-muted-foreground" />
                   </div>
-                  <h2 className="font-semibold text-lg mb-1 text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                  <h2 className="font-semibold text-lg mb-1 text-foreground font-dm-sans">
                     Select a conversation
                   </h2>
                   <p className="text-sm max-w-[240px] mx-auto text-muted-foreground">

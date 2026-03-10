@@ -148,7 +148,7 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
         className={cn(
           "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-colors",
           isOwn 
-            ? "bg-white/20 hover:bg-white/30 text-[#F7931E]" 
+            ? "bg-background/20 hover:bg-background/30 text-primary" 
             : "bg-primary/10 hover:bg-primary/20 text-primary"
         )}
         aria-label={isPlaying ? 'Pause' : 'Play'}
@@ -173,8 +173,8 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
               className={cn(
                 "w-[3px] rounded-full transition-all duration-75",
                 index < activeBarIndex
-                  ? isOwn ? "bg-[#F7931E]" : "bg-primary"
-                  : isOwn ? "bg-[#F7931E]/40" : "bg-primary/30",
+                  ? "bg-primary"
+                  : isOwn ? "bg-primary/40" : "bg-primary/30",
                 "group-hover:scale-y-110"
               )}
               style={{ height: `${height * 100}%` }}
@@ -185,7 +185,7 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
           <div 
             className={cn(
               "absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full shadow-md transition-transform",
-              isOwn ? "bg-[#F7931E]" : "bg-primary",
+              "bg-primary",
               isDragging ? "scale-125" : "scale-100 group-hover:scale-110"
             )}
             style={{ left: `calc(${progress}% - 6px)` }}
@@ -195,7 +195,7 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
         {/* Time display */}
         <div className={cn(
           "flex justify-between text-[10px]",
-          isOwn ? "text-[#F7931E]/70" : "text-muted-foreground"
+          isOwn ? "text-primary/70" : "text-muted-foreground"
         )}>
           <span>{formatTime(currentTime)}</span>
           <span>{formatTime(duration)}</span>
