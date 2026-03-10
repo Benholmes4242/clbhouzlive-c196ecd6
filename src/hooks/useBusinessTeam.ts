@@ -120,6 +120,9 @@ export function useRevokeInvite(businessId: string) {
       queryClient.invalidateQueries({ queryKey: ['business-invites', businessId] });
       toast.success('Invitation revoked');
     },
+    onError: () => {
+      toast.error('Failed to revoke invite');
+    },
   });
 }
 

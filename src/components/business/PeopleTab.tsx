@@ -200,7 +200,6 @@ export function PeopleTab({
                 handicap={member.eg_handicap_index}
                 showHandicap={member.show_handicap !== false}
                 homeClub={null}
-                alsoPlaysAt={member.also_plays_at || []}
                 onClick={() => handleProfileClick(member.id)}
               />
             ))}

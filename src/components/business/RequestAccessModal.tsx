@@ -124,13 +124,16 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
       
       // Close after short delay
       setTimeout(() => {
-        onOpenChange(false);
-        setSubmitted(false);
-        setMessage('');
-        setRequestedRole('team_member');
+        if (mountedRef.current) {
+          onOpenChange(false);
+          setSubmitted(false);
+          setMessage('');
+          setRequestedRole('team_member');
+        }
       }, 1500);
-    } catch (error: any) {
-      console.error('Error submitting access request:', error);
+    } catch (e: unknown) {
+      console.error('Error submitting access request:', e);
+      const error = e as { code?: string; message?: string };
       if (error.code === '23505') {
         toast.error('You already have a pending request for this business');
       } else {

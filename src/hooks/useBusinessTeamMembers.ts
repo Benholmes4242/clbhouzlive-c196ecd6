@@ -53,12 +53,12 @@ export function useBusinessTeamMembers(businessId: string | undefined) {
       }
 
       // Map and sort by role priority then alphabetically
-      const members: TeamMember[] = (data || []).map((row: any) => ({
+      const members: TeamMember[] = (data || []).map((row) => ({
         id: row.id,
-        role: row.role,
+        role: row.role as TeamMember['role'],
         created_at: row.created_at,
         display_title: row.display_title ?? null,
-        profile: row.user_profiles,
+        profile: row.user_profiles as TeamMember['profile'],
       }));
 
       return members.sort((a, b) => {

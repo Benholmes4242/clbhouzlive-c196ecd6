@@ -44,9 +44,10 @@ export function ManageTeamModal({
   const tm = useTeamManagement(businessId, currentTeam, { isOwner });
 
   // Reset state when sheet closes
+  const resetAll = useCallback(() => tm.resetAll(), [tm.resetAll]);
   useEffect(() => {
-    if (!open) tm.resetAll();
-  }, [open]);
+    if (!open) resetAll();
+  }, [open, resetAll]);
 
   return (
     <>

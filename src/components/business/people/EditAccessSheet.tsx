@@ -9,7 +9,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { TeamMember } from '@/hooks/useBusinessTeamMembers';
 import { getAccessLevel } from '@/hooks/useTeamManagement';
-import { cn } from '@/lib/utils';
+
 
 interface AccessOption {
   value: string;

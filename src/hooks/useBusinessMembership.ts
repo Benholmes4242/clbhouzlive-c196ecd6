@@ -27,10 +27,7 @@ export function useBusinessMembership(businessId?: string) {
         .eq('user_profile_id', userId)
         .maybeSingle();
 
-      if (error) {
-        console.error('[useBusinessMembership] error', error);
-        return null;
-      }
+      if (error) throw error;
 
       if (!data) return null;
 

@@ -327,9 +327,9 @@ export function useTeamManagement(
       await new Promise((r) => requestAnimationFrame(r));
 
       invalidateTeam();
-    } catch (error: any) {
-      AppLog.error('useTeamManagement', 'Remove failed', error);
-      toast.error(error?.message || 'Failed to remove team member');
+    } catch (e: unknown) {
+      AppLog.error('useTeamManagement', 'Remove failed', e);
+      toast.error((e as Error)?.message || 'Failed to remove team member');
     } finally {
       setRemoving(false);
     }
