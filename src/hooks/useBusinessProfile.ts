@@ -93,7 +93,7 @@ export function useBusinessProfile(idOrSlug: string | undefined) {
           .maybeSingle();
 
         if (courseError) {
-          console.error('[useBusinessProfile] course coords fallback error', courseError);
+          AppLog.error('[useBusinessProfile]', 'course coords fallback error', courseError);
         }
 
         if (courseData) {
