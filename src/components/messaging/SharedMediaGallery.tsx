@@ -41,13 +41,16 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
       setLoading(true);
 
       try {
+        // NOTE: Media gallery only scans the most recent 1000 messages.
+        // For very long conversations, older shared media will not appear.
         const { data: messages } = await supabase
           .from('messages')
           .select('id, content, message_type, media_url, media_metadata, created_at')
           .eq('conversation_id', conversationId)
           .is('deleted_at', null)
           .or('message_type.in.(image,video,course_share),media_url.neq.null')
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .limit(1000);
 
         const mediaItems: MediaItem[] = [];
         const courseItems: MediaItem[] = [];
