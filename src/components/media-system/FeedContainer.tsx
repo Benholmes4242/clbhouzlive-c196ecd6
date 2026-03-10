@@ -415,6 +415,9 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
               followOverride={followOverrides?.get(post.userId)}
               onFollowChange={onFollowChange}
               onFirstFrameReady={index === 0 ? onFirstFrameReady : undefined}
+              onLike={onLike}
+              onComment={onComment}
+              onShare={onShare}
             />
           );
         })}
