@@ -508,7 +508,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             <span>{getTourLabel(meta.tour_slug)}</span>
           </div>
 
-          {/* Engagement pills - centre */}
+          {/* Engagement pills - centre (matching CinematicActionRail icons & colors) */}
           <div style={{ display: 'flex', gap: 8 }}>
             <button
               onClick={onLike}
@@ -517,20 +517,25 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
                 alignItems: 'center',
                 gap: 5,
                 background: post.isLikedByMe
-                  ? 'rgba(249, 115, 22, 0.25)'
+                  ? 'rgba(245, 158, 11, 0.25)'
                   : 'rgba(255, 255, 255, 0.10)',
                 border: `1px solid ${post.isLikedByMe
-                  ? 'rgba(249, 115, 22, 0.5)'
+                  ? 'rgba(245, 158, 11, 0.5)'
                   : 'rgba(255, 255, 255, 0.15)'}`,
                 borderRadius: 20,
                 padding: '6px 12px',
-                color: post.isLikedByMe ? '#F97316' : 'rgba(255,255,255,0.85)',
+                color: post.isLikedByMe ? '#f59e0b' : 'rgba(255,255,255,0.85)',
                 fontSize: 13,
                 fontWeight: 600,
                 cursor: 'pointer',
               }}
             >
-              <span>{post.isLikedByMe ? '♥' : '♡'}</span>
+              <Heart
+                className="w-4 h-4"
+                style={{ color: post.isLikedByMe ? '#f59e0b' : 'rgba(255,255,255,0.85)' }}
+                fill={post.isLikedByMe ? '#f59e0b' : 'none'}
+                strokeWidth={post.isLikedByMe ? 0 : 2}
+              />
               <span>{post.likeCount}</span>
             </button>
 
@@ -550,7 +555,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
                 cursor: 'pointer',
               }}
             >
-              <span>💬</span>
+              <MessageSquare className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.85)' }} strokeWidth={2} />
               <span>{post.commentCount}</span>
             </button>
           </div>
