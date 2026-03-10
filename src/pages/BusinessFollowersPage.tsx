@@ -115,6 +115,9 @@ export default function BusinessFollowersPage() {
                 src={follower.profile_photo_url}
                 alt={follower.display_name || follower.username || ''}
                 size={48}
+                hideRing
+                className="[&>div]:!border [&>div]:!border-border"
+                style={{ '--sq-border': '0.5px solid hsl(var(--border))' } as React.CSSProperties}
               />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
