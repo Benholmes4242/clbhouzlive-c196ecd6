@@ -173,6 +173,13 @@ const ClubhouseContent = () => {
   const activePostId = posts[activeIndex]?.id;
   const { activePost, golfCourse, activeReview, isActiveReview, isActiveVideo } = useActivePostDerived(posts, activeIndex);
   const isTournamentCardActive = activePost?.postType === 'tournament_result';
+
+  // Hide bottom nav when tournament card is active
+  const { setVisible: setBottomNavVisible } = useBottomNavigation();
+  useEffect(() => {
+    setBottomNavVisible(!isTournamentCardActive);
+    return () => setBottomNavVisible(true);
+  }, [isTournamentCardActive, setBottomNavVisible]);
   
   // ── Optimistic like state ──
   const { handleLike, getActiveLikeState, resetLikes } = useClubhouseLikes({ userId: user?.id, activeActor });
