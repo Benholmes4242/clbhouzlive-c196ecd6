@@ -10,7 +10,6 @@ export interface ClubMember {
   show_handicap: boolean | null;
   is_verified_golfer: boolean;
   created_at: string | null;
-  also_plays_at?: string[]; // Additional club names
 }
 
 /**
