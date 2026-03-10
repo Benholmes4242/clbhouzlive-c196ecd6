@@ -540,6 +540,7 @@ const ClubhouseContent = () => {
 
           {/* CreatorCapsule — z-50, bottom-left */}
           <CreatorCapsule
+            postId={activePost.id}
             user={{
               id: activePost.userId,
               name: activePost.displayName,
