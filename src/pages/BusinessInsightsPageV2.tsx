@@ -158,8 +158,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
       {reviewStats.courses.length > 0 && (
         <button
           onClick={() => navigate(`/courses/${reviewStats.courses[0].id}?tab=reviews`)}
-          className="text-[0.8rem] hover:underline"
-          style={{ color: '#f59e0b' }}
+          className="text-[0.8rem] hover:underline text-primary"
         >
           View all reviews ›
         </button>
