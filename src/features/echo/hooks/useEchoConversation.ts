@@ -139,6 +139,7 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
       .order('created_at', { ascending: true });
 
     if (error) {
+      toast.error("Couldn't load conversation");
       return;
     }
 
