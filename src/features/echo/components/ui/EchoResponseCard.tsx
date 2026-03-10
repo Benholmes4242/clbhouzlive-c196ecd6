@@ -1,18 +1,15 @@
 /**
  * EchoResponseCard - Left-aligned assistant bubble
- * Warm amber tint to differentiate Echo's voice
- * Relocated from features/hub/components/echo-v2/
  */
 
 import React, { useState, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Copy, Check, ChevronRight, Share2 } from 'lucide-react';
+import { Copy, Check, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { haptic } from '@/utils/haptics';
 import { sanitizeEchoText, generateFollowUps, ECHO_ALLOWED_ELEMENTS } from '@/features/echo/utils/echoFormat';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
-// Course linkification patterns
 const COURSE_PATTERNS = [
   /\b([A-Z][a-zA-Z\s''-]+(?:Golf Club|Golf Course|Golf Links|Country Club))\b/g,
 ];
@@ -85,21 +82,22 @@ export function EchoResponseCard({
 
   return (
     <div className="flex justify-start">
-      <div className="max-w-[90%]">
-        {/* Main bubble - warm amber tint */}
-        <div 
-          className="px-4 py-4 rounded-2xl backdrop-blur-sm bg-white/70 border border-amber-200/20"
+      <div className="max-w-[92%]">
+        {/* Main bubble */}
+        <div
+          className="px-4 py-4 rounded-[4px_18px_18px_18px] bg-background border"
+          style={{ borderColor: 'hsl(var(--border))' }}
         >
-          <div className="text-[14px] prose prose-sm prose-neutral max-w-none" style={{ color: '#1C1917', lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif" }}>
+          <div className="text-[14px] prose prose-sm max-w-none text-foreground font-['DM_Sans']" style={{ lineHeight: 1.65 }}>
             <ReactMarkdown
               allowedElements={ECHO_ALLOWED_ELEMENTS}
               unwrapDisallowed
               components={{
-                p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1">{children}</ul>,
-                ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-2" style={{ color: '#44403C' }}>{children}</ol>,
-                li: ({ children }) => <li style={{ color: '#1C1917' }}>{children}</li>,
-                strong: ({ children }) => <strong className="font-semibold" style={{ color: '#1C1917' }}>{children}</strong>,
+                p: ({ children }) => <p className="mb-2 last:mb-0 text-foreground">{children}</p>,
+                ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1 text-foreground">{children}</ul>,
+                ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-2 text-foreground">{children}</ol>,
+                li: ({ children }) => <li className="text-foreground">{children}</li>,
+                strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
                 em: ({ children }) => <em className="italic">{children}</em>,
                 text: ({ children }) => {
                   if (typeof children !== 'string' || courseMatches.length === 0) {
@@ -120,7 +118,7 @@ export function EchoResponseCard({
                         <span
                           key={`course-${keyIndex++}`}
                           onClick={() => handleCourseClick(courseName)}
-                          className="text-[#B45309] font-medium underline decoration-[#FFBF66] underline-offset-2 cursor-pointer hover:opacity-80 transition-opacity"
+                          className="text-primary font-medium underline decoration-primary underline-offset-2 cursor-pointer hover:opacity-80 transition-opacity"
                           role="link"
                           tabIndex={0}
                           aria-label={`View ${courseName}`}
@@ -140,7 +138,7 @@ export function EchoResponseCard({
                   return result.length > 0 ? <>{result}</> : <>{children}</>;
                 },
                 code: ({ children }) => (
-                  <code className="px-1 py-0.5 rounded bg-[#F0F0F5] text-[0.8125rem] font-mono text-[#1D1D1F]">
+                  <code className="px-1.5 py-0.5 rounded-md bg-muted text-[0.8125rem] font-mono text-foreground">
                     {children}
                   </code>
                 ),
@@ -150,12 +148,11 @@ export function EchoResponseCard({
             </ReactMarkdown>
           </div>
           
-          {/* Streaming cursor - pulsing orange bar */}
+          {/* Streaming cursor */}
           {isStreaming && (
             <span 
-              className="inline-block w-[3px] h-4 rounded-full ml-1"
+              className="inline-block w-[3px] h-4 rounded-full ml-1 bg-primary"
               style={{
-                backgroundColor: '#EA580C',
                 animation: prefersReduced ? 'none' : 'echoCursorBlink 1s ease-in-out infinite',
               }}
             />
@@ -163,7 +160,7 @@ export function EchoResponseCard({
           
           {/* Aborted indicator */}
           {wasAborted && (
-            <span className="text-[0.75rem] mt-1 block" style={{ color: '#A8A29E' }}>(stopped)</span>
+            <span className="text-[0.75rem] text-muted-foreground mt-1 block">(stopped)</span>
           )}
         </div>
 
@@ -171,12 +168,12 @@ export function EchoResponseCard({
         {!isStreaming && (
           <button
             onClick={handleCopy}
-            className={`flex items-center gap-1 mt-1.5 px-2 py-1 rounded-lg text-[12px] font-medium active:bg-amber-50 transition-all ${copied ? 'text-amber-600' : 'text-amber-500'}`}
+            className={`flex items-center gap-1.5 mt-2 px-2 py-1 rounded-lg text-[12px] font-medium active:bg-primary/5 transition-all ${copied ? 'text-primary' : 'text-muted-foreground'}`}
             aria-label="Copy response to clipboard"
           >
             {copied ? (
               <>
-                <Check className="w-3.5 h-3.5 text-amber-600" />
+                <Check className="w-3.5 h-3.5 text-primary" />
                 <span>Copied</span>
               </>
             ) : (
@@ -190,17 +187,16 @@ export function EchoResponseCard({
 
         {/* Follow-up chips */}
         {isLast && !isStreaming && followUps.length > 0 && (
-          <div className="flex flex-col gap-[6px] mt-2">
+          <div className="flex flex-col gap-2 mt-3">
             {followUps.map((chip) => (
               <button
                 key={chip}
                 onClick={() => handleFollowUp(chip)}
-                className="flex items-center justify-between gap-2 px-4 py-3 rounded-xl text-sm font-medium active:bg-amber-100/50 transition-all bg-amber-50 border border-amber-200/30 text-amber-700"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
+                className="flex items-center justify-between gap-2 px-4 py-3 rounded-2xl text-[13px] font-medium active:bg-primary/5 active:scale-[0.98] transition-all duration-150 bg-background border border-border text-foreground font-['DM_Sans']"
                 aria-label={`Ask: ${chip}`}
               >
                 <span>{chip}</span>
-                <ChevronRight className="w-[14px] h-[14px] flex-shrink-0 text-amber-400" />
+                <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground" />
               </button>
             ))}
           </div>

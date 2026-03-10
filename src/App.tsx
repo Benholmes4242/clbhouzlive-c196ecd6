@@ -484,7 +484,7 @@ function AppRoutes() {
         <Route path="/create-moment" element={<Suspense fallback={<GenericPageSkeleton />}><CreateMomentPage /></Suspense>} />
         <Route path="/error-logs" element={<ErrorLogPage />} />
         
-        {/* TODO: Echo AI routes pending decommission — video players use legacy GlassVideo/HLSVideoPlayer outside standard video stack */}
+        {/* Echo AI */}
         <Route path="/echo" element={<Suspense fallback={<HubSkeleton />}><EchoPage /></Suspense>} />
         <Route path="/echo/:conversationId" element={<Suspense fallback={<HubSkeleton />}><EchoPage /></Suspense>} />
         

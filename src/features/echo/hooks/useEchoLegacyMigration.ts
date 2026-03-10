@@ -90,7 +90,7 @@ export function useEchoLegacyMigration(opts?: Options) {
 
         if (threadErr) {
           // Thread might already exist, skip
-          console.warn('Thread creation skipped:', threadErr.message);
+          // Thread might already exist, skip
           continue;
         }
 
@@ -110,7 +110,7 @@ export function useEchoLegacyMigration(opts?: Options) {
             .insert(messageInserts);
 
           if (msgErr) {
-            console.warn('Message insertion error:', msgErr.message);
+            // Message insertion error — skip
           }
         }
       }

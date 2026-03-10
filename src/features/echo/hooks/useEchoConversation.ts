@@ -110,7 +110,7 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
   // Signal ready only when userId is available
   useEffect(() => {
     if (userId && !isReady) {
-      console.log('[useEchoConversation] Hook ready, userId:', userId);
+      // Hook ready
       requestAnimationFrame(() => {
         setIsReady(true);
         initializingRef.current = false;
@@ -183,11 +183,11 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
 
   const sendMessage = useCallback(async (content: string) => {
     if (isStreaming || !userId || rateLimitCooldown) {
-      console.warn('[sendMessage] Blocked:', { isStreaming, hasUserId: !!userId, rateLimitCooldown });
+      return;
       return;
     }
 
-    console.log('[sendMessage] Starting message send:', content.substring(0, 50));
+    
 
     const userMessage: EchoMessage = {
       id: nanoid(),

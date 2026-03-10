@@ -102,11 +102,11 @@ export const EchoChatSurface = forwardRef<EchoChatSurfaceRef, EchoChatSurfacePro
     if (hubTheme) {
       return {
         messageBg: {
-          user: 'var(--hub-primary-bg, #1a1a1a)',
+          user: 'hsl(var(--background))',
           assistant: 'var(--hub-glass-bg)',
         },
         messageColor: {
-          user: 'white',
+          user: 'hsl(var(--primary-foreground))',
           assistant: 'var(--hub-text)',
         },
         iconBg: 'var(--hub-glass-bg)',
@@ -200,7 +200,7 @@ export const EchoChatSurface = forwardRef<EchoChatSurfaceRef, EchoChatSurfacePro
           style={{
             background: styles.inputBg,
             border: `1px solid ${styles.inputBorder}`,
-            boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+            boxShadow: '0 1px 4px hsl(var(--border) / 0.5)',
           }}
         >
           <input
@@ -228,7 +228,7 @@ export const EchoChatSurface = forwardRef<EchoChatSurfaceRef, EchoChatSurfacePro
               style={{ background: 'hsl(var(--destructive))' }}
               aria-label="Stop"
             >
-              <StopCircle className="w-5 h-5 text-white" />
+              <StopCircle className="w-5 h-5 text-primary-foreground" />
             </button>
           ) : (
             <button
@@ -241,11 +241,11 @@ export const EchoChatSurface = forwardRef<EchoChatSurfaceRef, EchoChatSurfacePro
                 input.trim() ? "opacity-100" : "opacity-40"
               )}
               style={{
-                background: hubTheme ? 'var(--hub-primary-bg, #1a1a1a)' : 'hsl(var(--primary))',
+                background: hubTheme ? 'var(--hub-primary-bg, hsl(var(--foreground)))' : 'hsl(var(--primary))',
               }}
               aria-label="Send"
             >
-              <Send className="w-4 h-4 text-white" />
+              <Send className="w-4 h-4 text-primary-foreground" />
             </button>
           )}
         </div>
@@ -301,7 +301,7 @@ function MessageBubble({ message, styles, hubTheme }: MessageBubbleProps) {
       >
         <div className="whitespace-pre-wrap">{message.content}</div>
         {message.meta?.error && (
-          <div className="mt-2 text-xs text-red-500">
+          <div className="mt-2 text-xs text-destructive">
             Error: {message.meta.error}
           </div>
         )}

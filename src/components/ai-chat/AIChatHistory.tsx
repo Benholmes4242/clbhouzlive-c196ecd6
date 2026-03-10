@@ -7,7 +7,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useConversationSession } from '@/hooks/useConversationSession';
+// Legacy useConversationSession removed — session stub for compatibility
 import { useCaddieLogs } from '@/hooks/useCaddieLogs';
 import { useEchoProtection } from '@/hooks/useEchoProtection';
 import { useEchoConversationsOptional } from '@/features/echo/components/EchoConversationsProvider';
@@ -89,11 +89,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({
     deleteSwingAnalysis: removeSwingAnalysis
   } = useSwingPagination();
 
-  // DB session for single source of truth
-  const session = useConversationSession({
-    storageKey: 'echo_chat',
-    isModalOpen: false
-  });
+  // Legacy session stub (useConversationSession deleted)
+  const session = { deleteConversation: async (_id: string) => {} };
 
   // Load data when component opens
   useEffect(() => {

@@ -38,11 +38,11 @@ export function useEchoConversations(search?: string) {
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        console.log('[useEchoConversations] No user found, returning empty array');
+        return [];
         return [];
       }
 
-      console.log('[useEchoConversations] Fetching conversations for user:', user.id);
+      
 
       let q = supabase
         .from('echo_conversations')
@@ -61,7 +61,7 @@ export function useEchoConversations(search?: string) {
         throw error;
       }
 
-      console.log('[useEchoConversations] Fetched conversations:', data?.length ?? 0);
+      
 
       // Get message counts using server-side RPC aggregate
       const conversationIds = (data ?? []).map(c => c.id);
