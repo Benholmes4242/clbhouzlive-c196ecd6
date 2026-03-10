@@ -298,6 +298,9 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 }) => {
   const navigate = useNavigate();
   const meta = post.tournamentMeta;
+  const isLiked = likeOverride?.isLiked ?? post.isLikedByMe;
+  const likeCount = likeOverride?.count ?? post.likeCount;
+  const commentCount = commentCountOverride ?? post.commentCount;
   const hasImage = !!meta.course_image_url;
   const bgGradient = TOUR_GRADIENTS[meta.tour_slug] || 'from-slate-900 via-slate-800 to-slate-900';
 
