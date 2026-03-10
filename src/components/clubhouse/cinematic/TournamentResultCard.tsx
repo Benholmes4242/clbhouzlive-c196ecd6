@@ -430,18 +430,20 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 };
 
 // ─── Score stat chip with glow ───
-function StatGlowChip({ value, label, color, bg, border, glow }: {
-  value: number; label: string; color: string; bg: string; border: string; glow: string;
+function StatGlowChip({ value, label, color, bg, border, glow, dimmed }: {
+  value: number; label: string; color: string; bg: string; border: string; glow: string; dimmed?: boolean;
 }) {
+  const opacity = dimmed ? 0.4 : 1;
   return (
     <div style={{
-      minWidth: 64, borderRadius: 12, padding: '10px 14px',
+      borderRadius: 12, padding: '10px 0',
       background: bg, border: `1px solid ${border}`,
-      boxShadow: `0 0 12px ${glow}`,
-      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flexShrink: 0,
+      boxShadow: dimmed ? 'none' : `0 0 12px ${glow}`,
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+      opacity,
     }}>
-      <span style={{ fontSize: 22, fontWeight: 800, color, lineHeight: 1 }}>{value}</span>
-      <span style={{ fontSize: 8.5, fontWeight: 700, color: 'rgba(255,255,255,0.45)', letterSpacing: 0.8, textTransform: 'uppercase' }}>{label}</span>
+      <span style={{ fontSize: 20, fontWeight: 800, color, lineHeight: 1 }}>{value}</span>
+      <span style={{ fontSize: 7.5, fontWeight: 700, color: 'rgba(255,255,255,0.45)', letterSpacing: 0.8, textTransform: 'uppercase' }}>{label}</span>
     </div>
   );
 }
