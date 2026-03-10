@@ -12,7 +12,7 @@ import {
 import { BusinessMembership } from '@/hooks/useBusinessMembership';
 import { DeleteBusinessDialog } from './DeleteBusinessDialog';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import BusinessVerificationModal from './verification/BusinessVerificationModal';
+
 
 interface BusinessOwnerMenuProps {
   businessId: string;
