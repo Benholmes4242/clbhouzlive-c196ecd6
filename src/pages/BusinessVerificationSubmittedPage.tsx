@@ -14,6 +14,7 @@ const BusinessVerificationSubmittedPage = () => {
   useHideBottomNav();
   useHideHeader();
 
+  const handleDone = () => {
     // Navigate back to business profile or manage page
     navigate('/business/manage');
   };
