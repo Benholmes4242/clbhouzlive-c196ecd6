@@ -74,9 +74,6 @@ export default function BusinessFollowersPage() {
                 <span className="font-normal text-muted-foreground">{followersCount}</span>
               )}
             </h1>
-            {business?.name && (
-              <p className="text-[12px] text-muted-foreground leading-none mt-0.5">{business.name}</p>
-            )}
           </div>
           <div className="w-11" />
         </div>
