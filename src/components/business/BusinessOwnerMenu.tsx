@@ -137,12 +137,6 @@ export function BusinessOwnerMenu({
         />
       )}
 
-      <BusinessVerificationModal
-        open={verificationModalOpen}
-        onOpenChange={setVerificationModalOpen}
-        businessId={businessId}
-        isReapply={isRejected}
-      />
     </>
   );
 }

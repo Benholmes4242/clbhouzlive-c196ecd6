@@ -434,12 +434,6 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
         userId={userId}
       />
 
-      <BusinessVerificationModal
-        open={showVerificationModal}
-        onOpenChange={setShowVerificationModal}
-        businessId={business.id}
-        isReapply={verificationState === 'rejected'}
-      />
     </>
   );
 }
