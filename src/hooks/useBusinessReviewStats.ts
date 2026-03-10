@@ -39,12 +39,13 @@ export function useBusinessReviewStats(businessId: string | undefined) {
       if (!businessId) return null;
 
       // Get business's club_id
-      const { data: business } = await supabase
+      const { data: business, error: businessError } = await supabase
         .from('business_accounts')
         .select('club_id')
         .eq('id', businessId)
         .single();
 
+      if (businessError) throw businessError;
       if (!business?.club_id) return null;
 
       // Get all courses for this club
