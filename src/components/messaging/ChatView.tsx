@@ -508,16 +508,16 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           </div>
           
           <div className="flex-1 min-w-0 text-left">
-           <h2 className="text-[16px] font-semibold truncate" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
+           <h2 className="text-[16px] font-semibold truncate text-foreground font-dm-sans">
               {headerInfo.name}
             </h2>
-            <p className="text-[11px] truncate" style={{ color: '#A8A29E' }}>
+            <p className="text-[11px] truncate text-muted-foreground">
               {isTyping ? (
-                <span className="text-amber-500">typing...</span>
+                <span className="text-primary">typing...</span>
               ) : 
                isGroupChat && conversation ? `${conversation.participants.length} members` :
                otherUserPresence?.status === 'online' ? (
-                <span style={{ color: '#22C55E' }}>online</span>
+                <span className="text-primary">online</span>
               ) : 
                otherUserPresence?.status === 'away' ? 'away' : 
                otherUserPresence?.last_seen_at 
