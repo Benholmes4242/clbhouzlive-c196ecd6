@@ -133,7 +133,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         setSearchError(null);
       }
     } catch (err) {
-      console.error('Address search error:', err);
+      AppLog.error('[AddressAutocomplete]', 'Address search error:', err);
       setSearchError('Unable to search addresses. Please try again.');
       setSuggestions([]);
     } finally {
