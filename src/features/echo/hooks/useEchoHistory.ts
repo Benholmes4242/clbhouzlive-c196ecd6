@@ -39,7 +39,6 @@ export function useEchoConversations(search?: string) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         return [];
-        return [];
       }
 
       

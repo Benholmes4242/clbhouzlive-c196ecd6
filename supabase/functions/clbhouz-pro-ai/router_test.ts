@@ -1,7 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 import {
   decideRoute,
-  modelDeclined,
   needsStaticExplainer,
 } from "./router.ts";
 import { assertEquals } from "https://deno.land/std@0.224.0/assert/mod.ts";
@@ -49,21 +48,6 @@ Deno.test("decideRoute() inverted hybrid (Perplexity-first)", () => {
   }
 });
 
-Deno.test("modelDeclined() triggers live fallback", () => {
-  const samples = [
-    "I don't have current information due to my knowledge cutoff.",
-    "I can't browse the web, please check the web.",
-    "Not up to date on live leaderboards.",
-  ];
-  for (const s of samples) {
-    if (!modelDeclined(s)) {
-      throw new Error(`Expected modelDeclined=true for: "${s}"`);
-    }
-  }
-  if (modelDeclined("All good, here is the answer.")) {
-    throw new Error("False positive on modelDeclined()");
-  }
-});
 
 // Optional: forced mode
 Deno.test("decideRoute() respects forced mode", () => {

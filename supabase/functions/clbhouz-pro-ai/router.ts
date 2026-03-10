@@ -178,15 +178,6 @@ export function needsStaticExplainer(q: string): [boolean, string] {
   return [false, "default-live"];
 }
 
-// Safety check: if OpenAI replies with a cutoff/decline, trigger live fallback
-export function modelDeclined(text?: string): boolean {
-  if (!text) return false;
-  const p = text.toLowerCase();
-  return /\b(i (don'?t|do not) have (current|real-?time) info|knowledge cutoff|can'?t browse|check the web|not up to date|my training data|as of my last update|i cannot access|unable to provide current)\b/.test(
-    p
-  );
-}
-
 // The top-level router used when mode === "auto"
 export function decideRoute(q: string, mode: Mode = "auto"): { route: Route; reason: string } {
   if (mode !== "auto") return { route: mode, reason: "forced" };
