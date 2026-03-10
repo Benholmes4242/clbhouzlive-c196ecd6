@@ -71,7 +71,7 @@ async function getCroppedImg(
           reject(new Error('Canvas is empty'));
           return;
         }
-        console.log('[Crop] Output blob size:', blob.size, 'bytes');
+        
         const file = new File([blob], outputFileName, { type: 'image/jpeg' });
         resolve(file);
       },
