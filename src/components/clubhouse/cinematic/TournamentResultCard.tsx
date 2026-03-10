@@ -565,7 +565,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
               }}
             >
               <MessageSquare className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.85)' }} strokeWidth={2} />
-              <span>{post.commentCount}</span>
+              <span>{commentCount}</span>
             </button>
           </div>
 
