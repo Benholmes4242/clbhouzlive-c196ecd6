@@ -12,7 +12,6 @@ interface PersonRowProps {
   handicap?: number | null;
   showHandicap?: boolean;
   homeClub?: string | null;
-  alsoPlaysAt?: string[];
   onClick: () => void;
 }
 
@@ -24,16 +23,10 @@ export function PersonRow({
   handicap,
   showHandicap = true,
   homeClub,
-  alsoPlaysAt = [],
   onClick,
 }: PersonRowProps) {
   const name = displayName || username || 'Unknown';
   const showHcp = showHandicap && handicap != null;
-  
-  // Format "Also plays at" text
-  const alsoPlaysAtText = alsoPlaysAt.length > 0
-    ? `Also plays at ${alsoPlaysAt.join(', ')}`
-    : null;
 
   return (
     <button
