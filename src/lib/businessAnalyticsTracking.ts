@@ -27,18 +27,19 @@ interface TrackEventParams {
  */
 export async function trackBusinessAnalyticsEvent(params: TrackEventParams): Promise<void> {
   try {
-    // Cast to any to bypass type checking until types are regenerated
+    const payload: Database['public']['Tables']['business_analytics_events']['Insert'] = {
+      business_id: params.businessId,
+      user_id: params.userId || null,
+      event_type: params.eventType,
+      action_type: params.actionType || null,
+      source: params.source || null,
+      content_id: params.contentId || null,
+      metadata: (params.metadata || {}) as Json,
+    };
+
     const { error } = await supabase
       .from('business_analytics_events')
-      .insert({
-        business_id: params.businessId,
-        user_id: params.userId || null,
-        event_type: params.eventType,
-        action_type: params.actionType || null,
-        source: params.source || null,
-        content_id: params.contentId || null,
-        metadata: params.metadata || {},
-      });
+      .insert(payload);
 
     if (error) {
       AppLog.error('[Analytics]', 'Failed to track event:', error);
