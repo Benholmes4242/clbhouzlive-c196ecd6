@@ -202,7 +202,7 @@ export function useMessaging(): UseMessagingReturn {
 
       setConversations(conversationsWithDetails);
     } catch (err) {
-      console.error('[useMessaging] Error fetching conversations:', err);
+      AppLog.error('[useMessaging]', 'Error fetching conversations:', err);
       setError(err instanceof Error ? err : new Error('Failed to fetch conversations'));
     } finally {
       setInitialLoading(false);
