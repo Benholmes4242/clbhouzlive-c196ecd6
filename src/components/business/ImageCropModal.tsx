@@ -160,7 +160,7 @@ export function ImageCropModal({
         </VisuallyHidden>
         
         {/* Crop area */}
-        <div className="relative h-[350px] w-full bg-black">
+        <div className="relative h-[350px] w-full bg-background">
           <Cropper
             image={imageSrc}
             crop={crop}
