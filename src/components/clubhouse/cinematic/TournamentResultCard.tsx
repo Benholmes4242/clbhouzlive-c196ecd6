@@ -306,9 +306,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
                 <span style={{
                   fontSize: 22, fontWeight: 800, lineHeight: 1,
-                  background: 'linear-gradient(135deg, #22C55E, #16A34A)',
-                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
+                  color: '#fff',
                 }}>
                   {meta.winner_score_display || 'E'}
                 </span>
