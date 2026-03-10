@@ -192,8 +192,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
       if (error) throw error;
       toast.success('Member removed');
       onUpdate();
-    } catch (error: any) {
-      toast.error('Failed to remove', { description: error.message });
+    } catch (e: unknown) {
+      toast.error('Failed to remove', { description: (e as Error).message ?? 'An error occurred' });
     }
   };
 
