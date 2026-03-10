@@ -296,7 +296,7 @@ export function useMessaging(): UseMessagingReturn {
       queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
       queryClient.invalidateQueries({ queryKey: ['unread-notifications'] });
     } catch (err) {
-      console.error('[useMessaging] Error marking as read:', err);
+      AppLog.error('[useMessaging]', 'Error marking as read:', err);
     }
   }, [user, queryClient]);
 
