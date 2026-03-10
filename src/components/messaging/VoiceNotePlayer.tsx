@@ -173,8 +173,8 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
               className={cn(
                 "w-[3px] rounded-full transition-all duration-75",
                 index < activeBarIndex
-                  ? isOwn ? "bg-[#F7931E]" : "bg-primary"
-                  : isOwn ? "bg-[#F7931E]/40" : "bg-primary/30",
+                  ? "bg-primary"
+                  : isOwn ? "bg-primary/40" : "bg-primary/30",
                 "group-hover:scale-y-110"
               )}
               style={{ height: `${height * 100}%` }}
