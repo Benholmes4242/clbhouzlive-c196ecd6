@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { AppLog } from '@/lib/logger';
 
 export type BusinessEventType = 
   | 'profile_visit'
