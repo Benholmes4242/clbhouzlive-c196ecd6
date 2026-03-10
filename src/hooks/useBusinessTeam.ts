@@ -22,7 +22,6 @@ export interface BusinessInvite {
   invitee_email: string;
   role: 'admin' | 'editor' | 'analyst' | 'member';
   status: 'pending' | 'accepted' | 'revoked' | 'expired';
-  token: string;
   created_at: string;
   expires_at: string;
 }
@@ -62,7 +61,7 @@ export function useBusinessInvites(businessId?: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('business_invites')
-        .select('id, business_id, invited_by, invitee_email, role, status, token, created_at, expires_at')
+        .select('id, business_id, invited_by, invitee_email, role, status, created_at, expires_at')
         .eq('business_id', businessId)
         .order('created_at', { ascending: false });
 
@@ -93,16 +92,6 @@ export function useCreateInvite(businessId: string) {
 
       if (error) throw error;
 
-      // Create notification for invitee (if they have an account)
-      const { data: inviteeProfile } = await supabase
-        .from('user_profiles')
-        .select('id')
-        .eq('id', (await supabase.auth.getUser()).data.user?.id)
-        .single();
-
-      // Look up user by email via auth
-      // Note: We can't query auth.users directly, so notification will be handled by accept flow
-
       return data;
     },
     onSuccess: () => {
@@ -130,6 +119,9 @@ export function useRevokeInvite(businessId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['business-invites', businessId] });
       toast.success('Invitation revoked');
+    },
+    onError: () => {
+      toast.error('Failed to revoke invite');
     },
   });
 }

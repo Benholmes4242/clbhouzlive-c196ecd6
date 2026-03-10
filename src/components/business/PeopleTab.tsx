@@ -9,7 +9,7 @@ import { SegmentedTabs } from './people/SegmentedTabs';
 import { PersonRow } from './people/PersonRow';
 import { TeamRow } from './people/TeamRow';
 import { EmptyState } from './people/EmptyState';
-import { useTeamManagement, getAccessLevel } from '@/hooks/useTeamManagement';
+import { useTeamManagement } from '@/hooks/useTeamManagement';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -24,7 +24,6 @@ import {
 interface PeopleTabProps {
   businessId: string;
   businessName?: string;
-  businessLocation?: string;
   category?: string | null;
   canManage?: boolean;
   isOwner?: boolean;
@@ -201,7 +200,6 @@ export function PeopleTab({
                 handicap={member.eg_handicap_index}
                 showHandicap={member.show_handicap !== false}
                 homeClub={null}
-                alsoPlaysAt={member.also_plays_at || []}
                 onClick={() => handleProfileClick(member.id)}
               />
             ))}

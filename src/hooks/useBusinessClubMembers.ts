@@ -10,7 +10,6 @@ export interface ClubMember {
   show_handicap: boolean | null;
   is_verified_golfer: boolean;
   created_at: string | null;
-  also_plays_at?: string[]; // Additional club names
 }
 
 /**
@@ -58,14 +57,15 @@ export function useBusinessClubMembers(businessId: string | undefined) {
         `)
         .eq('primary_club_id', business.club_id)
         .eq('is_public', true)
-        .order('display_name', { ascending: true });
+        .order('display_name', { ascending: true })
+        .limit(1000);
 
       if (error) {
         console.error('[useBusinessClubMembers] error:', error);
         throw error;
       }
 
-      return (data || []) as ClubMember[];
+      return data || [];
     },
     // Keep this fairly fresh; Members is a social surface.
     staleTime: 10 * 1000,

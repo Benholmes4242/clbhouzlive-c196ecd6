@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -7,6 +7,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Loader2, Building2, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { AppLog } from '@/lib/logger';
 
 interface RequestAccessModalProps {
   open: boolean;
@@ -32,6 +33,11 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => { mountedRef.current = false; };
+  }, []);
 
   const handleSubmit = async () => {
     setSubmitting(true);
@@ -106,7 +112,10 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
           }));
 
         if (notifications.length > 0) {
-          await supabase.from('notifications').insert(notifications);
+          const { error: notifError } = await supabase.from('notifications').insert(notifications);
+          if (notifError) {
+            AppLog.error('RequestAccessModal', 'Failed to insert notifications:', notifError);
+          }
         }
       }
 
@@ -115,13 +124,16 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
       
       // Close after short delay
       setTimeout(() => {
-        onOpenChange(false);
-        setSubmitted(false);
-        setMessage('');
-        setRequestedRole('team_member');
+        if (mountedRef.current) {
+          onOpenChange(false);
+          setSubmitted(false);
+          setMessage('');
+          setRequestedRole('team_member');
+        }
       }, 1500);
-    } catch (error: any) {
-      console.error('Error submitting access request:', error);
+    } catch (e: unknown) {
+      console.error('Error submitting access request:', e);
+      const error = e as { code?: string; message?: string };
       if (error.code === '23505') {
         toast.error('You already have a pending request for this business');
       } else {

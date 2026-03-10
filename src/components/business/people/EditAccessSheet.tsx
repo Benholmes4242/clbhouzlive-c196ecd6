@@ -11,6 +11,7 @@ import { TeamMember } from '@/hooks/useBusinessTeamMembers';
 import { getAccessLevel } from '@/hooks/useTeamManagement';
 import { cn } from '@/lib/utils';
 
+
 interface AccessOption {
   value: string;
   label: string;

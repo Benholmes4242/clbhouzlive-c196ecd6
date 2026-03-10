@@ -137,8 +137,8 @@ export function useTeamManagement(
     title: string | null,
   ) => {
     if (!businessId) return;
-    const { error } = await (supabase
-      .from('business_team_members') as any)
+    const { error } = await supabase
+      .from('business_team_members')
       .update({ display_title: title })
       .eq('business_id', businessId)
       .eq('user_profile_id', userProfileId);
@@ -177,6 +177,7 @@ export function useTeamManagement(
         );
       } catch (error) {
         console.error('Search error:', error);
+        toast.error('Search failed. Please try again.');
       } finally {
         setSearching(false);
       }
@@ -205,8 +206,8 @@ export function useTeamManagement(
       toast.success(`${user.display_name || user.username} added to team`);
       resetAddFlow();
       invalidateTeam();
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to add team member');
+    } catch (e: unknown) {
+      toast.error((e as Error).message || 'Failed to add team member');
     } finally {
       setAdding(false);
     }
@@ -258,8 +259,8 @@ export function useTeamManagement(
       toast.success('Changes saved');
       setEditingMember(null);
       invalidateTeam();
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to update');
+    } catch (e: unknown) {
+      toast.error((e as Error).message || 'Failed to update');
     } finally {
       setSaving(false);
     }
@@ -326,9 +327,9 @@ export function useTeamManagement(
       await new Promise((r) => requestAnimationFrame(r));
 
       invalidateTeam();
-    } catch (error: any) {
-      AppLog.error('useTeamManagement', 'Remove failed', error);
-      toast.error(error?.message || 'Failed to remove team member');
+    } catch (e: unknown) {
+      AppLog.error('useTeamManagement', 'Remove failed', e);
+      toast.error((e as Error)?.message || 'Failed to remove team member');
     } finally {
       setRemoving(false);
     }

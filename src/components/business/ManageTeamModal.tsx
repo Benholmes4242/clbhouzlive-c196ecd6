@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { Search, ChevronRight, Loader2, X, UserPlus } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { TeamMember } from '@/hooks/useBusinessTeamMembers';
 import { EditAccessSheet } from './people/EditAccessSheet';
-import { cn } from '@/lib/utils';
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,9 +44,10 @@ export function ManageTeamModal({
   const tm = useTeamManagement(businessId, currentTeam, { isOwner });
 
   // Reset state when sheet closes
+  const resetAll = useCallback(() => tm.resetAll(), [tm.resetAll]);
   useEffect(() => {
-    if (!open) tm.resetAll();
-  }, [open]);
+    if (!open) resetAll();
+  }, [open, resetAll]);
 
   return (
     <>
