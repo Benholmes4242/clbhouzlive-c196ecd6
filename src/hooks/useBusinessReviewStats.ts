@@ -65,6 +65,8 @@ export function useBusinessReviewStats(businessId: string | undefined) {
         .select('course_id, rating, design_score, condition_score, facilities_score, clubhouse_score, created_at')
         .in('course_id', courseIds)
         .eq('is_mock', false)
+        // TODO: .limit(5000) prevents the default 1000-row cap but will silently truncate
+        // data for businesses with >5000 reviews. Consider pagination or server-side aggregation.
         .limit(5000);
 
       if (ratingsError) throw ratingsError;
