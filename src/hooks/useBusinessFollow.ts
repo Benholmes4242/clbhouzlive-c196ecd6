@@ -13,8 +13,8 @@ export function useIsFollowingBusiness(businessId: string | undefined, userId: s
       const { data, error } = await supabase
         .from('business_follows')
         .select('id')
-        .eq('business_id', businessId!)
-        .eq('follower_id', userId!)
+        .eq('business_id', businessId ?? '')
+        .eq('follower_id', userId ?? '')
         .maybeSingle();
 
       if (error) throw error;
