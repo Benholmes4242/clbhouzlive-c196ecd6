@@ -40,7 +40,7 @@ export function FullscreenCreatorCapsule({ posts, store }: FullscreenCreatorCaps
     followMutation.mutate(
       {
         targetUserId: activePost.userId,
-        targetActorType: activePost.actorType,
+        targetActorType: activePost.actorType as 'personal' | 'business',
         targetActorId: activePost.actorId,
         currentUserId: user.id,
         isFollowed: currentlyFollowed,

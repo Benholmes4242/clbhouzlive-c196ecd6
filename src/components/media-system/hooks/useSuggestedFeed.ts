@@ -34,7 +34,7 @@ export function useSuggestedFeed(userId: string | undefined) {
           return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
         }
 
-        const rows = (data as FeedRpcRow[] ?? []);
+        const rows = ((data ?? []) as unknown as FeedRpcRow[]);
         const posts = groupMultiMedia(rows.map(mapRowToFeedPost));
         const interleaved = interleaveReviews(posts, 'suggested');
 
