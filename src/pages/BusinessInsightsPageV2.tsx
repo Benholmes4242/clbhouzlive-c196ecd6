@@ -146,7 +146,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
                 </p>
               </div>
               <div className="flex items-center gap-1 flex-shrink-0">
-                <Star className="h-3 w-3" style={{ color: '#f59e0b', fill: '#f59e0b' }} />
+                <Star className="h-3 w-3 text-primary fill-primary" />
                 <span className="text-sm font-medium text-foreground">{course.avgRating}</span>
               </div>
             </button>
