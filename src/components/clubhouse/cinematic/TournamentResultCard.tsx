@@ -288,7 +288,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
           {/* ── Winner block ── */}
           <div style={{
-            padding: 16,
+            padding: '20px 20px 18px',
             borderBottom: '1px solid rgba(255,255,255,0.06)',
             display: 'flex', alignItems: 'center', gap: 14,
             animation: 'trcard-slideIn 0.5s ease-out both',
