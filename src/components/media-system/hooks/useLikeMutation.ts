@@ -24,7 +24,10 @@ export function useLikeMutation() {
       } else {
         const { error } = await supabase
           .from('post_likes')
-          .insert({ post_id: postId, user_id: userId, actor_id: actorId, actor_type: actorType });
+          .upsert(
+            { post_id: postId, user_id: userId, actor_id: actorId, actor_type: actorType },
+            { onConflict: 'post_id,actor_type,actor_id', ignoreDuplicates: true }
+          );
         if (error) throw error;
       }
     },
