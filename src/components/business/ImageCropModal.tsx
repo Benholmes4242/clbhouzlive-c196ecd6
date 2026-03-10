@@ -43,7 +43,7 @@ async function getCroppedImg(
   const safeWidth = Math.min(pixelCrop.width, image.naturalWidth - safeX);
   const safeHeight = Math.min(pixelCrop.height, image.naturalHeight - safeY);
   
-  console.log('[Crop] Safe crop area:', { x: safeX, y: safeY, width: safeWidth, height: safeHeight });
+  
 
   // Set canvas size to the cropped area dimensions
   canvas.width = safeWidth;
