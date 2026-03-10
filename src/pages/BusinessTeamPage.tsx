@@ -72,7 +72,7 @@ export default function BusinessTeamPage() {
           size={44}
         />
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-[15px] truncate">{profile?.display_name || profile?.username || 'Unknown'}</p>
+          <p className="font-medium text-[15px] text-foreground truncate">{profile?.display_name || profile?.username || 'Unknown'}</p>
           <p className="text-sm text-muted-foreground">{role.label}</p>
         </div>
 
