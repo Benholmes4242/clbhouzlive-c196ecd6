@@ -65,7 +65,7 @@ const BusinessVerificationStatusPage = () => {
     if (business?.slug) {
       navigate(`/business/${business.slug}`);
     } else {
-      navigate('/business/manage');
+      navigate('/businesses/manage');
     }
   };
 
