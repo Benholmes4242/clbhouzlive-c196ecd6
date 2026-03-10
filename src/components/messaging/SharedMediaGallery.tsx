@@ -62,7 +62,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
           } else if (msg.message_type === 'video' && msg.media_url) {
             mediaItems.push({ id: msg.id, type: 'video', url: msg.media_url, createdAt: msg.created_at });
           } else if (msg.message_type === 'course_share' && msg.media_metadata) {
-            const meta = msg.media_metadata as any;
+            const meta = msg.media_metadata as Record<string, unknown>;
             courseItems.push({
               id: msg.id, type: 'course',
               url: `/courses/${meta.course_slug || meta.course_id}`,
