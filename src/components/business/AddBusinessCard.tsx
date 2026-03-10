@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Building2, ChevronRight } from 'lucide-react';
 

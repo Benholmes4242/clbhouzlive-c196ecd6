@@ -14,7 +14,7 @@ import { useHideHeader } from '@/hooks/useHeaderVisibility';
 const MyBusinessesPage = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useSupabaseSession();
-  const { data: businesses, isLoading } = useMyBusinesses(user?.id);
+  const { data: businesses, isLoading, error } = useMyBusinesses(user?.id);
   const { activeActor } = useActiveActor();
   const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -41,6 +41,18 @@ const MyBusinessesPage = () => {
   }, [authLoading, user, navigate]);
 
   if (!authLoading && !user) return null;
+
+  if (error) {
+    return (
+      <PageRoot>
+        <div className="min-h-screen bg-background flex items-center justify-center px-4">
+          <p className="text-sm text-muted-foreground text-center">
+            Failed to load your businesses.
+          </p>
+        </div>
+      </PageRoot>
+    );
+  }
 
   const handleCreateBusiness = () => {
     setShowCreateModal(true);

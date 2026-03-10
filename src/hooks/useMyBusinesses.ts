@@ -15,6 +15,7 @@ export interface BusinessMembership {
     country: string | null;
     logo_url: string | null;
     is_verified: boolean;
+    is_deleted: boolean | null;
   };
 }
 
@@ -42,7 +43,7 @@ export function useMyBusinesses(userProfileId?: string) {
             region,
             country,
             logo_url,
-            cover_image_url,
+            is_verified,
             is_verified,
             is_deleted
           )
@@ -55,8 +56,8 @@ export function useMyBusinesses(userProfileId?: string) {
       return (data ?? []).map(item => ({
         id: item.id,
         role: item.role as BusinessMembership['role'],
-        business: item.business as BusinessMembership['business'],
-      })).filter(item => item.business !== null && !(item.business as any).is_deleted);
+        business: item.business as unknown as BusinessMembership['business'],
+      })).filter(item => item.business !== null && !item.business.is_deleted);
     },
   });
 }
