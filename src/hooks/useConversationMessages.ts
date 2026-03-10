@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { AppLog } from '@/lib/logger';
 import type { MessageWithSender, ParticipantProfile, Message } from '@/types/messaging';
 
 interface UseConversationMessagesReturn {
@@ -131,7 +132,7 @@ export function useConversationMessages(conversationId: string | null): UseConve
       setHasMore(messagesData.length === PAGE_SIZE);
       offsetRef.current = offset + messagesData.length;
     } catch (err) {
-      console.error('[useConversationMessages] Error:', err);
+      AppLog.error('[useConversationMessages]', 'Error:', err);
       setError(err instanceof Error ? err : new Error('Failed to fetch messages'));
     } finally {
       setLoading(false);
@@ -173,7 +174,7 @@ export function useConversationMessages(conversationId: string | null): UseConve
       
       return data as string;
     } catch (err) {
-      console.error('[useConversationMessages] Error sending:', err);
+      AppLog.error('[useConversationMessages]', 'Error sending:', err);
       setError(err instanceof Error ? err : new Error('Failed to send message'));
       return null;
     }
@@ -203,7 +204,7 @@ export function useConversationMessages(conversationId: string | null): UseConve
 
       return true;
     } catch (err) {
-      console.error('[useConversationMessages] Error editing:', err);
+      AppLog.error('[useConversationMessages]', 'Error editing:', err);
       return false;
     }
   }, [user]);
@@ -224,7 +225,7 @@ export function useConversationMessages(conversationId: string | null): UseConve
 
       return true;
     } catch (err) {
-      console.error('[useConversationMessages] Error deleting:', err);
+      AppLog.error('[useConversationMessages]', 'Error deleting:', err);
       return false;
     }
   }, [user]);
@@ -262,13 +263,13 @@ export function useConversationMessages(conversationId: string | null): UseConve
           filter: `conversation_id=eq.${conversationId}`,
         },
         (payload) => {
-          const updated = payload.new as any;
+          const updated = payload.new as Record<string, unknown>;
           if (updated.deleted_at) {
             setMessages(prev => prev.filter(m => m.id !== updated.id));
           } else {
             setMessages(prev => prev.map(m =>
-              m.id === updated.id
-                ? { ...m, content: updated.content, is_edited: updated.is_edited, edited_at: updated.edited_at }
+              m.id === (updated.id as string)
+                ? { ...m, content: updated.content as string, is_edited: updated.is_edited as boolean, edited_at: updated.edited_at as string | null }
                 : m
             ));
           }

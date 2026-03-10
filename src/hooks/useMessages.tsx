@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { AppLog } from '@/lib/logger';
 
 export interface Message {
   id: string;
@@ -106,7 +107,7 @@ export function useMessages() {
 
       setConversations(conversationList);
     } catch (error) {
-      console.error('Error in fetchConversations:', error);
+      AppLog.error('[useMessages DEPRECATED]', 'Error in fetchConversations:', error);
     }
     
     setLoading(false);
@@ -146,7 +147,7 @@ export function useMessages() {
 
   const markMessagesAsRead = async (senderId: string) => {
     // This is now handled via mark_conversation_read RPC
-    console.log('[useMessages] markMessagesAsRead is deprecated, use markAsRead from useMessaging');
+    AppLog.debug('[useMessages DEPRECATED]', 'markMessagesAsRead is deprecated, use markAsRead from useMessaging');
   };
 
   return {

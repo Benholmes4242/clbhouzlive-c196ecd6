@@ -91,8 +91,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
       toast.success('Group name updated');
       setIsEditingName(false);
       onUpdate();
-    } catch (error: any) {
-      toast.error('Failed to update', { description: error.message });
+    } catch (e: unknown) {
+      toast.error('Failed to update', { description: (e as Error).message ?? 'An error occurred' });
     }
   };
 
@@ -106,8 +106,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
       toast.success('Description updated');
       setIsEditingDescription(false);
       onUpdate();
-    } catch (error: any) {
-      toast.error('Failed to update', { description: error.message });
+    } catch (e: unknown) {
+      toast.error('Failed to update', { description: (e as Error).message ?? 'An error occurred' });
     }
   };
 
@@ -129,8 +129,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
       if (error) throw error;
       toast.success('Group photo updated');
       onUpdate();
-    } catch (error: any) {
-      toast.error('Failed to upload', { description: error.message });
+    } catch (e: unknown) {
+      toast.error('Failed to upload', { description: (e as Error).message ?? 'An error occurred' });
     } finally {
       setIsUploading(false);
     }
@@ -147,7 +147,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
       if (error) throw error;
       toast.success(newMuted ? 'Notifications muted' : 'Notifications unmuted');
       onUpdate();
-    } catch (error: any) {
+    } catch (e: unknown) {
       setIsMutedLocal(!newMuted);
       toast.error('Failed to update');
     }
@@ -163,8 +163,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
       if (error) throw error;
       toast.success('Member is now an admin');
       onUpdate();
-    } catch (error: any) {
-      toast.error('Failed to update', { description: error.message });
+    } catch (e: unknown) {
+      toast.error('Failed to update', { description: (e as Error).message ?? 'An error occurred' });
     }
   };
 
@@ -178,8 +178,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
       if (error) throw error;
       toast.success('Admin rights removed');
       onUpdate();
-    } catch (error: any) {
-      toast.error('Failed to update', { description: error.message });
+    } catch (e: unknown) {
+      toast.error('Failed to update', { description: (e as Error).message ?? 'An error occurred' });
     }
   };
 
@@ -192,8 +192,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
       if (error) throw error;
       toast.success('Member removed');
       onUpdate();
-    } catch (error: any) {
-      toast.error('Failed to remove', { description: error.message });
+    } catch (e: unknown) {
+      toast.error('Failed to remove', { description: (e as Error).message ?? 'An error occurred' });
     }
   };
 
@@ -209,8 +209,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
       if (error) throw error;
       toast.success('You left the group');
       onClose();
-    } catch (error: any) {
-      toast.error('Failed to leave', { description: error.message });
+    } catch (e: unknown) {
+      toast.error('Failed to leave', { description: (e as Error).message ?? 'An error occurred' });
     } finally {
       setShowLeaveDialog(false);
     }
@@ -225,7 +225,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
       if (error) throw error;
       toast.success('Chat archived');
       onClose();
-    } catch (error: any) {
+    } catch (e: unknown) {
       toast.error('Failed to archive');
     }
   };
@@ -242,8 +242,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
       if (error) throw error;
       toast.success('Group deleted');
       onClose();
-    } catch (error: any) {
-      toast.error('Failed to delete group', { description: error.message });
+    } catch (e: unknown) {
+      toast.error('Failed to delete group', { description: (e as Error).message ?? 'An error occurred' });
     } finally {
       setShowDeleteDialog(false);
     }

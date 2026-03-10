@@ -16,8 +16,9 @@ import { useMessagingContext } from '@/contexts/MessagingContext';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
 import { haptic } from '@/utils/haptics';
+import { AppLog } from '@/lib/logger';
 import { cn } from '@/lib/utils';
-import type { ConversationWithDetails } from '@/types/messaging';
+import type { ConversationWithDetails, MessageType } from '@/types/messaging';
 
 interface ForwardMessageModalProps {
   open: boolean;
@@ -83,7 +84,7 @@ export function ForwardMessageModal({
       await sendMessage(
         conversationId,
         content,
-        isMedia ? messageType as any : 'text',
+        isMedia ? messageType as MessageType : 'text',
         isMedia ? (mediaUrl || null) : null,
         isMedia ? (mediaMetadata || null) : null,
         null
@@ -92,7 +93,7 @@ export function ForwardMessageModal({
       toast.success('Message forwarded');
       onOpenChange(false);
     } catch (error) {
-      console.error('Error forwarding message:', error);
+      AppLog.error('[ForwardMessageModal]', 'Error forwarding message:', error);
       toast.error('Failed to forward message');
     } finally {
       setForwarding(null);

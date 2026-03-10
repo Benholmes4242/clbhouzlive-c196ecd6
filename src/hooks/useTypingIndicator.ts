@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { AppLog } from '@/lib/logger';
 
 interface TypingUser {
   user_id: string;
@@ -35,7 +36,7 @@ export function useTypingIndicator(conversationId: string | null) {
         p_conversation_id: conversationId 
       });
     } catch (error) {
-      console.error('Error setting typing indicator:', error);
+      AppLog.error('[useTypingIndicator]', 'Error setting typing indicator:', error);
     }
 
     // Auto-clear after timeout
@@ -61,7 +62,7 @@ export function useTypingIndicator(conversationId: string | null) {
         p_conversation_id: conversationId 
       });
     } catch (error) {
-      console.error('Error clearing typing indicator:', error);
+      AppLog.error('[useTypingIndicator]', 'Error clearing typing indicator:', error);
     }
   }, [conversationId, user]);
 
@@ -74,6 +75,9 @@ export function useTypingIndicator(conversationId: string | null) {
 
     // Fetch initial typing users
     const fetchTypingUsers = async () => {
+      // TODO: typing_indicators table is not in the generated Supabase types.
+      // Run `supabase gen types` after confirming the table exists in the schema.
+      // Keep the as any cast until types are regenerated.
       const { data, error } = await supabase
         .from('typing_indicators' as any)
         .select('user_id, started_at')
@@ -81,7 +85,7 @@ export function useTypingIndicator(conversationId: string | null) {
         .neq('user_id', user.id);
 
       if (error) {
-        console.error('Error fetching typing indicators:', error);
+        AppLog.error('[useTypingIndicator]', 'Error fetching typing indicators:', error);
         return;
       }
 

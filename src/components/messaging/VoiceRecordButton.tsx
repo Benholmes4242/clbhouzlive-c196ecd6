@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Mic, X, Send, Trash2 } from 'lucide-react';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
+import { AppLog } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 
 interface VoiceRecordButtonProps {
@@ -103,7 +104,7 @@ export const VoiceRecordButton: React.FC<VoiceRecordButtonProps> = ({
   // Show error toast
   useEffect(() => {
     if (error) {
-      console.error('Voice recording error:', error);
+      AppLog.error('[VoiceRecordButton]', 'Voice recording error:', error);
     }
   }, [error]);
 

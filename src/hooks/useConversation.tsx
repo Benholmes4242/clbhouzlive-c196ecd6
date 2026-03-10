@@ -1,6 +1,8 @@
+/** @deprecated This hook is no longer used. Do not add new consumers. */
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { AppLog } from '@/lib/logger';
 import type { Message as NewMessage } from '@/types/messaging';
 
 // Legacy Message interface for backward compatibility
@@ -33,13 +35,13 @@ export function useConversation(friendId: string | null) {
       });
       
       if (error) {
-        console.error('[useConversation] Error getting/creating DM:', error);
+        AppLog.error('[useConversation DEPRECATED]', 'Error getting/creating DM:', error);
         return null;
       }
       
       return data as string;
     } catch (err) {
-      console.error('[useConversation] Error:', err);
+      AppLog.error('[useConversation DEPRECATED]', 'Error:', err);
       return null;
     }
   }, [user, friendId]);

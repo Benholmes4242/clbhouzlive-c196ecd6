@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
+import { AppLog } from '@/lib/logger';
 import type { 
   ConversationWithDetails, 
   ParticipantWithProfile,
@@ -201,7 +202,7 @@ export function useMessaging(): UseMessagingReturn {
 
       setConversations(conversationsWithDetails);
     } catch (err) {
-      console.error('[useMessaging] Error fetching conversations:', err);
+      AppLog.error('[useMessaging]', 'Error fetching conversations:', err);
       setError(err instanceof Error ? err : new Error('Failed to fetch conversations'));
     } finally {
       setInitialLoading(false);
@@ -226,7 +227,7 @@ export function useMessaging(): UseMessagingReturn {
       
       return data as string;
     } catch (err) {
-      console.error('[useMessaging] Error getting/creating DM:', err);
+      AppLog.error('[useMessaging]', 'Error getting/creating DM:', err);
       setError(err instanceof Error ? err : new Error('Failed to get or create DM'));
       return null;
     }
@@ -252,7 +253,7 @@ export function useMessaging(): UseMessagingReturn {
       
       return data as string;
     } catch (err) {
-      console.error('[useMessaging] Error creating group chat:', err);
+      AppLog.error('[useMessaging]', 'Error creating group chat:', err);
       setError(err instanceof Error ? err : new Error('Failed to create group chat'));
       return null;
     }
@@ -295,7 +296,7 @@ export function useMessaging(): UseMessagingReturn {
       queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
       queryClient.invalidateQueries({ queryKey: ['unread-notifications'] });
     } catch (err) {
-      console.error('[useMessaging] Error marking as read:', err);
+      AppLog.error('[useMessaging]', 'Error marking as read:', err);
     }
   }, [user, queryClient]);
 
@@ -344,7 +345,7 @@ export function useMessaging(): UseMessagingReturn {
       
       return data as string;
     } catch (err) {
-      console.error('[useMessaging] Error sending message:', err);
+      AppLog.error('[useMessaging]', 'Error sending message:', err);
       setError(err instanceof Error ? err : new Error('Failed to send message'));
       return null;
     }
@@ -365,7 +366,7 @@ export function useMessaging(): UseMessagingReturn {
       
       return (data as number) || 0;
     } catch (err) {
-      console.error('[useMessaging] Error getting unread count:', err);
+      AppLog.error('[useMessaging]', 'Error getting unread count:', err);
       return 0;
     }
   }, [user]);
@@ -396,7 +397,7 @@ export function useMessaging(): UseMessagingReturn {
           table: 'messages',
         },
         (payload) => {
-          const incomingConvId = (payload.new as any)?.conversation_id;
+          const incomingConvId = (payload.new as Record<string, unknown>)?.conversation_id;
           if (incomingConvId && conversationsRef.current.some(c => c.id === incomingConvId)) {
             fetchConversations(true);
           }
