@@ -29,7 +29,7 @@ export function useBusinessStats7d(businessId: string | undefined) {
         .gte('metric_date', fromDate);
 
       if (error) {
-        console.error('[useBusinessStats7d] error', error);
+        AppLog.error('[useBusinessStats7d]', 'error', error);
         return { visits: 0, followersGained: 0, impressions: 0 };
       }
 

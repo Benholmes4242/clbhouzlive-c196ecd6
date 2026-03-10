@@ -56,8 +56,8 @@ export function useMyBusinesses(userProfileId?: string) {
       return (data ?? []).map(item => ({
         id: item.id,
         role: item.role as BusinessMembership['role'],
-        business: item.business as BusinessMembership['business'],
-      })).filter(item => item.business !== null && !(item.business as any).is_deleted);
+        business: item.business as unknown as BusinessMembership['business'],
+      })).filter(item => item.business !== null && !item.business.is_deleted);
     },
   });
 }

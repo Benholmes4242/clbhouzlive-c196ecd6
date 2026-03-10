@@ -35,7 +35,7 @@ export function useBusinessFollowersCount(businessId: string | undefined) {
       const { count, error } = await supabase
         .from('business_follows')
         .select('*', { count: 'exact', head: true })
-        .eq('business_id', businessId!);
+        .eq('business_id', businessId ?? '');
 
       if (error) throw error;
       return count ?? 0;

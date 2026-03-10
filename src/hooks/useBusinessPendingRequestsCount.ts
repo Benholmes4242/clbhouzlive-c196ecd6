@@ -20,7 +20,7 @@ export function useBusinessPendingRequestsCount(businessId: string | undefined) 
         .eq('status', 'pending');
 
       if (error) {
-        console.error('[useBusinessPendingRequestsCount] error:', error);
+        AppLog.error('[useBusinessPendingRequestsCount]', 'error:', error);
         return 0;
       }
 
