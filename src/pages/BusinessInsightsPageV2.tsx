@@ -93,8 +93,8 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
               <span className="text-xs text-muted-foreground w-5 text-right">{item.score}</span>
               <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                 <div
-                  className="h-full rounded-full transition-all"
-                  style={{ width: `${(item.count / maxCount) * 100}%`, backgroundColor: '#f59e0b' }}
+                  className="h-full rounded-full transition-all bg-primary"
+                  style={{ width: `${(item.count / maxCount) * 100}%` }}
                 />
               </div>
               <span className="text-xs text-muted-foreground w-6 text-right">{item.count}</span>
