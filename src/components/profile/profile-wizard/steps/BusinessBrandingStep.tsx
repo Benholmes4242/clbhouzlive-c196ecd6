@@ -1,7 +1,7 @@
 /**
  * BusinessBrandingStep - Step 3: Logo and cover photo
  */
-import { motion } from 'framer-motion';
+import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BusinessBrandingSection } from '@/components/business/sections/BusinessBrandingSection';
 
 interface BusinessBrandingStepProps {
@@ -20,21 +20,17 @@ export function BusinessBrandingStep({
   businessName,
 }: BusinessBrandingStepProps) {
   return (
-    <div className="h-full overflow-y-auto">
-      <div className="px-4 py-6">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <BusinessBrandingSection
-            logoUrl={logoUrl}
-            setLogoUrl={setLogoUrl}
-            coverUrl={coverUrl}
-            setCoverUrl={setCoverUrl}
-            businessName={businessName}
-          />
-        </motion.div>
-      </div>
+    <div className="space-y-4 px-4 pb-4 pt-2">
+      <BusinessBrandingSection
+        logoUrl={logoUrl}
+        setLogoUrl={setLogoUrl}
+        coverUrl={coverUrl}
+        setCoverUrl={setCoverUrl}
+        businessName={businessName}
+      />
+      <p className="text-[12px] text-muted-foreground text-center">
+        You can always update these later from your business profile settings.
+      </p>
     </div>
   );
 }

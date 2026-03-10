@@ -1,8 +1,9 @@
 /**
  * BusinessProfileWizard - 3-step wizard for business profile creation
- * Follows Post/Review wizard pattern
+ * Visual layer matches PersonalProfileWizard exactly
  */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -13,6 +14,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
+  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -35,7 +37,23 @@ import { PhoneValue } from '@/components/business/PhoneInputWithDialCode';
 import { RequestAccessModal } from '@/components/business/RequestAccessModal';
 import { getCountryCodeFromClub } from '@/utils/countryCodeMapping';
 
+import type { WizardDirection } from './types';
+
 const TOTAL_STEPS = 3;
+
+const slideVariants = {
+  enter: (dir: WizardDirection) => ({
+    x: dir === 'forward' ? '100%' : '-100%',
+    opacity: 0,
+  }),
+  center: { x: 0, opacity: 1 },
+  exit: (dir: WizardDirection) => ({
+    x: dir === 'forward' ? '-100%' : '100%',
+    opacity: 0,
+  }),
+};
+
+const transition = { type: 'tween' as const, duration: 0.22, ease: 'easeInOut' as const };
 
 export function BusinessProfileWizard() {
   const navigate = useNavigate();
@@ -44,6 +62,7 @@ export function BusinessProfileWizard() {
   const { user, loading: authLoading } = useSupabaseSession();
 
   const [step, setStep] = useState<BusinessWizardStep>(1);
+  const [direction, setDirection] = useState<WizardDirection>('forward');
   const [saving, setSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
@@ -114,7 +133,7 @@ export function BusinessProfileWizard() {
           .limit(1)
           .maybeSingle();
         setExistingBusinessForClub(data);
-        
+
         if (!data && selectedClub) {
           const locationLabel = [selectedClub.sub_country, selectedClub.region, selectedClub.country].filter(Boolean).join(', ');
           setLocation({
@@ -166,11 +185,17 @@ export function BusinessProfileWizard() {
   const isDirty = category !== '' || businessName !== '' || selectedClub !== null;
 
   const nextStep = useCallback(() => {
-    if (step < TOTAL_STEPS) setStep((s) => (s + 1) as BusinessWizardStep);
+    if (step < TOTAL_STEPS) {
+      setDirection('forward');
+      setStep((s) => (s + 1) as BusinessWizardStep);
+    }
   }, [step]);
 
   const prevStep = useCallback(() => {
-    if (step > 1) setStep((s) => (s - 1) as BusinessWizardStep);
+    if (step > 1) {
+      setDirection('back');
+      setStep((s) => (s - 1) as BusinessWizardStep);
+    }
   }, [step]);
 
   const handleClose = useCallback(() => {
@@ -196,7 +221,7 @@ export function BusinessProfileWizard() {
     setSaving(true);
     try {
       const formattedLocation = location?.country ? `${location.city}, ${location.country}` : location?.label || '';
-      const insertData: any = {
+      const insertData: Record<string, unknown> = {
         name: effectiveBusinessName,
         category,
         location: formattedLocation,
@@ -224,7 +249,7 @@ export function BusinessProfileWizard() {
 
       const { data: businessData, error: businessError } = await supabase
         .from('business_accounts')
-        .insert(insertData)
+        .insert(insertData as Record<string, string | number | boolean | null>)
         .select('id, slug')
         .single();
 
@@ -258,7 +283,12 @@ export function BusinessProfileWizard() {
   }, [navigate]);
 
   if (authLoading) {
-    return <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-[#94a3b8]" /></div>;
+    return createPortal(
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background">
+        <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+      </div>,
+      document.body
+    );
   }
 
   if (showSuccess) {
@@ -267,34 +297,116 @@ export function BusinessProfileWizard() {
 
   const stepConfig = BUSINESS_STEP_CONFIG[step];
 
-  return (
+  return createPortal(
     <>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-[9999] bg-[#F8FAFC] flex flex-col overflow-hidden pt-safe pb-safe" style={{ touchAction: 'pan-y pinch-zoom', overscrollBehavior: 'contain' }}>
-        <div className="flex-shrink-0">
-          <ProfileWizardHeader title={stepConfig.title} currentStep={step} totalSteps={TOTAL_STEPS} onBack={handleBack} onClose={handleClose} />
-        </div>
+      <div className="fixed inset-0 z-[100] flex flex-col bg-background">
+        <ProfileWizardHeader
+          title={stepConfig.title}
+          currentStep={step}
+          totalSteps={TOTAL_STEPS}
+          onBack={handleBack}
+          onClose={handleClose}
+        />
         <ProfileWizardProgress currentStep={step} totalSteps={TOTAL_STEPS} />
-        <main className="flex-1 min-h-0 overflow-hidden">
-          <AnimatePresence mode="wait">
-            <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.2 }} className="h-full">
-              {step === 1 && <BusinessInfoStep category={category} setCategory={setCategory} businessName={businessName} setBusinessName={setBusinessName} selectedClub={selectedClub} setSelectedClub={setSelectedClub} selectedCollege={selectedCollege} setSelectedCollege={setSelectedCollege} description={description} setDescription={setDescription} existingBusinessForClub={existingBusinessForClub} onRequestAccess={() => setShowRequestAccessModal(true)} />}
-              {step === 2 && <BusinessLocationStep location={location} setLocation={setLocation} website={website} setWebsite={setWebsite} email={email} setEmail={setEmail} phone={phone} setPhone={setPhone} isGolfClub={isGolfClubCategory} clubLocation={clubLocationString} />}
-              {step === 3 && <BusinessBrandingStep logoUrl={logoUrl} setLogoUrl={setLogoUrl} coverUrl={coverUrl} setCoverUrl={setCoverUrl} businessName={effectiveBusinessName} />}
+
+        <div className="flex-1 overflow-y-auto overflow-x-hidden">
+          <AnimatePresence custom={direction} mode="wait">
+            <motion.div
+              key={step}
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={transition}
+              className="pt-4"
+            >
+              {step === 1 && (
+                <BusinessInfoStep
+                  category={category}
+                  setCategory={setCategory}
+                  businessName={businessName}
+                  setBusinessName={setBusinessName}
+                  selectedClub={selectedClub}
+                  setSelectedClub={setSelectedClub}
+                  selectedCollege={selectedCollege}
+                  setSelectedCollege={setSelectedCollege}
+                  description={description}
+                  setDescription={setDescription}
+                  existingBusinessForClub={existingBusinessForClub}
+                  onRequestAccess={() => setShowRequestAccessModal(true)}
+                />
+              )}
+              {step === 2 && (
+                <BusinessLocationStep
+                  location={location}
+                  setLocation={setLocation}
+                  website={website}
+                  setWebsite={setWebsite}
+                  email={email}
+                  setEmail={setEmail}
+                  phone={phone}
+                  setPhone={setPhone}
+                  isGolfClub={isGolfClubCategory}
+                  clubLocation={clubLocationString}
+                />
+              )}
+              {step === 3 && (
+                <BusinessBrandingStep
+                  logoUrl={logoUrl}
+                  setLogoUrl={setLogoUrl}
+                  coverUrl={coverUrl}
+                  setCoverUrl={setCoverUrl}
+                  businessName={effectiveBusinessName}
+                />
+              )}
             </motion.div>
           </AnimatePresence>
-        </main>
-        <ProfileWizardNavigation currentStep={step} totalSteps={TOTAL_STEPS} canProceed={canProceed} isSubmitting={saving} onBack={handleBack} onNext={nextStep} onSubmit={handleSubmit} submitLabel="Create Business" />
-      </motion.div>
+        </div>
+
+        <ProfileWizardNavigation
+          currentStep={step}
+          totalSteps={TOTAL_STEPS}
+          canProceed={canProceed}
+          isSubmitting={saving}
+          onBack={handleBack}
+          onNext={nextStep}
+          onSubmit={handleSubmit}
+          submitLabel="Create Business"
+        />
+      </div>
 
       <AlertDialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
-        <AlertDialogContent className="z-[10000] rounded-2xl">
-          <AlertDialogHeader><AlertDialogTitle>Discard changes?</AlertDialogTitle><AlertDialogDescription>Your changes aren't saved. Are you sure you want to leave?</AlertDialogDescription></AlertDialogHeader>
-          <AlertDialogFooter><AlertDialogCancel className="rounded-xl">Keep editing</AlertDialogCancel><Button variant="destructive" onClick={confirmClose} className="rounded-xl">Discard</Button></AlertDialogFooter>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Discard changes?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You have unsaved changes. They will be lost if you leave now.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep editing</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={confirmClose}
+            >
+              Discard
+            </AlertDialogAction>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {existingBusinessForClub && user && <RequestAccessModal open={showRequestAccessModal} onOpenChange={setShowRequestAccessModal} businessId={existingBusinessForClub.id} businessName={existingBusinessForClub.name} userId={user.id} />}
-    </>
+      {existingBusinessForClub && user && (
+        <RequestAccessModal
+          open={showRequestAccessModal}
+          onOpenChange={setShowRequestAccessModal}
+          businessId={existingBusinessForClub.id}
+          businessName={existingBusinessForClub.name}
+          userId={user.id}
+        />
+      )}
+    </>,
+    document.body
   );
 }
 
