@@ -10,7 +10,6 @@ import type { EchoProfile } from '@/features/echo/hooks/useEchoProfile';
 interface EchoPageWelcomeProps {
   profile: EchoProfile;
   onChipSelect: (prompt: string) => void;
-  onFocusInput: () => void;
 }
 
 // Pool of 50 diverse golf prompts
