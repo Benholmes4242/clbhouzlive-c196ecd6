@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useCallback, type RefObject } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { AppLog } from '@/lib/logger';
 import type { ConversationParticipant, ParticipantProfile, ParticipantWithProfile } from '@/types/messaging';
 import { useConversationMessages } from '@/hooks/useConversationMessages';
