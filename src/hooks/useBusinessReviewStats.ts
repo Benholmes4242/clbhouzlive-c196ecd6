@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { AppLog } from '@/lib/logger';
 
 function average(items: Record<string, unknown>[], key: string): number | null {
   const valid = items.filter(r => r[key] != null && typeof r[key] === 'number');
