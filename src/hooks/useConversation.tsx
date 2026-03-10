@@ -35,7 +35,7 @@ export function useConversation(friendId: string | null) {
       });
       
       if (error) {
-        console.error('[useConversation] Error getting/creating DM:', error);
+        AppLog.error('[useConversation DEPRECATED]', 'Error getting/creating DM:', error);
         return null;
       }
       
