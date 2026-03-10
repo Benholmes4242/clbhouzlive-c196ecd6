@@ -1,4 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
+import { AppLog } from '@/lib/logger';
+import type { Database, Json } from '@/integrations/supabase/types';
 
 export type BusinessEventType = 
   | 'profile_visit'
@@ -26,24 +28,25 @@ interface TrackEventParams {
  */
 export async function trackBusinessAnalyticsEvent(params: TrackEventParams): Promise<void> {
   try {
-    // Cast to any to bypass type checking until types are regenerated
+    const payload: Database['public']['Tables']['business_analytics_events']['Insert'] = {
+      business_id: params.businessId,
+      user_id: params.userId || null,
+      event_type: params.eventType,
+      action_type: params.actionType || null,
+      source: params.source || null,
+      content_id: params.contentId || null,
+      metadata: (params.metadata || {}) as Json,
+    };
+
     const { error } = await supabase
-      .from('business_analytics_events' as any)
-      .insert({
-        business_id: params.businessId,
-        user_id: params.userId || null,
-        event_type: params.eventType,
-        action_type: params.actionType || null,
-        source: params.source || null,
-        content_id: params.contentId || null,
-        metadata: params.metadata || {},
-      } as any);
+      .from('business_analytics_events')
+      .insert(payload);
 
     if (error) {
-      console.error('[Analytics] Failed to track event:', error);
+      AppLog.error('[Analytics]', 'Failed to track event:', error);
     }
   } catch (err) {
-    console.error('[Analytics] Error tracking event:', err);
+    AppLog.error('[Analytics]', 'Error tracking event:', err);
   }
 }
 

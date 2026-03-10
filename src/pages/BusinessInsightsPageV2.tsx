@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { trackBusinessProfileVisit } from '@/lib/businessAnalyticsTracking';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { AppLog } from '@/lib/logger';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
@@ -27,7 +28,18 @@ const ComingSoonEmpty = ({ title }: { title: string }) => (
 
 // Reviews section component using real data
 const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate: (path: string) => void }) => {
-  const { data: reviewStats, isLoading } = useBusinessReviewStats(businessId);
+  const { data: reviewStats, isLoading, error } = useBusinessReviewStats(businessId);
+
+  if (error) {
+    return (
+      <section className="bg-card border border-border rounded-[18px] p-4 md:p-5">
+        <h3 className="text-[0.9rem] font-medium text-foreground mb-4">Reviews & reputation</h3>
+        <div className="px-4 py-8 text-center">
+          <p className="text-sm text-muted-foreground">Failed to load review stats.</p>
+        </div>
+      </section>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -172,6 +184,10 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
 const BusinessInsightsPageV2 = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  // TODO: dateRange is UI-only and not wired to any query.
+  // useBusinessReviewStats must be updated to accept a dateRange param
+  // and filter results server-side before this toggle has any effect.
+  // Until then, the selector renders but changes nothing.
   const [dateRange, setDateRange] = useState<DateRange>('28d');
   const { user } = useSupabaseSession();
 
@@ -185,7 +201,9 @@ const BusinessInsightsPageV2 = () => {
   // Track page visit
   useEffect(() => {
     if (business?.id && !isLoading) {
-      trackBusinessProfileVisit(business.id, user?.id, 'direct', { page: 'insights' });
+      trackBusinessProfileVisit(business.id, user?.id, 'direct', { page: 'insights' }).catch((err) => {
+        AppLog.error('[BusinessInsightsPageV2]', 'Failed to track visit:', err);
+      });
     }
   }, [business?.id, user?.id, isLoading]);
 

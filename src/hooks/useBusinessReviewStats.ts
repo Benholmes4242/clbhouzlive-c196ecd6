@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { AppLog } from '@/lib/logger';
 
 function average(items: Record<string, unknown>[], key: string): number | null {
   const valid = items.filter(r => r[key] != null && typeof r[key] === 'number');
@@ -38,12 +39,13 @@ export function useBusinessReviewStats(businessId: string | undefined) {
       if (!businessId) return null;
 
       // Get business's club_id
-      const { data: business } = await supabase
+      const { data: business, error: businessError } = await supabase
         .from('business_accounts')
         .select('club_id')
         .eq('id', businessId)
         .single();
 
+      if (businessError) throw businessError;
       if (!business?.club_id) return null;
 
       // Get all courses for this club
@@ -63,6 +65,8 @@ export function useBusinessReviewStats(businessId: string | undefined) {
         .select('course_id, rating, design_score, condition_score, facilities_score, clubhouse_score, created_at')
         .in('course_id', courseIds)
         .eq('is_mock', false)
+        // TODO: .limit(5000) prevents the default 1000-row cap but will silently truncate
+        // data for businesses with >5000 reviews. Consider pagination or server-side aggregation.
         .limit(5000);
 
       if (ratingsError) throw ratingsError;
@@ -116,11 +120,19 @@ export function useBusinessReviewStats(businessId: string | undefined) {
       }).sort((a, b) => b.reviewCount - a.reviewCount);
 
       // Count unresponded reviews
-      const { count: respondedCount } = await supabase
+      // NOTE: If RLS denies access to review_responses for this business,
+      // respondedCount will be 0, making all reviews appear unresponded.
+      // Ensure RLS policy grants read access to business owners and managers.
+      const { count: respondedCount, error: responsesError } = await supabase
         .from('review_responses')
         .select('review_id', { count: 'exact', head: true })
         .eq('business_id', businessId)
         .eq('is_deleted', false);
+
+      if (responsesError) {
+        AppLog.error('[useBusinessReviewStats]', 'Failed to fetch response count:', responsesError);
+        // Don't throw — use 0 as fallback so other stats still render
+      }
 
       const unrespondedCount = Math.max(0, totalReviews - (respondedCount || 0));
 
