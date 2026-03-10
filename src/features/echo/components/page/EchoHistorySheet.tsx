@@ -10,6 +10,7 @@ import { useEchoConversations } from '../../hooks/useEchoHistory';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { haptic } from '@/utils/haptics';
 
 interface EchoHistorySheetProps {
   isOpen: boolean;

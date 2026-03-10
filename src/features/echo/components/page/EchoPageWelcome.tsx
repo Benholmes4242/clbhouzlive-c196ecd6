@@ -78,7 +78,7 @@ const getRandomPrompts = (count: number = 4): string[] => {
   return shuffled.slice(0, count);
 };
 
-export function EchoPageWelcome({ profile, onChipSelect, onFocusInput }: EchoPageWelcomeProps) {
+export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps) {
   const prompts = useMemo(() => getRandomPrompts(4), []);
   const greeting = getGreeting();
 

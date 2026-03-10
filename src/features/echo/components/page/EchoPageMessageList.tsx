@@ -112,7 +112,10 @@ export function EchoPageMessageList({
     shouldAutoScrollRef.current = true;
   }, []);
 
-  const lastAssistantMessage = [...messages].reverse().find(m => m.role === 'assistant');
+  const lastAssistantMessage = useMemo(
+    () => [...messages].reverse().find(m => m.role === 'assistant'),
+    [messages]
+  );
   const animationVariants = {
     initial: prefersReduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 },
     animate: { opacity: 1, y: 0 },

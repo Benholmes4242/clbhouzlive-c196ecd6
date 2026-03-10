@@ -44,7 +44,7 @@ export function EchoResponseCard({
   const prefersReduced = usePrefersReducedMotion();
   const navigate = useNavigate();
 
-  const cleanContent = sanitizeEchoText(content);
+  const cleanContent = content;
   const followUps = isLast && lastResponse ? generateFollowUps(lastResponse) : [];
 
   const courseMatches = useMemo(() => {
