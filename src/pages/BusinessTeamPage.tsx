@@ -16,6 +16,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { formatDistanceToNow } from 'date-fns';
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
+import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
 type RoleKey = 'owner' | 'admin' | 'member';
 
@@ -26,6 +28,11 @@ const roleConfig: Record<RoleKey, { label: string; description: string }> = {
 };
 
 export default function BusinessTeamPage() {
+  const { businessId } = useParams<{ businessId: string }>();
+  const navigate = useNavigate();
+
+  useHideBottomNav();
+  useHideHeader();
   const { businessId } = useParams<{ businessId: string }>();
   const navigate = useNavigate();
   const { data: membership } = useBusinessMembership(businessId);

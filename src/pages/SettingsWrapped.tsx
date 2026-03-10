@@ -1,15 +1,11 @@
-import React, { useEffect } from 'react';
-import { useHeader } from '@/contexts/GlobalHeaderContext';
+import React from 'react';
 import { SettingsPageV2 } from '@/components/settings/SettingsPageV2';
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
+import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
 const SettingsWrapped = () => {
-  const { hideHeader, showHeader } = useHeader();
-
-  useEffect(() => {
-    // SettingsPageV2 has its own header, hide the global one
-    hideHeader();
-    return () => showHeader();
-  }, [hideHeader, showHeader]);
+  useHideBottomNav();
+  useHideHeader();
 
   return <SettingsPageV2 />;
 };
