@@ -296,12 +296,18 @@ const ClubhouseContent = () => {
       />
 
       {/* Floating top bar: Tab Toggle + Search + Profile Pill — z-40 */}
-      <ClubhouseTopBar
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        isBusinessActor={isBusinessActor}
-        user={user}
-      />
+      <div style={{
+        opacity: isTournamentCardActive ? 0 : 1,
+        pointerEvents: isTournamentCardActive ? 'none' : 'auto',
+        transition: 'opacity 0.3s ease',
+      }}>
+        <ClubhouseTopBar
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          isBusinessActor={isBusinessActor}
+          user={user}
+        />
+      </div>
 
       {/* Offline indicator */}
       {!isOnline && (
