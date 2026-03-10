@@ -4,10 +4,15 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, BadgeCheck, Shield, Users, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
+import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
 const BusinessVerificationAboutPage = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+
+  useHideBottomNav();
+  useHideHeader();
 
   const handleContinue = () => {
     navigate(`/business/${id}/verification/request`);

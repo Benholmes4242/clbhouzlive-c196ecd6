@@ -4,10 +4,15 @@ import { motion } from 'framer-motion';
 import { Check, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
+import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
 const BusinessVerificationSubmittedPage = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+
+  useHideBottomNav();
+  useHideHeader();
 
   const handleDone = () => {
     // Navigate back to business profile or manage page

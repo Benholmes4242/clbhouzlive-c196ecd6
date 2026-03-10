@@ -8,6 +8,8 @@ import { ChevronLeft } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
+import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
 interface FollowerProfile {
   id: string;
@@ -20,6 +22,10 @@ interface FollowerProfile {
 export default function BusinessFollowersPage() {
   const { idOrSlug } = useParams<{ idOrSlug: string }>();
   const navigate = useNavigate();
+
+  useHideBottomNav();
+  useHideHeader();
+
   const { data: business, isLoading: bizLoading } = useBusinessProfile(idOrSlug);
   const { data: followersCount = 0 } = useBusinessFollowersCount(business?.id);
 
