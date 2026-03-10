@@ -7,7 +7,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { BusinessCommandCard } from '@/components/business/BusinessCommandCard';
 import { AddBusinessCard } from '@/components/business/AddBusinessCard';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { motion } from 'framer-motion';
+import { ChevronLeft } from 'lucide-react';
 
 const MyBusinessesPage = () => {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const MyBusinessesPage = () => {
   const { activeActor } = useActiveActor();
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  // Fix 2: Sort businesses — active first, then alphabetical
+  // Sort businesses — active first, then alphabetical
   const sortedBusinesses = useMemo(() => {
     if (!businesses || businesses.length === 0) return [];
     return [...businesses].sort((a, b) => {
@@ -46,99 +46,90 @@ const MyBusinessesPage = () => {
   const hasBusinesses = sortedBusinesses.length > 0;
 
   return (
-    <PageRoot className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border">
-        <div className="mx-auto max-w-xl px-4 pt-3 pb-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-0.5 text-sm font-medium text-muted-foreground active:opacity-70 transition-opacity min-h-[44px]"
-          >
-            ‹ Back
-          </button>
-          
-          <h1 className="text-2xl font-bold text-foreground text-center">Business profiles</h1>
-          <p className="text-sm text-muted-foreground mt-1 text-center">
-            Manage the golf businesses you represent
-          </p>
-        </div>
-      </header>
+    <PageRoot>
+      <div className="min-h-screen bg-background">
 
-      <main className="w-full bg-background min-h-[calc(100vh-120px)]">
+        {/* Header */}
+        <div
+          className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border"
+          style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+        >
+          <div className="flex items-center px-4 h-14">
+            {/* Back button */}
+            <button
+              onClick={() => navigate(-1)}
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-muted-foreground active:text-foreground transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            {/* Title — centred */}
+            <div className="flex-1 text-center">
+              <h1 className="text-[16px] font-semibold text-foreground">
+                Business Profiles
+              </h1>
+            </div>
+
+            {/* Right spacer to balance back button */}
+            <div className="w-11" />
+          </div>
+        </div>
+
         {/* Loading state */}
         {isLoading && (
           <div className="flex flex-col gap-4 pt-4 px-4 max-w-xl mx-auto">
-            {[1, 2].map(i => (
-              <motion.div 
-                key={i} 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-card border border-border rounded-2xl overflow-hidden"
-              >
-                <div className="flex items-start gap-3.5 p-5">
-                  <div className="h-12 w-12 rounded-xl bg-muted animate-pulse" />
+            {[0, 1].map((i) => (
+              <div key={i} className="bg-card border border-border rounded-2xl overflow-hidden">
+                <div className="p-4 flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-muted animate-pulse" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-5 w-2/3 rounded bg-muted animate-pulse" />
-                    <div className="h-3 w-1/2 rounded bg-muted animate-pulse" />
+                    <div className="h-4 bg-muted animate-pulse rounded-lg w-2/3" />
+                    <div className="h-3 bg-muted animate-pulse rounded-lg w-1/3" />
                   </div>
                 </div>
-                <div className="px-5 pb-3">
-                  <div className="bg-muted/50 rounded-xl p-3">
-                    <div className="grid grid-cols-3 gap-2">
-                      {[1, 2, 3].map(j => (
-                        <div key={j} className="flex flex-col items-center">
-                          <div className="h-5 w-8 bg-muted rounded animate-pulse mb-1" />
-                          <div className="h-3 w-12 bg-muted rounded animate-pulse" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                <div className="h-px bg-border/30" />
+                <div className="p-4 space-y-3">
+                  <div className="h-16 bg-muted animate-pulse rounded-xl" />
+                  <div className="h-11 bg-muted animate-pulse rounded-xl" />
                 </div>
-                <div className="h-px bg-border mx-5" />
-                <div className="flex gap-2 p-5 pt-3">
-                  <div className="h-11 flex-1 rounded-xl bg-muted animate-pulse" />
-                  <div className="h-11 flex-1 rounded-xl bg-muted animate-pulse" />
-                  <div className="h-11 flex-1 rounded-xl bg-muted animate-pulse" />
-                </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         )}
 
-        {/* Empty state */}
-        {!isLoading && !hasBusinesses && (
-          <div className="pt-4 px-4 max-w-xl mx-auto">
-            <AddBusinessCard onClick={handleCreateBusiness} isFirst />
-          </div>
-        )}
-
-        {/* Business list */}
-        {!isLoading && hasBusinesses && (
+        {/* Content */}
+        {!isLoading && (
           <div className="flex flex-col gap-4 pt-4 px-4 max-w-xl mx-auto pb-8">
-            {sortedBusinesses.map((membership, index) => {
-              const isSingleBusiness = sortedBusinesses.length === 1;
-              const hasActiveActor = activeActor?.type === 'business' && activeActor?.id;
-              const isExactMatch = activeActor?.type === 'business' && activeActor?.id === membership.business.id;
-              const isFirstBusiness = index === 0;
-              
-              const isActive = isSingleBusiness || isExactMatch || (!hasActiveActor && isFirstBusiness);
-              
-              return (
-                <BusinessCommandCard
-                  key={membership.id}
-                  membership={membership}
-                  userId={user?.id || ''}
-                  index={index}
-                  isActive={isActive}
-                />
-              );
-            })}
+            {!hasBusinesses ? (
+              <AddBusinessCard isFirst onClick={handleCreateBusiness} />
+            ) : (
+              <>
+                {sortedBusinesses.map((membership, index) => {
+                  const isSingleBusiness = sortedBusinesses.length === 1;
+                  const hasActiveActor = activeActor?.type === 'business' && activeActor?.id;
+                  const isExactMatch = activeActor?.type === 'business' && activeActor?.id === membership.business.id;
+                  const isFirstBusiness = index === 0;
 
-            <AddBusinessCard onClick={handleCreateBusiness} />
+                  const isActive = isSingleBusiness || isExactMatch || (!hasActiveActor && isFirstBusiness);
+
+                  return (
+                    <BusinessCommandCard
+                      key={membership.id}
+                      membership={membership}
+                      userId={user?.id || ''}
+                      index={index}
+                      isActive={isActive}
+                    />
+                  );
+                })}
+
+                <AddBusinessCard onClick={handleCreateBusiness} />
+              </>
+            )}
           </div>
         )}
-      </main>
+
+      </div>
 
       <CreateBusinessProfileIntroModal
         open={showCreateModal}

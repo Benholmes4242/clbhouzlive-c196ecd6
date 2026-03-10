@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, MapPin, ShieldCheck, Clock, CheckCircle, Mail, Users
+import {
+  MoreHorizontal, Eye, Pencil, BarChart3, Trash2, MapPin, ShieldCheck, Clock, CheckCircle, Mail, Users, Zap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -59,29 +59,29 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
       setShowVerificationModal(false);
     };
   }, []);
-  
+
   const { business, role } = membership;
-  
+
   // Fetch 7-day stats for visits/impressions
   const { data: stats, isLoading: statsLoading } = useBusinessStats7d(business.id);
-  
+
   // Fetch TOTAL followers count (source of truth)
   const { data: totalFollowers, isLoading: followersLoading } = useBusinessFollowersCount(business.id);
-  
+
   const { data: verificationRequest } = useBusinessVerificationRequest(business.id);
-  
+
   // Fetch pending access requests count for indicator
   const { data: pendingRequestsCount } = useBusinessPendingRequestsCount(business.id);
-  
-  // Subscribe to realtime updates for access requests (Ticket A)
+
+  // Subscribe to realtime updates for access requests
   useBusinessAccessRequestsRealtime(business.id);
-  
+
   const canDelete = role === 'owner';
   const canManage = role === 'owner' || role === 'admin';
-  
+
   // Derive verification state
   const verificationState = deriveVerificationState(business.is_verified, verificationRequest);
-  
+
   // Check if domain verification is required
   const needsDomainVerification = verificationRequest?.requires_domain_check && !verificationRequest?.domain_confirmed;
 
@@ -111,7 +111,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
     navigate(`/business/${business.id}`);
   };
 
-  // Stat tap handlers (Fix 1)
+  // Stat tap handlers
   const handleStatTap = (target: 'followers' | 'insights') => {
     if (target === 'followers') {
       navigate(`/business/${business.id}/followers`);
@@ -137,57 +137,68 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
         className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden"
       >
         {/* Business Identity Row */}
-        <div 
+        <div
           onClick={handleRowClick}
-          className="flex items-start gap-3.5 p-5 pb-3 cursor-pointer"
+          className="flex items-start gap-3 p-4 cursor-pointer"
         >
           {/* Logo — 48px squircle */}
-          {business.logo_url ? (
-            <img
-              src={business.logo_url}
-              alt={business.name}
-              className="h-12 w-12 rounded-xl object-cover flex-shrink-0 ring-1 ring-border"
-            />
-          ) : (
-            <div className="h-12 w-12 rounded-xl bg-muted ring-1 ring-border flex items-center justify-center text-base font-semibold text-foreground flex-shrink-0">
-              {business.name.charAt(0).toUpperCase()}
-            </div>
-          )}
+          <div className="w-12 h-12 rounded-xl bg-muted overflow-hidden shrink-0 flex items-center justify-center ring-1 ring-border">
+            {business.logo_url ? (
+              <img
+                src={business.logo_url}
+                alt={business.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-[18px] font-bold text-muted-foreground">
+                {business.name.charAt(0).toUpperCase()}
+              </span>
+            )}
+          </div>
 
           {/* Name & Meta */}
           <div className="flex-1 min-w-0">
             {/* Business name row */}
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-foreground truncate text-lg leading-tight">{business.name}</span>
+              <span className="font-semibold text-[16px] text-foreground truncate leading-tight">
+                {business.name}
+              </span>
               {business.is_verified && <VerifiedBadge size="sm" />}
             </div>
-            
-            {/* Role + Category pill + Posting as badge */}
-            <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-              <span className="text-xs text-muted-foreground">{ACCESS_LABELS[role] || role}</span>
-              {categoryDisplay && (
-                <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">
-                  {categoryDisplay}
-                </span>
-              )}
-              {isActive && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-50 text-green-600 border border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-800">
-                  Posting as
-                </span>
-              )}
-            </div>
+
+            {/* Role */}
+            <p className="text-[12px] text-muted-foreground mt-0.5">
+              {ACCESS_LABELS[role] || role}
+            </p>
+
+            {/* "Posting as" badge */}
+            {isActive && (
+              <span className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20">
+                <Zap className="w-3 h-3" />
+                Posting as this business
+              </span>
+            )}
+
+            {/* Category badge */}
+            {categoryDisplay && (
+              <span className="inline-flex mt-1.5 px-2 py-0.5 rounded-full text-[11px] bg-muted text-muted-foreground">
+                {categoryDisplay}
+              </span>
+            )}
 
             {/* Location */}
             {locationDisplay && (
-              <div className="flex items-center gap-1 mt-1.5 text-xs text-muted-foreground">
-                <MapPin className="h-3 w-3 flex-shrink-0" />
-                <span className="truncate">{locationDisplay}</span>
+              <div className="flex items-center gap-1 mt-1">
+                <MapPin className="w-3 h-3 text-muted-foreground shrink-0" />
+                <span className="text-[12px] text-muted-foreground truncate">
+                  {locationDisplay}
+                </span>
               </div>
             )}
-            
-            {/* Pending verification subtext (P4) */}
+
+            {/* Pending verification subtext */}
             {verificationState === 'pending' && (
-              <p className="text-xs text-[#C1A84C] mt-1">
+              <p className="text-[12px] text-primary/70 mt-1">
                 {needsDomainVerification ? 'Action required: verify your domain' : 'Pending verification'}
               </p>
             )}
@@ -196,18 +207,18 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
           {/* Three-dot menu */}
           <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
             <DropdownMenuTrigger asChild>
-              <button 
+              <button
                 className="min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2 -mt-1 active:opacity-60 rounded-xl transition-opacity"
                 onClick={(e) => e.stopPropagation()}
               >
                 <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent 
-              align="end" 
+            <DropdownMenuContent
+              align="end"
               className="w-52 rounded-xl shadow-lg border-border"
             >
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate(`/business/${business.id}`);
@@ -217,7 +228,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                 <Eye className="h-4 w-4 text-muted-foreground" />
                 View profile
               </DropdownMenuItem>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate(`/business/${business.id}/edit`);
@@ -227,7 +238,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                 <Pencil className="h-4 w-4 text-muted-foreground" />
                 Edit profile
               </DropdownMenuItem>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate(`/business/${business.id}/insights`);
@@ -237,11 +248,11 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                 <BarChart3 className="h-4 w-4 text-muted-foreground" />
                 Insights
               </DropdownMenuItem>
-              
+
               {canManage && (
                 <>
                   <DropdownMenuSeparator className="my-1" />
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     onClick={handleManageTeam}
                     className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
                   >
@@ -251,20 +262,20 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                       <span className="ml-auto h-2 w-2 rounded-full bg-primary" />
                     )}
                   </DropdownMenuItem>
-                  
+
                   {/* Verification menu item - state-based */}
                   {verificationState === 'verified' ? (
-                    <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] text-green-600 opacity-50 cursor-default">
+                    <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] text-primary opacity-50 cursor-default">
                       <CheckCircle className="h-4 w-4" />
                       Verified
                     </DropdownMenuItem>
                   ) : verificationState === 'pending' ? (
-                    <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] text-[#C1A84C] opacity-50 cursor-default">
+                    <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] text-primary/70 opacity-50 cursor-default">
                       <Clock className="h-4 w-4" />
                       Verification pending
                     </DropdownMenuItem>
                   ) : (
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={(e) => {
                         e.stopPropagation();
                         setShowVerificationModal(true);
@@ -277,11 +288,11 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   )}
                 </>
               )}
-              
+
               {canDelete && (
                 <>
                   <DropdownMenuSeparator className="my-1" />
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     onClick={(e) => {
                       e.stopPropagation();
                       setShowDeleteDialog(true);
@@ -297,65 +308,66 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
           </DropdownMenu>
         </div>
 
-        {/* Stats Strip — elevated background with tappable stats */}
-        <div className="px-5 pb-3">
-          <div className="bg-muted/50 rounded-xl p-3">
-            <div className="grid grid-cols-3 text-center">
-              {/* Visits */}
-              <button
-                onClick={() => handleStatTap('insights')}
-                className="flex flex-col items-center justify-center cursor-pointer active:opacity-70 transition-opacity border-r border-border pr-2"
-              >
-                <p className={cn(
-                  "text-lg font-bold tabular-nums min-w-[2ch]",
-                  statsLoading ? "opacity-0" : (stats?.visits ? "text-foreground" : "text-muted-foreground")
-                )}>
-                  {statsLoading ? '-' : formatStat(stats?.visits)}
-                </p>
-                <p className="text-[11px] text-muted-foreground uppercase tracking-wide mt-0.5">Visits (7d)</p>
-              </button>
+        {/* Divider */}
+        <div className="h-px bg-border/30" />
 
-              {/* Followers */}
-              <button
-                onClick={() => handleStatTap('followers')}
-                className="flex flex-col items-center justify-center cursor-pointer active:opacity-70 transition-opacity border-r border-border px-2"
-              >
-                <p className={cn(
-                  "text-lg font-bold tabular-nums min-w-[2ch]",
-                  followersLoading ? "opacity-0" : (totalFollowers ? "text-foreground" : "text-muted-foreground")
-                )}>
-                  {followersLoading ? '-' : formatStat(totalFollowers)}
-                </p>
-                <p className="text-[11px] text-muted-foreground uppercase tracking-wide mt-0.5">
-                  Followers
-                  {!statsLoading && stats?.followersGained !== undefined && stats.followersGained !== 0 && (
-                    <span className="ml-1 text-muted-foreground/50">({formatDelta(stats.followersGained)})</span>
-                  )}
-                </p>
-              </button>
+        {/* Stats Strip */}
+        <div className="mx-4 my-3">
+          <div className="bg-muted/50 rounded-xl p-3 grid grid-cols-3 divide-x divide-border/40">
+            {/* Visits */}
+            <button
+              onClick={() => handleStatTap('insights')}
+              className="flex flex-col items-center justify-center cursor-pointer active:opacity-70 transition-opacity"
+            >
+              <p className={cn(
+                "text-[16px] font-bold tabular-nums min-w-[2ch]",
+                statsLoading ? "opacity-0" : (stats?.visits ? "text-foreground" : "text-muted-foreground")
+              )}>
+                {statsLoading ? '-' : formatStat(stats?.visits)}
+              </p>
+              <p className="text-[11px] text-muted-foreground uppercase tracking-wide mt-0.5">Visits (7d)</p>
+            </button>
 
-              {/* Impressions */}
-              <button
-                onClick={() => handleStatTap('insights')}
-                className="flex flex-col items-center justify-center cursor-pointer active:opacity-70 transition-opacity pl-2"
-              >
-                <p className={cn(
-                  "text-lg font-bold tabular-nums min-w-[2ch]",
-                  statsLoading ? "opacity-0" : (stats?.impressions ? "text-foreground" : "text-muted-foreground")
-                )}>
-                  {statsLoading ? '-' : formatStat(stats?.impressions)}
-                </p>
-                <p className="text-[11px] text-muted-foreground uppercase tracking-wide mt-0.5">Impressions (7d)</p>
-              </button>
-            </div>
+            {/* Followers */}
+            <button
+              onClick={() => handleStatTap('followers')}
+              className="flex flex-col items-center justify-center cursor-pointer active:opacity-70 transition-opacity"
+            >
+              <p className={cn(
+                "text-[16px] font-bold tabular-nums min-w-[2ch]",
+                followersLoading ? "opacity-0" : (totalFollowers ? "text-foreground" : "text-muted-foreground")
+              )}>
+                {followersLoading ? '-' : formatStat(totalFollowers)}
+              </p>
+              <p className="text-[11px] text-muted-foreground uppercase tracking-wide mt-0.5">
+                Followers
+                {!statsLoading && stats?.followersGained !== undefined && stats.followersGained !== 0 && (
+                  <span className="ml-1 text-muted-foreground/50">({formatDelta(stats.followersGained)})</span>
+                )}
+              </p>
+            </button>
+
+            {/* Impressions */}
+            <button
+              onClick={() => handleStatTap('insights')}
+              className="flex flex-col items-center justify-center cursor-pointer active:opacity-70 transition-opacity"
+            >
+              <p className={cn(
+                "text-[16px] font-bold tabular-nums min-w-[2ch]",
+                statsLoading ? "opacity-0" : (stats?.impressions ? "text-foreground" : "text-muted-foreground")
+              )}>
+                {statsLoading ? '-' : formatStat(stats?.impressions)}
+              </p>
+              <p className="text-[11px] text-muted-foreground uppercase tracking-wide mt-0.5">Impressions (7d)</p>
+            </button>
           </div>
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-border mx-5" />
+        <div className="h-px bg-border/30" />
 
         {/* Actions Row */}
-        <div className="flex items-center gap-2 p-5 pt-3">
+        <div className="flex items-center gap-2 p-4 pt-3">
           {needsDomainVerification ? (
             <Button
               variant="default"
@@ -378,12 +390,12 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   e.stopPropagation();
                   navigate(`/business/${business.id}/edit`);
                 }}
-                className="min-h-[44px] flex-1 text-sm font-medium border-border bg-card text-foreground active:scale-[0.97] transition-transform rounded-xl flex items-center justify-center gap-1.5"
+                className="min-h-[44px] flex-1 text-[13px] font-medium border-border text-foreground active:scale-[0.97] transition-transform rounded-xl flex items-center justify-center gap-1.5"
               >
                 <Pencil className="h-3.5 w-3.5" />
                 Edit profile
               </Button>
-              
+
               <Button
                 variant="outline"
                 size="sm"
@@ -391,23 +403,23 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   e.stopPropagation();
                   navigate(`/business/${business.id}/insights`);
                 }}
-                className="min-h-[44px] flex-1 text-sm font-medium border-border bg-card text-foreground active:scale-[0.97] transition-transform rounded-xl flex items-center justify-center gap-1.5"
+                className="min-h-[44px] flex-1 text-[13px] font-medium border-border text-foreground active:scale-[0.97] transition-transform rounded-xl flex items-center justify-center gap-1.5"
               >
                 <BarChart3 className="h-3.5 w-3.5" />
                 Insights
               </Button>
-              
+
               {canManage && (
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleManageTeam}
-                  className="min-h-[44px] flex-1 text-sm font-medium border-border bg-card text-foreground active:scale-[0.97] transition-transform rounded-xl flex items-center justify-center gap-1.5 relative"
+                  className="min-h-[44px] flex-1 text-[13px] font-medium border-border text-foreground active:scale-[0.97] transition-transform rounded-xl flex items-center justify-center gap-1.5 relative"
                 >
                   <Users className="h-3.5 w-3.5" />
                   Manage team
                   {(pendingRequestsCount ?? 0) > 0 && (
-                    <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-[#C1A84C] ring-2 ring-card" />
+                    <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-card" />
                   )}
                 </Button>
               )}

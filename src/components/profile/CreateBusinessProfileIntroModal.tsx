@@ -6,7 +6,6 @@ import {
   DialogFooter,
   DialogHeader,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 
 interface CreateBusinessProfileIntroModalProps {
   open: boolean;
@@ -21,12 +20,12 @@ interface BenefitItemProps {
 }
 
 const BenefitItem = ({ icon: Icon, title, body }: BenefitItemProps) => (
-  <div className="flex items-start gap-3">
-    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#FFF7ED] to-[#FFEDD5] border border-[#FDBA74]/30 flex items-center justify-center flex-shrink-0">
-      <Icon className="h-5 w-5 text-[#F79E1B]" />
+  <div className="flex items-start gap-3 py-3">
+    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+      <Icon className="h-4 w-4 text-primary" />
     </div>
     <div>
-      <p className="text-sm font-medium text-foreground">{title}</p>
+      <p className="text-[14px] font-semibold text-foreground">{title}</p>
       <p className="text-[13px] text-muted-foreground leading-relaxed">{body}</p>
     </div>
   </div>
@@ -43,26 +42,26 @@ export const CreateBusinessProfileIntroModal: React.FC<CreateBusinessProfileIntr
 }) => {
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md rounded-none sm:rounded-sq-lg bg-background">
+      <DialogContent className="max-w-md rounded-none sm:rounded-2xl bg-background">
         <DialogHeader className="text-center sm:text-center">
-          {/* Gradient icon */}
-          <div className="mx-auto mb-4 h-14 w-14 rounded-full bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/60 flex items-center justify-center">
-            <Building2 className="h-7 w-7 text-[#64748b]" />
+          {/* Icon */}
+          <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
+            <Building2 className="h-7 w-7 text-muted-foreground" />
           </div>
-          
+
           {/* Title */}
-          <h2 className="text-xl font-semibold text-foreground">
+          <h2 className="text-[20px] font-bold text-foreground">
             Create your business presence
           </h2>
-          
+
           {/* Subtitle */}
-          <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+          <p className="text-[14px] text-muted-foreground mt-2 leading-relaxed">
             Be discovered by golfers, build credibility through reviews, and grow your brand inside the world's fastest-growing golf community.
           </p>
         </DialogHeader>
 
-        {/* Outcome-led benefits - no cards, just spacing */}
-        <div className="mt-6 space-y-4">
+        {/* Benefit items */}
+        <div className="mt-6 divide-y divide-border/30">
           <BenefitItem
             icon={Search}
             title="Be discoverable"
@@ -80,27 +79,27 @@ export const CreateBusinessProfileIntroModal: React.FC<CreateBusinessProfileIntr
           />
         </div>
 
-        <DialogFooter className="mt-8 flex flex-col-reverse sm:flex-row gap-3">
-          {/* Secondary: text button */}
+        <DialogFooter className="mt-6 flex flex-col gap-0">
+          {/* Primary CTA */}
           <button
             type="button"
-            onClick={onClose}
-            className="w-full sm:w-auto text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
-          >
-            Not now
-          </button>
-          
-          {/* Primary: slate button */}
-          <Button
-            variant="secondary"
             onClick={() => {
               onContinue();
               onClose();
             }}
-            className="w-full sm:w-auto"
+            className="w-full bg-primary text-primary-foreground min-h-[50px] rounded-2xl text-[15px] font-semibold active:opacity-80 transition-opacity"
           >
-            Set up my business profile
-          </Button>
+            Get Started
+          </button>
+
+          {/* Dismiss link */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-full text-[14px] text-muted-foreground mt-3 min-h-[44px] active:text-foreground transition-colors"
+          >
+            Maybe later
+          </button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
