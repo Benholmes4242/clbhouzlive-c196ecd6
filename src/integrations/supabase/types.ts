@@ -6913,6 +6913,7 @@ export type Database = {
           pinned_at: string | null
           pinned_by: string | null
           pinned_until: string | null
+          post_type: string | null
           scheduled_at: string | null
           source_review_id: string | null
           status: string
@@ -6940,6 +6941,7 @@ export type Database = {
           pinned_at?: string | null
           pinned_by?: string | null
           pinned_until?: string | null
+          post_type?: string | null
           scheduled_at?: string | null
           source_review_id?: string | null
           status?: string
@@ -6967,6 +6969,7 @@ export type Database = {
           pinned_at?: string | null
           pinned_by?: string | null
           pinned_until?: string | null
+          post_type?: string | null
           scheduled_at?: string | null
           source_review_id?: string | null
           status?: string
@@ -10462,6 +10465,111 @@ export type Database = {
         }
         Relationships: []
       }
+      tournament_result_meta: {
+        Row: {
+          course_image_url: string | null
+          id: string
+          injected_at: string
+          podium_rows: Json
+          post_id: string
+          stat_birdies: number | null
+          stat_bogeys: number | null
+          stat_driving_distance: number | null
+          stat_eagles: number | null
+          stat_fairways_pct: number | null
+          stat_gir_pct: number | null
+          stat_pars: number | null
+          stat_putts: number | null
+          tour_name: string
+          tour_priority: number
+          tour_slug: string
+          tournament_id: string
+          tournament_name: string
+          venue_city: string | null
+          venue_country: string | null
+          venue_name: string | null
+          winner_by: string | null
+          winner_id: string | null
+          winner_name: string
+          winner_photo_url: string | null
+          winner_score: number
+          winner_score_display: string
+        }
+        Insert: {
+          course_image_url?: string | null
+          id?: string
+          injected_at?: string
+          podium_rows?: Json
+          post_id: string
+          stat_birdies?: number | null
+          stat_bogeys?: number | null
+          stat_driving_distance?: number | null
+          stat_eagles?: number | null
+          stat_fairways_pct?: number | null
+          stat_gir_pct?: number | null
+          stat_pars?: number | null
+          stat_putts?: number | null
+          tour_name: string
+          tour_priority?: number
+          tour_slug: string
+          tournament_id: string
+          tournament_name: string
+          venue_city?: string | null
+          venue_country?: string | null
+          venue_name?: string | null
+          winner_by?: string | null
+          winner_id?: string | null
+          winner_name: string
+          winner_photo_url?: string | null
+          winner_score: number
+          winner_score_display: string
+        }
+        Update: {
+          course_image_url?: string | null
+          id?: string
+          injected_at?: string
+          podium_rows?: Json
+          post_id?: string
+          stat_birdies?: number | null
+          stat_bogeys?: number | null
+          stat_driving_distance?: number | null
+          stat_eagles?: number | null
+          stat_fairways_pct?: number | null
+          stat_gir_pct?: number | null
+          stat_pars?: number | null
+          stat_putts?: number | null
+          tour_name?: string
+          tour_priority?: number
+          tour_slug?: string
+          tournament_id?: string
+          tournament_name?: string
+          venue_city?: string | null
+          venue_country?: string | null
+          venue_name?: string | null
+          winner_by?: string | null
+          winner_id?: string | null
+          winner_name?: string
+          winner_photo_url?: string | null
+          winner_score?: number
+          winner_score_display?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_result_meta_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tournament_result_meta_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: true
+            referencedRelation: "sr_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trip_participants: {
         Row: {
           created_at: string
@@ -11484,6 +11592,7 @@ export type Database = {
       }
       user_profiles: {
         Row: {
+          actor_type: string | null
           additional_clubs_visibility: string
           background_image_url: string | null
           bag_visible: boolean | null
@@ -11592,6 +11701,7 @@ export type Database = {
           youtube_handle: string
         }
         Insert: {
+          actor_type?: string | null
           additional_clubs_visibility?: string
           background_image_url?: string | null
           bag_visible?: boolean | null
@@ -11700,6 +11810,7 @@ export type Database = {
           youtube_handle?: string
         }
         Update: {
+          actor_type?: string | null
           additional_clubs_visibility?: string
           background_image_url?: string | null
           bag_visible?: boolean | null
