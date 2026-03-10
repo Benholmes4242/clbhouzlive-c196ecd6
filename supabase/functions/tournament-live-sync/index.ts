@@ -526,6 +526,23 @@ async function syncTournament(
           console.warn(`[LiveSync] Final tee times failed for ${tournament.name}: ${e.message}`);
         }
       }
+
+      // ── Inject tournament result post into Clubhouse feed ──────
+      try {
+        const injectUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/inject-tournament-post`;
+        const injectResponse = await fetch(injectUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+          },
+          body: JSON.stringify({ tournamentId: tournament.id }),
+        });
+        const injectResult = await injectResponse.json();
+        console.log(`[LiveSync] inject-tournament-post result for ${tournament.name}:`, JSON.stringify(injectResult));
+      } catch (injectErr) {
+        console.error(`[LiveSync] inject-tournament-post failed for ${tournament.name} (non-blocking):`, (injectErr as Error).message);
+      }
     }
   } else {
     // Update last_live_sync timestamp
@@ -547,6 +564,82 @@ async function syncTournament(
     error: syncError,
     durationMs,
   };
+}
+
+// ── Round-completion detection ───────────────────────────────────────
+
+async function checkAndTriggerRoundComplete(
+  supabase: any, tournamentId: string, tournamentName: string
+): Promise<boolean> {
+  const { data: entries } = await supabase
+    .from('sr_leaderboards')
+    .select('thru, status')
+    .eq('tournament_id', tournamentId)
+    .not('status', 'in', '("cut","wd","dq","dns")');
+
+  if (!entries || entries.length === 0) return false;
+
+  const finished = entries.filter((e: any) => {
+    const thru = String(e.thru || '').toLowerCase();
+    return thru === '18' || thru === 'f' || thru === 'f*';
+  });
+
+  const ratio = finished.length / entries.length;
+  if (ratio < 0.8) return false;
+
+  const { data: roundCheck } = await supabase
+    .from('sr_leaderboards')
+    .select('round_1, round_2, round_3, round_4')
+    .eq('tournament_id', tournamentId)
+    .not('status', 'in', '("cut","wd","dq","dns")')
+    .limit(5);
+
+  let currentRound = 1;
+  if (roundCheck?.length) {
+    const sample = roundCheck[0];
+    if (sample.round_4 != null) currentRound = 4;
+    else if (sample.round_3 != null) currentRound = 3;
+    else if (sample.round_2 != null) currentRound = 2;
+  }
+
+  const { data: existing } = await supabase
+    .from('sr_sync_log')
+    .select('id')
+    .eq('sync_type', 'round_complete')
+    .eq('tournament_id', tournamentId)
+    .like('error_message', `%round_${currentRound}%`)
+    .limit(1);
+
+  if (existing?.length) return false;
+
+  console.log(`[LiveSync] Round ${currentRound} complete for ${tournamentName} (${finished.length}/${entries.length} finished) — triggering round-complete`);
+
+  try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+    const response = await fetch(`${supabaseUrl}/functions/v1/tournament-round-complete`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${supabaseServiceKey}`,
+      },
+      body: JSON.stringify({ tournamentId, roundNumber: currentRound }),
+    });
+
+    await supabase.from('sr_sync_log').insert({
+      sync_type: 'round_complete',
+      tournament_id: tournamentId,
+      status: response.ok ? 'success' : 'error',
+      error_message: `round_${currentRound}`,
+      records_synced: 0,
+    });
+
+    return response.ok;
+  } catch (err) {
+    console.error(`[LiveSync] Failed to invoke tournament-round-complete:`, err.message);
+    return false;
+  }
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────
@@ -790,80 +883,4 @@ async function syncLeaderboard(
   }
 
   return { records, sportradarStatus };
-}
-
-// ── Round-completion detection ───────────────────────────────────────
-
-async function checkAndTriggerRoundComplete(
-  supabase: any, tournamentId: string, tournamentName: string
-): Promise<boolean> {
-  const { data: entries } = await supabase
-    .from('sr_leaderboards')
-    .select('thru, status')
-    .eq('tournament_id', tournamentId)
-    .not('status', 'in', '("cut","wd","dq","dns")');
-
-  if (!entries || entries.length === 0) return false;
-
-  const finished = entries.filter((e: any) => {
-    const thru = String(e.thru || '').toLowerCase();
-    return thru === '18' || thru === 'f' || thru === 'f*';
-  });
-
-  const ratio = finished.length / entries.length;
-  if (ratio < 0.8) return false;
-
-  const { data: roundCheck } = await supabase
-    .from('sr_leaderboards')
-    .select('round_1, round_2, round_3, round_4')
-    .eq('tournament_id', tournamentId)
-    .not('status', 'in', '("cut","wd","dq","dns")')
-    .limit(5);
-
-  let currentRound = 1;
-  if (roundCheck?.length) {
-    const sample = roundCheck[0];
-    if (sample.round_4 != null) currentRound = 4;
-    else if (sample.round_3 != null) currentRound = 3;
-    else if (sample.round_2 != null) currentRound = 2;
-  }
-
-  const { data: existing } = await supabase
-    .from('sr_sync_log')
-    .select('id')
-    .eq('sync_type', 'round_complete')
-    .eq('tournament_id', tournamentId)
-    .like('error_message', `%round_${currentRound}%`)
-    .limit(1);
-
-  if (existing?.length) return false;
-
-  console.log(`[LiveSync] Round ${currentRound} complete for ${tournamentName} (${finished.length}/${entries.length} finished) — triggering round-complete`);
-
-  try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-
-    const response = await fetch(`${supabaseUrl}/functions/v1/tournament-round-complete`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${supabaseServiceKey}`,
-      },
-      body: JSON.stringify({ tournamentId, roundNumber: currentRound }),
-    });
-
-    await supabase.from('sr_sync_log').insert({
-      sync_type: 'round_complete',
-      tournament_id: tournamentId,
-      status: response.ok ? 'success' : 'error',
-      error_message: `round_${currentRound}`,
-      records_synced: 0,
-    });
-
-    return response.ok;
-  } catch (err) {
-    console.error(`[LiveSync] Failed to invoke tournament-round-complete:`, err.message);
-    return false;
-  }
 }
