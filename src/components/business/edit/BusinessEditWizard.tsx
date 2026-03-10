@@ -1,10 +1,11 @@
 /**
  * BusinessEditWizard — 3-step wizard for editing a business profile
- * Mirrors BusinessProfileWizard (create) and PersonalProfileWizard patterns.
+ * Visual layer matches BusinessProfileWizard (create) and PersonalProfileWizard exactly.
  * All changes deferred to Save on Step 3.
  */
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { createPortal } from 'react-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -17,6 +18,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
+  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -29,6 +31,7 @@ import { ProfileWizardHeader } from '@/components/profile/profile-wizard/Profile
 import { ProfileWizardProgress } from '@/components/profile/profile-wizard/ProfileWizardProgress';
 import { ProfileWizardNavigation } from '@/components/profile/profile-wizard/ProfileWizardNavigation';
 import { BUSINESS_STEP_CONFIG, BusinessWizardStep } from '@/components/profile/profile-wizard/types';
+import type { WizardDirection } from '@/components/profile/profile-wizard/types';
 
 import { AddressValue } from '@/components/business/AddressAutocomplete';
 import { PhoneValue } from '@/components/business/PhoneInputWithDialCode';
@@ -38,6 +41,20 @@ import { BusinessEditStep2Location } from './BusinessEditStep2Location';
 import { BusinessEditStep3Branding } from './BusinessEditStep3Branding';
 
 const TOTAL_STEPS = 3;
+
+const slideVariants = {
+  enter: (dir: WizardDirection) => ({
+    x: dir === 'forward' ? '100%' : '-100%',
+    opacity: 0,
+  }),
+  center: { x: 0, opacity: 1 },
+  exit: (dir: WizardDirection) => ({
+    x: dir === 'forward' ? '-100%' : '100%',
+    opacity: 0,
+  }),
+};
+
+const transition = { type: 'tween' as const, duration: 0.22, ease: 'easeInOut' as const };
 
 export default function BusinessEditWizard() {
   const { id } = useParams<{ id: string }>();
@@ -55,6 +72,7 @@ export default function BusinessEditWizard() {
   } = useBusinessImageUpload(id);
 
   const [step, setStep] = useState<BusinessWizardStep>(1);
+  const [direction, setDirection] = useState<WizardDirection>('forward');
   const [saving, setSaving] = useState(false);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
 
@@ -206,11 +224,17 @@ export default function BusinessEditWizard() {
   }, []);
 
   const nextStep = useCallback(() => {
-    if (step < TOTAL_STEPS) setStep((s) => (s + 1) as BusinessWizardStep);
+    if (step < TOTAL_STEPS) {
+      setDirection('forward');
+      setStep((s) => (s + 1) as BusinessWizardStep);
+    }
   }, [step]);
 
   const prevStep = useCallback(() => {
-    if (step > 1) setStep((s) => (s - 1) as BusinessWizardStep);
+    if (step > 1) {
+      setDirection('back');
+      setStep((s) => (s - 1) as BusinessWizardStep);
+    }
   }, [step]);
 
   const handleClose = useCallback(() => {
@@ -223,7 +247,6 @@ export default function BusinessEditWizard() {
 
   const confirmClose = useCallback(() => {
     setShowCloseConfirm(false);
-    // Cleanup previews
     if (localLogoPreview) URL.revokeObjectURL(localLogoPreview);
     if (localCoverPreview) URL.revokeObjectURL(localCoverPreview);
     navigate(`/business/${id}`);
@@ -246,7 +269,7 @@ export default function BusinessEditWizard() {
       if (pendingRemoveCover) await doRemoveCover();
       else if (pendingCoverFile) await doUploadCover(pendingCoverFile);
 
-      const updatePayload: Record<string, any> = {
+      const updatePayload: Record<string, unknown> = {
         name: formData.businessName,
         category: formData.businessCategory || null,
         website: formData.businessWebsite || null,
@@ -277,7 +300,7 @@ export default function BusinessEditWizard() {
 
       const { error: updateError } = await supabase
         .from('business_accounts')
-        .update(updatePayload)
+        .update(updatePayload as any)
         .eq('id', id);
 
       if (updateError) throw updateError;
@@ -304,64 +327,85 @@ export default function BusinessEditWizard() {
     localLogoPreview, localCoverPreview, queryClient, navigate,
   ]);
 
-  // Loading / error states
+  // Loading state
   if (authLoading || businessLoading || membershipLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-      </div>
+    return createPortal(
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background">
+        <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+      </div>,
+      document.body
     );
   }
 
+  // Error / not found state
   if (businessError || !business) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    return createPortal(
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background p-4">
         <div className="max-w-md text-center">
           <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-2xl font-semibold text-foreground mb-2">Business not found</h1>
-          <p className="text-muted-foreground mb-6">
+          <h1 className="text-[16px] font-bold text-foreground mb-2">Business not found</h1>
+          <p className="text-[13px] text-muted-foreground mb-6">
             This business may have been removed or is no longer available.
           </p>
-          <Button onClick={() => navigate(-1)}>Go back</Button>
+          <button
+            onClick={() => navigate(-1)}
+            className="text-[14px] font-semibold text-primary"
+          >
+            Go back
+          </button>
         </div>
-      </div>
+      </div>,
+      document.body
+    );
+  }
+
+  // Permission denied state
+  if (!membershipLoading && membership && !canEdit) {
+    return createPortal(
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background p-4">
+        <div className="max-w-md text-center">
+          <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h1 className="text-[16px] font-bold text-foreground mb-2">Access denied</h1>
+          <p className="text-[13px] text-muted-foreground mb-6">
+            You don't have permission to edit this business profile.
+          </p>
+          <button
+            onClick={() => navigate(-1)}
+            className="text-[14px] font-semibold text-primary"
+          >
+            Go back
+          </button>
+        </div>
+      </div>,
+      document.body
     );
   }
 
   const stepConfig = BUSINESS_STEP_CONFIG[step];
 
-  return (
+  return createPortal(
     <>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="fixed inset-0 z-[9999] bg-background flex flex-col overflow-hidden pt-safe pb-safe"
-        style={{ touchAction: 'pan-y pinch-zoom', overscrollBehavior: 'contain' }}
-      >
-        {/* Header */}
-        <div className="flex-shrink-0">
-          <ProfileWizardHeader
-            title={stepConfig.title}
-            currentStep={step}
-            totalSteps={TOTAL_STEPS}
-            onBack={handleBack}
-            onClose={handleClose}
-          />
-        </div>
-
-        {/* Progress bar */}
+      <div className="fixed inset-0 z-[100] flex flex-col bg-background">
+        <ProfileWizardHeader
+          title={stepConfig.title}
+          currentStep={step}
+          totalSteps={TOTAL_STEPS}
+          onBack={handleBack}
+          onClose={handleClose}
+        />
         <ProfileWizardProgress currentStep={step} totalSteps={TOTAL_STEPS} />
 
-        {/* Step content */}
-        <main className="flex-1 min-h-0 overflow-hidden">
-          <AnimatePresence mode="wait">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden">
+          <AnimatePresence custom={direction} mode="wait">
             <motion.div
               key={step}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.2 }}
-              className="h-full"
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={transition}
+              className="pt-4"
             >
               {step === 1 && (
                 <BusinessEditStep1Info
@@ -407,9 +451,8 @@ export default function BusinessEditWizard() {
               )}
             </motion.div>
           </AnimatePresence>
-        </main>
+        </div>
 
-        {/* Navigation */}
         <ProfileWizardNavigation
           currentStep={step}
           totalSteps={TOTAL_STEPS}
@@ -420,25 +463,28 @@ export default function BusinessEditWizard() {
           onSubmit={handleSubmit}
           submitLabel="Save changes"
         />
-      </motion.div>
+      </div>
 
-      {/* Discard changes dialog */}
       <AlertDialog open={showCloseConfirm} onOpenChange={setShowCloseConfirm}>
-        <AlertDialogContent className="z-[10000] rounded-2xl">
+        <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Discard changes?</AlertDialogTitle>
             <AlertDialogDescription>
-              Your changes aren't saved. Are you sure you want to leave?
+              You have unsaved changes. They will be lost if you leave now.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-xl">Keep editing</AlertDialogCancel>
-            <Button variant="destructive" onClick={confirmClose} className="rounded-xl">
+            <AlertDialogCancel>Keep editing</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={confirmClose}
+            >
               Discard
-            </Button>
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </>,
+    document.body
   );
 }

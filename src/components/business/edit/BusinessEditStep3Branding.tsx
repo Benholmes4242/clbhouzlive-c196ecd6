@@ -2,10 +2,9 @@
  * BusinessEditStep3Branding — Step 3 of business edit wizard
  * Logo and cover photo with deferred upload
  */
-import React, { useRef, useState } from 'react';
-import { Camera, ImageIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { useRef, useState } from 'react';
+import { Camera, Plus, Loader2 } from 'lucide-react';
+import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ImageCropModal } from '@/components/business/ImageCropModal';
 
@@ -13,10 +12,8 @@ const COVER_ASPECT_RATIO = 3.2;
 
 interface BusinessEditStep3Props {
   businessName: string;
-  // Current saved URLs
   currentLogoUrl: string | null;
   currentCoverUrl: string | null;
-  // Deferred state
   pendingLogoFile: File | null;
   setPendingLogoFile: (f: File | null) => void;
   pendingCoverFile: File | null;
@@ -59,177 +56,138 @@ export function BusinessEditStep3Branding({
   const effectiveLogoUrl = pendingRemoveLogo ? null : (localLogoPreview || currentLogoUrl);
   const effectiveCoverUrl = pendingRemoveCover ? null : (localCoverPreview || currentCoverUrl);
 
-  const initials = businessName
-    ?.split(' ')
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join('')
-    .toUpperCase() || '?';
-
   return (
-    <div className="h-full overflow-y-auto overscroll-contain">
-      <div className="px-4 py-6 max-w-xl mx-auto space-y-6">
-        {/* Section icon + heading */}
-        <div className="text-center space-y-2">
-          <div className="mx-auto w-12 h-12 rounded-full bg-[#C1A84C]/10 flex items-center justify-center">
-            <Camera className="w-5 h-5 text-[#C1A84C]" />
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Branding</h2>
-            <p className="text-sm text-muted-foreground">Add your logo and cover photo to stand out</p>
-          </div>
-        </div>
-
-        {/* Logo card */}
-        <div className="bg-card border border-border rounded-xl p-4 space-y-4">
-          <div>
-            <Label className="text-sm text-foreground font-medium">Business Logo</Label>
-            <p className="text-xs text-muted-foreground mt-0.5">Your logo appears as a squircle across Clbhouz</p>
-          </div>
-
+    <div className="space-y-4 px-4 pb-4 pt-2">
+      {/* Card 1: Logo */}
+      <SectionCard>
+        <div className="space-y-3">
+          <label className="text-[13px] font-medium text-muted-foreground">
+            Logo
+          </label>
           <div className="flex items-center gap-4">
-            <div className="flex-shrink-0">
-              {effectiveLogoUrl ? (
-                <SquircleAvatar
-                  src={effectiveLogoUrl}
-                  alt={businessName}
-                  size={72}
+            <div className="relative flex-shrink-0">
+              <SquircleAvatar
+                key={effectiveLogoUrl || 'empty'}
+                src={effectiveLogoUrl || undefined}
+                fallback={businessName?.[0] || 'B'}
+                size={96}
+              />
+              <label className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center cursor-pointer shadow-sm hover:bg-primary/90 transition-colors">
+                <input
+                  ref={logoInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const url = URL.createObjectURL(file);
+                      setSelectedLogoImage(url);
+                      setLogoCropModalOpen(true);
+                    }
+                    if (logoInputRef.current) logoInputRef.current.value = '';
+                  }}
+                  className="hidden"
                 />
-              ) : (
-                <div className="w-[72px] h-[72px] rounded-sq-md bg-muted flex items-center justify-center text-2xl font-bold text-muted-foreground">
-                  {initials}
-                </div>
-              )}
+                <Plus className="w-4 h-4" />
+              </label>
             </div>
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => logoInputRef.current?.click()}
-                  className="text-xs h-8 rounded-lg"
-                >
-                  Change
-                </Button>
-                {effectiveLogoUrl && (
-                  <button
-                    onClick={() => {
-                      setPendingRemoveLogo(true);
-                      setPendingLogoFile(null);
-                      if (localLogoPreview) URL.revokeObjectURL(localLogoPreview);
-                      setLocalLogoPreview(null);
-                    }}
-                    className="text-xs text-muted-foreground hover:text-destructive transition-colors min-h-[44px] px-2"
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-              <p className="text-xs text-muted-foreground">Square images work best</p>
-            </div>
-          </div>
 
-          <input
-            ref={logoInputRef}
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                const url = URL.createObjectURL(file);
-                setSelectedLogoImage(url);
-                setLogoCropModalOpen(true);
-              }
-              if (logoInputRef.current) logoInputRef.current.value = '';
-            }}
-            className="hidden"
-          />
-        </div>
-
-        {/* Cover photo card */}
-        <div className="bg-card border border-border rounded-xl p-4 space-y-4">
-          <div className="flex items-start justify-between">
-            <div>
-              <Label className="text-sm text-foreground font-medium">Cover Photo</Label>
-              <p className="text-xs text-muted-foreground mt-0.5">Appears at the top of your business profile</p>
-            </div>
-            {effectiveCoverUrl && (
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => coverInputRef.current?.click()}
-                  className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors min-h-[44px] px-1"
-                >
-                  Change
-                </button>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-medium text-foreground">
+                {effectiveLogoUrl ? 'Change Logo' : 'Upload Logo'}
+              </p>
+              <p className="text-[12px] text-muted-foreground mt-0.5">
+                Square image recommended. PNG or JPG.
+              </p>
+              {effectiveLogoUrl && (
                 <button
                   type="button"
                   onClick={() => {
-                    setPendingRemoveCover(true);
-                    setPendingCoverFile(null);
-                    if (localCoverPreview) URL.revokeObjectURL(localCoverPreview);
-                    setLocalCoverPreview(null);
+                    setPendingRemoveLogo(true);
+                    setPendingLogoFile(null);
+                    if (localLogoPreview) URL.revokeObjectURL(localLogoPreview);
+                    setLocalLogoPreview(null);
                   }}
-                  className="text-xs text-muted-foreground hover:text-destructive transition-colors min-h-[44px] px-1"
+                  className="text-[12px] font-medium text-destructive mt-1"
                 >
                   Remove
                 </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
+        </div>
+      </SectionCard>
 
-          <button
-            type="button"
-            onClick={() => coverInputRef.current?.click()}
-            className="relative w-full aspect-[3.2/1] overflow-hidden rounded-xl border border-dashed border-border bg-muted/30 flex items-center justify-center hover:bg-muted/50 transition-colors group"
-          >
+      {/* Card 2: Cover Photo */}
+      <SectionCard>
+        <div className="space-y-3">
+          <label className="text-[13px] font-medium text-muted-foreground">
+            Cover Photo
+          </label>
+
+          <label className="block cursor-pointer">
+            <input
+              ref={coverInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const url = URL.createObjectURL(file);
+                  setSelectedCoverImage(url);
+                  setCoverCropModalOpen(true);
+                }
+                if (coverInputRef.current) coverInputRef.current.value = '';
+              }}
+              className="hidden"
+            />
+
             {effectiveCoverUrl ? (
-              <>
+              <div className="relative aspect-[3.2/1] rounded-xl overflow-hidden group">
                 <img
                   src={effectiveCoverUrl}
                   alt="Cover preview"
-                  className="h-full w-full object-cover object-center"
+                  className="w-full h-full object-cover object-center"
                 />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <div className="flex items-center gap-2 text-white text-sm font-medium">
-                    <Camera className="w-4 h-4" />
-                    Change photo
-                  </div>
+                <div className="absolute inset-0 bg-foreground/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Camera className="w-6 h-6 text-background" />
                 </div>
-              </>
+              </div>
             ) : (
-              <div className="flex flex-col items-center gap-2">
-                <ImageIcon className="w-8 h-8 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">Tap to upload a cover photo</span>
+              <div className="aspect-[3.2/1] rounded-xl border-2 border-dashed border-border bg-muted flex flex-col items-center justify-center hover:border-primary/40 hover:bg-primary/5 transition-colors">
+                <div className="w-12 h-12 rounded-full bg-muted border border-border flex items-center justify-center mb-2">
+                  <Camera className="w-5 h-5 text-muted-foreground" />
+                </div>
+                <p className="text-[13px] font-medium text-foreground">
+                  Upload cover photo
+                </p>
+                <p className="text-[12px] text-muted-foreground">
+                  Recommended: 1600×500px • JPG, PNG or WebP
+                </p>
               </div>
             )}
-          </button>
+          </label>
 
-          <p className="text-xs text-muted-foreground">
-            Recommended: 1600×500px • JPG, PNG or WebP
-          </p>
-
-          <input
-            ref={coverInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                const url = URL.createObjectURL(file);
-                setSelectedCoverImage(url);
-                setCoverCropModalOpen(true);
-              }
-              if (coverInputRef.current) coverInputRef.current.value = '';
-            }}
-            className="hidden"
-          />
+          {effectiveCoverUrl && (
+            <button
+              type="button"
+              onClick={() => {
+                setPendingRemoveCover(true);
+                setPendingCoverFile(null);
+                if (localCoverPreview) URL.revokeObjectURL(localCoverPreview);
+                setLocalCoverPreview(null);
+              }}
+              className="text-[12px] font-medium text-destructive"
+            >
+              Remove
+            </button>
+          )}
         </div>
+      </SectionCard>
 
-        <p className="text-xs text-muted-foreground text-center">
-          You can always update these later.
-        </p>
-      </div>
+      <p className="text-[12px] text-muted-foreground text-center">
+        You can always update these later from your business profile settings.
+      </p>
 
       {/* Logo Crop Modal */}
       {selectedLogoImage && (
