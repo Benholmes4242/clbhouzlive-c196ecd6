@@ -323,7 +323,7 @@ export default function BusinessEditWizard() {
       toast.success('Changes saved');
       navigate(`/business/${id}`);
     } catch (error) {
-      console.error('Error updating business profile:', error);
+      AppLog.error('[BusinessEditWizard]', 'Error updating business profile:', error);
       toast.error('Unable to save your changes. Please try again.');
     } finally {
       setSaving(false);

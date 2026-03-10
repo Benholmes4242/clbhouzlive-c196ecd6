@@ -175,7 +175,7 @@ export function ImageCropModal({
         </div>
 
         {/* Controls */}
-        <div className="bg-white px-4 py-4 space-y-4">
+        <div className="bg-card px-4 py-4 space-y-4">
           {/* Zoom slider */}
           <div className="flex items-center gap-3">
             <ZoomIn className="h-4 w-4 text-muted-foreground flex-shrink-0" />

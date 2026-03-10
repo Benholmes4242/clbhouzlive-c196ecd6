@@ -333,7 +333,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
               >
                 <MapPin className={cn(
                   "h-4 w-4 shrink-0 mt-0.5",
-                  isPrecise ? "text-emerald-600" : "text-muted-foreground"
+                  isPrecise ? "text-primary" : "text-muted-foreground"
                 )} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{result.primary}</p>

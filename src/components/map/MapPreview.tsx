@@ -116,7 +116,7 @@ export const MapPreview: React.FC<MapPreviewProps> = ({
         mapRef.current = null;
       }
     };
-  }, [lat, lng, zoom, markerColor, interactive, mapInitialized, hasValidCoords, colorful]);
+  }, [lat, lng, zoom, interactive, mapInitialized, hasValidCoords, colorful]);
 
   // Reset map when coordinates change
   useEffect(() => {

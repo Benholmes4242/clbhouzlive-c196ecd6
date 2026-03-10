@@ -179,7 +179,7 @@ export const PinDropModal: React.FC<PinDropModalProps> = ({
         reverseGeocode(latitude, longitude);
       },
       (err) => {
-        console.error('Geolocation error:', err);
+        AppLog.error('[PinDropModal]', 'Geolocation error:', err);
       }
     );
   };
