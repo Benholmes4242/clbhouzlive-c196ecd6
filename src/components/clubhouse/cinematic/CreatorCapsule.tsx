@@ -469,8 +469,18 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
           }}
         >
-          {/* Collapsed State - mode-dependent */}
-          {isReview ? reviewContent : regularCollapsedContent}
+          {/* Collapsed State - mode-dependent, crossfade on post change */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={postId || 'capsule-content'}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
+            >
+              {isReview ? reviewContent : regularCollapsedContent}
+            </motion.div>
+          </AnimatePresence>
 
           {/* Expanded Content - only for regular mode */}
           {!isReview && (
