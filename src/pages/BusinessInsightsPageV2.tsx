@@ -184,6 +184,10 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
 const BusinessInsightsPageV2 = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  // TODO: dateRange is UI-only and not wired to any query.
+  // useBusinessReviewStats must be updated to accept a dateRange param
+  // and filter results server-side before this toggle has any effect.
+  // Until then, the selector renders but changes nothing.
   const [dateRange, setDateRange] = useState<DateRange>('28d');
   const { user } = useSupabaseSession();
 
