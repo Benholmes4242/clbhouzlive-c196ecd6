@@ -93,7 +93,7 @@ export function ForwardMessageModal({
       toast.success('Message forwarded');
       onOpenChange(false);
     } catch (error) {
-      console.error('Error forwarding message:', error);
+      AppLog.error('[ForwardMessageModal]', 'Error forwarding message:', error);
       toast.error('Failed to forward message');
     } finally {
       setForwarding(null);

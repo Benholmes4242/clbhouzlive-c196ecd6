@@ -397,7 +397,7 @@ export function useMessaging(): UseMessagingReturn {
           table: 'messages',
         },
         (payload) => {
-          const incomingConvId = (payload.new as any)?.conversation_id;
+          const incomingConvId = (payload.new as Record<string, unknown>)?.conversation_id;
           if (incomingConvId && conversationsRef.current.some(c => c.id === incomingConvId)) {
             fetchConversations(true);
           }

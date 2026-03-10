@@ -104,7 +104,7 @@ export const VoiceRecordButton: React.FC<VoiceRecordButtonProps> = ({
   // Show error toast
   useEffect(() => {
     if (error) {
-      console.error('Voice recording error:', error);
+      AppLog.error('[VoiceRecordButton]', 'Voice recording error:', error);
     }
   }, [error]);
 

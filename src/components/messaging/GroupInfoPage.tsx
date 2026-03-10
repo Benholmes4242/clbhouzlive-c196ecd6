@@ -242,8 +242,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
       if (error) throw error;
       toast.success('Group deleted');
       onClose();
-    } catch (error: any) {
-      toast.error('Failed to delete group', { description: error.message });
+    } catch (e: unknown) {
+      toast.error('Failed to delete group', { description: (e as Error).message ?? 'An error occurred' });
     } finally {
       setShowDeleteDialog(false);
     }

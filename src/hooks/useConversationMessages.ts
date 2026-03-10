@@ -268,8 +268,8 @@ export function useConversationMessages(conversationId: string | null): UseConve
             setMessages(prev => prev.filter(m => m.id !== updated.id));
           } else {
             setMessages(prev => prev.map(m =>
-              m.id === updated.id
-                ? { ...m, content: updated.content, is_edited: updated.is_edited, edited_at: updated.edited_at }
+              m.id === (updated.id as string)
+                ? { ...m, content: updated.content as string, is_edited: updated.is_edited as boolean, edited_at: updated.edited_at as string | null }
                 : m
             ));
           }

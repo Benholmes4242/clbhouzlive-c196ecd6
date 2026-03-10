@@ -41,7 +41,7 @@ export function useConversation(friendId: string | null) {
       
       return data as string;
     } catch (err) {
-      console.error('[useConversation] Error:', err);
+      AppLog.error('[useConversation DEPRECATED]', 'Error:', err);
       return null;
     }
   }, [user, friendId]);

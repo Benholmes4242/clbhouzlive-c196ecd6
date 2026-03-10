@@ -147,7 +147,7 @@ export function useMessages() {
 
   const markMessagesAsRead = async (senderId: string) => {
     // This is now handled via mark_conversation_read RPC
-    console.log('[useMessages] markMessagesAsRead is deprecated, use markAsRead from useMessaging');
+    AppLog.debug('[useMessages DEPRECATED]', 'markMessagesAsRead is deprecated, use markAsRead from useMessaging');
   };
 
   return {
