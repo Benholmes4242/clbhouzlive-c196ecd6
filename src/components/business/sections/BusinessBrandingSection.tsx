@@ -4,6 +4,7 @@ import { BusinessLogoUpload } from '../BusinessLogoUpload';
 import { BusinessCoverUpload } from '../BusinessCoverUpload';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { toast } from 'sonner';
+import { AppLog } from '@/lib/logger';
 
 interface BusinessBrandingSectionProps {
   logoUrl: string | null;
