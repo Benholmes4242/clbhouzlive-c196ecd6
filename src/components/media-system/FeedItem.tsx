@@ -19,10 +19,13 @@ interface FeedItemProps {
   followOverride?: boolean;
   onFollowChange?: (userId: string, isFollowed: boolean) => void;
   onFirstFrameReady?: () => void;
+  onLike?: (post: FeedPost) => void;
+  onComment?: () => void;
+  onShare?: (post: FeedPost) => void;
 }
 
 export function FeedItem({
-  post, index, isActive, onFirstFrameReady,
+  post, index, isActive, onFirstFrameReady, onLike, onComment, onShare,
 }: FeedItemProps) {
   const ref = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
