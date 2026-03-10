@@ -110,7 +110,7 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
   // Signal ready only when userId is available
   useEffect(() => {
     if (userId && !isReady) {
-      console.log('[useEchoConversation] Hook ready, userId:', userId);
+      // Hook ready
       requestAnimationFrame(() => {
         setIsReady(true);
         initializingRef.current = false;
