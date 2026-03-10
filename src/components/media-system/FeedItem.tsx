@@ -25,6 +25,7 @@ export function FeedItem({
   post, index, isActive, onFirstFrameReady,
 }: FeedItemProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   const isMultiMedia = post.mediaItems.length > 1;
   const media = post.mediaItems[0];
