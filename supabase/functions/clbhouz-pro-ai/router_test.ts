@@ -1,7 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 import {
   decideRoute,
-  modelDeclined,
   needsStaticExplainer,
 } from "./router.ts";
 import { assertEquals } from "https://deno.land/std@0.224.0/assert/mod.ts";
