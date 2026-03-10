@@ -350,7 +350,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
           {/* ── Leaderboard rows ── */}
           {hasPodium && (
-            <div style={{ padding: '0 16px 14px' }}>
+            <div style={{ padding: '0 20px 18px' }}>
               {meta.podium_rows.slice(0, 2).map((row) => (
                 <PodiumRunnerRow key={row.position} row={row} resolvePhoto={resolvePhoto} />
               ))}
