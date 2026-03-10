@@ -38,7 +38,7 @@ export function useEchoConversations(search?: string) {
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        console.log('[useEchoConversations] No user found, returning empty array');
+        return [];
         return [];
       }
 
