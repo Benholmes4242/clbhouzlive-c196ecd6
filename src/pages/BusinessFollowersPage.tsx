@@ -111,11 +111,14 @@ export default function BusinessFollowersPage() {
               onClick={() => navigate(`/profile/${follower.username || follower.id}`)}
               className="w-full flex items-center gap-3 px-4 py-3 active:bg-muted/50 transition-colors text-left"
             >
-              <SquircleAvatar
-                src={follower.profile_photo_url}
-                alt={follower.display_name || follower.username || ''}
-                size={48}
-              />
+              <div style={{ border: '0.5px solid hsl(var(--border))', borderRadius: '34%', lineHeight: 0 }}>
+                <SquircleAvatar
+                  src={follower.profile_photo_url}
+                  alt={follower.display_name || follower.username || ''}
+                  size={48}
+                  hideRing
+                />
+              </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
                   <span className="text-sm font-semibold text-foreground truncate">
