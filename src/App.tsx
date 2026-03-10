@@ -226,6 +226,7 @@ const BusinessManagePage = lazy(() => import("./pages/BusinessManagePage"));
 const BusinessEditWizard = lazy(() => import("./components/business/edit/BusinessEditWizard"));
 const BusinessProfileLiveSuccessPage = lazy(() => import("./pages/BusinessProfileLiveSuccessPage"));
 const BusinessVerificationAboutPage = lazy(() => import("./pages/BusinessVerificationAboutPage"));
+const BusinessVerificationWizardPage = lazy(() => import("./pages/BusinessVerificationWizardPage"));
 const BusinessVerificationRequestPage = lazy(() => import("./pages/BusinessVerificationRequestPage"));
 const BusinessVerificationSubmittedPage = lazy(() => import("./pages/BusinessVerificationSubmittedPage"));
 const BusinessVerificationStatusPage = lazy(() => import("./pages/BusinessVerificationStatusPage"));
