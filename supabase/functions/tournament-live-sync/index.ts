@@ -544,8 +544,26 @@ async function syncTournament(
         console.error(`[LiveSync] inject-tournament-post failed for ${tournament.name} (non-blocking):`, (injectErr as Error).message);
       }
     }
+  } else {
+    // Update last_live_sync timestamp
+    await supabase
+      .from('sr_tournaments')
+      .update({ last_live_sync: new Date().toISOString() })
+      .eq('id', tournament.id);
+  }
 
-  return { records, sportradarStatus };
+  const durationMs = Date.now() - tStart;
+  console.log(`[LiveSync] ✓ ${tournament.name}: ${leaderboardRecords} records in ${durationMs}ms${roundCompleteTriggered ? ' [round-complete triggered]' : ''}`);
+
+  return {
+    name: tournament.name,
+    records: leaderboardRecords,
+    gated: false,
+    transitionedToClosed,
+    roundCompleteTriggered,
+    error: syncError,
+    durationMs,
+  };
 }
 
 // ── Round-completion detection ───────────────────────────────────────
