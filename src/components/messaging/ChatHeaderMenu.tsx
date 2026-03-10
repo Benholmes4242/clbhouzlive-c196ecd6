@@ -137,8 +137,8 @@
    const handleLeaveGroupConfirmed = async () => {
      haptic('medium');
      try {
-      // TODO: Add leave_group_conversation to generated Supabase types
-      const { error } = await supabase.rpc('leave_group_conversation' as any, {
+      // TODO: leave_group_conversation RPC needs to be added to Supabase generated types
+      const { error } = await (supabase.rpc as Function)('leave_group_conversation', {
          p_conversation_id: conversation.id,
        });
        
