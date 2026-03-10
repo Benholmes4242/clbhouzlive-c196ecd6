@@ -270,7 +270,7 @@ export function BusinessProfileWizard() {
       setCreatedBusinessSlug(businessData.slug);
       setShowSuccess(true);
     } catch (error) {
-      console.error('Error creating business:', error);
+      AppLog.error('[BusinessProfileWizard]', 'Error creating business:', error);
       toast.error('Failed to create business profile');
     } finally {
       setSaving(false);

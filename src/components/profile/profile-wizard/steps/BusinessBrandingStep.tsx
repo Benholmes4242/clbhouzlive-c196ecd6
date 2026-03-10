@@ -1,7 +1,6 @@
 /**
  * BusinessBrandingStep - Step 3: Logo and cover photo
  */
-import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BusinessBrandingSection } from '@/components/business/sections/BusinessBrandingSection';
 
 interface BusinessBrandingStepProps {

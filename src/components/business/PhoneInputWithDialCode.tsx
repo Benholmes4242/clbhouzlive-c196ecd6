@@ -83,7 +83,7 @@ export const PhoneInputWithDialCode: React.FC<PhoneInputWithDialCodeProps> = ({
   className,
   disabled = false,
 }) => {
-  const dialCode = value?.dialCode || '+44';
+  const dialCode = value?.dialCode || '';
   const localNumber = value?.localNumber || '';
 
   const handleDialCodeChange = (newDialCode: string) => {

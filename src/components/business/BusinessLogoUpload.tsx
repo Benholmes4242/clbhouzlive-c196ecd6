@@ -28,7 +28,7 @@ export function BusinessLogoUpload({
       }
       setLocalPreviewUrl(null);
     }
-  }, [logoUrl]);
+  }, [logoUrl, localPreviewUrl]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

@@ -94,7 +94,7 @@ export function useClubSearch(query: string, options: UseClubSearchOptions = {})
         // Limit results (already sorted: direct first, then alias)
         setData(mergedClubs.slice(0, limit));
       } catch (err) {
-        console.error('Error searching clubs:', err);
+        AppLog.error('[useClubSearch]', 'Error searching clubs:', err);
         setError('Failed to search clubs');
         setData([]);
       } finally {

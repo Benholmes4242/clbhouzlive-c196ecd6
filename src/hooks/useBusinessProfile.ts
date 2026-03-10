@@ -99,7 +99,7 @@ export function useBusinessProfile(idOrSlug: string | undefined) {
         if (courseData) {
           finalLat = courseData.latitude;
           finalLng = courseData.longitude;
-          console.log('[useBusinessProfile] Using course coords fallback:', finalLat, finalLng);
+          AppLog.debug('[useBusinessProfile]', 'Using course coords fallback:', finalLat, finalLng);
         }
       }
 

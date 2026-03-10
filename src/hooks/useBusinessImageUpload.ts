@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { AppLog } from '@/lib/logger';
 
 export function useBusinessImageUpload(businessId: string | undefined) {
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -10,12 +11,11 @@ export function useBusinessImageUpload(businessId: string | undefined) {
   const queryClient = useQueryClient();
 
   const invalidateAllBusinessQueries = useCallback(async () => {
-    // Invalidate both the specific business profile and the list
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ['business-profile', businessId] }),
+      queryClient.invalidateQueries({ queryKey: ['business-profile'] }),
       queryClient.invalidateQueries({ queryKey: ['my-businesses'] }),
     ]);
-  }, [businessId, queryClient]);
+  }, [queryClient]);
 
   const uploadLogo = useCallback(async (file: File) => {
     if (!businessId) return;
@@ -38,23 +38,18 @@ export function useBusinessImageUpload(businessId: string | undefined) {
 
       if (error) throw error;
 
-      // Optimistic update for immediate UI feedback
-      queryClient.setQueryData(['business-profile', businessId], (old: any) => 
-        old ? { ...old, logo_url: uploadResult.publicUrl } : old
-      );
-
       await invalidateAllBusinessQueries();
       toast.success('Logo updated');
       
       return uploadResult.publicUrl;
     } catch (error) {
-      console.error('Error uploading logo:', error);
+      AppLog.error('[useBusinessImageUpload]', 'Error uploading logo:', error);
       toast.error("Couldn't upload logo");
       return null;
     } finally {
       setUploadingLogo(false);
     }
-  }, [businessId, queryClient, invalidateAllBusinessQueries]);
+  }, [businessId, invalidateAllBusinessQueries]);
 
   const removeLogo = useCallback(async () => {
     if (!businessId) return;
@@ -67,18 +62,13 @@ export function useBusinessImageUpload(businessId: string | undefined) {
 
       if (error) throw error;
 
-      // Optimistic update
-      queryClient.setQueryData(['business-profile', businessId], (old: any) => 
-        old ? { ...old, logo_url: null } : old
-      );
-
       await invalidateAllBusinessQueries();
       toast.success('Logo removed');
     } catch (error) {
-      console.error('Error removing logo:', error);
+      AppLog.error('[useBusinessImageUpload]', 'Error removing logo:', error);
       toast.error("Couldn't remove logo");
     }
-  }, [businessId, queryClient, invalidateAllBusinessQueries]);
+  }, [businessId, invalidateAllBusinessQueries]);
 
   const uploadCover = useCallback(async (file: File) => {
     if (!businessId) return;
@@ -101,23 +91,18 @@ export function useBusinessImageUpload(businessId: string | undefined) {
 
       if (error) throw error;
 
-      // Optimistic update for immediate UI feedback
-      queryClient.setQueryData(['business-profile', businessId], (old: any) => 
-        old ? { ...old, cover_image_url: uploadResult.publicUrl } : old
-      );
-
       await invalidateAllBusinessQueries();
       toast.success('Cover updated');
       
       return uploadResult.publicUrl;
     } catch (error) {
-      console.error('Error uploading cover:', error);
+      AppLog.error('[useBusinessImageUpload]', 'Error uploading cover:', error);
       toast.error("Couldn't upload cover");
       return null;
     } finally {
       setUploadingCover(false);
     }
-  }, [businessId, queryClient, invalidateAllBusinessQueries]);
+  }, [businessId, invalidateAllBusinessQueries]);
 
   const removeCover = useCallback(async () => {
     if (!businessId) return;
@@ -130,18 +115,13 @@ export function useBusinessImageUpload(businessId: string | undefined) {
 
       if (error) throw error;
 
-      // Optimistic update
-      queryClient.setQueryData(['business-profile', businessId], (old: any) => 
-        old ? { ...old, cover_image_url: null } : old
-      );
-
       await invalidateAllBusinessQueries();
       toast.success('Cover photo removed');
     } catch (error) {
-      console.error('Error removing cover:', error);
+      AppLog.error('[useBusinessImageUpload]', 'Error removing cover:', error);
       toast.error("Couldn't remove cover");
     }
-  }, [businessId, queryClient, invalidateAllBusinessQueries]);
+  }, [businessId, invalidateAllBusinessQueries]);
 
   return {
     uploadLogo,

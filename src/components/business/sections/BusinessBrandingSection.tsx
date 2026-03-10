@@ -53,7 +53,7 @@ export function BusinessBrandingSection({
         throw new Error(result.error || 'Upload failed');
       }
     } catch (err) {
-      console.error('Cover upload error:', err);
+      AppLog.error('[BusinessBrandingSection]', 'Cover upload error:', err);
       toast.error('Failed to upload cover photo');
     } finally {
       setIsUploadingCover(false);

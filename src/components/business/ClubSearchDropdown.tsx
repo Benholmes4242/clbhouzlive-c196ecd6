@@ -169,7 +169,7 @@ export const ClubSearchDropdown: React.FC<ClubSearchDropdownProps> = ({
                       key={club.id}
                       type="button"
                       onClick={() => handleSelect(club)}
-                      className="w-full px-3 py-2.5 text-left hover:bg-slate-100 transition-colors flex items-center gap-3"
+                      className="w-full px-3 py-2.5 text-left hover:bg-muted transition-colors flex items-center gap-3"
                     >
                       {(() => {
                         const flagCode = club.country ? getFlagCode(club.country) : null;
