@@ -173,20 +173,23 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
         </motion.div>
       </motion.button>
 
-      {/* Count container - ALWAYS in layout, opacity controls visibility */}
+      {/* Count container - ALWAYS in layout, crossfade on value change */}
       <div 
         className="flex items-center justify-center"
         style={{ height: COUNT_HEIGHT, marginTop: 4 }}
       >
-        <span
-          className={cn(
-            'text-[11px] font-medium text-white/90 drop-shadow-sm',
-            'transition-opacity duration-150 ease-out'
-          )}
-          style={{ opacity: hasVisibleCount ? 1 : 0 }}
-        >
-          {hasVisibleCount ? formatCount(count!) : '\u00A0'}
-        </span>
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={hasVisibleCount ? count : 'empty'}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: hasVisibleCount ? 1 : 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.1 }}
+            className="text-[11px] font-medium text-white/90 drop-shadow-sm"
+          >
+            {hasVisibleCount ? formatCount(count!) : '\u00A0'}
+          </motion.span>
+        </AnimatePresence>
       </div>
     </div>
   );
