@@ -64,7 +64,7 @@ const FriendsListPage = () => {
       title="Friends"
       subtitle={`Friends of @${profileUser.username}`}
       searchPlaceholder="Search friends by name or club"
-      emptyText={isOwnProfile ? "You haven't added any friends yet." : "No friends yet."}
+      
       users={friends}
       totalCount={totalCount}
       isLoading={friendsLoading}
