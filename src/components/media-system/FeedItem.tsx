@@ -19,10 +19,13 @@ interface FeedItemProps {
   followOverride?: boolean;
   onFollowChange?: (userId: string, isFollowed: boolean) => void;
   onFirstFrameReady?: () => void;
+  onLike?: (post: FeedPost) => void;
+  onComment?: () => void;
+  onShare?: (post: FeedPost) => void;
 }
 
 export function FeedItem({
-  post, index, isActive, onFirstFrameReady,
+  post, index, isActive, onFirstFrameReady, onLike, onComment, onShare,
 }: FeedItemProps) {
   const ref = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -42,9 +45,9 @@ export function FeedItem({
           post={post as TournamentResultFeedPost}
           isActive={isActive}
           isVisible={true}
-          onLike={() => {}}
-          onComment={() => {}}
-          onShare={() => {}}
+          onLike={onLike ? () => onLike(post) : () => {}}
+          onComment={onComment ?? (() => {})}
+          onShare={onShare ? () => onShare(post) : () => {}}
           onViewResults={() => {
             const meta = (post as TournamentResultFeedPost).tournamentMeta;
             navigate(`/tourhub/tournament/${meta.tournament_id}`);

@@ -67,6 +67,9 @@ function FeedWithPreloader({
   followOverrides,
   onFollowChange,
   onFirstFrameReady,
+  onLike,
+  onComment,
+  onShare,
 }: {
   posts: FeedPost[];
   onNearEnd: () => void;
@@ -76,6 +79,9 @@ function FeedWithPreloader({
   followOverrides: Map<string, boolean>;
   onFollowChange: (userId: string, isFollowed: boolean) => void;
   onFirstFrameReady?: () => void;
+  onLike?: (post: FeedPost) => void;
+  onComment?: () => void;
+  onShare?: (post: FeedPost) => void;
 }) {
   usePreloader(posts);
   return (
@@ -88,6 +94,9 @@ function FeedWithPreloader({
       followOverrides={followOverrides}
       onFollowChange={onFollowChange}
       onFirstFrameReady={onFirstFrameReady}
+      onLike={onLike}
+      onComment={onComment}
+      onShare={onShare}
     />
   );
 }
@@ -345,6 +354,9 @@ const ClubhouseContent = () => {
               followOverrides={followOverrides}
               onFollowChange={handleFollowChange}
               onFirstFrameReady={signalFirstFrameReady}
+              onLike={(post) => handleLike(post)}
+              onComment={openComments}
+              onShare={(post) => handleShare(post)}
             />
           </VideoPoolProvider>
         </MediaErrorBoundary>
