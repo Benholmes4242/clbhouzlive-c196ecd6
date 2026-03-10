@@ -172,7 +172,9 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       lat: result.lat,
       lng: result.lng,
       mapboxPlaceId: result.place_id,
-      precision: result.precision as LocationPrecision,
+      precision: (['address', 'poi', 'postcode', 'city', 'region', 'country', 'pin', 'unknown'].includes(result.precision)
+        ? result.precision
+        : 'unknown') as LocationPrecision,
       countryCode: countryCode,
       // Use structured data from edge function
       city: result.city || undefined,
