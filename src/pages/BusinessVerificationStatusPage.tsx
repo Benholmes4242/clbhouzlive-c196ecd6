@@ -87,6 +87,18 @@ const BusinessVerificationStatusPage = () => {
     );
   }
 
+  if (businessError || requestError) {
+    return (
+      <PageRoot className="min-h-screen bg-background">
+        <div className="flex-1 flex items-center justify-center px-4 min-h-[60vh]">
+          <p className="text-sm text-muted-foreground text-center">
+            Failed to load verification status.
+          </p>
+        </div>
+      </PageRoot>
+    );
+  }
+
   const status = request?.status;
   const isVerified = business?.is_verified;
   const requestedAt = request?.created_at;
