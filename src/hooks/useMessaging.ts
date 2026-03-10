@@ -345,7 +345,7 @@ export function useMessaging(): UseMessagingReturn {
       
       return data as string;
     } catch (err) {
-      console.error('[useMessaging] Error sending message:', err);
+      AppLog.error('[useMessaging]', 'Error sending message:', err);
       setError(err instanceof Error ? err : new Error('Failed to send message'));
       return null;
     }
