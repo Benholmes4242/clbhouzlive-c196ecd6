@@ -151,10 +151,10 @@ function MessagesPageInner() {
             style={{
               paddingTop: 'calc(54px + env(safe-area-inset-top, 0px))',
               height: 'calc(56px + 54px + env(safe-area-inset-top, 0px))',
-              background: 'rgba(248,250,252,0.9)',
+              background: 'hsl(var(--background) / 0.9)',
               backdropFilter: 'blur(24px)',
               WebkitBackdropFilter: 'blur(24px)',
-              borderBottom: '1px solid rgba(0,0,0,0.06)',
+              borderBottom: '1px solid hsl(var(--border))',
             }}
           >
             <button
