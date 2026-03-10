@@ -420,6 +420,8 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
               onLike={onLike}
               onComment={onComment}
               onShare={onShare}
+              getLikeState={getLikeState}
+              getCommentCount={getCommentCount}
             />
           );
         })}
