@@ -205,14 +205,14 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
       {/* Top fade */}
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '45%', background: 'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 1 }} />
       {/* Bottom fade (strong) */}
-      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '72%', background: 'linear-gradient(to top, rgba(0,0,0,0.97) 0%, rgba(0,0,0,0.85) 40%, rgba(0,0,0,0.4) 70%, transparent 100%)', pointerEvents: 'none', zIndex: 1 }} />
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '80%', background: 'linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.92) 30%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0.2) 75%, transparent 100%)', pointerEvents: 'none', zIndex: 1 }} />
 
       {/* ── LAYER 3: Foreground content ── */}
       <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
 
         {/* ── TOP BAR ── */}
         <div style={{
-          position: 'absolute', top: 56, left: 16, right: 16, zIndex: 10,
+          position: 'absolute', top: 'max(env(safe-area-inset-top, 0px), 12px)', left: 16, right: 16, zIndex: 10,
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           animation: 'trcard-fadeUp 0.5s ease-out both',
           animationDelay: '0ms',
@@ -246,11 +246,11 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         </div>
 
         {/* ── SPACER — push tournament name to bottom of image area ── */}
-        <div style={{ flex: 1 }} />
+        <div style={{ flex: '0 0 32%' }} />
 
         {/* ── TOURNAMENT NAME (overlaid on image) ── */}
         <div style={{
-          position: 'relative', zIndex: 10, padding: '0 20px',
+          position: 'relative', zIndex: 10, padding: '0 20px 12px',
           animation: 'trcard-fadeUp 0.5s ease-out both',
           animationDelay: '100ms',
         }}>
@@ -273,7 +273,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
         {/* ── GLASS CARD ── */}
         <div style={{
-          margin: '16px 16px 0',
+          margin: '0 16px 0',
           background: 'rgba(10,12,18,0.82)',
           backdropFilter: 'blur(28px) saturate(160%)', WebkitBackdropFilter: 'blur(28px) saturate(160%)',
           border: '1px solid rgba(255,255,255,0.09)',
@@ -288,7 +288,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
           {/* ── Winner block ── */}
           <div style={{
-            padding: 16,
+            padding: '20px 20px 18px',
             borderBottom: '1px solid rgba(255,255,255,0.06)',
             display: 'flex', alignItems: 'center', gap: 14,
             animation: 'trcard-slideIn 0.5s ease-out both',
@@ -324,7 +324,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
           </div>
 
           {/* ── Stats 2×4 grid ── */}
-          <div style={{ padding: '12px 16px 0' }}>
+          <div style={{ padding: '16px 20px 0' }}>
             <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 8 }}>
               Tournament Stats
             </div>
@@ -350,7 +350,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
           {/* ── Leaderboard rows ── */}
           {hasPodium && (
-            <div style={{ padding: '0 16px 14px' }}>
+            <div style={{ padding: '0 20px 18px' }}>
               {meta.podium_rows.slice(0, 2).map((row) => (
                 <PodiumRunnerRow key={row.position} row={row} resolvePhoto={resolvePhoto} />
               ))}
@@ -361,7 +361,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
           <div style={{
             borderTop: '1px solid rgba(255,255,255,0.07)',
             background: 'rgba(0,0,0,0.3)',
-            display: 'flex', gap: 8, padding: '12px 16px', alignItems: 'center',
+            display: 'flex', gap: 8, padding: '14px 20px', alignItems: 'center',
           }}>
             {/* Like button */}
             <button onClick={handleLike} style={{
@@ -408,7 +408,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         </div>
 
         {/* ── Bottom gap for nav bar ── */}
-        <div style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + 16px)', flexShrink: 0 }} />
+        <div style={{ height: 'max(env(safe-area-inset-bottom, 0px), 16px)', flexShrink: 0 }} />
       </div>
     </div>
   );
