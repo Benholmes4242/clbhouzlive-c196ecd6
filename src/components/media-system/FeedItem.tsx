@@ -45,7 +45,10 @@ export function FeedItem({
           onLike={() => {}}
           onComment={() => {}}
           onShare={() => {}}
-          onViewResults={() => {}}
+          onViewResults={() => {
+            const meta = (post as TournamentResultFeedPost).tournamentMeta;
+            navigate(`/tourhub/tournament/${meta.tournament_id}`);
+          }}
         />
       </div>
     );
