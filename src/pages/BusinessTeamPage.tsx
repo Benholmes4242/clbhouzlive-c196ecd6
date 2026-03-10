@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Plus, Users, Crown, MoreHorizontal, Trash2 } from 'lucide-react';
+import { ChevronLeft, Plus, Users, MoreHorizontal, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessTeam, useBusinessInvites, useRemoveMember, useUpdateMemberRole, useRevokeInvite, BusinessMember, BusinessInvite } from '@/hooks/useBusinessTeam';
+import { toast } from 'sonner';
 import { ConfirmModal } from '@/components/ui/confirm-modal';
 import { AccessRequestsSection } from '@/components/business/AccessRequestsSection';
 import { 
@@ -15,7 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { formatDistanceToNow } from 'date-fns';
+
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
@@ -55,12 +56,20 @@ export default function BusinessTeamPage() {
 
   const handleRemoveMember = async () => {
     if (!removeConfirm.member) return;
-    await removeMember.mutateAsync(removeConfirm.member.user_profile_id);
+    try {
+      await removeMember.mutateAsync(removeConfirm.member.user_profile_id);
+    } catch {
+      toast.error('Failed to remove member');
+    }
     setRemoveConfirm({ open: false, member: null });
   };
 
   const handleRoleChange = async (member: BusinessMember, newRole: string) => {
-    await updateRole.mutateAsync({ memberUserId: member.user_profile_id, newRole });
+    try {
+      await updateRole.mutateAsync({ memberUserId: member.user_profile_id, newRole });
+    } catch {
+      toast.error('Failed to update role');
+    }
   };
 
   if (!businessId) return null;
@@ -225,9 +234,6 @@ export default function BusinessTeamPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuItem className="text-sm">
-                          Resend invite
-                        </DropdownMenuItem>
                         <DropdownMenuItem 
                           className="text-destructive text-sm"
                           onClick={() => revokeInvite.mutate(invite.id)}

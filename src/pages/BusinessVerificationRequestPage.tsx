@@ -82,6 +82,7 @@ const BusinessVerificationRequestPage = () => {
   const submitMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error('Not authenticated');
+      if (!id) throw new Error('Business ID is missing');
       
       // Insert verification request into new table
       const { error } = await supabase

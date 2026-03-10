@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
@@ -15,7 +15,7 @@ import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -160,7 +160,7 @@ export default function BusinessEditWizard() {
       let newPhone: PhoneValue | null = null;
       if (business.phone) {
         newPhone = {
-          dialCode: '+44',
+          dialCode: '',
           localNumber: business.phone.replace(/^\+\d+\s*/, ''),
           fullNumber: business.phone,
         };
@@ -300,8 +300,8 @@ export default function BusinessEditWizard() {
 
       const { error: updateError } = await supabase
         .from('business_accounts')
-        .update(updatePayload as any)
-        .eq('id', id);
+        .update(updatePayload as Record<string, unknown>)
+        .eq('id', id!);
 
       if (updateError) throw updateError;
 

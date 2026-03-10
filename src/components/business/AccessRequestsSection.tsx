@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Loader2, UserPlus } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -112,7 +112,6 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
     // Prevent double-click
     if (loadingId) return;
     
-    const requesterName = request.requester.display_name || request.requester.username || 'A user';
     setLoadingId(request.id);
     
     // Ticket B: Close dialog FIRST, then wait for animation before proceeding
@@ -152,9 +151,9 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
         queryClient.invalidateQueries({ queryKey: ['notifications'] }),
         queryClient.invalidateQueries({ queryKey: ['unread-notifications-count'] }),
       ]);
-    } catch (e: any) {
+    } catch (e: unknown) {
       AppLog.error('AccessRequestsSection', 'Approve error:', e);
-      toast.error(e?.message ?? 'Failed to approve request');
+      toast.error((e as Error)?.message ?? 'Failed to approve request');
     } finally {
       setLoadingId(null);
     }
@@ -202,9 +201,9 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
         queryClient.invalidateQueries({ queryKey: ['notifications'] }),
         queryClient.invalidateQueries({ queryKey: ['unread-notifications-count'] }),
       ]);
-    } catch (e: any) {
+    } catch (e: unknown) {
       AppLog.error('AccessRequestsSection', 'Decline error:', e);
-      toast.error(e?.message ?? 'Failed to decline request');
+      toast.error((e as Error)?.message ?? 'Failed to decline request');
     } finally {
       setLoadingId(null);
     }

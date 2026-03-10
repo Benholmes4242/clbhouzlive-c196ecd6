@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMyBusinesses } from '@/hooks/useMyBusinesses';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CreateBusinessProfileIntroModal } from '@/components/profile/CreateBusinessProfileIntroModal';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { BusinessCommandCard } from '@/components/business/BusinessCommandCard';
@@ -34,10 +34,13 @@ const MyBusinessesPage = () => {
   }, [businesses, activeActor]);
 
   // Redirect to auth if not logged in
-  if (!authLoading && !user) {
-    navigate('/auth');
-    return null;
-  }
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/auth');
+    }
+  }, [authLoading, user, navigate]);
+
+  if (!authLoading && !user) return null;
 
   const handleCreateBusiness = () => {
     setShowCreateModal(true);

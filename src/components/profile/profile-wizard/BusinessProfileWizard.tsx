@@ -5,13 +5,13 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
+
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -255,11 +255,13 @@ export function BusinessProfileWizard() {
 
       if (businessError) throw businessError;
 
-      await supabase.from('business_members').insert({
+      const { error: memberError } = await supabase.from('business_members').insert({
         business_id: businessData.id,
         user_profile_id: user.id,
         role: 'owner',
       });
+
+      if (memberError) throw memberError;
 
       await queryClient.invalidateQueries({ queryKey: ['my-businesses'] });
       setCreatedBusinessId(businessData.id);

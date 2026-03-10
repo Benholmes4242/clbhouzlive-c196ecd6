@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Check, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,14 +9,13 @@ import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
 const BusinessVerificationSubmittedPage = () => {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
 
   useHideBottomNav();
   useHideHeader();
 
   const handleDone = () => {
     // Navigate back to business profile or manage page
-    navigate('/business/manage');
+    navigate('/businesses/manage');
   };
 
   return (

@@ -65,7 +65,7 @@ const BusinessVerificationStatusPage = () => {
     if (business?.slug) {
       navigate(`/business/${business.slug}`);
     } else {
-      navigate('/business/manage');
+      navigate('/businesses/manage');
     }
   };
 
@@ -159,7 +159,7 @@ const BusinessVerificationStatusPage = () => {
             </p>
             {(reviewedAt || business?.verified_at) && (
               <p className="text-xs text-muted-foreground/70 mb-8">
-                Verified on {format(new Date(reviewedAt ?? business?.verified_at ?? ''), 'MMM d, yyyy')}
+                Verified on {format(new Date(reviewedAt ?? business?.verified_at ?? Date.now()), 'MMM d, yyyy')}
               </p>
             )}
             <Button
