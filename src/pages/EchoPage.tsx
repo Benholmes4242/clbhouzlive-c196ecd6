@@ -139,9 +139,6 @@ export default function EchoPage() {
     sendMessage(text);
   }, [isStreaming, sendMessage]);
 
-  const handleFocusInput = useCallback(() => {
-    composerRef.current?.focus({ preventScroll: true });
-  }, []);
 
   const hasMessages = messages.length > 0 || isStreaming;
   const showPendingState = pendingPrompt !== null && !hasMessages;
