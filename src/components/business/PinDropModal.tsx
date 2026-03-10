@@ -131,7 +131,7 @@ export const PinDropModal: React.FC<PinDropModalProps> = ({
         setReverseGeocodeResult(data.features[0].place_name);
       }
     } catch (err) {
-      console.error('Search error:', err);
+      AppLog.error('[PinDropModal]', 'Search error:', err);
     } finally {
       setSearching(false);
     }
