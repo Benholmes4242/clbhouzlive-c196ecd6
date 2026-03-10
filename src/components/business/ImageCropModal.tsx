@@ -135,7 +135,8 @@ export function ImageCropModal({
       onCropComplete(croppedFile);
       onOpenChange(false);
     } catch (error) {
-      console.error('Error cropping image:', error);
+      AppLog.error('[ImageCropModal]', 'Error cropping image:', error);
+      toast.error('Failed to crop image. Please try again.');
     } finally {
       setIsProcessing(false);
     }
