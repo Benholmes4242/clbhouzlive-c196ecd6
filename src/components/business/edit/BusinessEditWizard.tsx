@@ -3,7 +3,7 @@
  * Visual layer matches BusinessProfileWizard (create) and PersonalProfileWizard exactly.
  * All changes deferred to Save on Step 3.
  */
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertCircle } from 'lucide-react';
@@ -15,6 +15,7 @@ import { useBusinessImageUpload } from '@/hooks/useBusinessImageUpload';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { AppLog } from '@/lib/logger';
 
 import {
   AlertDialog,
