@@ -55,7 +55,8 @@ export const ClaimCoursesStep: React.FC<ClaimCoursesStepProps> = ({
         // Select all by default
         setSelectedIds(new Set((data || []).map(c => c.id)));
       } catch (error) {
-        console.error('Error fetching courses:', error);
+        AppLog.error('[ClaimCoursesStep]', 'Error fetching courses:', error);
+        toast.error('Failed to load courses. Please try again.');
       } finally {
         setLoading(false);
       }
