@@ -525,15 +525,15 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 5,
-                background: post.isLikedByMe
+                background: isLiked
                   ? 'rgba(245, 158, 11, 0.25)'
                   : 'rgba(255, 255, 255, 0.10)',
-                border: `1px solid ${post.isLikedByMe
+                border: `1px solid ${isLiked
                   ? 'rgba(245, 158, 11, 0.5)'
                   : 'rgba(255, 255, 255, 0.15)'}`,
                 borderRadius: 20,
                 padding: '6px 12px',
-                color: post.isLikedByMe ? '#f59e0b' : 'rgba(255,255,255,0.85)',
+                color: isLiked ? '#f59e0b' : 'rgba(255,255,255,0.85)',
                 fontSize: 13,
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -541,11 +541,11 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             >
               <Heart
                 className="w-4 h-4"
-                style={{ color: post.isLikedByMe ? '#f59e0b' : 'rgba(255,255,255,0.85)' }}
-                fill={post.isLikedByMe ? '#f59e0b' : 'none'}
-                strokeWidth={post.isLikedByMe ? 0 : 2}
+                style={{ color: isLiked ? '#f59e0b' : 'rgba(255,255,255,0.85)' }}
+                fill={isLiked ? '#f59e0b' : 'none'}
+                strokeWidth={isLiked ? 0 : 2}
               />
-              <span>{post.likeCount}</span>
+              <span>{likeCount}</span>
             </button>
 
             <button
