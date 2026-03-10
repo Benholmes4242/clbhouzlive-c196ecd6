@@ -2,10 +2,9 @@
  * BusinessEditStep2Location — Step 2 of business edit wizard
  * Location, address, map, website, email, phone
  */
-import React, { useState } from 'react';
-import { MapPin, Globe, Mail, Phone, Flag, AlertTriangle } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useState } from 'react';
+import { MapPin } from 'lucide-react';
+import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { AddressAutocomplete, AddressValue } from '@/components/business/AddressAutocomplete';
 import { PinDropModal } from '@/components/business/PinDropModal';
 import { PhoneInputWithDialCode, PhoneValue } from '@/components/business/PhoneInputWithDialCode';
@@ -50,31 +49,23 @@ export function BusinessEditStep2Location({
   const hasNoContact = !formData.businessWebsite.trim() && !formData.businessContactEmail.trim();
 
   return (
-    <div className="h-full overflow-y-auto overscroll-contain">
-      <div className="px-4 py-6 max-w-xl mx-auto space-y-6">
-        {/* Section icon + heading */}
-        <div className="text-center space-y-2">
-          <div className="mx-auto w-12 h-12 rounded-full bg-[#C1A84C]/10 flex items-center justify-center">
-            <MapPin className="w-5 h-5 text-[#C1A84C]" />
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Location & Contact</h2>
-            <p className="text-sm text-muted-foreground">Help golfers find and reach you</p>
-          </div>
-        </div>
-
-        {/* Location */}
-        <div className="bg-card border border-border rounded-xl p-4 space-y-4">
+    <div className="space-y-4 px-4 pb-4 pt-2">
+      {/* Card 1: Location */}
+      <SectionCard>
+        <div className="space-y-3">
           {isClubLinked ? (
             <div className="space-y-1.5">
-              <Label className="text-sm text-foreground font-medium">Location</Label>
-              <div className="flex items-center gap-2 px-4 min-h-[48px] border border-border rounded-lg bg-muted/50">
-                <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                <span className="text-sm text-foreground">
+              <label className="text-[13px] font-medium text-muted-foreground">
+                Location
+              </label>
+              <div className="flex items-center gap-2 bg-muted rounded-xl px-4 py-3 text-[15px] text-muted-foreground">
+                <MapPin className="w-4 h-4 flex-shrink-0" />
+                <span className="flex-1">
                   {address?.label || businessLocation || 'Location unavailable'}
                 </span>
+                <span className="text-[11px] text-muted-foreground/70">From club data</span>
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[12px] text-muted-foreground">
                 Contact support to update the location for this linked club.
               </p>
             </div>
@@ -82,9 +73,9 @@ export function BusinessEditStep2Location({
             <>
               {/* Country */}
               <div className="space-y-1.5">
-                <Label className="text-sm text-foreground font-medium">
-                  Country <span className="text-red-500">*</span>
-                </Label>
+                <label className="text-[13px] font-medium text-muted-foreground">
+                  Country <span className="text-destructive">*</span>
+                </label>
                 <CountrySelector
                   value={countrySelection}
                   onChange={(name) => {
@@ -96,9 +87,9 @@ export function BusinessEditStep2Location({
 
               {/* Address */}
               <div className="space-y-1.5">
-                <Label className="text-sm text-foreground font-medium">
-                  Business address <span className="text-red-500">*</span>
-                </Label>
+                <label className="text-[13px] font-medium text-muted-foreground">
+                  Business address <span className="text-destructive">*</span>
+                </label>
                 <AddressAutocomplete
                   value={address}
                   onChange={(val) => {
@@ -111,103 +102,107 @@ export function BusinessEditStep2Location({
                   placeholder="Start typing street, postcode/ZIP, or area…"
                   error={addressError || undefined}
                 />
+                {addressError && (
+                  <p className="text-[12px] text-destructive">{addressError}</p>
+                )}
               </div>
 
               {/* Map preview */}
-              <div>
-                {address?.lat != null && address?.lng != null && Number.isFinite(address.lat) && Number.isFinite(address.lng) ? (
-                  <div className="rounded-xl border border-border overflow-hidden">
-                    <MapPreview
-                      lat={address.lat}
-                      lng={address.lng}
-                      name={formData.businessName || 'Business location'}
-                      height={160}
-                      zoom={14}
-                      markerColor="#F7931E"
-                      showExpandButton={false}
-                    />
-                    <div className="px-3 py-2.5 flex items-center justify-between bg-card border-t border-border">
-                      <div className="flex items-center gap-2 text-sm min-w-0">
-                        <MapPin className="h-4 w-4 text-[#C1A84C] flex-shrink-0" />
-                        <span className="truncate text-foreground">
-                          {address.city && address.country ? `${address.city}, ${address.country}` : address.label}
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setShowPinDropModal(true)}
-                        className="text-xs text-[#C1A84C] hover:underline flex-shrink-0 ml-2 font-medium"
-                      >
-                        Adjust pin
-                      </button>
+              {address?.lat != null && address?.lng != null && Number.isFinite(address.lat) && Number.isFinite(address.lng) ? (
+                <div className="rounded-xl border border-border overflow-hidden">
+                  <MapPreview
+                    lat={address.lat}
+                    lng={address.lng}
+                    name={formData.businessName || 'Business location'}
+                    height={160}
+                    zoom={14}
+                    markerColor="hsl(var(--primary))"
+                    showExpandButton={false}
+                  />
+                  <div className="px-3 py-2.5 flex items-center justify-between bg-card border-t border-border">
+                    <div className="flex items-center gap-2 text-[13px] min-w-0">
+                      <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                      <span className="truncate text-foreground">
+                        {address.city && address.country ? `${address.city}, ${address.country}` : address.label}
+                      </span>
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowPinDropModal(true)}
+                      className="text-[13px] font-medium text-primary flex-shrink-0 ml-2"
+                    >
+                      Adjust pin
+                    </button>
                   </div>
-                ) : (
-                  <div className="rounded-xl border border-dashed border-border bg-muted/30 p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
-                        <MapPin className="h-5 w-5 text-muted-foreground" />
-                      </div>
-                      <p className="text-sm text-muted-foreground">Select an address to preview your map pin.</p>
+                </div>
+              ) : (
+                <div className="rounded-xl border border-dashed border-border bg-muted/30 p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                      <MapPin className="h-5 w-5 text-muted-foreground" />
                     </div>
+                    <p className="text-[13px] text-muted-foreground">Select an address to preview your map pin.</p>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </>
           )}
         </div>
+      </SectionCard>
 
-        {/* Contact info */}
-        <div className="bg-card border border-border rounded-xl p-4 space-y-4">
+      {/* Card 2: Contact */}
+      <SectionCard>
+        <div className="space-y-3">
           <div className="space-y-1.5">
-            <Label className="text-sm text-foreground font-medium flex items-center gap-1.5">
-              <Globe className="w-3.5 h-3.5" />
+            <label className="text-[13px] font-medium text-muted-foreground">
               Website
-            </Label>
-            <Input
+            </label>
+            <input
+              type="url"
               value={formData.businessWebsite}
               onChange={(e) => onFieldChange('businessWebsite', e.target.value)}
               placeholder="https://yourwebsite.com"
-              className="min-h-[48px] rounded-lg border-border bg-card text-foreground px-4 focus:ring-2 focus:ring-[#C1A84C]/30 focus:border-[#C1A84C]"
+              className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors"
             />
           </div>
 
+          <div className="h-px bg-border/30" />
+
           <div className="space-y-1.5">
-            <Label className="text-sm text-foreground font-medium flex items-center gap-1.5">
-              <Mail className="w-3.5 h-3.5" />
-              Contact email
-            </Label>
-            <Input
+            <label className="text-[13px] font-medium text-muted-foreground">
+              Email
+            </label>
+            <input
               type="email"
               value={formData.businessContactEmail}
               onChange={(e) => onFieldChange('businessContactEmail', e.target.value)}
               placeholder="contact@business.com"
-              className="min-h-[48px] rounded-lg border-border bg-card text-foreground px-4 focus:ring-2 focus:ring-[#C1A84C]/30 focus:border-[#C1A84C]"
+              className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors"
             />
           </div>
 
+          <div className="h-px bg-border/30" />
+
           <div className="space-y-1.5">
-            <Label className="text-sm text-foreground font-medium flex items-center gap-1.5">
-              <Phone className="w-3.5 h-3.5" />
+            <label className="text-[13px] font-medium text-muted-foreground">
               Phone
-            </Label>
+            </label>
             <PhoneInputWithDialCode value={phone} onChange={setPhone} />
+            <p className="text-[12px] text-muted-foreground">
+              Your contact details are shown on your business profile.
+            </p>
           </div>
-
-          <p className="text-xs text-muted-foreground">
-            Your contact details are only shown on your business profile.
-          </p>
-
-          {hasNoContact && (
-            <div className="flex items-start gap-2 rounded-lg bg-[#C1A84C]/10 p-3">
-              <AlertTriangle className="w-4 h-4 text-[#C1A84C] flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-foreground">
-                Add a website or email so golfers can contact you.
-              </p>
-            </div>
-          )}
         </div>
-      </div>
+      </SectionCard>
+
+      {/* Validation hint */}
+      {hasNoContact && (
+        <SectionCard className="border-destructive/20 bg-destructive/5">
+          <p className="text-[12px] text-muted-foreground">
+            Add at least a website or email so golfers can contact you.
+          </p>
+        </SectionCard>
+      )}
 
       {/* Pin Drop Modal */}
       <PinDropModal
