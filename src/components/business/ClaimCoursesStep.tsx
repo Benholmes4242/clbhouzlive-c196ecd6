@@ -114,6 +114,10 @@ export const ClaimCoursesStep: React.FC<ClaimCoursesStepProps> = ({
         course_id: courseId,
       }));
 
+      // NOTE: This writes to business_claimed_courses but claim status is read via
+      // business_accounts.club_id in useCourseClaim and useBusinessClaimForCourse.
+      // The business_claimed_courses table is currently write-only from a read-path perspective.
+      // If the read path is ever migrated to use this table, ensure the data here is consistent.
       const { error } = await supabase
         .from('business_claimed_courses')
         .upsert(records, { onConflict: 'business_id,course_id' });
@@ -122,7 +126,8 @@ export const ClaimCoursesStep: React.FC<ClaimCoursesStepProps> = ({
 
       onComplete();
     } catch (error) {
-      console.error('Error claiming courses:', error);
+      AppLog.error('[ClaimCoursesStep]', 'Error claiming courses:', error);
+      toast.error('Failed to save claim. Please try again.');
     } finally {
       setSaving(false);
     }
