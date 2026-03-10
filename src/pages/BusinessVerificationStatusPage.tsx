@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -26,7 +25,7 @@ const BusinessVerificationStatusPage = () => {
   useVerificationNotificationsRealtime(user?.id);
 
   // Fetch business account
-  const { data: business, isLoading: isLoadingBusiness } = useQuery({
+  const { data: business, isLoading: isLoadingBusiness, error: businessError } = useQuery({
     queryKey: ['business-account-verification-status', id],
     enabled: !!id && !!user,
     queryFn: async () => {
@@ -34,7 +33,7 @@ const BusinessVerificationStatusPage = () => {
         .from('business_accounts')
         .select('id, name, slug, is_verified, verified_at')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -42,7 +41,7 @@ const BusinessVerificationStatusPage = () => {
   });
 
   // Fetch latest verification request
-  const { data: request, isLoading: isLoadingRequest } = useQuery({
+  const { data: request, isLoading: isLoadingRequest, error: requestError } = useQuery({
     queryKey: ['business-verification-request-status', id],
     enabled: !!id && !!user,
     queryFn: async () => {
@@ -83,6 +82,18 @@ const BusinessVerificationStatusPage = () => {
         <div className="space-y-4 px-4 pt-4">
           <div className="h-40 bg-muted animate-pulse rounded-2xl" />
           <div className="h-24 bg-muted animate-pulse rounded-2xl" />
+        </div>
+      </PageRoot>
+    );
+  }
+
+  if (businessError || requestError) {
+    return (
+      <PageRoot className="min-h-screen bg-background">
+        <div className="flex-1 flex items-center justify-center px-4 min-h-[60vh]">
+          <p className="text-sm text-muted-foreground text-center">
+            Failed to load verification status.
+          </p>
         </div>
       </PageRoot>
     );
@@ -159,7 +170,7 @@ const BusinessVerificationStatusPage = () => {
             </p>
             {(reviewedAt || business?.verified_at) && (
               <p className="text-xs text-muted-foreground/70 mb-8">
-                Verified on {format(new Date(reviewedAt ?? business?.verified_at ?? Date.now()), 'MMM d, yyyy')}
+                Verified on {format(new Date((reviewedAt ?? business?.verified_at) as string), 'MMM d, yyyy')}
               </p>
             )}
             <Button

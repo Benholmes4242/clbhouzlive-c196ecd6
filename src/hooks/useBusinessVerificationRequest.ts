@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { AppLog } from '@/lib/logger';
 
 export interface BusinessVerificationRequest {
   id: string;
@@ -33,10 +34,12 @@ export function useBusinessVerificationRequest(businessId: string | undefined) {
         .maybeSingle();
 
       if (error) {
-        console.error('[useBusinessVerificationRequest] error', error);
+        AppLog.error('[useBusinessVerificationRequest]', 'error', error);
         throw error;
       }
 
+      // NOTE: BusinessVerificationRequest.status is cast from string — if new statuses
+      // are added to the DB, update the union type in this file to match.
       return data as BusinessVerificationRequest | null;
     },
     staleTime: 30_000, // 30 seconds
