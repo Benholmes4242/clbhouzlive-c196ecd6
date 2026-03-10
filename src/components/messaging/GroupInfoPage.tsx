@@ -178,8 +178,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
       if (error) throw error;
       toast.success('Admin rights removed');
       onUpdate();
-    } catch (error: any) {
-      toast.error('Failed to update', { description: error.message });
+    } catch (e: unknown) {
+      toast.error('Failed to update', { description: (e as Error).message ?? 'An error occurred' });
     }
   };
 
