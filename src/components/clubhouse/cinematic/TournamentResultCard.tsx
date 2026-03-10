@@ -8,7 +8,6 @@ import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import type { TournamentResultFeedPost, TournamentResultMeta, PodiumRow as PodiumRowType } from '@/components/media-system/types/media';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { CinematicActionRail } from './CinematicActionRail';
 
 // ─── Gradient fallback map ───
@@ -50,29 +49,58 @@ const StatPill: React.FC<StatPillProps> = ({ value, label, color, suffix }) => (
   </div>
 );
 
-interface WinnerAvatarProps {
-  photoUrl: string | null;
-  name: string;
+interface FrostedAvatarProps {
+  src: string | null | undefined;
+  displayName: string;
+  size: number;
 }
 
-const WinnerAvatar: React.FC<WinnerAvatarProps> = ({ photoUrl, name }) => {
-  const initials = name
-    .split(' ')
-    .slice(0, 2)
-    .map(p => p[0])
-    .join('')
-    .toUpperCase();
+const SILHOUETTE_URL = 'https://pub-f598829c702247c88b3281e7ee9e35ea.r2.dev/DP%20World%20Tour/Silhouette.webp';
+
+const FrostedAvatar: React.FC<FrostedAvatarProps> = ({ src, displayName, size }) => {
+  const [currentSrc, setCurrentSrc] = React.useState(src || null);
+  const [imgError, setImgError] = React.useState(false);
+  const [loaded, setLoaded] = React.useState(false);
+  const initials = displayName.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() || '').slice(0, 2).join('') || '?';
+
+  React.useEffect(() => {
+    setCurrentSrc(src || null);
+    setImgError(false);
+    setLoaded(false);
+  }, [src]);
 
   return (
-    <SquircleAvatar
-      size={48}
-      src={photoUrl || undefined}
-      alt={name}
-      fallback={initials}
-      hideRing
-    />
+    <div style={{
+      width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
+      border: '1.5px solid #F8FAFC',
+      background: '#F8FAFC',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+    }}>
+      {currentSrc && !imgError ? (
+        <img
+          src={currentSrc}
+          alt={displayName}
+          onLoad={() => setLoaded(true)}
+          onError={() => {
+            if (loaded) return;
+            if (currentSrc !== SILHOUETTE_URL) {
+              setCurrentSrc(SILHOUETTE_URL);
+            } else {
+              setImgError(true);
+            }
+          }}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
+        />
+      ) : (
+        <span style={{ fontSize: Math.round(size * 0.35), fontWeight: 700, color: 'rgba(0,0,0,0.35)', lineHeight: 1 }}>{initials}</span>
+      )}
+    </div>
   );
 };
+
+const WinnerAvatar: React.FC<{ photoUrl: string | null; name: string }> = ({ photoUrl, name }) => (
+  <FrostedAvatar src={photoUrl} displayName={name} size={48} />
+);
 
 interface PodiumRowItemProps {
   row: PodiumRowType;
@@ -104,12 +132,10 @@ const PodiumRowItem: React.FC<PodiumRowItemProps> = ({ row }) => {
               position: 'relative',
             }}
           >
-            <SquircleAvatar
+            <FrostedAvatar
+              src={player.photoUrl}
+              displayName={player.name}
               size={28}
-              src={player.photoUrl || undefined}
-              alt={player.name}
-              fallback={player.name.split(' ').map(p => p[0]).join('').toUpperCase().slice(0, 2)}
-              hideRing
             />
           </div>
         ))}
