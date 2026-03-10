@@ -45,9 +45,9 @@ export function FeedItem({
           post={post as TournamentResultFeedPost}
           isActive={isActive}
           isVisible={true}
-          onLike={() => {}}
-          onComment={() => {}}
-          onShare={() => {}}
+          onLike={onLike ? () => onLike(post) : () => {}}
+          onComment={onComment ?? (() => {})}
+          onShare={onShare ? () => onShare(post) : () => {}}
           onViewResults={() => {
             const meta = (post as TournamentResultFeedPost).tournamentMeta;
             navigate(`/tourhub/tournament/${meta.tournament_id}`);
