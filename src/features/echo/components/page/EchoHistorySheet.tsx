@@ -304,7 +304,7 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
             {confirmDelete && (
               <>
                 <motion.div
-                  className="fixed inset-0 z-[60] bg-black/30"
+                  className="fixed inset-0 z-[60] bg-foreground/30"
                   initial={animationProps.initial}
                   animate={{ opacity: 1 }}
                   exit={animationProps.exit}

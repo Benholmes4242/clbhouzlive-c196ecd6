@@ -1,10 +1,9 @@
-// deno-lint-ignore-file no-explicit-any
 // Supabase Edge Function (Deno runtime)
 // ⚠️ Router applies ONLY to text Q&A. SwingCoach (CV/video) and CaddieLogs flows are untouched.
 import { serve } from "https://deno.land/std@0.220.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { crypto } from "https://deno.land/std@0.220.0/crypto/mod.ts";
-import { decideRoute, modelDeclined, type Mode } from "./router.ts";
+import { decideRoute, type Mode } from "./router.ts";
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
 const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY")!;
@@ -12,6 +11,8 @@ const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY")!;
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 const OPENAI_MODEL = "gpt-4o-mini";
 const PERPLEXITY_MODEL = "sonar";
@@ -104,7 +105,7 @@ function classifyIntent(query: string): {
 // ─── Context Fetcher ─────────────────────────────────────────────────────
 
 async function fetchEchoContext(
-  supabaseAdmin: ReturnType<typeof createClient>,
+  client: ReturnType<typeof createClient>,
   userId: string,
   intents: QueryIntent[],
   playerName: string | null,
@@ -125,7 +126,8 @@ async function fetchEchoContext(
 
   // Always fetch user context
   fetches.push(
-    supabaseAdmin.rpc('echo_get_user_context', { p_user_id: userId })
+    // deno-lint-ignore no-explicit-any
+    client.rpc('echo_get_user_context', { p_user_id: userId })
       .then(({ data }: any) => { if (data) userContext = data; })
       .catch(() => {})
   );
@@ -133,7 +135,8 @@ async function fetchEchoContext(
   // Tournament context
   if (intents.includes('tournament')) {
     fetches.push(
-      supabaseAdmin.rpc('echo_get_tournament_context')
+      // deno-lint-ignore no-explicit-any
+      client.rpc('echo_get_tournament_context')
         .then(({ data }: any) => { if (data?.available) tournamentContext = data; })
         .catch(() => {})
     );
@@ -142,7 +145,8 @@ async function fetchEchoContext(
   // Course context
   if (intents.includes('course') && courseQuery) {
     fetches.push(
-      supabaseAdmin.rpc('echo_get_course_context', {
+      // deno-lint-ignore no-explicit-any
+      client.rpc('echo_get_course_context', {
         p_query: courseQuery,
         p_country: countryQuery,
         p_limit: 8
@@ -155,7 +159,8 @@ async function fetchEchoContext(
   // Player context
   if (intents.includes('player') && playerName) {
     fetches.push(
-      supabaseAdmin.rpc('echo_get_player_context', { p_player_name: playerName })
+      // deno-lint-ignore no-explicit-any
+      client.rpc('echo_get_player_context', { p_player_name: playerName })
         .then(({ data }: any) => { if (data?.available) playerContext = data; })
         .catch(() => {})
     );
@@ -251,7 +256,7 @@ async function streamClaude(
   messages: Array<{ role: string; content: string }>,
   onChunk: (token: string) => void
 ): Promise<string> {
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+  const response = await withTimeout(fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -265,7 +270,7 @@ async function streamClaude(
       messages: messages.map(m => ({ role: m.role, content: m.content })),
       stream: true,
     }),
-  });
+  }), 30000);
 
   if (!response.ok) {
     throw new Error(`Claude API error: ${response.status}`);
@@ -314,7 +319,7 @@ async function callGemini(
     parts: [{ text: m.content }],
   }));
 
-  const response = await fetch(
+  const response = await withTimeout(fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
     {
       method: 'POST',
@@ -325,7 +330,7 @@ async function callGemini(
         generationConfig: { maxOutputTokens: 1024, temperature: 0.7 },
       }),
     }
-  );
+  ), 20000);
 
   if (!response.ok) throw new Error(`Gemini API error: ${response.status}`);
   const data = await response.json();
@@ -338,7 +343,7 @@ async function callGPT4o(
   systemPrompt: string,
   messages: Array<{ role: string; content: string }>
 ): Promise<string> {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  const response = await withTimeout(fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -352,7 +357,7 @@ async function callGPT4o(
         ...messages.map(m => ({ role: m.role, content: m.content })),
       ],
     }),
-  });
+  }), 20000);
 
   if (!response.ok) throw new Error(`GPT-4o API error: ${response.status}`);
   const data = await response.json();
@@ -365,7 +370,7 @@ async function callClaudeSync(
   systemPrompt: string,
   messages: Array<{ role: string; content: string }>
 ): Promise<string> {
-  const r = await fetch('https://api.anthropic.com/v1/messages', {
+  const r = await withTimeout(fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -378,7 +383,7 @@ async function callClaudeSync(
       system: systemPrompt,
       messages: messages.map(m => ({ role: m.role, content: m.content })),
     }),
-  });
+  }), 20000);
   const d = await r.json();
   return d?.content?.[0]?.text || '';
 }
@@ -427,7 +432,7 @@ Respond with only the final answer, nothing else.`;
       callGPT4o(systemPrompt, messages).catch(() => ''),
       callGemini(systemPrompt, messages).catch(() => ''),
       (async () => {
-        const r = await fetch('https://api.perplexity.ai/chat/completions', {
+        const r = await withTimeout(fetch('https://api.perplexity.ai/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -441,7 +446,7 @@ Respond with only the final answer, nothing else.`;
             ],
             max_tokens: 512,
           }),
-        });
+        }), 20000);
         const d = await r.json();
         return d?.choices?.[0]?.message?.content || '';
       })().catch(() => ''),
@@ -477,7 +482,6 @@ Respond with only the final answer.`;
 // ─── Rate Limiting ───────────────────────────────────────────────────────
 
 async function checkRateLimitDB(userId: string): Promise<{ allowed: boolean; error?: string; retryAfter?: number }> {
-  const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
   const now = new Date();
   
   const minuteStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
@@ -560,11 +564,9 @@ async function hashQuery(query: string): Promise<string> {
 }
 
 async function checkCache(queryHash: string): Promise<string | null> {
-  const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-  
   const { data, error } = await supabaseAdmin
     .from('echo_response_cache')
-    .select('response_text')
+    .select('response_text, hit_count')
     .eq('query_hash', queryHash)
     .maybeSingle();
 
@@ -572,7 +574,7 @@ async function checkCache(queryHash: string): Promise<string | null> {
   
   supabaseAdmin
     .from('echo_response_cache')
-    .update({ hit_count: (data as any).hit_count + 1 })
+    .update({ hit_count: (data.hit_count ?? 0) + 1 })
     .eq('query_hash', queryHash)
     .then(() => {});
   
@@ -580,8 +582,6 @@ async function checkCache(queryHash: string): Promise<string | null> {
 }
 
 async function cacheResponse(queryHash: string, queryText: string, responseText: string, modelUsed: string): Promise<void> {
-  const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-  
   try {
     await supabaseAdmin
       .from('echo_response_cache')
@@ -594,7 +594,7 @@ async function cacheResponse(queryHash: string, queryText: string, responseText:
         hit_count: 1
       }, { onConflict: 'query_hash' });
   } catch (error) {
-    console.warn('[Cache] Failed to cache response:', error);
+    console.error('[Cache] Failed to cache response:', error);
   }
 }
 
@@ -664,6 +664,7 @@ interface EchoV1RequestBody {
   images?: string[];
   detailMode?: boolean;
   isEcho?: boolean;
+  // deno-lint-ignore no-explicit-any
   swingContext?: any;
   mode?: Mode;
   nowIso?: string;
@@ -689,7 +690,7 @@ function nowISO() { return new Date().toISOString(); }
 // ─── Streaming Providers (Perplexity preserved for live route) ───────────
 
 // Streaming Perplexity call
-async function* streamPerplexity(query: string, nowIso: string, history: any[] = []): AsyncGenerator<string> {
+async function* streamPerplexity(query: string, nowIso: string, history: Array<{ role: string; content: string }> = []): AsyncGenerator<string> {
   const systemPrompt = [
     `You are Echo, a golf-first AI assistant with live web search. Today is ${nowIso.split("T")[0]}.`,
     "When asked about 'majors' without other context, assume golf majors (Masters, PGA Championship, US Open, The Open).",
@@ -704,7 +705,7 @@ async function* streamPerplexity(query: string, nowIso: string, history: any[] =
     { role: "user", content: query },
   ];
   
-  const resp = await fetch("https://api.perplexity.ai/chat/completions", {
+  const resp = await withTimeout(fetch("https://api.perplexity.ai/chat/completions", {
     method: "POST",
     headers: { Authorization: `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({ 
@@ -713,7 +714,7 @@ async function* streamPerplexity(query: string, nowIso: string, history: any[] =
       temperature: 0.2,
       stream: true 
     }),
-  });
+  }), 30000);
   
   if (!resp.ok) throw new Error(`Perplexity error: ${await resp.text()}`);
   
@@ -749,20 +750,20 @@ async function* streamPerplexity(query: string, nowIso: string, history: any[] =
 }
 
 // Non-streaming OpenAI call (for SwingCoach and fallbacks)
-async function callOpenAI(systemPrompt: string, userPrompt: string, history: any[] = []) {
+async function callOpenAI(systemPrompt: string, userPrompt: string, history: Array<{ role: string; content: string }> = []) {
   const messages = [{ role: "system", content: systemPrompt }, ...(history ?? []), { role: "user", content: userPrompt }];
-  const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+  const resp = await withTimeout(fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: { Authorization: `Bearer ${OPENAI_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({ model: OPENAI_MODEL, messages, temperature: 0.2 }),
-  });
+  }), 20000);
   if (!resp.ok) throw new Error(`OpenAI error: ${await resp.text()}`);
   const data = await resp.json();
   return data.choices?.[0]?.message?.content?.trim() || "Sorry, no response.";
 }
 
 // Non-streaming Perplexity call (for fallbacks)
-async function callPerplexity(query: string, nowIso: string, history: any[] = []) {
+async function callPerplexity(query: string, nowIso: string, history: Array<{ role: string; content: string }> = []) {
   const systemPrompt = [
     `You are Echo, a golf-first AI assistant with live web search. Today is ${nowIso.split("T")[0]}.`,
     "When asked about 'majors' without other context, assume golf majors.",
@@ -776,11 +777,11 @@ async function callPerplexity(query: string, nowIso: string, history: any[] = []
     ...(history ?? []),
     { role: "user", content: query },
   ];
-  const resp = await fetch("https://api.perplexity.ai/chat/completions", {
+  const resp = await withTimeout(fetch("https://api.perplexity.ai/chat/completions", {
     method: "POST",
     headers: { Authorization: `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({ model: PERPLEXITY_MODEL, messages, temperature: 0.2 }),
-  });
+  }), 20000);
   if (!resp.ok) throw new Error(`Perplexity error: ${await resp.text()}`);
   const data = await resp.json();
   let content = data.choices?.[0]?.message?.content?.trim() || "";
@@ -852,10 +853,12 @@ serve(async (req: Request) => {
     let images: string[] | undefined;
     let detailMode: boolean | undefined;
     let isEcho: boolean | undefined;
+    // deno-lint-ignore no-explicit-any
     let swingContext: any;
     let mode: Mode | "chat" = "auto";
     let timezone = DEFAULT_TIMEZONE;
     let shouldStream = true;
+    // deno-lint-ignore no-explicit-any
     let clientUserContext: any = null;
 
     // 1) New v2-style contract: messages[]
@@ -884,7 +887,6 @@ serve(async (req: Request) => {
     if ('detailMode' in body) detailMode = body.detailMode;
     if ('isEcho' in body) isEcho = body.isEcho;
     if ('swingContext' in body) swingContext = body.swingContext;
-    if (!mode && 'mode' in body) mode = (body.mode as Mode) || "auto";
     if ('timezone' in body) timezone = body.timezone || DEFAULT_TIMEZONE;
 
     if (!message?.trim()) {
@@ -920,6 +922,7 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
         ...(conversation || [])
       ];
 
+      // deno-lint-ignore no-explicit-any
       const userMessage: any = { 
         role: 'user', 
         content: images && images.length > 0 ? [
@@ -971,10 +974,11 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
 
-      } catch (error: any) {
+      } catch (error: unknown) {
         clearTimeout(timeoutId);
         
-        if (error.name === 'AbortError') {
+        const err = error as { name?: string };
+        if (err.name === 'AbortError') {
           const quickAnalysis = `## Quick Swing Analysis
 
 Based on the submitted frames, I can see:
@@ -1007,7 +1011,6 @@ Based on the submitted frames, I can see:
       classifyIntent(message);
 
     // 2. Fetch context from DB in parallel
-    const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     const { userContext, tournamentContext, courseContext, playerContext } =
       await fetchEchoContext(
         supabaseAdmin,
@@ -1027,7 +1030,8 @@ Based on the submitted frames, I can see:
       playerContext
     );
 
-    const firstName = (userContext?.first_name as string) || null;
+    const displayName = (userContext?.display_name as string) || null;
+    const firstName = displayName ? displayName.split(' ')[0] : null;
     const nameGreeting = firstName ? ` The user's name is ${firstName} — use it naturally.` : '';
 
     const enrichedSystemPrompt = [
@@ -1119,10 +1123,11 @@ Based on the submitted frames, I can see:
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
-  } catch (err: any) {
-    console.error('Edge function error:', err.message);
+  } catch (err: unknown) {
+    const errMsg = (err as { message?: string })?.message || String(err);
+    console.error('Edge function error:', errMsg);
     return new Response(JSON.stringify({
-      error: String(err?.message || err),
+      error: errMsg,
       text: "I'm having trouble processing your request right now. Please try again in a moment.",
       response: "I'm having trouble processing your request right now. Please try again in a moment."
     }), {

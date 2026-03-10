@@ -317,7 +317,7 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
       setIsStreaming(false);
       setStreamingContent('');
     }
-  }, [messages, sendToAI, isStreaming, userId, conversationId, queryClient, rateLimitCooldown, profile]);
+  }, [sendToAI, isStreaming, userId, conversationId, queryClient, rateLimitCooldown, profile]);
 
   const abortStream = useCallback(async () => {
     abort();
