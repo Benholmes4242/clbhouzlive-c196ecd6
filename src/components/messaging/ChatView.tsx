@@ -474,10 +474,10 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
         style={{
           height: 'calc(60px + max(env(safe-area-inset-top, 0px), 47px))',
           paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-          background: 'rgba(255,251,235,0.85)',
+          background: 'hsl(var(--background) / 0.9)',
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
-          borderBottom: '1px solid rgba(217,119,6,0.08)',
+          borderBottom: '1px solid hsl(var(--border))',
         }}
       >
         {/* Back button */}
