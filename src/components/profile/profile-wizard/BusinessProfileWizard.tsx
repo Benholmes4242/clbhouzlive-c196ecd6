@@ -36,8 +36,10 @@ import { LocationValue } from '@/components/business/LocationAutocomplete';
 import { PhoneValue } from '@/components/business/PhoneInputWithDialCode';
 import { RequestAccessModal } from '@/components/business/RequestAccessModal';
 import { getCountryCodeFromClub } from '@/utils/countryCodeMapping';
+import { AppLog } from '@/lib/logger';
 
 import type { WizardDirection } from './types';
+import type { Database } from '@/integrations/supabase/types';
 
 const TOTAL_STEPS = 3;
 
