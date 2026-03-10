@@ -84,7 +84,7 @@ export function ForwardMessageModal({
       await sendMessage(
         conversationId,
         content,
-        isMedia ? messageType as string : 'text',
+        isMedia ? messageType as MessageType : 'text',
         isMedia ? (mediaUrl || null) : null,
         isMedia ? (mediaMetadata || null) : null,
         null
