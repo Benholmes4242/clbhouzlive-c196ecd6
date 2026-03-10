@@ -6,6 +6,7 @@
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import type { TournamentResultFeedPost, TournamentResultMeta, PodiumRow as PodiumRowType } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { CinematicActionRail } from './CinematicActionRail';
@@ -65,7 +66,7 @@ const WinnerAvatar: React.FC<WinnerAvatarProps> = ({ photoUrl, name }) => {
   return (
     <SquircleAvatar
       size={48}
-      src={photoUrl}
+      src={photoUrl || undefined}
       alt={name}
       fallback={initials}
       hideRing
@@ -105,7 +106,7 @@ const PodiumRowItem: React.FC<PodiumRowItemProps> = ({ row }) => {
           >
             <SquircleAvatar
               size={28}
-              src={player.photoUrl}
+              src={player.photoUrl || undefined}
               alt={player.name}
               fallback={player.name.split(' ').map(p => p[0]).join('').toUpperCase().slice(0, 2)}
               hideRing
@@ -148,11 +149,10 @@ const PodiumRowItem: React.FC<PodiumRowItemProps> = ({ row }) => {
 };
 
 interface TournamentCreatorCapsuleProps {
-  tourName: string;
   isVisible: boolean;
 }
 
-const TournamentCreatorCapsule: React.FC<TournamentCreatorCapsuleProps> = ({ tourName, isVisible }) => (
+const TournamentCreatorCapsule: React.FC<TournamentCreatorCapsuleProps> = ({ isVisible }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
@@ -168,7 +168,7 @@ const TournamentCreatorCapsule: React.FC<TournamentCreatorCapsuleProps> = ({ tou
       gap: 10,
     }}
   >
-    {/* Logo circle */}
+    {/* Logo circle — orange spiral logomark */}
     <div
       style={{
         width: 32,
@@ -179,10 +179,14 @@ const TournamentCreatorCapsule: React.FC<TournamentCreatorCapsuleProps> = ({ tou
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: 16,
+        overflow: 'hidden',
       }}
     >
-      🏌️
+      <img
+        src="/assets/logomark-orange.png"
+        alt="clbhouz"
+        style={{ width: 28, height: 28, objectFit: 'contain' }}
+      />
     </div>
     {/* Text */}
     <div>
@@ -203,7 +207,7 @@ export interface TournamentResultCardProps {
   onLike: () => void;
   onComment: () => void;
   onShare: () => void;
-  onViewResults: () => void;
+  onViewResults?: () => void;
 }
 
 export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
@@ -215,12 +219,15 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
   onShare,
   onViewResults,
 }) => {
+  const navigate = useNavigate();
   const meta = post.tournamentMeta;
   const hasImage = !!meta.course_image_url;
   const bgGradient = TOUR_GRADIENTS[meta.tour_slug] || 'from-slate-900 via-slate-800 to-slate-900';
 
   const hasScoreStats = (meta.stat_birdies > 0 || meta.stat_pars > 0 || meta.stat_bogeys > 0);
   const hasPerfStats = !!(meta.stat_driving_distance || meta.stat_fairways_pct || meta.stat_gir_pct || meta.stat_putts);
+  const hasVenue = !!(meta.venue_name || meta.venue_city);
+  const hasPodium = meta.podium_rows && meta.podium_rows.length > 0;
 
   // Dynamic grid columns for stats
   const scoreGridCols = meta.stat_eagles > 0 ? 4 : 3;
@@ -234,6 +241,14 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
     if (meta.stat_putts) items.push({ value: meta.stat_putts.toFixed(2), label: 'PUTTS' });
     return items;
   }, [meta]);
+
+  const handleViewResults = () => {
+    if (onViewResults) {
+      onViewResults();
+    } else {
+      navigate(`/tourhub/tournament/${meta.tournament_id}`);
+    }
+  };
 
   return (
     <div
@@ -263,6 +278,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             src={meta.course_image_url!}
             alt={meta.venue_name || meta.tournament_name}
             className="absolute inset-0 w-full h-full object-cover"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
         ) : (
           <div className={`absolute inset-0 w-full h-full bg-gradient-to-br ${bgGradient}`}>
@@ -313,7 +329,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             <span>{meta.tour_name}</span>
           </div>
           <button
-            onClick={onViewResults}
+            onClick={handleViewResults}
             style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.85)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
           >
             View Results →
@@ -325,13 +341,15 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
           {meta.tournament_name}
         </p>
 
-        {/* Row 3: Venue */}
-        <p className="hero-venue" style={{ marginBottom: 16 }}>
-          {[meta.venue_name, meta.venue_city].filter(Boolean).join(' · ')}
-        </p>
+        {/* Row 3: Venue — only if data exists */}
+        {hasVenue && (
+          <p className="hero-venue" style={{ marginBottom: 16 }}>
+            {[meta.venue_name, meta.venue_city].filter(Boolean).join(' · ')}
+          </p>
+        )}
 
         {/* Row 4: Winner */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, marginTop: hasVenue ? 0 : 16 }}>
           <WinnerAvatar photoUrl={meta.winner_photo_url} name={meta.winner_name} />
           <div>
             <p style={{ fontSize: 17, fontWeight: 700, color: '#FFFFFF', letterSpacing: -0.3, lineHeight: 1.2 }}>
@@ -345,7 +363,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
           </div>
         </div>
 
-        {/* Row 5: Tournament stats */}
+        {/* Row 5: Tournament stats — hidden when all zeros */}
         {hasScoreStats && (
           <>
             <p style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: 1.2, textTransform: 'uppercase', marginBottom: 8 }}>
@@ -362,8 +380,8 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
           </>
         )}
 
-        {/* Row 6: Performance averages */}
-        {hasPerfStats && (
+        {/* Row 6: Performance averages — hidden when all null */}
+        {hasPerfStats && perfItems.length > 0 && (
           <>
             <p style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: 1.2, textTransform: 'uppercase', marginBottom: 8 }}>
               PERFORMANCE AVERAGES
@@ -376,8 +394,8 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
           </>
         )}
 
-        {/* Row 7: Podium rows */}
-        {meta.podium_rows && meta.podium_rows.length > 0 && (
+        {/* Row 7: Podium rows — hidden when empty */}
+        {hasPodium && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {meta.podium_rows.slice(0, 2).map((row) => (
               <PodiumRowItem key={row.position} row={row} />
@@ -404,7 +422,6 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
       {/* 5. TournamentCreatorCapsule — bottom left */}
       <TournamentCreatorCapsule
-        tourName={meta.tour_name}
         isVisible={isVisible}
       />
     </div>

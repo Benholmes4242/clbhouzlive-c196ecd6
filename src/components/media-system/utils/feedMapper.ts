@@ -33,7 +33,7 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
       actorType: 'system',
       actorId: row.post_user_id,
       username: 'clbhouz',
-      displayName: 'Clbhouz',
+      displayName: 'clbhouz',
       avatarUrl: '',
       isVerified: true,
       creatorRelation: 'system',
