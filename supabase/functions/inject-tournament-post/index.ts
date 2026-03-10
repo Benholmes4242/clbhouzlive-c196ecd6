@@ -276,9 +276,9 @@ Deno.serve(async (req) => {
           // deno-lint-ignore no-explicit-any
           players: entries.map((e: any) => {
             const p = e.player;
-            const name = `${p.first_name || ''} ${p.last_name || ''}`.trim();
+            const name = p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim();
             const photoUrl = getPlayerHeadshotUrl(
-              p.headshot_override || p.full_name || name,
+              p.headshot_override || name,
               tourSlug
             );
             return {
