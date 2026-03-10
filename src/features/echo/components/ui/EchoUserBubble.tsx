@@ -1,7 +1,5 @@
 /**
  * EchoUserBubble - Right-aligned user message bubble
- * Glass white with orange-tinted border
- * Relocated from features/hub/components/echo-v2/
  */
 
 import React from 'react';
@@ -13,10 +11,11 @@ interface EchoUserBubbleProps {
 export function EchoUserBubble({ content }: EchoUserBubbleProps) {
   return (
     <div className="flex justify-end" role="listitem">
-      <div 
-        className="max-w-[80%] px-4 py-3 rounded-[16px_16px_4px_16px] bg-amber-100/80"
+      <div
+        className="max-w-[82%] px-4 py-3 rounded-[18px_18px_4px_18px]"
+        style={{ background: 'hsl(var(--primary) / 0.1)' }}
       >
-        <p className="text-[14px] leading-relaxed whitespace-pre-wrap select-text" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>
+        <p className="text-[14px] leading-relaxed whitespace-pre-wrap select-text text-foreground font-['DM_Sans']">
           {content}
         </p>
       </div>

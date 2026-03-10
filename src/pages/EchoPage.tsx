@@ -1,7 +1,6 @@
 /**
  * EchoPage - Full-page Echo AI chat experience
  * Routes: /echo, /echo/:conversationId
- * Cleo design: warm gradient bg, glass bubbles, glass header
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
@@ -11,6 +10,7 @@ import { haptic } from '@/utils/haptics';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEchoConversation } from '@/features/echo/hooks/useEchoConversation';
+import { useEchoProfile } from '@/features/echo/hooks/useEchoProfile';
 import { EchoPageHeader } from '@/features/echo/components/page/EchoPageHeader';
 import { EchoPageWelcome } from '@/features/echo/components/page/EchoPageWelcome';
 import { EchoPageMessageList } from '@/features/echo/components/page/EchoPageMessageList';
@@ -25,6 +25,7 @@ export default function EchoPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const composerRef = useRef<HTMLInputElement>(null);
+  const profile = useEchoProfile();
   
   const [input, setInput] = useState('');
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -49,9 +50,6 @@ export default function EchoPage() {
   useEffect(() => {
     if (initialPrompt) {
       const decodedPrompt = decodeURIComponent(initialPrompt);
-      console.log('[EchoPage] Captured prompt from URL:', decodedPrompt);
-      
-      // Store as pending and clear URL immediately
       setPendingPrompt(decodedPrompt);
       setSearchParams({}, { replace: true });
     }
@@ -60,9 +58,8 @@ export default function EchoPage() {
   // Process pending prompt once hook is ready
   useEffect(() => {
     if (pendingPrompt && isReady && !isStreaming) {
-      console.log('[EchoPage] Hook ready, sending pending prompt:', pendingPrompt);
       const promptToSend = pendingPrompt;
-      setPendingPrompt(null); // Clear first to prevent re-fires
+      setPendingPrompt(null);
       sendMessage(promptToSend);
     }
   }, [pendingPrompt, isReady, isStreaming, sendMessage]);
@@ -108,7 +105,7 @@ export default function EchoPage() {
 
   const handleSelectConversation = useCallback((id: string) => {
     setHistoryOpen(false);
-    setPendingPrompt(null); // Clear any pending prompt when switching conversations
+    setPendingPrompt(null);
     navigate(`/echo/${id}`);
   }, [navigate]);
 
@@ -151,28 +148,27 @@ export default function EchoPage() {
 
   return (
     <motion.div 
-      className="fixed inset-0 flex flex-col"
-      style={{ backgroundColor: '#F8FAFC' }}
+      className="fixed inset-0 flex flex-col bg-background"
+      style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 44px)', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 0px)' }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
     >
       <div className="relative z-10 flex flex-col h-full">
-        {/* Header - Glass style */}
         <EchoPageHeader
           onBack={handleBack}
-          onNewChat={handleNewChat}
-          onOpenHistory={handleOpenHistory}
+          onNew={handleNewChat}
+          onHistory={handleOpenHistory}
           hasMessages={hasMessages}
         />
 
-        {/* Content - flex-1 to fill remaining space */}
         <div className="flex-1 min-h-0">
           {showPendingState ? (
             <EchoPendingState prompt={pendingPrompt} />
           ) : !hasMessages ? (
             <EchoPageWelcome
-              onPromptClick={handlePromptClick}
+              profile={profile}
+              onChipSelect={handlePromptClick}
               onFocusInput={handleFocusInput}
             />
           ) : (
@@ -192,31 +188,19 @@ export default function EchoPage() {
           )}
         </div>
 
-        {/* Input Bar - Glass pill style */}
-        <div 
-          className="flex-none px-4 pt-2"
-          style={{ 
-            paddingBottom: 'calc(32px + env(safe-area-inset-bottom, 0px))',
-            background: 'rgba(248,250,252,0.9)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            borderTop: '1px solid rgba(0,0,0,0.06)',
-          }}
-        >
-          <EchoPageComposer
-            ref={composerRef}
-            value={input}
-            onChange={setInput}
-            onSend={handleSend}
-            onAbort={abortStream}
-            isStreaming={isStreaming}
-            disabled={!!rateLimitCooldown}
-            cooldown={rateLimitCooldown}
-          />
-        </div>
+        {/* Composer */}
+        <EchoPageComposer
+          ref={composerRef}
+          value={input}
+          onChange={setInput}
+          onSend={handleSend}
+          onAbort={abortStream}
+          isStreaming={isStreaming}
+          disabled={!!rateLimitCooldown}
+          cooldown={rateLimitCooldown}
+        />
       </div>
 
-      {/* History Sheet */}
       <EchoHistorySheet
         isOpen={historyOpen}
         onClose={handleCloseHistory}

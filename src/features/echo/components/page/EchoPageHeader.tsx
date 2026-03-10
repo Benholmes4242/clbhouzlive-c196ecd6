@@ -1,93 +1,63 @@
 /**
- * EchoPageHeader - Cleo glass-style header for Echo
- * Glass background with warm gradient bleed-through
+ * EchoPageHeader - Clean static header with three zones
  */
 
 import React from 'react';
 import { ChevronLeft, Plus, Clock } from 'lucide-react';
-import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 interface EchoPageHeaderProps {
   onBack: () => void;
-  onNewChat: () => void;
-  onOpenHistory: () => void;
+  onNew: () => void;
+  onHistory: () => void;
   hasMessages: boolean;
 }
 
-export function EchoPageHeader({ onBack, onNewChat, onOpenHistory, hasMessages }: EchoPageHeaderProps) {
-  const prefersReduced = usePrefersReducedMotion();
-
+export function EchoPageHeader({ onBack, onNew, onHistory, hasMessages }: EchoPageHeaderProps) {
   return (
     <header 
-      className="flex-none px-[18px] flex items-center justify-between"
+      className="flex-none h-[52px] px-2 flex items-center justify-between"
       style={{
-        paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-        height: 'calc(56px + max(env(safe-area-inset-top, 0px), 47px))',
-        background: 'rgba(248,250,252,0.9)',
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
-        borderBottom: '1px solid rgba(0,0,0,0.06)',
+        background: 'hsl(var(--background) / 0.9)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid hsl(var(--border))',
       }}
     >
-      {/* Back button */}
+      {/* Left: Back */}
       <button
         onClick={onBack}
-        className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
-        aria-label="Go back to Hub"
+        className="w-11 h-11 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+        aria-label="Go back"
       >
-        <ChevronLeft className="w-5 h-5 text-foreground/60" />
+        <ChevronLeft className="w-5 h-5 text-foreground" />
       </button>
 
-      {/* Center - show orb + title when in conversation */}
+      {/* Centre: Title when in conversation */}
       <div className="flex-1 flex items-center justify-center">
         {hasMessages && (
-          <div className="flex items-center gap-2">
-            {/* Echo icon - gradient circle */}
-            <div 
-              className="w-6 h-6 rounded-full flex items-center justify-center"
-              style={{
-                background: '#F59E0B',
-                animation: prefersReduced ? 'none' : 'pulseGlow 3s ease-in-out infinite',
-              }}
-            >
-              <div className="flex items-center gap-[1.5px]">
-                <div 
-                  className="w-[1.5px] h-1 bg-white rounded-full"
-                  style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite' }}
-                />
-                <div 
-                  className="w-[1.5px] h-2 bg-white rounded-full"
-                  style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '0.5s' }}
-                />
-                <div 
-                  className="w-[1.5px] h-1 bg-white rounded-full"
-                  style={prefersReduced ? {} : { animation: 'gentleWave 3s ease-in-out infinite', animationDelay: '1s' }}
-                />
-              </div>
-            </div>
-            <span className="text-[16px] font-semibold" style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}>Echo</span>
-          </div>
+          <span className="text-[15px] font-semibold text-foreground font-['DM_Sans']">
+            Echo
+          </span>
         )}
       </div>
 
-      {/* Right button - contextual */}
-      {hasMessages ? (
+      {/* Right: History + New */}
+      <div className="flex items-center">
         <button
-          onClick={onNewChat}
-          className="w-11 h-11 -mr-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
-          aria-label="Start new conversation"
-        >
-          <Plus className="w-[22px] h-[22px] text-foreground/60" />
-        </button>
-      ) : (
-        <button
-          onClick={onOpenHistory}
-          className="w-11 h-11 -mr-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+          onClick={onHistory}
+          className="w-11 h-11 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
           aria-label="View conversation history"
         >
-          <Clock className="w-5 h-5 text-foreground/60" />
+          <Clock className="w-5 h-5 text-foreground" />
         </button>
-      )}
+        <button
+          onClick={onNew}
+          className="w-11 h-11 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+          aria-label="Start new conversation"
+        >
+          <Plus className="w-[22px] h-[22px] text-foreground" />
+        </button>
+      </div>
     </header>
   );
 }

@@ -1,6 +1,5 @@
 /**
- * EchoPageComposer - Cleo glass-style pill input bar
- * With voice input, character limit, and full accessibility
+ * EchoPageComposer - Clean pill-style input bar
  */
 
 import React, { forwardRef, useEffect } from 'react';
@@ -9,7 +8,9 @@ import { cn } from '@/lib/utils';
 import { useSpeechToText } from '@/hooks/useSpeechToText';
 import { haptic } from '@/utils/haptics';
 import { toast } from 'sonner';
-import { ECHO_LIMITS } from '@/features/echo/constants/echoTheme';
+
+const MAX_INPUT_LENGTH = 2000;
+const WARNING_THRESHOLD = 200;
 
 interface EchoPageComposerProps {
   value: string;
@@ -53,7 +54,7 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value;
-      if (newValue.length <= ECHO_LIMITS.maxInputLength) {
+      if (newValue.length <= MAX_INPUT_LENGTH) {
         onChange(newValue);
       }
     };
@@ -78,89 +79,89 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
     };
 
     const canSend = value.trim().length > 0 && !disabled;
-    const charsRemaining = ECHO_LIMITS.maxInputLength - value.length;
-    const showCharCount = charsRemaining <= ECHO_LIMITS.warningThreshold;
+    const charsRemaining = MAX_INPUT_LENGTH - value.length;
+    const showCharCount = charsRemaining <= WARNING_THRESHOLD;
 
     return (
-      <div 
-        className="relative flex items-center gap-2 h-[50px] rounded-[22px] px-[14px]"
+      <div
+        className="flex-none px-4 py-3"
         style={{
-          background: 'rgba(255,255,255,0.8)',
-          border: '1px solid rgba(217,119,6,0.12)',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+          background: 'hsl(var(--background) / 0.95)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderTop: '1px solid hsl(var(--border))',
+          paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 12px)',
         }}
       >
-        <input
-          ref={ref}
-          type="text"
-          value={value}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          placeholder={cooldown ? `Wait ${cooldown}s...` : "Ask Echo..."}
-          disabled={disabled}
-          aria-label="Type a message to Echo"
-          maxLength={ECHO_LIMITS.maxInputLength}
-          className="flex-1 bg-transparent outline-none text-[13px] disabled:cursor-not-allowed"
-          style={{ color: '#1C1917', fontFamily: "'DM Sans', sans-serif" }}
-        />
-
-        {/* Placeholder style override */}
-        <style>{`
-          .echo-composer-input::placeholder { color: #A8A29E; opacity: 1; }
-        `}</style>
-
+        {/* Character count */}
         {showCharCount && (
-          <span 
-            className={cn(
-              "absolute right-14 text-[0.6875rem]",
-              charsRemaining <= 50 ? "text-red-500" : "opacity-50"
-            )}
-            style={{ color: charsRemaining <= 50 ? undefined : '#A8A29E' }}
-          >
-            {charsRemaining}
-          </span>
+          <div className="flex justify-end mb-1 pr-2">
+            <span
+              className={cn(
+                "text-[11px]",
+                charsRemaining <= 50 ? "text-destructive" : "text-muted-foreground"
+              )}
+            >
+              {charsRemaining}
+            </span>
+          </div>
         )}
 
-        {/* Send/Stop/Mic button */}
-        {isStreaming ? (
-          <button
-            onClick={handleButtonClick}
-            className="w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95"
-            style={{ backgroundColor: '#F59E0B' }}
-            aria-label="Stop generating"
-          >
-            <Square className="w-3.5 h-3.5 text-white fill-white" />
-          </button>
-        ) : canSend ? (
-          <button
-            onClick={handleButtonClick}
-            className="w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95"
-            style={{ backgroundColor: '#F59E0B' }}
-            aria-label="Send message"
-          >
-            <ArrowUp className="w-4 h-4 text-white" />
-          </button>
-        ) : isSupported ? (
-          <button
-            onClick={handleMicClick}
-            className={cn(
-              "w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-95",
-              isListening && "animate-pulse"
-            )}
-            style={{ backgroundColor: isListening ? '#EF4444' : '#F59E0B' }}
-            aria-label={isListening ? "Stop listening" : "Voice input"}
-          >
-            <Mic className="w-4 h-4 text-white" />
-          </button>
-        ) : (
-          <button
-            disabled
-            className="w-9 h-9 rounded-full flex items-center justify-center bg-transparent opacity-50"
-            aria-label="Send message"
-          >
-            <ArrowUp className="w-4 h-4" style={{ color: '#A8A29E' }} />
-          </button>
-        )}
+        {/* Pill container */}
+        <div
+          className="flex items-center gap-2 rounded-full pl-4 pr-2 py-2 bg-background border border-border"
+        >
+          <input
+            ref={ref}
+            type="text"
+            value={value}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            placeholder={cooldown ? `Wait ${cooldown}s...` : "Ask Echo..."}
+            disabled={disabled}
+            aria-label="Type a message to Echo"
+            maxLength={MAX_INPUT_LENGTH}
+            className="flex-1 bg-transparent outline-none text-[14px] text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed font-['DM_Sans']"
+          />
+
+          {/* Send/Stop/Mic button */}
+          {isStreaming ? (
+            <button
+              onClick={handleButtonClick}
+              className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-95 bg-foreground"
+              aria-label="Stop generating"
+            >
+              <Square className="w-3.5 h-3.5 text-primary-foreground fill-primary-foreground" />
+            </button>
+          ) : canSend ? (
+            <button
+              onClick={handleButtonClick}
+              className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-95 bg-primary"
+              aria-label="Send message"
+            >
+              <ArrowUp className="w-4 h-4 text-primary-foreground" />
+            </button>
+          ) : isSupported ? (
+            <button
+              onClick={handleMicClick}
+              className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-95 border border-border",
+                isListening && "animate-pulse bg-destructive border-destructive"
+              )}
+              aria-label={isListening ? "Stop listening" : "Voice input"}
+            >
+              <Mic className={cn("w-4 h-4", isListening ? "text-primary-foreground" : "text-muted-foreground")} />
+            </button>
+          ) : (
+            <button
+              disabled
+              className="w-8 h-8 rounded-full flex items-center justify-center bg-transparent opacity-50"
+              aria-label="Send message"
+            >
+              <ArrowUp className="w-4 h-4 text-muted-foreground" />
+            </button>
+          )}
+        </div>
       </div>
     );
   }
