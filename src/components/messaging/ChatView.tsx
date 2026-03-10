@@ -324,6 +324,11 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     setUnreadBelowCount(0);
   }, []);
 
+  // Cleanup highlight timer on unmount
+  useEffect(() => {
+    return () => clearTimeout(highlightTimerRef.current);
+  }, []);
+
   // Mark as read when viewing
   useEffect(() => {
     if (conversationId) {
