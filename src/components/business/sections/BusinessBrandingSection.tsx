@@ -35,7 +35,7 @@ export function BusinessBrandingSection({
         throw new Error(result.error || 'Upload failed');
       }
     } catch (err) {
-      console.error('Logo upload error:', err);
+      AppLog.error('[BusinessBrandingSection]', 'Logo upload error:', err);
       toast.error('Failed to upload logo');
     } finally {
       setIsUploadingLogo(false);
