@@ -3,6 +3,7 @@ import { MapPin, Loader2, X, AlertCircle, AlertTriangle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { AppLog } from '@/lib/logger';
 
 export type LocationPrecision = 'address' | 'poi' | 'postcode' | 'city' | 'region' | 'country' | 'pin' | 'unknown';
 
