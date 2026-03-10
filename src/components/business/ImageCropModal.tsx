@@ -152,7 +152,7 @@ export function ImageCropModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent 
-        className="sm:max-w-lg p-0 overflow-hidden bg-black"
+        className="sm:max-w-lg p-0 overflow-hidden bg-background"
         aria-describedby={undefined}
       >
         <VisuallyHidden>
