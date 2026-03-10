@@ -31,8 +31,9 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
     return (
       <section className="bg-card border border-border rounded-[18px] p-4 md:p-5">
         <h3 className="text-[0.9rem] font-medium text-foreground mb-4">Reviews & reputation</h3>
-        <div className="flex items-center justify-center h-32">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+        <div className="space-y-3 px-4">
+          <div className="h-20 bg-muted animate-pulse rounded-2xl" />
+          <div className="h-20 bg-muted animate-pulse rounded-2xl" />
         </div>
       </section>
     );
