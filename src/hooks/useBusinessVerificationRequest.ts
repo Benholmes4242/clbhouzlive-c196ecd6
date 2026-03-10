@@ -34,7 +34,7 @@ export function useBusinessVerificationRequest(businessId: string | undefined) {
         .maybeSingle();
 
       if (error) {
-        console.error('[useBusinessVerificationRequest] error', error);
+        AppLog.error('[useBusinessVerificationRequest]', 'error', error);
         throw error;
       }
 
