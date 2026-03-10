@@ -35,9 +35,12 @@ interface FeedContainerProps {
   followOverrides?: Map<string, boolean>;
   onFollowChange?: (userId: string, isFollowed: boolean) => void;
   onFirstFrameReady?: () => void;
+  onLike?: (post: FeedPost) => void;
+  onComment?: () => void;
+  onShare?: (post: FeedPost) => void;
 }
 
-export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, isRefreshing = false, hasNextPage = true, followOverrides, onFollowChange, onFirstFrameReady }: FeedContainerProps) {
+export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, isRefreshing = false, hasNextPage = true, followOverrides, onFollowChange, onFirstFrameReady, onLike, onComment, onShare }: FeedContainerProps) {
   const [itemHeight, setItemHeight] = useState(
     typeof window !== 'undefined' ? window.innerHeight : 800
   );
