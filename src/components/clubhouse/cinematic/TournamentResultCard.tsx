@@ -133,12 +133,10 @@ const PodiumRowItem: React.FC<PodiumRowItemProps> = ({ row }) => {
               position: 'relative',
             }}
           >
-            <SquircleAvatar
+            <FrostedAvatar
+              src={player.photoUrl}
+              displayName={player.name}
               size={28}
-              src={player.photoUrl || undefined}
-              alt={player.name}
-              fallback={player.name.split(' ').map(p => p[0]).join('').toUpperCase().slice(0, 2)}
-              hideRing
             />
           </div>
         ))}
