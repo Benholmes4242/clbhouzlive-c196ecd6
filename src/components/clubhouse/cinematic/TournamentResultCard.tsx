@@ -279,6 +279,10 @@ export interface TournamentResultCardProps {
   onComment: () => void;
   onShare: () => void;
   onViewResults?: () => void;
+  /** Optimistic like state override from parent */
+  likeOverride?: { isLiked: boolean; count: number };
+  /** Optimistic comment count override from parent */
+  commentCountOverride?: number;
 }
 
 export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
@@ -289,6 +293,8 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
   onComment,
   onShare,
   onViewResults,
+  likeOverride,
+  commentCountOverride,
 }) => {
   const navigate = useNavigate();
   const meta = post.tournamentMeta;
