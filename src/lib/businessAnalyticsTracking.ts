@@ -29,7 +29,7 @@ export async function trackBusinessAnalyticsEvent(params: TrackEventParams): Pro
   try {
     // Cast to any to bypass type checking until types are regenerated
     const { error } = await supabase
-      .from('business_analytics_events' as any)
+      .from('business_analytics_events')
       .insert({
         business_id: params.businessId,
         user_id: params.userId || null,
@@ -38,7 +38,7 @@ export async function trackBusinessAnalyticsEvent(params: TrackEventParams): Pro
         source: params.source || null,
         content_id: params.contentId || null,
         metadata: params.metadata || {},
-      } as any);
+      });
 
     if (error) {
       console.error('[Analytics] Failed to track event:', error);
