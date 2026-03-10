@@ -11,12 +11,17 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
+import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
 const BusinessVerificationRequestPage = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
+
+  useHideBottomNav();
+  useHideHeader();
 
   const [website, setWebsite] = useState('');
   const [note, setNote] = useState('');

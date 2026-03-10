@@ -10,11 +10,16 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { format } from 'date-fns';
 import { useBusinessVerificationRealtime, useVerificationNotificationsRealtime } from '@/hooks/useBusinessVerificationRealtime';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
+import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
 const BusinessVerificationStatusPage = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { user } = useSupabaseSession();
+
+  useHideBottomNav();
+  useHideHeader();
 
   // Enable realtime updates for instant status changes
   useBusinessVerificationRealtime(id);
