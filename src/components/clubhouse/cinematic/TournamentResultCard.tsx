@@ -246,7 +246,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         </div>
 
         {/* ── SPACER — push tournament name to bottom of image area ── */}
-        <div style={{ flex: 1 }} />
+        <div style={{ flex: '0 0 32%' }} />
 
         {/* ── TOURNAMENT NAME (overlaid on image) ── */}
         <div style={{
