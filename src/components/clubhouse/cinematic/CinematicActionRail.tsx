@@ -292,7 +292,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       />
 
       {/* Slot 3: Mute/Unmute — only shown on video content */}
-      {isVideo && onMuteToggle && (
+      {isVideo && !hideMute && onMuteToggle && (
         <ActionSlot
           icon={
             audioMode === 'music_only' && postHasMusic
