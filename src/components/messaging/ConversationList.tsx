@@ -70,10 +70,12 @@ function getConversationDisplay(
 }
 
 // Component to show typing indicator or message preview
-function ConversationTypingOrPreview({ conversationId, preview }: { conversationId: string; preview: string | null }) {
-  const { typingUsers } = useTypingIndicator(conversationId);
+// Only subscribes to typing indicators when isActive to avoid N simultaneous realtime channels
+function ConversationTypingOrPreview({ conversationId, preview, isActive }: { conversationId: string; preview: string | null; isActive: boolean }) {
+  // Only subscribe to typing indicators for the active conversation
+  const { typingUsers } = useTypingIndicator(isActive ? conversationId : '');
   
-  if (typingUsers.length > 0) {
+  if (isActive && typingUsers.length > 0) {
     const text = typingUsers.length === 1 
       ? `${typingUsers[0].name} is typing...`
       : `${typingUsers.length} people typing...`;
