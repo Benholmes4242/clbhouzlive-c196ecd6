@@ -14,7 +14,7 @@ import { useHideHeader } from '@/hooks/useHeaderVisibility';
 const MyBusinessesPage = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useSupabaseSession();
-  const { data: businesses, isLoading } = useMyBusinesses(user?.id);
+  const { data: businesses, isLoading, error } = useMyBusinesses(user?.id);
   const { activeActor } = useActiveActor();
   const [showCreateModal, setShowCreateModal] = useState(false);
 
