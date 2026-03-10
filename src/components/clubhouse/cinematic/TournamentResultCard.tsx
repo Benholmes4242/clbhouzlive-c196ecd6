@@ -231,10 +231,6 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
             border: '1px solid rgba(255,255,255,0.18)', borderRadius: 20, padding: '5px 12px 5px 6px',
           }}>
-            <div style={{
-              width: 20, height: 20, borderRadius: '50%', background: '#F97316',
-              flexShrink: 0,
-            }} />
             <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 0.8 }}>
               {meta.tour_name || getTourLabel(meta.tour_slug)}
             </span>
