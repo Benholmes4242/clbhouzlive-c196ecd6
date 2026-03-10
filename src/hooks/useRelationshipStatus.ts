@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { AppLog } from '@/lib/logger';
 
 export interface RelationshipStatus {
   isFriend: boolean;
@@ -12,6 +13,9 @@ export interface RelationshipStatus {
 }
 
 /**
+ * @deprecated Use useRelationshipStatuses (batch) from '@/hooks/useRelationshipStatuses' instead.
+ * This hook causes N+1 RPC calls when used in lists. Only use for single-user contexts.
+ *
  * Hook to get the complete relationship status between the current user and a target user.
  * Uses the get_relationship_status RPC function to efficiently query all relationship types.
  * 
@@ -40,7 +44,7 @@ export function useRelationshipStatus(targetUserId: string | undefined) {
       });
 
       if (error) {
-        console.error('Error fetching relationship status:', error);
+        AppLog.error('[useRelationshipStatus]', 'Error fetching relationship status:', error);
         throw error;
       }
 

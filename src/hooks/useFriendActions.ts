@@ -12,6 +12,8 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { AppLog } from '@/lib/logger';
+import type { RelationshipStatusRow } from '@/hooks/useRelationshipStatuses';
 
 interface UseFriendActionsProps {
   currentUserId: string;
@@ -27,6 +29,7 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
 
   const invalidateQueries = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ['relationship-status'] });
+    queryClient.invalidateQueries({ queryKey: ['relationship-statuses'] });
     queryClient.invalidateQueries({ queryKey: ['social-counts'] });
     queryClient.invalidateQueries({ queryKey: ['friends-list'] });
     queryClient.invalidateQueries({ queryKey: ['notifications'] });
@@ -42,9 +45,15 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
    * Send a friend request to another user.
    * The database trigger will automatically create a notification for the recipient.
    */
-  const sendFriendRequest = useCallback(async (targetUserId: string, relationship?: any): Promise<boolean> => {
+  const sendFriendRequest = useCallback(async (targetUserId: string, relationship?: RelationshipStatusRow): Promise<boolean> => {
+    // Self-guard
+    if (targetUserId === currentUserId) {
+      AppLog.warn('[useFriendActions]', 'Attempted self-friend — blocked at client');
+      return false;
+    }
+
     // Check block state if relationship provided
-    if (relationship?.hasBlockedThem || relationship?.isBlockedByThem) {
+    if (relationship?.is_blocking || relationship?.is_blocked) {
       toast.error("Action not allowed", {
         description: "You can't interact with this user.",
       });
@@ -80,7 +89,7 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
       invalidateQueries();
       return true;
     } catch (error) {
-      console.error('Error sending friend request:', error);
+      AppLog.error('[useFriendActions]', 'Error sending friend request:', error);
       toast.error("Couldn't send request");
       return false;
     } finally {
@@ -115,7 +124,7 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
       invalidateQueries();
       return true;
     } catch (error) {
-      console.error('Error accepting friend request:', error);
+      AppLog.error('[useFriendActions]', 'Error accepting friend request:', error);
       toast.error("Couldn't accept request");
       return false;
     } finally {
@@ -147,7 +156,7 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
       invalidateQueries();
       return true;
     } catch (error) {
-      console.error('Error declining friend request:', error);
+      AppLog.error('[useFriendActions]', 'Error declining friend request:', error);
       toast.error("Couldn't decline request");
       return false;
     } finally {
@@ -179,7 +188,7 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
       invalidateQueries();
       return true;
     } catch (error) {
-      console.error('Error cancelling friend request:', error);
+      AppLog.error('[useFriendActions]', 'Error cancelling friend request:', error);
       toast.error("Couldn't cancel request");
       return false;
     } finally {
@@ -211,7 +220,7 @@ export const useFriendActions = ({ currentUserId }: UseFriendActionsProps) => {
       invalidateQueries();
       return true;
     } catch (error) {
-      console.error('Error removing friend:', error);
+      AppLog.error('[useFriendActions]', 'Error removing friend:', error);
       toast.error("Couldn't remove friend");
       return false;
     } finally {

@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { AppLog } from '@/lib/logger';
 
 export const useFollowUser = () => {
   const queryClient = useQueryClient();
@@ -11,6 +12,7 @@ export const useFollowUser = () => {
 
   const invalidateFollowCaches = (targetUserId: string) => {
     queryClient.invalidateQueries({ queryKey: ['relationship-status', targetUserId] });
+    queryClient.invalidateQueries({ queryKey: ['relationship-statuses'] });
     queryClient.invalidateQueries({ queryKey: ['followers-paginated'] });
     queryClient.invalidateQueries({ queryKey: ['following-paginated'] });
     queryClient.invalidateQueries({ queryKey: ['social-counts'] });
@@ -19,6 +21,11 @@ export const useFollowUser = () => {
   const followUser = async (targetUserId: string) => {
     if (!user) {
       toast.error('Please sign in to follow users');
+      return false;
+    }
+
+    if (targetUserId === user.id) {
+      AppLog.warn('[useFollowUser]', 'Attempted self-follow — blocked at client');
       return false;
     }
 
@@ -32,7 +39,7 @@ export const useFollowUser = () => {
         });
 
       if (error) {
-        console.error('Error following user:', error);
+        AppLog.error('[useFollowUser]', 'Error following user:', error);
         toast.error('Failed to follow user');
         return false;
       }
@@ -41,7 +48,7 @@ export const useFollowUser = () => {
       invalidateFollowCaches(targetUserId);
       return true;
     } catch (error) {
-      console.error('Error following user:', error);
+      AppLog.error('[useFollowUser]', 'Error following user (RLS path):', error);
       toast.error('Failed to follow user');
       return false;
     } finally {
@@ -55,6 +62,11 @@ export const useFollowUser = () => {
       return false;
     }
 
+    if (targetUserId === user.id) {
+      AppLog.warn('[useFollowUser]', 'Attempted self-unfollow — blocked at client');
+      return false;
+    }
+
     setLoading(true);
     try {
       const { error } = await supabase
@@ -64,7 +76,7 @@ export const useFollowUser = () => {
         .eq('following_id', targetUserId);
 
       if (error) {
-        console.error('Error unfollowing user:', error);
+        AppLog.error('[useFollowUser]', 'Error unfollowing user:', error);
         toast.error('Failed to unfollow user');
         return false;
       }
@@ -73,7 +85,7 @@ export const useFollowUser = () => {
       invalidateFollowCaches(targetUserId);
       return true;
     } catch (error) {
-      console.error('Error unfollowing user:', error);
+      AppLog.error('[useFollowUser]', 'Error unfollowing user (RLS path):', error);
       toast.error('Failed to unfollow user');
       return false;
     } finally {
