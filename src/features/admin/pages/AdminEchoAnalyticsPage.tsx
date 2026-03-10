@@ -1,3 +1,5 @@
+// TODO: echo_threads_timeseries RPC references legacy table.
+// Review with admin team before removing — analytics data may still exist.
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Kpi } from '../components/Kpi';
 import { ChartCard } from '../components/ChartCard';
