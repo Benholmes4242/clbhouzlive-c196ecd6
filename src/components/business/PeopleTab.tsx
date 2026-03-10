@@ -24,7 +24,6 @@ import {
 interface PeopleTabProps {
   businessId: string;
   businessName?: string;
-  businessLocation?: string;
   category?: string | null;
   canManage?: boolean;
   isOwner?: boolean;
