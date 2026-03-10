@@ -33,7 +33,7 @@ const BusinessVerificationStatusPage = () => {
         .from('business_accounts')
         .select('id, name, slug, is_verified, verified_at')
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
