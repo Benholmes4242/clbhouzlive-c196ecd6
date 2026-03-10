@@ -60,13 +60,6 @@ export function PersonRow({
             {homeClub && <span>{homeClub}</span>}
           </div>
         )}
-
-        {/* Line 3: Also plays at (allow wrap) */}
-        {alsoPlaysAtText && (
-          <div className="text-xs text-muted-foreground/80 leading-snug mt-0.5">
-            {alsoPlaysAtText}
-          </div>
-        )}
       </div>
 
       {/* Chevron */}
