@@ -223,7 +223,7 @@ export function BusinessProfileWizard() {
     setSaving(true);
     try {
       const formattedLocation = location?.country ? `${location.city}, ${location.country}` : location?.label || '';
-      const insertData: Record<string, unknown> = {
+      const insertData: Database['public']['Tables']['business_accounts']['Insert'] = {
         name: effectiveBusinessName,
         category,
         location: formattedLocation,
@@ -238,7 +238,7 @@ export function BusinessProfileWizard() {
         lng: location?.lng || null,
         city: location?.city || null,
         region: location?.region || null,
-        country: location?.country || null,
+        country: selectedClub?.country ?? location?.country ?? null,
         address_label: location?.label || null,
       };
 
@@ -251,7 +251,7 @@ export function BusinessProfileWizard() {
 
       const { data: businessData, error: businessError } = await supabase
         .from('business_accounts')
-        .insert(insertData as any)
+        .insert(insertData)
         .select('id, slug')
         .single();
 
