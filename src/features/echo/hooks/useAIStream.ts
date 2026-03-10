@@ -23,6 +23,13 @@ interface SSEData {
 
 export type RateLimitError = 'RATE_LIMIT_MINUTE' | 'RATE_LIMIT_HOUR' | 'RATE_LIMIT_DAY' | 'PROVIDER_RATE_LIMIT';
 
+export interface UserContextPayload {
+  firstName?: string | null;
+  handicap?: number | null;
+  homeClub?: string | null;
+  location?: string | null;
+}
+
 export function useAIStream() {
   const controllerRef = useRef<AbortController | null>(null);
 
@@ -30,7 +37,8 @@ export function useAIStream() {
     async (
       messages: Array<{ role: string; content: string }>,
       conversationId: string,
-      options: StreamOptions
+      options: StreamOptions,
+      userContext?: UserContextPayload | null
     ) => {
       // Abort any previous request
       if (controllerRef.current) {
@@ -60,6 +68,7 @@ export function useAIStream() {
             conversation_id: conversationId,
             stream: true,
             mode: 'auto',
+            user_context: userContext || null,
           }),
           signal: controller.signal,
         });
@@ -105,7 +114,6 @@ export function useAIStream() {
           return;
         }
 
-        console.error('[AIStream] Error:', error);
         options.onError(error.message || 'Failed to get AI response');
       }
     },
@@ -182,7 +190,6 @@ async function parseSSEStream(
 
           // Handle error events
           if (parsed.error) {
-            // If there's also a token, show it (fallback message)
             if (parsed.token) {
               options.onChunk(parsed.token);
             }
