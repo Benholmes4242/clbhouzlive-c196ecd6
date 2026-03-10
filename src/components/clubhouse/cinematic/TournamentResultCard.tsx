@@ -408,7 +408,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         </div>
 
         {/* ── Bottom gap for nav bar ── */}
-        <div style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + 16px)', flexShrink: 0 }} />
+        <div style={{ height: 'max(env(safe-area-inset-bottom, 0px), 16px)', flexShrink: 0 }} />
       </div>
     </div>
   );
