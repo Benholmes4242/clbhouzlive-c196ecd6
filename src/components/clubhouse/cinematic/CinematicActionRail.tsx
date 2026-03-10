@@ -216,6 +216,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   postHasMusic = false,
   bottomOffset,
   onChevronPositionChange,
+  hideMute = false,
 }) => {
   // Idle opacity: 75% when not interacted, full when interacted or active
   const idleOpacity = hasInteracted ? 1 : 0.75;
