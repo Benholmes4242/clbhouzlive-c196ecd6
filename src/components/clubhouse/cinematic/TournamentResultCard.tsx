@@ -56,7 +56,7 @@ function WinnerAvatar({ src, name, size }: { src: string | null; name: string; s
 
   return (
     <div style={{
-      width: size, height: size, borderRadius: '22%', overflow: 'hidden', flexShrink: 0,
+      width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
       border: '2px solid rgba(251,146,60,0.8)',
       boxShadow: '0 0 16px rgba(251,146,60,0.5), 0 0 32px rgba(251,146,60,0.2)',
       position: 'relative',
