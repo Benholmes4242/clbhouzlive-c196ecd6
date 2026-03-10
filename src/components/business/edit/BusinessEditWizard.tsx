@@ -107,9 +107,14 @@ export default function BusinessEditWizard() {
     phone: PhoneValue | null;
   } | null>(null);
 
+  // Guard against re-initialising form on background refetches
+  const hasInitialized = useRef(false);
+
   // Populate form when business data loads
   useEffect(() => {
-    if (business) {
+    if (!business) return;
+    if (hasInitialized.current) return;
+    hasInitialized.current = true;
       const newFormData = {
         businessName: business.name || '',
         businessCategory: business.category || '',
