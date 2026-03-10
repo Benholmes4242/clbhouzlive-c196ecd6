@@ -196,8 +196,10 @@ const BusinessInsightsPageV2 = () => {
   if (isLoading || !membershipFetched) {
     return (
       <PageRoot className="min-h-screen bg-background">
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        <div className="space-y-4 px-4 pt-4">
+          <div className="h-32 bg-muted animate-pulse rounded-2xl" />
+          <div className="h-24 bg-muted animate-pulse rounded-2xl" />
+          <div className="h-24 bg-muted animate-pulse rounded-2xl" />
         </div>
       </PageRoot>
     );
