@@ -141,7 +141,6 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
   const hasImage = !!meta.course_image_url;
   const hasVenue = !!(meta.venue_name || meta.venue_city);
   const hasPodium = meta.podium_rows && meta.podium_rows.length > 0;
-  const hasPodium = meta.podium_rows && meta.podium_rows.length > 0;
 
   // Heart pop state
   const [heartPopping, setHeartPopping] = useState(false);
