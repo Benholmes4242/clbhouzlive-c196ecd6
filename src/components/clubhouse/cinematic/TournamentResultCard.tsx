@@ -386,6 +386,22 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         )}
       </div>
 
+      {/* 4. CinematicActionRail — right side */}
+      <CinematicActionRail
+        postId={post.id}
+        likesCount={post.likeCount}
+        commentsCount={post.commentCount}
+        hasLiked={post.isLikedByMe}
+        isMuted={false}
+        isVisible={isVisible}
+        onLike={onLike}
+        onComment={onComment}
+        onShare={onShare}
+        onMore={() => {}}
+        onMuteToggle={() => {}}
+        hideMute={true}
+      />
+
       {/* 5. TournamentCreatorCapsule — bottom left */}
       <TournamentCreatorCapsule
         tourName={meta.tour_name}
