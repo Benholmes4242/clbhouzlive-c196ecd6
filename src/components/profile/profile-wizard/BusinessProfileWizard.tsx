@@ -249,7 +249,7 @@ export function BusinessProfileWizard() {
 
       const { data: businessData, error: businessError } = await supabase
         .from('business_accounts')
-        .insert(insertData as Record<string, string | number | boolean | null>)
+        .insert(insertData as any)
         .select('id, slug')
         .single();
 
