@@ -151,7 +151,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
         queryClient.invalidateQueries({ queryKey: ['notifications'] }),
         queryClient.invalidateQueries({ queryKey: ['unread-notifications-count'] }),
       ]);
-    } catch (e: any) {
+    } catch (e: unknown) {
       AppLog.error('AccessRequestsSection', 'Approve error:', e);
       toast.error(e?.message ?? 'Failed to approve request');
     } finally {
