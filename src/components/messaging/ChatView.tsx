@@ -472,11 +472,11 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
       <header 
         className="flex-shrink-0 px-[18px] flex items-center gap-3"
         style={{
-          height: 'calc(60px + max(env(safe-area-inset-top, 0px), 47px))',
+          height: 'calc(52px + max(env(safe-area-inset-top, 0px), 47px))',
           paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
           background: 'hsl(var(--background) / 0.9)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
           borderBottom: '1px solid hsl(var(--border))',
         }}
       >
