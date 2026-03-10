@@ -303,9 +303,9 @@
        <AlertDialog open={showClearChatDialog} onOpenChange={setShowClearChatDialog}>
          <AlertDialogContent>
            <AlertDialogHeader>
-             <AlertDialogTitle>Clear all messages?</AlertDialogTitle>
+            <AlertDialogTitle>Clear all messages?</AlertDialogTitle>
              <AlertDialogDescription>
-               This will permanently delete all messages in this conversation. This cannot be undone.
+               This will delete all messages for everyone in this conversation. This cannot be undone.
              </AlertDialogDescription>
            </AlertDialogHeader>
            <AlertDialogFooter>

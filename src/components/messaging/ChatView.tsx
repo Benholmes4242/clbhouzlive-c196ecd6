@@ -429,11 +429,14 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
  
   const handleNavigateToMessage = useCallback((messageId: string) => {
      const element = messageRefs.current.get(messageId);
-     if (element) {
-       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-       setHighlightedMessageId(messageId);
-       setTimeout(() => setHighlightedMessageId(null), 2000);
+     if (!element) {
+       AppLog.warn('[ChatView]', 'Navigate-to-message: element not found for', messageId);
+       return;
      }
+     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+     setHighlightedMessageId(messageId);
+     clearTimeout(highlightTimerRef.current);
+     highlightTimerRef.current = setTimeout(() => setHighlightedMessageId(null), 2000);
    }, []);
  
   // Check if message can be deleted for everyone (within 1 hour)

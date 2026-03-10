@@ -331,7 +331,7 @@ export function MessageBubble({
           {isVoiceNote && message.media_url && (
             <VoiceNotePlayer
               audioUrl={message.media_url}
-              duration={(message.media_metadata as any)?.duration}
+              duration={(message.media_metadata as Record<string, unknown>)?.duration as number | undefined}
               isOwn={isOwnMessage}
             />
           )}
