@@ -279,6 +279,10 @@ export interface TournamentResultCardProps {
   onComment: () => void;
   onShare: () => void;
   onViewResults?: () => void;
+  /** Optimistic like state override from parent */
+  likeOverride?: { isLiked: boolean; count: number };
+  /** Optimistic comment count override from parent */
+  commentCountOverride?: number;
 }
 
 export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
@@ -289,9 +293,14 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
   onComment,
   onShare,
   onViewResults,
+  likeOverride,
+  commentCountOverride,
 }) => {
   const navigate = useNavigate();
   const meta = post.tournamentMeta;
+  const isLiked = likeOverride?.isLiked ?? post.isLikedByMe;
+  const likeCount = likeOverride?.count ?? post.likeCount;
+  const commentCount = commentCountOverride ?? post.commentCount;
   const hasImage = !!meta.course_image_url;
   const bgGradient = TOUR_GRADIENTS[meta.tour_slug] || 'from-slate-900 via-slate-800 to-slate-900';
 
@@ -516,15 +525,15 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 5,
-                background: post.isLikedByMe
+                background: isLiked
                   ? 'rgba(245, 158, 11, 0.25)'
                   : 'rgba(255, 255, 255, 0.10)',
-                border: `1px solid ${post.isLikedByMe
+                border: `1px solid ${isLiked
                   ? 'rgba(245, 158, 11, 0.5)'
                   : 'rgba(255, 255, 255, 0.15)'}`,
                 borderRadius: 20,
                 padding: '6px 12px',
-                color: post.isLikedByMe ? '#f59e0b' : 'rgba(255,255,255,0.85)',
+                color: isLiked ? '#f59e0b' : 'rgba(255,255,255,0.85)',
                 fontSize: 13,
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -532,11 +541,11 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             >
               <Heart
                 className="w-4 h-4"
-                style={{ color: post.isLikedByMe ? '#f59e0b' : 'rgba(255,255,255,0.85)' }}
-                fill={post.isLikedByMe ? '#f59e0b' : 'none'}
-                strokeWidth={post.isLikedByMe ? 0 : 2}
+                style={{ color: isLiked ? '#f59e0b' : 'rgba(255,255,255,0.85)' }}
+                fill={isLiked ? '#f59e0b' : 'none'}
+                strokeWidth={isLiked ? 0 : 2}
               />
-              <span>{post.likeCount}</span>
+              <span>{likeCount}</span>
             </button>
 
             <button
@@ -556,7 +565,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
               }}
             >
               <MessageSquare className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.85)' }} strokeWidth={2} />
-              <span>{post.commentCount}</span>
+              <span>{commentCount}</span>
             </button>
           </div>
 
@@ -573,9 +582,9 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
       {/* 4. CinematicActionRail — right side */}
       <CinematicActionRail
         postId={post.id}
-        likesCount={post.likeCount}
-        commentsCount={post.commentCount}
-        hasLiked={post.isLikedByMe}
+        likesCount={likeCount}
+        commentsCount={commentCount}
+        hasLiked={isLiked}
         isMuted={false}
         isVisible={isVisible}
         onLike={onLike}

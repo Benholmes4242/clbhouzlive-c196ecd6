@@ -38,9 +38,11 @@ interface FeedContainerProps {
   onLike?: (post: FeedPost) => void;
   onComment?: () => void;
   onShare?: (post: FeedPost) => void;
+  getLikeState?: (post: FeedPost) => { isLiked: boolean; count: number };
+  getCommentCount?: (post: FeedPost) => number;
 }
 
-export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, isRefreshing = false, hasNextPage = true, followOverrides, onFollowChange, onFirstFrameReady, onLike, onComment, onShare }: FeedContainerProps) {
+export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, isRefreshing = false, hasNextPage = true, followOverrides, onFollowChange, onFirstFrameReady, onLike, onComment, onShare, getLikeState, getCommentCount }: FeedContainerProps) {
   const [itemHeight, setItemHeight] = useState(
     typeof window !== 'undefined' ? window.innerHeight : 800
   );
@@ -418,6 +420,8 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
               onLike={onLike}
               onComment={onComment}
               onShare={onShare}
+              getLikeState={getLikeState}
+              getCommentCount={getCommentCount}
             />
           );
         })}

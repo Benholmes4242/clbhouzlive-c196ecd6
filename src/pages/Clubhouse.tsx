@@ -70,6 +70,8 @@ function FeedWithPreloader({
   onLike,
   onComment,
   onShare,
+  getLikeState,
+  getCommentCount,
 }: {
   posts: FeedPost[];
   onNearEnd: () => void;
@@ -82,6 +84,8 @@ function FeedWithPreloader({
   onLike?: (post: FeedPost) => void;
   onComment?: () => void;
   onShare?: (post: FeedPost) => void;
+  getLikeState?: (post: FeedPost) => { isLiked: boolean; count: number };
+  getCommentCount?: (post: FeedPost) => number;
 }) {
   usePreloader(posts);
   return (
@@ -97,6 +101,8 @@ function FeedWithPreloader({
       onLike={onLike}
       onComment={onComment}
       onShare={onShare}
+      getLikeState={getLikeState}
+      getCommentCount={getCommentCount}
     />
   );
 }
@@ -357,6 +363,8 @@ const ClubhouseContent = () => {
               onLike={(post) => handleLike(post)}
               onComment={openComments}
               onShare={(post) => handleShare(post)}
+              getLikeState={(post) => getActiveLikeState(post)}
+              getCommentCount={(post) => getCommentCount(post)}
             />
           </VideoPoolProvider>
         </MediaErrorBoundary>
