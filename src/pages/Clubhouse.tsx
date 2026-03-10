@@ -172,6 +172,7 @@ const ClubhouseContent = () => {
   // ── Active post derivation ──
   const activePostId = posts[activeIndex]?.id;
   const { activePost, golfCourse, activeReview, isActiveReview, isActiveVideo } = useActivePostDerived(posts, activeIndex);
+  const isTournamentCardActive = activePost?.postType === 'tournament_result';
   
   // ── Optimistic like state ──
   const { handleLike, getActiveLikeState, resetLikes } = useClubhouseLikes({ userId: user?.id, activeActor });
