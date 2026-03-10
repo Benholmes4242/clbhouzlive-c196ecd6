@@ -211,7 +211,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
         </div>
 
         {/* Sticky search bar + tabs */}
-        <div className="sticky top-0 z-40 bg-background border-b border-border">
+        <div className="sticky z-40 bg-background border-b border-border" style={{ top: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
           <div className="px-4 py-3 space-y-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
