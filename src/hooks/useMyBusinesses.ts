@@ -43,7 +43,7 @@ export function useMyBusinesses(userProfileId?: string) {
             region,
             country,
             logo_url,
-            cover_image_url,
+            is_verified,
             is_verified,
             is_deleted
           )
