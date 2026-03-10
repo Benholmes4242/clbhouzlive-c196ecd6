@@ -273,7 +273,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
         {/* ── GLASS CARD ── */}
         <div style={{
-          margin: '16px 16px 0',
+          margin: '0 16px 0',
           background: 'rgba(10,12,18,0.82)',
           backdropFilter: 'blur(28px) saturate(160%)', WebkitBackdropFilter: 'blur(28px) saturate(160%)',
           border: '1px solid rgba(255,255,255,0.09)',
