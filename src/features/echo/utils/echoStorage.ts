@@ -13,7 +13,7 @@ export function loadConversations(): EchoConversation[] {
   try {
     const version = localStorage.getItem(VERSION_KEY);
     if (version !== String(CURRENT_VERSION)) {
-      console.log('[EchoStorage] Version mismatch, clearing storage');
+      // Version mismatch, clearing storage
       localStorage.removeItem(STORAGE_KEY);
       localStorage.setItem(VERSION_KEY, String(CURRENT_VERSION));
       return [];

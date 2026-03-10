@@ -110,7 +110,7 @@ export function useEchoLegacyMigration(opts?: Options) {
             .insert(messageInserts);
 
           if (msgErr) {
-            console.warn('Message insertion error:', msgErr.message);
+            // Message insertion error — skip
           }
         }
       }

@@ -114,7 +114,7 @@ export function startZipExport(opts: {
 
     if (canceled) return;
     if (errors.length) {
-      console.warn('Export skipped threads:', errors);
+      // Export had errors for some threads
     }
 
     worker.postMessage({ task: { format: opts.format, files } });
