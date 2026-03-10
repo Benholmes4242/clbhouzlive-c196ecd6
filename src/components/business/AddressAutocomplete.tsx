@@ -272,12 +272,12 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
       {/* Precision warning */}
       {showPrecisionWarning && (
-        <div className="mt-3 p-3 rounded-sq-sm bg-amber-50 border border-amber-200">
+        <div className="mt-3 p-3 rounded-sq-sm bg-muted border border-border">
           <div className="flex items-start gap-2">
-            <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="text-sm font-medium text-amber-800">That location is too general</p>
-              <p className="text-xs text-amber-700 mt-0.5">
+              <p className="text-sm font-medium text-foreground">That location is too general</p>
+              <p className="text-xs text-foreground mt-0.5">
                 Add a street address or postcode/ZIP to place your map pin accurately.
               </p>
               <div className="flex items-center gap-2 mt-2">
