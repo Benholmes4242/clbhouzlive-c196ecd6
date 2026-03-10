@@ -497,7 +497,7 @@ function PodiumRunnerRow({ row, resolvePhoto }: { row: PodiumRowType; resolvePho
       )}
 
       {/* Score */}
-      <span style={{ fontSize: 14, fontWeight: 700, color: '#22C55E', flexShrink: 0 }}>
+      <span style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.9)', flexShrink: 0 }}>
         {player.score || 'E'}
       </span>
     </div>
