@@ -2,7 +2,7 @@
  * EchoPageMessageList - Message list with bubble styling
  */
 
-import React, { useRef, useEffect, useState, useCallback, TouchEvent } from 'react';
+import React, { useRef, useEffect, useState, useCallback, useMemo, TouchEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Loader2 } from 'lucide-react';
 import { EchoResponseCard } from '@/features/echo/components/ui/EchoResponseCard';
