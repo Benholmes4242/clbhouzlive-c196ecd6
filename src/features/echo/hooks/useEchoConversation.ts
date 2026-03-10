@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import type { EchoMessage } from '../state/echoTypes';
 import { useAIStream, type RateLimitError } from './useAIStream';
+import { useEchoProfile } from './useEchoProfile';
 import { 
   createConversation, 
   insertMessage, 
@@ -63,6 +64,7 @@ const RATE_LIMIT_MESSAGES: Record<RateLimitError, { title: string; description: 
 export function useEchoConversation(opts?: UseEchoConversationOptions) {
   const resetOnMount = opts?.resetOnMount ?? false;
   const queryClient = useQueryClient();
+  const profile = useEchoProfile();
 
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<EchoMessage[]>([]);
@@ -110,7 +112,6 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
   // Signal ready only when userId is available
   useEffect(() => {
     if (userId && !isReady) {
-      // Hook ready
       requestAnimationFrame(() => {
         setIsReady(true);
         initializingRef.current = false;
@@ -138,7 +139,6 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
       .order('created_at', { ascending: true });
 
     if (error) {
-      console.error('[loadConversation] Error:', error);
       return;
     }
 
@@ -151,12 +151,11 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
 
     setMessages(loadedMessages);
     
-    // Store first user message for title
     const firstUser = loadedMessages.find(m => m.role === 'user');
     firstUserMessageRef.current = firstUser?.content ?? null;
   }, []);
 
-  // Refetch messages for current conversation (for pull-to-refresh)
+  // Refetch messages for current conversation
   const refetchMessages = useCallback(async () => {
     if (!conversationId) return;
 
@@ -167,7 +166,6 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
       .order('created_at', { ascending: true });
 
     if (error) {
-      console.error('[refetchMessages] Error:', error);
       return;
     }
 
@@ -184,10 +182,7 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
   const sendMessage = useCallback(async (content: string) => {
     if (isStreaming || !userId || rateLimitCooldown) {
       return;
-      return;
     }
-
-    
 
     const userMessage: EchoMessage = {
       id: nanoid(),
@@ -252,12 +247,10 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
             if (currentConvId) {
               await insertMessage(currentConvId, userId, 'assistant', sanitizedContent);
               
-              // Set title from first user message
               if (firstUserMessageRef.current) {
                 await setConversationTitleIfEmpty(currentConvId, firstUserMessageRef.current);
               }
               
-              // Invalidate history queries
               queryClient.invalidateQueries({ queryKey: ['echo', 'conversations'] });
             }
           },
@@ -272,11 +265,9 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
                 duration: 5000,
               });
 
-              // Set cooldown for minute limits
               if (rateLimitType === 'RATE_LIMIT_MINUTE') {
-                setRateLimitCooldown(10); // 10 second cooldown
+                setRateLimitCooldown(10);
                 
-                // Countdown timer
                 const countdown = () => {
                   setRateLimitCooldown(prev => {
                     if (prev === null || prev <= 1) {
@@ -289,7 +280,6 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
                 cooldownTimerRef.current = setTimeout(countdown, 1000);
               }
 
-              // Remove the user message since we couldn't process it
               setMessages(prev => prev.filter(m => m.id !== userMessage.id));
               setIsStreaming(false);
               setStreamingContent('');
@@ -308,26 +298,29 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
             setIsStreaming(false);
             setStreamingContent('');
 
-            // Persist error message
             if (currentConvId) {
               await insertMessage(currentConvId, userId, 'assistant', errorMessage.content);
               queryClient.invalidateQueries({ queryKey: ['echo', 'conversations'] });
             }
           },
+        },
+        {
+          firstName: profile.firstName,
+          handicap: profile.handicap,
+          homeClub: profile.homeClub,
+          location: profile.location,
         }
       );
     } catch (error) {
-      console.error('Send message error:', error);
       setIsStreaming(false);
       setStreamingContent('');
     }
-  }, [messages, sendToAI, isStreaming, userId, conversationId, queryClient, rateLimitCooldown]);
+  }, [messages, sendToAI, isStreaming, userId, conversationId, queryClient, rateLimitCooldown, profile]);
 
   const abortStream = useCallback(async () => {
     abort();
     setWasAborted(true);
     
-    // Keep partial content as a message marked as stopped
     if (streamingContent.trim()) {
       const sanitizedContent = sanitizeEchoText(streamingContent);
       const partialMessage: EchoMessage = {
@@ -339,7 +332,6 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
       };
       setMessages(prev => [...prev, partialMessage]);
 
-      // Persist partial message
       if (conversationId && userId) {
         await insertMessage(conversationId, userId, 'assistant', sanitizedContent);
         queryClient.invalidateQueries({ queryKey: ['echo', 'conversations'] });
@@ -350,7 +342,6 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
     setStreamingContent('');
   }, [abort, streamingContent, conversationId, userId, queryClient]);
 
-  // Reset conversation without page reload
   const resetConversation = useCallback(() => {
     setConversationId(null);
     setMessages([]);
@@ -359,7 +350,7 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
     setWasAborted(false);
     setRateLimitCooldown(null);
     firstUserMessageRef.current = null;
-    setIsReady(true); // Already ready after manual reset
+    setIsReady(true);
     
     if (cooldownTimerRef.current) {
       clearTimeout(cooldownTimerRef.current);

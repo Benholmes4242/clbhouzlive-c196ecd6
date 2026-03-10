@@ -13941,6 +13941,16 @@ export type Database = {
           thread_id: string
         }[]
       }
+      echo_get_course_context: {
+        Args: { p_country?: string; p_limit?: number; p_query?: string }
+        Returns: Json
+      }
+      echo_get_player_context: {
+        Args: { p_player_name: string }
+        Returns: Json
+      }
+      echo_get_tournament_context: { Args: never; Returns: Json }
+      echo_get_user_context: { Args: { p_user_id: string }; Returns: Json }
       echo_history_list: {
         Args: { limit_rows?: number }
         Returns: {

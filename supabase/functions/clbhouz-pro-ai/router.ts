@@ -63,6 +63,8 @@ const LIVE_DATA_PATTERNS = [
   /\b(202[4-9]|203[0-9])/i, // Recent/future years need live data
   /\b(last week|last month|past week|past month)/i,
   /\b(next|upcoming|soon|scheduled|when is|when are|when does|next year)/i, // Time-sensitive queries
+  /\b(leaderboard|live score|cut line|current standing|world ranking|owgr|fedex|race to dubai)\b/i,
+  /\b(withdrew|withdrawal|injured|injury|playing this week|in the field)\b/i,
 ];
 
 // Volatile entities that change frequently - route to Perplexity

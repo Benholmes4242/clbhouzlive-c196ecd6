@@ -8,11 +8,15 @@ import { decideRoute, modelDeclined, type Mode } from "./router.ts";
 
 const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")!;
 const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY")!;
+const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
+const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY")!;
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const OPENAI_MODEL = "gpt-4o-mini";
 const PERPLEXITY_MODEL = "sonar";
+const ANTHROPIC_MODEL = "claude-3-5-sonnet-20241022";
+const GEMINI_MODEL = "gemini-1.5-pro";
 const DEFAULT_TIMEZONE = "Europe/London";
 
 // Rate limiting config
@@ -20,18 +24,467 @@ const RATE_LIMIT_MINUTE = 10;
 const RATE_LIMIT_HOUR = 60;
 const RATE_LIMIT_DAY = 200;
 
-// FIX 7: Database-backed rate limiting (persists across cold starts)
+// ─── Intent Classification ───────────────────────────────────────────────
+
+type QueryIntent =
+  | 'tournament'
+  | 'course'
+  | 'player'
+  | 'user_advice'
+  | 'general';
+
+type ConsensusLevel =
+  | 'single'    // Claude only — simple technique/rules
+  | 'dual'      // Claude + GPT-4o — user-specific advice
+  | 'full'      // All 4 models — complex recommendations
+  | 'live';     // Perplexity only — real-time data
+
+function classifyIntent(query: string): {
+  intents: QueryIntent[];
+  consensusLevel: ConsensusLevel;
+  playerName: string | null;
+  courseQuery: string | null;
+  countryQuery: string | null;
+} {
+  const q = query.toLowerCase();
+
+  const intents: QueryIntent[] = [];
+
+  // Tournament intent
+  if (/\b(this week|next week|tournament|pick|picks|predict|who should i|who will win|masters|open|pga|lpga|liv|dp world|leaderboard|cut|field|favourite|favorite)\b/.test(q)) {
+    intents.push('tournament');
+  }
+
+  // Course intent
+  if (/\b(course|courses|golf club|links|ranked|rating|best course|top course|near me|in (ireland|scotland|england|uk|usa|spain|portugal|europe)|bucket list|hidden gem)\b/.test(q)) {
+    intents.push('course');
+  }
+
+  // Player intent — extract name if possible
+  const playerMatch = q.match(/\b(rory|mcilroy|scottie|scheffler|rahm|hovland|fleetwood|spieth|koepka|dustin|johnson|tiger|woods|mickelson|rose|stenson|garcia|hatton|lowry|casey)\b/i);
+  if (playerMatch || /\b(player|golfer|world ranking|owgr|stats|statistics)\b/.test(q)) {
+    intents.push('player');
+  }
+
+  // User advice intent
+  if (/\b(my handicap|for me|my game|my swing|should i|what should|recommend for|advice for|help me|my home course)\b/.test(q)) {
+    intents.push('user_advice');
+  }
+
+  if (intents.length === 0) intents.push('general');
+
+  // Determine consensus level
+  let consensusLevel: ConsensusLevel;
+  const { route } = decideRoute(query, 'auto');
+
+  if (route === 'live' && !intents.includes('tournament') && !intents.includes('course')) {
+    consensusLevel = 'live';
+  } else if (
+    intents.includes('tournament') ||
+    (intents.includes('course') && intents.length > 1)
+  ) {
+    consensusLevel = 'full';
+  } else if (intents.includes('user_advice') || intents.includes('player')) {
+    consensusLevel = 'dual';
+  } else {
+    consensusLevel = 'single';
+  }
+
+  // Extract player name
+  const playerName = playerMatch ? playerMatch[0] : null;
+
+  // Extract course/country query
+  const countryMatch = q.match(/\b(ireland|scotland|england|wales|uk|usa|spain|portugal|france|europe|northern ireland)\b/i);
+  const courseQuery = intents.includes('course') ? query : null;
+  const countryQuery = countryMatch ? countryMatch[0] : null;
+
+  return { intents, consensusLevel, playerName, courseQuery, countryQuery };
+}
+
+// ─── Context Fetcher ─────────────────────────────────────────────────────
+
+async function fetchEchoContext(
+  supabaseAdmin: ReturnType<typeof createClient>,
+  userId: string,
+  intents: QueryIntent[],
+  playerName: string | null,
+  courseQuery: string | null,
+  countryQuery: string | null
+): Promise<{
+  userContext: Record<string, unknown>;
+  tournamentContext: Record<string, unknown> | null;
+  courseContext: Record<string, unknown> | null;
+  playerContext: Record<string, unknown> | null;
+}> {
+  const fetches: Promise<void>[] = [];
+
+  let userContext: Record<string, unknown> = {};
+  let tournamentContext: Record<string, unknown> | null = null;
+  let courseContext: Record<string, unknown> | null = null;
+  let playerContext: Record<string, unknown> | null = null;
+
+  // Always fetch user context
+  fetches.push(
+    supabaseAdmin.rpc('echo_get_user_context', { p_user_id: userId })
+      .then(({ data }: any) => { if (data) userContext = data; })
+      .catch(() => {})
+  );
+
+  // Tournament context
+  if (intents.includes('tournament')) {
+    fetches.push(
+      supabaseAdmin.rpc('echo_get_tournament_context')
+        .then(({ data }: any) => { if (data?.available) tournamentContext = data; })
+        .catch(() => {})
+    );
+  }
+
+  // Course context
+  if (intents.includes('course') && courseQuery) {
+    fetches.push(
+      supabaseAdmin.rpc('echo_get_course_context', {
+        p_query: courseQuery,
+        p_country: countryQuery,
+        p_limit: 8
+      })
+        .then(({ data }: any) => { if (data?.available) courseContext = data; })
+        .catch(() => {})
+    );
+  }
+
+  // Player context
+  if (intents.includes('player') && playerName) {
+    fetches.push(
+      supabaseAdmin.rpc('echo_get_player_context', { p_player_name: playerName })
+        .then(({ data }: any) => { if (data?.available) playerContext = data; })
+        .catch(() => {})
+    );
+  }
+
+  // Run all fetches in parallel
+  await Promise.all(fetches);
+
+  return { userContext, tournamentContext, courseContext, playerContext };
+}
+
+// ─── Context-to-Prompt Builder ───────────────────────────────────────────
+
+function buildContextBlock(
+  userContext: Record<string, unknown>,
+  tournamentContext: Record<string, unknown> | null,
+  courseContext: Record<string, unknown> | null,
+  playerContext: Record<string, unknown> | null
+): string {
+  const lines: string[] = [];
+
+  // User block — always included
+  if (userContext && Object.keys(userContext).length > 0) {
+    const parts: string[] = [];
+    if (userContext.display_name) parts.push(`Name: ${userContext.display_name}`);
+    if (userContext.handicap != null) parts.push(`Handicap: ${userContext.handicap}`);
+    if (userContext.home_club) parts.push(`Home club: ${userContext.home_club}`);
+    if (userContext.city || userContext.country) {
+      parts.push(`Location: ${[userContext.city, userContext.country].filter(Boolean).join(', ')}`);
+    }
+    if (parts.length > 0) {
+      lines.push(`\n## User Profile\n${parts.join(' | ')}`);
+    }
+  }
+
+  // Tournament block
+  if (tournamentContext?.available && tournamentContext.tournament) {
+    const t = tournamentContext.tournament as Record<string, unknown>;
+    lines.push(`\n## Current Tournament Intelligence`);
+    lines.push(`Tournament: ${t.name} | Status: ${t.status}`);
+    lines.push(`Venue: ${t.venue}, ${t.location} | Par ${t.par}, ${t.yardage} yards`);
+    if (t.purse) lines.push(`Purse: $${Number(t.purse).toLocaleString()}`);
+    if (t.defending_champion) lines.push(`Defending champion: ${t.defending_champion}`);
+
+    if (tournamentContext.predictions) {
+      lines.push(`\nClbhouz AI Predictions (3-model consensus):`);
+      lines.push(JSON.stringify(tournamentContext.predictions, null, 2));
+    }
+    if (tournamentContext.dark_horses) {
+      lines.push(`\nDark horses: ${JSON.stringify(tournamentContext.dark_horses)}`);
+    }
+    if (tournamentContext.course_dna) {
+      const dna = tournamentContext.course_dna as Record<string, unknown>;
+      lines.push(`\nCourse DNA: Type: ${dna.course_type} | Difficulty: ${dna.scoring_difficulty}`);
+      lines.push(`Key stats: Putting importance ${dna.sg_putting_importance}, Driving distance ${dna.driving_distance_importance}, Approach ${dna.sg_approach_importance}`);
+    }
+  }
+
+  // Course block
+  if (courseContext?.available && Array.isArray(courseContext.courses) && courseContext.courses.length > 0) {
+    lines.push(`\n## Clbhouz Course Database`);
+    lines.push(`Top rated courses matching query:`);
+    for (const c of courseContext.courses.slice(0, 6)) {
+      const course = c as Record<string, unknown>;
+      const rating = course.avg_rating ? ` | Rating: ${course.avg_rating}/10 (${course.review_count} reviews)` : '';
+      const rank = course.global_rank ? ` | Global rank: #${course.global_rank}` : '';
+      lines.push(`- ${course.name}, ${course.country}${rating}${rank}`);
+    }
+  }
+
+  // Player block
+  if (playerContext?.available) {
+    const p = playerContext.player as Record<string, unknown>;
+    const s = playerContext.current_season as Record<string, unknown>;
+    const c = playerContext.career as Record<string, unknown>;
+    lines.push(`\n## Player Data: ${p.name}`);
+    lines.push(`Country: ${p.country} | Turned pro: ${p.turned_pro}`);
+    if (s) {
+      lines.push(`Current season: Scoring avg ${s.scoring_average} | SG Total ${s.sg_tee_to_green} | SG Putting ${s.sg_putting} | Wins: ${s.wins} | Top 10s: ${s.top_10s}`);
+    }
+    if (c) {
+      lines.push(`Career: ${c.career_wins} wins | ${c.majors_won} majors | Best ranking: #${c.best_world_ranking}`);
+    }
+  }
+
+  return lines.join('\n');
+}
+
+// ─── Claude Streaming ────────────────────────────────────────────────────
+
+async function streamClaude(
+  systemPrompt: string,
+  messages: Array<{ role: string; content: string }>,
+  onChunk: (token: string) => void
+): Promise<string> {
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: ANTHROPIC_MODEL,
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages: messages.map(m => ({ role: m.role, content: m.content })),
+      stream: true,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Claude API error: ${response.status}`);
+  }
+
+  const reader = response.body!.getReader();
+  const decoder = new TextDecoder();
+  let fullText = '';
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() || '';
+
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        const data = line.slice(6).trim();
+        if (data === '[DONE]') continue;
+        try {
+          const parsed = JSON.parse(data);
+          const token = parsed?.delta?.text || '';
+          if (token) {
+            fullText += token;
+            onChunk(token);
+          }
+        } catch { /* partial chunk */ }
+      }
+    }
+  }
+
+  return fullText;
+}
+
+// ─── Gemini Non-Streaming ────────────────────────────────────────────────
+
+async function callGemini(
+  systemPrompt: string,
+  messages: Array<{ role: string; content: string }>
+): Promise<string> {
+  const contents = messages.map(m => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: m.content }],
+  }));
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents,
+        generationConfig: { maxOutputTokens: 1024, temperature: 0.7 },
+      }),
+    }
+  );
+
+  if (!response.ok) throw new Error(`Gemini API error: ${response.status}`);
+  const data = await response.json();
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+}
+
+// ─── GPT-4o Non-Streaming ────────────────────────────────────────────────
+
+async function callGPT4o(
+  systemPrompt: string,
+  messages: Array<{ role: string; content: string }>
+): Promise<string> {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o',
+      max_tokens: 1024,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages.map(m => ({ role: m.role, content: m.content })),
+      ],
+    }),
+  });
+
+  if (!response.ok) throw new Error(`GPT-4o API error: ${response.status}`);
+  const data = await response.json();
+  return data?.choices?.[0]?.message?.content || '';
+}
+
+// ─── Claude Non-Streaming (for consensus) ────────────────────────────────
+
+async function callClaudeSync(
+  systemPrompt: string,
+  messages: Array<{ role: string; content: string }>
+): Promise<string> {
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: ANTHROPIC_MODEL,
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages: messages.map(m => ({ role: m.role, content: m.content })),
+    }),
+  });
+  const d = await r.json();
+  return d?.content?.[0]?.text || '';
+}
+
+// ─── Consensus Synthesiser ───────────────────────────────────────────────
+
+async function runConsensus(
+  systemPrompt: string,
+  messages: Array<{ role: string; content: string }>,
+  consensusLevel: ConsensusLevel,
+  onChunk: (token: string) => void
+): Promise<void> {
+  if (consensusLevel === 'single') {
+    await streamClaude(systemPrompt, messages, onChunk);
+    return;
+  }
+
+  if (consensusLevel === 'dual') {
+    const [claudeResponse, gptResponse] = await Promise.all([
+      callClaudeSync(systemPrompt, messages).catch(() => ''),
+      callGPT4o(systemPrompt, messages).catch(() => ''),
+    ]);
+
+    const synthesisPrompt = `You are synthesising two golf AI responses into one optimal answer.
+
+Model A (Claude, weight 57%): ${claudeResponse}
+
+Model B (GPT-4o, weight 43%): ${gptResponse}
+
+Produce a single, coherent response that:
+- Weights Model A's perspective at 57% and Model B's at 43%
+- Keeps the best specific details from both
+- Is concise and directly answers the user's question
+- Does not mention that you are synthesising multiple models
+- Uses the user's name if present in the context
+
+Respond with only the final answer, nothing else.`;
+
+    await streamClaude(synthesisPrompt, [{ role: 'user', content: 'Synthesise now.' }], onChunk);
+    return;
+  }
+
+  if (consensusLevel === 'full') {
+    const [claudeResponse, gptResponse, geminiResponse, perplexityResponse] = await Promise.all([
+      callClaudeSync(systemPrompt, messages).catch(() => ''),
+      callGPT4o(systemPrompt, messages).catch(() => ''),
+      callGemini(systemPrompt, messages).catch(() => ''),
+      (async () => {
+        const r = await fetch('https://api.perplexity.ai/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${PERPLEXITY_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: 'sonar',
+            messages: [
+              { role: 'system', content: `Today is ${new Date().toISOString().split('T')[0]}. Provide only the most current factual data relevant to this golf question. Be brief.` },
+              ...messages.slice(-2).map(m => ({ role: m.role, content: m.content })),
+            ],
+            max_tokens: 512,
+          }),
+        });
+        const d = await r.json();
+        return d?.choices?.[0]?.message?.content || '';
+      })().catch(() => ''),
+    ]);
+
+    const synthesisPrompt = `You are synthesising four golf AI responses using weighted consensus (same method as the Clbhouz Tournament Intelligence system).
+
+Model weights:
+- Claude (40%): ${claudeResponse || 'No response'}
+- GPT-4o (35%): ${gptResponse || 'No response'}  
+- Gemini (20%): ${geminiResponse || 'No response'}
+- Perplexity/live data (5%): ${perplexityResponse || 'No response'}
+
+Produce a single, authoritative response that:
+- Weights each model's contribution proportionally to its weight above
+- Prioritises specific facts, names, and data points where models agree
+- For disagreements, favours the higher-weighted model
+- Incorporates any real-time data from Perplexity where relevant
+- Is well-structured and directly answers the user's question
+- Uses the user's name naturally where appropriate
+- Does not mention models, AI, or the synthesis process
+- Reads as one cohesive, expert caddie response
+
+Respond with only the final answer.`;
+
+    await streamClaude(synthesisPrompt, [{ role: 'user', content: 'Synthesise now.' }], onChunk);
+    return;
+  }
+
+  // consensusLevel === 'live' — handled by caller
+}
+
+// ─── Rate Limiting ───────────────────────────────────────────────────────
+
 async function checkRateLimitDB(userId: string): Promise<{ allowed: boolean; error?: string; retryAfter?: number }> {
   const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
   const now = new Date();
   
-  // Calculate window starts
   const minuteStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
   const hourStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours());
   const dayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   try {
-    // Check minute window
     const { data: minuteData } = await supabaseAdmin
       .from('echo_rate_limits')
       .select('request_count')
@@ -45,7 +498,6 @@ async function checkRateLimitDB(userId: string): Promise<{ allowed: boolean; err
       return { allowed: false, error: "RATE_LIMIT_MINUTE", retryAfter };
     }
 
-    // Check hour window
     const { data: hourData } = await supabaseAdmin
       .from('echo_rate_limits')
       .select('request_count')
@@ -59,7 +511,6 @@ async function checkRateLimitDB(userId: string): Promise<{ allowed: boolean; err
       return { allowed: false, error: "RATE_LIMIT_HOUR", retryAfter };
     }
 
-    // Check day window
     const { data: dayData } = await supabaseAdmin
       .from('echo_rate_limits')
       .select('request_count')
@@ -72,7 +523,6 @@ async function checkRateLimitDB(userId: string): Promise<{ allowed: boolean; err
       return { allowed: false, error: "RATE_LIMIT_DAY", retryAfter: 0 };
     }
 
-    // Increment all windows using RPC
     await Promise.all([
       supabaseAdmin.rpc('increment_rate_limit', {
         p_user_id: userId,
@@ -94,12 +544,12 @@ async function checkRateLimitDB(userId: string): Promise<{ allowed: boolean; err
     return { allowed: true };
   } catch (error) {
     console.error('[RateLimit] Database error, allowing request:', error);
-    // Fail open - allow request if rate limit check fails
     return { allowed: true };
   }
 }
 
-// FIX 8: Response caching utilities
+// ─── Response Caching ────────────────────────────────────────────────────
+
 async function hashQuery(query: string): Promise<string> {
   const normalized = query.toLowerCase().trim().replace(/\s+/g, ' ');
   const encoder = new TextEncoder();
@@ -120,7 +570,6 @@ async function checkCache(queryHash: string): Promise<string | null> {
 
   if (error || !data) return null;
   
-  // Increment hit count (fire and forget)
   supabaseAdmin
     .from('echo_response_cache')
     .update({ hit_count: (data as any).hit_count + 1 })
@@ -149,7 +598,7 @@ async function cacheResponse(queryHash: string, queryText: string, responseText:
   }
 }
 
-// Legacy in-memory fallback (kept for anonymous users or DB failures)
+// Legacy in-memory fallback
 const rateLimitsMemory = new Map<string, { minute: number[]; hour: number[]; day: number[] }>();
 
 function checkRateLimitMemory(userId: string): { allowed: boolean; error?: string; retryAfter?: number } {
@@ -171,29 +620,17 @@ function checkRateLimitMemory(userId: string): { allowed: boolean; error?: strin
   if (limits.minute.length >= RATE_LIMIT_MINUTE) {
     const oldestInMinute = Math.min(...limits.minute);
     const retryAfter = Math.ceil((oldestInMinute + 60 * 1000 - now) / 1000);
-    return { 
-      allowed: false, 
-      error: "RATE_LIMIT_MINUTE",
-      retryAfter
-    };
+    return { allowed: false, error: "RATE_LIMIT_MINUTE", retryAfter };
   }
 
   if (limits.hour.length >= RATE_LIMIT_HOUR) {
     const oldestInHour = Math.min(...limits.hour);
     const retryAfter = Math.ceil((oldestInHour + 60 * 60 * 1000 - now) / 1000 / 60);
-    return { 
-      allowed: false, 
-      error: "RATE_LIMIT_HOUR",
-      retryAfter
-    };
+    return { allowed: false, error: "RATE_LIMIT_HOUR", retryAfter };
   }
 
   if (limits.day.length >= RATE_LIMIT_DAY) {
-    return { 
-      allowed: false, 
-      error: "RATE_LIMIT_DAY",
-      retryAfter: 0
-    };
+    return { allowed: false, error: "RATE_LIMIT_DAY", retryAfter: 0 };
   }
 
   limits.minute.push(now);
@@ -203,6 +640,8 @@ function checkRateLimitMemory(userId: string): { allowed: boolean; error?: strin
   return { allowed: true };
 }
 
+// ─── Request Contracts ───────────────────────────────────────────────────
+
 // Echo v2 contract (preferred)
 interface EchoV2RequestBody {
   messages: Array<{ role: "user" | "assistant" | "system"; content: string }>;
@@ -210,6 +649,12 @@ interface EchoV2RequestBody {
   stream?: boolean;
   mode?: Mode | "chat";
   timezone?: string;
+  user_context?: {
+    firstName?: string | null;
+    handicap?: number | null;
+    homeClub?: string | null;
+    location?: string | null;
+  } | null;
 }
 
 // Echo v1 contract (legacy, still supported)
@@ -240,102 +685,8 @@ const sseHeaders = {
 };
 
 function nowISO() { return new Date().toISOString(); }
-function normalize(s: string) { return (s || "").toLowerCase(); }
 
-const TIME_KEYWORDS = [
-  "today","tonight","tomorrow","yesterday","this week","this month","this year",
-  "current","latest","now","live","right now","up-to-date","as of","who is","who are",
-  "what's happening","breaking","recent","last week"
-];
-
-const VOLATILE_ENTITIES = [
-  "captain","manager","coach","lineup","fixture","schedule","tee times","pairings",
-  "leaderboard","odds","rankings","ryder cup","presidents cup","pga tour","lpga",
-  "european tour","dp world tour","premier league","champions league","nba","nfl",
-  "price","stock","exchange rate","bitcoin","forecast","weather","flight","train times",
-  "traffic","ceo","chairman","president","prime minister","release","patch notes","version",
-  "deadline","rule change","law change","election","scores","results","standings","news"
-];
-
-function mentionsPastYearExplicitly(text: string): boolean {
-  const yearRegex = /\b(19\d{2}|20\d{2})\b/g;
-  const matches = text.match(yearRegex);
-  if (!matches) return false;
-  const currentYear = new Date().getUTCFullYear();
-  return matches.some((y) => parseInt(y) <= currentYear);
-}
-
-function shouldUseLiveSearch(prompt: string) {
-  const p = normalize(prompt);
-  if (TIME_KEYWORDS.some((k) => p.includes(k))) return { useLive: true, reason: "time keywords" };
-  if (VOLATILE_ENTITIES.some((k) => p.includes(k))) {
-    return mentionsPastYearExplicitly(p)
-      ? { useLive: false, reason: "explicit past year" }
-      : { useLive: true, reason: "volatile entity" };
-  }
-  if (mentionsPastYearExplicitly(p)) return { useLive: false, reason: "historical" };
-  return { useLive: false, reason: "default static" };
-}
-
-// Non-streaming OpenAI call (for SwingCoach and fallbacks)
-async function callOpenAI(systemPrompt: string, userPrompt: string, history: EchoRequestBody["conversation"] = []) {
-  const messages = [{ role: "system", content: systemPrompt }, ...(history ?? []), { role: "user", content: userPrompt }];
-  const resp = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${OPENAI_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ model: OPENAI_MODEL, messages, temperature: 0.2 }),
-  });
-  if (!resp.ok) throw new Error(`OpenAI error: ${await resp.text()}`);
-  const data = await resp.json();
-  return data.choices?.[0]?.message?.content?.trim() || "Sorry, no response.";
-}
-
-// Streaming OpenAI call
-async function* streamOpenAI(systemPrompt: string, userPrompt: string, history: any[] = []): AsyncGenerator<string> {
-  const messages = [{ role: "system", content: systemPrompt }, ...(history ?? []), { role: "user", content: userPrompt }];
-  
-  const resp = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${OPENAI_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ 
-      model: OPENAI_MODEL, 
-      messages, 
-      temperature: 0.2,
-      stream: true 
-    }),
-  });
-  
-  if (!resp.ok) throw new Error(`OpenAI error: ${await resp.text()}`);
-  
-  const reader = resp.body?.getReader();
-  if (!reader) throw new Error("No response body");
-  
-  const decoder = new TextDecoder();
-  let buffer = "";
-  
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split("\n");
-    buffer = lines.pop() || "";
-    
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed === "data: [DONE]") continue;
-      if (!trimmed.startsWith("data: ")) continue;
-      
-      try {
-        const json = JSON.parse(trimmed.slice(6));
-        const content = json.choices?.[0]?.delta?.content;
-        if (content) yield content;
-      } catch {
-        // Ignore parse errors for partial chunks
-      }
-    }
-  }
-}
+// ─── Streaming Providers (Perplexity preserved for live route) ───────────
 
 // Streaming Perplexity call
 async function* streamPerplexity(query: string, nowIso: string, history: any[] = []): AsyncGenerator<string> {
@@ -389,23 +740,33 @@ async function* streamPerplexity(query: string, nowIso: string, history: any[] =
         const json = JSON.parse(trimmed.slice(6));
         const content = json.choices?.[0]?.delta?.content;
         if (content) {
-          // Clean up citation numbers
           const cleaned = content.replace(/\[\d+\]/g, '');
           if (cleaned) yield cleaned;
         }
-      } catch {
-        // Ignore parse errors
-      }
+      } catch { /* partial chunk */ }
     }
   }
 }
 
+// Non-streaming OpenAI call (for SwingCoach and fallbacks)
+async function callOpenAI(systemPrompt: string, userPrompt: string, history: any[] = []) {
+  const messages = [{ role: "system", content: systemPrompt }, ...(history ?? []), { role: "user", content: userPrompt }];
+  const resp = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${OPENAI_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ model: OPENAI_MODEL, messages, temperature: 0.2 }),
+  });
+  if (!resp.ok) throw new Error(`OpenAI error: ${await resp.text()}`);
+  const data = await resp.json();
+  return data.choices?.[0]?.message?.content?.trim() || "Sorry, no response.";
+}
+
 // Non-streaming Perplexity call (for fallbacks)
-async function callPerplexity(query: string, nowIso: string, history: EchoRequestBody["conversation"] = []) {
+async function callPerplexity(query: string, nowIso: string, history: any[] = []) {
   const systemPrompt = [
     `You are Echo, a golf-first AI assistant with live web search. Today is ${nowIso.split("T")[0]}.`,
-    "When asked about 'majors' without other context, assume golf majors (Masters, PGA Championship, US Open, The Open).",
-    "Always verify facts with fresh sources for schedules, rankings, results, and player status.",
+    "When asked about 'majors' without other context, assume golf majors.",
+    "Always verify facts with fresh sources.",
     `Include "As of ${nowIso.split("T")[0]}" for time-sensitive information.`,
     "Be concise, structured, and provide specific dates/venues when discussing events."
   ].join(" ");
@@ -423,10 +784,7 @@ async function callPerplexity(query: string, nowIso: string, history: EchoReques
   if (!resp.ok) throw new Error(`Perplexity error: ${await resp.text()}`);
   const data = await resp.json();
   let content = data.choices?.[0]?.message?.content?.trim() || "";
-  
-  // Clean up citation numbers for better readability
   content = content.replace(/\[\d+\]/g, '');
-  
   if (content && !/as of/i.test(content)) content += `\n\n_As of ${nowIso.split("T")[0]}._`;
   return content || "Sorry, no live result.";
 }
@@ -453,6 +811,8 @@ function extractUserId(req: Request): string {
   }
 }
 
+// ─── Main Handler ────────────────────────────────────────────────────────
+
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -461,7 +821,7 @@ serve(async (req: Request) => {
   try {
     const userId = extractUserId(req);
     
-    // FIX 7: Check rate limits (use DB for authenticated users, memory for anonymous)
+    // Check rate limits
     const rateLimitResult = userId !== 'anonymous' 
       ? await checkRateLimitDB(userId)
       : checkRateLimitMemory(userId);
@@ -495,23 +855,20 @@ serve(async (req: Request) => {
     let swingContext: any;
     let mode: Mode | "chat" = "auto";
     let timezone = DEFAULT_TIMEZONE;
-    let shouldStream = true; // Default to streaming
+    let shouldStream = true;
+    let clientUserContext: any = null;
 
     // 1) New v2-style contract: messages[]
     if ('messages' in body && Array.isArray(body.messages) && body.messages.length > 0) {
       const msgs = body.messages;
       const last = msgs[msgs.length - 1];
-
-      // Last message is treated as the "current" user prompt
       message = last.content;
-
-      // Everything before that is "conversation"
       conversation = msgs.slice(0, -1);
-
       conversationId = body.conversation_id ?? null;
       mode = (body.mode as Mode | "chat") || "auto";
       timezone = body.timezone || DEFAULT_TIMEZONE;
-      shouldStream = body.stream !== false; // Default true
+      shouldStream = body.stream !== false;
+      if ('user_context' in body) clientUserContext = body.user_context;
     }
 
     // 2) Legacy v1-style contract: message + conversation
@@ -530,19 +887,6 @@ serve(async (req: Request) => {
     if (!mode && 'mode' in body) mode = (body.mode as Mode) || "auto";
     if ('timezone' in body) timezone = body.timezone || DEFAULT_TIMEZONE;
 
-    // 🐛 DEBUGGING: Log incoming request details
-    console.log('🔍 EDGE FUNCTION DEBUG - Request Details:', { 
-      messageLength: message?.length || 0,
-      conversationLength: conversation?.length || 0,
-      imagesCount: images?.length || 0,
-      detailMode,
-      isEcho,
-      hasMessage: !!message,
-      conversationId,
-      isV2: 'messages' in body,
-      shouldStream
-    });
-
     if (!message?.trim()) {
       return new Response(JSON.stringify({ 
         error: "Empty message",
@@ -557,8 +901,6 @@ serve(async (req: Request) => {
 
     // Priority 1: SwingCoach analysis (UNCHANGED - preserves existing functionality)
     if (images && images.length > 0) {
-      console.log('🎯 Using OpenAI for swing analysis with images:', images?.length || 0);
-      
       const systemPrompt = `You are Echo, a professional golf instructor and swing coach with expertise in biomechanics and golf technique. When analyzing golf swing images/frames:
 
 1. Always provide DETAILED, comprehensive technical analysis of what you observe in the frames
@@ -571,46 +913,29 @@ serve(async (req: Request) => {
 8. Structure your response with clear headings for each swing phase
 9. Include a summary with 3-5 key takeaways and practice priorities
 
-IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide condensed or quick summaries unless specifically requested. Analyze the swing frames directly and give comprehensive feedback with specific observations for each frame/phase.`;
+IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide condensed or quick summaries unless specifically requested.`;
       
       const messages = [
         { role: 'system', content: systemPrompt },
         ...(conversation || [])
       ];
 
-      // Create user message with images
       const userMessage: any = { 
         role: 'user', 
         content: images && images.length > 0 ? [
           { type: 'text', text: message },
           ...images.map((image: string) => ({
             type: 'image_url',
-            image_url: {
-              url: image,
-              detail: 'high'
-            }
+            image_url: { url: image, detail: 'high' }
           }))
         ] : message
       };
 
       messages.push(userMessage);
 
-      // Add edge function telemetry
-      const edgeT0 = Date.now();
-      const frames = images?.length || 0;
-      const payloadBytes = messages ? JSON.stringify(messages).length : 0;
-      console.log('[SC-EDGE]', JSON.stringify({ evt: 'start', frames, payloadKB: Math.round(payloadBytes/1024), detailMode }));
-
-      console.log('🚀 Sending to OpenAI with images:', images?.length || 0);
-      if (images && images.length > 0) {
-        console.log('📸 Image details:', images.map((img, i) => `Frame ${i + 1}: ${img.substring(0, 50)}...`));
-      }
-
-      // Add timeout for faster failure/fallback
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s SLA for full analysis
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-      const openaiT0 = Date.now();
       try {
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
@@ -620,9 +945,9 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
           },
           signal: controller.signal,
           body: JSON.stringify({
-            model: 'gpt-4o-mini', // Fast vision model for swing analysis
+            model: 'gpt-4o-mini',
             messages: messages,
-            max_tokens: 1500, // Increased for detailed phase-by-phase analysis
+            max_tokens: 1500,
             temperature: 0.2
           }),
         });
@@ -631,36 +956,16 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('OpenAI API error:', response.status, errorText);
           throw new Error(`OpenAI API error: ${response.status}`);
         }
 
-        const openaiMs = Date.now() - openaiT0;
         const data = await response.json();
         const finalResponse = data.choices[0].message.content.trim();
-        
-        // If you have token usage in `body.usage`, include it; if not, omit it.
-        console.log('[SC-EDGE]', JSON.stringify({ evt: 'openai_ok', openaiMs, status: response.status, usage: data?.usage || null }));
-        
-        // Calculate payload size and log metrics
-        const payloadSize = JSON.stringify(messages).length;
-        const tokenCount = data.usage?.total_tokens || 0;
-        
-        console.log('✅ EDGE FUNCTION DEBUG - Response generated successfully:', {
-          responseLength: finalResponse.length,
-          responsePreview: finalResponse.substring(0, 100),
-          payloadBytes: payloadSize,
-          tokenCount: tokenCount,
-          timedOut: false
-        });
-
-        console.log('📤 EDGE FUNCTION DEBUG - Sending response back to client');
-        console.log('[SC-EDGE]', JSON.stringify({ evt: 'done', totalMs: Date.now() - edgeT0 }));
 
         return new Response(JSON.stringify({ 
-          text: finalResponse,          // NEW canonical field
-          response: finalResponse,       // keep for legacy callers
-          metadata: { timeout: false, quick: false, timedOut: false, tokenCount },
+          text: finalResponse,
+          response: finalResponse,
+          metadata: { timeout: false, quick: false, timedOut: false },
           mode: 'full'
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -668,13 +973,8 @@ IMPORTANT: Provide FULL, detailed phase-by-phase analysis. Do not provide conden
 
       } catch (error: any) {
         clearTimeout(timeoutId);
-        const openaiMs = Date.now() - openaiT0;
-        const isAbort = error?.name === 'AbortError';
-        console.warn('[SC-EDGE]', JSON.stringify({ evt: 'openai_fail', openaiMs, abort: isAbort, msg: String(error?.message || error) }));
         
-        // Handle AbortController timeout gracefully
         if (error.name === 'AbortError') {
-          console.log('🚨 API call aborted due to 30s timeout - returning quick analysis');
           const quickAnalysis = `## Quick Swing Analysis
 
 Based on the submitted frames, I can see:
@@ -686,208 +986,100 @@ Based on the submitted frames, I can see:
 
 *This is a condensed analysis due to processing time. For detailed breakdown, try uploading a shorter video clip or use the "Refine Details" option.*`;
 
-        return new Response(JSON.stringify({ 
-          text: quickAnalysis,           // NEW canonical field
-          response: quickAnalysis,       // keep for legacy callers
-          metadata: { timeout: true, quick: true, timedOut: true },
-          mode: 'quick'
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+          return new Response(JSON.stringify({ 
+            text: quickAnalysis,
+            response: quickAnalysis,
+            metadata: { timeout: true, quick: true, timedOut: true },
+            mode: 'quick'
+          }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
         }
         
-        console.log('[SC-EDGE]', JSON.stringify({ evt: 'done', totalMs: Date.now() - edgeT0 }));
         throw error;
-      } finally {
-        console.log('[SC-EDGE]', JSON.stringify({ evt: 'done', totalMs: Date.now() - edgeT0 }));
       }
     }
 
-    // Priority 2: Text Q&A with Enhanced Routing + SSE Streaming
-    console.log('📥 EDGE FUNCTION DEBUG - Processing text query with enhanced routing');
+    // Priority 2: Text Q&A with Echo Context Intelligence + SSE Streaming
 
-    // FIX 8: Check cache for single-turn static queries only
-    const isSingleTurn = conversation.length === 0;
-    const { route, reason } = decideRoute(message, mode);
-    let routeReason = reason;
-    
-    // Only cache static queries without conversation context
-    const shouldCheckCache = isSingleTurn && route === "static";
-    let queryHash = "";
-    let cachedResponse: string | null = null;
-    
-    if (shouldCheckCache) {
-      try {
-        queryHash = await hashQuery(message!);
-        cachedResponse = await checkCache(queryHash);
-        
-        if (cachedResponse) {
-          console.log('📦 Cache hit for query:', message?.substring(0, 50));
-          
-          // Stream cached response with small delays for consistent UX
-          if (shouldStream) {
-            const stream = new ReadableStream({
-              async start(controller) {
-                const encoder = new TextEncoder();
-                const words = cachedResponse!.split(' ');
-                
-                for (let i = 0; i < words.length; i++) {
-                  const token = (i === 0 ? '' : ' ') + words[i];
-                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ token })}\n\n`));
-                  // Small delay to simulate streaming (10-30ms per word)
-                  await new Promise(resolve => setTimeout(resolve, 15));
-                }
-                
-                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-                  done: true, 
-                  meta: { provider: 'cache', routeReason: 'cache-hit', latencyMs: 0 }
-                })}\n\n`));
-                controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-                controller.close();
-              }
-            });
-            
-            return new Response(stream, { headers: sseHeaders });
-          } else {
-            // Non-streaming cached response
-            return new Response(JSON.stringify({
-              text: cachedResponse,
-              response: cachedResponse,
-              modeUsed: 'static',
-              meta: { provider: 'cache', routeReason: 'cache-hit' }
-            }), {
-              status: 200,
-              headers: { ...corsHeaders, "Content-Type": "application/json" }
-            });
-          }
-        }
-      } catch (cacheError) {
-        console.warn('[Cache] Check failed, proceeding without cache:', cacheError);
-      }
-    }
-    
-    // Enhanced logging for route debugging
-    console.log('🤖 Echo Route Decision:', {
-      query: message?.substring(0, 100),
-      route,
-      reason,
-      timestamp: new Date().toISOString(),
-      shouldStream
-    });
+    // 1. Classify intent and consensus level
+    const { intents, consensusLevel, playerName, courseQuery, countryQuery } =
+      classifyIntent(message);
 
+    // 2. Fetch context from DB in parallel
+    const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const { userContext, tournamentContext, courseContext, playerContext } =
+      await fetchEchoContext(
+        supabaseAdmin,
+        userId,
+        intents,
+        playerName,
+        courseQuery,
+        countryQuery
+      );
+
+    // 3. Build enriched system prompt
     const todayDate = new Date().toISOString().split('T')[0];
-    const staticSystem = [
-      `Today's date is ${todayDate}.`,
-      "You are Echo, a friendly golf-first assistant.",
-      "Prefer golf context but answer general questions too.",
-      "Be concise, structured, and practical.",
-      "If you are not using live search, avoid claiming real-time facts.",
-      "If asked about future events, schedules, or 'next' occurrences, acknowledge that your information may be outdated and suggest checking official sources for current dates."
-    ].join("\n");
+    const contextBlock = buildContextBlock(
+      userContext,
+      tournamentContext,
+      courseContext,
+      playerContext
+    );
 
-    const t0 = Date.now();
-    
-    // Prepare conversation history (last 8 turns for better context)
+    const firstName = (userContext?.first_name as string) || null;
+    const nameGreeting = firstName ? ` The user's name is ${firstName} — use it naturally.` : '';
+
+    const enrichedSystemPrompt = [
+      `You are Echo, a world-class personal golf caddie and advisor.${nameGreeting}`,
+      `Today is ${todayDate}.`,
+      `You have access to real Clbhouz platform data — course ratings, tournament predictions, and player statistics. When you reference this data, present it as your own knowledge, not as an external source.`,
+      `Be conversational, specific, and practical. Speak like a knowledgeable caddie, not a search engine.`,
+      `When discussing courses, reference Clbhouz community ratings where available.`,
+      `When discussing tournament picks, reference the Clbhouz prediction data where available.`,
+      contextBlock,
+    ].join('\n');
+
+    // Prepare conversation history (last 8 turns for context)
     const history = conversation.slice(-8);
 
-    // SSE Streaming Response
+    // 4. Set up SSE stream
     if (shouldStream) {
       const stream = new ReadableStream({
         async start(controller) {
           const encoder = new TextEncoder();
-          let fullContent = "";
-          let provider = "";
-          
+
+          const send = (data: object) => {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+          };
+
+          const onChunk = (token: string) => send({ token });
+
           try {
-            const streamGenerator = route === "live"
-              ? streamPerplexity(message!, now, history)
-              : streamOpenAI(staticSystem, message!, history);
-            
-            provider = route === "live" ? "perplexity" : "openai";
-            
-            for await (const chunk of streamGenerator) {
-              fullContent += chunk;
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ token: chunk })}\n\n`));
-            }
-            
-            // Add "As of" date for live search if not present
-            if (route === "live" && fullContent && !/as of/i.test(fullContent)) {
-              const dateNote = `\n\n_As of ${now.split("T")[0]}._`;
-              fullContent += dateNote;
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ token: dateNote })}\n\n`));
-            }
-            
-            // Auto-switch if model declined
-            if (route === "static" && (!fullContent?.trim() || modelDeclined(fullContent))) {
-              console.log('🔄 Auto-switching to live search due to model decline');
-              fullContent = "";
-              
-              try {
-                for await (const chunk of streamPerplexity(message!, now, history)) {
-                  fullContent += chunk;
-                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ token: chunk })}\n\n`));
-                }
-                provider = "perplexity";
-                routeReason = "model-declined";
-              } catch (e) {
-                console.warn('⚠️ Auto-switch to live search failed:', (e as Error).message);
-              }
-            }
-            
-            const latencyMs = Date.now() - t0;
-            
-            // Send completion event with metadata
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-              done: true, 
-              meta: { provider, routeReason, latencyMs, now: now.split('T')[0] }
-            })}\n\n`));
-            
-            controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-            
-            // FIX 8: Cache successful static responses (single-turn only)
-            if (shouldCheckCache && queryHash && fullContent && provider === 'openai') {
-              cacheResponse(queryHash, message!, fullContent, 'gpt-4o-mini').catch(e => 
-                console.warn('[Cache] Failed to save:', e)
-              );
-            }
-            
-          } catch (error: any) {
-            console.error('❌ Streaming error:', error);
-            
-            // Try fallback for Perplexity failures
-            if (route === "live") {
-              console.warn('⚠️ Falling back from Perplexity to OpenAI - response may contain outdated information');
-              console.log('🔄 Fallback reason:', error.message);
-              try {
-                for await (const chunk of streamOpenAI(staticSystem, message!, history)) {
-                  fullContent += chunk;
-                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ token: chunk })}\n\n`));
-                }
-                provider = "openai";
-                routeReason = "perplexity-fallback-failed";
-                
-                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-                  done: true, 
-                  meta: { provider, routeReason, latencyMs: Date.now() - t0 }
-                })}\n\n`));
-                controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-              } catch (fallbackError) {
-                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-                  error: "Failed to get response",
-                  token: "Sorry, I'm having trouble responding right now. Please try again in a moment."
-                })}\n\n`));
-                controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+            if (consensusLevel === 'live') {
+              // Use existing Perplexity streaming for pure live queries
+              for await (const chunk of streamPerplexity(message!, now, history)) {
+                onChunk(chunk);
               }
             } else {
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
-                error: error.message || "Unknown error"
-              })}\n\n`));
-              controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+              await runConsensus(enrichedSystemPrompt, history.concat([{ role: 'user', content: message! }]), consensusLevel, onChunk);
+            }
+
+            send({ done: true, meta: { intents, consensusLevel } });
+          } catch (err) {
+            // Graceful degradation — fall back to single Claude call
+            try {
+              await streamClaude(enrichedSystemPrompt, history.concat([{ role: 'user', content: message! }]), onChunk);
+              send({ done: true, meta: { intents, consensusLevel, fallback: true } });
+            } catch {
+              send({ error: 'Echo encountered an error. Please try again.' });
+              send({ done: true, meta: { error: true } });
             }
           }
-          
+
+          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
           controller.close();
-        }
+        },
       });
 
       return new Response(stream, { headers: sseHeaders });
@@ -897,111 +1089,38 @@ Based on the submitted frames, I can see:
     const CHAT_EDGE_TIMEOUT_MS = 30000;
     let answer: string;
     let provider = '';
-    let sources: any = null;
-
-    async function callOpenAIEnhanced(messages: any[], _maxTokens = 900) {
-      const response = await callOpenAI(staticSystem, message!, messages);
-      return { text: response, usage: {}, sources: null };
-    }
-
-    async function callPerplexityEnhanced(messages: any[]) {
-      const response = await callPerplexity(message!, now, messages);
-      const sources = response.match(/\[(\d+)\]/g) ? 'Available' : null;
-      return { text: response, usage: {}, sources };
-    }
 
     try {
-      if (route === "live") {
-        console.log('🔍 Using live search (Perplexity) for current information');
-        const result = await withTimeout(callPerplexityEnhanced(history), CHAT_EDGE_TIMEOUT_MS);
-        answer = result.text;
+      if (consensusLevel === 'live') {
+        answer = await withTimeout(callPerplexity(message!, now, history), CHAT_EDGE_TIMEOUT_MS);
         provider = 'perplexity';
-        sources = result.sources;
       } else {
-        console.log('💬 Using static knowledge (OpenAI) for general/historical information');
-        const result = await withTimeout(callOpenAIEnhanced(history), CHAT_EDGE_TIMEOUT_MS);
-        answer = result.text;
-        provider = 'openai';
-
-        // Auto-switch if model declined or hinted cutoff
-        if (!answer?.trim() || modelDeclined(answer)) {
-          console.log('🔄 Auto-switching to live search due to model decline');
-          try {
-            const altResult = await withTimeout(callPerplexityEnhanced(history), CHAT_EDGE_TIMEOUT_MS);
-            if (altResult.text?.trim()) {
-              answer = altResult.text;
-              provider = 'perplexity';
-              sources = altResult.sources;
-              routeReason = 'model-declined';
-            }
-          } catch (e) {
-            console.warn('⚠️ Auto-switch to live search failed:', (e as Error).message);
-          }
-        }
+        answer = await withTimeout(callClaudeSync(enrichedSystemPrompt, history.concat([{ role: 'user', content: message! }])), CHAT_EDGE_TIMEOUT_MS);
+        provider = 'claude';
       }
     } catch (e) {
-      // Fallback to static if live search fails
-      if (route === "live") {
-        console.warn('⚠️ Falling back from Perplexity to OpenAI (non-streaming) - response may contain outdated information');
-        console.log('🔄 Perplexity failure:', (e as Error).message);
-        routeReason = 'perplexity-fallback-failed';
-        try {
-          const result = await withTimeout(callOpenAIEnhanced(history), CHAT_EDGE_TIMEOUT_MS);
-          answer = `I couldn't reach live sources quickly. Here's background info instead:\n\n${result.text}`;
-          provider = 'openai';
-        } catch (fallbackError) {
-          console.log('❌ Both Perplexity and OpenAI fallback failed');
-          answer = "Sorry, I'm having trouble responding right now. Please try again in a moment.";
-          provider = 'error';
-          routeReason = 'all-providers-failed';
-        }
-      } else {
-        throw e;
+      // Fallback
+      try {
+        answer = await withTimeout(callOpenAI(enrichedSystemPrompt, message!, history), CHAT_EDGE_TIMEOUT_MS);
+        provider = 'openai-fallback';
+      } catch {
+        answer = "Sorry, I'm having trouble responding right now. Please try again in a moment.";
+        provider = 'error';
       }
-    }
-
-    const latencyMs = Date.now() - t0;
-    
-    console.log('✅ EDGE FUNCTION DEBUG - Response generated successfully:', {
-      responseLength: answer.length,
-      responsePreview: answer.substring(0, 100),
-      provider,
-      routeReason,
-      latencyMs,
-      hasSources: !!sources
-    });
-
-    console.log('📤 EDGE FUNCTION DEBUG - Sending response back to client');
-
-    // FIX 8: Cache successful static responses (single-turn only, non-streaming)
-    if (shouldCheckCache && queryHash && answer && provider === 'openai') {
-      cacheResponse(queryHash, message!, answer, 'gpt-4o-mini').catch(e => 
-        console.warn('[Cache] Failed to save:', e)
-      );
     }
 
     return new Response(JSON.stringify({ 
-      text: answer,                      // NEW canonical field
-      response: answer,                  // keep for legacy callers
+      text: answer,
+      response: answer,
       modeUsed: provider === 'perplexity' ? 'live' : 'static',
-      sources,
-      meta: { 
-        provider, 
-        routeReason, 
-        latencyMs, 
-        now: now.split('T')[0], // Just the date part
-        usage: {} // placeholder for token counts
-      }
+      meta: { provider, intents, consensusLevel }
     }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
   } catch (err: any) {
-    console.error('❌ EDGE FUNCTION DEBUG - Function error:', {
-      message: err.message,
-      stack: err.stack
-    });
+    console.error('Edge function error:', err.message);
     return new Response(JSON.stringify({
       error: String(err?.message || err),
       text: "I'm having trouble processing your request right now. Please try again in a moment.",
