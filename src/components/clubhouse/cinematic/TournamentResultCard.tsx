@@ -1,70 +1,37 @@
 /**
  * TournamentResultCard — Full-bleed feed card for synthetic tournament result posts.
- * Renders as the same dimensions as video posts in the Clubhouse vertical grid.
- * Glass card spec matches HeroCarousel A* spec.
+ * Glass card is a 100% pixel-identical match to HeroCarousel completed state.
  */
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
 import type { TournamentResultFeedPost, TournamentResultMeta, PodiumRow as PodiumRowType } from '@/components/media-system/types/media';
 import { CinematicActionRail } from './CinematicActionRail';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import '@/styles/hero-glass.css';
 
 // ─── Gradient fallback map ───
 const TOUR_GRADIENTS: Record<string, string> = {
   pga: 'from-blue-900 via-blue-800 to-slate-900',
-  liv: 'from-red-900 via-red-800 to-slate-900',
-  euro: 'from-green-900 via-green-800 to-slate-900',
+  liv: 'from-slate-900 via-green-900 to-slate-950',
+  euro: 'from-indigo-900 via-purple-900 to-slate-900',
   dpw: 'from-green-900 via-green-800 to-slate-900',
-  lpga: 'from-purple-900 via-purple-800 to-slate-900',
+  lpga: 'from-pink-900 via-rose-800 to-slate-900',
   kft: 'from-amber-900 via-amber-800 to-slate-900',
-  champ: 'from-slate-800 via-slate-700 to-slate-900',
+  champ: 'from-amber-900 via-yellow-800 to-amber-950',
 };
 
-// ─── Sub-components ───
-
-interface StatPillProps {
-  value: number | string;
-  label: string;
-  color?: string;
-  suffix?: string;
-}
-
-const StatPill: React.FC<StatPillProps> = ({ value, label, color, suffix }) => (
-  <div
-    style={{
-      background: 'rgba(255,255,255,0.10)',
-      border: '1px solid rgba(255,255,255,0.12)',
-      borderRadius: 8,
-      padding: '8px 6px',
-      textAlign: 'center',
-    }}
-  >
-    <p style={{ fontSize: 15, fontWeight: 700, color: color || '#FFFFFF', lineHeight: 1.2 }}>
-      {value}{suffix || ''}
-    </p>
-    <p style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.8, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', marginTop: 2 }}>
-      {label}
-    </p>
-  </div>
-);
-
-interface FrostedAvatarProps {
-  src: string | null | undefined;
-  displayName: string;
-  size: number;
-}
-
-const SILHOUETTE_URL = 'https://pub-f598829c702247c88b3281e7ee9e35ea.r2.dev/DP%20World%20Tour/Silhouette.webp';
-
-const FrostedAvatar: React.FC<FrostedAvatarProps> = ({ src, displayName, size }) => {
-  const [currentSrc, setCurrentSrc] = React.useState(src || null);
+// ─── Frosted Avatar — identical to TourHeroHelpers FrostedAvatar ───
+function FrostedAvatar({ src, displayName, size }: { src: string | null; displayName: string; size: number }) {
+  const [currentSrc, setCurrentSrc] = React.useState(src);
   const [imgError, setImgError] = React.useState(false);
   const [loaded, setLoaded] = React.useState(false);
   const initials = displayName.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() || '').slice(0, 2).join('') || '?';
 
   React.useEffect(() => {
-    setCurrentSrc(src || null);
+    setCurrentSrc(src);
     setImgError(false);
     setLoaded(false);
   }, [src]);
@@ -83,8 +50,8 @@ const FrostedAvatar: React.FC<FrostedAvatarProps> = ({ src, displayName, size })
           onLoad={() => setLoaded(true)}
           onError={() => {
             if (loaded) return;
-            if (currentSrc !== SILHOUETTE_URL) {
-              setCurrentSrc(SILHOUETTE_URL);
+            if (currentSrc !== PLAYER_SILHOUETTE_URL) {
+              setCurrentSrc(PLAYER_SILHOUETTE_URL);
             } else {
               setImgError(true);
             }
@@ -92,88 +59,170 @@ const FrostedAvatar: React.FC<FrostedAvatarProps> = ({ src, displayName, size })
           style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
         />
       ) : (
-        <span style={{ fontSize: Math.round(size * 0.35), fontWeight: 700, color: 'rgba(0,0,0,0.35)', lineHeight: 1 }}>{initials}</span>
+        <span style={{ fontSize: Math.round(size * 0.35), fontWeight: 700, color: 'rgba(255,255,255,0.65)', lineHeight: 1 }}>{initials}</span>
       )}
     </div>
   );
-};
-
-const WinnerAvatar: React.FC<{ photoUrl: string | null; name: string }> = ({ photoUrl, name }) => (
-  <FrostedAvatar src={photoUrl} displayName={name} size={48} />
-);
-
-interface PodiumRowItemProps {
-  row: PodiumRowType;
 }
 
-const PodiumRowItem: React.FC<PodiumRowItemProps> = ({ row }) => {
-  const displayName = row.isTied && row.players.length > 1
-    ? `${row.players.length}-way tie`
-    : row.players[0]?.name || '';
-
-  const visiblePlayers = row.players.slice(0, 3);
-  const overflow = row.players.length > 3 ? row.players.length - 3 : 0;
-
+// ─── StatChip — identical to TourHeroHelpers StatChip ───
+function StatChip({ value, label, suffix, color }: { value: string | number; label: string; suffix?: string; color?: string }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 0' }}>
-      {/* Position label */}
-      <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.5)', width: 24, textAlign: 'center', flexShrink: 0 }}>
-        {row.label}
-      </span>
-
-      {/* Stacked avatars */}
-      <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-        {visiblePlayers.map((player, i) => (
-          <div
-            key={i}
-            style={{
-              marginLeft: i > 0 ? -8 : 0,
-              zIndex: visiblePlayers.length - i,
-              position: 'relative',
-            }}
-          >
-            <FrostedAvatar
-              src={player.photoUrl}
-              displayName={player.name}
-              size={28}
-            />
-          </div>
-        ))}
-        {overflow > 0 && (
-          <div
-            style={{
-              marginLeft: -8,
-              width: 28,
-              height: 28,
-              borderRadius: '50%',
-              background: 'rgba(255,255,255,0.15)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 10,
-              fontWeight: 600,
-              color: 'rgba(255,255,255,0.7)',
-            }}
-          >
-            +{overflow}
-          </div>
+    <div style={{
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: 3,
+      padding: '8px 4px',
+      background: 'rgba(255,255,255,0.06)',
+      border: '1px solid rgba(255,255,255,0.08)',
+      borderRadius: 10,
+      minWidth: 0,
+    }}>
+      <span style={{
+        fontSize: 15,
+        fontWeight: 700,
+        color: color ?? '#FFFFFF',
+        fontFamily: "'JetBrains Mono','SF Mono',monospace",
+        lineHeight: 1,
+        whiteSpace: 'nowrap',
+      }}>
+        {value}{suffix && (
+          <span style={{ fontSize: 10, fontWeight: 500, opacity: 0.65 }}>{suffix}</span>
         )}
-      </div>
-
-      {/* Name */}
-      <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.85)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {displayName}
       </span>
-
-      {/* Score */}
-      <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.8)', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
-        {row.players[0]?.score || ''}
+      <span style={{
+        fontSize: 9,
+        fontWeight: 600,
+        color: 'rgba(255,255,255,0.45)',
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+        lineHeight: 1,
+        textAlign: 'center',
+      }}>
+        {label}
       </span>
     </div>
   );
-};
+}
 
+// ─── PodiumRunnerRow — identical to TourHeroHelpers PodiumRunnerRow ───
+function FeedPodiumRunnerRow({ row, tourSlug }: { row: PodiumRowType; tourSlug: string }) {
+  const isSingle = !row.isTied || row.players.length === 1;
+  const player = row.players[0];
+  const shownAvatars = row.players.slice(0, 5);
+  const moreCount = row.players.length - shownAvatars.length;
+
+  const resolvePhoto = (name: string, photoUrl?: string | null) => {
+    return photoUrl || getPlayerHeadshotUrl(name, tourSlug) || PLAYER_SILHOUETTE_URL;
+  };
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      {/* Position label */}
+      <span style={{
+        minWidth: 24,
+        fontSize: 12,
+        fontWeight: 600,
+        color: 'rgba(255,255,255,0.5)',
+        textAlign: 'center',
+        flexShrink: 0,
+      }}>
+        {row.isTied ? `T${row.position}` : row.position}
+      </span>
+
+      {/* Avatar section */}
+      {isSingle ? (
+        <FrostedAvatar
+          src={resolvePhoto(player.name, player.photoUrl)}
+          displayName={player.name}
+          size={30}
+        />
+      ) : (
+        <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+          {shownAvatars.map((p, i) => (
+            <div
+              key={i}
+              style={{
+                marginLeft: i === 0 ? 0 : -8,
+                position: 'relative',
+                zIndex: shownAvatars.length - i,
+                flexShrink: 0,
+              }}
+            >
+              <FrostedAvatar
+                src={resolvePhoto(p.name, p.photoUrl)}
+                displayName={p.name}
+                size={26}
+              />
+            </div>
+          ))}
+          {moreCount > 0 && (
+            <div style={{
+              marginLeft: -6,
+              zIndex: 1,
+              width: 22,
+              height: 22,
+              borderRadius: '34%',
+              background: '#F8FAFC',
+              border: '1.5px solid #F8FAFC',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 9,
+              fontWeight: 600,
+              color: '#64748B',
+              flexShrink: 0,
+            }}>
+              +{moreCount}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Name — only for single-player rows */}
+      {isSingle ? (
+        <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.85)', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {player.name}
+        </span>
+      ) : (
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.35)' }}>
+            {row.players.length}-way tie
+          </span>
+        </div>
+      )}
+
+      {/* Score */}
+      <span style={{
+        fontFamily: "'JetBrains Mono', 'SF Mono', monospace",
+        fontSize: isSingle ? 14 : 13,
+        fontWeight: isSingle ? 700 : 600,
+        color: '#FFFFFF',
+        flexShrink: 0,
+      }}>
+        {player.score || 'E'}
+      </span>
+    </div>
+  );
+}
+
+// ─── Tour label helper ───
+function getTourLabel(slug: string): string {
+  const map: Record<string, string> = {
+    pga: 'PGA TOUR',
+    liv: 'LIV GOLF',
+    euro: 'DP WORLD',
+    dpw: 'DP WORLD',
+    lpga: 'LPGA',
+    champ: 'CHAMPIONS',
+    kft: 'KORN FERRY',
+  };
+  return map[slug] || slug.toUpperCase();
+}
+
+// ─── TournamentCreatorCapsule ───
 interface TournamentCreatorCapsuleProps {
   isVisible: boolean;
 }
@@ -194,27 +243,15 @@ const TournamentCreatorCapsule: React.FC<TournamentCreatorCapsuleProps> = ({ isV
       gap: 10,
     }}
   >
-    {/* Logo circle — orange spiral logomark */}
-    <div
-      style={{
-        width: 32,
-        height: 32,
-        borderRadius: '50%',
-        background: 'rgba(0, 0, 0, 0.35)',
-        border: '1px solid rgba(255, 255, 255, 0.15)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        overflow: 'hidden',
-      }}
-    >
-      <img
-        src="/assets/logomark-orange.png"
-        alt="clbhouz"
-        style={{ width: 28, height: 28, objectFit: 'contain' }}
-      />
+    <div style={{
+      width: 32, height: 32, borderRadius: '50%',
+      background: 'rgba(0, 0, 0, 0.35)',
+      border: '1px solid rgba(255, 255, 255, 0.15)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      overflow: 'hidden',
+    }}>
+      <img src="/assets/logomark-orange.png" alt="clbhouz" style={{ width: 28, height: 28, objectFit: 'contain' }} />
     </div>
-    {/* Text */}
     <div>
       <p style={{ fontSize: 14, fontWeight: 600, color: '#FFFFFF', lineHeight: 1.2 }}>clbhouz</p>
       <p style={{ fontSize: 12, fontWeight: 400, color: 'rgba(255,255,255,0.6)', lineHeight: 1.2, marginTop: 1 }}>
@@ -223,6 +260,13 @@ const TournamentCreatorCapsule: React.FC<TournamentCreatorCapsuleProps> = ({ isV
     </div>
   </motion.div>
 );
+
+// ─── Score colors (matching hero) ───
+const SCORE_COLORS = {
+  eagle: { text: '#F59E0B' },
+  birdie: { text: '#22C55E' },
+  bogey: { text: '#EF4444' },
+};
 
 // ─── Main component ───
 
@@ -255,16 +299,13 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
   const hasVenue = !!(meta.venue_name || meta.venue_city);
   const hasPodium = meta.podium_rows && meta.podium_rows.length > 0;
 
-  // Dynamic grid columns for stats
-  const scoreGridCols = meta.stat_eagles > 0 ? 4 : 3;
-
   // Performance stat items
   const perfItems = useMemo(() => {
     const items: { value: string; label: string; suffix?: string }[] = [];
-    if (meta.stat_driving_distance) items.push({ value: String(meta.stat_driving_distance), label: 'DRIVER', suffix: ' yds' });
-    if (meta.stat_fairways_pct) items.push({ value: String(Math.round(meta.stat_fairways_pct)), label: 'FAIRWAYS', suffix: '%' });
+    if (meta.stat_driving_distance) items.push({ value: String(meta.stat_driving_distance), label: 'Driver', suffix: 'yds' });
+    if (meta.stat_fairways_pct) items.push({ value: String(Math.round(meta.stat_fairways_pct)), label: 'Fairways', suffix: '%' });
     if (meta.stat_gir_pct) items.push({ value: String(Math.round(meta.stat_gir_pct)), label: 'GIR', suffix: '%' });
-    if (meta.stat_putts) items.push({ value: meta.stat_putts.toFixed(2), label: 'PUTTS' });
+    if (meta.stat_putts) items.push({ value: meta.stat_putts.toFixed(2), label: 'Putts' });
     return items;
   }, [meta]);
 
@@ -277,26 +318,15 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
   };
 
   return (
-    <div
-      style={{
-        position: 'relative',
-        width: '100%',
-        height: '100%',
-        background: '#000000',
-        overflow: 'hidden',
-      }}
-    >
+    <div style={{ position: 'relative', width: '100%', height: '100%', background: '#000000', overflow: 'hidden' }}>
       {/* 1. Course background image with Ken Burns */}
       <motion.div
         className="absolute inset-0 w-full h-full"
         initial={{ scale: 1.03, opacity: 0 }}
-        animate={{
-          scale: isActive ? 1 : 1.03,
-          opacity: isActive ? 1 : 0,
-        }}
+        animate={{ scale: isActive ? 1 : 1.03, opacity: isActive ? 1 : 0 }}
         transition={{
           opacity: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
-          scale: { duration: 8, ease: 'easeOut' },
+          scale: { duration: 5, ease: 'linear' },
         }}
       >
         {hasImage ? (
@@ -330,104 +360,159 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         }}
       />
 
-      {/* 3. Glass card — bottom anchored */}
+      {/* 3. Glass card — EXACT match to HeroCarousel completed state */}
       <div
         style={{
           position: 'absolute',
-          bottom: 'calc(env(safe-area-inset-bottom, 0px) + 90px)',
+          bottom: 20,
           left: 16,
-          right: 72,
-          background: 'rgba(0, 0, 0, 0.45)',
-          backdropFilter: 'blur(24px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+          maxWidth: 'min(350px, calc(100% - 32px))',
+          minWidth: '280px',
+          borderRadius: 12,
+          background: 'rgba(0, 0, 0, 0.35)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
+          padding: '20px 20px 14px 20px',
           border: '1px solid rgba(255, 255, 255, 0.10)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.35)',
-          borderRadius: 16,
-          padding: '20px 20px 16px 20px',
+          overflow: 'hidden',
           zIndex: 10,
-          overflowY: 'auto',
-          maxHeight: 'calc(100vh - env(safe-area-inset-bottom, 0px) - 200px)',
+          pointerEvents: 'auto' as const,
         }}
       >
-        {/* Row 1: Tour badge + View Results */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <div className="tour-badge">
-            <span>{meta.tour_name}</span>
-          </div>
-          <button
-            onClick={handleViewResults}
-            style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.85)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-          >
-            View Results →
-          </button>
-        </div>
+        {/* Row 1: Tournament name (same as hero completed — name is first) */}
+        <Link to={`/tourhub/tournament/${meta.tournament_id}`} className="block active:opacity-70 transition-opacity">
+          <h2 className="hero-tournament-name">{meta.tournament_name}</h2>
+        </Link>
 
-        {/* Row 2: Tournament name */}
-        <p className="hero-tournament-name" style={{ marginBottom: 2 }}>
-          {meta.tournament_name}
-        </p>
-
-        {/* Row 3: Venue — only if data exists */}
+        {/* Row 2: Venue */}
         {hasVenue && (
-          <p className="hero-venue" style={{ marginBottom: 16 }}>
+          <p className="hero-venue">
             {[meta.venue_name, meta.venue_city].filter(Boolean).join(' · ')}
           </p>
         )}
 
-        {/* Row 4: Winner */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, marginTop: hasVenue ? 0 : 16 }}>
-          <WinnerAvatar photoUrl={meta.winner_photo_url} name={meta.winner_name} />
-          <div>
-            <p style={{ fontSize: 17, fontWeight: 700, color: '#FFFFFF', letterSpacing: -0.3, lineHeight: 1.2 }}>
-              {meta.winner_name} {meta.winner_score_display}
-            </p>
-            {meta.winner_by && (
-              <p style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.65)', marginTop: 2 }}>
-                {meta.winner_by}
-              </p>
-            )}
+        {/* Row 3: Winner — 60px avatar, name + score on same line */}
+        <div style={{ marginTop: 14, minHeight: 52 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ flexShrink: 0 }}>
+              <FrostedAvatar
+                src={meta.winner_photo_url || getPlayerHeadshotUrl(meta.winner_name, meta.tour_slug) || PLAYER_SILHOUETTE_URL}
+                displayName={meta.winner_name}
+                size={60}
+              />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' }}>
+                <span style={{ fontSize: 17, fontWeight: 700, color: '#FFFFFF' }}>
+                  {meta.winner_name}
+                </span>
+                {meta.winner_score_display && (
+                  <span style={{ fontFamily: "'JetBrains Mono','SF Mono',monospace", fontSize: 17, fontWeight: 700, color: '#FFFFFF', flexShrink: 0 }}>
+                    {meta.winner_score_display}
+                  </span>
+                )}
+              </div>
+              {meta.winner_by && (
+                <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.50)', marginTop: 2, display: 'block' }}>
+                  {meta.winner_by}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Row 5: Tournament stats — hidden when all zeros */}
+        {/* Row 4: Tournament stats — using StatChip (matching hero WinnerStatsPanel) */}
         {hasScoreStats && (
           <>
-            <p style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: 1.2, textTransform: 'uppercase', marginBottom: 8 }}>
-              TOURNAMENT
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${scoreGridCols}, 1fr)`, gap: 6, marginBottom: 14 }}>
+            <div style={{
+              fontSize: 9,
+              fontWeight: 700,
+              letterSpacing: 1.5,
+              textTransform: 'uppercase' as const,
+              color: 'rgba(255,255,255,0.25)',
+              marginTop: 12,
+              marginBottom: 6,
+            }}>
+              Tournament
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
               {meta.stat_eagles > 0 && (
-                <StatPill value={meta.stat_eagles} label="EAGLES" color="#F59E0B" />
+                <StatChip
+                  value={meta.stat_eagles}
+                  label={meta.stat_eagles === 1 ? 'Eagle' : 'Eagles'}
+                  color={SCORE_COLORS.eagle.text}
+                />
               )}
-              <StatPill value={meta.stat_birdies} label="BIRDIES" color="#22C55E" />
-              <StatPill value={meta.stat_pars} label="PARS" color="rgba(255,255,255,0.9)" />
-              <StatPill value={meta.stat_bogeys} label="BOGEYS" color="#EF4444" />
+              <StatChip
+                value={meta.stat_birdies}
+                label="Birdies"
+                color={SCORE_COLORS.birdie.text}
+              />
+              <StatChip value={meta.stat_pars} label="Pars" />
+              {meta.stat_bogeys > 0 && (
+                <StatChip
+                  value={meta.stat_bogeys}
+                  label="Bogeys"
+                  color={SCORE_COLORS.bogey.text}
+                />
+              )}
             </div>
           </>
         )}
 
-        {/* Row 6: Performance averages — hidden when all null */}
+        {/* Row 5: Performance averages — using StatChip */}
         {hasPerfStats && perfItems.length > 0 && (
           <>
-            <p style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: 1.2, textTransform: 'uppercase', marginBottom: 8 }}>
-              PERFORMANCE AVERAGES
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${perfItems.length}, 1fr)`, gap: 6, marginBottom: 14 }}>
+            <div style={{
+              fontSize: 9,
+              fontWeight: 700,
+              letterSpacing: 1.5,
+              textTransform: 'uppercase' as const,
+              color: 'rgba(255,255,255,0.25)',
+              marginTop: hasScoreStats ? 10 : 12,
+              marginBottom: 6,
+            }}>
+              Performance Averages
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
               {perfItems.map((item) => (
-                <StatPill key={item.label} value={item.value} label={item.label} suffix={item.suffix} />
+                <StatChip key={item.label} value={item.value} label={item.label} suffix={item.suffix} />
               ))}
             </div>
           </>
         )}
 
-        {/* Row 7: Podium rows — hidden when empty */}
+        {/* Row 6: Podium rows — matching hero PodiumRunnerRow style */}
         {hasPodium && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div style={{
+            marginTop: 10,
+            paddingTop: 10,
+            borderTop: '1px solid rgba(255,255,255,0.06)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6,
+          }}>
             {meta.podium_rows.slice(0, 2).map((row) => (
-              <PodiumRowItem key={row.position} row={row} />
+              <FeedPodiumRunnerRow key={row.position} row={row} tourSlug={meta.tour_slug} />
             ))}
           </div>
         )}
+
+        {/* Row 7: Footer — tour badge left, View Results right (matching hero) */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
+          <div className="tour-badge">
+            <span>{getTourLabel(meta.tour_slug)}</span>
+          </div>
+          <button
+            onClick={handleViewResults}
+            className="hero-text-cta"
+            style={{ fontSize: 13, textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+          >
+            <span>View Results</span>
+            <ChevronRight className="w-4 h-4 cta-chevron" style={{ color: 'rgba(255,255,255,0.5)' }} />
+          </button>
+        </div>
       </div>
 
       {/* 4. CinematicActionRail — right side */}
@@ -447,9 +532,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
       />
 
       {/* 5. TournamentCreatorCapsule — bottom left */}
-      <TournamentCreatorCapsule
-        isVisible={isVisible}
-      />
+      <TournamentCreatorCapsule isVisible={isVisible} />
     </div>
   );
 };
