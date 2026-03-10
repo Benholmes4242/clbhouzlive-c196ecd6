@@ -112,7 +112,10 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
           }));
 
         if (notifications.length > 0) {
-          await supabase.from('notifications').insert(notifications);
+          const { error: notifError } = await supabase.from('notifications').insert(notifications);
+          if (notifError) {
+            AppLog.error('RequestAccessModal', 'Failed to insert notifications:', notifError);
+          }
         }
       }
 
