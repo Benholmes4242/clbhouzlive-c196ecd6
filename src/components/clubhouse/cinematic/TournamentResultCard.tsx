@@ -339,37 +339,30 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             </div>
           </div>
 
-          {/* ── Stats horizontal scroll ── */}
-          {showStats && (
-            <div style={{ padding: '12px 16px 0' }}>
-              <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 8 }}>
-                Tournament Stats
-              </div>
-              <div style={{
-                display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 12,
-                scrollbarWidth: 'none', msOverflowStyle: 'none',
-              }} className="[&::-webkit-scrollbar]:hidden">
-                {/* Score stat chips */}
-                {meta.stat_eagles > 0 && (
-                  <StatGlowChip value={meta.stat_eagles} label={meta.stat_eagles === 1 ? 'Eagle' : 'Eagles'} {...STAT_COLORS.eagles} />
-                )}
-                {meta.stat_birdies > 0 && (
-                  <StatGlowChip value={meta.stat_birdies} label="Birdies" {...STAT_COLORS.birdies} />
-                )}
-                {meta.stat_pars > 0 && (
-                  <StatGlowChip value={meta.stat_pars} label="Pars" {...STAT_COLORS.pars} />
-                )}
-                {meta.stat_bogeys > 0 && (
-                  <StatGlowChip value={meta.stat_bogeys} label="Bogeys" {...STAT_COLORS.bogeys} />
-                )}
-
-                {/* Performance stat chips */}
-                {perfItems.map(item => (
-                  <PerfChip key={item.label} value={item.value} label={item.label} suffix={item.suffix} />
-                ))}
-              </div>
+          {/* ── Stats 2×4 grid ── */}
+          <div style={{ padding: '12px 16px 0' }}>
+            <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 8 }}>
+              Tournament Stats
             </div>
-          )}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: 8,
+              paddingBottom: 12,
+            }}>
+              {/* Row 1 — tournament stats (always show, dim if 0) */}
+              <StatGlowChip value={meta.stat_eagles} label={meta.stat_eagles === 1 ? 'Eagle' : 'Eagles'} {...STAT_COLORS.eagles} dimmed={meta.stat_eagles === 0} />
+              <StatGlowChip value={meta.stat_birdies} label="Birdies" {...STAT_COLORS.birdies} dimmed={meta.stat_birdies === 0} />
+              <StatGlowChip value={meta.stat_pars} label="Pars" {...STAT_COLORS.pars} dimmed={meta.stat_pars === 0} />
+              <StatGlowChip value={meta.stat_bogeys} label="Bogeys" {...STAT_COLORS.bogeys} dimmed={meta.stat_bogeys === 0} />
+
+              {/* Row 2 — performance stats (placeholder if null) */}
+              <PerfChip value={meta.stat_driving_distance != null ? String(meta.stat_driving_distance) : null} label="DRIVER" suffix="yds" />
+              <PerfChip value={meta.stat_fairways_pct != null ? String(Math.round(meta.stat_fairways_pct)) : null} label="FAIRWAYS" suffix="%" />
+              <PerfChip value={meta.stat_gir_pct != null ? String(Math.round(meta.stat_gir_pct)) : null} label="GIR" suffix="%" />
+              <PerfChip value={meta.stat_putts != null ? meta.stat_putts.toFixed(2) : null} label="PUTTS" suffix="" />
+            </div>
+          </div>
 
           {/* ── Leaderboard rows ── */}
           {hasPodium && (
