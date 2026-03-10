@@ -35,7 +35,8 @@ import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
 import { useMediaStore } from '@/components/media-system/store/mediaStore';
 import { MediaErrorBoundary } from '@/components/media-system/MediaErrorBoundary';
 import { useVideoAnalytics } from '@/components/media-system/hooks/useVideoAnalytics';
-import type { FeedPost } from '@/components/media-system/types/media';
+import type { FeedPost, TournamentResultFeedPost } from '@/components/media-system/types/media';
+import { TournamentResultCard } from '@/components/clubhouse/cinematic/TournamentResultCard';
 
 // ── Clubhouse UI overlays ──
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
