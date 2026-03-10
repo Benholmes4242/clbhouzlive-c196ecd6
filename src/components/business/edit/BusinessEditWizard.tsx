@@ -115,71 +115,71 @@ export default function BusinessEditWizard() {
     if (!business) return;
     if (hasInitialized.current) return;
     hasInitialized.current = true;
-      const newFormData = {
-        businessName: business.name || '',
-        businessCategory: business.category || '',
-        businessBio: business.description || '',
-        businessWebsite: business.website || '',
-        businessContactEmail: business.email || '',
+
+    const newFormData = {
+      businessName: business.name || '',
+      businessCategory: business.category || '',
+      businessBio: business.description || '',
+      businessWebsite: business.website || '',
+      businessContactEmail: business.email || '',
+    };
+    setFormData(newFormData);
+
+    let newAddress: AddressValue | null = null;
+    if (business.address_label || business.location) {
+      newAddress = {
+        label: business.address_label || business.location || '',
+        addressLine1: business.address_line1 || undefined,
+        addressLine2: business.address_line2 || undefined,
+        city: business.city || undefined,
+        region: business.region || undefined,
+        postcode: business.postcode || undefined,
+        country: business.country || undefined,
+        countryCode: business.country || undefined,
+        lat: business.lat || undefined,
+        lng: business.lng || undefined,
+        mapboxPlaceId: business.mapbox_place_id || undefined,
+        precision: business.location_precision || 'city',
       };
-      setFormData(newFormData);
-
-      let newAddress: AddressValue | null = null;
-      if (business.address_label || business.location) {
-        newAddress = {
-          label: business.address_label || business.location || '',
-          addressLine1: business.address_line1 || undefined,
-          addressLine2: business.address_line2 || undefined,
-          city: business.city || undefined,
-          region: business.region || undefined,
-          postcode: business.postcode || undefined,
-          country: business.country || undefined,
-          countryCode: business.country || undefined,
-          lat: business.lat || undefined,
-          lng: business.lng || undefined,
-          mapboxPlaceId: business.mapbox_place_id || undefined,
-          precision: business.location_precision || 'city',
-        };
-        setAddress(newAddress);
-      }
-
-      let newCountrySelection: string | null = null;
-      if (business.country) {
-        const countryNameMap: Record<string, string> = {
-          'United Kingdom': 'England',
-          'UK': 'England',
-          'GB': 'England',
-          'Ireland': 'Ireland',
-          'IE': 'Ireland',
-          'United States': 'United States',
-          'US': 'United States',
-          'USA': 'United States',
-          'Canada': 'Canada',
-          'CA': 'Canada',
-          'Australia': 'Australia',
-          'AU': 'Australia',
-        };
-        newCountrySelection = countryNameMap[business.country] || business.country;
-      }
-      setCountrySelection(newCountrySelection);
-
-      let newPhone: PhoneValue | null = null;
-      if (business.phone) {
-        newPhone = {
-          dialCode: '',
-          localNumber: business.phone.replace(/^\+\d+\s*/, ''),
-          fullNumber: business.phone,
-        };
-        setPhone(newPhone);
-      }
-
-      setInitialValues({
-        formData: newFormData,
-        address: newAddress,
-        countrySelection: newCountrySelection,
-        phone: newPhone,
-      });
+      setAddress(newAddress);
     }
+
+    let newCountrySelection: string | null = null;
+    if (business.country) {
+      const countryNameMap: Record<string, string> = {
+        'United Kingdom': 'England',
+        'UK': 'England',
+        'GB': 'England',
+        'Ireland': 'Ireland',
+        'IE': 'Ireland',
+        'United States': 'United States',
+        'US': 'United States',
+        'USA': 'United States',
+        'Canada': 'Canada',
+        'CA': 'Canada',
+        'Australia': 'Australia',
+        'AU': 'Australia',
+      };
+      newCountrySelection = countryNameMap[business.country] || business.country;
+    }
+    setCountrySelection(newCountrySelection);
+
+    let newPhone: PhoneValue | null = null;
+    if (business.phone) {
+      newPhone = {
+        dialCode: '',
+        localNumber: business.phone.replace(/^\+\d+\s*/, ''),
+        fullNumber: business.phone,
+      };
+      setPhone(newPhone);
+    }
+
+    setInitialValues({
+      formData: newFormData,
+      address: newAddress,
+      countrySelection: newCountrySelection,
+      phone: newPhone,
+    });
   }, [business]);
 
   // Auth redirect
