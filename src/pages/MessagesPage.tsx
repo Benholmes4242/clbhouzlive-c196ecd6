@@ -256,9 +256,9 @@ function MessagesPageInner() {
           />
         )}
         
-        <div className="flex flex-1 rounded-[20px] overflow-hidden" style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.45)', boxShadow: '0 2px 16px rgba(0,0,0,0.03)' }}>
-          <div className="w-80 flex-shrink-0 flex flex-col" style={{ borderRight: '1px solid rgba(255,255,255,0.3)' }}>
-            <div className="p-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.3)' }}>
+        <div className="flex flex-1 rounded-[20px] overflow-hidden border border-border" style={{ background: 'hsl(var(--background) / 0.8)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}>
+          <div className="w-80 flex-shrink-0 flex flex-col border-r border-border">
+            <div className="p-4 border-b border-border">
               <ConversationSearchBar
                 value={searchInput}
                 onChange={handleSearchChange}
