@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, Plus, Users, Crown, MoreHorizontal, Trash2 } from 'lucide-react';
+import { ChevronLeft, Plus, Users, MoreHorizontal, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
