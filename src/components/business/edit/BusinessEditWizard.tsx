@@ -160,7 +160,7 @@ export default function BusinessEditWizard() {
       let newPhone: PhoneValue | null = null;
       if (business.phone) {
         newPhone = {
-          dialCode: '+44',
+          dialCode: '',
           localNumber: business.phone.replace(/^\+\d+\s*/, ''),
           fullNumber: business.phone,
         };
