@@ -41,7 +41,7 @@ const BusinessVerificationStatusPage = () => {
   });
 
   // Fetch latest verification request
-  const { data: request, isLoading: isLoadingRequest } = useQuery({
+  const { data: request, isLoading: isLoadingRequest, error: requestError } = useQuery({
     queryKey: ['business-verification-request-status', id],
     enabled: !!id && !!user,
     queryFn: async () => {
