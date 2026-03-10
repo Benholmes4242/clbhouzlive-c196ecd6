@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, BarChart3, Star, MessageCircle } from 'lucide-react';
+import { ChevronLeft, BarChart3, Star, MessageCircle } from 'lucide-react';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessMembership } from '@/hooks/useBusinessMembership';
 import { useBusinessReviewStats } from '@/hooks/useBusinessReviewStats';
@@ -31,8 +31,9 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
     return (
       <section className="bg-card border border-border rounded-[18px] p-4 md:p-5">
         <h3 className="text-[0.9rem] font-medium text-foreground mb-4">Reviews & reputation</h3>
-        <div className="flex items-center justify-center h-32">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+        <div className="space-y-3 px-4">
+          <div className="h-20 bg-muted animate-pulse rounded-2xl" />
+          <div className="h-20 bg-muted animate-pulse rounded-2xl" />
         </div>
       </section>
     );
@@ -69,14 +70,14 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
             <div className="mt-2 flex items-center gap-1 justify-center md:justify-start">
               <span className={cn(
                 "text-xs font-medium",
-                reviewStats.reviewTrend >= 0 ? "text-emerald-600" : "text-red-500"
+                reviewStats.reviewTrend >= 0 ? "text-primary" : "text-destructive"
               )}>
                 {reviewStats.recentReviews} new this month
               </span>
               {reviewStats.reviewTrend !== 0 && (
                 <span className={cn(
                   "text-xs",
-                  reviewStats.reviewTrend > 0 ? "text-emerald-600" : "text-red-500"
+                  reviewStats.reviewTrend > 0 ? "text-primary" : "text-destructive"
                 )}>
                   ({reviewStats.reviewTrend > 0 ? '+' : ''}{reviewStats.reviewTrend}%)
                 </span>
@@ -92,8 +93,8 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
               <span className="text-xs text-muted-foreground w-5 text-right">{item.score}</span>
               <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                 <div
-                  className="h-full rounded-full transition-all"
-                  style={{ width: `${(item.count / maxCount) * 100}%`, backgroundColor: '#f59e0b' }}
+                  className="h-full rounded-full transition-all bg-primary"
+                  style={{ width: `${(item.count / maxCount) * 100}%` }}
                 />
               </div>
               <span className="text-xs text-muted-foreground w-6 text-right">{item.count}</span>
@@ -120,7 +121,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
       {/* Action prompts */}
       <div className="flex flex-col sm:flex-row gap-2">
         {reviewStats.unrespondedCount > 0 && (
-          <div className="flex items-center gap-2 text-xs" style={{ color: '#f59e0b' }}>
+          <div className="flex items-center gap-2 text-xs text-primary">
             <MessageCircle className="h-3.5 w-3.5" />
             <span>{reviewStats.unrespondedCount} review{reviewStats.unrespondedCount !== 1 ? 's' : ''} awaiting your response</span>
           </div>
@@ -145,7 +146,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
                 </p>
               </div>
               <div className="flex items-center gap-1 flex-shrink-0">
-                <Star className="h-3 w-3" style={{ color: '#f59e0b', fill: '#f59e0b' }} />
+                <Star className="h-3 w-3 text-primary fill-primary" />
                 <span className="text-sm font-medium text-foreground">{course.avgRating}</span>
               </div>
             </button>
@@ -157,8 +158,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
       {reviewStats.courses.length > 0 && (
         <button
           onClick={() => navigate(`/courses/${reviewStats.courses[0].id}?tab=reviews`)}
-          className="text-[0.8rem] hover:underline"
-          style={{ color: '#f59e0b' }}
+          className="text-[0.8rem] hover:underline text-primary"
         >
           View all reviews ›
         </button>
@@ -196,8 +196,10 @@ const BusinessInsightsPageV2 = () => {
   if (isLoading || !membershipFetched) {
     return (
       <PageRoot className="min-h-screen bg-background">
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        <div className="space-y-4 px-4 pt-4">
+          <div className="h-32 bg-muted animate-pulse rounded-2xl" />
+          <div className="h-24 bg-muted animate-pulse rounded-2xl" />
+          <div className="h-24 bg-muted animate-pulse rounded-2xl" />
         </div>
       </PageRoot>
     );
@@ -235,41 +237,36 @@ const BusinessInsightsPageV2 = () => {
   return (
     <PageRoot className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-md border-b border-border">
-        <div className="max-w-[1024px] mx-auto px-4 md:px-6 py-4">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
+        <div className="flex items-center px-4 h-14">
+          <button
+            onClick={() => navigate(-1)}
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-muted-foreground active:text-foreground transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <div className="flex-1 text-center">
+            <h1 className="text-[16px] font-semibold text-foreground">Insights</h1>
+          </div>
+          <div className="w-11" />
+        </div>
+        {/* Date range selector */}
+        <div className="flex justify-center pb-3">
+          <div className="inline-flex rounded-full border border-border bg-muted p-1">
+            {(['7d', '28d', '90d'] as DateRange[]).map((range) => (
               <button
-                onClick={() => navigate(`/business/${id}`)}
-                className="p-2 -ml-2 hover:bg-muted rounded-[10px] transition-colors active:scale-[0.97]"
+                key={range}
+                onClick={() => setDateRange(range)}
+                className={cn(
+                  "px-3 md:px-4 py-1.5 text-[0.8rem] rounded-full transition-colors",
+                  dateRange === range 
+                    ? "bg-primary text-primary-foreground font-medium" 
+                    : "text-muted-foreground hover:text-foreground"
+                )}
               >
-                <ArrowLeft className="h-5 w-5 text-muted-foreground" />
+                {rangeLabels[range]}
               </button>
-              <div className="min-w-0">
-                <h1 className="text-xl font-semibold text-foreground">Insights</h1>
-                <p className="text-[0.8rem] text-muted-foreground truncate">
-                  {business.name} {business.location && `· ${business.location.split(',')[0]}`}
-                </p>
-              </div>
-            </div>
-
-            {/* Date range selector */}
-            <div className="inline-flex rounded-full border border-border bg-muted p-1">
-              {(['7d', '28d', '90d'] as DateRange[]).map((range) => (
-                <button
-                  key={range}
-                  onClick={() => setDateRange(range)}
-                  className={cn(
-                    "px-3 md:px-4 py-1.5 text-[0.8rem] rounded-full transition-colors",
-                    dateRange === range 
-                      ? "bg-primary text-primary-foreground font-medium" 
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  {rangeLabels[range]}
-                </button>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
       </div>
