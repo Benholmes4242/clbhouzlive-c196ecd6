@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { AppLog } from '@/lib/logger';
 
 /**
  * Hook to get the count of pending access requests for a business.
