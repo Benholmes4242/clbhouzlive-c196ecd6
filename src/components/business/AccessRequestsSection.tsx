@@ -112,7 +112,6 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
     // Prevent double-click
     if (loadingId) return;
     
-    const requesterName = request.requester.display_name || request.requester.username || 'A user';
     setLoadingId(request.id);
     
     // Ticket B: Close dialog FIRST, then wait for animation before proceeding
