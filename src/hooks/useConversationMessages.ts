@@ -174,7 +174,7 @@ export function useConversationMessages(conversationId: string | null): UseConve
       
       return data as string;
     } catch (err) {
-      console.error('[useConversationMessages] Error sending:', err);
+      AppLog.error('[useConversationMessages]', 'Error sending:', err);
       setError(err instanceof Error ? err : new Error('Failed to send message'));
       return null;
     }
