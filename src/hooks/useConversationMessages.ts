@@ -225,7 +225,7 @@ export function useConversationMessages(conversationId: string | null): UseConve
 
       return true;
     } catch (err) {
-      console.error('[useConversationMessages] Error deleting:', err);
+      AppLog.error('[useConversationMessages]', 'Error deleting:', err);
       return false;
     }
   }, [user]);
