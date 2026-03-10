@@ -55,7 +55,11 @@ export default function BusinessTeamPage() {
 
   const handleRemoveMember = async () => {
     if (!removeConfirm.member) return;
-    await removeMember.mutateAsync(removeConfirm.member.user_profile_id);
+    try {
+      await removeMember.mutateAsync(removeConfirm.member.user_profile_id);
+    } catch {
+      toast.error('Failed to remove member');
+    }
     setRemoveConfirm({ open: false, member: null });
   };
 
