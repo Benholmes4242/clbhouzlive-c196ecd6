@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-function average(items: any[], key: string): number | null {
+function average(items: Record<string, number | null>[], key: string): number | null {
   const valid = items.filter(r => r[key] != null);
   if (!valid.length) return null;
   return Math.round((valid.reduce((sum, r) => sum + r[key], 0) / valid.length) * 10) / 10;
