@@ -174,7 +174,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             .single();
 
           if (convError || !convData) {
-            console.error('[ChatView] Error fetching conversation:', convError);
+            AppLog.error('[ChatView]', 'Error fetching conversation:', convError);
             return;
           }
 
