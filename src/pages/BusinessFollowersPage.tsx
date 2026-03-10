@@ -4,7 +4,7 @@ import { useBusinessProfile } from '@/hooks/useBusinessProfile';
 import { useBusinessFollowersCount } from '@/hooks/useBusinessFollow';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, ChevronLeft } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
@@ -39,12 +39,12 @@ export default function BusinessFollowersPage() {
             is_verified_golfer
           )
         `)
-        .eq('business_id', business!.id)
+        .eq('business_id', business?.id ?? '')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       return (data || [])
-        .map((row: any) => row.follower as FollowerProfile)
+        .map((row: { id: string; follower: FollowerProfile | null }) => row.follower as FollowerProfile)
         .filter(Boolean);
     },
     staleTime: 60_000,
@@ -55,25 +55,30 @@ export default function BusinessFollowersPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-30 bg-background border-b border-border">
-        <div className="flex items-center gap-3 px-4 min-h-[56px]">
+      <div
+        className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border"
+        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+      >
+        <div className="flex items-center px-4 h-14">
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center active:opacity-70 transition-opacity"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-muted-foreground active:text-foreground transition-colors"
             aria-label="Back"
           >
-            <ChevronLeft className="h-5 w-5 text-foreground" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-semibold text-foreground truncate">
-              Followers
-              <span className="text-muted-foreground font-normal ml-1.5">{followersCount}</span>
+          <div className="flex-1 text-center">
+            <h1 className="text-[16px] font-semibold text-foreground">
+              Followers {followersCount > 0 && (
+                <span className="font-normal text-muted-foreground">{followersCount}</span>
+              )}
             </h1>
             {business?.name && (
-              <p className="text-sm text-muted-foreground truncate">{business.name}</p>
+              <p className="text-[12px] text-muted-foreground leading-none mt-0.5">{business.name}</p>
             )}
           </div>
+          <div className="w-11" />
         </div>
       </div>
 
