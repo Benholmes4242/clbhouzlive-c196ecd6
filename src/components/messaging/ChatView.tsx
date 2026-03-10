@@ -95,15 +95,7 @@ function ChatSkeleton() {
 function DateSeparator({ date }: { date: string }) {
   return (
     <div className="flex justify-center py-5">
-      <span 
-        className="px-[14px] py-[8px] rounded-full text-[11px] font-medium"
-        style={{
-          background: 'rgba(254,243,199,0.6)',
-          border: '1px solid rgba(217,119,6,0.12)',
-          color: '#B45309',
-          fontFamily: "'DM Sans', sans-serif",
-        }}
-      >
+      <span className="px-3 py-1 rounded-full bg-muted border border-border/40 text-muted-foreground text-[11px] font-medium tracking-wide font-dm-sans">
         {formatDateHeader(date)}
       </span>
     </div>
