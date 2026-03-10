@@ -78,13 +78,18 @@ export const uploadToR2Only = async (
 };
 
 // TODO: enforceR2OnlyPolicy permanently monkey-patches window.fetch globally.
-// This is never restored and will nest if called multiple times.
-// Needs dedicated refactor — do not call this function in production flows.
+// The module-level guard prevents multiple patches but this needs a proper refactor.
+// Do not add new callers.
 /**
  * Safeguard function to prevent accidental Supabase storage uploads
  * Call this before any upload operation to ensure R2-only policy
  */
+let r2PolicyEnforced = false;
+
 export const enforceR2OnlyPolicy = () => {
+  if (r2PolicyEnforced) return;
+  r2PolicyEnforced = true;
+
   const warning = 'WARNING: All images must be uploaded to Cloudflare R2 only. Supabase storage is not allowed for images.';
   AppLog.warn('[r2OnlyUpload]', warning);
   
