@@ -65,8 +65,8 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
             const meta = msg.media_metadata as Record<string, unknown>;
             courseItems.push({
               id: msg.id, type: 'course',
-              url: `/courses/${meta.course_slug || meta.course_id}`,
-              title: meta.course_name, thumbnail: meta.course_image_url,
+              url: `/courses/${(meta.course_slug as string) || (meta.course_id as string)}`,
+              title: meta.course_name as string, thumbnail: meta.course_image_url as string,
               createdAt: msg.created_at,
             });
           }

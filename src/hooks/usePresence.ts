@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { AppLog } from '@/lib/logger';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 export type PresenceStatus = 'online' | 'away' | 'offline';
@@ -24,7 +25,7 @@ export function usePresence() {
     try {
       await supabase.rpc('update_presence', { p_status: status });
     } catch (error) {
-      console.error('Error updating presence:', error);
+      AppLog.error('[usePresence]', 'Error updating presence:', error);
     }
   }, [user]);
 
@@ -34,7 +35,7 @@ export function usePresence() {
       .from('user_presence')
       .select('status, last_seen_at')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
     if (error || !data) {
       return null;

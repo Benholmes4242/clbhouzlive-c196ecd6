@@ -341,6 +341,7 @@ export function ConversationList({
                   <ConversationTypingOrPreview 
                     conversationId={conversation.id}
                     preview={conversation.last_message_preview}
+                    isActive={selectedConversationId === conversation.id}
                   />
                 </p>
                 

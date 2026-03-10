@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { AppLog } from '@/lib/logger';
 
 export interface Reaction {
   emoji: string;
@@ -25,10 +26,20 @@ export function useMessageReactions(conversationId: string | null) {
   const fetchReactions = useCallback(async () => {
     if (!conversationId) return;
 
-    const { data: messages } = await supabase
+    // NOTE: Reactions are only loaded for the most recent 500 messages.
+    // For older messages in long conversations, reactions won't display.
+    // A server-side aggregation approach would fix this properly.
+    const { data: messages, error: messagesError } = await supabase
       .from('messages')
       .select('id')
-      .eq('conversation_id', conversationId);
+      .eq('conversation_id', conversationId)
+      .order('created_at', { ascending: false })
+      .limit(500);
+
+    if (messagesError) {
+      AppLog.error('[useMessageReactions]', 'Error fetching message IDs:', messagesError);
+      return;
+    }
 
     if (!messages || messages.length === 0) {
       setReactions({});
@@ -42,7 +53,7 @@ export function useMessageReactions(conversationId: string | null) {
       .in('message_id', messageIds);
 
     if (reactionError) {
-      console.error('Error fetching reactions:', reactionError);
+      AppLog.error('[useMessageReactions]', 'Error fetching reactions:', reactionError);
       return;
     }
 
@@ -86,7 +97,7 @@ export function useMessageReactions(conversationId: string | null) {
         p_emoji: emoji 
       });
     } catch (error) {
-      console.error('Error adding reaction:', error);
+      AppLog.error('[useMessageReactions]', 'Error adding reaction:', error);
       // Roll back optimistic update
       setReactions(prev => {
         const rolled = { ...prev };
@@ -121,7 +132,7 @@ export function useMessageReactions(conversationId: string | null) {
         p_emoji: emoji 
       });
     } catch (error) {
-      console.error('Error removing reaction:', error);
+      AppLog.error('[useMessageReactions]', 'Error removing reaction:', error);
       // Roll back optimistic update
       setReactions(prev => {
         const rolled = { ...prev };
@@ -172,7 +183,9 @@ export function useMessageReactions(conversationId: string | null) {
           table: 'message_reactions',
         },
         (payload) => {
-          const messageId = (payload.new as any)?.message_id || (payload.old as any)?.message_id;
+          const newPayload = payload.new as Record<string, unknown> | undefined;
+          const oldPayload = payload.old as Record<string, unknown> | undefined;
+          const messageId = (newPayload?.message_id as string) || (oldPayload?.message_id as string);
           const currentMessageIds = new Set(Object.keys(reactionsRef.current));
           if (!messageId || currentMessageIds.has(messageId)) {
             fetchReactions();

@@ -1,6 +1,22 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { ConversationWithDetails, ConversationParticipant, ParticipantProfile, ParticipantWithProfile } from '@/types/messaging';
+import { AppLog } from '@/lib/logger';
+import { ConversationWithDetails, ParticipantProfile, ParticipantWithProfile } from '@/types/messaging';
+
+/** Shape returned by the nested conversation select */
+interface ArchivedParticipantRow {
+  conversation: {
+    id: string;
+    type: string;
+    name: string | null;
+    avatar_url: string | null;
+    created_by: string | null;
+    created_at: string | null;
+    updated_at: string | null;
+    last_message_at: string | null;
+    last_message_preview: string | null;
+  } | null;
+}
 
 export const useArchivedConversations = () => {
   const [archivedConversations, setArchivedConversations] = useState<ConversationWithDetails[]>([]);
@@ -34,10 +50,12 @@ export const useArchivedConversations = () => {
         
       if (error) throw error;
 
+      const rows = (data || []) as unknown as ArchivedParticipantRow[];
+
       // Get all conversation IDs
-      const conversationIds = (data || [])
-        .map(item => (item.conversation as any)?.id)
-        .filter((id): id is string => id !== null);
+      const conversationIds = rows
+        .map(item => item.conversation?.id)
+        .filter((id): id is string => id != null);
 
       if (conversationIds.length === 0) {
         setArchivedConversations([]);
@@ -79,7 +97,7 @@ export const useArchivedConversations = () => {
       });
 
       // Group participants by conversation
-      const participantsByConv = new Map<string, any[]>();
+      const participantsByConv = new Map<string, typeof allParticipants>();
       (allParticipants || []).forEach(p => {
         if (p.conversation_id) {
           const existing = participantsByConv.get(p.conversation_id) || [];
@@ -89,33 +107,41 @@ export const useArchivedConversations = () => {
       });
 
       // Build conversations with full profile data
-      const conversations = (data || []).map(item => {
-        const conv = item.conversation as any;
+      const conversations = rows.map(item => {
+        const conv = item.conversation;
         if (!conv) return null;
 
         const rawParticipants = participantsByConv.get(conv.id) || [];
         const participants: ParticipantWithProfile[] = rawParticipants.map(p => ({
           id: p.id,
-          conversation_id: p.conversation_id,
-          user_id: p.user_id,
-          role: p.role as 'admin' | 'member',
-          joined_at: p.joined_at,
+          conversation_id: p.conversation_id ?? '',
+          user_id: p.user_id ?? '',
+          role: (p.role as 'admin' | 'member') ?? 'member',
+          joined_at: p.joined_at ?? '',
           last_read_at: p.last_read_at,
-          is_muted: p.is_muted,
-          is_archived: p.is_archived,
+          is_muted: p.is_muted ?? false,
+          is_archived: p.is_archived ?? false,
           profile: p.user_id ? profilesMap.get(p.user_id) || null : null,
         }));
 
         return {
-          ...conv,
+          id: conv.id,
+          type: conv.type,
+          name: conv.name,
+          avatar_url: conv.avatar_url,
+          created_by: conv.created_by,
+          created_at: conv.created_at ?? '',
+          updated_at: conv.updated_at,
+          last_message_at: conv.last_message_at,
+          last_message_preview: conv.last_message_preview,
           participants,
           unread_count: 0,
         } as ConversationWithDetails;
-      }).filter(Boolean);
+      }).filter(Boolean) as ConversationWithDetails[];
       
-      setArchivedConversations(conversations.filter(Boolean) as ConversationWithDetails[]);
+      setArchivedConversations(conversations);
     } catch (error) {
-      console.error('Error fetching archived:', error);
+      AppLog.error('[useArchivedConversations]', 'Error fetching archived:', error);
     } finally {
       setIsLoading(false);
     }
@@ -136,7 +162,7 @@ export const useArchivedConversations = () => {
       
       return true;
     } catch (error) {
-      console.error('Error unarchiving:', error);
+      AppLog.error('[useArchivedConversations]', 'Error unarchiving:', error);
       return false;
     }
   };

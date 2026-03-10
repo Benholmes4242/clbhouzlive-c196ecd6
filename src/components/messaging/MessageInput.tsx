@@ -58,6 +58,15 @@ export function MessageInput({
     }
   }, [content]);
 
+  // Revoke media preview object URL on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (mediaPreview?.url) {
+        URL.revokeObjectURL(mediaPreview.url);
+      }
+    };
+  }, [mediaPreview?.url]);
+
   // Focus when replying
   useEffect(() => {
     if (replyingTo) {
