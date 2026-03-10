@@ -11,7 +11,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useFollowUser } from '@/hooks/useFollowUser';
 import { useFriendActions } from '@/hooks/useFriendActions';
 import { useRelationshipStatuses, type RelationshipStatusRow } from '@/hooks/useRelationshipStatuses';
-import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
+
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import type { SocialUser } from '@/hooks/useSocialLists';
