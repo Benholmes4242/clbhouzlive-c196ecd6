@@ -324,7 +324,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
           </div>
 
           {/* ── Stats 2×4 grid ── */}
-          <div style={{ padding: '12px 16px 0' }}>
+          <div style={{ padding: '16px 20px 0' }}>
             <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 8 }}>
               Tournament Stats
             </div>
