@@ -5,6 +5,7 @@
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { Heart, MessageSquare } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import type { TournamentResultFeedPost, TournamentResultMeta, PodiumRow as PodiumRowType } from '@/components/media-system/types/media';
