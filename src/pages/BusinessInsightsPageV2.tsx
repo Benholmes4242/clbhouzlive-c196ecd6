@@ -28,7 +28,18 @@ const ComingSoonEmpty = ({ title }: { title: string }) => (
 
 // Reviews section component using real data
 const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate: (path: string) => void }) => {
-  const { data: reviewStats, isLoading } = useBusinessReviewStats(businessId);
+  const { data: reviewStats, isLoading, error } = useBusinessReviewStats(businessId);
+
+  if (error) {
+    return (
+      <section className="bg-card border border-border rounded-[18px] p-4 md:p-5">
+        <h3 className="text-[0.9rem] font-medium text-foreground mb-4">Reviews & reputation</h3>
+        <div className="px-4 py-8 text-center">
+          <p className="text-sm text-muted-foreground">Failed to load review stats.</p>
+        </div>
+      </section>
+    );
+  }
 
   if (isLoading) {
     return (
