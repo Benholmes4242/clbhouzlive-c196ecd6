@@ -241,7 +241,7 @@ export const EchoChatSurface = forwardRef<EchoChatSurfaceRef, EchoChatSurfacePro
                 input.trim() ? "opacity-100" : "opacity-40"
               )}
               style={{
-                background: hubTheme ? 'var(--hub-primary-bg, #1a1a1a)' : 'hsl(var(--primary))',
+                background: hubTheme ? 'var(--hub-primary-bg, hsl(var(--foreground)))' : 'hsl(var(--primary))',
               }}
               aria-label="Send"
             >
