@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Camera } from 'lucide-react';
-import { BusinessSectionHeader } from '../BusinessSectionHeader';
+import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
 import { BusinessLogoUpload } from '../BusinessLogoUpload';
 import { BusinessCoverUpload } from '../BusinessCoverUpload';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
@@ -61,36 +60,35 @@ export function BusinessBrandingSection({
   };
 
   return (
-    <div>
-      <BusinessSectionHeader
-        icon={Camera}
-        title="Branding"
-        description="Add your logo and cover photo to stand out"
-      />
-      
-      {/* Logo Upload */}
-      <div className="bg-white rounded-xl border border-[#e2e8f0] p-6 mb-5">
-        <BusinessLogoUpload
-          logoUrl={logoUrl}
-          businessName={businessName}
-          onUpload={handleLogoUpload}
-          isUploading={isUploadingLogo}
-        />
-      </div>
-      
-      {/* Cover Upload */}
-      <div className="bg-white rounded-xl border border-[#e2e8f0] p-5">
-        <BusinessCoverUpload
-          coverUrl={coverUrl}
-          onUpload={handleCoverUpload}
-          isUploading={isUploadingCover}
-        />
-      </div>
-      
-      {/* Tip */}
-      <p className="text-xs text-[#64748b] mt-4 text-center">
-        You can always update these later from your business profile settings.
-      </p>
+    <div className="space-y-4">
+      {/* Card 1: Logo */}
+      <SectionCard>
+        <div className="space-y-3">
+          <label className="text-[13px] font-medium text-muted-foreground">
+            Logo
+          </label>
+          <BusinessLogoUpload
+            logoUrl={logoUrl}
+            businessName={businessName}
+            onUpload={handleLogoUpload}
+            isUploading={isUploadingLogo}
+          />
+        </div>
+      </SectionCard>
+
+      {/* Card 2: Cover Photo */}
+      <SectionCard>
+        <div className="space-y-3">
+          <label className="text-[13px] font-medium text-muted-foreground">
+            Cover Photo
+          </label>
+          <BusinessCoverUpload
+            coverUrl={coverUrl}
+            onUpload={handleCoverUpload}
+            isUploading={isUploadingCover}
+          />
+        </div>
+      </SectionCard>
     </div>
   );
 }

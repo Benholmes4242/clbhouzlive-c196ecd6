@@ -1,10 +1,10 @@
 /**
  * BusinessLocationStep - Step 2: Location, website, email, phone
  */
-import { motion } from 'framer-motion';
-import { BusinessLocationSection } from '@/components/business/sections/BusinessLocationSection';
-import { LocationValue } from '@/components/business/LocationAutocomplete';
-import { PhoneValue } from '@/components/business/PhoneInputWithDialCode';
+import { MapPin } from 'lucide-react';
+import { SectionCard } from '@/components/profile/edit-v2/SectionCard';
+import { LocationAutocomplete, LocationValue } from '@/components/business/LocationAutocomplete';
+import { PhoneInputWithDialCode, PhoneValue } from '@/components/business/PhoneInputWithDialCode';
 
 interface BusinessLocationStepProps {
   location: LocationValue | null;
@@ -32,26 +32,93 @@ export function BusinessLocationStep({
   clubLocation,
 }: BusinessLocationStepProps) {
   return (
-    <div className="h-full overflow-y-auto">
-      <div className="px-4 py-6">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <BusinessLocationSection
-            location={location}
-            setLocation={setLocation}
-            website={website}
-            setWebsite={setWebsite}
-            email={email}
-            setEmail={setEmail}
-            phone={phone}
-            setPhone={setPhone}
-            isGolfClub={isGolfClub}
-            clubLocation={clubLocation}
-          />
-        </motion.div>
-      </div>
+    <div className="space-y-4 px-4 pb-4 pt-2">
+      {/* Card 1: Location */}
+      <SectionCard>
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <label className="text-[13px] font-medium text-muted-foreground">
+              Location <span className="text-destructive">*</span>
+            </label>
+
+            {isGolfClub && clubLocation ? (
+              <div className="flex items-center gap-2 bg-muted rounded-xl px-4 py-3 text-[15px] text-muted-foreground">
+                <MapPin className="w-4 h-4 flex-shrink-0" />
+                <span className="flex-1">{clubLocation}</span>
+                <span className="text-[11px] text-muted-foreground/70">From club data</span>
+              </div>
+            ) : (
+              <LocationAutocomplete
+                value={location}
+                onChange={setLocation}
+                placeholder="Search for a city..."
+              />
+            )}
+            <p className="text-[12px] text-muted-foreground">
+              {isGolfClub && clubLocation
+                ? 'Location is linked to the club record.'
+                : 'Choose your main base so golfers know where to find you.'}
+            </p>
+          </div>
+        </div>
+      </SectionCard>
+
+      {/* Card 2: Contact */}
+      <SectionCard>
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <label className="text-[13px] font-medium text-muted-foreground">
+              Website
+            </label>
+            <input
+              type="url"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              placeholder="https://yourwebsite.com"
+              className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors"
+            />
+          </div>
+
+          <div className="h-px bg-border/30" />
+
+          <div className="space-y-1.5">
+            <label className="text-[13px] font-medium text-muted-foreground">
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="contact@business.com"
+              className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors"
+            />
+          </div>
+
+          <div className="h-px bg-border/30" />
+
+          <div className="space-y-1.5">
+            <label className="text-[13px] font-medium text-muted-foreground">
+              Phone
+            </label>
+            <PhoneInputWithDialCode
+              value={phone}
+              onChange={setPhone}
+            />
+            <p className="text-[12px] text-muted-foreground">
+              Your contact details are only shown on your business profile.
+            </p>
+          </div>
+        </div>
+      </SectionCard>
+
+      {/* Validation hint */}
+      {!website.trim() && !email.trim() && (
+        <SectionCard className="border-destructive/20 bg-destructive/5">
+          <p className="text-[12px] text-muted-foreground">
+            Add at least a website or email so golfers can contact you.
+          </p>
+        </SectionCard>
+      )}
     </div>
   );
 }
