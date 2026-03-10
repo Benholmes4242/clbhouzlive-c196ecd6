@@ -201,7 +201,9 @@ const BusinessInsightsPageV2 = () => {
   // Track page visit
   useEffect(() => {
     if (business?.id && !isLoading) {
-      trackBusinessProfileVisit(business.id, user?.id, 'direct', { page: 'insights' });
+      trackBusinessProfileVisit(business.id, user?.id, 'direct', { page: 'insights' }).catch((err) => {
+        AppLog.error('[BusinessInsightsPageV2]', 'Failed to track visit:', err);
+      });
     }
   }, [business?.id, user?.id, isLoading]);
 

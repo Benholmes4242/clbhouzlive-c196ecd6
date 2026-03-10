@@ -120,11 +120,19 @@ export function useBusinessReviewStats(businessId: string | undefined) {
       }).sort((a, b) => b.reviewCount - a.reviewCount);
 
       // Count unresponded reviews
-      const { count: respondedCount } = await supabase
+      // NOTE: If RLS denies access to review_responses for this business,
+      // respondedCount will be 0, making all reviews appear unresponded.
+      // Ensure RLS policy grants read access to business owners and managers.
+      const { count: respondedCount, error: responsesError } = await supabase
         .from('review_responses')
         .select('review_id', { count: 'exact', head: true })
         .eq('business_id', businessId)
         .eq('is_deleted', false);
+
+      if (responsesError) {
+        AppLog.error('[useBusinessReviewStats]', 'Failed to fetch response count:', responsesError);
+        // Don't throw — use 0 as fallback so other stats still render
+      }
 
       const unrespondedCount = Math.max(0, totalReviews - (respondedCount || 0));
 

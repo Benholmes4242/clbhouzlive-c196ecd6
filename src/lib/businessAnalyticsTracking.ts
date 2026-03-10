@@ -41,10 +41,10 @@ export async function trackBusinessAnalyticsEvent(params: TrackEventParams): Pro
       });
 
     if (error) {
-      console.error('[Analytics] Failed to track event:', error);
+      AppLog.error('[Analytics]', 'Failed to track event:', error);
     }
   } catch (err) {
-    console.error('[Analytics] Error tracking event:', err);
+    AppLog.error('[Analytics]', 'Error tracking event:', err);
   }
 }
 
