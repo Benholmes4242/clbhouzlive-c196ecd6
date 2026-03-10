@@ -35,7 +35,8 @@ import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
 import { useMediaStore } from '@/components/media-system/store/mediaStore';
 import { MediaErrorBoundary } from '@/components/media-system/MediaErrorBoundary';
 import { useVideoAnalytics } from '@/components/media-system/hooks/useVideoAnalytics';
-import type { FeedPost } from '@/components/media-system/types/media';
+import type { FeedPost, TournamentResultFeedPost } from '@/components/media-system/types/media';
+import { TournamentResultCard } from '@/components/clubhouse/cinematic/TournamentResultCard';
 
 // ── Clubhouse UI overlays ──
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
@@ -349,8 +350,62 @@ const ClubhouseContent = () => {
         </MediaErrorBoundary>
       )}
 
-      {/* ═══ OVERLAY LAYER ═══ */}
-      {activePost && posts.length > 0 && (
+      {/* ═══ TOURNAMENT RESULT CARD (full takeover — no other overlays) ═══ */}
+      {activePost && posts.length > 0 && activePost.postType === 'tournament_result' && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 20 }}>
+          <TournamentResultCard
+            post={activePost as TournamentResultFeedPost}
+            isActive={true}
+            isVisible={overlayVisible}
+            onLike={() => handleLike(activePost)}
+            onComment={openComments}
+            onShare={() => handleShare(activePost)}
+            onViewResults={() => {
+              const meta = (activePost as TournamentResultFeedPost).tournamentMeta;
+              navigate(`/tours/${meta.tour_slug}/tournament/${meta.tournament_id}`);
+            }}
+          />
+          {/* Comments sheet for tournament posts */}
+          <CommentsPage
+            isOpen={commentsOpen}
+            onClose={closeComments}
+            postId={activePost.id}
+            currentUserId={user?.id}
+            creatorUserId={activePost.userId}
+            creatorName={activePost.displayName}
+            creatorAvatar={activePost.avatarUrl}
+            caption={activePost.caption}
+            theme="dark"
+            onCommentPosted={() => handleCommentPosted(activePost)}
+          />
+          {/* More options sheet for tournament posts */}
+          <Drawer open={moreOptionsOpen} onOpenChange={setMoreOptionsOpen}>
+            <DrawerContent className="bg-black/95 border-white/10">
+              <div className="p-4 space-y-2">
+                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => handleReport(activePost)}>
+                  <Flag className="w-5 h-5 text-white/60" />
+                  <span className="text-sm text-white">Report this post</span>
+                </button>
+                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => handleNotInterested(activePost)}>
+                  <EyeOff className="w-5 h-5 text-white/60" />
+                  <span className="text-sm text-white">Not interested</span>
+                </button>
+                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/post/${activePost.id}`);
+                  toast.success('Link copied');
+                  setMoreOptionsOpen(false);
+                }}>
+                  <LinkIcon className="w-5 h-5 text-white/60" />
+                  <span className="text-sm text-white">Copy link</span>
+                </button>
+              </div>
+            </DrawerContent>
+          </Drawer>
+        </div>
+      )}
+
+      {/* ═══ OVERLAY LAYER (non-tournament posts only) ═══ */}
+      {activePost && posts.length > 0 && activePost.postType !== 'tournament_result' && (
         <>
           {/* Review overlay — z-10 */}
           {isActiveReview && activeReview && (
@@ -516,8 +571,8 @@ const ClubhouseContent = () => {
         </>
       )}
 
-      {/* ═══ PAGE-LEVEL SCRUBBER ═══ */}
-      {isActiveVideo && activeVideoRef && (
+      {/* ═══ PAGE-LEVEL SCRUBBER (non-tournament only) ═══ */}
+      {activePost?.postType !== 'tournament_result' && isActiveVideo && activeVideoRef && (
         <Scrubber
           videoRef={activeVideoRef}
           videoElement={activeVideoElement}

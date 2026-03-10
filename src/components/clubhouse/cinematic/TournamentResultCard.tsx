@@ -8,6 +8,7 @@ import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import type { TournamentResultFeedPost, TournamentResultMeta, PodiumRow as PodiumRowType } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { CinematicActionRail } from './CinematicActionRail';
 
 // ─── Gradient fallback map ───
 const TOUR_GRADIENTS: Record<string, string> = {
@@ -384,6 +385,22 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
           </div>
         )}
       </div>
+
+      {/* 4. CinematicActionRail — right side */}
+      <CinematicActionRail
+        postId={post.id}
+        likesCount={post.likeCount}
+        commentsCount={post.commentCount}
+        hasLiked={post.isLikedByMe}
+        isMuted={false}
+        isVisible={isVisible}
+        onLike={onLike}
+        onComment={onComment}
+        onShare={onShare}
+        onMore={() => {}}
+        onMuteToggle={() => {}}
+        hideMute={true}
+      />
 
       {/* 5. TournamentCreatorCapsule — bottom left */}
       <TournamentCreatorCapsule
