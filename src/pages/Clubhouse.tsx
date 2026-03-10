@@ -14,6 +14,7 @@ import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 
 import { cn } from '@/lib/utils';
 import { Compass, ChevronLeft, Flag, EyeOff, Link as LinkIcon } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { logRouteClubhouse } from '@/utils/bootTimeline';
@@ -307,7 +308,7 @@ const ClubhouseContent = () => {
       <div style={{
         opacity: isTournamentCardActive ? 0 : 1,
         pointerEvents: isTournamentCardActive ? 'none' : 'auto',
-        transition: 'opacity 0.3s ease',
+        transition: 'opacity 0.18s ease',
       }}>
         <ClubhouseTopBar
           activeTab={activeTab}
@@ -431,40 +432,49 @@ const ClubhouseContent = () => {
       {activePost && posts.length > 0 && activePost.postType !== 'tournament_result' && (
         <>
           {/* Review overlay — z-10 */}
-          {isActiveReview && activeReview && (
-            <div style={{ position: 'fixed', inset: 0, zIndex: 20, pointerEvents: 'none' }}>
-              <FullscreenReviewPost
-                mode="live"
-                hideUserCapsule
-                courseId={activeReview.courseId}
-                courseName={activeReview.courseName}
-                heroSubtitle={
-                  activeReview.courseSubCountry || activeReview.courseRegion
-                    ? [activeReview.courseSubCountry, activeReview.courseRegion, activeReview.courseCountry]
-                        .filter(Boolean)
-                        .join(', ')
-                    : activeReview.courseCountry || undefined
-                }
-                rating={activeReview.rating}
-                reviewId={activeReview.reviewId}
-                media={activePost?.mediaItems?.map((m, i) => ({
-                  id: m.id ?? `media-${i}`,
-                  media_type: m.type === 'video' ? 'video' as const : 'image' as const,
-                  media_url: m.imageUrl ?? m.mp4Url ?? '',
-                  stream_id: m.hlsUrl?.split('/').pop()?.replace('/manifest/video.m3u8', '') ?? undefined,
-                  poster_url: m.thumbnailUrl ?? undefined,
-                  display_order: i,
-                })) ?? []}
-                user={{
-                  name: activePost.displayName,
-                  username: activePost.username,
-                  avatar: activePost.avatarUrl,
-                }}
-                renderMedia={false}
-                hideCarouselArrows
-              />
-            </div>
-          )}
+          <AnimatePresence>
+            {isActiveReview && activeReview && (
+              <motion.div
+                key="review-overlay"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 12 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                style={{ position: 'fixed', inset: 0, zIndex: 20, pointerEvents: 'none' }}
+              >
+                <FullscreenReviewPost
+                  mode="live"
+                  hideUserCapsule
+                  courseId={activeReview.courseId}
+                  courseName={activeReview.courseName}
+                  heroSubtitle={
+                    activeReview.courseSubCountry || activeReview.courseRegion
+                      ? [activeReview.courseSubCountry, activeReview.courseRegion, activeReview.courseCountry]
+                          .filter(Boolean)
+                          .join(', ')
+                      : activeReview.courseCountry || undefined
+                  }
+                  rating={activeReview.rating}
+                  reviewId={activeReview.reviewId}
+                  media={activePost?.mediaItems?.map((m, i) => ({
+                    id: m.id ?? `media-${i}`,
+                    media_type: m.type === 'video' ? 'video' as const : 'image' as const,
+                    media_url: m.imageUrl ?? m.mp4Url ?? '',
+                    stream_id: m.hlsUrl?.split('/').pop()?.replace('/manifest/video.m3u8', '') ?? undefined,
+                    poster_url: m.thumbnailUrl ?? undefined,
+                    display_order: i,
+                  })) ?? []}
+                  user={{
+                    name: activePost.displayName,
+                    username: activePost.username,
+                    avatar: activePost.avatarUrl,
+                  }}
+                  renderMedia={false}
+                  hideCarouselArrows
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Media navigation dots for multi-media posts */}
           {activeMediaCount > 1 && (
@@ -530,6 +540,7 @@ const ClubhouseContent = () => {
 
           {/* CreatorCapsule — z-50, bottom-left */}
           <CreatorCapsule
+            postId={activePost.id}
             user={{
               id: activePost.userId,
               name: activePost.displayName,
