@@ -80,8 +80,8 @@ export function useClubSearch(query: string, options: UseClubSearchOptions = {})
           }
         }
 
-        // Merge results: direct matches first (sorted), then alias results (sorted)
-        const directMatches = (clubs || []).sort((a, b) => a.name.localeCompare(b.name));
+        // Merge results: direct matches first (already sorted by Supabase .order('name')), then alias results
+        const directMatches = clubs || [];
         const clubIds = new Set(directMatches.map(c => c.id));
         
         // Add alias clubs that aren't already in direct matches
