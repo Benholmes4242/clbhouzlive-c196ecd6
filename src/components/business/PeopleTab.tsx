@@ -9,7 +9,7 @@ import { SegmentedTabs } from './people/SegmentedTabs';
 import { PersonRow } from './people/PersonRow';
 import { TeamRow } from './people/TeamRow';
 import { EmptyState } from './people/EmptyState';
-import { useTeamManagement, getAccessLevel } from '@/hooks/useTeamManagement';
+import { useTeamManagement } from '@/hooks/useTeamManagement';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
