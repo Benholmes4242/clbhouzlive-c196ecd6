@@ -9,7 +9,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { TeamMember } from '@/hooks/useBusinessTeamMembers';
 import { EditAccessSheet } from './people/EditAccessSheet';
-import { cn } from '@/lib/utils';
+
 import {
   AlertDialog,
   AlertDialogAction,
