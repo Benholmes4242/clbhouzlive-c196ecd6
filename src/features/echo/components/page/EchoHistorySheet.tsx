@@ -10,6 +10,7 @@ import { useEchoConversations } from '../../hooks/useEchoHistory';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { haptic } from '@/utils/haptics';
 
 interface EchoHistorySheetProps {
   isOpen: boolean;
@@ -44,12 +45,6 @@ function formatRelativeDate(dateString: string): string {
   return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
-function haptic(style: 'light' | 'medium' | 'heavy' = 'medium') {
-  if ('vibrate' in navigator) {
-    const patterns = { light: 10, medium: 20, heavy: 30 };
-    navigator.vibrate(patterns[style]);
-  }
-}
 
 function useDeleteEchoConversation() {
   const queryClient = useQueryClient();

@@ -7,7 +7,7 @@ import ReactMarkdown from 'react-markdown';
 import { Copy, Check, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { haptic } from '@/utils/haptics';
-import { sanitizeEchoText, generateFollowUps, ECHO_ALLOWED_ELEMENTS } from '@/features/echo/utils/echoFormat';
+import { generateFollowUps, ECHO_ALLOWED_ELEMENTS } from '@/features/echo/utils/echoFormat';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 const COURSE_PATTERNS = [
@@ -44,7 +44,7 @@ export function EchoResponseCard({
   const prefersReduced = usePrefersReducedMotion();
   const navigate = useNavigate();
 
-  const cleanContent = sanitizeEchoText(content);
+  const cleanContent = content;
   const followUps = isLast && lastResponse ? generateFollowUps(lastResponse) : [];
 
   const courseMatches = useMemo(() => {

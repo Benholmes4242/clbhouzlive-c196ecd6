@@ -10,7 +10,6 @@ import type { EchoProfile } from '@/features/echo/hooks/useEchoProfile';
 interface EchoPageWelcomeProps {
   profile: EchoProfile;
   onChipSelect: (prompt: string) => void;
-  onFocusInput: () => void;
 }
 
 // Pool of 50 diverse golf prompts
@@ -79,7 +78,7 @@ const getRandomPrompts = (count: number = 4): string[] => {
   return shuffled.slice(0, count);
 };
 
-export function EchoPageWelcome({ profile, onChipSelect, onFocusInput }: EchoPageWelcomeProps) {
+export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps) {
   const prompts = useMemo(() => getRandomPrompts(4), []);
   const greeting = getGreeting();
 
