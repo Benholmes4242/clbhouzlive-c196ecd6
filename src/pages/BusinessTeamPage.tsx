@@ -33,8 +33,6 @@ export default function BusinessTeamPage() {
 
   useHideBottomNav();
   useHideHeader();
-  const { businessId } = useParams<{ businessId: string }>();
-  const navigate = useNavigate();
   const { data: membership } = useBusinessMembership(businessId);
   const { data: business } = useBusinessProfile(businessId);
   const { data: team, isLoading: teamLoading } = useBusinessTeam(businessId);

@@ -20,11 +20,6 @@ const MyBusinessesPage = () => {
 
   useHideBottomNav();
   useHideHeader();
-  const navigate = useNavigate();
-  const { user, loading: authLoading } = useSupabaseSession();
-  const { data: businesses, isLoading } = useMyBusinesses(user?.id);
-  const { activeActor } = useActiveActor();
-  const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Sort businesses — active first, then alphabetical
   const sortedBusinesses = useMemo(() => {
