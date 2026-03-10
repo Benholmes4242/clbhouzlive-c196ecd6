@@ -29,10 +29,7 @@ async function getCroppedImg(
 ): Promise<File> {
   const image = await createImage(imageSrc);
   
-  // Debug logging
-  console.log('[Crop] Image natural dimensions:', image.naturalWidth, 'x', image.naturalHeight);
-  console.log('[Crop] Pixel crop area:', pixelCrop);
-  
+
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
 
