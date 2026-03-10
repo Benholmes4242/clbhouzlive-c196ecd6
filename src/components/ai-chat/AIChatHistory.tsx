@@ -89,11 +89,8 @@ const AIChatHistory: React.FC<AIChatHistoryProps> = ({
     deleteSwingAnalysis: removeSwingAnalysis
   } = useSwingPagination();
 
-  // DB session for single source of truth
-  const session = useConversationSession({
-    storageKey: 'echo_chat',
-    isModalOpen: false
-  });
+  // Legacy session stub (useConversationSession deleted)
+  const session = { deleteConversation: async (_id: string) => {} };
 
   // Load data when component opens
   useEffect(() => {

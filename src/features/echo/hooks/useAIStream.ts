@@ -102,7 +102,6 @@ export function useAIStream() {
         }
       } catch (error: any) {
         if (error.name === 'AbortError') {
-          console.log('[AIStream] Request aborted');
           return;
         }
 
