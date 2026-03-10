@@ -363,6 +363,8 @@ const ClubhouseContent = () => {
               onLike={(post) => handleLike(post)}
               onComment={openComments}
               onShare={(post) => handleShare(post)}
+              getLikeState={(post) => getActiveLikeState(post)}
+              getCommentCount={(post) => getCommentCount(post)}
             />
           </VideoPoolProvider>
         </MediaErrorBoundary>
