@@ -167,15 +167,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
     return () => cancelAnimationFrame(raf);
   }, [isActive]);
 
-  // Performance stat items
-  const perfItems = useMemo(() => {
-    const items: { value: string; label: string; suffix: string }[] = [];
-    if (meta.stat_driving_distance) items.push({ value: String(meta.stat_driving_distance), label: 'Driver', suffix: 'yds' });
-    if (meta.stat_fairways_pct) items.push({ value: String(Math.round(meta.stat_fairways_pct)), label: 'Fairways', suffix: '%' });
-    if (meta.stat_gir_pct) items.push({ value: String(Math.round(meta.stat_gir_pct)), label: 'GIR', suffix: '%' });
-    if (meta.stat_putts) items.push({ value: meta.stat_putts.toFixed(2), label: 'Putts', suffix: '' });
-    return items;
-  }, [meta]);
+  // No longer needed — grid always renders all 8 chips
 
   const handleViewResults = useCallback(() => {
     if (onViewResults) onViewResults();
