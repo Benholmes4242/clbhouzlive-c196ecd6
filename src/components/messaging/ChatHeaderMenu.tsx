@@ -88,7 +88,8 @@
    const handleToggleMute = async () => {
      haptic('light');
      try {
-      const { error } = await supabase.rpc('toggle_conversation_mute' as any, {
+      // TODO: toggle_conversation_mute RPC needs to be added to Supabase generated types
+      const { error } = await (supabase.rpc as Function)('toggle_conversation_mute', {
          p_conversation_id: conversation.id,
          p_mute: !isMuted,
        });
@@ -101,6 +102,10 @@
      }
    };
  
+   // WARNING: This operation sets deleted_at on ALL messages in the conversation,
+   // affecting ALL participants — not just the current user.
+   // A per-user soft-delete (e.g. a user_id column on deleted messages) is needed
+   // to scope this correctly. Do not ship a "Clear Chat" UI without fixing this first.
    const handleClearChatConfirmed = async () => {
      haptic('medium');
      try {
@@ -132,8 +137,8 @@
    const handleLeaveGroupConfirmed = async () => {
      haptic('medium');
      try {
-      // TODO: Add leave_group_conversation to generated Supabase types
-      const { error } = await supabase.rpc('leave_group_conversation' as any, {
+      // TODO: leave_group_conversation RPC needs to be added to Supabase generated types
+      const { error } = await (supabase.rpc as Function)('leave_group_conversation', {
          p_conversation_id: conversation.id,
        });
        
@@ -298,9 +303,9 @@
        <AlertDialog open={showClearChatDialog} onOpenChange={setShowClearChatDialog}>
          <AlertDialogContent>
            <AlertDialogHeader>
-             <AlertDialogTitle>Clear all messages?</AlertDialogTitle>
+            <AlertDialogTitle>Clear all messages?</AlertDialogTitle>
              <AlertDialogDescription>
-               This will permanently delete all messages in this conversation. This cannot be undone.
+               This will delete all messages for everyone in this conversation. This cannot be undone.
              </AlertDialogDescription>
            </AlertDialogHeader>
            <AlertDialogFooter>

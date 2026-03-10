@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { AppLog } from '@/lib/logger';
 import type { ConversationParticipant, ParticipantProfile, ParticipantWithProfile } from '@/types/messaging';
 import { useConversationMessages } from '@/hooks/useConversationMessages';
 import { useMessagingContext } from '@/contexts/MessagingContext';
@@ -140,7 +141,11 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
    const [deletingMessage, setDeletingMessage] = useState<MessageWithSender | null>(null);
    const [forwardingMessage, setForwardingMessage] = useState<MessageWithSender | null>(null);
    const [highlightedMessageId, setHighlightedMessageId] = useState<string | null>(null);
+   // TODO: messageRefs is declared but never populated — MessageBubble components
+   // need to register themselves via a callback ref for navigate-to-message to work.
+   // handleNavigateToMessage will silently fail to scroll until this is implemented.
    const messageRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+   const highlightTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   // Find current conversation from context
   const contextConversation = useMemo(() => 
@@ -169,7 +174,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             .single();
 
           if (convError || !convData) {
-            console.error('[ChatView] Error fetching conversation:', convError);
+            AppLog.error('[ChatView]', 'Error fetching conversation:', convError);
             return;
           }
 
@@ -225,7 +230,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             unread_count: 0,
           });
         } catch (err) {
-          console.error('[ChatView] Error fetching direct conversation:', err);
+          AppLog.error('[ChatView]', 'Error fetching direct conversation:', err);
         } finally {
           setLoadingDirect(false);
         }
@@ -319,6 +324,11 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     setUnreadBelowCount(0);
   }, []);
 
+  // Cleanup highlight timer on unmount
+  useEffect(() => {
+    return () => clearTimeout(highlightTimerRef.current);
+  }, []);
+
   // Mark as read when viewing
   useEffect(() => {
     if (conversationId) {
@@ -380,7 +390,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
         { duration }
       );
     } catch (error) {
-      console.error('Error sending voice note:', error);
+      AppLog.error('[ChatView]', 'Error sending voice note:', error);
     }
   }, [user, sendMessage]);
 
@@ -424,11 +434,14 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
  
   const handleNavigateToMessage = useCallback((messageId: string) => {
      const element = messageRefs.current.get(messageId);
-     if (element) {
-       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-       setHighlightedMessageId(messageId);
-       setTimeout(() => setHighlightedMessageId(null), 2000);
+     if (!element) {
+       AppLog.warn('[ChatView]', 'Navigate-to-message: element not found for', messageId);
+       return;
      }
+     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+     setHighlightedMessageId(messageId);
+     clearTimeout(highlightTimerRef.current);
+     highlightTimerRef.current = setTimeout(() => setHighlightedMessageId(null), 2000);
    }, []);
  
   // Check if message can be deleted for everyone (within 1 hour)
