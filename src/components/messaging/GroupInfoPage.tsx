@@ -163,8 +163,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
       if (error) throw error;
       toast.success('Member is now an admin');
       onUpdate();
-    } catch (error: any) {
-      toast.error('Failed to update', { description: error.message });
+    } catch (e: unknown) {
+      toast.error('Failed to update', { description: (e as Error).message ?? 'An error occurred' });
     }
   };
 
