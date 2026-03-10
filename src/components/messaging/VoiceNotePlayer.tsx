@@ -185,7 +185,7 @@ export const VoiceNotePlayer: React.FC<VoiceNotePlayerProps> = ({
           <div 
             className={cn(
               "absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full shadow-md transition-transform",
-              isOwn ? "bg-[#F7931E]" : "bg-primary",
+              "bg-primary",
               isDragging ? "scale-125" : "scale-100 group-hover:scale-110"
             )}
             style={{ left: `calc(${progress}% - 6px)` }}
