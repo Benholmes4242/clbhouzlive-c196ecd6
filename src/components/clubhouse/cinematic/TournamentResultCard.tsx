@@ -76,14 +76,6 @@ function WinnerAvatar({ src, name, size }: { src: string | null; name: string; s
       ) : (
         <span style={{ fontSize: Math.round(size * 0.32), fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>{initials}</span>
       )}
-      {/* Trophy badge */}
-      <div style={{
-        position: 'absolute', bottom: -2, right: -2, width: 20, height: 20, borderRadius: '50%',
-        background: 'linear-gradient(135deg, #F59E0B, #D97706)',
-        border: '2px solid rgba(10,12,18,0.9)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 10, lineHeight: 1,
-      }}>🏆</div>
     </div>
   );
 }
@@ -231,10 +223,6 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
             border: '1px solid rgba(255,255,255,0.18)', borderRadius: 20, padding: '5px 12px 5px 6px',
           }}>
-            <div style={{
-              width: 20, height: 20, borderRadius: '50%', background: '#F97316',
-              flexShrink: 0,
-            }} />
             <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 0.8 }}>
               {meta.tour_name || getTourLabel(meta.tour_slug)}
             </span>
