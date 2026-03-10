@@ -91,7 +91,7 @@ function createImage(url: string): Promise<HTMLImageElement> {
       resolve(image);
     });
     image.addEventListener('error', (error) => {
-      console.error('[Crop] Image load error:', error);
+      AppLog.error('[ImageCropModal]', 'Image load error:', error);
       reject(error);
     });
     // Only set crossOrigin for non-blob URLs (blob URLs don't need it and it can cause issues)
