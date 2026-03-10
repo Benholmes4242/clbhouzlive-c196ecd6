@@ -75,6 +75,7 @@ const FriendsListPage = () => {
       onRefetch={() => refetch()}
       backPath={`/profile/${profileUser.username}`}
       isOwnProfile={isOwnProfile}
+      profileUsername={profileUser.username}
     />
   );
 };

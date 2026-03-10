@@ -37,7 +37,7 @@ const StatItem: React.FC<StatItemProps> = ({
         className="text-foreground text-base font-bold"
         minCh={1}
       />
-      <span className="mt-1 text-[11px] uppercase tracking-[0.05em] text-muted-foreground">
+      <span className="mt-1 text-[11px] uppercase tracking-wider text-muted-foreground">
         {label}
       </span>
     </div>
@@ -50,7 +50,7 @@ const StatItem: React.FC<StatItemProps> = ({
 
   if (isClickable && onClick) {
     return (
-      <button type="button" onClick={onClick} className={baseClasses}>
+      <button type="button" onClick={onClick} className={cn(baseClasses, "min-h-[44px] min-w-[44px]")}>
         {content}
       </button>
     );
