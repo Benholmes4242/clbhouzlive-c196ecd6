@@ -34,7 +34,7 @@ export function useClubhouseFollows({ userId }: UseClubhouseFollowsOptions) {
     followMutation.mutate(
       {
         targetUserId: post.userId,
-        targetActorType: post.actorType,
+        targetActorType: post.actorType as 'personal' | 'business',
         targetActorId: post.actorId,
         currentUserId: userId,
         isFollowed: currentlyFollowed,

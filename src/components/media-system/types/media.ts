@@ -182,8 +182,8 @@ export interface FeedRpcRow {
   review_course_region?: string | null;
   review_course_country?: string | null;
   review_course_sub_country?: string | null;
-  course_region: string | null;
-  course_country: string | null;
+  course_region?: string | null;
+  course_country?: string | null;
   creator_relation: string;
   is_liked_by_me: boolean;
   is_followed_by_me: boolean;
