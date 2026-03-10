@@ -37,7 +37,7 @@ const StatItem: React.FC<StatItemProps> = ({
         className="text-foreground text-base font-bold"
         minCh={1}
       />
-      <span className="mt-1 text-[11px] uppercase tracking-[0.05em] text-muted-foreground">
+      <span className="mt-1 text-[11px] uppercase tracking-wider text-muted-foreground">
         {label}
       </span>
     </div>
