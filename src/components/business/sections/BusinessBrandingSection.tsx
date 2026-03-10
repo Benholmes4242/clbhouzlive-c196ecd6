@@ -4,6 +4,7 @@ import { BusinessLogoUpload } from '../BusinessLogoUpload';
 import { BusinessCoverUpload } from '../BusinessCoverUpload';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { toast } from 'sonner';
+import { AppLog } from '@/lib/logger';
 
 interface BusinessBrandingSectionProps {
   logoUrl: string | null;
@@ -34,7 +35,7 @@ export function BusinessBrandingSection({
         throw new Error(result.error || 'Upload failed');
       }
     } catch (err) {
-      console.error('Logo upload error:', err);
+      AppLog.error('[BusinessBrandingSection]', 'Logo upload error:', err);
       toast.error('Failed to upload logo');
     } finally {
       setIsUploadingLogo(false);
@@ -52,7 +53,7 @@ export function BusinessBrandingSection({
         throw new Error(result.error || 'Upload failed');
       }
     } catch (err) {
-      console.error('Cover upload error:', err);
+      AppLog.error('[BusinessBrandingSection]', 'Cover upload error:', err);
       toast.error('Failed to upload cover photo');
     } finally {
       setIsUploadingCover(false);

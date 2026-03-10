@@ -36,8 +36,10 @@ import { LocationValue } from '@/components/business/LocationAutocomplete';
 import { PhoneValue } from '@/components/business/PhoneInputWithDialCode';
 import { RequestAccessModal } from '@/components/business/RequestAccessModal';
 import { getCountryCodeFromClub } from '@/utils/countryCodeMapping';
+import { AppLog } from '@/lib/logger';
 
 import type { WizardDirection } from './types';
+import type { Database } from '@/integrations/supabase/types';
 
 const TOTAL_STEPS = 3;
 
@@ -147,7 +149,7 @@ export function BusinessProfileWizard() {
           });
         }
       } catch (error) {
-        console.error('Error checking club:', error);
+        AppLog.error('[BusinessProfileWizard]', 'Error checking club:', error);
       }
     };
     checkClubBusiness();
@@ -221,7 +223,7 @@ export function BusinessProfileWizard() {
     setSaving(true);
     try {
       const formattedLocation = location?.country ? `${location.city}, ${location.country}` : location?.label || '';
-      const insertData: Record<string, unknown> = {
+      const insertData: Database['public']['Tables']['business_accounts']['Insert'] = {
         name: effectiveBusinessName,
         category,
         location: formattedLocation,
@@ -236,7 +238,7 @@ export function BusinessProfileWizard() {
         lng: location?.lng || null,
         city: location?.city || null,
         region: location?.region || null,
-        country: location?.country || null,
+        country: selectedClub?.country ?? location?.country ?? null,
         address_label: location?.label || null,
       };
 
@@ -249,7 +251,7 @@ export function BusinessProfileWizard() {
 
       const { data: businessData, error: businessError } = await supabase
         .from('business_accounts')
-        .insert(insertData as any)
+        .insert(insertData)
         .select('id, slug')
         .single();
 
@@ -268,7 +270,7 @@ export function BusinessProfileWizard() {
       setCreatedBusinessSlug(businessData.slug);
       setShowSuccess(true);
     } catch (error) {
-      console.error('Error creating business:', error);
+      AppLog.error('[BusinessProfileWizard]', 'Error creating business:', error);
       toast.error('Failed to create business profile');
     } finally {
       setSaving(false);

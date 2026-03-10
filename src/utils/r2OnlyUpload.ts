@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { AppLog } from '@/lib/logger';
 
 export interface R2OnlyUploadResult {
   success: boolean;
@@ -40,7 +41,7 @@ export const uploadToR2Only = async (
     formData.append('fileName', originalFileName || file.name);
     formData.append('bucketType', bucketType);
 
-    console.log(`Uploading to R2 only - Bucket: ${bucketType}, File: ${originalFileName || file.name}`);
+    AppLog.debug('[r2OnlyUpload]', `Uploading to R2 - Bucket: ${bucketType}, File: ${originalFileName || file.name}`);
 
     // Call the Cloudflare R2 upload edge function
     const { data, error } = await supabase.functions.invoke('cloudflare-r2-upload', {
@@ -51,7 +52,7 @@ export const uploadToR2Only = async (
     });
 
     if (error) {
-      console.error('R2 upload error:', error);
+      AppLog.error('[r2OnlyUpload]', 'R2 upload error:', error);
       throw new Error(error.message);
     }
 
@@ -59,7 +60,7 @@ export const uploadToR2Only = async (
       throw new Error(data?.error || 'Upload failed');
     }
 
-    console.log('R2 upload successful:', data);
+    AppLog.debug('[r2OnlyUpload]', 'R2 upload successful:', data);
     return {
       success: true,
       publicUrl: data.publicUrl || data.url,
@@ -68,7 +69,7 @@ export const uploadToR2Only = async (
     };
 
   } catch (error) {
-    console.error('R2-only upload failed:', error);
+    AppLog.error('[r2OnlyUpload]', 'R2-only upload failed:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Upload failed'
@@ -76,17 +77,19 @@ export const uploadToR2Only = async (
   }
 };
 
+// TODO: enforceR2OnlyPolicy permanently monkey-patches window.fetch globally.
+// This is never restored and will nest if called multiple times.
+// Needs dedicated refactor — do not call this function in production flows.
 /**
  * Safeguard function to prevent accidental Supabase storage uploads
  * Call this before any upload operation to ensure R2-only policy
  */
 export const enforceR2OnlyPolicy = () => {
   const warning = 'WARNING: All images must be uploaded to Cloudflare R2 only. Supabase storage is not allowed for images.';
-  console.warn(warning);
+  AppLog.warn('[r2OnlyUpload]', warning);
   
   // Override Supabase storage methods to prevent accidental usage
   if (typeof window !== 'undefined') {
-    const originalConsoleError = console.error;
     const storageErrorMessage = 'BLOCKED: Supabase storage upload attempted. Use uploadToR2Only() instead.';
     
     // Monitor for any Supabase storage calls
@@ -94,7 +97,7 @@ export const enforceR2OnlyPolicy = () => {
     window.fetch = function(...args) {
       const url = args[0] as string;
       if (typeof url === 'string' && url.includes('/storage/v1/object/')) {
-        originalConsoleError(storageErrorMessage);
+        AppLog.error('[r2OnlyUpload]', storageErrorMessage);
         throw new Error(storageErrorMessage);
       }
       return originalFetch.apply(this, args);
@@ -102,16 +105,18 @@ export const enforceR2OnlyPolicy = () => {
   }
 };
 
+// TODO: This function is a stub and always returns true without deleting anything.
+// Implement actual deletion or remove callers that depend on it.
 /**
  * Delete file from R2 (placeholder for future implementation)
  */
 export const deleteFromR2Only = async (filePath: string): Promise<boolean> => {
   try {
-    console.log('Delete request for R2 file:', filePath);
+    AppLog.debug('[r2OnlyUpload]', 'Delete request for R2 file:', filePath);
     // TODO: Implement R2 delete functionality when needed
     return true;
   } catch (error) {
-    console.error('Failed to delete from R2:', error);
+    AppLog.error('[r2OnlyUpload]', 'Failed to delete from R2:', error);
     return false;
   }
 };

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { AppLog } from '@/lib/logger';
 
 export interface GolfClub {
   id: string;
@@ -79,8 +80,8 @@ export function useClubSearch(query: string, options: UseClubSearchOptions = {})
           }
         }
 
-        // Merge results: direct matches first (sorted), then alias results (sorted)
-        const directMatches = (clubs || []).sort((a, b) => a.name.localeCompare(b.name));
+        // Merge results: direct matches first (already sorted by Supabase .order('name')), then alias results
+        const directMatches = clubs || [];
         const clubIds = new Set(directMatches.map(c => c.id));
         
         // Add alias clubs that aren't already in direct matches
@@ -93,7 +94,7 @@ export function useClubSearch(query: string, options: UseClubSearchOptions = {})
         // Limit results (already sorted: direct first, then alias)
         setData(mergedClubs.slice(0, limit));
       } catch (err) {
-        console.error('Error searching clubs:', err);
+        AppLog.error('[useClubSearch]', 'Error searching clubs:', err);
         setError('Failed to search clubs');
         setData([]);
       } finally {

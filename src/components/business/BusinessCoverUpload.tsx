@@ -27,7 +27,7 @@ export function BusinessCoverUpload({
       }
       setLocalPreviewUrl(null);
     }
-  }, [coverUrl]);
+  }, [coverUrl, localPreviewUrl]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

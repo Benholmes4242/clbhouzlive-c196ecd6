@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { AppLog } from '@/lib/logger';
 
 export type LocationPrecision = 'address' | 'poi' | 'postcode' | 'city' | 'region' | 'country' | 'pin';
 
@@ -63,7 +64,7 @@ export function useBusinessProfile(idOrSlug: string | undefined) {
         .maybeSingle();
 
       if (error) {
-        console.error('[useBusinessProfile] error', error);
+        AppLog.error('[useBusinessProfile]', 'query error', error);
         throw error;
       }
 
@@ -92,13 +93,13 @@ export function useBusinessProfile(idOrSlug: string | undefined) {
           .maybeSingle();
 
         if (courseError) {
-          console.error('[useBusinessProfile] course coords fallback error', courseError);
+          AppLog.error('[useBusinessProfile]', 'course coords fallback error', courseError);
         }
 
         if (courseData) {
           finalLat = courseData.latitude;
           finalLng = courseData.longitude;
-          console.log('[useBusinessProfile] Using course coords fallback:', finalLat, finalLng);
+          AppLog.debug('[useBusinessProfile]', 'Using course coords fallback:', finalLat, finalLng);
         }
       }
 
