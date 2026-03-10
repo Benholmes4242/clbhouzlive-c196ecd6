@@ -449,18 +449,24 @@ function StatGlowChip({ value, label, color, bg, border, glow, dimmed }: {
 }
 
 // ─── Performance stat chip (neutral) ───
-function PerfChip({ value, label, suffix }: { value: string; label: string; suffix: string }) {
+function PerfChip({ value, label, suffix }: { value: string | null; label: string; suffix: string }) {
+  const isNull = value === null;
   return (
     <div style={{
-      minWidth: 64, borderRadius: 12, padding: '10px 14px',
+      borderRadius: 12, padding: '10px 0',
       background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)',
-      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flexShrink: 0,
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+      opacity: isNull ? 0.4 : 1,
     }}>
-      <span style={{ fontSize: 18, fontWeight: 800, color: 'rgba(255,255,255,0.9)', lineHeight: 1 }}>
-        {value}
-        {suffix && <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>{suffix}</span>}
+      <span style={{ fontSize: 16, fontWeight: 800, color: 'rgba(255,255,255,0.9)', lineHeight: 1 }}>
+        {isNull ? '—' : (
+          <>
+            {value}
+            {suffix && <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>{suffix}</span>}
+          </>
+        )}
       </span>
-      <span style={{ fontSize: 8.5, fontWeight: 700, color: 'rgba(255,255,255,0.45)', letterSpacing: 0.8, textTransform: 'uppercase' }}>{label}</span>
+      <span style={{ fontSize: 7.5, fontWeight: 700, color: 'rgba(255,255,255,0.45)', letterSpacing: 0.8, textTransform: 'uppercase' }}>{label}</span>
     </div>
   );
 }
