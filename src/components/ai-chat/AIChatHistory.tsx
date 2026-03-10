@@ -7,7 +7,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useConversationSession } from '@/hooks/useConversationSession';
+// Legacy useConversationSession removed — session stub for compatibility
 import { useCaddieLogs } from '@/hooks/useCaddieLogs';
 import { useEchoProtection } from '@/hooks/useEchoProtection';
 import { useEchoConversationsOptional } from '@/features/echo/components/EchoConversationsProvider';
