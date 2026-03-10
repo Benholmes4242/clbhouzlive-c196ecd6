@@ -102,6 +102,10 @@
      }
    };
  
+   // WARNING: This operation sets deleted_at on ALL messages in the conversation,
+   // affecting ALL participants — not just the current user.
+   // A per-user soft-delete (e.g. a user_id column on deleted messages) is needed
+   // to scope this correctly. Do not ship a "Clear Chat" UI without fixing this first.
    const handleClearChatConfirmed = async () => {
      haptic('medium');
      try {
