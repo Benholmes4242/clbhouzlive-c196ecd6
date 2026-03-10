@@ -354,6 +354,9 @@ const ClubhouseContent = () => {
               followOverrides={followOverrides}
               onFollowChange={handleFollowChange}
               onFirstFrameReady={signalFirstFrameReady}
+              onLike={(post) => handleLike(post)}
+              onComment={openComments}
+              onShare={(post) => handleShare(post)}
             />
           </VideoPoolProvider>
         </MediaErrorBoundary>
