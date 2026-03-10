@@ -33,6 +33,11 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => { mountedRef.current = false; };
+  }, []);
 
   const handleSubmit = async () => {
     setSubmitting(true);
