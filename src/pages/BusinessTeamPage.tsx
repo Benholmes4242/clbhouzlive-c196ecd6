@@ -113,15 +113,18 @@ export default function BusinessTeamPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border">
-        <div className="flex items-center gap-3 px-4 py-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-lg font-semibold">Team & access</h1>
-            <p className="text-sm text-muted-foreground">Manage who can access and post from this business profile.</p>
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
+        <div className="flex items-center px-4 h-14">
+          <button
+            onClick={() => navigate(-1)}
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-muted-foreground active:text-foreground transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <div className="flex-1 text-center">
+            <h1 className="text-[16px] font-semibold text-foreground">Team & Access</h1>
           </div>
+          <div className="w-11" />
         </div>
       </div>
 
