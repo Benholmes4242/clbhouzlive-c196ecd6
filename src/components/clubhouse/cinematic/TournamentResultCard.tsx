@@ -500,18 +500,66 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
           </div>
         )}
 
-        {/* Row 7: Footer — tour badge left, View Results right (matching hero) */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
+        {/* Row 7: Footer — tour badge, engagement pills, View Results */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16 }}>
+          {/* Tour badge - left */}
           <div className="tour-badge">
             <span>{getTourLabel(meta.tour_slug)}</span>
           </div>
+
+          {/* Engagement pills - centre */}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              onClick={onLike}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5,
+                background: post.isLikedByMe
+                  ? 'rgba(249, 115, 22, 0.25)'
+                  : 'rgba(255, 255, 255, 0.10)',
+                border: `1px solid ${post.isLikedByMe
+                  ? 'rgba(249, 115, 22, 0.5)'
+                  : 'rgba(255, 255, 255, 0.15)'}`,
+                borderRadius: 20,
+                padding: '6px 12px',
+                color: post.isLikedByMe ? '#F97316' : 'rgba(255,255,255,0.85)',
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              <span>{post.isLikedByMe ? '♥' : '♡'}</span>
+              <span>{post.likeCount}</span>
+            </button>
+
+            <button
+              onClick={onComment}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5,
+                background: 'rgba(255, 255, 255, 0.10)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: 20,
+                padding: '6px 12px',
+                color: 'rgba(255,255,255,0.85)',
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              <span>💬</span>
+              <span>{post.commentCount}</span>
+            </button>
+          </div>
+
+          {/* View Results - right */}
           <button
             onClick={handleViewResults}
-            className="hero-text-cta"
-            style={{ fontSize: 13, textDecoration: 'none', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.85)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
           >
-            <span>View Results</span>
-            <ChevronRight className="w-4 h-4 cta-chevron" style={{ color: 'rgba(255,255,255,0.5)' }} />
+            View Results →
           </button>
         </div>
       </div>
