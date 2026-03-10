@@ -27,8 +27,8 @@ export function useEchoProfile(): EchoProfile {
       .select('display_name, home_club, eg_handicap_index, city, country')
       .eq('id', user.id)
       .single()
-      .then(({ data }) => {
-        if (!data) return;
+      .then(({ data, error }) => {
+        if (error || !data) return;
         const displayName = data.display_name || null;
         const firstName = displayName
           ? displayName.split(' ')[0]

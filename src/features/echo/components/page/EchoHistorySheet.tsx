@@ -56,17 +56,20 @@ function useDeleteEchoConversation() {
   
   return useMutation({
     mutationFn: async (conversationId: string) => {
-      await supabase
-        .from('echo_conversation_messages')
-        .delete()
-        .eq('conversation_id', conversationId);
-      
+      // Delete conversation first, then orphaned messages.
+      // If FK CASCADE is configured, messages are removed automatically.
       const { error } = await supabase
         .from('echo_conversations')
         .delete()
         .eq('id', conversationId);
       
       if (error) throw error;
+
+      // Clean up messages in case FK CASCADE is not set
+      await supabase
+        .from('echo_conversation_messages')
+        .delete()
+        .eq('conversation_id', conversationId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['echo', 'conversations'] });
@@ -232,7 +235,7 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
       {isOpen && (
         <>
           <motion.div
-            className="fixed inset-0 bg-black/25 z-40"
+            className="fixed inset-0 bg-foreground/25 z-40"
             initial={animationProps.initial}
             animate={{ opacity: 1 }}
             exit={animationProps.exit}
@@ -301,7 +304,7 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
             {confirmDelete && (
               <>
                 <motion.div
-                  className="fixed inset-0 z-[60] bg-black/30"
+                  className="fixed inset-0 z-[60] bg-foreground/30"
                   initial={animationProps.initial}
                   animate={{ opacity: 1 }}
                   exit={animationProps.exit}

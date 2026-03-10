@@ -139,6 +139,7 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
       .order('created_at', { ascending: true });
 
     if (error) {
+      toast.error("Couldn't load conversation");
       return;
     }
 
@@ -166,6 +167,7 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
       .order('created_at', { ascending: true });
 
     if (error) {
+      toast.error("Couldn't load messages");
       return;
     }
 
@@ -315,7 +317,7 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
       setIsStreaming(false);
       setStreamingContent('');
     }
-  }, [messages, sendToAI, isStreaming, userId, conversationId, queryClient, rateLimitCooldown, profile]);
+  }, [sendToAI, isStreaming, userId, conversationId, queryClient, rateLimitCooldown, profile]);
 
   const abortStream = useCallback(async () => {
     abort();
