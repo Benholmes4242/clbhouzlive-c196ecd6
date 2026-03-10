@@ -237,7 +237,7 @@ function MessagesPageInner() {
             <ChevronLeft className="w-5 h-5 text-foreground/60" />
           </button>
 
-          <span className="text-[16px] font-semibold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>Messages</span>
+          <span className="text-[16px] font-semibold text-foreground font-dm-sans">Messages</span>
 
           <button 
             onClick={handleNewConversation}
