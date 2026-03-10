@@ -177,6 +177,7 @@ export function useTeamManagement(
         );
       } catch (error) {
         console.error('Search error:', error);
+        toast.error('Search failed. Please try again.');
       } finally {
         setSearching(false);
       }
