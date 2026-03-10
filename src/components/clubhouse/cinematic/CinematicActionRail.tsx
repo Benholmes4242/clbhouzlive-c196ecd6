@@ -43,6 +43,8 @@ interface CinematicActionRailProps {
   /** Called with the vertical centre (px from top of viewport) of the top chevron after layout.
    *  Parent uses this to align the left chevron to the same Y position. */
   onChevronPositionChange?: (centreY: number) => void;
+  /** Hide the mute button entirely (e.g. for non-audio cards) */
+  hideMute?: boolean;
 }
 
 const formatCount = (count: number): string => {
@@ -214,6 +216,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   postHasMusic = false,
   bottomOffset,
   onChevronPositionChange,
+  hideMute = false,
 }) => {
   // Idle opacity: 75% when not interacted, full when interacted or active
   const idleOpacity = hasInteracted ? 1 : 0.75;
@@ -289,7 +292,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       />
 
       {/* Slot 3: Mute/Unmute — only shown on video content */}
-      {isVideo && onMuteToggle && (
+      {isVideo && !hideMute && onMuteToggle && (
         <ActionSlot
           icon={
             audioMode === 'music_only' && postHasMusic
