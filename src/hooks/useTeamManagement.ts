@@ -137,8 +137,8 @@ export function useTeamManagement(
     title: string | null,
   ) => {
     if (!businessId) return;
-    const { error } = await (supabase
-      .from('business_team_members') as any)
+    const { error } = await supabase
+      .from('business_team_members')
       .update({ display_title: title })
       .eq('business_id', businessId)
       .eq('user_profile_id', userProfileId);
