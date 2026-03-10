@@ -28,6 +28,27 @@ export function FeedItem({
   const isMultiMedia = post.mediaItems.length > 1;
   const media = post.mediaItems[0];
 
+  // Tournament result cards render as full-bleed inline items
+  if (post.postType === 'tournament_result' && post.tournamentMeta) {
+    return (
+      <div
+        ref={ref}
+        className="relative w-full flex-shrink-0"
+        style={{ height: '100dvh' }}
+      >
+        <TournamentResultCard
+          post={post as TournamentResultFeedPost}
+          isActive={isActive}
+          isVisible={true}
+          onLike={() => {}}
+          onComment={() => {}}
+          onShare={() => {}}
+          onViewResults={() => {}}
+        />
+      </div>
+    );
+  }
+
   if (!media) {
     // Review posts without media — render course image backdrop or plain dark
     if (post.isReview && post.review?.courseImageUrl) {

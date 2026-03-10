@@ -350,21 +350,9 @@ const ClubhouseContent = () => {
         </MediaErrorBoundary>
       )}
 
-      {/* ═══ TOURNAMENT RESULT CARD (full takeover — no other overlays) ═══ */}
+      {/* ═══ TOURNAMENT RESULT OVERLAY (comments/more options only — card renders inline in feed) ═══ */}
       {activePost && posts.length > 0 && activePost.postType === 'tournament_result' && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 20 }}>
-          <TournamentResultCard
-            post={activePost as TournamentResultFeedPost}
-            isActive={true}
-            isVisible={overlayVisible}
-            onLike={() => handleLike(activePost)}
-            onComment={openComments}
-            onShare={() => handleShare(activePost)}
-            onViewResults={() => {
-              const meta = (activePost as TournamentResultFeedPost).tournamentMeta;
-              navigate(`/tours/${meta.tour_slug}/tournament/${meta.tournament_id}`);
-            }}
-          />
+        <>
           {/* Comments sheet for tournament posts */}
           <CommentsPage
             isOpen={commentsOpen}
@@ -401,7 +389,7 @@ const ClubhouseContent = () => {
               </div>
             </DrawerContent>
           </Drawer>
-        </div>
+        </>
       )}
 
       {/* ═══ OVERLAY LAYER (non-tournament posts only) ═══ */}
