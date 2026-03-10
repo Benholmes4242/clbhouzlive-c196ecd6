@@ -219,9 +219,9 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         }}>
           {/* Tour badge pill */}
           <div style={{
-            display: 'flex', alignItems: 'center', gap: 6,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
             background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255,255,255,0.18)', borderRadius: 20, padding: '5px 12px 5px 6px',
+            border: '1px solid rgba(255,255,255,0.18)', borderRadius: 20, padding: '5px 12px',
           }}>
             <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 0.8 }}>
               {meta.tour_name || getTourLabel(meta.tour_slug)}
