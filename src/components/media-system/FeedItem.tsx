@@ -22,10 +22,12 @@ interface FeedItemProps {
   onLike?: (post: FeedPost) => void;
   onComment?: () => void;
   onShare?: (post: FeedPost) => void;
+  getLikeState?: (post: FeedPost) => { isLiked: boolean; count: number };
+  getCommentCount?: (post: FeedPost) => number;
 }
 
 export function FeedItem({
-  post, index, isActive, onFirstFrameReady, onLike, onComment, onShare,
+  post, index, isActive, onFirstFrameReady, onLike, onComment, onShare, getLikeState, getCommentCount,
 }: FeedItemProps) {
   const ref = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();

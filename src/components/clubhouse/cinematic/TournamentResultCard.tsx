@@ -582,9 +582,9 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
       {/* 4. CinematicActionRail — right side */}
       <CinematicActionRail
         postId={post.id}
-        likesCount={post.likeCount}
-        commentsCount={post.commentCount}
-        hasLiked={post.isLikedByMe}
+        likesCount={likeCount}
+        commentsCount={commentCount}
+        hasLiked={isLiked}
         isMuted={false}
         isVisible={isVisible}
         onLike={onLike}
