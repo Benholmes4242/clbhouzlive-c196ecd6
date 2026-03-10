@@ -592,7 +592,7 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode, on
           alt={user.displayName}
           size={56}
           fallback={user.displayName?.charAt(0) || '?'}
-          ringColor={getRingColorForTotalPlayed(0)}
+          hideRing
           className="flex-shrink-0"
         />
 
