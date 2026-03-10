@@ -132,7 +132,7 @@ export function useConversationMessages(conversationId: string | null): UseConve
       setHasMore(messagesData.length === PAGE_SIZE);
       offsetRef.current = offset + messagesData.length;
     } catch (err) {
-      console.error('[useConversationMessages] Error:', err);
+      AppLog.error('[useConversationMessages]', 'Error:', err);
       setError(err instanceof Error ? err : new Error('Failed to fetch messages'));
     } finally {
       setLoading(false);
