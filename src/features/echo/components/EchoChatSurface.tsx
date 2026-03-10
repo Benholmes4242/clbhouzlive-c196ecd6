@@ -301,7 +301,7 @@ function MessageBubble({ message, styles, hubTheme }: MessageBubbleProps) {
       >
         <div className="whitespace-pre-wrap">{message.content}</div>
         {message.meta?.error && (
-          <div className="mt-2 text-xs text-red-500">
+          <div className="mt-2 text-xs text-destructive">
             Error: {message.meta.error}
           </div>
         )}
