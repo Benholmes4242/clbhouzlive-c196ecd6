@@ -209,8 +209,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
       if (error) throw error;
       toast.success('You left the group');
       onClose();
-    } catch (error: any) {
-      toast.error('Failed to leave', { description: error.message });
+    } catch (e: unknown) {
+      toast.error('Failed to leave', { description: (e as Error).message ?? 'An error occurred' });
     } finally {
       setShowLeaveDialog(false);
     }
