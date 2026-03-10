@@ -19,7 +19,6 @@ import { useBusinessPendingRequestsCount } from '@/hooks/useBusinessPendingReque
 import { useBusinessAccessRequestsRealtime } from '@/hooks/useBusinessAccessRequestsRealtime';
 import { cn } from '@/lib/utils';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
-import BusinessVerificationModal from './verification/BusinessVerificationModal';
 import { useBusinessVerificationRequest, deriveVerificationState } from '@/hooks/useBusinessVerificationRequest';
 import { getCityCountry } from '@/lib/locationDisplay';
 import type { BusinessMembership } from '@/hooks/useMyBusinesses';
@@ -49,14 +48,12 @@ function getCategoryDisplay(category: string | null | undefined): string {
 export function BusinessCommandCard({ membership, userId, index = 0, isActive = false }: BusinessCommandCardProps) {
   const navigate = useNavigate();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // CRITICAL: Close modals on unmount to prevent stuck overlay
   useEffect(() => {
     return () => {
       setShowDeleteDialog(false);
-      setShowVerificationModal(false);
     };
   }, []);
 
@@ -278,7 +275,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                     <DropdownMenuItem
                       onClick={(e) => {
                         e.stopPropagation();
-                        setShowVerificationModal(true);
+                        navigate(`/business/${business.id}/verification/wizard`);
                       }}
                       className="gap-2.5 cursor-pointer min-h-[44px] active:bg-muted"
                     >
@@ -436,12 +433,6 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
         userId={userId}
       />
 
-      <BusinessVerificationModal
-        open={showVerificationModal}
-        onOpenChange={setShowVerificationModal}
-        businessId={business.id}
-        isReapply={verificationState === 'rejected'}
-      />
     </>
   );
 }

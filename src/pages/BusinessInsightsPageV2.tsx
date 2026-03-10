@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { trackBusinessProfileVisit } from '@/lib/businessAnalyticsTracking';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
+import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
 type DateRange = '7d' | '28d' | '90d';
 
@@ -173,6 +175,8 @@ const BusinessInsightsPageV2 = () => {
   const [dateRange, setDateRange] = useState<DateRange>('28d');
   const { user } = useSupabaseSession();
 
+  useHideBottomNav();
+  useHideHeader();
   const { data: business, isLoading: businessLoading } = useBusinessProfile(id);
   const { data: membership, isLoading: membershipLoading, isFetched: membershipFetched } = useBusinessMembership(id);
 

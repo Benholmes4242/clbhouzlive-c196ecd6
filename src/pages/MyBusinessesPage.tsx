@@ -8,6 +8,8 @@ import { BusinessCommandCard } from '@/components/business/BusinessCommandCard';
 import { AddBusinessCard } from '@/components/business/AddBusinessCard';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { ChevronLeft } from 'lucide-react';
+import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
+import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
 const MyBusinessesPage = () => {
   const navigate = useNavigate();
@@ -15,6 +17,9 @@ const MyBusinessesPage = () => {
   const { data: businesses, isLoading } = useMyBusinesses(user?.id);
   const { activeActor } = useActiveActor();
   const [showCreateModal, setShowCreateModal] = useState(false);
+
+  useHideBottomNav();
+  useHideHeader();
 
   // Sort businesses — active first, then alphabetical
   const sortedBusinesses = useMemo(() => {

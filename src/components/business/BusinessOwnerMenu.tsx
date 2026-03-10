@@ -12,7 +12,7 @@ import {
 import { BusinessMembership } from '@/hooks/useBusinessMembership';
 import { DeleteBusinessDialog } from './DeleteBusinessDialog';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import BusinessVerificationModal from './verification/BusinessVerificationModal';
+
 
 interface BusinessOwnerMenuProps {
   businessId: string;
@@ -34,13 +34,12 @@ export function BusinessOwnerMenu({
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [verificationModalOpen, setVerificationModalOpen] = useState(false);
+  
 
   // CRITICAL: Close modals on unmount to prevent stuck overlay
   useEffect(() => {
     return () => {
       setDeleteDialogOpen(false);
-      setVerificationModalOpen(false);
     };
   }, []);
 
@@ -58,7 +57,7 @@ export function BusinessOwnerMenu({
   const isRejected = status === 'rejected';
 
   const handleRequestVerification = () => {
-    setVerificationModalOpen(true);
+    navigate(`/business/${businessId}/verification/wizard`);
   };
 
   return (
@@ -138,12 +137,6 @@ export function BusinessOwnerMenu({
         />
       )}
 
-      <BusinessVerificationModal
-        open={verificationModalOpen}
-        onOpenChange={setVerificationModalOpen}
-        businessId={businessId}
-        isReapply={isRejected}
-      />
     </>
   );
 }
