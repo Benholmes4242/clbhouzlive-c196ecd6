@@ -32,16 +32,11 @@ const SkeletonBlock: React.FC<{
   <div 
     className={cn(
       "relative overflow-hidden bg-white/[0.06]",
+      !isStatic && "clb-shimmer-dark",
       className
     )}
     style={style}
-  >
-    {!isStatic && (
-      <div 
-        className="absolute inset-0 animate-[shimmer_1.5s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-white/[0.04] to-transparent"
-      />
-    )}
-  </div>
+  />
 );
 
 // Match CinematicActionRail layout constants exactly

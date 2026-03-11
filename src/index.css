@@ -349,15 +349,39 @@ html.lightbox-open {
 }
 
 /* ========================================
-   SKELETON SHIMMER UTILITY
+   CANONICAL SHIMMER SYSTEM
    ======================================== */
 
-@keyframes clbhouz-shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
+@keyframes clb-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Dark shimmer — for dark/glass contexts (Clubhouse, sheets, overlays) */
+.clb-shimmer-dark {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.06) 50%,
+    transparent 100%);
+  background-size: 200% 100%;
+  animation: clb-shimmer 1.5s ease-in-out infinite;
+}
+
+/* Light shimmer — for light contexts (CommentsSheet light mode, cards) */
+.clb-shimmer-light {
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.04) 50%,
+    transparent 100%);
+  background-size: 200% 100%;
+  animation: clb-shimmer 1.5s ease-in-out infinite;
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .clb-shimmer-dark,
+  .clb-shimmer-light {
+    animation: none;
   }
 }
 
@@ -379,7 +403,13 @@ html.lightbox-open {
     rgba(255, 255, 255, 0) 100%
   );
   background-size: 200% 100%;
-  animation: clbhouz-shimmer 1.2s ease-in-out infinite;
+  animation: clb-shimmer 1.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clb-skeleton::before {
+    animation: none;
+  }
 }
 .rating-slider {
   touch-action: pan-y;
