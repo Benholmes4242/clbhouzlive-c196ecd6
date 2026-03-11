@@ -513,10 +513,12 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   // ===========================================
   return (
     <>
-      <UploadCenterPanel 
-        isOpen={uploadCenterOpen} 
-        onClose={() => setUploadCenterOpen(false)} 
-      />
+      {uploadCenterOpen && (
+        <UploadCenterPanel 
+          isOpen={uploadCenterOpen} 
+          onClose={() => setUploadCenterOpen(false)} 
+        />
+      )}
       {createPortal(
         <div
           ref={menuRef}

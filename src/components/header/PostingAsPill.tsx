@@ -22,7 +22,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
     const { activeActor, isLoading } = useActiveActor();
     
     // Get unread messages count from messaging system
-    const { conversations } = useMessaging();
+    const { conversations } = useMessagingContext();
     const hasUnreadMessages = conversations?.some(conv => conv.unread_count > 0) || false;
 
     if (isLoading || !activeActor) {

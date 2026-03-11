@@ -188,13 +188,13 @@ function ProfileHubSheet({
 
               {/* ── Profile header ── */}
               <div className="flex items-center gap-3 py-3">
-                <div className="w-[52px] h-[52px] rounded-[18px] overflow-hidden bg-muted shrink-0">
-                  <img
-                    src={activeProfile.avatarUrl}
-                    alt={activeProfile.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+                <SquircleAvatar
+                  size={52}
+                  src={activeProfile.avatarUrl}
+                  alt={activeProfile.name}
+                  fallback={activeProfile.name?.charAt(0)?.toUpperCase() ?? '?'}
+                  hideRing
+                />
                 <div className="min-w-0">
                   <div className="text-[16px] font-semibold text-foreground truncate">
                     {activeProfile.name}
