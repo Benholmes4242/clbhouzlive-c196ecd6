@@ -35,8 +35,15 @@ export function ComposerScreen() {
   // Caption character count using Intl.Segmenter for accuracy
   const charCount = (() => {
     try {
-      const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-      return [...segmenter.segment(state.caption)].length;
+      // Use Intl.Segmenter for accurate grapheme counting when available
+      const SegmenterCtor = (Intl as Record<string, unknown>).Segmenter as
+        | (new (locale: string, opts: { granularity: string }) => { segment: (s: string) => Iterable<unknown> })
+        | undefined;
+      if (SegmenterCtor) {
+        const segmenter = new SegmenterCtor('en', { granularity: 'grapheme' });
+        return [...segmenter.segment(state.caption)].length;
+      }
+      return state.caption.length;
     } catch {
       return state.caption.length;
     }
