@@ -6,7 +6,7 @@
 import { memo, useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Heart, MessageCircle, MoreHorizontal, Send, ChevronRight } from 'lucide-react';
+import { X, Heart, MoreHorizontal, SendHorizontal, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -76,6 +76,7 @@ function CommentsSheet({
   initialCommentId,
   initialParentCommentId,
   caddiePickCommentId,
+  isReview,
   onCommentPosted,
   onCommentDeleted,
 }: CommentsSheetProps) {
@@ -309,7 +310,7 @@ function CommentsSheet({
                 Caddie Pick
               </span>
             )}
-            <span className={cn('text-[11px]', isDark ? 'text-white/35' : 'text-muted-foreground/60')}>
+            <span className={cn('text-[11px]', isDark ? 'text-white/50' : 'text-muted-foreground/60')}>
               {relativeTime(comment.created_at)}
             </span>
             {(comment as any).is_edited && (
@@ -451,7 +452,7 @@ function CommentsSheet({
 
         {/* Inset divider */}
         {idx < sortedComments.length - 1 && (
-          <div className={cn('ml-[62px] mr-4', isDark ? 'border-b border-white/[0.06]' : 'border-b border-border/30')} />
+          <div className={cn('ml-[64px] h-px', isDark ? 'bg-white/8' : 'bg-border/30')} />
         )}
       </div>
     );
@@ -493,25 +494,28 @@ function CommentsSheet({
 
             {/* Header */}
             <div className={cn(
-              'flex items-center justify-between px-4 py-2 shrink-0 border-b',
+              'flex items-center px-4 pt-3 pb-3 shrink-0 border-b',
               isDark ? 'border-white/[0.06]' : 'border-border/50'
             )}>
-              {/* Title */}
-              <div className="flex items-baseline gap-1.5">
+              {/* Left spacer — matches close button width */}
+              <div className="w-11" />
+
+              {/* Title — centred */}
+              <div className="flex-1 flex items-center justify-center gap-2">
                 <span className={cn('text-[16px] font-semibold', isDark ? 'text-white' : 'text-foreground')}>
                   Comments
                 </span>
                 {totalCount > 0 && (
-                  <span className={cn('text-[14px] font-normal', isDark ? 'text-white/45' : 'text-muted-foreground')}>
+                  <span className={cn('text-[16px] font-semibold', isDark ? 'text-white/40' : 'text-muted-foreground')}>
                     {totalCount}
                   </span>
                 )}
               </div>
 
-              <div className="flex items-center gap-2">
-                {/* Sort toggle */}
+              {/* Right — sort toggle + close */}
+              <div className="flex items-center gap-3">
                 {totalCount > 1 && (
-                  <div className={cn('flex items-center rounded-lg p-0.5', isDark ? 'bg-white/8' : 'bg-muted/60')}>
+                  <div className={cn('flex items-center gap-1 rounded-lg p-0.5', isDark ? 'bg-white/8' : 'bg-muted/60')}>
                     {(['best', 'newest'] as const).map(s => (
                       <button
                         key={s}
@@ -520,7 +524,7 @@ function CommentsSheet({
                         className={cn(
                           'px-3 py-1 rounded-md text-[12px] font-semibold transition-colors capitalize min-h-[32px]',
                           sort === s
-                            ? isDark ? 'bg-white/12 text-white shadow-sm' : 'bg-background text-foreground shadow-sm'
+                            ? isDark ? 'bg-white/15 text-white' : 'bg-background text-foreground shadow-sm'
                             : isDark ? 'text-white/40' : 'text-muted-foreground'
                         )}
                       >
@@ -530,16 +534,15 @@ function CommentsSheet({
                   </div>
                 )}
 
-                {/* Close */}
                 <button
                   type="button"
                   onClick={onClose}
                   className={cn(
-                    'w-11 h-11 rounded-full flex items-center justify-center shrink-0',
-                    isDark ? 'bg-white/8 text-white/60' : 'bg-muted text-muted-foreground'
+                    'w-11 h-11 rounded-full flex items-center justify-center',
+                    isDark ? 'bg-white/8' : 'bg-muted'
                   )}
                 >
-                  <X className="w-4 h-4" />
+                  <X className={cn('w-5 h-5', isDark ? 'text-white/70' : 'text-muted-foreground')} />
                 </button>
               </div>
             </div>
@@ -566,19 +569,23 @@ function CommentsSheet({
                 </div>
               ) : comments.length === 0 ? (
                 /* Empty state */
-                <div className="flex flex-col items-center justify-center py-20 px-6 gap-3">
-                  <div className={cn(
-                    'w-16 h-16 rounded-full flex items-center justify-center',
-                    isDark ? 'bg-white/[0.04]' : 'bg-muted/50'
-                  )}>
-                    <MessageCircle className={cn('w-7 h-7', isDark ? 'text-white/30' : 'text-muted-foreground/40')} />
+                <div className="flex-1 flex flex-col items-center justify-center px-8 gap-4">
+                  {/* Staggered bounce emoji cluster */}
+                  <div className="flex gap-3 text-4xl">
+                    <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>⛳</span>
+                    <span className="inline-block animate-bounce" style={{ animationDelay: '180ms' }}>🏌️</span>
+                    <span className="inline-block animate-bounce" style={{ animationDelay: '360ms' }}>💬</span>
                   </div>
-                  <p className={cn('text-sm font-medium', isDark ? 'text-white' : 'text-foreground')}>
-                    No comments yet
-                  </p>
-                  <p className={cn('text-xs text-center', isDark ? 'text-white/50' : 'text-muted-foreground')}>
-                    Be the first to share your thoughts
-                  </p>
+                  <div className="flex flex-col items-center gap-1.5">
+                    <p className={cn('text-[16px] font-semibold', isDark ? 'text-white' : 'text-foreground')}>
+                      No comments yet
+                    </p>
+                    <p className={cn('text-[13px] text-center leading-relaxed', isDark ? 'text-white/50' : 'text-muted-foreground')}>
+                      {isReview
+                        ? 'Be the first to review this course'
+                        : 'Be the first to drop your thoughts'}
+                    </p>
+                  </div>
                 </div>
               ) : (
                 /* Comment list */
@@ -661,9 +668,14 @@ function CommentsSheet({
                   type="button"
                   onClick={handleSend}
                   disabled={!inputText.trim() || isAddingComment}
-                  className="w-9 h-9 rounded-full bg-primary flex items-center justify-center shrink-0 mb-0.5 disabled:opacity-40 transition-opacity"
+                  className={cn(
+                    'w-9 h-9 rounded-full flex items-center justify-center transition-colors shrink-0',
+                    inputText.trim()
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-white/10 text-white/30'
+                  )}
                 >
-                  <Send className="w-4 h-4 text-primary-foreground" />
+                  <SendHorizontal className="w-4 h-4" />
                 </button>
               </div>
             </div>
