@@ -291,11 +291,6 @@ const ClubhouseContent = () => {
   // EVENT HANDLERS
   // ============================================================================
 
-  const handleCloseComposer = () => {
-    closeComposer();
-    setLocalSelectedTags([]);
-  };
-
   return (
     <PageRoot 
       ref={clubhouseRootRef} 
