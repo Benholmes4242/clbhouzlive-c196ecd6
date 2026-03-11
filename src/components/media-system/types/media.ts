@@ -24,6 +24,7 @@ export interface ReviewData {
   courseRegion?: string | null;
   courseCountry?: string | null;
   courseSubCountry?: string | null;
+  reviewText?: string | null;
 }
 
 /** Creator relationship to current user */
@@ -182,6 +183,7 @@ export interface FeedRpcRow {
   review_course_region?: string | null;
   review_course_country?: string | null;
   review_course_sub_country?: string | null;
+  review_text?: string | null;
   course_region?: string | null;
   course_country?: string | null;
   creator_relation: string;

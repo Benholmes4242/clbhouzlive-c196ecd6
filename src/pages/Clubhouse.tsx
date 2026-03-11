@@ -456,6 +456,7 @@ const ClubhouseContent = () => {
                       : activeReview.courseCountry || undefined
                   }
                   rating={activeReview.rating}
+                  reviewText={activeReview?.reviewText ?? null}
                   reviewId={activeReview.reviewId}
                   media={activePost?.mediaItems?.map((m, i) => ({
                     id: m.id ?? `media-${i}`,

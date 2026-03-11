@@ -82,6 +82,7 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
       courseRegion: row.review_course_region || null,
       courseCountry: row.review_course_country || null,
       courseSubCountry: row.review_course_sub_country || null,
+      reviewText: row.review_text ?? null,
     };
   }
 
