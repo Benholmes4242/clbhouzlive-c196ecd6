@@ -109,16 +109,6 @@ function ProfileHubSheet({
     onClose();
   }, [onNavigate, onClose]);
 
-  const handleLogout = useCallback(async () => {
-    try {
-      await supabase.auth.signOut();
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.href = '/';
-    } catch {
-      window.location.href = '/';
-    }
-  }, []);
 
   const activeProfile = profiles.find(p => p.id === localActiveId) || currentActor;
 
