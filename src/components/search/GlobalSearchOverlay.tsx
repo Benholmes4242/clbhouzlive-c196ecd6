@@ -29,15 +29,32 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const { people, clubs, businesses, trending, isLoading } =
     useGlobalEntitySearch({ query: debouncedQuery, enabled: isOpen });
 
-  // Auto-focus 100ms after open
+  // Auto-focus 100ms after open, refresh recent searches
   useEffect(() => {
     if (isOpen) {
+      setRecent(getRecentSearches());
       const t = setTimeout(() => inputRef.current?.focus(), 100);
       return () => clearTimeout(t);
     } else {
       setInputValue('');
     }
   }, [isOpen]);
+
+  const handleDeleteRecent = useCallback((id: string) => {
+    const updated = recent.filter(s => s.id !== id);
+    localStorage.setItem('recent_searches', JSON.stringify(updated));
+    setRecent(updated);
+  }, [recent]);
+
+  const handleClearAll = useCallback(() => {
+    clearRecentSearches();
+    setRecent([]);
+  }, []);
+
+  const handleSaveRecent = useCallback((query: string) => {
+    saveRecentSearch(query);
+    setRecent(getRecentSearches());
+  }, []);
 
   // Lock body scroll
   useEffect(() => {
