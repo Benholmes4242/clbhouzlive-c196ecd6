@@ -24,6 +24,7 @@ export interface ReviewData {
   courseRegion?: string | null;
   courseCountry?: string | null;
   courseSubCountry?: string | null;
+  reviewText?: string | null;
 }
 
 /** Creator relationship to current user */
