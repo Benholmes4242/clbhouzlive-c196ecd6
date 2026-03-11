@@ -9,7 +9,7 @@ import { Plus, AlertCircle, Images, Loader2 } from 'lucide-react';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import type { ReviewMediaItem } from '../types';
 import type { ReviewWizardCourse } from '../types';
-import { ComposerMediaItem } from '@/hooks/useSnapModal';
+import { ComposerMediaItem } from '@/components/post-studio/types';
 import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
 import { triggerHaptic } from '@/lib/ui/haptics';
 import { PermissionDeniedCard } from '@/components/post/post-wizard/components/PermissionDeniedCard';
