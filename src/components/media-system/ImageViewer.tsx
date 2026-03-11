@@ -9,6 +9,7 @@ interface ImageViewerProps {
   thumbnailUrl?: string;
   width?: number;
   height?: number;
+  onFirstFrameReady?: () => void;
 }
 
 export function ImageViewer({ imageUrl, thumbnailUrl, width, height }: ImageViewerProps) {
