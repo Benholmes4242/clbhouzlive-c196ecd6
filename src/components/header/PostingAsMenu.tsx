@@ -16,7 +16,7 @@ import { useIsMobile } from '@/hooks/useIsMobile';
 import { cn } from '@/lib/utils';
 import { postingAsCopy } from '@/lib/postingAsCopy';
 import { toast } from 'sonner';
-import { AccountHubSheet } from './AccountHubSheet';
+import ProfileHubSheet from '@/components/profile/ProfileHubSheet';
 
 interface PostingAsMenuProps {
   isOpen: boolean;
