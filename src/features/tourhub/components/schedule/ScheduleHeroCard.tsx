@@ -79,7 +79,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
     const row2 = podiumRows[1];
     if (winnerRow.sharedScore === null || row2.sharedScore === null) return null;
     const margin = row2.sharedScore - winnerRow.sharedScore;
-    if (margin === 0) return 'Won in playoff';
+    if (margin === 0) return 'Won in Playoff';
     return `Won by ${margin} stroke${margin === 1 ? '' : 's'}`;
   })();
 
