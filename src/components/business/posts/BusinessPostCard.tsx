@@ -38,7 +38,7 @@ import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/Un
 import { getFilterClass } from '@/utils/studioFilters';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
-import CommentsPage from '@/components/clubhouse/cinematic/CommentsPage';
+import CommentsSheet from '@/components/comments/CommentsSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { PostActionBar } from '@/components/posts/PostActionBar';
