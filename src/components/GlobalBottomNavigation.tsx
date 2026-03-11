@@ -12,7 +12,6 @@ import { useAppPrefetch } from '@/hooks/useAppPrefetch';
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import PostSubmissionHandler from './bottom-navigation/PostSubmissionHandler';
-import PostStudio from './post-studio/PostStudio';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
 
 import { cn } from '@/lib/utils';
@@ -217,14 +216,18 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
         )}
       </AnimatePresence>
 
-      {/* Post Creation — New PostStudio */}
-      <PostStudio
-        open={isComposerOpen}
+      {/* Post Submission Handler */}
+      <PostSubmissionHandler
+        isComposerOpen={isComposerOpen}
+        mediaItems={mediaItems}
+        selectedFile={selectedFile}
+        selectedCourse={selectedCourse}
+        onCourseSelect={setSelectedCourse}
         onClose={handleCloseComposer}
-        initialMedia={mediaItems.map(m => m.file)}
-        onSuccess={() => {
-          showConfirmationToast('Post shared!');
-        }}
+        onShowToast={showConfirmationToast}
+        isSubmitting={isSubmitting}
+        setIsSubmitting={() => {}}
+        onMediaChange={setMediaItems}
       />
 
       {/* Snap Toast */}
