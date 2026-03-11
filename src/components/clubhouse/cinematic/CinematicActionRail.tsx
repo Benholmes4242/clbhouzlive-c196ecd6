@@ -13,8 +13,8 @@ import { prefersReducedMotion } from '@/utils/safePlay';
 
 interface CinematicActionRailProps {
   postId: string;
-  likesCount: number;
-  commentsCount: number;
+  likesCount: number | null;
+  commentsCount: number | null;
   hasLiked: boolean;
   isMuted: boolean;
   isVisible: boolean;
