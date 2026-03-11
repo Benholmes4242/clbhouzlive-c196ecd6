@@ -193,7 +193,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           <button
                             type="button"
                             onClick={() => commitRecentSearch(item.query)}
-                            className="flex-1 text-left text-sm text-foreground"
+                            className="flex-1 text-left text-sm text-foreground truncate min-w-0 block"
                           >
                             {item.query}
                           </button>
