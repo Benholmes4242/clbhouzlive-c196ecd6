@@ -482,7 +482,7 @@ function AppRoutes() {
           } />
         </Route>
         
-        <Route path="/create-moment" element={<Suspense fallback={<GenericPageSkeleton />}><CreateMomentPage /></Suspense>} />
+        {/* /create-moment removed — PostStudio is now the sole creation flow */}
         <Route path="/error-logs" element={<ErrorLogPage />} />
         
         {/* Echo AI */}
