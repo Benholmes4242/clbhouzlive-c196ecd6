@@ -203,10 +203,12 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   if (isMobile) {
     return (
       <>
-        <UploadCenterPanel 
-          isOpen={uploadCenterOpen} 
-          onClose={() => setUploadCenterOpen(false)} 
-        />
+        {uploadCenterOpen && (
+          <UploadCenterPanel 
+            isOpen={uploadCenterOpen} 
+            onClose={() => setUploadCenterOpen(false)} 
+          />
+        )}
         <ProfileHubSheet
           open={isOpen}
           onClose={onClose}
@@ -215,8 +217,6 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
           onSwitchProfile={handleSwitchProfile}
           onNavigate={handleAccountHubNavigate}
           isAdmin={hasAdminAccess || false}
-          headerHeight={headerHeight}
-          useLightTheme={useLightTheme}
         />
       </>
     );
