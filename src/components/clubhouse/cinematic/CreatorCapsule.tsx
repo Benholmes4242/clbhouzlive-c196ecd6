@@ -18,8 +18,7 @@ import { ChevronUp, User, Music, ChevronRight } from 'lucide-react';
 import { FiMapPin } from 'react-icons/fi';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import CourseLocationRow from '@/components/posts/CourseLocationRow';
-import { getReviewOverlayTheme, getOverlayRatingColors, type ExtractedReviewData } from '@/lib/postHelpers';
-import { RatingPill } from '@/components/ui/RatingPill';
+import { getOverlayRatingColors, type ExtractedReviewData } from '@/lib/postHelpers';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
 /** Animated soundwave bars for music playback indicator */
