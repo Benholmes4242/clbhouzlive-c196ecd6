@@ -221,7 +221,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   };
 
   // ===========================================
-  // MOBILE: AccountHubSheet with two snap states
+  // MOBILE: ProfileHubSheet bottom sheet
   // ===========================================
   if (isMobile) {
     return (
