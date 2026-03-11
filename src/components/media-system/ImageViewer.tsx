@@ -22,9 +22,21 @@ export function ImageViewer({ imageUrl, thumbnailUrl, width, height, onFirstFram
   useEffect(() => {
     setLoaded(false);
     const img = new Image();
-    img.onload = () => setLoaded(true);
+    img.onload = () => {
+      setLoaded(true);
+      if (!firstFrameFiredRef.current && onFirstFrameReady) {
+        firstFrameFiredRef.current = true;
+        onFirstFrameReady();
+      }
+    };
     img.src = imageUrl;
-    if (img.complete) setLoaded(true);
+    if (img.complete) {
+      setLoaded(true);
+      if (!firstFrameFiredRef.current && onFirstFrameReady) {
+        firstFrameFiredRef.current = true;
+        onFirstFrameReady();
+      }
+    }
     return () => { img.onload = null; };
   }, [imageUrl]);
 
