@@ -59,6 +59,38 @@ import { useClubhouseComments } from '@/components/clubhouse/hooks/useClubhouseC
 import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShare';
 import { useClubhouseFeedNav } from '@/components/clubhouse/hooks/useClubhouseFeedNav';
 
+/** Shared More Options Drawer */
+interface MoreOptionsDrawerProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onReport: () => void;
+  onNotInterested: () => void;
+  onCopyLink: () => void;
+}
+
+const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
+  open, onOpenChange, onReport, onNotInterested, onCopyLink
+}) => (
+  <Drawer open={open} onOpenChange={onOpenChange}>
+    <DrawerContent className="bg-black/95 border-white/10">
+      <div className="p-4 space-y-2">
+        <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={onReport}>
+          <Flag className="w-5 h-5 text-white/60" />
+          <span className="text-sm text-white">Report this post</span>
+        </button>
+        <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={onNotInterested}>
+          <EyeOff className="w-5 h-5 text-white/60" />
+          <span className="text-sm text-white">Not interested</span>
+        </button>
+        <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={onCopyLink}>
+          <LinkIcon className="w-5 h-5 text-white/60" />
+          <span className="text-sm text-white">Copy link</span>
+        </button>
+      </div>
+    </DrawerContent>
+  </Drawer>
+);
+
 /** Feed + preloader wrapper — preloader must be inside VideoPoolProvider */
 function FeedWithPreloader({
   posts,
