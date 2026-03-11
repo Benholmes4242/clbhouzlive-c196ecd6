@@ -240,7 +240,11 @@ const ClubhouseContent = () => {
     hideToast
   } = useSnapModal();
 
-  const [localSelectedTags, setLocalSelectedTags] = useState<any[]>([]);
+  interface PostTag {
+    id: string;
+    name: string;
+  }
+  const [localSelectedTags, setLocalSelectedTags] = useState<PostTag[]>([]);
 
   // Season Recap Modal
   const { data: seasonRecap } = useSeasonRecap(user?.id);
