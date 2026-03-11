@@ -14,7 +14,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { ChevronUp, User, Music, ChevronRight, MapPin } from 'lucide-react';
+import { ChevronUp, User, Music, ChevronRight } from 'lucide-react';
+import { FiMapPin } from 'react-icons/fi';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import CourseLocationRow from '@/components/posts/CourseLocationRow';
 import { getOverlayRatingColors, type ExtractedReviewData } from '@/lib/postHelpers';
@@ -337,84 +338,61 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
 
   // Regular mode collapsed content
   const regularCollapsedContent = (
-    <div className="w-full flex items-center gap-3 px-3 py-2.5">
+    <button
+      type="button"
+      onClick={handleToggle}
+      className={cn(
+        'w-full flex items-center gap-3 px-3 py-2.5',
+        'text-left',
+        // No hover/active/focus states - static identity element
+        'hover:bg-transparent active:bg-transparent focus:bg-transparent',
+        'active:opacity-100 focus-visible:outline-none'
+      )}
+    >
+      {/* Avatar */}
+      <SquircleAvatar
+        size={40}
+        src={user?.avatar}
+        alt={user?.name ?? 'Creator'}
+        fallback={initials}
+        hideRing
+      />
 
-      {/* Avatar — taps to profile */}
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          handleViewProfile();
-        }}
-        className="flex-shrink-0 focus:outline-none active:opacity-70 transition-opacity"
-      >
-        <SquircleAvatar
-          size={40}
-          src={user?.avatar}
-          alt={user?.name ?? 'Creator'}
-          fallback={initials}
-          hideRing
-        />
-      </button>
-
-      {/* Name + caption + course tag — taps name to profile, rest is passive */}
+      {/* Display Name - never username */}
       <div className="flex-1 min-w-0">
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleViewProfile();
-          }}
-          className="flex items-center gap-1.5 focus:outline-none active:opacity-70 transition-opacity text-left"
-        >
+        <div className="flex items-center gap-1.5">
           <span className="text-[13px] font-semibold text-white truncate">
             {user?.name || 'Golfer'}
           </span>
-        </button>
-
-        {/* Caption preview (collapsed) — passive, no tap */}
+        </div>
+        
+        {/* Caption preview (collapsed) */}
         {!isExpanded && truncatedCaption && (
           <p className="text-[11px] text-white/60 line-clamp-1 mt-0.5">
             {truncatedCaption}
           </p>
         )}
 
-        {/* Course location (collapsed) — tappable, navigates to course */}
+        {/* Course location (collapsed) — separate line */}
         {!isExpanded && courseDisplayLabel && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              const courseIdentifier = golfCourse?.slug || golfCourse?.id;
-              if (courseIdentifier) {
-                navigate(`/courses/${courseIdentifier}`);
-              }
-            }}
-            className="flex items-center gap-1 mt-1.5 active:opacity-70 transition-opacity focus:outline-none"
-          >
-            <MapPin className="w-3.5 h-3.5 text-white/50 flex-shrink-0" />
+          <div className="flex items-center gap-1 mt-1.5">
+            <FiMapPin size={14} className="text-white/50 flex-shrink-0" />
             <span className="text-[11px] text-white/50 truncate">
               {courseDisplayLabel}
             </span>
-          </button>
+          </div>
         )}
       </div>
 
-      {/* Expand/Collapse chevron — taps to toggle */}
-      <button
-        type="button"
-        onClick={handleToggle}
-        className="flex-shrink-0 p-1 focus:outline-none"
+      {/* Expand/Collapse chevron */}
+      <motion.div
+        animate={{ rotate: isExpanded ? 180 : 0 }}
+        transition={{ duration: 0.2 }}
+        className="flex-shrink-0"
       >
-        <motion.div
-          animate={{ rotate: isExpanded ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <ChevronUp className="w-4 h-4 text-white/50" />
-        </motion.div>
-      </button>
-
-    </div>
+        <ChevronUp className="w-4 h-4 text-white/50" />
+      </motion.div>
+    </button>
   );
 
   // Determine border color based on mode
