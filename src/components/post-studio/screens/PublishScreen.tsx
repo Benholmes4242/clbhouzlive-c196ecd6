@@ -62,6 +62,7 @@ export function PublishScreen() {
       };
 
       enqueuePostUpload(input);
+      onSuccess?.('');
       setStep('SUCCESS');
     } catch (err) {
       console.error('[PublishScreen] Failed to enqueue:', err);

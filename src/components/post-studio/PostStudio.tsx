@@ -302,6 +302,7 @@ export default function PostStudio({
         <PostStudioProvider
           initialActorType={initialActorType}
           initialActorId={initialActorId}
+          onSuccess={onSuccess}
         >
           <StudioInner onClose={onClose} initialMedia={initialMedia} />
         </PostStudioProvider>
