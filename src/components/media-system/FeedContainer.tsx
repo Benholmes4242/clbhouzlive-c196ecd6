@@ -15,7 +15,7 @@ import { useMediaStoreCompat } from './store/useMediaStoreCompat';
 import { MediaStoreContext } from './store/MediaStoreContext';
 import { useVideoPoolContext } from './VideoPoolProvider';
 import { flingSpring, SPRING_CONFIGS } from './utils/spring';
-import { usePreloader, preloadByUrl } from './hooks/usePreloader';
+import { preloadByUrl } from './hooks/usePreloader';
 import type { FeedPost } from './types/media';
 import { haptic } from '@/utils/haptics';
 
