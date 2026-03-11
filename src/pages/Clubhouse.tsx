@@ -165,6 +165,8 @@ const ClubhouseContent = () => {
   
   // ── Media store state ──
   const activeIndex = useMediaStore((s) => s.activeIndex);
+  const setActiveIndex = useMediaStore((s) => s.setActiveIndex);
+  const setCarouselPosition = useMediaStore((s) => s.setCarouselPosition);
   const isMuted = useMediaStore((s) => s.isMuted);
   const toggleMute = useMediaStore((s) => s.toggleMute);
   
