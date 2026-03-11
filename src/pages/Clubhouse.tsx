@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
 import SnapToast from '@/components/snap/SnapToast';
 
-import { useSnapModal } from '@/hooks/useSnapModal';
+// useSnapModal removed — PostStudio is now the sole creation flow
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
