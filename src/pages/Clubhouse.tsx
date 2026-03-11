@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
-import SnapToast from '@/components/snap/SnapToast';
+// SnapToast removed — PostStudio handles its own toasts
 
 // useSnapModal removed — PostStudio is now the sole creation flow
 import { PageRoot } from '@/components/layout/PageRoot';
