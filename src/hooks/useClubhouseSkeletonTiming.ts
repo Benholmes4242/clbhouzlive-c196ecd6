@@ -29,6 +29,8 @@ interface UseClubhouseSkeletonTimingResult {
   signalFirstFrameReady: () => void;
   /** True when first video is confirmed playback-ready */
   isFirstVideoReady: boolean;
+  /** Re-show skeleton (e.g. on tab switch to unloaded feed) */
+  resetSkeleton: () => void;
 }
 
 export function useClubhouseSkeletonTiming(
