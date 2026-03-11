@@ -4,7 +4,7 @@ import { Check, Plus, User, Bell, Upload, Settings, Building2, Shield, LogOut, C
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
-import { useMessaging } from '@/hooks/useMessaging';
+import { useMessagingContext } from '@/contexts/MessagingContext';
 import { postingAsCopy } from '@/lib/postingAsCopy';
 import { useProfilePrefetch } from '@/hooks/useProfilePrefetch';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
