@@ -368,7 +368,7 @@ const ClubhouseContent = () => {
         </div>
       ) : (
         <MediaErrorBoundary onReset={() => {
-          useMediaStore.getState().setActiveIndex(0);
+          setActiveIndex(0);
           activeFeed.refetch();
         }}>
           <VideoPoolProvider>
