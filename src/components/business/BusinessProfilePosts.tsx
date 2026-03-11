@@ -119,8 +119,8 @@ export function BusinessProfilePosts({
             className={cn(
               "flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors",
               activeFilter === key
-                ? "bg-[#01754F] text-white"
-                : "bg-white text-foreground border border-border hover:bg-muted/50"
+                ? "bg-primary text-primary-foreground"
+                : "bg-card text-foreground border border-border hover:bg-muted/50"
             )}
           >
             {label}
