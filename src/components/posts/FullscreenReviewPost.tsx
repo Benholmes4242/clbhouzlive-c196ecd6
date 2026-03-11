@@ -368,17 +368,12 @@ export function FullscreenReviewPost({
           </div>
         </div>
 
-        {/* Tap to explore hint */}
-        <div className="flex items-center justify-center gap-1 pt-2 pb-1 pointer-events-none">
-          <span className="text-[10px] uppercase tracking-[0.08em] text-white/40 font-medium">
-            Tap to explore
-          </span>
-          <span
-            className="text-[10px] text-white/40"
-            style={{ animation: 'tapBounce 1.8s ease-in-out infinite' }}
-          >
-            ↓
-          </span>
+        {/* Chevron affordance */}
+        <div className="flex justify-center pt-1 pb-0.5">
+          <ChevronsDown
+            className="w-4 h-4 text-white/35"
+            style={{ animation: 'chevronBounce 1.8s ease-in-out infinite' }}
+          />
         </div>
 
         {/* One-shot shimmer sweep */}
