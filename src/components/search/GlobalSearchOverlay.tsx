@@ -124,7 +124,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
         >
           {/* Header */}
           <div
-            className="flex items-center gap-3 px-4 pb-3"
+            className="w-full md:max-w-[560px] flex items-center gap-3 px-4 pb-3"
             style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
           >
             {/* Search input container */}
