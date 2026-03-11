@@ -1947,6 +1947,12 @@ html[data-immersive="true"] .app-shell--topSpacer {
   }
 }
 
+/* Review card chevron bounce */
+@keyframes chevronBounce {
+  0%, 100% { transform: translateY(0px);  opacity: 0.35; }
+  50%       { transform: translateY(3px);  opacity: 0.6;  }
+}
+
 @keyframes echoPulse {
   0%, 100% {
     box-shadow: 0 0 0 0 rgba(42, 157, 143, 0.4);
