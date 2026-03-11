@@ -217,6 +217,7 @@ function ProfileHubSheet({
 
               {/* ── Switch profile ── */}
               <div className="pb-3">
+
                 <div className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground/60 mb-2.5">
                   Switch Profile
                 </div>
