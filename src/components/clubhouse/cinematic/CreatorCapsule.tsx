@@ -207,28 +207,32 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
       )}
 
       {/* Golf Course CTA - one-line gap after caption */}
-      {courseDisplayLabel && (
+      {golfCourse && courseDisplayLabel && (
         <button
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            const courseIdentifier = golfCourse?.slug || golfCourse?.id;
+            const courseIdentifier = golfCourse.slug || golfCourse.id;
             if (courseIdentifier) {
               navigate(`/courses/${courseIdentifier}`);
+            } else if (golfCourse.name) {
+              navigate(`/courses?search=${encodeURIComponent(golfCourse.name)}`);
             }
           }}
-          className={cn(
-            "flex items-center gap-1 mt-1.5 text-left w-full",
-            (golfCourse?.slug || golfCourse?.id) && "cursor-pointer hover:opacity-80 transition-opacity"
-          )}
+          className="flex items-start gap-2 py-2.5 text-left w-full cursor-pointer active:scale-[0.98] active:opacity-80 transition-all"
         >
-          <FiMapPin size={14} className="text-white/50 flex-shrink-0" />
-          <span className="text-[11px] text-white/50 truncate">
-            {courseDisplayLabel}
-          </span>
-          {(golfCourse?.slug || golfCourse?.id) && (
-            <ChevronRight className="w-3 h-3 text-white/40 flex-shrink-0 ml-auto" />
-          )}
+          <FiMapPin size={14} className="text-white/60 flex-shrink-0 mt-0.5" />
+          <div className="flex flex-col min-w-0 flex-1">
+            <span className="font-semibold text-[13px] leading-tight truncate text-white/90">
+              {golfCourse.name}
+            </span>
+            {golfCourse.courseCountry && (
+              <span className="text-xs leading-tight truncate text-white/60">
+                {golfCourse.courseCountry}
+              </span>
+            )}
+          </div>
+          <ChevronRight className="h-4 w-4 flex-shrink-0 mt-0.5 text-white/40" />
         </button>
       )}
 
