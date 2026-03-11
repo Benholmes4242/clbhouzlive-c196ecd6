@@ -436,7 +436,7 @@ const ClubhouseContent = () => {
             />
           </VideoPoolProvider>
         </MediaErrorBoundary>
-      )}
+      ) : null}
 
       {/* ═══ TOURNAMENT RESULT OVERLAY (comments/more options only — card renders inline in feed) ═══ */}
       {activePost && posts.length > 0 && activePost.postType === 'tournament_result' && (
