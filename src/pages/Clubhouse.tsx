@@ -43,7 +43,7 @@ import { TournamentResultCard } from '@/components/clubhouse/cinematic/Tournamen
 // ── Clubhouse UI overlays ──
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
-import { CommentsPage } from '@/components/clubhouse/cinematic/CommentsPage';
+import CommentsSheet from '@/components/comments/CommentsSheet';
 import { FullscreenReviewPost } from '@/components/posts/FullscreenReviewPost';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -390,7 +390,7 @@ const ClubhouseContent = () => {
       {activePost && posts.length > 0 && activePost.postType === 'tournament_result' && (
         <>
           {/* Comments sheet for tournament posts */}
-          <CommentsPage
+          <CommentsSheet
             isOpen={commentsOpen}
             onClose={closeComments}
             postId={activePost.id}
@@ -592,7 +592,7 @@ const ClubhouseContent = () => {
           </Drawer>
 
           {/* Comments sheet — z-100+ */}
-          <CommentsPage
+          <CommentsSheet
             isOpen={commentsOpen}
             onClose={closeComments}
             postId={activePost.id}

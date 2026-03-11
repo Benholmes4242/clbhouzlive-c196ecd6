@@ -6,7 +6,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { CommentsPage } from '@/components/clubhouse/cinematic/CommentsPage';
+import CommentsSheet from '@/components/comments/CommentsSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VideoCardMenu } from './VideoCardMenu';
 import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
@@ -236,7 +236,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
       </article>
 
       {/* Comments bottom sheet */}
-      <CommentsPage
+      <CommentsSheet
         isOpen={showComments}
         onClose={() => setShowComments(false)}
         postId={post.id}

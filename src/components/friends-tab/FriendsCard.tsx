@@ -6,7 +6,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { supabase } from '@/integrations/supabase/client';
 import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { toast } from 'sonner';
-import { CommentsPage } from '@/components/clubhouse/cinematic/CommentsPage';
+import CommentsSheet from '@/components/comments/CommentsSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { FriendsCardMenu } from './FriendsCardMenu';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
@@ -252,7 +252,7 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
       </article>
 
       {/* Comments bottom sheet */}
-      <CommentsPage
+      <CommentsSheet
         isOpen={showComments}
         onClose={() => setShowComments(false)}
         postId={post.id}

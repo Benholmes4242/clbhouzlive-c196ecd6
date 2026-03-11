@@ -1,0 +1,702 @@
+/**
+ * CommentsSheet — Full-featured comments bottom sheet.
+ * Rebuilt from scratch. Hooks (useCommentsWithReplies, useCommentsRealtime) are untouched.
+ */
+
+import { memo, useRef, useState, useEffect, useCallback, useMemo } from 'react';
+import { createPortal } from 'react-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Heart, MessageCircle, MoreHorizontal, Send, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+import { useCommentsWithReplies, type CommentWithReplies, type CommentReply } from '@/hooks/useCommentsWithReplies';
+import { useCommentsRealtime } from '@/hooks/useCommentsRealtime';
+import { useActiveActor } from '@/context/ActiveActorContext';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { MentionText } from '@/components/comments/MentionText';
+import { relativeTime } from '@/utils/relativeTime';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+
+// ── Types ──
+
+interface CommentsSheetProps {
+  isOpen: boolean;
+  onClose: () => void;
+  postId: string;
+  postImageUrl?: string | null;
+  videoThumbnail?: string | null;
+  creatorName?: string;
+  creatorAvatar?: string | null;
+  creatorHomeClub?: string | null;
+  creatorHandicap?: number | null;
+  caption?: string | null;
+  theme?: 'light' | 'dark' | 'grey';
+  currentUserId?: string | null;
+  creatorUserId?: string;
+  initialCommentId?: string | null;
+  initialParentCommentId?: string | null;
+  courseId?: string | null;
+  courseName?: string | null;
+  courseCountry?: string | null;
+  courseSubCountry?: string | null;
+  courseRegion?: string | null;
+  aspectRatio?: number;
+  isReview?: boolean;
+  reviewRating?: number | null;
+  caddiePickCommentId?: string | null;
+  onCommentPosted?: () => void;
+  onCommentDeleted?: () => void;
+}
+
+interface ReplyTarget {
+  topLevelId: string;
+  displayName: string;
+}
+
+// ── Component ──
+
+function CommentsSheet({
+  isOpen,
+  onClose,
+  postId,
+  theme = 'dark',
+  currentUserId: currentUserIdProp,
+  creatorUserId,
+  initialCommentId,
+  initialParentCommentId,
+  caddiePickCommentId,
+  onCommentPosted,
+  onCommentDeleted,
+}: CommentsSheetProps) {
+  const navigate = useNavigate();
+  const { user } = useSupabaseSession();
+  const { activeActor } = useActiveActor();
+  const currentUserId = currentUserIdProp ?? user?.id ?? null;
+
+  // ── Hook ──
+  const {
+    comments,
+    commentsLoading,
+    addComment,
+    isAddingComment,
+    toggleCommentLike,
+    deleteComment,
+    isDeletingComment,
+    updateComment,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    loadAllReplies,
+  } = useCommentsWithReplies(postId, onCommentDeleted);
+
+  useCommentsRealtime(postId, isOpen);
+
+  // ── State ──
+  const [sort, setSort] = useState<'best' | 'newest'>('newest');
+  const [replyingTo, setReplyingTo] = useState<ReplyTarget | null>(null);
+  const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
+  const [commentToDelete, setCommentToDelete] = useState<CommentWithReplies | CommentReply | null>(null);
+  const [inputText, setInputText] = useState('');
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const commentElsRef = useRef<Map<string, HTMLDivElement>>(new Map());
+
+  const isDark = theme === 'dark';
+
+  // ── Sorted comments ──
+  const sortedComments = useMemo(() => {
+    const sorted = [...comments];
+    if (sort === 'best') {
+      sorted.sort((a, b) => {
+        const score = (c: CommentWithReplies) => (c.likes_count || 0) + (c.replies_count || 0);
+        return score(b) - score(a);
+      });
+    }
+    // Pin caddie pick to top
+    if (caddiePickCommentId) {
+      const idx = sorted.findIndex(c => c.id === caddiePickCommentId);
+      if (idx > 0) {
+        const [picked] = sorted.splice(idx, 1);
+        sorted.unshift(picked);
+      }
+    }
+    return sorted;
+  }, [comments, sort, caddiePickCommentId]);
+
+  const totalCount = comments.length;
+
+  // ── Effects ──
+
+  // Auto-focus input
+  useEffect(() => {
+    if (isOpen) {
+      const t = setTimeout(() => textareaRef.current?.focus(), 350);
+      return () => clearTimeout(t);
+    } else {
+      setInputText('');
+      setReplyingTo(null);
+      setExpandedReplies(new Set());
+    }
+  }, [isOpen]);
+
+  // Lock body scroll
+  useEffect(() => {
+    if (isOpen) document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (el) {
+      el.style.height = 'auto';
+      el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+    }
+  }, [inputText]);
+
+  // Infinite scroll sentinel
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    const container = scrollRef.current;
+    if (!sentinel || !container || !hasNextPage || isFetchingNextPage) return;
+    const observer = new IntersectionObserver(
+      (entries) => { if (entries[0]?.isIntersecting) fetchNextPage(); },
+      { root: container, rootMargin: '200px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  // Deep link to comment
+  const hasHandledDeepLink = useRef(false);
+  useEffect(() => {
+    if (!isOpen) { hasHandledDeepLink.current = false; return; }
+    if (!initialCommentId || commentsLoading || hasHandledDeepLink.current) return;
+    hasHandledDeepLink.current = true;
+    if (initialParentCommentId) {
+      setExpandedReplies(prev => new Set(prev).add(initialParentCommentId));
+    }
+    setTimeout(() => highlightComment(initialCommentId), 200);
+  }, [isOpen, initialCommentId, initialParentCommentId, commentsLoading]);
+
+  // ── Callbacks ──
+
+  const highlightComment = useCallback((id: string) => {
+    setHighlightedId(id);
+    setTimeout(() => {
+      commentElsRef.current.get(id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 50);
+    setTimeout(() => setHighlightedId(null), 1200);
+  }, []);
+
+  const toggleReplies = useCallback((commentId: string) => {
+    setExpandedReplies(prev => {
+      const next = new Set(prev);
+      if (next.has(commentId)) next.delete(commentId);
+      else next.add(commentId);
+      return next;
+    });
+  }, []);
+
+  const handleSend = useCallback(async () => {
+    const content = inputText.trim();
+    if (!content || isAddingComment) return;
+
+    const parentId = replyingTo?.topLevelId;
+    setInputText('');
+    setReplyingTo(null);
+
+    try {
+      const newId = await addComment(content, parentId);
+      if (parentId) setExpandedReplies(prev => new Set(prev).add(parentId));
+      setTimeout(() => highlightComment(newId), 150);
+      onCommentPosted?.();
+    } catch (error) {
+      console.error('Failed to add comment:', error);
+    }
+  }, [inputText, isAddingComment, replyingTo, addComment, highlightComment, onCommentPosted]);
+
+  const handleInputKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  }, [handleSend]);
+
+  const confirmDelete = useCallback(async () => {
+    if (!commentToDelete) return;
+    try {
+      await deleteComment(commentToDelete.id);
+      toast.success('Comment deleted');
+    } catch {
+      toast.error('Failed to delete comment');
+    }
+    setCommentToDelete(null);
+  }, [commentToDelete, deleteComment]);
+
+  const registerRef = useCallback((id: string) => (el: HTMLDivElement | null) => {
+    if (el) commentElsRef.current.set(id, el);
+    else commentElsRef.current.delete(id);
+  }, []);
+
+  // ── Render helpers ──
+
+  const renderCommentRow = (
+    comment: CommentWithReplies | CommentReply,
+    isReply: boolean,
+    parentId?: string,
+  ) => {
+    const isOwn = currentUserId === comment.user_id;
+    const isOP = comment.user_id === creatorUserId;
+    const isCaddie = comment.id === caddiePickCommentId;
+
+    return (
+      <div
+        key={comment.id}
+        ref={registerRef(comment.id)}
+        className={cn(
+          'flex gap-3 px-4 py-3 transition-colors duration-300',
+          isReply && 'pl-14',
+          highlightedId === comment.id && (isDark ? 'bg-white/[0.05]' : 'bg-primary/[0.04]'),
+        )}
+      >
+        {/* Avatar */}
+        <button
+          type="button"
+          onClick={() => navigate(`/profile/${comment.actor_id || comment.user_id}`)}
+          className="shrink-0"
+        >
+          <SquircleAvatar
+            size={isReply ? 28 : 34}
+            src={comment.avatar_url}
+            alt={comment.user_name}
+            fallback={comment.user_name?.charAt(0) || '?'}
+            hideRing
+          />
+        </button>
+
+        {/* Body */}
+        <div className="flex-1 min-w-0">
+          {/* Name row */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className={cn(
+              'text-[13px] font-semibold truncate max-w-[140px]',
+              isDark ? 'text-white' : 'text-foreground'
+            )}>
+              {comment.user_name}
+            </span>
+            {isOP && (
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide bg-primary/15 text-primary">
+                OP
+              </span>
+            )}
+            {isCaddie && !isReply && (
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide" style={{ backgroundColor: '#f59e0b20', color: '#f59e0b' }}>
+                Caddie Pick
+              </span>
+            )}
+            <span className={cn('text-[11px]', isDark ? 'text-white/35' : 'text-muted-foreground/60')}>
+              {relativeTime(comment.created_at)}
+            </span>
+            {(comment as any).is_edited && (
+              <span className={cn('text-[11px]', isDark ? 'text-white/25' : 'text-muted-foreground/40')}>
+                edited
+              </span>
+            )}
+          </div>
+
+          {/* Content */}
+          <MentionText
+            text={comment.content}
+            className={cn(
+              'mt-1 text-[14px] leading-[20px] block',
+              isDark ? 'text-white/90' : 'text-foreground/90'
+            )}
+          />
+
+          {/* Media */}
+          {(comment as any).media_url && (comment as any).media_type === 'image' && (
+            <div className="mt-2 rounded-xl overflow-hidden max-w-[200px]">
+              <img
+                src={`${(window as any).__SUPABASE_URL || ''}/storage/v1/object/public/comment-images/${(comment as any).media_url}`}
+                alt=""
+                className="w-full object-cover rounded-xl"
+                loading="lazy"
+              />
+            </div>
+          )}
+
+          {/* Action row */}
+          <div className="flex items-center gap-4 mt-0.5">
+            {!isReply && (
+              <button
+                type="button"
+                onClick={() => {
+                  setReplyingTo({ topLevelId: comment.id, displayName: comment.user_name });
+                  highlightComment(comment.id);
+                  requestAnimationFrame(() => textareaRef.current?.focus());
+                }}
+                className={cn(
+                  'text-[12px] font-semibold min-h-[44px] flex items-center',
+                  isDark ? 'text-white/40' : 'text-muted-foreground'
+                )}
+              >
+                Reply
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => toggleCommentLike(comment.id)}
+              className="flex items-center gap-1 min-h-[44px]"
+            >
+              <Heart className={cn(
+                'w-4 h-4 transition-colors',
+                comment.has_liked
+                  ? 'fill-[#f59e0b] text-[#f59e0b]'
+                  : isDark ? 'text-white/40' : 'text-muted-foreground/50'
+              )} />
+              {comment.likes_count > 0 && (
+                <span className={cn(
+                  'text-[12px]',
+                  comment.has_liked ? 'text-[#f59e0b]' : isDark ? 'text-white/50' : 'text-muted-foreground/70'
+                )}>
+                  {comment.likes_count}
+                </span>
+              )}
+            </button>
+            {(isOwn || creatorUserId === currentUserId) && (
+              <button
+                type="button"
+                onClick={() => setCommentToDelete(comment)}
+                className={cn(
+                  'ml-auto min-h-[44px] flex items-center',
+                  isDark ? 'text-white/30' : 'text-muted-foreground/40'
+                )}
+              >
+                <MoreHorizontal className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderTopLevelComment = (comment: CommentWithReplies, idx: number) => {
+    const repliesExpanded = expandedReplies.has(comment.id);
+    const totalReplies = comment.total_replies_count ?? comment.replies_count;
+
+    return (
+      <div key={comment.id}>
+        {renderCommentRow(comment, false)}
+
+        {/* Replies section */}
+        {totalReplies > 0 && (
+          <div className={cn('ml-4 border-l', isDark ? 'border-white/[0.08]' : 'border-border/50')}>
+            {!repliesExpanded ? (
+              <button
+                type="button"
+                onClick={() => {
+                  loadAllReplies(comment.id);
+                  toggleReplies(comment.id);
+                }}
+                className={cn(
+                  'text-[12px] font-semibold min-h-[44px] flex items-center gap-1 pl-10',
+                  'text-primary'
+                )}
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+                View {totalReplies} {totalReplies === 1 ? 'reply' : 'replies'}
+              </button>
+            ) : (
+              <>
+                {comment.replies.map(reply => renderCommentRow(reply, true, comment.id))}
+                {comment.total_replies_count > comment.replies.length && (
+                  <button
+                    type="button"
+                    onClick={() => loadAllReplies(comment.id)}
+                    className="text-[12px] font-semibold text-primary min-h-[44px] flex items-center pl-14"
+                  >
+                    Load {comment.total_replies_count - comment.replies.length} more replies
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => toggleReplies(comment.id)}
+                  className={cn(
+                    'text-[12px] font-semibold min-h-[44px] flex items-center pl-14',
+                    isDark ? 'text-white/40' : 'text-muted-foreground'
+                  )}
+                >
+                  Hide replies
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Inset divider */}
+        {idx < sortedComments.length - 1 && (
+          <div className={cn('ml-[62px] mr-4', isDark ? 'border-b border-white/[0.06]' : 'border-b border-border/30')} />
+        )}
+      </div>
+    );
+  };
+
+  // ── Portal content ──
+
+  const content = (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[100] bg-black/40"
+            onClick={onClose}
+          />
+
+          {/* Panel */}
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            className={cn(
+              'fixed inset-x-0 bottom-0 z-[101] w-full rounded-t-[20px]',
+              'flex flex-col',
+              isDark ? 'bg-[#0d0d0d]' : 'bg-background'
+            )}
+            style={{ maxHeight: '92dvh' }}
+          >
+            {/* Drag handle */}
+            <div className="flex justify-center pt-2.5 pb-1 shrink-0">
+              <div className="w-9 h-1 rounded-full bg-muted-foreground/30" />
+            </div>
+
+            {/* Header */}
+            <div className={cn(
+              'flex items-center justify-between px-4 py-2 shrink-0 border-b',
+              isDark ? 'border-white/[0.06]' : 'border-border/50'
+            )}>
+              {/* Title */}
+              <div className="flex items-baseline gap-1.5">
+                <span className={cn('text-[16px] font-semibold', isDark ? 'text-white' : 'text-foreground')}>
+                  Comments
+                </span>
+                {totalCount > 0 && (
+                  <span className={cn('text-[14px] font-normal', isDark ? 'text-white/45' : 'text-muted-foreground')}>
+                    {totalCount}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2">
+                {/* Sort toggle */}
+                {totalCount > 1 && (
+                  <div className={cn('flex items-center rounded-lg p-0.5', isDark ? 'bg-white/8' : 'bg-muted/60')}>
+                    {(['best', 'newest'] as const).map(s => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setSort(s)}
+                        className={cn(
+                          'px-3 py-1 rounded-md text-[12px] font-semibold transition-colors capitalize min-h-[32px]',
+                          sort === s
+                            ? isDark ? 'bg-white/12 text-white shadow-sm' : 'bg-background text-foreground shadow-sm'
+                            : isDark ? 'text-white/40' : 'text-muted-foreground'
+                        )}
+                      >
+                        {s === 'best' ? 'Best' : 'Newest'}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Close */}
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className={cn(
+                    'w-11 h-11 rounded-full flex items-center justify-center shrink-0',
+                    isDark ? 'bg-white/8 text-white/60' : 'bg-muted text-muted-foreground'
+                  )}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Scroll area */}
+            <div
+              ref={scrollRef}
+              className="flex-1 overflow-y-auto overscroll-contain"
+              style={{ WebkitOverflowScrolling: 'touch' }}
+            >
+              {commentsLoading ? (
+                /* Loading skeletons */
+                <div className="px-4 py-4 space-y-4">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="flex gap-3 animate-pulse">
+                      <div className={cn('w-[34px] h-[34px] rounded-[34%] shrink-0', isDark ? 'bg-white/8' : 'bg-muted')} />
+                      <div className="flex-1 space-y-2 py-1">
+                        <div className={cn('h-3 w-24 rounded', isDark ? 'bg-white/8' : 'bg-muted')} />
+                        <div className={cn('h-3 w-[85%] rounded', isDark ? 'bg-white/6' : 'bg-muted/80')} />
+                        <div className={cn('h-3 w-[55%] rounded', isDark ? 'bg-white/5' : 'bg-muted/60')} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : comments.length === 0 ? (
+                /* Empty state */
+                <div className="flex flex-col items-center justify-center py-20 px-6 gap-3">
+                  <div className={cn(
+                    'w-16 h-16 rounded-full flex items-center justify-center',
+                    isDark ? 'bg-white/[0.04]' : 'bg-muted/50'
+                  )}>
+                    <MessageCircle className={cn('w-7 h-7', isDark ? 'text-white/30' : 'text-muted-foreground/40')} />
+                  </div>
+                  <p className={cn('text-sm font-medium', isDark ? 'text-white' : 'text-foreground')}>
+                    No comments yet
+                  </p>
+                  <p className={cn('text-xs text-center', isDark ? 'text-white/50' : 'text-muted-foreground')}>
+                    Be the first to share your thoughts
+                  </p>
+                </div>
+              ) : (
+                /* Comment list */
+                <div>
+                  {sortedComments.map((comment, idx) => renderTopLevelComment(comment, idx))}
+                  <div ref={sentinelRef} className="h-px" />
+                  {isFetchingNextPage && (
+                    <div className="flex items-center justify-center py-4">
+                      <div className={cn('w-5 h-5 border-2 rounded-full animate-spin', isDark ? 'border-white/20 border-t-white/60' : 'border-muted border-t-muted-foreground')} />
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Input bar */}
+            <div
+              className="shrink-0 px-4 py-3"
+              style={{
+                paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)',
+                borderTop: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid hsl(var(--border) / 0.5)',
+                background: isDark ? '#0d0d0d' : undefined,
+              }}
+            >
+              {/* Reply indicator */}
+              <AnimatePresence>
+                {replyingTo && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 28 }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="flex items-center justify-between mb-2 overflow-hidden"
+                  >
+                    <span className={cn('text-[13px]', isDark ? 'text-white/60' : 'text-muted-foreground')}>
+                      Replying to <span className="font-medium">{replyingTo.displayName}</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setReplyingTo(null)}
+                      className="min-h-[44px] min-w-[44px] flex items-center justify-center"
+                    >
+                      <X className={cn('w-4 h-4', isDark ? 'text-white/50' : 'text-muted-foreground')} />
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Input row */}
+              <div className="flex items-end gap-2">
+                <SquircleAvatar
+                  size={32}
+                  src={activeActor?.avatarUrl}
+                  alt={activeActor?.name || 'You'}
+                  fallback={activeActor?.name?.charAt(0) || '?'}
+                  hideRing
+                />
+                <div className={cn(
+                  'flex-1 flex items-end rounded-[22px] px-4 py-2',
+                  isDark
+                    ? 'bg-white/10 border border-white/15'
+                    : 'bg-muted border border-border/50'
+                )}>
+                  <textarea
+                    ref={textareaRef}
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    onKeyDown={handleInputKeyDown}
+                    placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : 'Add a comment...'}
+                    rows={1}
+                    className={cn(
+                      'flex-1 bg-transparent text-sm outline-none resize-none leading-snug',
+                      isDark
+                        ? 'text-white placeholder:text-white/40'
+                        : 'text-foreground placeholder:text-muted-foreground'
+                    )}
+                    style={{ maxHeight: '120px' }}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSend}
+                  disabled={!inputText.trim() || isAddingComment}
+                  className="w-9 h-9 rounded-full bg-primary flex items-center justify-center shrink-0 mb-0.5 disabled:opacity-40 transition-opacity"
+                >
+                  <Send className="w-4 h-4 text-primary-foreground" />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Delete confirmation */}
+          <AlertDialog open={!!commentToDelete} onOpenChange={(open) => { if (!open) setCommentToDelete(null); }}>
+            <AlertDialogContent className="z-[220]">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete comment?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This can't be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setCommentToDelete(null)}>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  onClick={confirmDelete}
+                  disabled={isDeletingComment}
+                >
+                  {isDeletingComment ? 'Deleting…' : 'Delete'}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </>
+      )}
+    </AnimatePresence>
+  );
+
+  return typeof window !== 'undefined' ? createPortal(content, document.body) : null;
+}
+
+export { CommentsSheet };
+export default memo(CommentsSheet);

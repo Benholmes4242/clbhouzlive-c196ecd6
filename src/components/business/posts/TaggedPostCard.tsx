@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils';
 import { getStreamPoster, getStreamIdFromUrl } from '@/utils/stream';
 import { UnifiedVideoPlayer, UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
-import CommentsPage from '@/components/clubhouse/cinematic/CommentsPage';
+import CommentsSheet from '@/components/comments/CommentsSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { usePostEngagement } from '@/hooks/usePostEngagement';
 import { PostActionBar } from '@/components/posts/PostActionBar';
@@ -634,7 +634,7 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
         />
       </div>
 
-      <CommentsPage
+      <CommentsSheet
         isOpen={commentsOpen}
         onClose={() => setCommentsOpen(false)}
         postId={post.id}
