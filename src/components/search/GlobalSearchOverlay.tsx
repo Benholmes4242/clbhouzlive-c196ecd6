@@ -87,22 +87,22 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   }, [onClose]);
 
   const selectCourse = useCallback((course: ClubResult) => {
-    saveRecentSearch(course.name);
+    handleSaveRecent(course.name);
     navigate(`/courses/${course.id}`);
     onClose();
-  }, [navigate, onClose]);
+  }, [navigate, onClose, handleSaveRecent]);
 
   const selectPerson = useCallback((person: PersonResult) => {
-    saveRecentSearch(person.display_name);
+    handleSaveRecent(person.display_name);
     navigate(`/profile/${person.username}`);
     onClose();
-  }, [navigate, onClose]);
+  }, [navigate, onClose, handleSaveRecent]);
 
   const selectBusiness = useCallback((business: BusinessResult) => {
-    saveRecentSearch(business.name);
+    handleSaveRecent(business.name);
     navigate(`/business/${business.slug}`);
     onClose();
-  }, [navigate, onClose]);
+  }, [navigate, onClose, handleSaveRecent]);
 
   const commitRecentSearch = useCallback((query: string) => {
     setInputValue(query);
