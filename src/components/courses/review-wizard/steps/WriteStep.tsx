@@ -266,11 +266,10 @@ export function WriteStep({
 
       {/* Mention bottom sheet */}
       <MentionBottomSheet
-        open={showMentions}
-        onOpenChange={setShowMentions}
+        isOpen={showMentions}
+        onClose={() => setShowMentions(false)}
         query={mentionQuery}
         onSelect={handleMentionSelect}
-        bottomOffset={keyboardHeight}
       />
     </motion.div>
   );
