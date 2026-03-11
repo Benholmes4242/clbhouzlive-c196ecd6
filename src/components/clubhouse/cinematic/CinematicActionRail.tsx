@@ -318,6 +318,17 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
           idleOpacity={idleOpacity}
         />
       )}
+
+      {/* Slot 8: Left chevron — bottom of rail, only when there's a previous media item */}
+      {onPrevMedia && hasPrevMedia && (
+        <ActionSlot
+          icon={ChevronLeft}
+          onClick={onPrevMedia}
+          ariaLabel="Previous media"
+          showCount={false}
+          idleOpacity={idleOpacity}
+        />
+      )}
     </motion.div>
   );
 };
