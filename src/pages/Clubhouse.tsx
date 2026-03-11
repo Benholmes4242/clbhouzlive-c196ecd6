@@ -310,9 +310,8 @@ const ClubhouseContent = () => {
   // EARLY RETURNS
   // ============================================================================
   
-  if (isRehydrating) {
-    return <ClubhouseSkeleton />;
-  }
+  // Rehydration is now handled via AnimatePresence below (G4 fix)
+  const showRehydrationSkeleton = isRehydrating;
 
   // ============================================================================
   // EVENT HANDLERS
