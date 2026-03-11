@@ -44,21 +44,6 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   const isMobile = useIsMobile();
   const menuRef = useRef<HTMLDivElement>(null);
   const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
-  const [headerHeight, setHeaderHeight] = useState(56);
-
-  // Measure header height on mount and resize
-  useEffect(() => {
-    const measureHeader = () => {
-      const header = document.querySelector('[data-chrome="header"]') as HTMLElement;
-      if (header) {
-        setHeaderHeight(header.getBoundingClientRect().height);
-      }
-    };
-    
-    measureHeader();
-    window.addEventListener('resize', measureHeader);
-    return () => window.removeEventListener('resize', measureHeader);
-  }, []);
 
   // Check admin status
   const { data: adminStatus } = useQuery({
