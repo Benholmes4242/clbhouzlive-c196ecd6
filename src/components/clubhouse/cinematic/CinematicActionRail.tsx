@@ -4,8 +4,8 @@
  * "Liquid glass" circular buttons for Mute, Like, Comment, Share, Save
  */
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, Music, MoreHorizontal, ChevronRight } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, Music, MoreHorizontal, ChevronRight, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { MOTION_FAST, EASE_OUT, pressFeedback, likePop } from '@/lib/motionTokens';
