@@ -245,6 +245,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             <p style={{
               fontSize: 11, fontWeight: 600, color: 'rgba(251,146,60,0.9)',
               letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
               {[meta.venue_name, meta.venue_city].filter(Boolean).join(' · ')}
             </p>
