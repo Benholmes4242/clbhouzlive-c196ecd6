@@ -57,5 +57,5 @@ export function useClubhouseComments() {
 
   const overlayVisible = !commentsOpen;
 
-  return { commentsOpen, overlayVisible, openComments, closeComments, handleCommentPosted, getCommentCount, resetComments };
+  return { commentsOpen, overlayVisible, openComments, closeComments, handleCommentPosted, handleCommentDeleted, getCommentCount, resetComments };
 }
