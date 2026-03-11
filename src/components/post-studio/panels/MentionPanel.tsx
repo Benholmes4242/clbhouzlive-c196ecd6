@@ -81,7 +81,7 @@ export function MentionPanel() {
         entityId: entity.id,
         displayName: entity.name,
         entityType: entity.entity_type,
-        avatarUrl: entity.avatar_url ?? undefined,
+        avatarUrl: entity.profile_image_url ?? undefined,
       };
 
       setCaption(newCaption);
