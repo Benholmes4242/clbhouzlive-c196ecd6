@@ -79,7 +79,7 @@ const CourseLocationRow: React.FC<CourseLocationRowProps> = ({
   const courseIdentifier = course.slug || course.id;
   const isClickable = !!courseIdentifier;
   
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
     
@@ -92,6 +92,24 @@ const CourseLocationRow: React.FC<CourseLocationRowProps> = ({
     
     if (courseIdentifier) {
       navigate(`/courses/${courseIdentifier}`);
+    } else if (course.name) {
+      // No UUID — resolve by name lookup
+      try {
+        const { data } = await supabase
+          .from('golf_courses')
+          .select('id')
+          .ilike('name', course.name.trim())
+          .limit(1)
+          .single();
+
+        if (data?.id) {
+          navigate(`/courses/${data.id}`);
+        } else {
+          navigate(`/courses?search=${encodeURIComponent(course.name)}`);
+        }
+      } catch {
+        navigate(`/courses?search=${encodeURIComponent(course.name)}`);
+      }
     }
   };
   
