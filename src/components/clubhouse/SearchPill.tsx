@@ -68,7 +68,6 @@ const SearchPill = ({
     videos,
     pages,
     businesses,
-    recent,
     trending,
     isLoading,
     error
