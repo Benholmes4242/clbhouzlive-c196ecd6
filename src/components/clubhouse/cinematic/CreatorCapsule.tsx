@@ -131,6 +131,9 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   const reviewTheme = isReview && reviewData 
     ? getReviewOverlayTheme(reviewData.rating)
     : null;
+  const reviewRatingColors = isReview && reviewData
+    ? getOverlayRatingColors(reviewData.rating)
+    : null;
   const isOutstanding = isReview && reviewData && reviewData.rating >= 9.0;
 
   const handleToggle = useCallback(() => {
