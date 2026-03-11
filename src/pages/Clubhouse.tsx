@@ -529,10 +529,10 @@ const ClubhouseContent = () => {
             hasNextMedia={currentMediaIndex < activeMediaCount - 1}
             hasPrevMedia={currentMediaIndex > 0}
             onNextMedia={activeMediaCount > 1 
-              ? () => useMediaStore.getState().setCarouselPosition(activeIndex, currentMediaIndex + 1) 
+              ? () => setCarouselPosition(activeIndex, currentMediaIndex + 1) 
               : undefined}
             onPrevMedia={activeMediaCount > 1 
-              ? () => useMediaStore.getState().setCarouselPosition(activeIndex, currentMediaIndex - 1) 
+              ? () => setCarouselPosition(activeIndex, currentMediaIndex - 1) 
               : undefined}
             onChevronPositionChange={setChevronY}
           />
