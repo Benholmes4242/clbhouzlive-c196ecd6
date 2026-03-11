@@ -146,10 +146,9 @@ export function BusinessProfilePosts({
       {!filteredPosts || filteredPosts.length === 0 ? (
         <div className="py-12 text-center">
           <div 
-            className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
-            style={{ background: '#EDEFF2' }}
+            className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center bg-muted"
           >
-            <ImageIcon className="h-8 w-8 text-[#97A1AA]" />
+            <ImageIcon className="h-8 w-8 text-muted-foreground" />
           </div>
           <p className="text-sm text-muted-foreground mb-4">
             {membership?.canManage 
