@@ -17,7 +17,6 @@ import { useMessagingContext } from '@/contexts/MessagingContext';
 import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useLogout } from '@/hooks/useLogout';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 // ── Types ──
 
