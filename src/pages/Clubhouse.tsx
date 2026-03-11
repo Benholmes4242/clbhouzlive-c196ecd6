@@ -350,7 +350,14 @@ const ClubhouseContent = () => {
       }}>
         <ClubhouseTopBar
           activeTab={activeTab}
-          onTabChange={setActiveTab}
+          onTabChange={(tab) => {
+            setActiveTab(tab);
+            // Re-show skeleton if switching to an unloaded feed
+            const targetFeed = tab === 'friends' ? friendsFeed : suggestedFeed;
+            if (targetFeed.isLoading) {
+              resetSkeleton();
+            }
+          }}
           isBusinessActor={isBusinessActor}
           user={user}
         />
