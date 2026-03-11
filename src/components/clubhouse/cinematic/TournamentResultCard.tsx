@@ -91,8 +91,10 @@ function SmallAvatar({ src, name, size }: { src: string | null; name: string; si
   return (
     <div style={{
       width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
-      border: '1.5px solid rgba(255,255,255,0.2)',
-      background: 'rgba(255,255,255,0.08)',
+      outline: '2px solid rgba(12,15,20,0.95)',
+      outlineOffset: 0,
+      border: 'none',
+      background: 'rgba(12,15,20,0.95)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       {currentSrc && !error ? (
@@ -192,7 +194,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             <img
               src={meta.course_image_url!}
               alt={meta.venue_name || meta.tournament_name}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.75) saturate(1.1)' }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.88) saturate(1.1)' }}
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
             />
           ) : (
@@ -205,7 +207,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
       {/* Top fade */}
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '45%', background: 'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 1 }} />
       {/* Bottom fade (strong) */}
-      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '80%', background: 'linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.92) 30%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0.2) 75%, transparent 100%)', pointerEvents: 'none', zIndex: 1 }} />
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '80%', background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.80) 30%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0.2) 75%, transparent 100%)', pointerEvents: 'none', zIndex: 1 }} />
 
       {/* ── LAYER 3: Foreground content ── */}
       <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -213,7 +215,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         {/* ── TOP BAR ── */}
         <div style={{
           position: 'absolute', top: 56, left: 16, right: 16, zIndex: 10,
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          display: 'flex', justifyContent: 'flex-start', alignItems: 'center',
           animation: 'trcard-fadeUp 0.5s ease-out both',
           animationDelay: '0ms',
         }}>
@@ -228,21 +230,6 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             </span>
           </div>
 
-          {/* FINAL RESULT pill */}
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)',
-            borderRadius: 20, padding: '5px 12px', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-          }}>
-            <div style={{ position: 'relative', width: 8, height: 8 }}>
-              <span style={{
-                position: 'absolute', inset: 0, borderRadius: '50%', background: '#EF4444',
-                animation: 'trcard-pulse 2s ease-in-out infinite',
-              }} />
-              <span style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: '#EF4444', width: 8, height: 8 }} />
-            </div>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#FCA5A5', letterSpacing: 1.0 }}>FINAL RESULT</span>
-          </div>
         </div>
 
         {/* ── SPACER — push tournament name to bottom of image area ── */}
@@ -274,7 +261,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         {/* ── GLASS CARD ── */}
         <div style={{
           margin: '0 16px 0',
-          background: 'rgba(10,12,18,0.82)',
+          background: 'rgba(20,24,32,0.76)',
           backdropFilter: 'blur(28px) saturate(160%)', WebkitBackdropFilter: 'blur(28px) saturate(160%)',
           border: '1px solid rgba(255,255,255,0.09)',
           borderTop: '1px solid rgba(255,255,255,0.15)',
@@ -492,7 +479,7 @@ function PodiumRunnerRow({ row, resolvePhoto }: { row: PodiumRowType; resolvePho
         </span>
       ) : (
         <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.35)', flex: 1 }}>
-          {row.players.length}-way tie
+          {row.players.length}-Way Tie
         </span>
       )}
 

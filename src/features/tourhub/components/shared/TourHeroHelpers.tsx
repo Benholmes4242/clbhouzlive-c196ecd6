@@ -294,7 +294,7 @@ export function calcWinningMargin(
     return 'Co-winners';
   }
   const margin = runnerUpScore - winnerScore;
-  if (margin === 0) return 'Won in playoff';
+  if (margin === 0) return 'Won in Playoff';
   return `Won by ${margin} stroke${margin === 1 ? '' : 's'}`;
 }
 
