@@ -205,7 +205,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
       {/* Top fade */}
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '45%', background: 'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 1 }} />
       {/* Bottom fade (strong) */}
-      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '80%', background: 'linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.92) 30%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0.2) 75%, transparent 100%)', pointerEvents: 'none', zIndex: 1 }} />
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '80%', background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.80) 30%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0.2) 75%, transparent 100%)', pointerEvents: 'none', zIndex: 1 }} />
 
       {/* ── LAYER 3: Foreground content ── */}
       <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
