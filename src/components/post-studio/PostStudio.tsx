@@ -96,7 +96,7 @@ function PanelRouter() {
 // INNER SHELL (inside provider)
 // ============================================================================
 
-function StudioInner({ onClose }: { onClose: () => void }) {
+function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMedia?: File[] }) {
   const { state, setDiscarding, reset } = usePostStudioContext();
 
   const handleClose = useCallback(() => {
