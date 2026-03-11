@@ -17,7 +17,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ChevronUp, User, Music, ChevronRight } from 'lucide-react';
 import { FiMapPin } from 'react-icons/fi';
 import { getProfilePathById } from '@/lib/profileRoutes';
-import CourseLocationRow from '@/components/posts/CourseLocationRow';
+
 import { getOverlayRatingColors, type ExtractedReviewData } from '@/lib/postHelpers';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
@@ -207,14 +207,29 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
       )}
 
       {/* Golf Course CTA - one-line gap after caption */}
-      {golfCourse && (
-        <div className="mt-3">
-          <CourseLocationRow
-            course={golfCourse}
-            showChevron
-            isDark
-          />
-        </div>
+      {courseDisplayLabel && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            const courseIdentifier = golfCourse?.slug || golfCourse?.id;
+            if (courseIdentifier) {
+              navigate(`/courses/${courseIdentifier}`);
+            }
+          }}
+          className={cn(
+            "flex items-center gap-1 mt-1.5 text-left w-full",
+            (golfCourse?.slug || golfCourse?.id) && "cursor-pointer hover:opacity-80 transition-opacity"
+          )}
+        >
+          <FiMapPin size={14} className="text-white/50 flex-shrink-0" />
+          <span className="text-[11px] text-white/50 truncate">
+            {courseDisplayLabel}
+          </span>
+          {(golfCourse?.slug || golfCourse?.id) && (
+            <ChevronRight className="w-3 h-3 text-white/40 flex-shrink-0 ml-auto" />
+          )}
+        </button>
       )}
 
       {/* Music Track Row - same spacing as golf course */}
