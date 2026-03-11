@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
 import SnapToast from '@/components/snap/SnapToast';
+import { PostStudio } from '@/components/post-studio';
+
+// Feature flag: set to true to use the new PostStudio instead of the legacy composer
+const USE_POST_STUDIO = true;
 
 import { useSnapModal } from '@/hooks/useSnapModal';
 import { PageRoot } from '@/components/layout/PageRoot';
