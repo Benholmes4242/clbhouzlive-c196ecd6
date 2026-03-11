@@ -214,7 +214,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
         {/* ── TOP BAR ── */}
         <div style={{
-          position: 'absolute', top: 56, left: 16, right: 16, zIndex: 10,
+          position: 'absolute', top: 'max(env(safe-area-inset-top, 0px), 56px)', left: 16, right: 16, zIndex: 10,
           display: 'flex', justifyContent: 'flex-start', alignItems: 'center',
           animation: 'trcard-fadeUp 0.5s ease-out both',
           animationDelay: '0ms',
@@ -245,6 +245,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             <p style={{
               fontSize: 11, fontWeight: 600, color: 'rgba(251,146,60,0.9)',
               letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
               {[meta.venue_name, meta.venue_city].filter(Boolean).join(' · ')}
             </p>
@@ -253,6 +254,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             fontSize: 26, fontWeight: 800, color: '#fff', lineHeight: 1.15,
             letterSpacing: -0.5, margin: 0,
             textShadow: '0 2px 12px rgba(0,0,0,0.5)',
+            overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const,
           }}>
             {meta.tournament_name}
           </h2>
@@ -287,7 +289,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
               size={60}
             />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 20, fontWeight: 800, color: '#fff', letterSpacing: -0.3, lineHeight: 1.2 }}>
+              <div style={{ fontSize: 20, fontWeight: 800, color: '#fff', letterSpacing: -0.3, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {meta.winner_name}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
@@ -318,7 +320,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(4, 1fr)',
-              gap: 8,
+              gap: 4,
               paddingBottom: 12,
             }}>
               {/* Row 1 — tournament stats (always show, dim if 0) */}
@@ -372,12 +374,13 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             <button onClick={onComment} style={{
               flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
               background: 'linear-gradient(135deg, rgba(249,115,22,0.22), rgba(234,88,12,0.15))',
-              border: '1px solid rgba(249,115,22,0.35)', borderRadius: 22, padding: '8px 16px',
+              border: '1px solid rgba(249,115,22,0.35)', borderRadius: 22, padding: '8px 8px',
               color: '#FB923C', fontSize: 13, fontWeight: 700, cursor: 'pointer',
               animation: 'trcard-glowPulse 3s ease-in-out infinite',
+              minWidth: 0, overflow: 'hidden',
             }}>
-              <span style={{ fontSize: 14 }}>💬</span>
-              <span>Join the conversation</span>
+              <span style={{ fontSize: 14, flexShrink: 0 }}>💬</span>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Join the conversation</span>
               {commentCount > 0 && (
                 <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(251,146,60,0.6)' }}>{commentCount}</span>
               )}
@@ -407,17 +410,17 @@ function StatGlowChip({ value, label, color, bg, border, glow, dimmed }: {
 }) {
   const opacity = dimmed ? 0.4 : 1;
   return (
-    <div style={{
-      borderRadius: 12, padding: '10px 0',
-      background: bg, border: `1px solid ${border}`,
-      boxShadow: dimmed ? 'none' : `0 0 12px ${glow}`,
-      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-      opacity,
-    }}>
-      <span style={{ fontSize: 20, fontWeight: 800, color, lineHeight: 1 }}>{value}</span>
-      <span style={{ fontSize: 7.5, fontWeight: 700, color: 'rgba(255,255,255,0.45)', letterSpacing: 0.8, textTransform: 'uppercase' }}>{label}</span>
-    </div>
-  );
+     <div style={{
+       borderRadius: 12, padding: '10px 0',
+       background: bg, border: `1px solid ${border}`,
+       boxShadow: dimmed ? 'none' : `0 0 12px ${glow}`,
+       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+       opacity, minWidth: 0, overflow: 'hidden',
+     }}>
+       <span style={{ fontSize: 'clamp(14px, 4.5vw, 20px)', fontWeight: 800, color, lineHeight: 1 }}>{value}</span>
+       <span style={{ fontSize: 'clamp(8px, 2.2vw, 9px)', fontWeight: 700, color: 'rgba(255,255,255,0.45)', letterSpacing: 0.8, textTransform: 'uppercase' }}>{label}</span>
+     </div>
+   );
 }
 
 // ─── Performance stat chip (neutral) ───
@@ -428,17 +431,17 @@ function PerfChip({ value, label, suffix }: { value: string | null; label: strin
       borderRadius: 12, padding: '10px 0',
       background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)',
       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-      opacity: isNull ? 0.4 : 1,
+      opacity: isNull ? 0.4 : 1, minWidth: 0, overflow: 'hidden',
     }}>
-      <span style={{ fontSize: 16, fontWeight: 800, color: 'rgba(255,255,255,0.9)', lineHeight: 1 }}>
+      <span style={{ fontSize: 'clamp(12px, 3.8vw, 16px)', fontWeight: 800, color: 'rgba(255,255,255,0.9)', lineHeight: 1 }}>
         {isNull ? '—' : (
           <>
             {value}
-            {suffix && <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>{suffix}</span>}
+            {suffix && <span style={{ fontSize: 'clamp(8px, 2.2vw, 10px)', fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>{suffix}</span>}
           </>
         )}
       </span>
-      <span style={{ fontSize: 7.5, fontWeight: 700, color: 'rgba(255,255,255,0.45)', letterSpacing: 0.8, textTransform: 'uppercase' }}>{label}</span>
+      <span style={{ fontSize: 'clamp(8px, 2.2vw, 9px)', fontWeight: 700, color: 'rgba(255,255,255,0.45)', letterSpacing: 0.8, textTransform: 'uppercase' }}>{label}</span>
     </div>
   );
 }

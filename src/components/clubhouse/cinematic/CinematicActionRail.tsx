@@ -220,7 +220,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   // Idle opacity: 75% when not interacted, full when interacted or active
   const idleOpacity = hasInteracted ? 1 : 0.75;
 
-  const CAPSULE_BOTTOM_OFFSET = bottomOffset || `calc(30px + 80px - ${SLOT_HEIGHT - ICON_SIZE}px)`;
+  const CAPSULE_BOTTOM_OFFSET = bottomOffset || `calc(30px + var(--bottom-nav-height, 80px) - ${SLOT_HEIGHT - ICON_SIZE}px)`;
 
   return (
     <motion.div
@@ -238,6 +238,8 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       style={{
         bottom: CAPSULE_BOTTOM_OFFSET,
         gap: 12,
+        maxHeight: 'calc(100dvh - 130px)',
+        overflowY: 'hidden' as const,
       }}
     >
       {/* Slot 1: Right chevron — top of rail, only when there's a next media item */}

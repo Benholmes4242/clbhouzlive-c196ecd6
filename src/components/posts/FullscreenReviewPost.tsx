@@ -348,7 +348,7 @@ export function FullscreenReviewPost({
             <span 
               className="font-bold tracking-tight leading-none"
               style={{ 
-                fontSize: '2.25rem',
+                fontSize: 'clamp(1.5rem, 7vw, 2.25rem)',
                 fontVariantNumeric: 'tabular-nums',
                 color: isOutstanding ? '#f59e0b' : '#cbd5e1',
                 textShadow: isOutstanding
