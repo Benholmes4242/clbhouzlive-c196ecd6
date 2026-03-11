@@ -10,7 +10,7 @@ import { AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { PostingAsPill } from '@/components/header/PostingAsPill';
 import { PostingAsMenu } from '@/components/header/PostingAsMenu';
-import { SearchOverlay } from '@/components/header/SearchOverlay';
+import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
 import { ClubhouseTabToggle, type ClubhouseTab } from '@/components/clubhouse/ClubhouseTabToggle';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { cn } from '@/lib/utils';
@@ -95,15 +95,10 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
       )}
 
       {/* Search Overlay */}
-      <AnimatePresence>
-        {searchOpen && (
-          <SearchOverlay
-            isOpen={searchOpen}
-            onClose={() => setSearchOpen(false)}
-            useLightTheme={true}
-          />
-        )}
-      </AnimatePresence>
+      <GlobalSearchOverlay
+        isOpen={searchOpen}
+        onClose={() => setSearchOpen(false)}
+      />
     </>
   );
 };
