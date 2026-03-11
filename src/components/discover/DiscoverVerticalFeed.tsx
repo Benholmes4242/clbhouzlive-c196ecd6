@@ -22,7 +22,7 @@ import { getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
 import { useHlsUrlCache, warmHlsJs } from '@/hooks/useHlsUrlCache';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
-import { CommentsPage } from '@/components/clubhouse/cinematic/CommentsPage';
+import CommentsSheet from '@/components/comments/CommentsSheet';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';

@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useStore } from 'zustand';
 import { ChevronLeft, Flag, EyeOff, Link2 } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { CommentsPage } from '@/components/clubhouse/cinematic/CommentsPage';
+import CommentsSheet from '@/components/comments/CommentsSheet';
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';

@@ -592,7 +592,7 @@ const ClubhouseContent = () => {
           </Drawer>
 
           {/* Comments sheet — z-100+ */}
-          <CommentsPage
+          <CommentsSheet
             isOpen={commentsOpen}
             onClose={closeComments}
             postId={activePost.id}

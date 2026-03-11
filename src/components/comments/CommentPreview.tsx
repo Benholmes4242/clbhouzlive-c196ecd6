@@ -101,7 +101,7 @@ const CommentPreview: React.FC<CommentPreviewProps> = ({ postId, totalComments, 
         )}
       </div>
 
-      <CommentsPage
+      <CommentsSheet
         isOpen={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         postId={postId}

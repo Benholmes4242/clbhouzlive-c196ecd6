@@ -634,7 +634,7 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
         />
       </div>
 
-      <CommentsPage
+      <CommentsSheet
         isOpen={commentsOpen}
         onClose={() => setCommentsOpen(false)}
         postId={post.id}

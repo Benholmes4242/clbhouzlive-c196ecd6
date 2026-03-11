@@ -754,7 +754,7 @@ const BusinessPostCard = React.memo(function BusinessPostCard({
       />
 
       {/* Comments drawer */}
-      <CommentsPage
+      <CommentsSheet
         isOpen={commentsOpen}
         onClose={() => setCommentsOpen(false)}
         postId={post.id}
