@@ -27,6 +27,7 @@ export const BottomNavigationProvider: React.FC<BottomNavigationProviderProps> =
   const [isVisible, setIsVisible] = useState(true);
   const [height, setHeight] = useState(0);
   const navRef = useRef<HTMLDivElement | null>(null);
+  const [navEl, setNavEl] = useState<HTMLDivElement | null>(null);
 
   const setVisible = useCallback((visible: boolean) => {
     setIsVisible(visible);
