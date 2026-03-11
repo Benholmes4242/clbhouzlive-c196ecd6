@@ -349,8 +349,8 @@ function ProfileHubSheet({
                     >
                       <Shield className="w-5 h-5 text-primary" />
                       <div className="flex-1 text-left">
-                        <div className="text-[14px] font-semibold text-foreground">Command Center</div>
-                        <div className="text-[11px] text-muted-foreground">Manage site settings</div>
+                        <div className="text-[14px] font-semibold text-primary">Command Center</div>
+                        <div className="text-[11px] text-primary/60">Manage site settings</div>
                       </div>
                       <ChevronRight className="w-4 h-4 text-primary/60" />
                     </button>
