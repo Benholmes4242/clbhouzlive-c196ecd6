@@ -303,7 +303,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
                         </button>
                         {idx < clubs.length - 1 && (
-                          <div className="ml-[64px] border-b border-border/30" />
+                          <div className="ml-[52px] border-b border-border/30" />
                         )}
                       </div>
                     ))}
