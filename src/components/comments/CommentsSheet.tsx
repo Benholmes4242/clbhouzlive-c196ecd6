@@ -568,19 +568,23 @@ function CommentsSheet({
                 </div>
               ) : comments.length === 0 ? (
                 /* Empty state */
-                <div className="flex flex-col items-center justify-center py-20 px-6 gap-3">
-                  <div className={cn(
-                    'w-16 h-16 rounded-full flex items-center justify-center',
-                    isDark ? 'bg-white/[0.04]' : 'bg-muted/50'
-                  )}>
-                    <MessageCircle className={cn('w-7 h-7', isDark ? 'text-white/30' : 'text-muted-foreground/40')} />
+                <div className="flex-1 flex flex-col items-center justify-center px-8 gap-4">
+                  {/* Staggered bounce emoji cluster */}
+                  <div className="flex gap-3 text-4xl">
+                    <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>⛳</span>
+                    <span className="inline-block animate-bounce" style={{ animationDelay: '180ms' }}>🏌️</span>
+                    <span className="inline-block animate-bounce" style={{ animationDelay: '360ms' }}>💬</span>
                   </div>
-                  <p className={cn('text-sm font-medium', isDark ? 'text-white' : 'text-foreground')}>
-                    No comments yet
-                  </p>
-                  <p className={cn('text-xs text-center', isDark ? 'text-white/50' : 'text-muted-foreground')}>
-                    Be the first to share your thoughts
-                  </p>
+                  <div className="flex flex-col items-center gap-1.5">
+                    <p className={cn('text-[16px] font-semibold', isDark ? 'text-white' : 'text-foreground')}>
+                      No comments yet
+                    </p>
+                    <p className={cn('text-[13px] text-center leading-relaxed', isDark ? 'text-white/50' : 'text-muted-foreground')}>
+                      {(CommentsSheet as any).__isReview
+                        ? 'Be the first to review this course'
+                        : 'Be the first to drop your thoughts'}
+                    </p>
+                  </div>
                 </div>
               ) : (
                 /* Comment list */
