@@ -401,6 +401,7 @@ const ClubhouseContent = () => {
             caption={activePost.caption}
             theme="dark"
             onCommentPosted={() => handleCommentPosted(activePost)}
+            onCommentDeleted={() => activePost && handleCommentDeleted(activePost.id, activePost.commentCount)}
           />
           {/* More options sheet for tournament posts */}
           <Drawer open={moreOptionsOpen} onOpenChange={setMoreOptionsOpen}>
