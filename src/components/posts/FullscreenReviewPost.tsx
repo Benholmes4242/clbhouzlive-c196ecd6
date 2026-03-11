@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, MapPin, ChevronsDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RatingPill } from '@/components/ui/RatingPill';
@@ -314,7 +314,7 @@ export function FullscreenReviewPost({
         onClick={handleOpenReviewSheet}
         className={cn(
           "absolute left-4 right-4 z-20",
-          "rounded-xl border overflow-hidden relative",
+          "rounded-xl border",
           "shadow-[0_4px_20px_rgba(0,0,0,0.2)]",
           "pointer-events-auto cursor-pointer transition-transform active:scale-[0.98]",
           "text-left w-auto"
@@ -367,30 +367,6 @@ export function FullscreenReviewPost({
             </span>
           </div>
         </div>
-
-        {/* Chevron affordance */}
-        <div className="flex justify-center pt-1 pb-0.5">
-          <ChevronsDown
-            className="w-4 h-4 text-white/35"
-            style={{ animation: 'chevronBounce 1.8s ease-in-out infinite' }}
-          />
-        </div>
-
-        {/* One-shot shimmer sweep */}
-        <div
-          className="pointer-events-none"
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: '-100%',
-            width: '60%',
-            height: '100%',
-            background: 'linear-gradient(to right, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%)',
-            transform: 'skewX(-15deg)',
-            animation: 'shimmerSweep 1.2s ease-out 0.3s forwards',
-            borderRadius: 'inherit',
-          }}
-        />
       </motion.button>
       
       {/* Review Bottom Sheet - Liquid Glass with swipe-to-dismiss */}
