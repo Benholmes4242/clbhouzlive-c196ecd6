@@ -6,7 +6,7 @@
 import { memo, useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Heart, MessageCircle, MoreHorizontal, Send, ChevronRight } from 'lucide-react';
+import { X, Heart, MoreHorizontal, SendHorizontal, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
