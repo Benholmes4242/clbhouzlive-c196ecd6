@@ -53,7 +53,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const { triggerPrefetch } = useAppPrefetch();
   const { activeTab, handleTabClick, handlePrefetch } = useNavigationHandlers();
   const isDesktop = useIsDesktop();
-  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  
   const navRef = useRef<HTMLDivElement>(null);
   
   // Prefetch routes on hover/touch for faster navigation
