@@ -57,8 +57,15 @@ const HIDE_DELAY = 2000;
 const LOOP_PULSE_WINDOW = 0.5; // seconds before loop
 
 export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubStart, onScrubEnd, bottomNavSelector = '.global-bottom-nav', position = 'absolute' }: ScrubberProps) {
-  const [progress, setProgress] = useState(0);
-  const [buffered, setBuffered] = useState(0);
+  // Progress & buffered use refs + direct DOM writes instead of state to avoid per-frame re-renders
+  const progressRef = useRef(0);
+  const bufferedRef = useRef(0);
+  const progressBarRef = useRef<HTMLDivElement>(null);
+  const bufferedBarRef = useRef<HTMLDivElement>(null);
+  const thumbRef = useRef<HTMLDivElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const tooltipTimeRef = useRef<HTMLDivElement>(null);
+
   const [scrubState, setScrubState] = useState<ScrubState>('default');
   const [tooltipTime, setTooltipTime] = useState('0:00');
   const [loopPulse, setLoopPulse] = useState(false);
@@ -125,11 +132,26 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
           setTimeout(() => setLoopReset(false), 250);
         }
         prevProgressRef.current = newProgress;
-        setProgress(newProgress);
+        progressRef.current = newProgress;
+
+        // Write progress directly to DOM — no React re-render
+        if (progressBarRef.current) {
+          progressBarRef.current.style.width = `${newProgress * 100}%`;
+        }
+        if (thumbRef.current) {
+          thumbRef.current.style.left = `${newProgress * 100}%`;
+        }
+        if (tooltipRef.current) {
+          tooltipRef.current.style.left = `${newProgress * 100}%`;
+        }
 
         // Buffered
         if (video.buffered.length > 0) {
-          setBuffered(video.buffered.end(video.buffered.length - 1) / dur);
+          const buf = video.buffered.end(video.buffered.length - 1) / dur;
+          bufferedRef.current = buf;
+          if (bufferedBarRef.current) {
+            bufferedBarRef.current.style.width = `${buf * 100}%`;
+          }
         }
 
         // Loop pulse: short videos near end
@@ -158,7 +180,19 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
     if (!video || !dur || !isFinite(dur)) return;
     const clamped = Math.max(0, Math.min(1, fraction));
     video.currentTime = clamped * dur;
-    setProgress(clamped);
+    progressRef.current = clamped;
+
+    // Direct DOM write
+    if (progressBarRef.current) {
+      progressBarRef.current.style.width = `${clamped * 100}%`;
+    }
+    if (thumbRef.current) {
+      thumbRef.current.style.left = `${clamped * 100}%`;
+    }
+    if (tooltipRef.current) {
+      tooltipRef.current.style.left = `${clamped * 100}%`;
+    }
+
     setTooltipTime(formatTime(clamped * dur));
   }, [videoRef, duration]);
 
@@ -255,7 +289,12 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
       {/* Invisible touch capture zone — bottom 60px */}
       <div
         className={`${position} left-0 right-0 z-[25]`}
-        style={{ bottom: bottomOffset, height: TOUCH_ZONE_HEIGHT }}
+        style={{
+          bottom: bottomOffset,
+          height: TOUCH_ZONE_HEIGHT,
+          touchAction: 'none',
+          willChange: 'transform',
+        }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -264,7 +303,7 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
         aria-label="Video progress"
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-valuenow={Math.round(progress * 100)}
+        aria-valuenow={Math.round(progressRef.current * 100)}
       />
 
       {/* Visual bar container */}
@@ -285,24 +324,22 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
 
         {/* Buffered range */}
         <div
+          ref={bufferedBarRef}
           className="absolute inset-0"
           style={{
-            width: `${buffered * 100}%`,
+            width: `${bufferedRef.current * 100}%`,
             backgroundColor: 'rgba(255,255,255,0.3)',
           }}
         />
 
         {/* Played progress */}
         <div
+          ref={progressBarRef}
           className="absolute inset-0"
           style={{
-            width: `${progress * 100}%`,
+            width: `${progressRef.current * 100}%`,
             backgroundColor: 'rgba(255,255,255,0.8)',
-            transition: loopReset
-              ? 'width 200ms ease-in-out'
-              : isScrubbing
-                ? 'none'
-                : 'width 100ms linear',
+            transition: loopReset ? 'width 200ms ease-in-out' : 'none',
           }}
         />
 
@@ -320,6 +357,7 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
         {/* Thumb */}
         {showThumb && (
           <div
+            ref={thumbRef}
             className="absolute pointer-events-none"
             style={{
               width: thumbSize,
@@ -327,10 +365,10 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
               borderRadius: '50%',
               backgroundColor: 'white',
               boxShadow: '0 1px 4px rgba(0,0,0,0.4)',
-              left: `${progress * 100}%`,
+              left: `${progressRef.current * 100}%`,
               top: '50%',
               transform: 'translate(-50%, -50%)',
-              transition: isScrubbing ? 'width 50ms, height 50ms' : 'all 100ms ease-out',
+              transition: isScrubbing ? 'width 50ms, height 50ms' : 'width 50ms ease-out, height 50ms ease-out',
             }}
           />
         )}
@@ -338,14 +376,16 @@ export function Scrubber({ videoRef, videoElement, isActive, duration, onScrubSt
         {/* Timestamp tooltip */}
         {showTooltip && (
           <div
+            ref={tooltipRef}
             className="absolute pointer-events-none flex flex-col items-center"
             style={{
-              left: `${progress * 100}%`,
+              left: `${progressRef.current * 100}%`,
               bottom: 24 + barHeight,
               transform: 'translateX(-50%)',
             }}
           >
             <div
+              ref={tooltipTimeRef}
               className="px-2 py-1 rounded text-center"
               style={{
                 backgroundColor: 'rgba(0,0,0,0.7)',
