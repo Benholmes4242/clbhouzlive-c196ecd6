@@ -209,9 +209,9 @@ function ProfileHubSheet({
                   <div className="text-[16px] font-semibold text-foreground truncate">
                     {activeProfile.name}
                   </div>
-                  <div className="text-[13px] text-muted-foreground mt-0.5">
-                    Posting as {activeProfile.name}
-                  </div>
+                  <p className="text-[12px] text-muted-foreground truncate">
+                    {activeProfile.type === 'business' ? 'Business account' : 'Personal account'}
+                  </p>
                 </div>
               </div>
 
