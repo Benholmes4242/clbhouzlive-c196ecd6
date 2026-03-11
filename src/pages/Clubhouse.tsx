@@ -655,7 +655,7 @@ const ClubhouseContent = () => {
         onClose={handleCloseComposer}
         onShowToast={showConfirmationToast}
         isSubmitting={isSubmitting}
-        setIsSubmitting={() => {}}
+        setIsSubmitting={setIsSubmitting}
         onMediaChange={setMediaItems}
       />
 
