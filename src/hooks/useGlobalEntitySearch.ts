@@ -438,6 +438,7 @@ export const useGlobalEntitySearch = ({
     pages,
     businesses,
     trending,
+    trendingLoading: trendingQuery.isLoading,
     isLoading,
     error: error || null
   };
