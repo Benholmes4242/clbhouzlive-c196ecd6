@@ -60,7 +60,6 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   // Calls both route prefetch AND hero video prefetch
   const handleNavPrefetch = useCallback((path: string) => {
     triggerPrefetch(path);
-    triggerPrefetch(path);
     handlePrefetch(path); // Also trigger hero video prefetch
   }, [triggerPrefetch, handlePrefetch]);
   
