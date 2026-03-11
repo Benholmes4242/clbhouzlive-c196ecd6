@@ -590,12 +590,6 @@ const ClubhouseContent = () => {
 
       {/* Post Creation — now handled globally by GlobalPostStudio in App.tsx */}
 
-      <SnapToast
-        message={toastMessage}
-        isVisible={showToast}
-        onHide={hideToast}
-      />
-
       {/* Season Recap Modal */}
       {seasonRecap && user && (
         <SeasonRecapModal
