@@ -529,6 +529,7 @@ export function useCommentsWithReplies(postId: string | null, onCommentDeleted?:
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId] });
       queryClient.invalidateQueries({ queryKey: ['post-engagement', postId] });
+      onCommentDeleted?.();
     },
   });
 
