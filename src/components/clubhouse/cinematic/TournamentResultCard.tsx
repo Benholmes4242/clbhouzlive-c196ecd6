@@ -228,21 +228,6 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             </span>
           </div>
 
-          {/* FINAL RESULT pill */}
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)',
-            borderRadius: 20, padding: '5px 12px', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-          }}>
-            <div style={{ position: 'relative', width: 8, height: 8 }}>
-              <span style={{
-                position: 'absolute', inset: 0, borderRadius: '50%', background: '#EF4444',
-                animation: 'trcard-pulse 2s ease-in-out infinite',
-              }} />
-              <span style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: '#EF4444', width: 8, height: 8 }} />
-            </div>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#FCA5A5', letterSpacing: 1.0 }}>FINAL RESULT</span>
-          </div>
         </div>
 
         {/* ── SPACER — push tournament name to bottom of image area ── */}
