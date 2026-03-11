@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
 import SnapToast from '@/components/snap/SnapToast';
-import { useNavigationHandlers } from '@/components/bottom-navigation/useNavigationHandlers';
+
 import { useSnapModal } from '@/hooks/useSnapModal';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
@@ -249,8 +249,7 @@ const ClubhouseContent = () => {
     navigate(getProfilePathById(activePost.userId));
   }, [activePost, navigate]);
 
-  // Navigation handlers
-  const { handleTabClick } = useNavigationHandlers();
+
   
   // Composer state management
   const {
