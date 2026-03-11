@@ -8,7 +8,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import HeaderNavigation from './HeaderNavigation';
 import { PostingAsPill } from './PostingAsPill';
 import { PostingAsMenu } from './PostingAsMenu';
-import { SearchOverlay } from './SearchOverlay';
+import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
 import { ActingAsIndicator } from './ActingAsIndicator';
 import { cn } from '@/lib/utils';
 import { NineDotsIcon } from '@/features/tourhub/components/NineDotsIcon';
