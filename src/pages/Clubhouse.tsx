@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
 import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
 import SnapToast from '@/components/snap/SnapToast';
+import { PostStudio } from '@/components/post-studio';
+
+// Feature flag: set to true to use the new PostStudio instead of the legacy composer
+const USE_POST_STUDIO = true;
 
 import { useSnapModal } from '@/hooks/useSnapModal';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -619,19 +623,30 @@ const ClubhouseContent = () => {
         />
       )}
 
-      {/* Post Submission Handler */}
-      <PostSubmissionHandler
-        isComposerOpen={isComposerOpen}
-        mediaItems={mediaItems}
-        selectedFile={selectedFile}
-        selectedCourse={selectedCourse}
-        onCourseSelect={setSelectedCourse}
-        onClose={handleCloseComposer}
-        onShowToast={showConfirmationToast}
-        isSubmitting={isSubmitting}
-        setIsSubmitting={setIsSubmitting}
-        onMediaChange={setMediaItems}
-      />
+      {/* Post Creation */}
+      {USE_POST_STUDIO ? (
+        <PostStudio
+          open={isComposerOpen}
+          onClose={handleCloseComposer}
+          initialMedia={mediaItems.map(m => m.file)}
+          onSuccess={() => {
+            showConfirmationToast('Post shared!');
+          }}
+        />
+      ) : (
+        <PostSubmissionHandler
+          isComposerOpen={isComposerOpen}
+          mediaItems={mediaItems}
+          selectedFile={selectedFile}
+          selectedCourse={selectedCourse}
+          onCourseSelect={setSelectedCourse}
+          onClose={handleCloseComposer}
+          onShowToast={showConfirmationToast}
+          isSubmitting={isSubmitting}
+          setIsSubmitting={setIsSubmitting}
+          onMediaChange={setMediaItems}
+        />
+      )}
 
       <SnapToast
         message={toastMessage}
