@@ -91,8 +91,10 @@ function SmallAvatar({ src, name, size }: { src: string | null; name: string; si
   return (
     <div style={{
       width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
-      border: '1.5px solid rgba(255,255,255,0.2)',
-      background: 'rgba(255,255,255,0.08)',
+      outline: '2px solid rgba(12,15,20,0.95)',
+      outlineOffset: 0,
+      border: 'none',
+      background: 'rgba(12,15,20,0.95)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       {currentSrc && !error ? (
