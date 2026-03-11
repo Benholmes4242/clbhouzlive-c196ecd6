@@ -282,19 +282,12 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   );
 
   // Get initials for avatar fallback
-  const userInitials = user?.name
+  const initials = user?.name
     ?.split(' ')
     .slice(0, 2)
     .map(part => part[0])
     .join('')
     .toUpperCase() || '?';
-
-  // Navigate to user profile
-  const handleUserTap = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    const path = getProfilePathById(user.id);
-    navigate(path);
-  }, [navigate, user.id]);
 
   // Review mode content - matches regular capsule layout exactly
   const reviewContent = reviewData && (
