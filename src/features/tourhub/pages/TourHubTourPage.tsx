@@ -110,7 +110,7 @@ export function TourHubTourPage() {
       {/* Sticky search + filter header */}
       <div
         className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border/50 -mx-4 px-4"
-        style={{ paddingTop: '12px' }}
+        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
       >
         <div className="pb-2">
           <button
