@@ -3,7 +3,7 @@ import { ChevronDown } from 'lucide-react';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
-import { useMessaging } from '@/hooks/useMessaging';
+import { useMessagingContext } from '@/contexts/MessagingContext';
 
 interface PostingAsPillProps {
   onClick: () => void;
