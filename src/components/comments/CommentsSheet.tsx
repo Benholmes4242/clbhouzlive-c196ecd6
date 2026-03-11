@@ -309,7 +309,7 @@ function CommentsSheet({
                 Caddie Pick
               </span>
             )}
-            <span className={cn('text-[11px]', isDark ? 'text-white/35' : 'text-muted-foreground/60')}>
+            <span className={cn('text-[11px]', isDark ? 'text-white/50' : 'text-muted-foreground/60')}>
               {relativeTime(comment.created_at)}
             </span>
             {(comment as any).is_edited && (
