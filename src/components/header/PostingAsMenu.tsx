@@ -16,7 +16,7 @@ import { useIsMobile } from '@/hooks/useIsMobile';
 import { cn } from '@/lib/utils';
 import { postingAsCopy } from '@/lib/postingAsCopy';
 import { toast } from 'sonner';
-import { AccountHubSheet } from './AccountHubSheet';
+import ProfileHubSheet from '@/components/profile/ProfileHubSheet';
 
 interface PostingAsMenuProps {
   isOpen: boolean;
@@ -177,7 +177,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   const displayName = userProfile?.display_name || user?.user_metadata?.full_name || 'User';
   const email = user?.email || '';
 
-  // Build profiles array for AccountHubSheet
+  // Build profiles array for ProfileHubSheet
   const profiles = availableActors.map(actor => ({
     id: actor.id,
     type: actor.type as 'personal' | 'business',
@@ -186,7 +186,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     subtitle: actor.type === 'personal' ? email : 'Business',
   }));
 
-  // Current actor for AccountHubSheet
+  // Current actor for ProfileHubSheet
   const currentActorData = {
     type: (activeActor?.type || 'personal') as 'personal' | 'business',
     id: activeActor?.id || user?.id || '',
@@ -195,7 +195,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     subtitle: email,
   };
 
-  // Handle profile switch in AccountHubSheet
+  // Handle profile switch in ProfileHubSheet
   const handleSwitchProfile = async (profileId: string) => {
     const actor = availableActors.find(a => a.id === profileId);
     if (actor && (activeActor?.id !== actor.id)) {
@@ -203,7 +203,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     }
   };
 
-  // Handle navigation from AccountHubSheet
+  // Handle navigation from ProfileHubSheet
   const handleAccountHubNavigate = (route: string) => {
     if (route === '/upload') {
       setUploadCenterOpen(true);
@@ -221,7 +221,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   };
 
   // ===========================================
-  // MOBILE: AccountHubSheet with two snap states
+  // MOBILE: ProfileHubSheet bottom sheet
   // ===========================================
   if (isMobile) {
     return (
@@ -230,7 +230,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
           isOpen={uploadCenterOpen} 
           onClose={() => setUploadCenterOpen(false)} 
         />
-        <AccountHubSheet
+        <ProfileHubSheet
           open={isOpen}
           onClose={onClose}
           currentActor={currentActorData}
