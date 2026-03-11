@@ -97,7 +97,72 @@ function PanelRouter() {
 // ============================================================================
 
 function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMedia?: File[] }) {
-  const { state, setDiscarding, reset } = usePostStudioContext();
+  const { state, setDiscarding, reset, addMedia, setStep } = usePostStudioContext();
+  const initialMediaProcessed = useRef(false);
+
+  // Process initialMedia files (from snap modal) on mount
+  useEffect(() => {
+    if (initialMediaProcessed.current || !initialMedia?.length) return;
+    initialMediaProcessed.current = true;
+
+    (async () => {
+      const items: StudioMediaItem[] = [];
+      for (const file of initialMedia) {
+        const isVideo = file.type.startsWith('video/');
+        const previewUrl = URL.createObjectURL(file);
+
+        let duration: number | null = null;
+        let thumbnailUrl: string | undefined;
+
+        if (isVideo) {
+          duration = await new Promise<number | null>((resolve) => {
+            const v = document.createElement('video');
+            v.preload = 'metadata';
+            const u = URL.createObjectURL(file);
+            v.src = u;
+            v.onloadedmetadata = () => { resolve(isFinite(v.duration) ? v.duration : null); URL.revokeObjectURL(u); };
+            v.onerror = () => { URL.revokeObjectURL(u); resolve(null); };
+          });
+          thumbnailUrl = await new Promise<string>((resolve) => {
+            const v = document.createElement('video');
+            v.preload = 'metadata'; v.muted = true; v.playsInline = true;
+            const u = URL.createObjectURL(file);
+            v.src = u;
+            v.onloadeddata = () => { v.currentTime = 0.1; };
+            v.onseeked = () => {
+              const c = document.createElement('canvas');
+              c.width = v.videoWidth; c.height = v.videoHeight;
+              c.getContext('2d')?.drawImage(v, 0, 0);
+              URL.revokeObjectURL(u);
+              resolve(c.toDataURL('image/jpeg', 0.7));
+            };
+            v.onerror = () => { URL.revokeObjectURL(u); resolve(''); };
+          });
+        }
+
+        items.push({
+          id: crypto.randomUUID(),
+          file,
+          mediaType: isVideo ? 'video' : 'image',
+          previewUrl,
+          thumbnailUrl,
+          duration,
+          trimStart: 0,
+          trimEnd: duration,
+          posterTimestamp: 0,
+          posterPreviewUrl: null,
+          width: null,
+          height: null,
+          validationError: null,
+        });
+      }
+
+      if (items.length > 0) {
+        addMedia(items);
+        setStep('COMPOSER');
+      }
+    })();
+  }, [initialMedia, addMedia, setStep]);
 
   const handleClose = useCallback(() => {
     if (state.isDirty) {
