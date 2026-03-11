@@ -58,7 +58,7 @@ interface PageData {
   nextCursor: string | null;
 }
 
-export function useCommentsWithReplies(postId: string | null) {
+export function useCommentsWithReplies(postId: string | null, onCommentDeleted?: () => void) {
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
   const { activeActor } = useActiveActor();
