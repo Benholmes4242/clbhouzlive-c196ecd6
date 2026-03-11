@@ -4,7 +4,7 @@ import { Check, Plus, User, Bell, Upload, Settings, Building2, Shield, LogOut, C
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
-import { useMessaging } from '@/hooks/useMessaging';
+import { useMessagingContext } from '@/contexts/MessagingContext';
 import { postingAsCopy } from '@/lib/postingAsCopy';
 import { useProfilePrefetch } from '@/hooks/useProfilePrefetch';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -64,8 +64,8 @@ export const AccountHubSheet: React.FC<AccountHubSheetProps> = ({
   const navigate = useNavigate();
   const { hasUnread, unreadCount: unreadNotificationCount } = useUnreadNotifications();
   
-  // Get unread messages from messaging system
-  const { conversations } = useMessaging();
+  // Get unread messages from shared messaging context
+  const { conversations } = useMessagingContext();
   const unreadMessageCount = conversations?.reduce((sum, conv) => sum + (conv.unread_count || 0), 0) || 0;
   
   const sheetRef = useRef<HTMLDivElement>(null);

@@ -1,4 +1,5 @@
 import React, { Suspense, lazy, useEffect, useMemo } from "react";
+import { MessagingProvider } from '@/contexts/MessagingContext';
 
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -699,6 +700,7 @@ const AppInner: React.FC = () => {
                                   <VideoPlaybackProvider>
                                       <ErrorBoundary>
                                         <AuthWrapper>
+                                          <MessagingProvider>
                                           <UploadResilienceProvider>
                                             <SeasonWrapModal />
                                             <AchievementToastWrapper />
@@ -717,6 +719,7 @@ const AppInner: React.FC = () => {
                                             {/* Fullscreen Feed Overlay - portal-based, renders above everything */}
                                             <FullscreenFeedOverlay />
                                           </UploadResilienceProvider>
+                                          </MessagingProvider>
                                         </AuthWrapper>
                                       </ErrorBoundary>
                                   </VideoPlaybackProvider>
