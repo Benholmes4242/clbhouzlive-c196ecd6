@@ -1,7 +1,7 @@
 // PostStudio — Root entry point
 // Full-screen sheet with spring animation, renders active screen + panels
 
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PostStudioProvider, usePostStudioContext } from './usePostStudio';
@@ -17,7 +17,7 @@ import { AudiencePanel } from './panels/AudiencePanel';
 import { SchedulePanel } from './panels/SchedulePanel';
 import { DraftsPanel } from './panels/DraftsPanel';
 import { SPRING, DURATION } from './constants';
-import type { PostStudioProps, StudioStep } from './types';
+import type { PostStudioProps, StudioStep, StudioMediaItem } from './types';
 
 // ============================================================================
 // SCREEN ROUTER
