@@ -1,6 +1,6 @@
 import { memo, useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Clock, TrendingUp, BadgeCheck, Briefcase } from 'lucide-react';
+import { Search, X, Clock, BadgeCheck, Briefcase, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useDebounce } from '@/hooks/useDebounce';
 import {
@@ -154,8 +154,8 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                 {/* Recent searches */}
                 {recent.length > 0 && (
                   <div>
-                    <div className="flex items-center justify-between px-4 pt-5 pb-2">
-                      <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    <div className="flex items-center justify-between px-4 pt-4 pb-2">
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
                         Recent Searches
                       </span>
                       <button
@@ -180,7 +180,6 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           <button
                             type="button"
                             onClick={() => {
-                              // Remove single item from recent searches
                               const stored = localStorage.getItem('recent_searches');
                               if (stored) {
                                 try {
@@ -190,7 +189,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                                 } catch { /* noop */ }
                               }
                             }}
-                            className="p-1 text-muted-foreground"
+                            className="p-1 text-muted-foreground/50"
                             aria-label={`Remove ${item.query}`}
                           >
                             <X className="w-3.5 h-3.5" />
@@ -204,13 +203,13 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                 {/* Today's Picks */}
                 {trending.length > 0 && (
                   <div>
-                    <div className="px-4 pt-5 pb-2">
-                      <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    <div className="px-4 pt-4 pb-2">
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
                         Today's Picks
                       </span>
                     </div>
                     <div className="flex flex-col">
-                      {trending.slice(0, 6).map(item => (
+                      {trending.slice(0, 8).map(item => (
                         <button
                           key={item.id ?? item.label}
                           type="button"
@@ -223,15 +222,20 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                               commitRecentSearch(item.label);
                             }
                           }}
-                          className="min-h-[44px] flex items-center px-4 gap-3"
+                          className="min-h-[56px] flex items-center px-4 gap-3 w-full active:bg-muted/50"
                         >
-                          <TrendingUp className="w-4 h-4 text-muted-foreground shrink-0" />
+                          <div className="w-10 h-10 rounded-xl bg-muted overflow-hidden shrink-0">
+                            {item.image && (
+                              <img src={item.image} alt="" className="w-full h-full object-cover" />
+                            )}
+                          </div>
                           <div className="flex-1 text-left min-w-0">
                             <p className="text-sm text-foreground truncate">{item.label}</p>
                             {item.subtitle && (
                               <p className="text-xs text-muted-foreground truncate">{item.subtitle}</p>
                             )}
                           </div>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
                         </button>
                       ))}
                     </div>
@@ -245,7 +249,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
               <div className="px-4 pt-4 space-y-3">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div key={i} className="flex items-center gap-3 animate-pulse">
-                    <div className="w-11 h-11 rounded-xl bg-muted shrink-0" />
+                    <div className="w-10 h-10 rounded-xl bg-muted shrink-0" />
                     <div className="flex-1 space-y-2">
                       <div className="h-3.5 w-32 rounded bg-muted" />
                       <div className="h-3 w-24 rounded bg-muted/60" />
@@ -261,8 +265,8 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                 {/* Courses */}
                 {clubs.length > 0 && (
                   <div>
-                    <div className="px-4 pt-5 pb-2">
-                      <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    <div className="px-4 pt-4 pb-2">
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
                         Courses
                       </span>
                     </div>
@@ -273,7 +277,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           onClick={() => selectCourse(course)}
                           className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-muted/50"
                         >
-                          <div className="w-11 h-11 rounded-xl bg-muted overflow-hidden shrink-0">
+                          <div className="w-10 h-10 rounded-xl bg-muted overflow-hidden shrink-0">
                             {course.logo_url && (
                               <img src={course.logo_url} alt="" className="w-full h-full object-cover" />
                             )}
@@ -285,6 +289,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                               {course.global_rank && ` · #${course.global_rank} World`}
                             </p>
                           </div>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
                         </button>
                         {idx < clubs.length - 1 && (
                           <div className="ml-[64px] border-b border-border/30" />
@@ -297,8 +302,8 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                 {/* People */}
                 {people.length > 0 && (
                   <div>
-                    <div className="px-4 pt-5 pb-2">
-                      <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    <div className="px-4 pt-4 pb-2">
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
                         People
                       </span>
                     </div>
@@ -309,7 +314,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           onClick={() => selectPerson(person)}
                           className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-muted/50"
                         >
-                          <div className="w-11 h-11 rounded-full bg-muted overflow-hidden shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-muted overflow-hidden shrink-0">
                             {person.avatar_url && (
                               <img src={person.avatar_url} alt="" className="w-full h-full object-cover" />
                             )}
@@ -320,9 +325,15 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                               {person.verified && <BadgeCheck className="w-3.5 h-3.5 text-primary shrink-0" />}
                             </div>
                             <p className="text-xs text-muted-foreground truncate">
-                              @{person.username}{person.home_club_name ? ` · ${person.home_club_name}` : ''}
+                              {person.username && !person.username.includes('@')
+                                ? `@${person.username}`
+                                : ''}
+                              {person.home_club_name
+                                ? `${person.username && !person.username.includes('@') ? ' · ' : ''}${person.home_club_name}`
+                                : ''}
                             </p>
                           </div>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
                         </button>
                         {idx < people.length - 1 && (
                           <div className="ml-[64px] border-b border-border/30" />
@@ -335,8 +346,8 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                 {/* Businesses */}
                 {businesses.length > 0 && (
                   <div>
-                    <div className="px-4 pt-5 pb-2">
-                      <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    <div className="px-4 pt-4 pb-2">
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
                         Businesses
                       </span>
                     </div>
@@ -347,7 +358,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           onClick={() => selectBusiness(business)}
                           className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-muted/50"
                         >
-                          <div className="w-11 h-11 rounded-xl bg-muted overflow-hidden shrink-0 flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-xl bg-muted overflow-hidden shrink-0 flex items-center justify-center">
                             {business.logo_url
                               ? <img src={business.logo_url} alt="" className="w-full h-full object-cover" />
                               : <Briefcase className="w-5 h-5 text-muted-foreground" />
@@ -362,6 +373,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                               {[business.city, business.country].filter(Boolean).join(', ')}
                             </p>
                           </div>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
                         </button>
                         {idx < businesses.length - 1 && (
                           <div className="ml-[64px] border-b border-border/30" />
