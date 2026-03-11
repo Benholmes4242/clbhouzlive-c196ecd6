@@ -199,6 +199,7 @@ interface PostStudioProviderProps {
   children: React.ReactNode;
   initialActorType?: StudioActorType;
   initialActorId?: string;
+  onSuccess?: (postId: string) => void;
 }
 
 export function PostStudioProvider({
