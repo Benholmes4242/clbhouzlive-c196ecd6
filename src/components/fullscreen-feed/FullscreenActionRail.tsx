@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useStore } from 'zustand';
-import { ChevronLeft, Flag, EyeOff, Link2 } from 'lucide-react';
+import { Flag, EyeOff, Link2 } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
@@ -34,7 +34,7 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
   const [likeCount, setLikeCount] = useState(activePost?.likeCount ?? 0);
   const [showComments, setShowComments] = useState(false);
   const [commentCountOverride, setCommentCountOverride] = useState<number | null>(null);
-  const [chevronY, setChevronY] = useState<number | null>(null);
+  
   const [moreOptionsOpen, setMoreOptionsOpen] = useState(false);
 
   // Reset like state and comment count override when activeIndex changes
@@ -185,37 +185,8 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
         onPrevMedia={activeMediaCount > 1
           ? () => store.getState().setCarouselPosition(activeIndex, currentMediaIndex - 1)
           : undefined}
-        onChevronPositionChange={setChevronY}
         bottomOffset={FULLSCREEN_BOTTOM_OFFSET}
       />
-
-      {/* Left chevron — mirrors right chevron Y position (identical to Clubhouse) */}
-      {currentMediaIndex > 0 && chevronY !== null && (
-        <button
-          onClick={() => store.getState().setCarouselPosition(activeIndex, currentMediaIndex - 1)}
-          style={{
-            position: 'fixed',
-            left: 16,
-            top: chevronY - 22,
-            zIndex: 40,
-            width: 44,
-            height: 44,
-            borderRadius: '50%',
-            background: 'rgba(0, 0, 0, 0.35)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.10)',
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-          }}
-          aria-label="Previous media"
-        >
-          <ChevronLeft className="w-5 h-5 text-white" />
-        </button>
-      )}
 
       {/* More Options drawer */}
       {moreOptionsOpen && (
