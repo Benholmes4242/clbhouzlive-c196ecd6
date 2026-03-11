@@ -4,8 +4,8 @@
  * "Liquid glass" circular buttons for Mute, Like, Comment, Share, Save
  */
 
-import React, { useState, useCallback } from 'react';
-import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, Music, MoreHorizontal, ChevronRight, ChevronLeft } from 'lucide-react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, Music, MoreHorizontal, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { MOTION_FAST, EASE_OUT, pressFeedback, likePop } from '@/lib/motionTokens';
@@ -40,6 +40,9 @@ interface CinematicActionRailProps {
   /** Override the bottom offset (default accounts for tab bar).
    *  Use for fullscreen viewer where there's no tab bar. */
   bottomOffset?: string;
+  /** Called with the vertical centre (px from top of viewport) of the top chevron after layout.
+   *  Parent uses this to align the left chevron to the same Y position. */
+  onChevronPositionChange?: (centreY: number) => void;
   /** Hide the mute button entirely (e.g. for non-audio cards) */
   hideMute?: boolean;
 }
@@ -215,12 +218,39 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   audioMode,
   postHasMusic = false,
   bottomOffset,
+  onChevronPositionChange,
   hideMute = false,
 }) => {
   // Idle opacity: 75% when not interacted, full when interacted or active
   const idleOpacity = hasInteracted ? 1 : 0.75;
 
   const CAPSULE_BOTTOM_OFFSET = bottomOffset || `calc(30px + 80px - ${SLOT_HEIGHT - ICON_SIZE}px)`;
+
+  // Ref on the top chevron's wrapper div — used to report its vertical centre to parent
+  const chevronSlotRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!onChevronPositionChange) return;
+
+    const report = () => {
+      const el = chevronSlotRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      // Report the vertical centre of the icon button (top 44px of the 64px slot)
+      onChevronPositionChange(rect.top + ICON_SIZE / 2);
+    };
+
+    // Report on mount and on any size/position change
+    report();
+    const ro = new ResizeObserver(report);
+    // Observe the document body so viewport resize triggers recalculation
+    ro.observe(document.documentElement);
+    window.addEventListener('resize', report);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', report);
+    };
+  }, [onChevronPositionChange, hasNextMedia, onNextMedia]);
 
   return (
     <motion.div
@@ -243,6 +273,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       {/* Slot 1: Right chevron — top of rail, only when there's a next media item */}
       {onNextMedia && hasNextMedia && (
         <ActionSlot
+          slotRef={chevronSlotRef}
           icon={ChevronRight}
           onClick={onNextMedia}
           ariaLabel="Next media"
@@ -314,17 +345,6 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
           icon={MoreHorizontal}
           onClick={onMore}
           ariaLabel="More options"
-          showCount={false}
-          idleOpacity={idleOpacity}
-        />
-      )}
-
-      {/* Slot 8: Left chevron — bottom of rail, only when there's a previous media item */}
-      {onPrevMedia && hasPrevMedia && (
-        <ActionSlot
-          icon={ChevronLeft}
-          onClick={onPrevMedia}
-          ariaLabel="Previous media"
           showCount={false}
           idleOpacity={idleOpacity}
         />

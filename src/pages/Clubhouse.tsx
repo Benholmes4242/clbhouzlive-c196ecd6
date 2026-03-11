@@ -13,7 +13,7 @@ import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 
 import { cn } from '@/lib/utils';
-import { Compass, Flag, EyeOff, Link as LinkIcon } from 'lucide-react';
+import { Compass, ChevronLeft, Flag, EyeOff, Link as LinkIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
@@ -282,7 +282,7 @@ const ClubhouseContent = () => {
   // Season Recap Modal
   const { data: seasonRecap } = useSeasonRecap(user?.id);
   const [showRecapModal, setShowRecapModal] = useState(false);
-  
+  const [chevronY, setChevronY] = useState<number | null>(null);
 
   useEffect(() => {
     if (seasonRecap) {
@@ -535,7 +535,36 @@ const ClubhouseContent = () => {
             onPrevMedia={activeMediaCount > 1 
               ? () => setCarouselPosition(activeIndex, currentMediaIndex - 1) 
               : undefined}
+            onChevronPositionChange={setChevronY}
           />
+
+          {/* Left chevron — mirrors right chevron Y position for multi-media non-review posts */}
+          {currentMediaIndex > 0 && chevronY !== null && (
+            <button
+              onClick={() => setCarouselPosition(activeIndex, currentMediaIndex - 1)}
+              style={{
+                position: 'fixed',
+                left: 16,
+                top: chevronY - 22,
+                zIndex: 40,
+                width: 44,
+                height: 44,
+                borderRadius: '50%',
+                background: 'rgba(0, 0, 0, 0.35)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.10)',
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+              }}
+              aria-label="Previous media"
+            >
+              <ChevronLeft className="w-5 h-5 text-white" />
+            </button>
+          )}
 
           {/* CreatorCapsule — z-50, bottom-left */}
           <CreatorCapsule
