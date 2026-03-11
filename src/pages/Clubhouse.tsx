@@ -530,8 +530,8 @@ const ClubhouseContent = () => {
           {/* CinematicActionRail — z-40, right side */}
           <CinematicActionRail
             postId={activePost.id}
-            likesCount={activeLikeState.count}
-            commentsCount={activeCommentCount}
+            likesCount={activeLikeState ? activeLikeState.count : null}
+            commentsCount={activePost ? activeCommentCount : null}
             hasLiked={activeLikeState.isLiked}
             isMuted={isMuted}
             isVisible={overlayVisible}
