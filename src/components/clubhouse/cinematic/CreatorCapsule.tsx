@@ -331,10 +331,10 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             "flex items-center gap-0.5 mt-0.5 py-2 px-3 -mx-3 rounded-md",
             "text-[11px] font-medium",
             "transition-opacity duration-150",
-            isOutstanding 
-              ? "text-amber-400/90 hover:text-amber-300"
-              : "text-white/60 hover:text-white/80"
           )}
+          style={{
+            color: reviewRatingColors?.main || 'rgba(255,255,255,0.6)',
+          }}
         >
           <span>Read review</span>
           <ChevronRight className="w-3 h-3" />
