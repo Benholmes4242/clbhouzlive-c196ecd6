@@ -145,14 +145,21 @@ export function getReviewOverlayTheme(score: number): ReviewOverlayTheme {
  * @returns Complete theme with overlay-specific colors
  */
 export function getReviewOverlayThemeByLabel(tierLabel: string): ReviewOverlayTheme {
-  const isOutstanding = tierLabel.toUpperCase() === 'OUTSTANDING';
-  const baseTheme = isOutstanding 
+  const labelToKey: Record<string, string> = {
+    'OUTSTANDING': 'outstanding',
+    'EXCELLENT': 'excellent',
+    'VERY GOOD': 'veryGood',
+    'GOOD': 'good',
+    'FAIR': 'fair',
+  };
+  const key = labelToKey[tierLabel.toUpperCase()] || 'good';
+  const baseTheme = key === 'outstanding' 
     ? COURSE_RATING_THEMES.OUTSTANDING 
-    : COURSE_RATING_THEMES.EXCELLENT; // Default to gray for non-outstanding
+    : COURSE_RATING_THEMES.EXCELLENT;
   
   return {
     ...baseTheme,
-    ...(isOutstanding ? amberOverlayTheme : grayOverlayTheme),
+    ...tierOverlayThemes[key],
   };
 }
 
