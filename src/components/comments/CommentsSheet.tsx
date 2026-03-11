@@ -606,6 +606,7 @@ function CommentsSheet({
                   )}
                 </div>
               )}
+              </AnimatePresence>
             </div>
 
             {/* Input bar */}
