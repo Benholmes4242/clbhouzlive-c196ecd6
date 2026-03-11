@@ -440,29 +440,17 @@ const ClubhouseContent = () => {
             onCommentPosted={() => handleCommentPosted(activePost)}
             onCommentDeleted={() => activePost && handleCommentDeleted(activePost.id, activePost.commentCount)}
           />
-          {/* More options sheet for tournament posts */}
-          <Drawer open={moreOptionsOpen} onOpenChange={setMoreOptionsOpen}>
-            <DrawerContent className="bg-black/95 border-white/10">
-              <div className="p-4 space-y-2">
-                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => handleReport(activePost)}>
-                  <Flag className="w-5 h-5 text-white/60" />
-                  <span className="text-sm text-white">Report this post</span>
-                </button>
-                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => handleNotInterested(activePost)}>
-                  <EyeOff className="w-5 h-5 text-white/60" />
-                  <span className="text-sm text-white">Not interested</span>
-                </button>
-                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => {
-                  navigator.clipboard.writeText(`${window.location.origin}/post/${activePost.id}`);
-                  toast.success('Link copied');
-                  setMoreOptionsOpen(false);
-                }}>
-                  <LinkIcon className="w-5 h-5 text-white/60" />
-                  <span className="text-sm text-white">Copy link</span>
-                </button>
-              </div>
-            </DrawerContent>
-          </Drawer>
+          <MoreOptionsDrawer
+            open={moreOptionsOpen}
+            onOpenChange={setMoreOptionsOpen}
+            onReport={() => handleReport(activePost)}
+            onNotInterested={() => handleNotInterested(activePost)}
+            onCopyLink={() => {
+              navigator.clipboard.writeText(`${window.location.origin}/post/${activePost.id}`);
+              toast.success('Link copied');
+              setMoreOptionsOpen(false);
+            }}
+          />
         </>
       )}
 
