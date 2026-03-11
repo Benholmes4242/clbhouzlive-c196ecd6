@@ -6,7 +6,6 @@ import { UploadCenterPanel } from '@/components/uploads/UploadCenterPanel';
 import { useUploadJobs } from '@/uploads/useUploadJobs';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -16,6 +15,8 @@ import { useIsMobile } from '@/hooks/useIsMobile';
 import { cn } from '@/lib/utils';
 import { postingAsCopy } from '@/lib/postingAsCopy';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useLogout } from '@/hooks/useLogout';
 import ProfileHubSheet from '@/components/profile/ProfileHubSheet';
 
 interface PostingAsMenuProps {
