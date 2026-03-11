@@ -1,5 +1,5 @@
-// SuccessScreen — Step 6: Upload queued confirmation
-// Animated checkmark + live upload progress
+// SuccessScreen — Step 6: Upload queued celebration
+// Amber halo checkmark + eyebrow label + live upload progress
 
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -13,15 +13,19 @@ interface SuccessScreenProps {
 
 export function SuccessScreen({ onDone }: SuccessScreenProps) {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-6 gap-6">
-      {/* Animated checkmark */}
+    <div className="flex-1 flex flex-col items-center justify-center px-6 gap-6 bg-clbhouzBg">
+      {/* Animated checkmark with amber halo */}
       <motion.div
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: [0, 1.2, 1], opacity: 1 }}
         transition={{ duration: DURATION.successCheck, ease: 'easeOut' }}
-        className="w-20 h-20 rounded-full bg-primary flex items-center justify-center"
+        className="flex items-center justify-center"
       >
-        <Check className="w-10 h-10 text-primary-foreground" strokeWidth={3} />
+        <div className="w-28 h-28 rounded-full bg-primary/15 flex items-center justify-center">
+          <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center">
+            <Check className="w-10 h-10 text-primary-foreground" strokeWidth={3} />
+          </div>
+        </div>
       </motion.div>
 
       {/* Text */}
@@ -31,8 +35,9 @@ export function SuccessScreen({ onDone }: SuccessScreenProps) {
         transition={{ delay: 0.3 }}
         className="text-center space-y-2"
       >
-        <h2 className="text-foreground text-lg font-semibold">Uploading in background</h2>
-        <p className="text-muted-foreground text-sm max-w-[260px]">
+        <p className="text-[11px] font-semibold text-primary uppercase tracking-[1.5px]">POST QUEUED</p>
+        <h2 className="text-foreground text-xl font-bold">Uploading in background</h2>
+        <p className="text-muted-foreground text-sm max-w-[260px] mx-auto">
           Your post will appear once uploaded. You can keep using clbhouz.
         </p>
       </motion.div>

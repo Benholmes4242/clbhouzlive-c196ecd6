@@ -209,9 +209,14 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', ...SPRING.sheet }}
-        className="fixed inset-0 z-[9999] bg-background rounded-t-[24px] flex flex-col overflow-hidden"
+        className="fixed inset-0 z-[9999] bg-clbhouzBg rounded-t-[24px] flex flex-col overflow-hidden"
         style={{ top: 0 }}
       >
+        {/* Amber drag handle */}
+        <div className="flex justify-center pt-2.5 pb-1 shrink-0">
+          <div className="w-10 h-1 rounded-full bg-primary/40" />
+        </div>
+
         {/* Discard confirmation */}
         <AnimatePresence>
           {state.isDiscarding && (
@@ -259,7 +264,7 @@ function DiscardConfirmation({
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-card rounded-2xl p-6 w-full max-w-[300px] text-center space-y-4"
+        className="bg-card rounded-2xl p-6 w-full max-w-[300px] text-center space-y-4 border border-border/50"
       >
         <h3 className="text-foreground font-semibold text-base">Discard post?</h3>
         <p className="text-muted-foreground text-sm">

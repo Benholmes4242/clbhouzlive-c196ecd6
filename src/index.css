@@ -318,6 +318,7 @@ html.lightbox-open {
 
 /* Dark mode achievement card tokens */
 .dark {
+  --bg-page: #111113;
   --achievement-card-bg: rgba(255, 255, 255, 0.05);
   --achievement-card-border: rgba(255, 255, 255, 0.10);
   --achievement-ghost-overlay: rgba(255, 255, 255, 0.15);
