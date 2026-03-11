@@ -215,39 +215,12 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   audioMode,
   postHasMusic = false,
   bottomOffset,
-  onChevronPositionChange,
   hideMute = false,
 }) => {
   // Idle opacity: 75% when not interacted, full when interacted or active
   const idleOpacity = hasInteracted ? 1 : 0.75;
 
   const CAPSULE_BOTTOM_OFFSET = bottomOffset || `calc(30px + 80px - ${SLOT_HEIGHT - ICON_SIZE}px)`;
-
-  // Ref on the top chevron's wrapper div — used to report its vertical centre to parent
-  const chevronSlotRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!onChevronPositionChange) return;
-
-    const report = () => {
-      const el = chevronSlotRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      // Report the vertical centre of the icon button (top 44px of the 64px slot)
-      onChevronPositionChange(rect.top + ICON_SIZE / 2);
-    };
-
-    // Report on mount and on any size/position change
-    report();
-    const ro = new ResizeObserver(report);
-    // Observe the document body so viewport resize triggers recalculation
-    ro.observe(document.documentElement);
-    window.addEventListener('resize', report);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener('resize', report);
-    };
-  }, [onChevronPositionChange, hasNextMedia, onNextMedia]);
 
   return (
     <motion.div
