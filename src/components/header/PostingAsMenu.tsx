@@ -6,7 +6,6 @@ import { UploadCenterPanel } from '@/components/uploads/UploadCenterPanel';
 import { useUploadJobs } from '@/uploads/useUploadJobs';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
@@ -16,6 +15,8 @@ import { useIsMobile } from '@/hooks/useIsMobile';
 import { cn } from '@/lib/utils';
 import { postingAsCopy } from '@/lib/postingAsCopy';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useLogout } from '@/hooks/useLogout';
 import ProfileHubSheet from '@/components/profile/ProfileHubSheet';
 
 interface PostingAsMenuProps {
@@ -43,21 +44,6 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   const isMobile = useIsMobile();
   const menuRef = useRef<HTMLDivElement>(null);
   const [popoverPosition, setPopoverPosition] = useState({ top: 0, left: 0 });
-  const [headerHeight, setHeaderHeight] = useState(56);
-
-  // Measure header height on mount and resize
-  useEffect(() => {
-    const measureHeader = () => {
-      const header = document.querySelector('[data-chrome="header"]') as HTMLElement;
-      if (header) {
-        setHeaderHeight(header.getBoundingClientRect().height);
-      }
-    };
-    
-    measureHeader();
-    window.addEventListener('resize', measureHeader);
-    return () => window.removeEventListener('resize', measureHeader);
-  }, []);
 
   // Check admin status
   const { data: adminStatus } = useQuery({
@@ -156,16 +142,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     return () => window.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose, isMobile]);
 
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.href = '/';
-    } catch (error) {
-      window.location.href = '/';
-    }
-  };
+  const { logout: handleLogout } = useLogout();
 
   const getInitials = (name: string) => name.charAt(0).toUpperCase();
 
@@ -226,10 +203,12 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   if (isMobile) {
     return (
       <>
-        <UploadCenterPanel 
-          isOpen={uploadCenterOpen} 
-          onClose={() => setUploadCenterOpen(false)} 
-        />
+        {uploadCenterOpen && (
+          <UploadCenterPanel 
+            isOpen={uploadCenterOpen} 
+            onClose={() => setUploadCenterOpen(false)} 
+          />
+        )}
         <ProfileHubSheet
           open={isOpen}
           onClose={onClose}
@@ -238,8 +217,6 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
           onSwitchProfile={handleSwitchProfile}
           onNavigate={handleAccountHubNavigate}
           isAdmin={hasAdminAccess || false}
-          headerHeight={headerHeight}
-          useLightTheme={useLightTheme}
         />
       </>
     );
@@ -523,12 +500,12 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   );
 
   if (!isOpen) {
-    return (
+    return uploadCenterOpen ? (
       <UploadCenterPanel 
         isOpen={uploadCenterOpen} 
         onClose={() => setUploadCenterOpen(false)} 
       />
-    );
+    ) : null;
   }
 
   // ===========================================
@@ -536,10 +513,12 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   // ===========================================
   return (
     <>
-      <UploadCenterPanel 
-        isOpen={uploadCenterOpen} 
-        onClose={() => setUploadCenterOpen(false)} 
-      />
+      {uploadCenterOpen && (
+        <UploadCenterPanel 
+          isOpen={uploadCenterOpen} 
+          onClose={() => setUploadCenterOpen(false)} 
+        />
+      )}
       {createPortal(
         <div
           ref={menuRef}

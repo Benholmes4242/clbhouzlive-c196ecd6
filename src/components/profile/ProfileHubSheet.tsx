@@ -14,9 +14,9 @@ import {
 import { cn } from '@/lib/utils';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { useMessagingContext } from '@/contexts/MessagingContext';
-import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useLogout } from '@/hooks/useLogout';
 
 // ── Types ──
 
@@ -44,8 +44,6 @@ interface ProfileHubSheetProps {
   onSwitchProfile: (profileId: string) => Promise<void> | void;
   onNavigate: (route: string) => void;
   isAdmin: boolean;
-  headerHeight: number;
-  useLightTheme?: boolean;
 }
 
 // ── Component ──
@@ -60,6 +58,7 @@ function ProfileHubSheet({
   isAdmin,
 }: ProfileHubSheetProps) {
   const navigate = useNavigate();
+  const { logout: handleLogout } = useLogout();
   const { unreadCount: unreadNotificationCount } = useUnreadNotifications();
   const { conversations } = useMessagingContext();
   const unreadMessageCount = conversations?.reduce(
@@ -109,16 +108,6 @@ function ProfileHubSheet({
     onClose();
   }, [onNavigate, onClose]);
 
-  const handleLogout = useCallback(async () => {
-    try {
-      await supabase.auth.signOut();
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.href = '/';
-    } catch {
-      window.location.href = '/';
-    }
-  }, []);
 
   const activeProfile = profiles.find(p => p.id === localActiveId) || currentActor;
 
@@ -198,13 +187,13 @@ function ProfileHubSheet({
 
               {/* ── Profile header ── */}
               <div className="flex items-center gap-3 py-3">
-                <div className="w-[52px] h-[52px] rounded-[18px] overflow-hidden bg-muted shrink-0">
-                  <img
-                    src={activeProfile.avatarUrl}
-                    alt={activeProfile.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+                <SquircleAvatar
+                  size={52}
+                  src={activeProfile.avatarUrl}
+                  alt={activeProfile.name}
+                  fallback={activeProfile.name?.charAt(0)?.toUpperCase() ?? '?'}
+                  hideRing
+                />
                 <div className="min-w-0">
                   <div className="text-[16px] font-semibold text-foreground truncate">
                     {activeProfile.name}

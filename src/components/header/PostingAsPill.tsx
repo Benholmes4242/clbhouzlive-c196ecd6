@@ -3,7 +3,7 @@ import { ChevronDown } from 'lucide-react';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
-import { useMessaging } from '@/hooks/useMessaging';
+import { useMessagingContext } from '@/contexts/MessagingContext';
 
 interface PostingAsPillProps {
   onClick: () => void;
@@ -22,7 +22,7 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
     const { activeActor, isLoading } = useActiveActor();
     
     // Get unread messages count from messaging system
-    const { conversations } = useMessaging();
+    const { conversations } = useMessagingContext();
     const hasUnreadMessages = conversations?.some(conv => conv.unread_count > 0) || false;
 
     if (isLoading || !activeActor) {
