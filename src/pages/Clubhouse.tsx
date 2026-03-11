@@ -456,10 +456,9 @@ const ClubhouseContent = () => {
                       : activeReview.courseCountry || undefined
                   }
                   rating={activeReview.rating}
+                  reviewText={activeReview?.reviewText ?? null}
                   reviewId={activeReview.reviewId}
                   media={activePost?.mediaItems?.map((m, i) => ({
-                    id: m.id ?? `media-${i}`,
-                    media_type: m.type === 'video' ? 'video' as const : 'image' as const,
                     media_url: m.imageUrl ?? m.mp4Url ?? '',
                     stream_id: m.hlsUrl?.split('/').pop()?.replace('/manifest/video.m3u8', '') ?? undefined,
                     poster_url: m.thumbnailUrl ?? undefined,
