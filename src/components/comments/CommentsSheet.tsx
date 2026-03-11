@@ -553,6 +553,7 @@ function CommentsSheet({
               className="flex-1 overflow-y-auto overscroll-contain"
               style={{ WebkitOverflowScrolling: 'touch' }}
             >
+              <AnimatePresence mode="wait">
               {commentsLoading ? (
                 /* Loading skeletons with crossfade */
                 <motion.div
