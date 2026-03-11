@@ -192,7 +192,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             <img
               src={meta.course_image_url!}
               alt={meta.venue_name || meta.tournament_name}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.75) saturate(1.1)' }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.88) saturate(1.1)' }}
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
             />
           ) : (
