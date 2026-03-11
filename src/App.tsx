@@ -41,6 +41,7 @@ import { PostEventsBridge } from '@/events/PostEventsBridge';
 import { UploadToastsBridge } from '@/uploads/UploadToastsBridge';
 import UploadProgressBanner from '@/components/uploads/UploadProgressBanner';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
+import { GlobalPostStudio } from '@/components/post-studio/GlobalPostStudio';
 import { FullscreenFeedOverlay } from '@/components/fullscreen-feed/FullscreenFeedOverlay';
 import { UploadResilienceProvider } from '@/contexts/UploadResilienceContext';
 import { useUploadGuard } from '@/hooks/useUploadGuard';
@@ -730,6 +731,7 @@ const AppInner: React.FC = () => {
                           
                           <Sonner />
                           <GlobalBottomNavigation />
+                          <GlobalPostStudio />
                         </ActiveActorProvider>
                     
                   </UIProvider>
