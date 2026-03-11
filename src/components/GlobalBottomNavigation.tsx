@@ -92,19 +92,15 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   
   // Composer state management
   const {
-    captionInputRef,
     isComposerOpen,
     mediaItems,
     setMediaItems,
     selectedFile,
-    caption,
-    setCaption,
     isSubmitting,
     showToast,
     toastMessage,
     selectedCourse,
     setSelectedCourse,
-    openComposer,
     openComposerWithFiles,
     closeComposer,
     showConfirmationToast,
