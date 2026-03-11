@@ -581,7 +581,7 @@ function CommentsSheet({
                       No comments yet
                     </p>
                     <p className={cn('text-[13px] text-center leading-relaxed', isDark ? 'text-white/50' : 'text-muted-foreground')}>
-                      {(CommentsSheet as any).__isReview
+                      {isReview
                         ? 'Be the first to review this course'
                         : 'Be the first to drop your thoughts'}
                     </p>
