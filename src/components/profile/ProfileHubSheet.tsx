@@ -59,6 +59,7 @@ function ProfileHubSheet({
   isAdmin,
 }: ProfileHubSheetProps) {
   const navigate = useNavigate();
+  const { logout: handleLogout } = useLogout();
   const { unreadCount: unreadNotificationCount } = useUnreadNotifications();
   const { conversations } = useMessagingContext();
   const unreadMessageCount = conversations?.reduce(
