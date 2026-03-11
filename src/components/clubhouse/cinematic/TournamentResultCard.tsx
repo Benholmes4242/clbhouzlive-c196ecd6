@@ -479,7 +479,7 @@ function PodiumRunnerRow({ row, resolvePhoto }: { row: PodiumRowType; resolvePho
         </span>
       ) : (
         <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.35)', flex: 1 }}>
-          {row.players.length}-way tie
+          {row.players.length}-Way Tie
         </span>
       )}
 
