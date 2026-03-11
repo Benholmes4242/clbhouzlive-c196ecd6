@@ -237,7 +237,7 @@ const BusinessActivityPage = lazy(() => import("./pages/BusinessActivityPage"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 // PostsTabTestPage removed — Posts tab now integrated into profiles
-const CreateMomentPage = lazy(() => import("./pages/CreateMomentPage"));
+// CreateMomentPage removed — PostStudio is now the sole creation flow
 const PostDeepLinkPage = lazy(() => import("./pages/PostDeepLinkPage"));
 const CommentDeepLinkPage = lazy(() => import("./components/comments/CommentDeepLinkHandler"));
 
