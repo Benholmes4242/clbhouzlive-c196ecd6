@@ -25,15 +25,15 @@ function ExploreHeaderInner({
 }: ExploreHeaderProps) {
   return (
     <div
-      className="sticky top-0 z-30 bg-background"
+      className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border/50"
       style={{
         paddingTop: embedded
           ? '24px'
-          : 'max(env(safe-area-inset-top, 0px), 12px)',
+          : 'max(env(safe-area-inset-top, 0px), 47px)',
       }}
     >
       {/* Search bar */}
-      <div className="px-3 pb-2">
+      <div className="px-4 pb-2">
         <button
           type="button"
           onClick={onOpenSearch}
@@ -45,7 +45,7 @@ function ExploreHeaderInner({
       </div>
 
       {/* Region chips */}
-      <div className="flex gap-2 px-3 pb-3 overflow-x-auto scrollbar-hide">
+      <div className="flex gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide">
         {regions.map((region) => {
           const isActive = activeRegion === region.slug;
           return (
@@ -53,12 +53,11 @@ function ExploreHeaderInner({
               key={region.slug ?? '__all'}
               type="button"
               onClick={() => onRegionChange(region.slug)}
-              className={`shrink-0 min-h-[36px] px-4 rounded-full text-sm font-semibold transition-colors ${
-                isActive
-                  ? 'text-white'
-                  : 'bg-muted text-muted-foreground'
-              }`}
-              style={isActive ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
+              className="shrink-0 min-h-[36px] px-4 rounded-full text-sm font-semibold transition-colors"
+              style={{
+                backgroundColor: isActive ? 'hsl(var(--tab-sub-active))' : 'hsl(var(--muted))',
+                color: isActive ? 'hsl(var(--tab-sub-active-foreground))' : 'hsl(var(--muted-foreground))',
+              }}
             >
               {region.title}
             </button>
