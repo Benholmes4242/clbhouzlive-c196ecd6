@@ -67,6 +67,26 @@ export function useClubhouseSkeletonTiming(
     }, 200);
   }, []);
 
+  // Reset skeleton visibility for tab switching
+  const resetSkeleton = useCallback(() => {
+    hasHiddenRef.current = false;
+    firstVideoReadyFiredRef.current = false;
+    startTimeRef.current = Date.now();
+    setSkeletonVisible(true);
+    setSkeletonMode('shimmer');
+    setIsFirstVideoReady(false);
+    setSafetyTimeoutFired(false);
+
+    // Re-arm safety timeout
+    if (maxTimerRef.current) clearTimeout(maxTimerRef.current);
+    maxTimerRef.current = setTimeout(() => {
+      if (!hasHiddenRef.current) {
+        logBootEvent('SKELETON_SAFETY_TIMEOUT', { elapsed: MAX_SKELETON_MS });
+        setSafetyTimeoutFired(true);
+      }
+    }, MAX_SKELETON_MS);
+  }, []);
+
   // Cache polling removed: readyCount > 0 does NOT mean the video element
   // has attached, decoded, and started playing. Only signalFirstFrameReady()
   // (fired after canplaythrough + 100ms buffer) should dismiss the skeleton.
