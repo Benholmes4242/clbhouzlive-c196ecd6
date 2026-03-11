@@ -493,25 +493,28 @@ function CommentsSheet({
 
             {/* Header */}
             <div className={cn(
-              'flex items-center justify-between px-4 py-2 shrink-0 border-b',
+              'flex items-center px-4 pt-3 pb-3 shrink-0 border-b',
               isDark ? 'border-white/[0.06]' : 'border-border/50'
             )}>
-              {/* Title */}
-              <div className="flex items-baseline gap-1.5">
+              {/* Left spacer — matches close button width */}
+              <div className="w-11" />
+
+              {/* Title — centred */}
+              <div className="flex-1 flex items-center justify-center gap-2">
                 <span className={cn('text-[16px] font-semibold', isDark ? 'text-white' : 'text-foreground')}>
                   Comments
                 </span>
                 {totalCount > 0 && (
-                  <span className={cn('text-[14px] font-normal', isDark ? 'text-white/45' : 'text-muted-foreground')}>
+                  <span className={cn('text-[16px] font-semibold', isDark ? 'text-white/40' : 'text-muted-foreground')}>
                     {totalCount}
                   </span>
                 )}
               </div>
 
-              <div className="flex items-center gap-2">
-                {/* Sort toggle */}
+              {/* Right — sort toggle + close */}
+              <div className="flex items-center gap-3">
                 {totalCount > 1 && (
-                  <div className={cn('flex items-center rounded-lg p-0.5', isDark ? 'bg-white/8' : 'bg-muted/60')}>
+                  <div className={cn('flex items-center gap-1 rounded-lg p-0.5', isDark ? 'bg-white/8' : 'bg-muted/60')}>
                     {(['best', 'newest'] as const).map(s => (
                       <button
                         key={s}
@@ -520,7 +523,7 @@ function CommentsSheet({
                         className={cn(
                           'px-3 py-1 rounded-md text-[12px] font-semibold transition-colors capitalize min-h-[32px]',
                           sort === s
-                            ? isDark ? 'bg-white/12 text-white shadow-sm' : 'bg-background text-foreground shadow-sm'
+                            ? isDark ? 'bg-white/15 text-white' : 'bg-background text-foreground shadow-sm'
                             : isDark ? 'text-white/40' : 'text-muted-foreground'
                         )}
                       >
@@ -530,16 +533,15 @@ function CommentsSheet({
                   </div>
                 )}
 
-                {/* Close */}
                 <button
                   type="button"
                   onClick={onClose}
                   className={cn(
-                    'w-11 h-11 rounded-full flex items-center justify-center shrink-0',
-                    isDark ? 'bg-white/8 text-white/60' : 'bg-muted text-muted-foreground'
+                    'w-11 h-11 rounded-full flex items-center justify-center',
+                    isDark ? 'bg-white/8' : 'bg-muted'
                   )}
                 >
-                  <X className="w-4 h-4" />
+                  <X className={cn('w-5 h-5', isDark ? 'text-white/70' : 'text-muted-foreground')} />
                 </button>
               </div>
             </div>
