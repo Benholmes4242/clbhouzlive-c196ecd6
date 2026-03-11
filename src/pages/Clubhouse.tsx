@@ -623,19 +623,30 @@ const ClubhouseContent = () => {
         />
       )}
 
-      {/* Post Submission Handler */}
-      <PostSubmissionHandler
-        isComposerOpen={isComposerOpen}
-        mediaItems={mediaItems}
-        selectedFile={selectedFile}
-        selectedCourse={selectedCourse}
-        onCourseSelect={setSelectedCourse}
-        onClose={handleCloseComposer}
-        onShowToast={showConfirmationToast}
-        isSubmitting={isSubmitting}
-        setIsSubmitting={setIsSubmitting}
-        onMediaChange={setMediaItems}
-      />
+      {/* Post Creation */}
+      {USE_POST_STUDIO ? (
+        <PostStudio
+          open={isComposerOpen}
+          onClose={handleCloseComposer}
+          initialMedia={mediaItems.map(m => m.file)}
+          onSuccess={() => {
+            showConfirmationToast('Post shared!');
+          }}
+        />
+      ) : (
+        <PostSubmissionHandler
+          isComposerOpen={isComposerOpen}
+          mediaItems={mediaItems}
+          selectedFile={selectedFile}
+          selectedCourse={selectedCourse}
+          onCourseSelect={setSelectedCourse}
+          onClose={handleCloseComposer}
+          onShowToast={showConfirmationToast}
+          isSubmitting={isSubmitting}
+          setIsSubmitting={setIsSubmitting}
+          onMediaChange={setMediaItems}
+        />
+      )}
 
       <SnapToast
         message={toastMessage}
