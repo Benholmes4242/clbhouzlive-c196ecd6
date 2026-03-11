@@ -261,6 +261,7 @@ const ClubhouseContent = () => {
     caption,
     setCaption,
     isSubmitting,
+    setIsSubmitting,
     showToast,
     toastMessage,
     selectedCourse,
