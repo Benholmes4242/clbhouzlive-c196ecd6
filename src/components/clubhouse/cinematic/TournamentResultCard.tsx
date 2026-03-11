@@ -374,12 +374,13 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             <button onClick={onComment} style={{
               flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
               background: 'linear-gradient(135deg, rgba(249,115,22,0.22), rgba(234,88,12,0.15))',
-              border: '1px solid rgba(249,115,22,0.35)', borderRadius: 22, padding: '8px 16px',
+              border: '1px solid rgba(249,115,22,0.35)', borderRadius: 22, padding: '8px 8px',
               color: '#FB923C', fontSize: 13, fontWeight: 700, cursor: 'pointer',
               animation: 'trcard-glowPulse 3s ease-in-out infinite',
+              minWidth: 0, overflow: 'hidden',
             }}>
-              <span style={{ fontSize: 14 }}>💬</span>
-              <span>Join the conversation</span>
+              <span style={{ fontSize: 14, flexShrink: 0 }}>💬</span>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Join the conversation</span>
               {commentCount > 0 && (
                 <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(251,146,60,0.6)' }}>{commentCount}</span>
               )}
