@@ -3,7 +3,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { MessageCircle, Plus, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { MessagingProvider, useMessagingContext } from '@/contexts/MessagingContext';
+import { useMessagingContext } from '@/contexts/MessagingContext';
 import { ConversationList, ChatView, NewConversationModal, NotificationPrompt } from '@/components/messaging';
 import { ConversationSearchBar } from '@/components/messaging/ConversationSearchBar';
 import { OfflineBanner } from '@/components/messaging/OfflineBanner';
