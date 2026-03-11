@@ -1,5 +1,5 @@
 // PosterScreen — Step 4: Poster frame selection (video only)
-// Full-width video preview frozen at posterTimestamp + PosterPicker filmstrip
+// Dark immersive mode matching TrimScreen
 
 import React, { useRef, useEffect } from 'react';
 import { StudioHeader } from '../components/StudioHeader';
@@ -13,7 +13,6 @@ export function PosterScreen() {
   const activeItem = state.mediaItems[state.activeMediaIndex];
   const isVideo = activeItem?.mediaType === 'video';
 
-  // Freeze at poster timestamp
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !isVideo) return;
@@ -21,26 +20,24 @@ export function PosterScreen() {
     video.pause();
   }, [isVideo, activeItem?.posterTimestamp]);
 
-  if (!activeItem || !isVideo) {
-    return null;
-  }
+  if (!activeItem || !isVideo) return null;
 
   const handlePosterChange = (timestamp: number, previewUrl: string | null) => {
     updatePoster(activeItem.id, timestamp, previewUrl);
-    if (videoRef.current) {
-      videoRef.current.currentTime = timestamp;
-    }
+    if (videoRef.current) videoRef.current.currentTime = timestamp;
   };
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col bg-[#0A0A0A]">
       <StudioHeader
         title="Cover"
+        step="POSTER"
+        darkMode
         leftAction={{ label: 'Cancel', onClick: () => setStep('COMPOSER') }}
         rightAction={{ label: 'Done', onClick: () => setStep('COMPOSER'), variant: 'primary' }}
       />
 
-      <div className="flex-1 flex items-center justify-center bg-black px-4">
+      <div className="flex-1 flex items-center justify-center px-4">
         <video
           ref={videoRef}
           src={activeItem.previewUrl}
@@ -50,8 +47,8 @@ export function PosterScreen() {
         />
       </div>
 
-      <div className="px-4 py-6 bg-background">
-        <PosterPicker item={activeItem} onPosterChange={handlePosterChange} />
+      <div className="bg-[#1A1A1A] rounded-2xl mx-4 mb-4 p-4">
+        <PosterPicker item={activeItem} onPosterChange={handlePosterChange} darkMode />
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 // TrimScreen — Step 3: Video trim UI
-// Full-width video preview with VideoTrimmer handles
+// Full dark immersive mode with amber-glow handles
 
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { StudioHeader } from '../components/StudioHeader';
 import { VideoTrimmer } from '../components/VideoTrimmer';
 import { usePostStudioContext } from '../usePostStudio';
@@ -16,43 +16,35 @@ export function TrimScreen() {
   const trimStart = isVideo ? activeItem.trimStart : 0;
   const trimEnd = isVideo ? (activeItem.trimEnd ?? activeItem.duration ?? 0) : 0;
 
-  // Enforce trim range on video playback
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !isVideo) return;
-
     video.currentTime = trimStart;
-
     const handleTimeUpdate = () => {
-      if (video.currentTime >= trimEnd) {
-        video.currentTime = trimStart;
-      }
+      if (video.currentTime >= trimEnd) video.currentTime = trimStart;
     };
-
     video.addEventListener('timeupdate', handleTimeUpdate);
     return () => video.removeEventListener('timeupdate', handleTimeUpdate);
   }, [isVideo, trimStart, trimEnd]);
 
-  if (!activeItem || !isVideo) {
-    return null;
-  }
+  if (!activeItem || !isVideo) return null;
 
   const handleTrimChange = (newStart: number, newEnd: number) => {
     updateTrim(activeItem.id, newStart, newEnd);
-    if (videoRef.current) {
-      videoRef.current.currentTime = newStart;
-    }
+    if (videoRef.current) videoRef.current.currentTime = newStart;
   };
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col bg-[#0A0A0A]">
       <StudioHeader
         title="Trim"
+        step="TRIM"
+        darkMode
         leftAction={{ label: 'Cancel', onClick: () => setStep('COMPOSER') }}
         rightAction={{ label: 'Done', onClick: () => setStep('COMPOSER'), variant: 'primary' }}
       />
 
-      <div className="flex-1 flex items-center justify-center bg-black px-4">
+      <div className="flex-1 flex items-center justify-center px-4">
         <video
           ref={videoRef}
           src={activeItem.previewUrl}
@@ -64,8 +56,8 @@ export function TrimScreen() {
         />
       </div>
 
-      <div className="px-4 py-6 bg-background">
-        <VideoTrimmer item={activeItem} onTrimChange={handleTrimChange} />
+      <div className="bg-[#1A1A1A] rounded-2xl mx-4 mb-4 p-4">
+        <VideoTrimmer item={activeItem} onTrimChange={handleTrimChange} darkMode />
       </div>
     </div>
   );
