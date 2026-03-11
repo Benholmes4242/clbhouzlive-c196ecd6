@@ -80,6 +80,7 @@ export interface GlobalSearchResults {
   pages: PageResult[];
   businesses: BusinessResult[];
   trending: TrendingItem[];
+  trendingLoading: boolean;
   isLoading: boolean;
   error?: Error | null;
 }
@@ -437,6 +438,7 @@ export const useGlobalEntitySearch = ({
     pages,
     businesses,
     trending,
+    trendingLoading: trendingQuery.isLoading,
     isLoading,
     error: error || null
   };
