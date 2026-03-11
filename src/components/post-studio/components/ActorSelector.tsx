@@ -1,5 +1,5 @@
 // ActorSelector — Personal / business avatar pill selector
-// Horizontal scroll row, amber ring on active
+// Horizontal scroll row, amber ring with offset on active
 
 import React, { useEffect, useState } from 'react';
 import { Check } from 'lucide-react';
@@ -16,22 +16,21 @@ export function ActorSelector() {
   const { state, setActor } = usePostStudioContext();
   const [businesses, setBusinesses] = useState<BusinessAccount[]>([]);
   const [userAvatar, setUserAvatar] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string>('You');
 
-  // Fetch businesses the user is a member of
   useEffect(() => {
     const fetchBusinesses = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Get user avatar
       const { data: profile } = await supabase
         .from('user_profiles')
-        .select('profile_photo_url')
+        .select('profile_photo_url, display_name')
         .eq('id', user.id)
         .maybeSingle();
       if (profile?.profile_photo_url) setUserAvatar(profile.profile_photo_url);
+      if (profile?.display_name) setUserName(profile.display_name.slice(0, 10));
 
-      // Get business memberships
       const { data: memberships } = await supabase
         .from('business_members')
         .select('business_id, business_accounts(id, name, logo_url)')
@@ -47,11 +46,9 @@ export function ActorSelector() {
         setBusinesses(biz);
       }
     };
-
     fetchBusinesses();
   }, []);
 
-  // Only show if user has businesses
   if (businesses.length === 0) return null;
 
   return (
@@ -61,7 +58,7 @@ export function ActorSelector() {
         onClick={() => setActor('personal', null)}
         className={`shrink-0 flex items-center gap-2 px-3 py-2 rounded-full border transition-all min-h-[44px] ${
           state.actorType === 'personal'
-            ? 'border-primary ring-2 ring-primary/30 bg-primary/5'
+            ? 'border-primary ring-2 ring-primary/30 ring-offset-1 ring-offset-background bg-primary/5'
             : 'border-border/50 bg-muted/50'
         }`}
       >
@@ -70,7 +67,7 @@ export function ActorSelector() {
             <img src={userAvatar} alt="" className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground font-bold">
-              Y
+              {userName.charAt(0)}
             </div>
           )}
           {state.actorType === 'personal' && (
@@ -79,7 +76,7 @@ export function ActorSelector() {
             </div>
           )}
         </div>
-        <span className="text-xs font-medium text-foreground">You</span>
+        <span className="text-xs font-medium text-foreground">{userName}</span>
       </button>
 
       {/* Business accounts */}
@@ -91,7 +88,7 @@ export function ActorSelector() {
             onClick={() => setActor('business', biz.id)}
             className={`shrink-0 flex items-center gap-2 px-3 py-2 rounded-full border transition-all min-h-[44px] ${
               isActive
-                ? 'border-primary ring-2 ring-primary/30 bg-primary/5'
+                ? 'border-primary ring-2 ring-primary/30 ring-offset-1 ring-offset-background bg-primary/5'
                 : 'border-border/50 bg-muted/50'
             }`}
           >
@@ -109,9 +106,7 @@ export function ActorSelector() {
                 </div>
               )}
             </div>
-            <span className="text-xs font-medium text-foreground truncate max-w-[80px]">
-              {biz.name}
-            </span>
+            <span className="text-xs font-medium text-foreground truncate max-w-[80px]">{biz.name}</span>
           </button>
         );
       })}
