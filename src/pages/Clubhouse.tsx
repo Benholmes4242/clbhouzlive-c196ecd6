@@ -618,30 +618,7 @@ const ClubhouseContent = () => {
         />
       )}
 
-      {/* Post Creation */}
-      {USE_POST_STUDIO ? (
-        <PostStudio
-          open={isComposerOpen}
-          onClose={handleCloseComposer}
-          initialMedia={mediaItems.map(m => m.file)}
-          onSuccess={() => {
-            showConfirmationToast('Post shared!');
-          }}
-        />
-      ) : (
-        <PostSubmissionHandler
-          isComposerOpen={isComposerOpen}
-          mediaItems={mediaItems}
-          selectedFile={selectedFile}
-          selectedCourse={selectedCourse}
-          onCourseSelect={setSelectedCourse}
-          onClose={handleCloseComposer}
-          onShowToast={showConfirmationToast}
-          isSubmitting={isSubmitting}
-          setIsSubmitting={setIsSubmitting}
-          onMediaChange={setMediaItems}
-        />
-      )}
+      {/* Post Creation — now handled globally by GlobalPostStudio in App.tsx */}
 
       <SnapToast
         message={toastMessage}
