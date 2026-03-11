@@ -26,10 +26,10 @@ export function ActorSelector() {
       // Get user avatar
       const { data: profile } = await supabase
         .from('user_profiles')
-        .select('profile_image_url')
+        .select('profile_photo_url')
         .eq('id', user.id)
         .maybeSingle();
-      if (profile?.profile_image_url) setUserAvatar(profile.profile_image_url);
+      if (profile?.profile_photo_url) setUserAvatar(profile.profile_photo_url);
 
       // Get business memberships
       const { data: memberships } = await supabase
