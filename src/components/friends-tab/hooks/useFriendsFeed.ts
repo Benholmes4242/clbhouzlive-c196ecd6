@@ -1,7 +1,14 @@
+/**
+ * Friends feed for the card-style Friends tab UI.
+ * NOTE: A separate useFriendsFeed exists at src/components/media-system/hooks/useFriendsFeed.ts
+ * for the Clubhouse fullscreen vertical feed.
+ * Keep both in sync if the RPC interface changes.
+ */
 import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
+import { deduplicatePosts } from '@/components/media-system/utils/feedAlgorithm';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
 
 export type FriendsMode = 'latest' | 'popular';
@@ -53,6 +60,10 @@ export function useFriendsFeed({ userId, mode, searchQuery }: UseFriendsFeedPara
           seenPostIds.current.push(post.id);
         }
       }
+      // Prevent unbounded growth — cap at last 200
+      if (seenPostIds.current.length > 200) {
+        seenPostIds.current = seenPostIds.current.slice(-200);
+      }
 
       const lastRow = rows[rows.length - 1];
       const nextCursor = posts.length >= PAGE_SIZE ? lastRow.post_created_at : undefined;
@@ -67,15 +78,10 @@ export function useFriendsFeed({ userId, mode, searchQuery }: UseFriendsFeedPara
     gcTime: 10 * 60 * 1000,
   });
 
-  const allPosts = useMemo(() => {
-    const posts = query.data?.pages.flatMap((page) => page.posts) ?? [];
-    const seen = new Set<string>();
-    return posts.filter(p => {
-      if (seen.has(p.id)) return false;
-      seen.add(p.id);
-      return true;
-    });
-  }, [query.data]);
+  const allPosts = useMemo(
+    () => deduplicatePosts(query.data?.pages.flatMap((page) => page.posts) ?? []),
+    [query.data]
+  );
 
   const resetSeen = useCallback(() => {
     seenPostIds.current = [];

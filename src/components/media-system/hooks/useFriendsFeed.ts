@@ -1,3 +1,9 @@
+/**
+ * Friends feed for the Clubhouse fullscreen vertical feed.
+ * NOTE: A separate useFriendsFeed exists at src/components/friends-tab/hooks/useFriendsFeed.ts
+ * for the card-style Friends tab — it supports mode/search params and keepPreviousData.
+ * Keep both in sync if the RPC interface changes.
+ */
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useRef, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
