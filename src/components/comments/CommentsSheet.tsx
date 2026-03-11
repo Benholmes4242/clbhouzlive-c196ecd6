@@ -675,7 +675,7 @@ function CommentsSheet({
                       : 'bg-white/10 text-white/30'
                   )}
                 >
-                  <SendHorizonal className="w-4 h-4" />
+                  <SendHorizontal className="w-4 h-4" />
                 </button>
               </div>
             </div>
