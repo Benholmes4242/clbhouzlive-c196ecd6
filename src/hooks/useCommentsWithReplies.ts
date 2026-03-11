@@ -58,7 +58,7 @@ interface PageData {
   nextCursor: string | null;
 }
 
-export function useCommentsWithReplies(postId: string | null) {
+export function useCommentsWithReplies(postId: string | null, onCommentDeleted?: () => void) {
   const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
   const { activeActor } = useActiveActor();
@@ -529,6 +529,7 @@ export function useCommentsWithReplies(postId: string | null) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['post-comments-with-replies', postId] });
       queryClient.invalidateQueries({ queryKey: ['post-engagement', postId] });
+      onCommentDeleted?.();
     },
   });
 

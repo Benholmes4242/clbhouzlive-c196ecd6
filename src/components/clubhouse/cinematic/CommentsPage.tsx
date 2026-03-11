@@ -68,6 +68,7 @@ interface CommentsPageProps {
   reviewRating?: number;
   caddiePickCommentId?: string | null;
   onCommentPosted?: () => void;
+  onCommentDeleted?: () => void;
 }
 
 interface ReplyingToState {
@@ -87,6 +88,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   initialParentCommentId,
   caddiePickCommentId,
   onCommentPosted,
+  onCommentDeleted,
 }) => {
   // --- State ---
   const [newComment, setNewComment] = useState('');
@@ -144,7 +146,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     hasNextPage,
     isFetchingNextPage,
     loadAllReplies,
-  } = useCommentsWithReplies(postId);
+  } = useCommentsWithReplies(postId, onCommentDeleted);
 
   const { hiddenCommentIds, hideComment } = useHiddenComments(postId);
   const { setCaddiePick, removeCaddiePick } = useCaddiePick(postId);

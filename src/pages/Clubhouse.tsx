@@ -192,7 +192,7 @@ const ClubhouseContent = () => {
   const isActivePostFollowed = getFollowState(activePost);
   
   // ── Comments state ──
-  const { commentsOpen, overlayVisible, openComments, closeComments, handleCommentPosted, getCommentCount, resetComments } = useClubhouseComments();
+  const { commentsOpen, overlayVisible, openComments, closeComments, handleCommentPosted, handleCommentDeleted, getCommentCount, resetComments } = useClubhouseComments();
   const activeCommentCount = getCommentCount(activePost);
   
   // ── Share / Report / Not Interested ──
@@ -401,6 +401,7 @@ const ClubhouseContent = () => {
             caption={activePost.caption}
             theme="dark"
             onCommentPosted={() => handleCommentPosted(activePost)}
+            onCommentDeleted={() => activePost && handleCommentDeleted(activePost.id, activePost.commentCount)}
           />
           {/* More options sheet for tournament posts */}
           <Drawer open={moreOptionsOpen} onOpenChange={setMoreOptionsOpen}>
@@ -601,6 +602,7 @@ const ClubhouseContent = () => {
             caption={activePost.caption}
             theme="dark"
             onCommentPosted={() => handleCommentPosted(activePost)}
+            onCommentDeleted={() => activePost && handleCommentDeleted(activePost.id, activePost.commentCount)}
           />
         </>
       )}
