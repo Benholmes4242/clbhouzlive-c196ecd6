@@ -19,6 +19,7 @@ export function PosterPicker({ item, onPosterChange }: PosterPickerProps) {
   const [frames, setFrames] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(true);
   const [currentTimestamp, setCurrentTimestamp] = useState(item.posterTimestamp);
+  const [isDragging, setIsDragging] = useState(false);
   const duration = item.duration ?? 0;
 
   // Generate filmstrip frames
@@ -77,9 +78,12 @@ export function PosterPicker({ item, onPosterChange }: PosterPickerProps) {
     };
   }, [item.previewUrl, duration]);
 
-  // Handle scrub
-  const handlePointerMove = useCallback(
+  // Handle pointer down — start drag
+  const handlePointerDown = useCallback(
     (e: React.PointerEvent) => {
+      e.currentTarget.setPointerCapture(e.pointerId);
+      setIsDragging(true);
+      // Also update position on initial tap
       if (!containerRef.current || !duration) return;
       const rect = containerRef.current.getBoundingClientRect();
       const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
@@ -90,7 +94,23 @@ export function PosterPicker({ item, onPosterChange }: PosterPickerProps) {
     [duration]
   );
 
+  // Handle scrub — only during drag
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!isDragging || !containerRef.current || !duration) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+      const percent = x / rect.width;
+      const timestamp = Math.round(percent * duration * 10) / 10;
+      setCurrentTimestamp(timestamp);
+    },
+    [isDragging, duration]
+  );
+
   const handlePointerUp = useCallback(() => {
+    if (!isDragging) return;
+    setIsDragging(false);
+
     // Capture the frame at current timestamp
     const video = videoRef.current;
     if (!video) {
@@ -109,7 +129,7 @@ export function PosterPicker({ item, onPosterChange }: PosterPickerProps) {
       onPosterChange(currentTimestamp, dataUrl);
       video.onseeked = null;
     };
-  }, [currentTimestamp, onPosterChange]);
+  }, [isDragging, currentTimestamp, onPosterChange]);
 
   const scrubPercent = duration > 0 ? (currentTimestamp / duration) * 100 : 0;
 
@@ -128,6 +148,7 @@ export function PosterPicker({ item, onPosterChange }: PosterPickerProps) {
       <div
         ref={containerRef}
         className="relative h-[42px] rounded-lg overflow-hidden bg-muted touch-none select-none cursor-pointer"
+        onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
       >

@@ -64,6 +64,12 @@ export function CourseTagPanel() {
       // Don't add duplicates
       if (state.taggedCourses.some((c) => c.courseId === course.id)) return;
 
+      // Max 5 courses
+      if (state.taggedCourses.length >= 5) {
+        toast.error('Maximum 5 courses per post');
+        return;
+      }
+
       const newCourse: TaggedCourse = {
         courseId: course.id,
         courseName: course.name,

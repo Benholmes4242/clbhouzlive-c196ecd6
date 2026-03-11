@@ -23,7 +23,7 @@ export function StudioHeader({ title, leftAction, rightAction }: StudioHeaderPro
     <header
       className="flex items-center justify-between px-4 border-b border-border/50 bg-background/95 backdrop-blur-xl shrink-0"
       style={{
-        paddingTop: `max(env(safe-area-inset-top, 0px), 12px)`,
+        paddingTop: `max(env(safe-area-inset-top, 0px), 47px)`,
         minHeight: '56px',
       }}
     >
