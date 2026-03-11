@@ -264,7 +264,7 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
 
       {/* Comments bottom sheet — z-index boosted via .fullscreen-comments-open class on body */}
       {showComments && (
-        <CommentsPage
+        <CommentsSheet
           isOpen={showComments}
           onClose={() => setShowComments(false)}
           postId={activePost.id}

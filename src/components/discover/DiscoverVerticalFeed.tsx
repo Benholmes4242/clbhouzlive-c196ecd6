@@ -909,7 +909,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
 
       {/* Comments Sheet */}
       {commentsModalOpen && selectedPostId && (
-        <CommentsPage
+        <CommentsSheet
           isOpen={commentsModalOpen}
           onClose={() => {
             setCommentsModalOpen(false);

@@ -236,7 +236,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
       </article>
 
       {/* Comments bottom sheet */}
-      <CommentsPage
+      <CommentsSheet
         isOpen={showComments}
         onClose={() => setShowComments(false)}
         postId={post.id}

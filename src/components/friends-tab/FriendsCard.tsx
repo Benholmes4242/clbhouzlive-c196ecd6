@@ -252,7 +252,7 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
       </article>
 
       {/* Comments bottom sheet */}
-      <CommentsPage
+      <CommentsSheet
         isOpen={showComments}
         onClose={() => setShowComments(false)}
         postId={post.id}
