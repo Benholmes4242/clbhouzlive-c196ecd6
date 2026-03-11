@@ -13,7 +13,7 @@ import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import PostSubmissionHandler from './bottom-navigation/PostSubmissionHandler';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
-import { useMediaHandlers } from '@/components/bottom-navigation/useMediaHandlers';
+
 import { cn } from '@/lib/utils';
 import { auditComponentMount, markPerformance } from '@/utils/clubhouseAudit';
 
@@ -53,13 +53,12 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const { triggerPrefetch } = useAppPrefetch();
   const { activeTab, handleTabClick, handlePrefetch } = useNavigationHandlers();
   const isDesktop = useIsDesktop();
-  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  
   const navRef = useRef<HTMLDivElement>(null);
   
   // Prefetch routes on hover/touch for faster navigation
   // Calls both route prefetch AND hero video prefetch
   const handleNavPrefetch = useCallback((path: string) => {
-    triggerPrefetch(path);
     triggerPrefetch(path);
     handlePrefetch(path); // Also trigger hero video prefetch
   }, [triggerPrefetch, handlePrefetch]);
@@ -93,19 +92,15 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   
   // Composer state management
   const {
-    captionInputRef,
     isComposerOpen,
     mediaItems,
     setMediaItems,
     selectedFile,
-    caption,
-    setCaption,
     isSubmitting,
     showToast,
     toastMessage,
     selectedCourse,
     setSelectedCourse,
-    openComposer,
     openComposerWithFiles,
     closeComposer,
     showConfirmationToast,
@@ -148,43 +143,6 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
     });
   }, [chromeState]);
 
-  // Handle keyboard visibility and visual viewport changes
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const handleVisualViewportChange = () => {
-      if (window.visualViewport) {
-        // Use visual viewport API for accurate keyboard detection
-        const { height: vpHeight } = window.visualViewport;
-        const windowHeight = window.innerHeight;
-        
-        // Keyboard is considered visible if viewport is significantly smaller
-        const heightDiff = windowHeight - vpHeight;
-        setIsKeyboardVisible(heightDiff > 150);
-      }
-    };
-
-    const handleResize = () => {
-      // Fallback for browsers without visual viewport support  
-      const heightDiff = window.screen.height - window.innerHeight;
-      setIsKeyboardVisible(heightDiff > 150);
-    };
-
-    // Use visual viewport API when available (better for mobile)
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', handleVisualViewportChange);
-      window.visualViewport.addEventListener('scroll', handleVisualViewportChange);
-      
-      return () => {
-        window.visualViewport?.removeEventListener('resize', handleVisualViewportChange);
-        window.visualViewport?.removeEventListener('scroll', handleVisualViewportChange);
-      };
-    } else {
-      // Fallback for older browsers
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }
-  }, []);
 
   const handleCloseComposer = () => {
     closeComposer();

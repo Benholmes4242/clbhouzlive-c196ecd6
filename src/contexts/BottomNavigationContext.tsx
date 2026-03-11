@@ -27,6 +27,7 @@ export const BottomNavigationProvider: React.FC<BottomNavigationProviderProps> =
   const [isVisible, setIsVisible] = useState(true);
   const [height, setHeight] = useState(0);
   const navRef = useRef<HTMLDivElement | null>(null);
+  const [navEl, setNavEl] = useState<HTMLDivElement | null>(null);
 
   const setVisible = useCallback((visible: boolean) => {
     setIsVisible(visible);
@@ -42,22 +43,22 @@ export const BottomNavigationProvider: React.FC<BottomNavigationProviderProps> =
 
   const setNavRef = useCallback((ref: HTMLDivElement | null) => {
     navRef.current = ref;
+    setNavEl(ref);
   }, []);
 
   // Measure bottom nav height with ResizeObserver
   useEffect(() => {
-    if (!navRef.current) return;
+    if (!navEl) return;
     
     const ro = new ResizeObserver((entries) => {
       const h = entries[0]?.contentRect?.height ?? 0;
       setHeight(h);
-      // Publish as CSS var for pure-CSS consumers
       document.documentElement.style.setProperty('--bottom-nav-height', `${h}px`);
     });
     
-    ro.observe(navRef.current);
+    ro.observe(navEl);
     return () => ro.disconnect();
-  }, [navRef.current]);
+  }, [navEl]);
 
   return (
     <BottomNavigationContext.Provider 
