@@ -602,6 +602,7 @@ const ClubhouseContent = () => {
             caption={activePost.caption}
             theme="dark"
             onCommentPosted={() => handleCommentPosted(activePost)}
+            onCommentDeleted={() => activePost && handleCommentDeleted(activePost.id, activePost.commentCount)}
           />
         </>
       )}
