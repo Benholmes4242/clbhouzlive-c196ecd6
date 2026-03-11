@@ -14,8 +14,9 @@ import {
 import { cn } from '@/lib/utils';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { useMessagingContext } from '@/contexts/MessagingContext';
-import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { useLogout } from '@/hooks/useLogout';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 // ── Types ──
