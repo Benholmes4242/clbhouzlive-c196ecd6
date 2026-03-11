@@ -67,7 +67,7 @@ export function FullscreenCreatorCapsule({ posts, store }: FullscreenCreatorCaps
       const extracted = extractGolfCourseFromContent(activePost.caption);
       if (extracted) {
         return {
-          id: activePost.courseId || null,
+          id: null as string | null,
           name: extracted.name,
           courseCountry: extracted.country || null,
         };

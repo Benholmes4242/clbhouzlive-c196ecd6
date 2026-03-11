@@ -216,8 +216,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             if (courseIdentifier) {
               navigate(`/courses/${courseIdentifier}`);
             } else if (golfCourse.name) {
-              // No direct ID — navigate to courses with search pre-filled
-              navigate(`/courses`, { state: { search: golfCourse.name } });
+              navigate(`/courses?search=${encodeURIComponent(golfCourse.name)}`);
             }
           }}
           className="flex items-start gap-2 py-2.5 text-left w-full cursor-pointer active:scale-[0.98] active:opacity-80 transition-all"
