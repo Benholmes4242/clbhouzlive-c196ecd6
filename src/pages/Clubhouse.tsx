@@ -248,10 +248,10 @@ const ClubhouseContent = () => {
 
   // Season Recap Modal
   const { data: seasonRecap } = useSeasonRecap(user?.id);
-  const [showRecapModal, setShowRecapModal] = React.useState(false);
+  const [showRecapModal, setShowRecapModal] = useState(false);
   const [chevronY, setChevronY] = useState<number | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (seasonRecap) {
       setShowRecapModal(true);
     }
