@@ -500,12 +500,12 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   );
 
   if (!isOpen) {
-    return (
+    return uploadCenterOpen ? (
       <UploadCenterPanel 
         isOpen={uploadCenterOpen} 
         onClose={() => setUploadCenterOpen(false)} 
       />
-    );
+    ) : null;
   }
 
   // ===========================================
