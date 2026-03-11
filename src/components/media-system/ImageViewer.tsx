@@ -12,7 +12,8 @@ interface ImageViewerProps {
   onFirstFrameReady?: () => void;
 }
 
-export function ImageViewer({ imageUrl, thumbnailUrl, width, height }: ImageViewerProps) {
+export function ImageViewer({ imageUrl, thumbnailUrl, width, height, onFirstFrameReady }: ImageViewerProps) {
+  const firstFrameFiredRef = useState(() => ({ current: false }))[0];
   const [loaded, setLoaded] = useState(false);
   const aspectRatio = width && height ? width / height : 1;
   const fit = aspectRatio > 1.2 ? 'contain' : 'cover';
