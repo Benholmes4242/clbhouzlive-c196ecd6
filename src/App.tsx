@@ -1,4 +1,5 @@
 import React, { Suspense, lazy, useEffect, useMemo } from "react";
+import { MessagingProvider } from '@/contexts/MessagingContext';
 
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
