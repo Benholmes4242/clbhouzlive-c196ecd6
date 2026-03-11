@@ -540,7 +540,7 @@ const ClubhouseContent = () => {
           {/* Left chevron — mirrors right chevron Y position for multi-media non-review posts */}
           {currentMediaIndex > 0 && chevronY !== null && (
             <button
-              onClick={() => useMediaStore.getState().setCarouselPosition(activeIndex, currentMediaIndex - 1)}
+              onClick={() => setCarouselPosition(activeIndex, currentMediaIndex - 1)}
               style={{
                 position: 'fixed',
                 left: 16,
