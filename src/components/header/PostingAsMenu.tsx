@@ -195,7 +195,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     subtitle: email,
   };
 
-  // Handle profile switch in AccountHubSheet
+  // Handle profile switch in ProfileHubSheet
   const handleSwitchProfile = async (profileId: string) => {
     const actor = availableActors.find(a => a.id === profileId);
     if (actor && (activeActor?.id !== actor.id)) {
