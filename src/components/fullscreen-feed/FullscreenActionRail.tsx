@@ -34,7 +34,7 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
   const [likeCount, setLikeCount] = useState(activePost?.likeCount ?? 0);
   const [showComments, setShowComments] = useState(false);
   const [commentCountOverride, setCommentCountOverride] = useState<number | null>(null);
-  const [chevronY, setChevronY] = useState<number | null>(null);
+  
   const [moreOptionsOpen, setMoreOptionsOpen] = useState(false);
 
   // Reset like state and comment count override when activeIndex changes
