@@ -1,6 +1,7 @@
 // CourseTagPanel — Golf course search and tag bottom sheet
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { toast } from 'sonner';
 import { Search, X, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
