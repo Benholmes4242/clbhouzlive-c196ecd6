@@ -125,6 +125,7 @@ export function FeedItem({
           thumbnailUrl={media.thumbnailUrl}
           width={media.width}
           height={media.height}
+          onFirstFrameReady={onFirstFrameReady}
         />
       ) : null}
     </div>

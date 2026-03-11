@@ -9,9 +9,11 @@ interface ImageViewerProps {
   thumbnailUrl?: string;
   width?: number;
   height?: number;
+  onFirstFrameReady?: () => void;
 }
 
-export function ImageViewer({ imageUrl, thumbnailUrl, width, height }: ImageViewerProps) {
+export function ImageViewer({ imageUrl, thumbnailUrl, width, height, onFirstFrameReady }: ImageViewerProps) {
+  const firstFrameFiredRef = useState(() => ({ current: false }))[0];
   const [loaded, setLoaded] = useState(false);
   const aspectRatio = width && height ? width / height : 1;
   const fit = aspectRatio > 1.2 ? 'contain' : 'cover';
@@ -20,9 +22,21 @@ export function ImageViewer({ imageUrl, thumbnailUrl, width, height }: ImageView
   useEffect(() => {
     setLoaded(false);
     const img = new Image();
-    img.onload = () => setLoaded(true);
+    img.onload = () => {
+      setLoaded(true);
+      if (!firstFrameFiredRef.current && onFirstFrameReady) {
+        firstFrameFiredRef.current = true;
+        onFirstFrameReady();
+      }
+    };
     img.src = imageUrl;
-    if (img.complete) setLoaded(true);
+    if (img.complete) {
+      setLoaded(true);
+      if (!firstFrameFiredRef.current && onFirstFrameReady) {
+        firstFrameFiredRef.current = true;
+        onFirstFrameReady();
+      }
+    }
     return () => { img.onload = null; };
   }, [imageUrl]);
 

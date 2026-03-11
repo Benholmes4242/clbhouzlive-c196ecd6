@@ -29,6 +29,8 @@ interface UseClubhouseSkeletonTimingResult {
   signalFirstFrameReady: () => void;
   /** True when first video is confirmed playback-ready */
   isFirstVideoReady: boolean;
+  /** Re-show skeleton (e.g. on tab switch to unloaded feed) */
+  resetSkeleton: () => void;
 }
 
 export function useClubhouseSkeletonTiming(
@@ -63,6 +65,26 @@ export function useClubhouseSkeletonTiming(
     setTimeout(() => {
       setIsFirstVideoReady(true);
     }, 200);
+  }, []);
+
+  // Reset skeleton visibility for tab switching
+  const resetSkeleton = useCallback(() => {
+    hasHiddenRef.current = false;
+    firstVideoReadyFiredRef.current = false;
+    startTimeRef.current = Date.now();
+    setSkeletonVisible(true);
+    setSkeletonMode('shimmer');
+    setIsFirstVideoReady(false);
+    setSafetyTimeoutFired(false);
+
+    // Re-arm safety timeout
+    if (maxTimerRef.current) clearTimeout(maxTimerRef.current);
+    maxTimerRef.current = setTimeout(() => {
+      if (!hasHiddenRef.current) {
+        logBootEvent('SKELETON_SAFETY_TIMEOUT', { elapsed: MAX_SKELETON_MS });
+        setSafetyTimeoutFired(true);
+      }
+    }, MAX_SKELETON_MS);
   }, []);
 
   // Cache polling removed: readyCount > 0 does NOT mean the video element
@@ -140,5 +162,6 @@ export function useClubhouseSkeletonTiming(
     skeletonMode,
     signalFirstFrameReady,
     isFirstVideoReady,
+    resetSkeleton,
   };
 }
