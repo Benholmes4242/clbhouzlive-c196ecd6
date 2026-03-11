@@ -355,7 +355,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         size={40}
         src={user?.avatar}
         alt={user?.name ?? 'Creator'}
-        fallback={initials}
+        fallback={userInitials}
         hideRing
       />
 
