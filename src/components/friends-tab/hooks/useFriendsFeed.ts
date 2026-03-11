@@ -1,7 +1,14 @@
+/**
+ * Friends feed for the card-style Friends tab UI.
+ * NOTE: A separate useFriendsFeed exists at src/components/media-system/hooks/useFriendsFeed.ts
+ * for the Clubhouse fullscreen vertical feed.
+ * Keep both in sync if the RPC interface changes.
+ */
 import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { useCallback, useMemo, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { mapRowToFeedPost, groupMultiMedia } from '@/components/media-system/utils/feedMapper';
+import { deduplicatePosts } from '@/components/media-system/utils/feedAlgorithm';
 import type { FeedPost, FeedRpcRow } from '@/components/media-system/types/media';
 
 export type FriendsMode = 'latest' | 'popular';
