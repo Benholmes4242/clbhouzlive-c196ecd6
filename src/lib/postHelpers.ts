@@ -53,43 +53,88 @@ export interface ReviewOverlayTheme extends RatingTheme {
   overlayText: string;
 }
 
-// Gray theme for non-outstanding ratings (on dark backgrounds)
-// Uses Gray: #9ca3af / #d1d5db
-const grayOverlayTheme: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
-  pillBg: 'rgba(156, 163, 175, 0.15)',           // gray-400 with 15% opacity
-  pillBorder: 'rgba(156, 163, 175, 0.45)',       // gray-400 border
-  pillText: '#9ca3af',                            // gray-400 text
-  containerBg: 'rgba(0, 0, 0, 0.5)',              // black/50 - matches CreatorCapsule
-  containerBorder: 'rgba(255, 255, 255, 0.08)',  // white/8 - matches CreatorCapsule
-  overlayText: '#FFFFFF',
+// Per-tier overlay themes for dark backgrounds
+// Maps course-detail tier palette to overlay-safe colors (light-on-dark)
+// Outstanding: Amber (#f59e0b), then graduated slate scale for visibility on glass
+const tierOverlayThemes: Record<string, Omit<ReviewOverlayTheme, keyof RatingTheme>> = {
+  outstanding: {
+    pillBg: 'rgba(245, 158, 11, 0.15)',
+    pillBorder: 'rgba(245, 158, 11, 0.5)',
+    pillText: '#f59e0b',
+    containerBg: 'rgba(245, 158, 11, 0.08)',
+    containerBorder: 'rgba(245, 158, 11, 0.3)',
+    overlayText: '#FFFFFF',
+  },
+  excellent: {
+    pillBg: 'rgba(226, 232, 240, 0.15)',
+    pillBorder: 'rgba(226, 232, 240, 0.45)',
+    pillText: '#e2e8f0',                          // slate-200
+    containerBg: 'rgba(0, 0, 0, 0.5)',
+    containerBorder: 'rgba(255, 255, 255, 0.08)',
+    overlayText: '#FFFFFF',
+  },
+  veryGood: {
+    pillBg: 'rgba(203, 213, 225, 0.15)',
+    pillBorder: 'rgba(203, 213, 225, 0.45)',
+    pillText: '#cbd5e1',                          // slate-300
+    containerBg: 'rgba(0, 0, 0, 0.5)',
+    containerBorder: 'rgba(255, 255, 255, 0.08)',
+    overlayText: '#FFFFFF',
+  },
+  good: {
+    pillBg: 'rgba(148, 163, 184, 0.15)',
+    pillBorder: 'rgba(148, 163, 184, 0.45)',
+    pillText: '#94a3b8',                          // slate-400
+    containerBg: 'rgba(0, 0, 0, 0.5)',
+    containerBorder: 'rgba(255, 255, 255, 0.08)',
+    overlayText: '#FFFFFF',
+  },
+  fair: {
+    pillBg: 'rgba(100, 116, 139, 0.15)',
+    pillBorder: 'rgba(100, 116, 139, 0.45)',
+    pillText: '#64748b',                          // slate-500
+    containerBg: 'rgba(0, 0, 0, 0.5)',
+    containerBorder: 'rgba(255, 255, 255, 0.08)',
+    overlayText: '#FFFFFF',
+  },
 };
 
-// Amber/Orange theme for outstanding ratings (on dark backgrounds)
-// Uses amber-500 → amber-400 gradient
-const amberOverlayTheme: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
-  pillBg: 'rgba(245, 158, 11, 0.15)',            // amber-500 with 15% opacity
-  pillBorder: 'rgba(245, 158, 11, 0.5)',         // amber-500 with 50% opacity
-  pillText: '#f59e0b',                            // amber-500
-  containerBg: 'rgba(245, 158, 11, 0.08)',       // amber-500 with 8% opacity
-  containerBorder: 'rgba(245, 158, 11, 0.3)',    // amber-500 with 30% opacity
-  overlayText: '#FFFFFF',
-};
+function getTierKey(score: number): string {
+  if (score >= 9) return 'outstanding';
+  if (score >= 8) return 'excellent';
+  if (score >= 7) return 'veryGood';
+  if (score >= 6) return 'good';
+  return 'fair';
+}
+
+/**
+ * Get overlay-safe rating colors for a score.
+ * Returns per-tier colors adapted for dark glass backgrounds.
+ * Matches course-detail tier palette: Outstanding (amber), Excellent→Fair (graduated slate).
+ */
+export function getOverlayRatingColors(score: number): { main: string; sub: string } {
+  if (score >= 9) return { main: '#f59e0b', sub: 'rgba(245, 158, 11, 0.6)' };
+  if (score >= 8) return { main: '#e2e8f0', sub: 'rgba(226, 232, 240, 0.6)' };
+  if (score >= 7) return { main: '#cbd5e1', sub: 'rgba(203, 213, 225, 0.6)' };
+  if (score >= 6) return { main: '#94a3b8', sub: 'rgba(148, 163, 184, 0.6)' };
+  return { main: '#64748b', sub: 'rgba(100, 116, 139, 0.6)' };
+}
 
 /**
  * Get review overlay theme for a rating score.
- * Uses Gold for Outstanding (9.0+), Slate for all others.
- * Optimized for dark overlay backgrounds (Clubhouse, preview screens).
+ * Uses per-tier colors matching the course detail page palette,
+ * adapted for dark overlay backgrounds (Clubhouse, preview screens).
  * 
  * @param score - Rating score (0-10)
  * @returns Complete theme with overlay-specific colors
  */
 export function getReviewOverlayTheme(score: number): ReviewOverlayTheme {
   const baseTheme = getRatingTheme(score);
-  const isOutstanding = score >= 9.0;
+  const key = getTierKey(score);
   
   return {
     ...baseTheme,
-    ...(isOutstanding ? amberOverlayTheme : grayOverlayTheme),
+    ...tierOverlayThemes[key],
   };
 }
 
@@ -100,14 +145,21 @@ export function getReviewOverlayTheme(score: number): ReviewOverlayTheme {
  * @returns Complete theme with overlay-specific colors
  */
 export function getReviewOverlayThemeByLabel(tierLabel: string): ReviewOverlayTheme {
-  const isOutstanding = tierLabel.toUpperCase() === 'OUTSTANDING';
-  const baseTheme = isOutstanding 
+  const labelToKey: Record<string, string> = {
+    'OUTSTANDING': 'outstanding',
+    'EXCELLENT': 'excellent',
+    'VERY GOOD': 'veryGood',
+    'GOOD': 'good',
+    'FAIR': 'fair',
+  };
+  const key = labelToKey[tierLabel.toUpperCase()] || 'good';
+  const baseTheme = key === 'outstanding' 
     ? COURSE_RATING_THEMES.OUTSTANDING 
-    : COURSE_RATING_THEMES.EXCELLENT; // Default to gray for non-outstanding
+    : COURSE_RATING_THEMES.EXCELLENT;
   
   return {
     ...baseTheme,
-    ...(isOutstanding ? amberOverlayTheme : grayOverlayTheme),
+    ...tierOverlayThemes[key],
   };
 }
 

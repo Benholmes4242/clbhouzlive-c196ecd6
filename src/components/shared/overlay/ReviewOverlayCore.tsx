@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { getReviewOverlayTheme } from '@/lib/postHelpers';
+import { getReviewOverlayTheme, getOverlayRatingColors } from '@/lib/postHelpers';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 
@@ -57,6 +57,7 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
   const navigate = useNavigate();
   const isFullscreen = variant === 'fullscreen';
   const theme = getReviewOverlayTheme(rating);
+  const ratingColors = getOverlayRatingColors(rating);
   const isOutstanding = rating >= 9.0;
   const isTappable = !!(courseId || onCourseTap);
 
@@ -171,13 +172,13 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
                 <div className="flex flex-col items-center gap-0 flex-shrink-0">
                   <span 
                     className="text-lg font-bold tabular-nums leading-none"
-                    style={{ color: isOutstanding ? '#f59e0b' : '#c4c8ce' }}
+                    style={{ color: ratingColors.main }}
                   >
                     {formattedRating}
                   </span>
                   <span 
                     className="text-[8px] font-medium tracking-wider truncate max-w-[48px]"
-                    style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.6)' : 'rgba(196, 200, 206, 0.6)' }}
+                    style={{ color: ratingColors.sub }}
                   >
                     {theme.label}
                   </span>
@@ -257,18 +258,18 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
                   className="text-3xl sm:text-4xl font-bold tabular-nums leading-none"
                   style={{ 
                     background: isOutstanding 
-                      ? 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)' 
+                      ? `linear-gradient(135deg, ${ratingColors.main} 0%, #fbbf24 100%)` 
                       : 'transparent',
                     WebkitBackgroundClip: isOutstanding ? 'text' : 'unset',
-                    WebkitTextFillColor: isOutstanding ? 'transparent' : '#c4c8ce',
-                    color: isOutstanding ? 'transparent' : '#c4c8ce',
+                    WebkitTextFillColor: isOutstanding ? 'transparent' : ratingColors.main,
+                    color: isOutstanding ? 'transparent' : ratingColors.main,
                   }}
                 >
                   {formattedRating}
                 </span>
                 <span 
                   className="text-[9px] font-medium tracking-wider mt-0.5"
-                  style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.7)' : 'rgba(196, 200, 206, 0.7)' }}
+                  style={{ color: ratingColors.sub }}
                 >
                   {theme.label}
                 </span>
