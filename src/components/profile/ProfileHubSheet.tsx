@@ -198,25 +198,26 @@ function ProfileHubSheet({
 
               {/* ── Profile header ── */}
               <div className="flex items-center gap-3 py-3">
-                <SquircleAvatar
-                  size={44}
-                  src={activeProfile.avatarUrl}
-                  alt={activeProfile.name}
-                  fallback={activeProfile.name?.charAt(0)?.toUpperCase()}
-                  hideRing
-                />
+                <div className="w-[52px] h-[52px] rounded-[18px] overflow-hidden bg-muted shrink-0">
+                  <img
+                    src={activeProfile.avatarUrl}
+                    alt={activeProfile.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
                 <div className="min-w-0">
                   <div className="text-[16px] font-semibold text-foreground truncate">
                     {activeProfile.name}
                   </div>
-                  <div className="text-[13px] text-muted-foreground mt-0.5">
-                    Posting as {activeProfile.name}
-                  </div>
+                  <p className="text-[12px] text-muted-foreground truncate">
+                    {activeProfile.type === 'business' ? 'Business account' : 'Personal account'}
+                  </p>
                 </div>
               </div>
 
               {/* ── Switch profile ── */}
               <div className="pb-3">
+
                 <div className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground/60 mb-2.5">
                   Switch Profile
                 </div>
@@ -287,7 +288,7 @@ function ProfileHubSheet({
               <div className="h-px bg-border/50 -mx-4" />
 
               {/* ── Quick actions ── */}
-              <div className="grid grid-cols-2 gap-3 py-4">
+              <div className="grid grid-cols-2 gap-2 py-4">
                 {quickActions.map(({ icon: Icon, label, route, badge, badgeColor }) => (
                   <button
                     key={label}
@@ -326,7 +327,7 @@ function ProfileHubSheet({
                     onClick={() => handleNav(route)}
                     className="w-full flex items-center gap-3 min-h-[48px] active:bg-muted/50 rounded-xl px-2 -mx-2 transition-colors"
                   >
-                    <Icon className="w-[18px] h-[18px] text-muted-foreground" />
+                    <Icon className="w-4 h-4 text-muted-foreground" />
                     <span className="flex-1 text-left text-[14px] font-medium text-foreground">{label}</span>
                     <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
                   </button>
@@ -348,8 +349,8 @@ function ProfileHubSheet({
                     >
                       <Shield className="w-5 h-5 text-primary" />
                       <div className="flex-1 text-left">
-                        <div className="text-[14px] font-semibold text-foreground">Command Center</div>
-                        <div className="text-[11px] text-muted-foreground">Manage site settings</div>
+                        <div className="text-[14px] font-semibold text-primary">Command Center</div>
+                        <div className="text-[11px] text-primary/60">Manage site settings</div>
                       </div>
                       <ChevronRight className="w-4 h-4 text-primary/60" />
                     </button>
