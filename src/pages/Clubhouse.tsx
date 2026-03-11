@@ -383,15 +383,23 @@ const ClubhouseContent = () => {
         </div>
       )}
 
+      {/* Rehydration skeleton with fade-out (G4) */}
+      <AnimatePresence>
+        {showRehydrationSkeleton && (
+          <motion.div
+            key="rehydration-skeleton"
+            className="absolute inset-0 z-50"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          >
+            <ClubhouseSkeleton />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ═══ MAIN FEED AREA ═══ */}
-      {isLoading ? (
-        <div className="flex flex-col items-center justify-center min-h-screen px-8 text-center">
-          <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
-            <Compass className="w-8 h-8 text-white/30 animate-pulse" />
-          </div>
-          <p className="text-sm text-white/50">Loading feed...</p>
-        </div>
-      ) : posts.length === 0 ? (
+      {!isLoading && posts.length === 0 ? (
         <div className="flex flex-col items-center justify-center min-h-screen px-8 text-center">
           <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
             <Compass className="w-8 h-8 text-white/30" />
@@ -405,7 +413,7 @@ const ClubhouseContent = () => {
               : 'Check back soon for new content'}
           </p>
         </div>
-      ) : (
+      ) : posts.length > 0 ? (
         <MediaErrorBoundary onReset={() => {
           setActiveIndex(0);
           activeFeed.refetch();
