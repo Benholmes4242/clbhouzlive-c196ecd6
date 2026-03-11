@@ -58,6 +58,7 @@ const SearchPill = ({
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [recent, setRecent] = useState<RecentSearch[]>(() => getRecentSearches());
   
   const debouncedQuery = useDebounce(query, 250); // Optimized 250ms debounce
   
