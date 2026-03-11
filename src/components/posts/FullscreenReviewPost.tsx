@@ -314,7 +314,7 @@ export function FullscreenReviewPost({
         onClick={handleOpenReviewSheet}
         className={cn(
           "absolute left-4 right-4 z-20",
-          "rounded-xl border",
+          "rounded-xl border overflow-hidden relative",
           "shadow-[0_4px_20px_rgba(0,0,0,0.2)]",
           "pointer-events-auto cursor-pointer transition-transform active:scale-[0.98]",
           "text-left w-auto"
@@ -367,6 +367,35 @@ export function FullscreenReviewPost({
             </span>
           </div>
         </div>
+
+        {/* Tap to explore hint */}
+        <div className="flex items-center justify-center gap-1 pt-2 pb-1 pointer-events-none">
+          <span className="text-[10px] uppercase tracking-[0.08em] text-white/40 font-medium">
+            Tap to explore
+          </span>
+          <span
+            className="text-[10px] text-white/40"
+            style={{ animation: 'tapBounce 1.8s ease-in-out infinite' }}
+          >
+            ↓
+          </span>
+        </div>
+
+        {/* One-shot shimmer sweep */}
+        <div
+          className="pointer-events-none"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: '-100%',
+            width: '60%',
+            height: '100%',
+            background: 'linear-gradient(to right, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%)',
+            transform: 'skewX(-15deg)',
+            animation: 'shimmerSweep 1.2s ease-out 0.3s forwards',
+            borderRadius: 'inherit',
+          }}
+        />
       </motion.button>
       
       {/* Review Bottom Sheet - Liquid Glass with swipe-to-dismiss */}
