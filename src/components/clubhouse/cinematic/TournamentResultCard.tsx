@@ -320,7 +320,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(4, 1fr)',
-              gap: 8,
+              gap: 4,
               paddingBottom: 12,
             }}>
               {/* Row 1 — tournament stats (always show, dim if 0) */}
