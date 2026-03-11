@@ -38,6 +38,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
     <>
       {/* Floating bar - fixed position below the notch/safe area */}
       <div
+        {/* TODO: Add desktop top bar variant when desktop layout is implemented */}
         className="fixed left-4 right-4 z-40 pointer-events-auto flex items-center justify-between gap-2 min-w-0 lg:hidden"
         style={{
           top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',

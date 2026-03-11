@@ -473,8 +473,8 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           bottom: bottomOffset 
             ? bottomOffset 
             : (isReview 
-                ? 'calc(30px + 88px)'
-                : 'calc(30px + 80px)'),
+                ? 'calc(30px + var(--bottom-nav-height, 80px) + 8px)'
+                : 'calc(30px + var(--bottom-nav-height, 80px))'),
         }}
       >
         {/* Media navigation dots - centered above capsule */}

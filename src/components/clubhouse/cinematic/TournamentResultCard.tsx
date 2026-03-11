@@ -431,17 +431,17 @@ function PerfChip({ value, label, suffix }: { value: string | null; label: strin
       borderRadius: 12, padding: '10px 0',
       background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)',
       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-      opacity: isNull ? 0.4 : 1,
+      opacity: isNull ? 0.4 : 1, minWidth: 0, overflow: 'hidden',
     }}>
-      <span style={{ fontSize: 16, fontWeight: 800, color: 'rgba(255,255,255,0.9)', lineHeight: 1 }}>
+      <span style={{ fontSize: 'clamp(12px, 3.8vw, 16px)', fontWeight: 800, color: 'rgba(255,255,255,0.9)', lineHeight: 1 }}>
         {isNull ? '—' : (
           <>
             {value}
-            {suffix && <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>{suffix}</span>}
+            {suffix && <span style={{ fontSize: 'clamp(8px, 2.2vw, 10px)', fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>{suffix}</span>}
           </>
         )}
       </span>
-      <span style={{ fontSize: 7.5, fontWeight: 700, color: 'rgba(255,255,255,0.45)', letterSpacing: 0.8, textTransform: 'uppercase' }}>{label}</span>
+      <span style={{ fontSize: 'clamp(8px, 2.2vw, 9px)', fontWeight: 700, color: 'rgba(255,255,255,0.45)', letterSpacing: 0.8, textTransform: 'uppercase' }}>{label}</span>
     </div>
   );
 }
