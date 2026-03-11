@@ -45,8 +45,6 @@ interface ProfileHubSheetProps {
   onSwitchProfile: (profileId: string) => Promise<void> | void;
   onNavigate: (route: string) => void;
   isAdmin: boolean;
-  headerHeight: number;
-  useLightTheme?: boolean;
 }
 
 // ── Component ──
