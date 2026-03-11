@@ -200,7 +200,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           <button
                             type="button"
                             onClick={() => handleDeleteRecent(item.id)}
-                            className="p-1 text-muted-foreground/50"
+                            className="shrink-0 flex items-center justify-center min-h-[44px] min-w-[44px] -mr-3 text-muted-foreground/50"
                             aria-label={`Remove ${item.query}`}
                           >
                             <X className="w-3.5 h-3.5" />
