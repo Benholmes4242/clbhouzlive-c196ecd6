@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { getReviewOverlayTheme } from '@/lib/postHelpers';
+import { getReviewOverlayTheme, getOverlayRatingColors } from '@/lib/postHelpers';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 
