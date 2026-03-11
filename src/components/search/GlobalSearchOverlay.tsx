@@ -199,16 +199,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           </button>
                           <button
                             type="button"
-                            onClick={() => {
-                              const stored = localStorage.getItem('recent_searches');
-                              if (stored) {
-                                try {
-                                  const parsed = JSON.parse(stored);
-                                  const filtered = parsed.filter((s: any) => s.id !== item.id);
-                                  localStorage.setItem('recent_searches', JSON.stringify(filtered));
-                                } catch { /* noop */ }
-                              }
-                            }}
+                            onClick={() => handleDeleteRecent(item.id)}
                             className="p-1 text-muted-foreground/50"
                             aria-label={`Remove ${item.query}`}
                           >
