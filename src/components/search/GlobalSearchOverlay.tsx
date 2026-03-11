@@ -72,9 +72,9 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && inputValue.trim()) {
-      saveRecentSearch(inputValue.trim());
+      handleSaveRecent(inputValue.trim());
     }
-  }, [inputValue]);
+  }, [inputValue, handleSaveRecent]);
 
   const handleClear = useCallback(() => {
     setInputValue('');
