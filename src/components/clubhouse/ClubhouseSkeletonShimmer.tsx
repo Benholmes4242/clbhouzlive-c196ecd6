@@ -148,7 +148,7 @@ const MediaAreaSkeleton: React.FC<{ isStatic?: boolean }> = ({ isStatic }) => (
   <div className="absolute inset-0">
     <SkeletonBlock 
       isStatic={isStatic}
-      className="w-full h-full rounded-2xl"
+      className="w-full h-full rounded-none"
     />
   </div>
 );
