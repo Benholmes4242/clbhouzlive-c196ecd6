@@ -59,6 +59,38 @@ import { useClubhouseComments } from '@/components/clubhouse/hooks/useClubhouseC
 import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShare';
 import { useClubhouseFeedNav } from '@/components/clubhouse/hooks/useClubhouseFeedNav';
 
+/** Shared More Options Drawer */
+interface MoreOptionsDrawerProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onReport: () => void;
+  onNotInterested: () => void;
+  onCopyLink: () => void;
+}
+
+const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
+  open, onOpenChange, onReport, onNotInterested, onCopyLink
+}) => (
+  <Drawer open={open} onOpenChange={onOpenChange}>
+    <DrawerContent className="bg-black/95 border-white/10">
+      <div className="p-4 space-y-2">
+        <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={onReport}>
+          <Flag className="w-5 h-5 text-white/60" />
+          <span className="text-sm text-white">Report this post</span>
+        </button>
+        <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={onNotInterested}>
+          <EyeOff className="w-5 h-5 text-white/60" />
+          <span className="text-sm text-white">Not interested</span>
+        </button>
+        <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={onCopyLink}>
+          <LinkIcon className="w-5 h-5 text-white/60" />
+          <span className="text-sm text-white">Copy link</span>
+        </button>
+      </div>
+    </DrawerContent>
+  </Drawer>
+);
+
 /** Feed + preloader wrapper — preloader must be inside VideoPoolProvider */
 function FeedWithPreloader({
   posts,
@@ -165,6 +197,8 @@ const ClubhouseContent = () => {
   
   // ── Media store state ──
   const activeIndex = useMediaStore((s) => s.activeIndex);
+  const setActiveIndex = useMediaStore((s) => s.setActiveIndex);
+  const setCarouselPosition = useMediaStore((s) => s.setCarouselPosition);
   const isMuted = useMediaStore((s) => s.isMuted);
   const toggleMute = useMediaStore((s) => s.toggleMute);
   
@@ -172,7 +206,6 @@ const ClubhouseContent = () => {
   useClubhouseLifecycle();
   
   // ── Active post derivation ──
-  const activePostId = posts[activeIndex]?.id;
   const { activePost, golfCourse, activeReview, isActiveReview, isActiveVideo } = useActivePostDerived(posts, activeIndex);
   const isTournamentCardActive = activePost?.postType === 'tournament_result';
 
@@ -228,6 +261,7 @@ const ClubhouseContent = () => {
     caption,
     setCaption,
     isSubmitting,
+    setIsSubmitting,
     showToast,
     toastMessage,
     selectedCourse,
@@ -239,14 +273,18 @@ const ClubhouseContent = () => {
     hideToast
   } = useSnapModal();
 
-  const [localSelectedTags, setLocalSelectedTags] = useState<any[]>([]);
+  interface PostTag {
+    id: string;
+    name: string;
+  }
+  const [localSelectedTags, setLocalSelectedTags] = useState<PostTag[]>([]);
 
   // Season Recap Modal
   const { data: seasonRecap } = useSeasonRecap(user?.id);
-  const [showRecapModal, setShowRecapModal] = React.useState(false);
+  const [showRecapModal, setShowRecapModal] = useState(false);
   const [chevronY, setChevronY] = useState<number | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (seasonRecap) {
       setShowRecapModal(true);
     }
@@ -292,7 +330,7 @@ const ClubhouseContent = () => {
       fixedHeight
       hasBottomNav={false}
       style={{ 
-        "--bg-page": "#000000", 
+        "--bg-page": "var(--color-black, #000000)", 
         position: 'relative', 
         isolation: 'isolate', 
         zIndex: 0
@@ -363,7 +401,7 @@ const ClubhouseContent = () => {
         </div>
       ) : (
         <MediaErrorBoundary onReset={() => {
-          useMediaStore.getState().setActiveIndex(0);
+          setActiveIndex(0);
           activeFeed.refetch();
         }}>
           <VideoPoolProvider>
@@ -403,29 +441,17 @@ const ClubhouseContent = () => {
             onCommentPosted={() => handleCommentPosted(activePost)}
             onCommentDeleted={() => activePost && handleCommentDeleted(activePost.id, activePost.commentCount)}
           />
-          {/* More options sheet for tournament posts */}
-          <Drawer open={moreOptionsOpen} onOpenChange={setMoreOptionsOpen}>
-            <DrawerContent className="bg-black/95 border-white/10">
-              <div className="p-4 space-y-2">
-                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => handleReport(activePost)}>
-                  <Flag className="w-5 h-5 text-white/60" />
-                  <span className="text-sm text-white">Report this post</span>
-                </button>
-                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => handleNotInterested(activePost)}>
-                  <EyeOff className="w-5 h-5 text-white/60" />
-                  <span className="text-sm text-white">Not interested</span>
-                </button>
-                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => {
-                  navigator.clipboard.writeText(`${window.location.origin}/post/${activePost.id}`);
-                  toast.success('Link copied');
-                  setMoreOptionsOpen(false);
-                }}>
-                  <LinkIcon className="w-5 h-5 text-white/60" />
-                  <span className="text-sm text-white">Copy link</span>
-                </button>
-              </div>
-            </DrawerContent>
-          </Drawer>
+          <MoreOptionsDrawer
+            open={moreOptionsOpen}
+            onOpenChange={setMoreOptionsOpen}
+            onReport={() => handleReport(activePost)}
+            onNotInterested={() => handleNotInterested(activePost)}
+            onCopyLink={() => {
+              navigator.clipboard.writeText(`${window.location.origin}/post/${activePost.id}`);
+              toast.success('Link copied');
+              setMoreOptionsOpen(false);
+            }}
+          />
         </>
       )}
 
@@ -483,7 +509,7 @@ const ClubhouseContent = () => {
             <MediaNavigationDots
               mediaCount={activeMediaCount}
               currentIndex={currentMediaIndex}
-              onJump={(idx) => useMediaStore.getState().setCarouselPosition(activeIndex, idx)}
+              onJump={(idx) => setCarouselPosition(activeIndex, idx)}
             />
           )}
 
@@ -504,10 +530,10 @@ const ClubhouseContent = () => {
             hasNextMedia={currentMediaIndex < activeMediaCount - 1}
             hasPrevMedia={currentMediaIndex > 0}
             onNextMedia={activeMediaCount > 1 
-              ? () => useMediaStore.getState().setCarouselPosition(activeIndex, currentMediaIndex + 1) 
+              ? () => setCarouselPosition(activeIndex, currentMediaIndex + 1) 
               : undefined}
             onPrevMedia={activeMediaCount > 1 
-              ? () => useMediaStore.getState().setCarouselPosition(activeIndex, currentMediaIndex - 1) 
+              ? () => setCarouselPosition(activeIndex, currentMediaIndex - 1) 
               : undefined}
             onChevronPositionChange={setChevronY}
           />
@@ -515,7 +541,7 @@ const ClubhouseContent = () => {
           {/* Left chevron — mirrors right chevron Y position for multi-media non-review posts */}
           {currentMediaIndex > 0 && chevronY !== null && (
             <button
-              onClick={() => useMediaStore.getState().setCarouselPosition(activeIndex, currentMediaIndex - 1)}
+              onClick={() => setCarouselPosition(activeIndex, currentMediaIndex - 1)}
               style={{
                 position: 'fixed',
                 left: 16,
@@ -567,29 +593,17 @@ const ClubhouseContent = () => {
             onReviewTap={handleReviewTap}
           />
 
-          {/* More options sheet */}
-          <Drawer open={moreOptionsOpen} onOpenChange={setMoreOptionsOpen}>
-            <DrawerContent className="bg-black/95 border-white/10">
-              <div className="p-4 space-y-2">
-                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => handleReport(activePost)}>
-                  <Flag className="w-5 h-5 text-white/60" />
-                  <span className="text-sm text-white">Report this post</span>
-                </button>
-                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => handleNotInterested(activePost)}>
-                  <EyeOff className="w-5 h-5 text-white/60" />
-                  <span className="text-sm text-white">Not interested</span>
-                </button>
-                <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={() => {
-                  navigator.clipboard.writeText(`${window.location.origin}/post/${activePost.id}`);
-                  toast.success('Link copied');
-                  setMoreOptionsOpen(false);
-                }}>
-                  <LinkIcon className="w-5 h-5 text-white/60" />
-                  <span className="text-sm text-white">Copy link</span>
-                </button>
-              </div>
-            </DrawerContent>
-          </Drawer>
+          <MoreOptionsDrawer
+            open={moreOptionsOpen}
+            onOpenChange={setMoreOptionsOpen}
+            onReport={() => handleReport(activePost)}
+            onNotInterested={() => handleNotInterested(activePost)}
+            onCopyLink={() => {
+              navigator.clipboard.writeText(`${window.location.origin}/post/${activePost.id}`);
+              toast.success('Link copied');
+              setMoreOptionsOpen(false);
+            }}
+          />
 
           {/* Comments sheet — z-100+ */}
           <CommentsSheet
@@ -630,7 +644,7 @@ const ClubhouseContent = () => {
         onClose={handleCloseComposer}
         onShowToast={showConfirmationToast}
         isSubmitting={isSubmitting}
-        setIsSubmitting={() => {}}
+        setIsSubmitting={setIsSubmitting}
         onMediaChange={setMediaItems}
       />
 

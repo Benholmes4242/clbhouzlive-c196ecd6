@@ -15,7 +15,7 @@ import { useMediaStoreCompat } from './store/useMediaStoreCompat';
 import { MediaStoreContext } from './store/MediaStoreContext';
 import { useVideoPoolContext } from './VideoPoolProvider';
 import { flingSpring, SPRING_CONFIGS } from './utils/spring';
-import { usePreloader, preloadByUrl } from './hooks/usePreloader';
+import { preloadByUrl } from './hooks/usePreloader';
 import type { FeedPost } from './types/media';
 import { haptic } from '@/utils/haptics';
 
@@ -70,9 +70,6 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
   const pool = useVideoPoolContext();
   const prevPostsRef = useRef(posts);
 
-  // ── Mount the preloader pipeline ──
-  usePreloader(posts);
-
   // Detect feed switch (posts array identity change)
   // Only reset to top when the feed is completely replaced (tab switch),
   // NOT when new pages are appended (infinite scroll).
@@ -98,7 +95,7 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
       // For appends, preserve current position — do nothing
     }
     prevPostsRef.current = posts;
-  }, [posts]);
+  }, [posts, initialIndex, itemHeight, setActiveIndex]);
 
   // Resize handling
   useEffect(() => {

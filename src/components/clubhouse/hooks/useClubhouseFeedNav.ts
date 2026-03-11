@@ -32,17 +32,25 @@ export function useClubhouseFeedNav({ activeTab, activeFeed, onTabSwitch }: UseF
     }
   }, [activeTab, onTabSwitch]);
 
+  const {
+    fetchNextPage,
+    refetch,
+    resetSeen,
+    hasNextPage,
+    isFetchingNextPage,
+  } = activeFeed;
+
   const handleNearEnd = useCallback(() => {
-    if (activeFeed.hasNextPage && !activeFeed.isFetchingNextPage) {
-      activeFeed.fetchNextPage();
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
     }
-  }, [activeFeed]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleRefresh = useCallback(async () => {
-    activeFeed.resetSeen();
+    resetSeen();
     onTabSwitch();
-    await activeFeed.refetch();
-  }, [activeFeed, onTabSwitch]);
+    await refetch();
+  }, [resetSeen, onTabSwitch, refetch]);
 
   return { handleNearEnd, handleRefresh };
 }

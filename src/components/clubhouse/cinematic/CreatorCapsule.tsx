@@ -169,12 +169,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
       navigate(path);
     }
   }, [navigate, onViewProfile, user.id]);
-  const initials = user?.name
-    ?.split(' ')
-    .slice(0, 2)
-    .map(part => part[0])
-    .join('')
-    .toUpperCase() || '?';
 
   // Clean caption: strip embedded "Played at" course text
   const cleanCaption = caption ? removeGolfCourseFromContent(caption) : '';
@@ -361,7 +355,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         size={40}
         src={user?.avatar}
         alt={user?.name ?? 'Creator'}
-        fallback={initials}
+        fallback={userInitials}
         hideRing
       />
 

@@ -13,6 +13,9 @@ import { useMediaStore } from '@/components/media-system/store/mediaStore';
 export function useClubhouseLifecycle(
   getStore?: () => { activeVideoElement: HTMLVideoElement | null; userPaused: boolean }
 ) {
+  // resolveStore is a plain getter function (not a hook).
+  // getStore, if provided, must also be a plain getter (not a hook call).
+  // useMediaStore.getState() is the Zustand imperative API — safe to call anywhere.
   const resolveStore = getStore ?? (() => useMediaStore.getState());
 
   // Pause/resume on visibility change (app background)
