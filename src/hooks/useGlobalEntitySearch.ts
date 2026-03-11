@@ -436,36 +436,10 @@ export const useGlobalEntitySearch = ({
     videos,
     pages,
     businesses,
-    recent,
     trending,
     isLoading,
     error: error || null
   };
-};
-
-// Utility functions for highlighting
-export const highlightText = (text: string, query: string): string => {
-  if (!query.trim()) return text;
-  
-  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-  return text.replace(regex, '<mark>$1</mark>');
-};
-
-export const getMatchPositions = (text: string, query: string): Array<{ start: number; end: number }> => {
-  if (!query.trim()) return [];
-  
-  const matches: Array<{ start: number; end: number }> = [];
-  const regex = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-  let match;
-  
-  while ((match = regex.exec(text)) !== null) {
-    matches.push({
-      start: match.index,
-      end: match.index + match[0].length
-    });
-  }
-  
-  return matches;
 };
 
 // Save recent search utility

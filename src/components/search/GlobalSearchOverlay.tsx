@@ -225,8 +225,8 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           key={item.id ?? item.label}
                           type="button"
                           onClick={() => {
-                            if (item.id) {
-                              saveRecentSearch(item.label);
+                          if (item.id) {
+                              handleSaveRecent(item.label);
                               navigate(`/courses/${item.id}`);
                               onClose();
                             } else {
