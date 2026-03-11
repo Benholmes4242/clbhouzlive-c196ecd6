@@ -288,7 +288,7 @@ function ProfileHubSheet({
               <div className="h-px bg-border/50 -mx-4" />
 
               {/* ── Quick actions ── */}
-              <div className="grid grid-cols-2 gap-3 py-4">
+              <div className="grid grid-cols-2 gap-2 py-4">
                 {quickActions.map(({ icon: Icon, label, route, badge, badgeColor }) => (
                   <button
                     key={label}
