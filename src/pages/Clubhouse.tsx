@@ -508,7 +508,7 @@ const ClubhouseContent = () => {
             <MediaNavigationDots
               mediaCount={activeMediaCount}
               currentIndex={currentMediaIndex}
-              onJump={(idx) => useMediaStore.getState().setCarouselPosition(activeIndex, idx)}
+              onJump={(idx) => setCarouselPosition(activeIndex, idx)}
             />
           )}
 
