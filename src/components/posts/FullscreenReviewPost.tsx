@@ -367,6 +367,12 @@ export function FullscreenReviewPost({
             </span>
           </div>
         </div>
+        <div className="flex justify-center pt-1 pb-0.5">
+          <ChevronsDown
+            className="w-4 h-4 text-white/35"
+            style={{ animation: 'chevronBounce 1.8s ease-in-out infinite' }}
+          />
+        </div>
       </motion.button>
       
       {/* Review Bottom Sheet - Liquid Glass with swipe-to-dismiss */}
