@@ -10,7 +10,7 @@ import type { PostStudioState, StudioMediaItem } from '../types';
 
 export function DraftsPanel() {
   const { dispatch, closePanel } = usePostStudioContext();
-  const { drafts, isLoading, deleteDraftMutation } = useDrafts();
+  const { drafts, isLoading, deleteDraft } = useDrafts();
 
   const handleLoadDraft = useCallback(
     (draft: (typeof drafts)[number]) => {
