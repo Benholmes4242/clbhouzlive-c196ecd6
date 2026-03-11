@@ -60,6 +60,10 @@ export function useFriendsFeed({ userId, mode, searchQuery }: UseFriendsFeedPara
           seenPostIds.current.push(post.id);
         }
       }
+      // Prevent unbounded growth — cap at last 200
+      if (seenPostIds.current.length > 200) {
+        seenPostIds.current = seenPostIds.current.slice(-200);
+      }
 
       const lastRow = rows[rows.length - 1];
       const nextCursor = posts.length >= PAGE_SIZE ? lastRow.post_created_at : undefined;
