@@ -206,6 +206,7 @@ export function PostStudioProvider({
   children,
   initialActorType,
   initialActorId,
+  onSuccess,
 }: PostStudioProviderProps) {
   const [state, dispatch] = useReducer(
     postStudioReducer,
