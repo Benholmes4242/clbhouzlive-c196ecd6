@@ -70,9 +70,6 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
   const pool = useVideoPoolContext();
   const prevPostsRef = useRef(posts);
 
-  // ── Mount the preloader pipeline ──
-  usePreloader(posts);
-
   // Detect feed switch (posts array identity change)
   // Only reset to top when the feed is completely replaced (tab switch),
   // NOT when new pages are appended (infinite scroll).
