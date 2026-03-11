@@ -162,5 +162,6 @@ export function useClubhouseSkeletonTiming(
     skeletonMode,
     signalFirstFrameReady,
     isFirstVideoReady,
+    resetSkeleton,
   };
 }
