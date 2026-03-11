@@ -292,7 +292,10 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   // Review mode content - matches regular capsule layout exactly
   const reviewContent = reviewData && (
     <div
-      onClick={handleUserTap}
+      onClick={(e: React.MouseEvent) => {
+        e.stopPropagation();
+        handleViewProfile();
+      }}
       className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:opacity-80 transition-opacity cursor-pointer"
     >
       {/* Avatar - same size as regular capsule */}
