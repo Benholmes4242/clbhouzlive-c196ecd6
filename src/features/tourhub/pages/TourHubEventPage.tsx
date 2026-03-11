@@ -30,7 +30,6 @@ export function TourHubEventPage() {
   
   const { data: events } = useTourEvents((tour || 'pga') as any);
   
-  // Only call leaderboard hook when we have valid params
   const hasValidParams = Boolean(tour) && Boolean(eventId) && eventId.length > 0;
   const { data: leaderboard, isLoading, error: leaderboardError, refetch } = useLeaderboard(
     hasValidParams ? tour : undefined,
@@ -48,7 +47,6 @@ export function TourHubEventPage() {
     return showFullLeaderboard ? leaderboard.leaders : leaderboard.leaders.slice(0, 10);
   }, [leaderboard, showFullLeaderboard]);
   
-  // Handle missing eventId - show empty state instead of crashing
   if (!eventId) {
     return (
       <TourHubShell>
@@ -76,7 +74,7 @@ export function TourHubEventPage() {
       </div>
       
       {/* Sticky Header */}
-      <header className="sticky top-0 z-10 bg-clbhouzBg py-4 -mx-4 px-4">
+      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl py-4 -mx-4 px-4">
         <div className="flex items-center justify-between gap-4">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
@@ -95,32 +93,32 @@ export function TourHubEventPage() {
         </div>
       </header>
       
-      {/* Tabs */}
-      <div 
-        className="flex items-stretch p-1 rounded-xl overflow-hidden mb-6"
-        style={{ background: '#e2e8f0' }}
-      >
-        {(['leaderboard', 'field', 'info'] as TabKey[]).map(tab => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={cn(
-              "flex-1 py-2.5 text-[13px] font-semibold transition-all capitalize",
-              "min-h-[44px]",
-              activeTab === tab
-                ? "bg-white text-[#1e293b] shadow-sm m-1 rounded-lg border border-[#e2e8f0]"
-                : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50"
-            )}
-          >
-            {tab}
-          </button>
-        ))}
+      {/* Sticky Tabs */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-xl py-3 -mx-4 px-4">
+        <div 
+          className="flex items-stretch p-1 rounded-xl overflow-hidden bg-muted"
+        >
+          {(['leaderboard', 'field', 'info'] as TabKey[]).map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={cn(
+                "flex-1 py-2.5 text-[13px] font-semibold transition-all capitalize",
+                "min-h-[44px]",
+                activeTab === tab
+                  ? "bg-foreground text-background shadow-sm m-1 rounded-lg border border-border"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              )}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
       </div>
       
       {/* Tab Content */}
       {activeTab === 'leaderboard' && (
         <div>
-          {/* Inline error state - non-fatal, keeps page visible */}
           {leaderboardError ? (
             <div className="bg-surface-card border border-border-subtle rounded-sq-lg p-6">
               <ErrorState 
@@ -131,9 +129,7 @@ export function TourHubEventPage() {
             <LeaderboardSkeleton rows={10} />
           ) : leaderboard?.leaders && leaderboard.leaders.length > 0 ? (
             <>
-              {/* Full Leaderboard Table */}
               <div className="bg-surface-alt border border-border-subtle rounded-sq-md overflow-hidden">
-                {/* Header */}
                 <div className="grid grid-cols-[40px_1fr_60px_50px_50px] gap-2 px-3 py-2 text-meta text-text-tertiary uppercase tracking-wide border-b border-border-subtle">
                   <span>Pos</span>
                   <span>Player</span>
@@ -142,7 +138,6 @@ export function TourHubEventPage() {
                   <span className="text-right">Thru</span>
                 </div>
                 
-                {/* Rows */}
                 {displayLeaders.map((entry, idx) => (
                   <div
                     key={`${entry.position}-${entry.playerName}-${idx}`}
@@ -169,7 +164,6 @@ export function TourHubEventPage() {
                 ))}
               </div>
               
-              {/* Show More/Less */}
               {leaderboard.leaders.length > 10 && (
                 <button
                   onClick={() => setShowFullLeaderboard(!showFullLeaderboard)}
