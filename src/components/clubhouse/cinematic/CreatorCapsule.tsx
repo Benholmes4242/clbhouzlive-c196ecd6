@@ -131,10 +131,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     setIsExpanded(false);
   }, [postId]);
 
-  // Get review theme if in review mode
-  const reviewTheme = isReview && reviewData 
-    ? getReviewOverlayTheme(reviewData.rating)
-    : null;
   const reviewRatingColors = isReview && reviewData
     ? getOverlayRatingColors(reviewData.rating)
     : null;
