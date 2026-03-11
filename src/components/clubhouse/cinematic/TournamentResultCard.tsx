@@ -254,6 +254,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             fontSize: 26, fontWeight: 800, color: '#fff', lineHeight: 1.15,
             letterSpacing: -0.5, margin: 0,
             textShadow: '0 2px 12px rgba(0,0,0,0.5)',
+            overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const,
           }}>
             {meta.tournament_name}
           </h2>
