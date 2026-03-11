@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import type { UploadJobInput } from '@/uploads/types';
 
 export function PublishScreen() {
-  const { state, setStep, openPanel, dispatch } = usePostStudioContext();
+  const { state, setStep, openPanel, dispatch, onSuccess } = usePostStudioContext();
 
   const visibilityLabel = {
     anyone: { label: 'Public', icon: Globe },
