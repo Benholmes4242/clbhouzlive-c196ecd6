@@ -280,6 +280,7 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
           isReview={activePost.isReview}
           reviewRating={activePost.review?.rating}
           onCommentPosted={handleCommentPosted}
+          onCommentDeleted={handleCommentDeleted}
         />
       )}
     </>
