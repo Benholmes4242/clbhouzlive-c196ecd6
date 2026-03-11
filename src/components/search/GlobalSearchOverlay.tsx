@@ -403,9 +403,9 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                   <Search className="w-7 h-7 text-muted-foreground/40" />
                 </div>
                 <p className="text-sm font-medium text-foreground">
-                  No results for "{debouncedQuery}"
+                  No results for "<span className="inline-block max-w-[180px] truncate align-bottom">{debouncedQuery}</span>"
                 </p>
-                <p className="text-xs text-muted-foreground text-center max-w-[240px]">
+                <p className="text-xs text-muted-foreground text-center max-w-[240px] md:max-w-[360px]">
                   Try searching for a course name, player, or business
                 </p>
               </div>
