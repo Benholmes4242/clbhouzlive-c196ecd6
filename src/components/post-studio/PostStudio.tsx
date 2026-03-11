@@ -303,7 +303,7 @@ export default function PostStudio({
           initialActorType={initialActorType}
           initialActorId={initialActorId}
         >
-          <StudioInner onClose={onClose} />
+          <StudioInner onClose={onClose} initialMedia={initialMedia} />
         </PostStudioProvider>
       )}
     </AnimatePresence>,
