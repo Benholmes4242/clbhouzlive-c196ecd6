@@ -80,6 +80,7 @@ export interface GlobalSearchResults {
   pages: PageResult[];
   businesses: BusinessResult[];
   trending: TrendingItem[];
+  trendingLoading: boolean;
   isLoading: boolean;
   error?: Error | null;
 }
