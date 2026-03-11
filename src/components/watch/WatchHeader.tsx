@@ -18,29 +18,24 @@ interface WatchHeaderProps {
 
 const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange, onOpenSearch, embedded = false }) => {
   return (
-    <div className="bg-background">
-      <div
-        className="px-4"
-        style={{
-          marginTop: embedded ? '24px' : 'calc(max(env(safe-area-inset-top, 0px), 47px) + 16px)',
-        }}
-      >
+    <div
+      className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border/50"
+      style={{
+        paddingTop: embedded ? '24px' : 'max(env(safe-area-inset-top, 0px), 47px)',
+      }}
+    >
+      <div className="px-4 pb-2">
         <button
           onClick={onOpenSearch}
-          className="w-full flex items-center gap-2 rounded-xl border border-border bg-background shadow-sm"
-          style={{ height: '40px', padding: '0 12px' }}
+          className="w-full flex items-center gap-2 h-10 px-3 rounded-xl bg-muted text-muted-foreground text-sm"
         >
-          <Search className="w-4 h-4 text-muted-foreground shrink-0" />
-          <span className="text-sm text-muted-foreground">Search shorts...</span>
+          <Search className="w-4 h-4 shrink-0" />
+          <span>Search shorts...</span>
         </button>
       </div>
 
       <div
-        className="flex gap-2 overflow-x-auto justify-center"
-        style={{
-          padding: '12px 16px 8px',
-          scrollbarWidth: 'none',
-        }}
+        className="flex gap-2 overflow-x-auto justify-center px-4 pb-3 scrollbar-hide"
       >
         {FILTERS.map(({ key, label }) => {
           const isActive = activeFilter === key;
@@ -48,16 +43,10 @@ const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange,
             <button
               key={key}
               onClick={() => onFilterChange(key)}
-              className="shrink-0 rounded-full active:scale-[0.96]"
+              className="shrink-0 min-h-[36px] px-4 rounded-full text-sm font-semibold transition-colors"
               style={{
-                minHeight: '36px',
-                padding: '0 16px',
-                fontSize: '13px',
-                fontWeight: 600,
-                background: isActive ? 'hsl(var(--tab-sub-active))' : 'hsl(var(--muted))',
-                color: isActive ? '#ffffff' : 'hsl(var(--muted-foreground))',
-                border: 'none',
-                transition: 'background 200ms ease, color 200ms ease',
+                backgroundColor: isActive ? 'hsl(var(--tab-sub-active))' : 'hsl(var(--muted))',
+                color: isActive ? 'hsl(var(--tab-sub-active-foreground))' : 'hsl(var(--muted-foreground))',
               }}
             >
               {label}

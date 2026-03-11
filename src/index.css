@@ -222,6 +222,7 @@ html.lightbox-open {
   /* Tab system — main & sub */
   --tab-main-active: 215 26% 17%;     /* #1e293b — slate-800 */
   --tab-sub-active: 215 16% 35%;      /* #475569 — slate-600 */
+  --tab-sub-active-foreground: 0 0% 100%; /* white text on active sub pills */
 
   /* Tournament Intelligence semantic colors */
   --intelligence-green: 142 64% 38%;    /* #16A34A - success/top performance */

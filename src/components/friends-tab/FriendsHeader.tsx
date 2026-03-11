@@ -19,36 +19,36 @@ export function FriendsHeader({
   onOpenSearch,
   embedded = false,
 }: FriendsHeaderProps) {
-  const topStyle = embedded
-    ? { marginTop: 24 }
-    : { marginTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 24px)' };
-
   return (
-    <div className="px-4 pb-3" style={topStyle}>
-      {/* Search bar */}
-      <button
-        onClick={onOpenSearch}
-        className="flex items-center gap-2 w-full h-10 px-3 rounded-xl bg-muted text-muted-foreground text-sm"
-        aria-label="Search friends' posts"
-      >
-        <Search className="h-4 w-4 shrink-0" />
-        <span>Search friends' posts…</span>
-      </button>
+    <div
+      className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border/50"
+      style={{
+        paddingTop: embedded ? '24px' : 'max(env(safe-area-inset-top, 0px), 47px)',
+      }}
+    >
+      <div className="px-4 pb-2">
+        <button
+          onClick={onOpenSearch}
+          className="flex items-center gap-2 w-full h-10 px-3 rounded-xl bg-muted text-muted-foreground text-sm"
+          aria-label="Search friends' posts"
+        >
+          <Search className="h-4 w-4 shrink-0" />
+          <span>Search friends' posts…</span>
+        </button>
+      </div>
 
-      {/* Filter chips */}
-      <div className="flex items-center justify-center gap-2 mt-3 overflow-x-auto scrollbar-hide">
+      <div className="flex items-center justify-center gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide">
         {MODES.map(({ id, label }) => {
           const isActive = activeMode === id;
           return (
             <button
               key={id}
               onClick={() => onModeChange(id)}
-              className={`min-h-[36px] px-4 rounded-full text-sm font-semibold transition-all duration-200 active:scale-[0.97] shrink-0 ${
-                isActive
-                  ? 'text-white'
-                  : 'bg-muted text-muted-foreground'
-              }`}
-              style={isActive ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
+              className="shrink-0 min-h-[36px] px-4 rounded-full text-sm font-semibold transition-colors"
+              style={{
+                backgroundColor: isActive ? 'hsl(var(--tab-sub-active))' : 'hsl(var(--muted))',
+                color: isActive ? 'hsl(var(--tab-sub-active-foreground))' : 'hsl(var(--muted-foreground))',
+              }}
             >
               {label}
             </button>
