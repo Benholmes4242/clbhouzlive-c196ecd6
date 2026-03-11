@@ -192,7 +192,8 @@ const ClubhouseContent = () => {
   const { 
     skeletonVisible, 
     skeletonMode, 
-    signalFirstFrameReady 
+    signalFirstFrameReady,
+    resetSkeleton,
   } = useClubhouseSkeletonTiming(!isLoading && posts.length > 0);
   
   // ── Media store state ──
