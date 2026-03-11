@@ -95,15 +95,10 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
       )}
 
       {/* Search Overlay */}
-      <AnimatePresence>
-        {searchOpen && (
-          <SearchOverlay
-            isOpen={searchOpen}
-            onClose={() => setSearchOpen(false)}
-            useLightTheme={true}
-          />
-        )}
-      </AnimatePresence>
+      <GlobalSearchOverlay
+        isOpen={searchOpen}
+        onClose={() => setSearchOpen(false)}
+      />
     </>
   );
 };

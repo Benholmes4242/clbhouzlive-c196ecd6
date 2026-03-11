@@ -1,0 +1,397 @@
+import { memo, useRef, useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, X, Clock, TrendingUp, BadgeCheck, Briefcase } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useDebounce } from '@/hooks/useDebounce';
+import {
+  useGlobalEntitySearch,
+  saveRecentSearch,
+  clearRecentSearches,
+  type ClubResult,
+  type PersonResult,
+  type BusinessResult,
+} from '@/hooks/useGlobalEntitySearch';
+
+interface GlobalSearchOverlayProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
+  const navigate = useNavigate();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [inputValue, setInputValue] = useState('');
+  const debouncedQuery = useDebounce(inputValue, 250);
+
+  const { people, clubs, businesses, recent, trending, isLoading } =
+    useGlobalEntitySearch({ query: debouncedQuery, enabled: isOpen });
+
+  // Auto-focus 100ms after open
+  useEffect(() => {
+    if (isOpen) {
+      const t = setTimeout(() => inputRef.current?.focus(), 100);
+      return () => clearTimeout(t);
+    } else {
+      setInputValue('');
+    }
+  }, [isOpen]);
+
+  // Lock body scroll
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
+  const handleInputChange = useCallback((value: string) => {
+    setInputValue(value);
+  }, []);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && inputValue.trim()) {
+      saveRecentSearch(inputValue.trim());
+    }
+  }, [inputValue]);
+
+  const handleClear = useCallback(() => {
+    setInputValue('');
+    inputRef.current?.focus();
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setInputValue('');
+    onClose();
+  }, [onClose]);
+
+  const selectCourse = useCallback((course: ClubResult) => {
+    saveRecentSearch(course.name);
+    navigate(`/courses/${course.id}`);
+    onClose();
+  }, [navigate, onClose]);
+
+  const selectPerson = useCallback((person: PersonResult) => {
+    saveRecentSearch(person.display_name);
+    navigate(`/profile/${person.username}`);
+    onClose();
+  }, [navigate, onClose]);
+
+  const selectBusiness = useCallback((business: BusinessResult) => {
+    saveRecentSearch(business.name);
+    navigate(`/business/${business.slug}`);
+    onClose();
+  }, [navigate, onClose]);
+
+  const commitRecentSearch = useCallback((query: string) => {
+    setInputValue(query);
+  }, []);
+
+  const hasQuery = debouncedQuery.trim().length > 0;
+  const allEmpty = clubs.length === 0 && people.length === 0 && businesses.length === 0;
+  const showNoResults = hasQuery && !isLoading && allEmpty;
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="fixed inset-0 z-[200] bg-background flex flex-col"
+          initial={{ y: '100%' }}
+          animate={{ y: 0 }}
+          exit={{ y: '100%' }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
+        >
+          {/* Header */}
+          <div
+            className="flex items-center gap-3 px-4 pb-3"
+            style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+          >
+            {/* Search input container */}
+            <div className="flex-1 flex items-center gap-2 h-11 px-3 rounded-xl bg-muted">
+              <Search className="w-4 h-4 text-muted-foreground shrink-0" />
+              <input
+                ref={inputRef}
+                type="text"
+                value={inputValue}
+                onChange={e => handleInputChange(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Search courses, players, businesses..."
+                className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
+                autoComplete="off"
+                spellCheck="false"
+              />
+              {inputValue.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleClear}
+                  className="shrink-0 flex items-center justify-center min-h-[44px] min-w-[44px] -mr-3"
+                  aria-label="Clear"
+                >
+                  <X className="w-4 h-4 text-muted-foreground" />
+                </button>
+              )}
+            </div>
+
+            {/* Cancel button */}
+            <button
+              type="button"
+              onClick={handleClose}
+              className="shrink-0 text-sm font-medium text-primary min-h-[44px] px-1"
+            >
+              Cancel
+            </button>
+          </div>
+
+          {/* Scroll area */}
+          <div
+            className="flex-1 overflow-y-auto overscroll-contain pb-safe"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
+            {/* Idle state */}
+            {!hasQuery && (
+              <>
+                {/* Recent searches */}
+                {recent.length > 0 && (
+                  <div>
+                    <div className="flex items-center justify-between px-4 pt-5 pb-2">
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        Recent Searches
+                      </span>
+                      <button
+                        type="button"
+                        onClick={clearRecentSearches}
+                        className="text-[11px] font-semibold text-primary"
+                      >
+                        Clear all
+                      </button>
+                    </div>
+                    <div className="flex flex-col">
+                      {recent.map(item => (
+                        <div key={item.id} className="min-h-[44px] flex items-center px-4 gap-3">
+                          <Clock className="w-4 h-4 text-muted-foreground shrink-0" />
+                          <button
+                            type="button"
+                            onClick={() => commitRecentSearch(item.query)}
+                            className="flex-1 text-left text-sm text-foreground"
+                          >
+                            {item.query}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              // Remove single item from recent searches
+                              const stored = localStorage.getItem('recent_searches');
+                              if (stored) {
+                                try {
+                                  const parsed = JSON.parse(stored);
+                                  const filtered = parsed.filter((s: any) => s.id !== item.id);
+                                  localStorage.setItem('recent_searches', JSON.stringify(filtered));
+                                } catch { /* noop */ }
+                              }
+                            }}
+                            className="p-1 text-muted-foreground"
+                            aria-label={`Remove ${item.query}`}
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Today's Picks */}
+                {trending.length > 0 && (
+                  <div>
+                    <div className="px-4 pt-5 pb-2">
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        Today's Picks
+                      </span>
+                    </div>
+                    <div className="flex flex-col">
+                      {trending.slice(0, 6).map(item => (
+                        <button
+                          key={item.id ?? item.label}
+                          type="button"
+                          onClick={() => {
+                            if (item.id) {
+                              saveRecentSearch(item.label);
+                              navigate(`/courses/${item.id}`);
+                              onClose();
+                            } else {
+                              commitRecentSearch(item.label);
+                            }
+                          }}
+                          className="min-h-[44px] flex items-center px-4 gap-3"
+                        >
+                          <TrendingUp className="w-4 h-4 text-muted-foreground shrink-0" />
+                          <div className="flex-1 text-left min-w-0">
+                            <p className="text-sm text-foreground truncate">{item.label}</p>
+                            {item.subtitle && (
+                              <p className="text-xs text-muted-foreground truncate">{item.subtitle}</p>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Loading */}
+            {isLoading && hasQuery && (
+              <div className="px-4 pt-4 space-y-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-3 animate-pulse">
+                    <div className="w-11 h-11 rounded-xl bg-muted shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-3.5 w-32 rounded bg-muted" />
+                      <div className="h-3 w-24 rounded bg-muted/60" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Results */}
+            {hasQuery && !isLoading && !allEmpty && (
+              <div>
+                {/* Courses */}
+                {clubs.length > 0 && (
+                  <div>
+                    <div className="px-4 pt-5 pb-2">
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        Courses
+                      </span>
+                    </div>
+                    {clubs.map((course, idx) => (
+                      <div key={course.id}>
+                        <button
+                          type="button"
+                          onClick={() => selectCourse(course)}
+                          className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-muted/50"
+                        >
+                          <div className="w-11 h-11 rounded-xl bg-muted overflow-hidden shrink-0">
+                            {course.logo_url && (
+                              <img src={course.logo_url} alt="" className="w-full h-full object-cover" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0 text-left">
+                            <p className="text-sm font-medium text-foreground truncate">{course.name}</p>
+                            <p className="text-xs text-muted-foreground truncate">
+                              {[course.region, course.country].filter(Boolean).join(', ')}
+                              {course.global_rank && ` · #${course.global_rank} World`}
+                            </p>
+                          </div>
+                        </button>
+                        {idx < clubs.length - 1 && (
+                          <div className="ml-[64px] border-b border-border/30" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* People */}
+                {people.length > 0 && (
+                  <div>
+                    <div className="px-4 pt-5 pb-2">
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        People
+                      </span>
+                    </div>
+                    {people.map((person, idx) => (
+                      <div key={person.id}>
+                        <button
+                          type="button"
+                          onClick={() => selectPerson(person)}
+                          className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-muted/50"
+                        >
+                          <div className="w-11 h-11 rounded-full bg-muted overflow-hidden shrink-0">
+                            {person.avatar_url && (
+                              <img src={person.avatar_url} alt="" className="w-full h-full object-cover" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0 text-left">
+                            <div className="flex items-center gap-1 min-w-0">
+                              <p className="text-sm font-medium text-foreground truncate">{person.display_name}</p>
+                              {person.verified && <BadgeCheck className="w-3.5 h-3.5 text-primary shrink-0" />}
+                            </div>
+                            <p className="text-xs text-muted-foreground truncate">
+                              @{person.username}{person.home_club_name ? ` · ${person.home_club_name}` : ''}
+                            </p>
+                          </div>
+                        </button>
+                        {idx < people.length - 1 && (
+                          <div className="ml-[64px] border-b border-border/30" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Businesses */}
+                {businesses.length > 0 && (
+                  <div>
+                    <div className="px-4 pt-5 pb-2">
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        Businesses
+                      </span>
+                    </div>
+                    {businesses.map((business, idx) => (
+                      <div key={business.id}>
+                        <button
+                          type="button"
+                          onClick={() => selectBusiness(business)}
+                          className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-muted/50"
+                        >
+                          <div className="w-11 h-11 rounded-xl bg-muted overflow-hidden shrink-0 flex items-center justify-center">
+                            {business.logo_url
+                              ? <img src={business.logo_url} alt="" className="w-full h-full object-cover" />
+                              : <Briefcase className="w-5 h-5 text-muted-foreground" />
+                            }
+                          </div>
+                          <div className="flex-1 min-w-0 text-left">
+                            <div className="flex items-center gap-1 min-w-0">
+                              <p className="text-sm font-medium text-foreground truncate">{business.name}</p>
+                              {business.verified && <BadgeCheck className="w-3.5 h-3.5 text-primary shrink-0" />}
+                            </div>
+                            <p className="text-xs text-muted-foreground truncate">
+                              {[business.city, business.country].filter(Boolean).join(', ')}
+                            </p>
+                          </div>
+                        </button>
+                        {idx < businesses.length - 1 && (
+                          <div className="ml-[64px] border-b border-border/30" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* No results */}
+            {showNoResults && (
+              <div className="flex flex-col items-center justify-center py-20 px-6 gap-3">
+                <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+                  <Search className="w-7 h-7 text-muted-foreground/40" />
+                </div>
+                <p className="text-sm font-medium text-foreground">
+                  No results for "{debouncedQuery}"
+                </p>
+                <p className="text-xs text-muted-foreground text-center max-w-[240px]">
+                  Try searching for a course name, player, or business
+                </p>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+export default memo(GlobalSearchOverlay);
