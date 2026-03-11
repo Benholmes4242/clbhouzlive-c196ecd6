@@ -186,6 +186,7 @@ interface PostStudioContextValue {
   closePanel: () => void;
   setDiscarding: (value: boolean) => void;
   reset: () => void;
+  onSuccess?: (postId: string) => void;
 }
 
 const PostStudioContext = createContext<PostStudioContextValue | null>(null);
