@@ -180,7 +180,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                       </span>
                       <button
                         type="button"
-                        onClick={clearRecentSearches}
+                        onClick={handleClearAll}
                         className="text-[11px] font-semibold text-primary"
                       >
                         Clear all
