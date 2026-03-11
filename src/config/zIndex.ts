@@ -15,6 +15,9 @@ export const Z = {
   // Toast notifications (highest priority)
   toast: 12000,
   
+  // Search overlay
+  searchOverlay: 1100,  // Above header/nav, below modals
+  
   // Modal & overlay layers (ordered by priority)
   hub: 12000,           // Hub modal shell
   sheetBackdrop: 12002, // Bottom sheet backdrop
