@@ -95,7 +95,7 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
       // For appends, preserve current position — do nothing
     }
     prevPostsRef.current = posts;
-  }, [posts]);
+  }, [posts, initialIndex, itemHeight, setActiveIndex]);
 
   // Resize handling
   useEffect(() => {
