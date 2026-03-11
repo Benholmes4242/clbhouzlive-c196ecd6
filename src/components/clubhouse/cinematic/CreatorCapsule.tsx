@@ -157,9 +157,12 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     if (isExpanded && deltaY > 40) {
       // Swipe down when expanded: collapse
       setIsExpanded(false);
+    } else if (!isExpanded && !isReview && deltaY < -40) {
+      // Swipe up when collapsed: expand (regular mode only)
+      setIsExpanded(true);
     }
     startYRef.current = null;
-  }, [isExpanded]);
+  }, [isExpanded, isReview]);
 
   const handleViewProfile = useCallback(() => {
     if (onViewProfile) {
