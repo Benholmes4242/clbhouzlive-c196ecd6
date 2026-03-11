@@ -142,16 +142,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     return () => window.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose, isMobile]);
 
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.href = '/';
-    } catch (error) {
-      window.location.href = '/';
-    }
-  };
+  const { logout: handleLogout } = useLogout();
 
   const getInitials = (name: string) => name.charAt(0).toUpperCase();
 
