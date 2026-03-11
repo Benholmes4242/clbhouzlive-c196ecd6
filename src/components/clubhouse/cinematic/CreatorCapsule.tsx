@@ -9,7 +9,7 @@
  * Expanded: Reveals caption, follow button, profile/course links
  */
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -18,8 +18,7 @@ import { ChevronUp, User, Music, ChevronRight } from 'lucide-react';
 import { FiMapPin } from 'react-icons/fi';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import CourseLocationRow from '@/components/posts/CourseLocationRow';
-import { getReviewOverlayTheme, getOverlayRatingColors, type ExtractedReviewData } from '@/lib/postHelpers';
-import { RatingPill } from '@/components/ui/RatingPill';
+import { getOverlayRatingColors, type ExtractedReviewData } from '@/lib/postHelpers';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
 /** Animated soundwave bars for music playback indicator */
@@ -127,10 +126,11 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   const capsuleRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef<number | null>(null);
 
-  // Get review theme if in review mode
-  const reviewTheme = isReview && reviewData 
-    ? getReviewOverlayTheme(reviewData.rating)
-    : null;
+  // Collapse when active post changes
+  useEffect(() => {
+    setIsExpanded(false);
+  }, [postId]);
+
   const reviewRatingColors = isReview && reviewData
     ? getOverlayRatingColors(reviewData.rating)
     : null;
@@ -157,9 +157,12 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     if (isExpanded && deltaY > 40) {
       // Swipe down when expanded: collapse
       setIsExpanded(false);
+    } else if (!isExpanded && !isReview && deltaY < -40) {
+      // Swipe up when collapsed: expand (regular mode only)
+      setIsExpanded(true);
     }
     startYRef.current = null;
-  }, [isExpanded]);
+  }, [isExpanded, isReview]);
 
   const handleViewProfile = useCallback(() => {
     if (onViewProfile) {
@@ -279,24 +282,20 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   );
 
   // Get initials for avatar fallback
-  const userInitials = user?.name
+  const initials = user?.name
     ?.split(' ')
     .slice(0, 2)
     .map(part => part[0])
     .join('')
     .toUpperCase() || '?';
 
-  // Navigate to user profile
-  const handleUserTap = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    const path = getProfilePathById(user.id);
-    navigate(path);
-  }, [navigate, user.id]);
-
   // Review mode content - matches regular capsule layout exactly
   const reviewContent = reviewData && (
     <div
-      onClick={handleUserTap}
+      onClick={(e: React.MouseEvent) => {
+        e.stopPropagation();
+        handleViewProfile();
+      }}
       className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:opacity-80 transition-opacity cursor-pointer"
     >
       {/* Avatar - same size as regular capsule */}
@@ -304,7 +303,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         size={40}
         src={user?.avatar}
         alt={user?.name ?? 'Creator'}
-        fallback={userInitials}
+        fallback={initials}
         hideRing
       />
       
@@ -355,7 +354,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         size={40}
         src={user?.avatar}
         alt={user?.name ?? 'Creator'}
-        fallback={userInitials}
+        fallback={initials}
         hideRing
       />
 
