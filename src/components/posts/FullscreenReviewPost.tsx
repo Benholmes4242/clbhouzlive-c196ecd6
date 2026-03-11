@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin, ChevronsDown } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RatingPill } from '@/components/ui/RatingPill';
@@ -366,6 +366,12 @@ export function FullscreenReviewPost({
               {tierData.label}
             </span>
           </div>
+        </div>
+        <div className="flex justify-center pt-1 pb-0.5">
+          <ChevronsDown
+            className="w-4 h-4 text-white/35"
+            style={{ animation: 'chevronBounce 1.8s ease-in-out infinite' }}
+          />
         </div>
       </motion.button>
       
