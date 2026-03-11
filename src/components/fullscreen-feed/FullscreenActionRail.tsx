@@ -150,6 +150,10 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
     setCommentCountOverride((prev) => (prev ?? activePost?.commentCount ?? 0) + 1);
   }, [activePost?.commentCount]);
 
+  const handleCommentDeleted = useCallback(() => {
+    setCommentCountOverride((prev) => Math.max(0, (prev ?? activePost?.commentCount ?? 0) - 1));
+  }, [activePost?.commentCount]);
+
   if (!activePost) return null;
 
   const thumbnailUrl = activePost.mediaItems[0]?.thumbnailUrl || '';
