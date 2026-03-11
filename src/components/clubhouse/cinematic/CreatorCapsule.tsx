@@ -126,6 +126,11 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   const capsuleRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef<number | null>(null);
 
+  // Collapse when active post changes
+  useEffect(() => {
+    setIsExpanded(false);
+  }, [postId]);
+
   // Get review theme if in review mode
   const reviewTheme = isReview && reviewData 
     ? getReviewOverlayTheme(reviewData.rating)
