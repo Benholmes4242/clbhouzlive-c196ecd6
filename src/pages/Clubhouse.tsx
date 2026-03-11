@@ -390,7 +390,7 @@ const ClubhouseContent = () => {
       {activePost && posts.length > 0 && activePost.postType === 'tournament_result' && (
         <>
           {/* Comments sheet for tournament posts */}
-          <CommentsPage
+          <CommentsSheet
             isOpen={commentsOpen}
             onClose={closeComments}
             postId={activePost.id}
