@@ -14,6 +14,95 @@ import {
   type RecentSearch,
 } from '@/hooks/useGlobalEntitySearch';
 
+/* ─── Skeleton sub-components ─── */
+
+const CROSSFADE = { duration: 0.15 };
+const FADE_PROPS = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+  transition: CROSSFADE,
+};
+
+/** Eyebrow shimmer pill matching real section headers */
+function EyebrowSkeleton({ width = 'w-16' }: { width?: string }) {
+  return (
+    <div className="px-4 pt-4 pb-2">
+      <div className={`h-2.5 ${width} rounded clb-shimmer-dark`} />
+    </div>
+  );
+}
+
+/** Row shimmer matching a real result row */
+function RowSkeleton({ avatarShape, nameW = 'w-32', subtitleW = 'w-24' }: {
+  avatarShape: string;
+  nameW?: string;
+  subtitleW?: string;
+}) {
+  return (
+    <div className="flex items-center gap-3 px-4 min-h-[60px]">
+      <div className={`w-10 h-10 ${avatarShape} clb-shimmer-dark shrink-0`} />
+      <div className="flex-1 space-y-2">
+        <div className={`h-3.5 ${nameW} rounded clb-shimmer-dark`} />
+        <div className={`h-3 ${subtitleW} rounded clb-shimmer-dark`} />
+      </div>
+    </div>
+  );
+}
+
+/** Divider matching real result dividers */
+function SkeletonDivider() {
+  return <div className="ml-[52px] border-b border-border/30" />;
+}
+
+/** Section-aware search skeleton (Gap 2, 3, 6, 7) */
+function SearchSkeleton() {
+  const sections = [
+    { label: 'Courses', count: 2, shape: 'rounded-xl', eyebrowW: 'w-14' },
+    { label: 'People', count: 2, shape: 'rounded-full', eyebrowW: 'w-12' },
+    { label: 'Businesses', count: 2, shape: 'rounded-xl', eyebrowW: 'w-16' },
+  ];
+  return (
+    <>
+      {sections.map(({ label, count, shape, eyebrowW }) => (
+        <div key={label}>
+          <EyebrowSkeleton width={eyebrowW} />
+          {Array.from({ length: count }).map((_, i) => (
+            <div key={i}>
+              <RowSkeleton
+                avatarShape={shape}
+                nameW={label === 'People' ? 'w-28' : 'w-32'}
+                subtitleW={label === 'People' ? 'w-20' : 'w-24'}
+              />
+              {i < count - 1 && <SkeletonDivider />}
+            </div>
+          ))}
+        </div>
+      ))}
+    </>
+  );
+}
+
+/** Trending skeleton (Gap 1) — 4 rows matching real trending item layout */
+function TrendingSkeletonSection() {
+  return (
+    <div>
+      <EyebrowSkeleton width="w-20" />
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-3 px-4 min-h-[56px]">
+          <div className="w-10 h-10 rounded-xl clb-shimmer-dark shrink-0" />
+          <div className="flex-1 space-y-2">
+            <div className="h-3.5 w-32 rounded clb-shimmer-dark" />
+            <div className="h-3 w-24 rounded clb-shimmer-dark" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ─── Main component ─── */
+
 interface GlobalSearchOverlayProps {
   isOpen: boolean;
   onClose: () => void;
@@ -26,7 +115,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const debouncedQuery = useDebounce(inputValue, 250);
   const [recent, setRecent] = useState<RecentSearch[]>(() => getRecentSearches());
 
-  const { people, clubs, businesses, trending, isLoading } =
+  const { people, clubs, businesses, trending, trendingLoading, isLoading } =
     useGlobalEntitySearch({ query: debouncedQuery, enabled: isOpen });
 
   // Auto-focus 100ms after open, refresh recent searches
@@ -110,6 +199,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
 
   const hasQuery = debouncedQuery.trim().length > 0;
   const allEmpty = clubs.length === 0 && people.length === 0 && businesses.length === 0;
+  const hasResults = hasQuery && !isLoading && !allEmpty;
   const showNoResults = hasQuery && !isLoading && allEmpty;
 
   return (
@@ -211,8 +301,10 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                   </div>
                 )}
 
-                {/* Today's Picks */}
-                {trending.length > 0 && (
+                {/* Today's Picks — skeleton while loading, real list when resolved */}
+                {trendingLoading ? (
+                  <TrendingSkeletonSection />
+                ) : trending.length > 0 ? (
                   <div>
                     <div className="px-4 pt-4 pb-2">
                       <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
@@ -251,166 +343,159 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                       ))}
                     </div>
                   </div>
-                )}
+                ) : null}
               </>
             )}
 
-            {/* Loading */}
-            {isLoading && hasQuery && (
-              <div className="px-4 pt-4 space-y-3">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-3 animate-pulse">
-                    <div className="w-10 h-10 rounded-xl bg-muted shrink-0" />
-                    <div className="flex-1 space-y-2">
-                      <div className="h-3.5 w-32 rounded bg-muted" />
-                      <div className="h-3 w-24 rounded bg-muted/60" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Results */}
-            {hasQuery && !isLoading && !allEmpty && (
-              <div>
-                {/* Courses */}
-                {clubs.length > 0 && (
-                  <div>
-                    <div className="px-4 pt-4 pb-2">
-                      <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-                        Courses
-                      </span>
-                    </div>
-                    {clubs.map((course, idx) => (
-                      <div key={course.id}>
-                        <button
-                          type="button"
-                          onClick={() => selectCourse(course)}
-                          className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-muted/50"
-                        >
-                          <div className="w-10 h-10 rounded-xl bg-muted overflow-hidden shrink-0">
-                            {course.logo_url && (
-                              <img src={course.logo_url} alt="" className="w-full h-full object-cover" />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0 text-left">
-                            <p className="text-sm font-medium text-foreground truncate">{course.name}</p>
-                            <p className="text-xs text-muted-foreground truncate">
-                              {[course.region, course.country].filter(Boolean).join(', ')}
-                              {course.global_rank && ` · #${course.global_rank} World`}
-                            </p>
-                          </div>
-                          <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-                        </button>
-                        {idx < clubs.length - 1 && (
-                          <div className="ml-[52px] border-b border-border/30" />
-                        )}
+            {/* Active search states — AnimatePresence crossfade (Gap 4) */}
+            <AnimatePresence mode="wait">
+              {isLoading && hasQuery ? (
+                <motion.div key="search-skeleton" {...FADE_PROPS}>
+                  <SearchSkeleton />
+                </motion.div>
+              ) : hasResults ? (
+                <motion.div key="search-results" {...FADE_PROPS}>
+                  {/* Courses */}
+                  {clubs.length > 0 && (
+                    <div>
+                      <div className="px-4 pt-4 pb-2">
+                        <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                          Courses
+                        </span>
                       </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* People */}
-                {people.length > 0 && (
-                  <div>
-                    <div className="px-4 pt-4 pb-2">
-                      <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-                        People
-                      </span>
-                    </div>
-                    {people.map((person, idx) => (
-                      <div key={person.id}>
-                        <button
-                          type="button"
-                          onClick={() => selectPerson(person)}
-                          className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-muted/50"
-                        >
-                          <div className="w-10 h-10 rounded-full bg-muted overflow-hidden shrink-0">
-                            {person.avatar_url && (
-                              <img src={person.avatar_url} alt="" className="w-full h-full object-cover" />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0 text-left">
-                            <div className="flex items-center gap-1 min-w-0">
-                              <p className="text-sm font-medium text-foreground truncate">{person.display_name}</p>
-                              {person.verified && <BadgeCheck className="w-3.5 h-3.5 text-primary shrink-0" />}
+                      {clubs.map((course, idx) => (
+                        <div key={course.id}>
+                          <button
+                            type="button"
+                            onClick={() => selectCourse(course)}
+                            className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-muted/50"
+                          >
+                            <div className="w-10 h-10 rounded-xl bg-muted overflow-hidden shrink-0">
+                              {course.logo_url && (
+                                <img src={course.logo_url} alt="" className="w-full h-full object-cover" />
+                              )}
                             </div>
-                            <p className="text-xs text-muted-foreground truncate">
-                              {person.username && !person.username.includes('@')
-                                ? `@${person.username}`
-                                : ''}
-                              {person.home_club_name
-                                ? `${person.username && !person.username.includes('@') ? ' · ' : ''}${person.home_club_name}`
-                                : ''}
-                            </p>
-                          </div>
-                          <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-                        </button>
-                        {idx < people.length - 1 && (
-                          <div className="ml-[52px] border-b border-border/30" />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Businesses */}
-                {businesses.length > 0 && (
-                  <div>
-                    <div className="px-4 pt-4 pb-2">
-                      <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-                        Businesses
-                      </span>
-                    </div>
-                    {businesses.map((business, idx) => (
-                      <div key={business.id}>
-                        <button
-                          type="button"
-                          onClick={() => selectBusiness(business)}
-                          className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-muted/50"
-                        >
-                          <div className="w-10 h-10 rounded-xl bg-muted overflow-hidden shrink-0 flex items-center justify-center">
-                            {business.logo_url
-                              ? <img src={business.logo_url} alt="" className="w-full h-full object-cover" />
-                              : <Briefcase className="w-5 h-5 text-muted-foreground" />
-                            }
-                          </div>
-                          <div className="flex-1 min-w-0 text-left">
-                            <div className="flex items-center gap-1 min-w-0">
-                              <p className="text-sm font-medium text-foreground truncate">{business.name}</p>
-                              {business.verified && <BadgeCheck className="w-3.5 h-3.5 text-primary shrink-0" />}
+                            <div className="flex-1 min-w-0 text-left">
+                              <p className="text-sm font-medium text-foreground truncate">{course.name}</p>
+                              <p className="text-xs text-muted-foreground truncate">
+                                {[course.region, course.country].filter(Boolean).join(', ')}
+                                {course.global_rank && ` · #${course.global_rank} World`}
+                              </p>
                             </div>
-                            <p className="text-xs text-muted-foreground truncate">
-                              {[business.city, business.country].filter(Boolean).join(', ')}
-                            </p>
-                          </div>
-                          <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-                        </button>
-                        {idx < businesses.length - 1 && (
-                          <div className="ml-[52px] border-b border-border/30" />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+                            <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
+                          </button>
+                          {idx < clubs.length - 1 && (
+                            <div className="ml-[52px] border-b border-border/30" />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
-            {/* No results */}
-            {showNoResults && (
-              <div className="flex flex-col items-center justify-center py-20 px-6 gap-3">
-                <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-                  <Search className="w-7 h-7 text-muted-foreground/40" />
-                </div>
-                <p className="text-sm font-medium text-foreground">
-                  No results for "<span className="inline-block max-w-[180px] truncate align-bottom">{debouncedQuery}</span>"
-                </p>
-                <p className="text-xs text-muted-foreground text-center max-w-[240px] md:max-w-[360px]">
-                  Try searching for a course name, player, or business
-                </p>
-              </div>
-            )}
+                  {/* People */}
+                  {people.length > 0 && (
+                    <div>
+                      <div className="px-4 pt-4 pb-2">
+                        <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                          People
+                        </span>
+                      </div>
+                      {people.map((person, idx) => (
+                        <div key={person.id}>
+                          <button
+                            type="button"
+                            onClick={() => selectPerson(person)}
+                            className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-muted/50"
+                          >
+                            <div className="w-10 h-10 rounded-full bg-muted overflow-hidden shrink-0">
+                              {person.avatar_url && (
+                                <img src={person.avatar_url} alt="" className="w-full h-full object-cover" />
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0 text-left">
+                              <div className="flex items-center gap-1 min-w-0">
+                                <p className="text-sm font-medium text-foreground truncate">{person.display_name}</p>
+                                {person.verified && <BadgeCheck className="w-3.5 h-3.5 text-primary shrink-0" />}
+                              </div>
+                              <p className="text-xs text-muted-foreground truncate">
+                                {person.username && !person.username.includes('@')
+                                  ? `@${person.username}`
+                                  : ''}
+                                {person.home_club_name
+                                  ? `${person.username && !person.username.includes('@') ? ' · ' : ''}${person.home_club_name}`
+                                  : ''}
+                              </p>
+                            </div>
+                            <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
+                          </button>
+                          {idx < people.length - 1 && (
+                            <div className="ml-[52px] border-b border-border/30" />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Businesses */}
+                  {businesses.length > 0 && (
+                    <div>
+                      <div className="px-4 pt-4 pb-2">
+                        <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                          Businesses
+                        </span>
+                      </div>
+                      {businesses.map((business, idx) => (
+                        <div key={business.id}>
+                          <button
+                            type="button"
+                            onClick={() => selectBusiness(business)}
+                            className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-muted/50"
+                          >
+                            <div className="w-10 h-10 rounded-xl bg-muted overflow-hidden shrink-0 flex items-center justify-center">
+                              {business.logo_url
+                                ? <img src={business.logo_url} alt="" className="w-full h-full object-cover" />
+                                : <Briefcase className="w-5 h-5 text-muted-foreground" />
+                              }
+                            </div>
+                            <div className="flex-1 min-w-0 text-left">
+                              <div className="flex items-center gap-1 min-w-0">
+                                <p className="text-sm font-medium text-foreground truncate">{business.name}</p>
+                                {business.verified && <BadgeCheck className="w-3.5 h-3.5 text-primary shrink-0" />}
+                              </div>
+                              <p className="text-xs text-muted-foreground truncate">
+                                {[business.city, business.country].filter(Boolean).join(', ')}
+                              </p>
+                            </div>
+                            <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
+                          </button>
+                          {idx < businesses.length - 1 && (
+                            <div className="ml-[52px] border-b border-border/30" />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              ) : showNoResults ? (
+                <motion.div key="search-no-results" {...FADE_PROPS}>
+                  <div className="flex flex-col items-center justify-center py-20 px-6 gap-3">
+                    <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+                      <Search className="w-7 h-7 text-muted-foreground/40" />
+                    </div>
+                    <p className="text-sm font-medium text-foreground">
+                      No results for "<span className="inline-block max-w-[180px] truncate align-bottom">{debouncedQuery}</span>"
+                    </p>
+                    <p className="text-xs text-muted-foreground text-center max-w-[240px] md:max-w-[360px]">
+                      Try searching for a course name, player, or business
+                    </p>
+                  </div>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
           </div>
+
+          {/* Bottom safe area */}
+          <div className="pb-safe" />
         </motion.div>
       )}
     </AnimatePresence>
