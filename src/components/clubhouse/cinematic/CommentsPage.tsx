@@ -146,7 +146,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
     hasNextPage,
     isFetchingNextPage,
     loadAllReplies,
-  } = useCommentsWithReplies(postId);
+  } = useCommentsWithReplies(postId, onCommentDeleted);
 
   const { hiddenCommentIds, hideComment } = useHiddenComments(postId);
   const { setCaddiePick, removeCaddiePick } = useCaddiePick(postId);
