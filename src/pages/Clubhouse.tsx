@@ -251,32 +251,7 @@ const ClubhouseContent = () => {
 
 
   
-  // Composer state management
-  const {
-    isComposerOpen,
-    mediaItems,
-    setMediaItems,
-    selectedFile,
-    caption,
-    setCaption,
-    isSubmitting,
-    setIsSubmitting,
-    showToast,
-    toastMessage,
-    selectedCourse,
-    setSelectedCourse,
-    openComposer,
-    openComposerWithFiles,
-    closeComposer,
-    showConfirmationToast,
-    hideToast
-  } = useSnapModal();
-
-  interface PostTag {
-    id: string;
-    name: string;
-  }
-  const [localSelectedTags, setLocalSelectedTags] = useState<PostTag[]>([]);
+  // Legacy composer state removed — PostStudio is now the sole creation flow
 
   // Season Recap Modal
   const { data: seasonRecap } = useSeasonRecap(user?.id);
