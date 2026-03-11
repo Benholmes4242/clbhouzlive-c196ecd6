@@ -352,9 +352,6 @@ export const useGlobalEntitySearch = ({
   const hasQuery = query.trim().length > 0;
   const normalizedQuery = query.trim().toLowerCase();
 
-  // Get recent searches (doesn't need React Query since it's localStorage)
-  const recent = getRecentSearches();
-
   // Get trending items
   const trendingQuery = useQuery({
     queryKey: ['global-search', 'trending'],
