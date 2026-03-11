@@ -7,9 +7,11 @@ import {
   useGlobalEntitySearch,
   saveRecentSearch,
   clearRecentSearches,
+  getRecentSearches,
   type ClubResult,
   type PersonResult,
   type BusinessResult,
+  type RecentSearch,
 } from '@/hooks/useGlobalEntitySearch';
 
 interface GlobalSearchOverlayProps {
