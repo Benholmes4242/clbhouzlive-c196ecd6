@@ -24,8 +24,9 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState('');
   const debouncedQuery = useDebounce(inputValue, 250);
+  const [recent, setRecent] = useState<RecentSearch[]>(() => getRecentSearches());
 
-  const { people, clubs, businesses, recent, trending, isLoading } =
+  const { people, clubs, businesses, trending, isLoading } =
     useGlobalEntitySearch({ query: debouncedQuery, enabled: isOpen });
 
   // Auto-focus 100ms after open
