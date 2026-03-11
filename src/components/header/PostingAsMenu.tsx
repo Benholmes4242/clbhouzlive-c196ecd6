@@ -203,7 +203,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     }
   };
 
-  // Handle navigation from AccountHubSheet
+  // Handle navigation from ProfileHubSheet
   const handleAccountHubNavigate = (route: string) => {
     if (route === '/upload') {
       setUploadCenterOpen(true);
