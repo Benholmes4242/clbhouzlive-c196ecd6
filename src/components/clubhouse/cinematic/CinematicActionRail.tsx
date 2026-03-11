@@ -57,7 +57,7 @@ const COUNT_HEIGHT = 16;
 
 interface ActionSlotProps {
   icon: React.ElementType;
-  count?: number;
+  count?: number | null;
   isActive?: boolean;
   onClick: () => void;
   ariaLabel: string;
