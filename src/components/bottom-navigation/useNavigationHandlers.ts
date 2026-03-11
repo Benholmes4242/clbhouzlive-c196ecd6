@@ -34,8 +34,6 @@ export const useNavigationHandlers = () => {
 
     if (tab.path) {
       setActiveTab(tab.id);
-      setActiveTab(tab.id);
-
 
       if (tab.path === '/profile') {
         // Profile tab: navigate to business profile when acting as business

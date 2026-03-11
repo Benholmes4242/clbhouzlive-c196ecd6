@@ -143,43 +143,6 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
     });
   }, [chromeState]);
 
-  // Handle keyboard visibility and visual viewport changes
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const handleVisualViewportChange = () => {
-      if (window.visualViewport) {
-        // Use visual viewport API for accurate keyboard detection
-        const { height: vpHeight } = window.visualViewport;
-        const windowHeight = window.innerHeight;
-        
-        // Keyboard is considered visible if viewport is significantly smaller
-        const heightDiff = windowHeight - vpHeight;
-        setIsKeyboardVisible(heightDiff > 150);
-      }
-    };
-
-    const handleResize = () => {
-      // Fallback for browsers without visual viewport support  
-      const heightDiff = window.screen.height - window.innerHeight;
-      setIsKeyboardVisible(heightDiff > 150);
-    };
-
-    // Use visual viewport API when available (better for mobile)
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', handleVisualViewportChange);
-      window.visualViewport.addEventListener('scroll', handleVisualViewportChange);
-      
-      return () => {
-        window.visualViewport?.removeEventListener('resize', handleVisualViewportChange);
-        window.visualViewport?.removeEventListener('scroll', handleVisualViewportChange);
-      };
-    } else {
-      // Fallback for older browsers
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }
-  }, []);
 
   const handleCloseComposer = () => {
     closeComposer();
