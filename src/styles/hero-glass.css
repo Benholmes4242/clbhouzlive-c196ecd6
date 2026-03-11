@@ -192,14 +192,10 @@
   color: #22C55E;
 }
 
-/* Shimmer animation for loading states */
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
+/* Shimmer animation — migrated to canonical .clb-shimmer-dark / .clb-shimmer-light in index.css */
+/* Legacy class kept for backwards compat but now uses canonical keyframe */
 .animate-shimmer {
-  animation: shimmer 1.8s linear infinite;
+  animation: clb-shimmer 1.5s ease-in-out infinite;
 }
 
 /* ============================================

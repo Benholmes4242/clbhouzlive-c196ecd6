@@ -13,8 +13,8 @@ import { prefersReducedMotion } from '@/utils/safePlay';
 
 interface CinematicActionRailProps {
   postId: string;
-  likesCount: number;
-  commentsCount: number;
+  likesCount: number | null;
+  commentsCount: number | null;
   hasLiked: boolean;
   isMuted: boolean;
   isVisible: boolean;
@@ -57,7 +57,7 @@ const COUNT_HEIGHT = 16;
 
 interface ActionSlotProps {
   icon: React.ElementType;
-  count?: number;
+  count?: number | null;
   isActive?: boolean;
   onClick: () => void;
   ariaLabel: string;
@@ -112,7 +112,7 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
     onClick();
   }, [onClick]);
 
-  const hasVisibleCount = showCount && count !== undefined && count > 0;
+  const hasVisibleCount = showCount && count !== undefined && count !== null && count > 0;
 
   return (
     <div 
@@ -176,16 +176,28 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
         style={{ height: COUNT_HEIGHT, marginTop: 4 }}
       >
         <AnimatePresence mode="wait">
-          <motion.span
-            key={hasVisibleCount ? count : 'empty'}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: hasVisibleCount ? 1 : 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.1 }}
-            className="text-[11px] font-medium text-white/90 drop-shadow-sm"
-          >
-            {hasVisibleCount ? formatCount(count!) : '\u00A0'}
-          </motion.span>
+          {count === null ? (
+            /* Skeleton pill while count is loading */
+            <motion.div
+              key="count-skeleton"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.1 }}
+              className="w-6 h-3 rounded-sm bg-white/10 clb-shimmer-dark"
+            />
+          ) : (
+            <motion.span
+              key={hasVisibleCount ? count : 'empty'}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: hasVisibleCount ? 1 : 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.1 }}
+              className="text-[11px] font-medium text-white/90 drop-shadow-sm"
+            >
+              {hasVisibleCount ? formatCount(count!) : '\u00A0'}
+            </motion.span>
+          )}
         </AnimatePresence>
       </div>
     </div>

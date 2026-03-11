@@ -59,15 +59,7 @@ export function LoadingSkeleton({ visible, posterUrl }: LoadingSkeletonProps) {
 
       {/* Layer 3: Shimmer overlay (only shows while poster hasn't loaded) */}
       {!posterLoaded && (
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(90deg, rgba(255,255,255,0.0) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.0) 75%)',
-            backgroundSize: '200% 100%',
-            animation: 'media-shimmer 1.5s infinite ease-in-out',
-          }}
-        />
+        <div className="absolute inset-0 clb-shimmer-dark" />
       )}
 
 

@@ -71,14 +71,7 @@ export function ImageViewer({ imageUrl, thumbnailUrl, width, height, onFirstFram
 
       {/* Shimmer while loading */}
       {!loaded && !thumbnailUrl && (
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(90deg, rgba(255,255,255,0) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0) 75%)',
-            backgroundSize: '200% 100%',
-            animation: 'media-shimmer 1.5s infinite ease-in-out',
-          }}
-        />
+        <div className="absolute inset-0 bg-white/[0.06] clb-shimmer-dark" />
       )}
     </div>
   );

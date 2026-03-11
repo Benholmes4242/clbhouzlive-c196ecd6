@@ -553,20 +553,27 @@ function CommentsSheet({
               className="flex-1 overflow-y-auto overscroll-contain"
               style={{ WebkitOverflowScrolling: 'touch' }}
             >
+              <AnimatePresence mode="wait">
               {commentsLoading ? (
-                /* Loading skeletons */
-                <div className="px-4 py-4 space-y-4">
+                /* Loading skeletons with crossfade */
+                <motion.div
+                  key="comments-skeleton"
+                  initial={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15, ease: 'easeOut' }}
+                  className="px-4 py-4 space-y-4"
+                >
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="flex gap-3 animate-pulse">
-                      <div className={cn('w-[34px] h-[34px] rounded-[34%] shrink-0', isDark ? 'bg-white/8' : 'bg-muted')} />
+                    <div key={i} className="flex gap-3">
+                      <div className={cn('w-[34px] h-[34px] rounded-[34%] shrink-0', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
                       <div className="flex-1 space-y-2 py-1">
-                        <div className={cn('h-3 w-24 rounded', isDark ? 'bg-white/8' : 'bg-muted')} />
-                        <div className={cn('h-3 w-[85%] rounded', isDark ? 'bg-white/6' : 'bg-muted/80')} />
-                        <div className={cn('h-3 w-[55%] rounded', isDark ? 'bg-white/5' : 'bg-muted/60')} />
+                        <div className={cn('h-3 w-24 rounded', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
+                        <div className={cn('h-3 w-[85%] rounded', isDark ? 'bg-white/6 clb-shimmer-dark' : 'bg-muted/80 clb-shimmer-light')} />
+                        <div className={cn('h-3 w-[55%] rounded', isDark ? 'bg-white/5 clb-shimmer-dark' : 'bg-muted/60 clb-shimmer-light')} />
                       </div>
                     </div>
                   ))}
-                </div>
+                </motion.div>
               ) : comments.length === 0 ? (
                 /* Empty state */
                 <div className="flex-1 flex flex-col items-center justify-center px-8 gap-4">
@@ -599,6 +606,7 @@ function CommentsSheet({
                   )}
                 </div>
               )}
+              </AnimatePresence>
             </div>
 
             {/* Input bar */}
