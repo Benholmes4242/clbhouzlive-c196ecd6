@@ -7,9 +7,11 @@ import {
   useGlobalEntitySearch,
   saveRecentSearch,
   clearRecentSearches,
+  getRecentSearches,
   type ClubResult,
   type PersonResult,
   type BusinessResult,
+  type RecentSearch,
 } from '@/hooks/useGlobalEntitySearch';
 
 interface GlobalSearchOverlayProps {
@@ -22,19 +24,37 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState('');
   const debouncedQuery = useDebounce(inputValue, 250);
+  const [recent, setRecent] = useState<RecentSearch[]>(() => getRecentSearches());
 
-  const { people, clubs, businesses, recent, trending, isLoading } =
+  const { people, clubs, businesses, trending, isLoading } =
     useGlobalEntitySearch({ query: debouncedQuery, enabled: isOpen });
 
-  // Auto-focus 100ms after open
+  // Auto-focus 100ms after open, refresh recent searches
   useEffect(() => {
     if (isOpen) {
+      setRecent(getRecentSearches());
       const t = setTimeout(() => inputRef.current?.focus(), 100);
       return () => clearTimeout(t);
     } else {
       setInputValue('');
     }
   }, [isOpen]);
+
+  const handleDeleteRecent = useCallback((id: string) => {
+    const updated = recent.filter(s => s.id !== id);
+    localStorage.setItem('recent_searches', JSON.stringify(updated));
+    setRecent(updated);
+  }, [recent]);
+
+  const handleClearAll = useCallback(() => {
+    clearRecentSearches();
+    setRecent([]);
+  }, []);
+
+  const handleSaveRecent = useCallback((query: string) => {
+    saveRecentSearch(query);
+    setRecent(getRecentSearches());
+  }, []);
 
   // Lock body scroll
   useEffect(() => {
@@ -52,9 +72,9 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && inputValue.trim()) {
-      saveRecentSearch(inputValue.trim());
+      handleSaveRecent(inputValue.trim());
     }
-  }, [inputValue]);
+  }, [inputValue, handleSaveRecent]);
 
   const handleClear = useCallback(() => {
     setInputValue('');
@@ -67,22 +87,22 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   }, [onClose]);
 
   const selectCourse = useCallback((course: ClubResult) => {
-    saveRecentSearch(course.name);
+    handleSaveRecent(course.name);
     navigate(`/courses/${course.id}`);
     onClose();
-  }, [navigate, onClose]);
+  }, [navigate, onClose, handleSaveRecent]);
 
   const selectPerson = useCallback((person: PersonResult) => {
-    saveRecentSearch(person.display_name);
+    handleSaveRecent(person.display_name);
     navigate(`/profile/${person.username}`);
     onClose();
-  }, [navigate, onClose]);
+  }, [navigate, onClose, handleSaveRecent]);
 
   const selectBusiness = useCallback((business: BusinessResult) => {
-    saveRecentSearch(business.name);
+    handleSaveRecent(business.name);
     navigate(`/business/${business.slug}`);
     onClose();
-  }, [navigate, onClose]);
+  }, [navigate, onClose, handleSaveRecent]);
 
   const commitRecentSearch = useCallback((query: string) => {
     setInputValue(query);
@@ -160,7 +180,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                       </span>
                       <button
                         type="button"
-                        onClick={clearRecentSearches}
+                        onClick={handleClearAll}
                         className="text-[11px] font-semibold text-primary"
                       >
                         Clear all
@@ -179,16 +199,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           </button>
                           <button
                             type="button"
-                            onClick={() => {
-                              const stored = localStorage.getItem('recent_searches');
-                              if (stored) {
-                                try {
-                                  const parsed = JSON.parse(stored);
-                                  const filtered = parsed.filter((s: any) => s.id !== item.id);
-                                  localStorage.setItem('recent_searches', JSON.stringify(filtered));
-                                } catch { /* noop */ }
-                              }
-                            }}
+                            onClick={() => handleDeleteRecent(item.id)}
                             className="p-1 text-muted-foreground/50"
                             aria-label={`Remove ${item.query}`}
                           >
@@ -214,8 +225,8 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           key={item.id ?? item.label}
                           type="button"
                           onClick={() => {
-                            if (item.id) {
-                              saveRecentSearch(item.label);
+                          if (item.id) {
+                              handleSaveRecent(item.label);
                               navigate(`/courses/${item.id}`);
                               onClose();
                             } else {

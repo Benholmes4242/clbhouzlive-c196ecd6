@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useGlobalEntitySearch, saveRecentSearch, clearRecentSearches, type PersonResult, type ClubResult, type PageResult, type BusinessResult, type VideoResult } from '@/hooks/useGlobalEntitySearch';
+import { useGlobalEntitySearch, saveRecentSearch, clearRecentSearches, getRecentSearches, type PersonResult, type ClubResult, type PageResult, type BusinessResult, type VideoResult, type RecentSearch } from '@/hooks/useGlobalEntitySearch';
 import GlobalSearchDropdown from '@/components/search/GlobalSearchDropdown';
 import type { HeaderVariant } from '@/contexts/GlobalHeaderContext';
 import { searchAnalytics } from '@/utils/searchAnalytics';
@@ -58,6 +58,7 @@ const SearchPill = ({
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [recent, setRecent] = useState<RecentSearch[]>(() => getRecentSearches());
   
   const debouncedQuery = useDebounce(query, 250); // Optimized 250ms debounce
   
@@ -68,7 +69,6 @@ const SearchPill = ({
     videos,
     pages,
     businesses,
-    recent,
     trending,
     isLoading,
     error

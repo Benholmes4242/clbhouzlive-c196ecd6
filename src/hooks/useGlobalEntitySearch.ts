@@ -79,7 +79,6 @@ export interface GlobalSearchResults {
   videos: VideoResult[];
   pages: PageResult[];
   businesses: BusinessResult[];
-  recent: RecentSearch[];
   trending: TrendingItem[];
   isLoading: boolean;
   error?: Error | null;
@@ -263,7 +262,7 @@ const searchBusinesses = async (query: string, limit: number = 6): Promise<Busin
 };
 
 // Get recent searches from localStorage
-const getRecentSearches = (): RecentSearch[] => {
+export const getRecentSearches = (): RecentSearch[] => {
   try {
     const stored = localStorage.getItem('recent_searches');
     if (stored) {
@@ -353,9 +352,6 @@ export const useGlobalEntitySearch = ({
   const hasQuery = query.trim().length > 0;
   const normalizedQuery = query.trim().toLowerCase();
 
-  // Get recent searches (doesn't need React Query since it's localStorage)
-  const recent = getRecentSearches();
-
   // Get trending items
   const trendingQuery = useQuery({
     queryKey: ['global-search', 'trending'],
@@ -385,17 +381,17 @@ export const useGlobalEntitySearch = ({
   const videosQuery = useQuery({
     queryKey: ['global-search', 'videos', normalizedQuery],
     queryFn: () => searchVideos(normalizedQuery, limits.videos || 6),
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000, // 5 minutes
-    enabled: enabled && hasQuery
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+    enabled: false, // Not displayed in overlay — disable until implemented
   });
 
   const pagesQuery = useQuery({
     queryKey: ['global-search', 'pages', normalizedQuery],
     queryFn: () => searchPages(normalizedQuery, limits.pages || 6),
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000, // 5 minutes
-    enabled: enabled && hasQuery
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+    enabled: false, // Not displayed in overlay — disable until implemented
   });
 
   const businessesQuery = useQuery({
@@ -415,7 +411,7 @@ export const useGlobalEntitySearch = ({
 
   // Loading state
   const isLoading = hasQuery 
-    ? (peopleQuery.isLoading || clubsQuery.isLoading || videosQuery.isLoading || pagesQuery.isLoading || businessesQuery.isLoading)
+    ? (peopleQuery.isLoading || clubsQuery.isLoading || businessesQuery.isLoading)
     : trendingQuery.isLoading;
 
   // Error handling
@@ -440,36 +436,10 @@ export const useGlobalEntitySearch = ({
     videos,
     pages,
     businesses,
-    recent,
     trending,
     isLoading,
     error: error || null
   };
-};
-
-// Utility functions for highlighting
-export const highlightText = (text: string, query: string): string => {
-  if (!query.trim()) return text;
-  
-  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-  return text.replace(regex, '<mark>$1</mark>');
-};
-
-export const getMatchPositions = (text: string, query: string): Array<{ start: number; end: number }> => {
-  if (!query.trim()) return [];
-  
-  const matches: Array<{ start: number; end: number }> = [];
-  const regex = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-  let match;
-  
-  while ((match = regex.exec(text)) !== null) {
-    matches.push({
-      start: match.index,
-      end: match.index + match[0].length
-    });
-  }
-  
-  return matches;
 };
 
 // Save recent search utility
