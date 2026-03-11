@@ -174,7 +174,6 @@ const ClubhouseContent = () => {
   useClubhouseLifecycle();
   
   // ── Active post derivation ──
-  const activePostId = posts[activeIndex]?.id;
   const { activePost, golfCourse, activeReview, isActiveReview, isActiveVideo } = useActivePostDerived(posts, activeIndex);
   const isTournamentCardActive = activePost?.postType === 'tournament_result';
 
