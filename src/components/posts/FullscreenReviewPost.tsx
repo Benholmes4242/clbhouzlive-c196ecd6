@@ -314,7 +314,7 @@ export function FullscreenReviewPost({
         onClick={handleOpenReviewSheet}
         className={cn(
           "absolute left-4 right-4 z-20",
-          "rounded-xl border",
+          "rounded-xl border overflow-hidden relative",
           "shadow-[0_4px_20px_rgba(0,0,0,0.2)]",
           "pointer-events-auto cursor-pointer transition-transform active:scale-[0.98]",
           "text-left w-auto"
