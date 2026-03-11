@@ -15,7 +15,7 @@ interface TaggableResult {
   entity_type: 'user' | 'business';
   name: string;
   username: string | null;
-  avatar_url: string | null;
+  profile_image_url: string | null;
 }
 
 export function MentionPanel() {
