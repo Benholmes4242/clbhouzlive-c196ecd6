@@ -215,7 +215,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         {/* ── TOP BAR ── */}
         <div style={{
           position: 'absolute', top: 56, left: 16, right: 16, zIndex: 10,
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          display: 'flex', justifyContent: 'flex-start', alignItems: 'center',
           animation: 'trcard-fadeUp 0.5s ease-out both',
           animationDelay: '0ms',
         }}>
