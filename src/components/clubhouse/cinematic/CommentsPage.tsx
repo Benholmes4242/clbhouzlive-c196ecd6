@@ -88,6 +88,7 @@ export const CommentsPage: React.FC<CommentsPageProps> = ({
   initialParentCommentId,
   caddiePickCommentId,
   onCommentPosted,
+  onCommentDeleted,
 }) => {
   // --- State ---
   const [newComment, setNewComment] = useState('');
