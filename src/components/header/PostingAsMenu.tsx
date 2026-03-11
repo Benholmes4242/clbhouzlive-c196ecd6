@@ -177,7 +177,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   const displayName = userProfile?.display_name || user?.user_metadata?.full_name || 'User';
   const email = user?.email || '';
 
-  // Build profiles array for AccountHubSheet
+  // Build profiles array for ProfileHubSheet
   const profiles = availableActors.map(actor => ({
     id: actor.id,
     type: actor.type as 'personal' | 'business',
