@@ -667,9 +667,14 @@ function CommentsSheet({
                   type="button"
                   onClick={handleSend}
                   disabled={!inputText.trim() || isAddingComment}
-                  className="w-9 h-9 rounded-full bg-primary flex items-center justify-center shrink-0 mb-0.5 disabled:opacity-40 transition-opacity"
+                  className={cn(
+                    'w-9 h-9 rounded-full flex items-center justify-center transition-colors shrink-0',
+                    inputText.trim()
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-white/10 text-white/30'
+                  )}
                 >
-                  <Send className="w-4 h-4 text-primary-foreground" />
+                  <SendHorizonal className="w-4 h-4" />
                 </button>
               </div>
             </div>
