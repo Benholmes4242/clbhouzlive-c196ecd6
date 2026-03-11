@@ -262,7 +262,7 @@ const searchBusinesses = async (query: string, limit: number = 6): Promise<Busin
 };
 
 // Get recent searches from localStorage
-const getRecentSearches = (): RecentSearch[] => {
+export const getRecentSearches = (): RecentSearch[] => {
   try {
     const stored = localStorage.getItem('recent_searches');
     if (stored) {
