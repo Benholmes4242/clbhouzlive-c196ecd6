@@ -112,7 +112,7 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
     onClick();
   }, [onClick]);
 
-  const hasVisibleCount = showCount && count !== undefined && count > 0;
+  const hasVisibleCount = showCount && count !== undefined && count !== null && count > 0;
 
   return (
     <div 
