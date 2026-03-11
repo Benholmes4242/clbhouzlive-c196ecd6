@@ -260,6 +260,7 @@ export function PostStudioProvider({
       closePanel,
       setDiscarding,
       reset,
+      onSuccess,
     }),
     [
       state,
