@@ -12,12 +12,12 @@ import type { ReviewWizardCourse } from '../types';
 import { ComposerMediaItem } from '@/components/post-studio/types';
 import { pickMediaFiles, validateMediaFiles } from '@/utils/media/pickMediaFiles';
 import { triggerHaptic } from '@/lib/ui/haptics';
-import { PermissionDeniedCard } from '@/components/post/post-wizard/components/PermissionDeniedCard';
+import { PermissionDeniedCard } from '@/components/shared/media/PermissionDeniedCard';
 import { StudioEdits } from '@/types/studio';
 import { toast } from 'sonner';
-import { MediaThumbnail } from '@/components/post/post-wizard/components/MediaThumbnail';
-import { MediaPreviewViewer } from '@/components/post/post-wizard/components/MediaPreviewViewer';
-import type { OrderedMediaItem } from '@/components/post/post-wizard/types';
+import { MediaThumbnail } from '@/components/shared/media/MediaThumbnail';
+import { MediaPreviewViewer } from '@/components/shared/media/MediaPreviewViewer';
+import type { OrderedMediaItem } from '@/components/shared/media/types';
 
 interface MediaStepProps {
   media: ReviewMediaItem[];
