@@ -40,9 +40,6 @@ interface CinematicActionRailProps {
   /** Override the bottom offset (default accounts for tab bar).
    *  Use for fullscreen viewer where there's no tab bar. */
   bottomOffset?: string;
-  /** Called with the vertical centre (px from top of viewport) of the top chevron after layout.
-   *  Parent uses this to align the left chevron to the same Y position. */
-  onChevronPositionChange?: (centreY: number) => void;
   /** Hide the mute button entirely (e.g. for non-audio cards) */
   hideMute?: boolean;
 }
