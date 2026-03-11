@@ -36,6 +36,15 @@ export function useClubhouseComments() {
     });
   }, []);
 
+  const handleCommentDeleted = useCallback((postId: string, currentCount: number) => {
+    setCommentCountOverrides(prev => {
+      const next = new Map(prev);
+      const current = next.get(postId) ?? currentCount;
+      next.set(postId, Math.max(0, current - 1));
+      return next;
+    });
+  }, []);
+
   const getCommentCount = useCallback((post: FeedPost | null): number => {
     if (!post) return 0;
     return commentCountOverrides.get(post.id) ?? post.commentCount;
