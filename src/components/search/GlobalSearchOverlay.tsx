@@ -165,7 +165,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
 
           {/* Scroll area */}
           <div
-            className="flex-1 overflow-y-auto overscroll-contain pb-safe"
+            className="flex-1 overflow-y-auto overscroll-contain pb-safe w-full md:max-w-[560px]"
             style={{ WebkitOverflowScrolling: 'touch' }}
           >
             {/* Idle state */}
