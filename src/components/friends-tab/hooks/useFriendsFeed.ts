@@ -78,15 +78,10 @@ export function useFriendsFeed({ userId, mode, searchQuery }: UseFriendsFeedPara
     gcTime: 10 * 60 * 1000,
   });
 
-  const allPosts = useMemo(() => {
-    const posts = query.data?.pages.flatMap((page) => page.posts) ?? [];
-    const seen = new Set<string>();
-    return posts.filter(p => {
-      if (seen.has(p.id)) return false;
-      seen.add(p.id);
-      return true;
-    });
-  }, [query.data]);
+  const allPosts = useMemo(
+    () => deduplicatePosts(query.data?.pages.flatMap((page) => page.posts) ?? []),
+    [query.data]
+  );
 
   const resetSeen = useCallback(() => {
     seenPostIds.current = [];
