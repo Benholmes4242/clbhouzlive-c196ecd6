@@ -192,7 +192,7 @@ const ClubhouseContent = () => {
   const isActivePostFollowed = getFollowState(activePost);
   
   // ── Comments state ──
-  const { commentsOpen, overlayVisible, openComments, closeComments, handleCommentPosted, getCommentCount, resetComments } = useClubhouseComments();
+  const { commentsOpen, overlayVisible, openComments, closeComments, handleCommentPosted, handleCommentDeleted, getCommentCount, resetComments } = useClubhouseComments();
   const activeCommentCount = getCommentCount(activePost);
   
   // ── Share / Report / Not Interested ──
