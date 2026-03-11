@@ -11,7 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
-import { useMessaging } from '@/hooks/useMessaging';
+import { useMessagingContext } from '@/contexts/MessagingContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { cn } from '@/lib/utils';
 import { postingAsCopy } from '@/lib/postingAsCopy';
