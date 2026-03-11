@@ -186,6 +186,7 @@ interface PostStudioContextValue {
   closePanel: () => void;
   setDiscarding: (value: boolean) => void;
   reset: () => void;
+  onSuccess?: (postId: string) => void;
 }
 
 const PostStudioContext = createContext<PostStudioContextValue | null>(null);
@@ -198,12 +199,14 @@ interface PostStudioProviderProps {
   children: React.ReactNode;
   initialActorType?: StudioActorType;
   initialActorId?: string;
+  onSuccess?: (postId: string) => void;
 }
 
 export function PostStudioProvider({
   children,
   initialActorType,
   initialActorId,
+  onSuccess,
 }: PostStudioProviderProps) {
   const [state, dispatch] = useReducer(
     postStudioReducer,
@@ -257,6 +260,7 @@ export function PostStudioProvider({
       closePanel,
       setDiscarding,
       reset,
+      onSuccess,
     }),
     [
       state,
@@ -280,6 +284,7 @@ export function PostStudioProvider({
       closePanel,
       setDiscarding,
       reset,
+      onSuccess,
     ]
   );
 

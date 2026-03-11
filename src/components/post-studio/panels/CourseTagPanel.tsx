@@ -1,6 +1,7 @@
 // CourseTagPanel — Golf course search and tag bottom sheet
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { toast } from 'sonner';
 import { Search, X, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
@@ -63,6 +64,12 @@ export function CourseTagPanel() {
     (course: CourseResult) => {
       // Don't add duplicates
       if (state.taggedCourses.some((c) => c.courseId === course.id)) return;
+
+      // Max 5 courses
+      if (state.taggedCourses.length >= 5) {
+        toast.error('Maximum 5 courses per post');
+        return;
+      }
 
       const newCourse: TaggedCourse = {
         courseId: course.id,

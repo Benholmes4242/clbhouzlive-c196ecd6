@@ -119,8 +119,8 @@ export function BusinessProfilePosts({
             className={cn(
               "flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors",
               activeFilter === key
-                ? "bg-[#01754F] text-white"
-                : "bg-white text-foreground border border-border hover:bg-muted/50"
+                ? "bg-primary text-primary-foreground"
+                : "bg-card text-foreground border border-border hover:bg-muted/50"
             )}
           >
             {label}
@@ -146,10 +146,9 @@ export function BusinessProfilePosts({
       {!filteredPosts || filteredPosts.length === 0 ? (
         <div className="py-12 text-center">
           <div 
-            className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
-            style={{ background: '#EDEFF2' }}
+            className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center bg-muted"
           >
-            <ImageIcon className="h-8 w-8 text-[#97A1AA]" />
+            <ImageIcon className="h-8 w-8 text-muted-foreground" />
           </div>
           <p className="text-sm text-muted-foreground mb-4">
             {membership?.canManage 
@@ -319,7 +318,7 @@ function ActionButton({ icon: Icon, label, isActive, onClick }: ActionButtonProp
       onClick={onClick}
       className={cn(
         "flex flex-col items-center gap-0.5 py-2 px-3 rounded-md transition-colors hover:bg-muted/50",
-        isActive ? "text-[#0A66C2]" : "text-muted-foreground"
+        isActive ? "text-primary" : "text-muted-foreground"
       )}
     >
       <Icon className="h-5 w-5" />

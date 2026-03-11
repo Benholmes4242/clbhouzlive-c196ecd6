@@ -195,3 +195,43 @@ export interface PostStudioProps {
   initialMedia?: File[];
   onSuccess?: (postId: string) => void;
 }
+
+// ============================================================================
+// LEGACY COMPATIBILITY
+// ============================================================================
+
+/** Upload status for individual media items (legacy compat) */
+export type MediaUploadStatus = 'pending' | 'uploading' | 'complete' | 'failed';
+
+/** Media type discriminator (legacy compat) */
+export type ComposerMediaType = 'image' | 'video';
+
+/**
+ * ComposerMediaItem — legacy type alias used across the codebase.
+ * New code should use StudioMediaItem instead.
+ */
+export interface ComposerMediaItem {
+  id: string;
+  type: ComposerMediaType;
+  file?: File;
+  previewUrl: string;
+  thumbnailUrl?: string;
+  duration?: number;
+  width?: number;
+  height?: number;
+  aspectRatio?: number;
+  compiledVideo?: {
+    streamId: string;
+    playbackUrl: string;
+    posterUrl: string;
+    duration: number;
+  };
+  isRestored?: boolean;
+  restoredMediaUrl?: string;
+  restoredStreamId?: string;
+  uploadStatus?: MediaUploadStatus;
+  uploadProgress?: number;
+  trimStart?: number | null;
+  trimEnd?: number | null;
+  posterTimestamp?: number | null;
+}

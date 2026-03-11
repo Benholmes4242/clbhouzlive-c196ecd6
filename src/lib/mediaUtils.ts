@@ -1,4 +1,4 @@
-import { ComposerMediaItem } from "@/hooks/useSnapModal";
+import { ComposerMediaItem } from "@/components/post-studio/types";
 import { validateMediaFile } from "@/constants/postLimits";
 
 export interface MediaValidationResult {
