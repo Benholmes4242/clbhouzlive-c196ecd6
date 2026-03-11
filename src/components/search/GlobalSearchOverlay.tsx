@@ -116,7 +116,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[200] bg-background flex flex-col"
+          className="fixed inset-0 z-[1100] bg-background flex flex-col md:items-center"
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
@@ -124,7 +124,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
         >
           {/* Header */}
           <div
-            className="flex items-center gap-3 px-4 pb-3"
+            className="w-full md:max-w-[560px] flex items-center gap-3 px-4 pb-3"
             style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
           >
             {/* Search input container */}
@@ -165,7 +165,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
 
           {/* Scroll area */}
           <div
-            className="flex-1 overflow-y-auto overscroll-contain pb-safe"
+            className="flex-1 overflow-y-auto overscroll-contain pb-safe w-full md:max-w-[560px]"
             style={{ WebkitOverflowScrolling: 'touch' }}
           >
             {/* Idle state */}
@@ -193,14 +193,14 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           <button
                             type="button"
                             onClick={() => commitRecentSearch(item.query)}
-                            className="flex-1 text-left text-sm text-foreground"
+                            className="flex-1 text-left text-sm text-foreground truncate min-w-0 block"
                           >
                             {item.query}
                           </button>
                           <button
                             type="button"
                             onClick={() => handleDeleteRecent(item.id)}
-                            className="p-1 text-muted-foreground/50"
+                            className="shrink-0 flex items-center justify-center min-h-[44px] min-w-[44px] -mr-3 text-muted-foreground/50"
                             aria-label={`Remove ${item.query}`}
                           >
                             <X className="w-3.5 h-3.5" />
@@ -303,7 +303,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
                         </button>
                         {idx < clubs.length - 1 && (
-                          <div className="ml-[64px] border-b border-border/30" />
+                          <div className="ml-[52px] border-b border-border/30" />
                         )}
                       </div>
                     ))}
@@ -347,7 +347,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
                         </button>
                         {idx < people.length - 1 && (
-                          <div className="ml-[64px] border-b border-border/30" />
+                          <div className="ml-[52px] border-b border-border/30" />
                         )}
                       </div>
                     ))}
@@ -387,7 +387,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                           <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
                         </button>
                         {idx < businesses.length - 1 && (
-                          <div className="ml-[64px] border-b border-border/30" />
+                          <div className="ml-[52px] border-b border-border/30" />
                         )}
                       </div>
                     ))}
@@ -403,9 +403,9 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                   <Search className="w-7 h-7 text-muted-foreground/40" />
                 </div>
                 <p className="text-sm font-medium text-foreground">
-                  No results for "{debouncedQuery}"
+                  No results for "<span className="inline-block max-w-[180px] truncate align-bottom">{debouncedQuery}</span>"
                 </p>
-                <p className="text-xs text-muted-foreground text-center max-w-[240px]">
+                <p className="text-xs text-muted-foreground text-center max-w-[240px] md:max-w-[360px]">
                   Try searching for a course name, player, or business
                 </p>
               </div>

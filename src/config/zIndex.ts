@@ -15,6 +15,9 @@ export const Z = {
   // Toast notifications (highest priority)
   toast: 12000,
   
+  // Search overlay
+  searchOverlay: 1100,  // Above header/nav, below modals
+  
   // Modal & overlay layers (ordered by priority)
   hub: 12000,           // Hub modal shell
   sheetBackdrop: 12002, // Bottom sheet backdrop
@@ -35,6 +38,7 @@ export const Z = {
   // Utility classes for inline styles
   asStyle: {
     header: { zIndex: 1000 },
+    searchOverlay: { zIndex: 1100 },
     nav: { zIndex: 999 },
     toast: { zIndex: 12000 },
     hub: { zIndex: 12000 },
