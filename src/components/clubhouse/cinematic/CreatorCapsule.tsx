@@ -211,13 +211,27 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
       {golfCourse && courseDisplayLabel && (
         <button
           type="button"
-          onClick={(e) => {
+          onClick={async (e) => {
             e.stopPropagation();
             const courseIdentifier = golfCourse.slug || golfCourse.id;
             if (courseIdentifier) {
               navigate(`/courses/${courseIdentifier}`);
             } else if (golfCourse.name) {
-              navigate(`/courses?search=${encodeURIComponent(golfCourse.name)}`);
+              try {
+                const { data } = await supabase
+                  .from('golf_courses')
+                  .select('id')
+                  .ilike('name', golfCourse.name.trim())
+                  .limit(1)
+                  .single();
+                if (data?.id) {
+                  navigate(`/courses/${data.id}`);
+                } else {
+                  navigate(`/courses?search=${encodeURIComponent(golfCourse.name)}`);
+                }
+              } catch {
+                navigate(`/courses?search=${encodeURIComponent(golfCourse.name)}`);
+              }
             }
           }}
           className="flex items-start gap-2 py-2.5 text-left w-full cursor-pointer active:scale-[0.98] active:opacity-80 transition-all"
