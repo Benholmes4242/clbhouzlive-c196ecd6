@@ -72,32 +72,30 @@ export function TourHubEventPage() {
           {tourLabel}
         </Link>
       </div>
-      
-      {/* Sticky Header */}
-      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl py-4 -mx-4 px-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-meta text-text-tertiary uppercase tracking-wide font-medium">
-                {tourLabel}
-              </span>
-              {event && <StatusChip status={event.status as any} />}
+      {/* Combined Sticky Header + Tabs */}
+      <div
+        className="sticky top-0 z-20 bg-background/95 backdrop-blur-xl border-b border-border/50 -mx-4 px-4"
+        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+      >
+        <div className="pt-2 pb-1">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-meta text-text-tertiary uppercase tracking-wide font-medium">
+                  {tourLabel}
+                </span>
+                {event && <StatusChip status={event.status as any} />}
+              </div>
+              <h1 className="text-heading-lg font-bold text-text-primary truncate">
+                {event?.name || 'Loading...'}
+              </h1>
             </div>
-            <h1 className="text-heading-lg font-bold text-text-primary truncate">
-              {event?.name || 'Loading...'}
-            </h1>
+            {leaderboard?.fetched_at && (
+              <LastUpdatedPill timestamp={leaderboard.fetched_at} />
+            )}
           </div>
-          {leaderboard?.fetched_at && (
-            <LastUpdatedPill timestamp={leaderboard.fetched_at} />
-          )}
         </div>
-      </header>
-      
-      {/* Sticky Tabs */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-xl py-3 -mx-4 px-4">
-        <div 
-          className="flex items-stretch p-1 rounded-xl overflow-hidden bg-muted"
-        >
+        <div className="flex items-stretch p-1 rounded-xl overflow-hidden bg-muted mb-3 mt-2">
           {(['leaderboard', 'field', 'info'] as TabKey[]).map(tab => (
             <button
               key={tab}
