@@ -249,8 +249,7 @@ const ClubhouseContent = () => {
     navigate(getProfilePathById(activePost.userId));
   }, [activePost, navigate]);
 
-  // Navigation handlers
-  const { handleTabClick } = useNavigationHandlers();
+
   
   // Composer state management
   const {
