@@ -228,7 +228,7 @@ export function WriteStep({
             maxLength={MAX_REVIEW_LENGTH + 100}
           />
           <div className="flex justify-end mt-1">
-            <CharacterRing current={reviewLength} max={MAX_REVIEW_LENGTH} />
+            <CharacterRing count={reviewLength} maxCount={MAX_REVIEW_LENGTH} />
           </div>
         </motion.div>
 
