@@ -57,6 +57,7 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
   const navigate = useNavigate();
   const isFullscreen = variant === 'fullscreen';
   const theme = getReviewOverlayTheme(rating);
+  const ratingColors = getOverlayRatingColors(rating);
   const isOutstanding = rating >= 9.0;
   const isTappable = !!(courseId || onCourseTap);
 
