@@ -33,8 +33,8 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
   const { data: userProfile } = useUserProfile(user?.id);
   const { hasUnread, unreadCount: unreadNotificationCount } = useUnreadNotifications();
   
-  // Get unread messages from messaging system
-  const { conversations } = useMessaging();
+  // Get unread messages from shared messaging context
+  const { conversations } = useMessagingContext();
   const unreadMessageCount = conversations?.reduce((sum, conv) => sum + (conv.unread_count || 0), 0) || 0;
   
   const [uploadCenterOpen, setUploadCenterOpen] = useState(false);

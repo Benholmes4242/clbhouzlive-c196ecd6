@@ -700,6 +700,7 @@ const AppInner: React.FC = () => {
                                   <VideoPlaybackProvider>
                                       <ErrorBoundary>
                                         <AuthWrapper>
+                                          <MessagingProvider>
                                           <UploadResilienceProvider>
                                             <SeasonWrapModal />
                                             <AchievementToastWrapper />
@@ -718,6 +719,7 @@ const AppInner: React.FC = () => {
                                             {/* Fullscreen Feed Overlay - portal-based, renders above everything */}
                                             <FullscreenFeedOverlay />
                                           </UploadResilienceProvider>
+                                          </MessagingProvider>
                                         </AuthWrapper>
                                       </ErrorBoundary>
                                   </VideoPlaybackProvider>

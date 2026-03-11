@@ -313,11 +313,7 @@ function MessagesPageInner() {
 }
 
 const MessagesPage = () => {
-  return (
-    <MessagingProvider>
-      <MessagesPageInner />
-    </MessagingProvider>
-  );
+  return <MessagesPageInner />;
 };
 
 export default MessagesPage;
