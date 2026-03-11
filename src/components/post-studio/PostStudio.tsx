@@ -1,13 +1,21 @@
 // PostStudio — Root entry point
-// Full-screen sheet with spring animation, renders active screen
+// Full-screen sheet with spring animation, renders active screen + panels
 
 import React, { useCallback, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PostStudioProvider, usePostStudioContext } from './usePostStudio';
-import { StudioHeader } from './components/StudioHeader';
 import { MediaPickerScreen } from './screens/MediaPickerScreen';
 import { ComposerScreen } from './screens/ComposerScreen';
+import { TrimScreen } from './screens/TrimScreen';
+import { PosterScreen } from './screens/PosterScreen';
+import { PublishScreen } from './screens/PublishScreen';
+import { SuccessScreen } from './screens/SuccessScreen';
+import { MentionPanel } from './panels/MentionPanel';
+import { CourseTagPanel } from './panels/CourseTagPanel';
+import { AudiencePanel } from './panels/AudiencePanel';
+import { SchedulePanel } from './panels/SchedulePanel';
+import { DraftsPanel } from './panels/DraftsPanel';
 import { SPRING, DURATION } from './constants';
 import type { PostStudioProps, StudioStep } from './types';
 
@@ -15,10 +23,15 @@ import type { PostStudioProps, StudioStep } from './types';
 // SCREEN ROUTER
 // ============================================================================
 
-function StudioScreenRouter() {
-  const { state } = usePostStudioContext();
+function StudioScreenRouter({ onClose }: { onClose: () => void }) {
+  const { state, reset } = usePostStudioContext();
 
   const direction = getSlideDirection(state.previousStep, state.step);
+
+  const handleSuccessDone = useCallback(() => {
+    reset();
+    onClose();
+  }, [reset, onClose]);
 
   return (
     <AnimatePresence mode="wait" initial={false}>
@@ -30,47 +43,29 @@ function StudioScreenRouter() {
         transition={{ duration: DURATION.screenTransition, ease: 'easeInOut' }}
         className="absolute inset-0 flex flex-col"
       >
-        {renderScreen(state.step)}
+        {renderScreen(state.step, handleSuccessDone)}
       </motion.div>
     </AnimatePresence>
   );
 }
 
-function renderScreen(step: StudioStep) {
+function renderScreen(step: StudioStep, onSuccessDone: () => void) {
   switch (step) {
     case 'MEDIA_PICKER':
       return <MediaPickerScreen />;
     case 'COMPOSER':
       return <ComposerScreen />;
     case 'TRIM':
-      return <PlaceholderScreen label="Trim" />;
+      return <TrimScreen />;
     case 'POSTER':
-      return <PlaceholderScreen label="Cover" />;
+      return <PosterScreen />;
     case 'PUBLISH':
-      return <PlaceholderScreen label="Publish" />;
+      return <PublishScreen />;
     case 'SUCCESS':
-      return <PlaceholderScreen label="Success" />;
+      return <SuccessScreen onDone={onSuccessDone} />;
     default:
       return null;
   }
-}
-
-/** Temporary placeholder for screens not yet built */
-function PlaceholderScreen({ label }: { label: string }) {
-  const { setStep } = usePostStudioContext();
-  return (
-    <div className="flex-1 flex flex-col">
-      <StudioHeader
-        title={label}
-        leftAction={{ label: 'Back', onClick: () => setStep('COMPOSER') }}
-      />
-      <div className="flex-1 flex items-center justify-center">
-        <p className="text-muted-foreground text-sm">
-          {label} — coming in next batch
-        </p>
-      </div>
-    </div>
-  );
 }
 
 function getSlideDirection(from: StudioStep | null, to: StudioStep): 'forward' | 'backward' {
@@ -80,13 +75,30 @@ function getSlideDirection(from: StudioStep | null, to: StudioStep): 'forward' |
 }
 
 // ============================================================================
+// PANEL ROUTER
+// ============================================================================
+
+function PanelRouter() {
+  const { state } = usePostStudioContext();
+
+  return (
+    <AnimatePresence>
+      {state.activePanelId === 'mention' && <MentionPanel />}
+      {state.activePanelId === 'course' && <CourseTagPanel />}
+      {state.activePanelId === 'audience' && <AudiencePanel />}
+      {state.activePanelId === 'schedule' && <SchedulePanel />}
+      {state.activePanelId === 'drafts' && <DraftsPanel />}
+    </AnimatePresence>
+  );
+}
+
+// ============================================================================
 // INNER SHELL (inside provider)
 // ============================================================================
 
 function StudioInner({ onClose }: { onClose: () => void }) {
   const { state, setDiscarding, reset } = usePostStudioContext();
 
-  // Handle discard confirmation
   const handleClose = useCallback(() => {
     if (state.isDirty) {
       setDiscarding(true);
@@ -96,7 +108,7 @@ function StudioInner({ onClose }: { onClose: () => void }) {
     }
   }, [state.isDirty, setDiscarding, reset, onClose]);
 
-  // Escape key handler
+  // Escape key
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') handleClose();
@@ -135,7 +147,7 @@ function StudioInner({ onClose }: { onClose: () => void }) {
         className="fixed inset-0 z-[9999] bg-background rounded-t-[24px] flex flex-col overflow-hidden"
         style={{ top: 0 }}
       >
-        {/* Discard confirmation overlay */}
+        {/* Discard confirmation */}
         <AnimatePresence>
           {state.isDiscarding && (
             <DiscardConfirmation
@@ -150,8 +162,11 @@ function StudioInner({ onClose }: { onClose: () => void }) {
 
         {/* Screen router */}
         <div className="relative flex-1 overflow-hidden">
-          <StudioScreenRouter />
+          <StudioScreenRouter onClose={onClose} />
         </div>
+
+        {/* Panel router */}
+        <PanelRouter />
       </motion.div>
     </>
   );
