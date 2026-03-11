@@ -12,6 +12,7 @@ import { useAppPrefetch } from '@/hooks/useAppPrefetch';
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import PostSubmissionHandler from './bottom-navigation/PostSubmissionHandler';
+import PostStudio from './post-studio/PostStudio';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
 
 import { cn } from '@/lib/utils';
