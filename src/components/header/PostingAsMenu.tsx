@@ -186,7 +186,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
     subtitle: actor.type === 'personal' ? email : 'Business',
   }));
 
-  // Current actor for AccountHubSheet
+  // Current actor for ProfileHubSheet
   const currentActorData = {
     type: (activeActor?.type || 'personal') as 'personal' | 'business',
     id: activeActor?.id || user?.id || '',
