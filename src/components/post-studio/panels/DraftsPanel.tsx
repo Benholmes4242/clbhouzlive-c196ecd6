@@ -46,9 +46,9 @@ export function DraftsPanel() {
   const handleDelete = useCallback(
     (e: React.MouseEvent, draftId: string) => {
       e.stopPropagation();
-      deleteDraftMutation.mutate(draftId);
+      deleteDraft(draftId);
     },
-    [deleteDraftMutation]
+    [deleteDraft]
   );
 
   return (

@@ -149,8 +149,8 @@ export function MentionPanel() {
           >
             {/* Avatar */}
             <div className="w-10 h-10 rounded-full bg-muted shrink-0 overflow-hidden">
-              {entity.avatar_url ? (
-                <img src={entity.avatar_url} alt="" className="w-full h-full object-cover" />
+              {entity.profile_image_url ? (
+                <img src={entity.profile_image_url} alt="" className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm font-semibold">
                   {entity.name.charAt(0).toUpperCase()}
