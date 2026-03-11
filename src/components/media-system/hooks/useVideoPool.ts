@@ -135,10 +135,13 @@ export function useVideoPool() {
     } catch (error) {
       if (error instanceof DOMException) {
         if (error.name === 'NotAllowedError') {
+          // Mute the element only — never touch the global store.
+          // The user's explicit mute preference is preserved.
           video.muted = true;
-          getStore().setMuted(true);
           try {
             await video.play();
+            // Restore the user's preferred mute state after play succeeds.
+            video.muted = getStore().isMuted;
             return true;
           } catch {
             return false;
