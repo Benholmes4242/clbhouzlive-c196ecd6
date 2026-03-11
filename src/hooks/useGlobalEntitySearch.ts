@@ -381,17 +381,17 @@ export const useGlobalEntitySearch = ({
   const videosQuery = useQuery({
     queryKey: ['global-search', 'videos', normalizedQuery],
     queryFn: () => searchVideos(normalizedQuery, limits.videos || 6),
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000, // 5 minutes
-    enabled: enabled && hasQuery
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+    enabled: false, // Not displayed in overlay — disable until implemented
   });
 
   const pagesQuery = useQuery({
     queryKey: ['global-search', 'pages', normalizedQuery],
     queryFn: () => searchPages(normalizedQuery, limits.pages || 6),
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000, // 5 minutes
-    enabled: enabled && hasQuery
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+    enabled: false, // Not displayed in overlay — disable until implemented
   });
 
   const businessesQuery = useQuery({
