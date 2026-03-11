@@ -44,13 +44,13 @@ export function MentionPanel() {
       try {
         const { data, error } = await supabase
           .from('taggable_entities')
-          .select('id, entity_id, entity_type, name, username, avatar_url')
+          .select('id, entity_id, entity_type, name, username, profile_image_url')
           .in('entity_type', ['user', 'business'])
           .or(`name.ilike.%${query}%,username.ilike.%${query}%`)
           .limit(15);
 
         if (!error && data) {
-          setResults(data as TaggableResult[]);
+          setResults(data as unknown as TaggableResult[]);
         }
       } catch (err) {
         console.error('[MentionPanel] search error:', err);
