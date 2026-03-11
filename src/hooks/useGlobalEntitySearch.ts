@@ -79,7 +79,6 @@ export interface GlobalSearchResults {
   videos: VideoResult[];
   pages: PageResult[];
   businesses: BusinessResult[];
-  recent: RecentSearch[];
   trending: TrendingItem[];
   isLoading: boolean;
   error?: Error | null;
