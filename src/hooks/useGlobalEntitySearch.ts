@@ -411,7 +411,7 @@ export const useGlobalEntitySearch = ({
 
   // Loading state
   const isLoading = hasQuery 
-    ? (peopleQuery.isLoading || clubsQuery.isLoading || videosQuery.isLoading || pagesQuery.isLoading || businessesQuery.isLoading)
+    ? (peopleQuery.isLoading || clubsQuery.isLoading || businessesQuery.isLoading)
     : trendingQuery.isLoading;
 
   // Error handling
