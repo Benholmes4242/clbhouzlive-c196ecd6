@@ -731,6 +731,7 @@ const AppInner: React.FC = () => {
                           
                           <Sonner />
                           <GlobalBottomNavigation />
+                          <GlobalPostStudio />
                         </ActiveActorProvider>
                     
                   </UIProvider>
