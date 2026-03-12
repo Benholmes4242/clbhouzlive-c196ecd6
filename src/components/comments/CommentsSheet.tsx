@@ -452,7 +452,7 @@ function CommentsSheet({
 
         {/* Inset divider */}
         {idx < sortedComments.length - 1 && (
-          <div className={cn('ml-[64px] h-px', isDark ? 'bg-white/8' : 'bg-border/30')} />
+          <div className={cn('ml-[56px] sm:ml-[64px] h-px', isDark ? 'bg-white/8' : 'bg-border/30')} />
         )}
       </div>
     );
