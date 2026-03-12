@@ -344,7 +344,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         exit={{ opacity: 0, x: -8 }}
         transition={{ duration: 0.2 }}
         onClick={onPrevMedia}
-        className="fixed left-4 z-40 pointer-events-auto
+        className="fixed left-4 pointer-events-auto
           w-11 h-11 rounded-full
           flex items-center justify-center"
         style={{
