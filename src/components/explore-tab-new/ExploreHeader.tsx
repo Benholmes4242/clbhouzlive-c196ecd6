@@ -37,6 +37,7 @@ function ExploreHeaderInner({
         <button
           type="button"
           onClick={onOpenSearch}
+          aria-label="Search courses and videos"
           className="w-full flex items-center gap-2 h-10 px-3 rounded-xl bg-muted text-muted-foreground text-sm"
         >
           <Search className="h-4 w-4 shrink-0" />
