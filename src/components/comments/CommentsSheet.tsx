@@ -439,7 +439,7 @@ function CommentsSheet({
                   type="button"
                   onClick={() => toggleReplies(comment.id)}
                   className={cn(
-                    'text-[12px] font-semibold min-h-[44px] flex items-center pl-14',
+                    'text-[12px] font-semibold min-h-[44px] flex items-center pl-10 sm:pl-14',
                     isDark ? 'text-white/40' : 'text-muted-foreground'
                   )}
                 >
