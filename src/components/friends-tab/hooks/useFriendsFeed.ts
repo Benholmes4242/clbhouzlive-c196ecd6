@@ -19,9 +19,10 @@ interface UseFriendsFeedParams {
   userId: string | undefined;
   mode: FriendsMode;
   searchQuery?: string;
+  enabled?: boolean;
 }
 
-export function useFriendsFeed({ userId, mode, searchQuery }: UseFriendsFeedParams) {
+export function useFriendsFeed({ userId, mode, searchQuery, enabled: externalEnabled = true }: UseFriendsFeedParams) {
   const seenPostIds = useRef<string[]>([]);
 
   const query = useInfiniteQuery({
@@ -72,7 +73,7 @@ export function useFriendsFeed({ userId, mode, searchQuery }: UseFriendsFeedPara
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as string | undefined,
-    enabled: !!userId,
+    enabled: !!userId && externalEnabled,
     placeholderData: keepPreviousData,
     staleTime: 2 * 60 * 1000,
     gcTime: 10 * 60 * 1000,

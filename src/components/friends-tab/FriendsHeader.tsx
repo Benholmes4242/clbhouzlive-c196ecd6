@@ -37,12 +37,14 @@ export function FriendsHeader({
         </button>
       </div>
 
-      <div className="flex items-center justify-center gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide">
+      <div role="tablist" aria-label="Friends feed filter" className="flex gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide">
         {MODES.map(({ id, label }) => {
           const isActive = activeMode === id;
           return (
             <button
               key={id}
+              role="tab"
+              aria-selected={isActive}
               onClick={() => onModeChange(id)}
               className="shrink-0 min-h-[36px] px-4 rounded-full text-sm font-semibold transition-colors"
               style={{
