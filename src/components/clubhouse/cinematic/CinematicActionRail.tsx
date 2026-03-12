@@ -232,7 +232,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   // Idle opacity: 75% when not interacted, full when interacted or active
   const idleOpacity = hasInteracted ? 1 : 0.75;
 
-  const CAPSULE_BOTTOM_OFFSET = bottomOffset || `calc(30px + var(--bottom-nav-height, 80px) - ${SLOT_HEIGHT - ICON_SIZE}px)`;
+  const CAPSULE_BOTTOM_OFFSET = bottomOffset || `calc(12px + var(--bottom-nav-height, 88px))`;
 
   return (
     <motion.div
@@ -250,7 +250,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       style={{
         bottom: CAPSULE_BOTTOM_OFFSET,
         gap: 12,
-        maxHeight: 'calc(100dvh - 130px)',
+        maxHeight: 'calc(100dvh - 120px)',
         overflowY: 'hidden' as const,
       }}
     >
