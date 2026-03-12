@@ -583,16 +583,21 @@ function CommentsSheet({
                   initial={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.15, ease: 'easeOut' }}
-                  className="px-4 py-4 space-y-4"
+                  className="px-4"
                 >
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="flex gap-3">
-                      <div className={cn('w-[34px] h-[34px] rounded-[34%] shrink-0', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
-                      <div className="flex-1 space-y-2 py-1">
-                        <div className={cn('h-3 w-24 rounded', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
-                        <div className={cn('h-3 w-[85%] rounded', isDark ? 'bg-white/6 clb-shimmer-dark' : 'bg-muted/80 clb-shimmer-light')} />
-                        <div className={cn('h-3 w-[55%] rounded', isDark ? 'bg-white/5 clb-shimmer-dark' : 'bg-muted/60 clb-shimmer-light')} />
+                    <div key={i}>
+                      <div className="flex gap-3 py-3">
+                        <div className={cn('w-[34px] h-[34px] rounded-[34%] shrink-0', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
+                        <div className="flex-1 space-y-2 py-0.5">
+                          <div className={cn('h-[18px] w-24 rounded', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
+                          <div className={cn('h-[18px] w-[85%] rounded', isDark ? 'bg-white/6 clb-shimmer-dark' : 'bg-muted/80 clb-shimmer-light')} />
+                          <div className={cn('h-[18px] w-[55%] rounded', isDark ? 'bg-white/5 clb-shimmer-dark' : 'bg-muted/60 clb-shimmer-light')} />
+                        </div>
                       </div>
+                      {i < 4 && (
+                        <div className={cn('ml-[56px] sm:ml-[64px] h-px', isDark ? 'bg-white/5' : 'bg-border/20')} />
+                      )}
                     </div>
                   ))}
                 </motion.div>
