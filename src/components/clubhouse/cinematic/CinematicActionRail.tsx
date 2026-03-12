@@ -8,6 +8,7 @@ import React, { useState, useCallback } from 'react';
 import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, Music, MoreHorizontal, ChevronRight, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { Z } from '@/config/zIndex';
 import { MOTION_FAST, EASE_OUT, pressFeedback, likePop } from '@/lib/motionTokens';
 import { prefersReducedMotion } from '@/utils/safePlay';
 
@@ -244,7 +245,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
       className={cn(
-        'fixed right-4 z-40',
+        'fixed right-4',
         'flex flex-col items-center',
         'pointer-events-auto'
       )}
@@ -253,6 +254,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         gap: 12,
         maxHeight: 'calc(100dvh - 120px)',
         overflowY: 'hidden' as const,
+        zIndex: Z.echo,
       }}
     >
       {/* Slot 1: Right chevron — top of rail, only when there's a next media item */}
@@ -344,7 +346,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         exit={{ opacity: 0, x: -8 }}
         transition={{ duration: 0.2 }}
         onClick={onPrevMedia}
-        className="fixed left-4 z-40 pointer-events-auto
+        className="fixed left-4 pointer-events-auto
           w-11 h-11 rounded-full
           flex items-center justify-center"
         style={{
@@ -352,6 +354,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
           background: 'rgba(0,0,0,0.45)',
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
+          zIndex: Z.echo,
         }}
         aria-label="Previous media"
       >
