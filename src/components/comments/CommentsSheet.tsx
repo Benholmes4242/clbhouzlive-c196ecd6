@@ -514,7 +514,7 @@ function CommentsSheet({
               </div>
 
               {/* Right — sort toggle + close */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 shrink-0">
                 {totalCount > 1 && (
                   <div className={cn('flex items-center gap-1 rounded-lg p-0.5', isDark ? 'bg-white/8' : 'bg-muted/60')}>
                     {(['best', 'newest'] as const).map(s => (

@@ -867,8 +867,8 @@ html, body, #root {
   /* Echo History safe-area alignment */
   --eh-safe-right: max(env(safe-area-inset-right), 16px);
   
-  /* Bottom nav height for consistent spacing */
-  --bottom-nav-height: 64px;
+  /* Bottom nav height for consistent spacing — 88px covers real nav (~85px) before ResizeObserver fires */
+  --bottom-nav-height: 88px;
   
   /* Top 100 Region Colors - Premium identity per list */
   --region-global: 180 140 70;      /* soft gold / champagne - prestige, pinnacle */

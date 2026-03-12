@@ -370,7 +370,7 @@ function ProfileHubSheet({
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="flex-1 min-h-[44px] rounded-xl bg-destructive text-[13px] font-semibold text-destructive-foreground"
+                      className="flex-1 min-h-[44px] rounded-xl bg-destructive text-[13px] font-semibold text-destructive-foreground hover:bg-destructive/90 active:bg-destructive/80 transition-colors duration-150"
                     >
                       Sign out
                     </button>
