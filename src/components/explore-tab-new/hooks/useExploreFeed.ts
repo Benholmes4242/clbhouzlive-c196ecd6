@@ -10,9 +10,10 @@ interface UseExploreFeedParams {
   userId: string | undefined;
   region?: string | null;
   searchQuery?: string;
+  enabled?: boolean;
 }
 
-export function useExploreFeed({ userId, region, searchQuery }: UseExploreFeedParams) {
+export function useExploreFeed({ userId, region, searchQuery, enabled: externalEnabled = true }: UseExploreFeedParams) {
   const seenPostIds = useRef<string[]>([]);
 
   const query = useInfiniteQuery({
@@ -63,7 +64,7 @@ export function useExploreFeed({ userId, region, searchQuery }: UseExploreFeedPa
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as string | undefined,
-    enabled: !!userId,
+    enabled: !!userId && externalEnabled,
     placeholderData: keepPreviousData,
     staleTime: 2 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
