@@ -107,6 +107,7 @@ function CommentsSheet({
   const [sort, setSort] = useState<'best' | 'newest'>('newest');
   const [replyingTo, setReplyingTo] = useState<ReplyTarget | null>(null);
   const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
+  const [loadingReplies, setLoadingReplies] = useState<Set<string>>(new Set());
   const [commentToDelete, setCommentToDelete] = useState<CommentWithReplies | CommentReply | null>(null);
   const [inputText, setInputText] = useState('');
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
