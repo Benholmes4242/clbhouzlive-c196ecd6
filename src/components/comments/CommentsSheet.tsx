@@ -603,7 +603,13 @@ function CommentsSheet({
                 </motion.div>
               ) : comments.length === 0 ? (
                 /* Empty state */
-                <div className="flex-1 flex flex-col items-center justify-center px-8 gap-4">
+                <motion.div
+                  key="comments-empty"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.15 }}
+                  className="flex-1 flex flex-col items-center justify-center px-8 gap-4"
+                >
                   {/* Staggered bounce emoji cluster */}
                   <div className="flex gap-3 text-4xl">
                     <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>⛳</span>
