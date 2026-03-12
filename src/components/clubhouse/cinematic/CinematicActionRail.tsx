@@ -244,7 +244,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
       className={cn(
-        'fixed right-4 z-40',
+        'fixed right-4',
         'flex flex-col items-center',
         'pointer-events-auto'
       )}
