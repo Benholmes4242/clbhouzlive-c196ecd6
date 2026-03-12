@@ -31,7 +31,7 @@ function TrendingCoursesStripInner({ activeRegion }: TrendingCoursesStripProps) 
 
       const { data, error } = await supabase.rpc('get_trending_courses', params);
       if (error) {
-        console.error('[TrendingCourses] RPC error:', error);
+        if (import.meta.env.DEV) console.error('[TrendingCourses] RPC error:', error);
         return [];
       }
       return (data ?? []) as TrendingCourse[];
