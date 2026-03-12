@@ -191,9 +191,11 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
         )}
 
         {/* Media area — dynamic aspect ratio */}
-        <div
+        <button
+          type="button"
           data-media-wrapper
-          className={`relative w-full ${aspectClass} bg-muted cursor-pointer`}
+          aria-label={`Play post by ${post.displayName}`}
+          className={`relative w-full ${aspectClass} bg-muted`}
           onClick={() => {
             if (allPosts && cardIndex != null) {
               useFullscreenFeed.getState().open({
