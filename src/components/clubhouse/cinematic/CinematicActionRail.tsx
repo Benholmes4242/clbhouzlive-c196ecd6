@@ -235,6 +235,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   const CAPSULE_BOTTOM_OFFSET = bottomOffset || '97px';
 
   return (
+    <>
     <motion.div
       initial={{ opacity: 0, x: 20 }}
       animate={{
