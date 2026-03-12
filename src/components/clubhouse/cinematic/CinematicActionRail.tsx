@@ -235,28 +235,21 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
 
   const CAPSULE_BOTTOM_OFFSET = bottomOffset || '97px';
 
-  // Track the right chevron slot's vertical center so the left chevron mirrors it
-  const rightChevronRef = useRef<HTMLDivElement>(null);
+  // Measure the rail's top edge so the left chevron aligns with it
   const railRef = useRef<HTMLDivElement>(null);
-  const [chevronTop, setChevronTop] = useState<number | null>(null);
+  const [railTop, setRailTop] = useState<number | null>(null);
 
-  // Measure right chevron position (or rail top as fallback)
   useEffect(() => {
     const measure = () => {
-      if (rightChevronRef.current) {
-        const rect = rightChevronRef.current.getBoundingClientRect();
-        setChevronTop(rect.top + rect.height / 2);
-      } else if (railRef.current) {
-        // Fallback: first slot position = top of rail + half slot height
+      if (railRef.current) {
         const rect = railRef.current.getBoundingClientRect();
-        setChevronTop(rect.top + SLOT_HEIGHT / 2);
+        setRailTop(rect.top);
       }
     };
     measure();
-    // Re-measure on resize
     window.addEventListener('resize', measure);
     return () => window.removeEventListener('resize', measure);
-  });
+  }, [isVideo, hideMute, onSave, onMore, onNextMedia, hasNextMedia]);
 
   return (
     <>
@@ -284,7 +277,6 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       {/* Slot 1: Right chevron — top of rail, only when there's a next media item */}
       {onNextMedia && hasNextMedia && (
         <ActionSlot
-          slotRef={rightChevronRef}
           icon={ChevronRight}
           onClick={onNextMedia}
           ariaLabel="Next media"
@@ -363,8 +355,8 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
 
     </motion.div>
 
-    {/* Left chevron — mirrors right chevron's exact vertical position */}
-    {onPrevMedia && hasPrevMedia && chevronTop !== null && (
+    {/* Left chevron — aligns with rail top edge */}
+    {onPrevMedia && hasPrevMedia && (
       <motion.button
         initial={{ opacity: 0, x: -8 }}
         animate={{ opacity: 1, x: 0 }}
@@ -375,8 +367,9 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
           w-11 h-11 rounded-full
           flex items-center justify-center"
         style={{
-          top: `${chevronTop}px`,
-          transform: 'translateY(-50%)',
+          top: railTop !== null ? railTop : undefined,
+          bottom: railTop !== null ? undefined : '370px',
+          transform: 'translateY(0)',
           background: 'rgba(0,0,0,0.45)',
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
