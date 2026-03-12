@@ -22,7 +22,7 @@ export function VideosHeader({
 }: VideosHeaderProps) {
   return (
     <div
-      className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border/50"
+      className="sticky top-[55px] z-30 bg-background/95 backdrop-blur-xl border-b border-border/50"
       style={{
         paddingTop: embedded ? '24px' : 'max(env(safe-area-inset-top, 0px), 47px)',
       }}
