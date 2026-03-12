@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import WatchHeader from '@/components/watch/WatchHeader';
 import WatchGrid from '@/components/watch/WatchGrid';
@@ -18,6 +18,24 @@ const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false })
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
 
+  const [userLat, setUserLat] = useState<number | null>(null);
+  const [userLng, setUserLng] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (activeFilter !== 'near') return;
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserLat(pos.coords.latitude);
+        setUserLng(pos.coords.longitude);
+      },
+      () => {
+        setUserLat(null);
+        setUserLng(null);
+      }
+    );
+  }, [activeFilter]);
+
   const {
     posts,
     isLoading,
@@ -27,7 +45,7 @@ const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false })
     fetchNextPage,
     refetch,
     resetSeen,
-  } = useWatchFeed({ userId, filter: activeFilter });
+  } = useWatchFeed({ userId, filter: activeFilter, userLat, userLng });
 
   const handleFilterChange = (f: WatchFilter) => {
     setActiveFilter(f);
