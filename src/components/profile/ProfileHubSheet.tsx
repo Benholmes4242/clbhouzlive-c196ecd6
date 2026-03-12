@@ -353,7 +353,7 @@ function ProfileHubSheet({
                   <button
                     type="button"
                     onClick={() => setShowLogoutConfirm(true)}
-                    className="w-full flex items-center gap-3 min-h-[48px] rounded-xl px-2 -mx-2 active:bg-destructive/10 transition-colors"
+                    className="w-full flex items-center gap-3 min-h-[48px] rounded-xl px-2 -mx-2 hover:bg-destructive/5 active:bg-destructive/10 transition-colors duration-150"
                   >
                     <LogOut className="w-[18px] h-[18px] text-destructive" />
                     <span className="text-[14px] font-medium text-destructive">Sign out</span>
