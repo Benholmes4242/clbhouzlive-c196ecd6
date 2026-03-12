@@ -29,7 +29,7 @@ export const VideoCardMenu = React.memo(function VideoCardMenu({ postId, userId,
       user_id: userId,
     });
     if (error) {
-      console.error('[VideoCardMenu] Dismiss failed:', error);
+      if (import.meta.env.DEV) console.error('[VideoCardMenu] Dismiss failed:', error);
     } else {
       toast.success("We'll show you less like this");
     }
