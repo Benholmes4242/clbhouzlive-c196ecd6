@@ -12,9 +12,10 @@ interface UseVideosFeedParams {
   userId: string | undefined;
   filter: VideosFilter;
   searchQuery?: string;
+  enabled?: boolean;
 }
 
-export function useVideosFeed({ userId, filter, searchQuery }: UseVideosFeedParams) {
+export function useVideosFeed({ userId, filter, searchQuery, enabled: externalEnabled = true }: UseVideosFeedParams) {
   const seenPostIds = useRef<string[]>([]);
 
   const query = useInfiniteQuery({
