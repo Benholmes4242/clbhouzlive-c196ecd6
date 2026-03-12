@@ -9,7 +9,7 @@ interface TrendingCourse {
   course_name: string;
   country: string;
   sub_country: string | null;
-  thumbnail_image: string;
+  thumbnail_image: string | null;
   global_rank: number | null;
   review_count: number;
   post_count: number;
