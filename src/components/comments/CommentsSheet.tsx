@@ -608,7 +608,7 @@ function CommentsSheet({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.15 }}
-                  className="flex-1 flex flex-col items-center justify-center px-8 gap-4"
+                  className="flex-1 flex flex-col items-center justify-center px-8 gap-4 min-h-[220px]"
                 >
                   {/* Staggered bounce emoji cluster */}
                   <div className="flex gap-3 text-4xl">
