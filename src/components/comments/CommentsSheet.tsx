@@ -107,6 +107,7 @@ function CommentsSheet({
   const [sort, setSort] = useState<'best' | 'newest'>('newest');
   const [replyingTo, setReplyingTo] = useState<ReplyTarget | null>(null);
   const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
+  const [loadingReplies, setLoadingReplies] = useState<Set<string>>(new Set());
   const [commentToDelete, setCommentToDelete] = useState<CommentWithReplies | CommentReply | null>(null);
   const [inputText, setInputText] = useState('');
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
@@ -411,9 +412,15 @@ function CommentsSheet({
             {!repliesExpanded ? (
               <button
                 type="button"
-                onClick={() => {
-                  loadAllReplies(comment.id);
+                onClick={async () => {
                   toggleReplies(comment.id);
+                  setLoadingReplies(prev => new Set(prev).add(comment.id));
+                  await loadAllReplies(comment.id);
+                  setLoadingReplies(prev => {
+                    const next = new Set(prev);
+                    next.delete(comment.id);
+                    return next;
+                  });
                 }}
                 className={cn(
                   'text-[12px] font-semibold min-h-[44px] flex items-center gap-1 pl-10',
@@ -425,6 +432,20 @@ function CommentsSheet({
               </button>
             ) : (
               <>
+                {/* Reply loading shimmer */}
+                {loadingReplies.has(comment.id) && comment.replies.length === 0 && (
+                  <div className="space-y-0">
+                    {[0, 1].map(i => (
+                      <div key={i} className="flex gap-3 pl-10 sm:pl-14 pr-4 py-3">
+                        <div className={cn('w-[28px] h-[28px] rounded-[34%] shrink-0', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
+                        <div className="flex-1 space-y-2 py-0.5">
+                          <div className={cn('h-[18px] w-20 rounded', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
+                          <div className={cn('h-[18px] w-[75%] rounded', isDark ? 'bg-white/6 clb-shimmer-dark' : 'bg-muted/80 clb-shimmer-light')} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {comment.replies.map(reply => renderCommentRow(reply, true, comment.id))}
                 {comment.total_replies_count > comment.replies.length && (
                   <button
@@ -562,22 +583,33 @@ function CommentsSheet({
                   initial={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.15, ease: 'easeOut' }}
-                  className="px-4 py-4 space-y-4"
+                  className="px-4"
                 >
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="flex gap-3">
-                      <div className={cn('w-[34px] h-[34px] rounded-[34%] shrink-0', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
-                      <div className="flex-1 space-y-2 py-1">
-                        <div className={cn('h-3 w-24 rounded', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
-                        <div className={cn('h-3 w-[85%] rounded', isDark ? 'bg-white/6 clb-shimmer-dark' : 'bg-muted/80 clb-shimmer-light')} />
-                        <div className={cn('h-3 w-[55%] rounded', isDark ? 'bg-white/5 clb-shimmer-dark' : 'bg-muted/60 clb-shimmer-light')} />
+                    <div key={i}>
+                      <div className="flex gap-3 py-3">
+                        <div className={cn('w-[34px] h-[34px] rounded-[34%] shrink-0', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
+                        <div className="flex-1 space-y-2 py-0.5">
+                          <div className={cn('h-[18px] w-24 rounded', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
+                          <div className={cn('h-[18px] w-[85%] rounded', isDark ? 'bg-white/6 clb-shimmer-dark' : 'bg-muted/80 clb-shimmer-light')} />
+                          <div className={cn('h-[18px] w-[55%] rounded', isDark ? 'bg-white/5 clb-shimmer-dark' : 'bg-muted/60 clb-shimmer-light')} />
+                        </div>
                       </div>
+                      {i < 4 && (
+                        <div className={cn('ml-[56px] sm:ml-[64px] h-px', isDark ? 'bg-white/5' : 'bg-border/20')} />
+                      )}
                     </div>
                   ))}
                 </motion.div>
               ) : comments.length === 0 ? (
                 /* Empty state */
-                <div className="flex-1 flex flex-col items-center justify-center px-8 gap-4">
+                <motion.div
+                  key="comments-empty"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.15 }}
+                  className="flex-1 flex flex-col items-center justify-center px-8 gap-4"
+                >
                   {/* Staggered bounce emoji cluster */}
                   <div className="flex gap-3 text-4xl">
                     <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>⛳</span>
@@ -594,10 +626,15 @@ function CommentsSheet({
                         : 'Be the first to drop your thoughts'}
                     </p>
                   </div>
-                </div>
+                </motion.div>
               ) : (
                 /* Comment list */
-                <div>
+                <motion.div
+                  key="comments-content"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.15 }}
+                >
                   {sortedComments.map((comment, idx) => renderTopLevelComment(comment, idx))}
                   <div ref={sentinelRef} className="h-px" />
                   {isFetchingNextPage && (
@@ -605,7 +642,7 @@ function CommentsSheet({
                       <div className={cn('w-5 h-5 border-2 rounded-full animate-spin', isDark ? 'border-white/20 border-t-white/60' : 'border-muted border-t-muted-foreground')} />
                     </div>
                   )}
-                </div>
+                </motion.div>
               )}
               </AnimatePresence>
             </div>
