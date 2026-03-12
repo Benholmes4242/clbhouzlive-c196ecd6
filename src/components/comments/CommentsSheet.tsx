@@ -507,7 +507,7 @@ function CommentsSheet({
               'flex flex-col',
               isDark ? 'bg-[#0d0d0d]' : 'bg-background'
             )}
-            style={{ minHeight: 'min(72dvh, 520px)', maxHeight: '92dvh' }}
+            style={{ minHeight: 'min(52dvh, 380px)', maxHeight: '92dvh' }}
           >
             {/* Drag handle */}
             <div className="flex justify-center pt-2.5 pb-1 shrink-0">
@@ -608,7 +608,7 @@ function CommentsSheet({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.15 }}
-                  className="flex-1 flex flex-col items-center justify-center px-8 gap-4"
+                  className="flex-1 flex flex-col items-center justify-center px-8 gap-4 min-h-[220px]"
                 >
                   {/* Staggered bounce emoji cluster */}
                   <div className="flex gap-3 text-4xl">
