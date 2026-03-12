@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Loader2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
+import type { VideosFilter } from './hooks/useVideosFeed';
 import { VideoCard } from './VideoCard';
 import { VideosFeedSkeleton } from './VideosFeedSkeleton';
 import { VideosAutoplay } from './VideosAutoplay';
@@ -16,6 +17,7 @@ interface VideosFeedProps {
   fetchNextPage: () => void;
   refetch: () => void;
   userId?: string;
+  activeFilter?: VideosFilter;
 }
 
 export function VideosFeed({
@@ -27,6 +29,7 @@ export function VideosFeed({
   fetchNextPage,
   refetch,
   userId,
+  activeFilter,
 }: VideosFeedProps) {
   const fetchGuard = useRef(false);
   const feedRef = useRef<HTMLDivElement>(null);
