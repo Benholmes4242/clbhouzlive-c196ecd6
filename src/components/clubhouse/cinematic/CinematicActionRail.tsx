@@ -254,6 +254,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         gap: 12,
         maxHeight: 'calc(100dvh - 120px)',
         overflowY: 'hidden' as const,
+        zIndex: Z.echo,
       }}
     >
       {/* Slot 1: Right chevron — top of rail, only when there's a next media item */}
