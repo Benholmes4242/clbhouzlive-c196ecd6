@@ -28,6 +28,7 @@ export default function VideosTabContent({ embedded = false }: VideosTabContentP
   const handleFilterChange = (filter: VideosFilter) => {
     setActiveFilter(filter);
     resetSeen();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
