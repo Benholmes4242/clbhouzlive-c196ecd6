@@ -9,7 +9,7 @@ interface TrendingCourse {
   course_name: string;
   country: string;
   sub_country: string | null;
-  thumbnail_image: string;
+  thumbnail_image: string | null;
   global_rank: number | null;
   review_count: number;
   post_count: number;
@@ -31,7 +31,7 @@ function TrendingCoursesStripInner({ activeRegion }: TrendingCoursesStripProps) 
 
       const { data, error } = await supabase.rpc('get_trending_courses', params);
       if (error) {
-        console.error('[TrendingCourses] RPC error:', error);
+        if (import.meta.env.DEV) console.error('[TrendingCourses] RPC error:', error);
         return [];
       }
       return (data ?? []) as TrendingCourse[];
@@ -49,7 +49,7 @@ function TrendingCoursesStripInner({ activeRegion }: TrendingCoursesStripProps) 
         <button
           type="button"
           onClick={() => navigate('/courses')}
-          className="text-xs text-muted-foreground"
+          className="text-xs text-muted-foreground min-h-[44px] px-2 flex items-center"
         >
           See all →
         </button>
@@ -59,15 +59,19 @@ function TrendingCoursesStripInner({ activeRegion }: TrendingCoursesStripProps) 
           <button
             key={course.course_id}
             type="button"
-            onClick={() => navigate(`/course/${course.course_id}`)}
+            onClick={() => navigate(`/courses/${course.course_id}`)}
             className="shrink-0 w-[140px] rounded-xl overflow-hidden bg-card border border-border/50 shadow-sm text-left focus:outline-none"
           >
-            <img
-              src={course.thumbnail_image}
-              alt={course.course_name}
-              loading="lazy"
-              className="aspect-[4/3] w-full object-cover"
-            />
+            {course.thumbnail_image ? (
+              <img
+                src={course.thumbnail_image}
+                alt={course.course_name}
+                loading="lazy"
+                className="aspect-[4/3] w-full object-cover"
+              />
+            ) : (
+              <div className="aspect-[4/3] w-full bg-muted" />
+            )}
             <div className="p-2">
               <p className="text-[12px] font-semibold text-foreground line-clamp-1">
                 {course.course_name}
