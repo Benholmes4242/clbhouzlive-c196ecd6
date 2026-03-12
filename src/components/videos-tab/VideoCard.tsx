@@ -93,7 +93,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
         if (error) throw error;
       }
     } catch (err) {
-      console.error('[VideoCard] Like toggle failed:', err);
+      if (import.meta.env.DEV) console.error('[VideoCard] Like toggle failed:', err);
       setIsLiked(!newLiked);
       setLikeCount(prev => newLiked ? Math.max(0, prev - 1) : prev + 1);
     }
