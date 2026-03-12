@@ -15,6 +15,7 @@ interface ReviewItem {
   course_location: string | null;
   avatar_url: string | null;
   username: string;
+  display_name: string;
 }
 
 interface ReviewsOfTheWeekStripProps {
