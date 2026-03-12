@@ -49,7 +49,7 @@ function TrendingCoursesStripInner({ activeRegion }: TrendingCoursesStripProps) 
         <button
           type="button"
           onClick={() => navigate('/courses')}
-          className="text-xs text-muted-foreground"
+          className="text-xs text-muted-foreground min-h-[44px] px-2 flex items-center"
         >
           See all →
         </button>
