@@ -211,7 +211,7 @@ function ProfileHubSheet({
                   Switch Profile
                 </div>
                 <div
-                  className="flex gap-3 overflow-x-auto pb-1"
+                  className="flex gap-3 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
                   style={{
                     scrollSnapType: 'x mandatory',
                     WebkitOverflowScrolling: 'touch',
