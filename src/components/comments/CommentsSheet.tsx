@@ -430,7 +430,7 @@ function CommentsSheet({
                   <button
                     type="button"
                     onClick={() => loadAllReplies(comment.id)}
-                    className="text-[12px] font-semibold text-primary min-h-[44px] flex items-center pl-14"
+                    className="text-[12px] font-semibold text-primary min-h-[44px] flex items-center pl-10 sm:pl-14"
                   >
                     Load {comment.total_replies_count - comment.replies.length} more replies
                   </button>
