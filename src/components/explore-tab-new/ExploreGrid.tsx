@@ -14,6 +14,7 @@ const REGIONS_AFTER = 18;
 
 interface ExploreGridProps {
   posts: FeedPost[];
+  coursePosts: FeedPost[];
   isLoading: boolean;
   isError: boolean;
   hasNextPage: boolean | undefined;
@@ -27,6 +28,7 @@ interface ExploreGridProps {
 
 export default function ExploreGrid({
   posts,
+  coursePosts,
   isLoading,
   isError,
   hasNextPage,
