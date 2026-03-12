@@ -230,7 +230,7 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
               <span className="text-xs font-medium text-white">{post.review.rating.toFixed(1)}</span>
             </div>
           )}
-        </div>
+        </button>
 
         {/* Engagement row */}
         <div className="flex items-center gap-6 px-3 py-3">
