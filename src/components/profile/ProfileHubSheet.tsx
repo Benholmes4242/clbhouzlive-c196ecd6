@@ -228,10 +228,7 @@ function ProfileHubSheet({
                         style={{ scrollSnapAlign: 'start' }}
                       >
                         <div className="relative">
-                          <div className={cn(
-                            'rounded-[34%] p-[2px] transition-colors',
-                            isActive ? 'bg-primary' : 'bg-transparent'
-                          )}>
+                          <div className="rounded-[34%]">
                             <SquircleAvatar
                               size={48}
                               src={profile.avatarUrl}
