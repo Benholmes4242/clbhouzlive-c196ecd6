@@ -140,25 +140,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
     setMenuOpen(v => !v);
   };
 
-  // Theme-specific styling
-  const LIGHT_BG = '#F8FAFC';
-  const LIGHT_BORDER = 'hsl(var(--border) / 0.5)';
-  const STANDARD_BG = 'hsl(var(--clubhouse-bg-header))';
-  const STANDARD_BORDER = 'hsl(var(--clubhouse-border))';
-
-  // Get background based on theme
-  const getBackground = () => {
-    if (useLightTheme) return LIGHT_BG;
-    return STANDARD_BG;
-  };
-
-  // Get border based on theme
-  const getBorder = () => {
-    if (useLightTheme) return LIGHT_BORDER;
-    return STANDARD_BORDER;
-  };
-
-  // Standardized header height: 55px content, with safe-area on top for Clubhouse
+  // Standardized header height: 55px content
   const contentHeight = 55;
   
   return (
