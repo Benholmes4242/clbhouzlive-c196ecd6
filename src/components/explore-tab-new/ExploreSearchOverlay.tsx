@@ -24,12 +24,12 @@ function ExploreSearchOverlayInner({ isOpen, onClose, userId }: ExploreSearchOve
   const { posts, isLoading, isError } = useExploreFeed({
     userId,
     searchQuery: query || undefined,
+    enabled: !!query,
   });
 
   const handleSearch = useCallback((q: string) => {
     setQuery(q);
-    if (q.trim()) addSearch(q.trim());
-  }, [addSearch]);
+  }, []);
 
   return (
     <SearchOverlay
