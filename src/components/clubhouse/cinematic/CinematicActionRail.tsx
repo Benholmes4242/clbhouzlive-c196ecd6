@@ -277,7 +277,6 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       {/* Slot 1: Right chevron — top of rail, only when there's a next media item */}
       {onNextMedia && hasNextMedia && (
         <ActionSlot
-          slotRef={rightChevronRef}
           icon={ChevronRight}
           onClick={onNextMedia}
           ariaLabel="Next media"
