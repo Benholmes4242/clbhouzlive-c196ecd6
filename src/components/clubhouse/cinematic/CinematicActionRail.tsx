@@ -235,28 +235,21 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
 
   const CAPSULE_BOTTOM_OFFSET = bottomOffset || '97px';
 
-  // Track the right chevron slot's vertical center so the left chevron mirrors it
-  const rightChevronRef = useRef<HTMLDivElement>(null);
+  // Measure the rail's top edge so the left chevron aligns with it
   const railRef = useRef<HTMLDivElement>(null);
-  const [chevronTop, setChevronTop] = useState<number | null>(null);
+  const [railTop, setRailTop] = useState<number | null>(null);
 
-  // Measure right chevron position (or rail top as fallback)
   useEffect(() => {
     const measure = () => {
-      if (rightChevronRef.current) {
-        const rect = rightChevronRef.current.getBoundingClientRect();
-        setChevronTop(rect.top + rect.height / 2);
-      } else if (railRef.current) {
-        // Fallback: first slot position = top of rail + half slot height
+      if (railRef.current) {
         const rect = railRef.current.getBoundingClientRect();
-        setChevronTop(rect.top + SLOT_HEIGHT / 2);
+        setRailTop(rect.top);
       }
     };
     measure();
-    // Re-measure on resize
     window.addEventListener('resize', measure);
     return () => window.removeEventListener('resize', measure);
-  });
+  }, [isVideo, hideMute, onSave, onMore, onNextMedia, hasNextMedia]);
 
   return (
     <>
