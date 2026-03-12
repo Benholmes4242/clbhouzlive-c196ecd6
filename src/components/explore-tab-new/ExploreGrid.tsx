@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback, useMemo, type RefObject } from 'react';
+import { useRef, useEffect, useCallback, type RefObject } from 'react';
 import { useInView } from 'react-intersection-observer';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { ExploreTile } from './ExploreTile';
