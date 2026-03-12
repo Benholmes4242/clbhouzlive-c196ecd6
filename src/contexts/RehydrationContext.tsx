@@ -57,8 +57,6 @@ export function RehydrationProvider({ children }: RehydrationProviderProps) {
 
     rehydrationInProgressRef.current = true;
     const startTime = Date.now();
-    
-    console.log(`[Rehydration] Starting ${lifecycle.rehydrationLevel} rehydration`);
 
     try {
       if (lifecycle.rehydrationLevel === 'light') {
@@ -69,7 +67,6 @@ export function RehydrationProvider({ children }: RehydrationProviderProps) {
             return FEED_QUERY_KEYS.includes(key);
           },
         });
-        console.log('[Rehydration] Light rehydration: Feed queries invalidated');
       } 
       else if (lifecycle.rehydrationLevel === 'full') {
         // Staggered full rehydration to avoid connection stampede
@@ -78,14 +75,6 @@ export function RehydrationProvider({ children }: RehydrationProviderProps) {
           'hero-carousel-data', 'overview-live-right-now', 'live-arena',
           'tournament-top-leaders', 'live-leader-teaser',
         ];
-        
-        const p1Count = queryClient.getQueryCache().findAll({
-          predicate: (query) => PRIORITY_KEYS.includes(query.queryKey[0] as string) && query.isActive(),
-        }).length;
-        console.log(`[Rehydration] Priority 1: ${p1Count} active queries to refetch`, 
-          queryClient.getQueryCache().findAll({
-            predicate: (query) => PRIORITY_KEYS.includes(query.queryKey[0] as string) && query.isActive(),
-          }).map(q => q.queryKey));
 
         await queryClient.invalidateQueries({
           predicate: (query) => {
@@ -93,18 +82,9 @@ export function RehydrationProvider({ children }: RehydrationProviderProps) {
             return PRIORITY_KEYS.includes(key);
           },
         });
-        console.log('[Rehydration] Priority 1: Live data invalidated');
 
         // Priority 2: Feed queries (after 500ms)
         await new Promise(resolve => setTimeout(resolve, 500));
-        
-        const p2Count = queryClient.getQueryCache().findAll({
-          predicate: (query) => FEED_QUERY_KEYS.includes(query.queryKey[0] as string) && query.isActive(),
-        }).length;
-        console.log(`[Rehydration] Priority 2: ${p2Count} active queries to refetch`,
-          queryClient.getQueryCache().findAll({
-            predicate: (query) => FEED_QUERY_KEYS.includes(query.queryKey[0] as string) && query.isActive(),
-          }).map(q => q.queryKey));
 
         await queryClient.invalidateQueries({
           predicate: (query) => {
@@ -112,18 +92,9 @@ export function RehydrationProvider({ children }: RehydrationProviderProps) {
             return FEED_QUERY_KEYS.includes(key);
           },
         });
-        console.log('[Rehydration] Priority 2: Feed queries invalidated');
 
         // Priority 3: Everything else (after another 1000ms)
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        const p3Count = queryClient.getQueryCache().findAll({
-          predicate: (query) => {
-            const key = query.queryKey[0] as string;
-            return !PRIORITY_KEYS.includes(key) && !FEED_QUERY_KEYS.includes(key) && query.isActive();
-          },
-        }).length;
-        console.log(`[Rehydration] Priority 3: ${p3Count} active queries to refetch`);
 
         await queryClient.invalidateQueries({
           predicate: (query) => {
@@ -132,9 +103,6 @@ export function RehydrationProvider({ children }: RehydrationProviderProps) {
           },
           refetchType: 'active',
         });
-        
-        const totalCount = p1Count + p2Count + p3Count;
-        console.log(`[Rehydration] TOTAL: ${totalCount} queries refetched across 3 phases (P1:${p1Count} P2:${p2Count} P3:${p3Count})`);
       }
 
       // Wait a minimum display time for skeleton loaders (perceived performance)
@@ -146,11 +114,8 @@ export function RehydrationProvider({ children }: RehydrationProviderProps) {
           setTimeout(resolve, MIN_SKELETON_DISPLAY_TIME - elapsed)
         );
       }
-
-      console.log('[Rehydration] Complete - content refreshed in', Date.now() - startTime, 'ms');
-    } catch (error) {
-      console.error('[Rehydration] Error during rehydration:', error);
-      // Continue anyway - better to show stale content than stay stuck
+    } catch {
+      // Rehydration failed — continue with stale content
     } finally {
       rehydrationInProgressRef.current = false;
       lifecycle.completeRehydration();

@@ -103,19 +103,18 @@ export function useMedianStatusBar(
     const t1 = setTimeout(apply, 250);
     const t2 = setTimeout(apply, 750);
 
-    // Re-apply on visibility restore (triple-fire for iOS reliability)
+    // Re-apply on visibility restore (single retry is sufficient)
     const handleVisibility = () => {
       if (!document.hidden) {
         apply();
-        setTimeout(apply, 100);
-        setTimeout(apply, 300);
+        setTimeout(apply, 200);
       }
     };
 
-    // Re-apply on focus (Median.co sometimes misses visibilitychange)
+    // Re-apply on focus (desktop fallback — visibilitychange handles iOS)
     const handleFocus = () => {
+      if (document.hidden) return; // skip if visibility handler will fire
       apply();
-      setTimeout(apply, 150);
     };
 
     document.addEventListener('visibilitychange', handleVisibility);
