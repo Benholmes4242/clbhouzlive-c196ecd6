@@ -25,12 +25,12 @@ function FriendsSearchOverlayInner({ isOpen, onClose, userId }: FriendsSearchOve
     userId,
     mode: 'latest',
     searchQuery: query || undefined,
+    enabled: !!query,
   });
 
   const handleSearch = useCallback((q: string) => {
     setQuery(q);
-    if (q.trim()) addSearch(q.trim());
-  }, [addSearch]);
+  }, []);
 
   return (
     <SearchOverlay
