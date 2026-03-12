@@ -642,7 +642,7 @@ function CommentsSheet({
                       <div className={cn('w-5 h-5 border-2 rounded-full animate-spin', isDark ? 'border-white/20 border-t-white/60' : 'border-muted border-t-muted-foreground')} />
                     </div>
                   )}
-                </div>
+                </motion.div>
               )}
               </AnimatePresence>
             </div>
