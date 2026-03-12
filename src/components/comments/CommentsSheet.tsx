@@ -271,7 +271,7 @@ function CommentsSheet({
         ref={registerRef(comment.id)}
         className={cn(
           'flex gap-3 px-4 py-3 transition-colors duration-300',
-          isReply && 'pl-14',
+          isReply && 'pl-10 sm:pl-14',
           highlightedId === comment.id && (isDark ? 'bg-white/[0.05]' : 'bg-primary/[0.04]'),
         )}
       >
