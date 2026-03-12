@@ -593,11 +593,11 @@ function CommentsSheet({
                         ? 'Be the first to review this course'
                         : 'Be the first to drop your thoughts'}
                     </p>
-                  </div>
                 </div>
+                </motion.div>
               ) : (
                 /* Comment list */
-                <div>
+                <motion.div key="comments-content" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }}>
                   {sortedComments.map((comment, idx) => renderTopLevelComment(comment, idx))}
                   <div ref={sentinelRef} className="h-px" />
                   {isFetchingNextPage && (
