@@ -354,6 +354,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
           background: 'rgba(0,0,0,0.45)',
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
+          zIndex: Z.echo,
         }}
         aria-label="Previous media"
       >
