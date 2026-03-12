@@ -188,7 +188,7 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
         const ratio = visibilityMap.get(tileIdx) ?? 0;
         if (ratio < DETACH_THRESHOLD) {
           activeMapRef.current.delete(slot);
-          detachSlot(slot, tileIdx);
+          detachSlot(slot);
         }
       }
 
