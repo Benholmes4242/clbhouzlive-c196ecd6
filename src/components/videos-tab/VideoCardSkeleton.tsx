@@ -11,15 +11,15 @@ export function VideoCardSkeleton() {
           <Skeleton className="h-3 w-16" />
         </div>
       </div>
-      {/* Video area */}
-      <Skeleton className="aspect-[16/9.5] w-full" />
       {/* Caption */}
-      <div className="p-3 space-y-2">
+      <div className="px-3 pb-2 space-y-2">
         <Skeleton className="h-3.5 w-full" />
         <Skeleton className="h-3.5 w-3/4" />
       </div>
+      {/* Video area */}
+      <Skeleton className="aspect-[16/9.5] w-full" />
       {/* Engagement row */}
-      <div className="flex items-center gap-6 px-3 pb-3">
+      <div className="flex items-center gap-6 px-3 py-3">
         <Skeleton className="h-3 w-12" />
         <Skeleton className="h-3 w-12" />
         <Skeleton className="h-3 w-12" />

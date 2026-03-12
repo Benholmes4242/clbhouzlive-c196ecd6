@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Loader2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
+import type { VideosFilter } from './hooks/useVideosFeed';
 import { VideoCard } from './VideoCard';
 import { VideosFeedSkeleton } from './VideosFeedSkeleton';
 import { VideosAutoplay } from './VideosAutoplay';
@@ -16,6 +17,7 @@ interface VideosFeedProps {
   fetchNextPage: () => void;
   refetch: () => void;
   userId?: string;
+  activeFilter?: VideosFilter;
 }
 
 export function VideosFeed({
@@ -27,6 +29,7 @@ export function VideosFeed({
   fetchNextPage,
   refetch,
   userId,
+  activeFilter,
 }: VideosFeedProps) {
   const fetchGuard = useRef(false);
   const feedRef = useRef<HTMLDivElement>(null);
@@ -79,8 +82,17 @@ export function VideosFeed({
     return (
       <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
         <span className="text-4xl mb-3">📹</span>
-        <p className="text-base font-medium text-foreground mb-1">No long-form videos yet</p>
-        <p className="text-sm text-muted-foreground">Videos over 4 minutes will appear here.</p>
+        {activeFilter === 'following' ? (
+          <>
+            <p className="text-base font-medium text-foreground mb-1">Nothing here yet</p>
+            <p className="text-sm text-muted-foreground">Follow golfers to see their long-form videos.</p>
+          </>
+        ) : (
+          <>
+            <p className="text-base font-medium text-foreground mb-1">No long-form videos yet</p>
+            <p className="text-sm text-muted-foreground">Videos over 4 minutes will appear here.</p>
+          </>
+        )}
       </div>
     );
   }

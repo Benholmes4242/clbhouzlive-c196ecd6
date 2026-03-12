@@ -93,7 +93,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
         if (error) throw error;
       }
     } catch (err) {
-      console.error('[VideoCard] Like toggle failed:', err);
+      if (import.meta.env.DEV) console.error('[VideoCard] Like toggle failed:', err);
       setIsLiked(!newLiked);
       setLikeCount(prev => newLiked ? Math.max(0, prev - 1) : prev + 1);
     }
@@ -165,7 +165,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
             {expanded && cleanedCaption.length > 100 && (
               <button
                 onClick={() => setExpanded(false)}
-                className="text-sm font-semibold text-muted-foreground mt-0.5"
+                className="text-xs font-semibold text-muted-foreground mt-0.5"
               >
                 less
               </button>
@@ -231,7 +231,11 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
 
         {/* Engagement row */}
         <div className="flex items-center gap-6 px-3 py-3">
-        <button onClick={toggleLike} className="flex items-center gap-1 text-xs">
+        <button
+          onClick={toggleLike}
+          aria-label={`${isLiked ? 'Unlike' : 'Like'} video`}
+          className="flex items-center gap-1 text-xs min-h-[44px]"
+        >
           <Heart
             className={`h-[18px] w-[18px] transition-colors ${isLiked ? 'fill-like text-like' : 'text-muted-foreground'}`}
           />
@@ -239,11 +243,19 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
             {formatCompact(likeCount)}
           </span>
         </button>
-          <button onClick={() => setShowComments(true)} className="flex items-center gap-1 text-xs text-muted-foreground">
+          <button
+            onClick={() => setShowComments(true)}
+            aria-label="Open comments"
+            className="flex items-center gap-1 text-xs text-muted-foreground min-h-[44px]"
+          >
             <MessageCircle className="h-[18px] w-[18px]" />
             {formatCompact(post.commentCount)}
           </button>
-          <button onClick={handleShare} className="flex items-center gap-1 text-xs text-muted-foreground">
+          <button
+            onClick={handleShare}
+            aria-label="Share video"
+            className="flex items-center gap-1 text-xs text-muted-foreground min-h-[44px]"
+          >
             <Share2 className="h-[18px] w-[18px]" />
             {formatCompact(post.shareCount)}
           </button>
