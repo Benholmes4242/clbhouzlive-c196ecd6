@@ -37,6 +37,7 @@ function ExploreSearchOverlayInner({ isOpen, onClose, userId }: ExploreSearchOve
       onClose={onClose}
       placeholder="Search courses & videos..."
       onSearch={handleSearch}
+      onCommit={addSearch}
       recentSearches={recentSearches}
       onClearRecent={clearAll}
       onRemoveRecent={removeSearch}
