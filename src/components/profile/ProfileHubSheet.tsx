@@ -331,7 +331,7 @@ function ProfileHubSheet({
                     <button
                       type="button"
                       onClick={() => handleNav('/admin/command-center')}
-                      className="w-full flex items-center gap-3 min-h-[48px] bg-primary/10 rounded-2xl px-4 active:bg-primary/20 transition-colors"
+                      className="w-full flex items-center gap-3 min-h-[48px] bg-primary/10 rounded-2xl px-4 hover:bg-primary/15 active:bg-primary/20 transition-colors duration-150"
                     >
                       <Shield className="w-5 h-5 text-primary" />
                       <div className="flex-1 text-left">
