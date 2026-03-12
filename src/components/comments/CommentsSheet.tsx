@@ -678,7 +678,7 @@ function CommentsSheet({
                   onClick={handleSend}
                   disabled={!inputText.trim() || isAddingComment}
                   className={cn(
-                    'w-9 h-9 rounded-full flex items-center justify-center transition-colors shrink-0',
+                    'w-11 h-11 rounded-full flex items-center justify-center transition-colors shrink-0',
                     inputText.trim()
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-white/10 text-white/30'
