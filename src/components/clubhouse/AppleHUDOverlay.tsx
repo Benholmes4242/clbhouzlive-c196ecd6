@@ -75,7 +75,7 @@ const AppleHUDOverlayBase = ({
   onMuteToggle,
   accentColor = '#ffffff'
 }: AppleHUDOverlayProps) => {
-  const HUD_BOTTOM = 'calc(16px + var(--bottom-nav-height, 88px))';
+  const HUD_BOTTOM = '101px';
 
   return (
     <>
