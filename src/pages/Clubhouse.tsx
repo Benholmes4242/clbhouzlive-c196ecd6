@@ -496,17 +496,6 @@ const ClubhouseContent = () => {
             />
           )}
 
-          {console.log('[Chevron Debug]', {
-            activeIndex,
-            currentMediaIndex,
-            activeMediaCount,
-            hasNextMedia: currentMediaIndex < activeMediaCount - 1,
-            hasPrevMedia: currentMediaIndex > 0,
-            onNextMedia: activeMediaCount > 1 ? 'defined' : 'undefined',
-            onPrevMedia: activeMediaCount > 1 ? 'defined' : 'undefined',
-            activePost: activePost?.id,
-            mediaItems: activePost?.mediaItems?.length,
-          })}
           {/* CinematicActionRail — z-40, right side */}
           <CinematicActionRail
             postId={activePost.id}
