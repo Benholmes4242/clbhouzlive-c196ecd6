@@ -38,6 +38,7 @@ function FriendsSearchOverlayInner({ isOpen, onClose, userId }: FriendsSearchOve
       onClose={onClose}
       placeholder="Search friends' posts..."
       onSearch={handleSearch}
+      onCommit={addSearch}
       recentSearches={recentSearches}
       onClearRecent={clearAll}
       onRemoveRecent={removeSearch}
