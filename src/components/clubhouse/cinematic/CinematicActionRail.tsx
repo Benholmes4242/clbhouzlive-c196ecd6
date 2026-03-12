@@ -350,7 +350,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
           w-11 h-11 rounded-full
           flex items-center justify-center"
         style={{
-          bottom: '97px',
+          bottom: '370px',
           background: 'rgba(0,0,0,0.45)',
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
