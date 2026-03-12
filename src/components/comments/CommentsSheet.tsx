@@ -502,8 +502,8 @@ function CommentsSheet({
               <div className="w-11" />
 
               {/* Title — centred */}
-              <div className="flex-1 flex items-center justify-center gap-2">
-                <span className={cn('text-[16px] font-semibold', isDark ? 'text-white' : 'text-foreground')}>
+              <div className="flex-1 min-w-0 flex items-center justify-center gap-2">
+                <span className={cn('text-[16px] font-semibold truncate', isDark ? 'text-white' : 'text-foreground')}>
                   Comments
                 </span>
                 {totalCount > 0 && (
