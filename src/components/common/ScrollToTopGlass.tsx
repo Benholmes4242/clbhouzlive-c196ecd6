@@ -46,7 +46,7 @@ const ScrollToTopGlass = () => {
           items-center
           justify-center
           active:scale-95
-          transition-all
+          transition-transform
           duration-150
           touch-manipulation
         "
