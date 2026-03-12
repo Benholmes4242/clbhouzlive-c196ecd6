@@ -175,7 +175,7 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
           <div className="px-3 pb-2">
             {courseId ? (
               <button
-                onClick={() => navigate(`/course/${courseId}`)}
+                onClick={() => navigate(`/courses/${courseId}`)}
                 className="flex items-center gap-1 hover:underline"
               >
                 <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
