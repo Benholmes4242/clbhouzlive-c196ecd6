@@ -29,7 +29,7 @@ export const FriendsCardMenu = React.memo(function FriendsCardMenu({ postId, use
       user_id: userId,
     });
     if (error) {
-      console.error('[FriendsCardMenu] Dismiss failed:', error);
+      if (import.meta.env.DEV) console.error('[FriendsCardMenu] Dismiss failed:', error);
     } else {
       toast.success("We'll show you less like this");
     }
