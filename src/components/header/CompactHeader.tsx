@@ -116,7 +116,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const handleDiscoverBack = () => {
     if (location.pathname.startsWith('/discover/explore/region/') || 
         location.pathname.startsWith('/discover/explore/theme/')) {
-      navigate('/discover?main=channels');
+      navigate('/discover?main=explore');
     } else if (searchParams.get('section')) {
       navigate('/discover?main=videos');
     } else {
