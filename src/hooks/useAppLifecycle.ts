@@ -29,7 +29,9 @@ export function useAppLifecycle() {
       // Going to background
       if (document.hidden) {
         backgroundTimeRef.current = Date.now();
-        console.log('[AppLifecycle] App backgrounded at', new Date().toISOString());
+        if (import.meta.env.DEV) {
+          console.log('[AppLifecycle] App backgrounded at', new Date().toISOString());
+        }
         return;
       }
 
@@ -37,7 +39,6 @@ export function useAppLifecycle() {
       if (!backgroundTimeRef.current || isRehydratingRef.current) return;
 
       const backgroundDuration = Date.now() - backgroundTimeRef.current;
-      console.log('[AppLifecycle] App foregrounded after', backgroundDuration, 'ms');
 
       // Step 1: Immediately ensure shield is painted (no gap)
       const shield = document.getElementById('safe-area-shield');
@@ -66,12 +67,8 @@ export function useAppLifecycle() {
 
       if (backgroundDuration >= REHYDRATION_THRESHOLDS.FULL) {
         level = 'full';
-        console.log('[AppLifecycle] Triggering FULL rehydration (>5min background)');
       } else if (backgroundDuration >= REHYDRATION_THRESHOLDS.LIGHT) {
         level = 'light';
-        console.log('[AppLifecycle] Triggering LIGHT rehydration (>30sec background)');
-      } else {
-        console.log('[AppLifecycle] No rehydration needed (<30sec background)');
       }
 
       if (level !== 'none') {
@@ -90,7 +87,9 @@ export function useAppLifecycle() {
     const handleWindowBlur = () => {
       if (!document.hidden && !backgroundTimeRef.current) {
         backgroundTimeRef.current = Date.now();
-        console.log('[AppLifecycle] Window blurred at', new Date().toISOString());
+        if (import.meta.env.DEV) {
+          console.log('[AppLifecycle] Window blurred at', new Date().toISOString());
+        }
       }
     };
 
