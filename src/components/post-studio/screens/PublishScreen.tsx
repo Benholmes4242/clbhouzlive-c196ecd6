@@ -1,8 +1,9 @@
-// PublishScreen — Step 5: Final review before publishing
-// Card-based options with amber accents
+// PublishScreen — Step 5: Premium final review
+// Dark glass cards. Amber CTA. The moment before launch.
 
-import React, { useCallback } from 'react';
-import { Globe, Users, Lock, Clock, Flag, Send } from 'lucide-react';
+import React, { useCallback, useState } from 'react';
+import { Globe, Users, Lock, Clock, Star, ChevronRight, Send, Zap } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { StudioHeader } from '../components/StudioHeader';
 import { usePostStudioContext } from '../usePostStudio';
 import { enqueuePostUpload } from '@/uploads/uploadPipeline';
@@ -10,20 +11,32 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { UploadJobInput } from '@/uploads/types';
 
-export function PublishScreen() {
-  const { state, setStep, openPanel, dispatch, onSuccess } = usePostStudioContext();
+const CARD_STYLE: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.04)',
+  border: '1px solid rgba(255,255,255,0.07)',
+  borderRadius: 20,
+};
 
-  const visibilityLabel = {
-    anyone: { label: 'Public', icon: Globe },
-    followers: { label: 'Friends', icon: Users },
-    private: { label: 'Private', icon: Lock },
+const ROW_DIVIDER: React.CSSProperties = {
+  borderTop: '1px solid rgba(255,255,255,0.06)',
+};
+
+export function PublishScreen() {
+  const { state, setStep, openPanel, onSuccess } = usePostStudioContext();
+  const [isPublishing, setIsPublishing] = useState(false);
+
+  const visibilityConfig = {
+    anyone:    { label: 'Public',  Icon: Globe,  desc: 'Everyone can see' },
+    followers: { label: 'Friends', Icon: Users,  desc: 'Followers only' },
+    private:   { label: 'Private', Icon: Lock,   desc: 'Only you' },
   }[state.visibility];
-  const VisIcon = visibilityLabel.icon;
 
   const handlePublish = useCallback(async () => {
+    if (isPublishing) return;
+    setIsPublishing(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { toast.error('You need to be logged in'); return; }
+      if (!user) { toast.error('You need to be logged in'); setIsPublishing(false); return; }
 
       const files = state.mediaItems.map((m) => m.file).filter((f): f is File => !!f);
       const input: UploadJobInput = {
@@ -33,8 +46,11 @@ export function PublishScreen() {
         caption: state.caption,
         files,
         mediaItems: state.mediaItems.map((item) => ({
-          id: item.id, file: item.file, type: item.mediaType, width: item.width ?? undefined, height: item.height ?? undefined,
-          duration: item.duration ?? undefined, trimStart: item.trimStart || null, trimEnd: item.trimEnd || null, posterTimestamp: item.posterTimestamp || null,
+          id: item.id, file: item.file, type: item.mediaType,
+          width: item.width ?? undefined, height: item.height ?? undefined,
+          duration: item.duration ?? undefined,
+          trimStart: item.trimStart || null, trimEnd: item.trimEnd || null,
+          posterTimestamp: item.posterTimestamp || null,
         })),
         courseIds: state.taggedCourses.map((c) => c.courseId),
         courseInfo: state.taggedCourses[0]
@@ -50,94 +66,104 @@ export function PublishScreen() {
     } catch (err) {
       console.error('[PublishScreen] Failed to enqueue:', err);
       toast.error('Failed to start upload. Please try again.');
+      setIsPublishing(false);
     }
-  }, [state, setStep]);
+  }, [state, setStep, onSuccess, isPublishing]);
+
+  const firstItem = state.mediaItems[0];
+  const itemCount = state.mediaItems.length;
+  const hasCaption = state.caption.trim().length > 0;
 
   return (
-    <div className="flex-1 flex flex-col bg-clbhouzBg">
-      <StudioHeader
-        title="Review"
-        step="PUBLISH"
-        leftAction={{ label: 'Back', onClick: () => setStep('COMPOSER') }}
-      />
+    <div className="flex-1 flex flex-col" style={{ background: '#0D0D0D' }}>
+      <StudioHeader title="Review" step="PUBLISH" leftAction={{ label: 'Back', onClick: () => setStep('COMPOSER') }} />
 
-      <div className="flex-1 overflow-y-auto">
-        {/* Preview card */}
-        <div className="bg-background rounded-2xl mx-4 mt-3 p-3 shadow-sm border border-border/40">
-          <div className="flex items-start gap-3">
-            {state.mediaItems[0] && (
-              <img
-                src={state.mediaItems[0].thumbnailUrl || state.mediaItems[0].previewUrl}
-                alt=""
-                className="w-16 h-16 rounded-lg object-cover shrink-0"
-              />
+      <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+        <div className="mx-4 mt-4" style={CARD_STYLE}>
+          <div className="flex items-start gap-3 p-4">
+            {firstItem && (
+              <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0" style={{ background: 'rgba(255,255,255,0.06)', boxShadow: '0 4px 12px rgba(0,0,0,0.4)' }}>
+                <img src={firstItem.thumbnailUrl || firstItem.previewUrl} alt="" className="w-full h-full object-cover" />
+              </div>
             )}
-            <div className="flex-1 min-w-0">
-              <p className="text-foreground text-sm line-clamp-3">{state.caption || 'No caption'}</p>
-              <p className="text-muted-foreground text-xs mt-1">
-                {state.mediaItems.length} item{state.mediaItems.length !== 1 ? 's' : ''}
-                {state.taggedCourses.length > 0 && ` · ${state.taggedCourses.length} course${state.taggedCourses.length !== 1 ? 's' : ''}`}
+            <div className="flex-1 min-w-0 pt-0.5">
+              <p className="text-sm line-clamp-2 leading-relaxed mb-1.5" style={{ color: hasCaption ? 'rgba(255,255,255,0.80)' : 'rgba(255,255,255,0.30)' }}>
+                {hasCaption ? state.caption : 'No caption'}
               </p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.35)' }}>{itemCount} item{itemCount !== 1 ? 's' : ''}</span>
+                {state.taggedCourses.length > 0 && (
+                  <>
+                    <span style={{ color: 'rgba(255,255,255,0.15)' }}>·</span>
+                    <span className="text-[11px] font-medium" style={{ color: 'rgba(245,158,11,0.70)' }}>⛳ {state.taggedCourses.map(c => c.courseName).join(', ')}</span>
+                  </>
+                )}
+                {state.postType === 'review' && state.reviewRating && (
+                  <>
+                    <span style={{ color: 'rgba(255,255,255,0.15)' }}>·</span>
+                    <span className="text-[11px] font-medium" style={{ color: 'rgba(245,158,11,0.80)' }}>{'★'.repeat(state.reviewRating)} {state.reviewRating}/5</span>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Options card */}
-        <div className="px-4 pt-5">
-          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Post options</h3>
+        <div className="mx-4 mt-3" style={CARD_STYLE}>
+          <p className="px-4 pt-4 pb-2 text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: 'rgba(255,255,255,0.30)' }}>Settings</p>
 
-          <div className="bg-background rounded-2xl overflow-hidden border border-border/40">
-            {/* Audience */}
-            <button
-              onClick={() => openPanel('audience')}
-              className="w-full flex items-center gap-3 py-3.5 px-3 min-h-[52px] border-b border-border/40"
-            >
-              <VisIcon className="w-5 h-5 text-muted-foreground" />
-              <div className="flex-1 text-left">
-                <p className="text-sm text-foreground">Audience</p>
-              </div>
-              <span className="text-xs font-medium text-primary">{visibilityLabel.label}</span>
-            </button>
+          <motion.button whileTap={{ backgroundColor: 'rgba(255,255,255,0.06)' }} onClick={() => openPanel('audience')} className="w-full flex items-center gap-3 px-4 py-4 min-h-[56px] transition-colors" style={ROW_DIVIDER}>
+            <visibilityConfig.Icon className="w-5 h-5 shrink-0" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={1.75} />
+            <div className="flex-1 text-left">
+              <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.80)' }}>Audience</p>
+              <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>{visibilityConfig.desc}</p>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm font-semibold" style={{ color: '#f59e0b' }}>{visibilityConfig.label}</span>
+              <ChevronRight className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.25)' }} />
+            </div>
+          </motion.button>
 
-            {/* Schedule */}
-            <button
-              onClick={() => openPanel('schedule')}
-              className={`w-full flex items-center gap-3 py-3.5 px-3 min-h-[52px] ${state.postType === 'review' ? 'border-b border-border/40' : ''}`}
-            >
-              <Clock className="w-5 h-5 text-muted-foreground" />
-              <div className="flex-1 text-left">
-                <p className="text-sm text-foreground">Schedule</p>
-              </div>
-              <span className="text-xs text-primary">
-                {state.scheduledAt
-                  ? state.scheduledAt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
-                  : 'Post now'}
+          <motion.button whileTap={{ backgroundColor: 'rgba(255,255,255,0.06)' }} onClick={() => openPanel('schedule')} className="w-full flex items-center gap-3 px-4 py-4 min-h-[56px] transition-colors" style={ROW_DIVIDER}>
+            <Clock className="w-5 h-5 shrink-0" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={1.75} />
+            <div className="flex-1 text-left">
+              <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.80)' }}>Schedule</p>
+              <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>{state.scheduledAt ? 'Scheduled' : 'Post immediately'}</p>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-medium" style={{ color: state.scheduledAt ? '#f59e0b' : 'rgba(255,255,255,0.35)' }}>
+                {state.scheduledAt ? state.scheduledAt.toLocaleDateString('en-GB', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : 'Now'}
               </span>
-            </button>
+              <ChevronRight className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.25)' }} />
+            </div>
+          </motion.button>
 
-            {/* Review */}
-            {state.postType === 'review' && (
-              <div className="flex items-center gap-3 py-3.5 px-3">
-                <Flag className="w-5 h-5 text-primary" />
-                <div className="flex-1 text-left">
-                  <p className="text-sm text-foreground">Review</p>
-                </div>
-                <span className="text-xs text-primary">{state.reviewRating ? `${state.reviewRating}/5 stars` : 'No rating'}</span>
-              </div>
-            )}
-          </div>
+          {state.postType === 'review' && (
+            <div className="flex items-center gap-3 px-4 py-4 min-h-[56px]" style={ROW_DIVIDER}>
+              <Star className="w-5 h-5 shrink-0" style={{ color: '#f59e0b' }} strokeWidth={1.75} fill="rgba(245,158,11,0.30)" />
+              <div className="flex-1 text-left"><p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.80)' }}>Rating</p></div>
+              <span className="text-sm font-semibold" style={{ color: '#f59e0b' }}>{state.reviewRating ? `${state.reviewRating}/5` : 'Not set'}</span>
+            </div>
+          )}
         </div>
+        <div className="h-6" />
       </div>
 
-      {/* Publish button */}
-      <div className="px-4 py-4 shrink-0">
-        <button
-          onClick={handlePublish}
-          className="w-full py-3.5 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm flex items-center justify-center gap-2 min-h-[56px] shadow-[0_4px_16px_rgba(245,158,11,0.35)]"
-        >
-          <Send className="w-4 h-4" />
-          {state.scheduledAt ? 'Schedule Post' : 'Post'}
-        </button>
+      <div className="shrink-0 px-4 pt-3 pb-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)', background: 'rgba(13,13,13,0.97)' }}>
+        <motion.button whileTap={{ scale: 0.97 }} onClick={handlePublish} disabled={isPublishing} className="w-full rounded-2xl font-bold text-base flex items-center justify-center gap-2.5 min-h-[58px] disabled:opacity-60"
+          style={{ background: isPublishing ? 'rgba(245,158,11,0.50)' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', color: '#0D0D0D', boxShadow: isPublishing ? 'none' : '0 6px 24px rgba(245,158,11,0.45), 0 2px 8px rgba(245,158,11,0.30)' }}>
+          {isPublishing ? (
+            <>
+              <div className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(0,0,0,0.4)', borderTopColor: 'transparent' }} />
+              Starting upload…
+            </>
+          ) : (
+            <>
+              {state.scheduledAt ? <Clock className="w-5 h-5" strokeWidth={2.5} /> : <Zap className="w-5 h-5" strokeWidth={2.5} fill="currentColor" />}
+              {state.scheduledAt ? 'Schedule Post' : 'Post Now'}
+            </>
+          )}
+        </motion.button>
       </div>
     </div>
   );

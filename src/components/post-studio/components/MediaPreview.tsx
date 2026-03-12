@@ -1,10 +1,12 @@
-// MediaPreview — Main preview pane for active media item
-// Video: 16:9, muted inline playback. Image: 1:1.
+// MediaPreview — Full-bleed dark media display with cinematic controls
 
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { Play, Pause } from 'lucide-react';
-import { ASPECT_RATIO } from '../constants';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { StudioMediaItem } from '../types';
+
+const VIDEO_ASPECT = 16 / 9;
+const IMAGE_MAX_ASPECT = 1.3;
 
 interface MediaPreviewProps {
   item: StudioMediaItem;
@@ -16,57 +18,70 @@ export function MediaPreview({ item, onSwipeLeft, onSwipeRight }: MediaPreviewPr
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [showControls, setShowControls] = useState(true);
+  const controlsTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
 
   const isVideo = item.mediaType === 'video';
-  const aspect = isVideo ? ASPECT_RATIO.video : ASPECT_RATIO.image;
+  const aspect = isVideo ? VIDEO_ASPECT : Math.min((item.width ?? 1) / (item.height ?? 1), IMAGE_MAX_ASPECT);
+
+  const fadeOutControls = useCallback(() => {
+    clearTimeout(controlsTimerRef.current);
+    controlsTimerRef.current = setTimeout(() => setShowControls(false), 2500);
+  }, []);
 
   const togglePlay = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
-    if (video.paused) { video.play(); setIsPlaying(true); }
-    else { video.pause(); setIsPlaying(false); }
-  }, []);
+    setShowControls(true);
+    if (video.paused) { video.play(); setIsPlaying(true); fadeOutControls(); }
+    else { video.pause(); setIsPlaying(false); clearTimeout(controlsTimerRef.current); }
+  }, [fadeOutControls]);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !isVideo) return;
-    const handleTimeUpdate = () => {
-      if (item.trimEnd != null && video.currentTime >= item.trimEnd) video.currentTime = item.trimStart;
-    };
+    const handleTimeUpdate = () => { if (item.trimEnd != null && video.currentTime >= item.trimEnd) video.currentTime = item.trimStart; };
     video.addEventListener('timeupdate', handleTimeUpdate);
     return () => video.removeEventListener('timeupdate', handleTimeUpdate);
   }, [isVideo, item.trimStart, item.trimEnd]);
 
-  const handleTouchStart = useCallback((e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; }, []);
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
     const dx = e.changedTouches[0].clientX - touchStartX.current;
-    if (Math.abs(dx) > 50) { if (dx < 0) onSwipeLeft?.(); else onSwipeRight?.(); }
+    const dy = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
+    if (Math.abs(dx) > 50 && dy < 40) { if (dx < 0) onSwipeLeft?.(); else onSwipeRight?.(); }
   }, [onSwipeLeft, onSwipeRight]);
 
   if (hasError) {
-    return (
-      <div className="w-full bg-muted rounded-xl flex items-center justify-center" style={{ aspectRatio: aspect }}>
-        <p className="text-muted-foreground text-sm">Failed to load</p>
-      </div>
-    );
+    return <div className="w-full flex items-center justify-center" style={{ aspectRatio: VIDEO_ASPECT, background: '#111' }}><p style={{ color: 'rgba(255,255,255,0.30)', fontSize: 13 }}>Failed to load</p></div>;
   }
 
   return (
-    <div
-      className="w-full relative rounded-xl overflow-hidden bg-[#0A0A0A]"
-      style={{ aspectRatio: aspect }}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
+    <div className="w-full relative" style={{ aspectRatio: aspect, background: '#000', cursor: isVideo ? 'pointer' : 'default' }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} onClick={isVideo ? togglePlay : undefined}>
       {isVideo ? (
         <>
           <video ref={videoRef} src={item.previewUrl} muted playsInline loop className="w-full h-full object-contain" onError={() => setHasError(true)} />
-          <button onClick={togglePlay} className="absolute inset-0 flex items-center justify-center">
-            <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
-              {isPlaying ? <Pause className="w-5 h-5 text-white" /> : <Play className="w-5 h-5 text-white ml-0.5" />}
-            </div>
-          </button>
+          <AnimatePresence>
+            {showControls && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.50)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}>
+                  {isPlaying ? <Pause className="w-6 h-6 text-white" strokeWidth={2} /> : <Play className="w-6 h-6 text-white ml-0.5" strokeWidth={2} />}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          {(item.trimStart > 0 || (item.trimEnd !== null && item.trimEnd !== item.duration)) && (
+            <div className="absolute top-2.5 right-2.5 px-2 py-1 rounded-lg text-[11px] font-semibold" style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', color: 'rgba(245,158,11,0.9)' }}>Trimmed</div>
+          )}
+          {item.posterPreviewUrl && (
+            <div className="absolute top-2.5 left-2.5 px-2 py-1 rounded-lg text-[11px] font-semibold" style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', color: 'rgba(255,255,255,0.70)' }}>Cover set</div>
+          )}
         </>
       ) : (
         <img src={item.previewUrl} alt="" className="w-full h-full object-cover" loading="lazy" onError={() => setHasError(true)} />
