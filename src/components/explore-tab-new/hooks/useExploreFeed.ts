@@ -64,7 +64,7 @@ export function useExploreFeed({ userId, region, searchQuery, enabled: externalE
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as string | undefined,
-    enabled: !!userId,
+    enabled: !!userId && externalEnabled,
     placeholderData: keepPreviousData,
     staleTime: 2 * 60 * 1000,
     gcTime: 10 * 60 * 1000,

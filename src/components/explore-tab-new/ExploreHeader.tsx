@@ -46,13 +46,15 @@ function ExploreHeaderInner({
       </div>
 
       {/* Region chips */}
-      <div className="flex gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide">
+      <div role="tablist" aria-label="Filter by region" className="flex gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide">
         {regions.map((region) => {
           const isActive = activeRegion === region.slug;
           return (
             <button
               key={region.slug ?? '__all'}
               type="button"
+              role="tab"
+              aria-selected={isActive}
               onClick={() => onRegionChange(region.slug)}
               className="shrink-0 min-h-[36px] px-4 rounded-full text-sm font-semibold transition-colors"
               style={{

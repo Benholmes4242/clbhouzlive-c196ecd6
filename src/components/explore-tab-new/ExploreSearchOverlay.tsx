@@ -63,7 +63,7 @@ function ExploreSearchOverlayInner({ isOpen, onClose, userId }: ExploreSearchOve
         ) : (
           <div className="grid grid-cols-2 gap-[2px] px-[2px]">
             {posts.map((post, index) => (
-              <ExploreTile key={post.id} post={post} index={index} />
+              <ExploreTile key={post.id} post={post} index={index} allPosts={posts} />
             ))}
           </div>
         )}
