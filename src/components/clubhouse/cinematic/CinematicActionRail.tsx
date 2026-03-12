@@ -363,8 +363,8 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
 
     </motion.div>
 
-    {/* Left chevron — independent, mirrors right chevron position */}
-    {onPrevMedia && hasPrevMedia && (
+    {/* Left chevron — mirrors right chevron's exact vertical position */}
+    {onPrevMedia && hasPrevMedia && chevronTop !== null && (
       <motion.button
         initial={{ opacity: 0, x: -8 }}
         animate={{ opacity: 1, x: 0 }}
@@ -375,7 +375,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
           w-11 h-11 rounded-full
           flex items-center justify-center"
         style={{
-          top: '50%',
+          top: `${chevronTop}px`,
           transform: 'translateY(-50%)',
           background: 'rgba(0,0,0,0.45)',
           backdropFilter: 'blur(8px)',
