@@ -496,7 +496,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             border: `1px solid ${borderColor}`,
-            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.35)',
           }}
         >
           {/* Collapsed State - mode-dependent, crossfade on post change */}
