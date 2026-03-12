@@ -59,6 +59,7 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
 
       <ExploreGrid
         posts={posts}
+        coursePosts={coursePosts}
         isLoading={isLoading}
         isError={isError}
         hasNextPage={hasNextPage}
@@ -70,7 +71,7 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
         onRegionChange={handleRegionChange}
       />
 
-      <ExploreAutoplay posts={posts} gridRef={gridRef} />
+      <ExploreAutoplay posts={coursePosts} gridRef={gridRef} />
 
       <ExploreSearchOverlay
         isOpen={isSearchOpen}

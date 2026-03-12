@@ -57,10 +57,6 @@ export default function ExploreGrid({
     if (inView) loadMore();
   }, [inView, loadMore]);
 
-  const coursePosts = useMemo(() => {
-    return posts.filter(post => !!(post.courseName || post.review?.courseName));
-  }, [posts]);
-
   // Sync new posts into fullscreen overlay
   const isFullscreenOpen = useFullscreenFeed(s => s.isOpen);
   const fullscreenPostCount = useFullscreenFeed(s => s.posts.length);
