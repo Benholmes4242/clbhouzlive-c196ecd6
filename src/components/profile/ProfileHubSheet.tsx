@@ -280,7 +280,7 @@ function ProfileHubSheet({
                     key={label}
                     type="button"
                     onClick={() => handleNav(route)}
-                    className="relative flex items-center gap-3 bg-muted rounded-2xl px-4 min-h-[56px] active:bg-muted/70 transition-colors"
+                    className="relative flex items-center gap-3 bg-muted rounded-2xl px-4 min-h-[56px] hover:bg-muted/80 active:bg-muted/70 transition-colors duration-150"
                   >
                     <div className="relative">
                       <Icon className="w-[18px] h-[18px] text-muted-foreground" />
