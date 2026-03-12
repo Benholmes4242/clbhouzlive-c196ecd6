@@ -42,7 +42,7 @@ export const VideoCardMenu = React.memo(function VideoCardMenu({ postId, userId,
       reporter_id: userId,
     });
     if (error) {
-      console.error('[VideoCardMenu] Report failed:', error);
+      if (import.meta.env.DEV) console.error('[VideoCardMenu] Report failed:', error);
     } else {
       toast.success('Report submitted');
     }

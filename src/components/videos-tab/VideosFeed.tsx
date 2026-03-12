@@ -82,8 +82,17 @@ export function VideosFeed({
     return (
       <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
         <span className="text-4xl mb-3">📹</span>
-        <p className="text-base font-medium text-foreground mb-1">No long-form videos yet</p>
-        <p className="text-sm text-muted-foreground">Videos over 4 minutes will appear here.</p>
+        {activeFilter === 'following' ? (
+          <>
+            <p className="text-base font-medium text-foreground mb-1">Nothing here yet</p>
+            <p className="text-sm text-muted-foreground">Follow golfers to see their long-form videos.</p>
+          </>
+        ) : (
+          <>
+            <p className="text-base font-medium text-foreground mb-1">No long-form videos yet</p>
+            <p className="text-sm text-muted-foreground">Videos over 4 minutes will appear here.</p>
+          </>
+        )}
       </div>
     );
   }

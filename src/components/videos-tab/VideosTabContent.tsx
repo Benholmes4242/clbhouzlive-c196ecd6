@@ -48,6 +48,7 @@ export default function VideosTabContent({ embedded = false }: VideosTabContentP
         fetchNextPage={fetchNextPage}
         refetch={refetch}
         userId={user?.id}
+        activeFilter={activeFilter}
       />
       <VideosSearchOverlay
         isOpen={isSearchOpen}
