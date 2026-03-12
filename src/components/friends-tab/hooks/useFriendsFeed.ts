@@ -66,7 +66,7 @@ export function useFriendsFeed({ userId, mode, searchQuery }: UseFriendsFeedPara
       }
 
       const lastRow = rows[rows.length - 1];
-      const nextCursor = posts.length >= PAGE_SIZE ? lastRow.post_created_at : undefined;
+      const nextCursor = rows.length >= PAGE_SIZE ? lastRow.post_created_at : undefined;
 
       return { posts, nextCursor };
     },
