@@ -172,10 +172,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           <div className="w-11 flex-shrink-0">
             <button
               type="button"
-              className={cn(
-                "flex items-center gap-2 bg-transparent border-0 transition-transform min-h-[44px]",
-                isClubhouseRoute && !isBackArrowRoute ? "pointer-events-none" : "cursor-pointer active:scale-[0.98]"
-              )}
+              className="flex items-center gap-2 bg-transparent border-0 transition-transform min-h-[44px] cursor-pointer active:scale-[0.98]"
               onClick={handleLogoClick}
               onTouchStart={isTourRoute ? prefetchNavMenu : undefined}
               aria-label={isBackArrowRoute ? "Go back" : isTourRoute ? "Go to tour menu" : "Go to home"}
