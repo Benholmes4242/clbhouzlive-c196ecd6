@@ -54,7 +54,7 @@ const PostMetadata = ({ title, description, user, onUserClick, className, tags, 
         className
       )}
       style={{
-        bottom: 'calc(12px + var(--bottom-nav-height, 88px))',
+        bottom: '97px',
       }}
     >
       {/* User Profile */}

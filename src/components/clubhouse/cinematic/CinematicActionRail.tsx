@@ -232,7 +232,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   // Idle opacity: 75% when not interacted, full when interacted or active
   const idleOpacity = hasInteracted ? 1 : 0.75;
 
-  const CAPSULE_BOTTOM_OFFSET = bottomOffset || `calc(12px + var(--bottom-nav-height, 88px))`;
+  const CAPSULE_BOTTOM_OFFSET = bottomOffset || '97px';
 
   return (
     <motion.div

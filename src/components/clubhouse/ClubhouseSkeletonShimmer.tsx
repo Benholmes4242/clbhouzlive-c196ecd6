@@ -191,7 +191,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
             <div 
               className="absolute left-4"
               style={{ 
-                bottom: 'calc(12px + var(--bottom-nav-height, 88px))',
+                bottom: '97px',
               }}
             >
               <CreatorCapsuleSkeleton isStatic={effectiveStatic} />
