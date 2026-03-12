@@ -4,7 +4,7 @@
  * "Liquid glass" circular buttons for Mute, Like, Comment, Share, Save
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, Music, MoreHorizontal, ChevronRight, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -235,9 +235,33 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
 
   const CAPSULE_BOTTOM_OFFSET = bottomOffset || '97px';
 
+  // Track the right chevron slot's vertical center so the left chevron mirrors it
+  const rightChevronRef = useRef<HTMLDivElement>(null);
+  const railRef = useRef<HTMLDivElement>(null);
+  const [chevronTop, setChevronTop] = useState<number | null>(null);
+
+  // Measure right chevron position (or rail top as fallback)
+  useEffect(() => {
+    const measure = () => {
+      if (rightChevronRef.current) {
+        const rect = rightChevronRef.current.getBoundingClientRect();
+        setChevronTop(rect.top + rect.height / 2);
+      } else if (railRef.current) {
+        // Fallback: first slot position = top of rail + half slot height
+        const rect = railRef.current.getBoundingClientRect();
+        setChevronTop(rect.top + SLOT_HEIGHT / 2);
+      }
+    };
+    measure();
+    // Re-measure on resize
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  });
+
   return (
     <>
     <motion.div
+      ref={railRef}
       initial={{ opacity: 0, x: 20 }}
       animate={{
         opacity: isVisible ? 1 : 0,
@@ -260,6 +284,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       {/* Slot 1: Right chevron — top of rail, only when there's a next media item */}
       {onNextMedia && hasNextMedia && (
         <ActionSlot
+          slotRef={rightChevronRef}
           icon={ChevronRight}
           onClick={onNextMedia}
           ariaLabel="Next media"
@@ -338,8 +363,8 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
 
     </motion.div>
 
-    {/* Left chevron — independent, mirrors right chevron position */}
-    {onPrevMedia && hasPrevMedia && (
+    {/* Left chevron — mirrors right chevron's exact vertical position */}
+    {onPrevMedia && hasPrevMedia && chevronTop !== null && (
       <motion.button
         initial={{ opacity: 0, x: -8 }}
         animate={{ opacity: 1, x: 0 }}
@@ -350,7 +375,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
           w-11 h-11 rounded-full
           flex items-center justify-center"
         style={{
-          top: '50%',
+          top: `${chevronTop}px`,
           transform: 'translateY(-50%)',
           background: 'rgba(0,0,0,0.45)',
           backdropFilter: 'blur(8px)',
