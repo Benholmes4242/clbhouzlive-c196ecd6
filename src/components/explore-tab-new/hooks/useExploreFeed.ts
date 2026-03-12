@@ -10,9 +10,10 @@ interface UseExploreFeedParams {
   userId: string | undefined;
   region?: string | null;
   searchQuery?: string;
+  enabled?: boolean;
 }
 
-export function useExploreFeed({ userId, region, searchQuery }: UseExploreFeedParams) {
+export function useExploreFeed({ userId, region, searchQuery, enabled: externalEnabled = true }: UseExploreFeedParams) {
   const seenPostIds = useRef<string[]>([]);
 
   const query = useInfiniteQuery({
