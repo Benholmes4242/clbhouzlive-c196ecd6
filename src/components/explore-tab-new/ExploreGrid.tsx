@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback, useMemo, type RefObject } from 'react';
+import { useRef, useEffect, useCallback, type RefObject } from 'react';
 import { useInView } from 'react-intersection-observer';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { ExploreTile } from './ExploreTile';
@@ -14,6 +14,7 @@ const REGIONS_AFTER = 18;
 
 interface ExploreGridProps {
   posts: FeedPost[];
+  coursePosts: FeedPost[];
   isLoading: boolean;
   isError: boolean;
   hasNextPage: boolean | undefined;
@@ -27,6 +28,7 @@ interface ExploreGridProps {
 
 export default function ExploreGrid({
   posts,
+  coursePosts,
   isLoading,
   isError,
   hasNextPage,
@@ -54,10 +56,6 @@ export default function ExploreGrid({
   useEffect(() => {
     if (inView) loadMore();
   }, [inView, loadMore]);
-
-  const coursePosts = useMemo(() => {
-    return posts.filter(post => !!(post.courseName || post.review?.courseName));
-  }, [posts]);
 
   // Sync new posts into fullscreen overlay
   const isFullscreenOpen = useFullscreenFeed(s => s.isOpen);
