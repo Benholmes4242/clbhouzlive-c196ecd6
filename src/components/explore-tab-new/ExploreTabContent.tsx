@@ -32,9 +32,14 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
     resetSeen,
   } = useExploreFeed({ userId, region: activeRegion });
 
+  const coursePosts = useMemo(() => {
+    return posts.filter(post => !!(post.courseName || post.review?.courseName));
+  }, [posts]);
+
   const handleRegionChange = useCallback((slug: string | null) => {
     setActiveRegion(slug);
     resetSeen();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [resetSeen]);
 
   const handleOpenSearch = useCallback(() => {
