@@ -665,7 +665,7 @@ function CommentsSheet({
                     placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : 'Add a comment...'}
                     rows={1}
                     className={cn(
-                      'flex-1 bg-transparent text-sm outline-none resize-none leading-snug',
+                      'flex-1 min-w-0 bg-transparent text-sm outline-none resize-none leading-snug',
                       isDark
                         ? 'text-white placeholder:text-white/40'
                         : 'text-foreground placeholder:text-muted-foreground'
