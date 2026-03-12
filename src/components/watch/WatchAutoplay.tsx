@@ -28,8 +28,10 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
   const videoPoolRef = useRef<HTMLVideoElement[]>([]);
   const hlsPoolRef = useRef<(any | null)[]>([null, null]);
   const activeMapRef = useRef<Map<number, number>>(new Map());
+  const prewarmObserverRef = useRef<IntersectionObserver | null>(null);
   const autoplayObserverRef = useRef<IntersectionObserver | null>(null);
   const observedTilesRef = useRef<Set<number>>(new Set());
+  const prewarmedSetRef = useRef<Set<number>>(new Set());
   const postsRef = useRef<FeedPost[]>(posts);
   postsRef.current = posts;
 
@@ -37,6 +39,43 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     const connection = (navigator as any).connection;
     const type = connection?.effectiveType || '4g';
     return type === '2g' || type === 'slow-2g';
+  }, []);
+
+  const prewarmTile = useCallback(async (hlsUrl: string, tileIdx: number) => {
+    try {
+      const masterText = await fetch(hlsUrl, { mode: 'cors', credentials: 'omit' }).then(r => r.text());
+      const masterLines = masterText.split('\n');
+      const streamIdx = masterLines.findIndex(l => l.startsWith('#EXT-X-STREAM-INF'));
+      const levelRelUrl = streamIdx >= 0 ? masterLines[streamIdx + 1]?.trim() : null;
+      if (!levelRelUrl || levelRelUrl.startsWith('#')) return;
+      const masterBase = hlsUrl.substring(0, hlsUrl.lastIndexOf('/') + 1);
+      const levelUrl = levelRelUrl.startsWith('http')
+        ? levelRelUrl
+        : new URL(levelRelUrl, masterBase).href;
+
+      const levelText = await fetch(levelUrl, { mode: 'cors', credentials: 'omit' }).then(r => r.text());
+      const lines = levelText.split('\n');
+      const base = levelUrl.substring(0, levelUrl.lastIndexOf('/') + 1);
+
+      const mapLine = lines.find(l => l.startsWith('#EXT-X-MAP:URI="'));
+      if (mapLine) {
+        const mapUri = mapLine.match(/#EXT-X-MAP:URI="([^"]+)"/)?.[1];
+        if (mapUri) {
+          const initUrl = mapUri.startsWith('http') ? mapUri : new URL(mapUri, base).href;
+          fetch(initUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
+        }
+      }
+
+      const segLine = lines.find(l => l.trim() && !l.startsWith('#'));
+      if (segLine) {
+        const segUrl = segLine.trim().startsWith('http')
+          ? segLine.trim()
+          : new URL(segLine.trim(), base).href;
+        fetch(segUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
+      }
+    } catch {
+      // silent
+    }
   }, []);
 
   // Create persistent video pool
@@ -228,6 +267,50 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     };
   }, [posts, gridRef, isSlowNetwork, attachToTile, detachSlot]);
 
+  // Pre-warm observer — fetch manifests + first segments before tiles enter viewport
+  useEffect(() => {
+    if (isSlowNetwork()) return;
+    const grid = gridRef.current;
+    if (!grid || posts.length === 0) return;
+
+    prewarmedSetRef.current.clear();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const el = entry.target as HTMLElement;
+          const idx = Number(el.dataset.watchIndex);
+          if (isNaN(idx) || prewarmedSetRef.current.has(idx)) continue;
+          const post = postsRef.current[idx];
+          const hlsUrl = post?.mediaItems?.[0]?.hlsUrl;
+          if (!hlsUrl) continue;
+          prewarmedSetRef.current.add(idx);
+          prewarmTile(hlsUrl, idx);
+        }
+      },
+      { rootMargin: '800px' }
+    );
+    prewarmObserverRef.current = observer;
+
+    const timer = setTimeout(() => {
+      const tiles = grid.querySelectorAll('[data-watch-index]');
+      tiles.forEach((tile) => {
+        const idx = Number((tile as HTMLElement).dataset.watchIndex);
+        if (!prewarmedSetRef.current.has(idx)) {
+          observer.observe(tile);
+        }
+      });
+    }, 0);
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+      prewarmObserverRef.current = null;
+      prewarmedSetRef.current.clear();
+    };
+  }, [posts, gridRef, isSlowNetwork, prewarmTile]);
+
   // Re-observe new tiles as infinite scroll loads
   useEffect(() => {
     const grid = gridRef.current;
@@ -239,6 +322,9 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
       if (autoplayObserverRef.current && !observedTilesRef.current.has(idx)) {
         observedTilesRef.current.add(idx);
         autoplayObserverRef.current.observe(tile);
+      }
+      if (prewarmObserverRef.current && !prewarmedSetRef.current.has(idx)) {
+        prewarmObserverRef.current.observe(tile);
       }
     });
   }, [posts.length, gridRef]);

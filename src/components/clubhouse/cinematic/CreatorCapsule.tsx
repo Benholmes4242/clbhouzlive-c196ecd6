@@ -473,8 +473,8 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           bottom: bottomOffset 
             ? bottomOffset 
             : (isReview 
-                ? '105px'
-                : '97px'),
+                ? 'calc(30px + var(--bottom-nav-height, 80px) + 8px)'
+                : 'calc(30px + var(--bottom-nav-height, 80px))'),
         }}
       >
         {/* Media navigation dots - centered above capsule */}
@@ -496,7 +496,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             border: `1px solid ${borderColor}`,
-            
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
           }}
         >
           {/* Collapsed State - mode-dependent, crossfade on post change */}

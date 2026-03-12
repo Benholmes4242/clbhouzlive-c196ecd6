@@ -28,7 +28,6 @@ export default function FriendsTabContent({ embedded = false }: FriendsTabConten
   const handleModeChange = (mode: FriendsMode) => {
     setActiveMode(mode);
     resetSeen();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (

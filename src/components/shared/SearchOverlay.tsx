@@ -7,7 +7,6 @@ interface SearchOverlayProps {
   onClose: () => void;
   placeholder: string;
   onSearch: (query: string) => void;
-  onCommit?: (term: string) => void;
   recentSearches: string[];
   onClearRecent: () => void;
   onRemoveRecent: (term: string) => void;
@@ -21,7 +20,6 @@ function SearchOverlayInner({
   onClose,
   placeholder,
   onSearch,
-  onCommit,
   recentSearches,
   onClearRecent,
   onRemoveRecent,
@@ -64,8 +62,7 @@ function SearchOverlayInner({
     setInputValue(trimmed);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     onSearch(trimmed);
-    onCommit?.(trimmed);
-  }, [onSearch, onCommit]);
+  }, [onSearch]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {

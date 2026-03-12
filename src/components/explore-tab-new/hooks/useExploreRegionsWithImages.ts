@@ -20,7 +20,7 @@ export function useExploreRegionsWithImages() {
         .order('sort_order');
 
       if (error) {
-        if (import.meta.env.DEV) console.error('[ExploreRegionsWithImages] fetch error:', error);
+        console.error('[ExploreRegionsWithImages] fetch error:', error);
         return [];
       }
 

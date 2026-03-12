@@ -2,7 +2,7 @@
  * Review Wizard Types
  */
 
-import type { MentionSuggestion } from '@/components/shared/media/MentionBottomSheet';
+import type { MentionSuggestion } from '@/components/post/post-wizard/steps/MentionBottomSheet';
 
 // Re-export for convenience
 export type ReviewTaggableEntity = MentionSuggestion;

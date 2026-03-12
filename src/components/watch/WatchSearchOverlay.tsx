@@ -26,15 +26,11 @@ function WatchSearchOverlayInner({ isOpen, onClose, userId }: WatchSearchOverlay
     userId,
     filter: 'trending',
     searchQuery: query || undefined,
-    enabled: !!query,
   });
 
   const handleSearch = useCallback((q: string) => {
     setQuery(q);
-  }, []);
-
-  const handleCommit = useCallback((term: string) => {
-    if (term.trim()) addSearch(term.trim());
+    if (q.trim()) addSearch(q.trim());
   }, [addSearch]);
 
   return (
@@ -43,7 +39,6 @@ function WatchSearchOverlayInner({ isOpen, onClose, userId }: WatchSearchOverlay
       onClose={onClose}
       placeholder="Search shorts..."
       onSearch={handleSearch}
-      onCommit={handleCommit}
       recentSearches={recentSearches}
       onClearRecent={clearAll}
       onRemoveRecent={removeSearch}
@@ -64,7 +59,7 @@ function WatchSearchOverlayInner({ isOpen, onClose, userId }: WatchSearchOverlay
         ) : (
           <div className="grid grid-cols-3 gap-[2px]">
             {posts.map((post, i) => (
-              <WatchTile key={post.id} post={post} index={i} allPosts={posts} />
+              <WatchTile key={post.id} post={post} index={i} />
             ))}
           </div>
         )}

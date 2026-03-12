@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
-// SnapToast removed — PostStudio handles its own toasts
+import PostSubmissionHandler from '@/components/bottom-navigation/PostSubmissionHandler';
+import SnapToast from '@/components/snap/SnapToast';
 
-// useSnapModal removed — PostStudio is now the sole creation flow
+import { useSnapModal } from '@/hooks/useSnapModal';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -251,7 +252,32 @@ const ClubhouseContent = () => {
 
 
   
-  // Legacy composer state removed — PostStudio is now the sole creation flow
+  // Composer state management
+  const {
+    isComposerOpen,
+    mediaItems,
+    setMediaItems,
+    selectedFile,
+    caption,
+    setCaption,
+    isSubmitting,
+    setIsSubmitting,
+    showToast,
+    toastMessage,
+    selectedCourse,
+    setSelectedCourse,
+    openComposer,
+    openComposerWithFiles,
+    closeComposer,
+    showConfirmationToast,
+    hideToast
+  } = useSnapModal();
+
+  interface PostTag {
+    id: string;
+    name: string;
+  }
+  const [localSelectedTags, setLocalSelectedTags] = useState<PostTag[]>([]);
 
   // Season Recap Modal
   const { data: seasonRecap } = useSeasonRecap(user?.id);
@@ -290,6 +316,11 @@ const ClubhouseContent = () => {
   // ============================================================================
   // EVENT HANDLERS
   // ============================================================================
+
+  const handleCloseComposer = () => {
+    closeComposer();
+    setLocalSelectedTags([]);
+  };
 
   return (
     <PageRoot 
@@ -588,7 +619,25 @@ const ClubhouseContent = () => {
         />
       )}
 
-      {/* Post Creation — now handled globally by GlobalPostStudio in App.tsx */}
+      {/* Post Submission Handler */}
+      <PostSubmissionHandler
+        isComposerOpen={isComposerOpen}
+        mediaItems={mediaItems}
+        selectedFile={selectedFile}
+        selectedCourse={selectedCourse}
+        onCourseSelect={setSelectedCourse}
+        onClose={handleCloseComposer}
+        onShowToast={showConfirmationToast}
+        isSubmitting={isSubmitting}
+        setIsSubmitting={setIsSubmitting}
+        onMediaChange={setMediaItems}
+      />
+
+      <SnapToast
+        message={toastMessage}
+        isVisible={showToast}
+        onHide={hideToast}
+      />
 
       {/* Season Recap Modal */}
       {seasonRecap && user && (

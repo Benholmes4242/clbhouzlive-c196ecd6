@@ -1,12 +1,12 @@
 import React from 'react';
-import { Search, MapPin } from 'lucide-react';
+import { Search } from 'lucide-react';
 import type { WatchFilter } from './types';
 
-const FILTERS: { key: WatchFilter; label: string; icon?: React.ReactNode }[] = [
+const FILTERS: { key: WatchFilter; label: string }[] = [
   { key: 'trending', label: 'Trending' },
   { key: 'latest', label: 'Latest' },
   { key: 'top', label: 'Top Rated' },
-  { key: 'near', label: 'Near Me', icon: <MapPin className="w-3 h-3" /> },
+  { key: 'near', label: 'Near Me' },
 ];
 
 interface WatchHeaderProps {
@@ -19,7 +19,7 @@ interface WatchHeaderProps {
 const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange, onOpenSearch, embedded = false }) => {
   return (
     <div
-      className="sticky top-[55px] z-30 bg-background/95 backdrop-blur-xl border-b border-border/50"
+      className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border/50"
       style={{
         paddingTop: embedded ? '24px' : 'max(env(safe-area-inset-top, 0px), 47px)',
       }}
@@ -35,26 +35,20 @@ const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange,
       </div>
 
       <div
-        role="tablist"
-        aria-label="Watch filters"
-        className="flex gap-2 overflow-x-auto px-4 pb-3 scrollbar-hide"
+        className="flex gap-2 overflow-x-auto justify-center px-4 pb-3 scrollbar-hide"
       >
-        {FILTERS.map(({ key, label, icon }) => {
+        {FILTERS.map(({ key, label }) => {
           const isActive = activeFilter === key;
           return (
             <button
               key={key}
-              role="tab"
-              aria-selected={isActive}
-              aria-label={label}
               onClick={() => onFilterChange(key)}
-              className="shrink-0 min-h-[36px] px-4 rounded-full text-sm font-semibold transition-colors flex items-center gap-1.5"
+              className="shrink-0 min-h-[36px] px-4 rounded-full text-sm font-semibold transition-colors"
               style={{
                 backgroundColor: isActive ? 'hsl(var(--tab-sub-active))' : 'hsl(var(--muted))',
                 color: isActive ? 'hsl(var(--tab-sub-active-foreground))' : 'hsl(var(--muted-foreground))',
               }}
             >
-              {icon}
               {label}
             </button>
           );

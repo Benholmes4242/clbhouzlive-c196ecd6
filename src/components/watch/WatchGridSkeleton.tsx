@@ -8,7 +8,7 @@ const WatchGridSkeleton: React.FC = () => {
           key={i}
           className="aspect-[4/5] rounded-[4px] animate-[shimmer_1.5s_infinite]"
           style={{
-            background: 'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted)/0.5) 50%, hsl(var(--muted)) 75%)',
+            background: 'linear-gradient(90deg, hsl(214 32% 91%) 25%, hsl(216 33% 94%) 50%, hsl(214 32% 91%) 75%)',
             backgroundSize: '200% 100%',
           }}
         />

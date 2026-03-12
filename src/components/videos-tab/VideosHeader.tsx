@@ -22,7 +22,7 @@ export function VideosHeader({
 }: VideosHeaderProps) {
   return (
     <div
-      className="sticky top-[55px] z-30 bg-background/95 backdrop-blur-xl border-b border-border/50"
+      className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border/50"
       style={{
         paddingTop: embedded ? '24px' : 'max(env(safe-area-inset-top, 0px), 47px)',
       }}
@@ -38,14 +38,12 @@ export function VideosHeader({
         </button>
       </div>
 
-      <div role="tablist" aria-label="Video filters" className="flex gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide">
+      <div className="flex items-center justify-center gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide">
         {FILTERS.map(({ id, label }) => {
           const isActive = activeFilter === id;
           return (
             <button
               key={id}
-              role="tab"
-              aria-selected={isActive}
               onClick={() => onFilterChange(id)}
               className="shrink-0 min-h-[36px] px-4 rounded-full text-sm font-semibold transition-colors"
               style={{

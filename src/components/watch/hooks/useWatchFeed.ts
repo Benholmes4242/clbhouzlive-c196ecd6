@@ -13,10 +13,9 @@ interface UseWatchFeedParams {
   searchQuery?: string;
   userLat?: number | null;
   userLng?: number | null;
-  enabled?: boolean;
 }
 
-export function useWatchFeed({ userId, filter, searchQuery, userLat, userLng, enabled = true }: UseWatchFeedParams) {
+export function useWatchFeed({ userId, filter, searchQuery, userLat, userLng }: UseWatchFeedParams) {
   const seenPostIds = useRef<string[]>([]);
 
   const query = useInfiniteQuery({
@@ -59,10 +58,6 @@ export function useWatchFeed({ userId, filter, searchQuery, userLat, userLng, en
           seenPostIds.current.push(post.id);
         }
       }
-      // Prevent unbounded growth — cap at last 200
-      if (seenPostIds.current.length > 200) {
-        seenPostIds.current = seenPostIds.current.slice(-200);
-      }
 
       const lastRow = rows[rows.length - 1];
       const nextCursor = rows.length >= PAGE_SIZE ? lastRow.post_created_at : undefined;
@@ -71,7 +66,7 @@ export function useWatchFeed({ userId, filter, searchQuery, userLat, userLng, en
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as string | undefined,
-    enabled: !!userId && enabled,
+    enabled: !!userId,
     placeholderData: keepPreviousData,
     staleTime: 2 * 60 * 1000,
     gcTime: 10 * 60 * 1000,

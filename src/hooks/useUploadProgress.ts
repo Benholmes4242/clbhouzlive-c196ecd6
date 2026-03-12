@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { uploadEventBus } from '@/uploads/uploadEventBus';
-import type { MediaUploadStatus } from '@/components/post-studio/types';
+import type { MediaUploadStatus } from '@/hooks/useSnapModal';
 
 export interface UploadProgressState {
   /** Whether upload is currently in progress */

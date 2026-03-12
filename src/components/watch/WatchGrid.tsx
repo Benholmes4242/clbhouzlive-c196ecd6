@@ -29,6 +29,11 @@ const WatchGrid: React.FC<WatchGridProps> = ({
   userId,
 }) => {
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const prevPostCountRef = useRef(0);
+
+  if (posts.length !== prevPostCountRef.current) {
+    prevPostCountRef.current = posts.length;
+  }
 
   // Infinite scroll via IntersectionObserver
   useEffect(() => {
@@ -117,20 +122,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
       {/* Sentinel for infinite scroll */}
       <div ref={sentinelRef} className="h-1" />
 
-      {isFetchingNextPage && (
-        <div className="grid grid-cols-3 gap-[2px] px-[2px] mt-[2px]">
-          {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              className="aspect-[4/5] rounded-[4px] animate-[shimmer_1.5s_infinite]"
-              style={{
-                background: 'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted)/0.5) 50%, hsl(var(--muted)) 75%)',
-                backgroundSize: '200% 100%',
-              }}
-            />
-          ))}
-        </div>
-      )}
+      {isFetchingNextPage && <WatchGridSkeleton />}
     </>
   );
 };

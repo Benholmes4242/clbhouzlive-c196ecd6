@@ -159,7 +159,7 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
   const thumbnailUrl = activePost.mediaItems[0]?.thumbnailUrl || '';
   const isActiveVideo = activePost.mediaItems[0]?.type === 'video';
   const activeMediaCount = activePost.mediaItems.length;
-  const currentMediaIndex = carouselPositions?.get?.(activeIndex) ?? 0;
+  const currentMediaIndex = carouselPositions?.[activeIndex] ?? 0;
 
   return (
     <>

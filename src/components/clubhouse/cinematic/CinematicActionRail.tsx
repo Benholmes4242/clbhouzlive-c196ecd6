@@ -4,11 +4,10 @@
  * "Liquid glass" circular buttons for Mute, Like, Comment, Share, Save
  */
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, Music, MoreHorizontal, ChevronRight, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { Z } from '@/config/zIndex';
 import { MOTION_FAST, EASE_OUT, pressFeedback, likePop } from '@/lib/motionTokens';
 import { prefersReducedMotion } from '@/utils/safePlay';
 
@@ -139,7 +138,7 @@ const ActionSlot: React.FC<ActionSlotProps> = ({
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           border: '1px solid rgba(255, 255, 255, 0.10)',
-          
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
         }}
       >
         {/* Ripple effect */}
@@ -233,28 +232,10 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   // Idle opacity: 75% when not interacted, full when interacted or active
   const idleOpacity = hasInteracted ? 1 : 0.75;
 
-  const CAPSULE_BOTTOM_OFFSET = bottomOffset || '97px';
-
-  // Measure the rail's top edge so the left chevron aligns with it
-  const railRef = useRef<HTMLDivElement>(null);
-  const [railTop, setRailTop] = useState<number | null>(null);
-
-  useEffect(() => {
-    const measure = () => {
-      if (railRef.current) {
-        const rect = railRef.current.getBoundingClientRect();
-        setRailTop(rect.top);
-      }
-    };
-    measure();
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, [isVideo, hideMute, onSave, onMore, onNextMedia, hasNextMedia]);
+  const CAPSULE_BOTTOM_OFFSET = bottomOffset || `calc(30px + var(--bottom-nav-height, 80px) - ${SLOT_HEIGHT - ICON_SIZE}px)`;
 
   return (
-    <>
     <motion.div
-      ref={railRef}
       initial={{ opacity: 0, x: 20 }}
       animate={{
         opacity: isVisible ? 1 : 0,
@@ -262,16 +243,15 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
       className={cn(
-        'fixed right-4',
+        'fixed right-4 z-40',
         'flex flex-col items-center',
         'pointer-events-auto'
       )}
       style={{
         bottom: CAPSULE_BOTTOM_OFFSET,
         gap: 12,
-        maxHeight: 'calc(100dvh - 120px)',
+        maxHeight: 'calc(100dvh - 130px)',
         overflowY: 'hidden' as const,
-        zIndex: Z.echo,
       }}
     >
       {/* Slot 1: Right chevron — top of rail, only when there's a next media item */}
@@ -353,34 +333,17 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         />
       )}
 
+      {/* Slot 8: Left chevron — bottom of rail, only when there's a previous media item */}
+      {onPrevMedia && hasPrevMedia && (
+        <ActionSlot
+          icon={ChevronLeft}
+          onClick={onPrevMedia}
+          ariaLabel="Previous media"
+          showCount={false}
+          idleOpacity={idleOpacity}
+        />
+      )}
     </motion.div>
-
-    {/* Left chevron — aligns with rail top edge */}
-    {onPrevMedia && hasPrevMedia && (
-      <motion.button
-        initial={{ opacity: 0, x: -8 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -8 }}
-        transition={{ duration: 0.2 }}
-        onClick={onPrevMedia}
-        className="fixed left-4 pointer-events-auto
-          w-11 h-11 rounded-full
-          flex items-center justify-center"
-        style={{
-          top: railTop !== null ? railTop : undefined,
-          bottom: railTop !== null ? undefined : '370px',
-          transform: 'translateY(0)',
-          background: 'rgba(0,0,0,0.45)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          zIndex: Z.echo,
-        }}
-        aria-label="Previous media"
-      >
-        <ChevronLeft size={20} className="text-white" />
-      </motion.button>
-    )}
-    </>
   );
 };
 

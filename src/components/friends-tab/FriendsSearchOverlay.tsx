@@ -25,12 +25,12 @@ function FriendsSearchOverlayInner({ isOpen, onClose, userId }: FriendsSearchOve
     userId,
     mode: 'latest',
     searchQuery: query || undefined,
-    enabled: !!query,
   });
 
   const handleSearch = useCallback((q: string) => {
     setQuery(q);
-  }, []);
+    if (q.trim()) addSearch(q.trim());
+  }, [addSearch]);
 
   return (
     <SearchOverlay
@@ -38,7 +38,6 @@ function FriendsSearchOverlayInner({ isOpen, onClose, userId }: FriendsSearchOve
       onClose={onClose}
       placeholder="Search friends' posts..."
       onSearch={handleSearch}
-      onCommit={addSearch}
       recentSearches={recentSearches}
       onClearRecent={clearAll}
       onRemoveRecent={removeSearch}
@@ -66,8 +65,8 @@ function FriendsSearchOverlayInner({ isOpen, onClose, userId }: FriendsSearchOve
           </div>
         ) : (
           <div className="flex flex-col gap-3 px-3 pb-4">
-            {posts.map((post, i) => (
-              <FriendsCard key={post.id} post={post} userId={userId} cardIndex={i} allPosts={posts} />
+            {posts.map(post => (
+              <FriendsCard key={post.id} post={post} />
             ))}
           </div>
         )}

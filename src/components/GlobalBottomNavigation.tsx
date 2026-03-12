@@ -1,15 +1,17 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSnapModal } from '@/hooks/useSnapModal';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useModalState } from '@/hooks/useModalDetector';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { useModalContext } from '@/contexts/ModalContext';
-import { usePostStudioStore } from '@/stores/usePostStudioStore';
 
 // Note: usePrefetch is accessed via useAppPrefetch to avoid static/dynamic import conflict
 import { useAppPrefetch } from '@/hooks/useAppPrefetch';
+import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
+import PostSubmissionHandler from './bottom-navigation/PostSubmissionHandler';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
 
 import { cn } from '@/lib/utils';
@@ -51,15 +53,17 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const { triggerPrefetch } = useAppPrefetch();
   const { activeTab, handleTabClick, handlePrefetch } = useNavigationHandlers();
   const isDesktop = useIsDesktop();
-  const openPostStudio = usePostStudioStore((s) => s.openPostStudio);
   
   const navRef = useRef<HTMLDivElement>(null);
   
   // Prefetch routes on hover/touch for faster navigation
+  // Calls both route prefetch AND hero video prefetch
   const handleNavPrefetch = useCallback((path: string) => {
     triggerPrefetch(path);
-    handlePrefetch(path);
+    handlePrefetch(path); // Also trigger hero video prefetch
   }, [triggerPrefetch, handlePrefetch]);
+  
+  
   
   // Check if drawer is active (for clubhouse mini profile or comments)
   const [isDrawerActive, setIsDrawerActive] = useState(false);
@@ -69,6 +73,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
       setIsDrawerActive(document.body.classList.contains('drawer-active'));
     };
     
+    // Check immediately and set up observer
     checkDrawer();
     const observer = new MutationObserver(checkDrawer);
     observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
@@ -82,7 +87,31 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const isClubhouseRoute = CLUBHOUSE_ROUTES.includes(location.pathname);
   const isWarmGradientRoute = WARM_GRADIENT_ROUTES.some(r => location.pathname.startsWith(r));
   
+  // Final visibility state - chrome auto-hide system now handles ECM footer behavior
   const showNavigation = isVisible && !shouldHideForRoute;
+  
+  // Composer state management
+  const {
+    isComposerOpen,
+    mediaItems,
+    setMediaItems,
+    selectedFile,
+    isSubmitting,
+    showToast,
+    toastMessage,
+    selectedCourse,
+    setSelectedCourse,
+    openComposerWithFiles,
+    closeComposer,
+    showConfirmationToast,
+    hideToast
+  } = useSnapModal();
+
+  // Register modal states with the modal detector
+  useModalState(isComposerOpen);
+
+  // State for tags handled in CreateMomentModal
+  const [localSelectedTags, setLocalSelectedTags] = React.useState<any[]>([]);
 
   // Audit on mount
   useEffect(() => {
@@ -103,6 +132,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
     const isHidden = chromeState === 'hidden';
     navRef.current.setAttribute('aria-hidden', isHidden.toString());
     
+    // Update tab order
     const interactiveElements = navRef.current.querySelectorAll('button, a, input');
     interactiveElements.forEach(el => {
       if (isHidden) {
@@ -113,10 +143,18 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
     });
   }, [chromeState]);
 
+
+  const handleCloseComposer = () => {
+    closeComposer();
+    setLocalSelectedTags([]);
+  };
+
   // Handle tab clicks including camera action
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
+    
     if (tab.isAction && tab.id === 'post') {
-      openPostStudio();
+      // Open composer directly with empty state
+      openComposerWithFiles([]);
     } else {
       handleTabClick(tab);
     }
@@ -132,14 +170,14 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
               "global-bottom-nav bottom-nav-fixed",
               "fixed! bottom-0! left-0! right-0! w-full",
               "z-[100]!",
-              "m-0!"
+              "m-0!" // Ensure no margins
             )}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
             style={{
-              transform: 'none',
+              transform: 'none', // Prevent Framer Motion from adding transforms that might cause floating
             }}
           >
             <div
@@ -177,6 +215,27 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Post Submission Handler */}
+      <PostSubmissionHandler
+        isComposerOpen={isComposerOpen}
+        mediaItems={mediaItems}
+        selectedFile={selectedFile}
+        selectedCourse={selectedCourse}
+        onCourseSelect={setSelectedCourse}
+        onClose={handleCloseComposer}
+        onShowToast={showConfirmationToast}
+        isSubmitting={isSubmitting}
+        setIsSubmitting={() => {}}
+        onMediaChange={setMediaItems}
+      />
+
+      {/* Snap Toast */}
+      <SnapToast
+        message={toastMessage}
+        isVisible={showToast}
+        onHide={hideToast}
+      />
     </>
   );
 };

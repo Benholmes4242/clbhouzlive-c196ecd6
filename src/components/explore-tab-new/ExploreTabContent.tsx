@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useMemo } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExploreFeed } from './hooks/useExploreFeed';
 import { useExploreRegionChips } from './hooks/useExploreRegionChips';
@@ -32,14 +32,9 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
     resetSeen,
   } = useExploreFeed({ userId, region: activeRegion });
 
-  const coursePosts = useMemo(() => {
-    return posts.filter(post => !!(post.courseName || post.review?.courseName));
-  }, [posts]);
-
   const handleRegionChange = useCallback((slug: string | null) => {
     setActiveRegion(slug);
     resetSeen();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [resetSeen]);
 
   const handleOpenSearch = useCallback(() => {
@@ -59,7 +54,6 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
 
       <ExploreGrid
         posts={posts}
-        coursePosts={coursePosts}
         isLoading={isLoading}
         isError={isError}
         hasNextPage={hasNextPage}
@@ -71,7 +65,7 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
         onRegionChange={handleRegionChange}
       />
 
-      <ExploreAutoplay posts={coursePosts} gridRef={gridRef} />
+      <ExploreAutoplay posts={posts} gridRef={gridRef} />
 
       <ExploreSearchOverlay
         isOpen={isSearchOpen}

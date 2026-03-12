@@ -1,5 +1,5 @@
 import { saveRecentMedia, loadRecentMedia } from "@/lib/recentMediaCache";
-import { ComposerMediaItem } from "@/components/post-studio/types";
+import { ComposerMediaItem } from "@/hooks/useSnapModal";
 
 let isListenerInitialized = false;
 

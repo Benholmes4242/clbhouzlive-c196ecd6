@@ -8,9 +8,9 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { CharacterRing } from '@/components/post-studio/components/CharacterRing';
+import { CharacterRing } from '@/components/post/post-wizard/components/CharacterRing';
 
-import { MentionBottomSheet, type MentionSuggestion } from '@/components/shared/media/MentionBottomSheet';
+import { MentionBottomSheet, type MentionSuggestion } from '@/components/post/post-wizard/steps/MentionBottomSheet';
 import { useKeyboardHeight } from '@/hooks/useKeyboardHeight';
 
 interface WriteStepProps {
@@ -228,7 +228,7 @@ export function WriteStep({
             maxLength={MAX_REVIEW_LENGTH + 100}
           />
           <div className="flex justify-end mt-1">
-            <CharacterRing count={reviewLength} maxCount={MAX_REVIEW_LENGTH} />
+            <CharacterRing current={reviewLength} max={MAX_REVIEW_LENGTH} />
           </div>
         </motion.div>
 
@@ -266,10 +266,11 @@ export function WriteStep({
 
       {/* Mention bottom sheet */}
       <MentionBottomSheet
-        isOpen={showMentions}
-        onClose={() => setShowMentions(false)}
+        open={showMentions}
+        onOpenChange={setShowMentions}
         query={mentionQuery}
         onSelect={handleMentionSelect}
+        bottomOffset={keyboardHeight}
       />
     </motion.div>
   );

@@ -1,8 +1,20 @@
 
-import React from 'react';
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
-import { usePostStudioStore } from '@/stores/usePostStudioStore';
+import { Plus, X } from 'lucide-react';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission';
+import { useActiveActor } from '@/context/ActiveActorContext';
+import PostContentForm from './PostContentForm';
+
+interface TaggableEntity {
+  id: string;
+  entity_type: 'user' | 'golf_club' | 'business';
+  entity_id: string;
+  name: string;
+  username: string | null;
+}
 
 interface CreatePostDialogProps {
   onPostCreated?: () => void;
@@ -10,28 +22,113 @@ interface CreatePostDialogProps {
 }
 
 const CreatePostDialog = ({ onPostCreated, variant = 'header' }: CreatePostDialogProps) => {
-  const openPostStudio = usePostStudioStore((s) => s.openPostStudio);
+  const { user } = useSupabaseSession();
+  const { submitPost } = useOptimisticPostSubmission();
+  const { activeActor } = useActiveActor();
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleClick = () => {
-    openPostStudio();
+  const handleSubmit = async (content: string, mediaFiles: File[], selectedTags: TaggableEntity[]) => {
+    if (!user) return;
+
+    setIsSubmitting(true);
+    
+    await submitPost({
+      user,
+      content,
+      mediaFiles,
+      selectedTags,
+      actorType: activeActor?.type ?? 'personal',
+      actorId: activeActor?.id ?? user.id,
+      onSuccess: () => {
+        setIsOpen(false);
+        setIsSubmitting(false);
+        onPostCreated?.();
+      },
+      onError: () => {
+        setIsSubmitting(false);
+        // Keep dialog open on error so user can retry
+      }
+    });
   };
 
-  if (variant === 'floating') {
-    return (
-      <button
-        onClick={handleClick}
-        className="fixed bottom-20 right-4 z-40 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:bg-primary/90 transition-colors"
-      >
-        <Plus className="h-6 w-6" />
-      </button>
-    );
-  }
+  const handleClose = () => {
+    if (!isSubmitting) {
+      setIsOpen(false);
+    }
+  };
+
+  if (!user) return null;
+
+  const getButtonElement = () => {
+    switch (variant) {
+      case 'header':
+        return (
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="relative h-9 w-9 rounded-full text-white hover:text-white"
+            style={{ backgroundColor: '#2a2626' }}
+          >
+            <Plus className="h-5 w-5" />
+          </Button>
+        );
+      case 'floating':
+        return (
+          <Button 
+            size="icon" 
+            className="h-12 w-12 rounded-full text-white shadow-lg hover:shadow-xl transition-all duration-200"
+            style={{ backgroundColor: '#2a2626' }}
+          >
+            <Plus className="h-6 w-6" />
+          </Button>
+        );
+      case 'bottom-nav':
+        return (
+          <Button 
+            size="icon" 
+            className="h-8 w-8 rounded-full text-white transition-all duration-200"
+            style={{ backgroundColor: '#2a2626' }}
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        );
+      default:
+        return (
+          <Button size="sm" className="flex items-center space-x-2 text-white" style={{ backgroundColor: '#2a2626' }}>
+            <Plus className="h-4 w-4" />
+            <span>Share</span>
+          </Button>
+        );
+    }
+  };
 
   return (
-    <Button onClick={handleClick} variant="outline" size="sm" className="gap-1.5">
-      <Plus className="h-4 w-4" />
-      Post
-    </Button>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        {getButtonElement()}
+      </DialogTrigger>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <div className="flex items-center justify-between">
+            <DialogTitle>Create Post</DialogTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClose}
+              disabled={isSubmitting}
+              className="h-6 w-6 p-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </DialogHeader>
+        <PostContentForm 
+          onSubmit={handleSubmit} 
+          isSubmitting={isSubmitting}
+        />
+      </DialogContent>
+    </Dialog>
   );
 };
 

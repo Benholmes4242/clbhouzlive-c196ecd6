@@ -1,7 +1,18 @@
-// Legacy re-exports — all post creation now handled by PostStudio
+
+import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 
 // Re-export types for backward compatibility
 export type { TaggableEntity, PostSubmissionParams } from '@/hooks/usePostSubmission/types';
 
-export { usePostDeletion };
+interface PostSubmissionHandlerProps {
+  user: any;
+  content: string;
+  mediaFiles: File[];
+  selectedTags: any[];
+  onSuccess: () => void;
+  onError: () => void;
+}
+
+// Export the hooks for use in components
+export { useOptimisticPostSubmission, usePostDeletion };

@@ -16,7 +16,11 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useActiveActor } from '@/context/ActiveActorContext';
-import { usePostStudioStore } from '@/stores/usePostStudioStore';
+import EnhancedCreateMomentModalCinematic from '@/components/post/EnhancedCreateMomentModal.cinematic';
+import { ComposerMediaItem } from '@/hooks/useSnapModal';
+import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useQueryClient } from '@tanstack/react-query';
 import { getStreamPoster } from '@/utils/stream';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -47,9 +51,14 @@ export function BusinessProfilePosts({
   const { data: posts, isLoading, error } = useBusinessPosts(businessId);
   useRealtimeBusinessPosts(businessId);
   const { setActiveActor, availableActors } = useActiveActor();
-  const openPostStudio = usePostStudioStore((s) => s.openPostStudio);
+  const { submitPost } = useOptimisticPostSubmission();
+  const { user } = useSupabaseSession();
+  const queryClient = useQueryClient();
   
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [isComposerOpen, setIsComposerOpen] = useState(false);
+  const [composerMedia, setComposerMedia] = useState<ComposerMediaItem[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCreatePost = useCallback(() => {
     const businessActor = availableActors.find(
@@ -58,8 +67,41 @@ export function BusinessProfilePosts({
     if (businessActor) {
       setActiveActor(businessActor);
     }
-    openPostStudio({ actorType: 'business', actorId: businessId });
-  }, [businessId, availableActors, setActiveActor, openPostStudio]);
+    setIsComposerOpen(true);
+  }, [businessId, availableActors, setActiveActor]);
+
+  const handleComposerSubmit = useCallback(async (data: any) => {
+    if (!user) return;
+    
+    setIsSubmitting(true);
+    
+    await submitPost({
+      user,
+      content: data.caption || '',
+      mediaFiles: data.files || [],
+      mediaItems: data.mediaItems,
+      selectedTags: [],
+      courseInfo: data.selectedCourse,
+      studioEditsByMediaId: data.studioEditsByMediaId,
+      actorType: 'business',
+      actorId: businessId,
+      onSuccess: () => {
+        setIsComposerOpen(false);
+        setComposerMedia([]);
+        setIsSubmitting(false);
+        queryClient.invalidateQueries({ queryKey: ['actor-posts', 'business', businessId] });
+        queryClient.invalidateQueries({ queryKey: ['actor-posts-count', 'business', businessId] });
+      },
+      onError: () => {
+        setIsSubmitting(false);
+      },
+    });
+  }, [user, businessId, submitPost, queryClient]);
+
+  const handleComposerClose = useCallback(() => {
+    setIsComposerOpen(false);
+    setComposerMedia([]);
+  }, []);
 
   // Filter posts based on active filter
   const filteredPosts = posts?.filter(post => {
@@ -119,8 +161,8 @@ export function BusinessProfilePosts({
             className={cn(
               "flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-colors",
               activeFilter === key
-                ? "bg-primary text-primary-foreground"
-                : "bg-card text-foreground border border-border hover:bg-muted/50"
+                ? "bg-[#01754F] text-white"
+                : "bg-white text-foreground border border-border hover:bg-muted/50"
             )}
           >
             {label}
@@ -146,9 +188,10 @@ export function BusinessProfilePosts({
       {!filteredPosts || filteredPosts.length === 0 ? (
         <div className="py-12 text-center">
           <div 
-            className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center bg-muted"
+            className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+            style={{ background: '#EDEFF2' }}
           >
-            <ImageIcon className="h-8 w-8 text-muted-foreground" />
+            <ImageIcon className="h-8 w-8 text-[#97A1AA]" />
           </div>
           <p className="text-sm text-muted-foreground mb-4">
             {membership?.canManage 
@@ -177,6 +220,17 @@ export function BusinessProfilePosts({
           ))}
         </div>
       )}
+
+      {/* Composer Modal - with actor override to this business */}
+      <EnhancedCreateMomentModalCinematic
+        isOpen={isComposerOpen}
+        onClose={handleComposerClose}
+        onSubmit={handleComposerSubmit}
+        isSubmitting={isSubmitting}
+        mediaItems={composerMedia}
+        onMediaChange={setComposerMedia}
+        initialActorOverride={{ type: 'business', id: businessId }}
+      />
     </div>
   );
 }
@@ -194,6 +248,7 @@ function LinkedInPostCard({ post, businessName, businessLogo, followerCount = 0 
   const isVideo = primaryMedia?.media_type === 'video';
   const hasMultipleMedia = (post.post_media?.length || 0) > 1;
   
+  // Format timestamp like LinkedIn (1d, 2w, etc.)
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: false })
     .replace('about ', '')
     .replace(' days', 'd')
@@ -207,19 +262,23 @@ function LinkedInPostCard({ post, businessName, businessLogo, followerCount = 0 
     .replace(' months', 'mo')
     .replace(' month', 'mo');
 
+  // Truncate content if longer than 150 chars
   const content = post.content || '';
   const shouldTruncate = content.length > 150 && !isExpanded;
   const displayContent = shouldTruncate ? content.slice(0, 150) : content;
 
+  // Get thumbnail for video
   const thumbnailUrl = isVideo 
     ? (primaryMedia?.poster_url || getStreamPoster(primaryMedia?.media_url || '', '1s', 600))
     : primaryMedia?.media_url;
 
   return (
     <div className="border-b border-border/30 pb-2">
+      {/* Post header */}
       <div className="py-3 pb-2">
         <div className="flex items-start justify-between">
           <div className="flex gap-3">
+            {/* Business avatar */}
             <div className="w-12 h-12 rounded-full overflow-hidden bg-muted flex-shrink-0">
               {businessLogo ? (
                 <img src={businessLogo} alt="" className="w-full h-full object-cover" />
@@ -229,6 +288,8 @@ function LinkedInPostCard({ post, businessName, businessLogo, followerCount = 0 
                 </div>
               )}
             </div>
+            
+            {/* Business info */}
             <div className="min-w-0">
               <p className="font-semibold text-foreground text-sm leading-tight">
                 {businessName || 'Business'}
@@ -243,12 +304,15 @@ function LinkedInPostCard({ post, businessName, businessLogo, followerCount = 0 
               </div>
             </div>
           </div>
+          
+          {/* More menu */}
           <button className="p-1 hover:bg-muted/50 rounded-full transition-colors">
             <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
           </button>
         </div>
       </div>
 
+      {/* Post content */}
       {content && (
         <div className="pb-2">
           <p className="text-sm text-foreground whitespace-pre-wrap">
@@ -268,11 +332,17 @@ function LinkedInPostCard({ post, businessName, businessLogo, followerCount = 0 
         </div>
       )}
 
+      {/* Media - full bleed with negative margins to break out of parent px-5 */}
       {primaryMedia && (
         <div className="relative -mx-5">
           {isVideo ? (
             <div className="relative aspect-[4/5] bg-muted">
-              <img src={thumbnailUrl || ''} alt="" className="w-full h-full object-cover" />
+              <img
+                src={thumbnailUrl || ''}
+                alt=""
+                className="w-full h-full object-cover"
+              />
+              {/* Play button overlay */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-16 h-16 rounded-full bg-black/60 flex items-center justify-center">
                   <Play className="h-8 w-8 text-white ml-1" fill="white" />
@@ -287,6 +357,8 @@ function LinkedInPostCard({ post, businessName, businessLogo, followerCount = 0 
               style={{ maxHeight: '500px' }}
             />
           )}
+          
+          {/* Multiple media indicator */}
           {hasMultipleMedia && (
             <div className="absolute bottom-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded">
               +{post.post_media!.length - 1}
@@ -295,6 +367,8 @@ function LinkedInPostCard({ post, businessName, businessLogo, followerCount = 0 
         </div>
       )}
 
+
+      {/* Action bar */}
       <div className="py-1 flex items-center justify-around">
         <ActionButton icon={ThumbsUp} label="Like" />
         <ActionButton icon={MessageSquare} label="Comment" />
@@ -318,7 +392,7 @@ function ActionButton({ icon: Icon, label, isActive, onClick }: ActionButtonProp
       onClick={onClick}
       className={cn(
         "flex flex-col items-center gap-0.5 py-2 px-3 rounded-md transition-colors hover:bg-muted/50",
-        isActive ? "text-primary" : "text-muted-foreground"
+        isActive ? "text-[#0A66C2]" : "text-muted-foreground"
       )}
     >
       <Icon className="h-5 w-5" />

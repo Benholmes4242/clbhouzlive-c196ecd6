@@ -9,7 +9,7 @@ interface TrendingCourse {
   course_name: string;
   country: string;
   sub_country: string | null;
-  thumbnail_image: string | null;
+  thumbnail_image: string;
   global_rank: number | null;
   review_count: number;
   post_count: number;
@@ -31,7 +31,7 @@ function TrendingCoursesStripInner({ activeRegion }: TrendingCoursesStripProps) 
 
       const { data, error } = await supabase.rpc('get_trending_courses', params);
       if (error) {
-        if (import.meta.env.DEV) console.error('[TrendingCourses] RPC error:', error);
+        console.error('[TrendingCourses] RPC error:', error);
         return [];
       }
       return (data ?? []) as TrendingCourse[];
@@ -49,7 +49,7 @@ function TrendingCoursesStripInner({ activeRegion }: TrendingCoursesStripProps) 
         <button
           type="button"
           onClick={() => navigate('/courses')}
-          className="text-xs text-muted-foreground min-h-[44px] px-2 flex items-center"
+          className="text-xs text-muted-foreground"
         >
           See all →
         </button>
@@ -59,20 +59,16 @@ function TrendingCoursesStripInner({ activeRegion }: TrendingCoursesStripProps) 
           <button
             key={course.course_id}
             type="button"
-            onClick={() => navigate(`/courses/${course.course_id}`)}
-            className="shrink-0 w-[140px] flex flex-col rounded-xl overflow-hidden bg-card border border-border/50 shadow-sm text-left focus:outline-none"
+            onClick={() => navigate(`/course/${course.course_id}`)}
+            className="shrink-0 w-[140px] rounded-xl overflow-hidden bg-card border border-border/50 shadow-sm text-left focus:outline-none"
           >
-            {course.thumbnail_image ? (
-              <img
-                src={course.thumbnail_image}
-                alt={course.course_name}
-                loading="lazy"
-                className="w-full aspect-[4/3] object-cover block shrink-0"
-              />
-            ) : (
-              <div className="aspect-[4/3] w-full bg-muted shrink-0" />
-            )}
-            <div className="p-2 flex-1">
+            <img
+              src={course.thumbnail_image}
+              alt={course.course_name}
+              loading="lazy"
+              className="aspect-[4/3] w-full object-cover"
+            />
+            <div className="p-2">
               <p className="text-[12px] font-semibold text-foreground line-clamp-1">
                 {course.course_name}
               </p>
