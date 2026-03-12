@@ -117,7 +117,7 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
               <div className="absolute top-2 left-2">
                 <SquircleAvatar
                   src={review.avatar_url}
-                  alt={review.username}
+                  alt={review.display_name}
                   size={24}
                   hideRing
                 />
