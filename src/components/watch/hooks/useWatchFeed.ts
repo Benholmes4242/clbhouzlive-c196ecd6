@@ -13,9 +13,10 @@ interface UseWatchFeedParams {
   searchQuery?: string;
   userLat?: number | null;
   userLng?: number | null;
+  enabled?: boolean;
 }
 
-export function useWatchFeed({ userId, filter, searchQuery, userLat, userLng }: UseWatchFeedParams) {
+export function useWatchFeed({ userId, filter, searchQuery, userLat, userLng, enabled = true }: UseWatchFeedParams) {
   const seenPostIds = useRef<string[]>([]);
 
   const query = useInfiniteQuery({
@@ -70,7 +71,7 @@ export function useWatchFeed({ userId, filter, searchQuery, userLat, userLng }: 
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as string | undefined,
-    enabled: !!userId,
+    enabled: !!userId && enabled,
     placeholderData: keepPreviousData,
     staleTime: 2 * 60 * 1000,
     gcTime: 10 * 60 * 1000,

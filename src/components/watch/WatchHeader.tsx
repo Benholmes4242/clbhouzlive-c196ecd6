@@ -1,12 +1,12 @@
 import React from 'react';
-import { Search } from 'lucide-react';
+import { Search, MapPin } from 'lucide-react';
 import type { WatchFilter } from './types';
 
-const FILTERS: { key: WatchFilter; label: string }[] = [
+const FILTERS: { key: WatchFilter; label: string; icon?: React.ReactNode }[] = [
   { key: 'trending', label: 'Trending' },
   { key: 'latest', label: 'Latest' },
   { key: 'top', label: 'Top Rated' },
-  { key: 'near', label: 'Near Me' },
+  { key: 'near', label: 'Near Me', icon: <MapPin className="w-3 h-3" /> },
 ];
 
 interface WatchHeaderProps {
@@ -35,20 +35,26 @@ const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange,
       </div>
 
       <div
-        className="flex gap-2 overflow-x-auto justify-center px-4 pb-3 scrollbar-hide"
+        role="tablist"
+        aria-label="Watch filters"
+        className="flex gap-2 overflow-x-auto px-4 pb-3 scrollbar-hide"
       >
-        {FILTERS.map(({ key, label }) => {
+        {FILTERS.map(({ key, label, icon }) => {
           const isActive = activeFilter === key;
           return (
             <button
               key={key}
+              role="tab"
+              aria-selected={isActive}
+              aria-label={label}
               onClick={() => onFilterChange(key)}
-              className="shrink-0 min-h-[36px] px-4 rounded-full text-sm font-semibold transition-colors"
+              className="shrink-0 min-h-[36px] px-4 rounded-full text-sm font-semibold transition-colors flex items-center gap-1.5"
               style={{
                 backgroundColor: isActive ? 'hsl(var(--tab-sub-active))' : 'hsl(var(--muted))',
                 color: isActive ? 'hsl(var(--tab-sub-active-foreground))' : 'hsl(var(--muted-foreground))',
               }}
             >
+              {icon}
               {label}
             </button>
           );
