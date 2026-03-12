@@ -177,11 +177,26 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
         {courseNameToShow && (
           <div className="px-3 pb-2">
             <button
-              onClick={() => {
+              onClick={async (e) => {
+                e.stopPropagation();
                 if (courseIdToShow) {
                   navigate(`/courses/${courseIdToShow}`);
-                } else {
-                  navigate(`/courses?q=${encodeURIComponent(courseNameToShow)}`);
+                } else if (courseNameToShow) {
+                  try {
+                    const { data } = await supabase
+                      .from('golf_courses')
+                      .select('id')
+                      .ilike('name', courseNameToShow.trim())
+                      .limit(1)
+                      .single();
+                    if (data?.id) {
+                      navigate(`/courses/${data.id}`);
+                    } else {
+                      navigate(`/courses?search=${encodeURIComponent(courseNameToShow)}`);
+                    }
+                  } catch {
+                    navigate(`/courses?search=${encodeURIComponent(courseNameToShow)}`);
+                  }
                 }
               }}
               className="flex items-center gap-1 hover:underline"
