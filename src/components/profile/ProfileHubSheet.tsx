@@ -363,7 +363,7 @@ function ProfileHubSheet({
                     <button
                       type="button"
                       onClick={() => setShowLogoutConfirm(false)}
-                      className="flex-1 min-h-[44px] rounded-xl border border-border text-[13px] font-semibold text-muted-foreground"
+                      className="flex-1 min-h-[44px] rounded-xl border border-border text-[13px] font-semibold text-muted-foreground hover:bg-muted/40 active:bg-muted/50 transition-colors duration-150"
                     >
                       Cancel
                     </button>
