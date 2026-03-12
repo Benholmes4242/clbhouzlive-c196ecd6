@@ -1,5 +1,4 @@
-// PosterScreen — Step 4: Poster frame selection (video only)
-// Dark immersive mode matching TrimScreen
+// PosterScreen — Step 4: Cover frame selection, dark immersive
 
 import React, { useRef, useEffect } from 'react';
 import { StudioHeader } from '../components/StudioHeader';
@@ -28,26 +27,15 @@ export function PosterScreen() {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-[#0A0A0A]">
-      <StudioHeader
-        title="Cover"
-        step="POSTER"
-        darkMode
-        leftAction={{ label: 'Cancel', onClick: () => setStep('COMPOSER') }}
-        rightAction={{ label: 'Done', onClick: () => setStep('COMPOSER'), variant: 'primary' }}
-      />
+    <div className="flex-1 flex flex-col" style={{ background: '#0A0A0A' }}>
+      <StudioHeader title="Cover" step="POSTER" darkMode leftAction={{ label: 'Cancel', onClick: () => setStep('COMPOSER') }} rightAction={{ label: 'Done', onClick: () => setStep('COMPOSER'), variant: 'primary' }} />
 
-      <div className="flex-1 flex items-center justify-center px-4">
-        <video
-          ref={videoRef}
-          src={activeItem.previewUrl}
-          muted
-          playsInline
-          className="max-w-full max-h-full object-contain rounded-xl"
-        />
+      <div className="flex-1 flex items-center justify-center px-4 py-6">
+        <video ref={videoRef} src={activeItem.previewUrl} muted playsInline className="max-w-full max-h-full object-contain" style={{ borderRadius: 16, boxShadow: '0 16px 48px rgba(0,0,0,0.70)' }} />
       </div>
 
-      <div className="bg-[#1A1A1A] rounded-2xl mx-4 mb-4 p-4">
+      <div className="mx-4 mb-4 p-5 rounded-[24px]" style={{ background: 'rgba(22,22,22,0.95)', border: '1px solid rgba(255,255,255,0.07)', boxShadow: '0 -4px 24px rgba(0,0,0,0.40)' }}>
+        <p className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-4 text-center" style={{ color: 'rgba(255,255,255,0.35)' }}>Drag to choose cover frame</p>
         <PosterPicker item={activeItem} onPosterChange={handlePosterChange} darkMode />
       </div>
     </div>

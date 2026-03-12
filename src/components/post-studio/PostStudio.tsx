@@ -1,5 +1,5 @@
-// PostStudio — Root entry point
-// Full-screen sheet with spring animation, renders active screen + panels
+// PostStudio — Cinematic Root Shell
+// Full-screen immersive studio. Dark-first. Golf-native. Better than Instagram.
 
 import React, { useCallback, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
@@ -19,14 +19,20 @@ import { DraftsPanel } from './panels/DraftsPanel';
 import { SPRING, DURATION } from './constants';
 import type { PostStudioProps, StudioStep, StudioMediaItem } from './types';
 
-// ============================================================================
-// SCREEN ROUTER
-// ============================================================================
+// ─── Screen order for directional transitions ───────────────────────────────
+const STEP_ORDER: StudioStep[] = [
+  'MEDIA_PICKER', 'COMPOSER', 'TRIM', 'POSTER', 'PUBLISH', 'SUCCESS',
+];
 
+function getDirection(from: StudioStep | null, to: StudioStep): 'forward' | 'backward' {
+  if (!from) return 'forward';
+  return STEP_ORDER.indexOf(to) >= STEP_ORDER.indexOf(from) ? 'forward' : 'backward';
+}
+
+// ─── Screen Router ────────────────────────────────────────────────────────────
 function StudioScreenRouter({ onClose }: { onClose: () => void }) {
   const { state, reset } = usePostStudioContext();
-
-  const direction = getSlideDirection(state.previousStep, state.step);
+  const dir = getDirection(state.previousStep, state.step);
 
   const handleSuccessDone = useCallback(() => {
     reset();
@@ -37,10 +43,10 @@ function StudioScreenRouter({ onClose }: { onClose: () => void }) {
     <AnimatePresence mode="wait" initial={false}>
       <motion.div
         key={state.step}
-        initial={{ x: direction === 'forward' ? '100%' : '-100%', opacity: 0 }}
+        initial={{ x: dir === 'forward' ? '100%' : '-100%', opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
-        exit={{ x: direction === 'forward' ? '-100%' : '100%', opacity: 0 }}
-        transition={{ duration: DURATION.screenTransition, ease: 'easeInOut' }}
+        exit={{ x: dir === 'forward' ? '-20%' : '20%', opacity: 0 }}
+        transition={{ duration: DURATION.screenTransition, ease: [0.22, 1, 0.36, 1] }}
         className="absolute inset-0 flex flex-col"
       >
         {renderScreen(state.step, handleSuccessDone)}
@@ -51,56 +57,98 @@ function StudioScreenRouter({ onClose }: { onClose: () => void }) {
 
 function renderScreen(step: StudioStep, onSuccessDone: () => void) {
   switch (step) {
-    case 'MEDIA_PICKER':
-      return <MediaPickerScreen />;
-    case 'COMPOSER':
-      return <ComposerScreen />;
-    case 'TRIM':
-      return <TrimScreen />;
-    case 'POSTER':
-      return <PosterScreen />;
-    case 'PUBLISH':
-      return <PublishScreen />;
-    case 'SUCCESS':
-      return <SuccessScreen onDone={onSuccessDone} />;
-    default:
-      return null;
+    case 'MEDIA_PICKER': return <MediaPickerScreen />;
+    case 'COMPOSER':     return <ComposerScreen />;
+    case 'TRIM':         return <TrimScreen />;
+    case 'POSTER':       return <PosterScreen />;
+    case 'PUBLISH':      return <PublishScreen />;
+    case 'SUCCESS':      return <SuccessScreen onDone={onSuccessDone} />;
+    default:             return null;
   }
 }
 
-function getSlideDirection(from: StudioStep | null, to: StudioStep): 'forward' | 'backward' {
-  const order: StudioStep[] = ['MEDIA_PICKER', 'COMPOSER', 'TRIM', 'POSTER', 'PUBLISH', 'SUCCESS'];
-  if (!from) return 'forward';
-  return order.indexOf(to) >= order.indexOf(from) ? 'forward' : 'backward';
-}
-
-// ============================================================================
-// PANEL ROUTER
-// ============================================================================
-
+// ─── Panel Router ─────────────────────────────────────────────────────────────
 function PanelRouter() {
   const { state } = usePostStudioContext();
-
   return (
     <AnimatePresence>
-      {state.activePanelId === 'mention' && <MentionPanel />}
-      {state.activePanelId === 'course' && <CourseTagPanel />}
+      {state.activePanelId === 'mention'  && <MentionPanel />}
+      {state.activePanelId === 'course'   && <CourseTagPanel />}
       {state.activePanelId === 'audience' && <AudiencePanel />}
       {state.activePanelId === 'schedule' && <SchedulePanel />}
-      {state.activePanelId === 'drafts' && <DraftsPanel />}
+      {state.activePanelId === 'drafts'   && <DraftsPanel />}
     </AnimatePresence>
   );
 }
 
-// ============================================================================
-// INNER SHELL (inside provider)
-// ============================================================================
+// ─── Discard Confirmation ─────────────────────────────────────────────────────
+function DiscardConfirmation({
+  onDiscard,
+  onCancel,
+}: {
+  onDiscard: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="absolute inset-0 z-50 flex items-center justify-center px-6"
+      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(12px)' }}
+    >
+      <motion.div
+        initial={{ scale: 0.92, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.92, opacity: 0, y: 20 }}
+        transition={{ type: 'spring', damping: 28, stiffness: 360 }}
+        className="w-full max-w-[300px] rounded-3xl overflow-hidden"
+        style={{
+          background: 'rgba(22, 22, 22, 0.95)',
+          border: '1px solid rgba(255,255,255,0.10)',
+          boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
+        }}
+      >
+        {/* Amber top glow */}
+        <div
+          className="h-1 w-full"
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(245,158,11,0.8), transparent)' }}
+        />
+        <div className="p-6 text-center space-y-5">
+          <div className="space-y-1.5">
+            <h3 className="text-white font-semibold text-base tracking-tight">Discard post?</h3>
+            <p className="text-white/50 text-sm leading-relaxed">
+              Your content will be lost and cannot be recovered.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2.5">
+            <button
+              onClick={onDiscard}
+              className="w-full py-3.5 rounded-2xl font-semibold text-sm text-white min-h-[52px]"
+              style={{ background: 'rgba(239,68,68,0.20)', border: '1px solid rgba(239,68,68,0.35)' }}
+            >
+              Discard
+            </button>
+            <button
+              onClick={onCancel}
+              className="w-full py-3.5 rounded-2xl font-semibold text-sm min-h-[52px]"
+              style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.85)' }}
+            >
+              Keep editing
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
 
+// ─── Studio Inner ─────────────────────────────────────────────────────────────
 function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMedia?: File[] }) {
   const { state, setDiscarding, reset, addMedia, setStep } = usePostStudioContext();
   const initialMediaProcessed = useRef(false);
 
-  // Process initialMedia files (from snap modal) on mount
+  // Process initialMedia on mount
   useEffect(() => {
     if (initialMediaProcessed.current || !initialMedia?.length) return;
     initialMediaProcessed.current = true;
@@ -110,7 +158,6 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
       for (const file of initialMedia) {
         const isVideo = file.type.startsWith('video/');
         const previewUrl = URL.createObjectURL(file);
-
         let duration: number | null = null;
         let thumbnailUrl: string | undefined;
 
@@ -141,43 +188,23 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
         }
 
         items.push({
-          id: crypto.randomUUID(),
-          file,
-          mediaType: isVideo ? 'video' : 'image',
-          previewUrl,
-          thumbnailUrl,
-          duration,
-          trimStart: 0,
-          trimEnd: duration,
-          posterTimestamp: 0,
-          posterPreviewUrl: null,
-          width: null,
-          height: null,
-          validationError: null,
+          id: crypto.randomUUID(), file, mediaType: isVideo ? 'video' : 'image',
+          previewUrl, thumbnailUrl, duration, trimStart: 0, trimEnd: duration,
+          posterTimestamp: 0, posterPreviewUrl: null, width: null, height: null, validationError: null,
         });
       }
-
-      if (items.length > 0) {
-        addMedia(items);
-        setStep('COMPOSER');
-      }
+      if (items.length > 0) { addMedia(items); setStep('COMPOSER'); }
     })();
   }, [initialMedia, addMedia, setStep]);
 
   const handleClose = useCallback(() => {
-    if (state.isDirty) {
-      setDiscarding(true);
-    } else {
-      reset();
-      onClose();
-    }
+    if (state.isDirty) setDiscarding(true);
+    else { reset(); onClose(); }
   }, [state.isDirty, setDiscarding, reset, onClose]);
 
   // Escape key
   useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') handleClose();
-    };
+    const onKeyDown = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose(); };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [handleClose]);
@@ -186,9 +213,7 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-    };
+    return () => { document.body.style.overflow = prev; };
   }, []);
 
   return (
@@ -199,32 +224,48 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: DURATION.backdrop }}
-        className="fixed inset-0 bg-black/40 z-[9998]"
+        className="fixed inset-0 z-[9998]"
+        style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
         onClick={handleClose}
       />
 
-      {/* Sheet */}
+      {/* Studio Sheet */}
       <motion.div
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', ...SPRING.sheet }}
-        className="fixed inset-0 z-[9999] bg-clbhouzBg rounded-t-[24px] flex flex-col overflow-hidden"
-        style={{ top: 0 }}
+        className="fixed inset-0 z-[9999] flex flex-col overflow-hidden"
+        style={{
+          top: 0,
+          background: '#0D0D0D',
+        }}
       >
-        {/* Amber drag handle */}
-        <div className="flex justify-center pt-2.5 pb-1 shrink-0">
-          <div className="w-10 h-1 rounded-full bg-primary/40" />
+        {/* Ambient amber top line — brand identity */}
+        <motion.div
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={{ scaleX: 1, opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute top-0 left-0 right-0 h-px origin-left"
+          style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(245,158,11,0.8) 30%, rgba(245,158,11,1) 50%, rgba(245,158,11,0.8) 70%, transparent 100%)' }}
+        />
+
+        {/* Drag handle */}
+        <div className="flex justify-center shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)', marginTop: 10 }}>
+          <motion.div
+            initial={{ scaleX: 0.3, opacity: 0 }}
+            animate={{ scaleX: 1, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+            className="w-10 h-1 rounded-full"
+            style={{ background: 'rgba(245,158,11,0.4)' }}
+          />
         </div>
 
-        {/* Discard confirmation */}
+        {/* Discard confirmation overlay */}
         <AnimatePresence>
           {state.isDiscarding && (
             <DiscardConfirmation
-              onDiscard={() => {
-                reset();
-                onClose();
-              }}
+              onDiscard={() => { reset(); onClose(); }}
               onCancel={() => setDiscarding(false)}
             />
           )}
@@ -242,57 +283,7 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
   );
 }
 
-// ============================================================================
-// DISCARD CONFIRMATION
-// ============================================================================
-
-function DiscardConfirmation({
-  onDiscard,
-  onCancel,
-}: {
-  onDiscard: () => void;
-  onCancel: () => void;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="absolute inset-0 z-50 bg-black/60 flex items-center justify-center p-6"
-    >
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-card rounded-2xl p-6 w-full max-w-[300px] text-center space-y-4 border border-border/50"
-      >
-        <h3 className="text-foreground font-semibold text-base">Discard post?</h3>
-        <p className="text-muted-foreground text-sm">
-          You'll lose any unsaved changes.
-        </p>
-        <div className="flex flex-col gap-2">
-          <button
-            onClick={onDiscard}
-            className="w-full py-3 rounded-xl bg-destructive text-destructive-foreground font-medium text-sm min-h-[44px]"
-          >
-            Discard
-          </button>
-          <button
-            onClick={onCancel}
-            className="w-full py-3 rounded-xl bg-muted text-foreground font-medium text-sm min-h-[44px]"
-          >
-            Keep editing
-          </button>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-// ============================================================================
-// ROOT EXPORT
-// ============================================================================
-
+// ─── Root Export ──────────────────────────────────────────────────────────────
 export default function PostStudio({
   open,
   onClose,

@@ -1,8 +1,8 @@
-// MediaPickerScreen — Step 1: File selection + validation + multi-select
-// Native file input with validation, multi-select order badges
+// MediaPickerScreen — Step 1: Cinematic entry into the studio
+// Dark immersive stage. Golf energy. Not a file picker — a creative launchpad.
 
 import React, { useCallback, useRef, useState } from 'react';
-import { Camera, Image as ImageIcon, FileText } from 'lucide-react';
+import { Camera, Layers, BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StudioHeader } from '../components/StudioHeader';
@@ -10,20 +10,16 @@ import { usePostStudioContext } from '../usePostStudio';
 import { validateMediaFile, POST_LIMITS, ALLOWED_VIDEO_TYPES, ALLOWED_IMAGE_TYPES } from '../constants';
 import type { StudioMediaItem } from '../types';
 
-/** Generate a video poster thumbnail from a file */
 async function generatePoster(file: File): Promise<string> {
   return new Promise((resolve) => {
     const video = document.createElement('video');
-    video.preload = 'metadata';
-    video.muted = true;
-    video.playsInline = true;
+    video.preload = 'metadata'; video.muted = true; video.playsInline = true;
     const url = URL.createObjectURL(file);
     video.src = url;
     video.onloadeddata = () => { video.currentTime = 0.1; };
     video.onseeked = () => {
       const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+      canvas.width = video.videoWidth; canvas.height = video.videoHeight;
       canvas.getContext('2d')?.drawImage(video, 0, 0);
       URL.revokeObjectURL(url);
       resolve(canvas.toDataURL('image/jpeg', 0.7));
@@ -32,22 +28,17 @@ async function generatePoster(file: File): Promise<string> {
   });
 }
 
-/** Get video duration from a file */
 async function getVideoDuration(file: File): Promise<number | null> {
   return new Promise((resolve) => {
     const video = document.createElement('video');
     video.preload = 'metadata';
     const url = URL.createObjectURL(file);
     video.src = url;
-    video.onloadedmetadata = () => {
-      resolve(isFinite(video.duration) ? video.duration : null);
-      URL.revokeObjectURL(url);
-    };
+    video.onloadedmetadata = () => { resolve(isFinite(video.duration) ? video.duration : null); URL.revokeObjectURL(url); };
     video.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
   });
 }
 
-/** Get image dimensions from a file */
 async function getImageDimensions(file: File): Promise<{ width: number; height: number } | null> {
   return new Promise((resolve) => {
     const url = URL.createObjectURL(file);
@@ -58,7 +49,6 @@ async function getImageDimensions(file: File): Promise<{ width: number; height: 
   });
 }
 
-/** Convert files to StudioMediaItems with validation */
 async function filesToMediaItems(files: File[]): Promise<StudioMediaItem[]> {
   const items: StudioMediaItem[] = [];
   for (const file of files) {
@@ -79,6 +69,12 @@ async function filesToMediaItems(files: File[]): Promise<StudioMediaItem[]> {
   return items;
 }
 
+function formatTime(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
 export function MediaPickerScreen() {
   const { state, addMedia, setStep, openPanel } = usePostStudioContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -86,6 +82,7 @@ export function MediaPickerScreen() {
 
   const hasMedia = state.mediaItems.length > 0;
   const mediaCount = state.mediaItems.length;
+  const acceptTypes = [...ALLOWED_VIDEO_TYPES, ...ALLOWED_IMAGE_TYPES].join(',');
 
   const handleFileSelect = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,7 +98,10 @@ export function MediaPickerScreen() {
       setIsProcessing(true);
       try {
         const items = await filesToMediaItems(toProcess);
-        if (items.length > 0) addMedia(items);
+        if (items.length > 0) {
+          addMedia(items);
+          setTimeout(() => setStep('COMPOSER'), 300);
+        }
       } catch (err) {
         console.error('[MediaPicker] Failed to process files:', err);
         toast.error('Failed to process some files');
@@ -110,13 +110,11 @@ export function MediaPickerScreen() {
         if (fileInputRef.current) fileInputRef.current.value = '';
       }
     },
-    [state.mediaItems.length, addMedia]
+    [state.mediaItems.length, addMedia, setStep]
   );
 
-  const acceptTypes = [...ALLOWED_VIDEO_TYPES, ...ALLOWED_IMAGE_TYPES].join(',');
-
   return (
-    <div className="flex-1 flex flex-col bg-clbhouzBg">
+    <div className="flex-1 flex flex-col" style={{ background: '#0D0D0D' }}>
       <StudioHeader
         title="New Post"
         step="MEDIA_PICKER"
@@ -127,103 +125,140 @@ export function MediaPickerScreen() {
         }
       />
 
-      {/* Hidden file input */}
       <input ref={fileInputRef} type="file" accept={acceptTypes} multiple onChange={handleFileSelect} className="hidden" />
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 gap-6">
-        {/* Selected media preview grid */}
+      <div className="flex-1 flex flex-col">
+        {!hasMedia && (
+          <div className="flex-1 flex flex-col items-center justify-center px-8">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="relative mb-8"
+            >
+              <div
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: 'radial-gradient(circle, rgba(245,158,11,0.15) 0%, transparent 70%)',
+                  transform: 'scale(2.5)',
+                }}
+              />
+              <div
+                className="w-28 h-28 rounded-full flex items-center justify-center relative"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(245,158,11,0.25) 0%, rgba(245,158,11,0.08) 100%)',
+                  border: '1px solid rgba(245,158,11,0.30)',
+                  boxShadow: '0 0 40px rgba(245,158,11,0.12), inset 0 1px 0 rgba(255,255,255,0.08)',
+                }}
+              >
+                <Camera className="w-10 h-10" style={{ color: 'rgba(245,158,11,0.90)' }} strokeWidth={1.5} />
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="text-center space-y-2 mb-10"
+            >
+              <p className="text-white text-2xl font-bold tracking-tight">Share a moment</p>
+              <p className="text-sm max-w-[240px] mx-auto leading-relaxed" style={{ color: 'rgba(255,255,255,0.40)' }}>
+                Photos, videos, course reviews — your story on the fairway.
+              </p>
+            </motion.div>
+
+            <AnimatePresence>
+              {isProcessing && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-center gap-2.5 text-sm mb-6"
+                  style={{ color: 'rgba(245,158,11,0.80)' }}
+                >
+                  <div
+                    className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin"
+                    style={{ borderColor: 'rgba(245,158,11,0.4)', borderTopColor: 'transparent' }}
+                  />
+                  Preparing…
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+
         {hasMedia && (
-          <div className="w-full max-w-sm">
-            <div className="grid grid-cols-3 gap-2">
+          <div className="flex-1 flex flex-col justify-center px-5 py-4">
+            <div className="grid grid-cols-3 gap-1.5 mb-4">
               <AnimatePresence>
                 {state.mediaItems.map((item, index) => (
                   <motion.div
                     key={item.id}
-                    initial={{ scale: 0.8, opacity: 0 }}
+                    initial={{ scale: 0.85, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.8, opacity: 0 }}
-                    className="relative aspect-square rounded-xl overflow-hidden bg-muted"
+                    exit={{ scale: 0.85, opacity: 0 }}
+                    transition={{ type: 'spring', damping: 22, stiffness: 380 }}
+                    className="relative aspect-square rounded-2xl overflow-hidden"
+                    style={{ background: 'rgba(255,255,255,0.05)' }}
                   >
-                    <img
-                      src={item.thumbnailUrl || item.previewUrl}
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                    {/* Order badge */}
-                    <div className="absolute top-1.5 left-1.5 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                      <span className="text-primary-foreground text-xs font-bold">{index + 1}</span>
+                    <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
+                    <div
+                      className="absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center"
+                      style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', boxShadow: '0 2px 8px rgba(245,158,11,0.5)' }}
+                    >
+                      <span className="text-[11px] font-bold text-black">{index + 1}</span>
                     </div>
-                    {/* Video indicator */}
                     {item.mediaType === 'video' && (
-                      <div className="absolute bottom-1.5 right-1.5 bg-black/60 rounded px-1.5 py-0.5">
-                        <span className="text-white text-[10px] font-medium">
-                          {item.duration ? formatTime(item.duration) : 'Video'}
-                        </span>
+                      <div className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded-md" style={{ background: 'rgba(0,0,0,0.70)', backdropFilter: 'blur(4px)' }}>
+                        <span className="text-white text-[10px] font-medium">{item.duration ? formatTime(item.duration) : 'Video'}</span>
                       </div>
                     )}
+                    <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: index === 0 ? 'inset 0 0 0 2px rgba(245,158,11,0.60)' : 'none' }} />
                   </motion.div>
                 ))}
               </AnimatePresence>
             </div>
-          </div>
-        )}
 
-        {/* Empty state */}
-        {!hasMedia && (
-          <div className="text-center space-y-3">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mx-auto">
-              <Camera className="w-8 h-8 text-primary" />
-            </div>
-            <p className="text-foreground text-xl font-bold">Share a moment</p>
-            <p className="text-muted-foreground text-sm max-w-[240px] text-center mx-auto">
-              Select photos or videos from your library
-            </p>
-          </div>
-        )}
-
-        {/* Processing indicator */}
-        {isProcessing && (
-          <div className="flex items-center gap-2 text-muted-foreground text-sm">
-            <div className="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-            Processing...
+            <AnimatePresence>
+              {isProcessing && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center justify-center gap-2.5 py-3 text-sm" style={{ color: 'rgba(245,158,11,0.80)' }}>
+                  <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(245,158,11,0.4)', borderTopColor: 'transparent' }} />
+                  Processing…
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )}
       </div>
 
-      {/* Bottom action row */}
-      <div className="flex items-center justify-around py-4 px-6 bg-background border-t border-border/50 shrink-0">
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          className="flex flex-col items-center gap-1 min-w-[60px] min-h-[44px]"
-          disabled={isProcessing}
-        >
-          <ImageIcon className="w-6 h-6 text-primary" />
-          <span className="text-xs text-primary font-medium">Gallery</span>
-        </button>
+      <div
+        className="shrink-0 px-6 py-5 flex items-center justify-around"
+        style={{
+          background: 'rgba(13,13,13,0.95)',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
+        }}
+      >
+        <motion.button whileTap={{ scale: 0.92 }} onClick={() => fileInputRef.current?.click()} disabled={isProcessing} className="flex flex-col items-center gap-1.5 min-w-[60px] min-h-[44px] justify-center disabled:opacity-40">
+          <Layers className="w-6 h-6" style={{ color: 'rgba(245,158,11,0.85)' }} strokeWidth={1.75} />
+          <span className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: 'rgba(245,158,11,0.70)' }}>Gallery</span>
+        </motion.button>
 
-        <button
+        <motion.button
+          whileTap={{ scale: 0.91 }}
           onClick={() => fileInputRef.current?.click()}
-          className="w-14 h-14 rounded-full bg-primary flex items-center justify-center min-h-[44px] shadow-[0_4px_16px_rgba(245,158,11,0.35)]"
           disabled={isProcessing}
+          className="relative flex items-center justify-center disabled:opacity-40"
+          style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', boxShadow: '0 0 0 3px rgba(245,158,11,0.25), 0 8px 24px rgba(245,158,11,0.45)' }}
         >
-          <Camera className="w-6 h-6 text-primary-foreground" />
-        </button>
+          <Camera className="w-7 h-7 text-black" strokeWidth={1.75} />
+        </motion.button>
 
-        <button
-          onClick={() => openPanel('drafts')}
-          className="flex flex-col items-center gap-1 min-w-[60px] min-h-[44px]"
-        >
-          <FileText className="w-6 h-6 text-primary" />
-          <span className="text-xs text-primary font-medium">Drafts</span>
-        </button>
+        <motion.button whileTap={{ scale: 0.92 }} onClick={() => openPanel('drafts')} className="flex flex-col items-center gap-1.5 min-w-[60px] min-h-[44px] justify-center">
+          <BookOpen className="w-6 h-6" style={{ color: 'rgba(245,158,11,0.85)' }} strokeWidth={1.75} />
+          <span className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: 'rgba(245,158,11,0.70)' }}>Drafts</span>
+        </motion.button>
       </div>
     </div>
   );
-}
-
-function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
 }

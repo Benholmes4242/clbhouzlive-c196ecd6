@@ -1,8 +1,9 @@
-// StudioHeader — Consistent top bar for every screen
-// Safe-area aware, min 44px tap targets, backdrop blur, step progress
+// StudioHeader — Glass dark nav bar, consistent across every screen
+// Safe-area aware, 44px tap targets, amber accent for primary actions
 
 import React from 'react';
 import { ChevronLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { MIN_TAP_TARGET } from '../constants';
 import type { StudioStep } from '../types';
 
@@ -17,57 +18,62 @@ interface StudioHeaderProps {
   title: string;
   leftAction?: HeaderAction;
   rightAction?: HeaderAction;
-  /** Current step for progress indicator */
   step?: StudioStep;
-  /** Whether header is on a dark immersive screen */
+  /** Force dark glass even on light screens */
   darkMode?: boolean;
 }
 
 const STEP_PROGRESS: Partial<Record<StudioStep, number>> = {
-  MEDIA_PICKER: 25,
-  COMPOSER: 50,
-  TRIM: 60,
-  POSTER: 65,
-  PUBLISH: 85,
-  SUCCESS: 100,
+  MEDIA_PICKER: 20,
+  COMPOSER:     50,
+  TRIM:         62,
+  POSTER:       68,
+  PUBLISH:      85,
+  SUCCESS:      100,
 };
 
-export function StudioHeader({ title, leftAction, rightAction, step, darkMode }: StudioHeaderProps) {
+export function StudioHeader({
+  title,
+  leftAction,
+  rightAction,
+  step,
+  darkMode = true, // Studio is always dark
+}: StudioHeaderProps) {
   const progress = step ? STEP_PROGRESS[step] ?? 0 : 0;
   const showProgress = step && progress > 0 && step !== 'SUCCESS';
 
-  const textColor = darkMode ? 'text-white' : 'text-foreground';
-  const mutedColor = darkMode ? 'text-white/70' : 'text-muted-foreground';
-  const bgClass = darkMode
-    ? 'bg-[#0A0A0A]/95 backdrop-blur-xl'
-    : 'bg-background/95 backdrop-blur-xl';
-  const borderClass = darkMode ? 'border-white/10' : 'border-border/50';
-
   return (
     <header
-      className={`flex flex-col shrink-0 ${bgClass}`}
+      className="flex flex-col shrink-0"
       style={{
-        paddingTop: `max(env(safe-area-inset-top, 0px), 47px)`,
+        paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+        background: 'rgba(13,13,13,0.95)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
       }}
     >
-      <div className={`flex items-center justify-between px-4 border-b ${borderClass}`} style={{ minHeight: '56px' }}>
+      <div className="flex items-center justify-between px-4" style={{ minHeight: '52px' }}>
         {/* Left */}
         <div className="w-20 flex justify-start">
-          {leftAction && (
+          {leftAction ? (
             <button
               onClick={leftAction.onClick}
               disabled={leftAction.disabled}
-              className={`flex items-center gap-1 ${mutedColor} disabled:opacity-40`}
-              style={{ minWidth: MIN_TAP_TARGET, minHeight: MIN_TAP_TARGET }}
+              className="flex items-center gap-0.5 disabled:opacity-30 transition-opacity"
+              style={{ minWidth: MIN_TAP_TARGET, minHeight: MIN_TAP_TARGET, color: 'rgba(255,255,255,0.55)' }}
             >
-              <ChevronLeft className="w-5 h-5" />
-              <span className="text-sm">{leftAction.label}</span>
+              <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
+              <span className="text-sm font-medium">{leftAction.label}</span>
             </button>
-          )}
+          ) : <div />}
         </div>
 
-        {/* Centre */}
-        <h1 className={`text-[16px] font-semibold ${textColor} text-center flex-1`}>
+        {/* Centre title */}
+        <h1
+          className="text-[15px] font-semibold tracking-tight flex-1 text-center"
+          style={{ color: 'rgba(255,255,255,0.90)' }}
+        >
           {title}
         </h1>
 
@@ -75,19 +81,28 @@ export function StudioHeader({ title, leftAction, rightAction, step, darkMode }:
         <div className="w-20 flex justify-end">
           {rightAction && (
             rightAction.variant === 'primary' ? (
-              <button
+              <motion.button
+                whileTap={{ scale: 0.94 }}
                 onClick={rightAction.onClick}
                 disabled={rightAction.disabled}
-                className="bg-primary text-primary-foreground text-sm font-semibold px-4 rounded-full min-h-[36px] disabled:opacity-40"
+                className="text-sm font-bold px-4 rounded-full disabled:opacity-30 transition-opacity"
+                style={{
+                  minHeight: '34px',
+                  background: rightAction.disabled
+                    ? 'rgba(245,158,11,0.3)'
+                    : 'linear-gradient(135deg, #f59e0b, #d97706)',
+                  color: '#0D0D0D',
+                  boxShadow: rightAction.disabled ? 'none' : '0 2px 12px rgba(245,158,11,0.40)',
+                }}
               >
                 {rightAction.label}
-              </button>
+              </motion.button>
             ) : (
               <button
                 onClick={rightAction.onClick}
                 disabled={rightAction.disabled}
-                className={`text-sm font-semibold rounded-lg px-4 disabled:opacity-40 ${mutedColor}`}
-                style={{ minHeight: MIN_TAP_TARGET }}
+                className="text-sm font-medium disabled:opacity-30"
+                style={{ minHeight: MIN_TAP_TARGET, color: 'rgba(255,255,255,0.55)' }}
               >
                 {rightAction.label}
               </button>
@@ -96,12 +111,15 @@ export function StudioHeader({ title, leftAction, rightAction, step, darkMode }:
         </div>
       </div>
 
-      {/* Step progress bar */}
+      {/* Amber progress bar */}
       {showProgress && (
-        <div className="h-[2px] bg-border/40">
-          <div
-            className="h-full bg-primary transition-all duration-300"
-            style={{ width: `${progress}%` }}
+        <div className="h-[2px]" style={{ background: 'rgba(255,255,255,0.06)' }}>
+          <motion.div
+            className="h-full"
+            initial={false}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            style={{ background: 'linear-gradient(90deg, #f59e0b, #d97706)' }}
           />
         </div>
       )}

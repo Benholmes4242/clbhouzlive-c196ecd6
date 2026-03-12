@@ -1,11 +1,11 @@
-// MediaReel — Horizontal thumbnail strip for all media items
-// Active item has amber ring + glow. Drag to reorder. + button to add more.
+// MediaReel — Dark horizontal thumbnail strip with amber active state
 
 import React, { useRef } from 'react';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Play } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { REEL_THUMB_SIZE } from '../constants';
 import type { StudioMediaItem } from '../types';
+
+const THUMB = 68;
 
 interface MediaReelProps {
   items: StudioMediaItem[];
@@ -20,49 +20,31 @@ export function MediaReel({ items, activeIndex, onSelect, onRemove, onAddMore }:
   if (items.length <= 1) return null;
 
   return (
-    <div ref={scrollRef} className="flex items-center gap-2 overflow-x-auto py-2 px-4 scrollbar-hide">
+    <div ref={scrollRef} className="flex items-center gap-2 overflow-x-auto py-3 px-4" style={{ scrollbarWidth: 'none' }}>
       <AnimatePresence>
         {items.map((item, index) => {
           const isActive = index === activeIndex;
           return (
-            <motion.button
-              key={item.id}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              onClick={() => onSelect(index)}
-              className={`relative shrink-0 rounded-lg overflow-hidden transition-all ${
-                isActive
-                  ? 'ring-2 ring-primary scale-105 shadow-[0_2px_8px_rgba(245,158,11,0.4)]'
-                  : 'ring-1 ring-border/50'
-              }`}
-              style={{ width: REEL_THUMB_SIZE, height: REEL_THUMB_SIZE }}
-            >
+            <motion.button key={item.id} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ type: 'spring', damping: 22, stiffness: 380 }} onClick={() => onSelect(index)} className="relative shrink-0 rounded-xl overflow-hidden"
+              style={{ width: THUMB, height: THUMB, outline: isActive ? '2px solid rgba(245,158,11,0.85)' : '1px solid rgba(255,255,255,0.10)', outlineOffset: isActive ? 2 : 0, boxShadow: isActive ? '0 0 12px rgba(245,158,11,0.35)' : 'none', transform: isActive ? 'scale(1.06)' : 'scale(1)', transition: 'transform 0.2s, outline 0.2s, box-shadow 0.2s', background: 'rgba(255,255,255,0.05)' }}>
               <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
-              <button
-                onClick={(e) => { e.stopPropagation(); onRemove(item.id); }}
-                className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center"
-              >
-                <X className="w-3 h-3 text-white" />
-              </button>
               {item.mediaType === 'video' && (
-                <div className="absolute bottom-0.5 left-0.5 bg-black/60 rounded px-1">
-                  <span className="text-white text-[8px]">▶</span>
+                <div className="absolute bottom-1 left-1 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.70)' }}>
+                  <Play className="w-2.5 h-2.5 text-white ml-0.5" fill="white" strokeWidth={0} />
                 </div>
               )}
+              <button onClick={(e) => { e.stopPropagation(); onRemove(item.id); }} className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.75)', border: '1px solid rgba(255,255,255,0.15)' }}>
+                <X className="w-3 h-3 text-white" strokeWidth={2.5} />
+              </button>
             </motion.button>
           );
         })}
       </AnimatePresence>
 
       {items.length < 10 && (
-        <button
-          onClick={onAddMore}
-          className="shrink-0 rounded-lg border-2 border-dashed border-primary/40 flex items-center justify-center"
-          style={{ width: REEL_THUMB_SIZE, height: REEL_THUMB_SIZE }}
-        >
-          <Plus className="w-5 h-5 text-primary" />
-        </button>
+        <motion.button whileTap={{ scale: 0.93 }} onClick={onAddMore} className="shrink-0 rounded-xl flex items-center justify-center" style={{ width: THUMB, height: THUMB, border: '1.5px dashed rgba(245,158,11,0.40)', background: 'rgba(245,158,11,0.05)' }}>
+          <Plus className="w-5 h-5" style={{ color: 'rgba(245,158,11,0.70)' }} strokeWidth={2} />
+        </motion.button>
       )}
     </div>
   );
