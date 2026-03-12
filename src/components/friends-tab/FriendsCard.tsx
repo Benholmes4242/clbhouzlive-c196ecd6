@@ -234,7 +234,11 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
 
         {/* Engagement row */}
         <div className="flex items-center gap-6 px-3 py-3">
-          <button onClick={toggleLike} className="flex items-center gap-1 text-xs">
+          <button
+            onClick={toggleLike}
+            aria-label={`${isLiked ? 'Unlike' : 'Like'} post`}
+            className="flex items-center gap-1 text-xs min-h-[44px]"
+          >
             <Heart
               className={`h-[18px] w-[18px] transition-colors ${isLiked ? 'fill-like text-like' : 'text-muted-foreground'}`}
             />
@@ -242,11 +246,19 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
               {formatCompact(likeCount)}
             </span>
           </button>
-          <button onClick={() => setShowComments(true)} className="flex items-center gap-1 text-xs text-muted-foreground">
+          <button
+            onClick={() => setShowComments(true)}
+            aria-label="Open comments"
+            className="flex items-center gap-1 text-xs text-muted-foreground min-h-[44px]"
+          >
             <MessageCircle className="h-[18px] w-[18px]" />
             {formatCompact(post.commentCount)}
           </button>
-          <button onClick={handleShare} className="flex items-center gap-1 text-xs text-muted-foreground">
+          <button
+            onClick={handleShare}
+            aria-label="Share post"
+            className="flex items-center gap-1 text-xs text-muted-foreground min-h-[44px]"
+          >
             <Share2 className="h-[18px] w-[18px]" />
             {formatCompact(post.shareCount)}
           </button>

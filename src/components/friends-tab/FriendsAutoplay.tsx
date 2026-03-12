@@ -214,18 +214,6 @@ export function FriendsAutoplay({ posts, feedRef }: FriendsAutoplayProps) {
             if (mediaEl) {
               activeMapRef.current.set(freeSlot, bestIdx);
               attachToCard(freeSlot, bestIdx, post, mediaEl);
-
-              // Pre-warm next 2 video cards ahead
-              const videoIndices = posts
-                .map((p, i) => ({ i, hasVideo: !!(p.mediaItems?.[0]?.hlsUrl || p.mediaItems?.[0]?.mp4Url) }))
-                .filter(p => p.hasVideo && p.i > bestIdx)
-                .slice(0, 2)
-                .map(p => p.i);
-
-              for (const nextIdx of videoIndices) {
-                const nextHlsUrl = posts[nextIdx]?.mediaItems?.[0]?.hlsUrl;
-                if (nextHlsUrl) prewarmVideo(nextHlsUrl, nextIdx, prewarmedSetRef.current);
-              }
             }
           }
         }

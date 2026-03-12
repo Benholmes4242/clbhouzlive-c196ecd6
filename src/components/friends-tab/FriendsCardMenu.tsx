@@ -42,7 +42,7 @@ export const FriendsCardMenu = React.memo(function FriendsCardMenu({ postId, use
       reporter_id: userId,
     });
     if (error) {
-      console.error('[FriendsCardMenu] Report failed:', error);
+      if (import.meta.env.DEV) console.error('[FriendsCardMenu] Report failed:', error);
     } else {
       toast.success('Report submitted');
     }
