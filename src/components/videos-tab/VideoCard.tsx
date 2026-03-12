@@ -165,7 +165,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
             {expanded && cleanedCaption.length > 100 && (
               <button
                 onClick={() => setExpanded(false)}
-                className="text-sm font-semibold text-muted-foreground mt-0.5"
+                className="text-xs font-semibold text-muted-foreground mt-0.5"
               >
                 less
               </button>
