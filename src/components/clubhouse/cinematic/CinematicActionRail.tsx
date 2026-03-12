@@ -333,17 +333,31 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         />
       )}
 
-      {/* Slot 8: Left chevron — bottom of rail, only when there's a previous media item */}
-      {onPrevMedia && hasPrevMedia && (
-        <ActionSlot
-          icon={ChevronLeft}
-          onClick={onPrevMedia}
-          ariaLabel="Previous media"
-          showCount={false}
-          idleOpacity={idleOpacity}
-        />
-      )}
     </motion.div>
+
+    {/* Left chevron — independent, mirrors right chevron position */}
+    {onPrevMedia && hasPrevMedia && (
+      <motion.button
+        initial={{ opacity: 0, x: -8 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -8 }}
+        transition={{ duration: 0.2 }}
+        onClick={onPrevMedia}
+        className="fixed left-4 z-40 pointer-events-auto
+          w-11 h-11 rounded-full
+          flex items-center justify-center"
+        style={{
+          bottom: '97px',
+          background: 'rgba(0,0,0,0.45)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+        }}
+        aria-label="Previous media"
+      >
+        <ChevronLeft size={20} className="text-white" />
+      </motion.button>
+    )}
+    </>
   );
 };
 
