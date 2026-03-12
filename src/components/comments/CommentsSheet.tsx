@@ -110,6 +110,7 @@ function CommentsSheet({
   const [commentToDelete, setCommentToDelete] = useState<CommentWithReplies | CommentReply | null>(null);
   const [inputText, setInputText] = useState('');
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
+  const [loadingReplies, setLoadingReplies] = useState<Set<string>>(new Set());
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
