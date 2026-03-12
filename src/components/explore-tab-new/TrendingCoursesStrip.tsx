@@ -67,7 +67,7 @@ function TrendingCoursesStripInner({ activeRegion }: TrendingCoursesStripProps) 
                 src={course.thumbnail_image}
                 alt={course.course_name}
                 loading="lazy"
-                className="aspect-[4/3] w-full object-cover"
+                className="aspect-[4/3] w-full object-cover block"
               />
             ) : (
               <div className="aspect-[4/3] w-full bg-muted" />
