@@ -90,7 +90,7 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
         if (error) throw error;
       }
     } catch (err) {
-      console.error('[FriendsCard] Like toggle failed:', err);
+      if (import.meta.env.DEV) console.error('[FriendsCard] Like toggle failed:', err);
       setIsLiked(!newLiked);
       setLikeCount(prev => newLiked ? Math.max(0, prev - 1) : prev + 1);
     }
