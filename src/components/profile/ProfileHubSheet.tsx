@@ -171,7 +171,7 @@ function ProfileHubSheet({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 32, stiffness: 320 }}
-            className="fixed inset-x-0 bottom-0 z-[9999] w-full rounded-t-[24px] bg-background flex flex-col"
+            className="fixed inset-x-0 bottom-0 z-[9999] w-full rounded-t-[24px] bg-background flex flex-col md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[560px]"
             style={{
               maxHeight: '92dvh',
               paddingBottom: 'env(safe-area-inset-bottom, 0px)',
@@ -211,7 +211,7 @@ function ProfileHubSheet({
                   Switch Profile
                 </div>
                 <div
-                  className="flex gap-3 overflow-x-auto pb-1"
+                  className="flex gap-3 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
                   style={{
                     scrollSnapType: 'x mandatory',
                     WebkitOverflowScrolling: 'touch',
@@ -280,7 +280,7 @@ function ProfileHubSheet({
                     key={label}
                     type="button"
                     onClick={() => handleNav(route)}
-                    className="relative flex items-center gap-3 bg-muted rounded-2xl px-4 min-h-[56px] active:bg-muted/70 transition-colors"
+                    className="relative flex items-center gap-3 bg-muted rounded-2xl px-4 min-h-[56px] hover:bg-muted/80 active:bg-muted/70 transition-colors duration-150"
                   >
                     <div className="relative">
                       <Icon className="w-[18px] h-[18px] text-muted-foreground" />
@@ -311,7 +311,7 @@ function ProfileHubSheet({
                     key={label}
                     type="button"
                     onClick={() => handleNav(route)}
-                    className="w-full flex items-center gap-3 min-h-[48px] active:bg-muted/50 rounded-xl px-2 -mx-2 transition-colors"
+                    className="w-full flex items-center gap-3 min-h-[48px] hover:bg-muted/40 active:bg-muted/50 rounded-xl px-2 -mx-2 transition-colors duration-150"
                   >
                     <Icon className="w-4 h-4 text-muted-foreground" />
                     <span className="flex-1 text-left text-[14px] font-medium text-foreground">{label}</span>
@@ -331,7 +331,7 @@ function ProfileHubSheet({
                     <button
                       type="button"
                       onClick={() => handleNav('/admin/command-center')}
-                      className="w-full flex items-center gap-3 min-h-[48px] bg-primary/10 rounded-2xl px-4 active:bg-primary/20 transition-colors"
+                      className="w-full flex items-center gap-3 min-h-[48px] bg-primary/10 rounded-2xl px-4 hover:bg-primary/15 active:bg-primary/20 transition-colors duration-150"
                     >
                       <Shield className="w-5 h-5 text-primary" />
                       <div className="flex-1 text-left">
@@ -353,7 +353,7 @@ function ProfileHubSheet({
                   <button
                     type="button"
                     onClick={() => setShowLogoutConfirm(true)}
-                    className="w-full flex items-center gap-3 min-h-[48px] rounded-xl px-2 -mx-2 active:bg-destructive/10 transition-colors"
+                    className="w-full flex items-center gap-3 min-h-[48px] rounded-xl px-2 -mx-2 hover:bg-destructive/5 active:bg-destructive/10 transition-colors duration-150"
                   >
                     <LogOut className="w-[18px] h-[18px] text-destructive" />
                     <span className="text-[14px] font-medium text-destructive">Sign out</span>
@@ -363,14 +363,14 @@ function ProfileHubSheet({
                     <button
                       type="button"
                       onClick={() => setShowLogoutConfirm(false)}
-                      className="flex-1 min-h-[44px] rounded-xl border border-border text-[13px] font-semibold text-muted-foreground"
+                      className="flex-1 min-h-[44px] rounded-xl border border-border text-[13px] font-semibold text-muted-foreground hover:bg-muted/40 active:bg-muted/50 transition-colors duration-150"
                     >
                       Cancel
                     </button>
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="flex-1 min-h-[44px] rounded-xl bg-destructive text-[13px] font-semibold text-destructive-foreground"
+                      className="flex-1 min-h-[44px] rounded-xl bg-destructive text-[13px] font-semibold text-destructive-foreground hover:bg-destructive/90 active:bg-destructive/80 transition-colors duration-150"
                     >
                       Sign out
                     </button>

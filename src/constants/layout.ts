@@ -3,6 +3,11 @@
  * All overlay elements (action rail, creator capsule, skeleton) reference these
  * so bottom nav height changes propagate from a single source.
  */
-export const BOTTOM_NAV_HEIGHT = 80;
-export const OVERLAY_BOTTOM = `calc(30px + ${BOTTOM_NAV_HEIGHT}px)`;
-export const OVERLAY_BOTTOM_REVIEW = `calc(30px + ${BOTTOM_NAV_HEIGHT + 8}px)`;
+export const BOTTOM_NAV_HEIGHT = 88;
+
+/** Gap between overlay elements and nav top (breathing room) */
+export const OVERLAY_GAP = 12;
+
+/** Total bottom offset for overlays: gap + nav height */
+export const OVERLAY_BOTTOM = `calc(${OVERLAY_GAP}px + var(--bottom-nav-height, ${BOTTOM_NAV_HEIGHT}px))`;
+export const OVERLAY_BOTTOM_REVIEW = `calc(${OVERLAY_GAP + 8}px + var(--bottom-nav-height, ${BOTTOM_NAV_HEIGHT}px))`;
