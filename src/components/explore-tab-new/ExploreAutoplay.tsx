@@ -13,39 +13,6 @@ function isSlowNetwork(): boolean {
   return ect === '2g' || ect === 'slow-2g';
 }
 
-const prewarmTile = async (hlsUrl: string, idx: number, seen: Set<number>) => {
-  if (seen.has(idx)) return;
-  seen.add(idx);
-  try {
-    const masterText = await fetch(hlsUrl, { mode: 'cors', credentials: 'omit' }).then(r => r.text());
-    const masterLines = masterText.split('\n');
-    const streamIdx = masterLines.findIndex(l => l.startsWith('#EXT-X-STREAM-INF'));
-    const levelRelUrl = streamIdx >= 0 ? masterLines[streamIdx + 1]?.trim() : null;
-    if (!levelRelUrl || levelRelUrl.startsWith('#')) return;
-    const masterBase = hlsUrl.substring(0, hlsUrl.lastIndexOf('/') + 1);
-    const levelUrl = levelRelUrl.startsWith('http') ? levelRelUrl : new URL(levelRelUrl, masterBase).href;
-
-    const levelText = await fetch(levelUrl, { mode: 'cors', credentials: 'omit' }).then(r => r.text());
-    const lines = levelText.split('\n');
-    const base = levelUrl.substring(0, levelUrl.lastIndexOf('/') + 1);
-
-    const mapLine = lines.find(l => l.startsWith('#EXT-X-MAP:URI="'));
-    if (mapLine) {
-      const mapUri = mapLine.match(/#EXT-X-MAP:URI="([^"]+)"/)?.[1];
-      if (mapUri) {
-        const initUrl = mapUri.startsWith('http') ? mapUri : new URL(mapUri, base).href;
-        fetch(initUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
-      }
-    }
-
-    const segLine = lines.find(l => l.trim() && !l.startsWith('#'));
-    if (segLine) {
-      const segUrl = segLine.trim().startsWith('http') ? segLine.trim() : new URL(segLine.trim(), base).href;
-      fetch(segUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
-    }
-  } catch { /* silent */ }
-};
-
 interface ExploreAutoplayProps {
   posts: FeedPost[];
   gridRef: RefObject<HTMLElement>;
@@ -57,7 +24,6 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
   const activeMapRef = useRef<Map<number, number>>(new Map()); // slot → tileIdx
   const observerRef = useRef<IntersectionObserver | null>(null);
   const observedTilesRef = useRef<number>(0);
-  const prewarmedSetRef = useRef<Set<number>>(new Set());
 
   // Create video pool once on mount
   useEffect(() => {
