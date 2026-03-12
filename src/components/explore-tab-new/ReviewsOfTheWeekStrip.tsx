@@ -34,7 +34,7 @@ function ReviewsOfTheWeekStripInner({ activeRegion = null }: ReviewsOfTheWeekStr
       const { data, error } = await supabase.rpc('get_top_video_reviews', params);
 
       if (error) {
-        console.error('[ReviewsOfTheWeek] RPC error:', error);
+        if (import.meta.env.DEV) console.error('[ReviewsOfTheWeek] RPC error:', error);
         return [];
       }
 
