@@ -206,7 +206,7 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
             const evictSlot = 0;
             const evictTile = activeMapRef.current.get(evictSlot)!;
             activeMapRef.current.delete(evictSlot);
-            detachSlot(evictSlot, evictTile);
+            detachSlot(evictSlot);
             freeSlot = evictSlot;
           }
 
