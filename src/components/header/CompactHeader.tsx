@@ -149,18 +149,17 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         data-chrome="header"
         className={cn(
           "compact-header clubhouse-header",
-          isClubhouseRoute && "chrome-header",
           "fixed left-0 right-0 z-header",
           className
         )}
         style={{
           top: 0,
-          background: getBackground(),
+          background: '#F8FAFC',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          height: isClubhouseRoute ? `calc(${contentHeight}px + env(safe-area-inset-top))` : `${contentHeight}px`,
-          paddingTop: isClubhouseRoute ? 'env(safe-area-inset-top)' : 0,
-          borderBottom: `0.5px solid ${getBorder()}`,
+          height: `${contentHeight}px`,
+          paddingTop: 0,
+          borderBottom: `0.5px solid hsl(var(--border) / 0.5)`,
           boxShadow: 'none',
         }}
       >
