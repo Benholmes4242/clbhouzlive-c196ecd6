@@ -1741,9 +1741,6 @@ html, body, #root, .app-shell { touch-action: auto; }
   /* Standard navigation heights */
   --header-height: 64px;
   --nav-height: 56px;
-  
-  /* Bottom navigation height - no safe area */
-  --bottom-nav-height: var(--nav-height);
 }
 
 /* Global bottom navigation styling */
