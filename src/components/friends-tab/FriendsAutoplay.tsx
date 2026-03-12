@@ -12,39 +12,6 @@ function isSlowNetwork(): boolean {
   return ect === '2g' || ect === 'slow-2g';
 }
 
-async function prewarmVideo(hlsUrl: string, idx: number, seen: Set<number>) {
-  if (seen.has(idx)) return;
-  seen.add(idx);
-  try {
-    const masterText = await fetch(hlsUrl, { mode: 'cors', credentials: 'omit' }).then(r => r.text());
-    const masterLines = masterText.split('\n');
-    const streamIdx = masterLines.findIndex(l => l.startsWith('#EXT-X-STREAM-INF'));
-    const levelRelUrl = streamIdx >= 0 ? masterLines[streamIdx + 1]?.trim() : null;
-    if (!levelRelUrl || levelRelUrl.startsWith('#')) return;
-    const masterBase = hlsUrl.substring(0, hlsUrl.lastIndexOf('/') + 1);
-    const levelUrl = levelRelUrl.startsWith('http') ? levelRelUrl : new URL(levelRelUrl, masterBase).href;
-
-    const levelText = await fetch(levelUrl, { mode: 'cors', credentials: 'omit' }).then(r => r.text());
-    const lines = levelText.split('\n');
-    const base = levelUrl.substring(0, levelUrl.lastIndexOf('/') + 1);
-
-    const mapLine = lines.find(l => l.startsWith('#EXT-X-MAP:URI="'));
-    if (mapLine) {
-      const mapUri = mapLine.match(/#EXT-X-MAP:URI="([^"]+)"/)?.[1];
-      if (mapUri) {
-        const initUrl = mapUri.startsWith('http') ? mapUri : new URL(mapUri, base).href;
-        fetch(initUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
-      }
-    }
-
-    const segLine = lines.find(l => l.trim() && !l.startsWith('#'));
-    if (segLine) {
-      const segUrl = segLine.trim().startsWith('http') ? segLine.trim() : new URL(segLine.trim(), base).href;
-      fetch(segUrl, { mode: 'cors', credentials: 'omit' }).catch(() => {});
-    }
-  } catch { /* silent */ }
-}
-
 interface FriendsAutoplayProps {
   posts: FeedPost[];
   feedRef: React.RefObject<HTMLElement>;
@@ -56,12 +23,6 @@ export function FriendsAutoplay({ posts, feedRef }: FriendsAutoplayProps) {
   const activeMapRef = useRef<Map<number, number>>(new Map()); // slot → cardIndex
   const observerRef = useRef<IntersectionObserver | null>(null);
   const observedCountRef = useRef<number>(0);
-  const prewarmedSetRef = useRef<Set<number>>(new Set());
-
-  // Reset pre-warm set when feed changes
-  useEffect(() => {
-    prewarmedSetRef.current = new Set();
-  }, [posts]);
 
   // Create video pool once on mount
   useEffect(() => {
