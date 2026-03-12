@@ -54,7 +54,7 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
     };
   }, []);
 
-  const detachSlot = useCallback((slot: number, tileIdx: number) => {
+  const detachSlot = useCallback((slot: number) => {
     const video = poolRef.current[slot];
     if (!video) return;
 
