@@ -250,7 +250,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       style={{
         bottom: CAPSULE_BOTTOM_OFFSET,
         gap: 12,
-        maxHeight: 'calc(100dvh - 130px)',
+        maxHeight: 'calc(100dvh - 120px)',
         overflowY: 'hidden' as const,
       }}
     >
