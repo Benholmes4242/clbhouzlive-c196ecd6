@@ -342,6 +342,11 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
 
     </motion.div>
 
+    {console.log('[Left Chevron Guard]', {
+      onPrevMedia: !!onPrevMedia,
+      hasPrevMedia,
+      willRender: !!(onPrevMedia && hasPrevMedia),
+    })}
     {/* Left chevron — independent, mirrors right chevron position */}
     {onPrevMedia && hasPrevMedia && (
       <motion.button
