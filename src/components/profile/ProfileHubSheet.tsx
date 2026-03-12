@@ -171,7 +171,7 @@ function ProfileHubSheet({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 32, stiffness: 320 }}
-            className="fixed inset-x-0 bottom-0 z-[9999] w-full rounded-t-[24px] bg-background flex flex-col"
+            className="fixed inset-x-0 bottom-0 z-[9999] w-full rounded-t-[24px] bg-background flex flex-col md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[560px]"
             style={{
               maxHeight: '92dvh',
               paddingBottom: 'env(safe-area-inset-bottom, 0px)',
