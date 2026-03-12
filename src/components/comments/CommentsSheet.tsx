@@ -412,9 +412,15 @@ function CommentsSheet({
             {!repliesExpanded ? (
               <button
                 type="button"
-                onClick={() => {
-                  loadAllReplies(comment.id);
+                onClick={async () => {
                   toggleReplies(comment.id);
+                  setLoadingReplies(prev => new Set(prev).add(comment.id));
+                  await loadAllReplies(comment.id);
+                  setLoadingReplies(prev => {
+                    const next = new Set(prev);
+                    next.delete(comment.id);
+                    return next;
+                  });
                 }}
                 className={cn(
                   'text-[12px] font-semibold min-h-[44px] flex items-center gap-1 pl-10',
@@ -426,6 +432,20 @@ function CommentsSheet({
               </button>
             ) : (
               <>
+                {/* Reply loading shimmer */}
+                {loadingReplies.has(comment.id) && comment.replies.length === 0 && (
+                  <div className="space-y-0">
+                    {[0, 1].map(i => (
+                      <div key={i} className="flex gap-3 pl-10 sm:pl-14 pr-4 py-3">
+                        <div className={cn('w-[28px] h-[28px] rounded-[34%] shrink-0', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
+                        <div className="flex-1 space-y-2 py-0.5">
+                          <div className={cn('h-[18px] w-20 rounded', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
+                          <div className={cn('h-[18px] w-[75%] rounded', isDark ? 'bg-white/6 clb-shimmer-dark' : 'bg-muted/80 clb-shimmer-light')} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {comment.replies.map(reply => renderCommentRow(reply, true, comment.id))}
                 {comment.total_replies_count > comment.replies.length && (
                   <button
