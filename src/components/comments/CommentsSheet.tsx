@@ -652,7 +652,7 @@ function CommentsSheet({
                   hideRing
                 />
                 <div className={cn(
-                  'flex-1 flex items-end rounded-[22px] px-4 py-2',
+                  'flex-1 min-w-0 flex items-end rounded-[22px] px-4 py-2',
                   isDark
                     ? 'bg-white/10 border border-white/15'
                     : 'bg-muted border border-border/50'
