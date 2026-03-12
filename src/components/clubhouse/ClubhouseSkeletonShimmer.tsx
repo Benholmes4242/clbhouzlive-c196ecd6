@@ -180,7 +180,7 @@ export const ClubhouseSkeletonShimmer: React.FC<ClubhouseSkeletonShimmerProps> =
             <div 
               className="absolute right-4 flex flex-col items-center"
               style={{ 
-                bottom: 'calc(12px + var(--bottom-nav-height, 88px))',
+                bottom: '97px',
                 maxHeight: 'calc(100dvh - 120px)',
               }}
             >
