@@ -613,7 +613,7 @@ function CommentsSheet({
             <div
               className="shrink-0 px-4 py-3"
               style={{
-                paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)',
+                paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 20px)',
                 borderTop: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid hsl(var(--border) / 0.5)',
                 background: isDark ? '#0d0d0d' : undefined,
               }}
