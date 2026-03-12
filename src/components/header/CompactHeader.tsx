@@ -15,8 +15,6 @@ import { NineDotsIcon } from '@/features/tourhub/components/NineDotsIcon';
 import { openTourNav } from '@/features/tourhub/contexts/TourNavContext';
 import { haptic } from '@/utils/haptics';
 import { useLiveTournamentCount, usePrefetchNavMenu } from '@/features/tourhub/hooks/useNavMenuData';
-import { ClubhouseTabToggle } from '@/components/clubhouse/ClubhouseTabToggle';
-import { useClubhouseTab } from '@/contexts/ClubhouseTabContext';
 
 interface CompactHeaderProps {
   className?: string;
@@ -51,17 +49,13 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const pillRef = useRef<HTMLButtonElement>(null);
   
   // Live tournament data for Tour routes
-  const isTourRouteEarly = location.pathname.startsWith('/tour') || location.pathname.startsWith('/tourhub');
+  const isTourRoute = location.pathname.startsWith('/tour') || location.pathname.startsWith('/tourhub');
   const { data: liveCount } = useLiveTournamentCount();
   const prefetchNavMenu = usePrefetchNavMenu();
-  const hasLiveTournaments = isTourRouteEarly && (liveCount ?? 0) > 0;
-  
-  // Clubhouse tab context - may be null if not on Clubhouse page
-  const clubhouseTab = useClubhouseTab();
+  const hasLiveTournaments = isTourRoute && (liveCount ?? 0) > 0;
   
   // Determine routes
-  const isClubhouseRoute = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
-  const isTourRoute = location.pathname.startsWith('/tour') || location.pathname.startsWith('/tourhub');
+  const isEditProfileRoute = location.pathname === '/edit-profile';
   const isEditProfileRoute = location.pathname === '/edit-profile';
   const isFriendsActivityRoute = location.pathname === '/friends-activity';
   const isAchievementsRoute = location.pathname === '/achievements' || location.pathname.startsWith('/achievements/') || location.pathname === '/profile/quest';
