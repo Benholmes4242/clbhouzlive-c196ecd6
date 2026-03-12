@@ -112,7 +112,7 @@ export function useAppLifecycle() {
   }, []);
 
   const completeRehydration = useCallback(() => {
-    console.log('[AppLifecycle] Rehydration complete');
+    isRehydratingRef.current = false;
     isRehydratingRef.current = false;
     setState({
       isRehydrating: false,
