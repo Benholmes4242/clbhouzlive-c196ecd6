@@ -45,7 +45,7 @@ export function useFriendsFeed({ userId, mode, searchQuery, enabled: externalEna
       const { data, error } = await supabase.rpc('get_friends_feed', params as any);
 
       if (error) {
-        console.error('[FriendsFeed] RPC error:', error);
+        if (import.meta.env.DEV) console.error('[FriendsFeed] RPC error:', error);
         return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
       }
 

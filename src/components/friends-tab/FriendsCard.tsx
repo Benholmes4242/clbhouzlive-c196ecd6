@@ -90,7 +90,7 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
         if (error) throw error;
       }
     } catch (err) {
-      console.error('[FriendsCard] Like toggle failed:', err);
+      if (import.meta.env.DEV) console.error('[FriendsCard] Like toggle failed:', err);
       setIsLiked(!newLiked);
       setLikeCount(prev => newLiked ? Math.max(0, prev - 1) : prev + 1);
     }
@@ -162,7 +162,7 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
             {expanded && cleanCaption.length > 100 && (
               <button
                 onClick={() => setExpanded(false)}
-                className="text-sm font-semibold text-muted-foreground mt-0.5"
+                className="text-xs font-semibold text-muted-foreground mt-0.5"
               >
                 less
               </button>
@@ -175,7 +175,7 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
           <div className="px-3 pb-2">
             {courseId ? (
               <button
-                onClick={() => navigate(`/course/${courseId}`)}
+                onClick={() => navigate(`/courses/${courseId}`)}
                 className="flex items-center gap-1 hover:underline"
               >
                 <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
@@ -191,9 +191,11 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
         )}
 
         {/* Media area — dynamic aspect ratio */}
-        <div
+        <button
+          type="button"
           data-media-wrapper
-          className={`relative w-full ${aspectClass} bg-muted cursor-pointer`}
+          aria-label={`Play post by ${post.displayName}`}
+          className={`relative w-full ${aspectClass} bg-muted`}
           onClick={() => {
             if (allPosts && cardIndex != null) {
               useFullscreenFeed.getState().open({
@@ -228,11 +230,15 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
               <span className="text-xs font-medium text-white">{post.review.rating.toFixed(1)}</span>
             </div>
           )}
-        </div>
+        </button>
 
         {/* Engagement row */}
         <div className="flex items-center gap-6 px-3 py-3">
-          <button onClick={toggleLike} className="flex items-center gap-1 text-xs">
+          <button
+            onClick={toggleLike}
+            aria-label={`${isLiked ? 'Unlike' : 'Like'} post`}
+            className="flex items-center gap-1 text-xs min-h-[44px]"
+          >
             <Heart
               className={`h-[18px] w-[18px] transition-colors ${isLiked ? 'fill-like text-like' : 'text-muted-foreground'}`}
             />
@@ -240,11 +246,19 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
               {formatCompact(likeCount)}
             </span>
           </button>
-          <button onClick={() => setShowComments(true)} className="flex items-center gap-1 text-xs text-muted-foreground">
+          <button
+            onClick={() => setShowComments(true)}
+            aria-label="Open comments"
+            className="flex items-center gap-1 text-xs text-muted-foreground min-h-[44px]"
+          >
             <MessageCircle className="h-[18px] w-[18px]" />
             {formatCompact(post.commentCount)}
           </button>
-          <button onClick={handleShare} className="flex items-center gap-1 text-xs text-muted-foreground">
+          <button
+            onClick={handleShare}
+            aria-label="Share post"
+            className="flex items-center gap-1 text-xs text-muted-foreground min-h-[44px]"
+          >
             <Share2 className="h-[18px] w-[18px]" />
             {formatCompact(post.shareCount)}
           </button>
