@@ -271,7 +271,7 @@ function CommentsSheet({
         ref={registerRef(comment.id)}
         className={cn(
           'flex gap-3 px-4 py-3 transition-colors duration-300',
-          isReply && 'pl-14',
+          isReply && 'pl-10 sm:pl-14',
           highlightedId === comment.id && (isDark ? 'bg-white/[0.05]' : 'bg-primary/[0.04]'),
         )}
       >
@@ -430,7 +430,7 @@ function CommentsSheet({
                   <button
                     type="button"
                     onClick={() => loadAllReplies(comment.id)}
-                    className="text-[12px] font-semibold text-primary min-h-[44px] flex items-center pl-14"
+                    className="text-[12px] font-semibold text-primary min-h-[44px] flex items-center pl-10 sm:pl-14"
                   >
                     Load {comment.total_replies_count - comment.replies.length} more replies
                   </button>
@@ -439,7 +439,7 @@ function CommentsSheet({
                   type="button"
                   onClick={() => toggleReplies(comment.id)}
                   className={cn(
-                    'text-[12px] font-semibold min-h-[44px] flex items-center pl-14',
+                    'text-[12px] font-semibold min-h-[44px] flex items-center pl-10 sm:pl-14',
                     isDark ? 'text-white/40' : 'text-muted-foreground'
                   )}
                 >
@@ -452,7 +452,7 @@ function CommentsSheet({
 
         {/* Inset divider */}
         {idx < sortedComments.length - 1 && (
-          <div className={cn('ml-[64px] h-px', isDark ? 'bg-white/8' : 'bg-border/30')} />
+          <div className={cn('ml-[56px] sm:ml-[64px] h-px', isDark ? 'bg-white/8' : 'bg-border/30')} />
         )}
       </div>
     );
@@ -482,6 +482,7 @@ function CommentsSheet({
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className={cn(
               'fixed inset-x-0 bottom-0 z-[101] w-full rounded-t-[20px]',
+              'md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-[560px]',
               'flex flex-col',
               isDark ? 'bg-[#0d0d0d]' : 'bg-background'
             )}
@@ -501,19 +502,19 @@ function CommentsSheet({
               <div className="w-11" />
 
               {/* Title — centred */}
-              <div className="flex-1 flex items-center justify-center gap-2">
-                <span className={cn('text-[16px] font-semibold', isDark ? 'text-white' : 'text-foreground')}>
+              <div className="flex-1 min-w-0 flex items-center justify-center gap-2">
+                <span className={cn('text-[16px] font-semibold truncate', isDark ? 'text-white' : 'text-foreground')}>
                   Comments
                 </span>
                 {totalCount > 0 && (
-                  <span className={cn('text-[16px] font-semibold', isDark ? 'text-white/40' : 'text-muted-foreground')}>
+                  <span className={cn('text-[16px] font-semibold shrink-0', isDark ? 'text-white/40' : 'text-muted-foreground')}>
                     {totalCount}
                   </span>
                 )}
               </div>
 
               {/* Right — sort toggle + close */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 shrink-0">
                 {totalCount > 1 && (
                   <div className={cn('flex items-center gap-1 rounded-lg p-0.5', isDark ? 'bg-white/8' : 'bg-muted/60')}>
                     {(['best', 'newest'] as const).map(s => (
@@ -651,7 +652,7 @@ function CommentsSheet({
                   hideRing
                 />
                 <div className={cn(
-                  'flex-1 flex items-end rounded-[22px] px-4 py-2',
+                  'flex-1 min-w-0 flex items-end rounded-[22px] px-4 py-2',
                   isDark
                     ? 'bg-white/10 border border-white/15'
                     : 'bg-muted border border-border/50'
@@ -664,7 +665,7 @@ function CommentsSheet({
                     placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : 'Add a comment...'}
                     rows={1}
                     className={cn(
-                      'flex-1 bg-transparent text-sm outline-none resize-none leading-snug',
+                      'flex-1 min-w-0 bg-transparent text-sm outline-none resize-none leading-snug',
                       isDark
                         ? 'text-white placeholder:text-white/40'
                         : 'text-foreground placeholder:text-muted-foreground'
@@ -677,13 +678,13 @@ function CommentsSheet({
                   onClick={handleSend}
                   disabled={!inputText.trim() || isAddingComment}
                   className={cn(
-                    'w-9 h-9 rounded-full flex items-center justify-center transition-colors shrink-0',
+                    'w-11 h-11 rounded-full flex items-center justify-center transition-colors shrink-0',
                     inputText.trim()
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-white/10 text-white/30'
                   )}
                 >
-                  <SendHorizontal className="w-4 h-4" />
+                  <SendHorizontal className="w-[18px] h-[18px]" />
                 </button>
               </div>
             </div>
