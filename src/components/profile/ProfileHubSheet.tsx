@@ -311,7 +311,7 @@ function ProfileHubSheet({
                     key={label}
                     type="button"
                     onClick={() => handleNav(route)}
-                    className="w-full flex items-center gap-3 min-h-[48px] active:bg-muted/50 rounded-xl px-2 -mx-2 transition-colors"
+                    className="w-full flex items-center gap-3 min-h-[48px] hover:bg-muted/40 active:bg-muted/50 rounded-xl px-2 -mx-2 transition-colors duration-150"
                   >
                     <Icon className="w-4 h-4 text-muted-foreground" />
                     <span className="flex-1 text-left text-[14px] font-medium text-foreground">{label}</span>
