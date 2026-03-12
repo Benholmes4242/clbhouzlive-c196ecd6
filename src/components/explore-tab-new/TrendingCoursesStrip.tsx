@@ -60,19 +60,19 @@ function TrendingCoursesStripInner({ activeRegion }: TrendingCoursesStripProps) 
             key={course.course_id}
             type="button"
             onClick={() => navigate(`/courses/${course.course_id}`)}
-            className="shrink-0 w-[140px] rounded-xl overflow-hidden bg-card border border-border/50 shadow-sm text-left focus:outline-none"
+            className="shrink-0 w-[140px] flex flex-col rounded-xl overflow-hidden bg-card border border-border/50 shadow-sm text-left focus:outline-none"
           >
             {course.thumbnail_image ? (
               <img
                 src={course.thumbnail_image}
                 alt={course.course_name}
                 loading="lazy"
-                className="aspect-[4/3] w-full object-cover block"
+                className="w-full aspect-[4/3] object-cover block shrink-0"
               />
             ) : (
-              <div className="aspect-[4/3] w-full bg-muted" />
+              <div className="aspect-[4/3] w-full bg-muted shrink-0" />
             )}
-            <div className="p-2">
+            <div className="p-2 flex-1">
               <p className="text-[12px] font-semibold text-foreground line-clamp-1">
                 {course.course_name}
               </p>
