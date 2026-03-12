@@ -336,32 +336,27 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
 
     </motion.div>
 
-    {/* Left chevron — independent fixed position, left side */}
+    {/* Left chevron — independent, mirrors right chevron position */}
     {onPrevMedia && hasPrevMedia && (
-      <div
+      <motion.button
+        initial={{ opacity: 0, x: -8 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -8 }}
+        transition={{ duration: 0.2 }}
+        onClick={onPrevMedia}
+        className="fixed left-4 z-40 pointer-events-auto
+          w-11 h-11 rounded-full
+          flex items-center justify-center"
         style={{
-          position: 'fixed',
-          left: '16px',
           bottom: '97px',
-          zIndex: 9999,
-          width: '44px',
-          height: '44px',
-          borderRadius: '50%',
           background: 'rgba(0,0,0,0.45)',
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          pointerEvents: 'auto',
         }}
-        onClick={onPrevMedia}
-        role="button"
         aria-label="Previous media"
       >
-        <ChevronLeft size={20} color="white" />
-      </div>
+        <ChevronLeft size={20} className="text-white" />
+      </motion.button>
     )}
     </>
   );
