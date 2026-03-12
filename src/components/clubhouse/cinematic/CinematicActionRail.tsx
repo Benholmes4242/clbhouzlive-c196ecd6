@@ -229,6 +229,12 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   bottomOffset,
   hideMute = false,
 }) => {
+  console.log('[Rail Props]', {
+    hasNextMedia,
+    hasPrevMedia,
+    onNextMedia: onNextMedia ? 'defined' : 'undefined',
+    onPrevMedia: onPrevMedia ? 'defined' : 'undefined',
+  });
   // Idle opacity: 75% when not interacted, full when interacted or active
   const idleOpacity = hasInteracted ? 1 : 0.75;
 
