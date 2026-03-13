@@ -309,7 +309,7 @@ export function ScheduleTab() {
     return filtered;
   }, [tournaments, filter, activeTour, search, heroItems]);
 
-  const monthGroups = useMemo((): (MonthGroup & { tourBreakdown: Record<string, number> })[] => {
+  const monthGroups = useMemo((): MonthGroup[] => {
     if (!filteredResults.length) return [];
     const groups = new Map<string, TourTournament[]>();
     filteredResults.forEach(tournament => {
@@ -330,7 +330,7 @@ export function ScheduleTab() {
       for (const t of tournaments) { if (t.tour_code) tourBreakdown[t.tour_code] = (tourBreakdown[t.tour_code] || 0) + 1; }
       return {
         monthKey,
-        monthLabel: format(new Date(tournaments[0].start_date + 'T12:00:00Z'), 'MMMM yyyy').toUpperCase(),
+        monthLabel: format(new Date(tournaments[0].start_date + 'T12:00:00Z'), 'MMMM yyyy'),
         tournaments,
         tourBreakdown,
       };
