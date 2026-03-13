@@ -1014,7 +1014,7 @@ interface HeroCarouselProps {
 
 export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
-  const { showBottomNav } = useBottomNavigation();
+  // Bottom nav no longer controlled from HeroCarousel — sentinel observers handle it
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
