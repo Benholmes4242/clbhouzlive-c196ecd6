@@ -2,8 +2,6 @@
 
 /* Remove any transform contexts from the nav itself */
 .global-bottom-nav {
-  transform: none !important;
-  will-change: auto !important;
 }
 
 /* Lock the nav to viewport bottom */
