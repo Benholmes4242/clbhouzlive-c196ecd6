@@ -651,7 +651,7 @@ export function CollegeRankingsPreview() {
             className="m-0 text-foreground"
             style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}
           >
-            Franchise Rankings
+            College Franchise Rankings
           </h2>
           <p
             className="m-0 mt-1 text-muted-foreground/60"
