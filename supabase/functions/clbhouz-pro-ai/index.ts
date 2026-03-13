@@ -699,9 +699,18 @@ async function* streamPerplexity(query: string, nowIso: string, history: Array<{
     "Be concise, structured, and provide specific dates/venues when discussing events."
   ].join(" ");
 
+  // Remove trailing user messages from history to prevent consecutive user messages
+  const cleanHistory = (history ?? []).filter((_: { role: string; content: string }, i: number, arr: Array<{ role: string; content: string }>) => {
+    let lastAssistantIdx = arr.length - 1;
+    while (lastAssistantIdx >= 0 && arr[lastAssistantIdx].role === 'user') {
+      lastAssistantIdx--;
+    }
+    return i <= lastAssistantIdx;
+  });
+
   const messages = [
     { role: "system", content: systemPrompt },
-    ...(history ?? []),
+    ...cleanHistory,
     { role: "user", content: query },
   ];
   
