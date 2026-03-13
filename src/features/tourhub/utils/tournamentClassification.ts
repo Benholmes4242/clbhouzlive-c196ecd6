@@ -58,6 +58,7 @@ const CHAMPIONS_MAJOR_KEYWORDS = [
   'senior open',
   'kaulig companies',
   'senior players',
+  'charles schwab cup championship',
 ];
 
 // --- SIGNATURE EVENTS (by tour) ---

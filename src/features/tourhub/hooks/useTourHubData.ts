@@ -295,10 +295,14 @@ export function useTourTournament(tournamentId: string) {
         return null;
       }
       const t = data as any;
+      const rawTourCode = t.season?.tour_name || null;
+      const rawTourFullName = t.season?.tour_full_name || null;
+      const tourCode = isMiscodedMajor(t.name, rawTourCode) ? 'pga' : rawTourCode;
+      const tourFullName = isMiscodedMajor(t.name, rawTourCode) ? 'PGA Tour' : rawTourFullName;
       return {
         ...t,
-        tour_code: t.season?.tour_name || null,
-        tour_full_name: t.season?.tour_full_name || null,
+        tour_code: tourCode,
+        tour_full_name: tourFullName,
         season: undefined,
       } as TourTournament;
     },
