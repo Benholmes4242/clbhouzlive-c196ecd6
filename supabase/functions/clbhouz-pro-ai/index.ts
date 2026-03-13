@@ -363,7 +363,10 @@ async function callGPT4o(
     }),
   }), 20000);
 
-  if (!response.ok) throw new Error(`GPT-4o API error: ${response.status}`);
+  if (!response.ok) {
+    console.error(`[Echo] Provider failure — OpenAI | model: gpt-4o | status: ${response.status}`);
+    throw new Error(`GPT-4o API error: ${response.status}`);
+  }
   const data = await response.json();
   return data?.choices?.[0]?.message?.content || '';
 }
