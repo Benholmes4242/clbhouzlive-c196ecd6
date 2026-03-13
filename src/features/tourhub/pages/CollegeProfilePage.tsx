@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Menu, Crown, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
+import { Menu, Crown, RefreshCw, AlertCircle, ChevronLeft, TrendingUp, Trophy } from 'lucide-react';
 import { openTourNav } from '../contexts/TourNavContext';
 import { motion } from 'framer-motion';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
@@ -10,9 +10,11 @@ import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 
 import { useCollegeStats, useCollegeSeasonStats } from '../hooks/useCollegeStats';
+import { useCollegeAlumni, type CollegeAlumnus } from '../hooks/useCollegeAlumni';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 import { getCollegeGradientCSS } from '../config/collegeBrandColors';
 import { useTourSeason } from '../hooks/useTourHubData';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -31,6 +33,7 @@ export function CollegeProfilePage() {
   const { data: collegeMap, isLoading: mediaLoading } = useCollegeMediaMap();
   const { data: allSeasonStats } = useCollegeSeasonStats();
   const { data: season } = useTourSeason();
+  const { data: alumni, isLoading: alumniLoading } = useCollegeAlumni(collegeSlug, { limit: 30 });
   const seasonYear = season?.year || new Date().getFullYear();
   
   const [heroImgError, setHeroImgError] = useState(false);
@@ -312,6 +315,62 @@ export function CollegeProfilePage() {
             </Link>
           </div>
         )}
+
+        {/* Alumni Roster */}
+        {stats && (
+          <motion.section
+            style={{ marginTop: 20 }}
+            variants={sectionVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.5, duration: 0.3 }}
+          >
+            <h2 className="text-foreground" style={{ fontSize: 18, fontWeight: 700, marginBottom: 14 }}>
+              PGA Tour Alumni
+            </h2>
+
+            {alumniLoading ? (
+              <div className="flex flex-col" style={{ gap: 8 }}>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="bg-card border border-border/30 animate-pulse" style={{ height: 64, borderRadius: 14 }} />
+                ))}
+              </div>
+            ) : alumni && alumni.length > 0 ? (
+              <div className="flex flex-col" style={{ gap: 6 }}>
+                {alumni.map((player, idx) => (
+                  <AlumniRow key={player.id} player={player} rank={idx + 1} />
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground py-8 text-center">
+                No alumni data available for this season.
+              </p>
+            )}
+          </motion.section>
+        )}
+
+        {/* Season Performance Summary */}
+        {stats && (
+          <motion.section
+            style={{ marginTop: 28 }}
+            variants={sectionVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.6, duration: 0.3 }}
+          >
+            <h2 className="text-foreground" style={{ fontSize: 18, fontWeight: 700, marginBottom: 14 }}>
+              Season Performance
+            </h2>
+            <div className="grid grid-cols-2" style={{ gap: 8 }}>
+              <StatTile label="Total Earnings" value={formatCurrency(stats.earnings_total)} />
+              <StatTile label="Wins" value={String(stats.wins_total)} highlight={stats.wins_total > 0} />
+              <StatTile label="Top 10s" value={String(stats.top10_total)} />
+              <StatTile label="Cuts Made" value={String(stats.cuts_total)} />
+              <StatTile label="Top 25s" value={String(stats.top25_total)} />
+              <StatTile label="Events Played" value={String(stats.events_total)} />
+            </div>
+          </motion.section>
+        )}
       </div>
     </PageRoot>
   );
@@ -341,6 +400,91 @@ function GlassStatCell({ label, value, highlight = false }: { label: string; val
         color: highlight ? 'rgba(245, 158, 11, 0.9)' : undefined,
         marginTop: 2,
       }}>
+        {value}
+      </span>
+    </div>
+  );
+}
+
+function AlumniRow({ player, rank }: { player: CollegeAlumnus; rank: number }) {
+  const tourCode = player.tour_codes?.[0] || 'pga';
+  const headshotUrl = getPlayerHeadshotUrl(
+    `${player.first_name} ${player.last_name}`,
+    tourCode
+  );
+
+  return (
+    <Link
+      to={`/tourhub/player/${player.id}`}
+      className="flex items-center gap-3 bg-card border border-border/30 active:scale-[0.98] transition-transform"
+      style={{ borderRadius: 14, padding: '10px 14px' }}
+    >
+      {/* Rank */}
+      <span
+        className="text-muted-foreground flex-shrink-0"
+        style={{ fontSize: 12, fontWeight: 600, width: 20, textAlign: 'center', fontVariantNumeric: 'tabular-nums' }}
+      >
+        {rank}
+      </span>
+
+      {/* Headshot */}
+      <img
+        src={headshotUrl}
+        alt={`${player.first_name} ${player.last_name}`}
+        className="rounded-full object-cover flex-shrink-0 bg-muted"
+        style={{ width: 38, height: 38 }}
+        onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+      />
+
+      {/* Name + country */}
+      <div className="flex-1 min-w-0">
+        <p className="text-foreground truncate" style={{ fontSize: 14, fontWeight: 600 }}>
+          {player.first_name} {player.last_name}
+        </p>
+        <div className="flex items-center gap-2">
+          {player.world_ranking && (
+            <span className="text-muted-foreground" style={{ fontSize: 12, fontWeight: 500 }}>
+              #{player.world_ranking}
+            </span>
+          )}
+          {player.country && (
+            <span className="text-muted-foreground/60" style={{ fontSize: 12 }}>
+              {player.country}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Earnings */}
+      <span
+        className="text-foreground flex-shrink-0"
+        style={{ fontSize: 13, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}
+      >
+        {formatCurrency(player.earnings || 0)}
+      </span>
+    </Link>
+  );
+}
+
+function StatTile({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
+  return (
+    <div
+      className="bg-card border border-border/30 flex flex-col items-center justify-center"
+      style={{ borderRadius: 14, padding: '14px 8px' }}
+    >
+      <span className="text-muted-foreground" style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+        {label}
+      </span>
+      <span
+        className="text-foreground"
+        style={{
+          fontSize: 20,
+          fontWeight: 700,
+          fontVariantNumeric: 'tabular-nums',
+          marginTop: 4,
+          color: highlight ? 'rgba(245, 158, 11, 0.9)' : undefined,
+        }}
+      >
         {value}
       </span>
     </div>
