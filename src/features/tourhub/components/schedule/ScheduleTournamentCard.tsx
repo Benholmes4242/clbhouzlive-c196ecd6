@@ -80,7 +80,7 @@ export function ScheduleTournamentCard({
     : hasLeaderWinnerData ? leaderWinner!.displayName : null;
 
   const winnerScore = hasSeasonWinner 
-    ? tournament.winner_score 
+    ? (tournament as TourTournament).winner_score 
     : hasLeaderWinnerData ? leaderWinner?.score : null;
 
   const handlePlayerTap = (e: React.MouseEvent) => {
