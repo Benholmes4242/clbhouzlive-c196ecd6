@@ -16,6 +16,7 @@ import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWin
 import { getContextLabel } from '../../utils/tournamentClassification';
 import { TOUR_COLORS } from '../../constants/colors';
 import { formatPurse } from '../shared/TourHeroHelpers';
+import { getCurrentRound } from '../../utils/formatThruDisplay';
 
 interface ScheduleTournamentCardProps {
   tournament: TourTournament | SeasonTournament;
