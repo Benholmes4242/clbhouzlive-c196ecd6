@@ -83,7 +83,7 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
   const player = players[currentIndex];
   if (!player) return null;
 
-  const photoUrl = getPlayerHeadshotUrl(player.playerName, 'pga');
+  const photoUrl = getPlayerHeadshotUrl(player.playerName, player.tourCode || 'pga');
   const country = titleCaseCountry(player.country);
 
   return (
