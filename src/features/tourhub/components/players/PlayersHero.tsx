@@ -425,6 +425,11 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
                   className="flex items-center gap-1.5"
                 >
                   <CountryFlag country={champion.country} size="sm" className="brightness-110" />
+                  {country && (
+                    <span style={{ fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>
+                      {country}
+                    </span>
+                  )}
                 </motion.div>
 
                 {metaParts.length > 0 && (
