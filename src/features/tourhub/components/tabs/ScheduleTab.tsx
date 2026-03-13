@@ -220,11 +220,6 @@ export function ScheduleTab() {
     }
 
     if (filter === 'upcoming') {
-      // Show live tournaments if any exist, otherwise upcoming per tour
-      if (liveList.length > 0) {
-        return [...liveList].sort((a, b) => getTournamentPriority(a) - getTournamentPriority(b))
-          .map(t => ({ tournament: t, type: 'live' as const }));
-      }
       return onePerTour(upcomingList, 'upcoming');
     }
 
