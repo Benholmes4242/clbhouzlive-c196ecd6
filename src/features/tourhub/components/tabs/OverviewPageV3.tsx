@@ -107,11 +107,11 @@ export function OverviewPageV3() {
         style={HERO_STYLES.containerNoHeader}
       >
         <HeroCarousel hasHeader={false} />
-        {/* Invisible sentinel at bottom edge of hero — when it scrolls out, bottom nav appears */}
+        {/* Invisible sentinel at top edge of hero — when it scrolls out, bottom nav appears */}
         <div
           ref={sentinelRef}
           aria-hidden="true"
-          style={{ position: 'absolute', bottom: 0, height: '1px', width: '1px', pointerEvents: 'none' }}
+          style={{ position: 'absolute', top: 0, height: '1px', width: '1px', pointerEvents: 'none' }}
         />
       </div>
 
