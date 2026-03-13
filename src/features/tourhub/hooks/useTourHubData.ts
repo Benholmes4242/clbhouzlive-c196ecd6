@@ -33,6 +33,8 @@ export interface TourTournament {
   tour_code: string | null;
   /** Full tour label from sr_seasons.tour_full_name (e.g. 'PGA Tour') */
   tour_full_name: string | null;
+  /** Winner's finishing score (for completed tournaments) */
+  winner_score?: number | string | null;
 }
 
 export interface TourPlayer {

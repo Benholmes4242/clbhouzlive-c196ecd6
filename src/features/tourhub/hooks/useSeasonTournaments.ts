@@ -34,6 +34,7 @@ export interface SeasonTournament {
   winnerLastName: string | null;
   winnerPhotoUrl: string | null;
   defendingChampion?: string | null;
+  winner_score?: number | string | null;
 }
 
 // Normalized tour key mapping

@@ -11,7 +11,7 @@
  * Slide order: LIVE (by tour priority) > COMPLETED (by end_date DESC) > UPCOMING (by start_date ASC)
  */
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, type ReactNode } from 'react';
 import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -81,6 +81,60 @@ function LeaderboardSkeleton() {
           <div className="w-8 h-3 bg-white/10 rounded animate-pulse" />
         </div>
       ))}
+    </div>
+  );
+}
+
+/**
+ * Infers current round from leaderboard data.
+ * Checks round_4 → round_3 → round_2 → round_1 (last non-null = current round).
+ * Falls back to date arithmetic only if no leaderboard data available.
+ */
+function getCurrentRoundLabel(leaders: LeaderEntry[], startDate: string): string {
+  if (leaders.length > 0) {
+    const sample = leaders[0];
+    if (sample.round_4 != null) return 'Final Round';
+    if (sample.round_3 != null) return 'Round 3 of 4';
+    if (sample.round_2 != null) return 'Round 2 of 4';
+    if (sample.round_1 != null) return 'Round 1 of 4';
+  }
+  // Fallback: date arithmetic
+  const dayIndex = Math.max(0, Math.floor(
+    (Date.now() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)
+  ));
+  const round = Math.min(dayIndex + 1, 4);
+  return round >= 4 ? 'Final Round' : `Round ${round} of 4`;
+}
+
+/**
+ * UpcomingCountdown — live countdown to tournament start
+ */
+function UpcomingCountdown({ startDate }: { startDate: string }) {
+  const [timeLeft, setTimeLeft] = useState('');
+  useEffect(() => {
+    function update() {
+      const diff = new Date(startDate).getTime() - Date.now();
+      if (diff <= 0) { setTimeLeft('Starting now'); return; }
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      if (days > 0) setTimeLeft(`${days}d ${hours}h`);
+      else if (hours > 0) setTimeLeft(`${hours}h ${mins}m`);
+      else setTimeLeft(`${mins}m`);
+    }
+    update();
+    const t = setInterval(update, 60_000);
+    return () => clearInterval(t);
+  }, [startDate]);
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+      <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
+        Starts in
+      </span>
+      <span style={{ fontSize: '15px', fontWeight: 800, color: '#FFFFFF', fontVariantNumeric: 'tabular-nums' }}>
+        {timeLeft}
+      </span>
     </div>
   );
 }
@@ -503,7 +557,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               WebkitBackdropFilter: isExpanded ? 'blur(24px)' : 'blur(20px)',
               boxShadow: isExpanded ? '0 8px 32px rgba(0, 0, 0, 0.35)' : '0 4px 16px rgba(0, 0, 0, 0.25)',
               padding: isExpanded ? '20px 0 8px 0' : '20px 20px 14px 20px',
-              border: '1px solid rgba(255, 255, 255, 0.10)',
+              border: tournament.isMajor
+                ? '1px solid rgba(250, 204, 21, 0.35)'
+                : tournament.isSignature
+                ? '1px solid rgba(16, 185, 129, 0.25)'
+                : '1px solid rgba(255, 255, 255, 0.10)',
               overflow: 'hidden',
               zIndex: isExpanded ? 20 : 10,
               pointerEvents: 'auto' as const,
@@ -535,13 +593,13 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               </>
             ) : (
               <>
-                <div style={{ padding: isExpanded ? '0 20px' : undefined }}>
+              <div style={{ padding: isExpanded ? '0 20px' : undefined }}>
                   {/* Row 1: Status | Tour Badge (right-aligned) — live + upcoming only */}
                   <div className="flex items-center justify-between" style={{ marginBottom: '6px' }}>
                     {isLive ? (
                       <div className="flex items-center gap-1.5">
                         <span className="live-dot" />
-                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: '#22C55E' }}>LIVE</span>
+                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: tournament.isMajor ? '#FACC15' : '#22C55E' }}>LIVE</span>
                       </div>
                     ) : isUpcoming ? (
                       <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' as const }}>
@@ -590,7 +648,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 >
                   {/* Round progress */}
                   <p className="hero-meta" style={{ padding: isExpanded ? '0 20px' : undefined, marginTop: 4, marginBottom: isExpanded ? 4 : 0 }}>
-                    {'In Progress'}
+                    {getCurrentRoundLabel(leaders, tournament.startDate)}
                   </p>
 
                   {/* Expanded: Full Leaderboard or Scorecard */}
@@ -990,6 +1048,19 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
 
     return () => clearInterval(interval);
   }, [slides.length, isPaused, isExpanded]);
+
+  // Pause auto-advance when app is backgrounded
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden) {
+        setIsPaused(true);
+      } else {
+        setTimeout(() => setIsPaused(false), 1000);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
 
   // Preload current slide's winner avatar into browser cache
   useEffect(() => {
