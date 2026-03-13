@@ -141,6 +141,11 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
           minWidth: '260px',
           maxWidth: 'min(330px, calc(100% - 32px))',
           padding: '16px 16px 12px 16px',
+          border: isMajor
+            ? '1px solid rgba(250, 204, 21, 0.35)'
+            : isSignature
+            ? '1px solid rgba(16, 185, 129, 0.25)'
+            : undefined,
         }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
