@@ -23,7 +23,6 @@ function CinematicOverviewSkeleton() {
       transition={{ duration: 0.3 }}
     >
       <CinematicHeroSkeleton />
-      <WorldRankShowcaseSkeleton />
       <ThisWeekSkeleton />
       <SeasonDashboardSkeleton />
     </motion.div>
