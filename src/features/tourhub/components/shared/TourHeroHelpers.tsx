@@ -3,7 +3,7 @@
  * Used by: HeroCarousel (overview) + ScheduleHeroCard (schedule tab)
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { WinnerStats } from '../../hooks/useWinnerScorecardStats';
 import type { WinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import { SCORE_COLORS } from '../../utils/scoreColors';
@@ -26,6 +26,60 @@ export function formatPurse(purse: number | null): string {
   return purse >= 1_000_000
     ? `$${(purse / 1_000_000).toFixed(purse % 1_000_000 === 0 ? 0 : 1)}M`
     : `$${(purse / 1_000).toFixed(0)}K`;
+}
+
+/**
+ * Infers current round label. Uses round scores if available (from full leaderboard),
+ * falls back to date arithmetic. Exported for use in both hero surfaces.
+ */
+export function getCurrentRoundLabel(
+  roundScores: { round_1?: number | null; round_2?: number | null; round_3?: number | null; round_4?: number | null } | null,
+  startDate: string
+): string {
+  if (roundScores) {
+    if (roundScores.round_4 != null) return 'Final Round';
+    if (roundScores.round_3 != null) return 'Round 3 of 4';
+    if (roundScores.round_2 != null) return 'Round 2 of 4';
+    if (roundScores.round_1 != null) return 'Round 1 of 4';
+  }
+  const dayIndex = Math.max(0, Math.floor(
+    (Date.now() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)
+  ));
+  const round = Math.min(dayIndex + 1, 4);
+  return round >= 4 ? 'Final Round' : `Round ${round} of 4`;
+}
+
+/**
+ * UpcomingCountdown — live countdown to tournament start
+ */
+export function UpcomingCountdown({ startDate }: { startDate: string }) {
+  const [timeLeft, setTimeLeft] = useState('');
+  useEffect(() => {
+    function update() {
+      const diff = new Date(startDate).getTime() - Date.now();
+      if (diff <= 0) { setTimeLeft('Starting now'); return; }
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      if (days > 0) setTimeLeft(`${days}d ${hours}h`);
+      else if (hours > 0) setTimeLeft(`${hours}h ${mins}m`);
+      else setTimeLeft(`${mins}m`);
+    }
+    update();
+    const t = setInterval(update, 60_000);
+    return () => clearInterval(t);
+  }, [startDate]);
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+      <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
+        Starts in
+      </span>
+      <span style={{ fontSize: '15px', fontWeight: 800, color: '#FFFFFF', fontVariantNumeric: 'tabular-nums' }}>
+        {timeLeft}
+      </span>
+    </div>
+  );
 }
 
 /** Frosted glass avatar — for use inside dark/photo glass cards */
