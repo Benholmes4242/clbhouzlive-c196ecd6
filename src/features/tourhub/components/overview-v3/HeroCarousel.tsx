@@ -17,6 +17,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronsUp, Trophy, Menu, X } from 'lucide-react';
 import { openTourNav } from '../../contexts/TourNavContext';
+import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { cn } from '@/lib/utils';
 import { 
   useHeroCarouselData,
