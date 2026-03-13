@@ -41,6 +41,18 @@ import { useWinnerScorecardStats } from '../../hooks/useWinnerScorecardStats';
 import { useWinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import '@/styles/hero-glass.css';
 
+function getTourDisplayName(tourSlug: string): string {
+  const names: Record<string, string> = {
+    pga: 'PGA TOUR',
+    liv: 'LIV GOLF',
+    euro: 'DP WORLD',
+    lpga: 'LPGA',
+    champ: 'CHAMPIONS',
+    pgad: 'KORN FERRY',
+  };
+  return names[tourSlug] ?? tourSlug.toUpperCase();
+}
+
 function getStartLabel(date: string): string {
   const startDate = new Date(date);
   if (isToday(startDate)) return 'Today';
