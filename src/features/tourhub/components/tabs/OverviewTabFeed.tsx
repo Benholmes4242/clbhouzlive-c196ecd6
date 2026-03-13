@@ -5,7 +5,6 @@
 
 import {
   HeroFeature,
-  WorldRankingsSection,
   FeatureStrip,
   PlayersFeed,
   LeadersPhotoCards,
@@ -89,8 +88,6 @@ export function OverviewTabFeed() {
         - Intentional negative space for premium feel
       */}
       <div className="mt-16 space-y-16">
-        {/* 2. World Rankings - Prestige treatment */}
-        <WorldRankingsSection />
 
         {/* 3. Season Headlines (formerly Snapshot) */}
         <FeatureStrip

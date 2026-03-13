@@ -6,10 +6,9 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { CinematicHero } from './CinematicHero';
-import { WorldRankShowcase } from './WorldRankShowcase';
 import { ThisWeekSection } from './ThisWeekSection';
 import { SeasonDashboard } from './SeasonDashboard';
-import { CinematicHeroSkeleton, WorldRankShowcaseSkeleton, ThisWeekSkeleton, SeasonDashboardSkeleton } from './CinematicSkeleton';
+import { CinematicHeroSkeleton, ThisWeekSkeleton, SeasonDashboardSkeleton } from './CinematicSkeleton';
 import { useTourSeason, useTourTournaments, useTourLeaderboard } from '../../hooks/useTourHubData';
 import { useLiveEvents, useUpcomingEvents } from '../../hooks/useTourEvents';
 import { useCourseImageResolver } from '../../hooks/useCourseImageResolver';
@@ -24,7 +23,6 @@ function CinematicOverviewSkeleton() {
       transition={{ duration: 0.3 }}
     >
       <CinematicHeroSkeleton />
-      <WorldRankShowcaseSkeleton />
       <ThisWeekSkeleton />
       <SeasonDashboardSkeleton />
     </motion.div>
@@ -143,12 +141,7 @@ export function CinematicOverview() {
         />
       )}
 
-      {/* 2. World Rankings Showcase */}
-      <motion.div variants={sectionVariants}>
-        <WorldRankShowcase />
-      </motion.div>
-
-      {/* 3. This Week in Golf */}
+      {/* 2. This Week in Golf */}
       <motion.div variants={sectionVariants}>
         <ThisWeekSection />
       </motion.div>

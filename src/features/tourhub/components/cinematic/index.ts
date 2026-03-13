@@ -3,7 +3,6 @@
 
 export { CinematicHero } from './CinematicHero';
 export { CinematicOverview } from './CinematicOverview';
-export { WorldRankShowcase } from './WorldRankShowcase';
 export { ThisWeekSection } from './ThisWeekSection';
 export { SeasonDashboard } from './SeasonDashboard';
 
