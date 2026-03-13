@@ -11,7 +11,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { ChevronRight, Trophy } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
@@ -399,61 +399,50 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
               </>
             )}
 
-            {/* ─── UPCOMING LAYOUT — countdown + defending champion ─── */}
+            {/* ─── UPCOMING LAYOUT — clean redesign ─── */}
             {isUpcoming && (
               <>
                 <UpcomingCountdown startDate={tournament.start_date} />
-                {/* B43 FIX 7: guard purse stats line */}
-                {(() => {
-                  const parts = [
-                    tournament.purse && formatPurse(tournament.purse),
-                    tournament.venue_par && `PAR ${tournament.venue_par}`,
-                    tournament.venue_yardage && `${tournament.venue_yardage.toLocaleString()} YDS`,
-                  ].filter(Boolean);
-                  return parts.length > 0 ? (
-                    <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '4px', marginTop: '6px' }}>
-                      {parts.join(' · ')}
-                    </p>
-                  ) : null;
-                })()}
 
-                {/* B43 FIX 5: cross-month date range */}
-                <p style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>
-                  {(() => {
-                    const start = new Date(tournament.start_date + 'T12:00:00');
-                    const end = new Date(tournament.end_date + 'T12:00:00');
-                    const sameMonth = start.getMonth() === end.getMonth();
-                    return sameMonth
-                      ? `${format(start, 'MMM d')} – ${format(end, 'd, yyyy')}`
-                      : `${format(start, 'MMM d')} – ${format(end, 'MMM d, yyyy')}`;
-                  })()}
-                </p>
-
-                {/* B43 FIX 6: defending champion with Trophy icon */}
+                {/* Defending champion with squircle avatar */}
                 {tournament.defending_champion && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8, marginBottom: 4 }}>
-                    <div style={{
-                      width: 28, height: 28, borderRadius: '50%',
-                      background: 'rgba(255,255,255,0.08)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      flexShrink: 0,
-                    }}>
-                      <Trophy style={{ width: 13, height: 13, color: 'rgba(255,255,255,0.4)' }} />
-                    </div>
-                    <div>
-                      <p style={{ fontSize: 12, fontWeight: 600, color: '#FFFFFF', lineHeight: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
+                    <PlayerAvatar
+                      displayName={tournament.defending_champion}
+                      fullName={tournament.defending_champion}
+                      tourCode={tournament.tour_code ?? undefined}
+                      size={36}
+                      frosted={false}
+                    />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <span style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF', lineHeight: 1.2 }}>
                         {tournament.defending_champion}
-                      </p>
-                      <p style={{ fontSize: 10, fontWeight: 500, color: 'rgba(255,255,255,0.45)', marginTop: 2, lineHeight: 1, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                      </span>
+                      <span style={{ fontSize: '11px', fontWeight: 500, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
                         Defending Champion
-                      </p>
+                      </span>
                     </div>
                   </div>
                 )}
+
+                {/* Single metadata line: date range · purse */}
+                <p style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.45)', marginTop: 8, marginBottom: 0 }}>
+                  {[
+                    tournament.start_date && tournament.end_date && (() => {
+                      const s = new Date(tournament.start_date + 'T12:00:00');
+                      const e = new Date(tournament.end_date + 'T12:00:00');
+                      return s.getMonth() === e.getMonth()
+                        ? `${format(s, 'MMM d')} – ${format(e, 'd, yyyy')}`
+                        : `${format(s, 'MMM d')} – ${format(e, 'MMM d, yyyy')}`;
+                    })(),
+                    tournament.purse && formatPurse(tournament.purse),
+                  ].filter(Boolean).join(' · ')}
+                </p>
+
                 <button
                   onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
                   className="hero-text-cta w-full"
-                  style={{ marginTop: '8px' }}
+                  style={{ marginTop: '10px' }}
                 >
                   <span>View Tournament</span>
                   <ChevronRight className="w-4 h-4 cta-chevron" />

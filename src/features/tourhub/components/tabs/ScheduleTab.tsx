@@ -87,7 +87,7 @@ export function ScheduleTab() {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
   
-  const filter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
+  const filter = (searchParams.get('filter') as ScheduleFilterType) || 'upcoming';
   const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
 
   // Scroll to top on mount — always start at top
@@ -179,16 +179,11 @@ export function ScheduleTab() {
     if (!tournaments) return [];
     const tourFiltered = activeTour === 'all' ? tournaments : tournaments.filter(t => t.tour_code === activeTour);
 
-    // B43 FIX 3: onePerTour with major-first + tour priority
+    // onePerTour: dedup by tour, preserving input list order (chronological)
+    // No major-priority hoisting — soonest event per tour wins
     const onePerTour = (list: TourTournament[], type: ScheduleHeroItem['type']): ScheduleHeroItem[] => {
-      const sorted = [...list].sort((a, b) => {
-        const pa = getTournamentPriority(a);
-        const pb = getTournamentPriority(b);
-        if (pa !== pb) return pa - pb;
-        return (b.purse ?? 0) - (a.purse ?? 0);
-      });
       const seenTours = new Set<string>();
-      return sorted.filter(t => {
+      return list.filter(t => {
         const tour = t.tour_code || 'unknown';
         if (seenTours.has(tour)) return false;
         seenTours.add(tour);

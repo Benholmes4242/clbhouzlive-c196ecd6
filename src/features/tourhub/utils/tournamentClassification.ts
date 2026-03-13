@@ -58,6 +58,7 @@ const CHAMPIONS_MAJOR_KEYWORDS = [
   'senior open',
   'kaulig companies',
   'senior players',
+  'charles schwab cup championship',
 ];
 
 // --- SIGNATURE EVENTS (by tour) ---
@@ -72,6 +73,8 @@ const PGA_SIGNATURE_KEYWORDS = [
   'cadillac championship',
   'memorial tournament',
   'travelers championship',
+  'presidents cup',
+  'hero world challenge',
 ];
 
 const LPGA_SIGNATURE_KEYWORDS = [
@@ -81,6 +84,7 @@ const LPGA_SIGNATURE_KEYWORDS = [
   'lotte championship',
   'cognizant founders',
   'founders cup',
+  'solheim cup',
 ];
 
 const DPWORLD_SIGNATURE_KEYWORDS = [
