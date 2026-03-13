@@ -58,20 +58,19 @@ export function OverviewPageV3() {
     const hideEl = hideSentinelRef.current;
     if (!showEl || !hideEl) return;
 
+    // FIX 4: rootMargin -40px so nav only shows after meaningful scroll past hero
     const showObserver = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) {
-          // Top sentinel scrolled out → show nav
           showBottomNav();
         }
       },
-      { threshold: 0 }
+      { threshold: 0, rootMargin: '-40px 0px 0px 0px' }
     );
 
     const hideObserver = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          // Hide sentinel came back into view (user scrolled back to hero) → hide nav
           hideBottomNav();
         }
       },
