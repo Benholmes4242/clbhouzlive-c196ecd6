@@ -32,16 +32,6 @@ export interface LiveTournamentWithLeader {
   } | null;
 }
 
-export interface UpcomingTournament {
-  id: string;
-  name: string;
-  startDate: string;
-  venueCity: string | null;
-  venueCountry: string | null;
-  purse: number | null;
-  tourId: string;
-  tourSlug: TourId;
-}
 
 export interface RankingMover {
   playerId: string;
