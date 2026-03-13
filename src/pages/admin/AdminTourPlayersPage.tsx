@@ -84,16 +84,19 @@ function PhotoManagementSheet({
   player,
   open,
   onClose,
+  cacheBust,
+  onCacheBust,
 }: {
   player: PlayerRow | null;
   open: boolean;
   onClose: () => void;
+  cacheBust: number;
+  onCacheBust: () => void;
 }) {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [removing, setRemoving] = useState(false);
-  const [imgKey, setImgKey] = useState(0);
   const [overrideValue, setOverrideValue] = useState('');
   const [savingOverride, setSavingOverride] = useState(false);
   const [overrideInitialized, setOverrideInitialized] = useState(false);
