@@ -110,9 +110,9 @@ export function ScheduleTournamentCard({
       style={{
         borderLeftWidth: (isLive || isMajor || isSignature || isRolex) ? '3px' : undefined,
         borderLeftColor: isLive
-          ? '#22C55E'
+          ? TOUR_COLORS.liveGreen
           : isMajor
-          ? '#f59e0b'
+          ? TOUR_COLORS.liveAmber
           : (isSignature || isRolex)
           ? 'rgba(16, 185, 129, 0.8)'
           : undefined,
