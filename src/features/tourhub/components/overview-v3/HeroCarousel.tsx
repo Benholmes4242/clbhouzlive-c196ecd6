@@ -922,9 +922,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 style={{
                   gap: '6px',
                   marginTop: '8px',
-                  opacity: isExpanded ? 0 : 1,
-                  transition: 'opacity 0.3s ease',
-                  pointerEvents: isExpanded ? 'none' : 'auto',
+                  paddingBottom: '4px',
+                  flexShrink: 0,
                 }}
               >
                 {Array.from({ length: totalSlides }).map((_, index) => (
