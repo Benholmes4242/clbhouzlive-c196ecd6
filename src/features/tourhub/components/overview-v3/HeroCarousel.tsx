@@ -557,7 +557,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               WebkitBackdropFilter: isExpanded ? 'blur(24px)' : 'blur(20px)',
               boxShadow: isExpanded ? '0 8px 32px rgba(0, 0, 0, 0.35)' : '0 4px 16px rgba(0, 0, 0, 0.25)',
               padding: isExpanded ? '20px 0 8px 0' : '20px 20px 14px 20px',
-              border: '1px solid rgba(255, 255, 255, 0.10)',
+              border: tournament.isMajor
+                ? '1px solid rgba(250, 204, 21, 0.35)'
+                : tournament.isSignature
+                ? '1px solid rgba(16, 185, 129, 0.25)'
+                : '1px solid rgba(255, 255, 255, 0.10)',
               overflow: 'hidden',
               zIndex: isExpanded ? 20 : 10,
               pointerEvents: 'auto' as const,
