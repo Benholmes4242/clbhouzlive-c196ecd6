@@ -286,7 +286,7 @@ export function ScheduleTab() {
       );
     }
     // Exclude hero items when hero is visible (all + live tabs)
-    if ((filter === 'all' || filter === 'live') && !search && heroItems.length > 0) {
+    if ((filter === 'all' || filter === 'live' || filter === 'completed') && !search && heroItems.length > 0) {
       const heroIds = new Set(heroItems.map(h => h.tournament.id));
       filtered = filtered.filter(t => !heroIds.has(t.id));
     }
