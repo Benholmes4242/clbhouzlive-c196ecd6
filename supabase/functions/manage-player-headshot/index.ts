@@ -141,8 +141,8 @@ serve(async (req) => {
       const formData = await req.formData();
       const file = formData.get('file') as File;
       const playerName = formData.get('playerName') as string;
-      const tourCode = formData.get('tourCode') as string;
-      const oldTourCode = formData.get('oldTourCode') as string | null;
+      const tourCode = ((formData.get('tourCode') as string) || '').toLowerCase();
+      const oldTourCode = ((formData.get('oldTourCode') as string) || '').toLowerCase() || null;
 
       if (!file || !playerName) throw new Error('file and playerName required');
 
