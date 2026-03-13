@@ -55,6 +55,11 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
   const isRecent = type === 'recent';
   const isUpcoming = type === 'upcoming';
 
+  // Major/signature detection for visual treatment
+  const contextLabel = getContextLabel({ name: tournament.name, tourName: tournament.tour_full_name ?? undefined });
+  const isMajor = contextLabel === 'MAJOR CHAMPIONSHIP';
+  const isSignature = contextLabel === 'SIGNATURE EVENT' || contextLabel === 'ROLEX SERIES';
+
   const handlePlayerTap = (playerId: string | null | undefined) => (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
