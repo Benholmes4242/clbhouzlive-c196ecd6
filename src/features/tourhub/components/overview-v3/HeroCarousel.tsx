@@ -1080,12 +1080,16 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     if (Math.abs(deltaX) > threshold && Math.abs(deltaX) > deltaY) {
       if (deltaX < -threshold && currentIndex < slides.length - 1) {
         setCurrentIndex(prev => prev + 1);
+        if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+        setIsPaused(false);
       } else if (deltaX > threshold && currentIndex > 0) {
         setCurrentIndex(prev => prev - 1);
+        if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+        setIsPaused(false);
       }
     }
 
-    setTimeout(() => setIsPaused(false), 5000);
+    scheduleResume();
   };
 
   if (isLoading) {
