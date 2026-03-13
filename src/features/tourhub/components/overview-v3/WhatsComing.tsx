@@ -3,7 +3,6 @@
  * Clean list layout matching reference: date block | context + name + venue | date
  */
 
-import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
@@ -11,6 +10,7 @@ import { useUpcomingTournaments } from '../../hooks/useUpcomingTournaments';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SectionErrorState } from '../SectionErrorState';
 import { getTourLogo } from '../../utils/tourLogos';
+import { TOUR_COLORS } from '../../constants/colors';
 import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 import { getContextLabel, TOUR_NAME_TO_SLUG } from '../../utils/tournamentClassification';
 
