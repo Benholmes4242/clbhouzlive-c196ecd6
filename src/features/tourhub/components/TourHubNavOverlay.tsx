@@ -82,6 +82,8 @@ export function TourHubNavOverlay({
   const navigate = useNavigate();
   const scrollRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const swipeStartXRef = useRef<number | null>(null);
+  const swipeStartYRef = useRef<number | null>(null);
 
   // Only fetch data when overlay is open (lazy-mount)
   const { data: topPlayers } = useTopWorldRanked(5);
