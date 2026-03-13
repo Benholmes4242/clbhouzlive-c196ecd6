@@ -242,7 +242,7 @@ export function ScheduleTab() {
       all: tourFiltered.length,
       live: tourFiltered.filter(t => t.status === 'inprogress').length,
       upcoming: tourFiltered.filter(t => t.status === 'scheduled' || t.status === 'created').length,
-      completed: tourFiltered.filter(t => t.status === 'closed').length,
+      completed: tourFiltered.filter(isCompleted).length,
     };
   }, [tournaments, activeTour]);
 
