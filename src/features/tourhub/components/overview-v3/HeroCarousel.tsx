@@ -342,7 +342,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
   // Touch isolation for expanded scroll area
   const handleExpandedTouch = useCallback((e: React.TouchEvent) => {
     e.stopPropagation();
-  }, []);
+    onInteraction();
+  }, [onInteraction]);
 
   // Phase 3+4: Track previous leaders for score change & movement animations
   const prevLeadersRef = useRef<LeaderEntry[]>([]);
