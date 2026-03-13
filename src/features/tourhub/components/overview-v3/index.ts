@@ -18,7 +18,6 @@ export { UnifiedWorldRankings } from './UnifiedWorldRankings';
 // Gamified Tour Hub Modules
 export { PowerLadderModule } from './PowerLadderModule';
 export { LiveArenaHero } from './LiveArenaHero';
-// PredictionsModule moved to ../predictions/AIPredictionsModule
 
 // Unified Season Leaderboards (replaces SkillTreeModule + SeasonStatsCarousel)
 export { SeasonLeaderboards } from './SeasonLeaderboards';

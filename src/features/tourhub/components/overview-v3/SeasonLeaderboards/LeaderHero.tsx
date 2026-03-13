@@ -18,11 +18,6 @@ interface LeaderHeroProps {
   accentColor: CategoryId;
 }
 
-function formatCountryName(country: string | null): string {
-  if (!country) return '';
-  return country.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-}
-
 export const LeaderHero = memo(function LeaderHero({ player, accentColor }: LeaderHeroProps) {
   const navigate = useNavigate();
   const photoUrl = getPlayerHeadshotUrl(player.playerName, player.tourCode ?? 'pga');
@@ -37,16 +32,13 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
       className="w-full text-left relative overflow-hidden active:scale-[0.99] transition-transform duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
       style={{
         padding: '20px',
-        background: '#FFFFFF',
+        background: 'hsl(var(--card))',
         borderRadius: '20px',
-        border: '1px solid rgba(0,0,0,0.06)',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+        border: '1px solid hsl(var(--border) / 0.5)',
         outlineColor: accent.primary,
       }}
       aria-label={`Season leader: ${player.playerName}, ${player.statDisplayValue} ${player.statUnit}`}
     >
-      {/* Clean card — no gradient overlay */}
-
       {/* Horizontal split: Avatar left, Info right */}
       <div className="relative flex" style={{ gap: '18px' }}>
         {/* LEFT: Large cinematic avatar - edge-to-edge */}
@@ -60,7 +52,7 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
               borderRadius: '0',
               borderTopLeftRadius: '20px',
               borderBottomLeftRadius: '20px',
-              backgroundColor: '#F8FAFC',
+              backgroundColor: 'hsl(var(--muted))',
             }}
           >
             {showPhoto ? (
@@ -76,7 +68,7 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
                 src={PLAYER_SILHOUETTE_URL}
                 alt={player.playerName}
                 className="w-full h-full object-cover"
-                style={{ backgroundColor: '#F8FAFC' }}
+                style={{ backgroundColor: 'hsl(var(--muted))' }}
               />
             )}
           </div>
@@ -100,12 +92,12 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
           {/* Stat value */}
           <div className="flex items-baseline justify-center" style={{ marginTop: '12px', gap: '4px' }}>
             <span
+              className="text-foreground"
               style={{
                 fontSize: '36px',
                 fontWeight: 800,
                 letterSpacing: '-1.5px',
                 lineHeight: 1,
-                color: 'hsl(var(--foreground))',
               }}
             >
               {player.statDisplayValue}
@@ -122,14 +114,13 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
 
           {/* "SEASON LEADER" label */}
           <p
-            className="m-0"
+            className="m-0 text-muted-foreground"
             style={{
               marginTop: '6px',
               fontSize: '10px',
               fontWeight: 600,
               letterSpacing: '1.2px',
               textTransform: 'uppercase' as const,
-              color: 'rgba(0,0,0,0.4)',
             }}
           >
             Season Leader

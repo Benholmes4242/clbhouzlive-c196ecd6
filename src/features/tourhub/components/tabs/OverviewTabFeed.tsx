@@ -5,9 +5,7 @@
 
 import {
   HeroFeature,
-  FeatureStrip,
   PlayersFeed,
-  LeadersPhotoCards,
   CoursesPhotoGrid,
   DataUnlocking,
 } from '../overview-feed';
@@ -89,22 +87,14 @@ export function OverviewTabFeed() {
       */}
       <div className="mt-16 space-y-16">
 
-        {/* 3. Season Headlines (formerly Snapshot) */}
-        <FeatureStrip
-          topPlayers={seasonLeaders}
-        />
-
-        {/* 4. Top Players - Intelligent tabs */}
+        {/* 3. Top Players - Intelligent tabs */}
         <PlayersFeed
           players={topPlayersData.players}
           maxEvents={topPlayersData.maxEvents}
           maxCuts={topPlayersData.maxCuts}
         />
 
-        {/* 5. Season Leaders - Highlight gallery */}
-        <LeadersPhotoCards leaders={seasonLeaders} />
-
-        {/* 6. Tour Venues - Aspirational gallery */}
+        {/* 4. Tour Venues - Aspirational gallery */}
         <CoursesPhotoGrid 
           courses={featuredCourses} 
           courseImages={courseImages}

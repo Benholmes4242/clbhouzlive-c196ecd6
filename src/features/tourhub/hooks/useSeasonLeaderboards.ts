@@ -3,38 +3,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import type { CategoryId } from '../components/overview-v3/SeasonLeaderboards/StatCategoryIcons';
+import type { LeaderboardPlayer } from '../components/overview-v3/SeasonLeaderboards/types';
 
 // ============================================
-// TYPES
+// TYPES (hook-specific)
 // ============================================
 
-export type CategoryId =
-  | 'sg_total'
-  | 'scoring_avg'
-  | 'earnings'
-  | 'distance'
-  | 'accuracy'
-  | 'gir_pct'
-  | 'putting'
-  | 'scrambling'
-  | 'sand_saves';
-
-export interface LeaderboardPlayer {
-  rank: number;
-  playerId: string;
-  playerName: string;
-  firstName: string;
-  lastName: string;
-  countryCode: string;
-  photoUrl: string | null;
-  tourCode?: string;
-  initials: string;
-  statValue: number;
-  statDisplayValue: string;
-  statUnit: string;
-  skillLevel: number;
-  skillProgress: number;
-}
+export type { CategoryId, LeaderboardPlayer };
 
 export interface LeaderboardCategory {
   id: CategoryId;
@@ -214,31 +190,24 @@ async function fetchSeasonLeaderboards(requestedYear?: number): Promise<SeasonLe
     throw new Error('Failed to fetch seasons');
   }
 
-  // Step 2: Check which seasons have statistics data
-  const seasonsWithStatsCheck = await Promise.all(
-    allSeasons.map(async (season) => {
-      const { count, error: countError } = await supabase
-        .from('sr_player_statistics')
-        .select('*', { count: 'exact', head: true })
-        .eq('season_id', season.id);
+  // Step 2: Check which seasons have statistics data (single query, no N+1)
+  const { data: seasonsWithStats } = await supabase
+    .from('sr_player_statistics')
+    .select('season_id')
+    .in('season_id', allSeasons.map(s => s.id));
 
-      return {
-        id: season.id,
-        year: season.year,
-        hasStats: !countError && count !== null && count > 0,
-      };
-    })
-  );
+  const seasonIdsWithStats = new Set((seasonsWithStats ?? []).map(r => r.season_id));
 
   const seenYears = new Set<number>();
-  const availableSeasons = seasonsWithStatsCheck
-    .filter((s) => {
-      if (s.hasStats && !seenYears.has(s.year)) {
+  const availableSeasons = allSeasons
+    .filter(s => {
+      if (seasonIdsWithStats.has(s.id) && !seenYears.has(s.year)) {
         seenYears.add(s.year);
         return true;
       }
       return false;
     })
+    .map(s => ({ id: s.id, year: s.year, hasStats: true }))
     .sort((a, b) => b.year - a.year);
 
   if (availableSeasons.length === 0) {
@@ -310,7 +279,7 @@ async function fetchSeasonLeaderboards(requestedYear?: number): Promise<SeasonLe
           firstName,
           lastName,
           countryCode: player.country || 'USA',
-          photoUrl: null, // Components resolve headshots via getPlayerHeadshotUrl
+          photoUrl: null,
           initials: `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase(),
           statValue,
           statDisplayValue: config.formatValue(statValue),
