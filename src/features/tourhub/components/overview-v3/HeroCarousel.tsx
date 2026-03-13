@@ -24,7 +24,7 @@ import {
   type HeroSlide as CarouselSlide,
   type HeroTournament,
 } from '../../hooks/useHeroCarouselData';
-import { useTournamentTopLeaders, TOUR_CONFIG, type LeaderEntry } from '../../hooks/useOverviewData';
+import { useTournamentTopLeaders, type LeaderEntry } from '../../hooks/useOverviewData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { useLeaderboardRealtime } from '../../hooks/useLeaderboardRealtime';
@@ -40,6 +40,18 @@ import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, Podium
 import { useWinnerScorecardStats } from '../../hooks/useWinnerScorecardStats';
 import { useWinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import '@/styles/hero-glass.css';
+
+function getTourDisplayName(tourSlug: string): string {
+  const names: Record<string, string> = {
+    pga: 'PGA TOUR',
+    liv: 'LIV GOLF',
+    euro: 'DP WORLD',
+    lpga: 'LPGA',
+    champ: 'CHAMPIONS',
+    pgad: 'KORN FERRY',
+  };
+  return names[tourSlug] ?? tourSlug.toUpperCase();
+}
 
 function getStartLabel(date: string): string {
   const startDate = new Date(date);
@@ -146,7 +158,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
                 src={photoUrl}
                 alt={abbreviatedName}
                 className="w-full h-full object-cover object-top"
-                onError={(e) => { console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+                onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-white/60 text-[10px] font-semibold" style={{ background: '#F8FAFC' }}>{initials}</div>
@@ -213,7 +225,7 @@ function CondensedTieRow({ row, index, isActive, tournamentTourSlug }: { row: Li
                 }}
               >
                 {photoUrl ? (
-                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
+                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
                 ) : (
                   <div style={{ width: '100%', height: '100%', background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>{initials}</div>
                 )}
@@ -253,17 +265,11 @@ interface HeroSlideProps {
   onInteraction: () => void;
 }
 
-// Card animation variants — matches CreatorCapsule entrance/exit
-const cardVariants = {
-  enter: { opacity: 0, y: 20 },
-  center: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: 20 },
-};
 
 function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction }: HeroSlideProps) {
   const { tournament, type } = slide;
   const navigate = useNavigate();
-  const tourConfig = TOUR_CONFIG[tournament.tourSlug] || TOUR_CONFIG.pga;
+  
   
   // Fetch real venue image
   const { data: venueImage } = useVenueImage(tournament.venueName, tournament.venueCity);
@@ -518,7 +524,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      window.location.href = `/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`;
+                      navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`);
                     }}
                     className="hero-venue block active:opacity-70 transition-opacity cursor-pointer"
                   >
@@ -547,12 +553,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     <div className="flex items-center gap-2">
                       <div className="tour-badge">
                         <span>
-                          {tournament.tourSlug === 'pga' ? 'PGA TOUR' :
-                           tournament.tourSlug === 'liv' ? 'LIV GOLF' :
-                           tournament.tourSlug === 'euro' ? 'DP WORLD' :
-                           tournament.tourSlug === 'lpga' ? 'LPGA' :
-                           tournament.tourSlug === 'champ' ? 'CHAMPIONS' :
-                           'KORN FERRY'}
+                          {getTourDisplayName(tournament.tourSlug)}
                         </span>
                       </div>
                     </div>
@@ -563,7 +564,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      window.location.href = `/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`;
+                      navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`);
                     }}
                     className="hero-venue block active:opacity-70 transition-opacity cursor-pointer"
                   >
@@ -589,14 +590,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 >
                   {/* Round progress */}
                   <p className="hero-meta" style={{ padding: isExpanded ? '0 20px' : undefined, marginTop: 4, marginBottom: isExpanded ? 4 : 0 }}>
-                    {(() => {
-                      const start = new Date(tournament.startDate);
-                      const now = new Date();
-                      const dayIndex = Math.max(0, Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
-                      const totalRounds = 4;
-                      const currentRound = Math.min(dayIndex + 1, totalRounds);
-                      return currentRound >= totalRounds ? 'Final Round' : `Round ${currentRound} of ${totalRounds}`;
-                    })()}
+                    {'In Progress'}
                   </p>
 
                   {/* Expanded: Full Leaderboard or Scorecard */}
@@ -859,12 +853,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
                     <div className="tour-badge">
                       <span>
-                        {tournament.tourSlug === 'pga' ? 'PGA TOUR' :
-                         tournament.tourSlug === 'liv' ? 'LIV GOLF' :
-                         tournament.tourSlug === 'euro' ? 'DP WORLD' :
-                         tournament.tourSlug === 'lpga' ? 'LPGA' :
-                         tournament.tourSlug === 'champ' ? 'CHAMPIONS' :
-                         'KORN FERRY'}
+                        {getTourDisplayName(tournament.tourSlug)}
                       </span>
                     </div>
                     <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta" style={{ fontSize: 13, textDecoration: 'none' }}>
@@ -1006,11 +995,11 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   useEffect(() => {
     const slide = slides[currentIndex];
     if (slide?.type === 'completed') {
-      const winners = leadersWinnersMap?.[slide.tournament.id];
-      const winner = winners?.find(w => w.position === 1);
+      const winners = leadersWinnersMap?.get(slide.tournament.id);
+      const winner = winners?.topFinishers?.find(w => w.position === 1);
       if (winner) {
         const url = getPlayerHeadshotUrl(
-          `${winner.player.firstName} ${winner.player.lastName}`,
+          winner.fullName || `${winner.firstName} ${winner.lastName}`,
           slide.tournament.tourSlug || 'pga'
         );
         if (url) {
@@ -1130,7 +1119,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     >
       <button 
         className="absolute z-20 flex items-center justify-center"
-        style={{ top: '56px', left: '16px', width: '44px', height: '44px' }}
+        style={{ top: 'calc(env(safe-area-inset-top, 0px) + 12px)', left: '16px', width: '44px', height: '44px' }}
         onClick={() => { openTourNav(); showBottomNav(); }}
         aria-label="Open tour menu"
       >
