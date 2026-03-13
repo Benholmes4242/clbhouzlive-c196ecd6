@@ -8,16 +8,28 @@ import { useNavigate } from 'react-router-dom';
 import { useLiveRightNow, type LiveTournamentWithLeader } from '../../hooks/useOverviewModules';
 import { SectionErrorState } from '../SectionErrorState';
 import { getTourLogo } from '../../utils/tourLogos';
+import { TOUR_COLORS } from '../../constants/colors';
+
+function abbreviateName(fullName: string): string {
+  const parts = fullName.trim().split(' ');
+  if (parts.length < 2) return fullName;
+  return `${parts[0][0]}. ${parts.slice(1).join(' ')}`;
+}
+
+// PGA/LPGA logos have more horizontal width so appear larger at 42px — use 36px for visual balance
+const WIDE_LOGO_TOURS = ['pga', 'lpga'];
 
 const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tournament }) => {
   const navigate = useNavigate();
   const tourLogoSrc = getTourLogo(tournament.tourSlug?.toLowerCase() ?? '');
+  const logoSize = WIDE_LOGO_TOURS.includes(tournament.tourSlug?.toLowerCase() ?? '') ? 36 : 42;
 
   return (
-    <div
+    <button
+      type="button"
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
       className="w-full flex items-center gap-3 px-3.5 py-2.5 bg-card rounded-2xl border border-border/50 text-left transition-all active:scale-[0.98]"
-      style={{ cursor: 'pointer' }}
+      aria-label={`${tournament.name} — live now`}
     >
       {/* Green live dot */}
       <div style={{
@@ -56,7 +68,7 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
             fontWeight: 500,
             color: 'hsl(var(--muted-foreground) / 0.6)',
           }}>
-            {tournament.leader?.name ?? 'Starting soon'}
+            {tournament.leader ? abbreviateName(tournament.leader.name) : 'Starting soon'}
           </span>
 
           <span style={{
@@ -65,11 +77,11 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
             fontVariantNumeric: 'tabular-nums',
             color: tournament.leader
               ? tournament.leader.score < 0
-                ? 'rgba(22,163,74,0.9)'
+                ? TOUR_COLORS.movementUp
                 : tournament.leader.score > 0
-                  ? 'rgba(220,38,38,0.85)'
-                  : 'rgba(0,0,0,0.35)'
-              : 'rgba(0,0,0,0.25)',
+                  ? TOUR_COLORS.movementDown
+                  : 'hsl(var(--muted-foreground))'
+              : 'hsl(var(--muted-foreground) / 0.5)',
           }}>
             {tournament.leader?.scoreDisplay ?? '—'}
           </span>
@@ -80,8 +92,8 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
       <div
         style={{
           flexShrink: 0,
-          width: ['pga', 'lpga'].includes(tournament.tourSlug?.toLowerCase() ?? '') ? 36 : 42,
-          height: ['pga', 'lpga'].includes(tournament.tourSlug?.toLowerCase() ?? '') ? 36 : 42,
+          width: logoSize,
+          height: logoSize,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -94,7 +106,7 @@ const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tou
           style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
         />
       </div>
-    </div>
+    </button>
   );
 };
 
@@ -109,13 +121,38 @@ export function LiveRightNow() {
     );
   }
 
-  if (isLoading || !liveTournaments || liveTournaments.length === 0) {
+  if (isLoading) {
+    return (
+      <section className="bg-background" aria-label="Live tournaments">
+        <div className="flex items-center gap-2 mb-4 px-4">
+          <span className="w-2 h-2 rounded-full bg-green-500 opacity-50" />
+          <h2 className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
+            Live Right Now
+          </h2>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', padding: '0 16px' }}>
+          {[0, 1].map(i => (
+            <div key={i} className="w-full flex items-center gap-3 px-3.5 py-2.5 bg-card rounded-2xl border border-border/50">
+              <div className="w-[7px] h-[7px] rounded-full bg-muted flex-shrink-0" />
+              <div className="flex-1 min-w-0 space-y-1.5">
+                <div className="h-3 w-36 rounded bg-muted animate-pulse" />
+                <div className="h-2.5 w-20 rounded bg-muted animate-pulse" />
+              </div>
+              <div className="w-9 h-9 rounded-lg bg-muted animate-pulse flex-shrink-0" />
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (!liveTournaments || liveTournaments.length === 0) {
     return null;
   }
 
   return (
     <section className="bg-background" aria-label="Live tournaments">
-      {/* Header — unchanged */}
+      {/* Header */}
       <div className="flex items-center gap-2 mb-4 px-4">
         <span
           className="w-2 h-2 rounded-full animate-live-pulse"
@@ -135,7 +172,6 @@ export function LiveRightNow() {
         flexDirection: 'column',
         gap: '6px',
         padding: '0 16px',
-        marginTop: '10px',
       }}>
         {liveTournaments.map((tournament) => (
           <LiveTickerRow key={tournament.id} tournament={tournament} />
