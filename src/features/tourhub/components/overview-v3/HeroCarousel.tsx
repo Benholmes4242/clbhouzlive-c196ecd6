@@ -250,6 +250,7 @@ interface HeroSlideProps {
   leadersWinnersMap?: Map<string, import('../../hooks/useTournamentLeadersWinners').TournamentLeaderWinner>;
   isExpanded: boolean;
   onToggleExpand: () => void;
+  onInteraction: () => void;
 }
 
 // Card animation variants — matches CreatorCapsule entrance/exit
@@ -259,7 +260,7 @@ const cardVariants = {
   exit: { opacity: 0, y: 20 },
 };
 
-function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand }: HeroSlideProps) {
+function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction }: HeroSlideProps) {
   const { tournament, type } = slide;
   const navigate = useNavigate();
   const tourConfig = TOUR_CONFIG[tournament.tourSlug] || TOUR_CONFIG.pga;
@@ -341,7 +342,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
   // Touch isolation for expanded scroll area
   const handleExpandedTouch = useCallback((e: React.TouchEvent) => {
     e.stopPropagation();
-  }, []);
+    onInteraction();
+  }, [onInteraction]);
 
   // Phase 3+4: Track previous leaders for score change & movement animations
   const prevLeadersRef = useRef<LeaderEntry[]>([]);
@@ -973,6 +975,21 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   // Touch swipe state
   const touchStartRef = React.useRef<{ x: number; y: number; time: number } | null>(null);
   const touchMoveRef = React.useRef<number>(0);
+  const resumeTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const scheduleResume = useCallback(() => {
+    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+    resumeTimerRef.current = setTimeout(() => {
+      setIsPaused(false);
+    }, 3500);
+  }, []);
+
+  // Clean up resume timer on unmount
+  useEffect(() => {
+    return () => {
+      if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+    };
+  }, []);
 
   // Auto-advance every 8 seconds (spec: 8s idle, 5s resume after touch)
   useEffect(() => {
@@ -1041,7 +1058,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (isExpanded) return;
     if (!touchStartRef.current) {
-      setTimeout(() => setIsPaused(false), 5000);
+      scheduleResume();
       return;
     }
     const deltaX = touchMoveRef.current;
@@ -1055,7 +1072,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
 
     // Tap detection: minimal movement + short duration → let browser handle as click
     if (Math.abs(deltaX) < 10 && deltaY < 10 && elapsed < 300) {
-      setTimeout(() => setIsPaused(false), 5000);
+      scheduleResume();
       return;
     }
 
@@ -1063,12 +1080,16 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     if (Math.abs(deltaX) > threshold && Math.abs(deltaX) > deltaY) {
       if (deltaX < -threshold && currentIndex < slides.length - 1) {
         setCurrentIndex(prev => prev + 1);
+        if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+        setIsPaused(false);
       } else if (deltaX > threshold && currentIndex > 0) {
         setCurrentIndex(prev => prev - 1);
+        if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+        setIsPaused(false);
       }
     }
 
-    setTimeout(() => setIsPaused(false), 5000);
+    scheduleResume();
   };
 
   if (isLoading) {
@@ -1132,6 +1153,10 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
             leadersWinnersMap={leadersWinnersMap}
             isExpanded={index === currentIndex && (slide.type === 'live' ? true : isExpanded)}
             onToggleExpand={handleToggleExpand}
+            onInteraction={() => {
+              setIsPaused(true);
+              scheduleResume();
+            }}
           />
         ))}
       </AnimatePresence>
