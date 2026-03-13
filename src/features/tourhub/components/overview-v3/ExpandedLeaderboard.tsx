@@ -208,7 +208,7 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
           {photoUrl ? (
             <img src={photoUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
           ) : (
-            <div className="w-full h-full flex items-center justify-center" style={{ background: 'red', fontSize: 8, fontWeight: 600, color: 'rgba(255,255,255,0.80)' }}>{initials}</div>
+            <div className="w-full h-full flex items-center justify-center" <div className="w-full h-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.12)', fontSize: 8, fontWeight: 600, color: 'rgba(255,255,255,0.80)' }}>{initials}</div>>{initials}</div>
           )}
         </div>
         <span className="truncate" style={{
