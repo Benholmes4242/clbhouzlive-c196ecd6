@@ -97,7 +97,7 @@ function PhotoManagementSheet({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [removing, setRemoving] = useState(false);
-  const [imgKey, setImgKey] = useState(0);
+  const [imgKey] = [headshotCacheBust]; // use page-level cache bust
   const [overrideValue, setOverrideValue] = useState('');
   const [savingOverride, setSavingOverride] = useState(false);
   const [overrideInitialized, setOverrideInitialized] = useState(false);
