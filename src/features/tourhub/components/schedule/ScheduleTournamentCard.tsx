@@ -14,6 +14,7 @@ import type { TourTournament } from '../../hooks/useTourHubData';
 import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { getContextLabel } from '../../utils/tournamentClassification';
+import { TOUR_COLORS } from '../../constants/colors';
 
 interface ScheduleTournamentCardProps {
   tournament: TourTournament | SeasonTournament;
