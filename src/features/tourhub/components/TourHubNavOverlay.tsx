@@ -638,7 +638,7 @@ export function TourHubNavOverlay({
                     />
                   </motion.button>
                 ))}
-              </div>
+
             </div>
             </div>{/* Close content padding wrapper */}
           </motion.div>
