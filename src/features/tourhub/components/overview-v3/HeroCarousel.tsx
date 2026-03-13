@@ -553,12 +553,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     <div className="flex items-center gap-2">
                       <div className="tour-badge">
                         <span>
-                          {tournament.tourSlug === 'pga' ? 'PGA TOUR' :
-                           tournament.tourSlug === 'liv' ? 'LIV GOLF' :
-                           tournament.tourSlug === 'euro' ? 'DP WORLD' :
-                           tournament.tourSlug === 'lpga' ? 'LPGA' :
-                           tournament.tourSlug === 'champ' ? 'CHAMPIONS' :
-                           'KORN FERRY'}
+                          {getTourDisplayName(tournament.tourSlug)}
                         </span>
                       </div>
                     </div>
