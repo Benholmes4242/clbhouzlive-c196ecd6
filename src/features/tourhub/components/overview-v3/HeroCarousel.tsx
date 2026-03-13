@@ -513,7 +513,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             onTouchEnd={isExpanded ? handleExpandedTouch : onCardTouchEnd}
             style={{ 
               position: 'absolute',
-              bottom: isLive ? 72 : (isExpanded ? 16 : 88),
+              bottom: isExpanded ? 16 : 88,
               left: isExpanded ? 12 : 16,
               ...(isExpanded
                 ? { right: 12, top: 'max(env(safe-area-inset-top, 20px) + 120px, 160px)' }
