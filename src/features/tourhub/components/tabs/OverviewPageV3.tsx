@@ -107,6 +107,12 @@ export function OverviewPageV3() {
         style={HERO_STYLES.containerNoHeader}
       >
         <HeroCarousel hasHeader={false} />
+        {/* Invisible sentinel at 95dvh — when it scrolls out of viewport, bottom nav appears */}
+        <div
+          ref={sentinelRef}
+          aria-hidden="true"
+          style={{ position: 'absolute', top: '95dvh', height: '1px', width: '1px', pointerEvents: 'none' }}
+        />
       </div>
 
       {/* Content sections — consistent 40px vertical rhythm between major sections */}
