@@ -21,7 +21,6 @@ import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeads
 import { 
   useLiveTournamentCount, 
   useLiveLeaderTeaser, 
-  usePlayerCount, 
   useTopCollegeTeaser 
 } from '../hooks/useNavMenuData';
 import { TOUR_COLORS } from '../constants/colors';
@@ -65,7 +64,7 @@ const LINK_ITEMS: LinkItem[] = [
 ];
 
 // Animation config
-const ITEM_EASE = [0.25, 0.46, 0.45, 0.94] as const;
+const ITEM_EASE: [number, number, number, number] = [0.25, 0.46, 0.45, 0.94];
 
 interface TourHubNavOverlayProps {
   isOpen: boolean;
@@ -83,16 +82,14 @@ export function TourHubNavOverlay({
   const navigate = useNavigate();
   const scrollRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const swipeStartXRef = useRef<number | null>(null);
+  const swipeStartYRef = useRef<number | null>(null);
 
   // Only fetch data when overlay is open (lazy-mount)
   const { data: topPlayers } = useTopWorldRanked(5);
   const { data: liveCount } = useLiveTournamentCount();
   const { data: leaderTeaser } = useLiveLeaderTeaser();
-  const { data: playerCount } = usePlayerCount();
   const { data: topCollege } = useTopCollegeTeaser();
-  
-  // World #1 name from the rankings data
-  const worldNumber1 = topPlayers?.[0];
   
   // Lock body scroll when open
   useEffect(() => {
@@ -209,15 +206,16 @@ export function TourHubNavOverlay({
           {leaderTeaser.isTied ? (
             <span className="font-medium">{leaderTeaser.playerName}</span>
           ) : (
-            <span 
-              className="font-medium transition-opacity active:opacity-70 cursor-pointer"
+            <button
+              type="button"
+              className="font-medium transition-opacity active:opacity-70 focus:outline-none"
               onClick={(e) => {
                 e.stopPropagation();
                 if (leaderTeaser.playerId) handlePlayerClick(leaderTeaser.playerId);
               }}
             >
               {leaderTeaser.playerName}
-            </span>
+            </button>
           )}
           {leaderTeaser.isTied ? ' at ' : ' leads at '}
           {scoreStr !== null && (
@@ -226,8 +224,9 @@ export function TourHubNavOverlay({
             </span>
           )}
           <br />
-          <span 
-            className="truncate transition-opacity active:opacity-70 cursor-pointer"
+          <button
+            type="button"
+            className="truncate transition-opacity active:opacity-70 focus:outline-none text-left"
             onClick={(e) => {
               e.stopPropagation();
               if (leaderTeaser.tournamentId) {
@@ -239,7 +238,7 @@ export function TourHubNavOverlay({
             }}
           >
             {leaderTeaser.tournamentName}
-          </span>
+          </button>
         </p>
       );
     }
@@ -299,13 +298,26 @@ export function TourHubNavOverlay({
               stiffness: 300,
             }}
             className="fixed inset-y-0 right-0 z-[10000] flex flex-col overflow-hidden"
+            onTouchStart={(e) => {
+              swipeStartXRef.current = e.touches[0].clientX;
+              swipeStartYRef.current = e.touches[0].clientY;
+            }}
+            onTouchEnd={(e) => {
+              if (swipeStartXRef.current === null || swipeStartYRef.current === null) return;
+              const deltaX = e.changedTouches[0].clientX - swipeStartXRef.current;
+              const deltaY = Math.abs(e.changedTouches[0].clientY - swipeStartYRef.current);
+              swipeStartXRef.current = null;
+              swipeStartYRef.current = null;
+              if (deltaX > 80 && deltaX > deltaY * 1.5) {
+                haptic('light');
+                onClose();
+              }
+            }}
             style={{
               width: '100vw',
               background: 'hsl(var(--background) / 0.85)',
               backdropFilter: 'blur(24px) saturate(1.4)',
               WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
-              borderLeft: '1px solid hsl(var(--border) / 0.3)',
-              boxShadow: '-8px 0 32px rgba(0, 0, 0, 0.08)',
             }}
             role="dialog"
             aria-modal="true"
@@ -475,6 +487,13 @@ export function TourHubNavOverlay({
                       );
                     })}
                   </div>
+                  {/* Right-fade overlay — indicates more cards to scroll */}
+                  <div
+                    className="absolute inset-y-0 right-0 w-12 pointer-events-none"
+                    style={{
+                      background: 'linear-gradient(to left, hsl(var(--background) / 0.9), transparent)',
+                    }}
+                  />
                 </div>
               </motion.div>
             )}
@@ -570,7 +589,7 @@ export function TourHubNavOverlay({
                       background: 'hsl(var(--card) / 0.5)',
                       border: '1px solid hsl(var(--border) / 0.2)',
                     }}
-                    aria-label="College Golf — From campus standout to Tour contender"
+                    aria-label={`${item.label} — ${item.subtitle}`}
                   >
                     {/* Icon in circle */}
                     <div 
@@ -604,8 +623,9 @@ export function TourHubNavOverlay({
                       {/* TM-06: College #1 teaser — school name tappable */}
                       {item.id === 'college-golf' && topCollege && (
                         <p className="text-[13px] mt-1 text-muted-foreground flex items-center gap-1.5">
-                          <span 
-                            className="inline-flex items-center gap-1.5 transition-opacity active:opacity-70 cursor-pointer"
+                          <button
+                            type="button"
+                            className="inline-flex items-center gap-1.5 transition-opacity active:opacity-70 focus:outline-none"
                             onClick={(e) => {
                               e.stopPropagation();
                               haptic('light');
@@ -622,7 +642,7 @@ export function TourHubNavOverlay({
                               />
                             )}
                             <span className="font-medium">{topCollege.name}</span>
-                          </span>
+                          </button>
                           <span>
                             {' leads • '}
                             {formatCurrency(topCollege.earnings)} earned
