@@ -40,8 +40,7 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
   const contextLabel = getContextLabel(tournament);
   const isSpecialEvent = ['MAJOR CHAMPIONSHIP', 'SIGNATURE EVENT', 'ROLEX SERIES', 'PLAYOFF EVENT'].includes(contextLabel);
   const isMajor = contextLabel === 'MAJOR CHAMPIONSHIP';
-  const isSignature = contextLabel === 'SIGNATURE EVENT';
-  const isRolex = contextLabel === 'ROLEX SERIES';
+  const isRolexOrSignature = contextLabel === 'ROLEX SERIES' || contextLabel === 'SIGNATURE EVENT';
   const venue = getVenueString(tournament);
   const tourSlug = TOUR_NAME_TO_SLUG[tournament.tourName || ''] || '';
   const tourLogoSrc = tourSlug ? getTourLogo(tourSlug) : null;
