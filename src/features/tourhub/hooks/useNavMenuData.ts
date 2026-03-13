@@ -9,6 +9,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
+import { getContextLabel } from '../utils/tournamentClassification';
 
 /**
  * Count of currently in-progress tournaments
