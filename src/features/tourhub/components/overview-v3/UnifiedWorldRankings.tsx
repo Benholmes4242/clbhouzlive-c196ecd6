@@ -17,49 +17,13 @@ import { useRankingMovers, useWorldRankingsFull } from '../../hooks/useOverviewM
 import { SectionErrorState } from '../SectionErrorState';
 import CountryFlag from '@/components/ui/country-flag';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { toTitleCase } from '../../hooks/useWorldRankings';
+import { TOUR_COLORS } from '../../constants/colors';
 
 const PLAYERS_PER_PAGE = 10;
 
-// ============================================================================
-// HELPERS
-// ============================================================================
-
-function formatCountryName(country: string | null): string {
-  if (!country) return '';
-  return country
-    .toLowerCase()
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-}
-
-function generateNarrative(
-  rankings: any[] | undefined,
-  movers: any[] | undefined
-): string {
-  if (!rankings?.length) return '';
-
-  const no1 = rankings[0];
-  const no1Name = no1?.player?.last_name || 'The leader';
-  const no1Stable = no1?.rank_change === 0;
-
-  const topMovers = movers?.filter(m => m.rank <= 20 && m.rankChange > 0) || [];
-  const biggestMover = topMovers[0];
-
-  if (no1Stable && biggestMover) {
-    return `${no1Name} holds firm at No.1 as ${biggestMover.lastName} surges ${biggestMover.rankChange} places`;
-  }
-  if (!no1Stable && no1?.rank_change > 0) {
-    return `${no1Name} claims the No.1 spot in this week's rankings`;
-  }
-  if (biggestMover && biggestMover.rankChange >= 20) {
-    return `${biggestMover.lastName} rockets up ${biggestMover.rankChange} spots — biggest move of the week`;
-  }
-  if (no1Stable) {
-    return `No.1 unchanged — ${no1Name} extends reign at the summit`;
-  }
-  return `${no1Name} leads the Official World Golf Ranking`;
-}
+// No.1 rank crown accent — amber-orange, distinct from live green
+const CROWN_COLOR = '#EA580C';
 
 // ============================================================================
 // SKELETON
@@ -166,7 +130,7 @@ function MomentumPill({ entry, index, direction }: MomentumPillProps) {
             <span className="whitespace-nowrap text-[0.8125rem] font-medium text-foreground/80">{entry.lastName}</span>
             <div className="flex items-center gap-1">
               <span className="text-[0.625rem] text-muted-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>#{entry.rank}</span>
-               <span className={cn("whitespace-nowrap text-[0.625rem] font-medium", isUp ? 'text-green-500' : 'text-red-400')}>
+               <span className="whitespace-nowrap text-[0.625rem] font-medium" style={{ color: isUp ? TOUR_COLORS.movementUp : TOUR_COLORS.movementDown }}>
                 <span style={{ fontSize: '10px' }}>{isUp ? '▲' : '▼'}</span>{isUp ? '+' : '−'}{absChange}
               </span>
             </div>
@@ -200,8 +164,6 @@ export function UnifiedWorldRankings() {
   const endIndex = Math.min(startIndex + PLAYERS_PER_PAGE, totalPlayers);
   const currentPagePlayers = rankings?.slice(startIndex, endIndex) || [];
 
-  const no1TotalPoints = rankings?.[0]?.total_points ?? 0;
-
   const moverPlayerIds = useMemo(() => new Set(movers?.map(m => m.playerId) || []), [movers]);
   const upwardMovers = useMemo(() => 
     (movers || []).filter(m => m.rankChange > 0).sort((a, b) => b.rankChange - a.rankChange).slice(0, 10), 
@@ -209,7 +171,6 @@ export function UnifiedWorldRankings() {
   const downwardMovers = useMemo(() => 
     (movers || []).filter(m => m.rankChange < 0).sort((a, b) => a.rankChange - b.rankChange).slice(0, 10), 
   [movers]);
-  const narrative = useMemo(() => generateNarrative(rankings, movers), [rankings, movers]);
 
   useEffect(() => {
     if (highlightedPlayerId) {
@@ -281,7 +242,6 @@ export function UnifiedWorldRankings() {
     <motion.section
       className="px-4"
       aria-label="Official World Golf Ranking"
-      role="region"
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
@@ -323,7 +283,7 @@ export function UnifiedWorldRankings() {
           {/* Row 1 — Risers */}
           {upwardMovers.length > 0 && (
             <div>
-              <span className="text-green-500" style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>▲ Risers</span>
+              <span style={{ color: TOUR_COLORS.movementUp, fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>▲ Risers</span>
               <div
                 className="flex gap-2 overflow-x-auto scrollbar-hide mt-1.5 pb-0.5"
                 style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', touchAction: 'pan-x pan-y' }}
@@ -339,7 +299,7 @@ export function UnifiedWorldRankings() {
           {/* Row 2 — Fallers */}
           {downwardMovers.length > 0 && (
             <div>
-              <span className="text-red-400" style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>▼ Fallers</span>
+              <span style={{ color: TOUR_COLORS.movementDown, fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>▼ Fallers</span>
               <div
                 className="flex gap-2 overflow-x-auto scrollbar-hide mt-1.5 pb-0.5"
                 style={{ WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', touchAction: 'pan-x pan-y' }}
@@ -415,7 +375,7 @@ export function UnifiedWorldRankings() {
                     padding: '12px 0',
                     minHeight: '64px',
                     borderBottom: '1px solid hsl(var(--border) / 0.15)',
-                    borderLeft: isMover ? '3px solid hsl(142 76% 36%)' : '3px solid transparent',
+                    borderLeft: isMover ? `3px solid ${TOUR_COLORS.movementUp}` : '3px solid transparent',
                     background: rowBg,
                   }}
                   aria-label={`${fullName}, rank ${entry.rank}, average ${entry.avg_points?.toFixed(2) ?? 'N/A'} points`}
@@ -424,14 +384,14 @@ export function UnifiedWorldRankings() {
                   <div className="w-10 flex-shrink-0 flex flex-col items-center gap-0.5">
                     <span className="text-[0.875rem] font-semibold text-foreground" style={{
                       fontVariantNumeric: 'tabular-nums',
-                      color: isCrown ? '#EA580C' : undefined,
+                      color: isCrown ? CROWN_COLOR : undefined,
                     }}>
                       {entry.rank}
                     </span>
                     {rankChange > 0 ? (
-                      <span className="text-green-500" style={{ fontSize: '10px', fontWeight: 600 }}>▲{Math.abs(rankChange)}</span>
+                      <span style={{ color: TOUR_COLORS.movementUp, fontSize: '10px', fontWeight: 600 }}>▲{Math.abs(rankChange)}</span>
                     ) : rankChange < 0 ? (
-                      <span className="text-red-400" style={{ fontSize: '10px', fontWeight: 600 }}>▼{Math.abs(rankChange)}</span>
+                      <span style={{ color: TOUR_COLORS.movementDown, fontSize: '10px', fontWeight: 600 }}>▼{Math.abs(rankChange)}</span>
                     ) : null}
                   </div>
 
@@ -446,7 +406,7 @@ export function UnifiedWorldRankings() {
                       <div className="flex items-center gap-1 mt-0.5">
                         <CountryFlag country={entry.player.country} size="sm" />
                         <span className="truncate leading-none text-[0.6875rem] text-muted-foreground">
-                          {formatCountryName(entry.player.country)}
+                          {toTitleCase(entry.player.country)}
                         </span>
                       </div>
                     </div>
@@ -457,7 +417,7 @@ export function UnifiedWorldRankings() {
                     <div className="w-16 text-right">
                       <div className="text-[0.8125rem] font-medium text-foreground/80" style={{
                         fontVariantNumeric: 'tabular-nums',
-                        color: isCrown ? '#EA580C' : undefined,
+                        color: isCrown ? CROWN_COLOR : undefined,
                       }}>
                         {entry.avg_points?.toFixed(2) ?? '—'}
                       </div>
@@ -506,7 +466,7 @@ export function UnifiedWorldRankings() {
                       borderRadius: '3px',
                       background: isActive
                         ? 'hsl(var(--foreground))'
-                        : 'rgba(0,0,0,0.12)',
+                        : 'hsl(var(--border))',
                     }}
                     aria-label={`Page ${dotIndex + 1} of ${totalPages}`}
                   />
