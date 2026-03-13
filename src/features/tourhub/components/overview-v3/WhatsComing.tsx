@@ -47,8 +47,8 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
 
   // Left border accent: amber for majors, emerald for signature/rolex
   const leftBorderStyle = isMajor
-    ? '3px solid #f59e0b'
-    : (isSignature || isRolex)
+    ? `3px solid ${TOUR_COLORS.liveAmber}`
+    : isRolexOrSignature
       ? '3px solid rgba(16, 185, 129, 0.8)'
       : '3px solid transparent';
 
