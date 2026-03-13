@@ -253,7 +253,7 @@ function CondensedTieRow({ row, index, isActive, tournamentTourSlug }: { row: Li
           {row.players.length > 4 && (
             <div
               className="flex-shrink-0 flex items-center justify-center"
-              style={{ width: 22, height: 22, borderRadius: '34%', background: '#F8FAFC', border: '1.5px solid #F8FAFC', marginLeft: -6, position: 'relative', zIndex: 0, fontSize: 9, fontWeight: 600, color: '#64748B' }}
+              style={{ width: 22, height: 22, borderRadius: '34%', background: 'rgba(255,255,255,0.08)', border: '1.5px solid rgba(255,255,255,0.15)', marginLeft: -6, position: 'relative', zIndex: 0, fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}
             >
               +{row.players.length - 4}
             </div>
