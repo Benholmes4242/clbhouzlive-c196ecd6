@@ -72,6 +72,8 @@ const PGA_SIGNATURE_KEYWORDS = [
   'cadillac championship',
   'memorial tournament',
   'travelers championship',
+  'presidents cup',
+  'hero world challenge',
 ];
 
 const LPGA_SIGNATURE_KEYWORDS = [
