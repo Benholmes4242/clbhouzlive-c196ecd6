@@ -6,11 +6,8 @@ import { motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import { TourHubShell } from '../components';
 import { CollegeSearch, FranchiseLeaderboard } from '../components/college';
-import { CollegeHeroBanner } from '../components/college/CollegeHeroBanner';
-import { AlumniFaceStrip } from '../components/college/AlumniFaceStrip';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
-import { useHeroAlumni } from '../hooks/useBatchCollegeAlumni';
 
 type MetricTab = 'earnings' | 'wins' | 'cuts' | 'top10s';
 const VALID_METRICS = new Set<string>(['earnings', 'wins', 'cuts', 'top10s']);
@@ -25,8 +22,7 @@ function getMetricValue(s: CollegeSeasonStats, metric: MetricTab): number {
 }
 
 /**
- * College Golf Hub - Immersive rankings page with full-bleed hero,
- * alumni showcase, franchise leaderboard, and weekly movers.
+ * College Golf Hub - Rankings page with franchise leaderboard and weekly movers.
  */
 export function CollegeGolfHubPage() {
   const [searchParams] = useSearchParams();
@@ -60,7 +56,6 @@ export function CollegeGolfHubPage() {
         queryClient.invalidateQueries({ queryKey: ['college-season-stats'] }),
         queryClient.invalidateQueries({ queryKey: ['college-movers'] }),
         queryClient.invalidateQueries({ queryKey: ['college-media'] }),
-        queryClient.invalidateQueries({ queryKey: ['hero-alumni'] }),
       ]);
       setIsRefreshing(false);
     }
@@ -99,11 +94,18 @@ export function CollegeGolfHubPage() {
   }, [allStats, activeMetric]);
 
   const topCollegeMedia = topCollege ? collegeMap?.get(topCollege.normalized_name) ?? null : null;
-  const { data: heroAlumni } = useHeroAlumni(topCollege?.normalized_name);
 
   return (
-    <TourHubShell immersive>
-      <div className="relative" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+    <TourHubShell>
+      <div
+        className="relative min-h-screen bg-background"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        style={{
+          paddingTop: 'max(var(--sat, env(safe-area-inset-top, 0px)), 47px)',
+        }}
+      >
         {/* Pull-to-refresh indicator */}
         {(pullDistance > 0 || isRefreshing) && (
           <div className="flex justify-center py-2" style={{ height: pullDistance > 0 ? pullDistance * 0.4 : 32 }}>
@@ -116,40 +118,18 @@ export function CollegeGolfHubPage() {
           </div>
         )}
 
-        {/* Immersive Hero */}
-        {topCollege && (
-          <CollegeHeroBanner
-            stats={topCollege}
-            college={topCollegeMedia}
-          />
-        )}
-
-        {/* Burger menu — AFTER hero in DOM so it paints on top of hero's stacking context */}
+        {/* Burger menu */}
         <button
           className="absolute z-30 flex items-center justify-center"
           style={{ top: 56, left: 16, width: 44, height: 44, pointerEvents: 'auto' as const }}
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
           aria-label="Open tour menu"
         >
-          <Menu
-            className="w-[24px] h-[24px]"
-            strokeWidth={1.5}
-            style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5))' }}
-          />
+          <Menu className="w-[24px] h-[24px] text-foreground" style={{ strokeWidth: 1.5 }} />
         </button>
 
-        {/* Alumni Face Strip — overlaps hero */}
-        {heroAlumni && heroAlumni.length > 0 && topCollege && (
-          <AlumniFaceStrip
-            alumni={heroAlumni}
-            collegeName={topCollegeMedia?.short_name || topCollegeMedia?.college_name || topCollege.normalized_name}
-            collegeSlug={topCollege.normalized_name}
-            totalAlumniCount={topCollege.player_count}
-          />
-        )}
-
         {/* ← Tour Overview link */}
-        <div className="px-4" style={{ marginTop: 16 }}>
+        <div className="px-4" style={{ marginTop: 56 }}>
           <Link
             to="/tourhub?tab=overview"
             replace
@@ -163,7 +143,7 @@ export function CollegeGolfHubPage() {
 
         {/* Content area */}
         <div className="px-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
-          {/* Search — 8px gap from tour overview link */}
+          {/* Search */}
           <div style={{ marginTop: 16 }}>
             <CollegeSearch />
           </div>
@@ -172,7 +152,6 @@ export function CollegeGolfHubPage() {
           <section style={{ marginTop: 24 }}>
             <FranchiseLeaderboard limit={25} />
           </section>
-
         </div>
       </div>
     </TourHubShell>
