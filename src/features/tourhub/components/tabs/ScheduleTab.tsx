@@ -197,7 +197,7 @@ export function ScheduleTab() {
 
     const liveList = tourFiltered.filter(t => t.status === 'inprogress');
     const completedList = tourFiltered
-      .filter(t => t.status === 'closed')
+      .filter(isCompleted)
       .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime());
     const now = new Date();
     const upcomingList = tourFiltered
