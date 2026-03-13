@@ -355,7 +355,7 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
       <button 
         className="fixed z-20 flex items-center justify-center"
         style={{
-          top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)',
+          top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 22px)',
           left: '16px',
           width: '44px',
           height: '44px',
