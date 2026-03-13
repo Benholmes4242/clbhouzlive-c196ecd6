@@ -1153,6 +1153,10 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
             leadersWinnersMap={leadersWinnersMap}
             isExpanded={index === currentIndex && (slide.type === 'live' ? true : isExpanded)}
             onToggleExpand={handleToggleExpand}
+            onInteraction={() => {
+              setIsPaused(true);
+              scheduleResume();
+            }}
           />
         ))}
       </AnimatePresence>
