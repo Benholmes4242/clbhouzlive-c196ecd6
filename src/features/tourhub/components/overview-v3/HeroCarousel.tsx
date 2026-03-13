@@ -225,7 +225,7 @@ function CondensedTieRow({ row, index, isActive, tournamentTourSlug }: { row: Li
                 }}
               >
                 {photoUrl ? (
-                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
+                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
                 ) : (
                   <div style={{ width: '100%', height: '100%', background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>{initials}</div>
                 )}
