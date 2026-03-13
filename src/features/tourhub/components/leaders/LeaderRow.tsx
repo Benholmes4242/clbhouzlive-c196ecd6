@@ -54,7 +54,7 @@ export function LeaderRow({
     <motion.div
       initial={{ opacity: 0, x: -12 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.02, duration: 0.25 }}
+      transition={{ delay: Math.min(index * 0.02, 0.3), duration: 0.25 }}
     >
       <Link
         to={`/tourhub/player/${player.id}`}

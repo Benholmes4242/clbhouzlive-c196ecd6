@@ -257,10 +257,28 @@ export function LeadersTab() {
             onCategoryChange={setCategory}
             leaderValue={leaderValue}
           />
-        </div>
+         </div>
 
-        {/* Rankings list (#4–50) */}
-        <div style={{ marginTop: 16 }}>
+         {/* Stat context card */}
+         <div style={{ marginTop: 12 }}>
+           <AnimatePresence mode="wait">
+             <motion.div
+               key={`ctx-${category.key}`}
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+               transition={{ duration: 0.2 }}
+             >
+               <LeadersStatContext
+                 category={category}
+                 leaderValue={leaderValue}
+               />
+             </motion.div>
+           </AnimatePresence>
+         </div>
+
+         {/* Rankings list (#4–50) */}
+         <div style={{ marginTop: 16 }}>
           <AnimatePresence mode="wait">
             <motion.div
               key={category.key}
