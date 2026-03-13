@@ -141,12 +141,7 @@ export function CinematicOverview() {
         />
       )}
 
-      {/* 2. World Rankings Showcase */}
-      <motion.div variants={sectionVariants}>
-        <WorldRankShowcase />
-      </motion.div>
-
-      {/* 3. This Week in Golf */}
+      {/* 2. This Week in Golf */}
       <motion.div variants={sectionVariants}>
         <ThisWeekSection />
       </motion.div>
