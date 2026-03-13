@@ -269,7 +269,7 @@ interface HeroSlideProps {
 function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction }: HeroSlideProps) {
   const { tournament, type } = slide;
   const navigate = useNavigate();
-  const tourConfig = TOUR_CONFIG[tournament.tourSlug] || TOUR_CONFIG.pga;
+  
   
   // Fetch real venue image
   const { data: venueImage } = useVenueImage(tournament.venueName, tournament.venueCity);
