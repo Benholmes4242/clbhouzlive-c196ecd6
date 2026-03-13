@@ -40,8 +40,8 @@ function getDayNum(dateStr: string): string {
 
 function getScoreColor(score: number | null): string {
   if (score === null || score === undefined) return 'hsl(var(--muted-foreground))';
-  if (score < 0) return '#22C55E';
-  if (score > 0) return '#EF4444';
+  if (score < 0) return TOUR_COLORS.movementUp;
+  if (score > 0) return TOUR_COLORS.movementDown;
   return 'hsl(var(--muted-foreground))';
 }
 
