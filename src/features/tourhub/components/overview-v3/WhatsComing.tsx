@@ -60,13 +60,11 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
       : 'rgba(16, 185, 129, 0.9)'; // emerald for SIGNATURE EVENT + ROLEX SERIES
 
   return (
-    <motion.div
-      role="button"
-      tabIndex={0}
+    <motion.button
+      type="button"
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/tourhub/tournament/${tournament.id}`); }}
       className="w-full flex items-center gap-3 px-3.5 py-2.5 bg-card rounded-2xl border border-border/50 text-left transition-all active:scale-[0.98]"
-      style={{ borderLeft: leftBorderStyle, cursor: 'pointer' }}
+      style={{ borderLeft: leftBorderStyle }}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: 0.05 * index, ease: [0.16, 1, 0.3, 1] }}
