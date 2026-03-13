@@ -19,6 +19,7 @@ import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWin
 import { TourHubEmptyState } from '../TourHubEmptyState';
 import { format, isAfter } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { getContextLabel } from '../../utils/tournamentClassification';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
