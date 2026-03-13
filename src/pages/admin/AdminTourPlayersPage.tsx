@@ -195,7 +195,7 @@ function PhotoManagementSheet({
       if (!res.ok) throw new Error(json.error || 'Delete failed');
 
       toast.success('Headshot removed');
-      setImgKey(k => k + 1);
+      onCacheBust();
       queryClient.invalidateQueries({ queryKey: ['admin-tour-players-all'] });
     } catch (err) {
       toast.error((err as Error).message);
