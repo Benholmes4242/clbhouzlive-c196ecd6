@@ -1254,38 +1254,36 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
         ))}
       </AnimatePresence>
 
-      {/* Scroll indicator — only when not expanded */}
-      {(!isExpanded || isCurrentSlideLive) && (
+      {/* FIX 6: Upgraded scroll-to-exit chevron with label */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2, duration: 0.5 }}
+        style={{
+          position: 'absolute',
+          bottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 16px)',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '4px',
+          pointerEvents: 'none',
+          opacity: isExpanded && !isCurrentSlideLive ? 0 : 1,
+          transition: 'opacity 0.2s',
+          zIndex: 5,
+        }}
+      >
+        <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '1.2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)' }}>
+          Explore
+        </span>
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 0.4 }}
-          style={{
-            position: 'absolute',
-            bottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 16px)',
-            left: 0,
-            right: 0,
-            display: 'flex',
-            justifyContent: 'center',
-            pointerEvents: 'none',
-            zIndex: 5,
-          }}
+          animate={{ y: [0, 4, 0] }}
+          transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <motion.div
-            animate={{ y: [0, 5, 0] }}
-            transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut', repeatDelay: 0.6 }}
-          >
-            <ChevronDown
-              style={{ 
-                width: 22, 
-                height: 22, 
-                color: 'rgba(255,255,255,0.45)',
-                filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))',
-              }}
-            />
-          </motion.div>
+          <ChevronDown size={16} style={{ color: 'rgba(255,255,255,0.45)', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))' }} />
         </motion.div>
-      )}
+      </motion.div>
     </div>
   );
 }

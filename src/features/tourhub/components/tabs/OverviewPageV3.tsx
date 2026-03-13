@@ -138,7 +138,7 @@ export function OverviewPageV3() {
           aria-hidden="true"
           style={{ position: 'absolute', top: '85px', height: '1px', width: '1px', pointerEvents: 'none' }}
         />
-      </div>
+      </motion.div>
 
       {/* Content sections — consistent 40px vertical rhythm between major sections */}
       <div 
