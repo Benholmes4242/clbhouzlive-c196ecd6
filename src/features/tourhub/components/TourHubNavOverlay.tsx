@@ -224,8 +224,9 @@ export function TourHubNavOverlay({
             </span>
           )}
           <br />
-          <span 
-            className="truncate transition-opacity active:opacity-70 cursor-pointer"
+          <button
+            type="button"
+            className="truncate transition-opacity active:opacity-70 focus:outline-none text-left"
             onClick={(e) => {
               e.stopPropagation();
               if (leaderTeaser.tournamentId) {
@@ -237,7 +238,7 @@ export function TourHubNavOverlay({
             }}
           >
             {leaderTeaser.tournamentName}
-          </span>
+          </button>
         </p>
       );
     }
