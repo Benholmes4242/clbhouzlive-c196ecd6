@@ -18,6 +18,7 @@ import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWin
 import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
 import { getCourseImage } from '../../utils/placeholders';
 import { getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, UpcomingCountdown, getCurrentRoundLabel } from '../shared/TourHeroHelpers';
+import { getCurrentRound } from '../../utils/formatThruDisplay';
 import { getContextLabel } from '../../utils/tournamentClassification';
 import '@/styles/hero-glass.css';
 
