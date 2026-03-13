@@ -765,7 +765,7 @@ export function CollegeRankingsPreview() {
           }}
         >
           <span className="text-foreground" style={{ fontSize: '13px', fontWeight: 600 }}>
-            View Full Franchise Rankings ›
+            View Full College Franchise Rankings ›
           </span>
         </button>
       </div>
