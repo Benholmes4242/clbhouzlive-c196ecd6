@@ -99,12 +99,6 @@ export interface CourseThisWeek {
   tourSlug: TourId;
 }
 
-export interface LivePulseStats {
-  liveNow: number;
-  activePlayers: number;
-  birdiesToday: number;
-  avgScore: number;
-}
 
 // ============================================================================
 // Helpers
