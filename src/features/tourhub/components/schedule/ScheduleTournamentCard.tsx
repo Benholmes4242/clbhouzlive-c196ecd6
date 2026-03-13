@@ -120,15 +120,22 @@ export function ScheduleTournamentCard({
       whileTap={{ scale: 0.98 }}
       aria-label={ariaLabel}
     >
-      {/* Date block */}
-      <div className="flex-shrink-0 w-12 text-center">
-        <p className="uppercase leading-none text-muted-foreground/70" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em' }}>
-          {getMonthAbbr(startDate)}
-        </p>
-        <p className="leading-none mt-0.5 text-foreground" style={{ fontSize: '20px', fontWeight: 700 }}>
-          {getDayNum(startDate)}
-        </p>
-      </div>
+      {/* Date block — show end date for completed */}
+      {(() => {
+        const displayDate = isFinal
+          ? (isSeasonTournament(tournament) ? tournament.endDate ?? startDate : (tournament as TourTournament).end_date ?? startDate)
+          : startDate;
+        return (
+          <div className="flex-shrink-0 w-12 text-center">
+            <p className="uppercase leading-none text-muted-foreground/70" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em' }}>
+              {getMonthAbbr(displayDate)}
+            </p>
+            <p className="leading-none mt-0.5 text-foreground" style={{ fontSize: '20px', fontWeight: 700 }}>
+              {getDayNum(displayDate)}
+            </p>
+          </div>
+        );
+      })()}
 
       {/* Content */}
       <div className="flex-1 min-w-0">
