@@ -271,10 +271,13 @@ interface HeroSlideProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
   onInteraction: () => void;
+  onCardTouchStart: (e: React.TouchEvent) => void;
+  onCardTouchMove: (e: React.TouchEvent) => void;
+  onCardTouchEnd: (e: React.TouchEvent) => void;
 }
 
 
-function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction }: HeroSlideProps) {
+function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction, onCardTouchStart, onCardTouchMove, onCardTouchEnd }: HeroSlideProps) {
   const { tournament, type } = slide;
   const navigate = useNavigate();
   
@@ -505,9 +508,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
           <motion.div
             layout
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            onTouchStart={isExpanded ? handleExpandedTouch : undefined}
-            onTouchMove={isExpanded ? handleExpandedTouch : undefined}
-            onTouchEnd={isExpanded ? handleExpandedTouch : undefined}
+            onTouchStart={isExpanded ? handleExpandedTouch : onCardTouchStart}
+            onTouchMove={isExpanded ? handleExpandedTouch : onCardTouchMove}
+            onTouchEnd={isExpanded ? handleExpandedTouch : onCardTouchEnd}
             style={{ 
               position: 'absolute',
               bottom: isLive ? 72 : (isExpanded ? 16 : 88),
@@ -1212,6 +1215,9 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
               setIsPaused(true);
               scheduleResume();
             }}
+            onCardTouchStart={handleTouchStart}
+            onCardTouchMove={handleTouchMove}
+            onCardTouchEnd={handleTouchEnd}
           />
         ))}
       </AnimatePresence>
