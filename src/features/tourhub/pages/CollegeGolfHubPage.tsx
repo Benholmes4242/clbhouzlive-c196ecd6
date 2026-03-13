@@ -6,8 +6,11 @@ import { motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import { TourHubShell } from '../components';
 import { CollegeSearch, FranchiseLeaderboard } from '../components/college';
+import { CollegeHeroBanner } from '../components/college/CollegeHeroBanner';
+import { AlumniFaceStrip } from '../components/college/AlumniFaceStrip';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
+import { useHeroAlumni } from '../hooks/useBatchCollegeAlumni';
 
 type MetricTab = 'earnings' | 'wins' | 'cuts' | 'top10s';
 const VALID_METRICS = new Set<string>(['earnings', 'wins', 'cuts', 'top10s']);
@@ -94,18 +97,19 @@ export function CollegeGolfHubPage() {
   }, [allStats, activeMetric]);
 
   const topCollegeMedia = topCollege ? collegeMap?.get(topCollege.normalized_name) ?? null : null;
+  const { data: heroAlumni } = useHeroAlumni(topCollege?.normalized_name);
 
   return (
-    <TourHubShell>
-      <div
-        className="relative min-h-screen bg-background"
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
-        style={{
-          paddingTop: 'max(var(--sat, env(safe-area-inset-top, 0px)), 47px)',
-        }}
-      >
+    <TourHubShell immersive>
+      <div className="relative" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+        {/* Hero banner */}
+        {topCollege && (
+          <CollegeHeroBanner
+            stats={topCollege}
+            college={topCollegeMedia}
+          />
+        )}
+
         {/* Pull-to-refresh indicator */}
         {(pullDistance > 0 || isRefreshing) && (
           <div className="flex justify-center py-2" style={{ height: pullDistance > 0 ? pullDistance * 0.4 : 32 }}>
@@ -125,11 +129,25 @@ export function CollegeGolfHubPage() {
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
           aria-label="Open tour menu"
         >
-          <Menu className="w-[24px] h-[24px] text-foreground" style={{ strokeWidth: 1.5 }} />
+          <Menu
+            className="w-[24px] h-[24px]"
+            strokeWidth={1.5}
+            style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5))' }}
+          />
         </button>
 
+        {/* Alumni face strip */}
+        {heroAlumni && heroAlumni.length > 0 && topCollege && (
+          <AlumniFaceStrip
+            alumni={heroAlumni}
+            collegeName={topCollegeMedia?.short_name || topCollegeMedia?.college_name || topCollege.normalized_name}
+            collegeSlug={topCollege.normalized_name}
+            totalAlumniCount={topCollege.player_count}
+          />
+        )}
+
         {/* ← Tour Overview link */}
-        <div className="px-4" style={{ marginTop: 56 }}>
+        <div className="px-4" style={{ marginTop: 16 }}>
           <Link
             to="/tourhub?tab=overview"
             replace

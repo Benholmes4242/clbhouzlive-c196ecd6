@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Menu, Crown, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
+import { Menu, Crown, RefreshCw, AlertCircle, ChevronLeft, Swords, GitCompare } from 'lucide-react';
 import { openTourNav } from '../contexts/TourNavContext';
 import { motion } from 'framer-motion';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
@@ -11,8 +11,15 @@ import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 
 import { useCollegeStats, useCollegeSeasonStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
+import { useCollegeAlumni } from '../hooks/useCollegeAlumni';
 import { getCollegeGradientCSS } from '../config/collegeBrandColors';
 import { useTourSeason } from '../hooks/useTourHubData';
+import {
+  FranchiseStoryStrip,
+  AlumniDepthChart,
+  CollegeRivalsCarousel,
+  CollegeCompareSheet,
+} from '../components/college';
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -31,9 +38,12 @@ export function CollegeProfilePage() {
   const { data: collegeMap, isLoading: mediaLoading } = useCollegeMediaMap();
   const { data: allSeasonStats } = useCollegeSeasonStats();
   const { data: season } = useTourSeason();
+  const { data: alumni } = useCollegeAlumni(collegeSlug, { limit: 20 });
   const seasonYear = season?.year || new Date().getFullYear();
   
   const [heroImgError, setHeroImgError] = useState(false);
+  const [compareOpen, setCompareOpen] = useState(false);
+  const [compareCollege2, setCompareCollege2] = useState<string | undefined>(undefined);
 
   // Pull-to-refresh state
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -53,6 +63,16 @@ export function CollegeProfilePage() {
     const idx = sorted.findIndex(s => s.normalized_name === collegeSlug);
     return idx >= 0 ? idx + 1 : null;
   })();
+
+  const handleCompareClick = useCallback(() => {
+    setCompareCollege2(undefined);
+    setCompareOpen(true);
+  }, []);
+
+  const handleRivalCompare = useCallback((rivalSlug: string) => {
+    setCompareCollege2(rivalSlug);
+    setCompareOpen(true);
+  }, []);
 
   // Pull-to-refresh handlers
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -273,6 +293,21 @@ export function CollegeProfilePage() {
         </div>
       )}
 
+      {/* Compare button */}
+      {stats && collegeSlug && (
+        <div className="px-4" style={{ marginTop: 12 }}>
+          <button
+            onClick={handleCompareClick}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-border/50 bg-card active:bg-muted/40 transition-colors w-full justify-center"
+          >
+            <GitCompare className="w-4 h-4 text-muted-foreground" />
+            <span className="text-foreground" style={{ fontSize: 14, fontWeight: 600 }}>
+              Compare Programs
+            </span>
+          </button>
+        </div>
+      )}
+
       {/* Back link */}
       <div className="px-4" style={{ marginTop: 12 }}>
         <button
@@ -286,6 +321,27 @@ export function CollegeProfilePage() {
 
       {/* Content sections */}
       <div className="w-full max-w-5xl mx-auto px-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
+        {/* Story Strip */}
+        {stats && (
+          <div style={{ marginTop: 20 }}>
+            <FranchiseStoryStrip stats={stats} />
+          </div>
+        )}
+
+        {/* Rivalries */}
+        {collegeSlug && (
+          <div style={{ marginTop: 24 }}>
+            <CollegeRivalsCarousel normalizedName={collegeSlug} onCompare={handleRivalCompare} />
+          </div>
+        )}
+
+        {/* Alumni Depth Chart */}
+        {alumni && alumni.length > 0 && (
+          <div style={{ marginTop: 24 }}>
+            <AlumniDepthChart alumni={alumni} collegeName={displayName} />
+          </div>
+        )}
+
         {!isLoading && !stats && (
           <div className="text-center py-16">
             <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-destructive/10 flex items-center justify-center">
@@ -313,13 +369,24 @@ export function CollegeProfilePage() {
           </div>
         )}
       </div>
+
+      {/* Compare Sheet */}
+      {collegeSlug && (
+        <CollegeCompareSheet
+          open={compareOpen}
+          onClose={() => setCompareOpen(false)}
+          college1Slug={collegeSlug}
+          college2Slug={compareCollege2}
+          onSelectCollege2={setCompareCollege2}
+        />
+      )}
     </PageRoot>
   );
 }
 
 function formatCurrency(amount: number): string {
   if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;
-  if (amount >= 1_000) return `$${(amount / 1_000).toFixed(0)}K`;
+  if (amount >= 1_000) return `$${(amount / 1_000).toFixed(0)}`;
   return `$${amount.toFixed(0)}`;
 }
 
