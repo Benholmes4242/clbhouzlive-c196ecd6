@@ -34,12 +34,39 @@ import { WifiOff } from 'lucide-react';
 
 export function OverviewPageV3() {
   const { isOnline } = useNetworkStatus();
+  const { hideBottomNav, showBottomNav } = useBottomNavigation();
 
   // Prevent pull-down overscroll bounce on this immersive page
   usePreventOverscroll();
 
   // Set transparent status bar with WHITE icons for dark hero image
   useMedianStatusBar("dark", "transparent", true, false);
+
+  // Hide nav immediately on mount, restore on unmount
+  useEffect(() => {
+    hideBottomNav();
+    return () => { showBottomNav(); };
+  }, [hideBottomNav, showBottomNav]);
+
+  // Show nav when user scrolls past the hero height (100dvh), hide again near top
+  useEffect(() => {
+    const THRESHOLD = window.innerHeight * 0.85;
+    let isNavVisible = false;
+
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      if (scrollY > THRESHOLD && !isNavVisible) {
+        isNavVisible = true;
+        showBottomNav();
+      } else if (scrollY <= THRESHOLD && isNavVisible) {
+        isNavVisible = false;
+        hideBottomNav();
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [hideBottomNav, showBottomNav]);
 
   return (
     <motion.div

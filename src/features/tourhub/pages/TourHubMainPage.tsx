@@ -76,7 +76,7 @@ function TourHubMainPageInner() {
       {/* Navigation Overlay */}
       <TourHubNavOverlay
         isOpen={isNavOpen}
-        onClose={closeNav}
+        onClose={handleCloseNav}
         activeTab={activeTab}
         onNavigate={handleTabChange}
       />
