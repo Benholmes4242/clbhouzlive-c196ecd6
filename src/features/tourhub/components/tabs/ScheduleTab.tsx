@@ -67,14 +67,11 @@ function InViewCard({ children }: { children: React.ReactNode }) {
   );
 }
 
-const SCROLL_KEY = 'schedule-scroll-pos';
-
 export function ScheduleTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   const filter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
   const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
@@ -88,14 +85,6 @@ export function ScheduleTab() {
     });
   }, []);
 
-  // Save scroll position before navigating away
-  useEffect(() => {
-    const saveScroll = () => {
-      sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
-    };
-    window.addEventListener('beforeunload', saveScroll);
-    return () => window.removeEventListener('beforeunload', saveScroll);
-  }, []);
   
   const setFilter = useCallback((f: ScheduleFilterType) => {
     const params = new URLSearchParams(searchParams);
@@ -282,7 +271,7 @@ export function ScheduleTab() {
       );
     }
     // Exclude hero items from list (non-live tabs only)
-    if (filter !== 'live' && filter === 'all' && !search && heroItems.length > 0) {
+    if (filter === 'all' && !search && heroItems.length > 0) {
       const heroIds = new Set(heroItems.map(h => h.tournament.id));
       filtered = filtered.filter(t => !heroIds.has(t.id));
     }
@@ -359,7 +348,6 @@ export function ScheduleTab() {
   return (
     <div
       className="min-h-screen -mx-4"
-      ref={scrollContainerRef}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
