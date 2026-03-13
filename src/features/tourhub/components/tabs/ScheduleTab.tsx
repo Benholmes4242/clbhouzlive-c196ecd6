@@ -348,7 +348,6 @@ export function ScheduleTab() {
   return (
     <div
       className="min-h-screen -mx-4"
-      ref={scrollContainerRef}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}

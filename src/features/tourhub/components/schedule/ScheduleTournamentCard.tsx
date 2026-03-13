@@ -175,7 +175,7 @@ export function ScheduleTournamentCard({
               </span>
             )}
             {hasLeaderData && !isFinal && (
-              <span style={{ color: '#22C55E' }}>
+              <span style={{ color: TOUR_COLORS.liveGreen }}>
                 Leader:{' '}
                 <button
                   onClick={handlePlayerTap}
