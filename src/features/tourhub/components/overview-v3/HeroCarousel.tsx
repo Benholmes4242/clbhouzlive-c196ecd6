@@ -515,9 +515,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               position: 'absolute',
               bottom: (isExpanded && !isLive) ? 16 : 88,
               left: isExpanded ? 12 : 16,
-              ...(isExpanded
+              ...((isExpanded && !isLive)
                 ? { right: 12, top: 'max(env(safe-area-inset-top, 20px) + 120px, 160px)' }
-                : { maxWidth: 'min(350px, calc(100% - 32px))' }
+                : isLive
+                  ? { right: 12, maxHeight: 'calc(100% - 88px - max(env(safe-area-inset-top, 20px) + 120px, 160px))' }
+                  : { maxWidth: 'min(350px, calc(100% - 32px))' }
               ),
               minWidth: isExpanded ? undefined : '280px',
               borderRadius: isExpanded ? 16 : 12,
