@@ -15,6 +15,15 @@ function TourHubMainPageInner() {
   const tabParam = searchParams.get('tab') as TourHubTab | null;
   const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
   const { isNavOpen, closeNav } = useTourNav();
+  const { hideBottomNav } = useBottomNavigation();
+
+  const handleCloseNav = () => {
+    closeNav();
+    // Re-hide nav if user hasn't scrolled past hero yet
+    if (window.scrollY < window.innerHeight * 0.85) {
+      hideBottomNav();
+    }
+  };
   
   // Subscribe to tournament status changes (live/completed transitions)
   useTournamentStatusRealtime();
