@@ -104,8 +104,8 @@ export function ScheduleHeroCarousel({ items, leadersMap }: ScheduleHeroCarousel
   return (
     <div className="relative">
       <button
-        className="absolute z-20 flex items-center justify-center"
-        style={{ top: '56px', left: '16px', width: '44px', height: '44px' }}
+        className="fixed z-20 flex items-center justify-center"
+        style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)', left: '16px', width: '44px', height: '44px' }}
         onClick={openTourNav}
         aria-label="Open tour menu"
       >
