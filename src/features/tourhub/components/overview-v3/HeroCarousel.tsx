@@ -1213,6 +1213,39 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
           />
         ))}
       </AnimatePresence>
+
+      {/* Scroll indicator — only when not expanded */}
+      {!isExpanded && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.2, duration: 0.4 }}
+          style={{
+            position: 'absolute',
+            bottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 16px)',
+            left: 0,
+            right: 0,
+            display: 'flex',
+            justifyContent: 'center',
+            pointerEvents: 'none',
+            zIndex: 5,
+          }}
+        >
+          <motion.div
+            animate={{ y: [0, 5, 0] }}
+            transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut', repeatDelay: 0.6 }}
+          >
+            <ChevronDown
+              style={{ 
+                width: 22, 
+                height: 22, 
+                color: 'rgba(255,255,255,0.45)',
+                filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))',
+              }}
+            />
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 }
