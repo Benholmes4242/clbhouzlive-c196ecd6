@@ -494,7 +494,7 @@ export function ScheduleTab() {
             variant="no-live" 
             nextTournamentName={nextUpcoming?.name}
             nextTournamentDate={nextUpcoming?.start_date}
-            onSwitchFilter={setFilter}
+            onSwitchFilter={heroItems.length === 0 ? setFilter : undefined}
           />
         )}
         
