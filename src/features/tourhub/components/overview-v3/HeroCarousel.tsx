@@ -33,7 +33,7 @@ import { PlayerScorecardCard } from '@/components/tourhub/PlayerScorecardCard';
 
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
 import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, WinnerStatsPanel, UpcomingCountdown, getCurrentRoundLabel as sharedGetCurrentRoundLabel } from '../shared/TourHeroHelpers';
@@ -148,8 +148,6 @@ interface LeaderboardRowProps {
 function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreFlash, positionDelta = 0, tournamentTourSlug }: LeaderboardRowProps) {
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
   const effectiveTourCode = leader.player.tourCode ?? tournamentTourSlug ?? 'pga';
-  const photoUrl = getPlayerHeadshotUrl(leader.player.fullName, effectiveTourCode, leader.player.headshotOverride);
-  const initials = `${leader.player.firstName[0]}${leader.player.lastName[0]}`.toUpperCase();
   const thruDisplay = formatThruDisplay(leader.thru, leader.round_1, leader.round_2, leader.round_3, leader.round_4, leader.status, leader.thruUpdatedAt, leader.tournamentTimezone);
   
   return (
@@ -167,20 +165,15 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
           {leader.position}
         </span>
         <div className="flex items-center gap-2 min-w-0">
-          <div
-            className="overflow-hidden flex-shrink-0"
-            style={{ width: '32px', height: '33px', borderRadius: '34%', border: '1.5px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.08)' }}
-          >
-            {photoUrl ? (
-              <img
-                src={photoUrl}
-                alt={abbreviatedName}
-                className="w-full h-full object-cover object-top"
-                onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-white/60 text-[10px] font-semibold" style={{ background: 'rgba(255,255,255,0.08)' }}>{initials}</div>
-            )}
+          <div className="flex-shrink-0">
+            <PlayerAvatar
+              displayName={abbreviatedName}
+              fullName={leader.player.fullName}
+              headshotOverride={leader.player.headshotOverride}
+              tourCode={effectiveTourCode}
+              size={32}
+              frosted
+            />
           </div>
           <span className={cn("leaderboard-name truncate", isFirst && "font-bold")}>
             {abbreviatedName}
@@ -225,28 +218,25 @@ function CondensedTieRow({ row, index, isActive, tournamentTourSlug }: { row: Li
         <div className="flex items-center flex-shrink-0">
           {row.players.slice(0, 4).map((player, i) => {
             const effectiveTourCode = player.player.tourCode ?? tournamentTourSlug ?? 'pga';
-            const photoUrl = getPlayerHeadshotUrl(player.player.fullName, effectiveTourCode, player.player.headshotOverride);
-            const initials = `${player.player.firstName[0]}${player.player.lastName[0]}`.toUpperCase();
+            const displayName = `${player.player.firstName[0]}. ${player.player.lastName}`;
             return (
               <div
                 key={player.player.id}
-                className="overflow-hidden flex-shrink-0"
+                className="flex-shrink-0"
                 style={{
-                  width: 28,
-                  height: 29,
-                  borderRadius: '34%',
-                  border: '1.5px solid rgba(255,255,255,0.15)',
-                  background: 'rgba(255,255,255,0.08)',
                   marginLeft: i > 0 ? -8 : 0,
                   zIndex: 4 - i,
                   position: 'relative',
                 }}
               >
-                {photoUrl ? (
-                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
-                ) : (
-                  <div style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>{initials}</div>
-                )}
+                <PlayerAvatar
+                  displayName={displayName}
+                  fullName={player.player.fullName}
+                  headshotOverride={player.player.headshotOverride}
+                  tourCode={effectiveTourCode}
+                  size={28}
+                  frosted
+                />
               </div>
             );
           })}
