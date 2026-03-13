@@ -153,13 +153,6 @@ export function WhatsComing() {
   const navigate = useNavigate();
   const { data: tournaments, isLoading, error, refetch } = useUpcomingTournaments(6);
 
-  const upcoming = useMemo(() => {
-    if (!tournaments) return [];
-    return tournaments.filter(
-      (t) => t.status === 'scheduled' || t.status === 'created'
-    );
-  }, [tournaments]);
-
   if (isLoading) {
     return (
       <section aria-label="Upcoming tournaments">
