@@ -169,7 +169,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
         <div className="flex items-center gap-2 min-w-0">
           <div
             className="overflow-hidden flex-shrink-0"
-            style={{ width: '32px', height: '33px', borderRadius: '34%', border: '1.5px solid #F8FAFC', background: '#F8FAFC' }}
+            style={{ width: '32px', height: '33px', borderRadius: '34%', border: '1.5px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.08)' }}
           >
             {photoUrl ? (
               <img
