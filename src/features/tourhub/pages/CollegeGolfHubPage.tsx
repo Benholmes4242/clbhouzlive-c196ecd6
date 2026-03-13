@@ -5,7 +5,7 @@ import { openTourNav } from '../contexts/TourNavContext';
 import { motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import { TourHubShell } from '../components';
-import { CollegeSearch, CollegeHeroBanner, FranchiseLeaderboard } from '../components/college';
+import { CollegeSearch, FranchiseLeaderboard } from '../components/college';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 
@@ -143,11 +143,6 @@ export function CollegeGolfHubPage() {
 
         {/* Content area */}
         <div className="px-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
-          {/* Hero Banner */}
-          <div style={{ marginTop: 16 }}>
-            <CollegeHeroBanner />
-          </div>
-
           {/* Search */}
           <div style={{ marginTop: 16 }}>
             <CollegeSearch />

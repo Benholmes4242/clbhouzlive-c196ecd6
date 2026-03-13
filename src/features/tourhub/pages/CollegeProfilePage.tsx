@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Menu, Crown, RefreshCw, AlertCircle, ChevronLeft, TrendingUp, Trophy } from 'lucide-react';
+import { Menu, Crown, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
 import { openTourNav } from '../contexts/TourNavContext';
 import { motion } from 'framer-motion';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
@@ -10,13 +10,9 @@ import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 
 import { useCollegeStats, useCollegeSeasonStats } from '../hooks/useCollegeStats';
-import { useCollegeAlumni, type CollegeAlumnus } from '../hooks/useCollegeAlumni';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
-import { useCollegeHeadToHead } from '../hooks/useCollegeStatus';
 import { getCollegeGradientCSS } from '../config/collegeBrandColors';
 import { useTourSeason } from '../hooks/useTourHubData';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
-import { useCollegeRivals } from '../hooks/useCollegeRivals';
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -35,10 +31,6 @@ export function CollegeProfilePage() {
   const { data: collegeMap, isLoading: mediaLoading } = useCollegeMediaMap();
   const { data: allSeasonStats } = useCollegeSeasonStats();
   const { data: season } = useTourSeason();
-  const { data: alumni, isLoading: alumniLoading } = useCollegeAlumni(collegeSlug, { limit: 30 });
-  const { data: rivals } = useCollegeRivals(collegeSlug);
-  const topRival = rivals?.[0];
-  const h2h = useCollegeHeadToHead(collegeSlug, topRival?.normalized_name);
   const seasonYear = season?.year || new Date().getFullYear();
   
   const [heroImgError, setHeroImgError] = useState(false);
@@ -320,125 +312,6 @@ export function CollegeProfilePage() {
             </Link>
           </div>
         )}
-
-        {/* Alumni Roster */}
-        {stats && (
-          <motion.section
-            style={{ marginTop: 20 }}
-            variants={sectionVariants}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.5, duration: 0.3 }}
-          >
-            <h2 className="text-foreground" style={{ fontSize: 18, fontWeight: 700, marginBottom: 14 }}>
-              PGA Tour Alumni
-            </h2>
-
-            {alumniLoading ? (
-              <div className="flex flex-col" style={{ gap: 8 }}>
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="bg-card border border-border/30 animate-pulse" style={{ height: 64, borderRadius: 14 }} />
-                ))}
-              </div>
-            ) : alumni && alumni.length > 0 ? (
-              <div className="flex flex-col" style={{ gap: 6 }}>
-                {alumni.map((player, idx) => (
-                  <AlumniRow key={player.id} player={player} rank={idx + 1} />
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground py-8 text-center">
-                No alumni data available for this season.
-              </p>
-            )}
-          </motion.section>
-        )}
-
-        {/* Head-to-Head Rivalry */}
-        {topRival && h2h && stats && (
-          <motion.section
-            style={{ marginTop: 28 }}
-            variants={sectionVariants}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.55, duration: 0.3 }}
-          >
-            <h2 className="text-foreground" style={{ fontSize: 18, fontWeight: 700, marginBottom: 14 }}>
-              Head to Head
-            </h2>
-            <Link
-              to={`/tourhub/college-golf/compare?c1=${collegeSlug}&c2=${topRival.normalized_name}`}
-              className="block bg-card border border-border/30 rounded-2xl active:scale-[0.98] transition-transform"
-              style={{ padding: '16px' }}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  {getCollegeLogoUrl(college?.college_name || collegeSlug) && (
-                    <img src={getCollegeLogoUrl(college?.college_name || collegeSlug)!} alt="" className="object-contain" style={{ width: 28, height: 28 }} />
-                  )}
-                  <span className="text-foreground font-bold" style={{ fontSize: 14 }}>{displayName}</span>
-                </div>
-                <span className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">vs</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-foreground font-bold" style={{ fontSize: 14 }}>{topRival.media?.short_name || topRival.media?.college_name || topRival.normalized_name}</span>
-                  {getCollegeLogoUrl(topRival.media?.college_name || topRival.normalized_name) && (
-                    <img src={getCollegeLogoUrl(topRival.media?.college_name || topRival.normalized_name)!} alt="" className="object-contain" style={{ width: 28, height: 28 }} />
-                  )}
-                </div>
-              </div>
-              {/* Score */}
-              <div className="flex items-center justify-center gap-4">
-                <span className="font-bold" style={{ fontSize: 24, fontVariantNumeric: 'tabular-nums', color: h2h.winner === 'A' ? 'rgba(245,158,11,0.9)' : 'hsl(var(--foreground))' }}>
-                  {h2h.winsA}
-                </span>
-                <span className="text-muted-foreground text-xs font-semibold">categories</span>
-                <span className="font-bold" style={{ fontSize: 24, fontVariantNumeric: 'tabular-nums', color: h2h.winner === 'B' ? 'rgba(245,158,11,0.9)' : 'hsl(var(--foreground))' }}>
-                  {h2h.winsB}
-                </span>
-              </div>
-              <p className="text-center text-muted-foreground mt-2" style={{ fontSize: 11 }}>
-                Tap for full comparison →
-              </p>
-            </Link>
-
-            {/* Other rivals */}
-            {rivals && rivals.length > 1 && (
-              <div className="flex flex-wrap gap-2 mt-3">
-                {rivals.slice(1).map((r) => (
-                  <Link
-                    key={r.normalized_name}
-                    to={`/tourhub/college-golf/compare?c1=${collegeSlug}&c2=${r.normalized_name}`}
-                    className="text-[12px] font-medium text-muted-foreground bg-card border border-border/30 rounded-full px-3 py-1.5 active:scale-95 transition-transform"
-                  >
-                    vs {r.media?.short_name || r.normalized_name}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </motion.section>
-        )}
-
-        {stats && (
-          <motion.section
-            style={{ marginTop: 28 }}
-            variants={sectionVariants}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.6, duration: 0.3 }}
-          >
-            <h2 className="text-foreground" style={{ fontSize: 18, fontWeight: 700, marginBottom: 14 }}>
-              Season Performance
-            </h2>
-            <div className="grid grid-cols-2" style={{ gap: 8 }}>
-              <StatTile label="Total Earnings" value={formatCurrency(stats.earnings_total)} />
-              <StatTile label="Wins" value={String(stats.wins_total)} highlight={stats.wins_total > 0} />
-              <StatTile label="Top 10s" value={String(stats.top10_total)} />
-              <StatTile label="Cuts Made" value={String(stats.cuts_total)} />
-              <StatTile label="Top 25s" value={String(stats.top25_total)} />
-              <StatTile label="Events Played" value={String(stats.events_total)} />
-            </div>
-          </motion.section>
-        )}
       </div>
     </PageRoot>
   );
@@ -468,91 +341,6 @@ function GlassStatCell({ label, value, highlight = false }: { label: string; val
         color: highlight ? 'rgba(245, 158, 11, 0.9)' : undefined,
         marginTop: 2,
       }}>
-        {value}
-      </span>
-    </div>
-  );
-}
-
-function AlumniRow({ player, rank }: { player: CollegeAlumnus; rank: number }) {
-  const tourCode = player.tour_codes?.[0] || 'pga';
-  const headshotUrl = getPlayerHeadshotUrl(
-    `${player.first_name} ${player.last_name}`,
-    tourCode
-  );
-
-  return (
-    <Link
-      to={`/tourhub/player/${player.id}`}
-      className="flex items-center gap-3 bg-card border border-border/30 active:scale-[0.98] transition-transform"
-      style={{ borderRadius: 14, padding: '10px 14px' }}
-    >
-      {/* Rank */}
-      <span
-        className="text-muted-foreground flex-shrink-0"
-        style={{ fontSize: 12, fontWeight: 600, width: 20, textAlign: 'center', fontVariantNumeric: 'tabular-nums' }}
-      >
-        {rank}
-      </span>
-
-      {/* Headshot */}
-      <img
-        src={headshotUrl}
-        alt={`${player.first_name} ${player.last_name}`}
-        className="rounded-full object-cover flex-shrink-0 bg-muted"
-        style={{ width: 38, height: 38 }}
-        onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-      />
-
-      {/* Name + country */}
-      <div className="flex-1 min-w-0">
-        <p className="text-foreground truncate" style={{ fontSize: 14, fontWeight: 600 }}>
-          {player.first_name} {player.last_name}
-        </p>
-        <div className="flex items-center gap-2">
-          {player.world_ranking && (
-            <span className="text-muted-foreground" style={{ fontSize: 12, fontWeight: 500 }}>
-              #{player.world_ranking}
-            </span>
-          )}
-          {player.country && (
-            <span className="text-muted-foreground/60" style={{ fontSize: 12 }}>
-              {player.country}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Earnings */}
-      <span
-        className="text-foreground flex-shrink-0"
-        style={{ fontSize: 13, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}
-      >
-        {formatCurrency(player.earnings || 0)}
-      </span>
-    </Link>
-  );
-}
-
-function StatTile({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
-  return (
-    <div
-      className="bg-card border border-border/30 flex flex-col items-center justify-center"
-      style={{ borderRadius: 14, padding: '14px 8px' }}
-    >
-      <span className="text-muted-foreground" style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
-        {label}
-      </span>
-      <span
-        className="text-foreground"
-        style={{
-          fontSize: 20,
-          fontWeight: 700,
-          fontVariantNumeric: 'tabular-nums',
-          marginTop: 4,
-          color: highlight ? 'rgba(245, 158, 11, 0.9)' : undefined,
-        }}
-      >
         {value}
       </span>
     </div>
