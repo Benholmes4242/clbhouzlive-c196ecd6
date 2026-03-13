@@ -454,7 +454,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
       />
 
       {/* Backdrop overlay when expanded — tap to collapse */}
-      {isExpanded && (
+      {isExpanded && !isLive && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
