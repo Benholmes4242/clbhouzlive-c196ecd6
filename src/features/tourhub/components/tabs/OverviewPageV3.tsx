@@ -48,13 +48,24 @@ export function OverviewPageV3() {
     return () => { showBottomNav(); };
   }, [hideBottomNav, showBottomNav]);
 
-  // Show nav when user scrolls past the hero height (100dvh), hide again near top
+  // Show nav when user scrolls past the hero threshold, hide again near top
   useEffect(() => {
-    const THRESHOLD = window.innerHeight * 0.85;
+    const THRESHOLD = window.innerHeight * 0.8;
     let isNavVisible = false;
+    const appShell = document.querySelector('.app-shell') as HTMLElement | null;
+
+    const getScrollY = () => {
+      return Math.max(
+        window.scrollY || 0,
+        window.pageYOffset || 0,
+        document.documentElement.scrollTop || 0,
+        document.body.scrollTop || 0,
+        appShell?.scrollTop || 0
+      );
+    };
 
     const handleScroll = () => {
-      const scrollY = window.scrollY;
+      const scrollY = getScrollY();
       if (scrollY > THRESHOLD && !isNavVisible) {
         isNavVisible = true;
         showBottomNav();
@@ -65,7 +76,15 @@ export function OverviewPageV3() {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    appShell?.addEventListener('scroll', handleScroll, { passive: true });
+
+    // Sync immediately in case page is restored at a scrolled position
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      appShell?.removeEventListener('scroll', handleScroll);
+    };
   }, [hideBottomNav, showBottomNav]);
 
   return (
