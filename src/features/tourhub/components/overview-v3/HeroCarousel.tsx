@@ -1081,6 +1081,8 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     }
   }, [slides.length, currentIndex]);
 
+  const isCurrentSlideLive = slides[currentIndex]?.type === 'live';
+
   // Auto-collapse if slide index changes
   const prevIndexRef = React.useRef(currentIndex);
   useEffect(() => {
