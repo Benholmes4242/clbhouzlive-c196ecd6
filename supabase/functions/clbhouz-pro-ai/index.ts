@@ -14,10 +14,10 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-const OPENAI_MODEL = "gpt-4o-mini";
-const PERPLEXITY_MODEL = "sonar";
-const ANTHROPIC_MODEL = "claude-sonnet-4-20250514";
-const GEMINI_MODEL = "gemini-1.5-pro";
+const OPENAI_MODEL = "gpt-4o";
+const PERPLEXITY_MODEL = "llama-3.1-sonar-large-128k-online";
+const ANTHROPIC_MODEL = "claude-sonnet-4-5";
+const GEMINI_MODEL = "gemini-1.5-pro-latest";
 const DEFAULT_TIMEZONE = "Europe/London";
 
 // Rate limiting config
