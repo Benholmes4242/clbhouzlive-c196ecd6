@@ -14,6 +14,7 @@ import type { TourTournament } from '../../hooks/useTourHubData';
 import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { getContextLabel } from '../../utils/tournamentClassification';
+import { TOUR_COLORS } from '../../constants/colors';
 
 interface ScheduleTournamentCardProps {
   tournament: TourTournament | SeasonTournament;
@@ -39,7 +40,7 @@ function getDayNum(dateStr: string): string {
 
 function getScoreColor(score: number | null): string {
   if (score === null || score === undefined) return 'hsl(var(--muted-foreground))';
-  if (score < 0) return '#22C55E';
+  if (score < 0) return TOUR_COLORS.movementUp;
   if (score > 0) return '#EF4444';
   return 'hsl(var(--muted-foreground))';
 }
@@ -79,7 +80,7 @@ export function ScheduleTournamentCard({
     : hasLeaderWinnerData ? leaderWinner!.displayName : null;
 
   const winnerScore = hasSeasonWinner 
-    ? (tournament as any).winnerScore 
+    ? tournament.winner_score 
     : hasLeaderWinnerData ? leaderWinner?.score : null;
 
   const handlePlayerTap = (e: React.MouseEvent) => {
@@ -109,9 +110,9 @@ export function ScheduleTournamentCard({
       style={{
         borderLeftWidth: (isLive || isMajor || isSignature || isRolex) ? '3px' : undefined,
         borderLeftColor: isLive
-          ? '#22C55E'
+          ? TOUR_COLORS.liveGreen
           : isMajor
-          ? '#f59e0b'
+          ? TOUR_COLORS.liveAmber
           : (isSignature || isRolex)
           ? 'rgba(16, 185, 129, 0.8)'
           : undefined,
@@ -139,7 +140,7 @@ export function ScheduleTournamentCard({
               fontSize: '10px',
               fontWeight: 600,
               letterSpacing: '0.05em',
-              color: isMajor ? '#f59e0b' : (isSignature || isRolex) ? 'rgba(16, 185, 129, 0.9)' : isLive ? '#22C55E' : 'hsl(var(--muted-foreground) / 0.7)',
+              color: isMajor ? TOUR_COLORS.liveAmber : (isSignature || isRolex) ? 'rgba(16, 185, 129, 0.9)' : isLive ? TOUR_COLORS.liveGreen : 'hsl(var(--muted-foreground) / 0.7)',
             }}
           >
             {isLive ? '● LIVE' : contextLabel}
@@ -159,7 +160,7 @@ export function ScheduleTournamentCard({
           <p className="flex items-center gap-1 mt-0.5" style={{ fontSize: '13px', fontWeight: 500 }}>
             {isFinal && winnerDisplay && (
               <span className="text-muted-foreground">
-                <Trophy className="w-3.5 h-3.5 inline mr-0.5" style={{ color: '#f59e0b' }} />
+                <Trophy className="w-3.5 h-3.5 inline mr-0.5" style={{ color: TOUR_COLORS.liveAmber }} />
                 <button
                   onClick={handlePlayerTap}
                   className="transition-opacity active:opacity-70 inline font-semibold"
@@ -167,14 +168,14 @@ export function ScheduleTournamentCard({
                   {winnerDisplay}
                 </button>
                 {winnerScore !== null && winnerScore !== undefined && (
-                  <span className="font-semibold ml-1" style={{ color: '#f59e0b' }}>
-                    ({hasSeasonWinner ? (tournament as any).winnerScore : leaderWinner!.displayScore})
+                  <span className="font-semibold ml-1" style={{ color: TOUR_COLORS.liveAmber }}>
+                    ({hasSeasonWinner ? tournament.winner_score : leaderWinner?.displayScore ?? ''})
                   </span>
                 )}
               </span>
             )}
             {hasLeaderData && !isFinal && (
-              <span style={{ color: '#22C55E' }}>
+              <span style={{ color: TOUR_COLORS.liveGreen }}>
                 Leader:{' '}
                 <button
                   onClick={handlePlayerTap}

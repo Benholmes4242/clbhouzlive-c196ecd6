@@ -818,59 +818,7 @@ export function useCoursesThisWeek() {
   });
 }
 
-// ============================================================================
-// MODULE 7: Live Golf Pulse
-// ============================================================================
-
-export function useLiveGolfPulse() {
-  return useQuery({
-    queryKey: ['overview-live-pulse'],
-    queryFn: async () => {
-      // Parallel queries
-      const [liveRes, activePlayersRes] = await Promise.all([
-        supabase
-          .from('sr_tournaments')
-          .select('id', { count: 'exact', head: true })
-          .eq('status', 'inprogress'),
-        supabase
-          .from('sr_leaderboards')
-          .select('id', { count: 'exact', head: true })
-          .in('status', ['active', 'cut']),
-      ]);
-
-      // Get all leaderboard data for live tournaments to calculate stats
-      const { data: liveLeaderboards } = await supabase
-        .from('sr_leaderboards')
-        .select(`
-          score,
-          tournament:sr_tournaments!inner(status)
-        `)
-        .eq('sr_tournaments.status', 'inprogress');
-
-      // Calculate average score
-      const scores = (liveLeaderboards || [])
-        .map((l: any) => l.score)
-        .filter((s: number | null) => s !== null && !isNaN(s));
-      
-      const avgScore = scores.length > 0 
-        ? scores.reduce((a: number, b: number) => a + b, 0) / scores.length 
-        : 0;
-
-      // Estimate birdies (scores under par indicate birdies made)
-      const birdiesToday = scores.filter((s: number) => s < 0).length * 3; // Rough estimate
-
-      return {
-        liveNow: liveRes.count || 0,
-        activePlayers: activePlayersRes.count || 0,
-        birdiesToday,
-        avgScore: Math.round(avgScore * 10) / 10,
-      } as LivePulseStats;
-    },
-    staleTime: 5 * 1000,          // 5s — Realtime handles freshness
-    refetchInterval: false,        // No polling — Realtime pushes updates
-    refetchOnWindowFocus: true,
-  });
-}
+// MODULE 7: Live Golf Pulse — REMOVED (Brief 36, dead consumer deleted)
 
 // ============================================================================
 // MODULE 8: World Rankings Full (Top 200 for browsing)
