@@ -17,7 +17,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
 import { TourHubEmptyState } from '../TourHubEmptyState';
-import { format, isAfter } from 'date-fns';
+import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { getContextLabel } from '../../utils/tournamentClassification';
 import { motion, AnimatePresence } from 'framer-motion';
