@@ -284,14 +284,14 @@ export function PodiumRunnerRow({
               width: 22,
               height: 22,
               borderRadius: '34%',
-              background: '#F8FAFC',
-              border: '1.5px solid #F8FAFC',
+              background: 'rgba(255,255,255,0.12)',
+              border: '1.5px solid rgba(255,255,255,0.18)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: 9,
               fontWeight: 600,
-              color: '#64748B',
+              color: 'rgba(255,255,255,0.70)',
               flexShrink: 0,
             }}>
               +{moreCount}

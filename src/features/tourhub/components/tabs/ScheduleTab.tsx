@@ -98,6 +98,15 @@ export function ScheduleTab() {
       window.scrollTo(0, 0);
     });
   }, []);
+
+  // Default to upcoming tab on fresh mount (no filter param in URL)
+  useEffect(() => {
+    if (!searchParams.get('filter')) {
+      const params = new URLSearchParams(searchParams);
+      params.set('filter', 'upcoming');
+      setSearchParams(params, { replace: true });
+    }
+  }, []); // runs once on mount only
   
   const setFilter = useCallback((f: ScheduleFilterType) => {
     const params = new URLSearchParams(searchParams);
