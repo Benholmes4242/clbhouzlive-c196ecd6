@@ -80,9 +80,8 @@ export function ScheduleTournamentCard({
     ? `${winnerFirstName?.charAt(0)}. ${winnerLastName}`
     : hasLeaderWinnerData ? leaderWinner!.displayName : null;
 
-  const winnerScore = hasSeasonWinner 
-    ? (tournament as TourTournament).winner_score 
-    : hasLeaderWinnerData ? leaderWinner?.score : null;
+  const winnerScore = leaderWinner?.score ?? null;
+  const winnerDisplayScore = leaderWinner?.displayScore ?? null;
 
   const handlePlayerTap = (e: React.MouseEvent) => {
     e.stopPropagation();
