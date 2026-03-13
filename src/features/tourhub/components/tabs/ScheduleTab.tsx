@@ -106,7 +106,7 @@ export function ScheduleTab() {
   const queryClient = useQueryClient();
   const { data: season } = useTourSeason();
   const { data: tournaments, isLoading, error, refetch } = useTourTournaments(season?.id, {
-    refetchInterval: filter === 'live' ? 30000 : false,
+    refetchInterval: filter === 'live' ? 30000 : filter === 'upcoming' ? 60000 : false,
   });
 
   // Pull-to-refresh state
