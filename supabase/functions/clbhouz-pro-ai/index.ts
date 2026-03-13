@@ -809,7 +809,10 @@ async function callPerplexity(query: string, nowIso: string, history: Array<{ ro
     headers: { Authorization: `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({ model: PERPLEXITY_MODEL, messages, temperature: 0.2 }),
   }), 20000);
-  if (!resp.ok) throw new Error(`Perplexity error: ${await resp.text()}`);
+  if (!resp.ok) {
+    console.error(`[Echo] Provider failure — Perplexity (non-stream) | model: ${PERPLEXITY_MODEL} | status: ${resp.status}`);
+    throw new Error(`Perplexity error: ${await resp.text()}`);
+  }
   const data = await resp.json();
   let content = data.choices?.[0]?.message?.content?.trim() || "";
   content = content.replace(/\[\d+\]/g, '');
