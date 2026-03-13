@@ -6,9 +6,9 @@
  */
 
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronRight, Trophy } from 'lucide-react';
+import { ChevronRight, Trophy, GraduationCap } from 'lucide-react';
 import { SectionErrorState } from '../SectionErrorState';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap, type CollegeMedia } from '../../hooks/useCollegeMedia';
@@ -54,7 +54,10 @@ const LEADER_CATEGORIES: LeaderCategory[] = [
   { key: 'avg_putting', title: 'Average Putts', sort: 'asc', format: (v) => `${Number(v).toFixed(2)}` },
   { key: 'avg_scrambling', title: 'Best Scramblers', sort: 'desc', format: (v) => `${Math.round(Number(v))}%` },
   { key: 'avg_sand_saves', title: 'Sand Saves', sort: 'desc', format: (v) => `${Math.round(Number(v))}%` },
-  { key: 'avg_sg_total', title: 'Strokes Gained', sort: 'desc', format: (v) => `+${Number(v).toFixed(2)}` },
+  { key: 'avg_sg_total', title: 'Strokes Gained', sort: 'desc', format: (v) => {
+    const n = Number(v);
+    return (n >= 0 ? '+' : '') + n.toFixed(2);
+  }},
   { key: 'avg_scoring', title: 'Lowest Avg Scoring', sort: 'asc', format: (v) => `${Number(v).toFixed(1)}` },
 ];
 
@@ -131,16 +134,18 @@ function PodiumCard({
   const navigate = useNavigate();
   const isFirst = rank === 1;
   const displayName = media?.short_name || media?.college_name || stats.normalized_name;
-  const captainPhotoUrl = captain ? getPlayerHeadshotUrl(captain.fullName, captain.tourCode) : null;
+  const captainPhotoUrl = captain
+    ? getPlayerHeadshotUrl(captain.fullName, captain.tourCode ?? 'pga')
+    : null;
   const logoUrl = getCollegeLogoUrl(media?.college_name || stats.normalized_name);
 
   return (
     <button
-      onClick={() => navigate('/tourhub/college-golf?sort=earnings')}
+      onClick={() => navigate(`/tourhub/college-golf/${stats.normalized_name}`)}
       className="flex flex-col text-left overflow-hidden active:scale-[0.97] transition-transform"
       style={{
         flex: isFirst ? '1 1 45%' : '1 1 27.5%',
-        background: getCollegePodiumTint(stats.normalized_name),
+        background: getCollegePodiumTint(stats.normalized_name) || 'hsl(var(--card))',
         border: '1px solid hsl(var(--border) / 0.5)',
         borderRadius: '16px',
         minHeight: isFirst ? '240px' : '200px',
@@ -315,7 +320,7 @@ function LeaderboardRows({
         return (
           <button
             key={stats.id}
-            onClick={() => navigate('/tourhub/college-golf?sort=earnings')}
+            onClick={() => navigate(`/tourhub/college-golf/${stats.normalized_name}`)}
             className="w-full flex items-center bg-transparent active:bg-black/[0.02] transition-colors"
             style={{
               padding: '14px 16px',
@@ -391,7 +396,6 @@ function useFranchiseLeaders(
 }
 
 function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
-  const navigate = useNavigate();
   if (!leaders.length) return null;
 
   return (
@@ -408,7 +412,7 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
 
       {/* Scroll container */}
       <div
-        className="flex overflow-x-auto"
+        className="flex overflow-x-auto scrollbar-hide"
         role="list"
         aria-label="Franchise statistical leaders by category"
         style={{
@@ -416,8 +420,6 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
           paddingLeft: '16px',
           paddingRight: '16px',
           WebkitOverflowScrolling: 'touch',
-          msOverflowStyle: 'none',
-          scrollbarWidth: 'none',
           scrollSnapType: 'x mandatory',
         }}
       >
@@ -425,12 +427,11 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
           const logoUrl = getCollegeLogoUrl(leader.media?.college_name || leader.college.normalized_name);
 
           return (
-            <button
+            <Link
               key={leader.title}
-              type="button"
+              to={`/tourhub/college-golf/${leader.college.normalized_name}`}
               role="listitem"
-              onClick={() => navigate('/tourhub/college-golf')}
-              className="flex-shrink-0 flex flex-col items-center text-center active:scale-[0.97] transition-transform"
+              className="flex-shrink-0 flex flex-col items-center text-center no-underline active:scale-[0.97] transition-transform"
               style={{
                 width: '160px',
                 minHeight: '140px',
@@ -438,7 +439,6 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
                 border: '1px solid hsl(var(--border) / 0.5)',
                 borderRadius: '16px',
                 padding: '14px',
-                cursor: 'pointer',
               }}
               aria-label={`${leader.title} leader: ${leader.media?.short_name || leader.college.normalized_name}`}
             >
@@ -481,7 +481,7 @@ function FranchiseLeadersCarousel({ leaders }: { leaders: FranchiseLeader[] }) {
               <span style={{ fontSize: '11px', fontWeight: 500, color: 'hsl(var(--muted-foreground) / 0.6)' }}>
                 {leader.alumni} on tour
               </span>
-            </button>
+            </Link>
           );
         })}
       </div>
@@ -497,10 +497,10 @@ function PickFranchiseCTA({ onOpen }: { onOpen: () => void }) {
   const { data: profile } = useUserProfile(user?.id);
   const { data: followed } = useFollowedColleges(user?.id);
 
-  const hasCollege = !!(profile as any)?.college_normalized;
   const hasFollowed = (followed?.length ?? 0) > 0;
 
-  if (!user || hasCollege || hasFollowed) return null;
+  // FIX 9: Only suppress if user already follows a franchise (not if they attended a college)
+  if (!user || hasFollowed) return null;
 
   return (
     <button
@@ -508,13 +508,13 @@ function PickFranchiseCTA({ onOpen }: { onOpen: () => void }) {
       className="w-full flex items-center text-left active:scale-[0.97] transition-transform"
       style={{
         background: 'hsl(var(--card))',
-        border: '1px dashed hsl(var(--border) / 0.5)',
+        border: '1px solid hsl(var(--border) / 0.5)',
         borderRadius: '16px',
         padding: '16px',
         gap: '12px',
       }}
     >
-      <span style={{ fontSize: '20px' }} aria-hidden="true">🏛</span>
+      <GraduationCap size={20} className="text-muted-foreground flex-shrink-0" />
       <div className="flex-1 min-w-0">
         <p className="m-0 text-foreground" style={{ fontSize: '14px', fontWeight: 600 }}>
           Pick your franchise
@@ -666,6 +666,21 @@ export function CollegeRankingsPreview() {
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       >
         <div>
+          {/* FIX 1: Trophy eyebrow matching other overview sections */}
+          <div className="flex items-center gap-1.5 mb-1">
+            <Trophy size={12} style={{ color: FRANCHISE_AMBER }} />
+            <span
+              style={{
+                fontSize: '11px',
+                fontWeight: 600,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase' as const,
+                color: FRANCHISE_AMBER,
+              }}
+            >
+              2026 Season
+            </span>
+          </div>
           <h2
             className="m-0 text-foreground"
             style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}
