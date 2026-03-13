@@ -1,18 +1,21 @@
 /**
  * PickFranchiseSheet — Bottom sheet for discovering and following college franchises.
- * Uses Vaul (Drawer) for native-feeling sheet behaviour.
+ * Uses the app's canonical BottomSheet component for consistent UX.
  */
 
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 import { useCollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
 import { useFollowedColleges, useFollowCollegeMutations } from '../../hooks/useCollegeMovers';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useCollegeMediaSearch } from '@/hooks/useCollegeMediaSearch';
+
+// Franchise amber accent
+const FRANCHISE_AMBER = '#D97706';
 
 interface PickFranchiseSheetProps {
   open: boolean;
@@ -50,9 +53,9 @@ function FollowBtn({
         fontWeight: 600,
         borderRadius: '20px',
         padding: '8px 18px',
-        border: isFollowed ? 'none' : '1px solid rgba(0,0,0,0.12)',
-        background: isFollowed ? 'rgba(0,0,0,0.85)' : 'white',
-        color: isFollowed ? 'white' : 'hsl(var(--foreground))',
+        border: isFollowed ? 'none' : '1px solid hsl(var(--border) / 0.6)',
+        background: isFollowed ? 'hsl(var(--foreground) / 0.9)' : 'hsl(var(--card))',
+        color: isFollowed ? 'hsl(var(--background))' : 'hsl(var(--foreground))',
         cursor: isPending ? 'not-allowed' : 'pointer',
         opacity: isPending ? 0.6 : 1,
         transition: 'all 0.2s ease',
@@ -90,22 +93,24 @@ export function PickFranchiseSheet({ open, onOpenChange }: PickFranchiseSheetPro
   const isSearching = searchQuery.length >= 2;
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85dvh]">
-        <DrawerHeader className="pb-0">
-          <DrawerTitle
+    <BottomSheet open={open} onClose={() => onOpenChange(false)} ariaLabelledBy="pick-franchise-title">
+      <div className="overflow-y-auto" style={{ maxHeight: 'calc(85dvh - 60px)' }}>
+        {/* Header */}
+        <div className="px-4 pt-2 pb-0 text-center">
+          <h2
+            id="pick-franchise-title"
+            className="m-0 text-foreground"
             style={{ fontSize: '20px', fontWeight: 700, letterSpacing: '-0.3px' }}
-            className="text-foreground text-center"
           >
             Pick Your Franchise
-          </DrawerTitle>
+          </h2>
           <p
-            className="text-center m-0"
-            style={{ fontSize: '13px', color: 'rgba(0,0,0,0.45)', marginTop: '2px' }}
+            className="m-0"
+            style={{ fontSize: '13px', color: 'hsl(var(--muted-foreground) / 0.6)', marginTop: '2px' }}
           >
             Follow a college and join the rivalry
           </p>
-        </DrawerHeader>
+        </div>
 
         {/* Search input */}
         <div className="px-4 pt-4 pb-2">
@@ -126,7 +131,7 @@ export function PickFranchiseSheet({ open, onOpenChange }: PickFranchiseSheetPro
         </div>
 
         {/* Scrollable list */}
-        <div className="flex-1 overflow-y-auto px-4 pb-4" style={{ maxHeight: 'calc(85dvh - 200px)' }}>
+        <div className="px-4 pb-4">
           {/* Section label */}
           {!isSearching && (
             <p
@@ -135,7 +140,7 @@ export function PickFranchiseSheet({ open, onOpenChange }: PickFranchiseSheetPro
                 fontWeight: 600,
                 letterSpacing: '0.5px',
                 textTransform: 'uppercase' as const,
-                color: 'rgba(0,0,0,0.35)',
+                color: 'hsl(var(--muted-foreground) / 0.5)',
                 marginBottom: '8px',
                 marginTop: '4px',
               }}
@@ -195,16 +200,16 @@ export function PickFranchiseSheet({ open, onOpenChange }: PickFranchiseSheetPro
             style={{
               fontSize: '14px',
               fontWeight: 600,
-              color: 'hsl(var(--primary))',
-              borderTop: '1px solid rgba(0,0,0,0.06)',
+              color: FRANCHISE_AMBER,
+              borderTop: '1px solid hsl(var(--border) / 0.2)',
               marginTop: '8px',
             }}
           >
             View All Franchises →
           </button>
         </div>
-      </DrawerContent>
-    </Drawer>
+      </div>
+    </BottomSheet>
   );
 }
 
@@ -228,7 +233,7 @@ function CollegeRow({
       className="flex items-center"
       style={{
         padding: '14px 0',
-        borderBottom: '1px solid rgba(0,0,0,0.04)',
+        borderBottom: '1px solid hsl(var(--border) / 0.2)',
         gap: '12px',
       }}
     >
@@ -256,7 +261,7 @@ function CollegeRow({
         <p className="m-0 text-foreground truncate" style={{ fontSize: '15px', fontWeight: 600 }}>
           {displayName}
         </p>
-        <p className="m-0" style={{ fontSize: '12px', color: 'rgba(0,0,0,0.4)' }}>
+        <p className="m-0" style={{ fontSize: '12px', color: 'hsl(var(--muted-foreground) / 0.6)' }}>
           {playerCount} {playerCount === 1 ? 'pro' : 'pros'} on tour
         </p>
       </div>
