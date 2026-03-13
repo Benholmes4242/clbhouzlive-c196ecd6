@@ -315,6 +315,62 @@ export function CollegeProfilePage() {
             </Link>
           </div>
         )}
+
+        {/* Alumni Roster */}
+        {stats && (
+          <motion.section
+            style={{ marginTop: 20 }}
+            variants={sectionVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.5, duration: 0.3 }}
+          >
+            <h2 className="text-foreground" style={{ fontSize: 18, fontWeight: 700, marginBottom: 14 }}>
+              PGA Tour Alumni
+            </h2>
+
+            {alumniLoading ? (
+              <div className="flex flex-col" style={{ gap: 8 }}>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="bg-card border border-border/30 animate-pulse" style={{ height: 64, borderRadius: 14 }} />
+                ))}
+              </div>
+            ) : alumni && alumni.length > 0 ? (
+              <div className="flex flex-col" style={{ gap: 6 }}>
+                {alumni.map((player, idx) => (
+                  <AlumniRow key={player.id} player={player} rank={idx + 1} />
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground py-8 text-center">
+                No alumni data available for this season.
+              </p>
+            )}
+          </motion.section>
+        )}
+
+        {/* Season Performance Summary */}
+        {stats && (
+          <motion.section
+            style={{ marginTop: 28 }}
+            variants={sectionVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.6, duration: 0.3 }}
+          >
+            <h2 className="text-foreground" style={{ fontSize: 18, fontWeight: 700, marginBottom: 14 }}>
+              Season Performance
+            </h2>
+            <div className="grid grid-cols-2" style={{ gap: 8 }}>
+              <StatTile label="Total Earnings" value={formatCurrency(stats.earnings_total)} />
+              <StatTile label="Wins" value={String(stats.wins_total)} highlight={stats.wins_total > 0} />
+              <StatTile label="Top 10s" value={String(stats.top10_total)} />
+              <StatTile label="Cuts Made" value={String(stats.cuts_total)} />
+              <StatTile label="Top 25s" value={String(stats.top25_total)} />
+              <StatTile label="Events Played" value={String(stats.events_total)} />
+            </div>
+          </motion.section>
+        )}
       </div>
     </PageRoot>
   );
