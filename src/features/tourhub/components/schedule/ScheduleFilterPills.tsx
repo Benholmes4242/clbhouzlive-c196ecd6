@@ -4,6 +4,7 @@
  */
 
 import { cn } from '@/lib/utils';
+import { TOUR_COLORS } from '../../constants/colors';
 
 export type ScheduleFilterType = 'all' | 'upcoming' | 'live' | 'completed';
 
