@@ -5,7 +5,7 @@
  * 
  * Display logic (per tour):
  * - Priority 1: LIVE (inprogress) - takes precedence
- * - Priority 2: COMPLETED (closed/complete, last 7 days) with winner
+ * - Priority 2: COMPLETED (closed/complete, last 14 days) with winner
  * - Priority 3: UPCOMING (scheduled/created) with countdown
  * 
  * Slide order: LIVE (by tour priority) > COMPLETED (by end_date DESC) > UPCOMING (by start_date ASC)
@@ -66,6 +66,61 @@ function getScoreClass(score: number): string {
   if (score < 0) return 'score-under';
   if (score > 0) return 'score-over';
   return 'score-even';
+}
+
+/**
+ * Infers current round from leaderboard data.
+ * Checks round_4 → round_3 → round_2 → round_1 (last non-null = current round).
+ * Falls back to date arithmetic only if no leaderboard data available.
+ */
+function getCurrentRoundLabel(leaders: LeaderEntry[], startDate: string): string {
+  if (leaders.length > 0) {
+    const sample = leaders[0];
+    if (sample.round_4 != null) return 'Final Round';
+    if (sample.round_3 != null) return 'Round 3 of 4';
+    if (sample.round_2 != null) return 'Round 2 of 4';
+    if (sample.round_1 != null) return 'Round 1 of 4';
+  }
+  // Fallback: date arithmetic
+  const dayIndex = Math.max(0, Math.floor(
+    (Date.now() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)
+  ));
+  const round = Math.min(dayIndex + 1, 4);
+  return round >= 4 ? 'Final Round' : `Round ${round} of 4`;
+}
+
+/**
+ * Upcoming countdown component with live updating
+ */
+function UpcomingCountdown({ startDate }: { startDate: string }) {
+  const [timeLeft, setTimeLeft] = useState('');
+
+  useEffect(() => {
+    function update() {
+      const diff = new Date(startDate).getTime() - Date.now();
+      if (diff <= 0) { setTimeLeft('Starting now'); return; }
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      if (days > 0) setTimeLeft(`${days}d ${hours}h`);
+      else if (hours > 0) setTimeLeft(`${hours}h ${mins}m`);
+      else setTimeLeft(`${mins}m`);
+    }
+    update();
+    const t = setInterval(update, 60_000);
+    return () => clearInterval(t);
+  }, [startDate]);
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+      <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+        Starts in
+      </span>
+      <span style={{ fontSize: '15px', fontWeight: 800, color: '#FFFFFF', fontVariantNumeric: 'tabular-nums' }}>
+        {timeLeft}
+      </span>
+    </div>
+  );
 }
 
 // Skeleton rows for loading state
@@ -270,6 +325,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
   const { tournament, type } = slide;
   const navigate = useNavigate();
   
+  const isMajor = tournament.isMajor;
+  const isSignature = tournament.isSignature;
   
   // Fetch real venue image
   const { data: venueImage } = useVenueImage(tournament.venueName, tournament.venueCity);
@@ -411,6 +468,16 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     isCompleted ? podiumWinner?.playerId : undefined
   );
 
+  // Glass card border based on major/signature status
+  const glassCardBorder = isMajor
+    ? '1px solid rgba(250, 204, 21, 0.35)'
+    : isSignature
+    ? '1px solid rgba(16, 185, 129, 0.25)'
+    : '1px solid rgba(255, 255, 255, 0.10)';
+
+  // Live status color
+  const liveStatusColor = isMajor ? '#FACC15' : '#22C55E';
+
   return (
     <motion.div
       className="absolute inset-0"
@@ -503,7 +570,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               WebkitBackdropFilter: isExpanded ? 'blur(24px)' : 'blur(20px)',
               boxShadow: isExpanded ? '0 8px 32px rgba(0, 0, 0, 0.35)' : '0 4px 16px rgba(0, 0, 0, 0.25)',
               padding: isExpanded ? '20px 0 8px 0' : '20px 20px 14px 20px',
-              border: '1px solid rgba(255, 255, 255, 0.10)',
+              border: glassCardBorder,
               overflow: 'hidden',
               zIndex: isExpanded ? 20 : 10,
               pointerEvents: 'auto' as const,
@@ -540,8 +607,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   <div className="flex items-center justify-between" style={{ marginBottom: '6px' }}>
                     {isLive ? (
                       <div className="flex items-center gap-1.5">
-                        <span className="live-dot" />
-                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: '#22C55E' }}>LIVE</span>
+                        <span className="live-dot" style={isMajor ? { background: '#FACC15', boxShadow: '0 0 6px rgba(250,204,21,0.5)' } : undefined} />
+                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: liveStatusColor }}>LIVE</span>
                       </div>
                     ) : isUpcoming ? (
                       <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' as const }}>
@@ -551,6 +618,17 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'white' }}>COMPLETED</span>
                     )}
                     <div className="flex items-center gap-2">
+                      {isMajor && (
+                        <span style={{
+                          fontSize: '10px', fontWeight: 800, letterSpacing: '1.5px',
+                          color: '#FACC15', textTransform: 'uppercase',
+                          background: 'rgba(250, 204, 21, 0.12)',
+                          border: '1px solid rgba(250, 204, 21, 0.3)',
+                          borderRadius: 4, padding: '2px 6px',
+                        }}>
+                          MAJOR
+                        </span>
+                      )}
                       <div className="tour-badge">
                         <span>
                           {getTourDisplayName(tournament.tourSlug)}
@@ -588,9 +666,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                   style={{ overflow: isExpanded ? 'visible' : 'hidden', flex: isExpanded ? 1 : undefined, minHeight: isExpanded ? 0 : undefined, display: isExpanded ? 'flex' : undefined, flexDirection: isExpanded ? 'column' as const : undefined }}
                 >
-                  {/* Round progress */}
+                  {/* Round progress — inferred from leaderboard data */}
                   <p className="hero-meta" style={{ padding: isExpanded ? '0 20px' : undefined, marginTop: 4, marginBottom: isExpanded ? 4 : 0 }}>
-                    {'In Progress'}
+                    {getCurrentRoundLabel(leaders, tournament.startDate)}
                   </p>
 
                   {/* Expanded: Full Leaderboard or Scorecard */}
@@ -790,14 +868,16 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                           style={{ display: 'flex', alignItems: 'center', gap: 10 }}
                         >
-                          <PlayerAvatar displayName={winnerInfo.winnerName} tourCode={winnerInfo.tourSlug || 'pga'} size={60} frosted />
-                          <div>
-                            <span style={{ fontSize: '17px', fontWeight: 700, color: '#FFFFFF', display: 'block' }}>{winnerInfo.winnerName}</span>
-                            {winnerInfo.winnerScore && (
-                              <span style={{ fontFamily: "'JetBrains Mono','SF Mono',monospace", fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
-                                {winnerInfo.winnerScore}
-                              </span>
-                            )}
+                          <PlayerAvatar displayName={winnerInfo.winnerName} fullName={winnerInfo.winnerName} headshotOverride={winnerInfo.winnerPhotoUrl} tourCode={tournament.tourSlug} size={60} frosted />
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' }}>
+                              <span style={{ fontSize: '17px', fontWeight: 700, color: '#FFFFFF' }}>{winnerInfo.winnerName}</span>
+                              {winnerInfo.winnerScore && (
+                                <span style={{ fontFamily: "'JetBrains Mono','SF Mono',monospace", fontSize: '17px', fontWeight: 700, color: '#4ADE80', flexShrink: 0 }}>
+                                  {winnerInfo.winnerScore}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </motion.div>
                       ) : (
@@ -874,6 +954,10 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                   style={{ overflow: 'hidden' }}
                 >
+                  {/* Live countdown */}
+                  <UpcomingCountdown startDate={tournament.startDate} />
+
+                  {/* Course meta */}
                   <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '8px', marginTop: '6px', letterSpacing: '0.3px' }}>
                     {[
                       tournament.purse && formatPurse(tournament.purse),
@@ -882,6 +966,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     ].filter(Boolean).join(' · ')}
                   </p>
 
+                  {/* Defending champion — with avatar */}
                   {tournament.defendingChampion && (
                     <motion.div
                       initial={{ opacity: 0, y: 6 }}
@@ -890,10 +975,22 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       className="flex items-center gap-2"
                       style={{ marginBottom: '10px' }}
                     >
-                      <Trophy className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(250,204,21,0.7)' }} />
-                      <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.45)' }}>
-                        Defending: <span style={{ fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>{tournament.defendingChampion}</span>
-                      </span>
+                      <PlayerAvatar
+                        displayName={tournament.defendingChampion}
+                        fullName={tournament.defendingChampion}
+                        headshotOverride={tournament.defendingChampionPhotoUrl || undefined}
+                        tourCode={tournament.tourSlug}
+                        size={36}
+                        frosted
+                      />
+                      <div>
+                        <span style={{ fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.8px', textTransform: 'uppercase', display: 'block' }}>
+                          Defending Champion
+                        </span>
+                        <span style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>
+                          {tournament.defendingChampion}
+                        </span>
+                      </div>
                     </motion.div>
                   )}
 
@@ -990,6 +1087,20 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
 
     return () => clearInterval(interval);
   }, [slides.length, isPaused, isExpanded]);
+
+  // FIX 4: Pause auto-advance when app is backgrounded
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden) {
+        setIsPaused(true);
+      } else {
+        // Resume after a short delay so the slide doesn't jump immediately on return
+        setTimeout(() => setIsPaused(false), 1000);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
 
   // Preload current slide's winner avatar into browser cache
   useEffect(() => {
