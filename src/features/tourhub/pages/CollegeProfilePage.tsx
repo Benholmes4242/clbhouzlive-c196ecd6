@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Menu, Crown, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
+import { Menu, Crown, RefreshCw, AlertCircle, ChevronLeft, TrendingUp, Trophy } from 'lucide-react';
 import { openTourNav } from '../contexts/TourNavContext';
 import { motion } from 'framer-motion';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
