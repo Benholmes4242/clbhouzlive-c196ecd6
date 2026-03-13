@@ -21,7 +21,6 @@ import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeads
 import { 
   useLiveTournamentCount, 
   useLiveLeaderTeaser, 
-  usePlayerCount, 
   useTopCollegeTeaser 
 } from '../hooks/useNavMenuData';
 import { TOUR_COLORS } from '../constants/colors';
