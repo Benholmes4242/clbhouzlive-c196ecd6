@@ -94,10 +94,7 @@ export function OverviewTabFeed() {
           maxCuts={topPlayersData.maxCuts}
         />
 
-        {/* 5. Season Leaders - Highlight gallery */}
-        <LeadersPhotoCards leaders={seasonLeaders} />
-
-        {/* 6. Tour Venues - Aspirational gallery */}
+        {/* 4. Tour Venues - Aspirational gallery */}
         <CoursesPhotoGrid 
           courses={featuredCourses} 
           courseImages={courseImages}

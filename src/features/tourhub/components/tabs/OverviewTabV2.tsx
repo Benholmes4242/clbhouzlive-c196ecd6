@@ -69,15 +69,12 @@ export function OverviewTabV2() {
         <StorylineInsightStrip insights={storylineInsights} />
       )}
 
-      {/* 5. Two Column Layout - Players & Leaders */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <TopPlayersFeed
-          players={topPlayersData.players}
-          maxEvents={topPlayersData.maxEvents}
-          maxCuts={topPlayersData.maxCuts}
-        />
-        <SeasonLeadersAward leaders={seasonLeaders} />
-      </div>
+      {/* 5. Top Players */}
+      <TopPlayersFeed
+        players={topPlayersData.players}
+        maxEvents={topPlayersData.maxEvents}
+        maxCuts={topPlayersData.maxCuts}
+      />
 
       {/* 6. Featured Courses */}
       <FeaturedCoursesDestination courses={featuredCourses} />
