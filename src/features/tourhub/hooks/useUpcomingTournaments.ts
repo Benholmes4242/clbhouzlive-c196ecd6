@@ -42,7 +42,7 @@ export function useUpcomingTournaments(limit = 6) {
           venueCountry: t.venue_country,
           venuePar: t.venue_par,
           venueYardage: t.venue_yardage,
-          tourName: TOUR_KEY_MAP[tourKey] || t.season?.tour_name || 'Tour Event',
+          tourName: TOUR_DISPLAY_NAMES[tourKey] || t.season?.tour_name || 'Tour Event',
           year: t.season?.year || new Date().getFullYear(),
           winnerId: null,
           winnerFirstName: null,
