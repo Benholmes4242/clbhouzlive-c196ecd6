@@ -767,10 +767,15 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       </AnimatePresence>
 
                       {!isExpanded && (
-                        <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta">
-                          <span>See All</span>
-                          <ChevronRight className="w-4 h-4 cta-chevron" />
-                        </Link>
+                        <>
+                          <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta">
+                            <span>See All</span>
+                            <ChevronRight className="w-4 h-4 cta-chevron" />
+                          </Link>
+                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
+                            <ChevronsUp size={14} style={{ color: 'rgba(255,255,255,0.35)', animation: 'pulse 2s infinite' }} />
+                          </div>
+                        </>
                       )}
                     </>
                   )}
