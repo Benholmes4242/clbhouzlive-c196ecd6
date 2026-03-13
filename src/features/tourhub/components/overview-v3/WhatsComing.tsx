@@ -177,7 +177,7 @@ export function WhatsComing() {
     );
   }
 
-  if (!upcoming.length) return null;
+  if (!tournaments?.length) return null;
 
   return (
     <motion.section
