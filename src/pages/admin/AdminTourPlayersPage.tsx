@@ -336,7 +336,7 @@ function PlayerDetailDialog({ player, open, onClose, cacheBust }: { player: Play
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <img
-              src={headshotUrl}
+              src={`${headshotUrl}?v=${cacheBust}`}
               alt={player.full_name || ''}
               className="w-12 h-12 rounded-full object-cover bg-muted"
               onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
