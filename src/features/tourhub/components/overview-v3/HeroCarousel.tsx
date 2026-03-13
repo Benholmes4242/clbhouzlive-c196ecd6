@@ -169,7 +169,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
                 onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-white/60 text-[10px] font-semibold" style={{ background: '#F8FAFC' }}>{initials}</div>
+              <div className="w-full h-full flex items-center justify-center text-[10px] font-semibold" style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.80)' }}>{initials}</div>
             )}
           </div>
           <span className={cn("leaderboard-name truncate", isFirst && "font-bold")}>
