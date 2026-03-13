@@ -71,14 +71,6 @@
   pointer-events: none;
 }
 
-/* Inner frosted pill (leader capsule) */
-.glass-pill {
-  background: rgba(255,255,255,0.10);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-radius: 999px;
-}
-
 /* ============================================
    2. TYPOGRAPHY HIERARCHY
    ============================================ */
