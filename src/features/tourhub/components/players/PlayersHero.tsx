@@ -115,10 +115,13 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
                 alt={player.playerName}
                 className="absolute inset-0 w-full h-full object-cover object-[center_10%]"
                 loading="eager"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
+                initial={{ opacity: 0, scale: 1.04 }}
+                animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
+                transition={{
+                  opacity: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+                  scale: { duration: 5, ease: 'linear' },
+                }}
                 onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
               />
             </AnimatePresence>
