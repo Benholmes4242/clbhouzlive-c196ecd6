@@ -473,7 +473,7 @@ export function AdminTourPlayersPage() {
                       <TableCell>
                         <div className="flex items-center gap-2.5">
                           <img
-                            src={headshotUrl}
+                            src={`${headshotUrl}?v=${headshotCacheBust}`}
                             alt=""
                             className="w-8 h-8 shrink-0 rounded-full object-cover object-top bg-muted cursor-pointer hover:ring-2 hover:ring-primary/50 transition-shadow"
                             onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
