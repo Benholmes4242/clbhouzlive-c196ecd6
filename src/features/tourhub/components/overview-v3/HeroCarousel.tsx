@@ -89,39 +89,7 @@ function getCurrentRoundLabel(leaders: LeaderEntry[], startDate: string): string
   return round >= 4 ? 'Final Round' : `Round ${round} of 4`;
 }
 
-/**
- * Upcoming countdown component with live updating
- */
-function UpcomingCountdown({ startDate }: { startDate: string }) {
-  const [timeLeft, setTimeLeft] = useState('');
-
-  useEffect(() => {
-    function update() {
-      const diff = new Date(startDate).getTime() - Date.now();
-      if (diff <= 0) { setTimeLeft('Starting now'); return; }
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      if (days > 0) setTimeLeft(`${days}d ${hours}h`);
-      else if (hours > 0) setTimeLeft(`${hours}h ${mins}m`);
-      else setTimeLeft(`${mins}m`);
-    }
-    update();
-    const t = setInterval(update, 60_000);
-    return () => clearInterval(t);
-  }, [startDate]);
-
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-      <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
-        Starts in
-      </span>
-      <span style={{ fontSize: '15px', fontWeight: 800, color: '#FFFFFF', fontVariantNumeric: 'tabular-nums' }}>
-        {timeLeft}
-      </span>
-    </div>
-  );
-}
+// UpcomingCountdown is now imported from shared/TourHeroHelpers
 
 // Skeleton rows for loading state
 function LeaderboardSkeleton() {
