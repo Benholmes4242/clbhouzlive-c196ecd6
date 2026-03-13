@@ -3,7 +3,7 @@
  * Used by: HeroCarousel (overview) + ScheduleHeroCard (schedule tab)
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { WinnerStats } from '../../hooks/useWinnerScorecardStats';
 import type { WinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import { SCORE_COLORS } from '../../utils/scoreColors';
@@ -465,4 +465,59 @@ export function WinnerStatsPanel({
       )}
     </div>
   );
+}
+
+// ─── UpcomingCountdown ────────────────────────────────────────────────────────
+
+/**
+ * Upcoming countdown component with live updating.
+ * Shared between HeroCarousel (overview) and ScheduleHeroCard (schedule).
+ */
+export function UpcomingCountdown({ startDate }: { startDate: string }) {
+  const [timeLeft, setTimeLeft] = useState('');
+
+  useEffect(() => {
+    function update() {
+      const diff = new Date(startDate).getTime() - Date.now();
+      if (diff <= 0) { setTimeLeft('Starting now'); return; }
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      if (days > 0) setTimeLeft(`${days}d ${hours}h`);
+      else if (hours > 0) setTimeLeft(`${hours}h ${mins}m`);
+      else setTimeLeft(`${mins}m`);
+    }
+    update();
+    const t = setInterval(update, 60_000);
+    return () => clearInterval(t);
+  }, [startDate]);
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+      <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+        Starts in
+      </span>
+      <span style={{ fontSize: '15px', fontWeight: 800, color: '#FFFFFF', fontVariantNumeric: 'tabular-nums' }}>
+        {timeLeft}
+      </span>
+    </div>
+  );
+}
+
+/**
+ * Infers current round label from leaderboard data or date arithmetic.
+ */
+export function getCurrentRoundLabel(startDate: string, leaderRounds?: { round_1?: number | null; round_2?: number | null; round_3?: number | null; round_4?: number | null }): string {
+  if (leaderRounds) {
+    if (leaderRounds.round_4 != null) return 'Final Round';
+    if (leaderRounds.round_3 != null) return 'Round 3 of 4';
+    if (leaderRounds.round_2 != null) return 'Round 2 of 4';
+    if (leaderRounds.round_1 != null) return 'Round 1 of 4';
+  }
+  // Fallback: date arithmetic
+  const dayIndex = Math.max(0, Math.floor(
+    (Date.now() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)
+  ));
+  const round = Math.min(dayIndex + 1, 4);
+  return round >= 4 ? 'Final Round' : `Round ${round} of 4`;
 }

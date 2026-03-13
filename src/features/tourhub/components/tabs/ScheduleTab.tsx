@@ -19,6 +19,7 @@ import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWin
 import { TourHubEmptyState } from '../TourHubEmptyState';
 import { format, isAfter } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { getContextLabel } from '../../utils/tournamentClassification';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
@@ -159,15 +160,32 @@ export function ScheduleTab() {
 
   const { data: leadersWinnersMap } = useTournamentLeadersWinners([...liveIds, ...completedIds]);
 
+  // Tour priority for hero slide ordering — majors always first
+  const SCHEDULE_TOUR_PRIORITY: Record<string, number> = {
+    pga: 0, LIV: 1, EURO: 2, LPGA: 3, PGAD: 4, CHAMP: 5,
+  };
+
+  function getTournamentPriority(t: TourTournament): number {
+    const label = getContextLabel({ name: t.name, tourName: t.tour_full_name ?? undefined });
+    if (label === 'MAJOR CHAMPIONSHIP') return -1; // always first
+    return SCHEDULE_TOUR_PRIORITY[t.tour_code || ''] ?? 99;
+  }
+
   // Unified hero items for all tabs
   const heroItems = useMemo((): ScheduleHeroItem[] => {
     if (!tournaments) return [];
     const tourFiltered = activeTour === 'all' ? tournaments : tournaments.filter(t => t.tour_code === activeTour);
 
-    // Helper: one per tour, deduped
+    // Helper: one per tour, deduped — sorted by major-first, then tour priority, then purse
     const onePerTour = (list: TourTournament[], type: ScheduleHeroItem['type']): ScheduleHeroItem[] => {
+      const sorted = [...list].sort((a, b) => {
+        const pa = getTournamentPriority(a);
+        const pb = getTournamentPriority(b);
+        if (pa !== pb) return pa - pb;
+        return (b.purse ?? 0) - (a.purse ?? 0);
+      });
       const seenTours = new Set<string>();
-      return list.filter(t => {
+      return sorted.filter(t => {
         const tour = t.tour_code || 'unknown';
         if (seenTours.has(tour)) return false;
         seenTours.add(tour);
@@ -187,7 +205,8 @@ export function ScheduleTab() {
 
     if (filter === 'live') {
       if (liveList.length > 0) {
-        return liveList.map(t => ({ tournament: t, type: 'live' as const }));
+        return [...liveList].sort((a, b) => getTournamentPriority(a) - getTournamentPriority(b))
+          .map(t => ({ tournament: t, type: 'live' as const }));
       }
       // No live tournaments — show next upcoming as hero
       if (upcomingList.length > 0) {
@@ -203,14 +222,16 @@ export function ScheduleTab() {
     if (filter === 'upcoming') {
       // Show live tournaments if any exist, otherwise upcoming per tour
       if (liveList.length > 0) {
-        return liveList.map(t => ({ tournament: t, type: 'live' as const }));
+        return [...liveList].sort((a, b) => getTournamentPriority(a) - getTournamentPriority(b))
+          .map(t => ({ tournament: t, type: 'live' as const }));
       }
       return onePerTour(upcomingList, 'upcoming');
     }
 
-    // 'all' tab: live + one completed per tour + one upcoming per tour, capped at 8
+    // 'all' tab: live (sorted by priority) + one completed per tour + one upcoming per tour, capped at 8
     const items: ScheduleHeroItem[] = [
-      ...liveList.map(t => ({ tournament: t, type: 'live' as const })),
+      ...[...liveList].sort((a, b) => getTournamentPriority(a) - getTournamentPriority(b))
+        .map(t => ({ tournament: t, type: 'live' as const })),
       ...onePerTour(completedList, 'recent'),
       ...onePerTour(upcomingList, 'upcoming'),
     ];
