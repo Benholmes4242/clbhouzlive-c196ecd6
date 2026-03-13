@@ -1121,7 +1121,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     >
       <button 
         className="absolute z-20 flex items-center justify-center"
-        style={{ top: '56px', left: '16px', width: '44px', height: '44px' }}
+        style={{ top: 'calc(env(safe-area-inset-top, 0px) + 12px)', left: '16px', width: '44px', height: '44px' }}
         onClick={() => { openTourNav(); showBottomNav(); }}
         aria-label="Open tour menu"
       >

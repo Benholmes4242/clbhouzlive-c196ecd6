@@ -173,7 +173,7 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
   return (
     <button
       type="button"
-      role="listitem"
+      aria-label={`${displayName}, position ${posDisplay}, ${formatScore(entry.score ?? null)} to par, thru ${thruDisplay}`}
       onClick={handleTap}
       className="flex items-center w-full text-left"
       style={{
