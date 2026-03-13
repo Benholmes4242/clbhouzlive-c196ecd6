@@ -157,7 +157,7 @@ export function ScheduleTournamentCard({
               </span>
             ) : null;
           })()}
-        
+        </div>
         {/* Tournament name */}
         <p
           className="mt-1 line-clamp-1 text-foreground"
