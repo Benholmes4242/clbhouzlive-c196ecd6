@@ -8,7 +8,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useTournamentsCache } from '@/hooks/useTournamentsCache';
 import type { SeasonTournament } from './useSeasonTournaments';
 
-const TOUR_KEY_MAP: Record<string, string> = {
+// Slug → display name for tournament rows (display only, distinct from TOUR_NAME_TO_SLUG which maps the reverse)
+const TOUR_DISPLAY_NAMES: Record<string, string> = {
   pga: 'PGA Tour',
   liv: 'LIV Golf',
   euro: 'DP World Tour',
