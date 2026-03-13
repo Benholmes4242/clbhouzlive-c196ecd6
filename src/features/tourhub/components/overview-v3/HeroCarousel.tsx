@@ -15,7 +15,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronsUp, Trophy, Menu, X } from 'lucide-react';
+import { ChevronRight, Trophy, Menu } from 'lucide-react';
 import { openTourNav } from '../../contexts/TourNavContext';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { cn } from '@/lib/utils';
@@ -306,7 +306,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
 
   // Full leaderboard — only fetched when expanded
   const { data: fullLeaderboard = [], isLoading: isLoadingFull, isError: isFullError, refetch: refetchFull } = useTourLeaderboard(
-    isExpanded && isLive ? tournament.id : ''
+    isLive ? tournament.id : ''
   );
   
   // Realtime updates — always subscribe when live so collapsed hero stays fresh
@@ -454,7 +454,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
       />
 
       {/* Backdrop overlay when expanded — tap to collapse */}
-      {isExpanded && (
+      {isExpanded && !isLive && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -553,16 +553,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                            'KORN FERRY'}
                         </span>
                       </div>
-                      {/* Close icon — only when expanded */}
-                      {isLive && leaders.length > 0 && isExpanded && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); e.preventDefault(); onToggleExpand(); }}
-                          aria-label="Collapse leaderboard"
-                          style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                        >
-                          <X style={{ width: 18, height: 18, color: 'rgba(255,255,255,0.6)' }} />
-                        </button>
-                      )}
                     </div>
                   </div>
                   <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
@@ -740,38 +730,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         )}
                       </AnimatePresence>
 
-                      {isLive && leaders.length > 0 && !isExpanded ? (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); e.preventDefault(); onToggleExpand(); }}
-                          className="hero-text-cta"
-                          style={{
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            padding: 0,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: 4,
-                            width: '100%',
-                            marginTop: 8,
-                          }}
-                          aria-label="View full leaderboard"
-                        >
-                          <span>View Full Leaderboard</span>
-                          <motion.div
-                            animate={{ y: [0, -3, 0] }}
-                            transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut', repeatDelay: 1 }}
-                          >
-                            <ChevronsUp size={16} style={{ color: 'rgba(255, 255, 255, 0.5)' }} />
-                          </motion.div>
-                        </button>
-                      ) : !isExpanded ? (
+                      {!isExpanded && (
                         <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta">
                           <span>See All</span>
                           <ChevronRight className="w-4 h-4 cta-chevron" />
                         </Link>
-                      ) : null}
+                      )}
                     </>
                   )}
                 </motion.div>
@@ -1167,7 +1131,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
             currentIndex={currentIndex}
             onDotClick={setCurrentIndex}
             leadersWinnersMap={leadersWinnersMap}
-            isExpanded={index === currentIndex && isExpanded}
+            isExpanded={index === currentIndex && (slide.type === 'live' ? true : isExpanded)}
             onToggleExpand={handleToggleExpand}
           />
         ))}
