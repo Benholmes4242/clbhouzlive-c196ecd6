@@ -28,6 +28,11 @@ export interface TournamentFinisher {
   displayName: string;
   /** Formatted score: "-12" or "E" or "+3" */
   displayScore: string;
+  round1: number | null;
+  round2: number | null;
+  round3: number | null;
+  round4: number | null;
+  thru: number | null;
 }
 
 export interface TournamentLeaderWinner extends TournamentFinisher {
