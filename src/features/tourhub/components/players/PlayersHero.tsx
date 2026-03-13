@@ -223,8 +223,8 @@ function RunnerCard({ player, index, activeTour, statsMap, sort, tiedCount }: {
   }
 
   const rankBg = index === 0
-    ? '#94A3B8'
-    : '#C2875A';
+    ? 'rgba(148, 163, 184, 0.9)'
+    : 'rgba(194, 135, 90, 0.9)';
 
   return (
     <Link
