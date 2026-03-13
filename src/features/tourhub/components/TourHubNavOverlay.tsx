@@ -482,14 +482,8 @@ export function TourHubNavOverlay({
             {/* Divider */}
             <div className="h-px mx-5 border-t border-border/30" />
             
-            {/* Menu Items — TM-03: bottom safe area padding */}
-            <div 
-              className="flex-1 overflow-y-auto px-5 py-5"
-              style={{ 
-                overscrollBehavior: 'contain',
-                paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
-              }}
-            >
+            {/* Nav + Link items */}
+            <div className="px-5 py-5">
               <div className="space-y-2">
                 {NAV_ITEMS.map((item, index) => {
                   const isActive = activeTab === item.value;
