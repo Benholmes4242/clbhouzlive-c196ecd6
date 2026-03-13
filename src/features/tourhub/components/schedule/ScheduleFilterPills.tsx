@@ -38,12 +38,11 @@ export function ScheduleFilterPills({
   ];
 
   return (
-    <div 
-      className="py-1"
+    <div
+      className="flex items-stretch rounded-xl overflow-hidden bg-transparent"
       role="tablist"
       aria-label="Filter tournaments"
     >
-      <div className="flex items-stretch rounded-xl overflow-hidden bg-transparent">
         {options.map((option) => {
           const isActive = activeFilter === option.value;
 
