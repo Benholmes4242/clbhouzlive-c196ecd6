@@ -1130,8 +1130,8 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   }, [currentIndex, isExpanded]);
 
   // Swipe gesture handlers
+  // FIX 1: Removed isExpanded guard — swipe always works; card's stopPropagation protects scroll
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (isExpanded) return;
     setIsPaused(true);
     touchStartRef.current = {
       x: e.touches[0].clientX,
