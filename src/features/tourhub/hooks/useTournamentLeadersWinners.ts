@@ -68,6 +68,11 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
           position,
           score,
           money,
+          round_1,
+          round_2,
+          round_3,
+          round_4,
+          thru,
           player_id,
           player:sr_players!inner (
             first_name,
