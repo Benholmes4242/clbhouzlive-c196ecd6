@@ -1049,6 +1049,19 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     return () => clearInterval(interval);
   }, [slides.length, isPaused, isExpanded]);
 
+  // Pause auto-advance when app is backgrounded
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden) {
+        setIsPaused(true);
+      } else {
+        setTimeout(() => setIsPaused(false), 1000);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
+
   // Preload current slide's winner avatar into browser cache
   useEffect(() => {
     const slide = slides[currentIndex];
