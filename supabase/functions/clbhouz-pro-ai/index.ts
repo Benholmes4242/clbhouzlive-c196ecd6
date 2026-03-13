@@ -781,9 +781,17 @@ async function callPerplexity(query: string, nowIso: string, history: Array<{ ro
     "Be concise, structured, and provide specific dates/venues when discussing events."
   ].join(" ");
 
+  const cleanHistory = (history ?? []).filter((_: { role: string; content: string }, i: number, arr: Array<{ role: string; content: string }>) => {
+    let lastAssistantIdx = arr.length - 1;
+    while (lastAssistantIdx >= 0 && arr[lastAssistantIdx].role === 'user') {
+      lastAssistantIdx--;
+    }
+    return i <= lastAssistantIdx;
+  });
+
   const messages = [
     { role: "system", content: systemPrompt },
-    ...(history ?? []),
+    ...cleanHistory,
     { role: "user", content: query },
   ];
   const resp = await withTimeout(fetch("https://api.perplexity.ai/chat/completions", {
