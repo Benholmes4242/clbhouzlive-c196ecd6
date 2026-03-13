@@ -508,9 +508,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
           <motion.div
             layout
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            onTouchStart={isExpanded ? handleExpandedTouch : undefined}
-            onTouchMove={isExpanded ? handleExpandedTouch : undefined}
-            onTouchEnd={isExpanded ? handleExpandedTouch : undefined}
+            onTouchStart={isExpanded ? handleExpandedTouch : onCardTouchStart}
+            onTouchMove={isExpanded ? handleExpandedTouch : onCardTouchMove}
+            onTouchEnd={isExpanded ? handleExpandedTouch : onCardTouchEnd}
             style={{ 
               position: 'absolute',
               bottom: isLive ? 72 : (isExpanded ? 16 : 88),
