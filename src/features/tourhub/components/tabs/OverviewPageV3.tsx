@@ -13,7 +13,7 @@
  * 7. College Golf Rankings (NEW - preview of college leaderboard)
  */
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   HeroCarousel,
@@ -34,7 +34,8 @@ import { WifiOff } from 'lucide-react';
 
 export function OverviewPageV3() {
   const { isOnline } = useNetworkStatus();
-  const { showBottomNav } = useBottomNavigation();
+  const { hideBottomNav, showBottomNav } = useBottomNavigation();
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   // Prevent pull-down overscroll bounce on this immersive page
   usePreventOverscroll();
@@ -42,10 +43,34 @@ export function OverviewPageV3() {
   // Set transparent status bar with WHITE icons for dark hero image
   useMedianStatusBar("dark", "transparent", true, false);
 
-  // Force bottom nav visible whenever this page is mounted
+  // Hide on mount, restore on unmount
   useEffect(() => {
-    showBottomNav();
-  }, [showBottomNav]);
+    hideBottomNav();
+    return () => { showBottomNav(); };
+  }, [hideBottomNav, showBottomNav]);
+
+  // IntersectionObserver on a sentinel placed at 95dvh inside the hero.
+  // When the sentinel scrolls out of view (hero scrolled past 95%), show nav.
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          // Sentinel visible = user is still in hero zone → hide nav
+          hideBottomNav();
+        } else {
+          // Sentinel out of view = user scrolled past 95% of hero → show nav
+          showBottomNav();
+        }
+      },
+      { threshold: 0 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hideBottomNav, showBottomNav]);
 
   return (
     <motion.div
