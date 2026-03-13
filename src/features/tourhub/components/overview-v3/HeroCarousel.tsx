@@ -997,8 +997,8 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   useEffect(() => {
     const slide = slides[currentIndex];
     if (slide?.type === 'completed') {
-      const winners = leadersWinnersMap?.[slide.tournament.id];
-      const winner = winners?.find(w => w.position === 1);
+      const winners = leadersWinnersMap?.get(slide.tournament.id);
+      const winner = winners?.topFinishers?.find(w => w.position === 1);
       if (winner) {
         const url = getPlayerHeadshotUrl(
           `${winner.player.firstName} ${winner.player.lastName}`,
