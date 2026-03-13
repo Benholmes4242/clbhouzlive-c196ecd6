@@ -212,7 +212,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                   </div>
                 </div>
               ) : (
-                <div style={{ height: 48, borderRadius: 10, background: 'rgba(255,255,255,0.04)', width: 200 }} />
+                <div className="animate-pulse" style={{ height: 48, borderRadius: 10, background: 'rgba(255,255,255,0.06)', width: 200 }} />
               )}
             </div>
 
