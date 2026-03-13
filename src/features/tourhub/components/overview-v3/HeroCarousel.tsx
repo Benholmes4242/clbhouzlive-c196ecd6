@@ -265,12 +265,6 @@ interface HeroSlideProps {
   onInteraction: () => void;
 }
 
-// Card animation variants — matches CreatorCapsule entrance/exit
-const cardVariants = {
-  enter: { opacity: 0, y: 20 },
-  center: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: 20 },
-};
 
 function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction }: HeroSlideProps) {
   const { tournament, type } = slide;
