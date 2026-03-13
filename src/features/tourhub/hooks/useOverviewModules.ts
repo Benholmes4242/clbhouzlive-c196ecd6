@@ -205,38 +205,7 @@ export function useLiveRightNow() {
   });
 }
 
-// ============================================================================
-// MODULE 2: Coming Up Next (Next 7 Days)
-// ============================================================================
-
-export function useComingUpNext() {
-  const { data: cache } = useTournamentsCache();
-
-  return useQuery({
-    queryKey: ['overview-coming-up-next', cache ? 'ready' : 'waiting'],
-    queryFn: async () => {
-      if (!cache?.upcoming.length) return [];
-
-      const sevenDaysFromNow = new Date(Date.now() + 7 * 86400000);
-
-      return cache.upcoming
-        .filter(t => new Date(t.start_date) <= sevenDaysFromNow)
-        .slice(0, 8)
-        .map((row): UpcomingTournament => ({
-          id: row.id,
-          name: row.name,
-          startDate: row.start_date,
-          venueCity: row.venue_city,
-          venueCountry: row.venue_country,
-          purse: row.purse,
-          tourId: row.season.tour_id,
-          tourSlug: mapTourSlug(row.season.tour_name),
-        }));
-    },
-    enabled: !!cache,
-    staleTime: 30_000,
-  });
-}
+// MODULE 2: Coming Up Next — REMOVED (Brief 36, dead consumer deleted)
 
 // ============================================================================
 // MODULE 3: Movers This Week (World Rankings)
