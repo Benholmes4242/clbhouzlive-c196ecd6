@@ -35,7 +35,8 @@ import { WifiOff } from 'lucide-react';
 export function OverviewPageV3() {
   const { isOnline } = useNetworkStatus();
   const { hideBottomNav, showBottomNav } = useBottomNavigation();
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  const showSentinelRef = useRef<HTMLDivElement>(null);
+  const hideSentinelRef = useRef<HTMLDivElement>(null);
 
   // Prevent pull-down overscroll bounce on this immersive page
   usePreventOverscroll();
@@ -49,27 +50,41 @@ export function OverviewPageV3() {
     return () => { showBottomNav(); };
   }, [hideBottomNav, showBottomNav]);
 
-  // IntersectionObserver on a sentinel placed at 95dvh inside the hero.
-  // When the sentinel scrolls out of view (hero scrolled past 95%), show nav.
+  // Two sentinels:
+  // 1. "show" sentinel at top of hero — when it leaves viewport, nav slides in
+  // 2. "hide" sentinel ~85px from top — when it re-enters viewport (scrolling back up), nav slides out
   useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
+    const showEl = showSentinelRef.current;
+    const hideEl = hideSentinelRef.current;
+    if (!showEl || !hideEl) return;
 
-    const observer = new IntersectionObserver(
+    const showObserver = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          // Sentinel visible = user is still in hero zone → hide nav
-          hideBottomNav();
-        } else {
-          // Sentinel out of view = user scrolled past 95% of hero → show nav
+        if (!entry.isIntersecting) {
+          // Top sentinel scrolled out → show nav
           showBottomNav();
         }
       },
       { threshold: 0 }
     );
 
-    observer.observe(el);
-    return () => observer.disconnect();
+    const hideObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          // Hide sentinel came back into view (user scrolled back to hero) → hide nav
+          hideBottomNav();
+        }
+      },
+      { threshold: 0 }
+    );
+
+    showObserver.observe(showEl);
+    hideObserver.observe(hideEl);
+
+    return () => {
+      showObserver.disconnect();
+      hideObserver.disconnect();
+    };
   }, [hideBottomNav, showBottomNav]);
 
   return (
