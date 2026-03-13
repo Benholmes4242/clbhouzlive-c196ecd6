@@ -270,7 +270,7 @@ export function useRankingMovers() {
     if (error) throw error;
 
     // Calculate movers with rank change >= 3
-    const allMovers = (data || [])
+    const allMovers = (latestRows)
       .map((row: any) => {
         const rankChange = (row.prior_rank || row.rank) - row.rank; // Positive = moved up
         return {
