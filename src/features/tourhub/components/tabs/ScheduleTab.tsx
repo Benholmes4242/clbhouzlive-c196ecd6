@@ -43,6 +43,7 @@ interface MonthGroup {
   monthKey: string;
   monthLabel: string;
   tournaments: TourTournament[];
+  tourBreakdown: Record<string, number>;
 }
 
 function useDebouncedValue<T>(value: T, delay: number): T {
