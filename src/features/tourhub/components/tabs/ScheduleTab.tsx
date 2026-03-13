@@ -291,10 +291,20 @@ export function ScheduleTab() {
         t.tour_full_name?.toLowerCase().includes(searchLower)
       );
     }
-    // Exclude hero items from list (non-live tabs only)
+    // Exclude hero items only when hero is visible
     if (filter === 'all' && !search && heroItems.length > 0) {
       const heroIds = new Set(heroItems.map(h => h.tournament.id));
       filtered = filtered.filter(t => !heroIds.has(t.id));
+    }
+    // Sort all-tab: live first, then upcoming chrono, then completed reverse-chrono
+    if (filter === 'all') {
+      filtered.sort((a, b) => {
+        const statusScore = (t: TourTournament) =>
+          t.status === 'inprogress' ? 0 : (t.status === 'scheduled' || t.status === 'created') ? 1 : 2;
+        const ss = statusScore(a) - statusScore(b);
+        if (ss !== 0) return ss;
+        return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+      });
     }
     return filtered;
   }, [tournaments, filter, activeTour, search, heroItems]);
