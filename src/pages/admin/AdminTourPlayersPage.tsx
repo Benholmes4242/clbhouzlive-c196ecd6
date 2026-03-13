@@ -84,10 +84,14 @@ function PhotoManagementSheet({
   player,
   open,
   onClose,
+  headshotCacheBust,
+  onCacheBust,
 }: {
   player: PlayerRow | null;
   open: boolean;
   onClose: () => void;
+  headshotCacheBust: number;
+  onCacheBust: () => void;
 }) {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
