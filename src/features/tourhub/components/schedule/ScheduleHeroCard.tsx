@@ -264,6 +264,14 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                   <>
                     <span className="live-dot" />
                     <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: isMajor ? '#FACC15' : '#22C55E' }}>LIVE</span>
+                    {(() => {
+                      const ri = leaderWinner ? getCurrentRound(leaderWinner.round1, leaderWinner.round2, leaderWinner.round3, leaderWinner.round4) : null;
+                      return ri ? (
+                        <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.5px' }}>
+                          · Round {ri.currentRound}
+                        </span>
+                      ) : null;
+                    })()}
                   </>
                 ) : (
                   <span className="countdown-label">
