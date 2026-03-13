@@ -113,7 +113,7 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
                 key={player.playerId}
                 src={photoUrl}
                 alt={player.playerName}
-className="absolute inset-0 w-full h-full object-cover object-[center_10%]"
+                className="absolute inset-0 w-full h-full object-cover object-[center_10%]"
                 loading="eager"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
