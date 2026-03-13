@@ -250,6 +250,7 @@ interface HeroSlideProps {
   leadersWinnersMap?: Map<string, import('../../hooks/useTournamentLeadersWinners').TournamentLeaderWinner>;
   isExpanded: boolean;
   onToggleExpand: () => void;
+  onInteraction: () => void;
 }
 
 // Card animation variants — matches CreatorCapsule entrance/exit
