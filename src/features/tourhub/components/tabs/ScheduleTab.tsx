@@ -87,7 +87,7 @@ export function ScheduleTab() {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
   
-  const filter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
+  const filter = (searchParams.get('filter') as ScheduleFilterType) || 'upcoming';
   const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
 
   // Scroll to top on mount — always start at top
