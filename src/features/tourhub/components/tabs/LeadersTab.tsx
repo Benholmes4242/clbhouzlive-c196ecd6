@@ -253,6 +253,7 @@ export function LeadersTab() {
             categories={LEADER_CATEGORIES}
             activeKey={category.key}
             onCategoryChange={setCategory}
+            leaderValue={leaderValue}
           />
         </div>
 
