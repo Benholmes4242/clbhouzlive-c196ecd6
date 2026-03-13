@@ -391,7 +391,7 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
                 <motion.img
                   src={photoUrl}
                   alt={champion.playerName}
-className={`absolute inset-0 w-full h-full object-cover ${activeTour === 'LIV' ? 'object-[center_-15%]' : 'object-[center_10%]'}`}
+                  className={`absolute inset-0 w-full h-full object-cover ${activeTour === 'LIV' ? 'object-[center_-15%]' : 'object-[center_10%]'}`}
                   loading="eager"
                   initial={{ scale: 1.06 }}
                   animate={{ scale: 1 }}
