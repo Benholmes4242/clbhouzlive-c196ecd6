@@ -1147,7 +1147,6 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (isExpanded) return;
     if (!touchStartRef.current) {
       scheduleResume();
       return;
