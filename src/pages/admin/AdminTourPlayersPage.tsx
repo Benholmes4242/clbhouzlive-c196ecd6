@@ -369,6 +369,8 @@ export function AdminTourPlayersPage() {
   const [page, setPage] = useState(0);
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerRow | null>(null);
   const [photoPlayer, setPhotoPlayer] = useState<PlayerRow | null>(null);
+  const [headshotCacheBust, setHeadshotCacheBust] = useState(0);
+  const bumpCacheBust = useCallback(() => setHeadshotCacheBust(prev => prev + 1), []);
 
   const { data: players = [], isLoading } = useQuery({
     queryKey: ['admin-tour-players-all'],
