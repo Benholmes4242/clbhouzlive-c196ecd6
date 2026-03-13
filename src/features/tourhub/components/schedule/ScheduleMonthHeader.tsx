@@ -4,7 +4,6 @@
  */
 
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
 
 const TOUR_LABELS: Record<string, string> = {
   pga: 'PGA',
@@ -35,15 +34,9 @@ export function ScheduleMonthHeader({
         .map(([code, count]) => `${count} ${TOUR_LABELS[code] || code}`)
     : [];
 
-  const formattedMonth = monthLabel.charAt(0) + monthLabel.slice(1).toLowerCase();
-
+  // B42 FIX 3: monthLabel arrives in title case from source, use directly
   return (
-    <motion.div 
-      className={cn("pt-6 pb-3 px-4", className)}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-    >
+    <div className={cn("pt-6 pb-3 px-4", className)}>
       <div className="flex items-center justify-between">
         <h3 
           className="text-foreground"
@@ -53,7 +46,7 @@ export function ScheduleMonthHeader({
             letterSpacing: '-0.3px',
           }}
         >
-          {formattedMonth}
+          {monthLabel}
         </h3>
         
         <span 
@@ -69,6 +62,6 @@ export function ScheduleMonthHeader({
           {breakdownParts.join(' · ')}
         </p>
       )}
-    </motion.div>
+    </div>
   );
 }
