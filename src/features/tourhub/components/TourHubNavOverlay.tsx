@@ -336,8 +336,20 @@ export function TourHubNavOverlay({
             {/* Header spacer for safe area */}
             <div style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }} />
             
-            {/* Content container — pushed down to fill space vacated by removed close button */}
-            <div style={{ paddingTop: '16px' }}>
+            {/* Back button */}
+            <div className="flex items-center px-5 pt-4 pb-2">
+              <button
+                onClick={onClose}
+                className="flex items-center gap-2 text-muted-foreground active:opacity-70 transition-opacity min-h-[44px]"
+                aria-label="Close menu"
+              >
+                <ChevronRight className="w-5 h-5 rotate-180" />
+                <span className="text-[15px] font-medium">Back</span>
+              </button>
+            </div>
+            
+            {/* Content container */}
+            <div style={{ paddingTop: '0px' }}>
             
             {/* World Rankings Strip */}
             {displayPlayers.length > 0 && (
