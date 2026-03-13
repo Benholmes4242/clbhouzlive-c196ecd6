@@ -43,6 +43,7 @@ interface MonthGroup {
   monthKey: string;
   monthLabel: string;
   tournaments: TourTournament[];
+  tourBreakdown: Record<string, number>;
 }
 
 function useDebouncedValue<T>(value: T, delay: number): T {
@@ -290,15 +291,25 @@ export function ScheduleTab() {
         t.tour_full_name?.toLowerCase().includes(searchLower)
       );
     }
-    // Exclude hero items from list (non-live tabs only)
+    // Exclude hero items only when hero is visible
     if (filter === 'all' && !search && heroItems.length > 0) {
       const heroIds = new Set(heroItems.map(h => h.tournament.id));
       filtered = filtered.filter(t => !heroIds.has(t.id));
     }
+    // Sort all-tab: live first, then upcoming chrono, then completed reverse-chrono
+    if (filter === 'all') {
+      filtered.sort((a, b) => {
+        const statusScore = (t: TourTournament) =>
+          t.status === 'inprogress' ? 0 : (t.status === 'scheduled' || t.status === 'created') ? 1 : 2;
+        const ss = statusScore(a) - statusScore(b);
+        if (ss !== 0) return ss;
+        return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+      });
+    }
     return filtered;
   }, [tournaments, filter, activeTour, search, heroItems]);
 
-  const monthGroups = useMemo((): (MonthGroup & { tourBreakdown: Record<string, number> })[] => {
+  const monthGroups = useMemo((): MonthGroup[] => {
     if (!filteredResults.length) return [];
     const groups = new Map<string, TourTournament[]>();
     filteredResults.forEach(tournament => {
@@ -319,7 +330,7 @@ export function ScheduleTab() {
       for (const t of tournaments) { if (t.tour_code) tourBreakdown[t.tour_code] = (tourBreakdown[t.tour_code] || 0) + 1; }
       return {
         monthKey,
-        monthLabel: format(new Date(tournaments[0].start_date + 'T12:00:00Z'), 'MMMM yyyy').toUpperCase(),
+        monthLabel: format(new Date(tournaments[0].start_date + 'T12:00:00Z'), 'MMMM yyyy'),
         tournaments,
         tourBreakdown,
       };
@@ -486,17 +497,12 @@ export function ScheduleTab() {
 
         {/* No Live Message — premium empty state SC-02 */}
         {filter === 'live' && filterStats.live === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <ScheduleEmptyMessage 
-              variant="no-live" 
-              nextTournamentName={nextUpcoming?.name}
-              nextTournamentDate={nextUpcoming?.start_date}
-              onSwitchFilter={setFilter}
-            />
-          </motion.div>
+          <ScheduleEmptyMessage 
+            variant="no-live" 
+            nextTournamentName={nextUpcoming?.name}
+            nextTournamentDate={nextUpcoming?.start_date}
+            onSwitchFilter={setFilter}
+          />
         )}
         
         {/* Event Cards — Grouped by Month */}
@@ -510,22 +516,16 @@ export function ScheduleTab() {
               transition={{ duration: 0.2 }}
             >
               {monthGroups.map((group, groupIndex) => (
-                <motion.div 
+                <div
                   key={group.monthKey}
                   id={`month-${group.monthKey}`}
                   className={groupIndex > 0 ? 'mt-7' : ''}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: groupIndex * 0.05, duration: 0.3 }}
                 >
-                  {/* Month header (non-sticky) */}
-                  <div>
-                    <ScheduleMonthHeader 
-                      monthLabel={group.monthLabel}
-                      eventCount={group.tournaments.length}
-                      tourBreakdown={group.tourBreakdown}
-                    />
-                  </div>
+                  <ScheduleMonthHeader 
+                    monthLabel={group.monthLabel}
+                    eventCount={group.tournaments.length}
+                    tourBreakdown={group.tourBreakdown}
+                  />
 
                   {/* Tournament list — 12px gap from header, 12px between cards */}
                   <div className="flex flex-col gap-3 px-4 mt-3">
@@ -538,7 +538,7 @@ export function ScheduleTab() {
                       </InViewCard>
                     ))}
                   </div>
-                </motion.div>
+                </div>
               ))}
             </motion.div>
           ) : (
