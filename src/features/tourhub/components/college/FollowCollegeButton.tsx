@@ -1,5 +1,5 @@
 import { Heart } from 'lucide-react';
-import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsCollegeFollowed, useFollowCollegeMutations } from '../../hooks/useCollegeMovers';
 
 interface FollowCollegeButtonProps {
