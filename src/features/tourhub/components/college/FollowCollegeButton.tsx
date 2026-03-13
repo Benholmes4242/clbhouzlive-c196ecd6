@@ -8,7 +8,8 @@ interface FollowCollegeButtonProps {
 }
 
 export function FollowCollegeButton({ normalizedName, compact = false }: FollowCollegeButtonProps) {
-  const { user } = useAuth();
+  const { session } = useSupabaseSession();
+  const user = session?.user;
   const isFollowed = useIsCollegeFollowed(user?.id, normalizedName);
   const { follow, unfollow } = useFollowCollegeMutations(user?.id);
 
