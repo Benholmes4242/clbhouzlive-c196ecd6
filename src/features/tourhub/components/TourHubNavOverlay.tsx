@@ -57,7 +57,7 @@ const NAV_ITEMS: NavItem[] = [
 const LINK_ITEMS: LinkItem[] = [
   { 
     id: 'college-golf', 
-    label: 'College Golf', 
+    label: 'College Franchise Rankings', 
     subtitle: 'From campus standout to Tour contender.',
     path: '/tourhub/college-golf',
     icon: <GraduationCap className="w-5 h-5" />,
@@ -336,8 +336,20 @@ export function TourHubNavOverlay({
             {/* Header spacer for safe area */}
             <div style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }} />
             
-            {/* Content container — pushed down to fill space vacated by removed close button */}
-            <div style={{ paddingTop: '16px' }}>
+            {/* Back button */}
+            <div className="flex items-center px-5 pt-4 pb-2">
+              <button
+                onClick={onClose}
+                className="flex items-center gap-2 text-muted-foreground active:opacity-70 transition-opacity min-h-[44px]"
+                aria-label="Close menu"
+              >
+                <ChevronRight className="w-5 h-5 rotate-180" />
+                <span className="text-[15px] font-medium">Back</span>
+              </button>
+            </div>
+            
+            {/* Content container */}
+            <div style={{ paddingTop: '0px' }}>
             
             {/* World Rankings Strip */}
             {displayPlayers.length > 0 && (
@@ -541,11 +553,7 @@ export function TourHubNavOverlay({
                 })}
                </div>
 
-              {/* Divider before link items */}
-              <div className="h-px my-4 border-t border-border/30" />
-
-              {/* Link Items (College Golf, etc.) */}
-              <div className="space-y-2">
+              {/* Link Items (College Golf, etc.) — unified list continues */}
                 {LINK_ITEMS.map((item, index) => (
                   <motion.button
                     key={item.id}
@@ -630,7 +638,7 @@ export function TourHubNavOverlay({
                     />
                   </motion.button>
                 ))}
-              </div>
+
             </div>
             </div>{/* Close content padding wrapper */}
           </motion.div>
