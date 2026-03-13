@@ -142,6 +142,11 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
                   transition={{ duration: 0.35 }}
                   className="space-y-1"
                 >
+                  {player.worldRank && (
+                    <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', marginBottom: '2px' }}>
+                      #{player.worldRank} World
+                    </p>
+                  )}
                   <h2
                     className="text-white"
                     style={{ fontSize: '22px', fontWeight: 800, letterSpacing: '-0.3px', lineHeight: 1.2 }}
