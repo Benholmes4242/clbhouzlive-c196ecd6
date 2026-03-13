@@ -219,8 +219,8 @@ function PhotoManagementSheet({
         <div className="flex flex-col items-center gap-5">
           {/* Current headshot preview */}
           <img
-            key={imgKey}
-            src={headshotUrl + `?v=${imgKey}`}
+            key={cacheBust}
+            src={headshotUrl + `?v=${cacheBust}`}
             alt={playerName}
             className="w-28 h-28 rounded-2xl object-cover object-top bg-muted border border-border"
             onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
