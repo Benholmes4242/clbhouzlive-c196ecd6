@@ -36,17 +36,53 @@ export function useLiveLeaderTeaser() {
   return useQuery({
     queryKey: ['live-leader-teaser'],
     queryFn: async () => {
-      // Get the first in-progress tournament
-      const { data: tournament } = await supabase
+      // Fetch ALL live tournaments with enough data to prioritise
+      const { data: liveTournaments } = await supabase
         .from('sr_tournaments')
-        .select('id, name')
+        .select('id, name, purse, season:sr_seasons!inner(tour_name)')
         .eq('status', 'inprogress')
-        .limit(1)
-        .maybeSingle();
+        .order('purse', { ascending: false });
 
-      if (!tournament) return null;
+      if (!liveTournaments || liveTournaments.length === 0) return null;
 
-      // Get all players at position 1 from that tournament's leaderboard
+      const TOUR_PRIORITY_ORDER: Record<string, number> = {
+        pga: 0, liv: 1, euro: 2, lpga: 3, pgad: 4, champ: 5,
+      };
+
+      function getTourSlug(tourName: string): string {
+        const n = tourName?.toLowerCase().trim();
+        if (n === 'pga' || n === 'pga tour') return 'pga';
+        if (n === 'euro' || n === 'dp world' || n === 'european tour') return 'euro';
+        if (n === 'lpga' || n === 'lpga tour') return 'lpga';
+        if (n === 'liv' || n === 'liv golf') return 'liv';
+        if (n === 'pgad' || n === 'korn ferry') return 'pgad';
+        if (n === 'champ' || n === 'champions') return 'champ';
+        return 'pga';
+      }
+
+      // Score each live tournament — majors always win
+      const scored = liveTournaments.map(t => {
+        const tourName = (t.season as any)?.tour_name || '';
+        const tourSlug = getTourSlug(tourName);
+        const label = getContextLabel({ name: t.name, tourName });
+        const isMajor = label === 'MAJOR CHAMPIONSHIP';
+        return {
+          id: t.id,
+          name: t.name,
+          isMajor,
+          tourPriority: TOUR_PRIORITY_ORDER[tourSlug] ?? 99,
+          purse: t.purse ?? 0,
+        };
+      });
+
+      scored.sort((a, b) => {
+        if (a.isMajor !== b.isMajor) return a.isMajor ? -1 : 1;
+        if (a.tourPriority !== b.tourPriority) return a.tourPriority - b.tourPriority;
+        return b.purse - a.purse;
+      });
+
+      const tournament = scored[0];
+
       const { data: leaders } = await supabase
         .from('sr_leaderboards')
         .select('score, position, player_id, sr_players!sr_leaderboards_player_id_fkey(full_name)')
@@ -85,8 +121,8 @@ export function useLiveLeaderTeaser() {
         isTied: false,
       };
     },
-    staleTime: 30_000,          // 30s — matches sync interval
-    refetchInterval: 60_000,   // 60s polling fallback
+    staleTime: 30_000,
+    refetchInterval: 60_000,
   });
 }
 
