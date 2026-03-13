@@ -553,16 +553,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                            'KORN FERRY'}
                         </span>
                       </div>
-                      {/* Close icon — only when expanded */}
-                      {isLive && leaders.length > 0 && isExpanded && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); e.preventDefault(); onToggleExpand(); }}
-                          aria-label="Collapse leaderboard"
-                          style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                        >
-                          <X style={{ width: 18, height: 18, color: 'rgba(255,255,255,0.6)' }} />
-                        </button>
-                      )}
                     </div>
                   </div>
                   <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
