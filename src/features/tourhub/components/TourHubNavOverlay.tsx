@@ -348,8 +348,14 @@ export function TourHubNavOverlay({
               </button>
             </div>
             
-            {/* Content container */}
-            <div style={{ paddingTop: '0px' }}>
+            {/* Scrollable content — rankings + nav items together */}
+            <div
+              className="flex-1 overflow-y-auto min-h-0"
+              style={{
+                overscrollBehavior: 'contain',
+                paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
+              }}
+            >
             
             {/* World Rankings Strip */}
             {displayPlayers.length > 0 && (
