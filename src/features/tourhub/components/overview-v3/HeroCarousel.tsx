@@ -159,7 +159,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
         <div className="flex items-center gap-2 min-w-0">
           <div
             className="overflow-hidden flex-shrink-0"
-            style={{ width: '32px', height: '33px', borderRadius: '34%', border: '1.5px solid #F8FAFC', background: '#F8FAFC' }}
+            style={{ width: '32px', height: '33px', borderRadius: '34%', border: '1.5px solid rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.12)' }}
           >
             {photoUrl ? (
               <img
@@ -169,7 +169,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
                 onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-white/60 text-[10px] font-semibold" style={{ background: '#F8FAFC' }}>{initials}</div>
+              <div className="w-full h-full flex items-center justify-center text-[10px] font-semibold" style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.80)' }}>{initials}</div>
             )}
           </div>
           <span className={cn("leaderboard-name truncate", isFirst && "font-bold")}>
@@ -225,8 +225,8 @@ function CondensedTieRow({ row, index, isActive, tournamentTourSlug }: { row: Li
                   width: 28,
                   height: 29,
                   borderRadius: '34%',
-                  border: '1.5px solid #F8FAFC',
-                  background: '#F8FAFC',
+                  border: '1.5px solid rgba(255,255,255,0.18)',
+                  background: 'rgba(255,255,255,0.12)',
                   marginLeft: i > 0 ? -8 : 0,
                   zIndex: 4 - i,
                   position: 'relative',
@@ -235,7 +235,7 @@ function CondensedTieRow({ row, index, isActive, tournamentTourSlug }: { row: Li
                 {photoUrl ? (
                   <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
                 ) : (
-                  <div style={{ width: '100%', height: '100%', background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>{initials}</div>
+                  <div style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.80)' }}>{initials}</div>
                 )}
               </div>
             );
@@ -243,7 +243,7 @@ function CondensedTieRow({ row, index, isActive, tournamentTourSlug }: { row: Li
           {row.players.length > 4 && (
             <div
               className="flex-shrink-0 flex items-center justify-center"
-              style={{ width: 22, height: 22, borderRadius: '34%', background: '#F8FAFC', border: '1.5px solid #F8FAFC', marginLeft: -6, position: 'relative', zIndex: 0, fontSize: 9, fontWeight: 600, color: '#64748B' }}
+              style={{ width: 22, height: 22, borderRadius: '34%', background: 'rgba(255,255,255,0.12)', border: '1.5px solid rgba(255,255,255,0.18)', marginLeft: -6, position: 'relative', zIndex: 0, fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.70)' }}
             >
               +{row.players.length - 4}
             </div>

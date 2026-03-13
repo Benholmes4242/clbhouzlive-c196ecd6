@@ -87,7 +87,7 @@ export function ScheduleTab() {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
   
-  const filter = (searchParams.get('filter') as ScheduleFilterType) || 'upcoming';
+  const filter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
   const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
 
   // Scroll to top on mount — always start at top
@@ -98,6 +98,15 @@ export function ScheduleTab() {
       window.scrollTo(0, 0);
     });
   }, []);
+
+  // Default to upcoming tab on fresh mount (no filter param in URL)
+  useEffect(() => {
+    if (!searchParams.get('filter')) {
+      const params = new URLSearchParams(searchParams);
+      params.set('filter', 'upcoming');
+      setSearchParams(params, { replace: true });
+    }
+  }, []); // runs once on mount only
   
   const setFilter = useCallback((f: ScheduleFilterType) => {
     const params = new URLSearchParams(searchParams);
