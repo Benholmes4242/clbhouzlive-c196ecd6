@@ -235,12 +235,11 @@ export function ScheduleTab() {
 
   const filterStats = useMemo(() => {
     if (!tournaments) return { all: 0, live: 0, upcoming: 0, completed: 0 };
-    const now = new Date();
     const tourFiltered = activeTour === 'all' ? tournaments : tournaments.filter(t => t.tour_code === activeTour);
     return {
       all: tourFiltered.length,
       live: tourFiltered.filter(t => t.status === 'inprogress').length,
-      upcoming: tourFiltered.filter(t => t.status === 'scheduled' || t.status === 'created' || isAfter(new Date(t.start_date), now)).length,
+      upcoming: tourFiltered.filter(t => t.status === 'scheduled' || t.status === 'created').length,
       completed: tourFiltered.filter(t => t.status === 'closed').length,
     };
   }, [tournaments, activeTour]);
