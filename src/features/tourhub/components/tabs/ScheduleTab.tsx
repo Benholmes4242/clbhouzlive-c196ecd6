@@ -67,14 +67,11 @@ function InViewCard({ children }: { children: React.ReactNode }) {
   );
 }
 
-const SCROLL_KEY = 'schedule-scroll-pos';
-
 export function ScheduleTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   const filter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
   const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
