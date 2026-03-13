@@ -41,7 +41,7 @@ function formatThru(entry: LeaderboardEntryWithPlayer): string {
 export function ExpandedLeaderboardSkeleton() {
   return (
     <div className="expanded-lb-scroll" style={{ flex: 1, padding: '0 16px' }}>
-      {Array.from({ length: 10 }).map((_, i) => (
+      {Array.from({ length: 7 }).map((_, i) => (
         <div key={i} className="flex items-center justify-between" style={{ padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="flex items-center gap-2">
             <div className="w-6 h-3 rounded" style={{ background: 'rgba(255,255,255,0.08)', animation: 'shimmer 1.8s infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
