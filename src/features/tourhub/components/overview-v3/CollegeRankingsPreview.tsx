@@ -628,8 +628,8 @@ export function CollegeRankingsPreview() {
 
   if (statsError || mediaError) {
     return (
-      <section aria-label="Franchise Rankings">
-        <SectionErrorState sectionName="franchise rankings" onRetry={() => { refetchStats(); refetchMedia(); }} />
+      <section aria-label="College Franchise Rankings">
+        <SectionErrorState sectionName="college franchise rankings" onRetry={() => { refetchStats(); refetchMedia(); }} />
       </section>
     );
   }
