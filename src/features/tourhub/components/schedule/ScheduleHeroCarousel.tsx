@@ -64,6 +64,19 @@ export function ScheduleHeroCarousel({ items, leadersMap, height }: ScheduleHero
     return () => { if (autoAdvanceRef.current) clearInterval(autoAdvanceRef.current); };
   }, [startAutoAdvance]);
 
+  // Pause auto-advance when app is backgrounded
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden) {
+        pausedRef.current = true;
+      } else {
+        setTimeout(() => { pausedRef.current = false; }, 1000);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
+
   const handleTouchStart = (e: React.TouchEvent) => {
     pausedRef.current = true;
     touchStartRef.current = e.touches[0].clientX;
