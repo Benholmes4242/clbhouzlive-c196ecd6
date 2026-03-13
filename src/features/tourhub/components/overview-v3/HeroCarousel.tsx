@@ -15,7 +15,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, Trophy, Menu } from 'lucide-react';
+import { ChevronDown, ChevronRight, Trophy, Menu } from 'lucide-react';
 import { openTourNav } from '../../contexts/TourNavContext';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { cn } from '@/lib/utils';
