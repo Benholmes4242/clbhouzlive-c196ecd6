@@ -115,10 +115,13 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
                 alt={player.playerName}
                 className="absolute inset-0 w-full h-full object-cover object-[center_10%]"
                 loading="eager"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
+                initial={{ opacity: 0, scale: 1.04 }}
+                animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
+                transition={{
+                  opacity: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+                  scale: { duration: 5, ease: 'linear' },
+                }}
                 onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
               />
             </AnimatePresence>
@@ -139,6 +142,11 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
                   transition={{ duration: 0.35 }}
                   className="space-y-1"
                 >
+                  {player.worldRank && (
+                    <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', marginBottom: '2px' }}>
+                      #{player.worldRank} World
+                    </p>
+                  )}
                   <h2
                     className="text-white"
                     style={{ fontSize: '22px', fontWeight: 800, letterSpacing: '-0.3px', lineHeight: 1.2 }}
@@ -156,34 +164,22 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
                 </motion.div>
               </AnimatePresence>
 
-              {/* Carousel dots */}
+              {/* Dots — below country row, left-aligned */}
               {count > 1 && (
-                <div className="flex items-center justify-center pt-1">
-                  <div
-                    className="flex items-center gap-2"
-                    style={{
-                      background: 'rgba(0,0,0,0.14)',
-                      backdropFilter: 'blur(16px)',
-                      WebkitBackdropFilter: 'blur(16px)',
-                      padding: '6px 12px',
-                      borderRadius: '9999px',
-                    }}
-                  >
-                    {players.map((_, i) => (
-                      <button
-                        key={i}
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo(i); }}
-                        className="rounded-full"
-                        style={{
-                          width: i === currentIndex ? '20px' : '6px',
-                          height: '6px',
-                          background: i === currentIndex ? 'white' : 'rgba(255,255,255,0.4)',
-                          transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-                        }}
-                        aria-label={`Go to player ${i + 1}`}
-                      />
-                    ))}
-                  </div>
+                <div className="flex items-center gap-1.5 pt-1">
+                  {players.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo(i); }}
+                      className="rounded-full transition-all duration-300"
+                      style={{
+                        width: i === currentIndex ? '18px' : '6px',
+                        height: '6px',
+                        background: i === currentIndex ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.35)',
+                      }}
+                      aria-label={`Player ${i + 1}`}
+                    />
+                  ))}
                 </div>
               )}
             </div>
