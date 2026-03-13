@@ -8,7 +8,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useTournamentsCache } from '@/hooks/useTournamentsCache';
 import type { SeasonTournament } from './useSeasonTournaments';
 
-const TOUR_KEY_MAP: Record<string, string> = {
+// Slug → display name for tournament rows (display only, distinct from TOUR_NAME_TO_SLUG which maps the reverse)
+const TOUR_DISPLAY_NAMES: Record<string, string> = {
   pga: 'PGA Tour',
   liv: 'LIV Golf',
   euro: 'DP World Tour',
@@ -41,12 +42,13 @@ export function useUpcomingTournaments(limit = 6) {
           venueCountry: t.venue_country,
           venuePar: t.venue_par,
           venueYardage: t.venue_yardage,
-          tourName: TOUR_KEY_MAP[tourKey] || t.season?.tour_name || 'Tour Event',
+          tourName: TOUR_DISPLAY_NAMES[tourKey] || t.season?.tour_name || 'Tour Event',
           year: t.season?.year || new Date().getFullYear(),
           winnerId: null,
           winnerFirstName: null,
           winnerLastName: null,
           winnerPhotoUrl: null,
+          defendingChampion: t.defending_champion ?? null,
         };
       });
     },

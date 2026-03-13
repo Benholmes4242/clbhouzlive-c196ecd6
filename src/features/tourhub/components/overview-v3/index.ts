@@ -9,7 +9,7 @@ export { TourBreakdown } from './TourBreakdown';
 
 // New Modules
 export { LiveRightNow } from './LiveRightNow';
-export { ComingUpNext } from './ComingUpNext';
+
 export { MoversThisWeek } from './MoversThisWeek';
 export { LiveGolfPulse } from './LiveGolfPulse';
 export { WorldRankingsModule } from './WorldRankingsModule';

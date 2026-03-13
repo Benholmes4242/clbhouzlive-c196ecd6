@@ -3,7 +3,6 @@
  * Clean list layout matching reference: date block | context + name + venue | date
  */
 
-import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
@@ -11,6 +10,7 @@ import { useUpcomingTournaments } from '../../hooks/useUpcomingTournaments';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SectionErrorState } from '../SectionErrorState';
 import { getTourLogo } from '../../utils/tourLogos';
+import { TOUR_COLORS } from '../../constants/colors';
 import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 import { getContextLabel, TOUR_NAME_TO_SLUG } from '../../utils/tournamentClassification';
 
@@ -40,16 +40,15 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
   const contextLabel = getContextLabel(tournament);
   const isSpecialEvent = ['MAJOR CHAMPIONSHIP', 'SIGNATURE EVENT', 'ROLEX SERIES', 'PLAYOFF EVENT'].includes(contextLabel);
   const isMajor = contextLabel === 'MAJOR CHAMPIONSHIP';
-  const isSignature = contextLabel === 'SIGNATURE EVENT';
-  const isRolex = contextLabel === 'ROLEX SERIES';
+  const isRolexOrSignature = contextLabel === 'ROLEX SERIES' || contextLabel === 'SIGNATURE EVENT';
   const venue = getVenueString(tournament);
   const tourSlug = TOUR_NAME_TO_SLUG[tournament.tourName || ''] || '';
   const tourLogoSrc = tourSlug ? getTourLogo(tourSlug) : null;
 
   // Left border accent: amber for majors, emerald for signature/rolex
   const leftBorderStyle = isMajor
-    ? '3px solid #f59e0b'
-    : (isSignature || isRolex)
+    ? `3px solid ${TOUR_COLORS.liveAmber}`
+    : isRolexOrSignature
       ? '3px solid rgba(16, 185, 129, 0.8)'
       : '3px solid transparent';
 
@@ -61,13 +60,11 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
       : 'rgba(16, 185, 129, 0.9)'; // emerald for SIGNATURE EVENT + ROLEX SERIES
 
   return (
-    <motion.div
-      role="button"
-      tabIndex={0}
+    <motion.button
+      type="button"
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/tourhub/tournament/${tournament.id}`); }}
       className="w-full flex items-center gap-3 px-3.5 py-2.5 bg-card rounded-2xl border border-border/50 text-left transition-all active:scale-[0.98]"
-      style={{ borderLeft: leftBorderStyle, cursor: 'pointer' }}
+      style={{ borderLeft: leftBorderStyle }}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: 0.05 * index, ease: [0.16, 1, 0.3, 1] }}
@@ -107,16 +104,19 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
             {venue}
           </p>
         )}
+        {tournament.defendingChampion && (
+          <p className="text-[0.6875rem] text-muted-foreground/50 truncate mt-0.5 leading-none">
+            Defending: <span className="font-medium">{tournament.defendingChampion}</span>
+          </p>
+        )}
       </div>
 
       {/* Tour logo */}
       {tourLogoSrc && (
         <div
           className="flex-shrink-0 flex items-center justify-center opacity-60"
-          style={{
-            width: ['pga', 'lpga'].includes(tourSlug) ? 36 : 42,
-            height: ['pga', 'lpga'].includes(tourSlug) ? 36 : 42,
-          }}
+          // PGA/LPGA logos are wider and appear oversized at 42px — use 36px for visual balance
+          style={{ width: (['pga', 'lpga'].includes(tourSlug) ? 36 : 42), height: (['pga', 'lpga'].includes(tourSlug) ? 36 : 42) }}
         >
           <img
             src={tourLogoSrc}
@@ -125,7 +125,7 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
           />
         </div>
       )}
-    </motion.div>
+    </motion.button>
   );
 }
 
@@ -153,13 +153,6 @@ export function WhatsComing() {
   const navigate = useNavigate();
   const { data: tournaments, isLoading, error, refetch } = useUpcomingTournaments(6);
 
-  const upcoming = useMemo(() => {
-    if (!tournaments) return [];
-    return tournaments.filter(
-      (t) => t.status === 'scheduled' || t.status === 'created'
-    );
-  }, [tournaments]);
-
   if (isLoading) {
     return (
       <section aria-label="Upcoming tournaments">
@@ -184,7 +177,7 @@ export function WhatsComing() {
     );
   }
 
-  if (!upcoming.length) return null;
+  if (!tournaments?.length) return null;
 
   return (
     <motion.section
@@ -212,7 +205,7 @@ export function WhatsComing() {
 
       {/* Event list */}
       <div className="flex flex-col gap-2 px-4">
-        {upcoming.map((tournament, index) => (
+        {(tournaments ?? []).map((tournament, index) => (
           <EventRow key={tournament.id} tournament={tournament} index={index} />
         ))}
       </div>
