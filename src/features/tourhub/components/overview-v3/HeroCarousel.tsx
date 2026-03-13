@@ -15,9 +15,9 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronRight, Trophy, Menu } from 'lucide-react';
+import { ChevronDown, ChevronRight, ChevronsUp, Trophy, Menu } from 'lucide-react';
 import { openTourNav } from '../../contexts/TourNavContext';
-import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
+
 import { cn } from '@/lib/utils';
 import { 
   useHeroCarouselData,
@@ -537,6 +537,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
           >
+            {/* Pill handle affordance for expandable cards */}
+            {!isExpanded && !isLive && (
+              <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: '8px', marginTop: '-8px' }}>
+                <div style={{ width: '32px', height: '3px', borderRadius: '2px', background: 'rgba(255,255,255,0.25)' }} />
+              </div>
+            )}
             {/* ─── COMPLETED: tournament name goes straight to top ─── */}
             {isCompleted ? (
               <>
@@ -761,10 +767,15 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       </AnimatePresence>
 
                       {!isExpanded && (
-                        <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta">
-                          <span>See All</span>
-                          <ChevronRight className="w-4 h-4 cta-chevron" />
-                        </Link>
+                        <>
+                          <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta">
+                            <span>See All</span>
+                            <ChevronRight className="w-4 h-4 cta-chevron" />
+                          </Link>
+                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
+                            <ChevronsUp size={14} style={{ color: 'rgba(255,255,255,0.35)', animation: 'pulse 2s infinite' }} />
+                          </div>
+                        </>
                       )}
                     </>
                   )}
@@ -954,6 +965,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     <span>View Tournament</span>
                     <ChevronRight className="w-4 h-4 cta-chevron" />
                   </Link>
+                  {!isExpanded && (
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
+                      <ChevronsUp size={14} style={{ color: 'rgba(255,255,255,0.35)', animation: 'pulse 2s infinite' }} />
+                    </div>
+                  )}
                 </motion.div>
               )}
 
@@ -998,7 +1014,7 @@ interface HeroCarouselProps {
 
 export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
-  const { showBottomNav } = useBottomNavigation();
+  // Bottom nav no longer controlled from HeroCarousel — sentinel observers handle it
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -1084,7 +1100,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     }
   }, [slides.length, currentIndex]);
 
-  const isCurrentSlideLive = slides[currentIndex]?.type === 'live';
+  
 
   // Auto-collapse if slide index changes
   const prevIndexRef = React.useRef(currentIndex);
@@ -1097,7 +1113,6 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
 
   // Swipe gesture handlers
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (isExpanded) return;
     setIsPaused(true);
     touchStartRef.current = {
       x: e.touches[0].clientX,
@@ -1108,13 +1123,11 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (isExpanded) return;
     if (!touchStartRef.current) return;
     touchMoveRef.current = e.touches[0].clientX - touchStartRef.current.x;
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (isExpanded) return;
     if (!touchStartRef.current) {
       scheduleResume();
       return;
@@ -1189,7 +1202,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
       <button 
         className="fixed z-20 flex items-center justify-center"
         style={{ top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: '16px', width: '44px', height: '44px' }}
-        onClick={() => { openTourNav(); showBottomNav(); }}
+        onClick={() => { openTourNav(); }}
         aria-label="Open tour menu"
       >
         <Menu 
@@ -1222,38 +1235,35 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
         ))}
       </AnimatePresence>
 
-      {/* Scroll indicator — only when not expanded */}
-      {(!isExpanded || isCurrentSlideLive) && (
+      {/* Scroll-to-exit indicator */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2, duration: 0.5 }}
+        style={{
+          position: 'absolute',
+          bottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 16px)',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '4px',
+          pointerEvents: 'none',
+          opacity: isExpanded ? 0 : 1,
+          transition: 'opacity 0.2s',
+        }}
+      >
+        <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '1.2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)' }}>
+          Explore
+        </span>
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 0.4 }}
-          style={{
-            position: 'absolute',
-            bottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 16px)',
-            left: 0,
-            right: 0,
-            display: 'flex',
-            justifyContent: 'center',
-            pointerEvents: 'none',
-            zIndex: 5,
-          }}
+          animate={{ y: [0, 4, 0] }}
+          transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <motion.div
-            animate={{ y: [0, 5, 0] }}
-            transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut', repeatDelay: 0.6 }}
-          >
-            <ChevronDown
-              style={{ 
-                width: 22, 
-                height: 22, 
-                color: 'rgba(255,255,255,0.45)',
-                filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))',
-              }}
-            />
-          </motion.div>
+          <ChevronDown size={16} style={{ color: 'rgba(255,255,255,0.45)' }} />
         </motion.div>
-      )}
+      </motion.div>
     </div>
   );
 }
