@@ -197,7 +197,11 @@ async function parseSSEStream(
 
           // Handle error events
           if (parsed.error) {
+            streamState.lastError = typeof parsed.error === 'string' 
+              ? parsed.error 
+              : 'Echo encountered an error. Please try again.';
             if (parsed.token) {
+              streamState.hasContent = true;
               options.onChunk(parsed.token);
             }
             continue;
@@ -211,6 +215,7 @@ async function parseSSEStream(
 
           // Handle token
           if (parsed.token) {
+            streamState.hasContent = true;
             options.onChunk(parsed.token);
           }
         } catch {
