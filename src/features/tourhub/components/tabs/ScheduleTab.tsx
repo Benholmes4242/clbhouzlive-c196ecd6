@@ -150,11 +150,13 @@ export function ScheduleTab() {
     isPulling.current = false;
   }, [pullDistance, handleRefresh]);
 
+  const isCompleted = (t: TourTournament) => t.status === 'closed' || t.status === 'complete';
+
   const { liveIds, completedIds } = useMemo(() => {
     if (!tournaments) return { liveIds: [] as string[], completedIds: [] as string[] };
     return {
       liveIds: tournaments.filter(t => t.status === 'inprogress').map(t => t.id),
-      completedIds: tournaments.filter(t => t.status === 'closed').map(t => t.id),
+      completedIds: tournaments.filter(isCompleted).map(t => t.id),
     };
   }, [tournaments]);
 
@@ -195,7 +197,7 @@ export function ScheduleTab() {
 
     const liveList = tourFiltered.filter(t => t.status === 'inprogress');
     const completedList = tourFiltered
-      .filter(t => t.status === 'closed')
+      .filter(isCompleted)
       .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime());
     const now = new Date();
     const upcomingList = tourFiltered
@@ -240,7 +242,7 @@ export function ScheduleTab() {
       all: tourFiltered.length,
       live: tourFiltered.filter(t => t.status === 'inprogress').length,
       upcoming: tourFiltered.filter(t => t.status === 'scheduled' || t.status === 'created').length,
-      completed: tourFiltered.filter(t => t.status === 'closed').length,
+      completed: tourFiltered.filter(isCompleted).length,
     };
   }, [tournaments, activeTour]);
 
@@ -249,7 +251,7 @@ export function ScheduleTab() {
     let statusFiltered = [...tournaments];
     switch (filter) {
       case 'upcoming': statusFiltered = statusFiltered.filter(t => t.status === 'scheduled' || t.status === 'created'); break;
-      case 'completed': statusFiltered = statusFiltered.filter(t => t.status === 'closed'); break;
+      case 'completed': statusFiltered = statusFiltered.filter(isCompleted); break;
       case 'live': statusFiltered = statusFiltered.filter(t => t.status === 'inprogress'); break;
     }
     const counts: Record<string, number> = {};
@@ -270,8 +272,7 @@ export function ScheduleTab() {
     if (activeTour !== 'all') filtered = filtered.filter(t => t.tour_code === activeTour);
     switch (filter) {
       case 'upcoming': filtered = filtered.filter(t => t.status === 'scheduled' || t.status === 'created'); break;
-      case 'completed': filtered = filtered.filter(t => t.status === 'closed'); break;
-      case 'completed': filtered = filtered.filter(t => t.status === 'closed'); break;
+      case 'completed': filtered = filtered.filter(isCompleted); break;
       case 'live': filtered = filtered.filter(t => t.status === 'inprogress'); break;
     }
     if (search) {
@@ -285,7 +286,7 @@ export function ScheduleTab() {
       );
     }
     // Exclude hero items when hero is visible (all + live tabs)
-    if ((filter === 'all' || filter === 'live') && !search && heroItems.length > 0) {
+    if ((filter === 'all' || filter === 'live' || filter === 'completed') && !search && heroItems.length > 0) {
       const heroIds = new Set(heroItems.map(h => h.tournament.id));
       filtered = filtered.filter(t => !heroIds.has(t.id));
     }
@@ -314,7 +315,7 @@ export function ScheduleTab() {
     const entries = Array.from(groups.entries());
     if (filter === 'completed') {
       entries.sort(([a], [b]) => b.localeCompare(a));
-      entries.forEach(([, tournaments]) => tournaments.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime()));
+      entries.forEach(([, tournaments]) => tournaments.sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime()));
     } else {
       entries.sort(([a], [b]) => a.localeCompare(b));
     }

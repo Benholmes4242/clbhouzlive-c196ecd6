@@ -31,13 +31,6 @@ interface ScheduleHeroCardProps {
   onDotClick?: (index: number) => void;
 }
 
-function getTourLabel(tourCode?: string): string {
-  const labels: Record<string, string> = {
-    pga: 'PGA TOUR', EURO: 'DP WORLD TOUR', LPGA: 'LPGA',
-    CHAMP: 'CHAMPIONS', PGAD: 'KORN FERRY', LIV: 'LIV GOLF',
-  };
-  return labels[tourCode || ''] || 'TOUR';
-}
 
 
 export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex = 0, totalSlides = 1, onDotClick }: ScheduleHeroCardProps) {
@@ -212,7 +205,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                   </div>
                 </div>
               ) : (
-                <div style={{ height: 48, borderRadius: 10, background: 'rgba(255,255,255,0.04)', width: 200 }} />
+                <div className="animate-pulse" style={{ height: 48, borderRadius: 10, background: 'rgba(255,255,255,0.06)', width: 200 }} />
               )}
             </div>
 
@@ -240,7 +233,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
             {/* Footer: tour badge left, View Results right */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
               <div className="tour-badge">
-                <span>{getTourLabel(tournament.tour_code)}</span>
+                <span>{(tournament.tour_full_name || tournament.tour_code || 'TOUR').toUpperCase()}</span>
               </div>
               <button
                 onClick={(e) => { e.preventDefault(); navigate(`/tourhub/tournament/${tournament.id}`); }}
@@ -291,7 +284,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                 )}
               </div>
               <div className="tour-badge">
-                <span>{getTourLabel(tournament.tour_code)}</span>
+                <span>{(tournament.tour_full_name || tournament.tour_code || 'TOUR').toUpperCase()}</span>
               </div>
             </div>
 
