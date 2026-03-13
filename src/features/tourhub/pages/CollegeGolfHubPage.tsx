@@ -5,7 +5,7 @@ import { openTourNav } from '../contexts/TourNavContext';
 import { motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import { TourHubShell } from '../components';
-import { CollegeSearch, FranchiseLeaderboard } from '../components/college';
+import { CollegeSearch, FranchiseLeaderboard, CollegeHeroBanner } from '../components/college';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 
@@ -30,7 +30,7 @@ export function CollegeGolfHubPage() {
   const activeMetric: MetricTab = VALID_METRICS.has(sortParam) ? (sortParam as MetricTab) : 'earnings';
   const queryClient = useQueryClient();
 
-  const { data: allStats } = useCollegeSeasonStats();
+  const { data: allStats, isLoading: statsLoading } = useCollegeSeasonStats();
   const { data: collegeMap } = useCollegeMediaMap();
 
   // --- Pull-to-refresh ---
@@ -121,7 +121,7 @@ export function CollegeGolfHubPage() {
         {/* Burger menu */}
         <button
           className="absolute z-30 flex items-center justify-center"
-          style={{ top: 56, left: 16, width: 44, height: 44, pointerEvents: 'auto' as const }}
+          style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)', left: 16, width: 44, height: 44, pointerEvents: 'auto' as const }}
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
           aria-label="Open tour menu"
         >
@@ -142,7 +142,23 @@ export function CollegeGolfHubPage() {
         </div>
 
         {/* Content area */}
-        <div className="px-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
+        <div className="px-4" style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
+          {/* Hero banner */}
+          <div style={{ marginTop: 16 }}>
+            {statsLoading ? (
+              <div
+                className="animate-pulse rounded-xl"
+                style={{ height: '45dvh', background: 'hsl(var(--muted) / 0.3)' }}
+              />
+            ) : topCollege ? (
+              <CollegeHeroBanner
+                stats={topCollege}
+                college={topCollegeMedia}
+                activeMetric={activeMetric}
+              />
+            ) : null}
+          </div>
+
           {/* Search */}
           <div style={{ marginTop: 16 }}>
             <CollegeSearch />
