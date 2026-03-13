@@ -125,7 +125,7 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
           />
         </div>
       )}
-    </motion.div>
+    </motion.button>
   );
 }
 
