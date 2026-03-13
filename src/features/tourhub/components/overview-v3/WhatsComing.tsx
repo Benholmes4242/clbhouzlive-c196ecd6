@@ -115,10 +115,8 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
       {tourLogoSrc && (
         <div
           className="flex-shrink-0 flex items-center justify-center opacity-60"
-          style={{
-            width: ['pga', 'lpga'].includes(tourSlug) ? 36 : 42,
-            height: ['pga', 'lpga'].includes(tourSlug) ? 36 : 42,
-          }}
+          // PGA/LPGA logos are wider and appear oversized at 42px — use 36px for visual balance
+          style={{ width: (['pga', 'lpga'].includes(tourSlug) ? 36 : 42), height: (['pga', 'lpga'].includes(tourSlug) ? 36 : 42) }}
         >
           <img
             src={tourLogoSrc}
