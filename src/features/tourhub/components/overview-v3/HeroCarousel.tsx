@@ -260,7 +260,7 @@ const cardVariants = {
   exit: { opacity: 0, y: 20 },
 };
 
-function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand }: HeroSlideProps) {
+function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction }: HeroSlideProps) {
   const { tournament, type } = slide;
   const navigate = useNavigate();
   const tourConfig = TOUR_CONFIG[tournament.tourSlug] || TOUR_CONFIG.pga;
