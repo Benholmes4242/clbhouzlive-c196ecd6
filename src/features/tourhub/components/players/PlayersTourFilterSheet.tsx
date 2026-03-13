@@ -11,6 +11,7 @@ import { AnimatedCheck } from '@/components/ui/AnimatedCheck';
 import { motion } from 'framer-motion';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 import type { PlayerTourCode } from './PlayersTourFilter';
+export type { PlayerTourCode };
 
 interface TourOption {
   code: PlayerTourCode;
