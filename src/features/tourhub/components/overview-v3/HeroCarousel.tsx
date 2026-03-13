@@ -494,7 +494,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               backdropFilter: isExpanded ? 'blur(24px)' : 'blur(20px)',
               WebkitBackdropFilter: isExpanded ? 'blur(24px)' : 'blur(20px)',
               boxShadow: isExpanded ? '0 8px 32px rgba(0, 0, 0, 0.35)' : '0 4px 16px rgba(0, 0, 0, 0.25)',
-              padding: isExpanded ? '20px 0 0 0' : '20px 20px 14px 20px',
+              padding: isExpanded ? '20px 0 8px 0' : '20px 20px 14px 20px',
               border: '1px solid rgba(255, 255, 255, 0.10)',
               overflow: 'hidden',
               zIndex: isExpanded ? 20 : 10,
