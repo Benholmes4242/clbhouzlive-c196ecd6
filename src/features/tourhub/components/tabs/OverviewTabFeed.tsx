@@ -5,7 +5,6 @@
 
 import {
   HeroFeature,
-  WorldRankingsSection,
   FeatureStrip,
   PlayersFeed,
   LeadersPhotoCards,
