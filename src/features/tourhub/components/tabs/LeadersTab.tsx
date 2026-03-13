@@ -14,6 +14,7 @@ import { useTourSeason, useTourPlayerStatistics } from '../../hooks/useTourHubDa
 import { useWorldRankingsLeaders } from '../../hooks/useWorldRankingsLeaders';
 import { LEADER_CATEGORIES, getCategoryByKey } from '../leaders/constants';
 import { LeadersCategorySheet } from '../leaders/LeadersCategorySheet';
+import { LeadersStatContext } from '../leaders/LeadersStatContext';
 import { LeadersHero } from '../leaders/LeadersHero';
 import { LeadersRunnersStrip } from '../leaders/LeadersRunnersStrip';
 import { LeaderRow } from '../leaders/LeaderRow';
@@ -167,8 +168,9 @@ export function LeadersTab() {
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-9 w-20 rounded-full bg-muted/40 shrink-0" />
           ))}
-        </div>
-        <div className="rounded-2xl border border-border/30 overflow-hidden mx-4">
+         </div>
+         <div className="mx-4 mt-3 h-[72px] rounded-xl bg-muted/40 animate-pulse" />
+         <div className="rounded-2xl border border-border/30 overflow-hidden mx-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-[60px] border-b border-border/20 bg-muted/20" />
           ))}
@@ -255,10 +257,28 @@ export function LeadersTab() {
             onCategoryChange={setCategory}
             leaderValue={leaderValue}
           />
-        </div>
+         </div>
 
-        {/* Rankings list (#4–50) */}
-        <div style={{ marginTop: 16 }}>
+         {/* Stat context card */}
+         <div style={{ marginTop: 12 }}>
+           <AnimatePresence mode="wait">
+             <motion.div
+               key={`ctx-${category.key}`}
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+               transition={{ duration: 0.2 }}
+             >
+               <LeadersStatContext
+                 category={category}
+                 leaderValue={leaderValue}
+               />
+             </motion.div>
+           </AnimatePresence>
+         </div>
+
+         {/* Rankings list (#4–50) */}
+         <div style={{ marginTop: 16 }}>
           <AnimatePresence mode="wait">
             <motion.div
               key={category.key}
