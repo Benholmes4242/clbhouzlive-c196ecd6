@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { CinematicHero } from './CinematicHero';
 import { ThisWeekSection } from './ThisWeekSection';
 import { SeasonDashboard } from './SeasonDashboard';
-import { CinematicHeroSkeleton, WorldRankShowcaseSkeleton, ThisWeekSkeleton, SeasonDashboardSkeleton } from './CinematicSkeleton';
+import { CinematicHeroSkeleton, ThisWeekSkeleton, SeasonDashboardSkeleton } from './CinematicSkeleton';
 import { useTourSeason, useTourTournaments, useTourLeaderboard } from '../../hooks/useTourHubData';
 import { useLiveEvents, useUpcomingEvents } from '../../hooks/useTourEvents';
 import { useCourseImageResolver } from '../../hooks/useCourseImageResolver';
