@@ -284,7 +284,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                 )}
               </div>
               <div className="tour-badge">
-                <span>{getTourLabel(tournament.tour_code)}</span>
+                <span>{(tournament.tour_full_name || tournament.tour_code || 'TOUR').toUpperCase()}</span>
               </div>
             </div>
 

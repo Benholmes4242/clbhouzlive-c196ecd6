@@ -315,7 +315,7 @@ export function ScheduleTab() {
     const entries = Array.from(groups.entries());
     if (filter === 'completed') {
       entries.sort(([a], [b]) => b.localeCompare(a));
-      entries.forEach(([, tournaments]) => tournaments.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime()));
+      entries.forEach(([, tournaments]) => tournaments.sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime()));
     } else {
       entries.sort(([a], [b]) => a.localeCompare(b));
     }
