@@ -140,7 +140,7 @@ export function ScheduleTournamentCard({
               fontSize: '10px',
               fontWeight: 600,
               letterSpacing: '0.05em',
-              color: isMajor ? '#f59e0b' : (isSignature || isRolex) ? 'rgba(16, 185, 129, 0.9)' : isLive ? '#22C55E' : 'hsl(var(--muted-foreground) / 0.7)',
+              color: isMajor ? TOUR_COLORS.liveAmber : (isSignature || isRolex) ? 'rgba(16, 185, 129, 0.9)' : isLive ? TOUR_COLORS.liveGreen : 'hsl(var(--muted-foreground) / 0.7)',
             }}
           >
             {isLive ? '● LIVE' : contextLabel}
