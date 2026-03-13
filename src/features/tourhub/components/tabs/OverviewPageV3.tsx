@@ -86,6 +86,11 @@ export function OverviewPageV3() {
     };
   }, [hideBottomNav, showBottomNav]);
 
+  // FIX 5: Parallax scale + fade on hero as user scrolls past
+  const { scrollY } = useScroll();
+  const heroOpacity = useTransform(scrollY, [0, 120], [1, 0.85]);
+  const heroScale = useTransform(scrollY, [0, 120], [1, 0.97]);
+
   return (
     <motion.div
       className="min-h-screen bg-background"
