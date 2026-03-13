@@ -57,7 +57,7 @@ const NAV_ITEMS: NavItem[] = [
 const LINK_ITEMS: LinkItem[] = [
   { 
     id: 'college-golf', 
-    label: 'College Golf', 
+    label: 'College Franchise Rankings', 
     subtitle: 'From campus standout to Tour contender.',
     path: '/tourhub/college-golf',
     icon: <GraduationCap className="w-5 h-5" />,
