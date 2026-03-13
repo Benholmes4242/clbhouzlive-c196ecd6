@@ -21,6 +21,12 @@ interface SSEData {
   meta?: any;
 }
 
+/** Tracks whether an SSE error event was received during streaming */
+interface StreamState {
+  hasContent: boolean;
+  lastError: string | null;
+}
+
 export type RateLimitError = 'RATE_LIMIT_MINUTE' | 'RATE_LIMIT_HOUR' | 'RATE_LIMIT_DAY' | 'PROVIDER_RATE_LIMIT';
 
 export interface UserContextPayload {
@@ -149,6 +155,7 @@ async function parseSSEStream(
   const decoder = new TextDecoder();
   let buffer = '';
   let meta: any = null;
+  const streamState: StreamState = { hasContent: false, lastError: null };
 
   try {
     while (true) {
@@ -190,7 +197,11 @@ async function parseSSEStream(
 
           // Handle error events
           if (parsed.error) {
+            streamState.lastError = typeof parsed.error === 'string' 
+              ? parsed.error 
+              : 'Echo encountered an error. Please try again.';
             if (parsed.token) {
+              streamState.hasContent = true;
               options.onChunk(parsed.token);
             }
             continue;
@@ -204,6 +215,7 @@ async function parseSSEStream(
 
           // Handle token
           if (parsed.token) {
+            streamState.hasContent = true;
             options.onChunk(parsed.token);
           }
         } catch {
@@ -237,6 +249,12 @@ async function parseSSEStream(
           // Ignore partial leftovers
         }
       }
+    }
+
+    // If stream had an error and no content was received, propagate as error
+    if (!streamState.hasContent && streamState.lastError) {
+      options.onError(streamState.lastError);
+      return;
     }
 
     // Complete

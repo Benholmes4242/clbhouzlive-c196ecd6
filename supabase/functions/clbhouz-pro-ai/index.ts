@@ -1071,11 +1071,13 @@ Based on the submitted frames, I can see:
 
             send({ done: true, meta: { intents, consensusLevel } });
           } catch (err) {
+            console.error('[Echo] Primary provider failed:', (err as Error).message);
             // Graceful degradation — fall back to single Claude call
             try {
               await streamClaude(enrichedSystemPrompt, history.concat([{ role: 'user', content: message! }]), onChunk);
               send({ done: true, meta: { intents, consensusLevel, fallback: true } });
-            } catch {
+            } catch (fallbackErr) {
+              console.error('[Echo] Fallback Claude also failed:', (fallbackErr as Error).message);
               send({ error: 'Echo encountered an error. Please try again.' });
               send({ done: true, meta: { error: true } });
             }
