@@ -74,10 +74,19 @@ export function ScheduleTab() {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
   
-  const filter = (searchParams.get('filter') as ScheduleFilterType) || 'upcoming';
+  const filter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
   const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
 
-  // Scroll to top on mount — always start at top
+  // Default to upcoming tab on fresh mount (no filter param in URL)
+  useEffect(() => {
+    if (!searchParams.get('filter')) {
+      const params = new URLSearchParams(searchParams);
+      params.set('filter', 'upcoming');
+      setSearchParams(params, { replace: true });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Scroll to top on mount
   useEffect(() => {
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
