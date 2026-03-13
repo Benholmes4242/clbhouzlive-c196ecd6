@@ -148,8 +148,6 @@ interface LeaderboardRowProps {
 function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreFlash, positionDelta = 0, tournamentTourSlug }: LeaderboardRowProps) {
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
   const effectiveTourCode = leader.player.tourCode ?? tournamentTourSlug ?? 'pga';
-  const photoUrl = getPlayerHeadshotUrl(leader.player.fullName, effectiveTourCode, leader.player.headshotOverride);
-  const initials = `${leader.player.firstName[0]}${leader.player.lastName[0]}`.toUpperCase();
   const thruDisplay = formatThruDisplay(leader.thru, leader.round_1, leader.round_2, leader.round_3, leader.round_4, leader.status, leader.thruUpdatedAt, leader.tournamentTimezone);
   
   return (
@@ -167,20 +165,15 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
           {leader.position}
         </span>
         <div className="flex items-center gap-2 min-w-0">
-          <div
-            className="overflow-hidden flex-shrink-0"
-            style={{ width: '32px', height: '33px', borderRadius: '34%', border: '1.5px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.08)' }}
-          >
-            {photoUrl ? (
-              <img
-                src={photoUrl}
-                alt={abbreviatedName}
-                className="w-full h-full object-cover object-top"
-                onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-white/60 text-[10px] font-semibold" style={{ background: 'rgba(255,255,255,0.08)' }}>{initials}</div>
-            )}
+          <div className="flex-shrink-0">
+            <PlayerAvatar
+              displayName={abbreviatedName}
+              fullName={leader.player.fullName}
+              headshotOverride={leader.player.headshotOverride}
+              tourCode={effectiveTourCode}
+              size={32}
+              frosted
+            />
           </div>
           <span className={cn("leaderboard-name truncate", isFirst && "font-bold")}>
             {abbreviatedName}
