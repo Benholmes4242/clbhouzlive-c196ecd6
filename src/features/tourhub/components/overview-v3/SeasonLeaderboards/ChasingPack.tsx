@@ -54,9 +54,9 @@ const ChaserCard = memo(function ChaserCard({
         width: 'calc(50% - 6px)',
         minWidth: '160px',
         padding: '12px',
-        background: '#FFFFFF',
+        background: 'hsl(var(--card))',
         borderRadius: '14px',
-        border: '1px solid rgba(0,0,0,0.06)',
+        border: '1px solid hsl(var(--border) / 0.5)',
         outlineColor: accent.primary,
       }}
       aria-label={`Rank ${player.rank}: ${player.playerName}, ${player.statDisplayValue} ${unit}`}
@@ -74,7 +74,7 @@ const ChaserCard = memo(function ChaserCard({
               borderRadius: '0',
               borderTopLeftRadius: '14px',
               borderBottomLeftRadius: '14px',
-              backgroundColor: '#F8FAFC',
+              backgroundColor: 'hsl(var(--muted))',
             }}
           >
             {showPhoto ? (
@@ -90,7 +90,7 @@ const ChaserCard = memo(function ChaserCard({
                 src={PLAYER_SILHOUETTE_URL}
                 alt={player.playerName}
                 className="w-full h-full object-cover"
-                style={{ backgroundColor: '#F8FAFC' }}
+                style={{ backgroundColor: 'hsl(var(--muted))' }}
               />
             )}
           </div>
@@ -117,10 +117,10 @@ const ChaserCard = memo(function ChaserCard({
           {/* Stat value */}
           <div className="flex items-baseline justify-center mt-1.5" style={{ gap: '2px' }}>
             <span
+              className="text-foreground"
               style={{
                 fontSize: '18px',
                 fontWeight: 700,
-                color: 'hsl(var(--foreground))',
                 lineHeight: 1,
               }}
             >

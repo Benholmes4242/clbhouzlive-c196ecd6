@@ -30,46 +30,41 @@ const DISCIPLINE_CONTEXT: Record<CategoryId, string> = {
   sand_saves: 'Best bunker save percentage',
 };
 
-const animationStyles = `
-  @keyframes fadeSlideIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-  }
-`;
+/** Category → URL slug mapping for navigation */
+const CATEGORY_TO_URL_SLUG: Record<CategoryId, string> = {
+  sg_total: 'strokes_gained_total',
+  scoring_avg: 'scoring_avg',
+  earnings: 'earnings',
+  distance: 'drive_avg',
+  accuracy: 'drive_acc',
+  gir_pct: 'gir_pct',
+  putting: 'putt_avg',
+  scrambling: 'scrambling_pct',
+  sand_saves: 'sand_saves_pct',
+};
 
 /** Skeleton loader */
 const SeasonLeaderboardsSkeleton = memo(function SeasonLeaderboardsSkeleton() {
-  const shimmerBg = {
-    background: 'linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)',
-    backgroundSize: '200% 100%',
-    animation: 'shimmer 1.5s infinite linear',
-  };
-
   return (
     <section>
-      <style>{animationStyles}</style>
       <div className="px-4 mb-4">
-        <div className="h-3 w-24 rounded mb-2" style={shimmerBg} />
-        <div className="h-7 w-40 rounded" style={shimmerBg} />
+        <div className="h-3 w-24 rounded bg-muted animate-pulse mb-2" />
+        <div className="h-7 w-40 rounded bg-muted animate-pulse" />
       </div>
       <div className="flex gap-2 px-4 mb-4 overflow-hidden">
         {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="h-9 w-24 rounded-[10px] flex-shrink-0" style={shimmerBg} />
+          <div key={i} className="h-9 w-24 rounded-[10px] flex-shrink-0 bg-muted animate-pulse" />
         ))}
       </div>
-      <div className="mx-4 rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(0,0,0,0.06)', background: '#FFFFFF', padding: '24px 20px' }}>
+      <div className="mx-4 rounded-2xl overflow-hidden bg-card border border-border/50" style={{ padding: '24px 20px' }}>
         <div className="flex items-center gap-3.5">
-          <div className="w-16 h-16 rounded-2xl" style={shimmerBg} />
+          <div className="w-16 h-16 rounded-2xl bg-muted animate-pulse" />
           <div className="flex-1">
-            <div className="h-5 w-32 rounded mb-2" style={shimmerBg} />
-            <div className="h-3 w-20 rounded" style={shimmerBg} />
+            <div className="h-5 w-32 rounded mb-2 bg-muted animate-pulse" />
+            <div className="h-3 w-20 rounded bg-muted animate-pulse" />
           </div>
         </div>
-        <div className="h-12 w-28 rounded mt-4" style={shimmerBg} />
+        <div className="h-12 w-28 rounded mt-4 bg-muted animate-pulse" />
       </div>
     </section>
   );
@@ -80,7 +75,7 @@ const SeasonLeaderboardsEmpty = memo(function SeasonLeaderboardsEmpty() {
   return (
     <section>
       <div className="px-4">
-        <p className="m-0" style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(0,0,0,0.3)', textTransform: 'uppercase', letterSpacing: '1.2px' }}>
+        <p className="m-0 text-muted-foreground/50" style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1.2px' }}>
           Season
         </p>
         <h2 className="m-0 mt-1 text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
@@ -89,7 +84,7 @@ const SeasonLeaderboardsEmpty = memo(function SeasonLeaderboardsEmpty() {
       </div>
       <div className="mx-4 mt-4 p-8 text-center rounded-2xl bg-muted/30 border border-border/50">
         <div className="flex flex-col items-center gap-3">
-          <BarChartIcon size={32} style={{ color: 'rgba(0,0,0,0.2)' }} />
+          <BarChartIcon size={32} className="text-muted-foreground/30" />
           <h3 className="font-semibold text-foreground m-0">No Stats Available</h3>
           <p className="text-sm text-muted-foreground m-0">Season statistics will appear here once available.</p>
         </div>
@@ -142,8 +137,6 @@ export function SeasonLeaderboards() {
 
   return (
     <section>
-      <style>{animationStyles}</style>
-
       {/* ═══ SECTION HEADER ═══ */}
       <motion.div
         className="flex items-end justify-between px-4"
@@ -171,18 +164,7 @@ export function SeasonLeaderboards() {
         </div>
         <button
           onClick={() => {
-            const categoryMap: Record<string, string> = {
-              'sg_total': 'strokes_gained_total',
-              'scoring_avg': 'scoring_avg',
-              'earnings': 'earnings',
-              'distance': 'drive_avg',
-              'accuracy': 'drive_acc',
-              'gir_pct': 'gir_pct',
-              'putting': 'putt_avg',
-              'scrambling': 'scrambling_pct',
-              'sand_saves': 'sand_saves_pct',
-            };
-            const leaderCategory = categoryMap[activeCategory] || 'strokes_gained_total';
+            const leaderCategory = CATEGORY_TO_URL_SLUG[activeCategory] || 'strokes_gained_total';
             navigate(`/tourhub?tab=leaderboards&category=${leaderCategory}`);
           }}
           className="flex items-center gap-0.5 transition-all duration-300 bg-transparent border-none cursor-pointer group text-muted-foreground"
@@ -215,7 +197,7 @@ export function SeasonLeaderboards() {
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="flex flex-col items-center gap-3">
-            <BarChartIcon size={32} style={{ color: 'rgba(0,0,0,0.2)' }} />
+            <BarChartIcon size={32} className="text-muted-foreground/30" />
             <h3 className="font-semibold text-foreground m-0">{displayYear} Stats Coming Soon</h3>
             <p className="text-sm text-muted-foreground m-0">
               {displayYear} season statistics will be available shortly.
@@ -260,18 +242,7 @@ export function SeasonLeaderboards() {
             {/* ═══ VIEW FULL RANKINGS — navigates to Leaders page ═══ */}
             <button
               onClick={() => {
-                const categoryMap: Record<string, string> = {
-                  'sg_total': 'strokes_gained_total',
-                  'scoring_avg': 'scoring_avg',
-                  'earnings': 'earnings',
-                  'distance': 'drive_avg',
-                  'accuracy': 'drive_acc',
-                  'gir_pct': 'gir_pct',
-                  'putting': 'putt_avg',
-                  'scrambling': 'scrambling_pct',
-                  'sand_saves': 'sand_saves_pct',
-                };
-                const leaderCategory = categoryMap[activeCategory] || 'strokes_gained_total';
+                const leaderCategory = CATEGORY_TO_URL_SLUG[activeCategory] || 'strokes_gained_total';
                 navigate(`/tourhub?tab=leaderboards&category=${leaderCategory}`);
               }}
               className="w-full flex items-center justify-center gap-1 py-3 text-[13px] font-semibold text-foreground hover:opacity-70 active:scale-[0.98] transition-all duration-150"

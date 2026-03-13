@@ -61,8 +61,6 @@ export const CategoryTabs = memo(function CategoryTabs({
     }
   }, [activeCategory]);
 
-  const accentColors = CATEGORY_ACCENT_COLORS[activeCategory];
-
   return (
     <div className="relative">
       {/* Left fade */}
@@ -70,7 +68,7 @@ export const CategoryTabs = memo(function CategoryTabs({
         className="absolute left-0 top-0 bottom-0 z-10 pointer-events-none transition-opacity duration-200"
         style={{ 
           width: '32px',
-          background: 'linear-gradient(to right, #f8fafc 0%, transparent 100%)',
+          background: 'linear-gradient(to right, hsl(var(--background)) 0%, transparent 100%)',
           opacity: showLeftFade ? 1 : 0,
         }}
       />
@@ -80,7 +78,7 @@ export const CategoryTabs = memo(function CategoryTabs({
         className="absolute right-0 top-0 bottom-0 z-10 pointer-events-none transition-opacity duration-200"
         style={{ 
           width: '32px',
-          background: 'linear-gradient(to left, #f8fafc 0%, transparent 100%)',
+          background: 'linear-gradient(to left, hsl(var(--background)) 0%, transparent 100%)',
           opacity: showRightFade ? 1 : 0,
         }}
       />
@@ -101,7 +99,6 @@ export const CategoryTabs = memo(function CategoryTabs({
         {categories.map((category) => {
           const isActive = category.id === activeCategory;
           const IconComponent = CATEGORY_ICONS[category.id];
-          const categoryAccent = CATEGORY_ACCENT_COLORS[category.id];
 
           return (
             <button
@@ -118,14 +115,14 @@ export const CategoryTabs = memo(function CategoryTabs({
                 fontSize: '12px',
                 fontWeight: isActive ? 600 : 500,
                 borderRadius: '20px',
-                background: isActive ? '#475569' : 'transparent',
+                background: isActive ? 'hsl(var(--foreground))' : 'transparent',
                 border: isActive 
-                  ? '1px solid #475569' 
-                  : '1px solid rgba(0, 0, 0, 0.08)',
-                color: isActive ? '#FFFFFF' : 'rgba(0, 0, 0, 0.45)',
+                  ? '1px solid hsl(var(--foreground))' 
+                  : '1px solid hsl(var(--border))',
+                color: isActive ? 'hsl(var(--background))' : 'hsl(var(--muted-foreground))',
                 boxShadow: 'none',
                 transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                outlineColor: '#475569',
+                outlineColor: 'hsl(var(--ring))',
               }}
             >
               <IconComponent size={14} />

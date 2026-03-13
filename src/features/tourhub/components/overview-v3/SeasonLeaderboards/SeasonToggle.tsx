@@ -2,12 +2,11 @@
  * SeasonToggle - Year Selection Component
  * 
  * Features:
- * - Matches category pill styling (amber active, subtle border inactive)
- * - Consistent design language
+ * - Matches category pill styling
+ * - Consistent design language with semantic tokens
  */
 
 import { memo } from 'react';
-import { CATEGORY_ACCENT_COLORS } from './constants';
 import type { AvailableSeason } from '@/features/tourhub/hooks/useSeasonLeaderboards';
 
 interface SeasonToggleProps {
@@ -25,8 +24,6 @@ export const SeasonToggle = memo(function SeasonToggle({
     return null;
   }
 
-  const accent = CATEGORY_ACCENT_COLORS['sg_total'];
-
   return (
     <div className="flex items-center" style={{ gap: '6px' }}>
       {availableSeasons.map((season) => {
@@ -42,13 +39,13 @@ export const SeasonToggle = memo(function SeasonToggle({
               fontSize: '12px',
               fontWeight: isSelected ? 600 : 500,
               borderRadius: '10px',
-              background: isSelected ? 'hsl(var(--foreground))' : '#FFFFFF',
+              background: isSelected ? 'hsl(var(--foreground))' : 'hsl(var(--card))',
               border: isSelected
                 ? '1px solid hsl(var(--foreground))'
-                : '1px solid rgba(0, 0, 0, 0.08)',
-              color: isSelected ? '#FFFFFF' : 'rgba(0, 0, 0, 0.45)',
+                : '1px solid hsl(var(--border))',
+              color: isSelected ? 'hsl(var(--background))' : 'hsl(var(--muted-foreground))',
               boxShadow: isSelected
-                ? '0 2px 8px rgba(0, 0, 0, 0.15)'
+                ? '0 2px 8px hsl(var(--foreground) / 0.15)'
                 : 'none',
               transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
               cursor: 'pointer',
