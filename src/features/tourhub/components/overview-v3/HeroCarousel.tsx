@@ -1032,7 +1032,7 @@ interface HeroCarouselProps {
 
 export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
-  const { showBottomNav } = useBottomNavigation();
+  // FIX 3: Removed showBottomNav — burger menu no longer forces nav visible
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
