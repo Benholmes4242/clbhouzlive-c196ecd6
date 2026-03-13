@@ -1184,8 +1184,8 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
       onTouchEnd={handleTouchEnd}
     >
       <button 
-        className="absolute z-20 flex items-center justify-center"
-        style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 20px)) + 12px)', left: '16px', width: '44px', height: '44px' }}
+        className="fixed z-20 flex items-center justify-center"
+        style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)', left: '16px', width: '44px', height: '44px' }}
         onClick={() => { openTourNav(); showBottomNav(); }}
         aria-label="Open tour menu"
       >
