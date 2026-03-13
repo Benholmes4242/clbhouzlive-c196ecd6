@@ -284,8 +284,8 @@ export function ScheduleTab() {
         t.tour_full_name?.toLowerCase().includes(searchLower)
       );
     }
-    // Exclude hero items only when hero is visible
-    if (filter === 'all' && !search && heroItems.length > 0) {
+    // Exclude hero items when hero is visible (all + live tabs)
+    if ((filter === 'all' || filter === 'live') && !search && heroItems.length > 0) {
       const heroIds = new Set(heroItems.map(h => h.tournament.id));
       filtered = filtered.filter(t => !heroIds.has(t.id));
     }
@@ -494,7 +494,7 @@ export function ScheduleTab() {
             variant="no-live" 
             nextTournamentName={nextUpcoming?.name}
             nextTournamentDate={nextUpcoming?.start_date}
-            onSwitchFilter={setFilter}
+            onSwitchFilter={heroItems.length === 0 ? setFilter : undefined}
           />
         )}
         
@@ -514,11 +514,13 @@ export function ScheduleTab() {
                   id={`month-${group.monthKey}`}
                   className={groupIndex > 0 ? 'mt-7' : ''}
                 >
-                  <ScheduleMonthHeader 
-                    monthLabel={group.monthLabel}
-                    eventCount={group.tournaments.length}
-                    tourBreakdown={group.tourBreakdown}
-                  />
+                  {filter !== 'live' && (
+                    <ScheduleMonthHeader 
+                      monthLabel={group.monthLabel}
+                      eventCount={group.tournaments.length}
+                      tourBreakdown={group.tourBreakdown}
+                    />
+                  )}
 
                   {/* Tournament list — 12px gap from header, 12px between cards */}
                   <div className="flex flex-col gap-3 px-4 mt-3">

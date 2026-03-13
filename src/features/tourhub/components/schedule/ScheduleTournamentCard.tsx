@@ -16,6 +16,7 @@ import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWin
 import { getContextLabel } from '../../utils/tournamentClassification';
 import { TOUR_COLORS } from '../../constants/colors';
 import { formatPurse } from '../shared/TourHeroHelpers';
+import { getCurrentRound } from '../../utils/formatThruDisplay';
 
 interface ScheduleTournamentCardProps {
   tournament: TourTournament | SeasonTournament;
@@ -145,8 +146,18 @@ export function ScheduleTournamentCard({
           >
             {isLive ? '● LIVE' : contextLabel}
           </p>
+          {isLive && leaderWinner && (() => {
+            const roundInfo = getCurrentRound(
+              leaderWinner.round1, leaderWinner.round2,
+              leaderWinner.round3, leaderWinner.round4
+            );
+            return roundInfo ? (
+              <span style={{ fontSize: '10px', fontWeight: 500, color: 'hsl(var(--muted-foreground) / 0.6)', letterSpacing: '0.03em' }}>
+                R{roundInfo.currentRound}
+              </span>
+            ) : null;
+          })()}
         </div>
-        
         {/* Tournament name */}
         <p
           className="mt-1 line-clamp-1 text-foreground"

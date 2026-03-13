@@ -28,6 +28,11 @@ export interface TournamentFinisher {
   displayName: string;
   /** Formatted score: "-12" or "E" or "+3" */
   displayScore: string;
+  round1: number | null;
+  round2: number | null;
+  round3: number | null;
+  round4: number | null;
+  thru: number | null;
 }
 
 export interface TournamentLeaderWinner extends TournamentFinisher {
@@ -63,6 +68,11 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
           position,
           score,
           money,
+          round_1,
+          round_2,
+          round_3,
+          round_4,
+          thru,
           player_id,
           player:sr_players!inner (
             first_name,
@@ -113,6 +123,11 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
           pgaTourId: player?.pga_tour_id || null,
           displayName: formatDisplayName(firstName, lastName),
           displayScore: formatScore(entry.score),
+          round1: (entry as any).round_1 ?? null,
+          round2: (entry as any).round_2 ?? null,
+          round3: (entry as any).round_3 ?? null,
+          round4: (entry as any).round_4 ?? null,
+          thru: (entry as any).thru ?? null,
         });
       }
 
