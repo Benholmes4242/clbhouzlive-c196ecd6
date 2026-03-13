@@ -164,34 +164,22 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
                 </motion.div>
               </AnimatePresence>
 
-              {/* Carousel dots */}
+              {/* Dots — below country row, left-aligned */}
               {count > 1 && (
-                <div className="flex items-center justify-center pt-1">
-                  <div
-                    className="flex items-center gap-2"
-                    style={{
-                      background: 'rgba(0,0,0,0.14)',
-                      backdropFilter: 'blur(16px)',
-                      WebkitBackdropFilter: 'blur(16px)',
-                      padding: '6px 12px',
-                      borderRadius: '9999px',
-                    }}
-                  >
-                    {players.map((_, i) => (
-                      <button
-                        key={i}
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo(i); }}
-                        className="rounded-full"
-                        style={{
-                          width: i === currentIndex ? '20px' : '6px',
-                          height: '6px',
-                          background: i === currentIndex ? 'white' : 'rgba(255,255,255,0.4)',
-                          transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-                        }}
-                        aria-label={`Go to player ${i + 1}`}
-                      />
-                    ))}
-                  </div>
+                <div className="flex items-center gap-1.5 pt-1">
+                  {players.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo(i); }}
+                      className="rounded-full transition-all duration-300"
+                      style={{
+                        width: i === currentIndex ? '18px' : '6px',
+                        height: '6px',
+                        background: i === currentIndex ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.35)',
+                      }}
+                      aria-label={`Player ${i + 1}`}
+                    />
+                  ))}
                 </div>
               )}
             </div>
