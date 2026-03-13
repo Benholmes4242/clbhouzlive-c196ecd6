@@ -1217,7 +1217,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
       </AnimatePresence>
 
       {/* Scroll indicator — only when not expanded */}
-      {!isExpanded && (
+      {(!isExpanded || isCurrentSlideLive) && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
