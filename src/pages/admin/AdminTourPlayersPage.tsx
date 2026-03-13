@@ -84,16 +84,20 @@ function PhotoManagementSheet({
   player,
   open,
   onClose,
+  headshotCacheBust,
+  onCacheBust,
 }: {
   player: PlayerRow | null;
   open: boolean;
   onClose: () => void;
+  headshotCacheBust: number;
+  onCacheBust: () => void;
 }) {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [removing, setRemoving] = useState(false);
-  const [imgKey, setImgKey] = useState(0);
+  const [imgKey] = [headshotCacheBust]; // use page-level cache bust
   const [overrideValue, setOverrideValue] = useState('');
   const [savingOverride, setSavingOverride] = useState(false);
   const [overrideInitialized, setOverrideInitialized] = useState(false);
@@ -124,7 +128,7 @@ function PhotoManagementSheet({
       if (error) throw error;
       toast.success(val ? `Override set to "${val}"` : 'Override cleared');
       queryClient.invalidateQueries({ queryKey: ['admin-tour-players-all'] });
-      setImgKey(k => k + 1);
+      onCacheBust();
     } catch (err) {
       toast.error((err as Error).message);
     } finally {
@@ -158,7 +162,7 @@ function PhotoManagementSheet({
       if (!res.ok) throw new Error(json.error || 'Upload failed');
 
       toast.success('Headshot uploaded');
-      setImgKey(k => k + 1);
+      onCacheBust();
       queryClient.invalidateQueries({ queryKey: ['admin-tour-players-all'] });
     } catch (err) {
       toast.error((err as Error).message);
@@ -192,7 +196,7 @@ function PhotoManagementSheet({
       if (!res.ok) throw new Error(json.error || 'Delete failed');
 
       toast.success('Headshot removed');
-      setImgKey(k => k + 1);
+      onCacheBust();
       queryClient.invalidateQueries({ queryKey: ['admin-tour-players-all'] });
     } catch (err) {
       toast.error((err as Error).message);
@@ -304,10 +308,10 @@ function PhotoManagementSheet({
 }
 
 /* ───────── Player Detail Dialog ───────── */
-function PlayerDetailDialog({ player, open, onClose }: { player: PlayerRow | null; open: boolean; onClose: () => void }) {
+function PlayerDetailDialog({ player, open, onClose, headshotCacheBust }: { player: PlayerRow | null; open: boolean; onClose: () => void; headshotCacheBust: number }) {
   if (!player) return null;
   const primaryTour = player.tour_codes?.[0] || 'pga';
-  const headshotUrl = player.full_name ? getPlayerHeadshotUrl(player.full_name, primaryTour, player.headshot_override) : PLAYER_SILHOUETTE_URL;
+  const headshotUrl = player.full_name ? `${getPlayerHeadshotUrl(player.full_name, primaryTour, player.headshot_override)}?v=${headshotCacheBust}` : PLAYER_SILHOUETTE_URL;
   const fields = [
     { label: 'Full Name', value: player.full_name },
     { label: 'Country', value: player.country },
@@ -365,6 +369,8 @@ export function AdminTourPlayersPage() {
   const [page, setPage] = useState(0);
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerRow | null>(null);
   const [photoPlayer, setPhotoPlayer] = useState<PlayerRow | null>(null);
+  const [headshotCacheBust, setHeadshotCacheBust] = useState(0);
+  const bumpCacheBust = useCallback(() => setHeadshotCacheBust(prev => prev + 1), []);
 
   const { data: players = [], isLoading } = useQuery({
     queryKey: ['admin-tour-players-all'],
@@ -457,7 +463,7 @@ export function AdminTourPlayersPage() {
                 {paged.map((player) => {
                   const primaryTour = player.tour_codes?.[0] || 'pga';
                   const headshotUrl = player.full_name
-                    ? getPlayerHeadshotUrl(player.full_name, primaryTour, player.headshot_override)
+                    ? `${getPlayerHeadshotUrl(player.full_name, primaryTour, player.headshot_override)}?v=${headshotCacheBust}`
                     : PLAYER_SILHOUETTE_URL;
 
                   return (
@@ -519,10 +525,10 @@ export function AdminTourPlayersPage() {
       )}
 
       {/* Player detail dialog */}
-      <PlayerDetailDialog player={selectedPlayer} open={!!selectedPlayer} onClose={() => setSelectedPlayer(null)} />
+      <PlayerDetailDialog player={selectedPlayer} open={!!selectedPlayer} onClose={() => setSelectedPlayer(null)} headshotCacheBust={headshotCacheBust} />
 
       {/* Photo management sheet */}
-      <PhotoManagementSheet player={photoPlayer} open={!!photoPlayer} onClose={() => setPhotoPlayer(null)} />
+      <PhotoManagementSheet player={photoPlayer} open={!!photoPlayer} onClose={() => setPhotoPlayer(null)} headshotCacheBust={headshotCacheBust} onCacheBust={bumpCacheBust} />
     </div>
   );
 }
