@@ -524,7 +524,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      window.location.href = `/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`;
+                      navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`);
                     }}
                     className="hero-venue block active:opacity-70 transition-opacity cursor-pointer"
                   >
