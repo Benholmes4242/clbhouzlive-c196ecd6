@@ -1,6 +1,23 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+// Major tour code override — Sportradar stores Grand Slams under EURO season
+const MAJOR_NAMES_TO_PGA: string[] = [
+  'masters tournament',
+  'pga championship',
+  'u.s. open',
+  'the open championship',
+];
+
+function isMiscodedMajor(name: string, tourCode: string | null): boolean {
+  if (tourCode === 'pga') return false;
+  const lower = name.toLowerCase();
+  return MAJOR_NAMES_TO_PGA.some(m => lower.includes(m))
+    && !lower.includes('senior')
+    && !lower.includes('women')
+    && !lower.includes('bmw');
+}
+
 // Types based on database schema
 export interface TourSeason {
   id: string;
