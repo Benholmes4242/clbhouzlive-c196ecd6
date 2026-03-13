@@ -251,6 +251,12 @@ async function parseSSEStream(
       }
     }
 
+    // If stream had an error and no content was received, propagate as error
+    if (!streamState.hasContent && streamState.lastError) {
+      options.onError(streamState.lastError);
+      return;
+    }
+
     // Complete
     options.onComplete({
       latency: performance.now() - startTime,
