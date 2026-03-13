@@ -128,7 +128,7 @@ function PhotoManagementSheet({
       if (error) throw error;
       toast.success(val ? `Override set to "${val}"` : 'Override cleared');
       queryClient.invalidateQueries({ queryKey: ['admin-tour-players-all'] });
-      setImgKey(k => k + 1);
+      onCacheBust();
     } catch (err) {
       toast.error((err as Error).message);
     } finally {
