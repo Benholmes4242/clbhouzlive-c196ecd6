@@ -33,6 +33,7 @@ export function CollegeProfilePage() {
   const { data: collegeMap, isLoading: mediaLoading } = useCollegeMediaMap();
   const { data: allSeasonStats } = useCollegeSeasonStats();
   const { data: season } = useTourSeason();
+  const { data: alumni, isLoading: alumniLoading } = useCollegeAlumni(collegeSlug, { limit: 30 });
   const seasonYear = season?.year || new Date().getFullYear();
   
   const [heroImgError, setHeroImgError] = useState(false);
