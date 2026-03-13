@@ -282,14 +282,12 @@ export function TourHubNavOverlay({
             className="fixed inset-0 z-[9998]"
             style={{
               background: 'rgba(0, 0, 0, 0.35)',
-              backdropFilter: 'blur(4px)',
-              WebkitBackdropFilter: 'blur(4px)',
             }}
             onClick={onClose}
             aria-hidden="true"
           />
           
-          {/* TM-02: 85vw width, TM-01: swipe-to-dismiss */}
+          {/* Full-width overlay panel */}
           <motion.div
             ref={overlayRef}
             initial={{ x: '100%', opacity: 0.5 }}
@@ -300,19 +298,9 @@ export function TourHubNavOverlay({
               damping: 28,
               stiffness: 300,
             }}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.2}
-            dragDirectionLock={true}
-            onDragEnd={(_e, info) => {
-              if (info.offset.x > 100 || info.velocity.x > 500) {
-                onClose();
-              }
-            }}
             className="fixed inset-y-0 right-0 z-[10000] flex flex-col overflow-hidden"
             style={{
-              width: '85vw',
-              maxWidth: '380px',
+              width: '100vw',
               background: 'hsl(var(--background) / 0.85)',
               backdropFilter: 'blur(24px) saturate(1.4)',
               WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
