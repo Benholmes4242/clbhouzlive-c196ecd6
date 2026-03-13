@@ -302,34 +302,6 @@
   margin-top: 2px;
 }
 
-/* Legacy winner badge */
-.winner-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 184, 0, 0.12);
-  border: 1px solid rgba(255, 184, 0, 0.2);
-  border-radius: 10px;
-  padding: 8px 14px;
-}
-
-.winner-name {
-  font-weight: 600;
-  font-size: 14px;
-  color: #FFB800;
-}
-
-.winner-score {
-  font-family: 'JetBrains Mono', 'SF Mono', 'Courier New', monospace;
-  font-weight: 700;
-  font-size: 13px;
-  color: rgba(255, 184, 0, 0.7);
-}
-
-.finished-text {
-  color: #FACC15;
-}
-
 /* ============================================
    8. UPCOMING STATE - Stronger Countdown
    ============================================ */
