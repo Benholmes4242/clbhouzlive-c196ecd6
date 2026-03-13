@@ -94,7 +94,7 @@ export function PlayerAvatar({
   /** Tour code for R2 folder lookup — e.g. 'pga', 'euro', 'lpga', 'liv' */
   tourCode?: string;
   size?: number;
-  /** Use frosted glass styling (#F8FAFC solid bg + border) — for glass card contexts */
+  /** Use frosted glass styling (translucent bg + border) — for glass card contexts */
   frosted?: boolean;
 }) {
   // PRIMARY: R2 headshot by full name + tour. FALLBACK: silhouette.
