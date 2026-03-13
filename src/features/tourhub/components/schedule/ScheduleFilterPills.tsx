@@ -4,6 +4,7 @@
  */
 
 import { cn } from '@/lib/utils';
+import { TOUR_COLORS } from '../../constants/colors';
 
 export type ScheduleFilterType = 'all' | 'upcoming' | 'live' | 'completed';
 
@@ -37,12 +38,11 @@ export function ScheduleFilterPills({
   ];
 
   return (
-    <div 
-      className="py-1"
+    <div
+      className="flex items-stretch rounded-xl overflow-hidden bg-transparent"
       role="tablist"
       aria-label="Filter tournaments"
     >
-      <div className="flex items-stretch rounded-xl overflow-hidden bg-transparent">
         {options.map((option) => {
           const isActive = activeFilter === option.value;
 
@@ -63,9 +63,9 @@ export function ScheduleFilterPills({
                 <span className="relative flex h-[6px] w-[6px]">
                   <span
                     className="absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping"
-                    style={{ background: '#22C55E' }}
+                    style={{ background: TOUR_COLORS.liveGreen }}
                   />
-                  <span className="relative inline-flex rounded-full h-[6px] w-[6px]" style={{ background: '#22C55E' }} />
+                  <span className="relative inline-flex rounded-full h-[6px] w-[6px]" style={{ background: TOUR_COLORS.liveGreen }} />
                 </span>
               )}
               {option.label}
@@ -75,7 +75,6 @@ export function ScheduleFilterPills({
             </button>
           );
         })}
-      </div>
     </div>
   );
 }
