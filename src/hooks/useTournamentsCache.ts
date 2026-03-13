@@ -56,7 +56,7 @@ export interface TournamentsCache {
 
 async function fetchTournamentsCache(): Promise<TournamentsCache> {
   const today = new Date().toISOString().split('T')[0];
-  const sevenDaysAgo = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0];
+  const fourteenDaysAgo = new Date(Date.now() - 14 * 86400000).toISOString().split('T')[0];
 
   const [liveRes, completedRes, upcomingRes] = await Promise.all([
     // Live + starting soon
