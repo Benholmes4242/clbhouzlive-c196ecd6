@@ -732,7 +732,10 @@ async function* streamPerplexity(query: string, nowIso: string, history: Array<{
     }),
   }), 30000);
   
-  if (!resp.ok) throw new Error(`Perplexity error: ${await resp.text()}`);
+  if (!resp.ok) {
+    console.error(`[Echo] Provider failure — Perplexity | model: ${PERPLEXITY_MODEL} | status: ${resp.status}`);
+    throw new Error(`Perplexity error: ${await resp.text()}`);
+  }
   
   const reader = resp.body?.getReader();
   if (!reader) throw new Error("No response body");
