@@ -44,7 +44,7 @@ function ChampionCard({ player }: { player: ElitePlayer }) {
         "bg-card border border-border"
       )}>
         {/* Subtle amber gradient for world #1 */}
-        <div className="absolute inset-0 bg-gradient-to-l from-amber-50 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to left, hsl(var(--accent) / 0.08), transparent)' }} />
 
         <div className="relative flex items-center gap-4">
           {/* Rank badge */}
