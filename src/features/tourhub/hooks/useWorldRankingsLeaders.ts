@@ -20,6 +20,7 @@ export interface WorldRankEntry {
     country_code: string | null;
     photo_url: string | null;
     pga_tour_id: string | null;
+    tour_codes?: string[] | null;
   };
 }
 
