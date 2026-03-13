@@ -36,7 +36,7 @@ import { getTourLogo } from '../../utils/tourLogos';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
-import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, WinnerStatsPanel, UpcomingCountdown } from '../shared/TourHeroHelpers';
+import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, WinnerStatsPanel, UpcomingCountdown, getCurrentRoundLabel as sharedGetCurrentRoundLabel } from '../shared/TourHeroHelpers';
 import { useWinnerScorecardStats } from '../../hooks/useWinnerScorecardStats';
 import { useWinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import '@/styles/hero-glass.css';
@@ -69,24 +69,19 @@ function getScoreClass(score: number): string {
 }
 
 /**
- * Infers current round from leaderboard data.
- * Checks round_4 → round_3 → round_2 → round_1 (last non-null = current round).
- * Falls back to date arithmetic only if no leaderboard data available.
+ * Wraps shared getCurrentRoundLabel for HeroCarousel's LeaderEntry[] API.
  */
 function getCurrentRoundLabel(leaders: LeaderEntry[], startDate: string): string {
   if (leaders.length > 0) {
     const sample = leaders[0];
-    if (sample.round_4 != null) return 'Final Round';
-    if (sample.round_3 != null) return 'Round 3 of 4';
-    if (sample.round_2 != null) return 'Round 2 of 4';
-    if (sample.round_1 != null) return 'Round 1 of 4';
+    return sharedGetCurrentRoundLabel(startDate, {
+      round_1: sample.round_1,
+      round_2: sample.round_2,
+      round_3: sample.round_3,
+      round_4: sample.round_4,
+    });
   }
-  // Fallback: date arithmetic
-  const dayIndex = Math.max(0, Math.floor(
-    (Date.now() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)
-  ));
-  const round = Math.min(dayIndex + 1, 4);
-  return round >= 4 ? 'Final Round' : `Round ${round} of 4`;
+  return sharedGetCurrentRoundLabel(startDate);
 }
 
 // UpcomingCountdown is now imported from shared/TourHeroHelpers

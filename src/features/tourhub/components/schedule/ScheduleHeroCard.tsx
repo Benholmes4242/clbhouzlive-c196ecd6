@@ -9,7 +9,7 @@
  */
 
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -90,10 +90,10 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
   })();
 
   return (
-    <Link
-      to={`/tourhub/tournament/${tournament.id}`}
-      className="block relative overflow-hidden active:scale-[0.98] transition-transform"
+    <div
+      className="block relative overflow-hidden cursor-pointer"
       style={{ height: '45dvh' }}
+      onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
     >
       {/* Background with Ken Burns */}
       <motion.div
@@ -419,25 +419,6 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
           </div>
         )}
       </motion.div>
-    </Link>
+    </div>
   );
-}
-
-export function getFeaturedTournament(
-  tournaments: TourTournament[]
-): { tournament: TourTournament; type: 'live' | 'upcoming' | 'recent' } | null {
-  if (!tournaments || tournaments.length === 0) return null;
-  const now = new Date();
-  const live = tournaments.find(t => t.status === 'inprogress');
-  if (live) return { tournament: live, type: 'live' };
-  const upcoming = tournaments
-    .filter(t => t.status === 'scheduled' || t.status === 'created')
-    .filter(t => new Date(t.start_date) >= now)
-    .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
-  if (upcoming.length > 0) return { tournament: upcoming[0], type: 'upcoming' };
-  const completed = tournaments
-    .filter(t => t.status === 'closed')
-    .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime());
-  if (completed.length > 0) return { tournament: completed[0], type: 'recent' };
-  return { tournament: tournaments[0], type: 'upcoming' };
 }
