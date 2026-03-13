@@ -143,6 +143,11 @@ export function CollegeGolfHubPage() {
 
         {/* Content area */}
         <div className="px-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
+          {/* Hero Banner */}
+          <div style={{ marginTop: 16 }}>
+            <CollegeHeroBanner />
+          </div>
+
           {/* Search */}
           <div style={{ marginTop: 16 }}>
             <CollegeSearch />

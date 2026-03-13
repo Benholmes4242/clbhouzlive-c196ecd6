@@ -10,9 +10,11 @@ import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 
 import { useCollegeStats, useCollegeSeasonStats } from '../hooks/useCollegeStats';
+import { useCollegeAlumni, type CollegeAlumnus } from '../hooks/useCollegeAlumni';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 import { getCollegeGradientCSS } from '../config/collegeBrandColors';
 import { useTourSeason } from '../hooks/useTourHubData';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
