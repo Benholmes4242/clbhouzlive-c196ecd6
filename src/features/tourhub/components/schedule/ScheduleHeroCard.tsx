@@ -90,10 +90,10 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
   })();
 
   return (
-    <Link
-      to={`/tourhub/tournament/${tournament.id}`}
-      className="block relative overflow-hidden active:scale-[0.98] transition-transform"
+    <div
+      className="block relative overflow-hidden cursor-pointer"
       style={{ height: '45dvh' }}
+      onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
     >
       {/* Background with Ken Burns */}
       <motion.div
