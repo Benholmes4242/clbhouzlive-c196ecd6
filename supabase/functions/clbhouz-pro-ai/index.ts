@@ -16,7 +16,7 @@ const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 const OPENAI_MODEL = "gpt-4o-mini";
 const PERPLEXITY_MODEL = "sonar";
-const ANTHROPIC_MODEL = "claude-3-5-sonnet-20241022";
+const ANTHROPIC_MODEL = "claude-sonnet-4-20250514";
 const GEMINI_MODEL = "gemini-1.5-pro";
 const DEFAULT_TIMEZONE = "Europe/London";
 
@@ -699,9 +699,18 @@ async function* streamPerplexity(query: string, nowIso: string, history: Array<{
     "Be concise, structured, and provide specific dates/venues when discussing events."
   ].join(" ");
 
+  // Remove trailing user messages from history to prevent consecutive user messages
+  const cleanHistory = (history ?? []).filter((_: { role: string; content: string }, i: number, arr: Array<{ role: string; content: string }>) => {
+    let lastAssistantIdx = arr.length - 1;
+    while (lastAssistantIdx >= 0 && arr[lastAssistantIdx].role === 'user') {
+      lastAssistantIdx--;
+    }
+    return i <= lastAssistantIdx;
+  });
+
   const messages = [
     { role: "system", content: systemPrompt },
-    ...(history ?? []),
+    ...cleanHistory,
     { role: "user", content: query },
   ];
   
@@ -772,9 +781,17 @@ async function callPerplexity(query: string, nowIso: string, history: Array<{ ro
     "Be concise, structured, and provide specific dates/venues when discussing events."
   ].join(" ");
 
+  const cleanHistory = (history ?? []).filter((_: { role: string; content: string }, i: number, arr: Array<{ role: string; content: string }>) => {
+    let lastAssistantIdx = arr.length - 1;
+    while (lastAssistantIdx >= 0 && arr[lastAssistantIdx].role === 'user') {
+      lastAssistantIdx--;
+    }
+    return i <= lastAssistantIdx;
+  });
+
   const messages = [
     { role: "system", content: systemPrompt },
-    ...(history ?? []),
+    ...cleanHistory,
     { role: "user", content: query },
   ];
   const resp = await withTimeout(fetch("https://api.perplexity.ai/chat/completions", {
