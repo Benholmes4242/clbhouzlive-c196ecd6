@@ -965,6 +965,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     <span>View Tournament</span>
                     <ChevronRight className="w-4 h-4 cta-chevron" />
                   </Link>
+                  {!isExpanded && (
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
+                      <ChevronsUp size={14} style={{ color: 'rgba(255,255,255,0.35)', animation: 'pulse 2s infinite' }} />
+                    </div>
+                  )}
                 </motion.div>
               )}
 
