@@ -1,5 +1,11 @@
 /* Bottom Navigation Fixed Positioning - Prevents floating on iOS */
 
+/* Remove any transform contexts from the nav itself */
+.global-bottom-nav {
+  transform: none !important;
+  will-change: auto !important;
+}
+
 /* Lock the nav to viewport bottom */
 .bottom-nav-fixed {
   position: fixed !important;
@@ -9,6 +15,7 @@
   z-index: 100 !important;
   backface-visibility: hidden; /* Reduces flicker on iOS */
   margin-bottom: 0 !important; /* Prevent any margin gaps */
+  transform: translate3d(0, 0, 0) !important; /* Force GPU compositing and prevent floating */
 }
 
 /* NUKED: No more CSS-level page-root padding — handled exclusively by PageRoot.tsx */
