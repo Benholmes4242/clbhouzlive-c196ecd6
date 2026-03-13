@@ -24,7 +24,7 @@ import {
   type HeroSlide as CarouselSlide,
   type HeroTournament,
 } from '../../hooks/useHeroCarouselData';
-import { useTournamentTopLeaders, TOUR_CONFIG, type LeaderEntry } from '../../hooks/useOverviewData';
+import { useTournamentTopLeaders, type LeaderEntry } from '../../hooks/useOverviewData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
 import { useTourLeaderboard } from '../../hooks/useTourHubData';
 import { useLeaderboardRealtime } from '../../hooks/useLeaderboardRealtime';
