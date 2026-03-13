@@ -589,7 +589,7 @@ export function TourHubNavOverlay({
                       background: 'hsl(var(--card) / 0.5)',
                       border: '1px solid hsl(var(--border) / 0.2)',
                     }}
-                    aria-label="College Golf — From campus standout to Tour contender"
+                    aria-label={`${item.label} — ${item.subtitle}`}
                   >
                     {/* Icon in circle */}
                     <div 
