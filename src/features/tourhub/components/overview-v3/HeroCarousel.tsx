@@ -17,6 +17,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronsUp, Trophy, Menu, X } from 'lucide-react';
 import { openTourNav } from '../../contexts/TourNavContext';
+import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { cn } from '@/lib/utils';
 import { 
   useHeroCarouselData,
@@ -990,6 +991,7 @@ interface HeroCarouselProps {
 
 export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
+  const { showBottomNav } = useBottomNavigation();
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -1145,7 +1147,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
       <button 
         className="absolute z-20 flex items-center justify-center"
         style={{ top: '56px', left: '16px', width: '44px', height: '44px' }}
-        onClick={openTourNav}
+        onClick={() => { openTourNav(); showBottomNav(); }}
         aria-label="Open tour menu"
       >
         <Menu 

@@ -8,12 +8,22 @@ import type { TourHubTab } from '../components/TourHubTabs';
 import { OverviewTab, ScheduleTab, PlayersTab, LeadersTab } from '../components/tabs';
 import { TourNavProvider, useTourNav } from '../contexts/TourNavContext';
 import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
+import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
 function TourHubMainPageInner() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tabParam = searchParams.get('tab') as TourHubTab | null;
   const [activeTab, setActiveTab] = useState<TourHubTab>(tabParam || 'overview');
   const { isNavOpen, closeNav } = useTourNav();
+  const { hideBottomNav } = useBottomNavigation();
+
+  const handleCloseNav = () => {
+    closeNav();
+    // Re-hide nav if user hasn't scrolled past hero yet
+    if (window.scrollY < window.innerHeight * 0.85) {
+      hideBottomNav();
+    }
+  };
   
   // Subscribe to tournament status changes (live/completed transitions)
   useTournamentStatusRealtime();
@@ -66,7 +76,7 @@ function TourHubMainPageInner() {
       {/* Navigation Overlay */}
       <TourHubNavOverlay
         isOpen={isNavOpen}
-        onClose={closeNav}
+        onClose={handleCloseNav}
         activeTab={activeTab}
         onNavigate={handleTabChange}
       />
