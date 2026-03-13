@@ -251,7 +251,7 @@ export function ScheduleTab() {
     let statusFiltered = [...tournaments];
     switch (filter) {
       case 'upcoming': statusFiltered = statusFiltered.filter(t => t.status === 'scheduled' || t.status === 'created'); break;
-      case 'completed': statusFiltered = statusFiltered.filter(t => t.status === 'closed'); break;
+      case 'completed': statusFiltered = statusFiltered.filter(isCompleted); break;
       case 'live': statusFiltered = statusFiltered.filter(t => t.status === 'inprogress'); break;
     }
     const counts: Record<string, number> = {};
