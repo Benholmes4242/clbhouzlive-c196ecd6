@@ -154,6 +154,32 @@ export function ScheduleTournamentCard({
         >
           {tournament.name}
         </p>
+
+        {/* Date range + purse for upcoming */}
+        {!isLive && !isFinal && (() => {
+          const endDate = isSeasonTournament(tournament)
+            ? null
+            : (tournament as TourTournament).end_date;
+          const purse = isSeasonTournament(tournament)
+            ? null
+            : (tournament as TourTournament).purse;
+          const parts = [
+            endDate && (() => {
+              const s = new Date(startDate + 'T12:00:00');
+              const e = new Date(endDate + 'T12:00:00');
+              const sameMonth = s.getMonth() === e.getMonth();
+              return sameMonth
+                ? `${getMonthAbbr(startDate)} ${getDayNum(startDate)}–${getDayNum(endDate)}`
+                : `${getMonthAbbr(startDate)} ${getDayNum(startDate)} – ${getMonthAbbr(endDate)} ${getDayNum(endDate)}`;
+            })(),
+            purse && formatPurse(purse),
+          ].filter(Boolean);
+          return parts.length > 0 ? (
+            <p className="mt-0.5 text-muted-foreground/60 line-clamp-1" style={{ fontSize: '12px', fontWeight: 500 }}>
+              {parts.join(' · ')}
+            </p>
+          ) : null;
+        })()}
         
         {/* Winner/Leader row */}
         {(winnerDisplay || hasLeaderData) && (

@@ -268,9 +268,9 @@ export function ScheduleTab() {
     if (!tournaments) return [];
     let filtered = [...tournaments];
     if (activeTour !== 'all') filtered = filtered.filter(t => t.tour_code === activeTour);
-    const now = new Date();
     switch (filter) {
-      case 'upcoming': filtered = filtered.filter(t => t.status === 'scheduled' || t.status === 'created' || isAfter(new Date(t.start_date), now)); break;
+      case 'upcoming': filtered = filtered.filter(t => t.status === 'scheduled' || t.status === 'created'); break;
+      case 'completed': filtered = filtered.filter(t => t.status === 'closed'); break;
       case 'completed': filtered = filtered.filter(t => t.status === 'closed'); break;
       case 'live': filtered = filtered.filter(t => t.status === 'inprogress'); break;
     }
