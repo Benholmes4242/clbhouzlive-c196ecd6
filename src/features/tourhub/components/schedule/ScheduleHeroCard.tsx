@@ -266,7 +266,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                   </>
                 ) : (
                   <span className="countdown-label">
-                    {format(new Date(tournament.start_date), 'MMM d')}
+                    {format(new Date(tournament.start_date + 'T12:00:00'), 'MMM d')}
                   </span>
                 )}
                 {isMajor && (
