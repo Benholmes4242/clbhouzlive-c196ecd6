@@ -405,3 +405,88 @@ function GlassStatCell({ label, value, highlight = false }: { label: string; val
     </div>
   );
 }
+
+function AlumniRow({ player, rank }: { player: CollegeAlumnus; rank: number }) {
+  const tourCode = player.tour_codes?.[0] || 'pga';
+  const headshotUrl = getPlayerHeadshotUrl(
+    `${player.first_name} ${player.last_name}`,
+    tourCode
+  );
+
+  return (
+    <Link
+      to={`/tourhub/player/${player.id}`}
+      className="flex items-center gap-3 bg-card border border-border/30 active:scale-[0.98] transition-transform"
+      style={{ borderRadius: 14, padding: '10px 14px' }}
+    >
+      {/* Rank */}
+      <span
+        className="text-muted-foreground flex-shrink-0"
+        style={{ fontSize: 12, fontWeight: 600, width: 20, textAlign: 'center', fontVariantNumeric: 'tabular-nums' }}
+      >
+        {rank}
+      </span>
+
+      {/* Headshot */}
+      <img
+        src={headshotUrl}
+        alt={`${player.first_name} ${player.last_name}`}
+        className="rounded-full object-cover flex-shrink-0 bg-muted"
+        style={{ width: 38, height: 38 }}
+        onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+      />
+
+      {/* Name + country */}
+      <div className="flex-1 min-w-0">
+        <p className="text-foreground truncate" style={{ fontSize: 14, fontWeight: 600 }}>
+          {player.first_name} {player.last_name}
+        </p>
+        <div className="flex items-center gap-2">
+          {player.world_ranking && (
+            <span className="text-muted-foreground" style={{ fontSize: 12, fontWeight: 500 }}>
+              #{player.world_ranking}
+            </span>
+          )}
+          {player.country && (
+            <span className="text-muted-foreground/60" style={{ fontSize: 12 }}>
+              {player.country}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Earnings */}
+      <span
+        className="text-foreground flex-shrink-0"
+        style={{ fontSize: 13, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}
+      >
+        {formatCurrency(player.earnings || 0)}
+      </span>
+    </Link>
+  );
+}
+
+function StatTile({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
+  return (
+    <div
+      className="bg-card border border-border/30 flex flex-col items-center justify-center"
+      style={{ borderRadius: 14, padding: '14px 8px' }}
+    >
+      <span className="text-muted-foreground" style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+        {label}
+      </span>
+      <span
+        className="text-foreground"
+        style={{
+          fontSize: 20,
+          fontWeight: 700,
+          fontVariantNumeric: 'tabular-nums',
+          marginTop: 4,
+          color: highlight ? 'rgba(245, 158, 11, 0.9)' : undefined,
+        }}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
