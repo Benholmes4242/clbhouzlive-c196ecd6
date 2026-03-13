@@ -218,28 +218,25 @@ function CondensedTieRow({ row, index, isActive, tournamentTourSlug }: { row: Li
         <div className="flex items-center flex-shrink-0">
           {row.players.slice(0, 4).map((player, i) => {
             const effectiveTourCode = player.player.tourCode ?? tournamentTourSlug ?? 'pga';
-            const photoUrl = getPlayerHeadshotUrl(player.player.fullName, effectiveTourCode, player.player.headshotOverride);
-            const initials = `${player.player.firstName[0]}${player.player.lastName[0]}`.toUpperCase();
+            const displayName = `${player.player.firstName[0]}. ${player.player.lastName}`;
             return (
               <div
                 key={player.player.id}
-                className="overflow-hidden flex-shrink-0"
+                className="flex-shrink-0"
                 style={{
-                  width: 28,
-                  height: 29,
-                  borderRadius: '34%',
-                  border: '1.5px solid rgba(255,255,255,0.15)',
-                  background: 'rgba(255,255,255,0.08)',
                   marginLeft: i > 0 ? -8 : 0,
                   zIndex: 4 - i,
                   position: 'relative',
                 }}
               >
-                {photoUrl ? (
-                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
-                ) : (
-                  <div style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>{initials}</div>
-                )}
+                <PlayerAvatar
+                  displayName={displayName}
+                  fullName={player.player.fullName}
+                  headshotOverride={player.player.headshotOverride}
+                  tourCode={effectiveTourCode}
+                  size={28}
+                  frosted
+                />
               </div>
             );
           })}
