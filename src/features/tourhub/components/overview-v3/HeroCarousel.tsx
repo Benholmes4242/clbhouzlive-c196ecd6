@@ -1072,7 +1072,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
 
     // Tap detection: minimal movement + short duration → let browser handle as click
     if (Math.abs(deltaX) < 10 && deltaY < 10 && elapsed < 300) {
-      setTimeout(() => setIsPaused(false), 5000);
+      scheduleResume();
       return;
     }
 
