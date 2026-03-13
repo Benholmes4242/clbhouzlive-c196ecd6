@@ -85,14 +85,6 @@ export function ScheduleTab() {
     });
   }, []);
 
-  // Save scroll position before navigating away
-  useEffect(() => {
-    const saveScroll = () => {
-      sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
-    };
-    window.addEventListener('beforeunload', saveScroll);
-    return () => window.removeEventListener('beforeunload', saveScroll);
-  }, []);
   
   const setFilter = useCallback((f: ScheduleFilterType) => {
     const params = new URLSearchParams(searchParams);
