@@ -507,7 +507,7 @@ function CommentsSheet({
               'md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[560px]',
               isDark ? 'bg-[#0d0d0d]' : 'bg-background'
             )}
-            style={{ minHeight: 'min(72dvh, 520px)', maxHeight: '92dvh' }}
+            style={{ minHeight: 'min(52dvh, 380px)', maxHeight: '92dvh' }}
           >
             {/* Drag handle */}
             <div className="flex justify-center pt-2.5 pb-1 shrink-0">
@@ -603,7 +603,7 @@ function CommentsSheet({
                 </motion.div>
               ) : comments.length === 0 ? (
                 /* Empty state */
-                <motion.div key="comments-empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col items-center justify-center px-8 gap-4">
+                <motion.div key="comments-empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col items-center justify-center px-8 gap-4 min-h-[220px]">
                   {/* Staggered bounce emoji cluster */}
                   <div className="flex gap-3 text-4xl">
                     <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>⛳</span>
