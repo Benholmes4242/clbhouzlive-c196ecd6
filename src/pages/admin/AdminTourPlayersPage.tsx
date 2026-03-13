@@ -308,10 +308,10 @@ function PhotoManagementSheet({
 }
 
 /* ───────── Player Detail Dialog ───────── */
-function PlayerDetailDialog({ player, open, onClose }: { player: PlayerRow | null; open: boolean; onClose: () => void }) {
+function PlayerDetailDialog({ player, open, onClose, headshotCacheBust }: { player: PlayerRow | null; open: boolean; onClose: () => void; headshotCacheBust: number }) {
   if (!player) return null;
   const primaryTour = player.tour_codes?.[0] || 'pga';
-  const headshotUrl = player.full_name ? getPlayerHeadshotUrl(player.full_name, primaryTour, player.headshot_override) : PLAYER_SILHOUETTE_URL;
+  const headshotUrl = player.full_name ? `${getPlayerHeadshotUrl(player.full_name, primaryTour, player.headshot_override)}?v=${headshotCacheBust}` : PLAYER_SILHOUETTE_URL;
   const fields = [
     { label: 'Full Name', value: player.full_name },
     { label: 'Country', value: player.country },
