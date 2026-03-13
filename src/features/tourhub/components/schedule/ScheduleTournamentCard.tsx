@@ -169,7 +169,7 @@ export function ScheduleTournamentCard({
                 </button>
                 {winnerScore !== null && winnerScore !== undefined && (
                   <span className="font-semibold ml-1" style={{ color: TOUR_COLORS.liveAmber }}>
-                    ({hasSeasonWinner ? tournament.winner_score : leaderWinner?.displayScore ?? ''})
+                    ({hasSeasonWinner ? (tournament as TourTournament).winner_score : leaderWinner?.displayScore ?? ''})
                   </span>
                 )}
               </span>
