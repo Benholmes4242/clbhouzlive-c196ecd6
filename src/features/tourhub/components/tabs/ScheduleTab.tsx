@@ -17,7 +17,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
 import { TourHubEmptyState } from '../TourHubEmptyState';
-import { format, isAfter } from 'date-fns';
+import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { getContextLabel } from '../../utils/tournamentClassification';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -106,7 +106,7 @@ export function ScheduleTab() {
   const queryClient = useQueryClient();
   const { data: season } = useTourSeason();
   const { data: tournaments, isLoading, error, refetch } = useTourTournaments(season?.id, {
-    refetchInterval: filter === 'live' ? 30000 : false,
+    refetchInterval: filter === 'live' ? 30000 : filter === 'upcoming' ? 60000 : false,
   });
 
   // Pull-to-refresh state
@@ -220,11 +220,6 @@ export function ScheduleTab() {
     }
 
     if (filter === 'upcoming') {
-      // Show live tournaments if any exist, otherwise upcoming per tour
-      if (liveList.length > 0) {
-        return [...liveList].sort((a, b) => getTournamentPriority(a) - getTournamentPriority(b))
-          .map(t => ({ tournament: t, type: 'live' as const }));
-      }
       return onePerTour(upcomingList, 'upcoming');
     }
 
@@ -240,22 +235,20 @@ export function ScheduleTab() {
 
   const filterStats = useMemo(() => {
     if (!tournaments) return { all: 0, live: 0, upcoming: 0, completed: 0 };
-    const now = new Date();
     const tourFiltered = activeTour === 'all' ? tournaments : tournaments.filter(t => t.tour_code === activeTour);
     return {
       all: tourFiltered.length,
       live: tourFiltered.filter(t => t.status === 'inprogress').length,
-      upcoming: tourFiltered.filter(t => t.status === 'scheduled' || t.status === 'created' || isAfter(new Date(t.start_date), now)).length,
+      upcoming: tourFiltered.filter(t => t.status === 'scheduled' || t.status === 'created').length,
       completed: tourFiltered.filter(t => t.status === 'closed').length,
     };
   }, [tournaments, activeTour]);
 
   const tourCounts = useMemo(() => {
     if (!tournaments) return {} as Record<string, number>;
-    const now = new Date();
     let statusFiltered = [...tournaments];
     switch (filter) {
-      case 'upcoming': statusFiltered = statusFiltered.filter(t => t.status === 'scheduled' || t.status === 'created' || isAfter(new Date(t.start_date), now)); break;
+      case 'upcoming': statusFiltered = statusFiltered.filter(t => t.status === 'scheduled' || t.status === 'created'); break;
       case 'completed': statusFiltered = statusFiltered.filter(t => t.status === 'closed'); break;
       case 'live': statusFiltered = statusFiltered.filter(t => t.status === 'inprogress'); break;
     }
@@ -275,9 +268,9 @@ export function ScheduleTab() {
     if (!tournaments) return [];
     let filtered = [...tournaments];
     if (activeTour !== 'all') filtered = filtered.filter(t => t.tour_code === activeTour);
-    const now = new Date();
     switch (filter) {
-      case 'upcoming': filtered = filtered.filter(t => t.status === 'scheduled' || t.status === 'created' || isAfter(new Date(t.start_date), now)); break;
+      case 'upcoming': filtered = filtered.filter(t => t.status === 'scheduled' || t.status === 'created'); break;
+      case 'completed': filtered = filtered.filter(t => t.status === 'closed'); break;
       case 'completed': filtered = filtered.filter(t => t.status === 'closed'); break;
       case 'live': filtered = filtered.filter(t => t.status === 'inprogress'); break;
     }

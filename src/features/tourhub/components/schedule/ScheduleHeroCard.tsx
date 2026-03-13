@@ -11,7 +11,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
@@ -266,7 +266,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                   </>
                 ) : (
                   <span className="countdown-label">
-                    {format(new Date(tournament.start_date), 'MMM d')}
+                    {format(new Date(tournament.start_date + 'T12:00:00'), 'MMM d')}
                   </span>
                 )}
                 {isMajor && (
@@ -364,30 +364,48 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                 {/* Live countdown — mirrors Overview hero */}
                 <UpcomingCountdown startDate={tournament.start_date} />
 
-                <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '4px', marginTop: '4px' }}>
-                  {[
+                {(() => {
+                  const parts = [
                     tournament.purse && formatPurse(tournament.purse),
                     tournament.venue_par && `PAR ${tournament.venue_par}`,
-                    tournament.venue_yardage && `${tournament.venue_yardage.toLocaleString()} YDS`
-                  ].filter(Boolean).join(' · ')}
+                    tournament.venue_yardage && `${tournament.venue_yardage.toLocaleString()} YDS`,
+                  ].filter(Boolean);
+                  return parts.length > 0 ? (
+                    <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '4px', marginTop: '6px' }}>
+                      {parts.join(' · ')}
+                    </p>
+                  ) : null;
+                })()}
+
+                {/* Date range */}
+                <p style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.5)', marginBottom: '6px' }}>
+                  {(() => {
+                    const start = new Date(tournament.start_date + 'T12:00:00');
+                    const end = new Date(tournament.end_date + 'T12:00:00');
+                    const sameMonth = start.getMonth() === end.getMonth();
+                    return sameMonth
+                      ? `${format(start, 'MMM d')} – ${format(end, 'd, yyyy')}`
+                      : `${format(start, 'MMM d')} – ${format(end, 'MMM d, yyyy')}`;
+                  })()}
                 </p>
 
                 {tournament.defending_champion && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '6px' }}>
-                    <PlayerAvatar
-                      displayName={tournament.defending_champion}
-                      fullName={tournament.defending_champion}
-                      tourCode={tournament.tour_code}
-                      size={30}
-                      frosted
-                    />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8, marginBottom: 4 }}>
+                    <div style={{
+                      width: 28, height: 28, borderRadius: '50%',
+                      background: 'rgba(255,255,255,0.08)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      flexShrink: 0,
+                    }}>
+                      <Trophy style={{ width: 13, height: 13, color: 'rgba(255,255,255,0.4)' }} />
+                    </div>
                     <div>
-                      <span style={{ fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.8px', textTransform: 'uppercase', display: 'block' }}>
-                        Defending Champion
-                      </span>
-                      <span style={{ fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>
+                      <p style={{ fontSize: 12, fontWeight: 600, color: '#FFFFFF', lineHeight: 1 }}>
                         {tournament.defending_champion}
-                      </span>
+                      </p>
+                      <p style={{ fontSize: 10, fontWeight: 500, color: 'rgba(255,255,255,0.45)', marginTop: 2, lineHeight: 1, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                        Defending Champion
+                      </p>
                     </div>
                   </div>
                 )}
