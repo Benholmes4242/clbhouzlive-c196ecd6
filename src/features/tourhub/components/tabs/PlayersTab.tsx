@@ -503,8 +503,19 @@ export function PlayersTab() {
         </div>
       </div>
 
-      {/* Tour dropdown — 24px from search */}
-      <div className="px-4" style={{ marginTop: '24px' }}>
+      {/* Sticky Tour Filter Toolbar */}
+      <div
+        className="sticky top-0 z-20 -mx-4 px-4"
+        style={{
+          background: 'hsl(var(--background) / 0.95)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderBottom: '1px solid hsl(var(--border) / 0.15)',
+          paddingTop: '12px',
+          paddingBottom: '10px',
+          marginTop: '16px',
+        }}
+      >
         <PlayersTourFilterSheet
           activeTour={activeTour}
           onTourChange={setActiveTour}
