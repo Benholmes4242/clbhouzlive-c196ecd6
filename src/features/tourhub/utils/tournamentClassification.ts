@@ -84,6 +84,7 @@ const LPGA_SIGNATURE_KEYWORDS = [
   'lotte championship',
   'cognizant founders',
   'founders cup',
+  'solheim cup',
 ];
 
 const DPWORLD_SIGNATURE_KEYWORDS = [
