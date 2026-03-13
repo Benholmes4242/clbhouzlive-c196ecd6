@@ -301,6 +301,11 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
             {/* ─── LIVE LAYOUT ─── */}
             {isLive && (
               <>
+                {/* Round label — inferred from date arithmetic */}
+                <p className="hero-meta" style={{ marginTop: 4, marginBottom: 0 }}>
+                  {getCurrentRoundLabel(tournament.start_date)}
+                </p>
+
                 {leaderWinner && (
                   <div style={{
                     display: 'flex',
