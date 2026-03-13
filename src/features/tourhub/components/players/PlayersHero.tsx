@@ -248,7 +248,7 @@ function RunnerCard({ player, index, activeTour, statsMap, sort, tiedCount }: {
       {/* Avatar */}
       <div
         className="flex-shrink-0 overflow-hidden"
-        style={{ width: '36px', height: '36px', borderRadius: '34%', border: '1px solid hsl(var(--border) / 0.4)' }}
+        style={{ width: '36px', height: '36px', borderRadius: '34%', border: '1px solid rgba(255,255,255,0.18)' }}
       >
         <img
           src={photoUrl}
