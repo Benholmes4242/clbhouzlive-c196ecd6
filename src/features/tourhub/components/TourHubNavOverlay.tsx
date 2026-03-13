@@ -623,8 +623,9 @@ export function TourHubNavOverlay({
                       {/* TM-06: College #1 teaser — school name tappable */}
                       {item.id === 'college-golf' && topCollege && (
                         <p className="text-[13px] mt-1 text-muted-foreground flex items-center gap-1.5">
-                          <span 
-                            className="inline-flex items-center gap-1.5 transition-opacity active:opacity-70 cursor-pointer"
+                          <button
+                            type="button"
+                            className="inline-flex items-center gap-1.5 transition-opacity active:opacity-70 focus:outline-none"
                             onClick={(e) => {
                               e.stopPropagation();
                               haptic('light');
@@ -641,7 +642,7 @@ export function TourHubNavOverlay({
                               />
                             )}
                             <span className="font-medium">{topCollege.name}</span>
-                          </span>
+                          </button>
                           <span>
                             {' leads • '}
                             {formatCurrency(topCollege.earnings)} earned

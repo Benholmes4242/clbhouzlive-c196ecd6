@@ -90,22 +90,6 @@ export function useLiveLeaderTeaser() {
 }
 
 /**
- * Total count of players in the database
- */
-export function usePlayerCount() {
-  return useQuery({
-    queryKey: ['player-count'],
-    queryFn: async () => {
-      const { count } = await supabase
-        .from('sr_players')
-        .select('*', { count: 'exact', head: true });
-      return count || 0;
-    },
-    staleTime: 600_000, // 10 minutes
-  });
-}
-
-/**
  * Top college by earnings
  * Returns: { name, earnings, logoUrl } or null
  */
