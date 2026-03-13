@@ -31,13 +31,6 @@ interface ScheduleHeroCardProps {
   onDotClick?: (index: number) => void;
 }
 
-function getTourLabel(tourCode?: string): string {
-  const labels: Record<string, string> = {
-    pga: 'PGA TOUR', EURO: 'DP WORLD TOUR', LPGA: 'LPGA',
-    CHAMP: 'CHAMPIONS', PGAD: 'KORN FERRY', LIV: 'LIV GOLF',
-  };
-  return labels[tourCode || ''] || 'TOUR';
-}
 
 
 export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex = 0, totalSlides = 1, onDotClick }: ScheduleHeroCardProps) {
