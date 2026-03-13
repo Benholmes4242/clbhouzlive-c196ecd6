@@ -553,11 +553,7 @@ export function TourHubNavOverlay({
                 })}
                </div>
 
-              {/* Divider before link items */}
-              <div className="h-px my-4 border-t border-border/30" />
-
-              {/* Link Items (College Golf, etc.) */}
-              <div className="space-y-2">
+              {/* Link Items (College Golf, etc.) — unified list continues */}
                 {LINK_ITEMS.map((item, index) => (
                   <motion.button
                     key={item.id}
