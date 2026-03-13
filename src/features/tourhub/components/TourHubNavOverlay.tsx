@@ -551,7 +551,6 @@ export function TourHubNavOverlay({
                     </motion.button>
                   );
                 })}
-               </div>
 
               {/* Link Items (College Golf, etc.) — unified list continues */}
                 {LINK_ITEMS.map((item, index) => (
@@ -639,6 +638,7 @@ export function TourHubNavOverlay({
                   </motion.button>
                 ))}
 
+              </div>{/* close space-y-2 */}
             </div>{/* close px-5 py-5 wrapper */}
             </div>{/* close scroll container */}
           </motion.div>
