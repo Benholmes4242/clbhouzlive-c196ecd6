@@ -21,6 +21,12 @@ interface SSEData {
   meta?: any;
 }
 
+/** Tracks whether an SSE error event was received during streaming */
+interface StreamState {
+  hasContent: boolean;
+  lastError: string | null;
+}
+
 export type RateLimitError = 'RATE_LIMIT_MINUTE' | 'RATE_LIMIT_HOUR' | 'RATE_LIMIT_DAY' | 'PROVIDER_RATE_LIMIT';
 
 export interface UserContextPayload {
