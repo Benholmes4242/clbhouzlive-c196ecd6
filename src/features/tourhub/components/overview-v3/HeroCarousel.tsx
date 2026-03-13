@@ -1131,7 +1131,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
             currentIndex={currentIndex}
             onDotClick={setCurrentIndex}
             leadersWinnersMap={leadersWinnersMap}
-            isExpanded={index === currentIndex && isExpanded}
+            isExpanded={index === currentIndex && (slide.type === 'live' ? true : isExpanded)}
             onToggleExpand={handleToggleExpand}
           />
         ))}
