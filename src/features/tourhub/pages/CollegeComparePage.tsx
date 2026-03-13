@@ -73,9 +73,9 @@ export function CollegeComparePage() {
               <div className="grid grid-cols-2 gap-4">
                 {[data.college1, data.college2].map((college, i) => (
                   <div key={i} className="bg-card border border-border/50 rounded-2xl p-4 text-center">
-                    <h3 className="text-foreground text-lg font-bold mb-2">{college?.name || (i === 0 ? c1 : c2)}</h3>
-                    <p className="text-muted-foreground text-sm">{formatCurrency(college?.earnings ?? 0)} earnings</p>
-                    <p className="text-muted-foreground text-sm">{college?.wins ?? 0} wins · {college?.playerCount ?? 0} pros</p>
+                    <h3 className="text-foreground text-lg font-bold mb-2">{college?.media?.short_name || college?.media?.college_name || (i === 0 ? c1 : c2)}</h3>
+                    <p className="text-muted-foreground text-sm">{formatCurrency(college?.stats?.earnings_total ?? 0)} earnings</p>
+                    <p className="text-muted-foreground text-sm">{college?.stats?.wins_total ?? 0} wins · {college?.stats?.player_count ?? 0} pros</p>
                   </div>
                 ))}
               </div>
