@@ -113,21 +113,19 @@ export const CategoryTabs = memo(function CategoryTabs({
               aria-label={`${category.name} category`}
               className="flex items-center whitespace-nowrap flex-shrink-0 active:scale-95 transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
               style={{
-                padding: '8px 14px',
+                padding: '6px 12px',
                 gap: '6px',
                 fontSize: '12px',
                 fontWeight: isActive ? 600 : 500,
                 borderRadius: '10px',
-                background: isActive ? 'hsl(var(--foreground))' : '#FFFFFF',
+                background: isActive ? '#475569' : 'transparent',
                 border: isActive 
-                  ? '1px solid hsl(var(--foreground))' 
+                  ? '1px solid #475569' 
                   : '1px solid rgba(0, 0, 0, 0.08)',
                 color: isActive ? '#FFFFFF' : 'rgba(0, 0, 0, 0.45)',
-                boxShadow: isActive 
-                  ? '0 2px 8px rgba(0, 0, 0, 0.15)' 
-                  : 'none',
+                boxShadow: 'none',
                 transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                outlineColor: 'hsl(var(--foreground))',
+                outlineColor: '#475569',
               }}
             >
               <IconComponent size={14} />
