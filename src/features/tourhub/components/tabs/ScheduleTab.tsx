@@ -300,8 +300,8 @@ export function ScheduleTab() {
         t.tour_full_name?.toLowerCase().includes(searchLower)
       );
     }
-    // B42 FIX 1 + B44 FIX 1 + B45 FIX 2: hero exclusion on all, live, and completed tabs
-    if ((filter === 'all' || filter === 'live' || filter === 'completed') && !search && heroItems.length > 0) {
+    // Remove hero items from the list on all tabs (they're shown in the carousel above)
+    if (!search && heroItems.length > 0) {
       const heroIds = new Set(heroItems.map(h => h.tournament.id));
       filtered = filtered.filter(t => !heroIds.has(t.id));
     }
