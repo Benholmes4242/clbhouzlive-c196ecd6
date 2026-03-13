@@ -589,13 +589,13 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               </>
             ) : (
               <>
-                <div style={{ padding: isExpanded ? '0 20px' : undefined }}>
+              <div style={{ padding: isExpanded ? '0 20px' : undefined }}>
                   {/* Row 1: Status | Tour Badge (right-aligned) — live + upcoming only */}
                   <div className="flex items-center justify-between" style={{ marginBottom: '6px' }}>
                     {isLive ? (
                       <div className="flex items-center gap-1.5">
                         <span className="live-dot" />
-                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: '#22C55E' }}>LIVE</span>
+                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: tournament.isMajor ? '#FACC15' : '#22C55E' }}>LIVE</span>
                       </div>
                     ) : isUpcoming ? (
                       <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' as const }}>
