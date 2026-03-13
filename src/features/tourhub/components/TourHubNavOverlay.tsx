@@ -282,8 +282,6 @@ export function TourHubNavOverlay({
             className="fixed inset-0 z-[9998]"
             style={{
               background: 'rgba(0, 0, 0, 0.35)',
-              backdropFilter: 'blur(4px)',
-              WebkitBackdropFilter: 'blur(4px)',
             }}
             onClick={onClose}
             aria-hidden="true"
