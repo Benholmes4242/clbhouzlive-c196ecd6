@@ -19,17 +19,7 @@ function TourHubMainPageInner() {
 
   const handleCloseNav = () => {
     closeNav();
-
-    // Force visibility while Overview is active
-    if (activeTab === 'overview') {
-      showBottomNav();
-      return;
-    }
-
-    // Preserve existing behavior for non-overview tabs
-    if (window.scrollY < window.innerHeight * 0.85) {
-      hideBottomNav();
-    }
+    // Don't touch bottom nav visibility on overview — the IntersectionObserver controls it
   };
   
   // Subscribe to tournament status changes (live/completed transitions)
