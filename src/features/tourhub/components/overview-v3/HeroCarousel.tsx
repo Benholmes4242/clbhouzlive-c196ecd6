@@ -590,14 +590,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 >
                   {/* Round progress */}
                   <p className="hero-meta" style={{ padding: isExpanded ? '0 20px' : undefined, marginTop: 4, marginBottom: isExpanded ? 4 : 0 }}>
-                    {(() => {
-                      const start = new Date(tournament.startDate);
-                      const now = new Date();
-                      const dayIndex = Math.max(0, Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
-                      const totalRounds = 4;
-                      const currentRound = Math.min(dayIndex + 1, totalRounds);
-                      return currentRound >= totalRounds ? 'Final Round' : `Round ${currentRound} of ${totalRounds}`;
-                    })()}
+                    {tournament.currentRound
+                      ? (tournament.currentRound >= 4 ? 'Final Round' : `Round ${tournament.currentRound} of 4`)
+                      : 'In Progress'}
                   </p>
 
                   {/* Expanded: Full Leaderboard or Scorecard */}
