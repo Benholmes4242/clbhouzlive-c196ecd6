@@ -116,7 +116,9 @@ serve(async (req) => {
 
     // DELETE: remove a headshot
     if (req.method === 'DELETE') {
-      const { playerName, tourCode } = await req.json();
+      const body = await req.json();
+      const playerName = body.playerName;
+      const tourCode = (body.tourCode || '').toLowerCase();
       if (!playerName) throw new Error('playerName required');
 
       const folder = TOUR_FOLDER[tourCode] || 'Misc';
@@ -141,8 +143,8 @@ serve(async (req) => {
       const formData = await req.formData();
       const file = formData.get('file') as File;
       const playerName = formData.get('playerName') as string;
-      const tourCode = formData.get('tourCode') as string;
-      const oldTourCode = formData.get('oldTourCode') as string | null;
+      const tourCode = ((formData.get('tourCode') as string) || '').toLowerCase();
+      const oldTourCode = ((formData.get('oldTourCode') as string) || '').toLowerCase() || null;
 
       if (!file || !playerName) throw new Error('file and playerName required');
 
