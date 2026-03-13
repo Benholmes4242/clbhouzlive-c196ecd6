@@ -463,7 +463,7 @@ export function AdminTourPlayersPage() {
                 {paged.map((player) => {
                   const primaryTour = player.tour_codes?.[0] || 'pga';
                   const headshotUrl = player.full_name
-                    ? getPlayerHeadshotUrl(player.full_name, primaryTour, player.headshot_override)
+                    ? `${getPlayerHeadshotUrl(player.full_name, primaryTour, player.headshot_override)}?v=${headshotCacheBust}`
                     : PLAYER_SILHOUETTE_URL;
 
                   return (
