@@ -628,8 +628,8 @@ export function CollegeRankingsPreview() {
 
   if (statsError || mediaError) {
     return (
-      <section aria-label="Franchise Rankings">
-        <SectionErrorState sectionName="franchise rankings" onRetry={() => { refetchStats(); refetchMedia(); }} />
+      <section aria-label="College Franchise Rankings">
+        <SectionErrorState sectionName="college franchise rankings" onRetry={() => { refetchStats(); refetchMedia(); }} />
       </section>
     );
   }
@@ -651,7 +651,7 @@ export function CollegeRankingsPreview() {
             className="m-0 text-foreground"
             style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}
           >
-            Franchise Rankings
+            College Franchise Rankings
           </h2>
           <p
             className="m-0 mt-1 text-muted-foreground/60"
@@ -765,7 +765,7 @@ export function CollegeRankingsPreview() {
           }}
         >
           <span className="text-foreground" style={{ fontSize: '13px', fontWeight: 600 }}>
-            View Full Franchise Rankings ›
+            View Full College Franchise Rankings ›
           </span>
         </button>
       </div>

@@ -117,7 +117,7 @@ export const CategoryTabs = memo(function CategoryTabs({
                 gap: '6px',
                 fontSize: '12px',
                 fontWeight: isActive ? 600 : 500,
-                borderRadius: '10px',
+                borderRadius: '20px',
                 background: isActive ? '#475569' : 'transparent',
                 border: isActive 
                   ? '1px solid #475569' 
