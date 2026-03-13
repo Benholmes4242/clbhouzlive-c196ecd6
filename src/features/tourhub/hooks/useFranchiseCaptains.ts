@@ -13,6 +13,7 @@ export interface FranchiseCaptain {
   pgaTourId: string | null;
   earnings: number;
   collegeNormalized: string;
+  tourCode: string;
 }
 
 export function useFranchiseCaptains(collegeNames: string[]) {
@@ -34,7 +35,8 @@ export function useFranchiseCaptains(collegeNames: string[]) {
             last_name,
             photo_url,
             pga_tour_id,
-            college_normalized
+            college_normalized,
+            tour_codes
           )
         `)
         .eq('season_id', seasonId)
@@ -62,6 +64,7 @@ export function useFranchiseCaptains(collegeNames: string[]) {
             pgaTourId: player.pga_tour_id || null,
             earnings: row.earnings || 0,
             collegeNormalized: key,
+            tourCode: player.tour_codes?.[0] ?? 'pga',
           });
         }
       }
