@@ -155,6 +155,7 @@ async function parseSSEStream(
   const decoder = new TextDecoder();
   let buffer = '';
   let meta: any = null;
+  const streamState: StreamState = { hasContent: false, lastError: null };
 
   try {
     while (true) {
