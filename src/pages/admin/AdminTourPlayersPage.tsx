@@ -525,10 +525,10 @@ export function AdminTourPlayersPage() {
       )}
 
       {/* Player detail dialog */}
-      <PlayerDetailDialog player={selectedPlayer} open={!!selectedPlayer} onClose={() => setSelectedPlayer(null)} />
+      <PlayerDetailDialog player={selectedPlayer} open={!!selectedPlayer} onClose={() => setSelectedPlayer(null)} headshotCacheBust={headshotCacheBust} />
 
       {/* Photo management sheet */}
-      <PhotoManagementSheet player={photoPlayer} open={!!photoPlayer} onClose={() => setPhotoPlayer(null)} />
+      <PhotoManagementSheet player={photoPlayer} open={!!photoPlayer} onClose={() => setPhotoPlayer(null)} headshotCacheBust={headshotCacheBust} onCacheBust={bumpCacheBust} />
     </div>
   );
 }
