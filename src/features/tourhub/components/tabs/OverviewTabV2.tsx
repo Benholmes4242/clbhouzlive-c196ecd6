@@ -8,7 +8,6 @@ import {
   FeaturedMomentCard,
   SeasonSnapshotCinematic,
   TopPlayersFeed,
-  SeasonLeadersAward,
   FeaturedCoursesDestination,
   StorylineInsightStrip,
   HistoryCarousel,
