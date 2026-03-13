@@ -18,6 +18,7 @@ import { PlayerSortControl, type PlayerSortType, getDefaultSortForTour } from '.
 import { PlayersTourFilterSheet } from '../players/PlayersTourFilterSheet';
 import { PlayerCardV2 } from '../players/PlayerCardV2';
 import { PlayersEmptyState } from '../players/PlayersEmptyState';
+import { PlayersWorldsBest } from '../players/PlayersWorldsBest';
 
 function useDebouncedValue(value: string, delay: number): string {
   const [debounced, setDebounced] = useState(value);
