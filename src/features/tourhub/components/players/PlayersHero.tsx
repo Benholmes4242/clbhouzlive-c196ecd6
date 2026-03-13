@@ -83,7 +83,7 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
   const player = players[currentIndex];
   if (!player) return null;
 
-  const photoUrl = getPlayerHeadshotUrl(player.playerName, 'pga');
+  const photoUrl = getPlayerHeadshotUrl(player.playerName, player.tourCode || 'pga');
   const country = titleCaseCountry(player.country);
 
   return (
@@ -113,7 +113,7 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
                 key={player.playerId}
                 src={photoUrl}
                 alt={player.playerName}
-className="absolute inset-0 w-full h-full object-cover object-[center_10%]"
+                className="absolute inset-0 w-full h-full object-cover object-[center_10%]"
                 loading="eager"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -223,8 +223,8 @@ function RunnerCard({ player, index, activeTour, statsMap, sort, tiedCount }: {
   }
 
   const rankBg = index === 0
-    ? '#94A3B8'
-    : '#C2875A';
+    ? 'rgba(148, 163, 184, 0.9)'
+    : 'rgba(194, 135, 90, 0.9)';
 
   return (
     <Link
@@ -248,7 +248,7 @@ function RunnerCard({ player, index, activeTour, statsMap, sort, tiedCount }: {
       {/* Avatar */}
       <div
         className="flex-shrink-0 overflow-hidden"
-        style={{ width: '36px', height: '36px', borderRadius: '34%', border: '1px solid hsl(var(--border) / 0.4)' }}
+        style={{ width: '36px', height: '36px', borderRadius: '34%', border: '1px solid rgba(255,255,255,0.18)' }}
       >
         <img
           src={photoUrl}
@@ -391,7 +391,7 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
                 <motion.img
                   src={photoUrl}
                   alt={champion.playerName}
-className={`absolute inset-0 w-full h-full object-cover ${activeTour === 'LIV' ? 'object-[center_-15%]' : 'object-[center_10%]'}`}
+                  className={`absolute inset-0 w-full h-full object-cover ${activeTour === 'LIV' ? 'object-[center_-15%]' : 'object-[center_10%]'}`}
                   loading="eager"
                   initial={{ scale: 1.06 }}
                   animate={{ scale: 1 }}
@@ -425,6 +425,11 @@ className={`absolute inset-0 w-full h-full object-cover ${activeTour === 'LIV' ?
                   className="flex items-center gap-1.5"
                 >
                   <CountryFlag country={champion.country} size="sm" className="brightness-110" />
+                  {country && (
+                    <span style={{ fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>
+                      {country}
+                    </span>
+                  )}
                 </motion.div>
 
                 {metaParts.length > 0 && (
@@ -437,7 +442,7 @@ className={`absolute inset-0 w-full h-full object-cover ${activeTour === 'LIV' ?
                       className="inline-block text-white"
                       style={{ 
                         fontSize: '13px', fontWeight: 600, 
-                        background: 'rgba(245,158,11,0.85)', 
+                        background: 'hsl(var(--warm-amber) / 0.85)', 
                         borderRadius: '20px', 
                         padding: '5px 12px',
                         letterSpacing: '0.3px',
