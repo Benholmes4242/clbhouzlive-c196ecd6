@@ -246,10 +246,9 @@ export function ScheduleTab() {
 
   const tourCounts = useMemo(() => {
     if (!tournaments) return {} as Record<string, number>;
-    const now = new Date();
     let statusFiltered = [...tournaments];
     switch (filter) {
-      case 'upcoming': statusFiltered = statusFiltered.filter(t => t.status === 'scheduled' || t.status === 'created' || isAfter(new Date(t.start_date), now)); break;
+      case 'upcoming': statusFiltered = statusFiltered.filter(t => t.status === 'scheduled' || t.status === 'created'); break;
       case 'completed': statusFiltered = statusFiltered.filter(t => t.status === 'closed'); break;
       case 'live': statusFiltered = statusFiltered.filter(t => t.status === 'inprogress'); break;
     }
