@@ -89,11 +89,7 @@ export function TourHubNavOverlay({
   const { data: topPlayers } = useTopWorldRanked(5);
   const { data: liveCount } = useLiveTournamentCount();
   const { data: leaderTeaser } = useLiveLeaderTeaser();
-  const { data: playerCount } = usePlayerCount();
   const { data: topCollege } = useTopCollegeTeaser();
-  
-  // World #1 name from the rankings data
-  const worldNumber1 = topPlayers?.[0];
   
   // Lock body scroll when open
   useEffect(() => {
