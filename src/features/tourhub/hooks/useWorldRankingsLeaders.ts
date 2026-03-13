@@ -57,7 +57,7 @@ export function useWorldRankingsLeaders(limit = 50) {
 
       // Deduplicate by player_id as safety fallback
       const seen = new Set<string>();
-      const unique = (data ?? []).filter((d) => {
+      const unique = latestRows.filter((d) => {
         if (!d.player_id || seen.has(d.player_id)) return false;
         seen.add(d.player_id);
         return true;
