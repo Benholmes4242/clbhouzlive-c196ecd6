@@ -442,7 +442,7 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
                       className="inline-block text-white"
                       style={{ 
                         fontSize: '13px', fontWeight: 600, 
-                        background: 'hsl(var(--accent-amber) / 0.85)', 
+                        background: 'hsl(var(--warm-amber) / 0.85)', 
                         borderRadius: '20px', 
                         padding: '5px 12px',
                         letterSpacing: '0.3px',
