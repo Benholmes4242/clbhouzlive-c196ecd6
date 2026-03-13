@@ -155,9 +155,11 @@ export function useLiveRightNow() {
         .gt('strokes', 0)
         .not('position', 'is', null);
 
-      // Build leader map
+      // Build leader map and count ties at position 1
       const leaderMap: Record<string, any> = {};
+      const leaderCountMap: Record<string, number> = {};
       for (const entry of allLeaders || []) {
+        leaderCountMap[entry.tournament_id] = (leaderCountMap[entry.tournament_id] ?? 0) + 1;
         if (!leaderMap[entry.tournament_id]) {
           leaderMap[entry.tournament_id] = entry;
         }
@@ -178,12 +180,21 @@ export function useLiveRightNow() {
           venueName: t.venue_name,
           venueCity: t.venue_city,
           isStartingSoon,
-          leader: leader ? {
-            id: (leader.player as any).id,
-            name: `${(leader.player as any).first_name} ${(leader.player as any).last_name}`,
-            score: leader.score,
-            scoreDisplay: formatScore(leader.score),
-          } : null,
+          leader: leader
+            ? leaderCountMap[t.id] > 1
+              ? {
+                  id: (leader.player as any).id,
+                  name: `${leaderCountMap[t.id]} tied`,
+                  score: leader.score,
+                  scoreDisplay: formatScore(leader.score),
+                }
+              : {
+                  id: (leader.player as any).id,
+                  name: `${(leader.player as any).first_name} ${(leader.player as any).last_name}`,
+                  score: leader.score,
+                  scoreDisplay: formatScore(leader.score),
+                }
+            : null,
         };
       });
     },
