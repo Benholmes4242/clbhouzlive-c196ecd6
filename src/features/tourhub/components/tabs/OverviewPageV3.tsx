@@ -120,10 +120,10 @@ export function OverviewPageV3() {
         )}
       </AnimatePresence>
 
-      {/* 1. Hero Carousel - using containerNoHeader since Overview has no header */}
-      <div 
+      {/* 1. Hero Carousel - FIX 5: parallax scale/fade wrapper */}
+      <motion.div 
         className="relative w-full z-0"
-        style={HERO_STYLES.containerNoHeader}
+        style={{ ...HERO_STYLES.containerNoHeader, opacity: heroOpacity, scale: heroScale }}
       >
         <HeroCarousel hasHeader={false} />
         {/* Show sentinel: top edge — when it leaves viewport, nav slides in */}
