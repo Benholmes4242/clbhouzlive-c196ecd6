@@ -85,58 +85,12 @@ function LeaderboardSkeleton() {
   );
 }
 
-/**
- * Infers current round from leaderboard data.
- * Checks round_4 → round_3 → round_2 → round_1 (last non-null = current round).
- * Falls back to date arithmetic only if no leaderboard data available.
- */
+// Use shared getCurrentRoundLabel, adapting LeaderEntry[] to the expected interface
 function getCurrentRoundLabel(leaders: LeaderEntry[], startDate: string): string {
   if (leaders.length > 0) {
-    const sample = leaders[0];
-    if (sample.round_4 != null) return 'Final Round';
-    if (sample.round_3 != null) return 'Round 3 of 4';
-    if (sample.round_2 != null) return 'Round 2 of 4';
-    if (sample.round_1 != null) return 'Round 1 of 4';
+    return getCurrentRoundLabelShared(leaders[0], startDate);
   }
-  // Fallback: date arithmetic
-  const dayIndex = Math.max(0, Math.floor(
-    (Date.now() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)
-  ));
-  const round = Math.min(dayIndex + 1, 4);
-  return round >= 4 ? 'Final Round' : `Round ${round} of 4`;
-}
-
-/**
- * UpcomingCountdown — live countdown to tournament start
- */
-function UpcomingCountdown({ startDate }: { startDate: string }) {
-  const [timeLeft, setTimeLeft] = useState('');
-  useEffect(() => {
-    function update() {
-      const diff = new Date(startDate).getTime() - Date.now();
-      if (diff <= 0) { setTimeLeft('Starting now'); return; }
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      if (days > 0) setTimeLeft(`${days}d ${hours}h`);
-      else if (hours > 0) setTimeLeft(`${hours}h ${mins}m`);
-      else setTimeLeft(`${mins}m`);
-    }
-    update();
-    const t = setInterval(update, 60_000);
-    return () => clearInterval(t);
-  }, [startDate]);
-
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-      <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
-        Starts in
-      </span>
-      <span style={{ fontSize: '15px', fontWeight: 800, color: '#FFFFFF', fontVariantNumeric: 'tabular-nums' }}>
-        {timeLeft}
-      </span>
-    </div>
-  );
+  return getCurrentRoundLabelShared(null, startDate);
 }
 
 // ── Live tie-condensing logic ──

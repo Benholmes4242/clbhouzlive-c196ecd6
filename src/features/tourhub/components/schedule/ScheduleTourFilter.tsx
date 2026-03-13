@@ -4,11 +4,12 @@
  */
 
 import { useState, useCallback } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { AnimatedCheck } from '@/components/ui/AnimatedCheck';
 import { motion } from 'framer-motion';
+import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 
 export type TourFilterCode = 'all' | 'pga' | 'EURO' | 'LPGA' | 'CHAMP' | 'PGAD' | 'LIV';
 
@@ -61,7 +62,6 @@ export function ScheduleTourFilter({
           'w-full flex items-center justify-between',
           'bg-card border border-border/50 rounded-2xl',
           'px-4 py-3',
-          'shadow-[0_1px_4px_rgba(0,0,0,0.04)]',
           'transition-all duration-200',
           'active:scale-[0.99]'
         )}
@@ -69,10 +69,24 @@ export function ScheduleTourFilter({
         aria-expanded={open}
       >
         <div className="flex items-center gap-2.5">
+          {activeTour !== 'all' && hasTourLogo(activeTour.toLowerCase()) ? (
+            <img
+              src={getTourLogo(activeTour.toLowerCase())}
+              alt={activeTourOption.label}
+              className="object-contain flex-shrink-0"
+              style={{ width: 28, height: 20 }}
+            />
+          ) : (
+            <span className="text-[11px] font-bold uppercase tracking-[0.5px] text-muted-foreground">
+              All Tours
+            </span>
+          )}
           <span className="text-sm font-semibold text-foreground">{activeTourOption.label}</span>
-          <span className="text-[11px] font-bold uppercase tracking-[0.5px] text-muted-foreground">
-            Schedule
-          </span>
+          {activeTour !== 'all' && (
+            <span className="text-[11px] font-bold tabular-nums text-muted-foreground">
+              · {tourCounts[activeTour] ?? 0}
+            </span>
+          )}
         </div>
         <ChevronDown className="w-4 h-4 text-muted-foreground opacity-60" />
       </button>
@@ -98,8 +112,10 @@ export function ScheduleTourFilter({
           </div>
 
           {/* Tour options */}
-          <div className="space-y-2" role="listbox">
-            {TOUR_OPTIONS.map((tour) => {
+          <div className="space-y-2" role="group" aria-label="Tour options">
+            {TOUR_OPTIONS.filter(tour => 
+              tour.code === 'all' || (tourCounts[tour.code] ?? 0) > 0
+            ).map((tour) => {
               const isActive = activeTour === tour.code;
               const count = tour.code === 'all'
                 ? totalCount
@@ -110,9 +126,8 @@ export function ScheduleTourFilter({
                   key={tour.code}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleSelect(tour.code)}
-                  role="option"
-                  aria-selected={isActive}
-                  className="w-full flex items-center gap-3 text-left transition-all duration-150"
+                  aria-pressed={isActive}
+                  className="w-full flex items-center gap-2.5 text-left transition-all duration-150"
                   style={{
                     borderRadius: 12,
                     padding: '14px 16px',
@@ -122,6 +137,20 @@ export function ScheduleTourFilter({
                     background: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--card))',
                   }}
                 >
+                  {tour.code === 'all' ? (
+                    <Globe className="w-5 h-5 flex-shrink-0"
+                      style={{ color: isActive ? 'white' : 'hsl(var(--muted-foreground))' }}
+                    />
+                  ) : (
+                    <img
+                      src={getTourLogo(tour.code.toLowerCase())}
+                      alt=""
+                      aria-hidden="true"
+                      className="object-contain flex-shrink-0"
+                      style={{ width: 32, height: 22 }}
+                    />
+                  )}
+
                   <div
                     className="w-9 rounded-[34%] aspect-[1/1.05] flex items-center justify-center text-xs font-bold tabular-nums"
                     style={{
@@ -160,7 +189,7 @@ export function ScheduleTourFilter({
           </div>
         </div>
 
-        <div style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} />
+        <div style={{ paddingBottom: 'calc(var(--sab, 0px) + 8px)' }} />
       </BottomSheet>
     </>
   );
