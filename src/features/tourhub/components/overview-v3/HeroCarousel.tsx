@@ -1123,7 +1123,6 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (isExpanded) return;
     if (!touchStartRef.current) return;
     touchMoveRef.current = e.touches[0].clientX - touchStartRef.current.x;
   };
