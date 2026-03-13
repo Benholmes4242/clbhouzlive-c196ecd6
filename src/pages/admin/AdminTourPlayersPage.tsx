@@ -84,16 +84,19 @@ function PhotoManagementSheet({
   player,
   open,
   onClose,
+  cacheBust,
+  onCacheBust,
 }: {
   player: PlayerRow | null;
   open: boolean;
   onClose: () => void;
+  cacheBust: number;
+  onCacheBust: () => void;
 }) {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [removing, setRemoving] = useState(false);
-  const [imgKey, setImgKey] = useState(0);
   const [overrideValue, setOverrideValue] = useState('');
   const [savingOverride, setSavingOverride] = useState(false);
   const [overrideInitialized, setOverrideInitialized] = useState(false);
@@ -124,7 +127,7 @@ function PhotoManagementSheet({
       if (error) throw error;
       toast.success(val ? `Override set to "${val}"` : 'Override cleared');
       queryClient.invalidateQueries({ queryKey: ['admin-tour-players-all'] });
-      setImgKey(k => k + 1);
+      onCacheBust();
     } catch (err) {
       toast.error((err as Error).message);
     } finally {
@@ -158,7 +161,7 @@ function PhotoManagementSheet({
       if (!res.ok) throw new Error(json.error || 'Upload failed');
 
       toast.success('Headshot uploaded');
-      setImgKey(k => k + 1);
+      onCacheBust();
       queryClient.invalidateQueries({ queryKey: ['admin-tour-players-all'] });
     } catch (err) {
       toast.error((err as Error).message);
@@ -192,7 +195,7 @@ function PhotoManagementSheet({
       if (!res.ok) throw new Error(json.error || 'Delete failed');
 
       toast.success('Headshot removed');
-      setImgKey(k => k + 1);
+      onCacheBust();
       queryClient.invalidateQueries({ queryKey: ['admin-tour-players-all'] });
     } catch (err) {
       toast.error((err as Error).message);
@@ -216,8 +219,8 @@ function PhotoManagementSheet({
         <div className="flex flex-col items-center gap-5">
           {/* Current headshot preview */}
           <img
-            key={imgKey}
-            src={headshotUrl + `?v=${imgKey}`}
+            key={cacheBust}
+            src={headshotUrl + `?v=${cacheBust}`}
             alt={playerName}
             className="w-28 h-28 rounded-2xl object-cover object-top bg-muted border border-border"
             onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
@@ -304,7 +307,7 @@ function PhotoManagementSheet({
 }
 
 /* ───────── Player Detail Dialog ───────── */
-function PlayerDetailDialog({ player, open, onClose }: { player: PlayerRow | null; open: boolean; onClose: () => void }) {
+function PlayerDetailDialog({ player, open, onClose, cacheBust }: { player: PlayerRow | null; open: boolean; onClose: () => void; cacheBust: number }) {
   if (!player) return null;
   const primaryTour = player.tour_codes?.[0] || 'pga';
   const headshotUrl = player.full_name ? getPlayerHeadshotUrl(player.full_name, primaryTour, player.headshot_override) : PLAYER_SILHOUETTE_URL;
@@ -333,7 +336,7 @@ function PlayerDetailDialog({ player, open, onClose }: { player: PlayerRow | nul
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <img
-              src={headshotUrl}
+              src={`${headshotUrl}?v=${cacheBust}`}
               alt={player.full_name || ''}
               className="w-12 h-12 rounded-full object-cover bg-muted"
               onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
@@ -365,6 +368,7 @@ export function AdminTourPlayersPage() {
   const [page, setPage] = useState(0);
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerRow | null>(null);
   const [photoPlayer, setPhotoPlayer] = useState<PlayerRow | null>(null);
+  const [headshotCacheBust, setHeadshotCacheBust] = useState(0);
 
   const { data: players = [], isLoading } = useQuery({
     queryKey: ['admin-tour-players-all'],
@@ -469,7 +473,7 @@ export function AdminTourPlayersPage() {
                       <TableCell>
                         <div className="flex items-center gap-2.5">
                           <img
-                            src={headshotUrl}
+                            src={`${headshotUrl}?v=${headshotCacheBust}`}
                             alt=""
                             className="w-8 h-8 shrink-0 rounded-full object-cover object-top bg-muted cursor-pointer hover:ring-2 hover:ring-primary/50 transition-shadow"
                             onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
@@ -519,10 +523,10 @@ export function AdminTourPlayersPage() {
       )}
 
       {/* Player detail dialog */}
-      <PlayerDetailDialog player={selectedPlayer} open={!!selectedPlayer} onClose={() => setSelectedPlayer(null)} />
+      <PlayerDetailDialog player={selectedPlayer} open={!!selectedPlayer} onClose={() => setSelectedPlayer(null)} cacheBust={headshotCacheBust} />
 
       {/* Photo management sheet */}
-      <PhotoManagementSheet player={photoPlayer} open={!!photoPlayer} onClose={() => setPhotoPlayer(null)} />
+      <PhotoManagementSheet player={photoPlayer} open={!!photoPlayer} onClose={() => setPhotoPlayer(null)} cacheBust={headshotCacheBust} onCacheBust={() => setHeadshotCacheBust(prev => prev + 1)} />
     </div>
   );
 }
