@@ -205,7 +205,7 @@ export function WhatsComing() {
 
       {/* Event list */}
       <div className="flex flex-col gap-2 px-4">
-        {upcoming.map((tournament, index) => (
+        {(tournaments ?? []).map((tournament, index) => (
           <EventRow key={tournament.id} tournament={tournament} index={index} />
         ))}
       </div>
