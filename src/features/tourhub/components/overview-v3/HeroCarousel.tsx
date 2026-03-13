@@ -1215,6 +1215,9 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
               setIsPaused(true);
               scheduleResume();
             }}
+            onCardTouchStart={handleTouchStart}
+            onCardTouchMove={handleTouchMove}
+            onCardTouchEnd={handleTouchEnd}
           />
         ))}
       </AnimatePresence>
