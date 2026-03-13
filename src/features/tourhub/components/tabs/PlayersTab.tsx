@@ -468,6 +468,13 @@ export function PlayersTab() {
         </button>
       </div>
 
+      {/* World's Best showcase — All Tours only, no search */}
+      {activeTour === 'all' && !debouncedSearch && elitePlayers && elitePlayers.length > 0 && (
+        <div className="px-4" style={{ marginTop: '20px' }}>
+          <PlayersWorldsBest players={elitePlayers.slice(0, 5)} />
+        </div>
+      )}
+
       {/* Search Bar — 24px gap from runner cards */}
       <div className="px-4" style={{ marginTop: '16px' }}>
         <div className="relative">
