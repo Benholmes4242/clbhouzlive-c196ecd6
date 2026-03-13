@@ -8,6 +8,7 @@ import type { TourHubTab } from '../components/TourHubTabs';
 import { OverviewTab, ScheduleTab, PlayersTab, LeadersTab } from '../components/tabs';
 import { TourNavProvider, useTourNav } from '../contexts/TourNavContext';
 import { useTournamentStatusRealtime } from '../hooks/useTournamentStatusRealtime';
+import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
 function TourHubMainPageInner() {
   const [searchParams, setSearchParams] = useSearchParams();
