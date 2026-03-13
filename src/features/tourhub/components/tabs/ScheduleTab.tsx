@@ -497,17 +497,12 @@ export function ScheduleTab() {
 
         {/* No Live Message — premium empty state SC-02 */}
         {filter === 'live' && filterStats.live === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <ScheduleEmptyMessage 
-              variant="no-live" 
-              nextTournamentName={nextUpcoming?.name}
-              nextTournamentDate={nextUpcoming?.start_date}
-              onSwitchFilter={setFilter}
-            />
-          </motion.div>
+          <ScheduleEmptyMessage 
+            variant="no-live" 
+            nextTournamentName={nextUpcoming?.name}
+            nextTournamentDate={nextUpcoming?.start_date}
+            onSwitchFilter={setFilter}
+          />
         )}
         
         {/* Event Cards — Grouped by Month */}
@@ -521,22 +516,16 @@ export function ScheduleTab() {
               transition={{ duration: 0.2 }}
             >
               {monthGroups.map((group, groupIndex) => (
-                <motion.div 
+                <div
                   key={group.monthKey}
                   id={`month-${group.monthKey}`}
                   className={groupIndex > 0 ? 'mt-7' : ''}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: groupIndex * 0.05, duration: 0.3 }}
                 >
-                  {/* Month header (non-sticky) */}
-                  <div>
-                    <ScheduleMonthHeader 
-                      monthLabel={group.monthLabel}
-                      eventCount={group.tournaments.length}
-                      tourBreakdown={group.tourBreakdown}
-                    />
-                  </div>
+                  <ScheduleMonthHeader 
+                    monthLabel={group.monthLabel}
+                    eventCount={group.tournaments.length}
+                    tourBreakdown={group.tourBreakdown}
+                  />
 
                   {/* Tournament list — 12px gap from header, 12px between cards */}
                   <div className="flex flex-col gap-3 px-4 mt-3">
@@ -549,7 +538,7 @@ export function ScheduleTab() {
                       </InViewCard>
                     ))}
                   </div>
-                </motion.div>
+                </div>
               ))}
             </motion.div>
           ) : (
