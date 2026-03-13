@@ -150,11 +150,13 @@ export function ScheduleTab() {
     isPulling.current = false;
   }, [pullDistance, handleRefresh]);
 
+  const isCompleted = (t: TourTournament) => t.status === 'closed' || t.status === 'complete';
+
   const { liveIds, completedIds } = useMemo(() => {
     if (!tournaments) return { liveIds: [] as string[], completedIds: [] as string[] };
     return {
       liveIds: tournaments.filter(t => t.status === 'inprogress').map(t => t.id),
-      completedIds: tournaments.filter(t => t.status === 'closed').map(t => t.id),
+      completedIds: tournaments.filter(isCompleted).map(t => t.id),
     };
   }, [tournaments]);
 
