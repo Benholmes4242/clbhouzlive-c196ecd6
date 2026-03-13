@@ -72,7 +72,7 @@ async function fetchTournamentsCache(): Promise<TournamentsCache> {
       .from('sr_tournaments')
       .select(CACHE_SELECT)
       .in('status', ['closed', 'complete'])
-      .gte('end_date', sevenDaysAgo)
+      .gte('end_date', fourteenDaysAgo)
       .order('end_date', { ascending: false })
       .order('purse', { ascending: false }),
 
