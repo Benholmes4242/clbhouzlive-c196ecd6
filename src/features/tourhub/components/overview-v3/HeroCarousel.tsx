@@ -1001,7 +1001,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
       const winner = winners?.topFinishers?.find(w => w.position === 1);
       if (winner) {
         const url = getPlayerHeadshotUrl(
-          `${winner.player.firstName} ${winner.player.lastName}`,
+          winner.fullName || `${winner.firstName} ${winner.lastName}`,
           slide.tournament.tourSlug || 'pga'
         );
         if (url) {
