@@ -39,6 +39,7 @@ export function CollegeProfilePage() {
   const { data: rivals } = useCollegeRivals(collegeSlug);
   const topRival = rivals?.[0];
   const h2h = useCollegeHeadToHead(collegeSlug, topRival?.normalized_name);
+  const seasonYear = season?.year || new Date().getFullYear();
   
   const [heroImgError, setHeroImgError] = useState(false);
 
