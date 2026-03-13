@@ -551,7 +551,6 @@ export function TourHubNavOverlay({
                     </motion.button>
                   );
                 })}
-               </div>
 
               {/* Link Items (College Golf, etc.) — unified list continues */}
                 {LINK_ITEMS.map((item, index) => (
