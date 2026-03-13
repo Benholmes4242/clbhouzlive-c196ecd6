@@ -258,16 +258,29 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
           <>
             {/* ─── NON-FINISHED: standard top row with status + tour badge ─── */}
             <div className="flex items-center justify-between" style={{ marginBottom: '6px' }}>
-              {isLive ? (
-                <div className="flex items-center gap-1.5">
-                  <span className="live-dot" />
-                  <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: '#22C55E' }}>LIVE</span>
-                </div>
-              ) : (
-                <span className="countdown-label">
-                  {format(new Date(tournament.start_date), 'MMM d')}
-                </span>
-              )}
+              <div className="flex items-center gap-1.5">
+                {isLive ? (
+                  <>
+                    <span className="live-dot" />
+                    <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: isMajor ? '#FACC15' : '#22C55E' }}>LIVE</span>
+                  </>
+                ) : (
+                  <span className="countdown-label">
+                    {format(new Date(tournament.start_date), 'MMM d')}
+                  </span>
+                )}
+                {isMajor && (
+                  <span style={{
+                    fontSize: '10px', fontWeight: 800, letterSpacing: '1.5px',
+                    color: '#FACC15', textTransform: 'uppercase',
+                    background: 'rgba(250, 204, 21, 0.12)',
+                    border: '1px solid rgba(250, 204, 21, 0.3)',
+                    borderRadius: 4, padding: '2px 6px', marginLeft: 4,
+                  }}>
+                    MAJOR
+                  </span>
+                )}
+              </div>
               <div className="tour-badge">
                 <span>{getTourLabel(tournament.tour_code)}</span>
               </div>
