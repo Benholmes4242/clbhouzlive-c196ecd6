@@ -60,8 +60,8 @@ function FrostedAvatar({ src, displayName, size }: { src: string | null; display
   return (
     <div style={{
       width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
-      border: '1.5px solid rgba(255,255,255,0.15)',
-      background: 'rgba(255,255,255,0.08)',
+      border: '1.5px solid rgba(255,255,255,0.18)',
+      background: 'rgba(255,255,255,0.12)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
       {currentSrc && !imgError ? (
