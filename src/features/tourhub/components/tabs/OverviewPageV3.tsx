@@ -65,7 +65,7 @@ export function OverviewPageV3() {
           showBottomNav();
         }
       },
-      { threshold: 0 }
+      { threshold: 0, rootMargin: '-40px 0px 0px 0px' }
     );
 
     const hideObserver = new IntersectionObserver(
