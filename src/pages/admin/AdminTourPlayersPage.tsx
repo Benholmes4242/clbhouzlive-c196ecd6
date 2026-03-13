@@ -161,7 +161,7 @@ function PhotoManagementSheet({
       if (!res.ok) throw new Error(json.error || 'Upload failed');
 
       toast.success('Headshot uploaded');
-      setImgKey(k => k + 1);
+      onCacheBust();
       queryClient.invalidateQueries({ queryKey: ['admin-tour-players-all'] });
     } catch (err) {
       toast.error((err as Error).message);
