@@ -590,9 +590,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                 >
                   {/* Round progress */}
                   <p className="hero-meta" style={{ padding: isExpanded ? '0 20px' : undefined, marginTop: 4, marginBottom: isExpanded ? 4 : 0 }}>
-                    {tournament.currentRound
-                      ? (tournament.currentRound >= 4 ? 'Final Round' : `Round ${tournament.currentRound} of 4`)
-                      : 'In Progress'}
+                    {'In Progress'}
                   </p>
 
                   {/* Expanded: Full Leaderboard or Scorecard */}
