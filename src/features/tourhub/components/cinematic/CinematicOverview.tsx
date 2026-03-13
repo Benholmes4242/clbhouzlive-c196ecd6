@@ -6,7 +6,6 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { CinematicHero } from './CinematicHero';
-import { WorldRankShowcase } from './WorldRankShowcase';
 import { ThisWeekSection } from './ThisWeekSection';
 import { SeasonDashboard } from './SeasonDashboard';
 import { CinematicHeroSkeleton, WorldRankShowcaseSkeleton, ThisWeekSkeleton, SeasonDashboardSkeleton } from './CinematicSkeleton';

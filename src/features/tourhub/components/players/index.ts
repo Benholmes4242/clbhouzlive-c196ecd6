@@ -3,7 +3,6 @@
  */
 
 export { FeaturedPlayersCarousel } from './FeaturedPlayersCarousel';
-export { WorldRankingsCarousel } from './WorldRankingsCarousel';
 export { SpotlightReel } from './SpotlightReel';
 export { PlayerFilterChips, type PlayerFilterType } from './PlayerFilterChips';
 export { EditorialTabs } from './EditorialTabs';

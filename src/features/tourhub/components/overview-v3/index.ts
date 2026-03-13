@@ -3,8 +3,6 @@
 export { HeroCarousel } from './HeroCarousel';
 export { TourSwitcher } from './TourSwitcher';
 export { ThisWeekView } from './ThisWeekView';
-export { WorldRankingsShowcase } from './WorldRankingsShowcase';
-export { SeasonDashboardV3 } from './SeasonDashboardV3';
 export { TourBreakdown } from './TourBreakdown';
 
 // New Modules
@@ -12,7 +10,6 @@ export { LiveRightNow } from './LiveRightNow';
 
 export { MoversThisWeek } from './MoversThisWeek';
 export { LiveGolfPulse } from './LiveGolfPulse';
-export { WorldRankingsModule } from './WorldRankingsModule';
 export { SeasonStatsShowcase } from './SeasonStatsShowcase';
 
 // Unified World Rankings (combines Movers + OWGR Table)
