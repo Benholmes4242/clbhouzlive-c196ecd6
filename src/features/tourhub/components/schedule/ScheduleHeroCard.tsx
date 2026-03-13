@@ -11,14 +11,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
 import { getCourseImage } from '../../utils/placeholders';
-import { getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, getCurrentRoundLabel, UpcomingCountdown } from '../shared/TourHeroHelpers';
+import { getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, UpcomingCountdown } from '../shared/TourHeroHelpers';
 import { getContextLabel } from '../../utils/tournamentClassification';
+import { getCurrentRound } from '../../utils/formatThruDisplay';
+import { TOUR_COLORS } from '../../constants/colors';
 import '@/styles/hero-glass.css';
 
 interface ScheduleHeroCardProps {
@@ -29,15 +31,6 @@ interface ScheduleHeroCardProps {
   totalSlides?: number;
   onDotClick?: (index: number) => void;
 }
-
-function getTourLabel(tourCode?: string): string {
-  const labels: Record<string, string> = {
-    pga: 'PGA TOUR', EURO: 'DP WORLD TOUR', LPGA: 'LPGA',
-    CHAMP: 'CHAMPIONS', PGAD: 'KORN FERRY', LIV: 'LIV GOLF',
-  };
-  return labels[tourCode || ''] || 'TOUR';
-}
-
 
 export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex = 0, totalSlides = 1, onDotClick }: ScheduleHeroCardProps) {
   const navigate = useNavigate();
@@ -88,6 +81,15 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
     if (margin === 0) return 'Won in Playoff';
     return `Won by ${margin} stroke${margin === 1 ? '' : 's'}`;
   })();
+
+  // B45 FIX 8: use tour_full_name directly instead of getTourLabel
+  const tourLabel = (tournament.tour_full_name || tournament.tour_code || 'TOUR').toUpperCase();
+
+  // B44 FIX 4C: round label for live card
+  const roundInfo = (isLive && leaderWinner)
+    ? getCurrentRound(leaderWinner.round1, leaderWinner.round2, leaderWinner.round3, leaderWinner.round4)
+    : null;
+  const roundLabel = roundInfo ? `Round ${roundInfo.currentRound}` : null;
 
   return (
     <div
@@ -210,7 +212,11 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                   </div>
                 </div>
               ) : (
-                <div style={{ height: 48, borderRadius: 10, background: 'rgba(255,255,255,0.04)', width: 200 }} />
+                // B45 FIX 7: animate-pulse skeleton for loading state
+                <div
+                  className="animate-pulse"
+                  style={{ height: 48, borderRadius: 10, background: 'rgba(255,255,255,0.06)', width: 200 }}
+                />
               )}
             </div>
 
@@ -250,7 +256,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                   </span>
                 )}
                 <div className="tour-badge">
-                  <span>{getTourLabel(tournament.tour_code)}</span>
+                  <span>{tourLabel}</span>
                 </div>
               </div>
               <button
@@ -273,11 +279,18 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
               {isLive ? (
                 <div className="flex items-center gap-1.5">
                   <span className="live-dot" />
-                  <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: isMajor ? '#FACC15' : '#22C55E' }}>LIVE</span>
+                  <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: isMajor ? '#FACC15' : TOUR_COLORS.liveGreen }}>LIVE</span>
+                  {/* B44 FIX 4C: round label */}
+                  {roundLabel && (
+                    <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.5px' }}>
+                      · {roundLabel}
+                    </span>
+                  )}
                 </div>
               ) : (
                 <span className="countdown-label">
-                  {format(new Date(tournament.start_date), 'MMM d')}
+                  {/* B43 FIX 5: timezone-safe date */}
+                  {format(new Date(tournament.start_date + 'T12:00:00'), 'MMM d')}
                 </span>
               )}
               <div className="flex items-center gap-1.5">
@@ -293,7 +306,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                   </span>
                 )}
                 <div className="tour-badge">
-                  <span>{getTourLabel(tournament.tour_code)}</span>
+                  <span>{tourLabel}</span>
                 </div>
               </div>
             </div>
@@ -313,11 +326,6 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
             {/* ─── LIVE LAYOUT ─── */}
             {isLive && (
               <>
-                {/* Round progress */}
-                <p className="hero-meta" style={{ marginTop: 4, marginBottom: 0 }}>
-                  {getCurrentRoundLabel(null, tournament.start_date)}
-                </p>
-
                 {leaderWinner && (
                   <div style={{
                     display: 'flex',
@@ -350,9 +358,10 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                         >
                           {leaderWinner.displayName}
                         </button>
+                        {/* B44 FIX 5: score color */}
                         <span
                           className="score-mono"
-                          style={{ fontSize: '18px', fontWeight: 800, color: '#FFFFFF', flexShrink: 0 }}
+                          style={{ fontSize: '18px', fontWeight: 800, color: getFinishedScoreColor(leaderWinner.score), flexShrink: 0 }}
                         >
                           {leaderWinner.displayScore}
                         </span>
@@ -363,6 +372,22 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                     </div>
                   </div>
                 )}
+
+                {/* B44 FIX 6: 2nd place runner below leader */}
+                {leaderWinner && leaderWinner.topFinishers[0] && leaderWinner.topFinishers[0].playerId !== leaderWinner.playerId && (
+                  <div style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '5px 8px', marginTop: 4,
+                  }}>
+                    <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.5)' }}>
+                      T{leaderWinner.topFinishers[0].position} {leaderWinner.topFinishers[0].displayName}
+                    </span>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: getFinishedScoreColor(leaderWinner.topFinishers[0].score) }}>
+                      {leaderWinner.topFinishers[0].displayScore}
+                    </span>
+                  </div>
+                )}
+
                 <button
                   onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
                   className="hero-text-cta w-full"
@@ -374,33 +399,54 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
               </>
             )}
 
-            {/* ─── UPCOMING LAYOUT — countdown + defending champion avatar ─── */}
+            {/* ─── UPCOMING LAYOUT — countdown + defending champion ─── */}
             {isUpcoming && (
               <>
                 <UpcomingCountdown startDate={tournament.start_date} />
-                <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '4px', marginTop: '4px' }}>
-                  {[
+                {/* B43 FIX 7: guard purse stats line */}
+                {(() => {
+                  const parts = [
                     tournament.purse && formatPurse(tournament.purse),
                     tournament.venue_par && `PAR ${tournament.venue_par}`,
-                    tournament.venue_yardage && `${tournament.venue_yardage.toLocaleString()} YDS`
-                  ].filter(Boolean).join(' · ')}
+                    tournament.venue_yardage && `${tournament.venue_yardage.toLocaleString()} YDS`,
+                  ].filter(Boolean);
+                  return parts.length > 0 ? (
+                    <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '4px', marginTop: '6px' }}>
+                      {parts.join(' · ')}
+                    </p>
+                  ) : null;
+                })()}
+
+                {/* B43 FIX 5: cross-month date range */}
+                <p style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>
+                  {(() => {
+                    const start = new Date(tournament.start_date + 'T12:00:00');
+                    const end = new Date(tournament.end_date + 'T12:00:00');
+                    const sameMonth = start.getMonth() === end.getMonth();
+                    return sameMonth
+                      ? `${format(start, 'MMM d')} – ${format(end, 'd, yyyy')}`
+                      : `${format(start, 'MMM d')} – ${format(end, 'MMM d, yyyy')}`;
+                  })()}
                 </p>
+
+                {/* B43 FIX 6: defending champion with Trophy icon */}
                 {tournament.defending_champion && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '6px' }}>
-                    <PlayerAvatar
-                      displayName={tournament.defending_champion}
-                      fullName={tournament.defending_champion}
-                      tourCode={tournament.tour_code}
-                      size={30}
-                      frosted
-                    />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8, marginBottom: 4 }}>
+                    <div style={{
+                      width: 28, height: 28, borderRadius: '50%',
+                      background: 'rgba(255,255,255,0.08)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      flexShrink: 0,
+                    }}>
+                      <Trophy style={{ width: 13, height: 13, color: 'rgba(255,255,255,0.4)' }} />
+                    </div>
                     <div>
-                      <span style={{ fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.8px', textTransform: 'uppercase' as const, display: 'block' }}>
-                        Defending Champion
-                      </span>
-                      <span style={{ fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>
+                      <p style={{ fontSize: 12, fontWeight: 600, color: '#FFFFFF', lineHeight: 1 }}>
                         {tournament.defending_champion}
-                      </span>
+                      </p>
+                      <p style={{ fontSize: 10, fontWeight: 500, color: 'rgba(255,255,255,0.45)', marginTop: 2, lineHeight: 1, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                        Defending Champion
+                      </p>
                     </div>
                   </div>
                 )}

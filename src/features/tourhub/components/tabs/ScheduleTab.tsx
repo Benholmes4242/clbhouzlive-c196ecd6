@@ -16,7 +16,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
 import { TourHubEmptyState } from '../TourHubEmptyState';
-import { format, isAfter } from 'date-fns';
+import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
@@ -48,10 +48,15 @@ function getTournamentPriority(t: TourTournament): number {
   return SCHEDULE_TOUR_PRIORITY[t.tour_code || ''] ?? 99;
 }
 
+// B45 FIX 1: Helper for completed status check
+const isCompleted = (t: TourTournament) => t.status === 'closed' || t.status === 'complete';
+
+// B42 FIX 4: tourBreakdown in interface directly
 interface MonthGroup {
   monthKey: string;
   monthLabel: string;
   tournaments: TourTournament[];
+  tourBreakdown: Record<string, number>;
 }
 
 function useDebouncedValue<T>(value: T, delay: number): T {
@@ -113,7 +118,8 @@ export function ScheduleTab() {
   const queryClient = useQueryClient();
   const { data: season } = useTourSeason();
   const { data: tournaments, isLoading, error, refetch } = useTourTournaments(season?.id, {
-    refetchInterval: filter === 'live' ? 30000 : false,
+    // B43 FIX 4: poll upcoming tab too
+    refetchInterval: filter === 'live' ? 30000 : filter === 'upcoming' ? 60000 : false,
   });
 
   // Pull-to-refresh state
@@ -161,7 +167,8 @@ export function ScheduleTab() {
     if (!tournaments) return { liveIds: [] as string[], completedIds: [] as string[] };
     return {
       liveIds: tournaments.filter(t => t.status === 'inprogress').map(t => t.id),
-      completedIds: tournaments.filter(t => t.status === 'closed').map(t => t.id),
+      // B45 FIX 1: include 'complete' status
+      completedIds: tournaments.filter(isCompleted).map(t => t.id),
     };
   }, [tournaments]);
 
@@ -172,7 +179,7 @@ export function ScheduleTab() {
     if (!tournaments) return [];
     const tourFiltered = activeTour === 'all' ? tournaments : tournaments.filter(t => t.tour_code === activeTour);
 
-    // Helper: one per tour, deduped, sorted by priority
+    // B43 FIX 3: onePerTour with major-first + tour priority
     const onePerTour = (list: TourTournament[], type: ScheduleHeroItem['type']): ScheduleHeroItem[] => {
       const sorted = [...list].sort((a, b) => {
         const pa = getTournamentPriority(a);
@@ -190,8 +197,9 @@ export function ScheduleTab() {
     };
 
     const liveList = tourFiltered.filter(t => t.status === 'inprogress');
+    // B45 FIX 1: use isCompleted
     const completedList = tourFiltered
-      .filter(t => t.status === 'closed')
+      .filter(isCompleted)
       .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime());
     const now = new Date();
     const upcomingList = tourFiltered
@@ -216,13 +224,8 @@ export function ScheduleTab() {
       return onePerTour(completedList, 'recent');
     }
 
+    // B43 FIX 2: upcoming tab always shows upcoming heroes
     if (filter === 'upcoming') {
-      // Show live tournaments if any exist, otherwise upcoming per tour
-      if (liveList.length > 0) {
-        return [...liveList]
-          .sort((a, b) => getTournamentPriority(a) - getTournamentPriority(b))
-          .map(t => ({ tournament: t, type: 'live' as const }));
-      }
       return onePerTour(upcomingList, 'upcoming');
     }
 
@@ -239,23 +242,25 @@ export function ScheduleTab() {
 
   const filterStats = useMemo(() => {
     if (!tournaments) return { all: 0, live: 0, upcoming: 0, completed: 0 };
-    const now = new Date();
     const tourFiltered = activeTour === 'all' ? tournaments : tournaments.filter(t => t.tour_code === activeTour);
     return {
       all: tourFiltered.length,
       live: tourFiltered.filter(t => t.status === 'inprogress').length,
-      upcoming: tourFiltered.filter(t => t.status === 'scheduled' || t.status === 'created' || isAfter(new Date(t.start_date), now)).length,
-      completed: tourFiltered.filter(t => t.status === 'closed').length,
+      // B43 FIX 1: remove isAfter
+      upcoming: tourFiltered.filter(t => t.status === 'scheduled' || t.status === 'created').length,
+      // B45 FIX 1: include 'complete'
+      completed: tourFiltered.filter(isCompleted).length,
     };
   }, [tournaments, activeTour]);
 
   const tourCounts = useMemo(() => {
     if (!tournaments) return {} as Record<string, number>;
-    const now = new Date();
     let statusFiltered = [...tournaments];
     switch (filter) {
-      case 'upcoming': statusFiltered = statusFiltered.filter(t => t.status === 'scheduled' || t.status === 'created' || isAfter(new Date(t.start_date), now)); break;
-      case 'completed': statusFiltered = statusFiltered.filter(t => t.status === 'closed'); break;
+      // B43 FIX 1: remove isAfter
+      case 'upcoming': statusFiltered = statusFiltered.filter(t => t.status === 'scheduled' || t.status === 'created'); break;
+      // B45 FIX 1: include 'complete'
+      case 'completed': statusFiltered = statusFiltered.filter(isCompleted); break;
       case 'live': statusFiltered = statusFiltered.filter(t => t.status === 'inprogress'); break;
     }
     const counts: Record<string, number> = {};
@@ -274,10 +279,11 @@ export function ScheduleTab() {
     if (!tournaments) return [];
     let filtered = [...tournaments];
     if (activeTour !== 'all') filtered = filtered.filter(t => t.tour_code === activeTour);
-    const now = new Date();
     switch (filter) {
-      case 'upcoming': filtered = filtered.filter(t => t.status === 'scheduled' || t.status === 'created' || isAfter(new Date(t.start_date), now)); break;
-      case 'completed': filtered = filtered.filter(t => t.status === 'closed'); break;
+      // B43 FIX 1: remove isAfter
+      case 'upcoming': filtered = filtered.filter(t => t.status === 'scheduled' || t.status === 'created'); break;
+      // B45 FIX 1: include 'complete'
+      case 'completed': filtered = filtered.filter(isCompleted); break;
       case 'live': filtered = filtered.filter(t => t.status === 'inprogress'); break;
     }
     if (search) {
@@ -290,15 +296,27 @@ export function ScheduleTab() {
         t.tour_full_name?.toLowerCase().includes(searchLower)
       );
     }
-    // Exclude hero items from list (non-live tabs only)
-    if (filter === 'all' && !search && heroItems.length > 0) {
+    // B42 FIX 1 + B44 FIX 1 + B45 FIX 2: hero exclusion on all, live, and completed tabs
+    if ((filter === 'all' || filter === 'live' || filter === 'completed') && !search && heroItems.length > 0) {
       const heroIds = new Set(heroItems.map(h => h.tournament.id));
       filtered = filtered.filter(t => !heroIds.has(t.id));
     }
+
+    // B42 FIX 2: "all" tab sort — live first, then upcoming by date, then completed
+    if (filter === 'all') {
+      filtered.sort((a, b) => {
+        const statusScore = (t: TourTournament) =>
+          t.status === 'inprogress' ? 0 : (t.status === 'scheduled' || t.status === 'created') ? 1 : 2;
+        const ss = statusScore(a) - statusScore(b);
+        if (ss !== 0) return ss;
+        return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+      });
+    }
+
     return filtered;
   }, [tournaments, filter, activeTour, search, heroItems]);
 
-  const monthGroups = useMemo((): (MonthGroup & { tourBreakdown: Record<string, number> })[] => {
+  const monthGroups = useMemo((): MonthGroup[] => {
     if (!filteredResults.length) return [];
     const groups = new Map<string, TourTournament[]>();
     filteredResults.forEach(tournament => {
@@ -310,7 +328,8 @@ export function ScheduleTab() {
     const entries = Array.from(groups.entries());
     if (filter === 'completed') {
       entries.sort(([a], [b]) => b.localeCompare(a));
-      entries.forEach(([, tournaments]) => tournaments.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime()));
+      // B45 FIX 3: sort by end_date for completed
+      entries.forEach(([, tournaments]) => tournaments.sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime()));
     } else {
       entries.sort(([a], [b]) => a.localeCompare(b));
     }
@@ -319,7 +338,8 @@ export function ScheduleTab() {
       for (const t of tournaments) { if (t.tour_code) tourBreakdown[t.tour_code] = (tourBreakdown[t.tour_code] || 0) + 1; }
       return {
         monthKey,
-        monthLabel: format(new Date(tournaments[0].start_date + 'T12:00:00Z'), 'MMMM yyyy').toUpperCase(),
+        // B42 FIX 3: title case from source, no toUpperCase
+        monthLabel: format(new Date(tournaments[0].start_date + 'T12:00:00Z'), 'MMMM yyyy'),
         tournaments,
         tourBreakdown,
       };
@@ -487,17 +507,14 @@ export function ScheduleTab() {
 
         {/* No Live Message — premium empty state SC-02 */}
         {filter === 'live' && filterStats.live === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <ScheduleEmptyMessage 
-              variant="no-live" 
-              nextTournamentName={nextUpcoming?.name}
-              nextTournamentDate={nextUpcoming?.start_date}
-              onSwitchFilter={setFilter}
-            />
-          </motion.div>
+          // B42 FIX 8: remove motion wrapper
+          <ScheduleEmptyMessage 
+            variant="no-live" 
+            nextTournamentName={nextUpcoming?.name}
+            nextTournamentDate={nextUpcoming?.start_date}
+            // B44 FIX 2: suppress CTA when hero already shows upcoming
+            onSwitchFilter={heroItems.length === 0 ? setFilter : undefined}
+          />
         )}
         
         {/* Event Cards — Grouped by Month */}
@@ -511,22 +528,21 @@ export function ScheduleTab() {
               transition={{ duration: 0.2 }}
             >
               {monthGroups.map((group, groupIndex) => (
-                <motion.div 
+                // B42 FIX 5: plain div, no staggered entrance
+                <div
                   key={group.monthKey}
                   id={`month-${group.monthKey}`}
                   className={groupIndex > 0 ? 'mt-7' : ''}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: groupIndex * 0.05, duration: 0.3 }}
                 >
-                  {/* Month header (non-sticky) */}
-                  <div>
+                  {/* B44 FIX 3: suppress month header on live tab */}
+                  {filter !== 'live' && (
+                    // B42 FIX 7: remove redundant wrapper div
                     <ScheduleMonthHeader 
                       monthLabel={group.monthLabel}
                       eventCount={group.tournaments.length}
                       tourBreakdown={group.tourBreakdown}
                     />
-                  </div>
+                  )}
 
                   {/* Tournament list — 12px gap from header, 12px between cards */}
                   <div className="flex flex-col gap-3 px-4 mt-3">
@@ -539,7 +555,7 @@ export function ScheduleTab() {
                       </InViewCard>
                     ))}
                   </div>
-                </motion.div>
+                </div>
               ))}
             </motion.div>
           ) : (

@@ -15,13 +15,15 @@ import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { getContextLabel } from '../../utils/tournamentClassification';
 import { TOUR_COLORS } from '../../constants/colors';
+import { getCurrentRound } from '../../utils/formatThruDisplay';
+import { formatPurse } from '../shared/TourHeroHelpers';
 
+// B42 FIX 11: removed batchImageUrl prop
 interface ScheduleTournamentCardProps {
   tournament: TourTournament | SeasonTournament;
   className?: string;
   compact?: boolean;
   leaderWinner?: TournamentLeaderWinner;
-  batchImageUrl?: string | null;
 }
 
 function isSeasonTournament(t: TourTournament | SeasonTournament): t is SeasonTournament {
@@ -40,7 +42,7 @@ function getDayNum(dateStr: string): string {
 
 function getScoreColor(score: number | null): string {
   if (score === null || score === undefined) return 'hsl(var(--muted-foreground))';
-  if (score < 0) return TOUR_COLORS.movementUp;
+  if (score < 0) return TOUR_COLORS.liveGreen;
   if (score > 0) return '#EF4444';
   return 'hsl(var(--muted-foreground))';
 }
@@ -79,9 +81,14 @@ export function ScheduleTournamentCard({
     ? `${winnerFirstName?.charAt(0)}. ${winnerLastName}`
     : hasLeaderWinnerData ? leaderWinner!.displayName : null;
 
-  const winnerScore = hasSeasonWinner 
-    ? tournament.winner_score 
-    : hasLeaderWinnerData ? leaderWinner?.score : null;
+  // B45 FIX 4: always use leaderWinner score when available
+  const winnerScore = leaderWinner?.score ?? null;
+  const winnerDisplayScore = leaderWinner?.displayScore ?? null;
+
+  // B45 FIX 6: show end date for completed tournaments
+  const displayDate = isFinal
+    ? (isSeasonTournament(tournament) ? tournament.endDate : (tournament as TourTournament).end_date)
+    : startDate;
 
   const handlePlayerTap = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -120,13 +127,13 @@ export function ScheduleTournamentCard({
       whileTap={{ scale: 0.98 }}
       aria-label={ariaLabel}
     >
-      {/* Date block */}
+      {/* Date block — B45 FIX 6: use displayDate */}
       <div className="flex-shrink-0 w-12 text-center">
         <p className="uppercase leading-none text-muted-foreground/70" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em' }}>
-          {getMonthAbbr(startDate)}
+          {getMonthAbbr(displayDate)}
         </p>
         <p className="leading-none mt-0.5 text-foreground" style={{ fontSize: '20px', fontWeight: 700 }}>
-          {getDayNum(startDate)}
+          {getDayNum(displayDate)}
         </p>
       </div>
 
@@ -145,6 +152,18 @@ export function ScheduleTournamentCard({
           >
             {isLive ? '● LIVE' : contextLabel}
           </p>
+          {/* B44 FIX 7: round label on live list card */}
+          {isLive && leaderWinner?.round1 !== undefined && (() => {
+            const roundInfo = getCurrentRound(
+              leaderWinner!.round1, leaderWinner!.round2, 
+              leaderWinner!.round3, leaderWinner!.round4
+            );
+            return roundInfo ? (
+              <span style={{ fontSize: '10px', fontWeight: 500, color: 'hsl(var(--muted-foreground) / 0.6)', letterSpacing: '0.03em' }}>
+                R{roundInfo.currentRound}
+              </span>
+            ) : null;
+          })()}
         </div>
         
         {/* Tournament name */}
@@ -167,9 +186,10 @@ export function ScheduleTournamentCard({
                 >
                   {winnerDisplay}
                 </button>
-                {winnerScore !== null && winnerScore !== undefined && (
+                {/* B45 FIX 4+5: use winnerDisplayScore + semantic color */}
+                {winnerDisplayScore && (
                   <span className="font-semibold ml-1" style={{ color: TOUR_COLORS.liveAmber }}>
-                    ({hasSeasonWinner ? tournament.winner_score : leaderWinner?.displayScore ?? ''})
+                    ({winnerDisplayScore})
                   </span>
                 )}
               </span>
@@ -190,6 +210,34 @@ export function ScheduleTournamentCard({
             )}
           </p>
         )}
+
+        {/* B43 FIX 8: date range + purse secondary line for upcoming */}
+        {!isLive && !isFinal && (() => {
+          const endDate = isSeasonTournament(tournament)
+            ? null
+            : (tournament as TourTournament).end_date;
+          const purse = isSeasonTournament(tournament)
+            ? null
+            : (tournament as TourTournament).purse;
+
+          const parts = [
+            endDate && (() => {
+              const s = new Date(startDate + 'T12:00:00');
+              const e = new Date(endDate + 'T12:00:00');
+              const sameMonth = s.getMonth() === e.getMonth();
+              return sameMonth
+                ? `${getMonthAbbr(startDate)} ${getDayNum(startDate)}–${getDayNum(endDate)}`
+                : `${getMonthAbbr(startDate)} ${getDayNum(startDate)} – ${getMonthAbbr(endDate)} ${getDayNum(endDate)}`;
+            })(),
+            purse && formatPurse(purse),
+          ].filter(Boolean);
+
+          return parts.length > 0 ? (
+            <p className="mt-0.5 text-muted-foreground/60 line-clamp-1" style={{ fontSize: '12px', fontWeight: 500 }}>
+              {parts.join(' · ')}
+            </p>
+          ) : null;
+        })()}
         
         {/* Venue (tappable) */}
         {venue && !compact && (

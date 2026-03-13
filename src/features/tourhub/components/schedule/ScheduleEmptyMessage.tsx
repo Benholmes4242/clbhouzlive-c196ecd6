@@ -32,10 +32,6 @@ export function ScheduleEmptyMessage({
   className 
 }: ScheduleEmptyMessageProps) {
 
-  const formattedDate = nextTournamentDate 
-    ? format(new Date(nextTournamentDate), 'EEE, MMM d') 
-    : null;
-
   const countdown = nextTournamentDate ? formatCountdown(nextTournamentDate) : null;
 
   // Premium no-live empty state
@@ -100,12 +96,12 @@ export function ScheduleEmptyMessage({
     );
   }
 
+  // B42 FIX 9: remove card container from non-live variants — bare centered layout
   return (
     <div 
       className={cn(
         "flex flex-col items-center justify-center gap-4 min-h-[240px]",
-        "py-12 px-6 mx-4 rounded-2xl text-center",
-        "bg-card border border-border shadow-sm",
+        "py-12 px-6 text-center",
         className
       )}
     >
