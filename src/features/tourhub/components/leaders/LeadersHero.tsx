@@ -51,7 +51,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
       {/* Burger menu */}
       <button 
         className="fixed z-20 flex items-center justify-center"
-        style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)', left: '16px', width: '44px', height: '44px' }}
+        style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 22px)', left: '16px', width: '44px', height: '44px' }}
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
         aria-label="Open tour menu"
       >
