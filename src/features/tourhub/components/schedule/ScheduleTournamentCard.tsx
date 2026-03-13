@@ -211,7 +211,7 @@ export function ScheduleTournamentCard({
                   {winnerDisplay}
                 </button>
                 {winnerDisplayScore && (
-                  <span className="font-semibold ml-1" style={{ color: 'hsl(var(--accent-amber))' }}>
+                  <span className="font-semibold ml-1" style={{ color: TOUR_COLORS.liveAmber }}>
                     ({winnerDisplayScore})
                   </span>
                 )}
