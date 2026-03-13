@@ -116,7 +116,9 @@ serve(async (req) => {
 
     // DELETE: remove a headshot
     if (req.method === 'DELETE') {
-      const { playerName, tourCode } = await req.json();
+      const body = await req.json();
+      const playerName = body.playerName;
+      const tourCode = (body.tourCode || '').toLowerCase();
       if (!playerName) throw new Error('playerName required');
 
       const folder = TOUR_FOLDER[tourCode] || 'Misc';
