@@ -855,12 +855,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
                     <div className="tour-badge">
                       <span>
-                        {tournament.tourSlug === 'pga' ? 'PGA TOUR' :
-                         tournament.tourSlug === 'liv' ? 'LIV GOLF' :
-                         tournament.tourSlug === 'euro' ? 'DP WORLD' :
-                         tournament.tourSlug === 'lpga' ? 'LPGA' :
-                         tournament.tourSlug === 'champ' ? 'CHAMPIONS' :
-                         'KORN FERRY'}
+                        {getTourDisplayName(tournament.tourSlug)}
                       </span>
                     </div>
                     <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta" style={{ fontSize: 13, textDecoration: 'none' }}>
