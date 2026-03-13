@@ -361,25 +361,38 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
             {/* ─── UPCOMING LAYOUT — tight spacing ─── */}
             {isUpcoming && (
               <>
-                <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '4px', marginTop: '6px' }}>
+                {/* Live countdown — mirrors Overview hero */}
+                <UpcomingCountdown startDate={tournament.start_date} />
+
+                <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '4px', marginTop: '4px' }}>
                   {[
                     tournament.purse && formatPurse(tournament.purse),
                     tournament.venue_par && `PAR ${tournament.venue_par}`,
                     tournament.venue_yardage && `${tournament.venue_yardage.toLocaleString()} YDS`
                   ].filter(Boolean).join(' · ')}
                 </p>
+
                 {tournament.defending_champion && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: '4px' }}>
-                    <Shield style={{ width: 11, height: 11, color: 'rgba(255,255,255,0.45)', flexShrink: 0 }} />
-                    <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.55)' }}>
-                      Defending: {tournament.defending_champion}
-                    </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '6px' }}>
+                    <PlayerAvatar
+                      displayName={tournament.defending_champion}
+                      fullName={tournament.defending_champion}
+                      tourCode={tournament.tour_code}
+                      size={30}
+                      frosted
+                    />
+                    <div>
+                      <span style={{ fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.8px', textTransform: 'uppercase', display: 'block' }}>
+                        Defending Champion
+                      </span>
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>
+                        {tournament.defending_champion}
+                      </span>
+                    </div>
                   </div>
                 )}
-                <p className="hero-meta" style={{ marginBottom: '6px' }}>
-                  {format(new Date(tournament.start_date), 'MMM d')} – {format(new Date(tournament.end_date), 'd, yyyy')}
-                </p>
-                <div className="hero-text-cta w-full" style={{ marginTop: '8px' }}>
+
+                <div className="hero-text-cta w-full" style={{ marginTop: '6px' }}>
                   <span>View Tournament</span>
                   <ChevronRight className="w-4 h-4 cta-chevron" />
                 </div>
