@@ -510,7 +510,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             onTouchEnd={isExpanded ? handleExpandedTouch : undefined}
             style={{ 
               position: 'absolute',
-              bottom: isExpanded ? 16 : 88,
+              bottom: isLive ? 72 : (isExpanded ? 16 : 88),
               left: isExpanded ? 12 : 16,
               ...(isExpanded
                 ? { right: 12, top: 'max(env(safe-area-inset-top, 20px) + 120px, 160px)' }
@@ -1081,6 +1081,8 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     }
   }, [slides.length, currentIndex]);
 
+  const isCurrentSlideLive = slides[currentIndex]?.type === 'live';
+
   // Auto-collapse if slide index changes
   const prevIndexRef = React.useRef(currentIndex);
   useEffect(() => {
@@ -1215,7 +1217,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
       </AnimatePresence>
 
       {/* Scroll indicator — only when not expanded */}
-      {!isExpanded && (
+      {(!isExpanded || isCurrentSlideLive) && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
