@@ -104,6 +104,11 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
             {venue}
           </p>
         )}
+        {tournament.defendingChampion && (
+          <p className="text-[0.6875rem] text-muted-foreground/50 truncate mt-0.5 leading-none">
+            Defending: <span className="font-medium">{tournament.defendingChampion}</span>
+          </p>
+        )}
       </div>
 
       {/* Tour logo */}
