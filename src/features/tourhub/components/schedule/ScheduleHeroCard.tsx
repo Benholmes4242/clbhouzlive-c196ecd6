@@ -233,7 +233,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
             {/* Footer: tour badge left, View Results right */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
               <div className="tour-badge">
-                <span>{getTourLabel(tournament.tour_code)}</span>
+                <span>{(tournament.tour_full_name || tournament.tour_code || 'TOUR').toUpperCase()}</span>
               </div>
               <button
                 onClick={(e) => { e.preventDefault(); navigate(`/tourhub/tournament/${tournament.id}`); }}
