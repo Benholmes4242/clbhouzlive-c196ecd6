@@ -5,9 +5,7 @@
 
 import {
   HeroFeature,
-  FeatureStrip,
   PlayersFeed,
-  LeadersPhotoCards,
   CoursesPhotoGrid,
   DataUnlocking,
 } from '../overview-feed';
