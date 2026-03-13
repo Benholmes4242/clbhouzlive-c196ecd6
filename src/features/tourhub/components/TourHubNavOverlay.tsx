@@ -298,13 +298,26 @@ export function TourHubNavOverlay({
               stiffness: 300,
             }}
             className="fixed inset-y-0 right-0 z-[10000] flex flex-col overflow-hidden"
+            onTouchStart={(e) => {
+              swipeStartXRef.current = e.touches[0].clientX;
+              swipeStartYRef.current = e.touches[0].clientY;
+            }}
+            onTouchEnd={(e) => {
+              if (swipeStartXRef.current === null || swipeStartYRef.current === null) return;
+              const deltaX = e.changedTouches[0].clientX - swipeStartXRef.current;
+              const deltaY = Math.abs(e.changedTouches[0].clientY - swipeStartYRef.current);
+              swipeStartXRef.current = null;
+              swipeStartYRef.current = null;
+              if (deltaX > 80 && deltaX > deltaY * 1.5) {
+                haptic('light');
+                onClose();
+              }
+            }}
             style={{
               width: '100vw',
               background: 'hsl(var(--background) / 0.85)',
               backdropFilter: 'blur(24px) saturate(1.4)',
               WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
-              borderLeft: '1px solid hsl(var(--border) / 0.3)',
-              boxShadow: '-8px 0 32px rgba(0, 0, 0, 0.08)',
             }}
             role="dialog"
             aria-modal="true"
