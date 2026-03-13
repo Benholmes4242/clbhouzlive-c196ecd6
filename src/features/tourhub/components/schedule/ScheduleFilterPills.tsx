@@ -75,7 +75,6 @@ export function ScheduleFilterPills({
             </button>
           );
         })}
-      </div>
     </div>
   );
 }

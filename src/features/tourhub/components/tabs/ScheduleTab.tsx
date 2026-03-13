@@ -412,23 +412,19 @@ export function ScheduleTab() {
       {/* Content below hero */}
       <div className="bg-background pt-3">
         {/* ← Tour Overview back link */}
-        <div className="px-4 mb-2">
+        <div className="px-4 pt-3">
           <button
             type="button"
             onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
-            className="text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
+            className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
           >
-            ← Tour Overview
+            <ChevronLeft size={14} />
+            Tour Overview
           </button>
         </div>
         {/* Search Bar */}
-        <div className="px-4">
-          <motion.div 
-            className="relative"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.3 }}
-          >
+        <div className="px-4" style={{ marginTop: '16px' }}>
+          <div className="relative">
             <Search 
               className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground w-[18px] h-[18px]"
               strokeWidth={2.5}
@@ -438,15 +434,12 @@ export function ScheduleTab() {
               placeholder="Search tournaments, venues, tours..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              onFocus={() => setIsSearchFocused(true)}
-              onBlur={() => setIsSearchFocused(false)}
               className={cn(
-                "w-full h-12 pl-11 pr-10 rounded-2xl text-[14px] transition-all duration-200",
+                "w-full h-12 pl-11 pr-10 rounded-2xl text-[13px] transition-all duration-200",
                 "bg-card border text-foreground placeholder:text-muted-foreground",
                 "focus:outline-none focus:ring-2 focus:bg-card",
-                isSearchFocused 
-                  ? "border-border ring-border/50 shadow-lg" 
-                  : "border-border/50 ring-transparent shadow-[0_1px_4px_rgba(0,0,0,0.06)]"
+                "border-border/50 ring-transparent",
+                "focus:border-border focus:ring-border/50 focus:shadow-lg"
               )}
             />
             <AnimatePresence>
@@ -462,31 +455,34 @@ export function ScheduleTab() {
                 </motion.button>
               )}
             </AnimatePresence>
-          </motion.div>
+          </div>
         </div>
 
         {/* Sticky Filter Toolbar */}
-        <motion.div
-          className="sticky top-0 z-20 bg-background/95 backdrop-blur-md px-4 mt-6"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.3 }}
+        <div
+          className="sticky top-0 z-20 -mx-4 px-4 mt-6"
+          style={{
+            background: 'hsl(var(--background) / 0.95)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            borderBottom: '1px solid hsl(var(--border) / 0.15)',
+          }}
         >
-          <div style={{ marginTop: '4px', paddingTop: '8px' }}>
+          <div className="pt-3 pb-1">
             <ScheduleFilterPills
               activeFilter={filter}
               onFilterChange={setFilter}
               counts={filterStats}
             />
           </div>
-          <div style={{ marginTop: '6px' }}>
+          <div className="pb-2">
             <ScheduleTourFilter
               activeTour={activeTour}
               onTourChange={setActiveTour}
               tourCounts={tourCounts}
             />
           </div>
-        </motion.div>
+        </div>
 
         {/* No Live Message — premium empty state SC-02 */}
         {filter === 'live' && filterStats.live === 0 && (
