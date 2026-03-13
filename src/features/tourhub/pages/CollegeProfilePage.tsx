@@ -36,7 +36,9 @@ export function CollegeProfilePage() {
   const { data: allSeasonStats } = useCollegeSeasonStats();
   const { data: season } = useTourSeason();
   const { data: alumni, isLoading: alumniLoading } = useCollegeAlumni(collegeSlug, { limit: 30 });
-  const seasonYear = season?.year || new Date().getFullYear();
+  const { data: rivals } = useCollegeRivals(collegeSlug);
+  const topRival = rivals?.[0];
+  const h2h = useCollegeHeadToHead(collegeSlug, topRival?.normalized_name);
   
   const [heroImgError, setHeroImgError] = useState(false);
 
