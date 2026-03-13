@@ -917,6 +917,13 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       <ChevronRight className="w-4 h-4 cta-chevron" style={{ color: 'rgba(255,255,255,0.5)' }} />
                     </Link>
                   </div>
+
+                  {/* FIX 2: ChevronsUp expand hint on collapsed completed card */}
+                  {!isExpanded && (
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
+                      <ChevronsUp size={14} style={{ color: 'rgba(255,255,255,0.35)' }} className="pulse" />
+                    </div>
+                  )}
                 </motion.div>
               )}
 
