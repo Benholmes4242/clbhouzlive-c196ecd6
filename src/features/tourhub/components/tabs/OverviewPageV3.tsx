@@ -14,7 +14,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import {
   HeroCarousel,
   LiveRightNow,
@@ -58,20 +58,19 @@ export function OverviewPageV3() {
     const hideEl = hideSentinelRef.current;
     if (!showEl || !hideEl) return;
 
+    // FIX 4: rootMargin -40px so nav only shows after meaningful scroll past hero
     const showObserver = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) {
-          // Top sentinel scrolled out → show nav
           showBottomNav();
         }
       },
-      { threshold: 0 }
+      { threshold: 0, rootMargin: '-40px 0px 0px 0px' }
     );
 
     const hideObserver = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          // Hide sentinel came back into view (user scrolled back to hero) → hide nav
           hideBottomNav();
         }
       },
@@ -86,6 +85,11 @@ export function OverviewPageV3() {
       hideObserver.disconnect();
     };
   }, [hideBottomNav, showBottomNav]);
+
+  // FIX 5: Parallax scale + fade on hero as user scrolls past
+  const { scrollY } = useScroll();
+  const heroOpacity = useTransform(scrollY, [0, 120], [1, 0.85]);
+  const heroScale = useTransform(scrollY, [0, 120], [1, 0.97]);
 
   return (
     <motion.div
@@ -116,10 +120,10 @@ export function OverviewPageV3() {
         )}
       </AnimatePresence>
 
-      {/* 1. Hero Carousel - using containerNoHeader since Overview has no header */}
-      <div 
+      {/* 1. Hero Carousel - FIX 5: parallax scale/fade wrapper */}
+      <motion.div 
         className="relative w-full z-0"
-        style={HERO_STYLES.containerNoHeader}
+        style={{ ...HERO_STYLES.containerNoHeader, opacity: heroOpacity, scale: heroScale }}
       >
         <HeroCarousel hasHeader={false} />
         {/* Show sentinel: top edge — when it leaves viewport, nav slides in */}
@@ -134,7 +138,7 @@ export function OverviewPageV3() {
           aria-hidden="true"
           style={{ position: 'absolute', top: '85px', height: '1px', width: '1px', pointerEvents: 'none' }}
         />
-      </div>
+      </motion.div>
 
       {/* Content sections — consistent 40px vertical rhythm between major sections */}
       <div 
