@@ -5,7 +5,7 @@
  * 
  * Display logic (per tour):
  * - Priority 1: LIVE (inprogress) - takes precedence
- * - Priority 2: COMPLETED (closed/complete, last 14 days) with winner
+ * - Priority 2: COMPLETED (closed/complete, last 7 days) with winner
  * - Priority 3: UPCOMING (scheduled/created) with countdown
  * 
  * Slide order: LIVE (by tour priority) > COMPLETED (by end_date DESC) > UPCOMING (by start_date ASC)
@@ -15,9 +15,9 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronRight, ChevronsUp, Trophy, Menu } from 'lucide-react';
+import { ChevronRight, Trophy, Menu } from 'lucide-react';
 import { openTourNav } from '../../contexts/TourNavContext';
-
+import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { cn } from '@/lib/utils';
 import { 
   useHeroCarouselData,
@@ -33,10 +33,10 @@ import { PlayerScorecardCard } from '@/components/tourhub/PlayerScorecardCard';
 
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
-import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, WinnerStatsPanel, UpcomingCountdown, getCurrentRoundLabel as sharedGetCurrentRoundLabel } from '../shared/TourHeroHelpers';
+import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, WinnerStatsPanel } from '../shared/TourHeroHelpers';
 import { useWinnerScorecardStats } from '../../hooks/useWinnerScorecardStats';
 import { useWinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import '@/styles/hero-glass.css';
@@ -67,24 +67,6 @@ function getScoreClass(score: number): string {
   if (score > 0) return 'score-over';
   return 'score-even';
 }
-
-/**
- * Wraps shared getCurrentRoundLabel for HeroCarousel's LeaderEntry[] API.
- */
-function getCurrentRoundLabel(leaders: LeaderEntry[], startDate: string): string {
-  if (leaders.length > 0) {
-    const sample = leaders[0];
-    return sharedGetCurrentRoundLabel(startDate, {
-      round_1: sample.round_1,
-      round_2: sample.round_2,
-      round_3: sample.round_3,
-      round_4: sample.round_4,
-    });
-  }
-  return sharedGetCurrentRoundLabel(startDate);
-}
-
-// UpcomingCountdown is now imported from shared/TourHeroHelpers
 
 // Skeleton rows for loading state
 function LeaderboardSkeleton() {
@@ -148,6 +130,8 @@ interface LeaderboardRowProps {
 function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreFlash, positionDelta = 0, tournamentTourSlug }: LeaderboardRowProps) {
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
   const effectiveTourCode = leader.player.tourCode ?? tournamentTourSlug ?? 'pga';
+  const photoUrl = getPlayerHeadshotUrl(leader.player.fullName, effectiveTourCode, leader.player.headshotOverride);
+  const initials = `${leader.player.firstName[0]}${leader.player.lastName[0]}`.toUpperCase();
   const thruDisplay = formatThruDisplay(leader.thru, leader.round_1, leader.round_2, leader.round_3, leader.round_4, leader.status, leader.thruUpdatedAt, leader.tournamentTimezone);
   
   return (
@@ -165,15 +149,20 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
           {leader.position}
         </span>
         <div className="flex items-center gap-2 min-w-0">
-          <div className="flex-shrink-0">
-            <PlayerAvatar
-              displayName={abbreviatedName}
-              fullName={leader.player.fullName}
-              headshotOverride={leader.player.headshotOverride}
-              tourCode={effectiveTourCode}
-              size={32}
-              frosted
-            />
+          <div
+            className="overflow-hidden flex-shrink-0"
+            style={{ width: '32px', height: '33px', borderRadius: '34%', border: '1.5px solid #F8FAFC', background: '#F8FAFC' }}
+          >
+            {photoUrl ? (
+              <img
+                src={photoUrl}
+                alt={abbreviatedName}
+                className="w-full h-full object-cover object-top"
+                onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-white/60 text-[10px] font-semibold" style={{ background: '#F8FAFC' }}>{initials}</div>
+            )}
           </div>
           <span className={cn("leaderboard-name truncate", isFirst && "font-bold")}>
             {abbreviatedName}
@@ -218,32 +207,35 @@ function CondensedTieRow({ row, index, isActive, tournamentTourSlug }: { row: Li
         <div className="flex items-center flex-shrink-0">
           {row.players.slice(0, 4).map((player, i) => {
             const effectiveTourCode = player.player.tourCode ?? tournamentTourSlug ?? 'pga';
-            const displayName = `${player.player.firstName[0]}. ${player.player.lastName}`;
+            const photoUrl = getPlayerHeadshotUrl(player.player.fullName, effectiveTourCode, player.player.headshotOverride);
+            const initials = `${player.player.firstName[0]}${player.player.lastName[0]}`.toUpperCase();
             return (
               <div
                 key={player.player.id}
-                className="flex-shrink-0"
+                className="overflow-hidden flex-shrink-0"
                 style={{
+                  width: 28,
+                  height: 29,
+                  borderRadius: '34%',
+                  border: '1.5px solid #F8FAFC',
+                  background: '#F8FAFC',
                   marginLeft: i > 0 ? -8 : 0,
                   zIndex: 4 - i,
                   position: 'relative',
                 }}
               >
-                <PlayerAvatar
-                  displayName={displayName}
-                  fullName={player.player.fullName}
-                  headshotOverride={player.player.headshotOverride}
-                  tourCode={effectiveTourCode}
-                  size={28}
-                  frosted
-                />
+                {photoUrl ? (
+                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
+                ) : (
+                  <div style={{ width: '100%', height: '100%', background: '#F8FAFC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>{initials}</div>
+                )}
               </div>
             );
           })}
           {row.players.length > 4 && (
             <div
               className="flex-shrink-0 flex items-center justify-center"
-              style={{ width: 22, height: 22, borderRadius: '34%', background: 'rgba(255,255,255,0.12)', border: '1.5px solid rgba(255,255,255,0.18)', marginLeft: -6, position: 'relative', zIndex: 0, fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.80)' }}
+              style={{ width: 22, height: 22, borderRadius: '34%', background: '#F8FAFC', border: '1.5px solid #F8FAFC', marginLeft: -6, position: 'relative', zIndex: 0, fontSize: 9, fontWeight: 600, color: '#64748B' }}
             >
               +{row.players.length - 4}
             </div>
@@ -271,18 +263,13 @@ interface HeroSlideProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
   onInteraction: () => void;
-  onCardTouchStart: (e: React.TouchEvent) => void;
-  onCardTouchMove: (e: React.TouchEvent) => void;
-  onCardTouchEnd: (e: React.TouchEvent) => void;
 }
 
 
-function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction, onCardTouchStart, onCardTouchMove, onCardTouchEnd }: HeroSlideProps) {
+function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction }: HeroSlideProps) {
   const { tournament, type } = slide;
   const navigate = useNavigate();
   
-  const isMajor = tournament.isMajor;
-  const isSignature = tournament.isSignature;
   
   // Fetch real venue image
   const { data: venueImage } = useVenueImage(tournament.venueName, tournament.venueCity);
@@ -424,16 +411,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     isCompleted ? podiumWinner?.playerId : undefined
   );
 
-  // Glass card border based on major/signature status
-  const glassCardBorder = isMajor
-    ? '1px solid rgba(250, 204, 21, 0.35)'
-    : isSignature
-    ? '1px solid rgba(16, 185, 129, 0.25)'
-    : '1px solid rgba(255, 255, 255, 0.10)';
-
-  // Live status color
-  const liveStatusColor = isMajor ? '#FACC15' : '#22C55E';
-
   return (
     <motion.div
       className="absolute inset-0"
@@ -508,18 +485,16 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
           <motion.div
             layout
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            onTouchStart={(isExpanded && !isLive) ? handleExpandedTouch : onCardTouchStart}
-            onTouchMove={(isExpanded && !isLive) ? handleExpandedTouch : onCardTouchMove}
-            onTouchEnd={(isExpanded && !isLive) ? handleExpandedTouch : onCardTouchEnd}
+            onTouchStart={isExpanded ? handleExpandedTouch : undefined}
+            onTouchMove={isExpanded ? handleExpandedTouch : undefined}
+            onTouchEnd={isExpanded ? handleExpandedTouch : undefined}
             style={{ 
               position: 'absolute',
-              bottom: (isExpanded && !isLive) ? 16 : 88,
+              bottom: isExpanded ? 16 : 20,
               left: isExpanded ? 12 : 16,
-              ...((isExpanded && !isLive)
+              ...(isExpanded
                 ? { right: 12, top: 'max(env(safe-area-inset-top, 20px) + 120px, 160px)' }
-                : isLive
-                  ? { right: 12, maxHeight: 'calc(100% - 88px - max(env(safe-area-inset-top, 20px) + 120px, 160px))' }
-                  : { maxWidth: 'min(350px, calc(100% - 32px))' }
+                : { maxWidth: 'min(350px, calc(100% - 32px))' }
               ),
               minWidth: isExpanded ? undefined : '280px',
               borderRadius: isExpanded ? 16 : 12,
@@ -528,7 +503,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               WebkitBackdropFilter: isExpanded ? 'blur(24px)' : 'blur(20px)',
               boxShadow: isExpanded ? '0 8px 32px rgba(0, 0, 0, 0.35)' : '0 4px 16px rgba(0, 0, 0, 0.25)',
               padding: isExpanded ? '20px 0 8px 0' : '20px 20px 14px 20px',
-              border: glassCardBorder,
+              border: '1px solid rgba(255, 255, 255, 0.10)',
               overflow: 'hidden',
               zIndex: isExpanded ? 20 : 10,
               pointerEvents: 'auto' as const,
@@ -539,12 +514,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
           >
-            {/* Pill handle affordance for expandable cards */}
-            {!isExpanded && !isLive && (
-              <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: '8px', marginTop: '-8px' }}>
-                <div style={{ width: '32px', height: '3px', borderRadius: '2px', background: 'rgba(255,255,255,0.25)' }} />
-              </div>
-            )}
             {/* ─── COMPLETED: tournament name goes straight to top ─── */}
             {isCompleted ? (
               <>
@@ -571,8 +540,8 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   <div className="flex items-center justify-between" style={{ marginBottom: '6px' }}>
                     {isLive ? (
                       <div className="flex items-center gap-1.5">
-                        <span className="live-dot" style={isMajor ? { background: '#FACC15', boxShadow: '0 0 6px rgba(250,204,21,0.5)' } : undefined} />
-                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: liveStatusColor }}>LIVE</span>
+                        <span className="live-dot" />
+                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: '#22C55E' }}>LIVE</span>
                       </div>
                     ) : isUpcoming ? (
                       <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' as const }}>
@@ -582,17 +551,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'white' }}>COMPLETED</span>
                     )}
                     <div className="flex items-center gap-2">
-                      {isMajor && (
-                        <span style={{
-                          fontSize: '10px', fontWeight: 800, letterSpacing: '1.5px',
-                          color: '#FACC15', textTransform: 'uppercase',
-                          background: 'rgba(250, 204, 21, 0.12)',
-                          border: '1px solid rgba(250, 204, 21, 0.3)',
-                          borderRadius: 4, padding: '2px 6px',
-                        }}>
-                          MAJOR
-                        </span>
-                      )}
                       <div className="tour-badge">
                         <span>
                           {getTourDisplayName(tournament.tourSlug)}
@@ -630,9 +588,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                   style={{ overflow: isExpanded ? 'visible' : 'hidden', flex: isExpanded ? 1 : undefined, minHeight: isExpanded ? 0 : undefined, display: isExpanded ? 'flex' : undefined, flexDirection: isExpanded ? 'column' as const : undefined }}
                 >
-                  {/* Round progress — inferred from leaderboard data */}
+                  {/* Round progress */}
                   <p className="hero-meta" style={{ padding: isExpanded ? '0 20px' : undefined, marginTop: 4, marginBottom: isExpanded ? 4 : 0 }}>
-                    {getCurrentRoundLabel(leaders, tournament.startDate)}
+                    {'In Progress'}
                   </p>
 
                   {/* Expanded: Full Leaderboard or Scorecard */}
@@ -769,15 +727,10 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       </AnimatePresence>
 
                       {!isExpanded && (
-                        <>
-                          <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta">
-                            <span>See All</span>
-                            <ChevronRight className="w-4 h-4 cta-chevron" />
-                          </Link>
-                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
-                            <ChevronsUp size={14} style={{ color: 'rgba(255,255,255,0.35)', animation: 'pulse 2s infinite' }} />
-                          </div>
-                        </>
+                        <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta">
+                          <span>See All</span>
+                          <ChevronRight className="w-4 h-4 cta-chevron" />
+                        </Link>
                       )}
                     </>
                   )}
@@ -837,16 +790,14 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                           style={{ display: 'flex', alignItems: 'center', gap: 10 }}
                         >
-                          <PlayerAvatar displayName={winnerInfo.winnerName} fullName={winnerInfo.winnerName} headshotOverride={winnerInfo.winnerPhotoUrl} tourCode={tournament.tourSlug} size={60} frosted />
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' }}>
-                              <span style={{ fontSize: '17px', fontWeight: 700, color: '#FFFFFF' }}>{winnerInfo.winnerName}</span>
-                              {winnerInfo.winnerScore && (
-                                <span style={{ fontFamily: "'JetBrains Mono','SF Mono',monospace", fontSize: '17px', fontWeight: 700, color: '#4ADE80', flexShrink: 0 }}>
-                                  {winnerInfo.winnerScore}
-                                </span>
-                              )}
-                            </div>
+                          <PlayerAvatar displayName={winnerInfo.winnerName} tourCode={winnerInfo.tourSlug || 'pga'} size={60} frosted />
+                          <div>
+                            <span style={{ fontSize: '17px', fontWeight: 700, color: '#FFFFFF', display: 'block' }}>{winnerInfo.winnerName}</span>
+                            {winnerInfo.winnerScore && (
+                              <span style={{ fontFamily: "'JetBrains Mono','SF Mono',monospace", fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
+                                {winnerInfo.winnerScore}
+                              </span>
+                            )}
                           </div>
                         </motion.div>
                       ) : (
@@ -923,10 +874,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                   style={{ overflow: 'hidden' }}
                 >
-                  {/* Live countdown */}
-                  <UpcomingCountdown startDate={tournament.startDate} />
-
-                  {/* Course meta */}
                   <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '8px', marginTop: '6px', letterSpacing: '0.3px' }}>
                     {[
                       tournament.purse && formatPurse(tournament.purse),
@@ -935,7 +882,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     ].filter(Boolean).join(' · ')}
                   </p>
 
-                  {/* Defending champion — with avatar */}
                   {tournament.defendingChampion && (
                     <motion.div
                       initial={{ opacity: 0, y: 6 }}
@@ -944,22 +890,10 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       className="flex items-center gap-2"
                       style={{ marginBottom: '10px' }}
                     >
-                      <PlayerAvatar
-                        displayName={tournament.defendingChampion}
-                        fullName={tournament.defendingChampion}
-                        headshotOverride={tournament.defendingChampionPhotoUrl || undefined}
-                        tourCode={tournament.tourSlug}
-                        size={36}
-                        frosted
-                      />
-                      <div>
-                        <span style={{ fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.8px', textTransform: 'uppercase', display: 'block' }}>
-                          Defending Champion
-                        </span>
-                        <span style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>
-                          {tournament.defendingChampion}
-                        </span>
-                      </div>
+                      <Trophy className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(250,204,21,0.7)' }} />
+                      <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.45)' }}>
+                        Defending: <span style={{ fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>{tournament.defendingChampion}</span>
+                      </span>
                     </motion.div>
                   )}
 
@@ -967,11 +901,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     <span>View Tournament</span>
                     <ChevronRight className="w-4 h-4 cta-chevron" />
                   </Link>
-                  {!isExpanded && (
-                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
-                      <ChevronsUp size={14} style={{ color: 'rgba(255,255,255,0.35)', animation: 'pulse 2s infinite' }} />
-                    </div>
-                  )}
                 </motion.div>
               )}
 
@@ -1016,7 +945,7 @@ interface HeroCarouselProps {
 
 export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
-  // Bottom nav no longer controlled from HeroCarousel — sentinel observers handle it
+  const { showBottomNav } = useBottomNavigation();
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -1062,20 +991,6 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     return () => clearInterval(interval);
   }, [slides.length, isPaused, isExpanded]);
 
-  // FIX 4: Pause auto-advance when app is backgrounded
-  useEffect(() => {
-    const handleVisibility = () => {
-      if (document.hidden) {
-        setIsPaused(true);
-      } else {
-        // Resume after a short delay so the slide doesn't jump immediately on return
-        setTimeout(() => setIsPaused(false), 1000);
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibility);
-    return () => document.removeEventListener('visibilitychange', handleVisibility);
-  }, []);
-
   // Preload current slide's winner avatar into browser cache
   useEffect(() => {
     const slide = slides[currentIndex];
@@ -1102,8 +1017,6 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     }
   }, [slides.length, currentIndex]);
 
-  
-
   // Auto-collapse if slide index changes
   const prevIndexRef = React.useRef(currentIndex);
   useEffect(() => {
@@ -1115,6 +1028,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
 
   // Swipe gesture handlers
   const handleTouchStart = (e: React.TouchEvent) => {
+    if (isExpanded) return;
     setIsPaused(true);
     touchStartRef.current = {
       x: e.touches[0].clientX,
@@ -1125,11 +1039,13 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    if (isExpanded) return;
     if (!touchStartRef.current) return;
     touchMoveRef.current = e.touches[0].clientX - touchStartRef.current.x;
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
+    if (isExpanded) return;
     if (!touchStartRef.current) {
       scheduleResume();
       return;
@@ -1202,9 +1118,9 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
       onTouchEnd={handleTouchEnd}
     >
       <button 
-        className="fixed z-20 flex items-center justify-center"
-        style={{ top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: '16px', width: '44px', height: '44px' }}
-        onClick={() => { openTourNav(); }}
+        className="absolute z-20 flex items-center justify-center"
+        style={{ top: 'calc(env(safe-area-inset-top, 0px) + 12px)', left: '16px', width: '44px', height: '44px' }}
+        onClick={() => { openTourNav(); showBottomNav(); }}
         aria-label="Open tour menu"
       >
         <Menu 
@@ -1230,42 +1146,9 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
               setIsPaused(true);
               scheduleResume();
             }}
-            onCardTouchStart={handleTouchStart}
-            onCardTouchMove={handleTouchMove}
-            onCardTouchEnd={handleTouchEnd}
           />
         ))}
       </AnimatePresence>
-
-      {/* Scroll-to-exit indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2, duration: 0.5 }}
-        style={{
-          position: 'absolute',
-          bottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 16px)',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '4px',
-          pointerEvents: 'none',
-          opacity: isExpanded ? 0 : 1,
-          transition: 'opacity 0.2s',
-        }}
-      >
-        <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '1.2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)' }}>
-          Explore
-        </span>
-        <motion.div
-          animate={{ y: [0, 4, 0] }}
-          transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <ChevronDown size={16} style={{ color: 'rgba(255,255,255,0.45)' }} />
-        </motion.div>
-      </motion.div>
     </div>
   );
 }

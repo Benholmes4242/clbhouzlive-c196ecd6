@@ -14,10 +14,10 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-const OPENAI_MODEL = "gpt-4o";
-const PERPLEXITY_MODEL = "llama-3.1-sonar-large-128k-online";
-const ANTHROPIC_MODEL = "claude-sonnet-4-5";
-const GEMINI_MODEL = "gemini-1.5-pro-latest";
+const OPENAI_MODEL = "gpt-4o-mini";
+const PERPLEXITY_MODEL = "sonar";
+const ANTHROPIC_MODEL = "claude-3-5-sonnet-20241022";
+const GEMINI_MODEL = "gemini-1.5-pro";
 const DEFAULT_TIMEZONE = "Europe/London";
 
 // Rate limiting config
@@ -273,7 +273,6 @@ async function streamClaude(
   }), 30000);
 
   if (!response.ok) {
-    console.error(`[Echo] Provider failure — Anthropic | model: ${ANTHROPIC_MODEL} | status: ${response.status}`);
     throw new Error(`Claude API error: ${response.status}`);
   }
 
@@ -333,10 +332,7 @@ async function callGemini(
     }
   ), 20000);
 
-  if (!response.ok) {
-    console.error(`[Echo] Provider failure — Gemini | model: ${GEMINI_MODEL} | status: ${response.status}`);
-    throw new Error(`Gemini API error: ${response.status}`);
-  }
+  if (!response.ok) throw new Error(`Gemini API error: ${response.status}`);
   const data = await response.json();
   return data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
 }
@@ -363,10 +359,7 @@ async function callGPT4o(
     }),
   }), 20000);
 
-  if (!response.ok) {
-    console.error(`[Echo] Provider failure — OpenAI | model: gpt-4o | status: ${response.status}`);
-    throw new Error(`GPT-4o API error: ${response.status}`);
-  }
+  if (!response.ok) throw new Error(`GPT-4o API error: ${response.status}`);
   const data = await response.json();
   return data?.choices?.[0]?.message?.content || '';
 }
@@ -706,18 +699,9 @@ async function* streamPerplexity(query: string, nowIso: string, history: Array<{
     "Be concise, structured, and provide specific dates/venues when discussing events."
   ].join(" ");
 
-  // Remove trailing user messages from history to prevent consecutive user messages
-  const cleanHistory = (history ?? []).filter((_: { role: string; content: string }, i: number, arr: Array<{ role: string; content: string }>) => {
-    let lastAssistantIdx = arr.length - 1;
-    while (lastAssistantIdx >= 0 && arr[lastAssistantIdx].role === 'user') {
-      lastAssistantIdx--;
-    }
-    return i <= lastAssistantIdx;
-  });
-
   const messages = [
     { role: "system", content: systemPrompt },
-    ...cleanHistory,
+    ...(history ?? []),
     { role: "user", content: query },
   ];
   
@@ -732,10 +716,7 @@ async function* streamPerplexity(query: string, nowIso: string, history: Array<{
     }),
   }), 30000);
   
-  if (!resp.ok) {
-    console.error(`[Echo] Provider failure — Perplexity | model: ${PERPLEXITY_MODEL} | status: ${resp.status}`);
-    throw new Error(`Perplexity error: ${await resp.text()}`);
-  }
+  if (!resp.ok) throw new Error(`Perplexity error: ${await resp.text()}`);
   
   const reader = resp.body?.getReader();
   if (!reader) throw new Error("No response body");
@@ -791,17 +772,9 @@ async function callPerplexity(query: string, nowIso: string, history: Array<{ ro
     "Be concise, structured, and provide specific dates/venues when discussing events."
   ].join(" ");
 
-  const cleanHistory = (history ?? []).filter((_: { role: string; content: string }, i: number, arr: Array<{ role: string; content: string }>) => {
-    let lastAssistantIdx = arr.length - 1;
-    while (lastAssistantIdx >= 0 && arr[lastAssistantIdx].role === 'user') {
-      lastAssistantIdx--;
-    }
-    return i <= lastAssistantIdx;
-  });
-
   const messages = [
     { role: "system", content: systemPrompt },
-    ...cleanHistory,
+    ...(history ?? []),
     { role: "user", content: query },
   ];
   const resp = await withTimeout(fetch("https://api.perplexity.ai/chat/completions", {
@@ -809,10 +782,7 @@ async function callPerplexity(query: string, nowIso: string, history: Array<{ ro
     headers: { Authorization: `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({ model: PERPLEXITY_MODEL, messages, temperature: 0.2 }),
   }), 20000);
-  if (!resp.ok) {
-    console.error(`[Echo] Provider failure — Perplexity (non-stream) | model: ${PERPLEXITY_MODEL} | status: ${resp.status}`);
-    throw new Error(`Perplexity error: ${await resp.text()}`);
-  }
+  if (!resp.ok) throw new Error(`Perplexity error: ${await resp.text()}`);
   const data = await resp.json();
   let content = data.choices?.[0]?.message?.content?.trim() || "";
   content = content.replace(/\[\d+\]/g, '');
@@ -1101,13 +1071,11 @@ Based on the submitted frames, I can see:
 
             send({ done: true, meta: { intents, consensusLevel } });
           } catch (err) {
-            console.error('[Echo] Primary provider failed:', (err as Error).message);
             // Graceful degradation — fall back to single Claude call
             try {
               await streamClaude(enrichedSystemPrompt, history.concat([{ role: 'user', content: message! }]), onChunk);
               send({ done: true, meta: { intents, consensusLevel, fallback: true } });
-            } catch (fallbackErr) {
-              console.error('[Echo] Fallback Claude also failed:', (fallbackErr as Error).message);
+            } catch {
               send({ error: 'Echo encountered an error. Please try again.' });
               send({ done: true, meta: { error: true } });
             }

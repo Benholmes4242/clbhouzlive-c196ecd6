@@ -54,7 +54,7 @@ export function LeaderRow({
     <motion.div
       initial={{ opacity: 0, x: -12 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: Math.min(index * 0.02, 0.3), duration: 0.25 }}
+      transition={{ delay: index * 0.02, duration: 0.25 }}
     >
       <Link
         to={`/tourhub/player/${player.id}`}
@@ -117,13 +117,8 @@ export function LeaderRow({
           <p style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px' }} className="text-foreground truncate leading-tight">
             {player.fullName}
           </p>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1">
             <CountryFlag country={player.countryCode || player.country} size="sm" />
-            {player.country && (
-              <span style={{ fontSize: 11, color: 'hsl(var(--muted-foreground) / 0.6)' }}>
-                {player.country}
-              </span>
-            )}
           </div>
         </div>
 

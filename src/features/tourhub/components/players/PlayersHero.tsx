@@ -83,15 +83,15 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
   const player = players[currentIndex];
   if (!player) return null;
 
-  const photoUrl = getPlayerHeadshotUrl(player.playerName, player.tourCode || 'pga');
+  const photoUrl = getPlayerHeadshotUrl(player.playerName, 'pga');
   const country = titleCaseCountry(player.country);
 
   return (
     <div className="relative">
       {/* Burger menu */}
       <button
-        className="fixed z-20 flex items-center justify-center"
-        style={{ top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: '16px', width: '44px', height: '44px' }}
+        className="absolute z-20 flex items-center justify-center"
+        style={{ top: '48px', left: '16px', width: '44px', height: '44px' }}
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
         aria-label="Open tour menu"
       >
@@ -113,15 +113,12 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
                 key={player.playerId}
                 src={photoUrl}
                 alt={player.playerName}
-                className="absolute inset-0 w-full h-full object-cover object-[center_10%]"
+className="absolute inset-0 w-full h-full object-cover object-[center_10%]"
                 loading="eager"
-                initial={{ opacity: 0, scale: 1.04 }}
-                animate={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{
-                  opacity: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
-                  scale: { duration: 5, ease: 'linear' },
-                }}
+                transition={{ duration: 0.5 }}
                 onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
               />
             </AnimatePresence>
@@ -142,11 +139,6 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
                   transition={{ duration: 0.35 }}
                   className="space-y-1"
                 >
-                  {player.worldRank && (
-                    <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', marginBottom: '2px' }}>
-                      #{player.worldRank} World
-                    </p>
-                  )}
                   <h2
                     className="text-white"
                     style={{ fontSize: '22px', fontWeight: 800, letterSpacing: '-0.3px', lineHeight: 1.2 }}
@@ -164,22 +156,34 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
                 </motion.div>
               </AnimatePresence>
 
-              {/* Dots — below country row, left-aligned */}
+              {/* Carousel dots */}
               {count > 1 && (
-                <div className="flex items-center gap-1.5 pt-1">
-                  {players.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo(i); }}
-                      className="rounded-full transition-all duration-300"
-                      style={{
-                        width: i === currentIndex ? '18px' : '6px',
-                        height: '6px',
-                        background: i === currentIndex ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.35)',
-                      }}
-                      aria-label={`Player ${i + 1}`}
-                    />
-                  ))}
+                <div className="flex items-center justify-center pt-1">
+                  <div
+                    className="flex items-center gap-2"
+                    style={{
+                      background: 'rgba(0,0,0,0.14)',
+                      backdropFilter: 'blur(16px)',
+                      WebkitBackdropFilter: 'blur(16px)',
+                      padding: '6px 12px',
+                      borderRadius: '9999px',
+                    }}
+                  >
+                    {players.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); goTo(i); }}
+                        className="rounded-full"
+                        style={{
+                          width: i === currentIndex ? '20px' : '6px',
+                          height: '6px',
+                          background: i === currentIndex ? 'white' : 'rgba(255,255,255,0.4)',
+                          transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                        }}
+                        aria-label={`Go to player ${i + 1}`}
+                      />
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -219,8 +223,8 @@ function RunnerCard({ player, index, activeTour, statsMap, sort, tiedCount }: {
   }
 
   const rankBg = index === 0
-    ? 'rgba(148, 163, 184, 0.9)'
-    : 'rgba(194, 135, 90, 0.9)';
+    ? '#94A3B8'
+    : '#C2875A';
 
   return (
     <Link
@@ -244,7 +248,7 @@ function RunnerCard({ player, index, activeTour, statsMap, sort, tiedCount }: {
       {/* Avatar */}
       <div
         className="flex-shrink-0 overflow-hidden"
-        style={{ width: '36px', height: '36px', borderRadius: '34%', border: '1px solid rgba(255,255,255,0.18)' }}
+        style={{ width: '36px', height: '36px', borderRadius: '34%', border: '1px solid hsl(var(--border) / 0.4)' }}
       >
         <img
           src={photoUrl}
@@ -353,9 +357,9 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
     <div className="relative">
       {/* Burger menu */}
       <button 
-        className="fixed z-20 flex items-center justify-center"
+        className="absolute z-20 flex items-center justify-center"
         style={{
-          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
+          top: '48px',
           left: '16px',
           width: '44px',
           height: '44px',
@@ -387,7 +391,7 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
                 <motion.img
                   src={photoUrl}
                   alt={champion.playerName}
-                  className={`absolute inset-0 w-full h-full object-cover ${activeTour === 'LIV' ? 'object-[center_-15%]' : 'object-[center_10%]'}`}
+className={`absolute inset-0 w-full h-full object-cover ${activeTour === 'LIV' ? 'object-[center_-15%]' : 'object-[center_10%]'}`}
                   loading="eager"
                   initial={{ scale: 1.06 }}
                   animate={{ scale: 1 }}
@@ -421,11 +425,6 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
                   className="flex items-center gap-1.5"
                 >
                   <CountryFlag country={champion.country} size="sm" className="brightness-110" />
-                  {country && (
-                    <span style={{ fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>
-                      {country}
-                    </span>
-                  )}
                 </motion.div>
 
                 {metaParts.length > 0 && (
@@ -438,7 +437,7 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
                       className="inline-block text-white"
                       style={{ 
                         fontSize: '13px', fontWeight: 600, 
-                        background: 'hsl(var(--warm-amber) / 0.85)', 
+                        background: 'rgba(245,158,11,0.85)', 
                         borderRadius: '20px', 
                         padding: '5px 12px',
                         letterSpacing: '0.3px',

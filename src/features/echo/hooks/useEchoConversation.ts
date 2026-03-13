@@ -235,26 +235,6 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
           onComplete: async () => {
             const sanitizedContent = sanitizeEchoText(accumulatedContent);
             
-            // Guard: if the stream completed with no content, treat as error
-            if (!sanitizedContent.trim()) {
-              const errorMessage: EchoMessage = {
-                id: assistantMessageId,
-                role: 'assistant',
-                content: 'Sorry, I couldn\'t generate a response. Please try again.',
-                createdAt: new Date().toISOString(),
-                meta: { error: 'Empty response from AI' },
-              };
-              setMessages(prev => [...prev, errorMessage]);
-              setIsStreaming(false);
-              setStreamingContent('');
-
-              if (currentConvId) {
-                await insertMessage(currentConvId, userId, 'assistant', errorMessage.content);
-                queryClient.invalidateQueries({ queryKey: ['echo', 'conversations'] });
-              }
-              return;
-            }
-
             const assistantMessage: EchoMessage = {
               id: assistantMessageId,
               role: 'assistant',

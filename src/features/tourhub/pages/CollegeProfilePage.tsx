@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Menu, Crown, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
+import { Menu, Swords, GitCompare, Crown, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
 import { openTourNav } from '../contexts/TourNavContext';
 import { motion } from 'framer-motion';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
@@ -8,11 +8,21 @@ import { useQueryClient } from '@tanstack/react-query';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+import { 
+  FranchiseStoryStrip,
+  AlumniDepthChart, 
+  CollegeRivalsCarousel,
+  CollegeCompareSheet,
+} from '../components/college';
 
 import { useCollegeStats, useCollegeSeasonStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
+import { useCollegeRivalries } from '../hooks/useCollegeMovers';
 import { getCollegeGradientCSS } from '../config/collegeBrandColors';
 import { useTourSeason } from '../hooks/useTourHubData';
+import { Button } from '@/components/ui/button';
+
+
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -26,13 +36,16 @@ export function CollegeProfilePage() {
   const navigate = useNavigate();
   const { setVariant, hideHeader, showHeader } = useHeader();
 
+  // Transparent status bar for immersive hero bleed into safe area
   useMedianStatusBar("dark", "transparent", true, false);
   const { data: stats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useCollegeStats(collegeSlug);
   const { data: collegeMap, isLoading: mediaLoading } = useCollegeMediaMap();
+  const { data: rivalries } = useCollegeRivalries(collegeSlug);
   const { data: allSeasonStats } = useCollegeSeasonStats();
   const { data: season } = useTourSeason();
   const seasonYear = season?.year || new Date().getFullYear();
   
+  const [compareOpen, setCompareOpen] = useState(false);
   const [heroImgError, setHeroImgError] = useState(false);
 
   // Pull-to-refresh state
@@ -40,10 +53,13 @@ export function CollegeProfilePage() {
   const [pullDistance, setPullDistance] = useState(0);
   const touchStartY = useRef(0);
   const isPulling = useRef(false);
+  const [compareCollege2, setCompareCollege2] = useState<string | null>(null);
   
   const college = collegeSlug ? collegeMap?.get(collegeSlug) || null : null;
   const displayName = college?.short_name || college?.college_name || collegeSlug || 'College';
   const isLoading = statsLoading || mediaLoading;
+  const rivalSlugs = rivalries?.map(r => r.rivalNormalizedName) ?? [];
+  const firstRival = rivalSlugs[0] ?? null;
   const gradientCSS = collegeSlug ? getCollegeGradientCSS(collegeSlug) : null;
 
   // Compute this college's rank by earnings
@@ -53,6 +69,8 @@ export function CollegeProfilePage() {
     const idx = sorted.findIndex(s => s.normalized_name === collegeSlug);
     return idx >= 0 ? idx + 1 : null;
   })();
+
+  // Scroll position handled by centralized ScrollRestoration component
 
   // Pull-to-refresh handlers
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -75,6 +93,7 @@ export function CollegeProfilePage() {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['college-stats', collegeSlug] }),
         queryClient.invalidateQueries({ queryKey: ['college-alumni', collegeSlug] }),
+        queryClient.invalidateQueries({ queryKey: ['college-rivals', collegeSlug] }),
       ]);
       setIsRefreshing(false);
     } else {
@@ -91,6 +110,25 @@ export function CollegeProfilePage() {
     };
   }, [hideHeader, showHeader, setVariant]);
   
+  useEffect(() => {
+    setCompareCollege2(null);
+    setCompareOpen(false);
+  }, [collegeSlug]);
+  
+  
+  
+  const handleCompareClick = () => {
+    if (!compareCollege2 && firstRival) {
+      setCompareCollege2(firstRival);
+    }
+    setCompareOpen(true);
+  };
+  
+  const handleRivalCompare = (rivalSlug: string) => {
+    setCompareCollege2(rivalSlug);
+    setCompareOpen(true);
+  };
+
   // Build descriptive subtitle
   const subtitleText = stats
     ? `${stats.player_count} alumni on the PGA Tour`
@@ -118,6 +156,7 @@ export function CollegeProfilePage() {
         className="relative overflow-hidden"
         style={{ height: '45dvh' }}
       >
+        {/* Brand gradient background with Ken Burns */}
         <motion.div
           className="absolute inset-0"
           initial={{ scale: 1.04 }}
@@ -126,6 +165,7 @@ export function CollegeProfilePage() {
           style={{ background: gradientCSS || 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--foreground)))' }}
         />
         
+        {/* Texture overlay */}
         <div
           className="absolute inset-0 opacity-[0.04]"
           style={{
@@ -133,6 +173,7 @@ export function CollegeProfilePage() {
           }}
         />
 
+        {/* Bottom fade — strong gradient for text legibility */}
         <div
           className="absolute inset-0"
           style={{
@@ -140,6 +181,7 @@ export function CollegeProfilePage() {
           }}
         />
 
+        {/* Burger menu — matches Players/Leaders pages */}
         <button
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
           aria-label="Open tour menu"
@@ -149,6 +191,7 @@ export function CollegeProfilePage() {
           <Menu className="w-[24px] h-[24px] text-white" style={{ strokeWidth: 1.5, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }} />
         </button>
 
+        {/* Content — centered */}
         {isLoading ? (
           <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8 pt-20">
             <div className="w-[140px] h-[140px] rounded-full bg-white/10 animate-pulse mb-4" />
@@ -157,6 +200,7 @@ export function CollegeProfilePage() {
           </div>
         ) : college ? (
           <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8 pt-20">
+            {/* Season label */}
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -173,6 +217,7 @@ export function CollegeProfilePage() {
               {seasonYear} Season
             </motion.span>
 
+            {/* Rank badge */}
             {collegeRank && (
               <motion.div
                 initial={{ opacity: 0, y: 6 }}
@@ -194,6 +239,7 @@ export function CollegeProfilePage() {
               </motion.div>
             )}
 
+            {/* Logo — 110×110px */}
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -221,6 +267,7 @@ export function CollegeProfilePage() {
               )}
             </motion.div>
 
+            {/* Name — 28px, weight 700, tracking -0.4px */}
             <motion.h1
               initial={{ y: 8, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -236,6 +283,7 @@ export function CollegeProfilePage() {
               {displayName}
             </motion.h1>
 
+            {/* Subtitle — 13px, weight 400, rgba(255,255,255,0.6) */}
             {subtitleText && (
               <motion.p
                 initial={{ opacity: 0 }}
@@ -250,16 +298,19 @@ export function CollegeProfilePage() {
                 {subtitleText}
               </motion.p>
             )}
+
           </div>
         ) : null}
       </div>
 
-      {/* Stats Bar */}
+      {/* Stats Bar — 3-column glass overlay on hero */}
       {stats && (
         <div className="relative z-10 mx-4" style={{ marginTop: '-24px' }}>
           <motion.div
             className="flex items-stretch rounded-2xl border border-border/50 bg-card"
-            style={{ padding: '12px 0' }}
+            style={{
+              padding: '12px 0',
+            }}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.3 }}
@@ -286,6 +337,85 @@ export function CollegeProfilePage() {
 
       {/* Content sections */}
       <div className="w-full max-w-5xl mx-auto px-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
+        {/* Compare Button — 16px from stats bar */}
+        {stats && firstRival && (
+          <motion.div
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            className="flex items-center justify-center"
+            style={{ marginTop: '16px' }}
+          >
+            <button 
+              onClick={handleCompareClick}
+              className="flex items-center rounded-xl border border-border/50 bg-card active:scale-95 transition-all"
+              style={{ padding: '10px 20px', gap: '6px' }}
+            >
+              <GitCompare className="w-4 h-4 text-muted-foreground" />
+              <span style={{ fontSize: '14px', fontWeight: 600 }} className="text-foreground">Compare</span>
+            </button>
+          </motion.div>
+        )}
+
+        {/* Story Strip — 16px from compare button */}
+        {stats && (
+          <motion.div
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.4 }}
+            style={{ marginTop: '16px' }}
+          >
+            <FranchiseStoryStrip normalizedName={collegeSlug || ''} />
+          </motion.div>
+        )}
+
+        {/* Rivalries — 28px from activity cards */}
+        {stats && rivalSlugs.length > 0 && (
+          <motion.section
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.4 }}
+            style={{ marginTop: '24px' }}
+          >
+            <div className="flex items-center gap-2" style={{ marginBottom: '12px' }}>
+              <Swords className="w-4 h-4 text-muted-foreground" />
+              <h2 style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }} className="text-foreground">
+                {rivalries?.every(r => r.isFallback) ? 'Similar Programs' : 'Rivals'}
+              </h2>
+            </div>
+            <CollegeRivalsCarousel 
+              normalizedName={collegeSlug || ''} 
+              onCompare={handleRivalCompare}
+            />
+          </motion.section>
+        )}
+
+        {/* Alumni Depth Chart — 28px from rivals */}
+        {stats && (
+          <motion.section
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-50px' }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+             style={{ marginTop: '24px' }}
+          >
+            <h2 style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }} className="text-foreground">
+              Alumni Depth Chart
+            </h2>
+            <p className="text-muted-foreground" style={{ fontSize: '13px', fontWeight: 400, marginTop: '4px', marginBottom: '20px' }}>
+              Current PGA Tour players ranked by contribution
+            </p>
+            <AlumniDepthChart normalizedName={collegeSlug || ''} />
+          </motion.section>
+        )}
+
         {!isLoading && !stats && (
           <div className="text-center py-16">
             <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-destructive/10 flex items-center justify-center">
@@ -312,7 +442,20 @@ export function CollegeProfilePage() {
             </Link>
           </div>
         )}
+
       </div>
+
+      {/* Compare Sheet */}
+      {collegeSlug && (
+        <CollegeCompareSheet
+          isOpen={compareOpen}
+          onClose={() => setCompareOpen(false)}
+          college1={collegeSlug}
+          college2={compareCollege2 ?? firstRival ?? ''}
+          rivals={rivalSlugs}
+          onCollegeChange={setCompareCollege2}
+        />
+      )}
     </PageRoot>
   );
 }

@@ -4,11 +4,11 @@
  * Logic:
  * For each major tour (PGA, LIV, DP World, LPGA, Korn Ferry, Champions):
  * - Priority 1: LIVE tournament (inprogress)
- * - Priority 2: Recently completed (closed/complete, last 14 days) with winner
+ * - Priority 2: Recently completed (closed/complete, last 7 days) with winner
  * - Priority 3: Next upcoming (scheduled/created)
  * 
  * Slide ordering:
- * 1. All LIVE (majors first, then by tour priority)
+ * 1. All LIVE (by tour priority)
  * 2. All COMPLETED (by end_date DESC)
  * 3. All UPCOMING (by start_date ASC)
  */
@@ -17,7 +17,6 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TOUR_CONFIG, type TourId } from './useOverviewData';
 import { useTournamentsCache, type CachedTournament } from '@/hooks/useTournamentsCache';
-import { getContextLabel } from '../utils/tournamentClassification';
 
 // Tour priority order for sorting live tournaments
 const TOUR_PRIORITY: TourId[] = ['pga', 'liv', 'euro', 'lpga', 'pgad', 'champ'];
@@ -38,10 +37,6 @@ export interface HeroTournament {
   tourSlug: TourId;
   tourName: string;
   defendingChampion: string | null;
-  defendingChampionPhotoUrl: string | null;
-  defendingChampionPgaTourId: string | null;
-  isMajor: boolean;
-  isSignature: boolean;
   // Winner info (for completed)
   winnerId: string | null;
   winnerName: string | null;
@@ -88,13 +83,8 @@ export function useHeroCarouselData() {
         .map(t => t.winner_id)
         .filter((id): id is string => !!id);
 
-      // Collect defending champion names for upcoming tournaments
-      const defendingChampionNames = upcomingTournaments
-        .map(t => t.defending_champion)
-        .filter((name): name is string => !!name);
-
-      // Fetch winner details, leaderboard data, and defending champion photos in parallel
-      const [winnersResult, leaderboardResult, defendingChampionResult] = await Promise.all([
+      // Fetch winner details and leaderboard data in parallel
+      const [winnersResult, leaderboardResult] = await Promise.all([
         winnerSrIds.length > 0
           ? supabase
               .from('sr_players')
@@ -112,19 +102,6 @@ export function useHeroCarouselData() {
               .gt('strokes', 0)
               .not('position', 'is', null)
               .eq('position', 1)
-          : Promise.resolve({ data: [] }),
-        defendingChampionNames.length > 0
-          ? supabase
-              .from('sr_players')
-              .select('sr_id, first_name, last_name, photo_url, pga_tour_id')
-              .or(
-                defendingChampionNames.map(name => {
-                  const parts = name.trim().split(' ');
-                  const first = parts[0];
-                  const last = parts.slice(1).join(' ');
-                  return `and(first_name.ilike.${first},last_name.ilike.${last})`;
-                }).join(',')
-              )
           : Promise.resolve({ data: [] }),
       ]);
 
@@ -152,22 +129,10 @@ export function useHeroCarouselData() {
         }
       });
 
-      // Build defending champion map
-      const defendingChampionMap: Record<string, { photo_url: string | null; pga_tour_id: string | null }> = {};
-      (defendingChampionResult.data || []).forEach((p: any) => {
-        const fullName = `${p.first_name} ${p.last_name}`.trim();
-        defendingChampionMap[fullName.toLowerCase()] = {
-          photo_url: p.photo_url,
-          pga_tour_id: p.pga_tour_id,
-        };
-      });
-
       // Helper to transform tournament data
       const transformTournament = (row: CachedTournament, includeWinner: boolean = false): HeroTournament => {
         const tourSlug = mapTourSlug(row.season?.tour_name || '');
         const tourConfig = TOUR_CONFIG[tourSlug];
-
-        const contextLabel = getContextLabel({ name: row.name, tourName: row.season?.tour_name });
 
         let winnerName: string | null = null;
         let winnerPhotoUrl: string | null = null;
@@ -192,9 +157,6 @@ export function useHeroCarouselData() {
             : null;
         }
 
-        const champKey = (row.defending_champion || '').toLowerCase();
-        const champData = defendingChampionMap[champKey] || null;
-
         return {
           id: row.id,
           name: row.name,
@@ -211,10 +173,6 @@ export function useHeroCarouselData() {
           tourSlug,
           tourName: tourConfig?.name || 'PGA Tour',
           defendingChampion: row.defending_champion || null,
-          defendingChampionPhotoUrl: champData?.photo_url ?? null,
-          defendingChampionPgaTourId: champData?.pga_tour_id ?? null,
-          isMajor: contextLabel === 'MAJOR CHAMPIONSHIP',
-          isSignature: contextLabel === 'SIGNATURE EVENT' || contextLabel === 'ROLEX SERIES',
           winnerId: row.winner_id,
           winnerName,
           winnerPhotoUrl,
@@ -272,11 +230,8 @@ export function useHeroCarouselData() {
         }
       });
 
-      // Sort within categories — majors first within live
-      liveSlides.sort((a, b) => {
-        if (a.tournament.isMajor !== b.tournament.isMajor) return a.tournament.isMajor ? -1 : 1;
-        return TOUR_PRIORITY.indexOf(a.tournament.tourSlug) - TOUR_PRIORITY.indexOf(b.tournament.tourSlug);
-      });
+      // Sort within categories
+      liveSlides.sort((a, b) => TOUR_PRIORITY.indexOf(a.tournament.tourSlug) - TOUR_PRIORITY.indexOf(b.tournament.tourSlug));
       completedSlides.sort((a, b) => {
         const dateDiff = new Date(b.tournament.endDate).getTime() - new Date(a.tournament.endDate).getTime();
         if (dateDiff !== 0) return dateDiff;
@@ -284,11 +239,7 @@ export function useHeroCarouselData() {
       });
       upcomingSlides.sort((a, b) => new Date(a.tournament.startDate).getTime() - new Date(b.tournament.startDate).getTime());
 
-      // Per-category caps instead of hard global cap
-      const cappedLive = liveSlides.slice(0, 6);
-      const cappedCompleted = completedSlides.slice(0, 4);
-      const cappedUpcoming = upcomingSlides.slice(0, 3);
-      return [...cappedLive, ...cappedCompleted, ...cappedUpcoming];
+      return [...liveSlides, ...completedSlides, ...upcomingSlides].slice(0, 8);
     },
     enabled: !!cache,
     staleTime: 30_000,

@@ -14,15 +14,13 @@ import type { TourTournament } from '../../hooks/useTourHubData';
 import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { getContextLabel } from '../../utils/tournamentClassification';
-import { TOUR_COLORS } from '../../constants/colors';
-import { formatPurse } from '../shared/TourHeroHelpers';
-import { getCurrentRound } from '../../utils/formatThruDisplay';
 
 interface ScheduleTournamentCardProps {
   tournament: TourTournament | SeasonTournament;
   className?: string;
   compact?: boolean;
   leaderWinner?: TournamentLeaderWinner;
+  batchImageUrl?: string | null;
 }
 
 function isSeasonTournament(t: TourTournament | SeasonTournament): t is SeasonTournament {
@@ -41,8 +39,8 @@ function getDayNum(dateStr: string): string {
 
 function getScoreColor(score: number | null): string {
   if (score === null || score === undefined) return 'hsl(var(--muted-foreground))';
-  if (score < 0) return TOUR_COLORS.movementUp;
-  if (score > 0) return TOUR_COLORS.movementDown;
+  if (score < 0) return '#22C55E';
+  if (score > 0) return '#EF4444';
   return 'hsl(var(--muted-foreground))';
 }
 
@@ -80,8 +78,9 @@ export function ScheduleTournamentCard({
     ? `${winnerFirstName?.charAt(0)}. ${winnerLastName}`
     : hasLeaderWinnerData ? leaderWinner!.displayName : null;
 
-  const winnerScore = leaderWinner?.score ?? null;
-  const winnerDisplayScore = leaderWinner?.displayScore ?? null;
+  const winnerScore = hasSeasonWinner 
+    ? (tournament as any).winnerScore 
+    : hasLeaderWinnerData ? leaderWinner?.score : null;
 
   const handlePlayerTap = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -110,9 +109,9 @@ export function ScheduleTournamentCard({
       style={{
         borderLeftWidth: (isLive || isMajor || isSignature || isRolex) ? '3px' : undefined,
         borderLeftColor: isLive
-          ? TOUR_COLORS.liveGreen
+          ? '#22C55E'
           : isMajor
-          ? TOUR_COLORS.liveAmber
+          ? '#f59e0b'
           : (isSignature || isRolex)
           ? 'rgba(16, 185, 129, 0.8)'
           : undefined,
@@ -120,22 +119,15 @@ export function ScheduleTournamentCard({
       whileTap={{ scale: 0.98 }}
       aria-label={ariaLabel}
     >
-      {/* Date block — show end date for completed */}
-      {(() => {
-        const displayDate = isFinal
-          ? (isSeasonTournament(tournament) ? tournament.endDate ?? startDate : (tournament as TourTournament).end_date ?? startDate)
-          : startDate;
-        return (
-          <div className="flex-shrink-0 w-12 text-center">
-            <p className="uppercase leading-none text-muted-foreground/70" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em' }}>
-              {getMonthAbbr(displayDate)}
-            </p>
-            <p className="leading-none mt-0.5 text-foreground" style={{ fontSize: '20px', fontWeight: 700 }}>
-              {getDayNum(displayDate)}
-            </p>
-          </div>
-        );
-      })()}
+      {/* Date block */}
+      <div className="flex-shrink-0 w-12 text-center">
+        <p className="uppercase leading-none text-muted-foreground/70" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em' }}>
+          {getMonthAbbr(startDate)}
+        </p>
+        <p className="leading-none mt-0.5 text-foreground" style={{ fontSize: '20px', fontWeight: 700 }}>
+          {getDayNum(startDate)}
+        </p>
+      </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0">
@@ -147,23 +139,13 @@ export function ScheduleTournamentCard({
               fontSize: '10px',
               fontWeight: 600,
               letterSpacing: '0.05em',
-              color: isMajor ? TOUR_COLORS.liveAmber : (isSignature || isRolex) ? 'rgba(16, 185, 129, 0.9)' : isLive ? TOUR_COLORS.liveGreen : 'hsl(var(--muted-foreground) / 0.7)',
+              color: isMajor ? '#f59e0b' : (isSignature || isRolex) ? 'rgba(16, 185, 129, 0.9)' : isLive ? '#22C55E' : 'hsl(var(--muted-foreground) / 0.7)',
             }}
           >
             {isLive ? '● LIVE' : contextLabel}
           </p>
-          {isLive && leaderWinner && (() => {
-            const roundInfo = getCurrentRound(
-              leaderWinner.round1, leaderWinner.round2,
-              leaderWinner.round3, leaderWinner.round4
-            );
-            return roundInfo ? (
-              <span style={{ fontSize: '10px', fontWeight: 500, color: 'hsl(var(--muted-foreground) / 0.6)', letterSpacing: '0.03em' }}>
-                R{roundInfo.currentRound}
-              </span>
-            ) : null;
-          })()}
         </div>
+        
         {/* Tournament name */}
         <p
           className="mt-1 line-clamp-1 text-foreground"
@@ -171,54 +153,28 @@ export function ScheduleTournamentCard({
         >
           {tournament.name}
         </p>
-
-        {/* Date range + purse for upcoming */}
-        {!isLive && !isFinal && (() => {
-          const endDate = isSeasonTournament(tournament)
-            ? null
-            : (tournament as TourTournament).end_date;
-          const purse = isSeasonTournament(tournament)
-            ? null
-            : (tournament as TourTournament).purse;
-          const parts = [
-            endDate && (() => {
-              const s = new Date(startDate + 'T12:00:00');
-              const e = new Date(endDate + 'T12:00:00');
-              const sameMonth = s.getMonth() === e.getMonth();
-              return sameMonth
-                ? `${getMonthAbbr(startDate)} ${getDayNum(startDate)}–${getDayNum(endDate)}`
-                : `${getMonthAbbr(startDate)} ${getDayNum(startDate)} – ${getMonthAbbr(endDate)} ${getDayNum(endDate)}`;
-            })(),
-            purse && formatPurse(purse),
-          ].filter(Boolean);
-          return parts.length > 0 ? (
-            <p className="mt-0.5 text-muted-foreground/60 line-clamp-1" style={{ fontSize: '12px', fontWeight: 500 }}>
-              {parts.join(' · ')}
-            </p>
-          ) : null;
-        })()}
         
         {/* Winner/Leader row */}
         {(winnerDisplay || hasLeaderData) && (
           <p className="flex items-center gap-1 mt-0.5" style={{ fontSize: '13px', fontWeight: 500 }}>
             {isFinal && winnerDisplay && (
               <span className="text-muted-foreground">
-                <Trophy className="w-3.5 h-3.5 inline mr-0.5" style={{ color: TOUR_COLORS.liveAmber }} />
+                <Trophy className="w-3.5 h-3.5 inline mr-0.5" style={{ color: '#f59e0b' }} />
                 <button
                   onClick={handlePlayerTap}
                   className="transition-opacity active:opacity-70 inline font-semibold"
                 >
                   {winnerDisplay}
                 </button>
-                {winnerDisplayScore && (
-                  <span className="font-semibold ml-1" style={{ color: TOUR_COLORS.liveAmber }}>
-                    ({winnerDisplayScore})
+                {winnerScore !== null && winnerScore !== undefined && (
+                  <span className="font-semibold ml-1" style={{ color: '#f59e0b' }}>
+                    ({hasSeasonWinner ? (tournament as any).winnerScore : leaderWinner!.displayScore})
                   </span>
                 )}
               </span>
             )}
             {hasLeaderData && !isFinal && (
-              <span style={{ color: TOUR_COLORS.liveGreen }}>
+              <span style={{ color: '#22C55E' }}>
                 Leader:{' '}
                 <button
                   onClick={handlePlayerTap}

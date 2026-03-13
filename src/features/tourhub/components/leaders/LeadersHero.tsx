@@ -50,8 +50,8 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
     >
       {/* Burger menu */}
       <button 
-        className="fixed z-20 flex items-center justify-center"
-        style={{ top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: '16px', width: '44px', height: '44px' }}
+        className="absolute z-20 flex items-center justify-center"
+        style={{ top: '48px', left: '16px', width: '44px', height: '44px' }}
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
         aria-label="Open tour menu"
       >
@@ -66,7 +66,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
         to={`/tourhub/player/${player.id}`}
         className="block active:scale-[0.995] transition-transform"
       >
-        {/* Hero — 45dvh */}
+        {/* Hero — 50dvh */}
         <div className="relative w-full overflow-hidden" style={{ height: '45dvh' }}>
           {photoUrl ? (
             <motion.img
@@ -77,7 +77,6 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
               initial={{ scale: 1.06 }}
               animate={{ scale: 1 }}
               transition={{ duration: 12, ease: 'linear' }}
-              onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
             />
           ) : (
             <div className="absolute inset-0 w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${category.accentColor}22, ${category.accentColor}44)` }}>
@@ -93,7 +92,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
           }} />
 
           <div className="absolute bottom-0 left-0 right-0 px-4 pb-6 space-y-1.5">
-            {/* Category label */}
+            {/* Category label — 11px, 700, amber, uppercase, wide tracking */}
             <motion.p
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -103,18 +102,18 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
                 fontWeight: 700,
                 letterSpacing: '1.2px',
                 textTransform: 'uppercase' as const,
-                color: category.accentColor,
+                color: 'rgba(245, 158, 11, 0.9)',
               }}
             >
               {category.label} Leader
             </motion.p>
 
-            {/* Player name + country */}
+            {/* Player name + flag */}
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.4 }}
-              className="space-y-0.5"
+              className="flex items-center gap-2"
             >
               <h2
                 style={{
@@ -127,15 +126,10 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
               >
                 {player.full_name}
               </h2>
-              <div className="flex items-center gap-1.5">
-                <CountryFlag country={player.country_code || player.country} size="sm" className="brightness-110" />
-                {countryName && (
-                  <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>{countryName}</span>
-                )}
-              </div>
+              <CountryFlag country={player.country_code || player.country} size="sm" className="brightness-110" />
             </motion.div>
 
-            {/* Stats pill */}
+            {/* Stats pill — amber bg, white text, 13px/600 */}
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -144,7 +138,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
               <span
                 className="inline-block"
                 style={{
-                  background: category.accentColor,
+                  background: 'rgba(245,158,11,0.85)',
                   color: 'white',
                   fontSize: 13,
                   fontWeight: 600,

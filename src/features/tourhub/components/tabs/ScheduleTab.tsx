@@ -12,14 +12,13 @@
 
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Search, X, AlertCircle, RefreshCw, ChevronLeft } from 'lucide-react';
+import { Search, X, AlertCircle, RefreshCw } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
 import { TourHubEmptyState } from '../TourHubEmptyState';
-import { format } from 'date-fns';
+import { format, isAfter } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { getContextLabel } from '../../utils/tournamentClassification';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
@@ -43,7 +42,6 @@ interface MonthGroup {
   monthKey: string;
   monthLabel: string;
   tournaments: TourTournament[];
-  tourBreakdown: Record<string, number>;
 }
 
 function useDebouncedValue<T>(value: T, delay: number): T {
@@ -69,24 +67,19 @@ function InViewCard({ children }: { children: React.ReactNode }) {
   );
 }
 
+const SCROLL_KEY = 'schedule-scroll-pos';
+
 export function ScheduleTab() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   const filter = (searchParams.get('filter') as ScheduleFilterType) || 'all';
   const activeTour = (searchParams.get('tour') as TourFilterCode) || 'all';
 
-  // Default to upcoming tab on fresh mount (no filter param in URL)
-  useEffect(() => {
-    if (!searchParams.get('filter')) {
-      const params = new URLSearchParams(searchParams);
-      params.set('filter', 'upcoming');
-      setSearchParams(params, { replace: true });
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Scroll to top on mount
+  // Scroll to top on mount — always start at top
   useEffect(() => {
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
@@ -95,6 +88,14 @@ export function ScheduleTab() {
     });
   }, []);
 
+  // Save scroll position before navigating away
+  useEffect(() => {
+    const saveScroll = () => {
+      sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
+    };
+    window.addEventListener('beforeunload', saveScroll);
+    return () => window.removeEventListener('beforeunload', saveScroll);
+  }, []);
   
   const setFilter = useCallback((f: ScheduleFilterType) => {
     const params = new URLSearchParams(searchParams);
@@ -115,7 +116,7 @@ export function ScheduleTab() {
   const queryClient = useQueryClient();
   const { data: season } = useTourSeason();
   const { data: tournaments, isLoading, error, refetch } = useTourTournaments(season?.id, {
-    refetchInterval: filter === 'live' ? 30000 : filter === 'upcoming' ? 60000 : false,
+    refetchInterval: filter === 'live' ? 30000 : false,
   });
 
   // Pull-to-refresh state
@@ -159,35 +160,22 @@ export function ScheduleTab() {
     isPulling.current = false;
   }, [pullDistance, handleRefresh]);
 
-  const isCompleted = (t: TourTournament) => t.status === 'closed' || t.status === 'complete';
-
   const { liveIds, completedIds } = useMemo(() => {
     if (!tournaments) return { liveIds: [] as string[], completedIds: [] as string[] };
     return {
       liveIds: tournaments.filter(t => t.status === 'inprogress').map(t => t.id),
-      completedIds: tournaments.filter(isCompleted).map(t => t.id),
+      completedIds: tournaments.filter(t => t.status === 'closed').map(t => t.id),
     };
   }, [tournaments]);
 
   const { data: leadersWinnersMap } = useTournamentLeadersWinners([...liveIds, ...completedIds]);
-
-  // Tour priority for hero slide ordering — majors always first
-  const SCHEDULE_TOUR_PRIORITY: Record<string, number> = {
-    pga: 0, LIV: 1, EURO: 2, LPGA: 3, PGAD: 4, CHAMP: 5,
-  };
-
-  function getTournamentPriority(t: TourTournament): number {
-    const label = getContextLabel({ name: t.name, tourName: t.tour_full_name ?? undefined });
-    if (label === 'MAJOR CHAMPIONSHIP') return -1; // always first
-    return SCHEDULE_TOUR_PRIORITY[t.tour_code || ''] ?? 99;
-  }
 
   // Unified hero items for all tabs
   const heroItems = useMemo((): ScheduleHeroItem[] => {
     if (!tournaments) return [];
     const tourFiltered = activeTour === 'all' ? tournaments : tournaments.filter(t => t.tour_code === activeTour);
 
-    // Helper: one per tour, deduped — preserves input sort order (chronological)
+    // Helper: one per tour, deduped
     const onePerTour = (list: TourTournament[], type: ScheduleHeroItem['type']): ScheduleHeroItem[] => {
       const seenTours = new Set<string>();
       return list.filter(t => {
@@ -200,7 +188,7 @@ export function ScheduleTab() {
 
     const liveList = tourFiltered.filter(t => t.status === 'inprogress');
     const completedList = tourFiltered
-      .filter(isCompleted)
+      .filter(t => t.status === 'closed')
       .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime());
     const now = new Date();
     const upcomingList = tourFiltered
@@ -210,8 +198,7 @@ export function ScheduleTab() {
 
     if (filter === 'live') {
       if (liveList.length > 0) {
-        return [...liveList].sort((a, b) => getTournamentPriority(a) - getTournamentPriority(b))
-          .map(t => ({ tournament: t, type: 'live' as const }));
+        return liveList.map(t => ({ tournament: t, type: 'live' as const }));
       }
       // No live tournaments — show next upcoming as hero
       if (upcomingList.length > 0) {
@@ -225,13 +212,16 @@ export function ScheduleTab() {
     }
 
     if (filter === 'upcoming') {
+      // Show live tournaments if any exist, otherwise upcoming per tour
+      if (liveList.length > 0) {
+        return liveList.map(t => ({ tournament: t, type: 'live' as const }));
+      }
       return onePerTour(upcomingList, 'upcoming');
     }
 
-    // 'all' tab: live (sorted by priority) + one completed per tour + one upcoming per tour, capped at 8
+    // 'all' tab: live + one completed per tour + one upcoming per tour, capped at 8
     const items: ScheduleHeroItem[] = [
-      ...[...liveList].sort((a, b) => getTournamentPriority(a) - getTournamentPriority(b))
-        .map(t => ({ tournament: t, type: 'live' as const })),
+      ...liveList.map(t => ({ tournament: t, type: 'live' as const })),
       ...onePerTour(completedList, 'recent'),
       ...onePerTour(upcomingList, 'upcoming'),
     ];
@@ -240,21 +230,23 @@ export function ScheduleTab() {
 
   const filterStats = useMemo(() => {
     if (!tournaments) return { all: 0, live: 0, upcoming: 0, completed: 0 };
+    const now = new Date();
     const tourFiltered = activeTour === 'all' ? tournaments : tournaments.filter(t => t.tour_code === activeTour);
     return {
       all: tourFiltered.length,
       live: tourFiltered.filter(t => t.status === 'inprogress').length,
-      upcoming: tourFiltered.filter(t => t.status === 'scheduled' || t.status === 'created').length,
-      completed: tourFiltered.filter(isCompleted).length,
+      upcoming: tourFiltered.filter(t => t.status === 'scheduled' || t.status === 'created' || isAfter(new Date(t.start_date), now)).length,
+      completed: tourFiltered.filter(t => t.status === 'closed').length,
     };
   }, [tournaments, activeTour]);
 
   const tourCounts = useMemo(() => {
     if (!tournaments) return {} as Record<string, number>;
+    const now = new Date();
     let statusFiltered = [...tournaments];
     switch (filter) {
-      case 'upcoming': statusFiltered = statusFiltered.filter(t => t.status === 'scheduled' || t.status === 'created'); break;
-      case 'completed': statusFiltered = statusFiltered.filter(isCompleted); break;
+      case 'upcoming': statusFiltered = statusFiltered.filter(t => t.status === 'scheduled' || t.status === 'created' || isAfter(new Date(t.start_date), now)); break;
+      case 'completed': statusFiltered = statusFiltered.filter(t => t.status === 'closed'); break;
       case 'live': statusFiltered = statusFiltered.filter(t => t.status === 'inprogress'); break;
     }
     const counts: Record<string, number> = {};
@@ -273,9 +265,10 @@ export function ScheduleTab() {
     if (!tournaments) return [];
     let filtered = [...tournaments];
     if (activeTour !== 'all') filtered = filtered.filter(t => t.tour_code === activeTour);
+    const now = new Date();
     switch (filter) {
-      case 'upcoming': filtered = filtered.filter(t => t.status === 'scheduled' || t.status === 'created'); break;
-      case 'completed': filtered = filtered.filter(isCompleted); break;
+      case 'upcoming': filtered = filtered.filter(t => t.status === 'scheduled' || t.status === 'created' || isAfter(new Date(t.start_date), now)); break;
+      case 'completed': filtered = filtered.filter(t => t.status === 'closed'); break;
       case 'live': filtered = filtered.filter(t => t.status === 'inprogress'); break;
     }
     if (search) {
@@ -288,25 +281,15 @@ export function ScheduleTab() {
         t.tour_full_name?.toLowerCase().includes(searchLower)
       );
     }
-    // Remove hero items from the list on all tabs (they're shown in the carousel above)
-    if (!search && heroItems.length > 0) {
+    // Exclude hero items from list (non-live tabs only)
+    if (filter !== 'live' && filter === 'all' && !search && heroItems.length > 0) {
       const heroIds = new Set(heroItems.map(h => h.tournament.id));
       filtered = filtered.filter(t => !heroIds.has(t.id));
-    }
-    // Sort all-tab: live first, then upcoming chrono, then completed reverse-chrono
-    if (filter === 'all') {
-      filtered.sort((a, b) => {
-        const statusScore = (t: TourTournament) =>
-          t.status === 'inprogress' ? 0 : (t.status === 'scheduled' || t.status === 'created') ? 1 : 2;
-        const ss = statusScore(a) - statusScore(b);
-        if (ss !== 0) return ss;
-        return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
-      });
     }
     return filtered;
   }, [tournaments, filter, activeTour, search, heroItems]);
 
-  const monthGroups = useMemo((): MonthGroup[] => {
+  const monthGroups = useMemo((): (MonthGroup & { tourBreakdown: Record<string, number> })[] => {
     if (!filteredResults.length) return [];
     const groups = new Map<string, TourTournament[]>();
     filteredResults.forEach(tournament => {
@@ -318,7 +301,7 @@ export function ScheduleTab() {
     const entries = Array.from(groups.entries());
     if (filter === 'completed') {
       entries.sort(([a], [b]) => b.localeCompare(a));
-      entries.forEach(([, tournaments]) => tournaments.sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime()));
+      entries.forEach(([, tournaments]) => tournaments.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime()));
     } else {
       entries.sort(([a], [b]) => a.localeCompare(b));
     }
@@ -327,7 +310,7 @@ export function ScheduleTab() {
       for (const t of tournaments) { if (t.tour_code) tourBreakdown[t.tour_code] = (tourBreakdown[t.tour_code] || 0) + 1; }
       return {
         monthKey,
-        monthLabel: format(new Date(tournaments[0].start_date + 'T12:00:00Z'), 'MMMM yyyy'),
+        monthLabel: format(new Date(tournaments[0].start_date + 'T12:00:00Z'), 'MMMM yyyy').toUpperCase(),
         tournaments,
         tourBreakdown,
       };
@@ -338,7 +321,7 @@ export function ScheduleTab() {
   if (isLoading) {
     return (
       <div className="space-y-6 -mx-4">
-        <div className="animate-pulse bg-muted" style={{ height: '45dvh' }} />
+        <div className="animate-pulse bg-muted" style={{ height: 'clamp(282px, 53vh, 422px)' }} />
         <div className="px-4 space-y-3">
           <div className="h-12 bg-muted rounded-xl w-full animate-pulse" />
           <div className="h-11 bg-muted rounded-xl animate-pulse" />
@@ -376,6 +359,7 @@ export function ScheduleTab() {
   return (
     <div
       className="min-h-screen -mx-4"
+      ref={scrollContainerRef}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -420,19 +404,23 @@ export function ScheduleTab() {
       {/* Content below hero */}
       <div className="bg-background pt-3">
         {/* ← Tour Overview back link */}
-        <div className="px-4 pt-3">
+        <div className="px-4 mb-2">
           <button
             type="button"
             onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
-            className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
+            className="text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
           >
-            <ChevronLeft size={14} />
-            Tour Overview
+            ← Tour Overview
           </button>
         </div>
         {/* Search Bar */}
-        <div className="px-4" style={{ marginTop: '16px' }}>
-          <div className="relative">
+        <div className="px-4">
+          <motion.div 
+            className="relative"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.3 }}
+          >
             <Search 
               className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground w-[18px] h-[18px]"
               strokeWidth={2.5}
@@ -442,12 +430,15 @@ export function ScheduleTab() {
               placeholder="Search tournaments, venues, tours..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)}
               className={cn(
-                "w-full h-12 pl-11 pr-10 rounded-2xl text-[13px] transition-all duration-200",
+                "w-full h-12 pl-11 pr-10 rounded-2xl text-[14px] transition-all duration-200",
                 "bg-card border text-foreground placeholder:text-muted-foreground",
                 "focus:outline-none focus:ring-2 focus:bg-card",
-                "border-border/50 ring-transparent",
-                "focus:border-border focus:ring-border/50 focus:shadow-lg"
+                isSearchFocused 
+                  ? "border-border ring-border/50 shadow-lg" 
+                  : "border-border/50 ring-transparent shadow-[0_1px_4px_rgba(0,0,0,0.06)]"
               )}
             />
             <AnimatePresence>
@@ -463,43 +454,45 @@ export function ScheduleTab() {
                 </motion.button>
               )}
             </AnimatePresence>
-          </div>
+          </motion.div>
         </div>
 
         {/* Sticky Filter Toolbar */}
-        <div
-          className="sticky top-0 z-20 -mx-4 px-4 mt-6"
-          style={{
-            background: 'hsl(var(--background) / 0.95)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            borderBottom: '1px solid hsl(var(--border) / 0.15)',
-          }}
+        <motion.div
+          className="sticky top-0 z-20 bg-background/95 backdrop-blur-md px-4 mt-6"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.3 }}
         >
-          <div className="pt-3 pb-1">
+          <div style={{ marginTop: '4px', paddingTop: '8px' }}>
             <ScheduleFilterPills
               activeFilter={filter}
               onFilterChange={setFilter}
               counts={filterStats}
             />
           </div>
-          <div className="pb-2">
+          <div style={{ marginTop: '6px' }}>
             <ScheduleTourFilter
               activeTour={activeTour}
               onTourChange={setActiveTour}
               tourCounts={tourCounts}
             />
           </div>
-        </div>
+        </motion.div>
 
         {/* No Live Message — premium empty state SC-02 */}
         {filter === 'live' && filterStats.live === 0 && (
-          <ScheduleEmptyMessage 
-            variant="no-live" 
-            nextTournamentName={nextUpcoming?.name}
-            nextTournamentDate={nextUpcoming?.start_date}
-            onSwitchFilter={heroItems.length === 0 ? setFilter : undefined}
-          />
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <ScheduleEmptyMessage 
+              variant="no-live" 
+              nextTournamentName={nextUpcoming?.name}
+              nextTournamentDate={nextUpcoming?.start_date}
+              onSwitchFilter={setFilter}
+            />
+          </motion.div>
         )}
         
         {/* Event Cards — Grouped by Month */}
@@ -513,18 +506,22 @@ export function ScheduleTab() {
               transition={{ duration: 0.2 }}
             >
               {monthGroups.map((group, groupIndex) => (
-                <div
+                <motion.div 
                   key={group.monthKey}
                   id={`month-${group.monthKey}`}
                   className={groupIndex > 0 ? 'mt-7' : ''}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: groupIndex * 0.05, duration: 0.3 }}
                 >
-                  {filter !== 'live' && (
+                  {/* Month header (non-sticky) */}
+                  <div>
                     <ScheduleMonthHeader 
                       monthLabel={group.monthLabel}
                       eventCount={group.tournaments.length}
                       tourBreakdown={group.tourBreakdown}
                     />
-                  )}
+                  </div>
 
                   {/* Tournament list — 12px gap from header, 12px between cards */}
                   <div className="flex flex-col gap-3 px-4 mt-3">
@@ -537,7 +534,7 @@ export function ScheduleTab() {
                       </InViewCard>
                     ))}
                   </div>
-                </div>
+                </motion.div>
               ))}
             </motion.div>
           ) : (

@@ -1,6 +1,6 @@
 /**
  * LeadersRunnersStrip — Runner-up cards matching Players page style.
- * bg-card, rounded-2xl, 32×32 rank circles, 36×36 avatars.
+ * bg-card, rounded-2xl, 32×32 amber rank circles, 36×36 avatars.
  * Overlaps hero bottom by ~20px.
  */
 
@@ -18,7 +18,6 @@ interface RunnerItem {
     country_code: string | null;
     photo_url: string | null;
     pga_tour_id: string | null;
-    tour_codes?: string[] | null;
   };
   playerId: string;
   value: number;
@@ -46,7 +45,7 @@ function RunnerCard({
   index: number;
 }) {
   const { player, value, rank } = runner;
-  const photoUrl = getPlayerHeadshotUrl(player.full_name, player.tour_codes?.[0] ?? 'pga');
+  const photoUrl = getPlayerHeadshotUrl(player.full_name, 'pga');
   const lastName = player.full_name.split(' ').slice(-1)[0];
   const fmt = formatOverride ?? category.format;
   const unit = unitOverride ?? category.unit;
@@ -62,7 +61,7 @@ function RunnerCard({
         style={{
           width: 26,
           height: 26,
-          background: index === 0 ? 'rgba(148,163,184,0.9)' : 'rgba(194,135,90,0.9)',
+          background: index === 0 ? '#94A3B8' : '#C2875A',
         }}
       >
         <span style={{ fontSize: 11, fontWeight: 700, color: 'white' }}>{index + 2}</span>
@@ -71,15 +70,10 @@ function RunnerCard({
       {/* Avatar — 36×36, 34% border-radius */}
       <div
         className="flex-shrink-0 overflow-hidden"
-        style={{ width: 36, height: 36, borderRadius: '34%', border: '1px solid rgba(255,255,255,0.18)' }}
+        style={{ width: 36, height: 36, borderRadius: '34%', border: '1px solid hsl(var(--border) / 0.4)' }}
       >
         {photoUrl ? (
-          <img
-            src={photoUrl}
-            alt={player.full_name}
-            style={{ width: 36, height: 36, objectFit: 'cover' }}
-            onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-          />
+          <img src={photoUrl} alt={player.full_name} style={{ width: 36, height: 36, objectFit: 'cover' }} />
         ) : (
           <div className="w-full h-full bg-muted flex items-center justify-center">
             <span className="text-muted-foreground text-xs font-semibold">

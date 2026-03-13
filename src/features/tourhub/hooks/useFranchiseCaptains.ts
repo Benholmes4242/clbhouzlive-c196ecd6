@@ -13,7 +13,6 @@ export interface FranchiseCaptain {
   pgaTourId: string | null;
   earnings: number;
   collegeNormalized: string;
-  tourCode: string;
 }
 
 export function useFranchiseCaptains(collegeNames: string[]) {
@@ -24,6 +23,7 @@ export function useFranchiseCaptains(collegeNames: string[]) {
     queryFn: async () => {
       if (!collegeNames.length || !seasonId) return new Map<string, FranchiseCaptain>();
 
+      // Fetch all players for these colleges with their season earnings
       const { data, error } = await supabase
         .from('sr_player_statistics')
         .select(`
@@ -34,8 +34,7 @@ export function useFranchiseCaptains(collegeNames: string[]) {
             last_name,
             photo_url,
             pga_tour_id,
-            college_normalized,
-            tour_codes
+            college_normalized
           )
         `)
         .eq('season_id', seasonId)
@@ -47,6 +46,7 @@ export function useFranchiseCaptains(collegeNames: string[]) {
         return new Map<string, FranchiseCaptain>();
       }
 
+      // Group by college, take the top earner for each
       const captainMap = new Map<string, FranchiseCaptain>();
 
       for (const row of data || []) {
@@ -62,7 +62,6 @@ export function useFranchiseCaptains(collegeNames: string[]) {
             pgaTourId: player.pga_tour_id || null,
             earnings: row.earnings || 0,
             collegeNormalized: key,
-            tourCode: player.tour_codes?.[0] ?? 'pga',
           });
         }
       }

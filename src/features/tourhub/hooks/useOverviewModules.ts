@@ -32,6 +32,16 @@ export interface LiveTournamentWithLeader {
   } | null;
 }
 
+export interface UpcomingTournament {
+  id: string;
+  name: string;
+  startDate: string;
+  venueCity: string | null;
+  venueCountry: string | null;
+  purse: number | null;
+  tourId: string;
+  tourSlug: TourId;
+}
 
 export interface RankingMover {
   playerId: string;
@@ -89,6 +99,12 @@ export interface CourseThisWeek {
   tourSlug: TourId;
 }
 
+export interface LivePulseStats {
+  liveNow: number;
+  activePlayers: number;
+  birdiesToday: number;
+  avgScore: number;
+}
 
 // ============================================================================
 // Helpers
@@ -189,6 +205,38 @@ export function useLiveRightNow() {
   });
 }
 
+// ============================================================================
+// MODULE 2: Coming Up Next (Next 7 Days)
+// ============================================================================
+
+export function useComingUpNext() {
+  const { data: cache } = useTournamentsCache();
+
+  return useQuery({
+    queryKey: ['overview-coming-up-next', cache ? 'ready' : 'waiting'],
+    queryFn: async () => {
+      if (!cache?.upcoming.length) return [];
+
+      const sevenDaysFromNow = new Date(Date.now() + 7 * 86400000);
+
+      return cache.upcoming
+        .filter(t => new Date(t.start_date) <= sevenDaysFromNow)
+        .slice(0, 8)
+        .map((row): UpcomingTournament => ({
+          id: row.id,
+          name: row.name,
+          startDate: row.start_date,
+          venueCity: row.venue_city,
+          venueCountry: row.venue_country,
+          purse: row.purse,
+          tourId: row.season.tour_id,
+          tourSlug: mapTourSlug(row.season.tour_name),
+        }));
+    },
+    enabled: !!cache,
+    staleTime: 30_000,
+  });
+}
 
 // ============================================================================
 // MODULE 3: Movers This Week (World Rankings)
@@ -801,6 +849,59 @@ export function useCoursesThisWeek() {
   });
 }
 
+// ============================================================================
+// MODULE 7: Live Golf Pulse
+// ============================================================================
+
+export function useLiveGolfPulse() {
+  return useQuery({
+    queryKey: ['overview-live-pulse'],
+    queryFn: async () => {
+      // Parallel queries
+      const [liveRes, activePlayersRes] = await Promise.all([
+        supabase
+          .from('sr_tournaments')
+          .select('id', { count: 'exact', head: true })
+          .eq('status', 'inprogress'),
+        supabase
+          .from('sr_leaderboards')
+          .select('id', { count: 'exact', head: true })
+          .in('status', ['active', 'cut']),
+      ]);
+
+      // Get all leaderboard data for live tournaments to calculate stats
+      const { data: liveLeaderboards } = await supabase
+        .from('sr_leaderboards')
+        .select(`
+          score,
+          tournament:sr_tournaments!inner(status)
+        `)
+        .eq('sr_tournaments.status', 'inprogress');
+
+      // Calculate average score
+      const scores = (liveLeaderboards || [])
+        .map((l: any) => l.score)
+        .filter((s: number | null) => s !== null && !isNaN(s));
+      
+      const avgScore = scores.length > 0 
+        ? scores.reduce((a: number, b: number) => a + b, 0) / scores.length 
+        : 0;
+
+      // Estimate birdies (scores under par indicate birdies made)
+      const birdiesToday = scores.filter((s: number) => s < 0).length * 3; // Rough estimate
+
+      return {
+        liveNow: liveRes.count || 0,
+        activePlayers: activePlayersRes.count || 0,
+        birdiesToday,
+        avgScore: Math.round(avgScore * 10) / 10,
+      } as LivePulseStats;
+    },
+    staleTime: 5 * 1000,          // 5s — Realtime handles freshness
+    refetchInterval: false,        // No polling — Realtime pushes updates
+    refetchOnWindowFocus: true,
+  });
+}
 
 // ============================================================================
 // MODULE 8: World Rankings Full (Top 200 for browsing)

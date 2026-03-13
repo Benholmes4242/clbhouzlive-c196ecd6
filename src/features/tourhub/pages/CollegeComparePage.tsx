@@ -1,9 +1,9 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import { TourHubShell } from '../components';
+import { CollegeCompareHero } from '../components/college/CollegeCompareHero';
 import { useCollegeCompare } from '../hooks/useCollegeCompare';
 import { openTourNav } from '../contexts/TourNavContext';
-import { formatCurrency } from '@/lib/utils/formatCurrency';
 
 /**
  * College Compare Page - Side-by-side comparison of two colleges.
@@ -18,7 +18,7 @@ export function CollegeComparePage() {
   const { data, isLoading, error } = useCollegeCompare(c1, c2);
   
   const hasValidParams = c1 && c2;
-
+  
   return (
     <TourHubShell>
       <div
@@ -69,17 +69,7 @@ export function CollegeComparePage() {
               </p>
             </div>
           ) : data ? (
-            <div className="space-y-6 mt-4">
-              <div className="grid grid-cols-2 gap-4">
-                {[data.college1, data.college2].map((college, i) => (
-                  <div key={i} className="bg-card border border-border/50 rounded-2xl p-4 text-center">
-                    <h3 className="text-foreground text-lg font-bold mb-2">{college?.media?.short_name || college?.media?.college_name || (i === 0 ? c1 : c2)}</h3>
-                    <p className="text-muted-foreground text-sm">{formatCurrency(college?.stats?.earnings_total ?? 0)} earnings</p>
-                    <p className="text-muted-foreground text-sm">{college?.stats?.wins_total ?? 0} wins · {college?.stats?.player_count ?? 0} pros</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <CollegeCompareHero data={data} onBack={() => navigate(-1)} />
           ) : null}
         </div>
       </div>

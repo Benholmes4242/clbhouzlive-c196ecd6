@@ -31,9 +31,10 @@ export interface ScheduleHeroItem {
 interface ScheduleHeroCarouselProps {
   items: ScheduleHeroItem[];
   leadersMap?: Map<string, TournamentLeaderWinner>;
+  height?: string;
 }
 
-export function ScheduleHeroCarousel({ items, leadersMap }: ScheduleHeroCarouselProps) {
+export function ScheduleHeroCarousel({ items, leadersMap, height }: ScheduleHeroCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const touchStartRef = useRef(0);
   const touchDeltaRef = useRef(0);
@@ -63,19 +64,6 @@ export function ScheduleHeroCarousel({ items, leadersMap }: ScheduleHeroCarousel
     return () => { if (autoAdvanceRef.current) clearInterval(autoAdvanceRef.current); };
   }, [startAutoAdvance]);
 
-  // Pause auto-advance when app is backgrounded
-  useEffect(() => {
-    const handleVisibility = () => {
-      if (document.hidden) {
-        pausedRef.current = true;
-      } else {
-        setTimeout(() => { pausedRef.current = false; }, 1000);
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibility);
-    return () => document.removeEventListener('visibilitychange', handleVisibility);
-  }, []);
-
   const handleTouchStart = (e: React.TouchEvent) => {
     pausedRef.current = true;
     touchStartRef.current = e.touches[0].clientX;
@@ -101,25 +89,50 @@ export function ScheduleHeroCarousel({ items, leadersMap }: ScheduleHeroCarousel
 
   const currentItem = items[Math.min(activeIndex, count - 1)];
 
+  if (count === 1) {
+    return (
+      <div className="relative">
+        <button 
+          className="absolute z-20 flex items-center justify-center"
+          style={{ top: '56px', left: '16px', width: '44px', height: '44px' }}
+          onClick={openTourNav}
+          aria-label="Open tour menu"
+        >
+          <Menu 
+            className="w-[22px] h-[22px]" 
+            strokeWidth={2}
+            style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5))' }}
+          />
+        </button>
+        <ScheduleHeroCard
+          tournament={currentItem.tournament}
+          type={currentItem.type}
+          leaderWinner={leadersMap?.get(currentItem.tournament.id)}
+          currentIndex={0}
+          totalSlides={1}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="relative">
-      <button
-        className="fixed z-20 flex items-center justify-center"
-        style={{ top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: '16px', width: '44px', height: '44px' }}
+      <button 
+        className="absolute z-20 flex items-center justify-center"
+        style={{ top: '56px', left: '16px', width: '44px', height: '44px' }}
         onClick={openTourNav}
         aria-label="Open tour menu"
       >
-        <Menu
-          className="w-[22px] h-[22px]"
+        <Menu 
+          className="w-[22px] h-[22px]" 
           strokeWidth={2}
           style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5))' }}
         />
       </button>
-
       <div
-        onTouchStart={count > 1 ? handleTouchStart : undefined}
-        onTouchMove={count > 1 ? handleTouchMove : undefined}
-        onTouchEnd={count > 1 ? handleTouchEnd : undefined}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         <AnimatePresence mode="wait">
           <motion.div
@@ -135,11 +148,12 @@ export function ScheduleHeroCarousel({ items, leadersMap }: ScheduleHeroCarousel
               leaderWinner={leadersMap?.get(currentItem.tournament.id)}
               currentIndex={activeIndex}
               totalSlides={count}
-              onDotClick={count > 1 ? (i) => { setActiveIndex(i); pausedRef.current = false; startAutoAdvance(); } : undefined}
+              onDotClick={(i) => { setActiveIndex(i); pausedRef.current = false; startAutoAdvance(); }}
             />
           </motion.div>
         </AnimatePresence>
       </div>
+
     </div>
   );
 }

@@ -1,7 +1,26 @@
+// Overview V3 Components - World-class Tour Hub Overview
+
 export { HeroCarousel } from './HeroCarousel';
+export { TourSwitcher } from './TourSwitcher';
+export { ThisWeekView } from './ThisWeekView';
+export { TourBreakdown } from './TourBreakdown';
+
+// New Modules
 export { LiveRightNow } from './LiveRightNow';
+
+export { MoversThisWeek } from './MoversThisWeek';
+export { LiveGolfPulse } from './LiveGolfPulse';
+export { SeasonStatsShowcase } from './SeasonStatsShowcase';
+
+// Unified World Rankings (combines Movers + OWGR Table)
 export { UnifiedWorldRankings } from './UnifiedWorldRankings';
-export { LazySection } from './LazySection';
-export { WhatsComing } from './WhatsComing';
-// SeasonLeaderboards imported directly from './SeasonLeaderboards' subfolder
-// CollegeRankingsPreview imported directly from './CollegeRankingsPreview'
+
+// Gamified Tour Hub Modules
+export { PowerLadderModule } from './PowerLadderModule';
+export { LiveArenaHero } from './LiveArenaHero';
+
+// Unified Season Leaderboards (replaces SkillTreeModule + SeasonStatsCarousel)
+export { SeasonLeaderboards } from './SeasonLeaderboards';
+
+// Tournament Schedule
+export { ScheduleModule } from './ScheduleModule';

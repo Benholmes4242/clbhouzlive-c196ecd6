@@ -15,7 +15,7 @@ interface CategoryGroup {
 }
 
 const CATEGORY_GROUPS: { label: string; keys: string[] }[] = [
-  { label: 'General', keys: ['world_rank', 'events_played', 'cuts_made', 'top_10', 'earnings', 'strokes_gained_total', 'scoring_avg'] },
+  { label: 'General', keys: ['world_rank', 'events_played', 'cuts_made', 'top_10', 'earnings', 'scoring_avg'] },
   { label: 'Ball Striking', keys: ['drive_avg', 'drive_acc', 'gir_pct'] },
   { label: 'Short Game', keys: ['putt_avg', 'sand_saves_pct', 'scrambling_pct'] },
 ];
@@ -24,14 +24,12 @@ interface LeadersCategorySheetProps {
   categories: LeaderCategory[];
   activeKey: string;
   onCategoryChange: (key: string) => void;
-  leaderValue?: string;
 }
 
 export function LeadersCategorySheet({
   categories,
   activeKey,
   onCategoryChange,
-  leaderValue,
 }: LeadersCategorySheetProps) {
   const [open, setOpen] = useState(false);
 
@@ -64,24 +62,17 @@ export function LeadersCategorySheet({
           border: '1px solid hsl(var(--border) / 0.5)',
           borderRadius: 16,
           padding: '12px 16px',
+          
         }}
         aria-haspopup="dialog"
         aria-expanded={open}
       >
         <div className="flex items-center gap-2.5">
-          <ActiveIcon
-            className="w-5 h-5 shrink-0"
-            style={{ color: activeKey !== 'world_rank' ? activeCategory.accentColor : 'hsl(var(--muted-foreground))' }}
-          />
+          <ActiveIcon className="w-5 h-5 text-muted-foreground" />
           <span style={{ fontSize: 14, fontWeight: 600 }} className="text-foreground">{activeCategory.shortLabel}</span>
           <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.5px', textTransform: 'uppercase' as const }} className="text-muted-foreground">
             Leaderboard
           </span>
-          {leaderValue && (
-            <span style={{ fontSize: 11, fontWeight: 700, color: 'hsl(var(--muted-foreground) / 0.5)' }}>
-              · {leaderValue}
-            </span>
-          )}
         </div>
         <ChevronDown className="w-4 h-4 text-muted-foreground opacity-60" />
       </button>
@@ -124,7 +115,7 @@ export function LeadersCategorySheet({
                 >
                   {group.label}
                 </p>
-                <div className="grid grid-cols-2" style={{ gap: 8 }} role="group" aria-label={group.label}>
+                <div className="grid grid-cols-2" style={{ gap: 8 }}>
                   {group.categories.map((cat) => {
                     const isActive = activeKey === cat.key;
                     const Icon = cat.icon;
@@ -132,14 +123,12 @@ export function LeadersCategorySheet({
                       <button
                         key={cat.key}
                         onClick={() => handleSelect(cat.key)}
-                        aria-pressed={isActive}
                         className={cn(
-                          'flex flex-col text-left transition-all duration-150',
+                          'flex items-center gap-2.5 text-left transition-all duration-150',
                         )}
                         style={{
                           borderRadius: 12,
-                          padding: '12px 14px',
-                          minWidth: 0,
+                          padding: '14px 16px',
                           border: isActive
                             ? '1px solid hsl(var(--foreground))'
                             : '1px solid hsl(var(--border) / 0.5)',
@@ -148,32 +137,18 @@ export function LeadersCategorySheet({
                           fontWeight: isActive ? 600 : 500,
                         }}
                       >
-                        <div className="flex items-center gap-2.5 w-full min-w-0">
-                          <Icon
-                            className="w-5 h-5 shrink-0"
-                            style={{
-                              color: isActive ? 'white' : 'hsl(var(--muted-foreground) / 0.5)',
-                            }}
-                          />
-                          <span style={{ fontSize: 14 }} className="flex-1 truncate">
-                            {cat.shortLabel}
-                          </span>
-                          {isActive && (
-                            <Check className="w-4 h-4 shrink-0" style={{ color: 'white' }} />
-                          )}
-                        </div>
-                        <span
+                        <Icon
+                          className="w-5 h-5 shrink-0"
                           style={{
-                            fontSize: 11,
-                            color: isActive ? 'rgba(255,255,255,0.6)' : 'hsl(var(--muted-foreground) / 0.5)',
-                            display: 'block',
-                            marginTop: 2,
-                            lineHeight: 1.3,
+                            color: isActive ? 'white' : 'hsl(var(--muted-foreground) / 0.5)',
                           }}
-                          className="truncate"
-                        >
-                          Tour avg: {cat.tourAverage}
+                        />
+                        <span style={{ fontSize: 14 }} className="flex-1 truncate">
+                          {cat.shortLabel}
                         </span>
+                        {isActive && (
+                          <Check className="w-4 h-4 shrink-0" style={{ color: 'white' }} />
+                        )}
                       </button>
                     );
                   })}
@@ -184,7 +159,7 @@ export function LeadersCategorySheet({
         </div>
 
         {/* Safe area bottom padding */}
-        <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 8px)' }} />
+        <div style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }} />
       </BottomSheet>
     </>
   );
