@@ -160,7 +160,7 @@ export function ScheduleTournamentCard({
           <p className="flex items-center gap-1 mt-0.5" style={{ fontSize: '13px', fontWeight: 500 }}>
             {isFinal && winnerDisplay && (
               <span className="text-muted-foreground">
-                <Trophy className="w-3.5 h-3.5 inline mr-0.5" style={{ color: '#f59e0b' }} />
+                <Trophy className="w-3.5 h-3.5 inline mr-0.5" style={{ color: TOUR_COLORS.liveAmber }} />
                 <button
                   onClick={handlePlayerTap}
                   className="transition-opacity active:opacity-70 inline font-semibold"
