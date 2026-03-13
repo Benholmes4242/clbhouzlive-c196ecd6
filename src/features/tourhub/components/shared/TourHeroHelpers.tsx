@@ -67,7 +67,7 @@ function FrostedAvatar({ src, displayName, size }: { src: string | null; display
       {currentSrc && !imgError ? (
         <img src={currentSrc} alt={displayName} onLoad={handleLoad} onError={handleError} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
       ) : (
-        <span style={{ fontSize: Math.round(size * 0.35), fontWeight: 700, color: 'rgba(255,255,255,0.65)', lineHeight: 1 }}>{initials}</span>
+        <span style={{ fontSize: Math.round(size * 0.35), fontWeight: 700, color: 'rgba(255,255,255,0.80)', lineHeight: 1 }}>{initials}</span>
       )}
     </div>
   );
