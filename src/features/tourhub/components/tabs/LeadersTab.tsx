@@ -6,7 +6,7 @@
  */
 
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, ChevronLeft } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -158,6 +158,11 @@ export function LeadersTab() {
     return (
       <div className="space-y-4 animate-pulse py-4">
         <div className="rounded-2xl bg-muted/40" style={{ height: '45dvh' }} />
+        {/* Runner card skeletons */}
+        <div className="flex gap-2 px-4" style={{ marginTop: '-20px', position: 'relative', zIndex: 10 }}>
+          <div className="flex-1 h-[60px] rounded-2xl bg-muted/40 animate-pulse" />
+          <div className="flex-1 h-[60px] rounded-2xl bg-muted/40 animate-pulse" />
+        </div>
         <div className="flex gap-2 overflow-hidden px-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-9 w-20 rounded-full bg-muted/40 shrink-0" />
@@ -175,7 +180,7 @@ export function LeadersTab() {
   // ─── Hero leader (#1) ───
   const leader = rankedPlayers[0] ?? null;
   const runners = rankedPlayers.slice(1, 3);
-  const listPlayers = rankedPlayers;
+  const listPlayers = rankedPlayers.slice(3);
 
   return (
     <div
@@ -220,26 +225,28 @@ export function LeadersTab() {
       )}
 
       {/* ← Tour Overview back link */}
-      <div className="px-4 pt-3 pb-0">
-        <button
-          onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
+      <div className="px-4" style={{ marginTop: '20px' }}>
+        <Link
+          to="/tourhub?tab=overview"
+          replace
           className="inline-flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
         >
           <ChevronLeft size={14} />
           Tour Overview
-        </button>
+        </Link>
       </div>
 
       {/* Content area */}
-      <div className="px-4" style={{ paddingTop: 8, paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
+      <div className="px-4" style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
         {/* Category selector — sticky */}
         <div
-          className="sticky top-0 z-20 -mx-4 px-4 pt-2 pb-2"
+          className="sticky top-0 z-20 -mx-4 px-4 pt-3 pb-2"
           style={{
             background: 'hsl(var(--background) / 0.95)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
             borderBottom: '1px solid hsl(var(--border) / 0.15)',
+            marginTop: '12px',
           }}
         >
           <LeadersCategorySheet
@@ -249,7 +256,7 @@ export function LeadersTab() {
           />
         </div>
 
-        {/* Rankings list (#4–50) — 12px gap from dropdown */}
+        {/* Rankings list (#4–50) */}
         <div style={{ marginTop: 16 }}>
           <AnimatePresence mode="wait">
             <motion.div
@@ -264,7 +271,7 @@ export function LeadersTab() {
                   {listPlayers.map((item, idx) => (
                     <LeaderRow
                       key={item.playerId}
-                      rank={idx + 1}
+                      rank={item.rank}
                       overrideRank={isWorldCategory ? item.rank : undefined}
                       player={{
                         id: item.playerId,
@@ -273,6 +280,7 @@ export function LeadersTab() {
                         countryCode: item.player.country_code,
                         photoUrl: item.player.photo_url,
                         pgaTourId: item.player.pga_tour_id,
+                        tourCodes: item.player.tour_codes ?? null,
                       }}
                       value={item.value}
                       leaderValue={rankedPlayers[0]?.value ?? item.value}

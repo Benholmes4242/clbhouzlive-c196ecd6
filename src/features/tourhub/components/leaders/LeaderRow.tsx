@@ -117,8 +117,13 @@ export function LeaderRow({
           <p style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px' }} className="text-foreground truncate leading-tight">
             {player.fullName}
           </p>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <CountryFlag country={player.countryCode || player.country} size="sm" />
+            {player.country && (
+              <span style={{ fontSize: 11, color: 'hsl(var(--muted-foreground) / 0.6)' }}>
+                {player.country}
+              </span>
+            )}
           </div>
         </div>
 
