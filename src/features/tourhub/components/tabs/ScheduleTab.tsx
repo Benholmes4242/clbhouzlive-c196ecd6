@@ -10,7 +10,7 @@
  * SC-17: Scroll position via sessionStorage
  */
 
-import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Search, X, AlertCircle, RefreshCw } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
