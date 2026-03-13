@@ -507,7 +507,7 @@ function CommentsSheet({
               'md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[560px]',
               isDark ? 'bg-[#0d0d0d]' : 'bg-background'
             )}
-            style={{ minHeight: 'min(72dvh, 520px)', maxHeight: '92dvh' }}
+            style={{ minHeight: 'min(52dvh, 380px)', maxHeight: '92dvh' }}
           >
             {/* Drag handle */}
             <div className="flex justify-center pt-2.5 pb-1 shrink-0">
