@@ -14,10 +14,10 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-const OPENAI_MODEL = "gpt-4o-mini";
-const PERPLEXITY_MODEL = "sonar";
-const ANTHROPIC_MODEL = "claude-sonnet-4-20250514";
-const GEMINI_MODEL = "gemini-1.5-pro";
+const OPENAI_MODEL = "gpt-4o";
+const PERPLEXITY_MODEL = "llama-3.1-sonar-large-128k-online";
+const ANTHROPIC_MODEL = "claude-sonnet-4-5";
+const GEMINI_MODEL = "gemini-1.5-pro-latest";
 const DEFAULT_TIMEZONE = "Europe/London";
 
 // Rate limiting config
@@ -273,6 +273,7 @@ async function streamClaude(
   }), 30000);
 
   if (!response.ok) {
+    console.error(`[Echo] Provider failure — Anthropic | model: ${ANTHROPIC_MODEL} | status: ${response.status}`);
     throw new Error(`Claude API error: ${response.status}`);
   }
 
@@ -332,7 +333,10 @@ async function callGemini(
     }
   ), 20000);
 
-  if (!response.ok) throw new Error(`Gemini API error: ${response.status}`);
+  if (!response.ok) {
+    console.error(`[Echo] Provider failure — Gemini | model: ${GEMINI_MODEL} | status: ${response.status}`);
+    throw new Error(`Gemini API error: ${response.status}`);
+  }
   const data = await response.json();
   return data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
 }
@@ -359,7 +363,10 @@ async function callGPT4o(
     }),
   }), 20000);
 
-  if (!response.ok) throw new Error(`GPT-4o API error: ${response.status}`);
+  if (!response.ok) {
+    console.error(`[Echo] Provider failure — OpenAI | model: gpt-4o | status: ${response.status}`);
+    throw new Error(`GPT-4o API error: ${response.status}`);
+  }
   const data = await response.json();
   return data?.choices?.[0]?.message?.content || '';
 }
@@ -725,7 +732,10 @@ async function* streamPerplexity(query: string, nowIso: string, history: Array<{
     }),
   }), 30000);
   
-  if (!resp.ok) throw new Error(`Perplexity error: ${await resp.text()}`);
+  if (!resp.ok) {
+    console.error(`[Echo] Provider failure — Perplexity | model: ${PERPLEXITY_MODEL} | status: ${resp.status}`);
+    throw new Error(`Perplexity error: ${await resp.text()}`);
+  }
   
   const reader = resp.body?.getReader();
   if (!reader) throw new Error("No response body");
@@ -799,7 +809,10 @@ async function callPerplexity(query: string, nowIso: string, history: Array<{ ro
     headers: { Authorization: `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({ model: PERPLEXITY_MODEL, messages, temperature: 0.2 }),
   }), 20000);
-  if (!resp.ok) throw new Error(`Perplexity error: ${await resp.text()}`);
+  if (!resp.ok) {
+    console.error(`[Echo] Provider failure — Perplexity (non-stream) | model: ${PERPLEXITY_MODEL} | status: ${resp.status}`);
+    throw new Error(`Perplexity error: ${await resp.text()}`);
+  }
   const data = await resp.json();
   let content = data.choices?.[0]?.message?.content?.trim() || "";
   content = content.replace(/\[\d+\]/g, '');
