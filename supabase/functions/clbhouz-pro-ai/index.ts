@@ -333,7 +333,10 @@ async function callGemini(
     }
   ), 20000);
 
-  if (!response.ok) throw new Error(`Gemini API error: ${response.status}`);
+  if (!response.ok) {
+    console.error(`[Echo] Provider failure — Gemini | model: ${GEMINI_MODEL} | status: ${response.status}`);
+    throw new Error(`Gemini API error: ${response.status}`);
+  }
   const data = await response.json();
   return data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
 }
