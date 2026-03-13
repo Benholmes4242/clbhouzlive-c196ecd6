@@ -273,6 +273,7 @@ async function streamClaude(
   }), 30000);
 
   if (!response.ok) {
+    console.error(`[Echo] Provider failure — Anthropic | model: ${ANTHROPIC_MODEL} | status: ${response.status}`);
     throw new Error(`Claude API error: ${response.status}`);
   }
 
