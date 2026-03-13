@@ -1,6 +1,23 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+// Major tour code override — Sportradar stores Grand Slams under EURO (Race to Dubai co-sanctioning)
+const MAJOR_NAMES_TO_PGA: string[] = [
+  'masters tournament',
+  'pga championship',
+  'u.s. open',
+  'the open championship',
+];
+
+function isMiscodedMajor(name: string, tourCode: string | null): boolean {
+  if (tourCode === 'pga') return false;
+  const lower = name.toLowerCase();
+  return MAJOR_NAMES_TO_PGA.some(m => lower.includes(m))
+    && !lower.includes('senior')
+    && !lower.includes('women')
+    && !lower.includes('bmw');
+}
+
 // Types based on database schema
 export interface TourSeason {
   id: string;
@@ -243,12 +260,18 @@ export function useTourTournaments(seasonId?: string, options?: UseTourTournamen
       console.log('[useTourTournaments] Loaded tournaments:', data?.length || 0);
       
       // Enrich tournaments with tour info from joined season
-      return (data || []).map((t: any) => ({
-        ...t,
-        tour_code: t.season?.tour_name || null,
-        tour_full_name: t.season?.tour_full_name || null,
-        season: undefined, // Remove the nested object
-      })) as TourTournament[];
+      return (data || []).map((t: any) => {
+        const rawTourCode = t.season?.tour_name || null;
+        const rawTourFullName = t.season?.tour_full_name || null;
+        const tourCode = isMiscodedMajor(t.name, rawTourCode) ? 'pga' : rawTourCode;
+        const tourFullName = isMiscodedMajor(t.name, rawTourCode) ? 'PGA Tour' : rawTourFullName;
+        return {
+          ...t,
+          tour_code: tourCode,
+          tour_full_name: tourFullName,
+          season: undefined,
+        };
+      }) as TourTournament[];
     },
     enabled: true,
     staleTime: 5 * 60 * 1000,
@@ -272,10 +295,14 @@ export function useTourTournament(tournamentId: string) {
         return null;
       }
       const t = data as any;
+      const rawTourCode = t.season?.tour_name || null;
+      const rawTourFullName = t.season?.tour_full_name || null;
+      const tourCode = isMiscodedMajor(t.name, rawTourCode) ? 'pga' : rawTourCode;
+      const tourFullName = isMiscodedMajor(t.name, rawTourCode) ? 'PGA Tour' : rawTourFullName;
       return {
         ...t,
-        tour_code: t.season?.tour_name || null,
-        tour_full_name: t.season?.tour_full_name || null,
+        tour_code: tourCode,
+        tour_full_name: tourFullName,
         season: undefined,
       } as TourTournament;
     },
