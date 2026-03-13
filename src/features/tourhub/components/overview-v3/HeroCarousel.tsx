@@ -306,7 +306,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
 
   // Full leaderboard — only fetched when expanded
   const { data: fullLeaderboard = [], isLoading: isLoadingFull, isError: isFullError, refetch: refetchFull } = useTourLeaderboard(
-    isExpanded && isLive ? tournament.id : ''
+    isLive ? tournament.id : ''
   );
   
   // Realtime updates — always subscribe when live so collapsed hero stays fresh
