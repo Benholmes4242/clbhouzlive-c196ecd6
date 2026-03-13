@@ -146,7 +146,17 @@ export function ScheduleTournamentCard({
           >
             {isLive ? '● LIVE' : contextLabel}
           </p>
-        </div>
+          {isLive && leaderWinner && (() => {
+            const roundInfo = getCurrentRound(
+              leaderWinner.round1, leaderWinner.round2,
+              leaderWinner.round3, leaderWinner.round4
+            );
+            return roundInfo ? (
+              <span style={{ fontSize: '10px', fontWeight: 500, color: 'hsl(var(--muted-foreground) / 0.6)', letterSpacing: '0.03em' }}>
+                R{roundInfo.currentRound}
+              </span>
+            ) : null;
+          })()}
         
         {/* Tournament name */}
         <p

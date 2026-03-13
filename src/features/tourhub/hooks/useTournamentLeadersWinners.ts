@@ -123,6 +123,11 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
           pgaTourId: player?.pga_tour_id || null,
           displayName: formatDisplayName(firstName, lastName),
           displayScore: formatScore(entry.score),
+          round1: (entry as any).round_1 ?? null,
+          round2: (entry as any).round_2 ?? null,
+          round3: (entry as any).round_3 ?? null,
+          round4: (entry as any).round_4 ?? null,
+          thru: (entry as any).thru ?? null,
         });
       }
 

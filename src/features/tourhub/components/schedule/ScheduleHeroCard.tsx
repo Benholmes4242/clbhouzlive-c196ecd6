@@ -349,7 +349,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                         </button>
                         <span
                           className="score-mono"
-                          style={{ fontSize: '18px', fontWeight: 800, color: '#FFFFFF', flexShrink: 0 }}
+                          style={{ fontSize: '18px', fontWeight: 800, color: getFinishedScoreColor(leaderWinner.score), flexShrink: 0 }}
                         >
                           {leaderWinner.displayScore}
                         </span>
@@ -360,6 +360,22 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                     </div>
                   </div>
                 )}
+
+                {/* 2nd place runner */}
+                {leaderWinner && leaderWinner.topFinishers && leaderWinner.topFinishers.length > 1 && leaderWinner.topFinishers[1].playerId !== leaderWinner.playerId && (
+                  <div style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '5px 8px', marginTop: 4,
+                  }}>
+                    <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.5)' }}>
+                      T{leaderWinner.topFinishers[1].position} {leaderWinner.topFinishers[1].displayName}
+                    </span>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: getFinishedScoreColor(leaderWinner.topFinishers[1].score) }}>
+                      {leaderWinner.topFinishers[1].displayScore}
+                    </span>
+                  </div>
+                )}
+
                 <div className="hero-text-cta w-full" style={{ marginTop: '8px' }}>
                   <span>See Leaderboard</span>
                   <ChevronRight className="w-4 h-4 cta-chevron" />

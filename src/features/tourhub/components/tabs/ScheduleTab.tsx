@@ -514,11 +514,13 @@ export function ScheduleTab() {
                   id={`month-${group.monthKey}`}
                   className={groupIndex > 0 ? 'mt-7' : ''}
                 >
-                  <ScheduleMonthHeader 
-                    monthLabel={group.monthLabel}
-                    eventCount={group.tournaments.length}
-                    tourBreakdown={group.tourBreakdown}
-                  />
+                  {filter !== 'live' && (
+                    <ScheduleMonthHeader 
+                      monthLabel={group.monthLabel}
+                      eventCount={group.tournaments.length}
+                      tourBreakdown={group.tourBreakdown}
+                    />
+                  )}
 
                   {/* Tournament list — 12px gap from header, 12px between cards */}
                   <div className="flex flex-col gap-3 px-4 mt-3">
