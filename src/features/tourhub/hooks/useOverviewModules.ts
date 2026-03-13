@@ -934,17 +934,7 @@ export function useWorldRankingsFull() {
   return useQuery({
     queryKey: ['world-rankings-full'],
     queryFn: async (): Promise<WorldRankingEntry[]> => {
-      // First get the latest ranking_date to avoid duplicate rows from older syncs
-      const { data: latestDateRow } = await supabase
-        .from('sr_world_rankings')
-        .select('ranking_date')
-        .order('ranking_date', { ascending: false })
-        .limit(1)
-        .single();
-      
-      const latestDate = latestDateRow?.ranking_date;
-
-      let query = supabase
+      const { data, error } = await supabase
         .from('sr_world_rankings')
         .select(`
           rank,
@@ -967,21 +957,20 @@ export function useWorldRankingsFull() {
         `)
         .gte('rank', 1)
         .lte('rank', 200)
+        .order('ranking_date', { ascending: false })
         .order('rank', { ascending: true });
-      
-      if (latestDate) {
-        query = query.eq('ranking_date', latestDate);
-      }
 
-      const { data, error } = await query;
-      
       if (error) {
         console.error('[WorldRankings] Query error:', error);
         throw error;
       }
+
+      // Post-filter to latest date
+      const latestDate = data?.[0]?.ranking_date ?? null;
+      const latestRows = latestDate ? (data ?? []).filter(r => r.ranking_date === latestDate) : (data ?? []);
       
       // Process data to extract all stats from raw_data.statistics
-      return (data || []).map((entry: any): WorldRankingEntry => {
+      return latestRows.map((entry: any): WorldRankingEntry => {
         // Calculate rank change (positive = moved up, negative = moved down)
         const rankChange = entry.prior_rank ? entry.prior_rank - entry.rank : 0;
         
