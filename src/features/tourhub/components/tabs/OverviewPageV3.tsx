@@ -13,7 +13,7 @@
  * 7. College Golf Rankings (NEW - preview of college leaderboard)
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   HeroCarousel,
@@ -34,7 +34,7 @@ import { WifiOff } from 'lucide-react';
 
 export function OverviewPageV3() {
   const { isOnline } = useNetworkStatus();
-  const { hideBottomNav, showBottomNav } = useBottomNavigation();
+  const { showBottomNav } = useBottomNavigation();
 
   // Prevent pull-down overscroll bounce on this immersive page
   usePreventOverscroll();
@@ -42,50 +42,10 @@ export function OverviewPageV3() {
   // Set transparent status bar with WHITE icons for dark hero image
   useMedianStatusBar("dark", "transparent", true, false);
 
-  // Hide nav immediately on mount, restore on unmount
+  // Force bottom nav visible whenever this page is mounted
   useEffect(() => {
-    hideBottomNav();
-    return () => { showBottomNav(); };
-  }, [hideBottomNav, showBottomNav]);
-
-  // Show nav when user scrolls past the hero threshold, hide again near top
-  useEffect(() => {
-    const THRESHOLD = window.innerHeight * 0.8;
-    let isNavVisible = false;
-    const appShell = document.querySelector('.app-shell') as HTMLElement | null;
-
-    const getScrollY = () => {
-      return Math.max(
-        window.scrollY || 0,
-        window.pageYOffset || 0,
-        document.documentElement.scrollTop || 0,
-        document.body.scrollTop || 0,
-        appShell?.scrollTop || 0
-      );
-    };
-
-    const handleScroll = () => {
-      const scrollY = getScrollY();
-      if (scrollY > THRESHOLD && !isNavVisible) {
-        isNavVisible = true;
-        showBottomNav();
-      } else if (scrollY <= THRESHOLD && isNavVisible) {
-        isNavVisible = false;
-        hideBottomNav();
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    appShell?.addEventListener('scroll', handleScroll, { passive: true });
-
-    // Sync immediately in case page is restored at a scrolled position
-    handleScroll();
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      appShell?.removeEventListener('scroll', handleScroll);
-    };
-  }, [hideBottomNav, showBottomNav]);
+    showBottomNav();
+  }, [showBottomNav]);
 
   return (
     <motion.div
