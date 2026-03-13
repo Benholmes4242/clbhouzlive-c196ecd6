@@ -165,7 +165,7 @@ const EngagementRail = ({
         className
       )}
       style={{ 
-        bottom: 'calc(30px + clamp(6px, var(--bottom-nav-height, 72px) + 18px - var(--chrome-bottom-shift, 0px), calc(var(--bottom-nav-height, 72px) + 18px)))' 
+        bottom: '97px' 
       }}
     >
       {/* Three dots menu - only show for own posts */}

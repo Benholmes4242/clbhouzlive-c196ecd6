@@ -25,11 +25,15 @@ function VideosSearchOverlayInner({ isOpen, onClose, userId }: VideosSearchOverl
     userId,
     filter: 'latest',
     searchQuery: query || undefined,
+    enabled: !!query,
   });
 
   const handleSearch = useCallback((q: string) => {
     setQuery(q);
-    if (q.trim()) addSearch(q.trim());
+  }, []);
+
+  const handleCommit = useCallback((term: string) => {
+    if (term.trim()) addSearch(term.trim());
   }, [addSearch]);
 
   return (
@@ -38,6 +42,7 @@ function VideosSearchOverlayInner({ isOpen, onClose, userId }: VideosSearchOverl
       onClose={onClose}
       placeholder="Search videos..."
       onSearch={handleSearch}
+      onCommit={handleCommit}
       recentSearches={recentSearches}
       onClearRecent={clearAll}
       onRemoveRecent={removeSearch}
@@ -65,8 +70,14 @@ function VideosSearchOverlayInner({ isOpen, onClose, userId }: VideosSearchOverl
           </div>
         ) : (
           <div className="flex flex-col gap-4 px-4 pb-4">
-            {posts.map(post => (
-              <VideoCard key={post.id} post={post} />
+            {posts.map((post, i) => (
+              <VideoCard
+                key={post.id}
+                post={post}
+                userId={userId}
+                cardIndex={i}
+                allPosts={posts}
+              />
             ))}
           </div>
         )}

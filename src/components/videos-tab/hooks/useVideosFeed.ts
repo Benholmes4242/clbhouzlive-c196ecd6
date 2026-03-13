@@ -12,9 +12,10 @@ interface UseVideosFeedParams {
   userId: string | undefined;
   filter: VideosFilter;
   searchQuery?: string;
+  enabled?: boolean;
 }
 
-export function useVideosFeed({ userId, filter, searchQuery }: UseVideosFeedParams) {
+export function useVideosFeed({ userId, filter, searchQuery, enabled: externalEnabled = true }: UseVideosFeedParams) {
   const seenPostIds = useRef<string[]>([]);
 
   const query = useInfiniteQuery({
@@ -53,15 +54,19 @@ export function useVideosFeed({ userId, filter, searchQuery }: UseVideosFeedPara
           seenPostIds.current.push(post.id);
         }
       }
+      // Prevent unbounded growth — cap at last 200
+      if (seenPostIds.current.length > 200) {
+        seenPostIds.current = seenPostIds.current.slice(-200);
+      }
 
       const lastRow = rows[rows.length - 1];
-      const nextCursor = posts.length >= PAGE_SIZE ? lastRow.post_created_at : undefined;
+      const nextCursor = rows.length >= PAGE_SIZE ? lastRow.post_created_at : undefined;
 
       return { posts, nextCursor };
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as string | undefined,
-    enabled: !!userId,
+    enabled: !!userId && externalEnabled,
     placeholderData: keepPreviousData,
     staleTime: 2 * 60 * 1000,
     gcTime: 10 * 60 * 1000,

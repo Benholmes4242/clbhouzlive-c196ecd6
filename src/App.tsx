@@ -41,6 +41,7 @@ import { PostEventsBridge } from '@/events/PostEventsBridge';
 import { UploadToastsBridge } from '@/uploads/UploadToastsBridge';
 import UploadProgressBanner from '@/components/uploads/UploadProgressBanner';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
+import { GlobalPostStudio } from '@/components/post-studio/GlobalPostStudio';
 import { FullscreenFeedOverlay } from '@/components/fullscreen-feed/FullscreenFeedOverlay';
 import { UploadResilienceProvider } from '@/contexts/UploadResilienceContext';
 import { useUploadGuard } from '@/hooks/useUploadGuard';
@@ -236,7 +237,7 @@ const BusinessActivityPage = lazy(() => import("./pages/BusinessActivityPage"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 // PostsTabTestPage removed — Posts tab now integrated into profiles
-const CreateMomentPage = lazy(() => import("./pages/CreateMomentPage"));
+// CreateMomentPage removed — PostStudio is now the sole creation flow
 const PostDeepLinkPage = lazy(() => import("./pages/PostDeepLinkPage"));
 const CommentDeepLinkPage = lazy(() => import("./components/comments/CommentDeepLinkHandler"));
 
@@ -481,7 +482,7 @@ function AppRoutes() {
           } />
         </Route>
         
-        <Route path="/create-moment" element={<Suspense fallback={<GenericPageSkeleton />}><CreateMomentPage /></Suspense>} />
+        {/* /create-moment removed — PostStudio is now the sole creation flow */}
         <Route path="/error-logs" element={<ErrorLogPage />} />
         
         {/* Echo AI */}
@@ -730,6 +731,7 @@ const AppInner: React.FC = () => {
                           
                           <Sonner />
                           <GlobalBottomNavigation />
+                          <GlobalPostStudio />
                         </ActiveActorProvider>
                     
                   </UIProvider>

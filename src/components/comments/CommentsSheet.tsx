@@ -107,10 +107,10 @@ function CommentsSheet({
   const [sort, setSort] = useState<'best' | 'newest'>('newest');
   const [replyingTo, setReplyingTo] = useState<ReplyTarget | null>(null);
   const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
+  const [loadingReplies, setLoadingReplies] = useState<Set<string>>(new Set());
   const [commentToDelete, setCommentToDelete] = useState<CommentWithReplies | CommentReply | null>(null);
   const [inputText, setInputText] = useState('');
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
-  const [loadingReplies, setLoadingReplies] = useState<Set<string>>(new Set());
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -416,7 +416,11 @@ function CommentsSheet({
                   toggleReplies(comment.id);
                   setLoadingReplies(prev => new Set(prev).add(comment.id));
                   await loadAllReplies(comment.id);
-                  setLoadingReplies(prev => { const next = new Set(prev); next.delete(comment.id); return next; });
+                  setLoadingReplies(prev => {
+                    const next = new Set(prev);
+                    next.delete(comment.id);
+                    return next;
+                  });
                 }}
                 className={cn(
                   'text-[12px] font-semibold min-h-[44px] flex items-center gap-1 pl-10',
@@ -430,13 +434,13 @@ function CommentsSheet({
               <>
                 {/* Reply loading shimmer */}
                 {loadingReplies.has(comment.id) && comment.replies.length === 0 && (
-                  <div className="pl-10 sm:pl-14">
+                  <div className="space-y-0">
                     {[0, 1].map(i => (
-                      <div key={i} className="flex gap-3 px-4 py-3">
+                      <div key={i} className="flex gap-3 pl-10 sm:pl-14 pr-4 py-3">
                         <div className={cn('w-[28px] h-[28px] rounded-[34%] shrink-0', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
                         <div className="flex-1 space-y-2 py-0.5">
                           <div className={cn('h-[18px] w-20 rounded', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
-                          <div className={cn('h-[18px] w-[70%] rounded', isDark ? 'bg-white/6 clb-shimmer-dark' : 'bg-muted/80 clb-shimmer-light')} />
+                          <div className={cn('h-[18px] w-[75%] rounded', isDark ? 'bg-white/6 clb-shimmer-dark' : 'bg-muted/80 clb-shimmer-light')} />
                         </div>
                       </div>
                     ))}
@@ -446,12 +450,8 @@ function CommentsSheet({
                 {comment.total_replies_count > comment.replies.length && (
                   <button
                     type="button"
-                    onClick={async () => {
-                      setLoadingReplies(prev => new Set(prev).add(comment.id));
-                      await loadAllReplies(comment.id);
-                      setLoadingReplies(prev => { const next = new Set(prev); next.delete(comment.id); return next; });
-                    }}
-                    className="text-[12px] font-semibold text-primary min-h-[44px] flex items-center pl-14"
+                    onClick={() => loadAllReplies(comment.id)}
+                    className="text-[12px] font-semibold text-primary min-h-[44px] flex items-center pl-10 sm:pl-14"
                   >
                     Load {comment.total_replies_count - comment.replies.length} more replies
                   </button>
@@ -460,7 +460,7 @@ function CommentsSheet({
                   type="button"
                   onClick={() => toggleReplies(comment.id)}
                   className={cn(
-                    'text-[12px] font-semibold min-h-[44px] flex items-center pl-14',
+                    'text-[12px] font-semibold min-h-[44px] flex items-center pl-10 sm:pl-14',
                     isDark ? 'text-white/40' : 'text-muted-foreground'
                   )}
                 >
@@ -503,8 +503,8 @@ function CommentsSheet({
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className={cn(
               'fixed inset-x-0 bottom-0 z-[101] w-full rounded-t-[20px]',
+              'md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-[560px]',
               'flex flex-col',
-              'md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[560px]',
               isDark ? 'bg-[#0d0d0d]' : 'bg-background'
             )}
             style={{ minHeight: 'min(52dvh, 380px)', maxHeight: '92dvh' }}
@@ -528,7 +528,7 @@ function CommentsSheet({
                   Comments
                 </span>
                 {totalCount > 0 && (
-                  <span className={cn('text-[16px] font-semibold', isDark ? 'text-white/40' : 'text-muted-foreground')}>
+                  <span className={cn('text-[16px] font-semibold shrink-0', isDark ? 'text-white/40' : 'text-muted-foreground')}>
                     {totalCount}
                   </span>
                 )}
@@ -589,21 +589,27 @@ function CommentsSheet({
                     <div key={i}>
                       <div className="flex gap-3 py-3">
                         <div className={cn('w-[34px] h-[34px] rounded-[34%] shrink-0', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
-                        <div className="flex-1 space-y-2 py-1">
+                        <div className="flex-1 space-y-2 py-0.5">
                           <div className={cn('h-[18px] w-24 rounded', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
                           <div className={cn('h-[18px] w-[85%] rounded', isDark ? 'bg-white/6 clb-shimmer-dark' : 'bg-muted/80 clb-shimmer-light')} />
                           <div className={cn('h-[18px] w-[55%] rounded', isDark ? 'bg-white/5 clb-shimmer-dark' : 'bg-muted/60 clb-shimmer-light')} />
                         </div>
                       </div>
                       {i < 4 && (
-                        <div className={cn('ml-[56px] h-px', isDark ? 'bg-white/5' : 'bg-border/30')} />
+                        <div className={cn('ml-[56px] sm:ml-[64px] h-px', isDark ? 'bg-white/5' : 'bg-border/20')} />
                       )}
                     </div>
                   ))}
                 </motion.div>
               ) : comments.length === 0 ? (
                 /* Empty state */
-                <motion.div key="comments-empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }} className="flex-1 flex flex-col items-center justify-center px-8 gap-4 min-h-[220px]">
+                <motion.div
+                  key="comments-empty"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.15 }}
+                  className="flex-1 flex flex-col items-center justify-center px-8 gap-4 min-h-[220px]"
+                >
                   {/* Staggered bounce emoji cluster */}
                   <div className="flex gap-3 text-4xl">
                     <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>⛳</span>
@@ -619,11 +625,16 @@ function CommentsSheet({
                         ? 'Be the first to review this course'
                         : 'Be the first to drop your thoughts'}
                     </p>
-                </div>
+                  </div>
                 </motion.div>
               ) : (
                 /* Comment list */
-                <motion.div key="comments-content" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }}>
+                <motion.div
+                  key="comments-content"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.15 }}
+                >
                   {sortedComments.map((comment, idx) => renderTopLevelComment(comment, idx))}
                   <div ref={sentinelRef} className="h-px" />
                   {isFetchingNextPage && (

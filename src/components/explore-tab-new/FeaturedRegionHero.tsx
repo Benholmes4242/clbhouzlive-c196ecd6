@@ -14,7 +14,6 @@ interface FeaturedRegion {
   subtitle: string | null;
   hero_image_url: string | null;
   courseCount: number;
-  recentReviewCount: number;
 }
 
 function FeaturedRegionHeroInner({ onRegionSelect, activeRegion }: FeaturedRegionHeroProps) {
@@ -28,15 +27,13 @@ function FeaturedRegionHeroInner({ onRegionSelect, activeRegion }: FeaturedRegio
         .limit(6);
 
       if (error || !regions || regions.length === 0) {
-        console.error('[FeaturedRegionHero] fetch error:', error);
+        if (import.meta.env.DEV) console.error('[FeaturedRegionHero] fetch error:', error);
         return null;
       }
 
       // Rotate based on day of week
       const dayIndex = new Date().getDay() % regions.length;
       const picked = regions[dayIndex];
-
-      // Allow regions without hero_image_url — gradient fallback in render
 
       // Fetch countries in this region, then count actual golf courses
       const { data: memberRows } = await supabase
@@ -55,16 +52,6 @@ function FeaturedRegionHeroInner({ onRegionSelect, activeRegion }: FeaturedRegio
         courseCount = count ?? 0;
       }
 
-      // Fetch recent review count (posts with source_review_id in last 30 days)
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-      const { count: reviewCount } = await supabase
-        .from('posts')
-        .select('*', { count: 'exact', head: true })
-        .not('source_review_id', 'is', null)
-        .gte('created_at', thirtyDaysAgo.toISOString());
-
       return {
         id: picked.id,
         slug: picked.slug,
@@ -72,7 +59,6 @@ function FeaturedRegionHeroInner({ onRegionSelect, activeRegion }: FeaturedRegio
         subtitle: picked.subtitle,
         hero_image_url: picked.hero_image_url,
         courseCount: courseCount ?? 0,
-        recentReviewCount: reviewCount ?? 0,
       };
     },
     staleTime: 30 * 60 * 1000,
@@ -80,7 +66,11 @@ function FeaturedRegionHeroInner({ onRegionSelect, activeRegion }: FeaturedRegio
   });
 
   if (activeRegion !== null) return null;
-  if (!region) return null;
+  if (!region) {
+    return (
+      <div className="mx-[2px] mb-[2px] aspect-[16/9] rounded-xl bg-muted animate-pulse" />
+    );
+  }
 
   return (
     <div className="mx-[2px] mb-[2px]">

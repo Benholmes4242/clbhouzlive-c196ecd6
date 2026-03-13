@@ -5,9 +5,9 @@
  */
 export const BOTTOM_NAV_HEIGHT = 88;
 
-/** Gap between overlay elements and nav top (breathing room) */
+/** Gap between overlay elements and nav top edge */
 export const OVERLAY_GAP = 12;
 
-/** Total bottom offset for overlays: gap + nav height */
+/** Total bottom offset for overlays: gap + nav height (CSS variable with JS fallback) */
 export const OVERLAY_BOTTOM = `calc(${OVERLAY_GAP}px + var(--bottom-nav-height, ${BOTTOM_NAV_HEIGHT}px))`;
 export const OVERLAY_BOTTOM_REVIEW = `calc(${OVERLAY_GAP + 8}px + var(--bottom-nav-height, ${BOTTOM_NAV_HEIGHT}px))`;

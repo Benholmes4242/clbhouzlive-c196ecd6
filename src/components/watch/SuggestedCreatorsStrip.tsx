@@ -20,7 +20,7 @@ const ShimmerItem: React.FC = () => (
       style={{
         width: 64,
         height: 64,
-        background: 'linear-gradient(90deg, #E2E8F0 25%, #EEF2F7 50%, #E2E8F0 75%)',
+        background: 'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted)/0.5) 50%, hsl(var(--muted)) 75%)',
         backgroundSize: '200% 100%',
       }}
     />
@@ -29,7 +29,7 @@ const ShimmerItem: React.FC = () => (
       style={{
         width: 52,
         height: 10,
-        background: 'linear-gradient(90deg, #E2E8F0 25%, #EEF2F7 50%, #E2E8F0 75%)',
+        background: 'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted)/0.5) 50%, hsl(var(--muted)) 75%)',
         backgroundSize: '200% 100%',
       }}
     />
@@ -38,7 +38,7 @@ const ShimmerItem: React.FC = () => (
       style={{
         width: 44,
         height: 16,
-        background: 'linear-gradient(90deg, #E2E8F0 25%, #EEF2F7 50%, #E2E8F0 75%)',
+        background: 'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted)/0.5) 50%, hsl(var(--muted)) 75%)',
         backgroundSize: '200% 100%',
       }}
     />
@@ -121,7 +121,7 @@ const CreatorItem: React.FC<CreatorItemProps> = ({ creator, currentUserId }) => 
             height: '100%',
             borderRadius: '34%',
             overflow: 'hidden',
-            background: '#F8FAFC',
+            background: 'hsl(var(--muted))',
           }}
         >
           {creator.avatarUrl ? (
@@ -135,8 +135,8 @@ const CreatorItem: React.FC<CreatorItemProps> = ({ creator, currentUserId }) => 
             <div
               className="w-full h-full flex items-center justify-center"
               style={{
-                background: '#E2E8F0',
-                color: '#64748B',
+                background: 'hsl(var(--muted))',
+                color: 'hsl(var(--muted-foreground))',
                 fontSize: 20,
                 fontWeight: 600,
                 borderRadius: '34%',
@@ -159,7 +159,7 @@ const CreatorItem: React.FC<CreatorItemProps> = ({ creator, currentUserId }) => 
             height: 16,
             borderRadius: '50%',
             background: '#D97706',
-            border: '2px solid #FFFFFF',
+            border: '2px solid hsl(var(--background))',
             alignSelf: 'center',
             marginLeft: 24,
           }}
@@ -171,7 +171,7 @@ const CreatorItem: React.FC<CreatorItemProps> = ({ creator, currentUserId }) => 
       <p
         onClick={handleProfileTap}
         className="w-full text-center truncate cursor-pointer"
-        style={{ fontSize: 12, fontWeight: 600, color: '#1A1A1A', lineHeight: '16px' }}
+        style={{ fontSize: 12, fontWeight: 600, color: 'hsl(var(--foreground))', lineHeight: '16px' }}
       >
         {shortName(creator.displayName)}
       </p>
@@ -186,7 +186,7 @@ const CreatorItem: React.FC<CreatorItemProps> = ({ creator, currentUserId }) => 
           lineHeight: '14px',
           ...(creator.handicap != null
             ? { background: '#FEF3C7', color: '#92400E' }
-            : { background: '#F1F5F9', color: '#64748B' }),
+            : { background: 'hsl(var(--muted))', color: 'hsl(var(--muted-foreground))' }),
         }}
       >
         {creator.handicap != null
@@ -204,7 +204,7 @@ const CreatorItem: React.FC<CreatorItemProps> = ({ creator, currentUserId }) => 
           fontSize: following ? 10 : 11,
           fontWeight: 600,
           background: following ? 'transparent' : 'hsl(var(--foreground))',
-          color: following ? '#94A3B8' : 'hsl(var(--background))',
+          color: following ? 'hsl(var(--muted-foreground))' : 'hsl(var(--background))',
           border: following ? '1px solid hsl(var(--border))' : 'none',
           cursor: 'pointer',
           transition: 'transform 100ms ease',
@@ -227,8 +227,8 @@ const SuggestedCreatorsStrip: React.FC<SuggestedCreatorsStripProps> = ({ userId 
 
   if (isLoading) {
     return (
-      <div style={{ gridColumn: '1 / -1', padding: '14px 0', background: '#FFFFFF', borderTop: '1px solid #F1F5F9', borderBottom: '1px solid #F1F5F9' }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', padding: '0 16px', marginBottom: 12 }}>
+      <div style={{ gridColumn: '1 / -1', padding: '14px 0', background: 'hsl(var(--background))', borderTop: '1px solid hsl(var(--muted))', borderBottom: '1px solid hsl(var(--muted))' }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: 'hsl(var(--foreground))', padding: '0 16px', marginBottom: 12 }}>
           People to follow
         </p>
         <div
@@ -248,8 +248,8 @@ const SuggestedCreatorsStrip: React.FC<SuggestedCreatorsStripProps> = ({ userId 
   }
 
   return (
-    <div style={{ gridColumn: '1 / -1', padding: '14px 0', background: '#FFFFFF', borderTop: '1px solid #F1F5F9', borderBottom: '1px solid #F1F5F9' }}>
-      <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', padding: '0 16px', marginBottom: 12 }}>
+    <div style={{ gridColumn: '1 / -1', padding: '14px 0', background: 'hsl(var(--background))', borderTop: '1px solid hsl(var(--muted))', borderBottom: '1px solid hsl(var(--muted))' }}>
+      <p style={{ fontSize: 13, fontWeight: 600, color: 'hsl(var(--foreground))', padding: '0 16px', marginBottom: 12 }}>
         People to follow
       </p>
 

@@ -24,12 +24,12 @@ function ExploreSearchOverlayInner({ isOpen, onClose, userId }: ExploreSearchOve
   const { posts, isLoading, isError } = useExploreFeed({
     userId,
     searchQuery: query || undefined,
+    enabled: !!query,
   });
 
   const handleSearch = useCallback((q: string) => {
     setQuery(q);
-    if (q.trim()) addSearch(q.trim());
-  }, [addSearch]);
+  }, []);
 
   return (
     <SearchOverlay
@@ -37,6 +37,7 @@ function ExploreSearchOverlayInner({ isOpen, onClose, userId }: ExploreSearchOve
       onClose={onClose}
       placeholder="Search courses & videos..."
       onSearch={handleSearch}
+      onCommit={addSearch}
       recentSearches={recentSearches}
       onClearRecent={clearAll}
       onRemoveRecent={removeSearch}
@@ -62,7 +63,7 @@ function ExploreSearchOverlayInner({ isOpen, onClose, userId }: ExploreSearchOve
         ) : (
           <div className="grid grid-cols-2 gap-[2px] px-[2px]">
             {posts.map((post, index) => (
-              <ExploreTile key={post.id} post={post} index={index} />
+              <ExploreTile key={post.id} post={post} index={index} allPosts={posts} />
             ))}
           </div>
         )}

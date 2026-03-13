@@ -36,6 +36,7 @@ function ExploreTileInner({ post, index, allPosts, fetchNextPage, hasNextPage, i
     <button
       type="button"
       onClick={handleTap}
+      aria-label={courseName ? `View ${courseName}` : 'View post'}
       className="relative aspect-[4/5] rounded-[4px] overflow-hidden bg-muted focus:outline-none"
       data-explore-index={index}
     >

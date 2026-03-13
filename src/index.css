@@ -318,6 +318,7 @@ html.lightbox-open {
 
 /* Dark mode achievement card tokens */
 .dark {
+  --bg-page: #111113;
   --achievement-card-bg: rgba(255, 255, 255, 0.05);
   --achievement-card-border: rgba(255, 255, 255, 0.10);
   --achievement-ghost-overlay: rgba(255, 255, 255, 0.15);
@@ -867,7 +868,7 @@ html, body, #root {
   /* Echo History safe-area alignment */
   --eh-safe-right: max(env(safe-area-inset-right), 16px);
   
-  /* Bottom nav height for consistent spacing — 88px covers real nav (~85px) before ResizeObserver fires */
+  /* Bottom nav height for consistent spacing */
   --bottom-nav-height: 88px;
   
   /* Top 100 Region Colors - Premium identity per list */
@@ -1740,9 +1741,6 @@ html, body, #root, .app-shell { touch-action: auto; }
   /* Standard navigation heights */
   --header-height: 64px;
   --nav-height: 56px;
-  
-  /* Bottom navigation height - no safe area */
-  --bottom-nav-height: var(--nav-height);
 }
 
 /* Global bottom navigation styling */

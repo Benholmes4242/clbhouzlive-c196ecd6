@@ -19,9 +19,10 @@ interface UseFriendsFeedParams {
   userId: string | undefined;
   mode: FriendsMode;
   searchQuery?: string;
+  enabled?: boolean;
 }
 
-export function useFriendsFeed({ userId, mode, searchQuery }: UseFriendsFeedParams) {
+export function useFriendsFeed({ userId, mode, searchQuery, enabled: externalEnabled = true }: UseFriendsFeedParams) {
   const seenPostIds = useRef<string[]>([]);
 
   const query = useInfiniteQuery({
@@ -44,7 +45,7 @@ export function useFriendsFeed({ userId, mode, searchQuery }: UseFriendsFeedPara
       const { data, error } = await supabase.rpc('get_friends_feed', params as any);
 
       if (error) {
-        console.error('[FriendsFeed] RPC error:', error);
+        if (import.meta.env.DEV) console.error('[FriendsFeed] RPC error:', error);
         return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
       }
 
@@ -66,13 +67,13 @@ export function useFriendsFeed({ userId, mode, searchQuery }: UseFriendsFeedPara
       }
 
       const lastRow = rows[rows.length - 1];
-      const nextCursor = posts.length >= PAGE_SIZE ? lastRow.post_created_at : undefined;
+      const nextCursor = rows.length >= PAGE_SIZE ? lastRow.post_created_at : undefined;
 
       return { posts, nextCursor };
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as string | undefined,
-    enabled: !!userId,
+    enabled: !!userId && externalEnabled,
     placeholderData: keepPreviousData,
     staleTime: 2 * 60 * 1000,
     gcTime: 10 * 60 * 1000,

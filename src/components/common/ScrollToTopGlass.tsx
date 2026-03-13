@@ -7,50 +7,14 @@ const ScrollToTopGlass = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const checkScroll = () => {
-      const rootContainer = document.getElementById('root');
-      const mainElement = document.querySelector('main');
-      const pageContainer = document.querySelector('.page-with-header');
-      
-      const rootScroll = rootContainer?.scrollTop || 0;
-      const mainScroll = mainElement?.scrollTop || 0;
-      const pageScroll = pageContainer?.scrollTop || 0;
-      const windowScroll = window.scrollY || document.documentElement.scrollTop || 0;
-      
-      const scrollTop = Math.max(rootScroll, mainScroll, pageScroll, windowScroll);
-      
-      setVisible(scrollTop > 400);
+    const onScroll = () => {
+      setVisible(window.scrollY > 400);
     };
 
-    checkScroll();
+    onScroll();
 
-    const rootContainer = document.getElementById('root');
-    const mainElement = document.querySelector('main');
-    const pageContainer = document.querySelector('.page-with-header');
-    
-    if (rootContainer) {
-      rootContainer.addEventListener('scroll', checkScroll, { passive: true });
-    }
-    if (mainElement) {
-      mainElement.addEventListener('scroll', checkScroll, { passive: true });
-    }
-    if (pageContainer) {
-      pageContainer.addEventListener('scroll', checkScroll, { passive: true });
-    }
-    window.addEventListener('scroll', checkScroll, { passive: true });
-
-    return () => {
-      if (rootContainer) {
-        rootContainer.removeEventListener('scroll', checkScroll);
-      }
-      if (mainElement) {
-        mainElement.removeEventListener('scroll', checkScroll);
-      }
-      if (pageContainer) {
-        pageContainer.removeEventListener('scroll', checkScroll);
-      }
-      window.removeEventListener('scroll', checkScroll);
-    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   return createPortal(
@@ -82,7 +46,7 @@ const ScrollToTopGlass = () => {
           items-center
           justify-center
           active:scale-95
-          transition-all
+          transition-transform
           duration-150
           touch-manipulation
         "

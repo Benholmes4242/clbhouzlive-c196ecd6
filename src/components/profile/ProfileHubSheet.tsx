@@ -211,7 +211,7 @@ function ProfileHubSheet({
                   Switch Profile
                 </div>
                 <div
-                  className="flex gap-3 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                  className="flex gap-3 overflow-x-auto pb-1 no-scrollbar"
                   style={{
                     scrollSnapType: 'x mandatory',
                     WebkitOverflowScrolling: 'touch',
@@ -280,7 +280,7 @@ function ProfileHubSheet({
                     key={label}
                     type="button"
                     onClick={() => handleNav(route)}
-                    className="relative flex items-center gap-3 bg-muted rounded-2xl px-4 min-h-[56px] hover:bg-muted/80 active:bg-muted/70 transition-colors duration-150"
+                    className="relative flex items-center gap-3 bg-muted rounded-2xl px-4 min-h-[56px] hover:bg-muted/40 active:bg-muted/70 transition-colors duration-150"
                   >
                     <div className="relative">
                       <Icon className="w-[18px] h-[18px] text-muted-foreground" />

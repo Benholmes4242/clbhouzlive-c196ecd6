@@ -15,8 +15,6 @@ import { NineDotsIcon } from '@/features/tourhub/components/NineDotsIcon';
 import { openTourNav } from '@/features/tourhub/contexts/TourNavContext';
 import { haptic } from '@/utils/haptics';
 import { useLiveTournamentCount, usePrefetchNavMenu } from '@/features/tourhub/hooks/useNavMenuData';
-import { ClubhouseTabToggle } from '@/components/clubhouse/ClubhouseTabToggle';
-import { useClubhouseTab } from '@/contexts/ClubhouseTabContext';
 
 interface CompactHeaderProps {
   className?: string;
@@ -51,17 +49,12 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const pillRef = useRef<HTMLButtonElement>(null);
   
   // Live tournament data for Tour routes
-  const isTourRouteEarly = location.pathname.startsWith('/tour') || location.pathname.startsWith('/tourhub');
+  const isTourRoute = location.pathname.startsWith('/tour') || location.pathname.startsWith('/tourhub');
   const { data: liveCount } = useLiveTournamentCount();
   const prefetchNavMenu = usePrefetchNavMenu();
-  const hasLiveTournaments = isTourRouteEarly && (liveCount ?? 0) > 0;
-  
-  // Clubhouse tab context - may be null if not on Clubhouse page
-  const clubhouseTab = useClubhouseTab();
+  const hasLiveTournaments = isTourRoute && (liveCount ?? 0) > 0;
   
   // Determine routes
-  const isClubhouseRoute = location.pathname === '/' || location.pathname.startsWith('/clubhouse');
-  const isTourRoute = location.pathname.startsWith('/tour') || location.pathname.startsWith('/tourhub');
   const isEditProfileRoute = location.pathname === '/edit-profile';
   const isFriendsActivityRoute = location.pathname === '/friends-activity';
   const isAchievementsRoute = location.pathname === '/achievements' || location.pathname.startsWith('/achievements/') || location.pathname === '/profile/quest';
@@ -122,7 +115,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const handleDiscoverBack = () => {
     if (location.pathname.startsWith('/discover/explore/region/') || 
         location.pathname.startsWith('/discover/explore/theme/')) {
-      navigate('/discover?main=channels');
+      navigate('/discover?main=explore');
     } else if (searchParams.get('section')) {
       navigate('/discover?main=videos');
     } else {
@@ -146,25 +139,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
     setMenuOpen(v => !v);
   };
 
-  // Theme-specific styling
-  const LIGHT_BG = '#F8FAFC';
-  const LIGHT_BORDER = 'hsl(var(--border) / 0.5)';
-  const STANDARD_BG = 'hsl(var(--clubhouse-bg-header))';
-  const STANDARD_BORDER = 'hsl(var(--clubhouse-border))';
-
-  // Get background based on theme
-  const getBackground = () => {
-    if (useLightTheme) return LIGHT_BG;
-    return STANDARD_BG;
-  };
-
-  // Get border based on theme
-  const getBorder = () => {
-    if (useLightTheme) return LIGHT_BORDER;
-    return STANDARD_BORDER;
-  };
-
-  // Standardized header height: 55px content, with safe-area on top for Clubhouse
+  // Standardized header height: 55px content
   const contentHeight = 55;
   
   return (
@@ -173,18 +148,17 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         data-chrome="header"
         className={cn(
           "compact-header clubhouse-header",
-          isClubhouseRoute && "chrome-header",
           "fixed left-0 right-0 z-header",
           className
         )}
         style={{
           top: 0,
-          background: getBackground(),
+          background: '#F8FAFC',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          height: isClubhouseRoute ? `calc(${contentHeight}px + env(safe-area-inset-top))` : `${contentHeight}px`,
-          paddingTop: isClubhouseRoute ? 'env(safe-area-inset-top)' : 0,
-          borderBottom: `0.5px solid ${getBorder()}`,
+          height: `${contentHeight}px`,
+          paddingTop: 0,
+          borderBottom: `0.5px solid hsl(var(--border) / 0.5)`,
           boxShadow: 'none',
         }}
       >
@@ -197,10 +171,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           <div className="w-11 flex-shrink-0">
             <button
               type="button"
-              className={cn(
-                "flex items-center gap-2 bg-transparent border-0 transition-transform min-h-[44px]",
-                isClubhouseRoute && !isBackArrowRoute ? "pointer-events-none" : "cursor-pointer active:scale-[0.98]"
-              )}
+              className="flex items-center gap-2 bg-transparent border-0 transition-transform min-h-[44px] cursor-pointer active:scale-[0.98]"
               onClick={handleLogoClick}
               onTouchStart={isTourRoute ? prefetchNavMenu : undefined}
               aria-label={isBackArrowRoute ? "Go back" : isTourRoute ? "Go to tour menu" : "Go to home"}
