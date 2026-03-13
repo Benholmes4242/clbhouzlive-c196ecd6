@@ -5,7 +5,7 @@ import { openTourNav } from '../contexts/TourNavContext';
 import { motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import { TourHubShell } from '../components';
-import { CollegeSearch, FranchiseLeaderboard } from '../components/college';
+import { CollegeSearch, CollegeHeroBanner, FranchiseLeaderboard } from '../components/college';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 
