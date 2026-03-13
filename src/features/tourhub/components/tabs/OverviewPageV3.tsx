@@ -13,12 +13,14 @@
  * 7. College Golf Rankings (NEW - preview of college leaderboard)
  */
 
+import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   HeroCarousel,
   LiveRightNow,
   UnifiedWorldRankings,
 } from '../overview-v3';
+import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { WhatsComing } from '../overview-v3/WhatsComing';
 import { CollegeRankingsPreview } from '../overview-v3/CollegeRankingsPreview';
 import { SeasonLeaderboards } from '../overview-v3/SeasonLeaderboards';
