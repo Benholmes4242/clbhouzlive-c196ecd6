@@ -10,6 +10,7 @@
  * - Auto-advance every 7s, pause on touch, resume after 5s
  * - Pagination dots inside the card area (hero-dot-active / hero-dot-inactive)
  * - No dots or auto-advance for single slides
+ * - Pauses auto-advance when app is backgrounded
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -31,10 +32,9 @@ export interface ScheduleHeroItem {
 interface ScheduleHeroCarouselProps {
   items: ScheduleHeroItem[];
   leadersMap?: Map<string, TournamentLeaderWinner>;
-  height?: string;
 }
 
-export function ScheduleHeroCarousel({ items, leadersMap, height }: ScheduleHeroCarouselProps) {
+export function ScheduleHeroCarousel({ items, leadersMap }: ScheduleHeroCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const touchStartRef = useRef(0);
   const touchDeltaRef = useRef(0);
@@ -64,6 +64,19 @@ export function ScheduleHeroCarousel({ items, leadersMap, height }: ScheduleHero
     return () => { if (autoAdvanceRef.current) clearInterval(autoAdvanceRef.current); };
   }, [startAutoAdvance]);
 
+  // Pause auto-advance when app is backgrounded
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.hidden) {
+        pausedRef.current = true;
+      } else {
+        setTimeout(() => { pausedRef.current = false; }, 1000);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
+
   const handleTouchStart = (e: React.TouchEvent) => {
     pausedRef.current = true;
     touchStartRef.current = e.touches[0].clientX;
@@ -89,50 +102,24 @@ export function ScheduleHeroCarousel({ items, leadersMap, height }: ScheduleHero
 
   const currentItem = items[Math.min(activeIndex, count - 1)];
 
-  if (count === 1) {
-    return (
-      <div className="relative">
-        <button 
-          className="absolute z-20 flex items-center justify-center"
-          style={{ top: '56px', left: '16px', width: '44px', height: '44px' }}
-          onClick={openTourNav}
-          aria-label="Open tour menu"
-        >
-          <Menu 
-            className="w-[22px] h-[22px]" 
-            strokeWidth={2}
-            style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5))' }}
-          />
-        </button>
-        <ScheduleHeroCard
-          tournament={currentItem.tournament}
-          type={currentItem.type}
-          leaderWinner={leadersMap?.get(currentItem.tournament.id)}
-          currentIndex={0}
-          totalSlides={1}
-        />
-      </div>
-    );
-  }
-
   return (
     <div className="relative">
-      <button 
+      <button
         className="absolute z-20 flex items-center justify-center"
         style={{ top: '56px', left: '16px', width: '44px', height: '44px' }}
         onClick={openTourNav}
         aria-label="Open tour menu"
       >
-        <Menu 
-          className="w-[22px] h-[22px]" 
+        <Menu
+          className="w-[22px] h-[22px]"
           strokeWidth={2}
           style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5))' }}
         />
       </button>
       <div
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
+        onTouchStart={count > 1 ? handleTouchStart : undefined}
+        onTouchMove={count > 1 ? handleTouchMove : undefined}
+        onTouchEnd={count > 1 ? handleTouchEnd : undefined}
       >
         <AnimatePresence mode="wait">
           <motion.div
@@ -148,12 +135,11 @@ export function ScheduleHeroCarousel({ items, leadersMap, height }: ScheduleHero
               leaderWinner={leadersMap?.get(currentItem.tournament.id)}
               currentIndex={activeIndex}
               totalSlides={count}
-              onDotClick={(i) => { setActiveIndex(i); pausedRef.current = false; startAutoAdvance(); }}
+              onDotClick={count > 1 ? (i) => { setActiveIndex(i); pausedRef.current = false; startAutoAdvance(); } : undefined}
             />
           </motion.div>
         </AnimatePresence>
       </div>
-
     </div>
   );
 }

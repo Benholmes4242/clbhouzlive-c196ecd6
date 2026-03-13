@@ -9,15 +9,16 @@
  */
 
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { ChevronRight, Shield } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { useSingleCourseImage } from '../../hooks/useCourseImageResolver';
 import { getCourseImage } from '../../utils/placeholders';
-import { getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows } from '../shared/TourHeroHelpers';
+import { getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, getCurrentRoundLabel, UpcomingCountdown } from '../shared/TourHeroHelpers';
+import { getContextLabel } from '../../utils/tournamentClassification';
 import '@/styles/hero-glass.css';
 
 interface ScheduleHeroCardProps {
@@ -54,6 +55,11 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
   const isRecent = type === 'recent';
   const isUpcoming = type === 'upcoming';
 
+  // Major/signature detection
+  const contextLabel = getContextLabel({ name: tournament.name, tourName: tournament.tour_full_name ?? undefined });
+  const isMajor = contextLabel === 'MAJOR CHAMPIONSHIP';
+  const isSignature = contextLabel === 'SIGNATURE EVENT' || contextLabel === 'ROLEX SERIES';
+
   const handlePlayerTap = (playerId: string | null | undefined) => (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
@@ -84,9 +90,8 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
   })();
 
   return (
-    <Link
-      to={`/tourhub/tournament/${tournament.id}`}
-      className="block relative overflow-hidden active:scale-[0.98] transition-transform"
+    <div
+      className="block relative overflow-hidden"
       style={{ height: '45dvh' }}
     >
       {/* Background with Ken Burns */}
@@ -135,6 +140,11 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
           minWidth: '260px',
           maxWidth: 'min(330px, calc(100% - 32px))',
           padding: '16px 16px 12px 16px',
+          border: isMajor
+            ? '1px solid rgba(250, 204, 21, 0.35)'
+            : isSignature
+            ? '1px solid rgba(16, 185, 129, 0.25)'
+            : undefined,
         }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -227,8 +237,21 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
 
             {/* Footer: tour badge left, View Results right */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-              <div className="tour-badge">
-                <span>{getTourLabel(tournament.tour_code)}</span>
+              <div className="flex items-center gap-1.5">
+                {isMajor && (
+                  <span style={{
+                    fontSize: '10px', fontWeight: 800, letterSpacing: '1.5px',
+                    color: '#FACC15', textTransform: 'uppercase' as const,
+                    background: 'rgba(250, 204, 21, 0.12)',
+                    border: '1px solid rgba(250, 204, 21, 0.3)',
+                    borderRadius: 4, padding: '2px 6px',
+                  }}>
+                    MAJOR
+                  </span>
+                )}
+                <div className="tour-badge">
+                  <span>{getTourLabel(tournament.tour_code)}</span>
+                </div>
               </div>
               <button
                 onClick={(e) => { e.preventDefault(); navigate(`/tourhub/tournament/${tournament.id}`); }}
@@ -250,15 +273,28 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
               {isLive ? (
                 <div className="flex items-center gap-1.5">
                   <span className="live-dot" />
-                  <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: '#22C55E' }}>LIVE</span>
+                  <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: isMajor ? '#FACC15' : '#22C55E' }}>LIVE</span>
                 </div>
               ) : (
                 <span className="countdown-label">
                   {format(new Date(tournament.start_date), 'MMM d')}
                 </span>
               )}
-              <div className="tour-badge">
-                <span>{getTourLabel(tournament.tour_code)}</span>
+              <div className="flex items-center gap-1.5">
+                {isMajor && (
+                  <span style={{
+                    fontSize: '10px', fontWeight: 800, letterSpacing: '1.5px',
+                    color: '#FACC15', textTransform: 'uppercase' as const,
+                    background: 'rgba(250, 204, 21, 0.12)',
+                    border: '1px solid rgba(250, 204, 21, 0.3)',
+                    borderRadius: 4, padding: '2px 6px',
+                  }}>
+                    MAJOR
+                  </span>
+                )}
+                <div className="tour-badge">
+                  <span>{getTourLabel(tournament.tour_code)}</span>
+                </div>
               </div>
             </div>
 
@@ -277,6 +313,11 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
             {/* ─── LIVE LAYOUT ─── */}
             {isLive && (
               <>
+                {/* Round progress */}
+                <p className="hero-meta" style={{ marginTop: 4, marginBottom: 0 }}>
+                  {getCurrentRoundLabel(null, tournament.start_date)}
+                </p>
+
                 {leaderWinner && (
                   <div style={{
                     display: 'flex',
@@ -322,17 +363,22 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                     </div>
                   </div>
                 )}
-                <div className="hero-text-cta w-full" style={{ marginTop: '8px' }}>
+                <button
+                  onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
+                  className="hero-text-cta w-full"
+                  style={{ marginTop: '8px' }}
+                >
                   <span>See Leaderboard</span>
                   <ChevronRight className="w-4 h-4 cta-chevron" />
-                </div>
+                </button>
               </>
             )}
 
-            {/* ─── UPCOMING LAYOUT — tight spacing ─── */}
+            {/* ─── UPCOMING LAYOUT — countdown + defending champion avatar ─── */}
             {isUpcoming && (
               <>
-                <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '4px', marginTop: '6px' }}>
+                <UpcomingCountdown startDate={tournament.start_date} />
+                <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '4px', marginTop: '4px' }}>
                   {[
                     tournament.purse && formatPurse(tournament.purse),
                     tournament.venue_par && `PAR ${tournament.venue_par}`,
@@ -340,20 +386,32 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                   ].filter(Boolean).join(' · ')}
                 </p>
                 {tournament.defending_champion && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: '4px' }}>
-                    <Shield style={{ width: 11, height: 11, color: 'rgba(255,255,255,0.45)', flexShrink: 0 }} />
-                    <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.55)' }}>
-                      Defending: {tournament.defending_champion}
-                    </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '6px' }}>
+                    <PlayerAvatar
+                      displayName={tournament.defending_champion}
+                      fullName={tournament.defending_champion}
+                      tourCode={tournament.tour_code}
+                      size={30}
+                      frosted
+                    />
+                    <div>
+                      <span style={{ fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.8px', textTransform: 'uppercase' as const, display: 'block' }}>
+                        Defending Champion
+                      </span>
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>
+                        {tournament.defending_champion}
+                      </span>
+                    </div>
                   </div>
                 )}
-                <p className="hero-meta" style={{ marginBottom: '6px' }}>
-                  {format(new Date(tournament.start_date), 'MMM d')} – {format(new Date(tournament.end_date), 'd, yyyy')}
-                </p>
-                <div className="hero-text-cta w-full" style={{ marginTop: '8px' }}>
+                <button
+                  onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
+                  className="hero-text-cta w-full"
+                  style={{ marginTop: '8px' }}
+                >
                   <span>View Tournament</span>
                   <ChevronRight className="w-4 h-4 cta-chevron" />
-                </div>
+                </button>
               </>
             )}
           </>
@@ -377,25 +435,6 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
           </div>
         )}
       </motion.div>
-    </Link>
+    </div>
   );
-}
-
-export function getFeaturedTournament(
-  tournaments: TourTournament[]
-): { tournament: TourTournament; type: 'live' | 'upcoming' | 'recent' } | null {
-  if (!tournaments || tournaments.length === 0) return null;
-  const now = new Date();
-  const live = tournaments.find(t => t.status === 'inprogress');
-  if (live) return { tournament: live, type: 'live' };
-  const upcoming = tournaments
-    .filter(t => t.status === 'scheduled' || t.status === 'created')
-    .filter(t => new Date(t.start_date) >= now)
-    .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
-  if (upcoming.length > 0) return { tournament: upcoming[0], type: 'upcoming' };
-  const completed = tournaments
-    .filter(t => t.status === 'closed')
-    .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime());
-  if (completed.length > 0) return { tournament: completed[0], type: 'recent' };
-  return { tournament: tournaments[0], type: 'upcoming' };
 }

@@ -6,6 +6,6 @@ export { ScheduleFilterPills, type ScheduleFilterType } from './ScheduleFilterPi
 export { ScheduleTournamentCard, prefetchTournamentImages } from './ScheduleTournamentCard';
 export { ScheduleMonthHeader } from './ScheduleMonthHeader';
 export { ScheduleEmptyMessage } from './ScheduleEmptyMessage';
-export { ScheduleHeroCard, getFeaturedTournament } from './ScheduleHeroCard';
+export { ScheduleHeroCard } from './ScheduleHeroCard';
 export { ScheduleTourFilter, type TourFilterCode } from './ScheduleTourFilter';
 export { ScheduleHeroCarousel, type ScheduleHeroItem } from './ScheduleHeroCarousel';
