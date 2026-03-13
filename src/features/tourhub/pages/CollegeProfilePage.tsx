@@ -12,9 +12,11 @@ import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { useCollegeStats, useCollegeSeasonStats } from '../hooks/useCollegeStats';
 import { useCollegeAlumni, type CollegeAlumnus } from '../hooks/useCollegeAlumni';
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
+import { useCollegeHeadToHead } from '../hooks/useCollegeStatus';
 import { getCollegeGradientCSS } from '../config/collegeBrandColors';
 import { useTourSeason } from '../hooks/useTourHubData';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { useCollegeRivals } from '../hooks/useCollegeRivals';
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -34,6 +36,9 @@ export function CollegeProfilePage() {
   const { data: allSeasonStats } = useCollegeSeasonStats();
   const { data: season } = useTourSeason();
   const { data: alumni, isLoading: alumniLoading } = useCollegeAlumni(collegeSlug, { limit: 30 });
+  const { data: rivals } = useCollegeRivals(collegeSlug);
+  const topRival = rivals?.[0];
+  const h2h = useCollegeHeadToHead(collegeSlug, topRival?.normalized_name);
   const seasonYear = season?.year || new Date().getFullYear();
   
   const [heroImgError, setHeroImgError] = useState(false);
@@ -349,7 +354,70 @@ export function CollegeProfilePage() {
           </motion.section>
         )}
 
-        {/* Season Performance Summary */}
+        {/* Head-to-Head Rivalry */}
+        {topRival && h2h && stats && (
+          <motion.section
+            style={{ marginTop: 28 }}
+            variants={sectionVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.55, duration: 0.3 }}
+          >
+            <h2 className="text-foreground" style={{ fontSize: 18, fontWeight: 700, marginBottom: 14 }}>
+              Head to Head
+            </h2>
+            <Link
+              to={`/tourhub/college-golf/compare?c1=${collegeSlug}&c2=${topRival.normalized_name}`}
+              className="block bg-card border border-border/30 rounded-2xl active:scale-[0.98] transition-transform"
+              style={{ padding: '16px' }}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  {getCollegeLogoUrl(college?.college_name || collegeSlug) && (
+                    <img src={getCollegeLogoUrl(college?.college_name || collegeSlug)!} alt="" className="object-contain" style={{ width: 28, height: 28 }} />
+                  )}
+                  <span className="text-foreground font-bold" style={{ fontSize: 14 }}>{displayName}</span>
+                </div>
+                <span className="text-muted-foreground text-[11px] font-semibold uppercase tracking-wider">vs</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-foreground font-bold" style={{ fontSize: 14 }}>{topRival.media?.short_name || topRival.media?.college_name || topRival.normalized_name}</span>
+                  {getCollegeLogoUrl(topRival.media?.college_name || topRival.normalized_name) && (
+                    <img src={getCollegeLogoUrl(topRival.media?.college_name || topRival.normalized_name)!} alt="" className="object-contain" style={{ width: 28, height: 28 }} />
+                  )}
+                </div>
+              </div>
+              {/* Score */}
+              <div className="flex items-center justify-center gap-4">
+                <span className="font-bold" style={{ fontSize: 24, fontVariantNumeric: 'tabular-nums', color: h2h.winner === 'A' ? 'rgba(245,158,11,0.9)' : 'hsl(var(--foreground))' }}>
+                  {h2h.winsA}
+                </span>
+                <span className="text-muted-foreground text-xs font-semibold">categories</span>
+                <span className="font-bold" style={{ fontSize: 24, fontVariantNumeric: 'tabular-nums', color: h2h.winner === 'B' ? 'rgba(245,158,11,0.9)' : 'hsl(var(--foreground))' }}>
+                  {h2h.winsB}
+                </span>
+              </div>
+              <p className="text-center text-muted-foreground mt-2" style={{ fontSize: 11 }}>
+                Tap for full comparison →
+              </p>
+            </Link>
+
+            {/* Other rivals */}
+            {rivals && rivals.length > 1 && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {rivals.slice(1).map((r) => (
+                  <Link
+                    key={r.normalized_name}
+                    to={`/tourhub/college-golf/compare?c1=${collegeSlug}&c2=${r.normalized_name}`}
+                    className="text-[12px] font-medium text-muted-foreground bg-card border border-border/30 rounded-full px-3 py-1.5 active:scale-95 transition-transform"
+                  >
+                    vs {r.media?.short_name || r.normalized_name}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </motion.section>
+        )}
+
         {stats && (
           <motion.section
             style={{ marginTop: 28 }}
