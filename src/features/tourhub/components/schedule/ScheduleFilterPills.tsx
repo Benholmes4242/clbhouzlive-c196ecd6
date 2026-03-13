@@ -63,9 +63,9 @@ export function ScheduleFilterPills({
                 <span className="relative flex h-[6px] w-[6px]">
                   <span
                     className="absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping"
-                    style={{ background: '#22C55E' }}
+                    style={{ background: TOUR_COLORS.liveGreen }}
                   />
-                  <span className="relative inline-flex rounded-full h-[6px] w-[6px]" style={{ background: '#22C55E' }} />
+                  <span className="relative inline-flex rounded-full h-[6px] w-[6px]" style={{ background: TOUR_COLORS.liveGreen }} />
                 </span>
               )}
               {option.label}
