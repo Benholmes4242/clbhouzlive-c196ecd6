@@ -67,17 +67,17 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
   if (!winner) {
     return (
       <motion.div className={cn("", className)} {...sectionEntrance}>
-        <div className="flex items-center gap-2 mb-3">
-          <Trophy className="w-4 h-4 text-amber-500" />
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
+          <Trophy className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber))' }} />
+          <h2 className="text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
             Champion
-          </span>
+          </h2>
         </div>
         
         <div className="p-6 bg-gradient-to-br from-foreground/50 to-foreground/30 rounded-xl border border-foreground/20">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-foreground/30 flex items-center justify-center">
-              <Trophy className="w-8 h-8 text-amber-500/60" />
+              <Trophy className="w-8 h-8" style={{ color: 'hsl(var(--accent-amber) / 0.6)' }} />
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-white/80">Champion unlocking soon</h3>
@@ -95,17 +95,17 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
   if (!winner.player) {
     return (
       <motion.div className={cn("", className)} {...sectionEntrance}>
-        <div className="flex items-center gap-2 mb-3">
-          <Trophy className="w-4 h-4 text-amber-500" />
-          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
+          <Trophy className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber))' }} />
+          <h2 className="text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
             Champion
-          </span>
+          </h2>
         </div>
         
         <div className="p-5 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl border border-amber-500/30">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-full bg-amber-500/20 flex items-center justify-center">
-              <Trophy className="w-7 h-7 text-amber-600" />
+              <Trophy className="w-7 h-7" style={{ color: 'hsl(var(--accent-amber))' }} />
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-foreground">{winner.headline || 'Champion crowned'}</h3>
@@ -122,11 +122,11 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
   // Full winner display with player linked
   return (
     <motion.div className={cn("", className)} {...sectionEntrance}>
-      <div className="flex items-center gap-2 mb-3">
-        <Trophy className="w-4 h-4 text-amber-500" />
-        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
+        <Trophy className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber))' }} />
+        <h2 className="text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
           Champion
-        </span>
+        </h2>
       </div>
       
       <Link 
@@ -228,7 +228,7 @@ export function CompactWinner({ winner, className }: CompactWinnerProps) {
         className
       )}
     >
-      <Trophy className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+      <Trophy className="w-3.5 h-3.5 shrink-0" style={{ color: 'hsl(var(--accent-amber))' }} />
       <span className="font-medium text-foreground truncate">
         {winner.player.full_name}
       </span>
