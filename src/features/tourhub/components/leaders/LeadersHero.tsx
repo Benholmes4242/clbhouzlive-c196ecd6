@@ -109,12 +109,11 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
               {category.label} Leader
             </motion.p>
 
-            {/* Player name + flag */}
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.4 }}
-              className="flex items-center gap-2"
+              className="space-y-0.5"
             >
               <h2
                 style={{
@@ -127,7 +126,12 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
               >
                 {player.full_name}
               </h2>
-              <CountryFlag country={player.country_code || player.country} size="sm" className="brightness-110" />
+              <div className="flex items-center gap-1.5">
+                <CountryFlag country={player.country_code || player.country} size="sm" className="brightness-110" />
+                {countryName && (
+                  <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>{countryName}</span>
+                )}
+              </div>
             </motion.div>
 
             {/* Stats pill — amber bg, white text, 13px/600 */}
