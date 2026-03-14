@@ -319,15 +319,17 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
       </div>
 
       {/* Subtext below token */}
-      <span className="text-[11px] font-medium mt-1"
-        style={showCompletionHero ? { color: 'hsl(var(--accent-amber) / 0.8)' } : undefined}
-        {...(!showCompletionHero ? { className: `text-[11px] font-medium mt-1 ${
-          isNextUp 
-            ? 'text-muted-foreground' 
-            : isUnlocked 
+      <span 
+        className={`text-[11px] font-medium mt-1 ${
+          showCompletionHero
+            ? ''
+            : isNextUp 
               ? 'text-muted-foreground' 
-              : 'text-muted-foreground/50'
-        }` } : {})}>
+              : isUnlocked 
+                ? 'text-muted-foreground' 
+                : 'text-muted-foreground/50'
+        }`}
+        style={showCompletionHero ? { color: 'hsl(var(--accent-amber) / 0.8)' } : undefined}>
         {isNextUp && aspirationalCopy
           ? aspirationalCopy
           : isUnlocked || showCompletionHero
