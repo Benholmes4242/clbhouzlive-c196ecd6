@@ -9,7 +9,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { BatchPlayerAvatar } from '../PlayerAvatar';
 import { RoundSelector } from './RoundSelector';
-import { TOUR_COLORS } from '../../constants/colors';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 
 interface RawRoundData {
@@ -77,10 +76,10 @@ function ScoreToPar({ score, className }: { score: number | null; className?: st
       style={{
         fontVariantNumeric: 'tabular-nums',
         color: score < 0
-          ? TOUR_COLORS.scoreUnderPar
+          ? 'hsl(var(--accent-amber))'
           : score > 0
           ? 'hsl(var(--foreground))'
-            : 'hsl(var(--muted-foreground))',
+          : 'hsl(var(--muted-foreground))',
       }}
     >
       {formatted}
@@ -88,29 +87,13 @@ function ScoreToPar({ score, className }: { score: number | null; className?: st
   );
 }
 
-function PositionBadge({ position, tied, isMissedCut, status }: {
-  position: number;
-  tied?: boolean;
-  isMissedCut?: boolean;
-  status?: string;
-}) {
-  const isTop3 = position <= 3 && !isMissedCut;
-  const display = isMissedCut ? 'MC' : status === 'WD' ? 'WD' : tied ? `T${position}` : String(position);
-
-  const podiumStyles: Record<number, string> = {
-    1: 'bg-gradient-to-br from-amber-300 to-amber-500 text-amber-900 shadow-sm shadow-amber-500/20',
-    2: 'bg-gradient-to-br from-slate-200 to-slate-400 text-slate-800 shadow-sm shadow-slate-400/20',
-    3: 'bg-gradient-to-br from-orange-300 to-orange-500 text-orange-900 shadow-sm shadow-orange-500/20',
-  };
-
-  return (
-    <div className={cn(
-      "w-[22px] h-[22px] rounded-full flex items-center justify-center text-[8px] font-bold shrink-0",
-      isTop3 ? podiumStyles[position] : "bg-muted text-muted-foreground"
-    )}>
-      {display}
-    </div>
-  );
+/** Aria label helper for thru/status display */
+function getThruAriaLabel(entry: FullLeaderboardEntry, isMissedCut: boolean, isWD: boolean, isLive: boolean): string {
+  if (isMissedCut) return 'missed cut';
+  if (isWD) return 'withdrawn';
+  if (entry.thru === null) return 'not started';
+  if (entry.thru >= 18 || entry.strokes) return 'finished';
+  return `through hole ${entry.thru}`;
 }
 
 const rowVariants = {
@@ -244,7 +227,7 @@ export function FullLeaderboard({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-muted flex items-center justify-center hover:bg-muted-foreground/20 transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-muted flex items-center justify-center active:scale-90 transition-transform"
             >
               <X className="w-3.5 h-3.5 text-muted-foreground" />
             </motion.button>
@@ -310,7 +293,6 @@ export function FullLeaderboard({
 
           // Compute position in round view from sort order
           const displayPosition = isRoundView ? index + 1 : entry.position;
-          const isTop3 = displayPosition <= 3 && !isMissedCut && !isWD;
 
           return (
             <motion.div
@@ -323,27 +305,40 @@ export function FullLeaderboard({
               <Link
                 to={`/tourhub/player/${entry.player?.id}`}
                 onClick={onPlayerTap}
-                aria-label={`Position ${entry.position_tied ? `T${entry.position}` : entry.position}, ${entry.player?.full_name || 'Unknown'}, ${entry.score === null ? 'no score' : entry.score === 0 ? 'even' : entry.score < 0 ? `${entry.score} to par` : `+${entry.score} to par`}, ${(() => {
-                  if (isMissedCut) return 'missed cut';
-                  if (isWD) return 'withdrawn';
-                  if (entry.thru === null) return 'not started';
-                  if (entry.thru === 18 || entry.strokes) return 'finished';
-                  return `through hole ${entry.thru}`;
-                })()}`}
+                aria-label={`Position ${entry.position_tied ? `T${entry.position}` : entry.position}, ${entry.player?.full_name || 'Unknown'}, ${entry.score === null ? 'no score' : entry.score === 0 ? 'even' : entry.score < 0 ? `${entry.score} to par` : `+${entry.score} to par`}, ${getThruAriaLabel(entry, isMissedCut, isWD, isLive)}`}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-3 transition-all duration-200 min-h-[52px]",
-                   "hover:bg-muted/40 active:scale-[0.995]",
-                   entry.position === 1 && !isMissedCut && !isWD && "bg-amber-50/30 dark:bg-amber-900/10 border-l-[3px] border-l-amber-400",
-                   isTop3 && displayPosition !== 1 && "bg-amber-50/10 dark:bg-amber-900/5",
+                  "flex items-center gap-2 px-4 py-3 transition-transform min-h-[52px]",
+                  "active:scale-[0.995]",
                   (isMissedCut || isWD) && "opacity-50",
                 )}
+                style={{
+                  ...(entry.position === 1 && !isMissedCut && !isWD ? {
+                    backgroundColor: 'hsl(var(--accent-amber) / 0.06)',
+                    borderLeft: '3px solid hsl(var(--accent-amber) / 0.6)',
+                    paddingLeft: '13px',
+                  } : {}),
+                }}
               >
-                <PositionBadge
-                  position={displayPosition}
-                  tied={isRoundView ? false : entry.position_tied}
-                  isMissedCut={isMissedCut}
-                  status={entry.status}
-                />
+                {/* Position — plain text */}
+                <span
+                  style={{
+                    width: '28px',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    fontVariantNumeric: 'tabular-nums',
+                    flexShrink: 0,
+                    color: isMissedCut || isWD
+                      ? 'hsl(var(--muted-foreground) / 0.4)'
+                      : displayPosition === 1
+                      ? 'hsl(var(--accent-amber))'
+                      : 'hsl(var(--muted-foreground))',
+                  }}
+                >
+                  {isMissedCut ? 'MC'
+                    : isWD ? 'WD'
+                    : (!isRoundView && entry.position_tied) ? `T${displayPosition}`
+                    : String(displayPosition)}
+                </span>
 
                 <div className="shrink-0">
                   <BatchPlayerAvatar
@@ -355,14 +350,14 @@ export function FullLeaderboard({
 
                 <div className="flex-1 min-w-0">
                   <p className={cn(
-                    "font-semibold truncate text-foreground text-[15px]",
+                    "font-semibold truncate text-foreground text-[14px]",
                     isWD && "italic"
                   )} style={{ letterSpacing: '-0.2px' }}>
                     {entry.player?.full_name || 'Unknown'}
                   </p>
-                  {entry.player?.country_code && (
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
-                      {entry.player.country_code}
+                  {(entry.player?.country || entry.player?.country_code) && (
+                    <p className="text-[10px] text-muted-foreground">
+                      {entry.player.country || entry.player.country_code}
                     </p>
                   )}
                 </div>
@@ -405,17 +400,17 @@ export function FullLeaderboard({
                     // Round view: show round-specific thru from raw_data
                     if (isRoundView && liveRoundThru != null && liveRoundThru > 0) {
                       if (liveRoundThru >= 18) {
-                        return <span className="text-[10px] text-emerald-600 font-medium">F</span>;
+                        return <span className="text-[10px] font-medium" style={{ color: 'hsl(var(--accent-amber))' }}>F</span>;
                       }
                       return (
-                        <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
-                          {liveRoundThru}
+                        <span className="text-[10px] text-muted-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                          Thru {liveRoundThru}
                         </span>
                       );
                     }
                     // Round view with completed round — show F
                     if (isRoundView && roundScoreForSelected != null) {
-                      return <span className="text-[10px] text-emerald-600 font-medium">F</span>;
+                      return <span className="text-[10px] font-medium" style={{ color: 'hsl(var(--accent-amber))' }}>F</span>;
                     }
 
                     if (isLive) {
@@ -428,11 +423,11 @@ export function FullLeaderboard({
                         return <span className="text-[10px] text-muted-foreground font-medium">{display}</span>;
                       }
                       if (display === 'F') {
-                        return <span className="text-[10px] text-emerald-600 font-medium">F</span>;
+                        return <span className="text-[10px] font-medium" style={{ color: 'hsl(var(--accent-amber))' }}>F</span>;
                       }
                       return (
-                        <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
-                          {display}
+                        <span className="text-[10px] text-muted-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                          Thru {display}
                         </span>
                       );
                     }
@@ -444,7 +439,7 @@ export function FullLeaderboard({
                       return <span className="text-[10px] text-muted-foreground font-medium">WD</span>;
                     }
                     if (entry.strokes) {
-                      return <span className="text-[10px] text-emerald-600 font-medium">F</span>;
+                      return <span className="text-[10px] font-medium" style={{ color: 'hsl(var(--accent-amber))' }}>F</span>;
                     }
                     return <span className="text-[10px] text-muted-foreground">—</span>;
                   })()}
@@ -454,12 +449,12 @@ export function FullLeaderboard({
               </Link>
 
               {showCutLine && (
-                <div className="flex items-center gap-3 px-4 py-2 bg-destructive/5">
-                  <div className="flex-1 border-t border-dashed border-destructive/50" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-destructive/80">
-                    Projected Cut
+                <div className="flex items-center gap-3 px-4 py-2">
+                  <div className="flex-1 border-t border-dashed border-border/50" />
+                  <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
+                    Cut Line
                   </span>
-                  <div className="flex-1 border-t border-dashed border-destructive/50" />
+                  <div className="flex-1 border-t border-dashed border-border/50" />
                 </div>
               )}
             </motion.div>
@@ -468,7 +463,7 @@ export function FullLeaderboard({
       </div>
 
       {/* Results count */}
-      <div className="py-4 border-t border-border/20 text-center">
+      <div className="py-4 border-t border-border/15 text-center">
         <span className="text-xs text-muted-foreground">
           {sortedEntries.length} player{sortedEntries.length !== 1 ? 's' : ''}
           {searchQuery && ` matching "${searchQuery}"`}
