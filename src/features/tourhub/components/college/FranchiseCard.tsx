@@ -68,6 +68,7 @@ export function FranchiseCard({
   const slug = stats.normalized_name;
   const isTopThree = rank !== undefined && rank <= 3;
   const momentumRising = momentum?.isRising ?? false;
+  const logoUrl = getCollegeLogoUrl(college?.college_name || stats.normalized_name);
 
   const buildStats = () => {
     if (isDelta && deltas) {
@@ -111,7 +112,7 @@ export function FranchiseCard({
         to={`/tourhub/college-golf/${slug}`}
         aria-label={ariaLabel}
         className={cn(
-          'flex overflow-hidden group',
+          'flex overflow-hidden',
           'active:scale-[0.98] transition-all',
           className
         )}
@@ -119,7 +120,6 @@ export function FranchiseCard({
           background: 'hsl(var(--card))',
           borderRadius: 16,
           border: '1px solid hsl(var(--border) / 0.5)',
-          
           minHeight: 110,
         }}
       >
@@ -132,9 +132,9 @@ export function FranchiseCard({
             borderRadius: '16px 0 0 16px',
           }}
         >
-          {getCollegeLogoUrl(college?.college_name || stats.normalized_name) ? (
+          {logoUrl ? (
             <img
-              src={getCollegeLogoUrl(college?.college_name || stats.normalized_name)!}
+              src={logoUrl}
               alt={displayName}
               style={{ width: 64, height: 64, objectFit: 'contain' }}
               loading="lazy"
@@ -154,9 +154,9 @@ export function FranchiseCard({
                 width: isTopThree ? 24 : 'auto',
                 height: isTopThree ? 24 : 'auto',
                 borderRadius: isTopThree ? '50%' : 4,
-                background: rank === 1 ? '#f59e0b'
-                  : rank === 2 ? '#94A3B8'
-                  : rank === 3 ? '#C2875A'
+                background: rank === 1 ? 'hsl(var(--accent-amber) / 0.9)'
+                  : rank === 2 ? 'rgba(148,163,184,0.9)'
+                  : rank === 3 ? 'rgba(194,135,90,0.9)'
                   : 'transparent',
                 color: isTopThree ? 'white' : 'hsl(var(--muted-foreground) / 0.6)',
                 fontSize: isTopThree ? 11 : 12,
@@ -181,7 +181,7 @@ export function FranchiseCard({
           {/* Momentum indicator */}
           {!isDelta && momentumRising && (
             <div className="absolute bottom-2 left-2">
-              <TrendingUp className="w-3.5 h-3.5" style={{ color: '#22C55E' }} />
+              <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
             </div>
           )}
         </div>
@@ -190,7 +190,7 @@ export function FranchiseCard({
         <div className="flex-1 min-w-0 flex flex-col justify-center" style={{ padding: '14px 12px 14px 0', paddingLeft: 14 }}>
           {/* College name — 16px, 600 */}
           <h3
-            className="text-foreground leading-tight group-hover:text-primary transition-colors"
+            className="text-foreground leading-tight"
             style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px' }}
           >
             {displayName}
@@ -204,13 +204,12 @@ export function FranchiseCard({
                 <span
                   className={cn(
                     'tabular-nums',
-                    item.isAccent
-                      ? 'text-[#f59e0b]'
-                      : item.color || 'text-muted-foreground'
+                    !item.isAccent && (item.color || 'text-muted-foreground')
                   )}
                   style={{
                     fontSize: item.isAccent ? 13 : 12,
                     fontWeight: item.isAccent ? 600 : 500,
+                    ...(item.isAccent ? { color: 'hsl(var(--accent-amber))' } : {}),
                   }}
                 >
                   {item.value}{item.label ? ` ${item.label}` : ''}
@@ -233,7 +232,7 @@ export function FranchiseCard({
                         width: 24,
                         height: 24,
                         borderRadius: '34%',
-                        border: '1.5px solid white',
+                        border: '1.5px solid hsl(var(--card))',
                         marginLeft: i === 0 ? 0 : -6,
                         zIndex: alumni.length - i,
                         position: 'relative',
