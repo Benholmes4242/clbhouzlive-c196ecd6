@@ -141,14 +141,17 @@ export function HandicapPodiumSlot({
             )}
           </div>
 
-          {/* Rank — plain number */}
+          {/* Rank badge — filled circle matching TrophyPodiumSlot */}
           <div
-            className="absolute -bottom-1.5 -right-0.5 flex items-center justify-center font-bold"
+            className="absolute -bottom-1.5 -right-0.5 flex items-center justify-center font-bold text-white shadow-md"
             style={{
-              fontSize: rank === 1 ? 13 : 11,
-              fontWeight: 700,
-              color: rank === 1 ? 'hsl(var(--accent-amber))' : 'hsl(var(--muted-foreground))',
-              textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+              width: rank === 1 ? 26 : 22,
+              height: rank === 1 ? 26 : 22,
+              borderRadius: '50%',
+              backgroundColor: rank === 1 ? 'hsl(var(--accent-amber))' : rank === 2 ? '#A8B4C0' : '#C4956A',
+              border: '2px solid hsl(var(--background))',
+              fontSize: (rank === 1 ? 26 : 22) * 0.45,
+              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
             }}
           >
             {rank}
