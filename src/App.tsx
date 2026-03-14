@@ -64,7 +64,7 @@ import AppShell from '@/components/AppShell';
 import { ReviewIslandLoader } from '@/ReviewIslandLoader';
 import { supabase } from '@/integrations/supabase/client';
 import { migrateChatHistory } from '@/utils/chatHistoryMigration';
-import { PanelGuard } from "@/components/admin/PanelGuard";
+
 
 import { AchievementToastContainer } from '@/components/achievements/AchievementToastContainer';
 import { LevelUpToastContainer } from '@/components/achievements/LevelUpToastContainer';
@@ -107,7 +107,7 @@ const ProfileHandicapView = lazy(() => import("./pages/ProfileHandicapView"));
 const ProfileQuestView = lazy(() => import("./pages/ProfileQuestView"));
 const QuestIndexView = lazy(() => import("./pages/QuestIndexView"));
 const QuestReplayView = lazy(() => import("./pages/QuestReplayView"));
-const AdminBackfill = lazy(() => import("./pages/AdminBackfill"));
+
 const UserReviewsPage = lazy(() => import("./pages/UserReviewsPage"));
 // Old Settings page removed - now using SettingsPageV2 via SettingsWrapped
 // Courses page now uses CoursesWrapped (imported above) which handles header/dim reset
@@ -141,37 +141,7 @@ const Top100List = lazy(() => import("./pages/Top100List"));
 const AchievementsHubPage = lazy(() => import("./pages/AchievementsHubPage"));
 const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
-const AdminPage = lazy(() => import("./pages/AdminPage"));
-const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
-const AdminLanding = lazy(() => import("./pages/admin/AdminLanding").then(m => ({ default: m.AdminLanding })));
 const AdminV2Shell = lazy(() => import('./features/admin-v2/AdminV2Shell'));
-const AdminUsersPage = lazy(() => import("./pages/admin/AdminUsersPage").then(m => ({ default: m.AdminUsersPage })));
-const AdminMembersPage = lazy(() => import("./pages/admin/AdminMembersPage").then(m => ({ default: m.AdminMembersPage })));
-const AdminOverviewPage = lazy(() => import("./pages/admin/AdminOverviewPage").then(m => ({ default: m.AdminOverviewPage })));
-const CommandCenterPage = lazy(() => import("./pages/admin/CommandCenterPage"));
-const AdminInvitesPage = lazy(() => import("./pages/admin/AdminInvitesPage").then(m => ({ default: m.AdminInvitesPage })));
-const InviteAcceptPage = lazy(() => import("./pages/admin/InviteAcceptPage").then(m => ({ default: m.InviteAcceptPage })));
-const VerificationsPage = lazy(() => import("./pages/admin/VerificationsPage"));
-const AdminBusinessDirectoryPage = lazy(() => import("./pages/admin/AdminBusinessDirectoryPage"));
-const AdminAuditPage = lazy(() => import("./pages/admin/AdminAuditPage"));
-
-// Legacy admin pages
-const GolfCoursesPage = lazy(() => import("./pages/admin/GolfCoursesPage").then(m => ({ default: m.GolfCoursesPage })));
-const GolfCourseEditorPage = lazy(() => import("./pages/admin/GolfCourseEditorPage"));
-const LogosPage = lazy(() => import("./pages/admin/LogosPage").then(m => ({ default: m.LogosPage })));
-const CollegeLogosPage = lazy(() => import("./pages/admin/CollegeLogosPage").then(m => ({ default: m.CollegeLogosPage })));
-const CountryFlagsPage = lazy(() => import("./pages/admin/CountryFlagsPage").then(m => ({ default: m.CountryFlagsPage })));
-const AssetManagerPage = lazy(() => import("./pages/admin/AssetManagerPage").then(m => ({ default: m.AssetManagerPage })));
-const CourseImportPage = lazy(() => import("./pages/admin/CourseImportPage").then(m => ({ default: m.CourseImportPage })));
-const AnalyticsPage = lazy(() => import("./pages/admin/AnalyticsPage").then(m => ({ default: m.AnalyticsPage })));
-const AdminEchoAnalyticsPage = lazy(() => import("./features/admin/pages/AdminEchoAnalyticsPage").then(m => ({ default: m.AdminEchoAnalyticsPage })));
-const AuthMonitoringPage = lazy(() => import("./pages/admin/AuthMonitoringPage"));
-const TeamPage = lazy(() => import("./pages/admin/TeamPage").then(m => ({ default: m.TeamPage })));
-const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage").then(m => ({ default: m.AdminSettingsPage })));
-const Top100GeocodingPage = lazy(() => import("./pages/admin/Top100GeocodingPage").then(m => ({ default: m.Top100GeocodingPage })));
-const AdminTestLabPage = lazy(() => import("./pages/admin/AdminTestLabPage"));
-const AdminTourPage = lazy(() => import("./pages/admin/AdminTourPage").then(m => ({ default: m.AdminTourPage })));
-const AdminTourPlayersPage = lazy(() => import("./pages/admin/AdminTourPlayersPage"));
 
 
 
@@ -394,95 +364,10 @@ function AppRoutes() {
         <Route path="/achievements/:userId" element={<Suspense fallback={<AchievementsSkeleton />}><AchievementsPage /></Suspense>} />
         <Route path="/admin-setup" element={<Suspense fallback={<GenericPageSkeleton />}><AdminSetupPage /></Suspense>} />
         
-        {/* Admin routes wrapped with AdminLayout */}
-        <Route path="/admin" element={<Suspense fallback={<GenericPageSkeleton />}><AdminLayout /></Suspense>}>
-          <Route index element={<Suspense fallback={<GenericPageSkeleton />}><AdminLanding /></Suspense>} />
-          <Route path="overview" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AdminOverviewPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="command-center" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><CommandCenterPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="users" element={
-            <PanelGuard need="users">
-              <Suspense fallback={<GenericPageSkeleton />}><AdminUsersPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="admins" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AdminMembersPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="invites" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AdminInvitesPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="verification" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><VerificationsPage /></Suspense>
-            </PanelGuard>
-          } />
-          {/* Redirect old route to new unified verification */}
-          <Route path="business-verifications" element={<Navigate to="/admin/verification?type=businesses" replace />} />
-          <Route path="businesses" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AdminBusinessDirectoryPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="audit" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AdminAuditPage /></Suspense>
-            </PanelGuard>
-          } />
-          
-          {/* Legacy/management sections */}
-          <Route path="golf-courses" element={<Suspense fallback={<GenericPageSkeleton />}><GolfCoursesPage /></Suspense>} />
-          <Route path="assets" element={<Suspense fallback={<GenericPageSkeleton />}><AssetManagerPage /></Suspense>} />
-          {/* Legacy routes - redirect to unified Asset Manager */}
-          <Route path="logos" element={<Navigate to="/admin/assets" replace />} />
-          <Route path="college-logos" element={<Navigate to="/admin/assets" replace />} />
-          <Route path="country-flags" element={<Navigate to="/admin/assets" replace />} />
-          <Route path="courses" element={<Suspense fallback={<GenericPageSkeleton />}><CourseImportPage /></Suspense>} />
-          <Route path="analytics" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AnalyticsPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="analytics/echo" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AdminEchoAnalyticsPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="auth-monitoring" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AuthMonitoringPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="team" element={<Suspense fallback={<GenericPageSkeleton />}><TeamPage /></Suspense>} />
-          <Route path="settings" element={<Suspense fallback={<GenericPageSkeleton />}><AdminSettingsPage /></Suspense>} />
-          <Route path="top100-geocoding" element={<Suspense fallback={<GenericPageSkeleton />}><Top100GeocodingPage /></Suspense>} />
-          <Route path="tour" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AdminTourPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="tour-players" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AdminTourPlayersPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="test-lab" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AdminTestLabPage /></Suspense>
-            </PanelGuard>
-          } />
-        </Route>
-        
+        {/* Old /admin routes removed — redirected to admin-v2 */}
+        <Route path="/admin" element={<Navigate to="/admin-v2/dashboard" replace />} />
+        <Route path="/admin/*" element={<Navigate to="/admin-v2/dashboard" replace />} />
+
         {/* Admin V2 — new standalone console */}
         <Route
           path="/admin-v2/*"
@@ -503,12 +388,7 @@ function AppRoutes() {
         {/* Public Echo Share Page */}
         <Route path="/echo/share/:token" element={<Suspense fallback={<GenericPageSkeleton />}><EchoSharePage /></Suspense>} />
         
-        {/* Golf Course Editor - full page routes outside AdminLayout */}
-        <Route path="/admin/golf-courses/new" element={<Suspense fallback={<GenericPageSkeleton />}><GolfCourseEditorPage /></Suspense>} />
-        <Route path="/admin/golf-courses/:id/edit" element={<Suspense fallback={<GenericPageSkeleton />}><GolfCourseEditorPage /></Suspense>} />
-        
-        <Route path="/admin/invite-accept" element={<Suspense fallback={<GenericPageSkeleton />}><InviteAcceptPage /></Suspense>} />
-        <Route path="/admin-backfill" element={<Suspense fallback={<GenericPageSkeleton />}><AdminBackfill /></Suspense>} />
+
 
         <Route path="/channel/:slug" element={<Suspense fallback={<ProfileSkeleton />}><ChannelProfile /></Suspense>} />
         <Route path="/game/:id" element={<Suspense fallback={<GenericPageSkeleton />}><GameDetailView /></Suspense>} />
