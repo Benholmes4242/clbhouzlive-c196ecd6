@@ -97,20 +97,35 @@ async function reviewVerification(
   decision: 'approved' | 'rejected',
   adminNote: string
 ): Promise<void> {
-  const table = type === 'business'
-    ? 'business_verification_requests'
-    : 'golfer_verification_requests';
+  const now = new Date().toISOString();
 
-  const { error } = await supabase
-    .from(table)
-    .update({
-      status:      decision,
-      admin_note:  adminNote || null,
-      reviewed_at: new Date().toISOString(),
-    } as any)
-    .eq('id', id);
-
-  if (error) throw error;
+  if (type === 'business') {
+    const { error } = await supabase
+      .from('business_verification_requests')
+      .update({
+        status:      decision,
+        admin_note:  adminNote || null,
+        reviewed_at: now,
+      })
+      .eq('id', id);
+    if (error) throw error;
+  } else {
+    // Golfer table uses 'accepted'/'declined' status values
+    const golferStatus = decision === 'approved' ? 'accepted' : 'declined';
+    const { error } = await supabase
+      .from('golfer_verification_requests' as any)
+      .update({
+        status:      golferStatus,
+        admin_note:  adminNote || null,
+        reviewed_at: now,
+        ...(decision === 'approved'
+          ? { accepted_at: now }
+          : { declined_at: now }
+        ),
+      } as any)
+      .eq('id', id);
+    if (error) throw error;
+  }
 }
 
 // ─── Team fetchers ─────────────────────────────────────────────────────────
