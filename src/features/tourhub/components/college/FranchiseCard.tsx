@@ -21,7 +21,6 @@ interface FranchiseCardProps {
   maxValue?: number;
   activeMetric?: 'earnings' | 'wins' | 'top10s';
   previousRank?: number;
-  status?: CollegeStatus | null;
   momentum?: CollegeMomentum | null;
   alumni?: AlumniFace[];
   className?: string;
