@@ -128,7 +128,7 @@ const AdminSetupPage = () => {
 
         toast.success("Admin account created");
 
-        navigate('/admin');
+        navigate('/admin-v2/dashboard');
       }
     } catch (error) {
       console.error('Error setting up admin account:', error);
