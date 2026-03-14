@@ -41,7 +41,7 @@ function ChampionCard({ player }: { player: ElitePlayer }) {
     >
       <div className={cn(
         "relative overflow-hidden rounded-2xl p-5",
-        "bg-card border border-border"
+        "bg-card"
       )}>
         {/* Subtle amber gradient for world #1 */}
         <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to left, hsl(var(--accent-amber) / 0.08), transparent)' }} />

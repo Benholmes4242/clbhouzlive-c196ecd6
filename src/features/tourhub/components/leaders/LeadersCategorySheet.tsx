@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { ChevronDown, Check } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import type { LeaderCategory } from './constants';
@@ -158,9 +158,8 @@ export function LeadersCategorySheet({
                           <span style={{ fontSize: 14 }} className="flex-1 truncate">
                             {cat.shortLabel}
                           </span>
-                          {isActive && (
-                            <Check className="w-4 h-4 shrink-0" style={{ color: 'white' }} />
-                          )}
+
+
                         </div>
                         {(cat as any).tourAverage && (
                           <span
