@@ -55,7 +55,7 @@ function VerificationDrawer({
     onDecide(item.id, item.type, decision, adminNote);
     setAdminNote('');
     setConfirming(null);
-    onClose();
+    // Do not close here — onDecide's mutation calls onClose on success
   };
 
   const isPendingItem = item?.status === 'pending';
