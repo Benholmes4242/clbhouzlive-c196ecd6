@@ -98,7 +98,7 @@ export function ScheduleTournamentCard({
 
   const handleVenueTap = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (venueName) navigate(`/tourhub/courses?q=${encodeURIComponent(venueName)}`);
+    if (venueName) navigate(`/courses?q=${encodeURIComponent(venueName)}`);
   };
 
   // Build aria-label
