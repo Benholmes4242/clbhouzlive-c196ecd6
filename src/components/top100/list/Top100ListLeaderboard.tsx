@@ -1,10 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Users } from 'lucide-react';
+import { Users, Trophy } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ArrowUp, ArrowDown, Minus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 interface FriendLeaderboardEntry {
   id: string;
