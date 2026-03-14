@@ -292,7 +292,7 @@ function UserDetailDrawer({
 
 export default function UsersPage() {
   const {
-    users, allCount, filteredCount, isLoading,
+    users, allFilteredUsers, allCount, filteredCount, isLoading,
     search, setSearch,
     filter, setFilter, counts,
     page, setPage, pageSize, setPageSize,
