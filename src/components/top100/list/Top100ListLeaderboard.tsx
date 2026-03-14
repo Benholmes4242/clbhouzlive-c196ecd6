@@ -154,12 +154,18 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
               onClick={() => navigate(`/profile/${friend.username}`)}
-              className={`
-                flex-shrink-0 w-[76px] p-1.5 rounded-xl bg-card border transition-all text-center active:scale-[0.95]
-                ${isCurrentUser ? 'border-[#D4A853] ring-2 ring-[#D4A853]/20' : ''}
-                ${isClosestCompetitor && !isCurrentUser ? 'border-[#D4A853]/60 shadow-[0_0_8px_rgba(212,168,83,0.25)]' : ''}
-                ${!isCurrentUser && !isClosestCompetitor ? 'border-border/60' : ''}
-              `}
+              className="flex-shrink-0 w-[76px] p-1.5 rounded-xl bg-card border transition-all text-center active:scale-[0.95]"
+              style={{
+                ...(isCurrentUser ? {
+                  borderColor: 'hsl(var(--accent-amber))',
+                  boxShadow: '0 0 0 2px hsl(var(--accent-amber) / 0.2)',
+                } : isClosestCompetitor ? {
+                  borderColor: 'hsl(var(--accent-amber) / 0.6)',
+                  boxShadow: '0 0 8px hsl(var(--accent-amber) / 0.25)',
+                } : {
+                  borderColor: 'hsl(var(--border) / 0.6)',
+                }),
+              }}
             >
               {/* Avatar - no border ring per avatar-border-removal-policy */}
               <div className="relative mx-auto mb-1">
