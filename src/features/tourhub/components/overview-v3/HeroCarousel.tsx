@@ -1056,7 +1056,6 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
 
   // Swipe gesture handlers
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (isExpanded) return;
     setIsPaused(true);
     touchStartRef.current = {
       x: e.touches[0].clientX,
