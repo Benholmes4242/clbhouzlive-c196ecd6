@@ -553,7 +553,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
     const map = mapRef.current;
     if (!map || !mapLoaded) return;
     if (map.getLayer('played-points')) {
-      map.setPaintProperty('played-points', 'circle-color', seasonColor);
+      map.setPaintProperty('played-points', 'circle-color', PLAYED_COLOR);
     }
   }, [seasonColor, mapLoaded]);
 
