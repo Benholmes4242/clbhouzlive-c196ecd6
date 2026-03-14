@@ -498,6 +498,8 @@ export function useTourPlayerStatistics(seasonId?: string) {
           scrambling: rawExtracted.scrambling ?? null,
           birdies_per_round: rawExtracted.birdies_per_round ?? null,
           strokes_gained_total: rawExtracted.strokes_gained_total ?? null,
+          strokes_gained_tee_green: rawExtracted.strokes_gained_tee_green ?? null,
+          strokes_gained: rawExtracted.strokes_gained ?? null,
           player: playerMap.get(stat.player_id),
         } as TourPlayerStatistics;
       });
