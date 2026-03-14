@@ -529,6 +529,13 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
           >
+            {/* Pill handle affordance for non-live collapsed cards */}
+            {!isExpanded && !isLive && (
+              <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: '8px', marginTop: '-8px' }}>
+                <div style={{ width: '32px', height: '3px', borderRadius: '2px', background: 'rgba(255,255,255,0.25)' }} />
+              </div>
+            )}
+
             {/* ─── COMPLETED: tournament name goes straight to top ─── */}
             {isCompleted ? (
               <>
