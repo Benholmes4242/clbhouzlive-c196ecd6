@@ -18,7 +18,7 @@ const tabs: { id: CourseTabId; label: string }[] = [
 
 /**
  * Course detail tabs — Tier 1 main tabs
- * Active: #1e293b rounded rectangle, no track
+ * Active: bg-foreground text-background, no track
  */
 export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: CourseTabsProps) {
   const getLabel = (tab: { id: CourseTabId; label: string }) => {
@@ -43,10 +43,10 @@ export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: Cou
               className={cn(
                 "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] rounded-lg",
                 isActive 
-                  ? "text-white" 
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "text-background" 
+                  : "text-muted-foreground"
               )}
-              style={isActive ? { backgroundColor: 'hsl(var(--tab-main-active))' } : undefined}
+              style={isActive ? { backgroundColor: 'hsl(var(--foreground))' } : undefined}
             >
               {getLabel(tab)}
             </button>
