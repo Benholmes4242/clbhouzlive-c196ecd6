@@ -137,6 +137,7 @@ export interface TournamentLiveMeta {
   leader:         LiveLeaderboardEntry | null;
   leaderboard:    LiveLeaderboardEntry[];
   lastUpdated:    string;
+  tourPriority:   number;
 }
 
 /** Live tournament feed post — client-side synthetic, never stored in DB */
