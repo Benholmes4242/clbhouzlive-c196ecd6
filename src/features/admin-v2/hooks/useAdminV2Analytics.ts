@@ -1,6 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+interface CourseRatingAggregateRow {
+  course_id:         string | null;
+  avg_overall_score: number | null;
+  review_count:      number | null;
+}
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type AnalyticsPeriod = '7d' | '14d' | '30d' | '90d';
