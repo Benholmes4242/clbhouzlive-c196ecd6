@@ -24,6 +24,7 @@ function fmt(value: number | null | undefined, type?: 'decimal' | 'percent' | 'y
   if (value === null || value === undefined) return '—';
   switch (type) {
     case 'decimal': return value.toFixed(2);
+    case 'putting': return value.toFixed(3);
     case 'percent': return `${value.toFixed(1)}%`;
     case 'yards': return `${value.toFixed(1)} yds`;
     case 'currency':
