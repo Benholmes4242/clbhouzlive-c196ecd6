@@ -90,20 +90,19 @@ export const Top100CourseListItem: React.FC<Top100CourseListItemProps> = ({
                   onTogglePlayed?.();
                 }}
                 className={cn(
-                  'inline-flex items-center rounded-full border px-2.5 py-[4px] text-[11px] font-medium transition-colors',
-                  isPlayed
-                    ? 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100'
-                    : 'border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100'
+                  'inline-flex items-center rounded-full border px-2.5 py-[4px] text-[11px] font-medium',
+                  !isPlayed && 'border-border/50 bg-muted text-muted-foreground'
                 )}
+                style={isPlayed ? { borderColor: 'hsl(var(--accent-amber) / 0.3)', background: 'hsl(var(--accent-amber) / 0.1)', color: 'hsl(var(--accent-amber))' } : undefined}
               >
                 {isPlayed ? (
                   <>
-                    <span className="mr-1.5 inline-block h-3 w-3 rounded-full border border-amber-500 bg-amber-400" />
+                    <span className="mr-1.5 inline-block h-3 w-3 rounded-full" style={{ border: '1px solid hsl(var(--accent-amber))', backgroundColor: 'hsl(var(--accent-amber))' }} />
                     Played
                   </>
                 ) : (
                   <>
-                    <span className="mr-1.5 inline-block h-3 w-3 rounded-full border border-slate-400 bg-slate-100" />
+                    <span className="mr-1.5 inline-block h-3 w-3 rounded-full border border-border bg-muted" />
                     Not played yet
                   </>
                 )}

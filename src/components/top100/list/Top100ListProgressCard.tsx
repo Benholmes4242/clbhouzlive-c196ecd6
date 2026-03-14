@@ -105,7 +105,7 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
           <p className="text-[13px] font-medium text-muted-foreground italic whitespace-nowrap">
             {statusCopy}
           </p>
-          <ChevronRight className="w-4 h-4 text-muted-foreground/60 group-hover:text-muted-foreground transition-colors" />
+          <ChevronRight className="w-4 h-4 text-muted-foreground/60" />
         </div>
       </div>
     </motion.button>

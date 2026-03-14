@@ -191,12 +191,12 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
               </div>
 
               {/* Relative position indicator */}
-              <div className={`
-                mt-0.5 flex items-center justify-center gap-0.5 text-[9px] font-medium rounded-full px-1 py-0.5
-                ${isAhead ? 'bg-emerald-50 text-emerald-600' : ''}
-                ${isBehind ? 'bg-rose-50 text-rose-500' : ''}
-                ${isSame ? 'bg-amber-50 text-amber-600' : ''}
-              `}>
+              <div className="mt-0.5 flex items-center justify-center gap-0.5 text-[9px] font-medium rounded-full px-1 py-0.5"
+                style={
+                  isAhead ? { background: 'hsl(var(--accent-amber) / 0.1)', color: 'hsl(var(--accent-amber))' } :
+                  isSame ? { background: 'hsl(var(--muted))', color: 'hsl(var(--muted-foreground))' } :
+                  isBehind ? { background: 'hsl(var(--destructive) / 0.08)', color: 'hsl(var(--destructive) / 0.7)' } : {}
+                }>
                 {isAhead && (
                   <>
                     <ArrowUp className="w-2 h-2" />

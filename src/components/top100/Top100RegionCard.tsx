@@ -192,8 +192,7 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
                     'bg-white/95 backdrop-blur-sm text-foreground',
                     'border border-white/20',
                     'shadow-[0_2px_8px_rgba(0,0,0,0.15)]',
-                    'hover:bg-white hover:shadow-md',
-                    'active:scale-[0.97] transition-all duration-150'
+                    'active:opacity-90 active:scale-[0.97] transition-all duration-150'
                   )}
                   onClick={(e) => {
                     e.stopPropagation();

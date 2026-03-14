@@ -145,7 +145,7 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
                       ? 'text-muted-foreground/60 cursor-not-allowed'
                       : isActive 
                         ? 'bg-muted/50 border border-border text-foreground font-medium cursor-pointer' 
-                        : 'text-muted-foreground hover:bg-muted/50 cursor-pointer'
+                        : 'text-muted-foreground cursor-pointer'
                   }`}
                   disabled={isDisabled}
                 >
