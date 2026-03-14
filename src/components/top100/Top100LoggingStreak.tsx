@@ -78,12 +78,13 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
         <div className="flex items-center gap-3">
           {/* Fire icon with orange/amber color */}
           <div
-            className={cn(
-              'w-9 h-9 rounded-full flex items-center justify-center transition-all',
-              currentStreak > 0
-                ? 'bg-gradient-to-br from-orange-500/15 to-amber-500/15 text-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.2)]'
-                : 'bg-muted text-muted-foreground'
-            )}
+            className="w-9 h-9 rounded-full flex items-center justify-center transition-all"
+            style={currentStreak > 0 ? {
+              background: 'hsl(var(--accent-amber) / 0.15)',
+              color: 'hsl(var(--accent-amber))',
+              boxShadow: '0 0 12px hsl(var(--accent-amber) / 0.2)',
+            } : undefined}
+            {...(currentStreak <= 0 ? { className: 'w-9 h-9 rounded-full flex items-center justify-center transition-all bg-muted text-muted-foreground' } : {})}
           >
             <Flame className={cn(
               "h-4.5 w-4.5 transition-transform",
