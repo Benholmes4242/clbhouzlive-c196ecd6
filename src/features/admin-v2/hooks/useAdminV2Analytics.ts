@@ -157,8 +157,8 @@ async function fetchContentAnalytics(period: AnalyticsPeriod): Promise<ContentAn
       .limit(10),
   ]);
 
-  const topRatings = (topRatingsRes.data ?? []) as any[];
-  const topCourseIds = topRatings.map((r: any) => r.course_id).filter(Boolean) as string[];
+  const topRatings = (topRatingsRes.data ?? []) as CourseRatingAggregateRow[];
+  const topCourseIds = topRatings.map(r => r.course_id).filter(Boolean) as string[];
   const { data: topCourseNames } = topCourseIds.length > 0
     ? await supabase.from('golf_courses').select('id, name, country').in('id', topCourseIds)
     : { data: [] };
