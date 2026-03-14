@@ -98,21 +98,13 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
         <h2 className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground/60">
           Your Milestones
         </h2>
-        <motion.button
+        <button
           onClick={handleTileClick}
-          className="text-[11px] font-medium text-muted-foreground/60 transition-colors flex items-center gap-0.5 group py-2 px-2 -mr-2 rounded-lg active:scale-[0.97]"
-          whileHover={{ x: 2 }}
+          className="text-[11px] font-medium text-muted-foreground/60 flex items-center gap-0.5 py-2 px-2 -mr-2 rounded-lg active:scale-[0.97] active:opacity-70 transition-all"
         >
           See all
-          <motion.span 
-            className="inline-block"
-            initial={{ x: 0 }}
-            whileHover={{ x: 3 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-          >
-            →
-          </motion.span>
-        </motion.button>
+          <span className="inline-block">→</span>
+        </button>
       </div>
 
       {/* Horizontal scrolling rail */}

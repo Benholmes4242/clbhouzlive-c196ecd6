@@ -115,7 +115,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
 
       {/* PROGRESS SECTION - on page background with semantic text */}
       {showProgress && (
-        <div className="w-full px-4 py-4 bg-muted/20">
+        <div className="w-full px-4 py-4">
           {/* Top row: X / total (primary) + % complete (secondary) */}
           <div className="flex items-baseline justify-between gap-4">
             <div className="flex items-baseline">

@@ -495,7 +495,7 @@ const Top100List = () => {
 
           {filteredAndSortedCourses.length === 0 && (
             <div className="text-center py-12 mx-4">
-              <p className="text-muted-foreground text-lg">
+              <p className="text-sm text-muted-foreground">
                 No courses match your current filter
               </p>
             </div>
