@@ -67,13 +67,13 @@ export const MasteryTrack: React.FC<MasteryTrackProps> = ({
       <div 
         className="rounded-xl p-4 mb-4"
         style={{
-          background: 'linear-gradient(135deg, rgba(193, 168, 76, 0.06) 0%, rgba(255,255,255,0.98) 100%)',
-          border: '1px solid rgba(193, 168, 76, 0.15)',
+          background: 'hsl(var(--accent-amber) / 0.05)',
+          border: '1px solid hsl(var(--accent-amber) / 0.15)',
         }}
       >
         <div className="flex items-center gap-2 mb-1">
-          <Crown className="w-4 h-4 text-[#C1A84C]" />
-          <span className="text-xs font-bold uppercase tracking-wider text-[#8B7635]">
+          <Crown className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber))' }} />
+          <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'hsl(var(--accent-amber))' }}>
             Mastery Track
           </span>
         </div>
