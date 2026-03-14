@@ -76,14 +76,14 @@ function MetricCompareRow({ label, value1, value2, format = String, lowerIsBette
           className="rounded-l-full"
           style={{
             width: `${pct1}%`,
-            backgroundColor: isLeading1 ? 'rgba(245, 158, 11, 0.9)' : 'hsl(var(--border))',
+            backgroundColor: isLeading1 ? 'hsl(var(--accent-amber) / 0.9)' : 'hsl(var(--border))',
           }}
         />
         <div
           className="rounded-r-full"
           style={{
             width: `${pct2}%`,
-            backgroundColor: isLeading2 ? 'rgba(245, 158, 11, 0.9)' : 'hsl(var(--border))',
+            backgroundColor: isLeading2 ? 'hsl(var(--accent-amber) / 0.9)' : 'hsl(var(--border))',
           }}
         />
       </div>
@@ -133,7 +133,7 @@ function AlumniCompareBlock({ title, alumni1, alumni2, statKey, emptyLabel }: {
         <Link
           key={a.id}
           to={`/tourhub/player/${a.id}`}
-          className="flex items-center gap-2 bg-card rounded-2xl border border-border/50 hover:border-border transition-colors"
+          className="flex items-center gap-2 bg-card rounded-2xl border border-border/50 active:scale-[0.98] transition-transform"
           style={{ padding: '10px 12px' }}
         >
           <span className="text-muted-foreground" style={{ fontSize: 11, fontWeight: 500, width: '16px', fontVariantNumeric: 'tabular-nums' }}>{i + 1}</span>
@@ -208,6 +208,9 @@ export function CollegeCompareHero({ data, className, onBack }: CollegeCompareHe
 
   const name1 = college1.media?.short_name || college1.media?.college_name || 'College 1';
   const name2 = college2.media?.short_name || college2.media?.college_name || 'College 2';
+
+  const logo1 = getCollegeLogoUrl(college1.media?.college_name || name1);
+  const logo2 = getCollegeLogoUrl(college2.media?.college_name || name2);
 
   const s1 = college1.stats;
   const s2 = college2.stats;
@@ -284,16 +287,16 @@ export function CollegeCompareHero({ data, className, onBack }: CollegeCompareHe
         <div className="flex items-start" style={{ gap: 0 }}>
           <Link
             to={`/tourhub/college-golf/${s1?.normalized_name}`}
-            className="flex-1 flex flex-col items-center group min-w-0"
+            className="flex-1 flex flex-col items-center min-w-0"
           >
-            <div className="w-20 h-20 rounded-xl bg-card border border-border/50 flex items-center justify-center overflow-hidden mb-2 group-hover:border-primary/30 transition-colors">
-              {getCollegeLogoUrl(college1.media?.college_name || name1) ? (
-                <img src={getCollegeLogoUrl(college1.media?.college_name || name1)!} alt={name1} className="w-16 h-16 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+            <div className="w-20 h-20 rounded-xl bg-card border border-border/50 flex items-center justify-center overflow-hidden mb-2">
+              {logo1 ? (
+                <img src={logo1} alt={name1} className="w-16 h-16 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
               ) : (
                 <span className="text-xl font-bold text-muted-foreground">{name1.charAt(0)}</span>
               )}
             </div>
-            <span className="text-foreground group-hover:text-primary transition-colors text-center truncate max-w-full" style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px' }}>
+            <span className="text-foreground text-center truncate max-w-full" style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px' }}>
               {name1}
             </span>
           </Link>
@@ -305,16 +308,16 @@ export function CollegeCompareHero({ data, className, onBack }: CollegeCompareHe
 
           <Link
             to={`/tourhub/college-golf/${s2?.normalized_name}`}
-            className="flex-1 flex flex-col items-center group min-w-0"
+            className="flex-1 flex flex-col items-center min-w-0"
           >
-            <div className="w-20 h-20 rounded-xl bg-card border border-border/50 flex items-center justify-center overflow-hidden mb-2 group-hover:border-primary/30 transition-colors">
-              {getCollegeLogoUrl(college2.media?.college_name || name2) ? (
-                <img src={getCollegeLogoUrl(college2.media?.college_name || name2)!} alt={name2} className="w-16 h-16 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+            <div className="w-20 h-20 rounded-xl bg-card border border-border/50 flex items-center justify-center overflow-hidden mb-2">
+              {logo2 ? (
+                <img src={logo2} alt={name2} className="w-16 h-16 object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
               ) : (
                 <span className="text-xl font-bold text-muted-foreground">{name2.charAt(0)}</span>
               )}
             </div>
-            <span className="text-foreground group-hover:text-primary transition-colors text-center truncate max-w-full" style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px' }}>
+            <span className="text-foreground text-center truncate max-w-full" style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px' }}>
               {name2}
             </span>
           </Link>

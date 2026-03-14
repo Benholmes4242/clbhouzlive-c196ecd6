@@ -69,9 +69,25 @@ export function CollegeComparePage() {
               </button>
             </div>
           ) : isLoading ? (
-            <div className="space-y-4">
-              <div className="h-32 bg-card border border-border rounded-xl animate-pulse" />
-              <div className="h-48 bg-card border border-border rounded-xl animate-pulse" />
+            <div>
+              {/* VS header skeleton */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex-1 flex flex-col items-center gap-2">
+                  <div className="w-20 h-20 rounded-xl bg-muted animate-pulse" />
+                  <div className="h-4 w-24 rounded bg-muted animate-pulse" />
+                </div>
+                <div className="w-16 flex justify-center">
+                  <div className="h-5 w-8 rounded bg-muted animate-pulse" />
+                </div>
+                <div className="flex-1 flex flex-col items-center gap-2">
+                  <div className="w-20 h-20 rounded-xl bg-muted animate-pulse" />
+                  <div className="h-4 w-24 rounded bg-muted animate-pulse" />
+                </div>
+              </div>
+              {/* Summary card skeleton */}
+              <div className="h-24 rounded-2xl bg-muted animate-pulse mb-4" />
+              {/* Stats skeleton */}
+              <div className="h-48 rounded-2xl bg-muted animate-pulse" />
             </div>
           ) : error ? (
             <div className="text-center py-16">

@@ -336,12 +336,10 @@ export function CollegeProfilePage() {
       {/* Content sections */}
       <div className="w-full max-w-5xl mx-auto px-4" style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
         {/* Compare Button — 16px from stats bar */}
-        {stats && firstRival && (
+        {stats && rivalSlugs.length > 0 && (
           <motion.div
-            variants={sectionVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
             className="flex items-center justify-center"
             style={{ marginTop: '16px' }}
