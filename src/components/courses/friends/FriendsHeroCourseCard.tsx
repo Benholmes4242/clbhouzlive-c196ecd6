@@ -39,7 +39,7 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="relative overflow-hidden cursor-pointer group"
+      className="relative overflow-hidden cursor-pointer active:scale-[0.98] transition-transform"
       onClick={() => navigate(`/courses/${course.course_id}`)}
     >
       {/* Course Image with overlay */}
@@ -48,7 +48,7 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
           src={course.thumbnail_url || '/placeholder.svg'}
           alt={course.course_name}
           loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+          className="w-full h-full object-cover"
           onError={(e) => { e.currentTarget.src = '/placeholder.svg'; }}
         />
         
@@ -100,7 +100,7 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
         </button>
         <p className="text-sm text-muted-foreground">
           Played by{' '}
-          <button onClick={handleFriendClick} className="font-semibold text-foreground hover:underline">
+          <button onClick={handleFriendClick} className="font-semibold text-foreground active:opacity-70 transition-opacity">
             {friendName}
           </button>
           {course.total_friends_played > 1 && (

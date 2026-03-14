@@ -33,10 +33,7 @@ const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.15, delay: index * 0.03 }}
-      className="rounded-[14px] p-3 cursor-pointer group transition-shadow bg-card border border-border/30"
-      style={{
-        boxShadow: '0 1px 3px hsl(var(--foreground) / 0.04)',
-      }}
+      className="rounded-2xl p-3 cursor-pointer bg-card border border-border/50 active:scale-[0.98] transition-transform"
       onClick={handleCourseClick}
     >
       <div className="flex gap-3">
@@ -58,7 +55,7 @@ const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
         <div className="flex-1 min-w-0">
           <p className="text-sm">
             <button
-              className="font-semibold text-foreground hover:underline"
+              className="font-semibold text-foreground active:opacity-70 transition-opacity"
               onClick={handleFriendClick}
             >
               {friendName}
@@ -84,7 +81,7 @@ const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
             src={hit.thumbnail_url || '/placeholder.svg'}
             alt={hit.course_name}
             className="w-14 h-14 rounded-[10px] object-cover"
-            style={{ border: '1px solid hsl(var(--border) / 0.3)' }}
+            style={{ border: '1px solid hsl(var(--border) / 0.5)' }}
             onError={(e) => { e.currentTarget.src = '/placeholder.svg'; }}
           />
         </div>

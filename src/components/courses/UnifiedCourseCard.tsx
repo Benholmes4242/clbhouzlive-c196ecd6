@@ -45,7 +45,6 @@ interface UnifiedCourseCardProps {
 function getRegionalBadgeSlug(course: CourseCardModel): 'usa' | 'gb-i' | 'europe' | null {
   if (course.ranks?.usa) return 'usa';
   if (course.ranks?.regional) {
-    // Determine region based on country - check both individual countries and region names
     const gbCountries = [
       'England', 'Scotland', 'Wales', 'Ireland', 'Northern Ireland',
       'Britain & Ireland', 'Great Britain', 'United Kingdom', 'UK', 'GB'
@@ -54,7 +53,6 @@ function getRegionalBadgeSlug(course: CourseCardModel): 'usa' | 'gb-i' | 'europe
     if (gbCountries.some(c => country.toLowerCase() === c.toLowerCase())) {
       return 'gb-i';
     }
-    // Also check if locationText contains GB&I region indicators
     const locationText = course.locationText?.toLowerCase() || '';
     if (locationText.includes('britain') || locationText.includes('ireland') || 
         locationText.includes('scotland') || locationText.includes('england') ||
@@ -100,7 +98,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
       <button
         type="button"
         onClick={handleClick}
-        className={`group w-full bg-card border border-border/60 rounded-sq-sm overflow-hidden text-left hover:border-border hover:shadow-sm active:scale-[0.99] transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 ${className}`}
+        className={`group w-full bg-card border border-border/60 rounded-sq-sm overflow-hidden text-left active:scale-[0.99] transition-transform duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 ${className}`}
       >
         <div className="flex">
           {/* Thumbnail */}
@@ -156,7 +154,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
       type="button"
       onClick={handleClick}
       aria-label={`View ${course.name}`}
-      className={`group w-full rounded-none sm:rounded-sq-md overflow-hidden bg-card sm:border sm:border-border/50 text-left shadow-none sm:shadow-sm hover:sm:shadow-lg hover:sm:scale-[1.005] active:scale-[0.98] sm:active:scale-[0.995] transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 ${className}`}
+      className={`group w-full rounded-none sm:rounded-sq-md overflow-hidden bg-card sm:border sm:border-border/50 text-left shadow-none sm:shadow-sm active:scale-[0.98] sm:active:scale-[0.995] transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 ${className}`}
     >
       {/* Hero image with badges */}
       <div className={`relative w-full ${IMAGE_ASPECT} overflow-hidden`}>
@@ -165,7 +163,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
             src={course.imageUrl}
             alt={course.name}
             loading="lazy"
-            className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]"
+            className="w-full h-full object-cover"
             onError={(e) => {
               e.currentTarget.src = '/placeholder.svg';
             }}
@@ -230,7 +228,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
 
             {/* Logged date pill - aligned with course name */}
             {loggedDate && (
-              <div className="inline-block text-[9px] font-medium text-muted-foreground bg-muted/60 px-2.5 py-1 rounded-full">
+              <div className="inline-block text-[9px] font-medium text-muted-foreground bg-muted/60 px-2.5 py-1 rounded-lg">
                 Logged: {format(new Date(loggedDate), 'd MMM yyyy')}
               </div>
             )}

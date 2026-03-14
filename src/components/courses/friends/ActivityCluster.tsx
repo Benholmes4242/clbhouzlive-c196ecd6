@@ -53,10 +53,7 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.15, delay: index * 0.03 }}
-      className="rounded-[14px] p-3 cursor-pointer group transition-shadow bg-card border border-border/30"
-      style={{
-        boxShadow: '0 1px 3px hsl(var(--foreground) / 0.04)',
-      }}
+      className="rounded-2xl p-3 cursor-pointer bg-card border border-border/50 active:scale-[0.98] transition-transform"
       onClick={handleCourseClick}
     >
       <div className="flex gap-3">
@@ -100,7 +97,7 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
             src={thumbnailUrl || '/placeholder.svg'}
             alt={courseName}
             className="w-14 h-14 rounded-[10px] object-cover"
-            style={{ border: '1px solid hsl(var(--border) / 0.3)' }}
+            style={{ border: '1px solid hsl(var(--border) / 0.5)' }}
             onError={(e) => { e.currentTarget.src = '/placeholder.svg'; }}
           />
         </div>
@@ -110,7 +107,7 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
       {friends.length > 1 && (
         <button
           onClick={toggleExpand}
-          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mt-2 pt-2 transition-colors"
+          className="flex items-center gap-1 text-xs text-muted-foreground mt-2 pt-2 transition-colors active:opacity-70"
           style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}
         >
           {isExpanded ? 'Hide friends' : `Show ${friends.length} friends`}
@@ -134,7 +131,7 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
               {sortedFriends.map((friend) => (
                 <button
                   key={`${friend.friend_id}-${friend.played_at}`}
-                  className="w-full flex items-center justify-between py-1.5 px-1 rounded-lg hover:bg-muted/40 transition-colors"
+                  className="w-full flex items-center justify-between py-1.5 px-1 rounded-lg active:bg-muted/40 transition-colors"
                   onClick={(e) => handleFriendClick(friend.friend_profile.username, e)}
                 >
                   <div className="flex items-center gap-2 min-w-0">
@@ -152,10 +149,10 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
                   {friend.rating ? (
                     <div className="flex items-center gap-1 shrink-0">
                       <ClubhouseLogo size="xs" />
-                      <span className={cn(
-                        "text-sm font-semibold tabular-nums",
-                        friend.rating >= 9.0 ? 'text-accent-amber' : 'text-foreground'
-                      )}>{friend.rating.toFixed(1)}</span>
+                      <span
+                        className="text-sm font-semibold tabular-nums text-foreground"
+                        style={friend.rating >= 9.0 ? { color: 'hsl(var(--accent-amber))' } : undefined}
+                      >{friend.rating.toFixed(1)}</span>
                     </div>
                   ) : (
                     <span className="text-xs text-muted-foreground">—</span>
