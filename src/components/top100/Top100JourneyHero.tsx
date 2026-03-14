@@ -11,18 +11,6 @@ interface Top100JourneyHeroProps {
   className?: string;
 }
 
-/**
- * Calculate stage label based on completed courses
- */
-function getStageLabel(completed: number): string {
-  if (completed >= 100) return 'Grand Slam';
-  if (completed >= 50) return '50 Club';
-  if (completed >= 20) return '20 Club';
-  if (completed >= 10) return 'Explorer';
-  if (completed >= 5) return 'Rookie';
-  return 'Getting Started';
-}
-
 interface ProgressRingProps {
   completed: number;
   total: number;
@@ -62,7 +50,7 @@ const ProgressRing: React.FC<ProgressRingProps> = ({
         height={size}
         className="transform -rotate-90"
       >
-        {/* Gradient definition */}
+        {/* Gradient definition — amber-500/amber-400, consistent with accent-amber */}
         <defs>
           <linearGradient id="outstandingGradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="rgba(245, 158, 11, 0.9)" />
@@ -79,7 +67,7 @@ const ProgressRing: React.FC<ProgressRingProps> = ({
           strokeWidth={strokeWidth}
           className="text-muted"
         />
-        {/* Progress arc - Outstanding gradient */}
+        {/* Progress arc */}
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -111,8 +99,6 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
   className,
 }) => {
   const navigate = useNavigate();
-  const stageLabel = getStageLabel(completedCourses);
-  const isComplete = totalCoursesInStartedLists > 0 && completedCourses >= totalCoursesInStartedLists;
   const isZeroProgress = completedCourses === 0;
 
   const handleClick = () => {
@@ -132,13 +118,12 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
         className={cn(
           'relative w-full p-4',
           'rounded-2xl',
-          'bg-card/92 backdrop-blur-sm',
+          'bg-card',
           'border border-border/50',
           'text-left',
           'cursor-pointer',
-          'hover:bg-card/95',
           'active:scale-[0.99]',
-          'transition-all duration-200'
+          'transition-transform duration-200'
         )}
         aria-label="View your Top 100 Journey"
       >
@@ -162,15 +147,11 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
             Your Top 100 Journey
           </h2>
 
-          {/* Progress Headline - Outstanding gradient on number */}
+          {/* Progress Headline — accent-amber number */}
           <div className="flex items-baseline gap-2 mb-3">
             <span 
               className="text-3xl font-bold"
-              style={{ 
-                background: 'linear-gradient(to right, rgba(245, 158, 11, 0.9), rgba(251, 191, 36, 0.9))', 
-                WebkitBackgroundClip: 'text', 
-                WebkitTextFillColor: 'transparent' 
-              }}
+              style={{ color: 'hsl(var(--accent-amber))' }}
             >
               {completedCourses}
             </span>
@@ -187,9 +168,8 @@ export const Top100JourneyHero: React.FC<Top100JourneyHeroProps> = ({
               'text-sm font-medium',
               'bg-muted text-foreground',
               'rounded-lg',
-              'hover:bg-muted/80',
               'active:scale-[0.97]',
-              'transition-all duration-150',
+              'transition-transform duration-150',
               'whitespace-nowrap'
             )}
           >
