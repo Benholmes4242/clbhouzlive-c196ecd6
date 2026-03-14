@@ -54,7 +54,8 @@ const REGION_CONFIG: Record<
   },
 };
 
-const WANT_TO_PLAY_COLOR = '#F7931E';
+const PLAYED_COLOR = '#f59e0b';       // amber-400 — brand colour, matches accent-amber
+const WANT_TO_PLAY_COLOR = '#22c55e'; // green-500 — aspiration, growth
 
 // Shared fog config
 const GLOBE_FOG_CONFIG: mapboxgl.FogSpecification = {
@@ -325,7 +326,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           'circle-stroke-color': [
             'case',
             ['>', ['/', ['get', 'played_count'], ['get', 'point_count']], 0.5],
-            seasonColor + '99', // 60% opacity
+            PLAYED_COLOR + '99', // 60% opacity
             'rgba(255, 255, 255, 0.15)',
           ],
         },
@@ -403,7 +404,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             12, 22,
             16, 26,
           ],
-          'circle-color': 'rgba(247, 147, 30, 0.2)',
+          'circle-color': 'rgba(34, 197, 94, 0.2)',
           'circle-blur': 0.8,
           'circle-opacity-transition': { duration: 300, delay: 0 },
         },
@@ -444,7 +445,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             12, 14,
             16, 18,
           ],
-          'circle-color': seasonColor,
+          'circle-color': PLAYED_COLOR,
           'circle-opacity': 1.0,
           'circle-stroke-width': 2,
           'circle-stroke-color': 'rgba(255,255,255,0.8)',
@@ -552,7 +553,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
     const map = mapRef.current;
     if (!map || !mapLoaded) return;
     if (map.getLayer('played-points')) {
-      map.setPaintProperty('played-points', 'circle-color', seasonColor);
+      map.setPaintProperty('played-points', 'circle-color', PLAYED_COLOR);
     }
   }, [seasonColor, mapLoaded]);
 
@@ -636,13 +637,13 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
               <span 
                 className="inline-block h-2.5 w-2.5 rounded-full shadow-sm" 
-                style={{ backgroundColor: seasonColor }}
+                style={{ backgroundColor: PLAYED_COLOR }}
                 aria-hidden="true" 
               />
               <span className="text-[11px] font-medium text-white/90">Played</span>
             </div>
             <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
-              <span className="inline-block h-2.5 w-2.5 rounded-full border-2 bg-transparent shadow-[0_0_4px_rgba(247,147,30,0.4)]" style={{ borderColor: WANT_TO_PLAY_COLOR }} aria-hidden="true" />
+              <span className="inline-block h-2.5 w-2.5 rounded-full border-2 bg-transparent shadow-[0_0_4px_rgba(34,197,94,0.4)]" style={{ borderColor: WANT_TO_PLAY_COLOR }} aria-hidden="true" />
               <span className="text-[11px] font-medium text-white/90">Want to Play</span>
             </div>
             <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
@@ -749,7 +750,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
               <div 
                 className="absolute inset-0 rounded-full blur-sm opacity-60"
                 style={{
-                  background: seasonColor,
+                  background: PLAYED_COLOR,
                   width: `${progressPercent}%`,
                   transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
                 }}
@@ -758,7 +759,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                 className="h-full rounded-full relative z-10 transition-all duration-700 ease-out"
                 style={{ 
                   width: `${progressPercent}%`,
-                  background: seasonColor
+                  background: PLAYED_COLOR
                 }}
               />
             </div>
