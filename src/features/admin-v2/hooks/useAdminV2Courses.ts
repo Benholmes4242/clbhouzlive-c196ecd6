@@ -27,6 +27,12 @@ export interface AdminCourseRow {
 
 export type CourseFilterList = 'all' | 'global' | 'gbi' | 'usa' | 'europe' | 'unranked';
 
+interface CourseRatingAggregateRow {
+  course_id:         string;
+  avg_overall_score: number | null;
+  review_count:      number | null;
+}
+
 // ─── Fetchers ─────────────────────────────────────────────────────────────────
 
 async function fetchCourses(): Promise<AdminCourseRow[]> {
@@ -45,13 +51,13 @@ async function fetchCourses(): Promise<AdminCourseRow[]> {
 
   // Separate query for ratings (view — no FK for PostgREST nested select)
   const courseIds = (data ?? []).map(c => c.id);
-  const { data: ratingsData } = await supabase
+  const { data: ratingsData } = await (supabase
     .from('course_rating_aggregates' as any)
     .select('course_id, avg_overall_score, review_count')
-    .in('course_id', courseIds);
+    .in('course_id', courseIds) as any as Promise<{ data: CourseRatingAggregateRow[] | null; error: any }>);
 
   const ratingsMap = new Map(
-    ((ratingsData ?? []) as any[]).map((r: any) => [r.course_id, r])
+    (ratingsData ?? []).map(r => [r.course_id, r])
   );
 
   return (data ?? []).map((c: any) => ({

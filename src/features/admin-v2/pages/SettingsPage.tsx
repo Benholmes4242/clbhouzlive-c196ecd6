@@ -39,7 +39,10 @@ export default function SettingsPage() {
                 <p className="text-[12px] text-muted-foreground">Your current permission level</p>
               </div>
             </div>
-            <AdminStatusPill status="active" label={role ?? 'unknown'} />
+            <AdminStatusPill
+              status={role === 'full' ? 'full' : 'limited'}
+              label={role === 'full' ? 'Full Admin' : 'Limited Admin'}
+            />
           </div>
 
           <div className="flex items-center justify-between px-5 py-4">

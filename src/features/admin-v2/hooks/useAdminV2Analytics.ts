@@ -1,6 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+interface CourseRatingAggregateRow {
+  course_id:         string | null;
+  avg_overall_score: number | null;
+  review_count:      number | null;
+}
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type AnalyticsPeriod = '7d' | '14d' | '30d' | '90d';
@@ -151,8 +157,8 @@ async function fetchContentAnalytics(period: AnalyticsPeriod): Promise<ContentAn
       .limit(10),
   ]);
 
-  const topRatings = (topRatingsRes.data ?? []) as any[];
-  const topCourseIds = topRatings.map((r: any) => r.course_id).filter(Boolean) as string[];
+  const topRatings = (topRatingsRes.data ?? []) as unknown as CourseRatingAggregateRow[];
+  const topCourseIds = topRatings.map(r => r.course_id).filter(Boolean) as string[];
   const { data: topCourseNames } = topCourseIds.length > 0
     ? await supabase.from('golf_courses').select('id, name, country').in('id', topCourseIds)
     : { data: [] };
@@ -170,9 +176,9 @@ async function fetchContentAnalytics(period: AnalyticsPeriod): Promise<ContentAn
     totalReviews:  totalReviewsRes.count ?? 0,
     postsThisPeriod:   posts.data?.length ?? 0,
     reviewsThisPeriod: reviews.data?.length ?? 0,
-    topReviewedCourses: topRatings.map((r: any) => ({
-      name:      courseNameMap.get(r.course_id)?.name ?? 'Unknown',
-      country:   courseNameMap.get(r.course_id)?.country ?? '',
+    topReviewedCourses: topRatings.map(r => ({
+      name:      courseNameMap.get(r.course_id ?? '')?.name ?? 'Unknown',
+      country:   courseNameMap.get(r.course_id ?? '')?.country ?? '',
       count:     r.review_count ?? 0,
       avgRating: r.avg_overall_score ?? 0,
     })),

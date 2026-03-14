@@ -292,7 +292,7 @@ function UserDetailDrawer({
 
 export default function UsersPage() {
   const {
-    users, allCount, filteredCount, isLoading,
+    users, allFilteredUsers, allCount, filteredCount, isLoading,
     search, setSearch,
     filter, setFilter, counts,
     page, setPage, pageSize, setPageSize,
@@ -438,7 +438,7 @@ export default function UsersPage() {
             id: 'export',
             label: 'Export CSV',
             onClick: () => {
-              const rows = users.filter(u => selectedIds.has(u.id));
+              const rows = allFilteredUsers.filter(u => selectedIds.has(u.id));
               const csv  = [
                 'ID,Name,Username,Country,Role,Verified,Joined',
                 ...rows.map(u => [
