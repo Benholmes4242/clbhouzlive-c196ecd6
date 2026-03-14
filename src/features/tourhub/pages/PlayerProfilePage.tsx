@@ -38,7 +38,7 @@ export function PlayerProfilePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
-  const { setVariant, hideHeader, showHeader } = useHeader();
+  const { hideHeader, showHeader } = useHeader();
 
   // Transparent status bar for immersive hero bleed into safe area
   useMedianStatusBar("dark", "transparent", true, false);
@@ -93,9 +93,8 @@ export function PlayerProfilePage() {
     hideHeader();
     return () => {
       showHeader();
-      setVariant('solid-light');
     };
-  }, [hideHeader, showHeader, setVariant]);
+  }, [hideHeader, showHeader]);
 
   const handleBack = () => {
     if (location.key !== 'default') {
@@ -198,7 +197,7 @@ export function PlayerProfilePage() {
         <StatRibbon playerStats={playerStats ?? null} />
 
         {/* ← Back text link */}
-        <div className="px-4" style={{ padding: '12px 16px 8px 16px' }}>
+        <div style={{ padding: '12px 16px 8px 16px' }}>
           <button
             onClick={handleBack}
             className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
@@ -212,7 +211,7 @@ export function PlayerProfilePage() {
         {playerId && <PlayerRecentForm playerId={playerId} />}
 
         {/* Content sections */}
-        <div className="w-full max-w-5xl mx-auto px-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
+        <div className="w-full max-w-5xl mx-auto px-4" style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
           {/* TEMPORARILY HIDDEN — Clbhouz Rating (re-enable when algorithm is tuned)
           {playerRating && (
             <motion.div
@@ -234,9 +233,9 @@ export function PlayerProfilePage() {
           )}
           */}
 
-          {/* Season Performance — 24px from momentum strip */}
+          {/* Season Performance — 28px from momentum strip */}
           <motion.div
-            style={{ marginTop: '0px' }}
+            style={{ marginTop: 28 }}
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"
@@ -261,7 +260,7 @@ export function PlayerProfilePage() {
           {/* Skill Build — 28px gap */}
           {playerId && (
             <motion.div
-              style={{ marginTop: '0px' }}
+              style={{ marginTop: 28 }}
               variants={sectionVariants}
               initial="hidden"
               whileInView="visible"
@@ -275,7 +274,7 @@ export function PlayerProfilePage() {
           {/* Recent Tournaments — 28px gap */}
           {playerId && (
             <motion.div
-              style={{ marginTop: '0px' }}
+              style={{ marginTop: 28 }}
               variants={sectionVariants}
               initial="hidden"
               whileInView="visible"
@@ -288,7 +287,7 @@ export function PlayerProfilePage() {
 
           {/* Player Info — 28px gap */}
           <motion.div
-            style={{ marginTop: '0px' }}
+            style={{ marginTop: 28 }}
             variants={sectionVariants}
             initial="hidden"
             whileInView="visible"
@@ -299,7 +298,7 @@ export function PlayerProfilePage() {
           </motion.div>
 
           {/* Bottom spacer */}
-          <div style={{ marginTop: '0px' }} />
+          <div style={{ marginTop: 28 }} />
         </div>
       </div>
     </PageRoot>
