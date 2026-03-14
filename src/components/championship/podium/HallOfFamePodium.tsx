@@ -15,6 +15,7 @@ interface HallOfFamePodiumProps {
 }
 
 // Scaled-up configuration matching TrophyPodiumSlot
+// Gold uses accent-amber CSS var; silver (#A8B4C0) and bronze (#C4956A) are decorative — no semantic var available
 const POSITION_CONFIG = {
   1: {
     avatarSize: 120,
@@ -25,9 +26,9 @@ const POSITION_CONFIG = {
     statSize: 24,
     statWeight: 800,
     labelSize: 13,
-    borderColor: '#D4A853',
-    badgeBg: '#D4A853',
-    shadowColor: 'rgba(212, 168, 83, 0.3)',
+    borderColor: 'hsl(var(--accent-amber))',
+    badgeBg: 'hsl(var(--accent-amber))',
+    shadowColor: 'hsl(var(--accent-amber) / 0.3)',
     crownSize: 36,
     verticalOffset: 0,
   },
@@ -40,7 +41,7 @@ const POSITION_CONFIG = {
     statSize: 20,
     statWeight: 700,
     labelSize: 12,
-    borderColor: '#A8B4C0',
+    borderColor: '#A8B4C0', // Silver — decorative, no semantic var
     badgeBg: '#A8B4C0',
     shadowColor: 'rgba(0, 0, 0, 0.1)',
     crownSize: 0,
@@ -55,7 +56,7 @@ const POSITION_CONFIG = {
     statSize: 20,
     statWeight: 700,
     labelSize: 12,
-    borderColor: '#C4956A',
+    borderColor: '#C4956A', // Bronze — decorative, no semantic var
     badgeBg: '#C4956A',
     shadowColor: 'rgba(0, 0, 0, 0.1)',
     crownSize: 0,
@@ -117,8 +118,8 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
           <Crown
             size={config.crownSize}
             className="drop-shadow-md"
-            style={{ color: '#D4A853' }}
-            fill="#D4A853"
+            style={{ color: 'hsl(var(--accent-amber))' }}
+            fill="#f59e0b"
             strokeWidth={1.5}
           />
         </motion.div>
@@ -134,7 +135,7 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
               left: '-2rem',
               right: '-2rem',
               bottom: '-2rem',
-              background: 'radial-gradient(ellipse at center, rgba(212, 168, 83, 0.35) 0%, rgba(212, 168, 83, 0.12) 50%, transparent 80%)',
+              background: 'radial-gradient(ellipse at center, hsl(var(--accent-amber) / 0.35) 0%, hsl(var(--accent-amber) / 0.12) 50%, transparent 80%)',
               filter: 'blur(12px)',
             }}
           />
@@ -194,7 +195,7 @@ const HallOfFameSlot: React.FC<SlotProps> = ({ entry, position, onClick, animati
       {/* Stat */}
       <motion.p
         className="font-bold mt-0.5"
-        style={{ color: '#D4A853', fontSize: config.statSize, fontWeight: config.statWeight }}
+        style={{ color: 'hsl(var(--accent-amber))', fontSize: config.statSize, fontWeight: config.statWeight }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: animationDelay + 0.3, duration: 0.3 }}
@@ -269,17 +270,17 @@ export const HallOfFamePodium: React.FC<HallOfFamePodiumProps> = ({
         <div className="flex items-center justify-center gap-3 mb-2">
           <div 
             className="h-px w-20"
-            style={{ background: 'linear-gradient(90deg, transparent, rgba(212, 168, 83, 0.3), transparent)' }}
+            style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--accent-amber) / 0.3), transparent)' }}
           />
           <div 
             className="relative"
-            style={{ filter: 'drop-shadow(0 0 12px rgba(212, 168, 83, 0.2))' }}
+            style={{ filter: 'drop-shadow(0 0 12px hsl(var(--accent-amber) / 0.2))' }}
           >
-            <Trophy size={32} style={{ color: '#D4A853' }} />
+            <Trophy size={32} style={{ color: 'hsl(var(--accent-amber))' }} />
           </div>
           <div 
             className="h-px w-20"
-            style={{ background: 'linear-gradient(90deg, transparent, rgba(212, 168, 83, 0.3), transparent)' }}
+            style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--accent-amber) / 0.3), transparent)' }}
           />
         </div>
         

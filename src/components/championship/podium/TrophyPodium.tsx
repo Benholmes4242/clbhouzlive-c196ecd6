@@ -18,7 +18,7 @@ interface TrophyPodiumProps {
  */
 export const TrophyPodium: React.FC<TrophyPodiumProps> = ({
   entries,
-  seasonThemeColor = '#22c55e',
+  seasonThemeColor = 'hsl(var(--accent-amber))',
   currentUserId,
   onUserClick,
   isLoading = false,
