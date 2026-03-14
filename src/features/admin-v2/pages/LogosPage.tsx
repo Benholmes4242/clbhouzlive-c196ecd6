@@ -1,17 +1,19 @@
 import React from 'react';
+import { AdminPageHeader, AdminButton } from '../components/ui';
+import { ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import LogosManagement from '@/components/admin/LogosManagement';
 
 export default function LogosPage() {
+  const navigate = useNavigate();
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Logos</h1>
-          <p className="text-sm text-muted-foreground">Coming in Sprint 8</p>
-        </div>
-      </div>
-      <div className="rounded-xl border border-border/60 bg-card p-8 text-center">
-        <p className="text-sm text-muted-foreground">This section is being built</p>
-      </div>
+    <div className="p-6 max-w-5xl mx-auto space-y-6">
+      <AdminPageHeader
+        title="Logos"
+        description="Club and organization logo management"
+        action={<AdminButton variant="outline" icon={ArrowLeft} size="sm" onClick={() => navigate('/admin-v2/assets')}>Back</AdminButton>}
+      />
+      <LogosManagement />
     </div>
   );
 }

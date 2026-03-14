@@ -1,16 +1,19 @@
 import React from 'react';
+import { AdminPageHeader, AdminSectionHeader } from '../../components/ui';
+import { BusinessAccessTestLab } from '@/components/admin/BusinessAccessTestLab';
+import { GameInviteTestLab } from '@/components/admin/GameInviteTestLab';
 
 export default function TestLabPage() {
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Test Lab</h1>
-          <p className="text-sm text-muted-foreground">Coming in Sprint 8</p>
-        </div>
+    <div className="p-6 max-w-4xl mx-auto space-y-6">
+      <AdminPageHeader title="Test Lab" description="Development testing tools" />
+      <div className="space-y-4">
+        <AdminSectionHeader title="Business Access" />
+        <BusinessAccessTestLab />
       </div>
-      <div className="rounded-xl border border-border/60 bg-card p-8 text-center">
-        <p className="text-sm text-muted-foreground">This section is being built</p>
+      <div className="space-y-4">
+        <AdminSectionHeader title="Game Invites" />
+        <GameInviteTestLab />
       </div>
     </div>
   );
