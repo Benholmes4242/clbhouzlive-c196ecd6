@@ -87,7 +87,7 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
       value: player.college_normalized ? (
         <Link
           to={`/tourhub/college-golf/${player.college_normalized}`}
-          className="text-primary hover:underline font-medium active:opacity-70 transition-opacity"
+          className="text-primary font-medium active:opacity-70 transition-opacity"
         >
           {player.college}
         </Link>
