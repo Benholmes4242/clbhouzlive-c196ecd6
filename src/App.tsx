@@ -64,7 +64,7 @@ import AppShell from '@/components/AppShell';
 import { ReviewIslandLoader } from '@/ReviewIslandLoader';
 import { supabase } from '@/integrations/supabase/client';
 import { migrateChatHistory } from '@/utils/chatHistoryMigration';
-import { PanelGuard } from "@/components/admin/PanelGuard";
+
 
 import { AchievementToastContainer } from '@/components/achievements/AchievementToastContainer';
 import { LevelUpToastContainer } from '@/components/achievements/LevelUpToastContainer';
