@@ -58,7 +58,10 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
         default: return s.earnings_total;
       }
     };
-    const sorted = [...allStats].sort((a, b) => getValue(b) - getValue(a)).slice(0, limit);
+    const sorted = [...allStats]
+      .sort((a, b) => getValue(b) - getValue(a))
+      .filter(s => activeMetric === 'wins' ? getValue(s) > 0 : true)
+      .slice(0, limit);
     const max = sorted.length > 0 ? getValue(sorted[0]) : 1;
     return { sortedStats: sorted, maxValue: max };
   }, [allStats, activeMetric, limit]);
@@ -139,31 +142,46 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
             ) : error ? (
               <div className="text-center py-12 text-sm text-muted-foreground">Failed to load leaderboard</div>
             ) : sortedStats.length > 0 ? (
-              sortedStats.map((collegeStats, index) => {
-                const status = statusMap.get(collegeStats.normalized_name) || null;
-                const moverData = moverInfo?.moverData?.get(collegeStats.normalized_name);
-                const momentum = moverData ? {
-                  rankChange: moverData.rankChange,
-                  earningsDelta: moverData.earningsDelta,
-                  isRising: moverData.earningsDelta > 0 || (moverData.rankChange !== null && moverData.rankChange > 0),
-                } : null;
-                const alumni = alumniMap?.get(collegeStats.normalized_name) || undefined;
+              <>
+                {sortedStats.map((collegeStats, index) => {
+                  const status = statusMap.get(collegeStats.normalized_name) || null;
+                  const moverData = moverInfo?.moverData?.get(collegeStats.normalized_name);
+                  const momentum = moverData ? {
+                    rankChange: moverData.rankChange,
+                    earningsDelta: moverData.earningsDelta,
+                    isRising: moverData.earningsDelta > 0 || (moverData.rankChange !== null && moverData.rankChange > 0),
+                  } : null;
+                  const alumni = alumniMap?.get(collegeStats.normalized_name) || undefined;
 
-                return (
-                  <FranchiseCard
-                    key={collegeStats.normalized_name}
-                    stats={collegeStats}
-                    college={collegeMap?.get(collegeStats.normalized_name) || null}
-                    rank={index + 1}
-                    maxValue={maxValue}
-                    activeMetric={activeMetric}
-                    status={status}
-                    momentum={momentum}
-                    alumni={alumni}
-                    animationDelay={index * 0.03}
-                  />
-                );
-              })
+                  return (
+                    <FranchiseCard
+                      key={collegeStats.normalized_name}
+                      stats={collegeStats}
+                      college={collegeMap?.get(collegeStats.normalized_name) || null}
+                      rank={index + 1}
+                      maxValue={maxValue}
+                      activeMetric={activeMetric}
+                      status={status}
+                      momentum={momentum}
+                      alumni={alumni}
+                      animationDelay={index * 0.03}
+                    />
+                  );
+                })}
+                {activeMetric === 'wins' && (
+                  <p
+                    style={{ fontSize: 12, fontWeight: 500, textAlign: 'center', marginTop: 8 }}
+                    className="text-muted-foreground/50"
+                  >
+                    {sortedStats.length} {sortedStats.length === 1 ? 'franchise' : 'franchises'} with wins this season
+                  </p>
+                )}
+              </>
+            ) : activeMetric === 'wins' ? (
+              <div className="flex flex-col items-center py-12 text-center">
+                <p className="text-sm font-medium text-foreground mb-1">No wins yet this season</p>
+                <p className="text-xs text-muted-foreground">Check back as the season progresses.</p>
+              </div>
             ) : (
               <div className="flex flex-col items-center py-12 text-center">
                 <p className="text-sm font-medium text-foreground mb-1">No data available</p>
