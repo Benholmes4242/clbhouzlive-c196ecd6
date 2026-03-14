@@ -36,7 +36,7 @@ export const CoursePodiumSlot: React.FC<Props> = ({
   position,
   sort,
   showGlow,
-  seasonColor = '#006747',
+  seasonColor = 'hsl(var(--accent-amber))',
   onClick,
 }) => {
   const isCenter = position === 'center';
@@ -46,21 +46,12 @@ export const CoursePodiumSlot: React.FC<Props> = ({
     return { border: 'none' };
   };
 
-  const getRankBadgeColor = () => {
-    switch (rank) {
-      case 1: return '#D4A853';
-      case 2: return '#A8B4C0';
-      case 3: return '#C4956A';
-    }
-  };
-
   const getMetricDisplay = () => {
-    const iconCls = `w-[${config.iconSize}px] h-[${config.iconSize}px]`;
     switch (sort) {
       case 'highest_rated':
         return (
           <span className="flex items-center justify-center">
-            <span style={{ color: '#D4A853', fontSize: config.metricSize, fontWeight: config.metricWeight }}>
+            <span style={{ color: 'hsl(var(--accent-amber))', fontSize: config.metricSize, fontWeight: config.metricWeight }}>
               {course.avg_rating?.toFixed(1) || '-'}
             </span>
           </span>
@@ -78,7 +69,7 @@ export const CoursePodiumSlot: React.FC<Props> = ({
         if (!course.rank_change || course.rank_change === 0) {
           return (
             <span className="flex items-center justify-center">
-              <span style={{ color: '#D4A853', fontSize: config.metricSize, fontWeight: config.metricWeight }}>
+              <span style={{ color: 'hsl(var(--accent-amber))', fontSize: config.metricSize, fontWeight: config.metricWeight }}>
                 {course.avg_rating?.toFixed(1) || '-'}
               </span>
             </span>
@@ -122,8 +113,8 @@ export const CoursePodiumSlot: React.FC<Props> = ({
           <Crown
             size={36}
             className="drop-shadow-md"
-            style={{ color: '#D4A853', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))' }}
-            fill="#D4A853"
+            style={{ color: 'hsl(var(--accent-amber))', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))' }}
+            fill="#f59e0b"
             strokeWidth={1.5}
           />
         </motion.div>
@@ -134,7 +125,7 @@ export const CoursePodiumSlot: React.FC<Props> = ({
         <div
           className="absolute -inset-6 -z-10 rounded-3xl"
           style={{
-            background: 'radial-gradient(ellipse at center, rgba(212, 168, 83, 0.05) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse at center, hsl(var(--accent-amber) / 0.08) 0%, transparent 70%)',
           }}
         />
       )}
@@ -150,7 +141,7 @@ export const CoursePodiumSlot: React.FC<Props> = ({
             aspectRatio: '4/3',
             ...getBorderStyle(),
             boxShadow: rank === 1
-              ? '0 8px 24px rgba(212, 168, 83, 0.2)'
+              ? '0 8px 24px hsl(var(--accent-amber) / 0.2)'
               : '0 4px 12px rgba(0, 0, 0, 0.1)',
           }}
         >
@@ -168,18 +159,16 @@ export const CoursePodiumSlot: React.FC<Props> = ({
           )}
         </div>
 
-        {/* Rank badge - bottom center */}
+        {/* Rank number — plain typographic, amber for #1, muted for others */}
         <div
-          className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full flex items-center justify-center text-white font-bold shadow-md"
+          className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex items-center justify-center font-bold"
           style={{
-            width: config.badgeSize,
-            height: config.badgeSize,
-            background: getRankBadgeColor(),
             fontSize: config.badgeFontSize,
-            border: '2px solid white',
+            color: rank === 1 ? 'hsl(var(--accent-amber))' : 'hsl(var(--muted-foreground))',
+            textShadow: '0 1px 2px rgba(0,0,0,0.3)',
           }}
         >
-          {rank}
+          #{rank}
         </div>
       </div>
 
