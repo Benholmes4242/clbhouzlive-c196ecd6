@@ -350,9 +350,9 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                       "flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium active:scale-[0.98] transition-all duration-150",
                     )}
                     style={isWantToPlay ? {
-                      background: '#F7931E',
+                      background: '#22c55e',
                       color: '#ffffff',
-                      boxShadow: '0 2px 8px rgba(247,147,30,0.25)',
+                      boxShadow: '0 2px 8px rgba(34,197,94,0.25)',
                     } : {
                       background: 'rgba(255, 255, 255, 0.08)',
                       border: '1px solid rgba(255, 255, 255, 0.15)',

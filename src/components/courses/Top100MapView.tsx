@@ -759,7 +759,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                 className="h-full rounded-full relative z-10 transition-all duration-700 ease-out"
                 style={{ 
                   width: `${progressPercent}%`,
-                  background: seasonColor
+                  background: PLAYED_COLOR
                 }}
               />
             </div>
