@@ -210,17 +210,20 @@ const InlineLoadingSkeleton = () => (
 
 const ErrorState = ({ onRetry }: { onRetry: () => void }) => (
   <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
-    <div className="w-10 h-10 rounded-full border border-dashed border-destructive/40 flex items-center justify-center text-destructive mb-1">
-      <X className="w-4 h-4" />
+    <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-destructive/10 flex items-center justify-center">
+      <AlertCircle className="w-6 h-6 text-destructive" />
     </div>
     <h3 className="text-sm font-semibold">Unable to load courses</h3>
     <p className="text-sm text-muted-foreground max-w-xs">
       We couldn't fetch the courses. Please check your connection and try again.
     </p>
-    <Button variant="outline" size="sm" className="mt-2 gap-1.5" onClick={onRetry}>
+    <button
+      onClick={onRetry}
+      className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-card border border-border/50 text-foreground active:scale-[0.98] transition-transform"
+    >
       <ChevronDown className="h-4 w-4 rotate-180" />
       Retry
-    </Button>
+    </button>
   </div>
 );
 
