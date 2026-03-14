@@ -9,7 +9,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
-import { useCollegeStatusMap, useTopMovers } from '../../hooks/useCollegeStatus';
+import { useTopMovers } from '../../hooks/useCollegeStatus';
 import { useBatchCollegeAlumni } from '../../hooks/useBatchCollegeAlumni';
 import { FranchiseCard } from './FranchiseCard';
 import { FranchiseMovers } from './FranchiseMovers';
