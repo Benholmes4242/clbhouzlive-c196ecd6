@@ -56,17 +56,20 @@ function RunnerCard({
       to={`/tourhub/player/${player.id}`}
       className="flex items-center gap-2 active:scale-[0.97] transition-transform flex-1 min-w-0 bg-card border border-border/50 rounded-2xl px-3.5 py-2.5"
     >
-      {/* Rank circle — 26×26 */}
-      <div
-        className="flex-shrink-0 flex items-center justify-center rounded-full"
+      {/* Rank number — plain, muted */}
+      <span
         style={{
-          width: 26,
-          height: 26,
-          background: index === 0 ? 'rgba(148,163,184,0.9)' : 'rgba(194,135,90,0.9)',
+          fontSize: 12,
+          fontWeight: 700,
+          fontVariantNumeric: 'tabular-nums',
+          color: 'hsl(var(--muted-foreground))',
+          flexShrink: 0,
+          width: 18,
+          textAlign: 'center',
         }}
       >
-        <span style={{ fontSize: 11, fontWeight: 700, color: 'white' }}>{index + 2}</span>
-      </div>
+        {index + 2}
+      </span>
 
       {/* Avatar — 36×36, 34% border-radius */}
       <div
