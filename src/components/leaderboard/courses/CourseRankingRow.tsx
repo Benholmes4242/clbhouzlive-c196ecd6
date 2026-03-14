@@ -27,9 +27,9 @@ interface Props {
   onClick: () => void;
 }
 
-export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonColor = '#006747', onClick }) => {
+export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonColor = 'hsl(var(--accent-amber))', onClick }) => {
   const getRankColor = () => {
-    if (rank === 1) return '#D4A853';
+    if (rank === 1) return 'hsl(var(--accent-amber))';
     if (rank === 2) return '#A8B4C0';
     if (rank === 3) return '#C4956A';
     return undefined;
@@ -44,9 +44,9 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonCo
   const location = course.sub_country || course.country || '';
   const rankColor = getRankColor();
 
-  // Season-aware played treatment
-  const playedBg = course.current_user_played ? `${seasonColor}08` : undefined;
-  const playedBorder = course.current_user_played ? `${seasonColor}4D` : undefined;
+  // Season-aware played treatment using CSS vars for proper alpha
+  const playedBg = course.current_user_played ? 'hsl(var(--accent-amber) / 0.05)' : undefined;
+  const playedBorder = course.current_user_played ? 'hsl(var(--accent-amber) / 0.3)' : undefined;
 
   return (
     <button
@@ -55,10 +55,9 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonCo
       className={cn(
         'w-full flex items-center gap-3 py-4 px-5 text-left',
         'transition-colors active:scale-[0.98] transition-transform',
-        'hover:bg-[rgba(0,0,0,0.02)]',
       )}
       style={{
-        borderBottom: '1px solid hsl(var(--border) / 0.15)',
+        borderBottom: '1px solid hsl(var(--border) / 0.25)',
         borderLeft: playedBorder ? `3px solid ${playedBorder}` : undefined,
         backgroundColor: playedBg,
       }}
@@ -102,11 +101,11 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonCo
         {/* Rating row */}
         <div className="flex items-center gap-1.5 mt-1" style={{ fontSize: 13 }}>
           <span className="flex items-center">
-            <span className="font-bold" style={{ color: '#D4A853', fontSize: 16 }}>
+            <span className="font-bold" style={{ color: 'hsl(var(--accent-amber))', fontSize: 16 }}>
               {course.avg_rating?.toFixed(1) || '-'}
             </span>
           </span>
-          <span style={{ color: 'rgba(0,0,0,0.15)' }}>·</span>
+          <span className="text-muted-foreground/40">·</span>
           <span className="text-muted-foreground">
             Played by {course.unique_players || course.times_played}
           </span>

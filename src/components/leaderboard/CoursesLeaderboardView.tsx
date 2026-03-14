@@ -53,7 +53,7 @@ const CourseLeaderboardSkeleton = () => (
   <div className="flex flex-col">
     {[1, 2, 3].map((i) => (
       <div key={i} className="flex items-center gap-3 py-3 px-4 border-b border-border animate-pulse">
-        <Skeleton className="w-7 h-7 rounded-full" />
+        <Skeleton className="w-6 h-5 rounded" />
         <Skeleton className="w-14 h-14 rounded-xl" />
         <div className="flex-1 space-y-1.5">
           <Skeleton className="h-4 w-3/4" />
@@ -70,7 +70,7 @@ const InlineRetryCard = ({ onRetry }: { onRetry: () => void }) => (
   <div className="max-w-md mx-auto mt-4 px-4">
     <button
       onClick={onRetry}
-      className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-sq-sm bg-card border border-border text-sm text-muted-foreground hover:text-foreground hover:border-border/80 transition-colors active:scale-[0.98]"
+      className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-sq-sm bg-card border border-border text-sm text-muted-foreground transition-colors active:scale-[0.98] active:opacity-70"
     >
       <RefreshCw className="w-3.5 h-3.5" />
       Couldn't load more courses · Tap to retry
@@ -85,7 +85,7 @@ const InitialErrorState = ({ onRetry }: { onRetry: () => void }) => (
     <p className="text-sm text-muted-foreground mb-4">Check your connection and try again</p>
     <button
       onClick={onRetry}
-      className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 active:scale-[0.97] transition-all"
+      className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium active:scale-[0.97] active:opacity-90 transition-all"
     >
       Retry
     </button>
@@ -93,7 +93,6 @@ const InitialErrorState = ({ onRetry }: { onRetry: () => void }) => (
 );
 
 // ─── Virtualization constants ───────────────────────────────────────
-// CourseRankingRow: py-3 (24px) + h-14 thumbnail (56px) + border-b (1px) = ~81px
 const ROW_HEIGHT = 81;
 const VIRTUALIZATION_THRESHOLD = 50;
 const OVERSCAN = 8;
@@ -105,7 +104,7 @@ export function CoursesLeaderboardView() {
   const { data: seasonCalendar } = useSeasonCalendar();
   const seasonThemeColor = useMemo(() => {
     const currentSeason = seasonCalendar?.find(s => s.is_current);
-    if (!currentSeason) return '#006747';
+    if (!currentSeason) return 'hsl(var(--accent-amber))';
     const lower = currentSeason.name.toLowerCase();
     let id: SeasonId = 'major';
     if (lower.includes('pre-season') || lower.includes('preseason')) id = 'preseason';
@@ -390,7 +389,7 @@ export function CoursesLeaderboardView() {
         <div className="space-y-0">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
             <div key={i} className="flex items-center gap-3 py-3 px-4 border-b border-border">
-              <Skeleton className="w-8 h-8 rounded-full" />
+              <Skeleton className="w-6 h-5 rounded" />
               <Skeleton className="w-14 h-10 rounded-lg" />
               <div className="flex-1 space-y-2">
                 <Skeleton className="h-4 w-3/4" />
@@ -441,16 +440,12 @@ export function CoursesLeaderboardView() {
                     {/* Course Image */}
                     <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-2">
                       {round.golf_courses?.thumbnail_image ? (
-                        <>
-                          <img
-                            src={round.golf_courses.thumbnail_image}
-                            alt={round.golf_courses.name}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                          />
-                          {/* Bottom gradient overlay */}
-                          <div className="absolute inset-x-0 bottom-0 h-8" style={{ background: 'linear-gradient(transparent, rgba(0,0,0,0.03))' }} />
-                        </>
+                        <img
+                          src={round.golf_courses.thumbnail_image}
+                          alt={round.golf_courses.name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
                       ) : (
                         <div className="w-full h-full bg-muted flex items-center justify-center">
                           <span className="text-muted-foreground text-xs">No image</span>
@@ -486,7 +481,7 @@ export function CoursesLeaderboardView() {
                         <>
                           <span className="text-xs text-muted-foreground/40">·</span>
                           <div className="flex items-center">
-                            <span className="font-bold" style={{ color: '#D4A853', fontSize: 14 }}>
+                            <span className="font-bold" style={{ color: 'hsl(var(--accent-amber))', fontSize: 14 }}>
                               {round.rating.toFixed(1)}
                             </span>
                           </div>
@@ -509,7 +504,7 @@ export function CoursesLeaderboardView() {
                 className="rounded-full transition-colors"
                 style={index === 0 
                   ? { width: 20, height: 6, background: seasonThemeColor }
-                  : { width: 6, height: 6, background: 'rgba(0, 0, 0, 0.12)' }
+                  : { width: 6, height: 6, background: 'hsl(var(--border))' }
                 }
               />
             ))}
