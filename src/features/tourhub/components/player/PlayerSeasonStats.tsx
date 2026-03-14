@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TrendingUp, Trophy, Target, BarChart3 } from 'lucide-react';
+import { TrendingUp, Trophy, Target, BarChart3, Flag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
 
@@ -14,15 +14,17 @@ const TOUR_AVG = {
   drivingDistance: 301.8,
   drivingAccuracy: 59.0,
   gir: 68.5,
-  puttingAverage: 1.790,
-  sandSaves: 49.5,
+  puttingAverage: 1.752,
+  sandSaves: 53.1,
   scrambling: 56.8,
+  birdiesPerRound: 3.8,
 } as const;
 
-function fmt(value: number | null | undefined, type?: 'decimal' | 'percent' | 'yards' | 'currency' | 'signed'): string {
+function fmt(value: number | null | undefined, type?: 'decimal' | 'percent' | 'yards' | 'currency' | 'signed' | 'putting'): string {
   if (value === null || value === undefined) return '—';
   switch (type) {
     case 'decimal': return value.toFixed(2);
+    case 'putting': return value.toFixed(3);
     case 'percent': return `${value.toFixed(1)}%`;
     case 'yards': return `${value.toFixed(1)} yds`;
     case 'currency':
@@ -300,12 +302,77 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
           )}
 
           {activeTab === 'Short Game' && (
-            <div>
-              <StatRow label="Putting Average" value={playerStats.putting_average ? playerStats.putting_average.toFixed(3) : '—'} />
-              <StatRow label="Sand Saves" value={fmt(playerStats.sand_saves, 'percent')} />
-              <StatRow label="Scrambling" value={fmt(playerStats.scrambling, 'percent')} />
-              <StatRow label="Birdies per Round" value={fmt(playerStats.birdies_per_round, 'decimal')} />
-            </div>
+            <>
+              {!playerStats.putting_average && !playerStats.sand_saves && !playerStats.scrambling ? (
+                <p className="text-muted-foreground text-center" style={{ fontSize: 14, padding: '24px 0' }}>
+                  Short game stats unavailable for this player.
+                </p>
+              ) : (
+                <div>
+                  <SubSectionLabel icon={Flag} label="ON THE GREEN" style={{ marginTop: 0 }} />
+                  <StatRow
+                    label="Putting Average"
+                    value={fmt(playerStats.putting_average, 'putting')}
+                    trend={
+                      playerStats.putting_average
+                        ? playerStats.putting_average < TOUR_AVG.puttingAverage ? 'positive'
+                          : playerStats.putting_average > 1.820 ? 'negative'
+                          : null
+                        : null
+                    }
+                    barPercent={playerStats.putting_average
+                      ? Math.max(0, ((1.880 - playerStats.putting_average) / (1.880 - 1.596)) * 100)
+                      : undefined}
+                    barIndex={0}
+                  />
+                  <StatRow
+                    label="Birdies per Round"
+                    value={fmt(playerStats.birdies_per_round, 'decimal')}
+                    trend={
+                      playerStats.birdies_per_round
+                        ? playerStats.birdies_per_round > TOUR_AVG.birdiesPerRound ? 'positive'
+                          : playerStats.birdies_per_round < 3.0 ? 'negative'
+                          : null
+                        : null
+                    }
+                    barPercent={playerStats.birdies_per_round
+                      ? Math.min(100, (playerStats.birdies_per_round / 7) * 100)
+                      : undefined}
+                    barIndex={1}
+                  />
+
+                  <SubSectionLabel icon={Target} label="AROUND THE GREEN" style={{ marginTop: 24 }} />
+                  <StatRow
+                    label="Sand Saves"
+                    value={fmt(playerStats.sand_saves, 'percent')}
+                    trend={
+                      playerStats.sand_saves
+                        ? playerStats.sand_saves > TOUR_AVG.sandSaves ? 'positive'
+                          : playerStats.sand_saves < 40 ? 'negative'
+                          : null
+                        : null
+                    }
+                    barPercent={playerStats.sand_saves
+                      ? Math.max(0, Math.min(100, ((playerStats.sand_saves - 30) / (80 - 30)) * 100))
+                      : undefined}
+                    barIndex={2}
+                  />
+                  <StatRow
+                    label="Scrambling"
+                    value={fmt(playerStats.scrambling, 'percent')}
+                    trend={
+                      playerStats.scrambling
+                        ? playerStats.scrambling > TOUR_AVG.scrambling ? 'positive'
+                          : playerStats.scrambling < 48 ? 'negative'
+                          : null
+                        : null
+                    }
+                    barPercent={playerStats.scrambling ?? undefined}
+                    barIndex={3}
+                  />
+                </div>
+              )}
+            </>
           )}
 
           {activeTab === 'SG' && (
