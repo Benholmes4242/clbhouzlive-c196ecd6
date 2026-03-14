@@ -63,7 +63,7 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                       fontSize: '13px',
                       fontWeight: 600,
                       fontVariantNumeric: 'tabular-nums',
-                      color: isWin ? 'rgba(245, 158, 11, 0.9)' : 'hsl(var(--foreground))',
+                      color: isWin ? 'hsl(var(--accent-amber))' : 'hsl(var(--foreground))',
                     }}
                   >
                     {isWin ? <Trophy className="w-4 h-4 inline" style={{ color: 'rgba(245, 158, 11, 0.9)' }} /> : pos}
