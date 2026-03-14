@@ -56,15 +56,15 @@ export function PlayerRecentForm({ playerId }: PlayerRecentFormProps) {
 
   if (avgPosition <= 5) {
     formLabel = 'On fire';
-    textColor = 'rgb(34,197,94)';
-    bgColor = 'rgba(34,197,94,0.08)';
-    borderColor = 'rgb(34,197,94)';
+    textColor = 'hsl(var(--accent-amber))';
+    bgColor = 'hsl(var(--accent-amber) / 0.08)';
+    borderColor = 'hsl(var(--accent-amber))';
     Icon = TrendingUp;
   } else if (avgPosition <= 10) {
     formLabel = 'In form';
-    textColor = 'rgb(34,197,94)';
-    bgColor = 'rgba(34,197,94,0.08)';
-    borderColor = 'rgb(34,197,94)';
+    textColor = 'hsl(var(--accent-amber))';
+    bgColor = 'hsl(var(--accent-amber) / 0.08)';
+    borderColor = 'hsl(var(--accent-amber))';
     Icon = TrendingUp;
   } else if (avgPosition <= 25) {
     formLabel = 'Steady';
@@ -74,9 +74,9 @@ export function PlayerRecentForm({ playerId }: PlayerRecentFormProps) {
     Icon = Minus;
   } else {
     formLabel = 'Out of form';
-    textColor = 'hsl(var(--destructive))';
-    bgColor = 'rgba(220,38,38,0.08)';
-    borderColor = 'hsl(var(--destructive))';
+    textColor = 'hsl(var(--muted-foreground))';
+    bgColor = 'hsl(var(--muted) / 0.2)';
+    borderColor = 'hsl(var(--muted-foreground) / 0.3)';
     Icon = TrendingDown;
   }
 
