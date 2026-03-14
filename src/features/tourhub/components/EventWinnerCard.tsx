@@ -105,7 +105,7 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
         <div className="p-5 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl border border-amber-500/30">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-full bg-amber-500/20 flex items-center justify-center">
-              <Trophy className="w-7 h-7 text-amber-600" />
+              <Trophy className="w-7 h-7" style={{ color: 'hsl(var(--accent-amber))' }} />
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-foreground">{winner.headline || 'Champion crowned'}</h3>
