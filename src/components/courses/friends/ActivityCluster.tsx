@@ -71,12 +71,13 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
               style={{ zIndex: 10 - idx }}
               onClick={(e) => handleFriendClick(f.friend_profile.username, e)}
             >
-              <img
-                src={f.friend_profile.profile_photo_url || '/placeholder.svg'}
-                alt={f.friend_profile.display_name || f.friend_profile.username}
-                className="w-9 h-9 rounded-full object-cover ring-2 ring-white"
-                onError={(e) => { e.currentTarget.src = '/placeholder.svg'; }}
-              />
+                <SquircleAvatar
+                  size={36}
+                  src={f.friend_profile.profile_photo_url}
+                  alt={f.friend_profile.display_name || f.friend_profile.username}
+                  fallback={(f.friend_profile.display_name || f.friend_profile.username || '?').charAt(0)}
+                  hideRing
+                />
             </button>
           ))}
         </div>
