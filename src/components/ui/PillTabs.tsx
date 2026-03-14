@@ -15,7 +15,8 @@ interface PillTabsProps {
 
 /**
  * PillTabs — Tier 2 sub-tab pill
- * Active: #475569 filled pill, no underline
+ * Active: filled pill, no underline
+ * Inactive: plain text, no track/background
  */
 export const PillTabs: React.FC<PillTabsProps> = ({
   options,
@@ -36,7 +37,7 @@ export const PillTabs: React.FC<PillTabsProps> = ({
               'px-4 min-h-[36px] rounded-full text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold',
               isActive
                 ? 'text-white'
-                : 'text-muted-foreground bg-muted'
+                : 'text-muted-foreground'
             )}
             style={isActive ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
             type="button"
