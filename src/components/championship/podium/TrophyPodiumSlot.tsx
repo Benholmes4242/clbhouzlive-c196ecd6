@@ -14,59 +14,46 @@ interface TrophyPodiumSlotProps {
   animationDelay?: number;
 }
 
-// Premium awards stage configuration — scaled up
 const POSITION_CONFIG = {
   1: {
     avatarSize: 120,
     mobileAvatarSize: 120,
-    borderWidth: 3,
-    badgeSize: 26,
     nameClass: 'text-[17px] font-bold',
     statSize: 24,
     statWeight: 800,
     labelSize: 13,
-    borderGradient: ['#D4A853', '#F0D78C', '#D4A853'],
-    badgeBg: '#D4A853',
-    shadowColor: 'rgba(212, 168, 83, 0.25)',
     crownSize: 36,
     verticalOffset: 0,
+    boxShadow: '0 8px 28px hsl(var(--accent-amber) / 0.25)',
   },
   2: {
     avatarSize: 88,
     mobileAvatarSize: 88,
-    borderWidth: 3,
-    badgeSize: 22,
     nameClass: 'text-[15px] font-semibold',
     statSize: 20,
     statWeight: 700,
     labelSize: 12,
-    borderGradient: ['#A8B4C0'],
-    badgeBg: '#A8B4C0',
-    shadowColor: 'rgba(0, 0, 0, 0.1)',
     crownSize: 0,
     verticalOffset: 24,
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
   },
   3: {
     avatarSize: 88,
     mobileAvatarSize: 88,
-    borderWidth: 3,
-    badgeSize: 22,
     nameClass: 'text-[15px] font-semibold',
     statSize: 20,
     statWeight: 700,
     labelSize: 12,
-    borderGradient: ['#C4956A'],
-    badgeBg: '#C4956A',
-    shadowColor: 'rgba(0, 0, 0, 0.1)',
     crownSize: 0,
     verticalOffset: 40,
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
   },
 } as const;
 
 export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
   entry,
   position,
-  seasonThemeColor = '#006747',
+  seasonThemeColor = 'hsl(var(--accent-amber))',
   isCurrentUser = false,
   onClick,
   animationDelay = 0,
@@ -88,7 +75,6 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
 
   const nameParts = formatNameTwoLines(entry.display_name, entry.username);
   const avatarFallback = entry.display_name?.charAt(0) || entry.username?.charAt(0) || '?';
-  const borderColor = config.borderGradient[0];
 
   return (
     <motion.div
@@ -120,14 +106,14 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
           <Crown
             size={config.crownSize}
             className="drop-shadow-md"
-            style={{ color: '#D4A853' }}
-            fill="#D4A853"
+            style={{ color: 'hsl(var(--accent-amber))' }}
+            fill="#f59e0b"
             strokeWidth={1.5}
           />
         </motion.div>
       )}
 
-      {/* Avatar with metallic ring */}
+      {/* Avatar */}
       <div className="relative">
         {/* Golden glow for #1 */}
         {position === 1 && (
@@ -138,7 +124,7 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
               left: '-2rem',
               right: '-2rem',
               bottom: '-2rem',
-              background: 'radial-gradient(ellipse at center, rgba(212, 168, 83, 0.3) 0%, rgba(212, 168, 83, 0.1) 50%, transparent 80%)',
+              background: 'radial-gradient(ellipse at center, hsl(var(--accent-amber) / 0.3) 0%, hsl(var(--accent-amber) / 0.1) 50%, transparent 80%)',
               filter: 'blur(12px)',
             }}
           />
@@ -152,7 +138,7 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
             height: config.mobileAvatarSize,
             borderRadius: '50%',
             border: 'none',
-            boxShadow: `0 ${position === 1 ? '8px 24px' : '4px 12px'} ${config.shadowColor}`,
+            boxShadow: config.boxShadow,
           }}
         >
           {entry.avatar_url ? (
@@ -168,17 +154,19 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
           )}
         </div>
 
-        {/* Rank badge */}
+        {/* Rank pill */}
         <div
-          className="absolute -bottom-1.5 -right-0.5 flex items-center justify-center font-bold text-white shadow-md"
+          className="absolute -bottom-2 left-1/2 -translate-x-1/2"
           style={{
-            width: config.badgeSize,
-            height: config.badgeSize,
-            borderRadius: '50%',
-            backgroundColor: config.badgeBg,
-            border: '2px solid white',
-            fontSize: config.badgeSize * 0.45,
-            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
+            background: 'hsl(var(--background))',
+            border: '1px solid hsl(var(--border) / 0.4)',
+            borderRadius: 8,
+            padding: '1px 7px',
+            fontSize: 12,
+            fontWeight: 700,
+            color: position === 1 ? 'hsl(var(--accent-amber))' : 'hsl(var(--muted-foreground))',
+            lineHeight: 1.5,
+            whiteSpace: 'nowrap',
           }}
         >
           {position}
@@ -200,7 +188,7 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
       {/* Stat */}
       <motion.p
         className="font-bold mt-0.5"
-        style={{ color: seasonThemeColor, fontSize: config.statSize, fontWeight: config.statWeight }}
+        style={{ color: 'hsl(var(--accent-amber))', fontSize: config.statSize, fontWeight: config.statWeight }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: animationDelay + 0.3, duration: 0.3 }}
