@@ -5,13 +5,14 @@
  * toughest/easiest holes podiums, summary stats strip, front/back nine dividers.
  */
 
-import { useState, useMemo, useEffect, useRef } from 'react';
-import { Target, TrendingUp, TrendingDown, Flame, Leaf, Clock } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Target, TrendingUp, TrendingDown, Flame, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { RoundSelector } from './RoundSelector';
 import { TournamentEmptyState } from './TournamentEmptyState';
 import { useTourHoleStats } from '../../hooks/useTourHubData';
+import type React from 'react';
 
 interface HoleStatsTabProps {
   tournamentId: string;
@@ -34,6 +35,10 @@ interface ProcessedHole {
   other: number;
   totalPlayers: number;
   difficultyRank: number;
+  _scoreSum: number;
+  _scoreCount: number;
+  _diffSum: number;
+  _diffCount: number;
 }
 
 // Loading skeleton
@@ -78,26 +83,54 @@ function HoleStatsEmpty({ isCompleted, roundLabel }: { isCompleted?: boolean; ro
   );
 }
 
-// Difficulty badge color — softened tiers with borders
-function getDiffBadge(avgDiff: number) {
-  if (avgDiff > 0.05) return 'bg-red-100 text-red-600 border border-red-200';
-  if (avgDiff > 0.01) return 'bg-orange-50 text-orange-500 border border-orange-100';
-  if (avgDiff > -0.01) return 'bg-muted text-muted-foreground';
-  if (avgDiff > -0.15) return 'bg-green-50 text-green-600 border border-green-100';
-  return 'bg-green-100 text-green-700 border border-green-200';
+// Difficulty badge style — returns inline styles for dark mode compat
+function getDiffStyle(avgDiff: number): React.CSSProperties {
+  if (avgDiff > 0.05) return {
+    backgroundColor: 'hsl(var(--destructive) / 0.1)',
+    color: 'hsl(var(--destructive))',
+    border: '1px solid hsl(var(--destructive) / 0.2)',
+  };
+  if (avgDiff > 0.01) return {
+    backgroundColor: 'hsl(var(--muted-foreground) / 0.08)',
+    color: 'hsl(var(--muted-foreground))',
+    border: '1px solid hsl(var(--muted-foreground) / 0.15)',
+  };
+  if (avgDiff > -0.01) return {
+    backgroundColor: 'hsl(var(--muted))',
+    color: 'hsl(var(--muted-foreground))',
+  };
+  if (avgDiff > -0.15) return {
+    backgroundColor: 'hsl(var(--accent-amber) / 0.1)',
+    color: 'hsl(var(--accent-amber))',
+    border: '1px solid hsl(var(--accent-amber) / 0.2)',
+  };
+  return {
+    backgroundColor: 'hsl(var(--accent-amber) / 0.18)',
+    color: 'hsl(var(--accent-amber))',
+    border: '1px solid hsl(var(--accent-amber) / 0.3)',
+  };
 }
 
-// Scoring distribution bar — refined 2-3 tone palette
+// Scoring segment colours — amber spectrum for good, muted for bad
+const SEGMENT_COLORS = {
+  eagles: 'hsl(var(--accent-amber))',
+  birdies: 'hsl(var(--accent-amber) / 0.55)',
+  pars: 'hsl(var(--border))',
+  bogeys: 'hsl(var(--muted-foreground) / 0.5)',
+  doublePlus: 'hsl(var(--muted-foreground) / 0.8)',
+};
+
+// Scoring distribution bar
 function ScoringBar({ hole }: { hole: ProcessedHole }) {
   const total = hole.eagles + hole.birdies + hole.pars + hole.bogeys + hole.doubleBogeys + hole.other;
   if (total === 0) return null;
 
   const segments = [
-    { count: hole.eagles, color: 'rgba(245, 158, 11, 0.9)', label: 'Eag' },
-    { count: hole.birdies, color: '#22C55E', label: 'Bir' },
-    { count: hole.pars, color: 'hsl(var(--border))', label: 'Par' },
-    { count: hole.bogeys, color: '#EF4444', label: 'Bog' },
-    { count: hole.doubleBogeys + hole.other, color: '#1E293B', label: 'Dbl+' },
+    { count: hole.eagles, color: SEGMENT_COLORS.eagles, label: 'Eag' },
+    { count: hole.birdies, color: SEGMENT_COLORS.birdies, label: 'Bir' },
+    { count: hole.pars, color: SEGMENT_COLORS.pars, label: 'Par' },
+    { count: hole.bogeys, color: SEGMENT_COLORS.bogeys, label: 'Bog' },
+    { count: hole.doubleBogeys + hole.other, color: SEGMENT_COLORS.doublePlus, label: 'Dbl+' },
   ].filter(s => s.count > 0);
 
   return (
@@ -133,12 +166,6 @@ function ScoringBar({ hole }: { hole: ProcessedHole }) {
 export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
   const [selectedRound, setSelectedRound] = useState('Overall');
   const { data: rawHoleStats, isLoading } = useTourHoleStats(tournamentId);
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  // Scroll to top when switching rounds
-  useEffect(() => {
-    contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, [selectedRound]);
 
   // Determine available rounds — hide individual tabs if only 1 round
   const availableRounds = useMemo(() => {
@@ -160,7 +187,10 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
     const holeMap = new Map<number, ProcessedHole>();
 
     for (const stat of filtered as any[]) {
+      const scoreAvg = Number(stat.scoring_average) || 0;
+      const diff = Number(stat.avg_diff) || 0;
       const existing = holeMap.get(stat.hole_number);
+
       if (existing) {
         existing.eagles += Number(stat.eagles) || 0;
         existing.birdies += Number(stat.birdies) || 0;
@@ -168,15 +198,19 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
         existing.bogeys += Number(stat.bogeys) || 0;
         existing.doubleBogeys += Number(stat.double_bogeys) || 0;
         existing.other += Number(stat.other) || 0;
-        existing.scoringAverage = (existing.scoringAverage + (Number(stat.scoring_average) || 0)) / 2;
-        existing.avgDiff = (existing.avgDiff + (Number(stat.avg_diff) || 0)) / 2;
+        existing._scoreSum += scoreAvg;
+        existing._scoreCount += 1;
+        existing.scoringAverage = existing._scoreSum / existing._scoreCount;
+        existing._diffSum += diff;
+        existing._diffCount += 1;
+        existing.avgDiff = existing._diffSum / existing._diffCount;
       } else {
         holeMap.set(stat.hole_number, {
           holeNumber: stat.hole_number,
           par: stat.par,
           yardage: stat.yardage,
-          scoringAverage: Number(stat.scoring_average) || 0,
-          avgDiff: Number(stat.avg_diff) || 0,
+          scoringAverage: scoreAvg,
+          avgDiff: diff,
           eagles: Number(stat.eagles) || 0,
           birdies: Number(stat.birdies) || 0,
           pars: Number(stat.pars) || 0,
@@ -185,6 +219,10 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
           other: Number(stat.other) || 0,
           totalPlayers: stat.raw_data?.players || 0,
           difficultyRank: 0,
+          _scoreSum: scoreAvg,
+          _scoreCount: 1,
+          _diffSum: diff,
+          _diffCount: 1,
         });
       }
     }
@@ -224,8 +262,8 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
   const frontNine = useMemo(() => processedHoles.filter(h => h.holeNumber <= 9), [processedHoles]);
   const backNine = useMemo(() => processedHoles.filter(h => h.holeNumber > 9), [processedHoles]);
 
-  const frontNineAvg = frontNine.length > 0 ? frontNine.reduce((a, h) => a + h.scoringAverage, 0) : null;
-  const backNineAvg = backNine.length > 0 ? backNine.reduce((a, h) => a + h.scoringAverage, 0) : null;
+  const frontNineTotal = frontNine.length > 0 ? frontNine.reduce((a, h) => a + h.scoringAverage, 0) : null;
+  const backNineTotal = backNine.length > 0 ? backNine.reduce((a, h) => a + h.scoringAverage, 0) : null;
   const frontNinePar = frontNine.reduce((a, h) => a + h.par, 0);
   const backNinePar = backNine.reduce((a, h) => a + h.par, 0);
 
@@ -239,7 +277,6 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
 
   return (
     <motion.div
-      ref={contentRef}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
@@ -279,7 +316,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
           {hasRoundData && toughestHoles.length > 0 && (
             <div className="mt-6 mb-3">
               <div className="flex items-center gap-1.5 mb-3">
-                <Flame className="w-4 h-4 text-red-500" />
+                <Flame className="w-4 h-4" style={{ color: 'hsl(var(--destructive))' }} />
                 <span className="text-muted-foreground/60" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' as const }}>
                   Toughest Holes
                 </span>
@@ -289,16 +326,16 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                   <div
                     key={hole.holeNumber}
                     className="flex-1 bg-card rounded-2xl border border-border/50 p-4 text-center"
-                    style={{ borderLeft: '3px solid #EF4444' }}
+                    style={{ borderLeft: '3px solid hsl(var(--destructive))' }}
                   >
-                    <div className="font-bold text-red-500" style={{ fontSize: '11px' }}>#{idx + 1}</div>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: 'hsl(var(--destructive))' }}>#{idx + 1}</div>
                     <div className="text-xl font-bold text-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>
                       Hole {hole.holeNumber}
                     </div>
                     <div className="text-xs text-muted-foreground">
                       Par {hole.par} · Avg {hole.scoringAverage.toFixed(2)}
                     </div>
-                    <div className="font-semibold text-red-500 mt-1" style={{ fontSize: '13px', fontVariantNumeric: 'tabular-nums' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 600, fontVariantNumeric: 'tabular-nums', color: 'hsl(var(--destructive))', marginTop: 4 }}>
                       +{hole.avgDiff.toFixed(2)}
                     </div>
                   </div>
@@ -311,7 +348,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
           {hasRoundData && easiestHoles.length > 0 && easiestHoles[0].avgDiff < 0 && (
             <div className="mt-6 mb-3">
               <div className="flex items-center gap-1.5 mb-3">
-                <Leaf className="w-4 h-4 text-green-500" />
+                <TrendingDown className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber))' }} />
                 <span className="text-muted-foreground/60" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' as const }}>
                   Easiest Holes
                 </span>
@@ -321,16 +358,16 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                   <div
                     key={hole.holeNumber}
                     className="flex-1 bg-card rounded-2xl border border-border/50 p-4 text-center"
-                    style={{ borderLeft: '3px solid #22C55E' }}
+                    style={{ borderLeft: '3px solid hsl(var(--accent-amber))' }}
                   >
-                    <div className="font-bold text-green-600" style={{ fontSize: '11px' }}>#{idx + 1}</div>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: 'hsl(var(--accent-amber))' }}>#{idx + 1}</div>
                     <div className="text-xl font-bold text-foreground" style={{ fontVariantNumeric: 'tabular-nums' }}>
                       Hole {hole.holeNumber}
                     </div>
                     <div className="text-xs text-muted-foreground">
                       Par {hole.par} · Avg {hole.scoringAverage.toFixed(2)}
                     </div>
-                    <div className="font-semibold text-green-600 mt-1" style={{ fontSize: '13px', fontVariantNumeric: 'tabular-nums' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 600, fontVariantNumeric: 'tabular-nums', color: 'hsl(var(--accent-amber))', marginTop: 4 }}>
                       {hole.avgDiff.toFixed(2)}
                     </div>
                   </div>
@@ -339,7 +376,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
             </div>
           )}
 
-          {/* Course summary stats strip — 4 columns with Eagles promoted */}
+          {/* Course summary stats strip */}
           {hasRoundData && summary && (
             <div
               className="bg-card rounded-2xl border border-border/50 grid grid-cols-4 text-center p-4 mt-8"
@@ -357,7 +394,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                 <div className="text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' as const }}>
                   Eagles
                 </div>
-                <div style={{ fontSize: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: 'rgba(245, 158, 11, 0.9)' }}>
+                <div style={{ fontSize: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: 'hsl(var(--accent-amber))' }}>
                   {summary.totalEagles}
                 </div>
               </div>
@@ -365,7 +402,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                 <div className="text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' as const }}>
                   Birdies
                 </div>
-                <div style={{ fontSize: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: '#22C55E' }}>
+                <div style={{ fontSize: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: 'hsl(var(--accent-amber))' }}>
                   {summary.totalBirdies}
                 </div>
               </div>
@@ -373,7 +410,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                 <div className="text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' as const }}>
                   Bogeys
                 </div>
-                <div style={{ fontSize: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: '#EF4444' }}>
+                <div className="text-muted-foreground" style={{ fontSize: '20px', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
                   {summary.totalBogeys}
                 </div>
               </div>
@@ -391,9 +428,9 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                 <span className="text-muted-foreground/60" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' as const }}>
                   Front Nine
                 </span>
-                {frontNineAvg !== null && (
+                {frontNineTotal !== null && (
                   <span className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
-                    Avg {frontNineAvg.toFixed(1)} (Par {frontNinePar})
+                    {frontNineTotal.toFixed(1)} / Par {frontNinePar}
                   </span>
                 )}
               </div>
@@ -412,9 +449,9 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                 <span className="text-muted-foreground/60" style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' as const }}>
                   Back Nine
                 </span>
-                {backNineAvg !== null && (
+                {backNineTotal !== null && (
                   <span className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
-                    Avg {backNineAvg.toFixed(1)} (Par {backNinePar})
+                    {backNineTotal.toFixed(1)} / Par {backNinePar}
                   </span>
                 )}
               </div>
@@ -437,11 +474,11 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
                 marginTop: 8,
               }}>
                 {[
-                  { color: 'rgba(245, 158, 11, 0.9)', label: 'Eagles' },
-                  { color: '#22C55E', label: 'Birdies' },
-                  { color: 'hsl(var(--border))', label: 'Pars' },
-                  { color: '#EF4444', label: 'Bogeys' },
-                  { color: '#1E293B', label: 'Dbl Bogey+' },
+                  { color: SEGMENT_COLORS.eagles, label: 'Eagles' },
+                  { color: SEGMENT_COLORS.birdies, label: 'Birdies' },
+                  { color: SEGMENT_COLORS.pars, label: 'Pars' },
+                  { color: SEGMENT_COLORS.bogeys, label: 'Bogeys' },
+                  { color: SEGMENT_COLORS.doublePlus, label: 'Dbl Bogey+' },
                 ].map((item, i) => (
                   <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                     <span style={{ 
@@ -469,7 +506,7 @@ export function HoleStatsTab({ tournamentId, isCompleted }: HoleStatsTabProps) {
   );
 }
 
-// Extracted hole row — clean layout: no average indicator track
+// Extracted hole row
 const HoleRow = ({ hole, total }: { hole: ProcessedHole; total: number }) => {
   const hasData = hole.scoringAverage > 0;
 
@@ -478,11 +515,11 @@ const HoleRow = ({ hole, total }: { hole: ProcessedHole; total: number }) => {
       className="flex items-start gap-3 py-4 px-0"
       style={{ borderBottom: '1px solid hsl(var(--border) / 0.15)' }}
     >
-      {/* Hole badge — w-8 h-8 */}
-      <div className={cn(
-        "w-8 h-8 rounded-full flex items-center justify-center shrink-0",
-        getDiffBadge(hole.avgDiff)
-      )} style={{ fontSize: '12px', fontWeight: 600 }}>
+      {/* Hole badge */}
+      <div
+        className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
+        style={{ fontSize: '12px', fontWeight: 600, ...getDiffStyle(hole.avgDiff) }}
+      >
         {hole.holeNumber}
       </div>
 
@@ -499,12 +536,12 @@ const HoleRow = ({ hole, total }: { hole: ProcessedHole; total: number }) => {
           {/* Difficulty indicator */}
           <div className="shrink-0">
             {hole.avgDiff > 0 ? (
-              <div className="flex items-center gap-0.5" style={{ color: '#EF4444' }}>
+              <div className="flex items-center gap-0.5" style={{ color: 'hsl(var(--muted-foreground))' }}>
                 <TrendingUp className="w-3 h-3" />
                 <span style={{ fontSize: '12px', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>+{hole.avgDiff.toFixed(2)}</span>
               </div>
             ) : hole.avgDiff < 0 ? (
-              <div className="flex items-center gap-0.5" style={{ color: '#22C55E' }}>
+              <div className="flex items-center gap-0.5" style={{ color: 'hsl(var(--accent-amber))' }}>
                 <TrendingDown className="w-3 h-3" />
                 <span style={{ fontSize: '12px', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{hole.avgDiff.toFixed(2)}</span>
               </div>
@@ -514,7 +551,7 @@ const HoleRow = ({ hole, total }: { hole: ProcessedHole; total: number }) => {
           </div>
         </div>
 
-        {/* Line 2 + 3: Scoring distribution bar with avg value, then breakdown */}
+        {/* Scoring distribution bar */}
         {hasData ? (
           <ScoringBar hole={hole} />
         ) : (
