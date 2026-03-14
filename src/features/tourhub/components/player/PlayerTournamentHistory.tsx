@@ -74,7 +74,7 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                   </span>
 
                   {/* Tournament name — 14px, weight 500 */}
-                  <span className="text-foreground flex-1 min-w-0 truncate group-hover:text-primary transition-colors" style={{ fontSize: '15px', fontWeight: 600, letterSpacing: '-0.2px' }}>
+                  <span className="text-foreground flex-1 min-w-0 truncate" style={{ fontSize: '15px', fontWeight: 600, letterSpacing: '-0.2px' }}>
                     {result.tournament_name}
                   </span>
 
