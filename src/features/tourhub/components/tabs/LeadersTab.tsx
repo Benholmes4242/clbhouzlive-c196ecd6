@@ -18,6 +18,7 @@ import { LeadersHero } from '../leaders/LeadersHero';
 import { LeadersRunnersStrip } from '../leaders/LeadersRunnersStrip';
 import { LeaderRow } from '../leaders/LeaderRow';
 import { LeadersEmptyState } from '../leaders/LeadersEmptyState';
+import { LeadersStatContext } from '../leaders/LeadersStatContext';
 
 interface RankedItem {
   player: {
@@ -161,11 +162,8 @@ export function LeadersTab() {
           <div className="flex-1 h-[60px] rounded-2xl bg-muted/40 animate-pulse" />
           <div className="flex-1 h-[60px] rounded-2xl bg-muted/40 animate-pulse" />
         </div>
-        <div className="flex gap-2 overflow-hidden px-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-9 w-20 rounded-full bg-muted/40 shrink-0" />
-          ))}
-        </div>
+        <div className="mx-4 mt-3 h-[48px] rounded-2xl bg-muted/40 animate-pulse" />
+        <div className="mx-4 mt-3 h-[72px] rounded-xl bg-muted/40 animate-pulse" />
         <div className="rounded-2xl border border-border/30 overflow-hidden mx-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-[60px] border-b border-border/20 bg-muted/20" />
@@ -253,6 +251,24 @@ export function LeadersTab() {
             onCategoryChange={setCategory}
             leaderValue={leaderValue}
           />
+        </div>
+
+        {/* Stat context */}
+        <div style={{ marginTop: 12 }}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`ctx-${category.key}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <LeadersStatContext
+                category={category}
+                leaderValue={leaderValue}
+              />
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* Rankings list (#4–50) */}

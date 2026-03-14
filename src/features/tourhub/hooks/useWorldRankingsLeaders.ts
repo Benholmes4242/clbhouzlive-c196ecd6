@@ -20,6 +20,7 @@ export interface WorldRankEntry {
     country_code: string | null;
     photo_url: string | null;
     pga_tour_id: string | null;
+    tour_codes?: string[] | null;
   };
 }
 
@@ -39,7 +40,7 @@ export function useWorldRankingsLeaders(limit = 50) {
           player_id,
           player:sr_players!sr_world_rankings_player_id_fkey (
             id, full_name, country, country_code,
-            photo_url, pga_tour_id
+            photo_url, pga_tour_id, tour_codes
           )
         `)
         .order('ranking_date', { ascending: false })

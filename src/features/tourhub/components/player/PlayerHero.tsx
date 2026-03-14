@@ -70,8 +70,8 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
       <button
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
         aria-label="Open tour menu"
-        className="absolute z-30 flex items-center justify-center"
-        style={{ width: 44, height: 44, top: 56, left: 16 }}
+        className="fixed z-30 flex items-center justify-center"
+        style={{ width: 44, height: 44, top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: 16 }}
       >
         <Menu
           className="w-[24px] h-[24px]"
