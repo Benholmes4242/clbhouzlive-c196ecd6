@@ -33,7 +33,7 @@ export function CollegeProfilePage() {
   
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { setVariant, hideHeader, showHeader } = useHeader();
+  const { hideHeader, showHeader } = useHeader();
 
   // Transparent status bar for immersive hero bleed into safe area
   useMedianStatusBar("dark", "transparent", true, false);
