@@ -8,7 +8,6 @@ import { Search, Award, X } from 'lucide-react';
 import { Top100JourneyHero } from '@/components/top100/Top100JourneyHero';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import VirtualizedCourseList from './VirtualizedCourseList';
@@ -176,7 +175,7 @@ const Top100CoursesHubPanel = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Top 100 Journey Hero - Premium progress module */}
       {user && (
         <Top100JourneyHero
@@ -196,13 +195,13 @@ const Top100CoursesHubPanel = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search within this Top 100 list"
             aria-label="Search within Top 100 list"
-            className="pl-10 pr-10 h-11 bg-card border border-border/50 rounded-sq-sm text-base focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border focus-visible:outline-none"
+            className="pl-10 pr-10 h-12 bg-muted/50 border border-border rounded-2xl text-base focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border focus-visible:outline-none"
           />
           {searchTerm && (
             <button
               type="button"
               onClick={() => setSearchTerm('')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 rounded-full text-muted-foreground hover:text-foreground active:scale-[0.9] transition-transform"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 text-muted-foreground active:scale-[0.9] active:opacity-70 transition-all"
               aria-label="Clear search"
             >
               <X className="h-4 w-4" />
@@ -210,19 +209,18 @@ const Top100CoursesHubPanel = () => {
           )}
         </div>
 
-        {/* List + Sort selectors - matching Explore page exactly */}
+        {/* List + Sort selectors */}
         <div className="grid grid-cols-2 gap-3 sm:flex sm:gap-3">
           {/* List selector */}
           <div className="flex-1">
             <Select value={selectedList} onValueChange={setSelectedList}>
               <SelectTrigger 
                 aria-label="Select Top 100 list" 
-                className="h-11 w-full rounded-sq-sm bg-card border-border/50 justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98]"
-                style={{ color: 'hsl(210, 13%, 18%)' }}
+                className="h-11 w-full rounded-2xl bg-card border-border/50 justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98]"
               >
                 <SelectValue placeholder="Global Top 100" />
               </SelectTrigger>
-              <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
+              <SelectContent className="bg-card border-border z-50 rounded-2xl shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
                 {listOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
@@ -237,12 +235,11 @@ const Top100CoursesHubPanel = () => {
             <Select value={sortOption} onValueChange={(v) => setSortOption(v as Top100SortOption)}>
               <SelectTrigger 
                 aria-label="Sort courses" 
-                className="h-11 w-full rounded-sq-sm bg-card border-border/50 justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98]"
-                style={{ color: 'hsl(210, 13%, 18%)' }}
+                className="h-11 w-full rounded-2xl bg-card border-border/50 justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98]"
               >
                 <SelectValue placeholder="Official ranking" />
               </SelectTrigger>
-              <SelectContent className="bg-card border-border z-50 rounded-sq-sm shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
+              <SelectContent className="bg-card border-border z-50 rounded-2xl shadow-lg animate-in fade-in-0 zoom-in-95 duration-150">
                 {sortOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
@@ -258,14 +255,14 @@ const Top100CoursesHubPanel = () => {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="space-y-3 p-3 rounded-sq-md bg-card border border-border/40">
-              <Skeleton className="h-40 w-full rounded-sq-sm" />
+            <div key={i} className="space-y-3 p-3 rounded-2xl bg-card border border-border/40">
+              <Skeleton className="h-40 w-full rounded-xl" />
               <div className="space-y-2">
                 <Skeleton className="h-5 w-3/4" />
                 <Skeleton className="h-4 w-1/2" />
                 <div className="flex gap-2 pt-1">
-                  <Skeleton className="h-5 w-14 rounded-full" />
-                  <Skeleton className="h-5 w-14 rounded-full" />
+                  <Skeleton className="h-5 w-14 rounded-lg" />
+                  <Skeleton className="h-5 w-14 rounded-lg" />
                 </div>
               </div>
             </div>
@@ -273,7 +270,7 @@ const Top100CoursesHubPanel = () => {
         </div>
       ) : allCourses.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center gap-4 animate-fade-in">
-          <div className="w-14 h-14 rounded-full bg-muted/50 border border-border/60 flex items-center justify-center shadow-sm">
+          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-1">
             {searchTerm ? (
               <Search className="w-5 h-5 text-muted-foreground" />
             ) : (
@@ -291,18 +288,20 @@ const Top100CoursesHubPanel = () => {
             </p>
           </div>
           {searchTerm ? (
-            <Button 
-              variant="outline" 
+            <button
               onClick={() => setSearchTerm('')}
-              className="mt-1 gap-1.5 h-11 active:scale-[0.97] transition-transform"
+              className="mt-2 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium bg-card border border-border/50 text-foreground active:scale-[0.97] transition-transform"
             >
               <X className="h-3.5 w-3.5" />
               Clear search
-            </Button>
+            </button>
           ) : (
-            <Button variant="outline" onClick={handleResetFilters} className="mt-1 h-11 active:scale-[0.97] transition-transform">
+            <button
+              onClick={handleResetFilters}
+              className="mt-2 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium bg-card border border-border/50 text-foreground active:scale-[0.97] transition-transform"
+            >
               Reset filters
-            </Button>
+            </button>
           )}
         </div>
       ) : (
