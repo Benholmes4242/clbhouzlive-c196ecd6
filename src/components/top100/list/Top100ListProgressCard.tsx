@@ -69,7 +69,7 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
             <p className="text-xs font-medium italic whitespace-nowrap" style={{ color: theme.ringColor }}>
               {statusCopy}
             </p>
-            <ChevronRight className="w-4 h-4 text-muted-foreground/60 group-hover:text-muted-foreground transition-colors" />
+            <ChevronRight className="w-4 h-4 text-muted-foreground/60" />
           </div>
         </div>
       </motion.button>
