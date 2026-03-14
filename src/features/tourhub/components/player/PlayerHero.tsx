@@ -3,12 +3,12 @@
  * overlaid player identity, glass rank pills, and Ken Burns animation.
  */
 
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Menu } from 'lucide-react';
-import { useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
-import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
+import { titleCaseCountry } from '../../utils/countryFlags';
+import CountryFlag from '@/components/ui/country-flag';
 import { openTourNav } from '../../contexts/TourNavContext';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 
@@ -18,27 +18,19 @@ interface PlayerHeroProps {
 }
 
 export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
-  const heroRef = useRef<HTMLDivElement>(null);
-
   const heroPhotoUrl = getPlayerHeadshotUrl(player.full_name, player.tour_codes?.[0] ?? 'pga');
 
   const age = player.birth_date
     ? Math.floor((Date.now() - new Date(player.birth_date).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
     : null;
 
-  const flag = countryCodeToFlag(player.country_code);
   const countryDisplay = player.country ? titleCaseCountry(player.country) : null;
   const isWorldNo1 = playerStats?.world_rank === 1;
 
-  // Parallax on scroll
-  const { scrollY } = useScroll();
-  const imageY = useTransform(scrollY, [0, 400], [0, 80]);
-
   return (
     <div
-      ref={heroRef}
       className="relative w-full overflow-hidden"
-      style={{ height: '45dvh' }}
+      style={{ height: 'calc(45dvh + var(--sat, env(safe-area-inset-top, 0px)))' }}
     >
       {/* Hero Image or Fallback Gradient */}
       {heroPhotoUrl ? (
@@ -46,13 +38,13 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
           src={heroPhotoUrl}
           alt={player.full_name}
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ y: imageY, objectPosition: 'center 20%' }}
+          style={{ objectPosition: 'center 20%' }}
           loading="eager"
           fetchPriority="high"
           initial={{ scale: 1.06 }}
           animate={{ scale: 1 }}
           transition={{ duration: 10, ease: 'linear' }}
-          
+          onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
         />
       ) : (
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-800 via-emerald-900 to-slate-900" />
@@ -71,12 +63,12 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
         aria-label="Open tour menu"
         className="fixed z-30 flex items-center justify-center"
-        style={{ width: 44, height: 44, top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: 16 }}
+        style={{ width: 44, height: 44, top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)', left: 16 }}
       >
         <Menu
           className="w-[24px] h-[24px]"
           strokeWidth={1.5}
-          style={{ color: 'hsl(var(--foreground))', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.15))' }}
+          style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }}
         />
       </button>
 
@@ -106,7 +98,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         <div className="flex items-center gap-2" style={{ marginBottom: '8px' }}>
           {countryDisplay && (
             <span className="flex items-center gap-1.5" style={{ fontSize: '13px', fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>
-              {flag && <span className="text-lg leading-none">{flag}</span>}
+              <CountryFlag country={player.country} size="sm" />
               {countryDisplay}
             </span>
           )}
@@ -159,16 +151,11 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.3 }}
             >
-              #{playerStats.fedex_rank} FedEx
+              #{playerStats.fedex_rank} FedEx Cup
             </motion.span>
           )}
         </div>
       </motion.div>
-
-      {/* World #1 gold shimmer */}
-      {isWorldNo1 && (
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400" />
-      )}
     </div>
   );
 }

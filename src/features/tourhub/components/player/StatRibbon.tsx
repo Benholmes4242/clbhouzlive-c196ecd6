@@ -19,10 +19,10 @@ function formatEarnings(earnings: number | null | undefined): string | null {
 
 export function StatRibbon({ playerStats }: StatRibbonProps) {
   const stats = [
-    { label: 'WORLD', value: playerStats?.world_rank && playerStats.world_rank > 0 ? `#${playerStats.world_rank}` : null },
-    { label: 'FEDEX', value: playerStats?.fedex_rank && playerStats.fedex_rank > 0 ? `#${playerStats.fedex_rank}` : null },
-    { label: 'WINS', value: playerStats?.wins != null ? String(playerStats.wins) : null, highlightColor: playerStats?.wins && playerStats.wins > 0 ? 'rgba(245, 158, 11, 0.9)' : undefined },
-    { label: 'EARNINGS', value: formatEarnings(playerStats?.earnings) },
+    { label: 'RANK', value: playerStats?.world_rank && playerStats.world_rank > 0 ? `#${playerStats.world_rank}` : null },
+    { label: 'CUP', value: playerStats?.fedex_rank && playerStats.fedex_rank > 0 ? `#${playerStats.fedex_rank}` : null },
+    { label: 'WINS', value: playerStats?.wins != null ? String(playerStats.wins) : null, highlightColor: playerStats?.wins && playerStats.wins > 0 ? 'hsl(var(--accent-amber) / 0.9)' : undefined },
+    { label: 'EARNED', value: formatEarnings(playerStats?.earnings) },
   ];
 
   return (
