@@ -62,6 +62,7 @@ export function CollegeProfilePage() {
   const rivalSlugs = rivalries?.map(r => r.rivalNormalizedName) ?? [];
   const firstRival = rivalSlugs[0] ?? null;
   const gradientCSS = collegeSlug ? getCollegeGradientCSS(collegeSlug) : null;
+  const logoUrl = getCollegeLogoUrl(college?.college_name || collegeSlug);
 
   // Compute this college's rank by earnings
   const collegeRank = (() => {
