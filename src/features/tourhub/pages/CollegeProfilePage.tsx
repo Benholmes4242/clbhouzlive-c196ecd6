@@ -20,8 +20,6 @@ import { useCollegeStats, useCollegeSeasonStats } from '../hooks/useCollegeStats
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 import { useCollegeRivalries } from '../hooks/useCollegeMovers';
 import { getCollegeGradientCSS } from '../config/collegeBrandColors';
-import { useTourSeason } from '../hooks/useTourHubData';
-import { Button } from '@/components/ui/button';
 
 
 
