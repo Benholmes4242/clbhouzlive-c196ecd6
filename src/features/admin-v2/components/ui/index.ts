@@ -8,6 +8,7 @@ export { AdminDrawer }         from './AdminDrawer';
 export { AdminBulkActionBar }  from './AdminBulkActionBar';
 export { AdminSectionHeader }  from './AdminSectionHeader';
 export { AdminButton }         from './AdminButton';
+export { AdminPeriodPicker }   from './AdminPeriodPicker';
 
 export type { AdminKpiCardProps }       from './AdminKpiCard';
 export type { AdminTableProps }         from './AdminTable';
