@@ -350,7 +350,7 @@ export function TournamentDetailPage() {
           imageUrl={heroImageUrl}
         />
         
-        <div className="px-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
+        <div className="px-4" style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
           {/* Status bar */}
           <div className="pt-5">
             {isLive && (
