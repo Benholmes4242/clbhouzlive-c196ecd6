@@ -103,7 +103,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
                 fontWeight: 700,
                 letterSpacing: '1.2px',
                 textTransform: 'uppercase' as const,
-                color: 'rgba(245, 158, 11, 0.9)',
+                color: 'hsl(var(--accent-amber) / 0.9)',
               }}
             >
               {category.label} Leader
