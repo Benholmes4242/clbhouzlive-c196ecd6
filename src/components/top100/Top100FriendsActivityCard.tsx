@@ -79,7 +79,7 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         aria-expanded={isExpanded}
-        className="w-full px-5 py-4 hover:bg-muted/30 active:scale-[0.98] transition-all"
+        className="w-full px-5 py-4 active:bg-muted/30 active:scale-[0.98] transition-all"
       >
         {/* Title row */}
         <div className="flex items-start justify-between">
