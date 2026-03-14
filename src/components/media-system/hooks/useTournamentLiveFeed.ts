@@ -82,6 +82,7 @@ export function useTournamentLiveFeed(): {
         leader:          leaderboard[0] ?? null,
         leaderboard,
         lastUpdated:     new Date().toISOString(),
+        tourPriority:    TOUR_PRIORITY[tournament.tourSlug] ?? 99,
       };
 
       return {
