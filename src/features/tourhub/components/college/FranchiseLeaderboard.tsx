@@ -171,12 +171,12 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
                     />
                   );
                 })}
-                {activeMetric === 'wins' && (
+                {(activeMetric === 'wins' || activeMetric === 'top10s') && (
                   <p
                     style={{ fontSize: 12, fontWeight: 500, textAlign: 'center', marginTop: 8 }}
                     className="text-muted-foreground/50"
                   >
-                    {sortedStats.length} {sortedStats.length === 1 ? 'franchise' : 'franchises'} with wins this season
+                    {sortedStats.length} {sortedStats.length === 1 ? 'franchise' : 'franchises'} with {activeMetric === 'wins' ? 'wins' : 'top 10s'} this season
                   </p>
                 )}
               </>
