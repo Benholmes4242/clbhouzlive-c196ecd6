@@ -588,7 +588,7 @@ const ClubhouseContent = () => {
       )}
 
       {/* ═══ PAGE-LEVEL SCRUBBER (non-tournament only) ═══ */}
-      {activePost?.postType !== 'tournament_result' && isActiveVideo && activeVideoRef && (
+      {activePost?.postType !== 'tournament_result' && activePost?.postType !== 'tournament_live' && isActiveVideo && activeVideoRef && (
         <Scrubber
           videoRef={activeVideoRef}
           videoElement={activeVideoElement}
