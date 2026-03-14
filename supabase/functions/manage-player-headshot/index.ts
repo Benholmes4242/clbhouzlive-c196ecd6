@@ -119,7 +119,8 @@ serve(async (req) => {
       const { playerName, tourCode } = await req.json();
       if (!playerName) throw new Error('playerName required');
 
-      const folder = TOUR_FOLDER[tourCode] || 'Misc';
+      const normalizedTourCode = typeof tourCode === 'string' ? tourCode.toLowerCase() : '';
+      const folder = TOUR_FOLDER[normalizedTourCode] || 'Misc';
       const objectKey = `${folder}/${playerName}.webp`;
       const deleteUrl = `https://${accountId}.r2.cloudflarestorage.com/${bucket}/${encodeURIComponent(folder)}/${encodeURIComponent(playerName)}.webp`;
 
@@ -146,10 +147,12 @@ serve(async (req) => {
 
       if (!file || !playerName) throw new Error('file and playerName required');
 
-      const folder = TOUR_FOLDER[tourCode] || 'Misc';
+      const normalizedTourCode = typeof tourCode === 'string' ? tourCode.toLowerCase() : '';
+      const normalizedOldTourCode = typeof oldTourCode === 'string' ? oldTourCode.toLowerCase() : null;
+      const folder = TOUR_FOLDER[normalizedTourCode] || 'Misc';
 
       // If there was an old photo to remove (could be in a different tour folder)
-      const oldFolder = oldTourCode ? (TOUR_FOLDER[oldTourCode] || 'Misc') : folder;
+      const oldFolder = normalizedOldTourCode ? (TOUR_FOLDER[normalizedOldTourCode] || 'Misc') : folder;
       if (oldFolder) {
         const oldDeleteUrl = `https://${accountId}.r2.cloudflarestorage.com/${bucket}/${encodeURIComponent(oldFolder)}/${encodeURIComponent(playerName)}.webp`;
         const delHeaders = await signRequest('DELETE', oldDeleteUrl, null, accessKeyId, secretAccessKey, accountId, '');
