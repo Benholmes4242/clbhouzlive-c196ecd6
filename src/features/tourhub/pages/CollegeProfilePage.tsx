@@ -20,8 +20,6 @@ import { useCollegeStats, useCollegeSeasonStats } from '../hooks/useCollegeStats
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 import { useCollegeRivalries } from '../hooks/useCollegeMovers';
 import { getCollegeGradientCSS } from '../config/collegeBrandColors';
-import { useTourSeason } from '../hooks/useTourHubData';
-import { Button } from '@/components/ui/button';
 
 
 
@@ -35,7 +33,7 @@ export function CollegeProfilePage() {
   
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { setVariant, hideHeader, showHeader } = useHeader();
+  const { hideHeader, showHeader } = useHeader();
 
   // Transparent status bar for immersive hero bleed into safe area
   useMedianStatusBar("dark", "transparent", true, false);
@@ -43,8 +41,7 @@ export function CollegeProfilePage() {
   const { data: collegeMap, isLoading: mediaLoading } = useCollegeMediaMap();
   const { data: rivalries } = useCollegeRivalries(collegeSlug);
   const { data: allSeasonStats } = useCollegeSeasonStats();
-  const { data: season } = useTourSeason();
-  const seasonYear = season?.year || new Date().getFullYear();
+  const seasonYear = new Date().getFullYear();
   
   const [compareOpen, setCompareOpen] = useState(false);
   const [heroImgError, setHeroImgError] = useState(false);
@@ -106,9 +103,8 @@ export function CollegeProfilePage() {
     hideHeader();
     return () => {
       showHeader();
-      setVariant('solid-light');
     };
-  }, [hideHeader, showHeader, setVariant]);
+  }, [hideHeader, showHeader]);
   
   useEffect(() => {
     setCompareCollege2(null);

@@ -165,7 +165,7 @@ export function CollegeCompareSheet({
   const media1 = collegeMap?.get(college1) || null;
   const media2 = collegeMap?.get(selectedCollege2) || null;
 
-  const hasError = (statsError || mediaError) || (!statsLoading && !mediaLoading && !stats1 && college1);
+  const hasError = !!(statsError || mediaError);
   const hasNoRivals = rivals.length === 0;
 
   const getValue = (stats: typeof stats1, metric: CompareMetric): number => {
