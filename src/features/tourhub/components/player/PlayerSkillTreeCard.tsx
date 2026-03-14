@@ -238,7 +238,7 @@ function SkillTreeEmpty() {
 
 export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
   const { data: skillTree, isLoading, error } = usePlayerSkillTree(playerId);
-  const { ref, inView } = useInView({ threshold: 0.2, triggerOnce: true });
+  const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true });
 
   const headerContent = (
     <div className="flex items-center gap-2">

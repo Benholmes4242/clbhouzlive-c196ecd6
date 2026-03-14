@@ -130,7 +130,7 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
       {careerFields.length > 0 && (
         <div>
           {/* Sub-section: GOLF CAREER — amber */}
-          <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'rgba(245, 158, 11, 0.9)', marginBottom: '12px' }}>
+          <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'hsl(var(--accent-amber) / 0.9)', marginBottom: '12px' }}>
             Golf Career
           </p>
           <div className="grid grid-cols-2" style={{ gap: '16px' }}>

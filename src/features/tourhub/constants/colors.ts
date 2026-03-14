@@ -13,8 +13,8 @@ export const TOUR_COLORS = {
   
   // Scores (PGA Tour convention)
   scoreUnderPar: 'rgba(245, 158, 11, 0.9)',
-  scoreOverPar: '#111827',
-  scoreEven: 'rgba(0,0,0,0.4)',
+  scoreOverPar: 'hsl(var(--foreground))',
+  scoreEven: 'hsl(var(--muted-foreground) / 0.6)',
   
   // Live indicator
   liveAmber: '#f59e0b',

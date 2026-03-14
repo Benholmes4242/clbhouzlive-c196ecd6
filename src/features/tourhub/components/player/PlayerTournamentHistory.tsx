@@ -95,7 +95,7 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                       fontWeight: 700,
                       fontVariantNumeric: 'tabular-nums',
                       color: score !== null && score < 0
-                        ? 'rgba(245, 158, 11, 0.9)'
+                        ? 'hsl(var(--accent-amber) / 0.9)'
                         : score !== null && score > 0
                           ? TOUR_COLORS.scoreOverPar
                           : TOUR_COLORS.scoreEven,
