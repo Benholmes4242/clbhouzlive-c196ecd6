@@ -32,7 +32,7 @@ export interface CollegeRivalry {
  */
 export function useCollegeWeeklyMovers(options?: {
   direction?: 'up' | 'down';
-  metric?: 'earnings' | 'wins' | 'cuts' | 'top10s';
+  metric?: 'earnings' | 'wins' | 'top10s';
   limit?: number;
 }) {
   const { direction = 'up', metric = 'earnings', limit = 10 } = options || {};
