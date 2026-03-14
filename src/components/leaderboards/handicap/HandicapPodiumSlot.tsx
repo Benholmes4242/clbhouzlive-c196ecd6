@@ -19,20 +19,18 @@ const POSITION_CONFIG = {
   1: {
     avatarSize: 120,
     borderWidth: 0.5,
-    borderGradient: 'linear-gradient(135deg, #D4A853, #F0D78C, #D4A853)',
     badgeSize: 26,
     nameSize: 17,
     nameWeight: 700,
     statSize: 24,
     statWeight: 800,
-    glowShadow: '0 8px 28px rgba(212, 168, 83, 0.25)',
+    glowShadow: '0 8px 28px hsl(var(--accent-amber) / 0.25)',
     showCrown: true,
     verticalOffset: 0,
   },
   2: {
     avatarSize: 88,
     borderWidth: 0.5,
-    borderGradient: '#A8B4C0',
     badgeSize: 22,
     nameSize: 15,
     nameWeight: 600,
@@ -45,7 +43,6 @@ const POSITION_CONFIG = {
   3: {
     avatarSize: 88,
     borderWidth: 0.5,
-    borderGradient: '#C4956A',
     badgeSize: 22,
     nameSize: 15,
     nameWeight: 600,
@@ -56,12 +53,6 @@ const POSITION_CONFIG = {
     verticalOffset: 40,
   },
 } as const;
-
-const BADGE_COLORS: Record<number, { bg: string; text: string }> = {
-  1: { bg: '#D4A853', text: 'white' },
-  2: { bg: '#A8B4C0', text: 'white' },
-  3: { bg: '#C4956A', text: 'white' },
-};
 
 const formatNameTwoLines = (name: string) => {
   const parts = name.trim().split(' ');
@@ -84,7 +75,6 @@ export function HandicapPodiumSlot({
   const statusLabel = getHandicapStatusLabel(handicap);
   const badgeStyle = getHandicapBadgeStyle(handicap, seasonColor);
   const handicapColor = getHandicapStatusColor(handicap, seasonColor);
-  const badge = BADGE_COLORS[rank];
 
   const initials = displayName
     ?.split(' ')
@@ -113,8 +103,8 @@ export function HandicapPodiumSlot({
           >
             <Crown
               size={36}
-              style={{ color: '#D4A853', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))' }}
-              fill="#D4A853"
+              style={{ color: 'hsl(var(--accent-amber))', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))' }}
+              fill="#f59e0b"
               strokeWidth={1.5}
             />
           </motion.div>
@@ -127,7 +117,7 @@ export function HandicapPodiumSlot({
             <div
               className="absolute -inset-8 -z-10"
               style={{
-                background: 'radial-gradient(ellipse at center, rgba(212, 168, 83, 0.06) 0%, transparent 70%)',
+                background: 'radial-gradient(ellipse at center, hsl(var(--accent-amber) / 0.08) 0%, transparent 70%)',
               }}
             />
           )}
@@ -151,17 +141,14 @@ export function HandicapPodiumSlot({
             )}
           </div>
 
-          {/* Rank badge — circular */}
+          {/* Rank — plain number */}
           <div
-            className="absolute -bottom-1.5 -right-0.5 flex items-center justify-center font-bold shadow-md"
+            className="absolute -bottom-1.5 -right-0.5 flex items-center justify-center font-bold"
             style={{
-              width: config.badgeSize,
-              height: config.badgeSize,
-              borderRadius: '50%',
-              background: badge.bg,
-              color: badge.text,
-              fontSize: rank === 1 ? 14 : 12,
-              border: '2px solid white',
+              fontSize: rank === 1 ? 13 : 11,
+              fontWeight: 700,
+              color: rank === 1 ? 'hsl(var(--accent-amber))' : 'hsl(var(--muted-foreground))',
+              textShadow: '0 1px 2px rgba(0,0,0,0.3)',
             }}
           >
             {rank}
@@ -170,9 +157,9 @@ export function HandicapPodiumSlot({
 
         {/* Name */}
         <div className="mt-2.5 text-center max-w-[120px]">
-          {/* "You" label — season colored */}
+          {/* "You" label */}
           {isCurrentUser && (
-            <p className="text-xs font-medium mb-0.5" style={{ color: seasonColor || '#40916C' }}>You</p>
+            <p className="text-xs font-medium mb-0.5" style={{ color: seasonColor || 'hsl(var(--accent-amber))' }}>You</p>
           )}
           <p
             className="text-foreground leading-tight"

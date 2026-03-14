@@ -34,7 +34,7 @@ export function HandicapTab() {
   const { data: seasonCalendar } = useSeasonCalendar();
   const seasonThemeColor = useMemo(() => {
     const currentSeason = seasonCalendar?.find(s => s.is_current);
-    if (!currentSeason) return '#006747';
+    if (!currentSeason) return 'hsl(var(--accent-amber))';
     const lower = currentSeason.name.toLowerCase();
     let id: SeasonId = 'major';
     if (lower.includes('pre-season') || lower.includes('preseason') || lower.includes('training')) id = 'preseason';
