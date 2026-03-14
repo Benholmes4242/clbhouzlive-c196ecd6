@@ -131,6 +131,8 @@ export interface TourPlayerStatistics {
   scrambling: number | null;
   birdies_per_round: number | null;
   strokes_gained_total: number | null;
+  strokes_gained_tee_green: number | null;
+  strokes_gained: number | null;
   // Joined player data
   player?: TourPlayer;
 }
