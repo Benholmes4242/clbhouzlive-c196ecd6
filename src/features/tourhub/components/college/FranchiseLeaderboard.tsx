@@ -45,7 +45,6 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
   const { data: allStats, isLoading, error } = useCollegeSeasonStats();
   const { data: collegeMap } = useCollegeMediaMap();
   const { data: moverInfo } = useTopMovers();
-  const { data: moverInfo } = useTopMovers();
 
   const { sortedStats, maxValue } = useMemo(() => {
     if (!allStats) return { sortedStats: [], maxValue: 1 };
