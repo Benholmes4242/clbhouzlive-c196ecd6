@@ -122,7 +122,7 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
         {friends.length > 8 && (
           <button
             onClick={onViewAll}
-            className="text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-0.5 py-2 px-2 -mr-2 rounded-lg active:scale-[0.97] transition-transform"
+            className="text-[11px] font-medium text-muted-foreground active:opacity-70 transition-opacity flex items-center gap-0.5 py-2 px-2 -mr-2 rounded-lg active:scale-[0.97]"
           >
             View all
             <span className="text-[10px]">→</span>
