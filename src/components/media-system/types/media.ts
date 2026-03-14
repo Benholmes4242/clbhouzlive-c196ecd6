@@ -107,6 +107,47 @@ export interface TournamentResultFeedPost extends Omit<FeedPost, 'mediaItems' | 
   isReview: false;
 }
 
+/** Live tournament player row for feed card */
+export interface LiveLeaderboardEntry {
+  position:     number;
+  positionTied: boolean;
+  playerId:     string;
+  playerName:   string;
+  photoUrl:     string | null;
+  country:      string | null;
+  scoreDisplay: string;     // '-15', '+2', 'E'
+  score:        number;     // raw integer for gap calculation
+  thru:         string | null; // '14', 'F', '-'
+  today:        string | null; // today's round score '+3', '-2'
+}
+
+/** Live tournament metadata for feed card */
+export interface TournamentLiveMeta {
+  tournamentId:   string;
+  tournamentName: string;
+  tourSlug:       string;
+  tourName:       string;
+  venueName:      string | null;
+  venueCity:      string | null;
+  currentRound:   number;
+  totalRounds:    number;
+  momentumTags:   string[];
+  volatilityIndex:number;
+  scoreSpread:    number;
+  leader:         LiveLeaderboardEntry | null;
+  leaderboard:    LiveLeaderboardEntry[];
+  lastUpdated:    string;
+}
+
+/** Live tournament feed post — client-side synthetic, never stored in DB */
+export interface TournamentLiveFeedPost extends Omit<FeedPost, 'mediaItems' | 'review' | 'isReview'> {
+  postType:    'tournament_live';
+  liveMeta:    TournamentLiveMeta;
+  mediaItems:  MediaItem[];
+  review:      null;
+  isReview:    false;
+}
+
 export interface VideoSessionState {
   currentTime: number;
   wasMuted: boolean;

@@ -58,3 +58,34 @@ export function deduplicatePosts(posts: FeedPost[]): FeedPost[] {
     return true;
   });
 }
+
+/**
+ * Inject live tournament cards into the feed and suppress completed cards
+ * for the same tour slug.
+ *
+ * - Live cards go at position 0 (first thing seen)
+ * - Completed tournament_result cards for live tour slugs are suppressed
+ */
+export function injectLiveTournamentCards(
+  feedPosts: FeedPost[],
+  livePosts: FeedPost[],
+  liveTourSlugs: string[]
+): FeedPost[] {
+  if (!livePosts.length) return feedPosts;
+
+  // Remove completed tournament_result cards for tours that are currently live
+  const filtered = feedPosts.filter(post => {
+    if (post.postType !== 'tournament_result') return true;
+    const meta = (post as Record<string, unknown>).tournamentMeta as { tour_slug?: string } | undefined;
+    if (!meta?.tour_slug) return true;
+    return !liveTourSlugs.includes(meta.tour_slug);
+  });
+
+  // Deduplicate: don't inject if somehow already present
+  const existingLiveIds = new Set(
+    filtered.filter(p => p.postType === 'tournament_live').map(p => p.id)
+  );
+  const newLivePosts = livePosts.filter(p => !existingLiveIds.has(p.id));
+
+  return [...newLivePosts, ...filtered];
+}
