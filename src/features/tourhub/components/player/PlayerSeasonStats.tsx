@@ -214,7 +214,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
           transition={{ duration: 0.15 }}
           style={{ marginTop: '16px' }}
         >
-          {activeTab === 'Overview' && (
+          {activeTab === 'Player Overview' && (
             <div>
               <SubSectionLabel icon={Trophy} label="RESULTS" style={{ marginTop: 0 }} />
               <StatRow label="Events Played" value={fmt(playerStats.events_played)} />
