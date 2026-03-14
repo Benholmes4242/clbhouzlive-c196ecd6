@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
@@ -6,6 +6,7 @@ import AdminV2Sidebar from './components/shell/AdminV2Sidebar';
 import AdminV2Header from './components/shell/AdminV2Header';
 import AdminV2Loading from './components/ui/AdminV2Loading';
 import AdminV2AccessDenied from './components/ui/AdminV2AccessDenied';
+import { AdminCommandPalette } from './components/ui';
 
 // Lazy-loaded pages
 const DashboardPage        = lazy(() => import('./pages/DashboardPage'));
