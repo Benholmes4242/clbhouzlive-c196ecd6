@@ -111,7 +111,7 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
                 onClick={() => setSelectedMonth(month)}
                 className={cn(
                   'flex-1 rounded-t cursor-pointer relative overflow-hidden',
-                  'hover:opacity-90 active:scale-[0.97] transition-all duration-200',
+                  'active:scale-[0.97] active:opacity-80 transition-all duration-200',
                   isActive
                     ? 'shadow-sm'
                     : ''
