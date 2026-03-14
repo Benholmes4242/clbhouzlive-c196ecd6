@@ -217,6 +217,7 @@ const Top100CoursesHubPanel = () => {
               <SelectTrigger 
                 aria-label="Select Top 100 list" 
                 className="h-11 w-full rounded-2xl bg-card border-border/50 justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150"
+                style={{ color: 'hsl(var(--foreground))' }}
               >
                 <SelectValue placeholder="Global Top 100" />
               </SelectTrigger>
