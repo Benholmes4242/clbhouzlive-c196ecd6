@@ -185,7 +185,13 @@ const ClubhouseContent = () => {
   const friendsFeed = useFriendsFeed(user?.id);
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
   
-  const posts = activeFeed.posts;
+  // ── Live tournament injection ──
+  const { livePosts, liveTourSlugs } = useTournamentLiveFeed();
+  
+  const posts = useMemo(
+    () => injectLiveTournamentCards(activeFeed.posts, livePosts, liveTourSlugs),
+    [activeFeed.posts, livePosts, liveTourSlugs]
+  );
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? true;
   
