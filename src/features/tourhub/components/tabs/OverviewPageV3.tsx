@@ -14,7 +14,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import {
   HeroCarousel,
   LiveRightNow,
@@ -41,6 +41,11 @@ export function OverviewPageV3() {
   // Prevent pull-down overscroll bounce on this immersive page
   usePreventOverscroll();
 
+  // Parallax scale + fade on hero as user scrolls past
+  const { scrollY } = useScroll();
+  const heroOpacity = useTransform(scrollY, [0, 120], [1, 0.85]);
+  const heroScale = useTransform(scrollY, [0, 120], [1, 0.97]);
+
   // Set transparent status bar with WHITE icons for dark hero image
   useMedianStatusBar("dark", "transparent", true, false);
 
@@ -65,7 +70,7 @@ export function OverviewPageV3() {
           showBottomNav();
         }
       },
-      { threshold: 0 }
+      { threshold: 0, rootMargin: '-40px 0px 0px 0px' }
     );
 
     const hideObserver = new IntersectionObserver(
@@ -117,9 +122,9 @@ export function OverviewPageV3() {
       </AnimatePresence>
 
       {/* 1. Hero Carousel - using containerNoHeader since Overview has no header */}
-      <div 
+      <motion.div 
         className="relative w-full z-0"
-        style={HERO_STYLES.containerNoHeader}
+        style={{ ...HERO_STYLES.containerNoHeader, opacity: heroOpacity, scale: heroScale }}
       >
         <HeroCarousel hasHeader={false} />
         {/* Show sentinel: top edge — when it leaves viewport, nav slides in */}
@@ -134,7 +139,7 @@ export function OverviewPageV3() {
           aria-hidden="true"
           style={{ position: 'absolute', top: '85px', height: '1px', width: '1px', pointerEvents: 'none' }}
         />
-      </div>
+      </motion.div>
 
       {/* Content sections — consistent 40px vertical rhythm between major sections */}
       <div 
