@@ -104,10 +104,10 @@ interface SGBarProps {
 
 function SGBar({ label, value }: SGBarProps) {
   if (value === null || value === undefined) return null;
-  const maxWidth = 50;
-  const barWidth = Math.min(maxWidth, (Math.abs(value) / 3.0) * maxWidth);
+  const maxWidth = 60;
+  const barWidth = Math.min(maxWidth, Math.abs(value) * 15);
   const isPositive = value >= 0;
-  const formattedValue = value === 0 ? '0.00' : value > 0 ? `+${value.toFixed(2)}` : value.toFixed(2);
+  const formattedValue = value > 0 ? `+${value.toFixed(2)}` : value.toFixed(2);
 
   return (
     <div
@@ -127,7 +127,7 @@ function SGBar({ label, value }: SGBarProps) {
       </div>
       <div className="relative overflow-hidden" style={{ height: '5px', borderRadius: '2.5px' }} >
         <div className="absolute inset-0" style={{ backgroundColor: 'hsl(var(--border))' }} />
-        <div className="absolute left-1/2 top-0 bottom-0 z-10" style={{ width: 1, backgroundColor: 'hsl(var(--border))' }} />
+        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-border z-10" />
         <motion.div
           className="absolute top-0 bottom-0"
           style={{
@@ -377,15 +377,11 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
 
           {activeTab === 'SG' && (
             <div>
-              <SubSectionLabel icon={TrendingUp} label="STROKES GAINED" style={{ marginTop: 0 }} />
-              <p style={{ fontSize: 12, color: 'hsl(var(--muted-foreground) / 0.5)', marginBottom: 16 }}>
-                Strokes gained vs. tour average per round
-              </p>
               <SGBar label="SG: Total" value={playerStats.strokes_gained_total} />
-              <SGBar label="SG: Tee to Green" value={playerStats.strokes_gained_tee_green} />
-              <SGBar label="SG: Around Green" value={playerStats.strokes_gained} />
-              {!playerStats.strokes_gained_total && !playerStats.strokes_gained_tee_green && !playerStats.strokes_gained && (
-                <p className="text-muted-foreground text-center" style={{ fontSize: 14, padding: '24px 0' }}>
+              <SGBar label="SG: Tee to Green" value={playerStats.strokes_gained_tee_green ?? null} />
+              <SGBar label="SG: Around Green" value={playerStats.strokes_gained ?? null} />
+              {!playerStats.strokes_gained_total && !playerStats.strokes_gained_tee_green && (
+                <p className="text-muted-foreground text-center" style={{ fontSize: '14px', padding: '24px 0' }}>
                   Strokes Gained data unavailable for this player.
                 </p>
               )}
