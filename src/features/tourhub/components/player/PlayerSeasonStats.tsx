@@ -162,8 +162,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
   return (
     <div className="px-4 py-6 border-b border-border/30">
       {/* Section header — 22px / 700 / tracking -0.3px */}
-      <div className="flex items-center gap-2" style={{ marginBottom: '12px' }}>
-        <BarChart3 className="w-4 h-4 text-muted-foreground" />
+      <div style={{ marginBottom: '12px' }}>
         <h2 className="text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
           Season Performance
         </h2>
