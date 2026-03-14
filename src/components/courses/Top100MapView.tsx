@@ -88,7 +88,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   const { data: seasonCalendar } = useSeasonCalendar();
   const seasonColor = useMemo(() => {
     const activeSeason = seasonCalendar?.find(s => s.is_current);
-    if (!activeSeason?.name) return '#3EBD93';
+    if (!activeSeason?.name) return '#f59e0b'; // amber-400 hex — Mapbox compatible
     const lower = activeSeason.name.toLowerCase();
     let id: SeasonId = 'preseason';
     if (lower.includes('major')) id = 'major';
