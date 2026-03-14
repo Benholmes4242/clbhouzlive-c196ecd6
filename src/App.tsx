@@ -364,95 +364,10 @@ function AppRoutes() {
         <Route path="/achievements/:userId" element={<Suspense fallback={<AchievementsSkeleton />}><AchievementsPage /></Suspense>} />
         <Route path="/admin-setup" element={<Suspense fallback={<GenericPageSkeleton />}><AdminSetupPage /></Suspense>} />
         
-        {/* Admin routes wrapped with AdminLayout */}
-        <Route path="/admin" element={<Suspense fallback={<GenericPageSkeleton />}><AdminLayout /></Suspense>}>
-          <Route index element={<Suspense fallback={<GenericPageSkeleton />}><AdminLanding /></Suspense>} />
-          <Route path="overview" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AdminOverviewPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="command-center" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><CommandCenterPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="users" element={
-            <PanelGuard need="users">
-              <Suspense fallback={<GenericPageSkeleton />}><AdminUsersPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="admins" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AdminMembersPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="invites" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AdminInvitesPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="verification" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><VerificationsPage /></Suspense>
-            </PanelGuard>
-          } />
-          {/* Redirect old route to new unified verification */}
-          <Route path="business-verifications" element={<Navigate to="/admin/verification?type=businesses" replace />} />
-          <Route path="businesses" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AdminBusinessDirectoryPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="audit" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AdminAuditPage /></Suspense>
-            </PanelGuard>
-          } />
-          
-          {/* Legacy/management sections */}
-          <Route path="golf-courses" element={<Suspense fallback={<GenericPageSkeleton />}><GolfCoursesPage /></Suspense>} />
-          <Route path="assets" element={<Suspense fallback={<GenericPageSkeleton />}><AssetManagerPage /></Suspense>} />
-          {/* Legacy routes - redirect to unified Asset Manager */}
-          <Route path="logos" element={<Navigate to="/admin/assets" replace />} />
-          <Route path="college-logos" element={<Navigate to="/admin/assets" replace />} />
-          <Route path="country-flags" element={<Navigate to="/admin/assets" replace />} />
-          <Route path="courses" element={<Suspense fallback={<GenericPageSkeleton />}><CourseImportPage /></Suspense>} />
-          <Route path="analytics" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AnalyticsPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="analytics/echo" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AdminEchoAnalyticsPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="auth-monitoring" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AuthMonitoringPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="team" element={<Suspense fallback={<GenericPageSkeleton />}><TeamPage /></Suspense>} />
-          <Route path="settings" element={<Suspense fallback={<GenericPageSkeleton />}><AdminSettingsPage /></Suspense>} />
-          <Route path="top100-geocoding" element={<Suspense fallback={<GenericPageSkeleton />}><Top100GeocodingPage /></Suspense>} />
-          <Route path="tour" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AdminTourPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="tour-players" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AdminTourPlayersPage /></Suspense>
-            </PanelGuard>
-          } />
-          <Route path="test-lab" element={
-            <PanelGuard need="admins">
-              <Suspense fallback={<GenericPageSkeleton />}><AdminTestLabPage /></Suspense>
-            </PanelGuard>
-          } />
-        </Route>
-        
+        {/* Old /admin routes removed — redirected to admin-v2 */}
+        <Route path="/admin" element={<Navigate to="/admin-v2/dashboard" replace />} />
+        <Route path="/admin/*" element={<Navigate to="/admin-v2/dashboard" replace />} />
+
         {/* Admin V2 — new standalone console */}
         <Route
           path="/admin-v2/*"
