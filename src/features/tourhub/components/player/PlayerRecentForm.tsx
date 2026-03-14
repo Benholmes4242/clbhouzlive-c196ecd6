@@ -28,16 +28,16 @@ export function PlayerRecentForm({ playerId }: PlayerRecentFormProps) {
       <div
         style={{
           padding: '12px 16px',
-          backgroundColor: 'rgba(220,38,38,0.08)',
-          borderLeft: '3px solid hsl(var(--destructive))',
+          backgroundColor: 'hsl(var(--muted) / 0.2)',
+          borderLeft: '3px solid hsl(var(--muted-foreground) / 0.3)',
           borderBottom: '1px solid hsl(var(--border) / 0.1)',
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
         }}
       >
-        <TrendingDown style={{ width: 16, height: 16, color: 'hsl(var(--destructive))', flexShrink: 0 }} />
-        <span style={{ fontSize: 13, fontWeight: 600, color: 'hsl(var(--destructive))' }}>
+        <TrendingDown style={{ width: 16, height: 16, color: 'hsl(var(--muted-foreground))', flexShrink: 0 }} />
+        <span style={{ fontSize: 13, fontWeight: 600, color: 'hsl(var(--muted-foreground))' }}>
           Out of form · missed last {cutCount} {cutCount === 1 ? 'cut' : 'cuts'}
         </span>
       </div>

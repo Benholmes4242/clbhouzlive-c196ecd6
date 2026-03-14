@@ -132,7 +132,7 @@ function SGBar({ label, value }: SGBarProps) {
           className="absolute top-0 bottom-0"
           style={{
             borderRadius: '2.5px',
-            backgroundColor: isPositive ? 'hsl(var(--accent-amber) / 0.9)' : 'hsl(var(--destructive))',
+            backgroundColor: isPositive ? 'hsl(var(--accent-amber))' : 'hsl(var(--muted-foreground) / 0.5)',
             width: `${barWidth}%`,
             left: isPositive ? '50%' : `${50 - barWidth}%`,
           }}
