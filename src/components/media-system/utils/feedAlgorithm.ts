@@ -76,7 +76,7 @@ export function injectLiveTournamentCards(
   // Remove completed tournament_result cards for tours that are currently live
   const filtered = feedPosts.filter(post => {
     if (post.postType !== 'tournament_result') return true;
-    const meta = (post as Record<string, unknown>).tournamentMeta as { tour_slug?: string } | undefined;
+    const meta = (post as unknown as Record<string, unknown>).tournamentMeta as { tour_slug?: string } | undefined;
     if (!meta?.tour_slug) return true;
     return !liveTourSlugs.includes(meta.tour_slug);
   });
