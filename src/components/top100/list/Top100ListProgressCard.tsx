@@ -45,8 +45,8 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
           borderColor: theme.ringColor,
           borderWidth: '1px',
         }}
-        whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
+      >
       >
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
