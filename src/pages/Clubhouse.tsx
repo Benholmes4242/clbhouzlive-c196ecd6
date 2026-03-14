@@ -215,7 +215,9 @@ const ClubhouseContent = () => {
   
   // ── Active post derivation ──
   const { activePost, golfCourse, activeReview, isActiveReview, isActiveVideo } = useActivePostDerived(posts, activeIndex);
-  const isTournamentCardActive = activePost?.postType === 'tournament_result';
+  const isTournamentCardActive =
+    activePost?.postType === 'tournament_result' ||
+    activePost?.postType === 'tournament_live';
 
   // Hide bottom nav when tournament card is active
   const { setVisible: setBottomNavVisible } = useBottomNavigation();
