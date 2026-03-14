@@ -84,21 +84,21 @@ export function FranchiseCard({
     }
 
     const primaryStat = activeMetric === 'wins'
-      ? { label: pluralize(stats.wins_total, 'win'), value: String(stats.wins_total), isAccent: true }
+      ? { label: pluralize(stats.wins_total, 'win'), value: String(stats.wins_total), isAccent: true, color: undefined as string | undefined }
       : activeMetric === 'top10s'
-      ? { label: 'top 10s', value: String(stats.top10_total), isAccent: true }
-      : { label: '', value: formatCompact(stats.earnings_total), isAccent: true };
+      ? { label: 'top 10s', value: String(stats.top10_total), isAccent: true, color: undefined as string | undefined }
+      : { label: '', value: formatCompact(stats.earnings_total), isAccent: true, color: undefined as string | undefined };
 
     const secondaryStat = activeMetric === 'wins' || activeMetric === 'top10s'
-      ? { label: '', value: formatCompact(stats.earnings_total), isAccent: false }
-      : { label: pluralize(stats.wins_total, 'win'), value: String(stats.wins_total), isAccent: false };
+      ? { label: '', value: formatCompact(stats.earnings_total), isAccent: false, color: undefined as string | undefined }
+      : { label: pluralize(stats.wins_total, 'win'), value: String(stats.wins_total), isAccent: false, color: undefined as string | undefined };
 
     return [
       primaryStat,
       secondaryStat,
       activeMetric !== 'top10s'
-        ? { label: 'top 10s', value: String(stats.top10_total), isAccent: false }
-        : { label: pluralize(stats.wins_total, 'win'), value: String(stats.wins_total), isAccent: false },
+        ? { label: 'top 10s', value: String(stats.top10_total), isAccent: false, color: undefined as string | undefined }
+        : { label: pluralize(stats.wins_total, 'win'), value: String(stats.wins_total), isAccent: false, color: undefined as string | undefined },
     ];
   };
 
