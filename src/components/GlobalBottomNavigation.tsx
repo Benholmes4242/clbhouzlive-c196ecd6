@@ -166,15 +166,38 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 transition: 'all var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1)',
               }}
             >
-              <NavigationBar
-                activeTab={activeTab}
-                onTabClick={handleTabClickWithCamera}
-                onPrefetch={handleNavPrefetch}
-                variant={isClubhouseRoute ? 'clubhouse' : 'default'}
-                isDimmed={false}
-                useAmberActive={isWarmGradientRoute}
-                showBorder={false}
-              />
+              <div className="flex w-full">
+                <div className="flex-1">
+                  <NavigationBar
+                    activeTab={activeTab}
+                    onTabClick={handleTabClickWithCamera}
+                    onPrefetch={handleNavPrefetch}
+                    variant={isClubhouseRoute ? 'clubhouse' : 'default'}
+                    isDimmed={false}
+                    useAmberActive={isWarmGradientRoute}
+                    showBorder={false}
+                  />
+                </div>
+                {isAdminUser && (
+                  <button
+                    onClick={() => navigate('/admin-v2/dashboard')}
+                    className={cn(
+                      "flex-shrink-0 w-14 flex flex-col items-center justify-center gap-1 py-1.5 rounded-xl",
+                      "active:scale-95 focus:outline-none"
+                    )}
+                    style={{ transition: 'all 150ms ease' }}
+                    aria-label="Admin"
+                  >
+                    <span className="relative">
+                      <ShieldCheckIcon className="w-6 h-6 text-muted-foreground" />
+                      <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full" style={{ background: 'hsl(var(--accent-amber))' }} />
+                    </span>
+                    <span className="text-[10px] font-medium text-muted-foreground">
+                      Admin
+                    </span>
+                  </button>
+                )}
+              </div>
             </div>
           </motion.div>
         )}
