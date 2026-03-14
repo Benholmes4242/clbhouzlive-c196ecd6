@@ -368,7 +368,7 @@ const Top100List = () => {
 
   if (isLoading) {
     return (
-      <PageRoot className="min-h-screen bg-[var(--bg-page)]" immersive immersiveStatusBar>
+      <PageRoot className="min-h-screen bg-background" immersive immersiveStatusBar>
         <main className="pb-20">
           <div className="animate-pulse space-y-4 pt-0">
             <div className="h-[260px] bg-muted" />
