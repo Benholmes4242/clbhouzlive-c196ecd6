@@ -122,11 +122,11 @@ export function EventWinnerCard({ tournamentId, className }: EventWinnerCardProp
   // Full winner display with player linked
   return (
     <motion.div className={cn("", className)} {...sectionEntrance}>
-      <div className="flex items-center gap-2 mb-3">
-        <Trophy className="w-4 h-4 text-amber-500" />
-        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      <div className="flex items-center gap-2" style={{ marginBottom: 12 }}>
+        <Trophy className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber))' }} />
+        <h2 className="text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
           Champion
-        </span>
+        </h2>
       </div>
       
       <Link 
