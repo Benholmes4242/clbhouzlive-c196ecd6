@@ -47,7 +47,11 @@ function useBreadcrumbs() {
   }));
 }
 
-export default function AdminV2Header() {
+interface AdminV2HeaderProps {
+  onOpenPalette: () => void;
+}
+
+export default function AdminV2Header({ onOpenPalette }: AdminV2HeaderProps) {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { data: profile } = useUserProfile(user?.id);
