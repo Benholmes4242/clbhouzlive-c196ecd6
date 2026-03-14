@@ -52,7 +52,6 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
     const getValue = (s: CollegeSeasonStats) => {
       switch (activeMetric) {
         case 'wins': return s.wins_total;
-        case 'cuts': return s.cuts_total;
         case 'top10s': return s.top10_total;
         default: return s.earnings_total;
       }
