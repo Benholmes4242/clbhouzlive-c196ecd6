@@ -395,6 +395,8 @@ function extractRawStats(rawData: { statistics?: RawStatistics } | null): Partia
     scrambling: stats.scrambling_pct ?? null,
     birdies_per_round: stats.birdies_per_round ?? null,
     strokes_gained_total: stats.strokes_gained_total ?? null,
+    strokes_gained_tee_green: stats.strokes_gained_tee_green ?? null,
+    strokes_gained: stats.strokes_gained ?? null,
     // Fill in missing column data from raw
     scoring_average: stats.scoring_avg ?? null,
     driving_distance: stats.drive_avg ?? null,
