@@ -62,7 +62,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
   const handleVenueTap = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    if (tournament.venue_name) navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venue_name)}`);
+    if (tournament.venue_name) navigate(`/courses?q=${encodeURIComponent(tournament.venue_name)}`);
   };
 
   // Podium data for finished state — position-based rows
