@@ -47,7 +47,6 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
         }}
         whileTap={{ scale: 0.99 }}
       >
-      >
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div 
