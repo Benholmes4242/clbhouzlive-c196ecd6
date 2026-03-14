@@ -77,8 +77,8 @@ export const CoursePodiumSlot: React.FC<Props> = ({
         }
         return (
           <span className="flex items-center justify-center gap-1">
-            <TrendingUp style={{ color: seasonColor, width: config.iconSize, height: config.iconSize }} />
-            <span style={{ color: seasonColor, fontSize: config.metricSize, fontWeight: config.metricWeight }}>
+            <TrendingUp style={{ color: 'hsl(var(--accent-amber))', width: config.iconSize, height: config.iconSize }} />
+            <span style={{ color: 'hsl(var(--accent-amber))', fontSize: config.metricSize, fontWeight: config.metricWeight }}>
               +{course.rank_change}
             </span>
           </span>

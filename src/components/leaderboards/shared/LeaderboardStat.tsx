@@ -17,18 +17,13 @@ export function LeaderboardStat({
   positive = false,
   negative = false,
   className,
-  seasonColor,
+  seasonColor: _seasonColor,
 }: LeaderboardStatProps) {
   return (
     <div className={cn('text-right', className)}>
       <div
-        className={cn(
-          'text-[22px] font-extrabold',
-          !seasonColor && highlight && 'text-primary',
-          !seasonColor && positive && 'text-green-600 dark:text-green-400',
-          !seasonColor && negative && 'text-red-600 dark:text-red-400',
-        )}
-        style={seasonColor ? { color: seasonColor } : undefined}
+        className="text-[22px] font-extrabold"
+        style={{ color: 'hsl(var(--accent-amber))' }}
       >
         {value}
       </div>

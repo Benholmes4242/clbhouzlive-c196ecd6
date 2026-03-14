@@ -44,50 +44,47 @@ export function getHandicapStatusLabel(handicap: number): string | null {
 
 /**
  * Get status color based on handicap value.
- * Plus/Scratch = gold, Single Figure = seasonColor (defaults to green), Mid/High = muted.
+ * Plus/Scratch = amber, Single Figure = amber (slightly softer), Mid/High = muted.
  */
-export function getHandicapStatusColor(handicap: number, seasonColor?: string): string {
-  if (handicap < -0.4) return '#D4A853'; // Gold - plus figure
-  if (handicap >= -0.4 && handicap <= 0.4) return '#D4A853'; // Gold - scratch
-  if (handicap >= 0.5 && handicap <= 9.9) return seasonColor || '#40916C'; // Season color - single figure
-  return 'hsl(var(--muted-foreground))'; // Muted for mid/high
+export function getHandicapStatusColor(handicap: number, _seasonColor?: string): string {
+  if (handicap < -0.4) return 'hsl(var(--accent-amber))';
+  if (handicap >= -0.4 && handicap <= 0.4) return 'hsl(var(--accent-amber))';
+  if (handicap >= 0.5 && handicap <= 9.9) return 'hsl(var(--accent-amber) / 0.8)';
+  return 'hsl(var(--muted-foreground))';
 }
 
 /**
  * Get handicap category badge styling.
- * Single Figure tier accepts optional seasonColor for season-aware tinting.
+ * All tiers use amber-based or muted tokens — no season color dependency.
  */
-export function getHandicapBadgeStyle(handicap: number, seasonColor?: string): {
+export function getHandicapBadgeStyle(handicap: number, _seasonColor?: string): {
   bg: string;
   text: string;
   border: string;
 } {
   if (handicap < -0.4) return {
-    bg: 'rgba(212, 168, 83, 0.12)',
-    text: '#C4963E',
-    border: 'rgba(212, 168, 83, 0.25)',
+    bg: 'hsl(var(--accent-amber) / 0.12)',
+    text: 'hsl(var(--accent-amber))',
+    border: 'hsl(var(--accent-amber) / 0.25)',
   };
   if (handicap >= -0.4 && handicap <= 0.4) return {
-    bg: 'rgba(212, 168, 83, 0.12)',
-    text: '#C4963E',
-    border: 'rgba(212, 168, 83, 0.25)',
+    bg: 'hsl(var(--accent-amber) / 0.12)',
+    text: 'hsl(var(--accent-amber))',
+    border: 'hsl(var(--accent-amber) / 0.25)',
   };
-  if (handicap >= 0.5 && handicap <= 9.9) {
-    const color = seasonColor || '#40916C';
-    return {
-      bg: `${color}1A`,      // ~10% opacity
-      text: color,
-      border: `${color}33`,  // ~20% opacity
-    };
-  }
+  if (handicap >= 0.5 && handicap <= 9.9) return {
+    bg: 'hsl(var(--accent-amber) / 0.1)',
+    text: 'hsl(var(--accent-amber))',
+    border: 'hsl(var(--accent-amber) / 0.2)',
+  };
   if (handicap >= 10.0 && handicap <= 19.9) return {
-    bg: 'rgba(0, 0, 0, 0.04)',
+    bg: 'hsl(var(--muted) / 0.5)',
     text: 'hsl(var(--muted-foreground))',
-    border: 'rgba(0, 0, 0, 0.08)',
+    border: 'hsl(var(--border) / 0.3)',
   };
   return {
-    bg: 'rgba(0, 0, 0, 0.03)',
+    bg: 'hsl(var(--muted) / 0.3)',
     text: 'hsl(var(--muted-foreground))',
-    border: 'rgba(0, 0, 0, 0.06)',
+    border: 'hsl(var(--border) / 0.2)',
   };
 }

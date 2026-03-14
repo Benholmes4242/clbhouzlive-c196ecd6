@@ -116,7 +116,7 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonCo
           className="font-semibold"
           style={{
             fontSize: 13,
-            color: course.current_user_played ? seasonColor : 'hsl(var(--muted-foreground))',
+            color: course.current_user_played ? 'hsl(var(--accent-amber))' : 'hsl(var(--muted-foreground))',
           }}
         >
           {getUserHistory()}

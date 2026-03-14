@@ -85,7 +85,7 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
       {/* Score */}
       <div
         className="flex-shrink-0"
-        style={{ color: seasonColor, fontSize: 22, fontWeight: 800 }}
+        style={{ color: 'hsl(var(--accent-amber))', fontSize: 22, fontWeight: 800 }}
       >
         {courses}
       </div>
