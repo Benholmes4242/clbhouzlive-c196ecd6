@@ -46,7 +46,7 @@ function RunnerCard({
   index: number;
 }) {
   const { player, value, rank } = runner;
-  const photoUrl = getPlayerHeadshotUrl(player.full_name, 'pga');
+  const photoUrl = getPlayerHeadshotUrl(player.full_name, player.tour_codes?.[0] ?? 'pga');
   const lastName = player.full_name.split(' ').slice(-1)[0];
   const fmt = formatOverride ?? category.format;
   const unit = unitOverride ?? category.unit;
