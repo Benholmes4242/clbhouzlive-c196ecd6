@@ -181,7 +181,7 @@ function SkillRadarChart({ attributes, animate = true }: { attributes: SkillAttr
       <motion.polygon
         points={dataPoints}
         fill="url(#skill-fill)"
-        stroke="rgba(245, 158, 11, 0.9)"
+        stroke="hsl(var(--accent-amber) / 0.9)"
         strokeWidth="2.5"
         initial={animate ? { opacity: 0, scale: 0.5 } : false}
         animate={animate ? { opacity: 1, scale: 1 } : undefined}
