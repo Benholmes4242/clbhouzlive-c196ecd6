@@ -301,7 +301,7 @@ export function ScheduleTab() {
       );
     }
     // Remove hero items from the list on all tabs (they're shown in the carousel above)
-    if (!search && heroItems.length > 0) {
+    if (!search && heroItems.length > 0 && filter !== 'all' && filter !== 'live') {
       const heroIds = new Set(heroItems.map(h => h.tournament.id));
       filtered = filtered.filter(t => !heroIds.has(t.id));
     }
