@@ -513,7 +513,7 @@ const CourseExplorer = () => {
       {/* Context row with sort */}
       {!isLoading && totalCount > 0 && (
         <div className="flex items-center justify-between gap-3 pt-2">
-          <p className="text-xs text-muted-foreground flex-1">
+          <p className="text-sm text-muted-foreground flex-1" style={{ fontSize: 13 }}>
             {hasSearch ? (
               <>
                 Results for "{debouncedSearch}" {selectedRegion === PRIMARY_REGIONS.ALL
