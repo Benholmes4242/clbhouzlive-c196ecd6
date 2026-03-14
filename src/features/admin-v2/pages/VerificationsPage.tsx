@@ -358,7 +358,10 @@ export default function VerificationsPage() {
         item={drawerItem}
         onClose={() => setDrawerItem(null)}
         onDecide={(id, type, decision, note) =>
-          reviewMutation.mutate({ id, type, decision, adminNote: note })
+          reviewMutation.mutate(
+            { id, type, decision, adminNote: note },
+            { onSuccess: () => setDrawerItem(null) }
+          )
         }
         isPending={reviewMutation.isPending}
       />

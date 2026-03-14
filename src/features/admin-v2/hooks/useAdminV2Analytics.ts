@@ -141,15 +141,23 @@ async function fetchContentAnalytics(period: AnalyticsPeriod): Promise<ContentAn
   const days  = periodToDays(period);
   const since = startOf(period).toISOString();
 
-  const [posts, reviews, topCourses] = await Promise.all([
+  const [posts, reviews, topRatingsRes] = await Promise.all([
     supabase.from('posts').select('created_at').gte('created_at', since),
     supabase.from('course_ratings').select('created_at').gte('created_at', since),
     supabase
-      .from('course_rating_aggregates')
-      .select('course_id, review_count, avg_overall_score, golf_courses(name, country)')
+      .from('course_rating_aggregates' as any)
+      .select('course_id, review_count, avg_overall_score')
       .order('review_count', { ascending: false })
       .limit(10),
   ]);
+
+  const topRatings = (topRatingsRes.data ?? []) as any[];
+  const topCourseIds = topRatings.map((r: any) => r.course_id).filter(Boolean) as string[];
+  const { data: topCourseNames } = topCourseIds.length > 0
+    ? await supabase.from('golf_courses').select('id, name, country').in('id', topCourseIds)
+    : { data: [] };
+
+  const courseNameMap = new Map((topCourseNames ?? []).map(c => [c.id, c]));
 
   const totalPostsRes   = await supabase.from('posts').select('id', { count: 'exact', head: true });
   const totalReviewsRes = await supabase.from('course_ratings').select('id', { count: 'exact', head: true });
@@ -162,9 +170,9 @@ async function fetchContentAnalytics(period: AnalyticsPeriod): Promise<ContentAn
     totalReviews:  totalReviewsRes.count ?? 0,
     postsThisPeriod:   posts.data?.length ?? 0,
     reviewsThisPeriod: reviews.data?.length ?? 0,
-    topReviewedCourses: (topCourses.data ?? []).map((r: any) => ({
-      name:      r.golf_courses?.name ?? 'Unknown',
-      country:   r.golf_courses?.country ?? '',
+    topReviewedCourses: topRatings.map((r: any) => ({
+      name:      courseNameMap.get(r.course_id)?.name ?? 'Unknown',
+      country:   courseNameMap.get(r.course_id)?.country ?? '',
       count:     r.review_count ?? 0,
       avgRating: r.avg_overall_score ?? 0,
     })),

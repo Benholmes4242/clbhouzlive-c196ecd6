@@ -28,6 +28,7 @@ const HIDDEN_ROUTES = [
 // Route prefixes where bottom navigation should be hidden
 const HIDDEN_ROUTE_PREFIXES = [
   '/echo', // Echo AI page - immersive full-screen experience
+  '/admin-v2', // Admin console — uses its own sidebar/header chrome
 ];
 
 // Routes that use different nav styling (like clubhouse)

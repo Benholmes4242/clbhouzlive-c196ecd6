@@ -1,19 +1,26 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Command } from 'cmdk';
+import {
+  Command,
+  CommandInput,
+  CommandList,
+  CommandItem,
+  CommandGroup,
+  CommandEmpty,
+} from '@/components/ui/command';
 import { supabase } from '@/integrations/supabase/client';
 import {
   LayoutDashboard, Users, MapPin, CheckCircle, Shield,
   Mail, Trophy, Building2, Image, ClipboardList,
   Settings, BarChart3, Map, FlaskConical, Upload,
-  BookOpen, Flag, Search, ArrowRight, User, Clock,
+  BookOpen, Flag, ArrowRight, User, Clock,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface CommandItem {
+interface CommandItemData {
   id:          string;
   label:       string;
   description?: string;
@@ -25,7 +32,7 @@ interface CommandItem {
 
 // ─── Static page items ────────────────────────────────────────────────────────
 
-const PAGES: CommandItem[] = [
+const PAGES: CommandItemData[] = [
   { id: 'dashboard',       label: 'Dashboard',          icon: LayoutDashboard, href: '/admin-v2/dashboard',             group: 'Pages' },
   { id: 'users',           label: 'Users',              icon: Users,           href: '/admin-v2/users',                 group: 'Pages' },
   { id: 'verifications',   label: 'Verification Queue', icon: CheckCircle,     href: '/admin-v2/verifications',         group: 'Pages' },
@@ -87,7 +94,7 @@ function useLiveSearch(query: string) {
         icon:  User,
         href:  `/admin-v2/users`,
         group: 'Users',
-      })) as CommandItem[];
+      })) as CommandItemData[];
     },
     enabled:   trimmed.length >= 2,
     staleTime: 30_000,
@@ -109,7 +116,7 @@ function useLiveSearch(query: string) {
         icon:        MapPin,
         href:        `/admin-v2/courses`,
         group:       'Courses',
-      })) as CommandItem[];
+      })) as CommandItemData[];
     },
     enabled:   trimmed.length >= 2,
     staleTime: 30_000,
@@ -124,24 +131,20 @@ function useLiveSearch(query: string) {
 
 // ─── Command item renderer ────────────────────────────────────────────────────
 
-function CmdItem({
+function CmdRow({
   item,
   onSelect,
 }: {
-  item: CommandItem;
-  onSelect: (item: CommandItem) => void;
+  item: CommandItemData;
+  onSelect: (item: CommandItemData) => void;
 }) {
   const Icon = item.icon;
   return (
-    <Command.Item
+    <CommandItem
       value={item.label + (item.description ?? '') + (item.keywords?.join(' ') ?? '')}
       onSelect={() => onSelect(item)}
       className={cn(
         'flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors',
-        'data-[selected=true]:bg-muted/80 data-[selected=true]:text-foreground',
-        'aria-selected:bg-muted/80',
-        'hover:bg-muted/60',
-        'outline-none',
         'text-[13px] text-foreground',
       )}
     >
@@ -155,7 +158,7 @@ function CmdItem({
         )}
       </div>
       <ArrowRight className="w-3.5 h-3.5 text-muted-foreground/40 flex-shrink-0" />
-    </Command.Item>
+    </CommandItem>
   );
 }
 
@@ -169,14 +172,10 @@ interface AdminCommandPaletteProps {
 export function AdminCommandPalette({ open, onClose }: AdminCommandPaletteProps) {
   const navigate  = useNavigate();
   const [query, setQuery] = useState('');
-  const inputRef  = useRef<HTMLInputElement>(null);
 
   // Reset on open
   useEffect(() => {
-    if (open) {
-      setQuery('');
-      setTimeout(() => inputRef.current?.focus(), 30);
-    }
+    if (open) setQuery('');
   }, [open]);
 
   const { users, courses, isLoading } = useLiveSearch(query);
@@ -184,7 +183,7 @@ export function AdminCommandPalette({ open, onClose }: AdminCommandPaletteProps)
   const recent  = getRecent();
   const recentItems = recent
     .map(id => PAGES.find(p => p.id === id))
-    .filter((p): p is CommandItem => !!p);
+    .filter((p): p is CommandItemData => !!p);
 
   // Filter static pages by query
   const filteredPages = query.trim()
@@ -194,7 +193,7 @@ export function AdminCommandPalette({ open, onClose }: AdminCommandPaletteProps)
       )
     : [];
 
-  const handleSelect = useCallback((item: CommandItem) => {
+  const handleSelect = useCallback((item: CommandItemData) => {
     pushRecent(item.id);
     navigate(item.href);
     onClose();
@@ -218,26 +217,23 @@ export function AdminCommandPalette({ open, onClose }: AdminCommandPaletteProps)
       {/* Palette */}
       <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] px-4 pointer-events-none">
         <Command
-          className="w-full max-w-lg rounded-2xl border bg-card shadow-2xl pointer-events-auto overflow-hidden"
-          style={{ borderColor: 'hsl(var(--border) / 0.6)' }}
+          className="w-full max-w-lg rounded-2xl border border-border/60 bg-card shadow-2xl pointer-events-auto overflow-hidden"
           shouldFilter={false}
         >
           {/* Search input */}
-          <div className="flex items-center gap-2 px-4 py-3 border-b" style={{ borderColor: 'hsl(var(--border) / 0.4)' }}>
-            <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-            <Command.Input
-              ref={inputRef}
+          <div className="flex items-center gap-2 px-1 border-b border-border/40">
+            <CommandInput
               value={query}
               onValueChange={setQuery}
               placeholder="Search pages, users, courses…"
-              className="flex-1 bg-transparent text-[14px] text-foreground placeholder:text-muted-foreground outline-none"
+              className="text-[14px]"
             />
             {isLoading && (
-              <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-foreground rounded-full animate-spin flex-shrink-0" />
+              <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-foreground rounded-full animate-spin flex-shrink-0 mr-2" />
             )}
             <button
               onClick={onClose}
-              className="px-1.5 py-0.5 rounded text-[10px] font-mono text-muted-foreground"
+              className="px-1.5 py-0.5 rounded text-[10px] font-mono text-muted-foreground mr-2 flex-shrink-0"
               style={{ background: 'hsl(var(--muted) / 0.6)', border: '1px solid hsl(var(--border) / 0.4)' }}
             >
               esc
@@ -245,103 +241,72 @@ export function AdminCommandPalette({ open, onClose }: AdminCommandPaletteProps)
           </div>
 
           {/* Results */}
-          <Command.List className="max-h-[320px] overflow-y-auto p-2">
+          <CommandList className="max-h-[320px] overflow-y-auto p-2">
             {/* Empty state */}
             {isEmpty && !isLoading && (
-              <Command.Empty className="py-8 text-center text-[13px] text-muted-foreground">
+              <CommandEmpty>
                 No results for &ldquo;{query}&rdquo;
-              </Command.Empty>
+              </CommandEmpty>
             )}
 
             {/* Recent — shown when no query */}
             {showRecent && (
-              <Command.Group
-                heading={
-                  <span className="flex items-center gap-1.5 px-2 py-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                    <Clock className="w-3 h-3" />
-                    Recent
-                  </span>
-                }
-              >
+              <CommandGroup heading="Recent">
                 {recentItems.map(item => (
-                  <CmdItem key={item.id} item={item} onSelect={handleSelect} />
+                  <CmdRow key={item.id} item={item} onSelect={handleSelect} />
                 ))}
-              </Command.Group>
+              </CommandGroup>
             )}
 
             {/* All pages — shown when no query */}
             {!query.trim() && (
-              <Command.Group
-                heading={
-                  <span className="px-2 py-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                    Pages
-                  </span>
-                }
-              >
+              <CommandGroup heading="Pages">
                 {PAGES.map(item => (
-                  <CmdItem key={item.id} item={item} onSelect={handleSelect} />
+                  <CmdRow key={item.id} item={item} onSelect={handleSelect} />
                 ))}
-              </Command.Group>
+              </CommandGroup>
             )}
 
             {/* Filtered pages — shown with query */}
             {query.trim() && filteredPages.length > 0 && (
-              <Command.Group
-                heading={
-                  <span className="px-2 py-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                    Pages
-                  </span>
-                }
-              >
+              <CommandGroup heading="Pages">
                 {filteredPages.map(item => (
-                  <CmdItem key={item.id} item={item} onSelect={handleSelect} />
+                  <CmdRow key={item.id} item={item} onSelect={handleSelect} />
                 ))}
-              </Command.Group>
+              </CommandGroup>
             )}
 
             {/* Live users */}
             {showLive && users.length > 0 && (
-              <Command.Group
-                heading={
-                  <span className="px-2 py-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                    Users
-                  </span>
-                }
-              >
+              <CommandGroup heading="Users">
                 {users.map(item => (
-                  <CmdItem key={item.id} item={item} onSelect={handleSelect} />
+                  <CmdRow key={item.id} item={item} onSelect={handleSelect} />
                 ))}
-              </Command.Group>
+              </CommandGroup>
             )}
 
             {/* Live courses */}
             {showLive && courses.length > 0 && (
-              <Command.Group
-                heading={
-                  <span className="px-2 py-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                    Courses
-                  </span>
-                }
-              >
+              <CommandGroup heading="Courses">
                 {courses.map(item => (
-                  <CmdItem key={item.id} item={item} onSelect={handleSelect} />
+                  <CmdRow key={item.id} item={item} onSelect={handleSelect} />
                 ))}
-              </Command.Group>
+              </CommandGroup>
             )}
-          </Command.List>
+          </CommandList>
 
           {/* Footer */}
-          <div className="flex items-center gap-4 px-4 py-2 border-t text-[11px] text-muted-foreground" style={{ borderColor: 'hsl(var(--border) / 0.4)' }}>
+          <div className="flex items-center gap-4 px-4 py-2 border-t border-border/40 text-[11px] text-muted-foreground">
             <span className="flex items-center gap-1">
-              <kbd className="px-1 py-0.5 rounded font-mono text-[10px]" style={{ background: 'hsl(var(--muted) / 0.6)' }}>↑↓</kbd>
+              <kbd className="px-1 py-0.5 rounded font-mono text-[10px] bg-muted/60">↑↓</kbd>
               Navigate
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1 py-0.5 rounded font-mono text-[10px]" style={{ background: 'hsl(var(--muted) / 0.6)' }}>↵</kbd>
+              <kbd className="px-1 py-0.5 rounded font-mono text-[10px] bg-muted/60">↵</kbd>
               Open
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1 py-0.5 rounded font-mono text-[10px]" style={{ background: 'hsl(var(--muted) / 0.6)' }}>esc</kbd>
+              <kbd className="px-1 py-0.5 rounded font-mono text-[10px] bg-muted/60">esc</kbd>
               Close
             </span>
           </div>

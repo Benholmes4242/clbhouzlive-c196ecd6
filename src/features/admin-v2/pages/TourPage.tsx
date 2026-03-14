@@ -51,7 +51,7 @@ export default function TourPage() {
   });
 
   const filtered = data.filter(r =>
-    !search.trim() || r.playerName.toLowerCase().includes(search.toLowerCase())
+    !search.trim() || (r.playerName ?? '').toLowerCase().includes(search.toLowerCase())
   );
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
