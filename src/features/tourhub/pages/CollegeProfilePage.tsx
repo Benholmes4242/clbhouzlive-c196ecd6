@@ -244,9 +244,9 @@ export function CollegeProfilePage() {
               transition={{ duration: 0.4, delay: 0.15 }}
               style={{ marginBottom: '16px' }}
             >
-              {getCollegeLogoUrl(college?.college_name || collegeSlug) && !heroImgError ? (
+              {logoUrl && !heroImgError ? (
                 <img
-                  src={getCollegeLogoUrl(college?.college_name || collegeSlug)!}
+                  src={logoUrl}
                   alt={displayName}
                   className="object-contain"
                   style={{
