@@ -1,8 +1,5 @@
 /**
  * TeeTimesTab - Tee time pairings grouped by round
- * 
- * Premium editorial tee times with search, contextual empty states,
- * polished group cards, and tappable player rows.
  */
 
 import { useState, useMemo } from 'react';
@@ -127,7 +124,7 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
 
       return {
         teeTime: tt.tee_time,
-        startingHole: tt.tee_number || (tt.back_nine ? 10 : 1),
+        startingHole: tt.back_nine ? 10 : (tt.tee_number || 1),
         backNine: tt.back_nine || false,
         players,
       };
@@ -166,7 +163,7 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
     return <TeeTimesEmpty isCompleted={isCompleted} roundLabel={!availableRounds.includes(selectedRound) ? `Round ${roundNumber}` : undefined} />;
   }
 
-  const teeTimeDate = groups[0]?.teeTime ? format(new Date(groups[0].teeTime), 'EEE, MMM d') : null;
+  const teeTimeDate = groups[0]?.teeTime ? format(new Date(groups[0].teeTime), 'EEE, MMM d, yyyy') : null;
 
   return (
     <motion.div
@@ -211,14 +208,12 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
         {searchQuery && (
           <button
             onClick={() => setSearchQuery('')}
-            className="absolute right-7 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-muted active:scale-95 transition-all"
+            className="absolute right-7 top-1/2 -translate-y-1/2 p-1 rounded-full active:scale-90 active:opacity-70 transition-all"
           >
             <X className="w-4 h-4 text-muted-foreground" />
           </button>
         )}
       </div>
-
-      <div />
 
       {/* Tee time groups */}
       <div className="space-y-4 pt-4 px-4">
@@ -231,9 +226,17 @@ export function TeeTimesTab({ tournamentId, isCompleted }: TeeTimesTabProps) {
         {hasSplitTees && groupedByHole ? (
           groupedByHole.map(([hole, holeGroups]) => (
             <div key={hole}>
-              <div className="text-xs font-semibold tracking-widest uppercase text-muted-foreground py-2">
+              <p style={{
+                fontSize: '11px',
+                fontWeight: 700,
+                letterSpacing: '0.8px',
+                textTransform: 'uppercase',
+                color: 'hsl(var(--muted-foreground) / 0.5)',
+                paddingTop: 8,
+                paddingBottom: 8,
+              }}>
                 Hole {hole} Start
-              </div>
+              </p>
               <div className="space-y-4">
                 {holeGroups.map((group, idx) => (
                   <TeeTimeGroupCard key={`${group.teeTime}-${idx}`} group={group} index={idx} searchQuery={searchQuery} />
@@ -262,11 +265,11 @@ function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; 
 
   return (
     <motion.div
-      className={cn(
-        "bg-card rounded-2xl border border-border/50 overflow-hidden",
-        hasMatchingPlayer && "ring-2 ring-amber-400"
-      )}
-      
+      className="bg-card rounded-2xl border border-border/50 overflow-hidden"
+      style={hasMatchingPlayer ? {
+        outline: '2px solid hsl(var(--accent-amber))',
+        outlineOffset: '1px',
+      } : undefined}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: Math.min(index * 0.02, 0.4), duration: 0.3 }}
@@ -297,7 +300,7 @@ function TeeTimeGroupCard({ group, index, searchQuery }: { group: TeeTimeGroup; 
             <div
               className={cn(
                 "flex items-center gap-3 py-3 px-4 transition-all duration-150",
-                "hover:bg-muted/40 active:scale-[0.995]"
+                hasTappableLink && "active:scale-[0.995] active:bg-muted/30"
               )}
               style={!isLast ? { borderBottom: '1px solid hsl(var(--border) / 0.15)' } : undefined}
             >

@@ -27,12 +27,12 @@ export function RoundSelector({ rounds, activeRound, onRoundChange, className }:
             aria-selected={isActive}
             onClick={() => onRoundChange(round)}
             className={cn(
-              "px-4 min-h-[36px] rounded-full text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold",
+              "px-4 min-h-[36px] rounded-full text-sm whitespace-nowrap transition-all active:scale-[0.97] font-semibold",
               isActive
-                ? "text-white"
-                : "text-muted-foreground bg-muted"
+                ? "text-background"
+                : "text-muted-foreground bg-muted border border-transparent"
             )}
-            style={isActive ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
+            style={isActive ? { backgroundColor: 'hsl(var(--foreground))' } : undefined}
           >
             {round}
           </button>
