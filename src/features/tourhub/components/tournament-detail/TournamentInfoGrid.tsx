@@ -36,7 +36,9 @@ export function TournamentInfoGrid({ tournament, fieldSize }: TournamentInfoGrid
     items.push({
       icon: <DollarSign className="w-4 h-4" />,
       label: 'Purse',
-      value: `$${tournament.purse.toLocaleString()} ${tournament.currency || 'USD'}`,
+      value: tournament.purse >= 1_000_000
+        ? `$${(tournament.purse / 1_000_000).toFixed(1)}M`
+        : `$${(tournament.purse / 1_000).toFixed(0)}K`,
     });
   }
   

@@ -228,7 +228,7 @@ export function CompactWinner({ winner, className }: CompactWinnerProps) {
         className
       )}
     >
-      <Trophy className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+      <Trophy className="w-3.5 h-3.5 shrink-0" style={{ color: 'hsl(var(--accent-amber))' }} />
       <span className="font-medium text-foreground truncate">
         {winner.player.full_name}
       </span>
