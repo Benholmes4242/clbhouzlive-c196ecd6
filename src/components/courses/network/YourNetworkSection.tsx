@@ -80,7 +80,7 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
       ) : (
         // Fallback for no highlights: Show subtle CTA
         friends.length < 3 && (
-          <div className="mt-3 p-3 rounded-lg bg-muted/50 text-center">
+          <div className="mt-3 p-3 rounded-xl bg-card border border-border/50 text-center">
             <p className="text-sm text-muted-foreground">
               Add friends to see their activity
             </p>
