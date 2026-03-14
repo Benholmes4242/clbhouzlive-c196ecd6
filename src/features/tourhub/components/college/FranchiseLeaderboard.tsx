@@ -57,8 +57,13 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
       }
     };
     const sorted = [...allStats]
-      .sort((a, b) => getValue(b) - getValue(a))
-      .filter(s => activeMetric === 'wins' ? getValue(s) > 0 : true)
+      .sort((a, b) => {
+        const diff = getValue(b) - getValue(a);
+        if (diff !== 0) return diff;
+        if (activeMetric === 'wins' || activeMetric === 'top10s') return b.earnings_total - a.earnings_total;
+        return b.wins_total - a.wins_total;
+      })
+      .filter(s => (activeMetric === 'wins' || activeMetric === 'top10s') ? getValue(s) > 0 : true)
       .slice(0, limit);
     const max = sorted.length > 0 ? getValue(sorted[0]) : 1;
     return { sortedStats: sorted, maxValue: max };
