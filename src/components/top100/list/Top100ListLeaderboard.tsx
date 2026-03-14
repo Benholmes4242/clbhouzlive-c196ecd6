@@ -80,7 +80,7 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
           Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
         </h2>
         <motion.div 
-          className="text-center py-6 px-4 rounded-sq-md bg-card border border-border/60"
+          className="text-center py-6 px-4 rounded-2xl bg-card border border-border/60"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
