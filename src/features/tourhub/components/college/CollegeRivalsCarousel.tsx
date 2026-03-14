@@ -12,17 +12,6 @@ interface CollegeRivalsCarouselProps {
   onCompare?: (rivalNormalizedName: string) => void;
 }
 
-function formatDelta(amount: number): string {
-  const sign = amount >= 0 ? '+' : '';
-  if (Math.abs(amount) >= 1_000_000) {
-    return `${sign}$${(amount / 1_000_000).toFixed(1)}M`;
-  }
-  if (Math.abs(amount) >= 1_000) {
-    return `${sign}$${Math.round(amount / 1_000)}K`;
-  }
-  return `${sign}$${amount.toFixed(0)}`;
-}
-
 interface HeadToHeadChipProps {
   winsA: number;
   winsB: number;
@@ -30,7 +19,7 @@ interface HeadToHeadChipProps {
   winner: 'A' | 'B' | 'tie';
 }
 
-function HeadToHeadChip({ winsA, winsB, earningsDiff, winner }: HeadToHeadChipProps) {
+function HeadToHeadChip({ winsA, winsB, winner }: HeadToHeadChipProps) {
   const isWinning = winner === 'A';
   const isTied = winner === 'tie';
   
@@ -41,11 +30,22 @@ function HeadToHeadChip({ winsA, winsB, earningsDiff, winner }: HeadToHeadChipPr
         fontSize: '11px',
         fontWeight: 600,
         padding: '4px 10px',
-        backgroundColor: isWinning ? 'rgba(34,197,94,0.1)' : isTied ? 'hsl(var(--muted))' : 'rgba(239,68,68,0.1)',
-        color: isWinning ? '#22C55E' : isTied ? 'hsl(var(--muted-foreground))' : 'hsl(var(--destructive))',
+        backgroundColor: isWinning
+          ? 'rgba(34,197,94,0.1)'
+          : isTied
+          ? 'hsl(var(--muted))'
+          : 'rgba(239,68,68,0.1)',
+        color: isWinning
+          ? 'rgb(34,197,94)'
+          : isTied
+          ? 'hsl(var(--muted-foreground))'
+          : 'hsl(var(--destructive))',
       }}
     >
-      {isTied ? 'Tied' : isWinning ? `Ahead ${winsA} of 3 stats` : `Trails ${winsA} of 3 stats`}
+      {isTied ? 'Tied' : isWinning
+        ? `Leading ${winsA}–${winsB}`
+        : `Trailing ${winsA}–${winsB}`
+      }
     </div>
   );
 }
@@ -114,19 +114,20 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
   }
   
   return (
-    <div className={cn('flex overflow-x-auto pb-2 -mx-4 px-4', className)} style={{ gap: '8px', touchAction: 'pan-x pan-y' }}>
+    <div className={cn('flex overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide', className)} style={{ gap: '8px', touchAction: 'pan-x pan-y' }}>
       {enrichedRivalries.map((rivalry) => {
         const rivalName = rivalry.rivalNormalizedName;
         const college = rivalry.college;
         const displayName = college?.short_name || college?.college_name || rivalName;
+        const logoUrl = getCollegeLogoUrl(college?.college_name || rivalName);
         
         const cardContent = (
           <>
             {/* Logo with circular muted background */}
             <div className="relative flex items-center justify-center rounded-full bg-muted/20" style={{ width: '72px', height: '72px' }}>
-              {getCollegeLogoUrl(college?.college_name || rivalName) ? (
+              {logoUrl ? (
                 <img 
-                  src={getCollegeLogoUrl(college?.college_name || rivalName)!} 
+                  src={logoUrl} 
                   alt={displayName}
                   className="object-contain relative z-10"
                   style={{ width: '56px', height: '56px' }}
@@ -140,8 +141,8 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
               )}
             </div>
             
-            {/* Name — 14px, weight 600, centered */}
-            <p className="text-foreground truncate w-full group-hover:text-primary transition-colors text-center" style={{ fontSize: '15px', fontWeight: 600, letterSpacing: '-0.2px', marginTop: '10px' }}>
+            {/* Name */}
+            <p className="text-foreground truncate w-full text-center" style={{ fontSize: '15px', fontWeight: 600, letterSpacing: '-0.2px', marginTop: '10px' }}>
               {displayName}
             </p>
             
@@ -156,7 +157,7 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
             )}
             
             {/* Compare → */}
-            <span className="text-muted-foreground flex items-center gap-0.5 group-hover:text-primary transition-colors" style={{ fontSize: '12px', fontWeight: 500, marginTop: '8px' }}>
+            <span className="text-muted-foreground flex items-center gap-0.5" style={{ fontSize: '12px', fontWeight: 500, marginTop: '8px' }}>
               Compare <ArrowRight className="w-2.5 h-2.5" />
             </span>
           </>
@@ -165,9 +166,9 @@ export function CollegeRivalsCarousel({ normalizedName, className, onCompare }: 
         const cardStyles = cn(
           'shrink-0 rounded-2xl',
           'bg-card border border-border/50',
-          'hover:border-primary/30 hover:bg-card/90 transition-all duration-200',
           'active:scale-[0.98]',
-          'flex flex-col items-center text-center group'
+          'flex flex-col items-center text-center',
+          'transition-all duration-200'
         );
         
         if (onCompare) {
