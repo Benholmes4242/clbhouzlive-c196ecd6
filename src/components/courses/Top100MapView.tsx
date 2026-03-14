@@ -820,7 +820,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                     'active:scale-[0.96]',
                     isActive
                       ? 'bg-white/90 text-foreground border-white/50'
-                      : 'bg-white/[0.08] border-white/12 text-white/60 hover:border-white/30 hover:bg-white/[0.12] hover:text-white/80'
+                      : 'bg-white/[0.08] border-white/12 text-white/60 active:border-white/30 active:bg-white/[0.12]'
                   )}
                 >
                   {labels[regionScope]}

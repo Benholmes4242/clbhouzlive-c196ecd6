@@ -212,7 +212,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
       >
         {/* Drag handle */}
         <div className="flex-shrink-0 flex justify-center cursor-grab active:cursor-grabbing" style={{ margin: '12px auto 8px' }}>
-          <div className="rounded-full" style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255, 255, 255, 0.25)' }} />
+          <div style={{ width: 36, height: 4, borderRadius: 4, background: 'rgba(255, 255, 255, 0.25)' }} />
         </div>
 
         <div className="flex-shrink-0">

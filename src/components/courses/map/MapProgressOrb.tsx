@@ -188,7 +188,7 @@ export const MapProgressOrb: React.FC<MapProgressOrbProps> = ({
                 'w-full flex items-center justify-center gap-1',
                 'px-2.5 py-1.5 rounded-lg',
                 'bg-white/90 text-foreground text-[10px] font-medium',
-                'hover:bg-white active:scale-[0.98]',
+                'active:opacity-90 active:scale-[0.98]',
                 'transition-all duration-150'
               )}
             >
