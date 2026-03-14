@@ -119,7 +119,7 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
                 style={{ 
                   height: `${heightPercent}%`,
                   background: isActive 
-                    ? 'linear-gradient(to top, #3EBD93, #5EDBB5)'
+                    ? 'linear-gradient(to top, hsl(var(--accent-amber)), hsl(var(--accent-amber) / 0.7))'
                     : 'hsl(var(--muted) / 0.3)',
                   // Animate grow from bottom
                   animation: `bar-grow 0.5s ease-out ${idx * 0.03}s both`,
