@@ -306,7 +306,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                     border: '1px solid rgba(255, 255, 255, 0.12)',
                   }}
                 >
-                  <Star className="h-3.5 w-3.5 fill-current text-amber-400" />
+                  <Star className="h-3.5 w-3.5 fill-current" style={{ color: 'hsl(var(--accent-amber))' }} />
                   <span className="text-xs font-semibold" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                     Your rating: {course.user_rating.toFixed(1)}
                   </span>
