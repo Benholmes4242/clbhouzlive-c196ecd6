@@ -424,9 +424,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             12, 14,
             16, 18,
           ],
-          'circle-color': 'rgba(255,255,255,0.95)',
-          'circle-stroke-width': 2.5,
-          'circle-stroke-color': WANT_TO_PLAY_COLOR,
+          'circle-color': WANT_TO_PLAY_COLOR,
+          'circle-stroke-width': 2,
+          'circle-stroke-color': 'rgba(255,255,255,0.8)',
           'circle-opacity-transition': { duration: 300, delay: 0 },
         },
       });
