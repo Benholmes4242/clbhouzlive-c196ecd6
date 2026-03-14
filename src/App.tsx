@@ -483,6 +483,16 @@ function AppRoutes() {
           } />
         </Route>
         
+        {/* Admin V2 — new standalone console */}
+        <Route
+          path="/admin-v2/*"
+          element={
+            <Suspense fallback={<GenericPageSkeleton />}>
+              <AdminV2Shell />
+            </Suspense>
+          }
+        />
+
         {/* /create-moment removed — PostStudio is now the sole creation flow */}
         <Route path="/error-logs" element={<ErrorLogPage />} />
         
