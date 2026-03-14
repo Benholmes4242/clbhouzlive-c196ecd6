@@ -116,7 +116,7 @@ export const Top100RegionCard: React.FC<Top100RegionCardProps> = ({
             e.stopPropagation();
             onBack();
           }}
-          className="absolute top-3 left-3 z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-sq-sm flex items-center justify-center hover:bg-black/40 transition-colors focus:outline-none"
+          className="absolute top-3 left-3 z-20 h-9 w-9 bg-black/20 backdrop-blur-sm rounded-sq-sm flex items-center justify-center active:bg-black/40 transition-colors focus:outline-none"
           aria-label="Go back"
         >
           <ArrowLeft className="h-5 w-5 text-white" />
