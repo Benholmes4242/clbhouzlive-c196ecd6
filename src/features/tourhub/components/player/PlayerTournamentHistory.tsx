@@ -52,7 +52,7 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                 <Link
                   key={result.id}
                   to={`/tourhub/tournament/${result.tournament_id}`}
-                  className="flex items-center gap-3 group active:scale-[0.98] transition-transform"
+                  className="flex items-center gap-3 active:scale-[0.98] transition-transform"
                   style={{ padding: '12px 0', borderBottom: '1px solid hsl(var(--border) / 0.15)' }}
                 >
                   {/* Position — 14px, weight 700 */}
