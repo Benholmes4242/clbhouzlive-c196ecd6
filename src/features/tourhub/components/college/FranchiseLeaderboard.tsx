@@ -147,7 +147,7 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
             ) : sortedStats.length > 0 ? (
               <>
                 {sortedStats.map((collegeStats, index) => {
-                  const status = statusMap.get(collegeStats.normalized_name) || null;
+                  const moverData = moverInfo?.moverData?.get(collegeStats.normalized_name);
                   const moverData = moverInfo?.moverData?.get(collegeStats.normalized_name);
                   const momentum = moverData ? {
                     rankChange: moverData.rankChange,
