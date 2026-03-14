@@ -41,7 +41,7 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
     // Podium styling for ranks 1-3
     if (rank === 1) {
       return (
-        <span className="inline-flex items-center rounded-full border border-[#D4A853]/30 bg-[#D4A853]/10 px-2 py-[2px] text-xs font-semibold text-[#D4A853]">
+        <span className="inline-flex items-center rounded-full px-2 py-[2px] text-xs font-semibold" style={{ borderColor: 'hsl(var(--accent-amber) / 0.3)', background: 'hsl(var(--accent-amber) / 0.1)', color: 'hsl(var(--accent-amber))', border: '1px solid' }}>
           #{rank}
         </span>
       );
