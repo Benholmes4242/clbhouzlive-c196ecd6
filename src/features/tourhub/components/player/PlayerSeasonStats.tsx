@@ -120,7 +120,7 @@ function SGBar({ label, value }: SGBarProps) {
           fontSize: '15px',
           fontWeight: 700,
           fontVariantNumeric: 'tabular-nums',
-          color: isPositive ? 'hsl(var(--accent-amber) / 0.9)' : 'hsl(var(--destructive))',
+          color: isPositive ? 'hsl(var(--accent-amber))' : 'hsl(var(--muted-foreground))',
         }}>
           {formattedValue}
         </span>
