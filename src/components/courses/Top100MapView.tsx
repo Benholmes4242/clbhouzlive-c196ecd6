@@ -750,7 +750,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
               <div 
                 className="absolute inset-0 rounded-full blur-sm opacity-60"
                 style={{
-                  background: seasonColor,
+                  background: PLAYED_COLOR,
                   width: `${progressPercent}%`,
                   transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
                 }}
