@@ -260,7 +260,7 @@ export function ExplorationPodium({ entries, metric, currentUserId, seasonColor 
                 {/* Stat — season-colored number + muted label */}
                 <motion.p
                   className="font-bold mt-0.5"
-                  style={{ color: seasonColor, fontSize: config.statSize, fontWeight: config.statWeight }}
+                  style={{ color: 'hsl(var(--accent-amber))', fontSize: config.statSize, fontWeight: config.statWeight }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: delay + 0.3, duration: 0.3 }}
