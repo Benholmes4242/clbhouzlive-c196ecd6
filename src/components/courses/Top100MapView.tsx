@@ -694,7 +694,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                 className={cn(
                   'flex items-center justify-center w-11 h-11',
                   'text-white/80',
-                  'hover:bg-white/10',
                   'active:bg-white/20 active:scale-[0.92]',
                   'transition-all duration-150'
                 )}
