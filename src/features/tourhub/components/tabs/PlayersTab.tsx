@@ -604,7 +604,7 @@ export function PlayersTab() {
                   Show More Players
                 </span>
                 <span style={{ fontSize: '14px', fontWeight: 400, color: 'hsl(var(--foreground) / 0.6)' }}>
-                 ({visibleCount + 1}-{Math.min(visibleCount + PAGE_SIZE, totalCount)} of {totalCount})
+                 ({Math.min(visibleCount, totalCount) + 1}–{Math.min(visibleCount + PAGE_SIZE, totalCount)} of {totalCount})
                 </span>
               </span>
               <ChevronDown className="w-4 h-4 text-muted-foreground/40" />
