@@ -151,17 +151,6 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
           />
         </button>
 
-        {/* Status Badge - top-right */}
-        <motion.div 
-          className="absolute right-4 z-10"
-          style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 8px)' }}
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.4 }}
-        >
-          <StatusBadge status={tournament.status} />
-        </motion.div>
-
         {/* Content overlay - bottom aligned */}
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
           <motion.h1 
