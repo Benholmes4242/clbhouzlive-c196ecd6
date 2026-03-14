@@ -144,7 +144,7 @@ export function Top100RecentRoundsCarousel({
                 'h-10 w-10 rounded-full flex items-center justify-center transition-all duration-200',
                 current === 0
                   ? 'bg-muted text-muted-foreground/30 cursor-not-allowed'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground active:scale-95'
+                  : 'bg-muted text-muted-foreground active:scale-95 active:opacity-70'
               )}
               aria-label="Previous round"
             >
@@ -159,9 +159,10 @@ export function Top100RecentRoundsCarousel({
                   className={cn(
                     'h-1.5 rounded-full transition-all duration-200',
                     idx === current
-                      ? 'w-5 bg-foreground/50'
-                      : 'w-2 bg-foreground/15'
+                      ? 'w-5'
+                      : 'w-2 bg-muted'
                   )}
+                  style={idx === current ? { background: 'hsl(var(--accent-amber))' } : undefined}
                 />
               ))}
             </div>
@@ -174,7 +175,7 @@ export function Top100RecentRoundsCarousel({
                 'h-10 w-10 rounded-full flex items-center justify-center transition-all duration-200',
                 current === count - 1
                   ? 'bg-muted text-muted-foreground/30 cursor-not-allowed'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground active:scale-95'
+                  : 'bg-muted text-muted-foreground active:scale-95 active:opacity-70'
               )}
               aria-label="Next round"
             >
@@ -191,7 +192,7 @@ export function Top100RecentRoundsCarousel({
             variant="outline"
             size="sm"
             onClick={onAddRound}
-            className="w-full rounded-full border-dashed border-border hover:border-border/80 hover:bg-muted/30 transition-colors"
+            className="w-full rounded-2xl border-dashed border-border active:opacity-70 transition-opacity"
           >
             <Plus className="w-4 h-4 mr-1.5" />
             Add another Top 100 round

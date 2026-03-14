@@ -41,7 +41,7 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
     // Podium styling for ranks 1-3
     if (rank === 1) {
       return (
-        <span className="inline-flex items-center rounded-full border border-[#D4A853]/30 bg-[#D4A853]/10 px-2 py-[2px] text-xs font-semibold text-[#D4A853]">
+        <span className="inline-flex items-center rounded-full px-2 py-[2px] text-xs font-semibold" style={{ borderColor: 'hsl(var(--accent-amber) / 0.3)', background: 'hsl(var(--accent-amber) / 0.1)', color: 'hsl(var(--accent-amber))', border: '1px solid' }}>
           #{rank}
         </span>
       );
@@ -79,7 +79,7 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         aria-expanded={isExpanded}
-        className="w-full px-5 py-4 hover:bg-muted/30 active:scale-[0.98] transition-all"
+        className="w-full px-5 py-4 active:bg-muted/30 active:scale-[0.98] transition-all"
       >
         {/* Title row */}
         <div className="flex items-start justify-between">
@@ -96,7 +96,7 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
         
         {/* Top 10 pill on its own row */}
         <div className="flex justify-start mt-3">
-          <span className="inline-flex items-center rounded-full border border-[#D4A853]/30 bg-[#D4A853]/10 px-2.5 py-[2px] text-xs font-semibold text-[#D4A853]">
+          <span className="inline-flex items-center rounded-full px-2.5 py-[2px] text-xs font-semibold" style={{ borderColor: 'hsl(var(--accent-amber) / 0.3)', background: 'hsl(var(--accent-amber) / 0.1)', color: 'hsl(var(--accent-amber))', border: '1px solid' }}>
             Top 10
           </span>
         </div>
@@ -108,7 +108,7 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
           <div
             key={friend.friend_id}
             onClick={() => navigate(`/profile/${friend.friend_id}?tab=top100`)}
-            className="px-5 py-3 flex items-center justify-between hover:bg-muted/30 active:scale-[0.98] transition-all cursor-pointer border-b last:border-b-0 border-border/40"
+            className="px-5 py-3 flex items-center justify-between active:bg-muted/30 active:scale-[0.98] transition-all cursor-pointer border-b last:border-b-0 border-border/40"
           >
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <SquircleAvatar

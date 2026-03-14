@@ -80,10 +80,13 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
           <div
             className={cn(
               'w-9 h-9 rounded-full flex items-center justify-center transition-all',
-              currentStreak > 0
-                ? 'bg-gradient-to-br from-orange-500/15 to-amber-500/15 text-orange-500 shadow-[0_0_12px_rgba(249,115,22,0.2)]'
-                : 'bg-muted text-muted-foreground'
+              currentStreak <= 0 && 'bg-muted text-muted-foreground'
             )}
+            style={currentStreak > 0 ? {
+              background: 'hsl(var(--accent-amber) / 0.15)',
+              color: 'hsl(var(--accent-amber))',
+              boxShadow: '0 0 12px hsl(var(--accent-amber) / 0.2)',
+            } : undefined}
           >
             <Flame className={cn(
               "h-4.5 w-4.5 transition-transform",
@@ -124,7 +127,7 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
           <button
             type="button"
             onClick={onLogRound}
-            className="text-sm font-semibold text-background bg-foreground px-4 py-2 rounded-full whitespace-nowrap active:scale-[0.97] transition-transform"
+            className="text-sm font-semibold text-background bg-foreground px-4 py-2 rounded-xl whitespace-nowrap active:scale-[0.97] transition-transform"
           >
             Log now
           </button>
@@ -154,16 +157,21 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
               <div
                 className={cn(
                   'w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium transition-all',
-                  hasLog
-                    ? 'bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-600 shadow-[0_0_8px_rgba(62,189,147,0.3)]'
-                    : isCurrent
+                  !hasLog && isCurrent
                     ? 'bg-muted/80 border-2 border-dashed border-primary/40 text-muted-foreground animate-[pulse_3s_ease-in-out_infinite]'
-                    : 'bg-muted/40 text-muted-foreground/50 border border-dashed border-muted-foreground/20'
+                    : !hasLog
+                    ? 'bg-muted/40 text-muted-foreground/50 border border-dashed border-muted-foreground/20'
+                    : ''
                 )}
+                style={hasLog ? {
+                  background: 'hsl(var(--accent-amber) / 0.15)',
+                  color: 'hsl(var(--accent-amber))',
+                  boxShadow: '0 0 8px hsl(var(--accent-amber) / 0.3)',
+                } : undefined}
                 aria-hidden="true"
               >
                 {hasLog ? (
-                  <span className="text-emerald-600">✓</span>
+                  <span style={{ color: 'hsl(var(--accent-amber))' }}>✓</span>
                 ) : null}
               </div>
               <span 

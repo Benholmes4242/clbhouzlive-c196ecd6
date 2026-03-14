@@ -111,7 +111,7 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
                 onClick={() => setSelectedMonth(month)}
                 className={cn(
                   'flex-1 rounded-t cursor-pointer relative overflow-hidden',
-                  'hover:opacity-90 active:scale-[0.97] transition-all duration-200',
+                  'active:scale-[0.97] active:opacity-80 transition-all duration-200',
                   isActive
                     ? 'shadow-sm'
                     : ''
@@ -119,7 +119,7 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
                 style={{ 
                   height: `${heightPercent}%`,
                   background: isActive 
-                    ? 'linear-gradient(to top, #3EBD93, #5EDBB5)'
+                    ? 'linear-gradient(to top, hsl(var(--accent-amber)), hsl(var(--accent-amber) / 0.7))'
                     : 'hsl(var(--muted) / 0.3)',
                   // Animate grow from bottom
                   animation: `bar-grow 0.5s ease-out ${idx * 0.03}s both`,
@@ -204,7 +204,7 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
                     className={cn(
                       'w-full flex items-center justify-between py-3 px-2 -mx-2 rounded-lg',
                       'text-left transition-all duration-100 cursor-pointer',
-                      'hover:bg-muted/50 active:bg-muted/80 active:scale-[0.995]'
+                      'active:bg-muted/50 active:scale-[0.995]'
                     )}
                   >
                     <span className="text-sm font-medium text-foreground truncate pr-3 flex-1">

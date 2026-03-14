@@ -29,9 +29,9 @@ function StatItem({
   const deltaPrefix = delta && delta > 0 ? '+' : '';
   
   return (
-    <div className="text-center flex flex-col items-center gap-1 group cursor-default transition-colors hover:bg-muted/30 rounded-lg py-1 -my-1">
+    <div className="text-center flex flex-col items-center gap-1 cursor-default rounded-lg py-1 -my-1">
       {/* Icon - consistent muted color with hover state */}
-      <Icon className="w-5 h-5 text-muted-foreground/50 group-hover:text-muted-foreground/70 transition-colors" />
+      <Icon className="w-5 h-5 text-muted-foreground/50" />
       <p className="text-xl font-bold leading-tight text-foreground tabular-nums">
         {value}
       </p>
@@ -40,7 +40,7 @@ function StatItem({
       </p>
       {/* Micro-delta line (A4) */}
       {showDelta && (
-        <p className="text-[10px] font-medium text-emerald-500">
+        <p className="text-[10px] font-medium" style={{ color: 'hsl(var(--accent-amber))' }}>
           {deltaPrefix}{delta} this year
         </p>
       )}

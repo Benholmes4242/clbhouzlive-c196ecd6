@@ -67,13 +67,13 @@ export const MasteryTrack: React.FC<MasteryTrackProps> = ({
       <div 
         className="rounded-xl p-4 mb-4"
         style={{
-          background: 'linear-gradient(135deg, rgba(193, 168, 76, 0.06) 0%, rgba(255,255,255,0.98) 100%)',
-          border: '1px solid rgba(193, 168, 76, 0.15)',
+          background: 'hsl(var(--accent-amber) / 0.05)',
+          border: '1px solid hsl(var(--accent-amber) / 0.15)',
         }}
       >
         <div className="flex items-center gap-2 mb-1">
-          <Crown className="w-4 h-4 text-[#C1A84C]" />
-          <span className="text-xs font-bold uppercase tracking-wider text-[#8B7635]">
+          <Crown className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber))' }} />
+          <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'hsl(var(--accent-amber))' }}>
             Mastery Track
           </span>
         </div>
@@ -162,14 +162,14 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ region, index, onClick }) =
                 <div className="flex-1 h-2 bg-muted/40 rounded-full overflow-hidden">
                   <motion.div 
                     className="h-full rounded-full"
-                    style={{ backgroundColor: '#3EBD93' }}
+                    style={{ backgroundColor: 'hsl(var(--accent-amber))' }}
                     initial={{ width: 0 }}
                     animate={{ width: `${progressPercent}%` }}
                     transition={{ duration: 0.5, delay: 0.3 }}
                   />
                 </div>
                 <span className="text-sm font-semibold tabular-nums">
-                  <span style={{ color: '#3EBD93' }}>{region.played}</span>
+                  <span style={{ color: 'hsl(var(--accent-amber))' }}>{region.played}</span>
                   <span className="text-muted-foreground">/{region.total}</span>
                 </span>
               </div>
@@ -178,7 +178,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ region, index, onClick }) =
           
           {/* Status */}
           {isComplete && (
-            <span className="text-sm font-semibold text-[#334E3D] flex-shrink-0">
+            <span className="text-sm font-semibold text-foreground flex-shrink-0">
               Complete
             </span>
           )}
