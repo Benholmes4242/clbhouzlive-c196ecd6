@@ -94,7 +94,7 @@ async function fetchUserDetail(userId: string): Promise<AdminUserDetail> {
     avatar_url:     p.profile_photo_url,
     country:        p.country,
     home_club:      p.home_club,
-    handicap_index: p.handicap_index,
+    handicap_index: p.eg_handicap_index,
     is_verified:    p.is_verified_golfer ?? false,
     created_at:     p.created_at,
     bio:            p.bio,
