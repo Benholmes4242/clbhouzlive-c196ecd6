@@ -184,7 +184,7 @@ const MilestoneRow: React.FC<MilestoneRowProps> = ({
             top: '96px',
             height: '12px',
             backgroundColor: milestone.isUnlocked 
-              ? '#3EBD93' 
+              ? 'hsl(var(--accent-amber))' 
               : 'hsl(var(--border))',
           }}
         />
