@@ -44,7 +44,7 @@ async function fetchAllUsers(): Promise<AdminUserRow[]> {
       profile_photo_url,
       country,
       home_club,
-      handicap_index,
+      eg_handicap_index,
       is_verified_golfer,
       created_at
     `)
