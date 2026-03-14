@@ -96,7 +96,7 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
         
         {/* Top 10 pill on its own row */}
         <div className="flex justify-start mt-3">
-          <span className="inline-flex items-center rounded-full border border-[#D4A853]/30 bg-[#D4A853]/10 px-2.5 py-[2px] text-xs font-semibold text-[#D4A853]">
+          <span className="inline-flex items-center rounded-full px-2.5 py-[2px] text-xs font-semibold" style={{ borderColor: 'hsl(var(--accent-amber) / 0.3)', background: 'hsl(var(--accent-amber) / 0.1)', color: 'hsl(var(--accent-amber))', border: '1px solid' }}>
             Top 10
           </span>
         </div>
