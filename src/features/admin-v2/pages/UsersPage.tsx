@@ -407,7 +407,7 @@ export default function UsersPage() {
       </div>
 
       {/* Table */}
-      <AdminTable<AdminUserRow>
+      <AdminTable
         columns={columns}
         data={users}
         isLoading={isLoading}
