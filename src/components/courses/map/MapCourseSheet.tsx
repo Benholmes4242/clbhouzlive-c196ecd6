@@ -256,8 +256,8 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                   'text-[11px] font-semibold backdrop-blur-md',
                   statusBadge.className
                 )}
-                style={statusBadge.style
-                )}
+                style={statusBadge.style}
+              >
               >
                 {statusBadge.icon}
                 {statusBadge.text}
