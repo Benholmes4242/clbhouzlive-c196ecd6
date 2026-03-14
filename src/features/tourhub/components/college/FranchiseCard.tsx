@@ -11,7 +11,7 @@ import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeads
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
-import type { CollegeStatus, CollegeMomentum } from '../../hooks/useCollegeStatus';
+import type { CollegeMomentum } from '../../hooks/useCollegeStatus';
 import type { AlumniFace } from '../../hooks/useBatchCollegeAlumni';
 
 interface FranchiseCardProps {
