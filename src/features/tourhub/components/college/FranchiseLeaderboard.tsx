@@ -6,7 +6,6 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
@@ -20,6 +19,7 @@ type MetricTab = 'earnings' | 'wins' | 'cuts' | 'top10s' | 'movers';
 const METRIC_TABS: { value: MetricTab; label: string }[] = [
   { value: 'earnings', label: 'Earnings' },
   { value: 'wins', label: 'Wins' },
+  { value: 'cuts', label: 'Cuts' },
   { value: 'top10s', label: 'Top 10s' },
   { value: 'movers', label: 'Movers' },
 ];
@@ -72,12 +72,13 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
       <div
         className="sticky top-0 z-20 -mx-4 px-4"
         style={{
-          background: 'hsl(var(--background))',
+          background: 'hsl(var(--background) / 0.95)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           paddingTop: 8,
           paddingBottom: 8,
           marginBottom: 16,
+          borderBottom: '1px solid hsl(var(--border) / 0.15)',
         }}
       >
         <div
@@ -133,7 +134,7 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
           >
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="bg-card/50 border border-border/30 animate-pulse" style={{ height: 110, borderRadius: 16 }} />
+                <div key={i} className="bg-muted/40 animate-pulse" style={{ minHeight: 110, borderRadius: 16 }} />
               ))
             ) : error ? (
               <div className="text-center py-12 text-sm text-muted-foreground">Failed to load leaderboard</div>
@@ -165,9 +166,8 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
               })
             ) : (
               <div className="flex flex-col items-center py-12 text-center">
-                <Loader2 className="w-5 h-5 text-muted-foreground/50 animate-spin mb-3" />
-                <p className="text-sm font-medium text-foreground mb-1">Season stats are being calculated</p>
-                <p className="text-xs text-muted-foreground">Check back soon.</p>
+                <p className="text-sm font-medium text-foreground mb-1">No data available</p>
+                <p className="text-xs text-muted-foreground">Season stats are being calculated. Check back soon.</p>
               </div>
             )}
           </motion.div>
