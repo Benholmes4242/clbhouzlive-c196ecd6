@@ -427,7 +427,7 @@ const CourseExplorer = () => {
 
 
   return (
-    <div className="w-full space-y-block">
+    <div className="w-full space-y-5">
       {/* Your Network Section - Shows activity from friends */}
       <YourNetworkSection className="mt-2" />
 
