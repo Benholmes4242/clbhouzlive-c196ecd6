@@ -168,9 +168,10 @@ export function useAdminV2Users() {
         const { error } = await supabase.from('user_roles').delete().eq('user_id', userId);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from('user_roles').upsert(
-          { user_id: userId, role: role as AppRole },
-          { onConflict: 'user_id,role' }
+        // Delete existing role first to guarantee single role per user
+        await supabase.from('user_roles').delete().eq('user_id', userId);
+        const { error } = await supabase.from('user_roles').insert(
+          { user_id: userId, role: role as AppRole }
         );
         if (error) throw error;
       }
