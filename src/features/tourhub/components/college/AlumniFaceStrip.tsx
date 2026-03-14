@@ -100,7 +100,7 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
                 width: 32,
                 height: 32,
                 borderRadius: '34%',
-                border: '2px solid white',
+                border: '2px solid hsl(var(--card))',
                 marginLeft: -8,
                 position: 'relative',
               }}
