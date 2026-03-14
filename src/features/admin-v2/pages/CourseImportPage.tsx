@@ -76,7 +76,7 @@ async function importCourses(
     const chunk = valid.slice(i, i + CHUNK).map(r => ({
       name:          r.data.name,
       country:       r.data.country,
-      continent:     r.data.continent,
+      continent:     r.data.continent as any,
       sub_country:   r.data.sub_country || null,
       region:        r.data.region || null,
       global_rank:   r.data.global_rank ? parseInt(r.data.global_rank) || null : null,
