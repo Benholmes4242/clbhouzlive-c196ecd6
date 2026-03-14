@@ -11,6 +11,16 @@ import { useMultiLeaderboardRealtime } from '@/features/tourhub/hooks/useLeaderb
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import type { TournamentLiveFeedPost, TournamentLiveMeta, LiveLeaderboardEntry } from '../types/media';
 
+const TOUR_PRIORITY: Record<string, number> = {
+  pga:   1,
+  liv:   2,
+  euro:  3,
+  dpw:   3,
+  lpga:  4,
+  champ: 5,
+  kft:   6,
+};
+
 const LIVE_CARD_USER_ID = 'system-live-tournament';
 
 export function useTournamentLiveFeed(): {
