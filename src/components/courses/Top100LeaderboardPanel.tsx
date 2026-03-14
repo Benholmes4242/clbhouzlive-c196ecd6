@@ -47,7 +47,7 @@ const Top100LeaderboardPanel = () => {
                 key={tab.id}
                 value={tab.id}
                 className="min-h-[36px] px-4 rounded-full text-sm font-semibold transition-all active:scale-[0.97] border-0 shadow-none
-                  data-[state=active]:text-background data-[state=active]:shadow-none data-[state=active]:bg-foreground
+                  data-[state=active]:text-white data-[state=active]:shadow-none data-[state=active]:bg-[hsl(var(--tab-sub-active))]
                   data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground"
               >
                 {tab.label}
