@@ -30,9 +30,7 @@ interface Props {
 export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonColor = 'hsl(var(--accent-amber))', onClick }) => {
   const getRankColor = () => {
     if (rank === 1) return 'hsl(var(--accent-amber))';
-    if (rank === 2) return '#A8B4C0';
-    if (rank === 3) return '#C4956A';
-    return undefined;
+    return 'hsl(var(--muted-foreground))';
   };
 
   const getUserHistory = () => {
