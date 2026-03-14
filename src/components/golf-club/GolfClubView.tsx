@@ -3,7 +3,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { ChevronLeft } from 'lucide-react';
-import { IoMdArrowBack } from 'react-icons/io';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import CourseAboutTab from '@/components/courses/course-detail/CourseAboutTab';
@@ -31,20 +30,15 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
   
-  // Support both location.state and query params for tab selection
-  // Priority: state > query param > default
   const tabFromState = (location.state as any)?.activeTab;
   const tabFromQuery = searchParams.get('tab');
   const initialTab = tabFromState || tabFromQuery || 'about';
   const [activeTab, setActiveTab] = useState(initialTab);
   
-  // Read reviewId for deep linking (passed to CourseReviewsTab)
   const highlightReviewId = searchParams.get('review');
   
-  // Phase 3: Track which tabs have been visited for keep-mounted pattern
   const [visitedTabs, setVisitedTabs] = useState<Set<string>>(new Set([initialTab]));
 
-  // Fire both queries in parallel for faster initial load
   const { data: course, isLoading: courseLoading } = useQuery({
     queryKey: ['course-detail', courseId],
     queryFn: async () => {
@@ -69,32 +63,24 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       return data;
     },
     enabled: !!courseId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 
-  // FIX #2: Use centralized rating aggregates hook instead of client-side calculation
   const { isLoading: ratingStatsLoading } = useCourseRatingAggregates(courseId);
 
-
-  // FIX #4: Tab Switch Refetch Safety Net
-  // Force refetch of user-specific data when switching tabs
   const handleTabChange = useCallback((newTab: string) => {
     setActiveTab(newTab);
     setVisitedTabs(prev => new Set(prev).add(newTab));
     
-    // Force refetch user-specific data when switching tabs
-    // This acts as a safety net for any edge cases missed by optimistic updates
     if (user?.id && courseId) {
       queryClient.invalidateQueries({ 
         queryKey: ['user-course-rating', courseId, user.id],
-        refetchType: 'active' // Only refetch if query is actively being used
+        refetchType: 'active'
       });
     }
   }, [user?.id, courseId, queryClient]);
 
-  // Phase 2 Perf: Only show skeleton if both queries are loading
-  // This prevents unnecessary skeleton flash when data is cached
   if ((courseLoading || !course) && ratingStatsLoading) {
     return <CourseDetailSkeleton />;
   }
@@ -104,48 +90,57 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
   }
 
   return (
-      <div className={isInModal ? "w-full" : "min-h-screen w-full bg-[var(--bg-page)]"}>
+    <div
+      className={isInModal ? "w-full" : "min-h-screen w-full bg-background"}
+      style={!isInModal ? { paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' } : undefined}
+    >
       {/* Hero Image - bleeds into safe area */}
       <div 
-        className="relative overflow-hidden bg-[var(--bg-page)]"
+        className="relative overflow-hidden bg-background"
         style={{
-          height: '45dvh',
+          height: 'calc(45dvh + var(--sat, env(safe-area-inset-top, 0px)))',
           minHeight: '220px',
           maxHeight: '400px',
           marginTop: 0,
         }}
       >
-        {course.thumbnail_image ? (
+        {/* Always render gradient fallback behind image */}
+        <div className="absolute inset-0 h-full w-full bg-gradient-to-br from-green-400 to-blue-500" />
+        {course.thumbnail_image && (
           <img
             src={course.thumbnail_image}
             alt={course.name}
             className="absolute inset-0 h-full w-full object-cover"
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
           />
-        ) : (
-          <div className="absolute inset-0 h-full w-full bg-gradient-to-br from-green-400 to-blue-500" />
         )}
         
-        {/* Dark gradient overlay for text legibility - matches PostPlayRatingModal */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+        {/* Dark gradient scrim */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.05) 70%, transparent 100%)',
+          }}
+        />
         
-        {/* Back button for modal only — standalone page uses text link below hero */}
+        {/* Back button for modal only */}
         {isInModal && onClose && (
           <button
             onClick={onClose}
-            className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm hover:bg-black/40 active:scale-95 transition-all z-10"
-            style={{ top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
+            className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-md bg-black/20 backdrop-blur-sm active:scale-95 transition-all z-10"
+            style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)' }}
             aria-label="Go back"
           >
-            <IoMdArrowBack className="h-6 w-6 text-white" />
+            <ChevronLeft className="h-6 w-6 text-white" strokeWidth={2} />
           </button>
         )}
 
-        {/* Course name and location overlay on image - matches PostPlayRatingModal */}
+        {/* Course name and location overlay */}
         <div className="absolute inset-x-0 bottom-4 px-4">
           <h1 className="text-[22px] md:text-[28px] font-extrabold tracking-[-0.3px] text-white drop-shadow-2xl mb-1.5">
             {course.name}
           </h1>
-          <p className="text-lg md:text-xl text-white opacity-90 drop-shadow-lg mb-2">
+          <p className="drop-shadow-lg mb-2" style={{ fontSize: '14px', fontWeight: 500, color: 'rgba(255,255,255,0.75)' }}>
             {formatCourseLocation(course)}
           </p>
           
@@ -164,7 +159,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
 
       {/* ← Back text link below hero */}
       {!isInModal && (
-        <div className="px-4 pt-1.5 pb-0 bg-[var(--bg-page)]">
+        <div className="px-4 pt-1.5 pb-0 bg-background">
           <button
             type="button"
             onClick={() => safeGoBack(navigate, '/courses')}
@@ -177,17 +172,16 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       )}
 
       {/* Claimed By Badge */}
-      <div className="px-4 pt-0 pb-0 bg-[var(--bg-page)]">
+      <div className="px-4 pt-0 pb-0 bg-background">
         <CourseClaimBadge courseId={course.id} />
       </div>
 
-      {/* Segmented Control Tabs - positioned below hero */}
+      {/* Segmented Control Tabs */}
       <CourseTabs activeTab={activeTab as any} onChange={handleTabChange as any} />
 
-      {/* Phase 3: Keep-mounted tabs - render all visited tabs, hide inactive */}
-      <div className="course-hero-wrapper bg-[var(--bg-page)]">
+      {/* Keep-mounted tabs */}
+      <div className="course-hero-wrapper bg-background">
         <Tabs value={activeTab} onValueChange={handleTabChange}>
-          {/* About Tab - always rendered */}
           <TabsContent 
             value="about" 
             className={`mt-0 transition-opacity duration-200 ${activeTab === 'about' ? 'opacity-100' : 'hidden'}`}
@@ -198,7 +192,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             />
           </TabsContent>
           
-          {/* Reviews Tab - render after first visit */}
           {visitedTabs.has('reviews') && (
             <TabsContent 
               value="reviews" 
@@ -212,7 +205,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
             </TabsContent>
           )}
           
-          {/* Media Tab - render after first visit */}
           {visitedTabs.has('media') && (
             <TabsContent 
               value="media" 
@@ -223,7 +215,6 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
           )}
         </Tabs>
       </div>
-
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import GolfClubView from '@/components/golf-club/GolfClubView';
@@ -12,36 +12,20 @@ const CourseDetailPage = () => {
   const courseId = params?.courseId;
   const navigate = useNavigate();
   
-  // Prevent pull-down overscroll bounce on this immersive page
   usePreventOverscroll();
-  
-  // Safe area bleed: transparent status bar with white icons for hero image
   useMedianStatusBar("dark", "transparent", true, false);
 
-  // Always scroll to top ONLY when navigating to a different course
-  // Does NOT scroll when tab/filter changes (preserves scroll position)
   useEffect(() => {
-    // Scroll both window and #root container to ensure it works
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'auto',
-    });
-    
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     const rootElement = document.getElementById('root');
     if (rootElement) {
-      rootElement.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: 'auto',
-      });
+      rootElement.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     }
-  }, [courseId]); // Only courseId - NOT location.pathname
+  }, [courseId]);
 
-  // Add defensive check for courseId
   if (!courseId) {
     return (
-      <PageRoot className="min-h-screen bg-[var(--bg-page)] flex items-center justify-center">
+      <PageRoot className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Course not found</h1>
           <p className="text-muted-foreground mb-4">The course you're looking for doesn't exist.</p>
@@ -54,7 +38,7 @@ const CourseDetailPage = () => {
   }
 
   return (
-    <PageRoot className="min-h-screen bg-[var(--bg-page)]" immersive immersiveStatusBar style={{ overscrollBehaviorY: 'none' }}>
+    <PageRoot className="min-h-screen bg-background" immersive immersiveStatusBar style={{ overscrollBehaviorY: 'none' }}>
       <FadeInContent>
         <GolfClubView courseId={courseId} isInModal={false} />
       </FadeInContent>

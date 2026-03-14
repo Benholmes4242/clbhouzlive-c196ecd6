@@ -5,7 +5,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ExternalLink, ChevronDown, ChevronUp, MapPin, Loader2, Pencil } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
 import AboutMediaStrip from './AboutMediaStrip';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
 import { LocationMapCard } from '@/components/map';
@@ -71,7 +70,6 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [showWebsiteSheet, setShowWebsiteSheet] = useState(false);
   const [showSuggestEdit, setShowSuggestEdit] = useState(false);
-  const isMobile = useIsMobile();
   const { user } = useSupabaseSession();
   
   const navigate = useNavigate();
@@ -145,7 +143,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           <div className="space-y-2">
             <Button 
               onClick={handleRateClick}
-              className="w-full justify-center h-11 rounded-sq-sm bg-muted text-foreground border-0 hover:bg-secondary active:scale-[0.98]"
+              className="w-full justify-center h-11 rounded-sq-sm bg-muted text-foreground border-0 active:scale-[0.98]"
               variant="outline"
             >
               {rateButtonLabel}
@@ -157,28 +155,21 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         )}
       </section>
 
-      {/* Spacer */}
-      <div className="h-3" />
-
       {/* 3. Your Journey Section */}
       {user && (
-        <PersonalSection courseId={course.id} courseName={course.name} />
+        <section style={{ marginTop: 12 }}>
+          <PersonalSection courseId={course.id} courseName={course.name} />
+        </section>
       )}
 
-      {/* Spacer */}
-      <div className="h-3" />
-
       {/* 4. Friends Who've Played */}
-      <section className="px-4 pt-4 pb-4 md:px-6">
+      <section className="px-4 pt-4 pb-4 md:px-6" style={{ marginTop: 12 }}>
         <CourseFriendsStrip courseId={course.id} courseName={course.name} />
       </section>
 
-      {/* Spacer */}
-      <div className="h-3" />
-
       {/* 5. About Section */}
       {course.description && (
-        <section className="pt-8 pb-6 space-y-4 md:pt-10">
+        <section className="pt-8 pb-6 space-y-4 md:pt-10" style={{ marginTop: 12 }}>
           <div className="px-5">
             <SectionHeading title="About" />
           </div>
@@ -190,13 +181,13 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
             >
               {formatDescription(displayDescription)}
               {!showFullDescription && shouldShowReadMore && (
-                <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-[var(--bg-page)] to-transparent pointer-events-none" />
+                <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-background to-transparent pointer-events-none" />
               )}
             </div>
             {shouldShowReadMore && (
               <button
                 onClick={() => setShowFullDescription(!showFullDescription)}
-                className="flex items-center gap-1.5 mt-3 min-h-[44px] text-base font-medium text-muted-foreground hover:text-foreground active:scale-[0.98] transition-all"
+                className="flex items-center gap-1.5 mt-3 min-h-[44px] text-base font-medium text-muted-foreground active:scale-[0.98] active:opacity-70 transition-all"
               >
                 <span>{showFullDescription ? 'Show less' : 'Read more'}</span>
                 {showFullDescription ? (
@@ -235,12 +226,9 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         />
       )}
 
-      {/* Spacer */}
-      <div className="h-3" />
-
       {/* 6. Top 100 Spotlight */}
       {course.id && (
-        <section className="px-4 pt-5 pb-5 md:px-6">
+        <section className="px-4 pt-5 pb-5 md:px-6" style={{ marginTop: 12 }}>
           <CourseTop100Spotlight
             courseId={course.id}
             courseName={course.name}
@@ -251,11 +239,8 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
       {/* 7. Top 100 mini-journey summary */}
       <CourseTop100Summary />
 
-      {/* Spacer */}
-      <div className="h-3" />
-
       {/* 8. Location Section */}
-      <section className="pt-6 pb-5 md:pt-8">
+      <section className="pt-6 pb-5 md:pt-8" style={{ marginTop: 12 }}>
         <div className="px-5 mb-4">
           <SectionHeading title="Location" />
         </div>
@@ -287,56 +272,48 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         )}
       </section>
 
-      {/* Spacer */}
-      <div className="h-3" />
-
       {/* 9. CTA for users who haven't rated yet */}
       {user && !userRating && ratingAggregates && ratingAggregates.review_count > 0 && (
-        <section className="px-4 pt-5 pb-5 md:pt-6">
+        <section className="px-4 pt-5 pb-5 md:pt-6" style={{ marginTop: 12 }}>
           <h3 className="text-lg font-semibold text-foreground mb-1">How do you rate this course?</h3>
           <p className="text-base text-muted-foreground mb-3">
             Add your rating to see how it compares with the clbhouz community.
           </p>
-          <Button onClick={handleRateClick} className="w-full bg-muted text-foreground border-0 hover:bg-secondary active:scale-[0.98]" variant="outline">
+          <Button onClick={handleRateClick} className="w-full bg-muted text-foreground border-0 active:scale-[0.98]" variant="outline">
             Rate this course
           </Button>
         </section>
       )}
 
-      {/* Spacer */}
-      <div className="h-3" />
-
       {/* Claim This Course CTA - only for unclaimed courses with a club_id */}
       {!courseClaim && course.club_id && (
-        <ClaimCourseCTA
-          clubId={course.club_id}
-          clubName={course.name}
-        />
+        <div style={{ marginTop: 12 }}>
+          <ClaimCourseCTA
+            clubId={course.club_id}
+            clubName={course.name}
+          />
+        </div>
       )}
 
-      {/* Spacer */}
-      <div className="h-3" />
-
       {/* 10. Media Section */}
-      <section className="pt-6 pb-5 space-y-3 md:pt-8">
+      <section className="pt-6 pb-5 space-y-3 md:pt-8" style={{ marginTop: 12 }}>
         <AboutMediaStrip 
           clubId={course.id} 
           onSeeAllClick={() => onTabChange?.('media')}
         />
       </section>
 
-      {/* Spacer */}
-      <div className="h-3" />
-
       {/* 11. Explore More Links */}
-      <CourseExploreLinks course={course} />
+      <div style={{ marginTop: 12 }}>
+        <CourseExploreLinks course={course} />
+      </div>
 
       {/* 12. Visit Website */}
       {course.website_url && (
         <section className="px-4 pt-2 pb-4">
           <Button
             onClick={handleWebsiteClick}
-            className="w-full flex items-center justify-center gap-2 h-11 rounded-lg bg-card text-foreground border border-border/60 hover:bg-muted active:scale-[0.98]"
+            className="w-full flex items-center justify-center gap-2 h-11 rounded-lg bg-card text-foreground border border-border/60 active:scale-[0.98]"
             variant="outline"
           >
             <ExternalLink className="h-4 w-4" />
