@@ -84,7 +84,7 @@ const Top100Hub = () => {
 
   if (listsLoading) {
     return (
-      <PageRoot className="min-h-screen bg-[var(--bg-page)]">
+      <PageRoot className="min-h-screen bg-background">
         <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
           <div className="space-y-4">
             <div className="aspect-[16/10] bg-card/60 border border-border/40 rounded-2xl clb-skeleton" />
