@@ -470,6 +470,7 @@ export function CoursesLeaderboardView() {
                         src={round.user_profiles?.profile_photo_url}
                         alt={round.user_profiles?.display_name}
                         fallback={(round.user_profiles?.display_name?.[0] || '?').toUpperCase()}
+                        hideRing
                       />
                       <span className="text-sm text-muted-foreground truncate">
                         {round.user_profiles?.display_name}
