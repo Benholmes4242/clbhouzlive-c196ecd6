@@ -36,13 +36,23 @@ async function fetchCourses(): Promise<AdminCourseRow[]> {
       id, name, country, sub_country, region, continent,
       global_rank, regional_rank, usa_rank,
       thumbnail_image, latitude, longitude,
-      website_url, description, created_at,
-      course_rating_aggregates (avg_overall_score, review_count)
+      website_url, description, created_at
     `)
     .order('name', { ascending: true })
     .limit(5000);
 
   if (error) throw error;
+
+  // Separate query for ratings (view — no FK for PostgREST nested select)
+  const courseIds = (data ?? []).map(c => c.id);
+  const { data: ratingsData } = await supabase
+    .from('course_rating_aggregates' as any)
+    .select('course_id, avg_overall_score, review_count')
+    .in('course_id', courseIds);
+
+  const ratingsMap = new Map(
+    ((ratingsData ?? []) as any[]).map((r: any) => [r.course_id, r])
+  );
 
   return (data ?? []).map((c: any) => ({
     id:             c.id,
@@ -60,8 +70,8 @@ async function fetchCourses(): Promise<AdminCourseRow[]> {
     website_url:    c.website_url,
     description:    c.description,
     created_at:     c.created_at,
-    avg_rating:     c.course_rating_aggregates?.[0]?.avg_overall_score ?? null,
-    review_count:   c.course_rating_aggregates?.[0]?.review_count ?? null,
+    avg_rating:     ratingsMap.get(c.id)?.avg_overall_score ?? null,
+    review_count:   ratingsMap.get(c.id)?.review_count ?? null,
   }));
 }
 

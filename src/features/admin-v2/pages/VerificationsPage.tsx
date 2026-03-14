@@ -55,7 +55,7 @@ function VerificationDrawer({
     onDecide(item.id, item.type, decision, adminNote);
     setAdminNote('');
     setConfirming(null);
-    onClose();
+    // Do not close here — onDecide's mutation calls onClose on success
   };
 
   const isPendingItem = item?.status === 'pending';
@@ -358,7 +358,10 @@ export default function VerificationsPage() {
         item={drawerItem}
         onClose={() => setDrawerItem(null)}
         onDecide={(id, type, decision, note) =>
-          reviewMutation.mutate({ id, type, decision, adminNote: note })
+          reviewMutation.mutate(
+            { id, type, decision, adminNote: note },
+            { onSuccess: () => setDrawerItem(null) }
+          )
         }
         isPending={reviewMutation.isPending}
       />
