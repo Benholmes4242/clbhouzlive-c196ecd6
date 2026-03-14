@@ -230,7 +230,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
           SECTION A: HERO / IDENTITY - section band, no card
           Background: bg-slate-50, pt-8 pb-10
           ============================================ */}
-      <section className="bg-muted/30 pt-8 pb-10">
+      <section className="pt-8 pb-10">
         <Top100ProgressHero
           displayName={displayName}
           avatarUrl={avatarUrl}
