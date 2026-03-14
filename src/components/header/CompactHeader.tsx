@@ -153,7 +153,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         )}
         style={{
           top: 0,
-          background: '#F8FAFC',
+          background: 'hsl(var(--background))',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           height: `${contentHeight}px`,
@@ -187,7 +187,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   {hasLiveTournaments && (
                     <motion.span
                       className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-background"
-                      style={{ background: '#FF3B30' }}
+                      style={{ background: 'hsl(var(--destructive))' }}
                       animate={{ scale: [1, 1.2, 1] }}
                       transition={{ duration: 2, repeat: Infinity }}
                     />
@@ -197,7 +197,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 <img
                   src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
                   alt="clbhouz"
-                  className="object-contain h-9 w-9 hover:opacity-80"
+                  className="object-contain h-9 w-9"
                 />
               )}
             </button>
@@ -224,7 +224,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                       useLightTheme 
                         ? isActive 
                           ? "text-foreground bg-muted/80" 
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          : "text-muted-foreground"
                         : isActive 
                           ? "text-white bg-white/10"
                           : "text-white/60 hover:text-white hover:bg-white/5"
@@ -247,7 +247,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 "p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all",
                 "h-11 w-11",
                 useLightTheme
-                  ? "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  ? "text-muted-foreground"
                   : "hover:bg-[hsl(var(--clubhouse-active-bg))]"
               )}
               style={{ 
