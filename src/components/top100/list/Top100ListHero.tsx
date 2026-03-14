@@ -60,8 +60,8 @@ export const Top100ListHero: React.FC<Top100ListHeroProps> = ({
         {/* Progress bar */}
         <div className="mt-3 h-2 rounded-full bg-white/25 overflow-hidden">
           <div
-            className="h-full rounded-full bg-[#F3B13E] transition-all duration-500"
-            style={{ width: `${listMeta.completionPercent * 100}%` }}
+            className="h-full rounded-full transition-all duration-500"
+            style={{ width: `${listMeta.completionPercent * 100}%`, backgroundColor: 'hsl(var(--accent-amber))' }}
           />
         </div>
 
@@ -69,7 +69,7 @@ export const Top100ListHero: React.FC<Top100ListHeroProps> = ({
         <div className="mt-3 flex items-center justify-between gap-2">
           <button
             onClick={onContinueJourney}
-            className="px-4 py-2 rounded-full bg-white text-[13px] font-semibold text-slate-900 hover:bg-white/90 transition-colors"
+            className="px-4 py-2 rounded-xl bg-white text-[13px] font-semibold text-foreground active:opacity-80 transition-opacity"
           >
             Continue your journey
           </button>

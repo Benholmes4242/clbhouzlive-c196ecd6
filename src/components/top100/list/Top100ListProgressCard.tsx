@@ -51,7 +51,7 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div 
-              className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+              className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
               style={{ backgroundColor: `${theme.ringColor}20` }}
             >
               <Trophy className="w-5 h-5" style={{ color: theme.ringColor }} />
@@ -69,7 +69,7 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
             <p className="text-xs font-medium italic whitespace-nowrap" style={{ color: theme.ringColor }}>
               {statusCopy}
             </p>
-            <ChevronRight className="w-4 h-4 text-muted-foreground/60 group-hover:text-muted-foreground transition-colors" />
+            <ChevronRight className="w-4 h-4 text-muted-foreground/60" />
           </div>
         </div>
       </motion.button>
@@ -79,7 +79,7 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
   return (
     <motion.button
       onClick={handleClick}
-      className="mx-4 mt-5 w-[calc(100%-2rem)] text-left px-4 py-3.5 rounded-sq-md bg-card border border-border transition-all duration-150 group hover:border-border"
+      className="mx-4 mt-5 w-[calc(100%-2rem)] text-left px-4 py-3.5 rounded-sq-md bg-card border border-border transition-all duration-150"
       style={{ borderLeftWidth: '3px', borderLeftColor: theme.ringColor }}
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
@@ -87,7 +87,7 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <div 
-            className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+            className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
             style={{ backgroundColor: `${theme.ringColor}1A` }}
           >
             <Target className="w-5 h-5" style={{ color: theme.ringColor }} />
@@ -105,7 +105,7 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
           <p className="text-[13px] font-medium text-muted-foreground italic whitespace-nowrap">
             {statusCopy}
           </p>
-          <ChevronRight className="w-4 h-4 text-muted-foreground/60 group-hover:text-muted-foreground transition-colors" />
+          <ChevronRight className="w-4 h-4 text-muted-foreground/60" />
         </div>
       </div>
     </motion.button>

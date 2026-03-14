@@ -100,7 +100,7 @@ export const Top100ListMilestoneRail: React.FC<Top100ListMilestoneRailProps> = (
         </h2>
         <motion.button
           onClick={handleTileClick}
-          className="text-[11px] font-medium text-muted-foreground/60 hover:text-muted-foreground transition-colors flex items-center gap-0.5 group py-2 px-2 -mr-2 rounded-lg active:scale-[0.97]"
+          className="text-[11px] font-medium text-muted-foreground/60 transition-colors flex items-center gap-0.5 group py-2 px-2 -mr-2 rounded-lg active:scale-[0.97]"
           whileHover={{ x: 2 }}
         >
           See all
@@ -319,15 +319,17 @@ const MilestoneToken = React.forwardRef<HTMLButtonElement, MilestoneTokenProps>(
       </div>
 
       {/* Subtext below token */}
-      <span className={`text-[11px] font-medium mt-1 ${
-        showCompletionHero
-          ? 'text-amber-700/80'
-          : isNextUp 
-            ? 'text-muted-foreground' 
-            : isUnlocked 
+      <span 
+        className={`text-[11px] font-medium mt-1 ${
+          showCompletionHero
+            ? ''
+            : isNextUp 
               ? 'text-muted-foreground' 
-              : 'text-muted-foreground/50'
-      }`}>
+              : isUnlocked 
+                ? 'text-muted-foreground' 
+                : 'text-muted-foreground/50'
+        }`}
+        style={showCompletionHero ? { color: 'hsl(var(--accent-amber) / 0.8)' } : undefined}>
         {isNextUp && aspirationalCopy
           ? aspirationalCopy
           : isUnlocked || showCompletionHero

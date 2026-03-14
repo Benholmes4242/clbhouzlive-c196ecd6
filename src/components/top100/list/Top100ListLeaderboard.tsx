@@ -122,7 +122,7 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
         {friends.length > 8 && (
           <button
             onClick={onViewAll}
-            className="text-[11px] font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-0.5 py-2 px-2 -mr-2 rounded-lg active:scale-[0.97] transition-transform"
+            className="text-[11px] font-medium text-muted-foreground active:opacity-70 transition-opacity flex items-center gap-0.5 py-2 px-2 -mr-2 rounded-lg active:scale-[0.97]"
           >
             View all
             <span className="text-[10px]">→</span>
@@ -154,12 +154,18 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
               onClick={() => navigate(`/profile/${friend.username}`)}
-              className={`
-                flex-shrink-0 w-[76px] p-1.5 rounded-xl bg-card border transition-all text-center active:scale-[0.95]
-                ${isCurrentUser ? 'border-[#D4A853] ring-2 ring-[#D4A853]/20' : ''}
-                ${isClosestCompetitor && !isCurrentUser ? 'border-[#D4A853]/60 shadow-[0_0_8px_rgba(212,168,83,0.25)]' : ''}
-                ${!isCurrentUser && !isClosestCompetitor ? 'border-border/60' : ''}
-              `}
+              className="flex-shrink-0 w-[76px] p-1.5 rounded-xl bg-card border transition-all text-center active:scale-[0.95]"
+              style={{
+                ...(isCurrentUser ? {
+                  borderColor: 'hsl(var(--accent-amber))',
+                  boxShadow: '0 0 0 2px hsl(var(--accent-amber) / 0.2)',
+                } : isClosestCompetitor ? {
+                  borderColor: 'hsl(var(--accent-amber) / 0.6)',
+                  boxShadow: '0 0 8px hsl(var(--accent-amber) / 0.25)',
+                } : {
+                  borderColor: 'hsl(var(--border) / 0.6)',
+                }),
+              }}
             >
               {/* Avatar - no border ring per avatar-border-removal-policy */}
               <div className="relative mx-auto mb-1">
@@ -171,7 +177,8 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
                 />
                 {/* Mini progress badge */}
                 <div 
-                  className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-foreground flex items-center justify-center text-[8px] font-bold text-background"
+                  className="absolute -bottom-0.5 -right-0.5 rounded flex items-center justify-center text-[8px] font-bold"
+                  style={{ background: 'hsl(var(--background))', border: '1px solid hsl(var(--border) / 0.4)', padding: '0 3px', color: 'hsl(var(--muted-foreground))' }}
                   title={`${friend.playedOnList}/${totalInList} played`}
                 >
                   {friend.playedOnList}
@@ -184,12 +191,12 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
               </div>
 
               {/* Relative position indicator */}
-              <div className={`
-                mt-0.5 flex items-center justify-center gap-0.5 text-[9px] font-medium rounded-full px-1 py-0.5
-                ${isAhead ? 'bg-emerald-50 text-emerald-600' : ''}
-                ${isBehind ? 'bg-rose-50 text-rose-500' : ''}
-                ${isSame ? 'bg-amber-50 text-amber-600' : ''}
-              `}>
+              <div className="mt-0.5 flex items-center justify-center gap-0.5 text-[9px] font-medium rounded-full px-1 py-0.5"
+                style={
+                  isAhead ? { background: 'hsl(var(--accent-amber) / 0.1)', color: 'hsl(var(--accent-amber))' } :
+                  isSame ? { background: 'hsl(var(--muted))', color: 'hsl(var(--muted-foreground))' } :
+                  isBehind ? { background: 'hsl(var(--destructive) / 0.08)', color: 'hsl(var(--destructive) / 0.7)' } : {}
+                }>
                 {isAhead && (
                   <>
                     <ArrowUp className="w-2 h-2" />

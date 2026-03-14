@@ -7,8 +7,7 @@ import React from 'react';
 import { AnimatedNumber, AnimatedProgressBar } from '@/components/ui/motion';
 import { cn } from '@/lib/utils';
 
-// Season color - Pre-Season mint (matches Top100ProgressHero)
-const SEASON_COLOR = '#3EBD93';
+const SEASON_COLOR = 'hsl(var(--accent-amber))';
 
 type Props = {
   ratedCount: number;
