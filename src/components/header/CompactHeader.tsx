@@ -224,7 +224,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                       useLightTheme 
                         ? isActive 
                           ? "text-foreground bg-muted/80" 
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          : "text-muted-foreground"
                         : isActive 
                           ? "text-white bg-white/10"
                           : "text-white/60 hover:text-white hover:bg-white/5"
