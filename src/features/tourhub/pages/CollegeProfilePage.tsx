@@ -323,7 +323,7 @@ export function CollegeProfilePage() {
       )}
 
       {/* Back link */}
-      <div className="px-4" style={{ marginTop: 12 }}>
+      <div className="px-4" style={{ marginTop: 20 }}>
         <button
           onClick={() => navigate('/tourhub/college-golf')}
           className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"

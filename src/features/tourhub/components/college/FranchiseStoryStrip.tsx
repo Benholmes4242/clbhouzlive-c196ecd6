@@ -7,17 +7,12 @@ import { TrendingUp, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollegeWeeklyMovers } from '../../hooks/useCollegeMovers';
 import { useCollegeAlumni } from '../../hooks/useCollegeAlumni';
+import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { Link } from 'react-router-dom';
 
 interface FranchiseStoryStripProps {
   normalizedName: string;
   className?: string;
-}
-
-function formatCurrency(amount: number): string {
-  if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;
-  if (amount >= 1_000) return `$${Math.round(amount / 1_000)}K`;
-  return `$${amount.toFixed(0)}`;
 }
 
 interface StoryTileProps {
@@ -38,12 +33,12 @@ function StoryTile({ icon: Icon, iconColor, title, children, to, delay = 0 }: St
       className={cn(
         "flex flex-col items-center text-center rounded-2xl",
         "bg-card border border-border/50",
-        to && "hover:border-primary/40 hover:shadow-md transition-all cursor-pointer"
+        to && "hover:border-primary/40 hover:shadow-md active:scale-[0.98] transition-all cursor-pointer"
       )}
       style={{ padding: '16px' }}
     >
       <div className="flex items-center gap-1.5 mb-1.5">
-        <Icon className={cn('text-muted-foreground/50')} style={{ width: '14px', height: '14px' }} />
+        <Icon className={iconColor} style={{ width: '14px', height: '14px' }} />
         <span style={{
           fontSize: '10px',
           fontWeight: 700,
@@ -80,7 +75,7 @@ function StoryTileSkeleton({ delay = 0 }: { delay?: number }) {
 }
 
 export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStoryStripProps) {
-  const { data: movers, isLoading: moversLoading } = useCollegeWeeklyMovers({ limit: 50 });
+  const { data: moverRows, isLoading: moversLoading } = useCollegeWeeklyMovers({ collegeName: normalizedName });
   const { data: alumni, isLoading: alumniLoading } = useCollegeAlumni(normalizedName, { orderBy: 'earnings', limit: 1 });
 
   const isLoading = moversLoading || alumniLoading;
@@ -94,8 +89,8 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
     );
   }
 
-  // Find this college in movers
-  const thisMover = movers?.find(m => m.normalized_name === normalizedName);
+  // Direct lookup — no client-side find needed
+  const thisMover = moverRows?.[0] ?? null;
   const weekEarnings = thisMover?.earnings_delta || 0;
   const weekWins = thisMover?.wins_delta || 0;
   const weekTop10s = thisMover?.top10_delta || 0;
@@ -103,7 +98,7 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
   // Top alumnus
   const topAlumnus = alumni?.[0];
 
-  const hasWeekActivity = weekEarnings > 0 || weekWins > 0 || weekTop10s > 0;
+  const hasWeekActivity = weekEarnings !== 0 || weekWins > 0 || weekTop10s > 0;
 
   const secondaryWeekParts = [
     weekWins > 0 ? `${weekWins} win${weekWins > 1 ? 's' : ''}` : null,
@@ -116,9 +111,12 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
       <StoryTile icon={TrendingUp} iconColor="text-emerald-500" title="This Week" delay={0}>
         {hasWeekActivity ? (
           <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {weekEarnings > 0 && (
-              <span style={{ fontSize: 15, fontWeight: 600, color: '#22c55e' }}>
-                +{formatCurrency(weekEarnings)}
+            {weekEarnings !== 0 && (
+              <span
+                className={weekEarnings > 0 ? 'text-emerald-500' : 'text-rose-500'}
+                style={{ fontSize: 15, fontWeight: 600 }}
+              >
+                {weekEarnings > 0 ? '+' : ''}{formatCurrency(weekEarnings)}
               </span>
             )}
             {secondaryWeekParts && (
@@ -138,7 +136,7 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
       <StoryTile
         icon={Star}
         iconColor="text-amber-500"
-        title="Top Performer"
+        title={alumni && alumni.length === 1 ? 'Alumni' : 'Top Performer'}
         to={topAlumnus ? `/tourhub/player/${topAlumnus.id}` : undefined}
         delay={0.05}
       >
@@ -148,7 +146,7 @@ export function FranchiseStoryStrip({ normalizedName, className }: FranchiseStor
         {topAlumnus && (
           <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 1 }}>
             {topAlumnus.earnings ? (
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#f59e0b' }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'hsl(var(--accent-amber))' }}>
                 {formatCurrency(topAlumnus.earnings)}
               </span>
             ) : null}
