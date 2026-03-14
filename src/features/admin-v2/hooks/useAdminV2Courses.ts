@@ -27,6 +27,12 @@ export interface AdminCourseRow {
 
 export type CourseFilterList = 'all' | 'global' | 'gbi' | 'usa' | 'europe' | 'unranked';
 
+interface CourseRatingAggregateRow {
+  course_id:         string;
+  avg_overall_score: number | null;
+  review_count:      number | null;
+}
+
 // ─── Fetchers ─────────────────────────────────────────────────────────────────
 
 async function fetchCourses(): Promise<AdminCourseRow[]> {
