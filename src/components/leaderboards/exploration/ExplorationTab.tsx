@@ -24,7 +24,7 @@ import { usePlayedCourseCoordinates } from '@/hooks/usePlayedCourseCoordinates';
 import type { LeaderboardScope, ExplorationMetric } from '@/types/leaderboards';
 
 // --- Constants ---
-const ROW_HEIGHT = 72; // 64px row (py-3 + h-10 avatar) + 8px gap (space-y-2)
+const ROW_HEIGHT = 72;
 const VIRTUALIZATION_THRESHOLD = 50;
 const OVERSCAN = 8;
 const STORAGE_KEY_SCROLL = 'exploration-leaderboard-scroll';
@@ -36,8 +36,8 @@ function ExplorationLeaderboardSkeleton() {
     <div className="space-y-2">
       {Array.from({ length: 3 }).map((_, i) => (
         <div key={i} className="flex items-center gap-3 p-3">
-          <Skeleton className="h-8 w-8 rounded-full" />
-          <Skeleton className="h-10 w-10 rounded-full" />
+          <Skeleton className="h-8 w-6 rounded" />
+          <Skeleton className="h-10 w-10 rounded-lg" />
           <div className="flex-1 space-y-1.5">
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-3 w-20" />
@@ -54,7 +54,7 @@ function InlineRetryCard({ onRetry }: { onRetry: () => void }) {
     <div className="py-4 px-4">
       <button
         onClick={onRetry}
-        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-surface-alt text-sm text-muted-foreground hover:bg-muted/30 active:scale-[0.98] transition-all"
+        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-card border border-border/50 text-sm text-muted-foreground active:scale-[0.98] active:opacity-70 transition-all"
       >
         Couldn't load more golfers · Tap to retry
       </button>
@@ -68,7 +68,7 @@ function InitialErrorState({ onRetry }: { onRetry: () => void }) {
       <p className="text-muted-foreground text-sm">Something went wrong loading the leaderboard.</p>
       <button
         onClick={onRetry}
-        className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 active:scale-[0.97] transition-all"
+        className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium active:scale-[0.97] active:opacity-90 transition-all"
       >
         Try again
       </button>
@@ -94,7 +94,7 @@ export function ExplorationTab() {
   const { data: seasonCalendar } = useSeasonCalendar();
   const seasonThemeColor = useMemo(() => {
     const currentSeason = seasonCalendar?.find(s => s.is_current);
-    if (!currentSeason) return '#006747';
+    if (!currentSeason) return 'hsl(var(--accent-amber))';
     const lower = currentSeason.name.toLowerCase();
     let id: SeasonId = 'major';
     if (lower.includes('pre-season') || lower.includes('preseason') || lower.includes('training')) id = 'preseason';
@@ -284,7 +284,7 @@ export function ExplorationTab() {
 
   const getPodiumRingColor = (rank: number): string | null => {
     switch (rank) {
-      case 1: return '#D4A853';
+      case 1: return 'hsl(var(--accent-amber))';
       case 2: return '#B8C6C9';
       case 3: return '#C4956A';
       default: return null;

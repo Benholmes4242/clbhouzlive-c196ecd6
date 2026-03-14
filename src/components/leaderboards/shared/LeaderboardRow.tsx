@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { MedalBadge } from '@/components/championship/primitives';
 import { cn } from '@/lib/utils';
 
 interface LeaderboardRowProps {
@@ -44,22 +43,36 @@ export function LeaderboardRow({
     <Link
       to={`/profile/${userId}`}
       className={cn(
-        'w-full py-4 flex items-center gap-3 transition-colors transition-transform active:scale-[0.98]',
+        'w-full py-4 flex items-center gap-3 transition-colors transition-transform',
         'px-4',
-        'hover:bg-muted/20 active:bg-muted/30',
+        'active:bg-muted/30 active:scale-[0.98]',
         isCurrentUser && 'rounded-xl'
       )}
       style={{
-        borderBottom: isCurrentUser ? undefined : '1px solid hsl(var(--border) / 0.08)',
+        borderBottom: isCurrentUser ? undefined : '1px solid hsl(var(--border) / 0.2)',
         ...(isCurrentUser ? {
-          background: 'rgba(212, 168, 83, 0.08)',
-          border: '2px solid rgba(212, 168, 83, 0.2)',
+          background: 'hsl(var(--accent-amber) / 0.08)',
+          border: '2px solid hsl(var(--accent-amber) / 0.2)',
         } : {}),
       }}
     >
       
-      {/* Rank Badge - using Championship MedalBadge */}
-      <MedalBadge rank={rank} size="md" />
+      {/* Rank — plain typographic number */}
+      <span
+        style={{
+          width: 28,
+          fontSize: 13,
+          fontWeight: 700,
+          fontVariantNumeric: 'tabular-nums',
+          flexShrink: 0,
+          textAlign: 'center',
+          color: rank === 1
+            ? 'hsl(var(--accent-amber))'
+            : 'hsl(var(--muted-foreground))',
+        }}
+      >
+        {rank}
+      </span>
 
       {/* Avatar — 48px squircle */}
       <SquircleAvatar
@@ -73,10 +86,7 @@ export function LeaderboardRow({
       {/* Name & Info */}
       <div className="flex-1 min-w-0 text-left">
         {/* Line 1: Name — 16px semibold */}
-        <span className={cn(
-          'text-base font-semibold truncate block',
-          isCurrentUser && 'text-primary'
-        )}>
+        <span className="text-base font-semibold truncate block">
           {displayName}
         </span>
         

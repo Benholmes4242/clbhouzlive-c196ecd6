@@ -6,6 +6,7 @@ import { getSeasonGradient } from '@/lib/colorUtils';
 import type { ExplorationLeaderboardEntry, ExplorationMetric } from '@/types/leaderboards';
 
 // Premium awards stage configuration — matches TrophyPodiumSlot A* spec
+// Gold uses accent-amber CSS var; silver (#A8B4C0) and bronze (#C4956A) are decorative — no semantic var available
 const POSITION_CONFIG = {
   1: {
     avatarSize: 120,
@@ -17,10 +18,10 @@ const POSITION_CONFIG = {
     statSize: 24,
     statWeight: 800,
     labelSize: 13,
-    borderColor: '#D4A853',
-    borderGradient: ['#D4A853', '#F0D78C', '#D4A853'],
-    badgeBg: '#D4A853',
-    shadowColor: 'rgba(212, 168, 83, 0.25)',
+    borderColor: 'hsl(var(--accent-amber))',
+    borderGradient: ['hsl(var(--accent-amber))', '#F0D78C', 'hsl(var(--accent-amber))'],
+    badgeBg: 'hsl(var(--accent-amber))',
+    shadowColor: 'hsl(var(--accent-amber) / 0.25)',
     crownSize: 36,
     verticalOffset: 0,
   },
@@ -107,7 +108,7 @@ function formatNameTwoLines(displayName: string | null): { firstName: string; la
 // Stagger order: #2 first (0ms), #1 second (100ms), #3 third (200ms)
 const ANIMATION_DELAYS = { 1: 0.1, 2: 0, 3: 0.2 } as const;
 
-export function ExplorationPodium({ entries, metric, currentUserId, seasonColor = '#006747' }: ExplorationPodiumProps) {
+export function ExplorationPodium({ entries, metric, currentUserId, seasonColor = 'hsl(var(--accent-amber))' }: ExplorationPodiumProps) {
   const gradient = getSeasonGradient(seasonColor);
 
   if (entries.length < 3) {
@@ -173,8 +174,8 @@ export function ExplorationPodium({ entries, metric, currentUserId, seasonColor 
                     <Crown
                       size={config.crownSize}
                       className="drop-shadow-md"
-                      style={{ color: '#D4A853' }}
-                      fill="#D4A853"
+                      style={{ color: 'hsl(var(--accent-amber))' }}
+                      fill="#f59e0b"
                       strokeWidth={1.5}
                     />
                   </motion.div>
@@ -191,7 +192,7 @@ export function ExplorationPodium({ entries, metric, currentUserId, seasonColor 
                         left: '-2rem',
                         right: '-2rem',
                         bottom: '-2rem',
-                        background: 'radial-gradient(ellipse at center, rgba(212, 168, 83, 0.3) 0%, rgba(212, 168, 83, 0.1) 50%, transparent 80%)',
+                        background: 'radial-gradient(ellipse at center, hsl(var(--accent-amber) / 0.3) 0%, hsl(var(--accent-amber) / 0.1) 50%, transparent 80%)',
                         filter: 'blur(12px)',
                       }}
                     />
@@ -281,8 +282,8 @@ export function ExplorationPodium({ entries, metric, currentUserId, seasonColor 
                         key={continent}
                         className="text-[11px] px-2 py-0.5 text-muted-foreground rounded-md whitespace-nowrap"
                         style={{
-                          background: 'rgba(0, 0, 0, 0.04)',
-                          border: '1px solid rgba(0, 0, 0, 0.08)',
+                          background: 'hsl(var(--muted) / 0.5)',
+                          border: '1px solid hsl(var(--border) / 0.3)',
                         }}
                       >
                         {getShortContinent(continent)}

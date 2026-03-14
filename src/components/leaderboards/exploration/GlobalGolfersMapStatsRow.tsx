@@ -19,7 +19,7 @@ interface GlobalGolfersMapStatsRowProps {
 
 export function GlobalGolfersMapStatsRow({
   countriesPlayed,
-  seasonColor = '#006747',
+  seasonColor = 'hsl(var(--accent-amber))',
 }: GlobalGolfersMapStatsRowProps) {
   const gradient = getSeasonGradient(seasonColor);
 
