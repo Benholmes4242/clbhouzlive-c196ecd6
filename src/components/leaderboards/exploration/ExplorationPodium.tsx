@@ -222,17 +222,14 @@ export function ExplorationPodium({ entries, metric, currentUserId, seasonColor 
                     )}
                   </div>
 
-                  {/* Rank badge — circular, bottom-right */}
+                  {/* Rank — plain number */}
                   <div
-                    className="absolute -bottom-1.5 -right-0.5 flex items-center justify-center font-bold text-white shadow-md"
+                    className="absolute -bottom-1.5 -right-0.5 flex items-center justify-center font-bold"
                     style={{
-                      width: config.badgeSize,
-                      height: config.badgeSize,
-                      borderRadius: '50%',
-                      backgroundColor: config.badgeBg,
-                      border: '2px solid white',
-                      fontSize: config.badgeSize * 0.45,
-                      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
+                      fontSize: position === 1 ? 13 : 11,
+                      fontWeight: 700,
+                      color: position === 1 ? 'hsl(var(--accent-amber))' : 'hsl(var(--muted-foreground))',
+                      textShadow: '0 1px 2px rgba(0,0,0,0.3)',
                     }}
                   >
                     {position}
@@ -260,7 +257,7 @@ export function ExplorationPodium({ entries, metric, currentUserId, seasonColor 
                 {/* Stat — season-colored number + muted label */}
                 <motion.p
                   className="font-bold mt-0.5"
-                  style={{ color: seasonColor, fontSize: config.statSize, fontWeight: config.statWeight }}
+                  style={{ color: 'hsl(var(--accent-amber))', fontSize: config.statSize, fontWeight: config.statWeight }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: delay + 0.3, duration: 0.3 }}

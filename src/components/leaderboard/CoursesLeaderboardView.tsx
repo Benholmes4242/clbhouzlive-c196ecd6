@@ -503,7 +503,7 @@ export function CoursesLeaderboardView() {
                 key={index}
                 className="rounded-full transition-colors"
                 style={index === 0 
-                  ? { width: 20, height: 6, background: seasonThemeColor }
+                   ? { width: 20, height: 6, background: 'hsl(var(--accent-amber))' }
                   : { width: 6, height: 6, background: 'hsl(var(--border))' }
                 }
               />
