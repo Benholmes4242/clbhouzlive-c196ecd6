@@ -9,6 +9,16 @@ import { TrendingUp, Trophy, Target, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
 
+// Tour averages — 2026 PGA Tour season
+const TOUR_AVG = {
+  drivingDistance: 301.8,
+  drivingAccuracy: 59.0,
+  gir: 68.5,
+  puttingAverage: 1.790,
+  sandSaves: 49.5,
+  scrambling: 56.8,
+} as const;
+
 function fmt(value: number | null | undefined, type?: 'decimal' | 'percent' | 'yards' | 'currency' | 'signed'): string {
   if (value === null || value === undefined) return '—';
   switch (type) {
