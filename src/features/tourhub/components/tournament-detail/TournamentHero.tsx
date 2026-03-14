@@ -69,8 +69,10 @@ function HeroPill({ children, className }: { children: React.ReactNode; classNam
         className
       )}
       style={{ 
-        background: 'rgba(0,0,0,0.35)', 
-        backdropFilter: 'blur(12px)',
+        background: 'rgba(0, 0, 0, 0.35)', 
+        backdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
       }}
     >
       {children}
@@ -148,17 +150,6 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
             style={{ strokeWidth: 1.5, filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.7)) drop-shadow(0 0px 8px rgba(0,0,0,0.3))' }}
           />
         </button>
-
-        {/* Status Badge - top-right */}
-        <motion.div 
-          className="absolute right-4 z-10"
-          style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 8px)' }}
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.4 }}
-        >
-          <StatusBadge status={tournament.status} />
-        </motion.div>
 
         {/* Content overlay - bottom aligned */}
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">

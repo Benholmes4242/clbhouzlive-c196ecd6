@@ -1,5 +1,5 @@
 /**
- * TournamentDetailTabs - Pill-style tabs with sticky positioning
+ * TournamentDetailTabs - Secondary pill-style tabs
  * TD-05: role="tablist" and role="tab" with aria-selected
  */
 
@@ -34,15 +34,13 @@ interface TournamentDetailTabsProps {
 }
 
 export function TournamentDetailTabs({ activeTab, onTabChange, className, tournamentStatus }: TournamentDetailTabsProps) {
-  const isLive = tournamentStatus === 'inprogress';
   const isCompleted = tournamentStatus === 'closed';
-
   const visibleTabs = isCompleted ? COMPLETED_TABS : DEFAULT_TABS;
 
   return (
     <div className={cn("sticky top-0 z-20 bg-background/95 backdrop-blur-md py-3", className)}>
       <div 
-        className="flex gap-1"
+        className="flex gap-1.5"
         role="tablist"
         aria-label="Tournament Sections"
       >
@@ -56,12 +54,16 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className, tourna
               aria-selected={isActive}
               onClick={() => onTabChange(tab.value)}
               className={cn(
-                "relative flex-1 flex items-center justify-center gap-1 rounded-lg py-2.5 text-[13px] font-semibold",
-                "min-h-[44px] transition-all duration-200 active:scale-[0.95]",
-                isActive 
-                  ? "bg-foreground text-background" 
-                  : "bg-transparent text-muted-foreground"
+                "px-3 py-1.5 text-[13px] font-semibold transition-all active:scale-[0.95]",
+                isActive
+                  ? "text-foreground"
+                  : "text-muted-foreground"
               )}
+              style={{
+                borderRadius: 20,
+                backgroundColor: isActive ? '#475569' : 'transparent',
+                color: isActive ? '#fff' : undefined,
+              }}
             >
               {tab.label}
             </button>
