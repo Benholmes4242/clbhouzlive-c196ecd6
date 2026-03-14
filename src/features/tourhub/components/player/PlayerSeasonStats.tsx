@@ -67,7 +67,7 @@ function StatRow({ label, value, trend, barPercent, barIndex = 0 }: StatRowProps
             fontWeight: 700,
             fontVariantNumeric: 'tabular-nums',
             color: hasValue
-              ? (trend === 'positive' ? 'rgb(34,197,94)' : trend === 'negative' ? 'hsl(var(--destructive))' : undefined)
+              ? (trend === 'positive' ? 'hsl(var(--accent-amber))' : trend === 'negative' ? 'hsl(var(--muted-foreground))' : undefined)
               : undefined,
           }} className={hasValue ? (trend ? '' : 'text-foreground') : 'text-muted-foreground'}>
             {mainValue}
@@ -120,7 +120,7 @@ function SGBar({ label, value }: SGBarProps) {
           fontSize: '15px',
           fontWeight: 700,
           fontVariantNumeric: 'tabular-nums',
-          color: isPositive ? 'hsl(var(--accent-amber) / 0.9)' : 'hsl(var(--destructive))',
+          color: isPositive ? 'hsl(var(--accent-amber))' : 'hsl(var(--muted-foreground))',
         }}>
           {formattedValue}
         </span>
@@ -132,7 +132,7 @@ function SGBar({ label, value }: SGBarProps) {
           className="absolute top-0 bottom-0"
           style={{
             borderRadius: '2.5px',
-            backgroundColor: isPositive ? 'hsl(var(--accent-amber) / 0.9)' : 'hsl(var(--destructive))',
+            backgroundColor: isPositive ? 'hsl(var(--accent-amber))' : 'hsl(var(--muted-foreground) / 0.5)',
             width: `${barWidth}%`,
             left: isPositive ? '50%' : `${50 - barWidth}%`,
           }}

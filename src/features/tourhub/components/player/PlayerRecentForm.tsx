@@ -28,16 +28,16 @@ export function PlayerRecentForm({ playerId }: PlayerRecentFormProps) {
       <div
         style={{
           padding: '12px 16px',
-          backgroundColor: 'rgba(220,38,38,0.08)',
-          borderLeft: '3px solid hsl(var(--destructive))',
+          backgroundColor: 'hsl(var(--muted) / 0.2)',
+          borderLeft: '3px solid hsl(var(--muted-foreground) / 0.3)',
           borderBottom: '1px solid hsl(var(--border) / 0.1)',
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
         }}
       >
-        <TrendingDown style={{ width: 16, height: 16, color: 'hsl(var(--destructive))', flexShrink: 0 }} />
-        <span style={{ fontSize: 13, fontWeight: 600, color: 'hsl(var(--destructive))' }}>
+        <TrendingDown style={{ width: 16, height: 16, color: 'hsl(var(--muted-foreground))', flexShrink: 0 }} />
+        <span style={{ fontSize: 13, fontWeight: 600, color: 'hsl(var(--muted-foreground))' }}>
           Out of form · missed last {cutCount} {cutCount === 1 ? 'cut' : 'cuts'}
         </span>
       </div>
@@ -56,15 +56,15 @@ export function PlayerRecentForm({ playerId }: PlayerRecentFormProps) {
 
   if (avgPosition <= 5) {
     formLabel = 'On fire';
-    textColor = 'rgb(34,197,94)';
-    bgColor = 'rgba(34,197,94,0.08)';
-    borderColor = 'rgb(34,197,94)';
+    textColor = 'hsl(var(--accent-amber))';
+    bgColor = 'hsl(var(--accent-amber) / 0.08)';
+    borderColor = 'hsl(var(--accent-amber))';
     Icon = TrendingUp;
   } else if (avgPosition <= 10) {
     formLabel = 'In form';
-    textColor = 'rgb(34,197,94)';
-    bgColor = 'rgba(34,197,94,0.08)';
-    borderColor = 'rgb(34,197,94)';
+    textColor = 'hsl(var(--accent-amber))';
+    bgColor = 'hsl(var(--accent-amber) / 0.08)';
+    borderColor = 'hsl(var(--accent-amber))';
     Icon = TrendingUp;
   } else if (avgPosition <= 25) {
     formLabel = 'Steady';
@@ -74,9 +74,9 @@ export function PlayerRecentForm({ playerId }: PlayerRecentFormProps) {
     Icon = Minus;
   } else {
     formLabel = 'Out of form';
-    textColor = 'hsl(var(--destructive))';
-    bgColor = 'rgba(220,38,38,0.08)';
-    borderColor = 'hsl(var(--destructive))';
+    textColor = 'hsl(var(--muted-foreground))';
+    bgColor = 'hsl(var(--muted) / 0.2)';
+    borderColor = 'hsl(var(--muted-foreground) / 0.3)';
     Icon = TrendingDown;
   }
 
