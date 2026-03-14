@@ -191,13 +191,13 @@ export function CollegeProfilePage() {
 
         {/* Content — centered */}
         {isLoading ? (
-          <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8 pt-20">
-            <div className="w-[140px] h-[140px] rounded-full bg-white/10 animate-pulse mb-4" />
+          <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8" style={{ paddingTop: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 80px)' }}>
+            <div className="w-[140px] h-[140px] bg-white/10 animate-pulse mb-4" style={{ borderRadius: '34%' }} />
             <div className="h-8 w-48 bg-white/10 rounded animate-pulse mb-2" />
             <div className="h-4 w-32 bg-white/10 rounded animate-pulse" />
           </div>
-        ) : college ? (
-          <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8 pt-20">
+        ) : (college || stats) ? (
+          <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8" style={{ paddingTop: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 80px)' }}>
             {/* Season label */}
             <motion.span
               initial={{ opacity: 0 }}
