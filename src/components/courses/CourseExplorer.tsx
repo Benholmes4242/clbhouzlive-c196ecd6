@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, MapPin, X, ChevronDown, RefreshCw } from 'lucide-react';
+import { Search, MapPin, X, ChevronDown, RefreshCw, AlertCircle } from 'lucide-react';
 import VirtualizedCourseList from './VirtualizedCourseList';
 import { YourNetworkSection } from './network';
 import { Skeleton } from '@/components/ui/skeleton';
