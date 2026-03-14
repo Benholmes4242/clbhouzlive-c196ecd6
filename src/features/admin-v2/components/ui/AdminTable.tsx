@@ -187,6 +187,7 @@ export function AdminTable<T>({
   stickyHeader = true,
 }: AdminTableProps<T>) {
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
 
   const table = useReactTable({
     data,
