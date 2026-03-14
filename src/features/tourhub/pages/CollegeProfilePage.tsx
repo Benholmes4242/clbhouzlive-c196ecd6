@@ -317,7 +317,7 @@ export function CollegeProfilePage() {
             <div style={{ width: 1 }} className="bg-border/50" />
             <GlassStatCell label="WINS" value={String(stats.wins_total)} highlight={stats.wins_total > 0} />
             <div style={{ width: 1 }} className="bg-border/50" />
-            <GlassStatCell label="ALUMNI" value={String(stats.player_count)} />
+            <GlassStatCell label="TOP 10s" value={String(stats.top10_total)} highlight={stats.top10_total > 0} />
           </motion.div>
         </div>
       )}
