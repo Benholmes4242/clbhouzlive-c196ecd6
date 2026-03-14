@@ -28,14 +28,14 @@ export function RoundSelector({ rounds, activeRound, onRoundChange, className }:
             aria-selected={isActive}
             onClick={() => onRoundChange(round)}
             className={cn(
-              "px-4 min-h-[36px] text-sm whitespace-nowrap transition-all active:scale-[0.97] font-semibold",
+              "px-3 py-1.5 text-[13px] whitespace-nowrap transition-all active:scale-[0.95] font-semibold",
               isActive
                 ? "text-white"
-                : "text-muted-foreground bg-muted"
+                : "text-muted-foreground"
             )}
             style={{
               borderRadius: 20,
-              ...(isActive ? { backgroundColor: '#475569' } : {}),
+              backgroundColor: isActive ? '#475569' : 'transparent',
             }}
           >
             {round}
