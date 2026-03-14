@@ -49,13 +49,15 @@ async function fetchAllUsers(): Promise<AdminUserRow[]> {
       created_at
     `)
     .is('deleted_at', null)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .limit(10000); // Explicit limit — Supabase default is 1000 which silently truncates
 
   if (error) throw error;
 
   const { data: roles } = await supabase
     .from('user_roles')
-    .select('user_id, role');
+    .select('user_id, role')
+    .limit(10000);
 
   const roleMap = new Map((roles ?? []).map(r => [r.user_id, r.role]));
 

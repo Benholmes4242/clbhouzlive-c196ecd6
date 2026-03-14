@@ -193,16 +193,25 @@ async function fetchAuthAnalytics(period: AnalyticsPeriod): Promise<AuthAnalytic
 
   const authEventNames = ['signup_success', 'signup_failed', 'login_success', 'login_failed', 'auth_failed'];
 
-  const [authEvents, allProfiles] = await Promise.all([
+  const [authEvents, totalProfilesRes, completedOnboardingRes, profileIssuesData] = await Promise.all([
     supabase
       .from('analytics_events')
       .select('created_at, name, user_id')
       .in('name', authEventNames)
       .gte('created_at', since),
-    supabase
-      .from('user_profiles')
-      .select('id, username, has_completed_onboarding, profile_photo_url, created_at')
+    supabase.from('user_profiles')
+      .select('id', { count: 'exact', head: true })
       .is('deleted_at', null),
+    supabase.from('user_profiles')
+      .select('id', { count: 'exact', head: true })
+      .is('deleted_at', null)
+      .eq('has_completed_onboarding', true),
+    supabase.from('user_profiles')
+      .select('id, username, has_completed_onboarding, profile_photo_url, created_at')
+      .is('deleted_at', null)
+      .or('has_completed_onboarding.is.false,profile_photo_url.is.null,username.is.null')
+      .limit(20)
+      .order('created_at', { ascending: false }),
   ]);
 
   const events = authEvents.data ?? [];
@@ -212,23 +221,19 @@ async function fetchAuthAnalytics(period: AnalyticsPeriod): Promise<AuthAnalytic
   const loginSuccess  = events.filter(e => e.name === 'login_success');
   const loginFail     = events.filter(e => e.name === 'login_failed' || e.name === 'auth_failed');
 
-  const profiles = allProfiles.data ?? [];
-  const onboardingComplete = profiles.filter((p: any) => p.has_completed_onboarding).length;
-  const onboardingTotal    = profiles.length;
+  const onboardingTotal    = totalProfilesRes.count ?? 0;
+  const onboardingComplete = completedOnboardingRes.count ?? 0;
 
-  const profileIssues = profiles
-    .filter((p: any) => !p.has_completed_onboarding || !p.profile_photo_url || !p.username)
-    .slice(0, 20)
-    .map((p: any) => ({
-      id:        p.id,
-      username:  p.username,
-      issue:     !p.has_completed_onboarding
-        ? 'Incomplete onboarding'
-        : !p.profile_photo_url
-          ? 'No avatar'
-          : 'Missing username',
-      createdAt: p.created_at,
-    }));
+  const profileIssues = (profileIssuesData.data ?? []).map((p: any) => ({
+    id:        p.id,
+    username:  p.username,
+    issue:     !p.has_completed_onboarding
+      ? 'Incomplete onboarding'
+      : !p.profile_photo_url
+        ? 'No avatar'
+        : 'Missing username',
+    createdAt: p.created_at,
+  }));
 
   const totalSignups = signupSuccess.length + signupFail.length;
   const totalLogins  = loginSuccess.length + loginFail.length;

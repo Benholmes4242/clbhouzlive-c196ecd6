@@ -47,6 +47,11 @@ function parseCSV(text: string): { headers: string[]; rows: Record<string, strin
 
 const REQUIRED_FIELDS = ['name', 'country', 'continent'];
 
+const VALID_CONTINENTS = [
+  'Africa', 'Antarctica', 'Asia', 'Europe',
+  'North America', 'Oceania', 'South America',
+] as const;
+
 interface ValidatedRow {
   data: Record<string, string>;
   valid: boolean;
@@ -55,8 +60,12 @@ interface ValidatedRow {
 
 function validateRow(row: Record<string, string>): ValidatedRow {
   const errors: string[] = [];
-  for (const field of REQUIRED_FIELDS) {
-    if (!row[field]?.trim()) errors.push(`Missing ${field}`);
+  if (!row['name']?.trim())    errors.push('Missing name');
+  if (!row['country']?.trim()) errors.push('Missing country');
+  if (!row['continent']?.trim()) {
+    errors.push('Missing continent');
+  } else if (!(VALID_CONTINENTS as readonly string[]).includes(row['continent'].trim())) {
+    errors.push(`Invalid continent "${row['continent']}" — must be one of: ${VALID_CONTINENTS.join(', ')}`);
   }
   return { data: row, valid: errors.length === 0, errors };
 }

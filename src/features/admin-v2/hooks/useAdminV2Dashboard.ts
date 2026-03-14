@@ -165,9 +165,9 @@ async function fetchActivityTrend(days = 14): Promise<ActivityTrendDay[]> {
   const iso = startDate.toISOString();
 
   const [users, posts, reviews] = await Promise.all([
-    supabase.from('user_profiles').select('created_at').gte('created_at', iso).is('deleted_at', null),
-    supabase.from('posts').select('created_at').gte('created_at', iso),
-    supabase.from('course_ratings').select('created_at').gte('created_at', iso),
+    supabase.from('user_profiles').select('created_at').gte('created_at', iso).is('deleted_at', null).limit(5000),
+    supabase.from('posts').select('created_at').gte('created_at', iso).limit(5000),
+    supabase.from('course_ratings').select('created_at').gte('created_at', iso).limit(5000),
   ]);
 
   const buckets: Record<string, ActivityTrendDay> = {};

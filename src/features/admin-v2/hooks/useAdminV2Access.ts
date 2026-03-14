@@ -218,7 +218,7 @@ export function useAdminV2Verifications() {
   const counts = {
     all:      data.length,
     pending:  data.filter(v => v.status === 'pending').length,
-    approved: data.filter(v => v.status === 'approved').length,
+    approved: data.filter(v => v.status === 'approved' || v.status === 'accepted').length,
     rejected: data.filter(v => v.status === 'rejected' || v.status === 'declined').length,
     business: data.filter(v => v.type === 'business').length,
     golfer:   data.filter(v => v.type === 'golfer').length,
