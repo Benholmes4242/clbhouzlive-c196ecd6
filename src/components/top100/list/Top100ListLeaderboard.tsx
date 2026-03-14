@@ -85,8 +85,8 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-3">
-            <span className="text-2xl">🏆</span>
+          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
+            <Trophy className="w-6 h-6 text-muted-foreground" />
           </div>
           <p className="text-sm font-semibold text-foreground">
             Be the first
