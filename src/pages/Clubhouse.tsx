@@ -38,6 +38,8 @@ import { MediaErrorBoundary } from '@/components/media-system/MediaErrorBoundary
 import { useVideoAnalytics } from '@/components/media-system/hooks/useVideoAnalytics';
 import type { FeedPost, TournamentResultFeedPost } from '@/components/media-system/types/media';
 import { TournamentResultCard } from '@/components/clubhouse/cinematic/TournamentResultCard';
+import { useTournamentLiveFeed } from '@/components/media-system/hooks/useTournamentLiveFeed';
+import { injectLiveTournamentCards } from '@/components/media-system/utils/feedAlgorithm';
 
 // ── Clubhouse UI overlays ──
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
