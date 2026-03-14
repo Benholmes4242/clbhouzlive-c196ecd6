@@ -164,11 +164,9 @@ export function TournamentDetailPage() {
       <TourHubShell immersive>
         <div className="animate-pulse">
           <div 
+            className="animate-pulse bg-muted"
             style={{ 
-              minHeight: 'calc(45dvh + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
-              background: 'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--background)) 50%, hsl(var(--muted)) 75%)',
-              backgroundSize: '200% 100%',
-              animation: 'shimmer 1.5s infinite',
+              minHeight: 'calc(45dvh + var(--sat, env(safe-area-inset-top, 0px)))',
             }}
           />
           <div className="space-y-4 mt-6 px-4">
