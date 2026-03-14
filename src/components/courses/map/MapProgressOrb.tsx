@@ -25,7 +25,7 @@ export const MapProgressOrb: React.FC<MapProgressOrbProps> = ({
   playedCount,
   totalCount,
   scope,
-  seasonColor = '#3EBD93',
+  seasonColor = '#f59e0b',
   onMilestoneClick,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
