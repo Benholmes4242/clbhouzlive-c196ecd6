@@ -62,7 +62,7 @@ function RunnerCard({
         style={{
           width: 26,
           height: 26,
-          background: index === 0 ? '#94A3B8' : '#C2875A',
+          background: index === 0 ? 'rgba(148,163,184,0.9)' : 'rgba(194,135,90,0.9)',
         }}
       >
         <span style={{ fontSize: 11, fontWeight: 700, color: 'white' }}>{index + 2}</span>
