@@ -14,17 +14,16 @@ import { useBatchCollegeAlumni } from '../../hooks/useBatchCollegeAlumni';
 import { FranchiseCard } from './FranchiseCard';
 import { FranchiseMovers } from './FranchiseMovers';
 
-type MetricTab = 'earnings' | 'wins' | 'cuts' | 'top10s' | 'movers';
+type MetricTab = 'earnings' | 'wins' | 'top10s' | 'movers';
 
 const METRIC_TABS: { value: MetricTab; label: string }[] = [
   { value: 'earnings', label: 'Earnings' },
   { value: 'wins', label: 'Wins' },
-  { value: 'cuts', label: 'Cuts' },
   { value: 'top10s', label: 'Top 10s' },
   { value: 'movers', label: 'Movers' },
 ];
 
-const VALID_METRICS = new Set<string>(['earnings', 'wins', 'cuts', 'top10s', 'movers']);
+const VALID_METRICS = new Set<string>(['earnings', 'wins', 'top10s', 'movers']);
 
 interface FranchiseLeaderboardProps {
   limit?: number;
@@ -53,7 +52,6 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
     const getValue = (s: CollegeSeasonStats) => {
       switch (activeMetric) {
         case 'wins': return s.wins_total;
-        case 'cuts': return s.cuts_total;
         case 'top10s': return s.top10_total;
         default: return s.earnings_total;
       }

@@ -19,7 +19,7 @@ interface FranchiseCardProps {
   college: CollegeMedia | null;
   rank?: number;
   maxValue?: number;
-  activeMetric?: 'earnings' | 'wins' | 'cuts' | 'top10s';
+  activeMetric?: 'earnings' | 'wins' | 'top10s';
   previousRank?: number;
   status?: CollegeStatus | null;
   momentum?: CollegeMomentum | null;
