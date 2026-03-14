@@ -17,7 +17,6 @@ export type SkillAttributeKey = 'power' | 'precision' | 'scoring' | 'recovery' |
 export interface SkillAttribute {
   name: string;
   key: SkillAttributeKey;
-  icon: string;
   color: string;
   gradient: string;
   score: number; // 0-100
