@@ -7,8 +7,9 @@ import { useNavigate } from 'react-router-dom';
 import { VideoPlayer } from './VideoPlayer';
 import { ImageViewer } from './ImageViewer';
 import { MediaCarousel } from './MediaCarousel';
-import type { FeedPost, TournamentResultFeedPost } from './types/media';
+import type { FeedPost, TournamentResultFeedPost, TournamentLiveFeedPost } from './types/media';
 import { TournamentResultCard } from '@/components/clubhouse/cinematic/TournamentResultCard';
+import { TournamentLiveCard } from '@/components/clubhouse/cinematic/TournamentLiveCard';
 
 interface FeedItemProps {
   post: FeedPost;
@@ -34,6 +35,26 @@ export function FeedItem({
 
   const isMultiMedia = post.mediaItems.length > 1;
   const media = post.mediaItems[0];
+
+  // Live tournament cards render as full-bleed inline items
+  if (post.postType === 'tournament_live') {
+    return (
+      <div
+        ref={ref}
+        className="relative w-full flex-shrink-0"
+        style={{ height: '100dvh' }}
+      >
+        <TournamentLiveCard
+          post={post as TournamentLiveFeedPost}
+          isActive={isActive}
+          onLike={onLike ? () => onLike(post) : () => {}}
+          onComment={onComment ?? (() => {})}
+          likeOverride={getLikeState ? getLikeState(post) : undefined}
+          commentCountOverride={getCommentCount ? getCommentCount(post) : undefined}
+        />
+      </div>
+    );
+  }
 
   // Tournament result cards render as full-bleed inline items
   if (post.postType === 'tournament_result' && post.tournamentMeta) {

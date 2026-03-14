@@ -38,6 +38,8 @@ import { MediaErrorBoundary } from '@/components/media-system/MediaErrorBoundary
 import { useVideoAnalytics } from '@/components/media-system/hooks/useVideoAnalytics';
 import type { FeedPost, TournamentResultFeedPost } from '@/components/media-system/types/media';
 import { TournamentResultCard } from '@/components/clubhouse/cinematic/TournamentResultCard';
+import { useTournamentLiveFeed } from '@/components/media-system/hooks/useTournamentLiveFeed';
+import { injectLiveTournamentCards } from '@/components/media-system/utils/feedAlgorithm';
 
 // ── Clubhouse UI overlays ──
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
@@ -183,7 +185,13 @@ const ClubhouseContent = () => {
   const friendsFeed = useFriendsFeed(user?.id);
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
   
-  const posts = activeFeed.posts;
+  // ── Live tournament injection ──
+  const { livePosts, liveTourSlugs } = useTournamentLiveFeed();
+  
+  const posts = useMemo(
+    () => injectLiveTournamentCards(activeFeed.posts, livePosts, liveTourSlugs),
+    [activeFeed.posts, livePosts, liveTourSlugs]
+  );
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? true;
   
@@ -207,7 +215,9 @@ const ClubhouseContent = () => {
   
   // ── Active post derivation ──
   const { activePost, golfCourse, activeReview, isActiveReview, isActiveVideo } = useActivePostDerived(posts, activeIndex);
-  const isTournamentCardActive = activePost?.postType === 'tournament_result';
+  const isTournamentCardActive =
+    activePost?.postType === 'tournament_result' ||
+    activePost?.postType === 'tournament_live';
 
   // Hide bottom nav when tournament card is active
   const { setVisible: setBottomNavVisible } = useBottomNavigation();
@@ -408,7 +418,8 @@ const ClubhouseContent = () => {
       ) : null}
 
       {/* ═══ TOURNAMENT RESULT OVERLAY (comments/more options only — card renders inline in feed) ═══ */}
-      {activePost && posts.length > 0 && activePost.postType === 'tournament_result' && (
+      {activePost && posts.length > 0 &&
+        (activePost.postType === 'tournament_result' || activePost.postType === 'tournament_live') && (
         <>
           {/* Comments sheet for tournament posts */}
           <CommentsSheet
@@ -439,7 +450,7 @@ const ClubhouseContent = () => {
       )}
 
       {/* ═══ OVERLAY LAYER (non-tournament posts only) ═══ */}
-      {activePost && posts.length > 0 && activePost.postType !== 'tournament_result' && (
+      {activePost && posts.length > 0 && activePost.postType !== 'tournament_result' && activePost.postType !== 'tournament_live' && (
         <>
           {/* Review overlay — z-10 */}
           <AnimatePresence>
@@ -577,7 +588,7 @@ const ClubhouseContent = () => {
       )}
 
       {/* ═══ PAGE-LEVEL SCRUBBER (non-tournament only) ═══ */}
-      {activePost?.postType !== 'tournament_result' && isActiveVideo && activeVideoRef && (
+      {activePost?.postType !== 'tournament_result' && activePost?.postType !== 'tournament_live' && isActiveVideo && activeVideoRef && (
         <Scrubber
           videoRef={activeVideoRef}
           videoElement={activeVideoElement}
