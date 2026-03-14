@@ -32,7 +32,7 @@ export const Top100CourseListItem: React.FC<Top100CourseListItemProps> = ({
       <div className="flex items-stretch rounded-[22px] bg-card shadow-sm border border-border/60 overflow-hidden">
         {/* Rank column */}
         <div className="flex w-14 items-center justify-center flex-shrink-0 bg-card">
-          <span className="text-xl font-semibold text-amber-500">
+          <span className="text-xl font-semibold" style={{ color: 'hsl(var(--accent-amber))' }}>
             #{position}
           </span>
         </div>
