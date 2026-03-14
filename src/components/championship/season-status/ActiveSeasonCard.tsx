@@ -101,7 +101,7 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
               cy={ringSize / 2}
               r={ringRadius}
               fill="none"
-              stroke="rgba(0, 0, 0, 0.06)"
+              stroke="hsl(var(--border) / 0.3)"
               strokeWidth={ringStroke}
             />
             {/* Progress arc */}
@@ -154,56 +154,81 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
         </div>
       </div>
 
-      {/* Season Selector Tabs — Pill container */}
-      <div
-        className="rounded-[14px] p-[3px]"
-        style={{ backgroundColor: 'rgba(0, 0, 0, 0.03)' }}
-      >
-        <div className="flex gap-1">
-          {SEASON_ORDER.map((id) => {
-            const seasonConfig = getSeasonConfig(id);
-            const SeasonIcon = seasonConfig.Icon;
-            const state = getSeasonState(id);
-            const isLocked = state === 'locked';
-            const isActive = state === 'active';
-            const tabColor = getTabSeasonColor(id);
+      {/* Season Selector — 2×2 grid of independent tiles */}
+      <div className="grid grid-cols-2 gap-2.5">
+        {SEASON_ORDER.map((id) => {
+          const seasonConfig = getSeasonConfig(id);
+          const SeasonIcon = seasonConfig.Icon;
+          const state = getSeasonState(id);
+          const isLocked = state === 'locked';
+          const isActive = state === 'active';
+          const tabColor = getTabSeasonColor(id);
+          const daysUntil = seasonData[id]?.daysUntilAvailable;
 
-            return (
-              <button
-                key={id}
-                onClick={() => !isLocked && onSeasonSelect?.(id)}
-                disabled={isLocked}
-                className={cn(
-                'flex-1 flex flex-col items-center gap-1.5 px-3 py-3 rounded-xl min-w-0',
-                  'transition-all duration-200 active:scale-[0.97]',
-                  isActive && 'bg-card shadow-[0_2px_8px_rgba(0,0,0,0.08)]',
-                  isLocked && 'cursor-not-allowed',
-                  !isLocked && !isActive && 'hover:opacity-60'
-                )}
-              >
-                <div className="relative">
-                  <SeasonIcon
-                    className={cn('w-6 h-6', isLocked && 'opacity-50')}
-                    style={{ color: isActive ? tabColor : 'hsl(var(--muted-foreground))' }}
+          return (
+            <button
+              key={id}
+              onClick={() => !isLocked && onSeasonSelect?.(id)}
+              disabled={isLocked}
+              className={cn(
+                'relative flex flex-col items-start gap-2 p-3.5 rounded-2xl text-left',
+                'transition-all duration-200 active:scale-[0.97]',
+                isActive && 'bg-card shadow-sm',
+                !isActive && !isLocked && 'bg-muted/40',
+                isLocked && 'bg-muted/20 cursor-not-allowed',
+              )}
+              style={{
+                border: isActive
+                  ? `1.5px solid ${tabColor}30`
+                  : '1.5px solid hsl(var(--border) / 0.3)',
+              }}
+            >
+              {/* Icon row */}
+              <div className="flex items-center justify-between w-full">
+                <SeasonIcon
+                  className="w-5 h-5"
+                  style={{
+                    color: isActive ? tabColor : 'hsl(var(--muted-foreground))',
+                    opacity: isLocked ? 0.4 : 1,
+                  }}
+                />
+                {isActive && (
+                  <span
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: tabColor }}
                   />
-                  {isLocked && (
-                    <Lock className="absolute -bottom-0.5 -right-1 w-2.5 h-2.5 text-muted-foreground/60" />
-                  )}
-                </div>
-                <span
+                )}
+                {isLocked && (
+                  <Lock className="w-3.5 h-3.5 text-muted-foreground/40" />
+                )}
+              </div>
+
+              {/* Label */}
+              <div>
+                <p
                   className={cn(
-                    'font-medium leading-tight text-center whitespace-nowrap',
-                    isActive ? 'text-foreground font-semibold' : 'text-muted-foreground',
-                    isLocked && 'opacity-50'
+                    'font-semibold leading-tight',
+                    isActive ? 'text-foreground' : 'text-muted-foreground',
+                    isLocked && 'opacity-40',
                   )}
-                  style={{ fontSize: '12px' }}
+                  style={{ fontSize: 13 }}
                 >
                   {getShortName(id)}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+                </p>
+                {isLocked && daysUntil && (
+                  <p className="text-[11px] text-muted-foreground/50 mt-0.5">
+                    In {daysUntil}d
+                  </p>
+                )}
+                {isActive && (
+                  <p className="text-[11px] mt-0.5" style={{ color: tabColor }}>
+                    Active
+                  </p>
+                )}
+              </div>
+            </button>
+          );
+        })}
       </div>
     </motion.div>
   );

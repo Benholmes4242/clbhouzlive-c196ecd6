@@ -80,7 +80,7 @@ export const TrophyPodium: React.FC<TrophyPodiumProps> = ({
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: `radial-gradient(ellipse 60% 80% at 50% 35%, ${getSeasonGradient(seasonThemeColor).subtleTint} 0%, transparent 70%)`,
+          background: 'radial-gradient(ellipse 60% 80% at 50% 35%, hsl(var(--accent-amber) / 0.05) 0%, transparent 70%)',
         }}
       />
 
