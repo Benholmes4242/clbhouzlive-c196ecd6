@@ -107,7 +107,7 @@ const ProfileHandicapView = lazy(() => import("./pages/ProfileHandicapView"));
 const ProfileQuestView = lazy(() => import("./pages/ProfileQuestView"));
 const QuestIndexView = lazy(() => import("./pages/QuestIndexView"));
 const QuestReplayView = lazy(() => import("./pages/QuestReplayView"));
-const AdminBackfill = lazy(() => import("./pages/AdminBackfill"));
+
 const UserReviewsPage = lazy(() => import("./pages/UserReviewsPage"));
 // Old Settings page removed - now using SettingsPageV2 via SettingsWrapped
 // Courses page now uses CoursesWrapped (imported above) which handles header/dim reset
