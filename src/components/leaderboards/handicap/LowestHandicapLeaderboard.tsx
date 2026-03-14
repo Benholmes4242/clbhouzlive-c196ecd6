@@ -18,20 +18,14 @@ const VIRTUALIZATION_THRESHOLD = 50;
 const OVERSCAN = 8;
 const STORAGE_KEY_SCROLL = 'handicap-leaderboard-scroll';
 
-const RANK_BADGE_COLORS: Record<number, { bg: string; text: string }> = {
-  1: { bg: '#D4A853', text: 'white' },
-  2: { bg: '#A8B4C0', text: 'white' },
-  3: { bg: '#C4956A', text: 'white' },
-};
-
 // --- Helper components ---
 function HandicapLeaderboardSkeleton() {
   return (
     <div className="space-y-2">
       {Array.from({ length: 3 }).map((_, i) => (
         <div key={i} className="flex items-center gap-3 p-3">
-          <Skeleton className="h-7 w-7 rounded-full" />
-          <Skeleton className="h-11 w-11 rounded-full" />
+          <Skeleton className="h-5 w-6 rounded" />
+          <Skeleton className="h-11 w-11 rounded-lg" />
           <div className="flex-1 space-y-1.5">
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-3 w-20" />
@@ -48,7 +42,7 @@ function InlineRetryCard({ onRetry }: { onRetry: () => void }) {
     <div className="py-4 px-5">
       <button
         onClick={onRetry}
-        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-muted text-sm text-muted-foreground hover:bg-muted/80 active:scale-[0.98] transition-all"
+        className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-muted text-sm text-muted-foreground active:scale-[0.98] active:opacity-70 transition-all"
       >
         Couldn't load more entries · Tap to retry
       </button>
@@ -62,7 +56,7 @@ function InitialErrorState({ onRetry }: { onRetry: () => void }) {
       <p className="text-muted-foreground text-sm">Something went wrong loading the leaderboard.</p>
       <button
         onClick={onRetry}
-        className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 active:scale-[0.97] transition-all"
+        className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium active:scale-[0.97] active:opacity-90 transition-all"
       >
         Try again
       </button>
@@ -71,7 +65,7 @@ function InitialErrorState({ onRetry }: { onRetry: () => void }) {
 }
 
 // --- Empty State ---
-function EmptyState({ scope, clubName, seasonColor }: { scope: string; clubName?: string | null; seasonColor?: string }) {
+function EmptyState({ scope, clubName }: { scope: string; clubName?: string | null }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-5 text-center space-y-4">
       <div className="flex items-center justify-center" style={{ opacity: 0.2 }}>
@@ -85,7 +79,7 @@ function EmptyState({ scope, clubName, seasonColor }: { scope: string; clubName?
       <Link
         to="/profile/edit"
         className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-all active:scale-[0.97]"
-        style={{ backgroundColor: seasonColor || 'hsl(var(--primary))' }}
+        style={{ backgroundColor: 'hsl(var(--accent-amber))' }}
       >
         Add Handicap
       </Link>
@@ -108,7 +102,6 @@ function HandicapRow({
   const handicap = entry.handicap_index;
   const statusLabel = getHandicapStatusLabel(handicap);
   const handicapColor = getHandicapStatusColor(handicap, seasonColor);
-  const badgeColors = RANK_BADGE_COLORS[rank];
   const categoryBadge = getHandicapBadgeStyle(handicap, seasonColor);
 
   const initials = (entry.display_name || '?')
@@ -123,31 +116,33 @@ function HandicapRow({
       to={`/profile/${entry.user_id}`}
       className={cn(
         'w-full py-4 flex items-center gap-3 transition-colors active:scale-[0.98]',
-        'hover:bg-[rgba(0,0,0,0.02)]',
         isCurrentUser ? 'px-4' : 'px-5',
       )}
       style={{
-        borderBottom: isCurrentUser ? undefined : '1px solid hsl(var(--border) / 0.15)',
+        borderBottom: isCurrentUser ? undefined : '1px solid hsl(var(--border) / 0.25)',
         ...(isCurrentUser ? {
-          background: 'rgba(212, 168, 83, 0.08)',
-          border: '2px solid rgba(212, 168, 83, 0.2)',
+          background: 'hsl(var(--accent-amber) / 0.08)',
+          border: '2px solid hsl(var(--accent-amber) / 0.2)',
           borderRadius: 12,
         } : {}),
       }}
     >
-      {/* Rank badge */}
-      <div
-        className="w-[22px] h-[22px] rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"
-        style={badgeColors ? {
-          background: badgeColors.bg,
-          color: badgeColors.text,
-        } : {
-          background: 'rgba(0, 0, 0, 0.08)',
-          color: 'hsl(var(--muted-foreground))',
+      {/* Rank */}
+      <span
+        style={{
+          width: 24,
+          fontSize: 12,
+          fontWeight: 700,
+          fontVariantNumeric: 'tabular-nums',
+          textAlign: 'center',
+          flexShrink: 0,
+          color: rank === 1
+            ? 'hsl(var(--accent-amber))'
+            : 'hsl(var(--muted-foreground))',
         }}
       >
         {rank}
-      </div>
+      </span>
 
       {/* Avatar */}
       <SquircleAvatar
@@ -160,7 +155,7 @@ function HandicapRow({
 
       {/* Name & category */}
       <div className="flex-1 min-w-0">
-        <p className={cn('font-semibold text-foreground truncate', isCurrentUser && 'text-primary')}
+        <p className="font-semibold text-foreground truncate"
           style={{ fontSize: 16 }}
         >
           {entry.display_name || 'Unknown'}
@@ -327,7 +322,7 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
     return (
       <div className="px-5 space-y-5">
         {scopeSelector}
-        <EmptyState scope={scope} clubName={clubName} seasonColor={seasonColor} />
+        <EmptyState scope={scope} clubName={clubName} />
       </div>
     );
   }

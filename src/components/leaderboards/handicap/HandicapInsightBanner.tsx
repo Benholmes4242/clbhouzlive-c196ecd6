@@ -7,7 +7,7 @@ interface HandicapInsightBannerProps {
 }
 
 function getRankMessage(rank: number): { message: string; highlightRank: boolean } {
-  if (rank === 1) return { message: `You're #1 — top of the leaderboard! 👑`, highlightRank: true };
+  if (rank === 1) return { message: `You're #1 — top of the leaderboard!`, highlightRank: true };
   if (rank <= 3) return { message: `You're #${rank} — leading the pack!`, highlightRank: true };
   if (rank <= 10) return { message: `You're #${rank} — in the top 10!`, highlightRank: true };
   if (rank <= 50) return { message: `You're #${rank} — climbing the ranks!`, highlightRank: false };
@@ -49,21 +49,21 @@ export function HandicapInsightBanner({
     <div
       className="mx-5 flex items-center gap-3 rounded-[14px]"
       style={{
-        background: 'linear-gradient(to right, rgba(212, 168, 83, 0.08), rgba(212, 168, 83, 0.04))',
-        border: '1px solid rgba(212, 168, 83, 0.15)',
+        background: 'hsl(var(--accent-amber) / 0.06)',
+        border: '1px solid hsl(var(--accent-amber) / 0.15)',
         padding: '12px 16px',
       }}
     >
       <div
         className="flex-shrink-0 flex items-center justify-center"
-        style={{ filter: 'drop-shadow(0 0 8px rgba(212, 168, 83, 0.2))' }}
+        style={{ filter: 'drop-shadow(0 0 8px hsl(var(--accent-amber) / 0.2))' }}
       >
-        <Icon size={28} style={{ color: '#D4A853' }} />
+        <Icon size={28} style={{ color: 'hsl(var(--accent-amber))' }} />
       </div>
       <p className="text-sm font-semibold text-foreground flex-1">
         {isTopRank && highlightNumber ? (
           <>
-            You're <span className="font-bold" style={{ color: '#D4A853' }}>{highlightNumber}</span>
+            You're <span className="font-bold" style={{ color: 'hsl(var(--accent-amber))' }}>{highlightNumber}</span>
             {message.substring(message.indexOf('—'))}
           </>
         ) : (
