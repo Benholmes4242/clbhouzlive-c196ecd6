@@ -172,8 +172,8 @@ function SkillRadarChart({ attributes, animate = true }: { attributes: SkillAttr
     <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="mx-auto" style={{ width: '280px', height: '280px' }}>
       <defs>
         <linearGradient id="skill-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="rgba(245,158,11,0.25)" />
-          <stop offset="100%" stopColor="rgba(245,158,11,0.1)" />
+          <stop offset="0%" stopColor="hsl(var(--accent-amber) / 0.25)" />
+          <stop offset="100%" stopColor="hsl(var(--accent-amber) / 0.1)" />
         </linearGradient>
       </defs>
       {gridRings}
