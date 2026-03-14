@@ -162,11 +162,8 @@ export function LeadersTab() {
           <div className="flex-1 h-[60px] rounded-2xl bg-muted/40 animate-pulse" />
           <div className="flex-1 h-[60px] rounded-2xl bg-muted/40 animate-pulse" />
         </div>
-        <div className="flex gap-2 overflow-hidden px-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-9 w-20 rounded-full bg-muted/40 shrink-0" />
-          ))}
-        </div>
+        <div className="mx-4 mt-3 h-[48px] rounded-2xl bg-muted/40 animate-pulse" />
+        <div className="mx-4 mt-3 h-[72px] rounded-xl bg-muted/40 animate-pulse" />
         <div className="rounded-2xl border border-border/30 overflow-hidden mx-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-[60px] border-b border-border/20 bg-muted/20" />
