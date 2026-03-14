@@ -13,6 +13,7 @@ interface CollegeSearchProps {
 
 export function CollegeSearch({ className }: CollegeSearchProps) {
   const [searchInput, setSearchInput] = useState('');
+  const [focused, setFocused] = useState(false);
   const debouncedSearch = useDebouncedValue(searchInput, 200);
   const { data: results, isLoading } = useCollegeSearch(debouncedSearch);
   const { data: collegeMap } = useCollegeMediaMap();
@@ -33,15 +34,16 @@ export function CollegeSearch({ className }: CollegeSearchProps) {
           placeholder="Search colleges..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          className="w-full pl-11 pr-10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-border focus:shadow-lg"
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          className="w-full pl-11 pr-10 text-foreground placeholder:text-muted-foreground focus:outline-none"
           style={{
             height: 48,
             fontSize: 14,
             background: 'hsl(var(--card))',
-            border: '1px solid hsl(var(--border) / 0.5)',
+            border: `1px solid ${focused ? 'hsl(var(--border))' : 'hsl(var(--border) / 0.5)'}`,
             borderRadius: 16,
             padding: '12px 16px 12px 44px',
-            
           }}
         />
         {searchInput && (
@@ -68,8 +70,10 @@ export function CollegeSearch({ className }: CollegeSearchProps) {
             className="mt-3 space-y-2"
           >
             {isLoading ? (
-              <div className="text-center py-8 text-sm text-muted-foreground">
-                Searching...
+              <div className="flex flex-col gap-2 mt-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="h-[110px] rounded-xl bg-muted/40 animate-pulse" />
+                ))}
               </div>
             ) : results && results.length > 0 ? (
               results.map((stats, index) => (

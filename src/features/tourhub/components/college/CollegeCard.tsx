@@ -22,6 +22,7 @@ interface CollegeCardProps {
 export function CollegeCard({ stats, college, rank, alumni, className }: CollegeCardProps) {
   const displayName = college?.short_name || college?.college_name || stats.normalized_name;
   const slug = stats.normalized_name;
+  const logoUrl = getCollegeLogoUrl(college?.college_name || stats.normalized_name);
 
   return (
     <Link
@@ -37,9 +38,9 @@ export function CollegeCard({ stats, college, rank, alumni, className }: College
     >
       {/* Logo section — left ~110px, matching PlayerCardV2 photo area */}
       <div className="relative w-[110px] shrink-0 bg-muted overflow-hidden flex items-center justify-center">
-        {getCollegeLogoUrl(college?.college_name || stats.normalized_name) ? (
+        {logoUrl ? (
           <img
-            src={getCollegeLogoUrl(college?.college_name || stats.normalized_name)!}
+            src={logoUrl}
             alt={displayName}
             className="w-16 h-16 object-contain"
             loading="lazy"
@@ -64,7 +65,7 @@ export function CollegeCard({ stats, college, rank, alumni, className }: College
 
         {/* Stats row */}
         <div className="flex items-center gap-3 mt-1.5">
-          <span className="inline-flex items-center gap-1 text-[13px] font-semibold font-mono tabular-nums text-[hsl(var(--tab-orange))]">
+          <span className="inline-flex items-center gap-1 text-[13px] font-semibold tabular-nums" style={{ fontVariantNumeric: 'tabular-nums', color: 'hsl(var(--accent-amber))' }}>
             <DollarSign className="w-3.5 h-3.5" />
             {formatCurrency(stats.earnings_total)}
           </span>
@@ -84,7 +85,7 @@ export function CollegeCard({ stats, college, rank, alumni, className }: College
         {alumni && alumni.length > 0 && (
           <div className="flex items-center -space-x-1.5 mt-2 overflow-hidden flex-nowrap">
             {alumni.map(a => {
-              const photoUrl = getPlayerHeadshotUrl(a.full_name, 'pga');
+              const photoUrl = getPlayerHeadshotUrl(a.full_name, a.tour_codes?.[0] ?? 'pga');
               return (
                 <div key={a.id} className="w-5 h-5 shrink-0 border border-card overflow-hidden bg-muted" style={{ borderRadius: '34%' }}>
                   <img src={photoUrl} alt={a.full_name} className="w-full h-full object-cover object-top" loading="lazy"

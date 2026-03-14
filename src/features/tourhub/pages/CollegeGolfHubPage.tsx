@@ -155,10 +155,9 @@ export function CollegeGolfHubPage() {
         )}
 
         {/* ← Tour Overview link */}
-        <div className="px-4" style={{ marginTop: 16 }}>
+        <div className="px-4" style={{ marginTop: 20 }}>
           <Link
             to="/tourhub?tab=overview"
-            replace
             className="inline-flex items-center gap-0.5 text-muted-foreground hover:text-foreground transition-colors active:opacity-70"
             style={{ fontSize: 13, fontWeight: 500 }}
           >
