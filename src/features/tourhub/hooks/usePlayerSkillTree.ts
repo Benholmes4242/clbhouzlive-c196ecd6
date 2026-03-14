@@ -17,7 +17,6 @@ export type SkillAttributeKey = 'power' | 'precision' | 'scoring' | 'recovery' |
 export interface SkillAttribute {
   name: string;
   key: SkillAttributeKey;
-  icon: string;
   color: string;
   gradient: string;
   score: number; // 0-100
@@ -50,7 +49,6 @@ export interface SkillLeader {
 // Attribute configuration
 export const SKILL_ATTRIBUTES: Record<SkillAttributeKey, {
   name: string;
-  icon: string;
   color: string;
   gradient: string;
   description: string;
@@ -58,7 +56,6 @@ export const SKILL_ATTRIBUTES: Record<SkillAttributeKey, {
 }> = {
   power: {
     name: 'Driving Distance',
-    icon: '💪',
     color: 'text-red-500',
     gradient: 'from-red-500 to-orange-500',
     description: 'Raw driving distance off the tee',
@@ -66,7 +63,6 @@ export const SKILL_ATTRIBUTES: Record<SkillAttributeKey, {
   },
   precision: {
     name: 'Driving Accuracy',
-    icon: '🎯',
     color: 'text-blue-500',
     gradient: 'from-blue-500 to-indigo-500',
     description: 'Accuracy in fairways and greens',
@@ -74,7 +70,6 @@ export const SKILL_ATTRIBUTES: Record<SkillAttributeKey, {
   },
   scoring: {
     name: 'Birdies per Round',
-    icon: '🔥',
     color: 'text-amber-500',
     gradient: 'from-amber-500 to-yellow-500',
     description: 'Birdie-making ability and low scoring',
@@ -82,7 +77,6 @@ export const SKILL_ATTRIBUTES: Record<SkillAttributeKey, {
   },
   recovery: {
     name: 'Scrambling',
-    icon: '🛡️',
     color: 'text-green-500',
     gradient: 'from-green-500 to-emerald-500',
     description: 'Scrambling and sand save efficiency',
@@ -90,7 +84,6 @@ export const SKILL_ATTRIBUTES: Record<SkillAttributeKey, {
   },
   consistency: {
     name: 'SG Total',
-    icon: '⚡',
     color: 'text-purple-500',
     gradient: 'from-purple-500 to-violet-500',
     description: 'Overall strokes gained performance',

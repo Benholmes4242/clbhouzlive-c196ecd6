@@ -87,7 +87,7 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
       value: player.college_normalized ? (
         <Link
           to={`/tourhub/college-golf/${player.college_normalized}`}
-          className="text-primary hover:underline font-medium active:opacity-70 transition-opacity"
+          className="text-primary font-medium active:opacity-70 transition-opacity"
         >
           {player.college}
         </Link>
@@ -101,8 +101,7 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
 
   return (
     <div className="px-4 py-6">
-      {/* Section header — 22px / 700 / -0.3px */}
-      {/* Section header — 11px / 700 / uppercase / muted */}
+      {/* Section header */}
       <div className="flex items-center gap-2" style={{ marginBottom: '16px' }}>
         <User className="w-4 h-4 text-muted-foreground" />
         <h2 className="text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
@@ -113,7 +112,7 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
       {personalFields.length > 0 && (
         <div>
           {/* Sub-section: PERSONAL — amber */}
-          <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'rgba(245, 158, 11, 0.9)', marginBottom: '12px' }}>
+          <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'hsl(var(--accent-amber) / 0.9)', marginBottom: '12px' }}>
             Personal
           </p>
           <div className="grid grid-cols-2" style={{ gap: '16px' }}>
@@ -131,7 +130,7 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
       {careerFields.length > 0 && (
         <div>
           {/* Sub-section: GOLF CAREER — amber */}
-          <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'rgba(245, 158, 11, 0.9)', marginBottom: '12px' }}>
+          <p style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'hsl(var(--accent-amber) / 0.9)', marginBottom: '12px' }}>
             Golf Career
           </p>
           <div className="grid grid-cols-2" style={{ gap: '16px' }}>

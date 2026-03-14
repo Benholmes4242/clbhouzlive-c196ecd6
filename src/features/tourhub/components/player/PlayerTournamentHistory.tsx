@@ -52,7 +52,7 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                 <Link
                   key={result.id}
                   to={`/tourhub/tournament/${result.tournament_id}`}
-                  className="flex items-center gap-3 group active:scale-[0.98] transition-transform"
+                  className="flex items-center gap-3 active:scale-[0.98] transition-transform"
                   style={{ padding: '12px 0', borderBottom: '1px solid hsl(var(--border) / 0.15)' }}
                 >
                   {/* Position — 14px, weight 700 */}
@@ -63,14 +63,18 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                       fontSize: '13px',
                       fontWeight: 600,
                       fontVariantNumeric: 'tabular-nums',
-                      color: isWin ? 'rgba(245, 158, 11, 0.9)' : 'hsl(var(--foreground))',
+                      color: isWin ? 'hsl(var(--accent-amber))' : 'hsl(var(--foreground))',
                     }}
                   >
-                    {isWin ? <Trophy className="w-4 h-4 inline" style={{ color: 'rgba(245, 158, 11, 0.9)' }} /> : pos}
+                    {isWin ? (
+                      <span className="flex items-center gap-1" aria-label="Winner">
+                        <Trophy className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber))' }} />
+                      </span>
+                    ) : pos}
                   </span>
 
                   {/* Tournament name — 14px, weight 500 */}
-                  <span className="text-foreground flex-1 min-w-0 truncate group-hover:text-primary transition-colors" style={{ fontSize: '15px', fontWeight: 600, letterSpacing: '-0.2px' }}>
+                  <span className="text-foreground flex-1 min-w-0 truncate" style={{ fontSize: '15px', fontWeight: 600, letterSpacing: '-0.2px' }}>
                     {result.tournament_name}
                   </span>
 
@@ -91,7 +95,7 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                       fontWeight: 700,
                       fontVariantNumeric: 'tabular-nums',
                       color: score !== null && score < 0
-                        ? 'rgba(245, 158, 11, 0.9)'
+                        ? 'hsl(var(--accent-amber) / 0.9)'
                         : score !== null && score > 0
                           ? TOUR_COLORS.scoreOverPar
                           : TOUR_COLORS.scoreEven,

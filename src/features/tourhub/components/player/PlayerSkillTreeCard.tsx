@@ -32,13 +32,6 @@ const SKILL_ICON_BG: Record<SkillAttributeKey, { bg: string; text: string }> = {
   consistency: { bg: 'bg-muted', text: 'text-muted-foreground' },
 };
 
-const SKILL_ACCENT_COLORS: Record<SkillAttributeKey, string> = {
-  power: '#EF4444',
-  precision: '#F59E0B',
-  scoring: '#10B981',
-  recovery: '#14B8A6',
-  consistency: '#A855F7',
-};
 
 /** Canonical row labels and units */
 const ROW_CONFIG: Record<SkillAttributeKey, { label: string; unit: string }> = {
@@ -179,8 +172,8 @@ function SkillRadarChart({ attributes, animate = true }: { attributes: SkillAttr
     <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="mx-auto" style={{ width: '280px', height: '280px' }}>
       <defs>
         <linearGradient id="skill-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="rgba(245,158,11,0.25)" />
-          <stop offset="100%" stopColor="rgba(245,158,11,0.1)" />
+          <stop offset="0%" stopColor="hsl(var(--accent-amber) / 0.25)" />
+          <stop offset="100%" stopColor="hsl(var(--accent-amber) / 0.1)" />
         </linearGradient>
       </defs>
       {gridRings}
@@ -188,7 +181,7 @@ function SkillRadarChart({ attributes, animate = true }: { attributes: SkillAttr
       <motion.polygon
         points={dataPoints}
         fill="url(#skill-fill)"
-        stroke="rgba(245, 158, 11, 0.9)"
+        stroke="hsl(var(--accent-amber) / 0.9)"
         strokeWidth="2.5"
         initial={animate ? { opacity: 0, scale: 0.5 } : false}
         animate={animate ? { opacity: 1, scale: 1 } : undefined}
@@ -202,7 +195,7 @@ function SkillRadarChart({ attributes, animate = true }: { attributes: SkillAttr
           cx={p.x}
           cy={p.y}
           r={4}
-          fill="rgba(245, 158, 11, 0.9)"
+          fill="hsl(var(--accent-amber) / 0.9)"
           stroke="white"
           strokeWidth={2}
           initial={animate ? { scale: 0 } : false}
@@ -245,7 +238,7 @@ function SkillTreeEmpty() {
 
 export function PlayerSkillTreeCard({ playerId }: { playerId: string }) {
   const { data: skillTree, isLoading, error } = usePlayerSkillTree(playerId);
-  const { ref, inView } = useInView({ threshold: 0.2, triggerOnce: true });
+  const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true });
 
   const headerContent = (
     <div className="flex items-center gap-2">
