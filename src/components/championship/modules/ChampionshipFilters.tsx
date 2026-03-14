@@ -60,7 +60,7 @@ export function ChampionshipFilters({
               'flex-shrink-0 px-3.5 py-2 text-xs font-medium rounded-xl border transition-colors active:scale-[0.95]',
               divisionFilter === 'all'
                 ? 'bg-card text-foreground font-semibold border-border'
-                : 'bg-card text-muted-foreground border-border hover:border-border/80'
+                : 'bg-card text-muted-foreground border-border'
             )}
           >
             All Divisions
@@ -73,7 +73,7 @@ export function ChampionshipFilters({
                 'flex-shrink-0 px-3.5 py-2 text-xs font-medium rounded-xl border transition-colors active:scale-[0.95]',
                 divisionFilter === division.slug
                   ? 'text-white border-transparent'
-                  : 'bg-card text-muted-foreground border-border hover:border-border/80'
+                  : 'bg-card text-muted-foreground border-border'
               )}
               style={divisionFilter === division.slug ? { backgroundColor: division.color_hex } : undefined}
             >

@@ -66,8 +66,8 @@ const LeaderboardLoadingSkeleton = () => (
   <div className="space-y-2">
     {[1, 2, 3].map((i) => (
       <div key={i} className="flex items-center gap-3 p-3 rounded-xl animate-pulse">
-        <Skeleton className="w-7 h-7 rounded-full" />
-        <Skeleton className="w-10 h-10 rounded-full" />
+        <Skeleton className="w-7 h-7 rounded" />
+        <Skeleton className="w-10 h-10 rounded-lg" />
         <div className="flex-1 space-y-1.5">
           <Skeleton className="h-4 w-32" />
           <Skeleton className="h-3 w-24" />
@@ -82,7 +82,7 @@ const InlineRetryCard = ({ onRetry }: { onRetry: () => void }) => (
   <div className="max-w-md mx-auto mt-4">
     <button
       onClick={onRetry}
-      className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-sq-sm bg-card border border-border text-sm text-muted-foreground hover:text-foreground hover:border-border/80 transition-colors active:scale-[0.98]"
+      className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-sq-sm bg-card border border-border text-sm text-muted-foreground transition-colors active:scale-[0.98] active:opacity-70"
     >
       <RefreshCw className="w-3.5 h-3.5" />
       Couldn't load more entries · Tap to retry
@@ -97,7 +97,7 @@ const InitialErrorState = ({ onRetry }: { onRetry: () => void }) => (
     <p className="text-sm text-muted-foreground mb-4">Check your connection and try again</p>
     <button
       onClick={onRetry}
-      className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 active:scale-[0.97] transition-all"
+      className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium active:scale-[0.97] active:opacity-90 transition-all"
     >
       Retry
     </button>
@@ -694,8 +694,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           <div className="space-y-2">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="py-3 px-4 animate-pulse flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-muted" />
-                <div className="w-11 h-11 rounded-full bg-muted" />
+                <div className="w-8 h-8 rounded bg-muted" />
+                <div className="w-11 h-11 rounded-lg bg-muted" />
                 <div className="flex-1 space-y-2">
                   <div className="h-4 w-32 bg-muted rounded" />
                   <div className="h-3 w-24 bg-muted rounded" />
@@ -746,7 +746,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                   homeClubName={entry.home_club}
                   courses={entry.courses_this_season}
                   isCurrentUser={entry.is_current_user}
-                  seasonColor={timeFilter === 'seasonal' ? seasonThemeColor : '#D4A853'}
+                  seasonColor={timeFilter === 'seasonal' ? seasonThemeColor : 'hsl(var(--accent-amber))'}
                   onClick={() => handleEntryClick(entry.user_id)}
                 />
               ))}
@@ -764,7 +764,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 homeClubName={entry.home_club}
                 courses={entry.courses_this_season}
                   isCurrentUser={entry.is_current_user}
-                  seasonColor={timeFilter === 'seasonal' ? seasonThemeColor : '#D4A853'}
+                  seasonColor={timeFilter === 'seasonal' ? seasonThemeColor : 'hsl(var(--accent-amber))'}
                 onClick={() => handleEntryClick(entry.user_id)}
               />
             ))}
@@ -780,8 +780,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               Invite friends to climb the leaderboard
             </p>
             <button
-              className="text-[14px] font-semibold transition-opacity hover:opacity-80 active:scale-[0.97]"
-              style={{ color: timeFilter === 'seasonal' ? seasonThemeColor : '#D4A853' }}
+              className="text-[14px] font-semibold transition-opacity active:scale-[0.97] active:opacity-70"
+              style={{ color: timeFilter === 'seasonal' ? seasonThemeColor : 'hsl(var(--accent-amber))' }}
               onClick={() => {
                 if (navigator.share) {
                   navigator.share({ title: 'Join me on Clbhouz', url: window.location.origin });

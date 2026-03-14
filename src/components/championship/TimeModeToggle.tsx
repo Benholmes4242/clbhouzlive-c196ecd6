@@ -27,7 +27,7 @@ export const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
     <div className="w-full px-1">
       <div
         className="flex rounded-xl p-1"
-        style={{ backgroundColor: 'rgba(0, 0, 0, 0.04)' }}
+        style={{ backgroundColor: 'hsl(var(--muted) / 0.5)' }}
       >
         {options.map((option) => {
           const isActive = value === option.id;
@@ -40,7 +40,7 @@ export const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
                 'transition-all duration-200 ease-in-out active:scale-[0.97]',
                 isActive
                   ? 'bg-card text-foreground shadow-sm font-semibold'
-                  : 'text-muted-foreground hover:text-foreground'
+                  : 'text-muted-foreground'
               )}
             >
               {option.label}
