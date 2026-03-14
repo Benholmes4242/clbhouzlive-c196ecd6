@@ -29,22 +29,24 @@ export interface CollegeRivalry {
 /**
  * Fetches weekly movers for the current week.
  * direction: 'up' = positive delta, 'down' = negative delta
+ * collegeName: when set, fetches only this college's row regardless of direction
  */
 export function useCollegeWeeklyMovers(options?: {
   direction?: 'up' | 'down';
   metric?: 'earnings' | 'wins' | 'top10s';
   limit?: number;
+  collegeName?: string;
 }) {
-  const { direction = 'up', metric = 'earnings', limit = 10 } = options || {};
+  const { direction = 'up', metric = 'earnings', limit = 10, collegeName } = options || {};
   const seasonId = useCurrentSeasonId();
   const { data: collegeMap } = useCollegeMediaMap();
   
   return useQuery({
-    queryKey: ['college-weekly-movers', seasonId, direction, metric, limit],
+    queryKey: ['college-weekly-movers', seasonId, collegeName || direction, metric, collegeName ? 1 : limit],
     queryFn: async () => {
       if (!seasonId) return [];
       
-      // Fetch the latest available week_start instead of computing it
+      // Fetch the latest available week_start
       const { data: latestWeek } = await supabase
         .from('college_weekly_movers')
         .select('week_start')
@@ -56,6 +58,26 @@ export function useCollegeWeeklyMovers(options?: {
       if (!latestWeek?.week_start) return [];
       
       const weekStart = latestWeek.week_start;
+
+      // Single-college lookup mode
+      if (collegeName) {
+        const { data, error } = await supabase
+          .from('college_weekly_movers')
+          .select('*')
+          .eq('season_id', seasonId)
+          .eq('week_start', weekStart)
+          .eq('normalized_name', collegeName)
+          .maybeSingle();
+
+        if (error) {
+          console.error('[useCollegeWeeklyMovers] Error:', error);
+          throw error;
+        }
+
+        return data
+          ? [{ ...data, college: collegeMap?.get(collegeName) || null } as CollegeWeeklyMover]
+          : [];
+      }
       
       const deltaColumn = {
         earnings: 'earnings_delta',
