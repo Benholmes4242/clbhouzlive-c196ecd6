@@ -66,7 +66,11 @@ export function PlayerTournamentHistory({ playerId }: PlayerTournamentHistoryPro
                       color: isWin ? 'hsl(var(--accent-amber))' : 'hsl(var(--foreground))',
                     }}
                   >
-                    {isWin ? <Trophy className="w-4 h-4 inline" style={{ color: 'rgba(245, 158, 11, 0.9)' }} /> : pos}
+                    {isWin ? (
+                      <span className="flex items-center gap-1" aria-label="Winner">
+                        <Trophy className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber))' }} />
+                      </span>
+                    ) : pos}
                   </span>
 
                   {/* Tournament name — 14px, weight 500 */}
