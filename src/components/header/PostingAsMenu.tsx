@@ -468,7 +468,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             <MenuRow
               icon={<Shield className="h-[18px] w-[18px]" />}
               label="Admin Dashboard"
-              onClick={() => handleNavigate('/admin')}
+              onClick={() => handleNavigate('/admin-v2/dashboard')}
               useLightTheme={useLightTheme}
             />
           )}

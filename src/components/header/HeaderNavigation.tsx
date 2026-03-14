@@ -129,7 +129,7 @@ const HeaderNavigation: React.FC<HeaderNavigationProps> = ({ onInteraction, useL
       return;
     }
     
-    navigate('/admin', { replace: true });
+    navigate('/admin-v2/dashboard', { replace: true });
   };
 
   const handleSettingsClick = () => {
