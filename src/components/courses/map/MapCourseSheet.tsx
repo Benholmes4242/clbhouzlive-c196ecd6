@@ -148,7 +148,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
     if (course?.user_has_rated) {
       return { 
         text: 'Played', 
-        className: 'bg-emerald-500/95 text-white shadow-[0_2px_8px_rgba(16,185,129,0.3)]',
+        className: 'bg-emerald-500/95 text-white shadow-sm',
         icon: <Check className="h-3 w-3 mr-1" />
       };
     }
