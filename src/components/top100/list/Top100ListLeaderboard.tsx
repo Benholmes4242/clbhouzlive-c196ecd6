@@ -1,10 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Users } from 'lucide-react';
+import { Users, Trophy } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ArrowUp, ArrowDown, Minus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 interface FriendLeaderboardEntry {
   id: string;
@@ -46,7 +45,7 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
           Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
         </h2>
         <motion.div 
-          className="text-center py-6 px-4 rounded-sq-md bg-card border border-border/60"
+          className="text-center py-6 px-4 rounded-2xl bg-card border border-border/60"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
@@ -60,12 +59,12 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
           <p className="mt-2 text-sm text-muted-foreground max-w-[260px] mx-auto">
             Follow golfers to compare progress on this Top 100.
           </p>
-          <Button
+          <button
             onClick={() => navigate('/golferstofollow')}
-            className="w-full max-w-[260px] h-11 rounded-sq-sm mt-4"
+            className="w-full max-w-[260px] h-11 rounded-2xl mt-4 bg-foreground text-background text-sm font-semibold active:scale-[0.97] transition-transform"
           >
             Find golfers to follow
-          </Button>
+          </button>
         </motion.div>
       </section>
     );
@@ -80,13 +79,13 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
           Your {listName.replace('Great Britain & Ireland', 'GB&I')} Leaderboard
         </h2>
         <motion.div 
-          className="text-center py-6 px-4 rounded-sq-md bg-card border border-border/60"
+          className="text-center py-6 px-4 rounded-2xl bg-card border border-border/60"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-3">
-            <span className="text-2xl">🏆</span>
+          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
+            <Trophy className="w-6 h-6 text-muted-foreground" />
           </div>
           <p className="text-sm font-semibold text-foreground">
             Be the first
@@ -94,12 +93,12 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
           <p className="mt-2 text-sm text-muted-foreground max-w-[260px] mx-auto">
             Start rating courses to set the pace for your friends.
           </p>
-          <Button
+          <button
             onClick={() => navigate('/courses')}
-            className="w-full max-w-[260px] h-11 rounded-sq-sm mt-4"
+            className="w-full max-w-[260px] h-11 rounded-2xl mt-4 bg-foreground text-background text-sm font-semibold active:scale-[0.97] transition-transform"
           >
             Explore courses
-          </Button>
+          </button>
         </motion.div>
       </section>
     );
@@ -192,11 +191,11 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
 
               {/* Relative position indicator */}
               <div className="mt-0.5 flex items-center justify-center gap-0.5 text-[9px] font-medium rounded-full px-1 py-0.5"
-                style={
-                  isAhead ? { background: 'hsl(var(--accent-amber) / 0.1)', color: 'hsl(var(--accent-amber))' } :
-                  isSame ? { background: 'hsl(var(--muted))', color: 'hsl(var(--muted-foreground))' } :
-                  isBehind ? { background: 'hsl(var(--destructive) / 0.08)', color: 'hsl(var(--destructive) / 0.7)' } : {}
-                }>
+                 style={
+                   isAhead ? { background: 'hsl(var(--accent-amber) / 0.1)', color: 'hsl(var(--accent-amber))' } :
+                   isSame ? { background: 'hsl(var(--muted))', color: 'hsl(var(--muted-foreground))' } :
+                   isBehind ? { background: 'hsl(var(--muted))', color: 'hsl(var(--muted-foreground))' } : {}
+                 }>
                 {isAhead && (
                   <>
                     <ArrowUp className="w-2 h-2" />

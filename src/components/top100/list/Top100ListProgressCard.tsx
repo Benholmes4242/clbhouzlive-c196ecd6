@@ -39,13 +39,12 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
     return (
       <motion.button
         onClick={handleClick}
-        className="mx-4 mt-5 w-[calc(100%-2rem)] text-left px-4 py-3.5 rounded-sq-md border transition-all duration-150 group"
+        className="mx-4 mt-5 w-[calc(100%-2rem)] text-left px-4 py-3.5 rounded-2xl border transition-all duration-150 group"
         style={{
           background: `linear-gradient(135deg, rgba(var(--region-${listSlug === 'gb-i' ? 'gbi' : listSlug}), 0.08) 0%, transparent 100%)`,
           borderColor: theme.ringColor,
           borderWidth: '1px',
         }}
-        whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
       >
         <div className="flex items-center justify-between gap-3">
@@ -79,9 +78,8 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
   return (
     <motion.button
       onClick={handleClick}
-      className="mx-4 mt-5 w-[calc(100%-2rem)] text-left px-4 py-3.5 rounded-sq-md bg-card border border-border transition-all duration-150"
+      className="mx-4 mt-5 w-[calc(100%-2rem)] text-left px-4 py-3.5 rounded-2xl bg-card border border-border transition-all duration-150"
       style={{ borderLeftWidth: '3px', borderLeftColor: theme.ringColor }}
-      whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
     >
       <div className="flex items-center justify-between gap-3">

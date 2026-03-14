@@ -95,7 +95,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
           >
-            <h1 className="text-white text-[22px] font-extrabold tracking-[-0.3px] drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]">
+            <h1 className="text-white text-[22px] font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)]" style={{ letterSpacing: '-0.3px' }}>
               {displayLabel}
             </h1>
           </motion.div>
@@ -115,7 +115,7 @@ export const Top100HeroShell: React.FC<Top100HeroShellProps> = ({
 
       {/* PROGRESS SECTION - on page background with semantic text */}
       {showProgress && (
-        <div className="w-full px-4 py-4 bg-muted/20">
+        <div className="w-full px-4 py-4">
           {/* Top row: X / total (primary) + % complete (secondary) */}
           <div className="flex items-baseline justify-between gap-4">
             <div className="flex items-baseline">

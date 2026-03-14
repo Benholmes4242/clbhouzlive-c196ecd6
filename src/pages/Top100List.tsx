@@ -368,7 +368,7 @@ const Top100List = () => {
 
   if (isLoading) {
     return (
-      <PageRoot className="min-h-screen bg-[var(--bg-page)]" immersive immersiveStatusBar>
+      <PageRoot className="min-h-screen bg-background" immersive immersiveStatusBar>
         <main className="pb-20">
           <div className="animate-pulse space-y-4 pt-0">
             <div className="h-[260px] bg-muted" />
@@ -388,7 +388,7 @@ const Top100List = () => {
   const unplayedCount = courses?.filter(c => !playedCourseIds.has(c.id)).length || 0;
 
   return (
-    <PageRoot className="min-h-screen bg-[var(--bg-page)]" immersive immersiveStatusBar>
+    <PageRoot className="min-h-screen bg-background" immersive immersiveStatusBar>
       {/* 1. Full-bleed Hero + Progress Slab - MUST be direct child of PageRoot */}
       {listSummary && (
         <Top100HeroShell
@@ -495,7 +495,7 @@ const Top100List = () => {
 
           {filteredAndSortedCourses.length === 0 && (
             <div className="text-center py-12 mx-4">
-              <p className="text-muted-foreground text-lg">
+              <p className="text-sm text-muted-foreground">
                 No courses match your current filter
               </p>
             </div>
