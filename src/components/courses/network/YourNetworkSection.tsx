@@ -55,7 +55,7 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
         </h2>
         <button
           onClick={handleViewAll}
-          className="py-2.5 px-1 text-[13px] text-muted-foreground font-medium hover:text-foreground active:scale-[0.97] transition-all flex items-center gap-0.5"
+          className="py-2.5 px-1 text-[13px] text-muted-foreground font-medium active:scale-[0.97] active:opacity-70 transition-all flex items-center gap-0.5"
         >
           View all
           <ChevronRight size={14} />
