@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   useReactTable,
   getCoreRowModel,
@@ -188,6 +188,11 @@ export function AdminTable<T>({
 }: AdminTableProps<T>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
+
+  // Reset shift-click anchor when data changes (search/filter/page change)
+  useEffect(() => {
+    setLastSelectedIndex(null);
+  }, [data]);
 
   const table = useReactTable({
     data,
