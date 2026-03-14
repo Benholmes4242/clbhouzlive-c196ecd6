@@ -1,5 +1,5 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Menu } from 'lucide-react';
+import { Menu, ChevronLeft } from 'lucide-react';
 import { TourHubShell } from '../components';
 import { CollegeCompareHero } from '../components/college/CollegeCompareHero';
 import { useCollegeCompare } from '../hooks/useCollegeCompare';
@@ -25,7 +25,7 @@ export function CollegeComparePage() {
         className="min-h-screen relative px-4 bg-background"
         style={{
           paddingTop: 'max(var(--sat, env(safe-area-inset-top, 0px)), 47px)',
-          paddingBottom: 'calc(var(--sab, 30px) + 16px)',
+          paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)',
         }}
       >
         {/* Burger menu */}
@@ -43,8 +43,19 @@ export function CollegeComparePage() {
           <Menu className="w-[24px] h-[24px] text-foreground" style={{ strokeWidth: 1.5 }} />
         </button>
 
-        {/* Content */}
+        {/* Back CTA */}
         <div style={{ paddingTop: 56 }}>
+          <button
+            onClick={() => navigate('/tourhub/college-golf')}
+            className="inline-flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
+          >
+            <ChevronLeft size={14} />
+            College Golf
+          </button>
+        </div>
+
+        {/* Content */}
+        <div style={{ paddingTop: 8 }}>
           {!hasValidParams ? (
             <div className="text-center py-16">
               <p className="text-base text-muted-foreground mb-4">

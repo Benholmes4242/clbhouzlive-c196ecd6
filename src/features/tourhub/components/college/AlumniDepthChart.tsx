@@ -4,7 +4,7 @@
 
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Crown, Cog, Rocket, ChevronDown, ChevronUp, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollegeAlumni, type CollegeAlumnus } from '../../hooks/useCollegeAlumni';
@@ -25,7 +25,7 @@ interface AlumniRowProps {
 }
 
 const tierBorderColor: Record<TierAccent, string> = {
-  amber: '#f59e0b',
+  amber: 'hsl(var(--accent-amber))',
   blue: '#60A5FA',
   green: '#22C55E',
 };
@@ -170,13 +170,11 @@ function Section({ title, subtitle, icon: Icon, iconColor, alumni, defaultExpand
         </div>
       </button>
       
-      <AnimatePresence initial={false}>
-        <motion.div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }} initial={false} animate={{ height: 'auto' }}>
-          {displayedAlumni.map((alumnus, index) => (
-            <AlumniRow key={alumnus.id} alumnus={alumnus} index={index} tierAccent={tierAccent} />
-          ))}
-        </motion.div>
-      </AnimatePresence>
+      <motion.div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }} initial={false} animate={{ height: 'auto' }}>
+        {displayedAlumni.map((alumnus, index) => (
+          <AlumniRow key={alumnus.id} alumnus={alumnus} index={index} tierAccent={tierAccent} />
+        ))}
+      </motion.div>
       
       {hasMore && (
         <button
