@@ -53,7 +53,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
   return (
     <div className={cn('', className)}>
       {weekLabel && (
-        <div className="flex items-center gap-1.5 text-muted-foreground/50 uppercase mb-3" style={{ fontSize: 11, fontWeight: 600, letterSpacing: '1px' }}>
+        <div className="flex items-center justify-center gap-1.5 text-muted-foreground/50 uppercase mb-3" style={{ fontSize: 11, fontWeight: 600, letterSpacing: '1px' }}>
           <CalendarDays className="w-3.5 h-3.5" />
           {weekLabel}
         </div>
@@ -61,7 +61,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
 
       {/* Rising / Falling toggle — Tier 2 pill tabs */}
       <div
-        className="flex items-center gap-2"
+        className="flex items-center justify-center gap-2"
         role="tablist"
         style={{ marginBottom: 16 }}
       >
