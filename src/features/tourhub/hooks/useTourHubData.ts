@@ -802,6 +802,8 @@ export function useSinglePlayerStatistics(playerId: string | undefined) {
         scrambling: rawExtracted.scrambling ?? null,
         birdies_per_round: rawExtracted.birdies_per_round ?? null,
         strokes_gained_total: rawExtracted.strokes_gained_total ?? null,
+        strokes_gained_tee_green: rawExtracted.strokes_gained_tee_green ?? null,
+        strokes_gained: rawExtracted.strokes_gained ?? null,
       } as TourPlayerStatistics;
     },
     enabled: !!playerId,
