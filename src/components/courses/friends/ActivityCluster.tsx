@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ChevronDown } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
