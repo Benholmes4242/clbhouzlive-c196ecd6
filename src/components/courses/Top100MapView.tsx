@@ -54,7 +54,8 @@ const REGION_CONFIG: Record<
   },
 };
 
-const WANT_TO_PLAY_COLOR = '#F7931E';
+const PLAYED_COLOR = '#f59e0b';       // amber-400 — brand colour, matches accent-amber
+const WANT_TO_PLAY_COLOR = '#22c55e'; // green-500 — aspiration, growth
 
 // Shared fog config
 const GLOBE_FOG_CONFIG: mapboxgl.FogSpecification = {
