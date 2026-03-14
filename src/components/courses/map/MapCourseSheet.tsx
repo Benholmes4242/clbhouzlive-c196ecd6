@@ -258,7 +258,6 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                 )}
                 style={statusBadge.style}
               >
-              >
                 {statusBadge.icon}
                 {statusBadge.text}
               </span>
