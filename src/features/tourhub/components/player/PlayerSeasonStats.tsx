@@ -55,7 +55,7 @@ function StatRow({ label, value, trend, barPercent, barIndex = 0 }: StatRowProps
             fontWeight: 700,
             fontVariantNumeric: 'tabular-nums',
             color: hasValue
-              ? (trend === 'positive' ? '#22C55E' : trend === 'negative' ? '#EF4444' : undefined)
+              ? (trend === 'positive' ? 'rgb(34,197,94)' : trend === 'negative' ? 'hsl(var(--destructive))' : undefined)
               : undefined,
           }} className={hasValue ? (trend ? '' : 'text-foreground') : 'text-muted-foreground'}>
             {mainValue}
@@ -69,7 +69,7 @@ function StatRow({ label, value, trend, barPercent, barIndex = 0 }: StatRowProps
                 style={{
                   height: '100%',
                   borderRadius: '2px',
-                  backgroundColor: 'rgba(245, 158, 11, 0.9)',
+                  backgroundColor: 'hsl(var(--accent-amber) / 0.9)',
                   width: `${Math.min(100, Math.max(0, barPercent))}%`,
                   originX: 0,
                 }}
@@ -108,7 +108,7 @@ function SGBar({ label, value }: SGBarProps) {
           fontSize: '15px',
           fontWeight: 700,
           fontVariantNumeric: 'tabular-nums',
-          color: isPositive ? 'rgba(245, 158, 11, 0.9)' : '#EF4444',
+          color: isPositive ? 'hsl(var(--accent-amber) / 0.9)' : 'hsl(var(--destructive))',
         }}>
           {formattedValue}
         </span>
@@ -120,7 +120,7 @@ function SGBar({ label, value }: SGBarProps) {
           className="absolute top-0 bottom-0"
           style={{
             borderRadius: '2.5px',
-            backgroundColor: isPositive ? 'rgba(245, 158, 11, 0.9)' : '#EF4444',
+            backgroundColor: isPositive ? 'hsl(var(--accent-amber) / 0.9)' : 'hsl(var(--destructive))',
             width: `${barWidth}%`,
             left: isPositive ? '50%' : `${50 - barWidth}%`,
           }}
@@ -133,7 +133,7 @@ function SGBar({ label, value }: SGBarProps) {
   );
 }
 
-const TABS = ['Overview', 'Ball Striking', 'Short Game', 'Strokes Gained'];
+const TABS = ['Overview', 'Ball Striking', 'Short Game', 'SG'];
 
 interface PlayerSeasonStatsProps {
   playerStats: TourPlayerStatistics;
@@ -158,7 +158,10 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
       </div>
 
       {/* Tab bar — sticky pill style */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-md pb-3 pt-1">
+      <div
+        className="sticky top-0 z-20 bg-background/95 backdrop-blur-md pb-3 pt-1"
+        style={{ borderBottom: '1px solid hsl(var(--border) / 0.15)' }}
+      >
         <div className="flex gap-1" role="tablist" aria-label="Season Performance Stats">
           {TABS.map((tab) => {
             const isActive = activeTab === tab;
@@ -174,10 +177,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
                     ? "bg-foreground text-background shadow-sm"
                     : "bg-transparent text-muted-foreground"
                 )}
-                style={{
-                  fontSize: tab === 'Strokes Gained' ? '12px' : '13px',
-                  fontWeight: 600,
-                }}
+                style={{ fontSize: '13px', fontWeight: 600 }}
               >
                 {tab}
               </button>
@@ -199,22 +199,37 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
         >
           {activeTab === 'Overview' && (
             <div>
-              <SubSectionLabel icon={Trophy} label="RESULTS" />
+              <SubSectionLabel icon={Trophy} label="RESULTS" style={{ marginTop: 0 }} />
               <StatRow label="Events Played" value={fmt(playerStats.events_played)} />
-              <StatRow label="Wins" value={fmt(playerStats.wins)} />
+              <StatRow
+                label="Wins"
+                value={fmt(playerStats.wins)}
+                trend={playerStats.wins && playerStats.wins > 0 ? 'positive' : null}
+              />
               <StatRow label="Top 10s" value={fmt(playerStats.top_10s)} barPercent={top10Ratio} barIndex={0} />
               <StatRow label="Top 25s" value={fmt(playerStats.top_25s)} barPercent={top25Ratio} barIndex={1} />
+              <StatRow label="Cuts Made" value={fmt(playerStats.cuts_made)} />
+              <StatRow
+                label="Scoring Average"
+                value={fmt(playerStats.scoring_average, 'decimal')}
+                trend={
+                  playerStats.scoring_average
+                    ? playerStats.scoring_average < 70 ? 'positive'
+                      : playerStats.scoring_average > 72 ? 'negative'
+                      : null
+                    : null
+                }
+              />
 
-              <SubSectionLabel icon={TrendingUp} label="FINANCIALS" style={{ marginTop: '24px' }} />
-              <StatRow label="Earnings" value={fmt(playerStats.earnings, 'currency')} />
+              <SubSectionLabel icon={TrendingUp} label="EARNINGS" style={{ marginTop: '24px' }} />
+              <StatRow label="Season Earnings" value={fmt(playerStats.earnings, 'currency')} />
               <StatRow label="FedEx Points" value={fmt(playerStats.fedex_points)} />
-              <StatRow label="Scoring Average" value={fmt(playerStats.scoring_average, 'decimal')} />
             </div>
           )}
 
           {activeTab === 'Ball Striking' && (
             <div>
-              <SubSectionLabel icon={Target} label="OFF THE TEE & APPROACH" />
+              <SubSectionLabel icon={Target} label="OFF THE TEE & APPROACH" style={{ marginTop: 0 }} />
               <StatRow label="Driving Distance" value={fmt(playerStats.driving_distance, 'yards')} />
               <StatRow label="Driving Accuracy" value={fmt(playerStats.driving_accuracy, 'percent')} />
               <StatRow label="Greens in Regulation" value={fmt(playerStats.greens_in_reg, 'percent')} />
@@ -226,17 +241,16 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
               <StatRow label="Putting Average" value={playerStats.putting_average ? playerStats.putting_average.toFixed(3) : '—'} />
               <StatRow label="Sand Saves" value={fmt(playerStats.sand_saves, 'percent')} />
               <StatRow label="Scrambling" value={fmt(playerStats.scrambling, 'percent')} />
-              <StatRow label="Scoring Average" value={fmt(playerStats.scoring_average, 'decimal')} />
               <StatRow label="Birdies per Round" value={fmt(playerStats.birdies_per_round, 'decimal')} />
             </div>
           )}
 
-          {activeTab === 'Strokes Gained' && (
+          {activeTab === 'SG' && (
             <div>
               <SGBar label="SG: Total" value={playerStats.strokes_gained_total} />
-              <SGBar label="SG: Putting" value={(playerStats as any).strokes_gained_putting ?? null} />
-              <SGBar label="SG: Tee to Green" value={(playerStats as any).strokes_gained_tee_green ?? null} />
-              {!playerStats.strokes_gained_total && (
+              <SGBar label="SG: Tee to Green" value={playerStats.strokes_gained_tee_green ?? null} />
+              <SGBar label="SG: Around Green" value={playerStats.strokes_gained ?? null} />
+              {!playerStats.strokes_gained_total && !playerStats.strokes_gained_tee_green && (
                 <p className="text-muted-foreground text-center" style={{ fontSize: '14px', padding: '24px 0' }}>
                   Strokes Gained data unavailable for this player.
                 </p>
