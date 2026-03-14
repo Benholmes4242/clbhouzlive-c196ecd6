@@ -77,6 +77,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
               initial={{ scale: 1.06 }}
               animate={{ scale: 1 }}
               transition={{ duration: 12, ease: 'linear' }}
+              onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
             />
           ) : (
             <div className="absolute inset-0 w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${category.accentColor}22, ${category.accentColor}44)` }}>
