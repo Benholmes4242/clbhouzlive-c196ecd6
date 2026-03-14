@@ -143,7 +143,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
               <span
                 className="inline-block"
                 style={{
-                  background: 'rgba(245,158,11,0.85)',
+                  background: 'hsl(var(--accent-amber) / 0.85)',
                   color: 'white',
                   fontSize: 13,
                   fontWeight: 600,

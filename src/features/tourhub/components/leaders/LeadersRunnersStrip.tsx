@@ -71,7 +71,7 @@ function RunnerCard({
       {/* Avatar — 36×36, 34% border-radius */}
       <div
         className="flex-shrink-0 overflow-hidden"
-        style={{ width: 36, height: 36, borderRadius: '34%', border: '1px solid hsl(var(--border) / 0.4)' }}
+        style={{ width: 36, height: 36, borderRadius: '34%', border: '1px solid rgba(255,255,255,0.18)' }}
       >
         {photoUrl ? (
           <img src={photoUrl} alt={player.full_name} style={{ width: 36, height: 36, objectFit: 'cover' }} />
