@@ -42,22 +42,22 @@ export function StatusBar({
           className
         )}
         style={{
-          background: 'rgba(var(--muted-rgb, 241, 245, 249), 0.7)',
+          background: 'hsl(var(--muted) / 0.5)',
           backdropFilter: 'blur(8px)',
           border: '1px solid hsl(var(--border))',
-          borderLeft: '3px solid hsl(var(--border))',
+          borderLeft: '3px solid hsl(var(--accent-amber) / 0.6)',
         }}
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
         <div className="flex items-center gap-1.5">
-          <CheckCircle className="w-4 h-4 text-muted-foreground" />
-          <span className="text-xs font-semibold text-foreground uppercase tracking-wide">
+          <CheckCircle className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber) / 0.8)' }} />
+          <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'hsl(var(--foreground))' }}>
             Final
           </span>
         </div>
-        <div className="h-4 w-px bg-border" />
+        <div className="h-4 w-px" style={{ backgroundColor: 'hsl(var(--border))' }} />
         <span className="text-xs text-muted-foreground">Official results</span>
       </motion.div>
     );
@@ -71,30 +71,30 @@ export function StatusBar({
           className
         )}
         style={{
-          background: 'rgba(255, 251, 235, 0.7)',
+          background: 'hsl(var(--accent-amber) / 0.08)',
           backdropFilter: 'blur(8px)',
-          border: '1px solid rgba(245, 158, 11, 0.15)',
-          borderLeft: '3px solid rgb(217, 119, 6)',
+          border: '1px solid hsl(var(--accent-amber) / 0.15)',
+          borderLeft: '3px solid hsl(var(--accent-amber) / 0.7)',
         }}
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
         <div className="flex items-center gap-1.5">
-          <Clock className="w-4 h-4 text-amber-600" />
-          <span className="text-xs font-semibold text-amber-700 uppercase tracking-wide">
+          <Clock className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber))' }} />
+          <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'hsl(var(--accent-amber))' }}>
             Upcoming
           </span>
         </div>
-        <div className="h-4 w-px bg-amber-200/60" />
-        <span className="text-xs text-amber-600">
+        <div className="h-4 w-px" style={{ backgroundColor: 'hsl(var(--accent-amber) / 0.3)' }} />
+        <span style={{ fontSize: '12px', color: 'hsl(var(--accent-amber) / 0.8)' }}>
           {countdownText || 'Tournament has not started'}
         </span>
       </motion.div>
     );
   }
 
-  // Live variant
+  // Live variant — green is semantically correct for "live" status
   return (
     <motion.div
       className={cn(
@@ -102,10 +102,10 @@ export function StatusBar({
         className
       )}
       style={{
-        background: 'rgba(236, 253, 245, 0.7)',
+        background: 'rgba(34, 197, 94, 0.06)',
         backdropFilter: 'blur(8px)',
         border: '1px solid rgba(34, 197, 94, 0.15)',
-        borderLeft: '3px solid #22C55E',
+        borderLeft: '3px solid rgb(34, 197, 94)',
       }}
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
@@ -113,18 +113,18 @@ export function StatusBar({
     >
       <div className="flex items-center gap-1.5">
         <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: 'rgb(34, 197, 94)' }} />
+          <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: 'rgb(34, 197, 94)' }} />
         </span>
-        <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">
+        <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'rgb(34, 197, 94)' }}>
           Live
         </span>
       </div>
 
       {leaderName && (
         <>
-          <span className="text-xs text-emerald-600/60">·</span>
-          <span className="text-xs font-medium text-emerald-700 truncate">
+          <span style={{ color: 'hsl(var(--muted-foreground) / 0.4)' }}>·</span>
+          <span style={{ fontSize: '12px', fontWeight: 500, color: 'hsl(var(--foreground))' }} className="truncate">
             {leaderName}{leaderScore ? ` at ${leaderScore}` : ''}
           </span>
         </>
@@ -132,11 +132,17 @@ export function StatusBar({
 
       {lastUpdatedText && !leaderName && (
         <>
-          <div className="h-4 w-px bg-emerald-200/60" />
-          <span className="text-xs text-emerald-600">
+          <div className="h-4 w-px" style={{ backgroundColor: 'rgba(34, 197, 94, 0.3)' }} />
+          <span style={{ fontSize: '12px', color: 'rgb(34, 197, 94)' }}>
             Updated {lastUpdatedText}
           </span>
         </>
+      )}
+
+      {lastUpdatedText && leaderName && (
+        <span style={{ fontSize: '11px', color: 'hsl(var(--muted-foreground) / 0.5)', marginLeft: 'auto' }}>
+          {lastUpdatedText}
+        </span>
       )}
 
       {onRefresh && (
@@ -145,10 +151,10 @@ export function StatusBar({
           disabled={isRefreshing}
           className={cn(
             "ml-auto flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium",
-            "bg-emerald-100/80 text-emerald-700 hover:bg-emerald-200/80",
-            "transition-all duration-200 active:scale-[0.95]",
+            "active:scale-[0.95] active:opacity-70 transition-all duration-200",
             isRefreshing && "opacity-50 cursor-not-allowed"
           )}
+          style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)', color: 'rgb(34, 197, 94)' }}
         >
           <RefreshCw 
             className={cn(

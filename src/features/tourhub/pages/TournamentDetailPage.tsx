@@ -351,8 +351,24 @@ export function TournamentDetailPage() {
         />
         
         <div className="px-4" style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
-          {/* Status bar */}
-          <div className="pt-5">
+          {/* Canonical back link — always first below hero */}
+          <button
+            onClick={() => {
+              if (window.history.length > 1) {
+                navigate(-1);
+              } else {
+                navigate('/tourhub?tab=schedule');
+              }
+            }}
+            className="flex items-center gap-0.5 text-muted-foreground active:opacity-70 transition-opacity"
+            style={{ fontSize: 13, fontWeight: 500, padding: '12px 0 8px 0' }}
+          >
+            <ChevronLeft size={14} />
+            Back
+          </button>
+
+          {/* Status bar — below back CTA */}
+          <div>
             {isLive && (
               <StatusBar
                 variant="live"
@@ -370,16 +386,6 @@ export function TournamentDetailPage() {
               <StatusBar variant="upcoming" countdownText={countdownText} className="mb-4" />
             )}
           </div>
-
-          {/* Canonical back link */}
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-0.5 text-muted-foreground active:opacity-70 transition-opacity"
-            style={{ fontSize: 13, fontWeight: 500, padding: '12px 0 8px 0' }}
-          >
-            <ChevronLeft size={14} />
-            Tournament
-          </button>
           
           {/* TD-05: Tabs with role="tablist" */}
           <TournamentDetailTabs 
