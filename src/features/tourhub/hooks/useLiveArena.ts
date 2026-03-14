@@ -217,10 +217,21 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
       : 0;
     
     // Derive tour slug from event_type or season
-    const eventType = (tournament.event_type || '').toLowerCase();
-    const tourSlug = eventType.includes('pga') ? 'pga' : 
-                     eventType.includes('european') || eventType.includes('dp') ? 'euro' :
-                     eventType.includes('liv') ? 'liv' : 'pga';
+    const eventType  = (tournament.event_type || '').toLowerCase();
+    const tourName   = (tournament.name       || '').toLowerCase();
+    // Sportradar sets event_type = 'stroke' for all tours — cannot rely on it alone.
+    // Check tournament name and season_id as additional signals.
+    const tourSlug =
+      tourName.includes('liv')                                                         ? 'liv'   :
+      tourName.includes('lpga')                                                        ? 'lpga'  :
+      tourName.includes('champions') || tourName.includes('pga tour champions')        ? 'champ' :
+      tourName.includes('korn ferry') || tourName.includes('kft')                      ? 'kft'   :
+      tourName.includes('dp world') || tourName.includes('european tour')              ? 'euro'  :
+      eventType.includes('liv')                                                         ? 'liv'   :
+      eventType.includes('european') || eventType.includes('dp')                       ? 'euro'  :
+      eventType.includes('lpga')                                                        ? 'lpga'  :
+      eventType.includes('champions')                                                   ? 'champ' :
+      'pga'; // genuine fallback — only after all name and event_type checks fail
     
     const estimatedRound = tournament.cut_round ? Math.min(tournament.cut_round, 4) : 1;
     
