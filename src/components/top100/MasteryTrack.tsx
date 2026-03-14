@@ -162,7 +162,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ region, index, onClick }) =
                 <div className="flex-1 h-2 bg-muted/40 rounded-full overflow-hidden">
                   <motion.div 
                     className="h-full rounded-full"
-                    style={{ backgroundColor: '#3EBD93' }}
+                    style={{ backgroundColor: 'hsl(var(--accent-amber))' }}
                     initial={{ width: 0 }}
                     animate={{ width: `${progressPercent}%` }}
                     transition={{ duration: 0.5, delay: 0.3 }}
