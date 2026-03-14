@@ -374,7 +374,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
             </>
           )}
 
-          {activeTab === 'SG' && (
+          {activeTab === 'Shots Gained' && (
             <div>
               <SubSectionLabel icon={TrendingUp} label="STROKES GAINED" style={{ marginTop: 0 }} />
               <p style={{ fontSize: 12, color: 'hsl(var(--muted-foreground) / 0.5)', marginBottom: 16 }}>
