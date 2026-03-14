@@ -104,10 +104,10 @@ interface SGBarProps {
 
 function SGBar({ label, value }: SGBarProps) {
   if (value === null || value === undefined) return null;
-  const maxWidth = 60;
-  const barWidth = Math.min(maxWidth, Math.abs(value) * 15);
+  const maxWidth = 50;
+  const barWidth = Math.min(maxWidth, (Math.abs(value) / 3.0) * maxWidth);
   const isPositive = value >= 0;
-  const formattedValue = value > 0 ? `+${value.toFixed(2)}` : value.toFixed(2);
+  const formattedValue = value === 0 ? '0.00' : value > 0 ? `+${value.toFixed(2)}` : value.toFixed(2);
 
   return (
     <div
@@ -127,7 +127,7 @@ function SGBar({ label, value }: SGBarProps) {
       </div>
       <div className="relative overflow-hidden" style={{ height: '5px', borderRadius: '2.5px' }} >
         <div className="absolute inset-0" style={{ backgroundColor: 'hsl(var(--border))' }} />
-        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-border z-10" />
+        <div className="absolute left-1/2 top-0 bottom-0 z-10" style={{ width: 1, backgroundColor: 'hsl(var(--border))' }} />
         <motion.div
           className="absolute top-0 bottom-0"
           style={{
