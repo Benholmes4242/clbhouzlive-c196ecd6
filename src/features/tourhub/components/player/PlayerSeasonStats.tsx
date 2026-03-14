@@ -67,7 +67,7 @@ function StatRow({ label, value, trend, barPercent, barIndex = 0 }: StatRowProps
             fontWeight: 700,
             fontVariantNumeric: 'tabular-nums',
             color: hasValue
-              ? (trend === 'positive' ? 'rgb(34,197,94)' : trend === 'negative' ? 'hsl(var(--destructive))' : undefined)
+              ? (trend === 'positive' ? 'hsl(var(--accent-amber))' : trend === 'negative' ? 'hsl(var(--muted-foreground))' : undefined)
               : undefined,
           }} className={hasValue ? (trend ? '' : 'text-foreground') : 'text-muted-foreground'}>
             {mainValue}
