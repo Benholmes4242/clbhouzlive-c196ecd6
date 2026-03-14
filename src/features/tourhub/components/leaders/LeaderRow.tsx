@@ -6,7 +6,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import CountryFlag from '@/components/ui/country-flag';
 import type { LeaderCategory } from './constants';
@@ -54,7 +53,7 @@ export function LeaderRow({
     <motion.div
       initial={{ opacity: 0, x: -12 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.02, duration: 0.25 }}
+      transition={{ delay: Math.min(index * 0.02, 0.3), duration: 0.25 }}
     >
       <Link
         to={`/tourhub/player/${player.id}`}
@@ -67,7 +66,7 @@ export function LeaderRow({
         }}
         aria-label={ariaLabel}
       >
-        {/* Rank — 14px, 600, muted/50, 32px wide, centered */}
+        {/* Rank */}
         <span
           style={{
             width: 32,
@@ -81,12 +80,13 @@ export function LeaderRow({
           {displayRank}
         </span>
 
-        {/* Avatar — 44×44, border-radius 13px */}
+        {/* Avatar — 44×44 */}
         <div className="shrink-0" style={{ width: 44, height: 44 }}>
           {photoUrl ? (
             <img
               src={photoUrl}
               alt={player.fullName}
+              onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
               style={{
                 width: 44,
                 height: 44,
@@ -117,12 +117,17 @@ export function LeaderRow({
           <p style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px' }} className="text-foreground truncate leading-tight">
             {player.fullName}
           </p>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <CountryFlag country={player.countryCode || player.country} size="sm" />
+            {player.country && (
+              <span style={{ fontSize: 11, color: 'hsl(var(--muted-foreground) / 0.6)' }}>
+                {player.country}
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Stat value — JetBrains Mono, 15px, 700, tabular-nums */}
+        {/* Stat value */}
         <div className="text-right shrink-0">
           <span
             style={{
@@ -150,7 +155,7 @@ export function LeaderRow({
           )}
         </div>
 
-        {/* Chevron — 3.5, muted/25 */}
+        {/* Chevron */}
         <ChevronRight className="shrink-0" style={{ width: 14, height: 14, color: 'hsl(var(--muted-foreground) / 0.5)' }} />
       </Link>
     </motion.div>
