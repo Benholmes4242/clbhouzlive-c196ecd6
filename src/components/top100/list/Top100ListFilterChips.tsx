@@ -83,7 +83,7 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
-              className="flex items-center justify-between w-44 px-3 py-2.5 rounded-sq-sm bg-card border border-border hover:border-border hover:shadow-sm transition-all duration-150 text-sm font-medium text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-border active:scale-[0.98]"
+              className="flex items-center justify-between w-44 px-3 py-2.5 rounded-sq-sm bg-card border border-border transition-all duration-150 text-sm font-medium text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-border active:scale-[0.98]"
             >
               <span className="truncate">{currentFilterLabel}</span>
               <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0 ml-1" />
