@@ -69,8 +69,10 @@ function HeroPill({ children, className }: { children: React.ReactNode; classNam
         className
       )}
       style={{ 
-        background: 'rgba(0,0,0,0.35)', 
-        backdropFilter: 'blur(12px)',
+        background: 'rgba(0, 0, 0, 0.35)', 
+        backdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
       }}
     >
       {children}
