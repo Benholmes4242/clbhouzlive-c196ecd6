@@ -20,13 +20,6 @@ function getInitials(name: string): string {
   return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
 }
 
-function getRankBadgeClasses(rank: number): string {
-  if (rank === 1) return 'bg-gradient-to-br from-amber-300 to-amber-500 text-amber-900';
-  if (rank === 2) return 'bg-gradient-to-br from-slate-300 to-slate-400 text-white';
-  if (rank === 3) return 'bg-gradient-to-br from-amber-600 to-amber-700 text-white';
-  return 'bg-muted text-muted-foreground';
-}
-
 /** #1 Champion card */
 function ChampionCard({ player }: { player: ElitePlayer }) {
   const photoUrl = getPlayerHeadshotUrl(player.playerName, player.tourCode ?? 'pga');
@@ -39,21 +32,21 @@ function ChampionCard({ player }: { player: ElitePlayer }) {
       to={`/tourhub/player/${player.playerId}`}
       className="block active:scale-[0.98] transition-transform"
     >
-      <div className={cn(
-        "relative overflow-hidden rounded-2xl p-5",
-        "bg-card"
-      )}>
-        {/* Subtle amber gradient for world #1 */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to left, hsl(var(--accent-amber) / 0.08), transparent)' }} />
-
+      <div className="relative overflow-hidden rounded-2xl p-5 bg-card border border-border">
         <div className="relative flex items-center gap-4">
-          {/* Rank badge */}
-          <div className={cn(
-            "w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shrink-0",
-            getRankBadgeClasses(1)
-          )}>
+          {/* Rank number — plain, amber */}
+          <span
+            className="flex-shrink-0"
+            style={{
+              width: 20,
+              fontSize: 13,
+              fontWeight: 700,
+              fontVariantNumeric: 'tabular-nums',
+              color: 'hsl(var(--accent-amber))',
+            }}
+          >
             1
-          </div>
+          </span>
 
           {/* Avatar */}
           <SquircleAvatar
@@ -62,7 +55,6 @@ function ChampionCard({ player }: { player: ElitePlayer }) {
             fallback={initials}
             size="xl"
             hideRing
-            className="ring-2 ring-amber-400/40 ring-offset-2 ring-offset-card"
           />
 
           {/* Info */}
@@ -101,16 +93,21 @@ function RunnerCard({ player }: { player: ElitePlayer }) {
       to={`/tourhub/player/${player.playerId}`}
       className="block flex-shrink-0 active:scale-[0.97] transition-transform"
     >
-      <div className={cn(
-        "relative w-[150px] bg-card border border-border rounded-xl p-3 text-center"
-      )}>
-        {/* Rank badge */}
-        <div className={cn(
-          "absolute -top-1 -left-1 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold z-10",
-          getRankBadgeClasses(player.worldRank)
-        )}>
+      <div className="relative w-[150px] bg-card border border-border rounded-xl p-3 text-center">
+        {/* Rank number — plain, amber for #1 else muted */}
+        <span
+          className="absolute top-2 left-2.5"
+          style={{
+            fontSize: 11,
+            fontWeight: 700,
+            fontVariantNumeric: 'tabular-nums',
+            color: player.worldRank === 1
+              ? 'hsl(var(--accent-amber))'
+              : 'hsl(var(--muted-foreground))',
+          }}
+        >
           {player.worldRank}
-        </div>
+        </span>
 
         {/* Avatar centered */}
         <div className="flex justify-center">
