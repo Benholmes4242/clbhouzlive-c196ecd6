@@ -450,7 +450,7 @@ const ClubhouseContent = () => {
       )}
 
       {/* ═══ OVERLAY LAYER (non-tournament posts only) ═══ */}
-      {activePost && posts.length > 0 && activePost.postType !== 'tournament_result' && (
+      {activePost && posts.length > 0 && activePost.postType !== 'tournament_result' && activePost.postType !== 'tournament_live' && (
         <>
           {/* Review overlay — z-10 */}
           <AnimatePresence>
