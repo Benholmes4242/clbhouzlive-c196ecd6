@@ -154,19 +154,17 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
           )}
         </div>
 
-        {/* Rank pill */}
+        {/* Rank badge — matching HallOfFamePodium */}
         <div
-          className="absolute -bottom-2 left-1/2 -translate-x-1/2"
+          className="absolute -bottom-1.5 -right-0.5 flex items-center justify-center font-bold text-white shadow-md"
           style={{
-            background: 'hsl(var(--background))',
-            border: '1px solid hsl(var(--border) / 0.4)',
-            borderRadius: 8,
-            padding: '1px 7px',
-            fontSize: 12,
-            fontWeight: 700,
-            color: position === 1 ? 'hsl(var(--accent-amber))' : 'hsl(var(--muted-foreground))',
-            lineHeight: 1.5,
-            whiteSpace: 'nowrap',
+            width: position === 1 ? 26 : 22,
+            height: position === 1 ? 26 : 22,
+            borderRadius: '50%',
+            backgroundColor: position === 1 ? 'hsl(var(--accent-amber))' : position === 2 ? '#A8B4C0' : '#C4956A',
+            border: '2px solid hsl(var(--background))',
+            fontSize: (position === 1 ? 26 : 22) * 0.45,
+            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
           }}
         >
           {position}

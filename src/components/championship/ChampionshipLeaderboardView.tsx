@@ -781,7 +781,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             </p>
             <button
               className="text-[14px] font-semibold transition-opacity active:scale-[0.97] active:opacity-70"
-              style={{ color: timeFilter === 'seasonal' ? seasonThemeColor : 'hsl(var(--accent-amber))' }}
+              style={{ color: 'hsl(var(--accent-amber))' }}
               onClick={() => {
                 if (navigator.share) {
                   navigator.share({ title: 'Join me on Clbhouz', url: window.location.origin });
