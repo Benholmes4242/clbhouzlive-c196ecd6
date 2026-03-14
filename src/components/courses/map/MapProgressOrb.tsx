@@ -151,7 +151,7 @@ export const MapProgressOrb: React.FC<MapProgressOrbProps> = ({
           {/* Current progress */}
           <div className="flex items-center gap-2 mb-2.5">
             <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/10">
-              <Trophy className="h-4 w-4 text-amber-400" />
+              <Trophy className="h-4 w-4" style={{ color: 'hsl(var(--accent-amber))' }} />
             </div>
             <div>
               <p className="text-[10px] text-white/50">Current</p>
