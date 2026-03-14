@@ -7,8 +7,9 @@ import { useNavigate } from 'react-router-dom';
 import { VideoPlayer } from './VideoPlayer';
 import { ImageViewer } from './ImageViewer';
 import { MediaCarousel } from './MediaCarousel';
-import type { FeedPost, TournamentResultFeedPost } from './types/media';
+import type { FeedPost, TournamentResultFeedPost, TournamentLiveFeedPost } from './types/media';
 import { TournamentResultCard } from '@/components/clubhouse/cinematic/TournamentResultCard';
+import { TournamentLiveCard } from '@/components/clubhouse/cinematic/TournamentLiveCard';
 
 interface FeedItemProps {
   post: FeedPost;
