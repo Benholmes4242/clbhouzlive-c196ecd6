@@ -44,7 +44,7 @@ export function CollegeComparePage() {
         </button>
 
         {/* Back CTA */}
-        <div style={{ paddingTop: 56 }}>
+        <div>
           <button
             onClick={() => navigate('/tourhub/college-golf')}
             className="inline-flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"

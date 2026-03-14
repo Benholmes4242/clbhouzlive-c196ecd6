@@ -103,9 +103,8 @@ export function CollegeProfilePage() {
     hideHeader();
     return () => {
       showHeader();
-      setVariant('solid-light');
     };
-  }, [hideHeader, showHeader, setVariant]);
+  }, [hideHeader, showHeader]);
   
   useEffect(() => {
     setCompareCollege2(null);
