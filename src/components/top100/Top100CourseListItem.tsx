@@ -61,7 +61,7 @@ export const Top100CourseListItem: React.FC<Top100CourseListItemProps> = ({
                   </span>
                 )}
                 {officialRankChipRight && (
-                  <span className="rounded-full bg-slate-900/75 px-2 py-[2px] text-[11px] font-semibold text-white backdrop-blur-sm">
+                  <span className="rounded-lg bg-black/70 px-2 py-[2px] text-[11px] font-semibold text-white backdrop-blur-sm">
                     {officialRankChipRight}
                   </span>
                 )}
