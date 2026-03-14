@@ -780,8 +780,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
               Invite friends to climb the leaderboard
             </p>
             <button
-              className="text-[14px] font-semibold transition-opacity hover:opacity-80 active:scale-[0.97]"
-              style={{ color: timeFilter === 'seasonal' ? seasonThemeColor : '#D4A853' }}
+              className="text-[14px] font-semibold transition-opacity active:scale-[0.97] active:opacity-70"
+              style={{ color: timeFilter === 'seasonal' ? seasonThemeColor : 'hsl(var(--accent-amber))' }}
               onClick={() => {
                 if (navigator.share) {
                   navigator.share({ title: 'Join me on Clbhouz', url: window.location.origin });
