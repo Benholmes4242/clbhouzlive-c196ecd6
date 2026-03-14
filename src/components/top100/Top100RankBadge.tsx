@@ -16,7 +16,7 @@ export const Top100RankBadge: React.FC<Top100RankBadgeProps> = ({ listSlug, rank
   const renderIcon = () => {
     switch (listSlug) {
       case 'global':
-        return <Earth className="h-5 w-5 text-white" />;
+        return <Earth className="h-4 w-4 text-white" />;
       case 'gb-i':
         return <CountryFlag country="Britain & Ireland" size="md" />;
       case 'usa':
@@ -24,7 +24,7 @@ export const Top100RankBadge: React.FC<Top100RankBadgeProps> = ({ listSlug, rank
       case 'europe':
         return <CountryFlag country="Continental Europe" size="md" />;
       default:
-        return <Earth className="h-5 w-5 text-white" />;
+        return <Earth className="h-4 w-4 text-white" />;
     }
   };
 
