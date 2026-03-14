@@ -4,10 +4,9 @@
  */
 
 import { useState, useCallback } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { AnimatedCheck } from '@/components/ui/AnimatedCheck';
 import { motion } from 'framer-motion';
 import { getTourLogo, hasTourLogo } from '../../utils/tourLogos';
 import type { PlayerTourCode } from './PlayersTourFilter';
@@ -72,15 +71,17 @@ export function PlayersTourFilterSheet({
             <img
               src={getTourLogo(activeTour.toLowerCase())}
               alt={activeTourOption.label}
-              style={{ width: 28, height: 20, objectFit: 'contain' }}
+              className="object-contain flex-shrink-0"
+              style={{ width: 28, height: 20 }}
             />
-          ) : null}
+          ) : (
+            <span className="text-[11px] font-bold uppercase tracking-[0.5px] text-muted-foreground">
+              All Tours
+            </span>
+          )}
           <span className="text-sm font-semibold text-foreground">{activeTourOption.label}</span>
-          <span className="text-[11px] font-bold uppercase tracking-[0.5px] text-muted-foreground">
-            Players
-          </span>
           {activeTour !== 'all' && (
-            <span className="text-[11px] font-bold text-muted-foreground">
+            <span className="text-[11px] font-bold tabular-nums text-muted-foreground">
               · {tourCounts[activeTour] ?? 0}
             </span>
           )}
@@ -124,7 +125,7 @@ export function PlayersTourFilterSheet({
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleSelect(tour.code)}
                   aria-pressed={isActive}
-                  className="w-full flex items-center gap-3 text-left transition-all duration-150"
+                  className="w-full flex items-center gap-2.5 text-left transition-all duration-150"
                   style={{
                     borderRadius: 12,
                     padding: '14px 16px',
@@ -134,15 +135,19 @@ export function PlayersTourFilterSheet({
                     background: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--card))',
                   }}
                 >
-                  <div
-                    className="w-9 rounded-[34%] aspect-[1/1.05] flex items-center justify-center text-xs font-bold tabular-nums"
-                    style={{
-                      background: isActive ? 'rgba(255,255,255,0.2)' : 'hsl(var(--muted))',
-                      color: isActive ? 'white' : 'hsl(var(--muted-foreground))',
-                    }}
-                  >
-                    {count}
-                  </div>
+                  {tour.code === 'all' ? (
+                    <Globe className="w-5 h-5 flex-shrink-0"
+                      style={{ color: isActive ? 'white' : 'hsl(var(--muted-foreground))' }}
+                    />
+                  ) : (
+                    <img
+                      src={getTourLogo(tour.code.toLowerCase())}
+                      alt=""
+                      aria-hidden="true"
+                      className="object-contain flex-shrink-0"
+                      style={{ width: 32, height: 22 }}
+                    />
+                  )}
 
                   <div className="flex-1">
                     <p
@@ -165,7 +170,17 @@ export function PlayersTourFilterSheet({
                     </p>
                   </div>
 
-                  {isActive && <AnimatedCheck color="white" />}
+                  <span
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 600,
+                      fontVariantNumeric: 'tabular-nums',
+                      color: isActive ? 'rgba(255,255,255,0.65)' : 'hsl(var(--muted-foreground) / 0.6)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {count}
+                  </span>
                 </motion.button>
               );
             })}
