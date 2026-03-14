@@ -25,10 +25,7 @@ export const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
 
   return (
     <div className="w-full px-1">
-      <div
-        className="flex rounded-xl p-1"
-        style={{ backgroundColor: 'hsl(var(--muted) / 0.5)' }}
-      >
+      <div className="flex gap-2 justify-center">
         {options.map((option) => {
           const isActive = value === option.id;
           return (
@@ -36,12 +33,15 @@ export const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
               key={option.id}
               onClick={() => onChange(option.id)}
               className={cn(
-                'flex-1 py-2.5 rounded-[10px] text-[15px] font-medium',
-                'transition-all duration-200 ease-in-out active:scale-[0.97]',
+                'px-5 py-1.5 text-[14px] font-medium transition-all duration-200 active:scale-[0.97]',
                 isActive
-                  ? 'bg-card text-foreground shadow-sm font-semibold'
+                  ? 'text-white font-semibold'
                   : 'text-muted-foreground'
               )}
+              style={{
+                borderRadius: 20,
+                backgroundColor: isActive ? '#475569' : 'transparent',
+              }}
             >
               {option.label}
             </button>
