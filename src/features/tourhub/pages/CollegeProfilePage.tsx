@@ -41,8 +41,7 @@ export function CollegeProfilePage() {
   const { data: collegeMap, isLoading: mediaLoading } = useCollegeMediaMap();
   const { data: rivalries } = useCollegeRivalries(collegeSlug);
   const { data: allSeasonStats } = useCollegeSeasonStats();
-  const { data: season } = useTourSeason();
-  const seasonYear = season?.year || new Date().getFullYear();
+  const seasonYear = new Date().getFullYear();
   
   const [compareOpen, setCompareOpen] = useState(false);
   const [heroImgError, setHeroImgError] = useState(false);
