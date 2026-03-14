@@ -33,29 +33,24 @@ function ensureKeyframes() {
 
 // ─── Tour identity system ──────────────────────────────────────────────────────
 
-interface TourIdentity {
-  label: string;
-  accentColor: string;
-  gradient: string;
-  badgeBg: string;
-}
-
-const TOUR_IDENTITY: Record<string, TourIdentity> = {
-  pga:   { label: 'PGA TOUR',   accentColor: '#3B82F6', gradient: 'linear-gradient(180deg, #0a1628 0%, #071020 100%)', badgeBg: 'rgba(59,130,246,0.18)' },
-  liv:   { label: 'LIV GOLF',   accentColor: '#EF4444', gradient: 'linear-gradient(180deg, #1a0a0a 0%, #100505 100%)', badgeBg: 'rgba(239,68,68,0.18)' },
-  euro:  { label: 'DP WORLD',   accentColor: '#22C55E', gradient: 'linear-gradient(180deg, #091a0f 0%, #05100a 100%)', badgeBg: 'rgba(34,197,94,0.18)' },
-  dpw:   { label: 'DP WORLD',   accentColor: '#22C55E', gradient: 'linear-gradient(180deg, #091a0f 0%, #05100a 100%)', badgeBg: 'rgba(34,197,94,0.18)' },
-  lpga:  { label: 'LPGA',       accentColor: '#EC4899', gradient: 'linear-gradient(180deg, #1a0912 0%, #10050b 100%)', badgeBg: 'rgba(236,72,153,0.18)' },
-  kft:   { label: 'KORN FERRY', accentColor: '#F59E0B', gradient: 'linear-gradient(180deg, #1a1005 0%, #100a03 100%)', badgeBg: 'rgba(245,158,11,0.18)' },
-  champ: { label: 'CHAMPIONS',  accentColor: '#A78BFA', gradient: 'linear-gradient(180deg, #10091a 0%, #080510 100%)', badgeBg: 'rgba(167,139,250,0.18)' },
+// Tour label map — names only, all use Clbhouz brand amber
+const TOUR_LABELS: Record<string, string> = {
+  pga:   'PGA TOUR',
+  liv:   'LIV GOLF',
+  euro:  'DP WORLD',
+  dpw:   'DP WORLD',
+  lpga:  'LPGA',
+  kft:   'KORN FERRY',
+  champ: 'CHAMPIONS',
 };
 
-function getTourIdentity(slug: string): TourIdentity {
-  return TOUR_IDENTITY[slug] ?? {
-    label: slug.toUpperCase(),
-    accentColor: '#F97316',
-    gradient: 'linear-gradient(180deg, #111827 0%, #0a0f1a 100%)',
-    badgeBg: 'rgba(249,115,22,0.18)',
+// Single brand identity used for every tour
+function getTourIdentity(slug: string) {
+  return {
+    label:       TOUR_LABELS[slug] ?? slug.toUpperCase(),
+    accentColor: 'hsl(var(--accent-amber))',
+    gradient:    'linear-gradient(180deg, #111418 0%, #080a0e 100%)',
+    badgeBg:     'hsl(var(--accent-amber) / 0.15)',
   };
 }
 
