@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatDistanceToNow } from 'date-fns';
 import { Top100RankBadge } from '@/components/top100/Top100RankBadge';
 import { extractRanksFromMemberships } from '@/utils/rankingUtils';
