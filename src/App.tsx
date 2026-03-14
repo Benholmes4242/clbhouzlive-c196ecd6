@@ -388,12 +388,7 @@ function AppRoutes() {
         {/* Public Echo Share Page */}
         <Route path="/echo/share/:token" element={<Suspense fallback={<GenericPageSkeleton />}><EchoSharePage /></Suspense>} />
         
-        {/* Golf Course Editor - full page routes outside AdminLayout */}
-        <Route path="/admin/golf-courses/new" element={<Suspense fallback={<GenericPageSkeleton />}><GolfCourseEditorPage /></Suspense>} />
-        <Route path="/admin/golf-courses/:id/edit" element={<Suspense fallback={<GenericPageSkeleton />}><GolfCourseEditorPage /></Suspense>} />
-        
-        <Route path="/admin/invite-accept" element={<Suspense fallback={<GenericPageSkeleton />}><InviteAcceptPage /></Suspense>} />
-        <Route path="/admin-backfill" element={<Suspense fallback={<GenericPageSkeleton />}><AdminBackfill /></Suspense>} />
+
 
         <Route path="/channel/:slug" element={<Suspense fallback={<ProfileSkeleton />}><ChannelProfile /></Suspense>} />
         <Route path="/game/:id" element={<Suspense fallback={<GenericPageSkeleton />}><GameDetailView /></Suspense>} />
