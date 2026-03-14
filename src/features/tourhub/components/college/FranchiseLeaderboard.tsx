@@ -58,7 +58,10 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
         default: return s.earnings_total;
       }
     };
-    const sorted = [...allStats].sort((a, b) => getValue(b) - getValue(a)).slice(0, limit);
+    const sorted = [...allStats]
+      .sort((a, b) => getValue(b) - getValue(a))
+      .filter(s => activeMetric === 'wins' ? getValue(s) > 0 : true)
+      .slice(0, limit);
     const max = sorted.length > 0 ? getValue(sorted[0]) : 1;
     return { sortedStats: sorted, maxValue: max };
   }, [allStats, activeMetric, limit]);
