@@ -54,7 +54,6 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
           border: '1px solid hsl(var(--border) / 0.5)',
           borderRadius: 16,
           padding: '12px 16px',
-          
         }}
       >
         {/* Stacked squircle avatars — 32×32, 34% radius, 2px white border, -8px overlap */}
