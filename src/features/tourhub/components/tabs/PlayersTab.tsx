@@ -13,7 +13,7 @@ import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer
 import { useElitePlayers, type ElitePlayer } from '../../hooks/useElitePlayers';
 import { useTourSeasonRankings } from '../../hooks/useTourSeasonRankings';
 import { PlayersHero } from '../players/PlayersHero';
-import { type PlayerTourCode } from '../players/PlayersTourFilter';
+import { type PlayerTourCode } from '../players/PlayersTourFilterSheet';
 import { PlayerSortControl, type PlayerSortType, getDefaultSortForTour } from '../players/PlayerSortControl';
 import { PlayersTourFilterSheet } from '../players/PlayersTourFilterSheet';
 import { PlayerCardV2 } from '../players/PlayerCardV2';
