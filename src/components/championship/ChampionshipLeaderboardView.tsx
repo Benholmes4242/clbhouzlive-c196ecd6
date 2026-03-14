@@ -764,7 +764,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
                 homeClubName={entry.home_club}
                 courses={entry.courses_this_season}
                   isCurrentUser={entry.is_current_user}
-                  seasonColor={timeFilter === 'seasonal' ? seasonThemeColor : '#D4A853'}
+                  seasonColor={timeFilter === 'seasonal' ? seasonThemeColor : 'hsl(var(--accent-amber))'}
                 onClick={() => handleEntryClick(entry.user_id)}
               />
             ))}
