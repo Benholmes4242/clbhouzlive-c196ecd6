@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TrendingUp, Trophy, Target, BarChart3 } from 'lucide-react';
+import { TrendingUp, Trophy, Target, BarChart3, Flag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
 
