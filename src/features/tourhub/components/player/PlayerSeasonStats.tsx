@@ -377,11 +377,15 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
 
           {activeTab === 'SG' && (
             <div>
+              <SubSectionLabel icon={TrendingUp} label="STROKES GAINED" style={{ marginTop: 0 }} />
+              <p style={{ fontSize: 12, color: 'hsl(var(--muted-foreground) / 0.5)', marginBottom: 16 }}>
+                Strokes gained vs. tour average per round
+              </p>
               <SGBar label="SG: Total" value={playerStats.strokes_gained_total} />
-              <SGBar label="SG: Tee to Green" value={playerStats.strokes_gained_tee_green ?? null} />
-              <SGBar label="SG: Around Green" value={playerStats.strokes_gained ?? null} />
-              {!playerStats.strokes_gained_total && !playerStats.strokes_gained_tee_green && (
-                <p className="text-muted-foreground text-center" style={{ fontSize: '14px', padding: '24px 0' }}>
+              <SGBar label="SG: Tee to Green" value={playerStats.strokes_gained_tee_green} />
+              <SGBar label="SG: Around Green" value={playerStats.strokes_gained} />
+              {!playerStats.strokes_gained_total && !playerStats.strokes_gained_tee_green && !playerStats.strokes_gained && (
+                <p className="text-muted-foreground text-center" style={{ fontSize: 14, padding: '24px 0' }}>
                   Strokes Gained data unavailable for this player.
                 </p>
               )}
