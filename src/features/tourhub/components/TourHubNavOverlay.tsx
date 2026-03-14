@@ -433,32 +433,21 @@ export function TourHubNavOverlay({
                             minWidth: '155px',
                           }}
                         >
-                          {/* Rank Badge */}
-                          <div
-                            className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center"
+                          {/* Rank number — plain typographic, amber for #1 */}
+                          <span
+                            className="flex-shrink-0 text-center"
                             style={{
-                              background: index === 0
-                                ? 'linear-gradient(135deg, #fcd34d, #f59e0b)'
-                                : index === 1
-                                ? 'linear-gradient(135deg, hsl(var(--foreground) / 0.3), hsl(var(--foreground) / 0.4))'
-                                : index === 2
-                                ? 'linear-gradient(135deg, #d97706, #b45309)'
-                                : 'linear-gradient(135deg, hsl(var(--muted-foreground) / 0.2), hsl(var(--muted-foreground) / 0.25))',
-                              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.12)',
+                              width: '20px',
+                              fontSize: '13px',
+                              fontWeight: 700,
+                              fontVariantNumeric: 'tabular-nums',
+                              color: index === 0
+                                ? 'hsl(var(--accent-amber))'
+                                : 'hsl(var(--muted-foreground))',
                             }}
                           >
-                            <span className="text-xs font-bold" style={{
-                              color: index === 0
-                                ? '#78350f'
-                                : index === 1
-                                ? 'hsl(var(--background))'
-                                : index === 2
-                                ? '#ffffff'
-                                : 'hsl(var(--muted-foreground))',
-                            }}>
-                              {player.worldRank}
-                            </span>
-                          </div>
+                            {player.worldRank}
+                          </span>
                           
                           {/* TM-11: Avatar with initials fallback */}
                           {(() => {
