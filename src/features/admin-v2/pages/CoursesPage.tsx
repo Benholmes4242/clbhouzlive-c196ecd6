@@ -255,7 +255,7 @@ function CourseDrawer({
           <div className="space-y-3">
             <AdminSectionHeader title="Details" />
             {([
-              { label: 'Name',     key: 'name',        value: course.name },
+              { label: 'Name',     key: 'name',        value: course.name,        type: 'text' as const },
               { label: 'Website',  key: 'website_url', value: course.website_url, type: 'url' as const },
             ] as const).map(({ label, key, value, type }) => (
               <div key={key} className="flex items-center justify-between gap-4">
