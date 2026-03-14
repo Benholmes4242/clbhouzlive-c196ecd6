@@ -25,7 +25,7 @@ export const MapProgressOrb: React.FC<MapProgressOrbProps> = ({
   playedCount,
   totalCount,
   scope,
-  seasonColor = '#3EBD93',
+  seasonColor = '#f59e0b',
   onMilestoneClick,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -99,7 +99,7 @@ export const MapProgressOrb: React.FC<MapProgressOrbProps> = ({
           exit={{ scale: 0.8, opacity: 0 }}
           transition={{ type: 'spring', damping: 20, stiffness: 300 }}
           onClick={handleToggle}
-          className="glass-card relative flex items-center justify-center w-12 h-12 rounded-full hover:bg-white/15 active:scale-95 transition-all duration-150"
+          className="glass-card relative flex items-center justify-center w-12 h-12 rounded-full active:scale-95 active:bg-white/15 transition-all duration-150"
         >
           {/* Progress ring - dynamic season color */}
           <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 48 48">
@@ -143,7 +143,7 @@ export const MapProgressOrb: React.FC<MapProgressOrbProps> = ({
               setIsExpanded(false);
               clearAutoCollapseTimer();
             }}
-            className="absolute top-1.5 right-1.5 p-2.5 text-white/50 hover:text-white/80 active:scale-[0.9] transition-transform rounded-full"
+            className="absolute top-1.5 right-1.5 p-2.5 text-white/50 active:scale-[0.9] active:text-white/80 transition-transform rounded-full"
           >
             <X className="h-3 w-3" />
           </button>
@@ -151,7 +151,7 @@ export const MapProgressOrb: React.FC<MapProgressOrbProps> = ({
           {/* Current progress */}
           <div className="flex items-center gap-2 mb-2.5">
             <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/10">
-              <Trophy className="h-4 w-4 text-amber-400" />
+              <Trophy className="h-4 w-4" style={{ color: 'hsl(var(--accent-amber))' }} />
             </div>
             <div>
               <p className="text-[10px] text-white/50">Current</p>
@@ -188,7 +188,7 @@ export const MapProgressOrb: React.FC<MapProgressOrbProps> = ({
                 'w-full flex items-center justify-center gap-1',
                 'px-2.5 py-1.5 rounded-lg',
                 'bg-white/90 text-foreground text-[10px] font-medium',
-                'hover:bg-white active:scale-[0.98]',
+                'active:opacity-90 active:scale-[0.98]',
                 'transition-all duration-150'
               )}
             >

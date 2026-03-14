@@ -88,7 +88,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   const { data: seasonCalendar } = useSeasonCalendar();
   const seasonColor = useMemo(() => {
     const activeSeason = seasonCalendar?.find(s => s.is_current);
-    if (!activeSeason?.name) return '#3EBD93';
+    if (!activeSeason?.name) return '#f59e0b'; // amber-400 hex — Mapbox compatible
     const lower = activeSeason.name.toLowerCase();
     let id: SeasonId = 'preseason';
     if (lower.includes('major')) id = 'major';
@@ -612,8 +612,10 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
         {/* Back button — canonical glass, one size smaller */}
         <button
           onClick={() => onClose ? onClose() : navigate(-1)}
-          className="glass-card fixed left-4 z-40 w-9 h-9 flex items-center justify-center !rounded-full !overflow-visible active:scale-[0.92] active:bg-white/20 transition-all duration-150"
+          className="glass-card fixed left-4 z-40 w-9 h-9 flex items-center justify-center active:scale-[0.92] active:bg-white/20 transition-all duration-150"
           style={{
+            borderRadius: '50%',
+            overflow: 'visible',
             top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
             position: 'fixed',
           }}
@@ -676,7 +678,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                 className={cn(
                   'flex items-center justify-center w-11 h-11',
                   'text-white/80',
-                  'hover:bg-white/10',
                   'active:bg-white/20 active:scale-[0.92]',
                   'transition-all duration-150',
                   'border-b border-white/10'
@@ -693,7 +694,6 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                 className={cn(
                   'flex items-center justify-center w-11 h-11',
                   'text-white/80',
-                  'hover:bg-white/10',
                   'active:bg-white/20 active:scale-[0.92]',
                   'transition-all duration-150'
                 )}
@@ -707,7 +707,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             
             <button
               onClick={handleResetView}
-              className="glass-card flex items-center justify-center w-11 h-11 rounded-xl text-white/80 hover:bg-white/10 active:bg-white/20 active:scale-[0.92] transition-all duration-150"
+              className="glass-card flex items-center justify-center w-11 h-11 rounded-xl text-white/80 active:bg-white/20 active:scale-[0.92] transition-all duration-150"
               aria-label="Reset map view"
             >
               <RotateCcw className="h-4 w-4" aria-hidden="true" />
@@ -790,7 +790,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                     'active:scale-[0.96]',
                     isActive
                       ? 'bg-white/90 text-foreground'
-                      : 'text-white/60 hover:text-white/80 hover:bg-white/[0.08]'
+                      : 'text-white/60 active:text-white/80 active:bg-white/[0.08]'
                   )}
                 >
                   {labels[filter]}
@@ -820,7 +820,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
                     'active:scale-[0.96]',
                     isActive
                       ? 'bg-white/90 text-foreground border-white/50'
-                      : 'bg-white/[0.08] border-white/12 text-white/60 hover:border-white/30 hover:bg-white/[0.12] hover:text-white/80'
+                      : 'bg-white/[0.08] border-white/12 text-white/60 active:border-white/30 active:bg-white/[0.12]'
                   )}
                 >
                   {labels[regionScope]}

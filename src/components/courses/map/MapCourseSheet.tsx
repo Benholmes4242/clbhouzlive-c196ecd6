@@ -148,7 +148,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
     if (course?.user_has_rated) {
       return { 
         text: 'Played', 
-        className: 'bg-emerald-500/95 text-white shadow-[0_2px_8px_rgba(16,185,129,0.3)]',
+        className: 'bg-emerald-500/95 text-white shadow-sm',
         icon: <Check className="h-3 w-3 mr-1" />
       };
     }
@@ -212,7 +212,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
       >
         {/* Drag handle */}
         <div className="flex-shrink-0 flex justify-center cursor-grab active:cursor-grabbing" style={{ margin: '12px auto 8px' }}>
-          <div className="rounded-full" style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255, 255, 255, 0.25)' }} />
+          <div style={{ width: 36, height: 4, borderRadius: 4, background: 'rgba(255, 255, 255, 0.25)' }} />
         </div>
 
         <div className="flex-shrink-0">
@@ -306,7 +306,7 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
                     border: '1px solid rgba(255, 255, 255, 0.12)',
                   }}
                 >
-                  <Star className="h-3.5 w-3.5 fill-current text-amber-400" />
+                  <Star className="h-3.5 w-3.5 fill-current" style={{ color: 'hsl(var(--accent-amber))' }} />
                   <span className="text-xs font-semibold" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                     Your rating: {course.user_rating.toFixed(1)}
                   </span>
