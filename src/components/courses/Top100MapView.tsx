@@ -707,7 +707,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             
             <button
               onClick={handleResetView}
-              className="glass-card flex items-center justify-center w-11 h-11 rounded-xl text-white/80 hover:bg-white/10 active:bg-white/20 active:scale-[0.92] transition-all duration-150"
+              className="glass-card flex items-center justify-center w-11 h-11 rounded-xl text-white/80 active:bg-white/20 active:scale-[0.92] transition-all duration-150"
               aria-label="Reset map view"
             >
               <RotateCcw className="h-4 w-4" aria-hidden="true" />
