@@ -169,7 +169,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ region, index, onClick }) =
                   />
                 </div>
                 <span className="text-sm font-semibold tabular-nums">
-                  <span style={{ color: '#3EBD93' }}>{region.played}</span>
+                  <span style={{ color: 'hsl(var(--accent-amber))' }}>{region.played}</span>
                   <span className="text-muted-foreground">/{region.total}</span>
                 </span>
               </div>
