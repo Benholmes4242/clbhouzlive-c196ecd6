@@ -62,14 +62,15 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
           {ranks.regionalRank && !ranks.usaRank && <Top100RankBadge listSlug="gb-i" rank={ranks.regionalRank} />}
         </div>
 
-        {/* Highlight badge (top-right) — frosted glass */}
+        {/* Highlight badge (top-right) — canonical liquid glass */}
         <div
           className="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-xs font-semibold text-white"
           style={{
-            background: 'rgba(255, 255, 255, 0.2)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
+            background: 'rgba(0, 0, 0, 0.35)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
           }}
         >
           {getHighlightLabel()}

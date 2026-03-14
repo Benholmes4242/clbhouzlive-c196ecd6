@@ -33,11 +33,9 @@ const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.15, delay: index * 0.03 }}
-      className="rounded-[14px] p-3 cursor-pointer group transition-shadow hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
+      className="rounded-[14px] p-3 cursor-pointer group transition-shadow bg-card border border-border/30"
       style={{
-        background: 'white',
-        border: '1px solid rgba(0,0,0,0.04)',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+        boxShadow: '0 1px 3px hsl(var(--foreground) / 0.04)',
       }}
       onClick={handleCourseClick}
     >
@@ -67,7 +65,7 @@ const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
             </button>
             <span className="text-muted-foreground"> played</span>
           </p>
-          <p className="text-sm font-semibold mt-0.5" style={{ color: '#40916C' }}>
+          <p className="text-sm font-semibold mt-0.5 text-foreground">
             {hit.course_name}
           </p>
           {(hit.course_country) && (
@@ -86,7 +84,7 @@ const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
             src={hit.thumbnail_url || '/placeholder.svg'}
             alt={hit.course_name}
             className="w-14 h-14 rounded-[10px] object-cover"
-            style={{ border: '1px solid rgba(0,0,0,0.04)' }}
+            style={{ border: '1px solid hsl(var(--border) / 0.3)' }}
             onError={(e) => { e.currentTarget.src = '/placeholder.svg'; }}
           />
         </div>
