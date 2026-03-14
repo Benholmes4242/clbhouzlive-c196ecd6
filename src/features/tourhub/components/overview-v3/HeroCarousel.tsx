@@ -271,10 +271,13 @@ interface HeroSlideProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
   onInteraction: () => void;
+  onCardTouchStart: (e: React.TouchEvent) => void;
+  onCardTouchMove: (e: React.TouchEvent) => void;
+  onCardTouchEnd: (e: React.TouchEvent) => void;
 }
 
 
-function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction }: HeroSlideProps) {
+function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction, onCardTouchStart, onCardTouchMove, onCardTouchEnd }: HeroSlideProps) {
   const { tournament, type } = slide;
   const navigate = useNavigate();
   
@@ -493,9 +496,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
           <motion.div
             layout
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            onTouchStart={isExpanded ? handleExpandedTouch : undefined}
-            onTouchMove={isExpanded ? handleExpandedTouch : undefined}
-            onTouchEnd={isExpanded ? handleExpandedTouch : undefined}
+            onTouchStart={(e) => { onCardTouchStart(e); }}
+            onTouchMove={(e) => { onCardTouchMove(e); }}
+            onTouchEnd={(e) => { onCardTouchEnd(e); }}
             style={{ 
               position: 'absolute',
               bottom: isLive ? 72 : (isExpanded ? 16 : 88),
@@ -1053,7 +1056,6 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
 
   // Swipe gesture handlers
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (isExpanded) return;
     setIsPaused(true);
     touchStartRef.current = {
       x: e.touches[0].clientX,
@@ -1064,13 +1066,11 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (isExpanded) return;
     if (!touchStartRef.current) return;
     touchMoveRef.current = e.touches[0].clientX - touchStartRef.current.x;
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (isExpanded) return;
     if (!touchStartRef.current) {
       scheduleResume();
       return;
@@ -1143,8 +1143,8 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
       onTouchEnd={handleTouchEnd}
     >
       <button 
-        className="absolute z-20 flex items-center justify-center"
-        style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 20px)) + 12px)', left: '16px', width: '44px', height: '44px' }}
+        className="fixed z-20 flex items-center justify-center"
+        style={{ top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: '16px', width: '44px', height: '44px' }}
         onClick={() => { openTourNav(); showBottomNav(); }}
         aria-label="Open tour menu"
       >
@@ -1171,6 +1171,9 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
               setIsPaused(true);
               scheduleResume();
             }}
+            onCardTouchStart={handleTouchStart}
+            onCardTouchMove={handleTouchMove}
+            onCardTouchEnd={handleTouchEnd}
           />
         ))}
       </AnimatePresence>

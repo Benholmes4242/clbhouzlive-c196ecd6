@@ -13,11 +13,12 @@ import { useTourPlayers, useTourSeason, useTourPlayerStatistics, type TourPlayer
 import { useElitePlayers, type ElitePlayer } from '../../hooks/useElitePlayers';
 import { useTourSeasonRankings } from '../../hooks/useTourSeasonRankings';
 import { PlayersHero } from '../players/PlayersHero';
-import { type PlayerTourCode } from '../players/PlayersTourFilter';
+import { type PlayerTourCode } from '../players/PlayersTourFilterSheet';
 import { PlayerSortControl, type PlayerSortType, getDefaultSortForTour } from '../players/PlayerSortControl';
 import { PlayersTourFilterSheet } from '../players/PlayersTourFilterSheet';
 import { PlayerCardV2 } from '../players/PlayerCardV2';
 import { PlayersEmptyState } from '../players/PlayersEmptyState';
+import { PlayersWorldsBest } from '../players/PlayersWorldsBest';
 
 function useDebouncedValue(value: string, delay: number): string {
   const [debounced, setDebounced] = useState(value);
@@ -467,6 +468,13 @@ export function PlayersTab() {
         </button>
       </div>
 
+      {/* World's Best showcase — All Tours only */}
+      {activeTour === 'all' && !debouncedSearch && elitePlayers && elitePlayers.length > 0 && (
+        <div className="px-4" style={{ marginTop: '20px' }}>
+          <PlayersWorldsBest players={elitePlayers.slice(0, 5)} />
+        </div>
+      )}
+
       {/* Search Bar — 24px gap from runner cards */}
       <div className="px-4" style={{ marginTop: '16px' }}>
         <div className="relative">
@@ -530,6 +538,13 @@ export function PlayersTab() {
           <div className="flex items-center justify-end" style={{ marginTop: '24px' }}>
             <PlayerSortControl value={sort} onChange={(v) => { setSort(v); setVisibleCount(PAGE_SIZE); }} activeTour={activeTour} />
           </div>
+        )}
+
+        {/* All Tours sort label */}
+        {activeTour === 'all' && !debouncedSearch && (
+          <p className="text-right" style={{ fontSize: '11px', color: 'hsl(var(--muted-foreground) / 0.5)', marginTop: '8px' }}>
+            {totalCount} players · A–Z
+          </p>
         )}
 
         {/* Player cards — 12px from sort */}
@@ -603,7 +618,7 @@ export function PlayersTab() {
                   Show More Players
                 </span>
                 <span style={{ fontSize: '14px', fontWeight: 400, color: 'hsl(var(--foreground) / 0.6)' }}>
-                 ({visibleCount + 1}-{Math.min(visibleCount + PAGE_SIZE, totalCount)} of {totalCount})
+                 ({Math.min(visibleCount, totalCount) + 1}–{Math.min(visibleCount + PAGE_SIZE, totalCount)} of {totalCount})
                 </span>
               </span>
               <ChevronDown className="w-4 h-4 text-muted-foreground/40" />
@@ -620,7 +635,7 @@ export function PlayersTab() {
       </div>
 
       {/* Bottom safe area */}
-      <div style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }} />
+      <div style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }} />
     </div>
   );
 }

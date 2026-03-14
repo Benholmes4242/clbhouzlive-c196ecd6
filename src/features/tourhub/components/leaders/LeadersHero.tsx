@@ -50,8 +50,8 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
     >
       {/* Burger menu */}
       <button 
-        className="absolute z-20 flex items-center justify-center"
-        style={{ top: '48px', left: '16px', width: '44px', height: '44px' }}
+        className="fixed z-20 flex items-center justify-center"
+        style={{ top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: '16px', width: '44px', height: '44px' }}
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
         aria-label="Open tour menu"
       >
@@ -77,6 +77,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
               initial={{ scale: 1.06 }}
               animate={{ scale: 1 }}
               transition={{ duration: 12, ease: 'linear' }}
+              onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
             />
           ) : (
             <div className="absolute inset-0 w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${category.accentColor}22, ${category.accentColor}44)` }}>
@@ -102,18 +103,17 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
                 fontWeight: 700,
                 letterSpacing: '1.2px',
                 textTransform: 'uppercase' as const,
-                color: 'rgba(245, 158, 11, 0.9)',
+                color: 'hsl(var(--accent-amber) / 0.9)',
               }}
             >
               {category.label} Leader
             </motion.p>
 
-            {/* Player name + flag */}
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.4 }}
-              className="flex items-center gap-2"
+              className="space-y-0.5"
             >
               <h2
                 style={{
@@ -126,7 +126,12 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
               >
                 {player.full_name}
               </h2>
-              <CountryFlag country={player.country_code || player.country} size="sm" className="brightness-110" />
+              <div className="flex items-center gap-1.5">
+                <CountryFlag country={player.country_code || player.country} size="sm" className="brightness-110" />
+                {countryName && (
+                  <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>{countryName}</span>
+                )}
+              </div>
             </motion.div>
 
             {/* Stats pill — amber bg, white text, 13px/600 */}
@@ -138,7 +143,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
               <span
                 className="inline-block"
                 style={{
-                  background: 'rgba(245,158,11,0.85)',
+                  background: 'hsl(var(--accent-amber) / 0.85)',
                   color: 'white',
                   fontSize: 13,
                   fontWeight: 600,
