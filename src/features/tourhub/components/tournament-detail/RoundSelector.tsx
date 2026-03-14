@@ -1,5 +1,6 @@
 /**
  * RoundSelector - Tier 2 sub-tab pills
+ * Uses the canonical secondary tab style: bg-[#475569] active, bg-muted inactive
  */
 
 import { cn } from '@/lib/utils';
@@ -14,7 +15,7 @@ interface RoundSelectorProps {
 export function RoundSelector({ rounds, activeRound, onRoundChange, className }: RoundSelectorProps) {
   return (
     <div
-      className={cn("flex items-center gap-2 mb-4", className)}
+      className={cn("flex items-center gap-1.5 mb-4", className)}
       role="tablist"
       aria-label="Round Selection"
     >
@@ -27,12 +28,15 @@ export function RoundSelector({ rounds, activeRound, onRoundChange, className }:
             aria-selected={isActive}
             onClick={() => onRoundChange(round)}
             className={cn(
-              "px-4 min-h-[36px] rounded-full text-sm whitespace-nowrap transition-all active:scale-[0.97] font-semibold",
+              "px-4 min-h-[36px] text-sm whitespace-nowrap transition-all active:scale-[0.97] font-semibold",
               isActive
-                ? "text-background"
-                : "text-muted-foreground bg-muted border border-transparent"
+                ? "text-white"
+                : "text-muted-foreground bg-muted"
             )}
-            style={isActive ? { backgroundColor: 'hsl(var(--foreground))' } : undefined}
+            style={{
+              borderRadius: 20,
+              ...(isActive ? { backgroundColor: '#475569' } : {}),
+            }}
           >
             {round}
           </button>
