@@ -148,7 +148,7 @@ const Top100Hub = () => {
               })()}
               
               {/* View Mode Toggle - Pill toggle style */}
-              <div className="flex justify-center py-3">
+              <div className="flex justify-center py-4">
                 <div className="flex p-1 rounded-xl overflow-hidden bg-muted">
                   <button
                     type="button"
@@ -156,8 +156,8 @@ const Top100Hub = () => {
                     className={cn(
                       'inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.97]',
                       viewMode === 'list'
-                        ? 'm-1 bg-card text-foreground border border-border'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
+                        ? 'bg-card text-foreground shadow-sm'
+                        : 'text-muted-foreground'
                     )}
                   >
                     <List className="h-3.5 w-3.5" />
@@ -170,8 +170,8 @@ const Top100Hub = () => {
                     className={cn(
                       'inline-flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-[0.97]',
                       viewMode === 'map'
-                        ? 'm-1 bg-card text-foreground border border-border'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
+                        ? 'bg-card text-foreground shadow-sm'
+                        : 'text-muted-foreground'
                     )}
                   >
                     <MapIcon className="h-3.5 w-3.5" />
