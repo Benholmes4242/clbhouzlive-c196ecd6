@@ -144,6 +144,7 @@ const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
 const AdminLanding = lazy(() => import("./pages/admin/AdminLanding").then(m => ({ default: m.AdminLanding })));
+const AdminV2Shell = lazy(() => import('./features/admin-v2/AdminV2Shell'));
 const AdminUsersPage = lazy(() => import("./pages/admin/AdminUsersPage").then(m => ({ default: m.AdminUsersPage })));
 const AdminMembersPage = lazy(() => import("./pages/admin/AdminMembersPage").then(m => ({ default: m.AdminMembersPage })));
 const AdminOverviewPage = lazy(() => import("./pages/admin/AdminOverviewPage").then(m => ({ default: m.AdminOverviewPage })));
@@ -482,6 +483,16 @@ function AppRoutes() {
           } />
         </Route>
         
+        {/* Admin V2 — new standalone console */}
+        <Route
+          path="/admin-v2/*"
+          element={
+            <Suspense fallback={<GenericPageSkeleton />}>
+              <AdminV2Shell />
+            </Suspense>
+          }
+        />
+
         {/* /create-moment removed — PostStudio is now the sole creation flow */}
         <Route path="/error-logs" element={<ErrorLogPage />} />
         
