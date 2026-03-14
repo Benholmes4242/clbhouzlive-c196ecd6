@@ -145,7 +145,7 @@ function SGBar({ label, value }: SGBarProps) {
   );
 }
 
-const TABS = ['Overview', 'Ball Striking', 'Short Game', 'Shots Gained'];
+const TABS = ['Player Overview', 'Ball Striking', 'Short Game', 'Shots Gained'];
 
 interface PlayerSeasonStatsProps {
   playerStats: TourPlayerStatistics;
