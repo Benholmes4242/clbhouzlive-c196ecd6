@@ -404,7 +404,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             12, 22,
             16, 26,
           ],
-          'circle-color': 'rgba(247, 147, 30, 0.2)',
+          'circle-color': 'rgba(34, 197, 94, 0.2)',
           'circle-blur': 0.8,
           'circle-opacity-transition': { duration: 300, delay: 0 },
         },
