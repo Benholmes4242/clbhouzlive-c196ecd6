@@ -84,8 +84,12 @@ export function FranchiseCard({
     }
 
     return [
-      { label: '', value: formatCompact(stats.earnings_total), isAccent: activeMetric === 'earnings' },
-      { label: pluralize(stats.wins_total, 'win'), value: String(stats.wins_total), isAccent: activeMetric === 'wins' },
+      activeMetric === 'wins'
+        ? { label: pluralize(stats.wins_total, 'win'), value: String(stats.wins_total), isAccent: true }
+        : { label: '', value: formatCompact(stats.earnings_total), isAccent: activeMetric === 'earnings' },
+      activeMetric === 'wins'
+        ? { label: '', value: formatCompact(stats.earnings_total), isAccent: false }
+        : { label: pluralize(stats.wins_total, 'win'), value: String(stats.wins_total), isAccent: false },
       { label: 'top 10s', value: String(stats.top10_total), isAccent: activeMetric === 'top10s' },
     ];
   };

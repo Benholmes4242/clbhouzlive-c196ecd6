@@ -167,6 +167,11 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
                   />
                 );
               })
+            ) : activeMetric === 'wins' ? (
+              <div className="flex flex-col items-center py-12 text-center">
+                <p className="text-sm font-medium text-foreground mb-1">No wins yet this season</p>
+                <p className="text-xs text-muted-foreground">Check back as the season progresses.</p>
+              </div>
             ) : (
               <div className="flex flex-col items-center py-12 text-center">
                 <p className="text-sm font-medium text-foreground mb-1">No data available</p>

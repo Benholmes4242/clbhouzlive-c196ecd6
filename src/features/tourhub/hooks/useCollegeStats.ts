@@ -38,8 +38,9 @@ export function useCurrentSeasonId() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('college_season_stats')
-        .select('season_id')
-        .order('created_at', { ascending: false })
+        .select('season_id, season:sr_seasons!college_season_stats_season_id_fkey(year)')
+        .not('season_id', 'is', null)
+        .order('season(year)', { ascending: false })
         .limit(1)
         .maybeSingle();
 
