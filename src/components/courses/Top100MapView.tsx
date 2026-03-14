@@ -445,7 +445,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             12, 14,
             16, 18,
           ],
-          'circle-color': seasonColor,
+          'circle-color': PLAYED_COLOR,
           'circle-opacity': 1.0,
           'circle-stroke-width': 2,
           'circle-stroke-color': 'rgba(255,255,255,0.8)',
