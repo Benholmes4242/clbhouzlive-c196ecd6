@@ -164,7 +164,7 @@ export function FranchiseCard({
                 width: isTopThree ? 24 : 'auto',
                 height: isTopThree ? 24 : 'auto',
                 borderRadius: isTopThree ? '50%' : 4,
-                background: rank === 1 ? 'hsl(var(--accent-amber) / 0.9)'
+                background: rank === 1 ? 'hsl(var(--accent-amber))'
                   : rank === 2 ? 'rgba(148,163,184,0.9)'
                   : rank === 3 ? 'rgba(194,135,90,0.9)'
                   : 'transparent',
