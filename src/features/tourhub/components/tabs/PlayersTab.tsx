@@ -540,6 +540,13 @@ export function PlayersTab() {
           </div>
         )}
 
+        {/* All Tours sort label */}
+        {activeTour === 'all' && !debouncedSearch && (
+          <p className="text-right" style={{ fontSize: '11px', color: 'hsl(var(--muted-foreground) / 0.5)', marginTop: '8px' }}>
+            {totalCount} players · A–Z
+          </p>
+        )}
+
         {/* Player cards — 12px from sort */}
         <AnimatePresence mode="wait">
           <motion.div
