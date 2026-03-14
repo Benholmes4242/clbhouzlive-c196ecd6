@@ -168,12 +168,12 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
         </h2>
       </div>
 
-      {/* Tab bar — sticky pill style */}
+      {/* Tab bar — secondary pill style */}
       <div
         className="sticky top-0 z-20 bg-background/95 backdrop-blur-md pb-3 pt-1"
         style={{ borderBottom: '1px solid hsl(var(--border) / 0.15)' }}
       >
-        <div className="flex gap-1" role="tablist" aria-label="Season Performance Stats">
+        <div className="flex gap-1.5" role="tablist" aria-label="Season Performance Stats">
           {TABS.map((tab) => {
             const isActive = activeTab === tab;
             return (
@@ -183,12 +183,18 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
                 aria-selected={isActive}
                 onClick={() => setActiveTab(tab)}
                 className={cn(
-                  "flex-1 rounded-lg py-2.5 min-h-[44px] transition-all text-center",
+                  "px-3 py-1.5 transition-all text-center",
                   isActive
-                    ? "bg-foreground text-background shadow-sm"
-                    : "bg-transparent text-muted-foreground"
+                    ? "text-foreground"
+                    : "text-muted-foreground"
                 )}
-                style={{ fontSize: '13px', fontWeight: 600 }}
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  borderRadius: 20,
+                  backgroundColor: isActive ? '#475569' : 'transparent',
+                  color: isActive ? '#fff' : undefined,
+                }}
               >
                 {tab}
               </button>
