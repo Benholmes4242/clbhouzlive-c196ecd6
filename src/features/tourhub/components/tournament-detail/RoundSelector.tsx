@@ -15,7 +15,7 @@ interface RoundSelectorProps {
 export function RoundSelector({ rounds, activeRound, onRoundChange, className }: RoundSelectorProps) {
   return (
     <div
-      className={cn("flex items-center gap-1.5 mb-4", className)}
+      className={cn("flex items-center justify-center gap-1.5 mb-4", className)}
       role="tablist"
       aria-label="Round Selection"
     >
