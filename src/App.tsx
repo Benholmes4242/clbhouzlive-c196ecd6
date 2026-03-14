@@ -141,37 +141,7 @@ const Top100List = lazy(() => import("./pages/Top100List"));
 const AchievementsHubPage = lazy(() => import("./pages/AchievementsHubPage"));
 const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
-const AdminPage = lazy(() => import("./pages/AdminPage"));
-const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
-const AdminLanding = lazy(() => import("./pages/admin/AdminLanding").then(m => ({ default: m.AdminLanding })));
 const AdminV2Shell = lazy(() => import('./features/admin-v2/AdminV2Shell'));
-const AdminUsersPage = lazy(() => import("./pages/admin/AdminUsersPage").then(m => ({ default: m.AdminUsersPage })));
-const AdminMembersPage = lazy(() => import("./pages/admin/AdminMembersPage").then(m => ({ default: m.AdminMembersPage })));
-const AdminOverviewPage = lazy(() => import("./pages/admin/AdminOverviewPage").then(m => ({ default: m.AdminOverviewPage })));
-const CommandCenterPage = lazy(() => import("./pages/admin/CommandCenterPage"));
-const AdminInvitesPage = lazy(() => import("./pages/admin/AdminInvitesPage").then(m => ({ default: m.AdminInvitesPage })));
-const InviteAcceptPage = lazy(() => import("./pages/admin/InviteAcceptPage").then(m => ({ default: m.InviteAcceptPage })));
-const VerificationsPage = lazy(() => import("./pages/admin/VerificationsPage"));
-const AdminBusinessDirectoryPage = lazy(() => import("./pages/admin/AdminBusinessDirectoryPage"));
-const AdminAuditPage = lazy(() => import("./pages/admin/AdminAuditPage"));
-
-// Legacy admin pages
-const GolfCoursesPage = lazy(() => import("./pages/admin/GolfCoursesPage").then(m => ({ default: m.GolfCoursesPage })));
-const GolfCourseEditorPage = lazy(() => import("./pages/admin/GolfCourseEditorPage"));
-const LogosPage = lazy(() => import("./pages/admin/LogosPage").then(m => ({ default: m.LogosPage })));
-const CollegeLogosPage = lazy(() => import("./pages/admin/CollegeLogosPage").then(m => ({ default: m.CollegeLogosPage })));
-const CountryFlagsPage = lazy(() => import("./pages/admin/CountryFlagsPage").then(m => ({ default: m.CountryFlagsPage })));
-const AssetManagerPage = lazy(() => import("./pages/admin/AssetManagerPage").then(m => ({ default: m.AssetManagerPage })));
-const CourseImportPage = lazy(() => import("./pages/admin/CourseImportPage").then(m => ({ default: m.CourseImportPage })));
-const AnalyticsPage = lazy(() => import("./pages/admin/AnalyticsPage").then(m => ({ default: m.AnalyticsPage })));
-const AdminEchoAnalyticsPage = lazy(() => import("./features/admin/pages/AdminEchoAnalyticsPage").then(m => ({ default: m.AdminEchoAnalyticsPage })));
-const AuthMonitoringPage = lazy(() => import("./pages/admin/AuthMonitoringPage"));
-const TeamPage = lazy(() => import("./pages/admin/TeamPage").then(m => ({ default: m.TeamPage })));
-const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage").then(m => ({ default: m.AdminSettingsPage })));
-const Top100GeocodingPage = lazy(() => import("./pages/admin/Top100GeocodingPage").then(m => ({ default: m.Top100GeocodingPage })));
-const AdminTestLabPage = lazy(() => import("./pages/admin/AdminTestLabPage"));
-const AdminTourPage = lazy(() => import("./pages/admin/AdminTourPage").then(m => ({ default: m.AdminTourPage })));
-const AdminTourPlayersPage = lazy(() => import("./pages/admin/AdminTourPlayersPage"));
 
 
 
