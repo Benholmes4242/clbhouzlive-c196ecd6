@@ -14,9 +14,10 @@ const TOUR_AVG = {
   drivingDistance: 301.8,
   drivingAccuracy: 59.0,
   gir: 68.5,
-  puttingAverage: 1.790,
-  sandSaves: 49.5,
+  puttingAverage: 1.752,
+  sandSaves: 53.1,
   scrambling: 56.8,
+  birdiesPerRound: 3.8,
 } as const;
 
 function fmt(value: number | null | undefined, type?: 'decimal' | 'percent' | 'yards' | 'currency' | 'signed'): string {
