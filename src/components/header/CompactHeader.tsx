@@ -187,7 +187,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   {hasLiveTournaments && (
                     <motion.span
                       className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-background"
-                      style={{ background: '#FF3B30' }}
+                      style={{ background: 'hsl(var(--destructive))' }}
                       animate={{ scale: [1, 1.2, 1] }}
                       transition={{ duration: 2, repeat: Infinity }}
                     />
