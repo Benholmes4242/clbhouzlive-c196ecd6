@@ -17,12 +17,6 @@ interface FriendsActivityCardProps {
   timeframe: string;
 }
 
-const RANK_COLORS: Record<number, string> = {
-  1: '#D4A853',
-  2: '#A8B4C0',
-  3: '#C4956A',
-};
-
 const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, timeframe }) => {
   const [showAll, setShowAll] = useState(false);
   const navigate = useNavigate();
@@ -54,7 +48,7 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
         <span className="text-xs text-muted-foreground">{getTimeLabel()}</span>
       </div>
 
-      {/* Friend rows — no card wrapper */}
+      {/* Friend rows */}
       <div>
         <AnimatePresence mode="sync">
           {visible.map((entry, index) => (
@@ -67,7 +61,7 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
               onClick={() => navigate(`/profile/${entry.friendId}`)}
               className="flex items-center gap-3 py-3 cursor-pointer active:scale-[0.98] transition-transform"
               style={{
-                borderBottom: index < visible.length - 1 ? '1px solid rgba(0,0,0,0.04)' : 'none',
+                borderBottom: index < visible.length - 1 ? '1px solid hsl(var(--border) / 0.3)' : 'none',
               }}
             >
               {/* Avatar */}
@@ -89,16 +83,22 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
                 </p>
               </div>
 
-              {/* Rank badge */}
-              <div
-                className="flex items-center justify-center w-6 h-6 rounded-full shrink-0 text-[10px] font-bold"
+              {/* Rank number */}
+              <span
                 style={{
-                  background: RANK_COLORS[index + 1] || 'rgba(0,0,0,0.06)',
-                  color: (index + 1) <= 3 ? 'white' : 'hsl(var(--muted-foreground))',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  fontVariantNumeric: 'tabular-nums',
+                  color: index === 0
+                    ? 'hsl(var(--accent-amber))'
+                    : 'hsl(var(--muted-foreground))',
+                  width: 18,
+                  textAlign: 'center',
+                  flexShrink: 0,
                 }}
               >
                 {index + 1}
-              </div>
+              </span>
             </motion.div>
           ))}
         </AnimatePresence>
@@ -108,8 +108,7 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
       {!showAll && trimmed.length > 3 && (
         <button
           onClick={() => setShowAll(true)}
-          className="mt-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-          style={{ color: '#40916C' }}
+          className="mt-1 text-xs font-medium text-muted-foreground active:opacity-70 transition-opacity"
         >
           See all {trimmed.length} friends
         </button>
