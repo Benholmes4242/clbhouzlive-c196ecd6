@@ -60,12 +60,12 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
           <p className="mt-2 text-sm text-muted-foreground max-w-[260px] mx-auto">
             Follow golfers to compare progress on this Top 100.
           </p>
-          <Button
+          <button
             onClick={() => navigate('/golferstofollow')}
-            className="w-full max-w-[260px] h-11 rounded-sq-sm mt-4"
+            className="w-full max-w-[260px] h-11 rounded-2xl mt-4 bg-foreground text-background text-sm font-semibold active:scale-[0.97] transition-transform"
           >
             Find golfers to follow
-          </Button>
+          </button>
         </motion.div>
       </section>
     );
