@@ -119,7 +119,8 @@ serve(async (req) => {
       const { playerName, tourCode } = await req.json();
       if (!playerName) throw new Error('playerName required');
 
-      const folder = TOUR_FOLDER[tourCode] || 'Misc';
+      const normalizedTourCode = typeof tourCode === 'string' ? tourCode.toLowerCase() : '';
+      const folder = TOUR_FOLDER[normalizedTourCode] || 'Misc';
       const objectKey = `${folder}/${playerName}.webp`;
       const deleteUrl = `https://${accountId}.r2.cloudflarestorage.com/${bucket}/${encodeURIComponent(folder)}/${encodeURIComponent(playerName)}.webp`;
 
