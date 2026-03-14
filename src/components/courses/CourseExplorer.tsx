@@ -450,7 +450,7 @@ const CourseExplorer = () => {
         {searchTerm && (
           <button
             onClick={() => setSearchTerm('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 text-muted-foreground active:opacity-70 transition-opacity"
             aria-label="Clear search"
           >
             <X className="h-4 w-4" />
