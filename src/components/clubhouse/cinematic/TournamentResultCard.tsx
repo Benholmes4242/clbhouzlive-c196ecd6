@@ -470,8 +470,9 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
                       <div key={i} style={{
                         marginLeft: i === 0 ? 0 : -10,
                         zIndex: stackedAvatars.length - i,
-                        borderRadius: '50%',
+                        borderRadius: '34%',
                         border: '2px solid rgba(0,0,0,0.95)',
+                        overflow: 'hidden',
                       }}>
                         <RowAvatar src={resolvePhoto(p.name, p.photoUrl)} name={p.name} size={30} />
                       </div>
