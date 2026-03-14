@@ -64,7 +64,7 @@ export function FranchiseCard({
 }: FranchiseCardProps) {
   const displayName = college?.short_name || college?.college_name || stats.normalized_name;
   const slug = stats.normalized_name;
-  const isTopThree = rank !== undefined && rank <= 3;
+  
   const momentumRising = momentum?.isRising ?? false;
   const logoUrl = getCollegeLogoUrl(college?.college_name || stats.normalized_name);
 
