@@ -177,7 +177,8 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
                 />
                 {/* Mini progress badge */}
                 <div 
-                  className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-foreground flex items-center justify-center text-[8px] font-bold text-background"
+                  className="absolute -bottom-0.5 -right-0.5 rounded flex items-center justify-center text-[8px] font-bold"
+                  style={{ background: 'hsl(var(--background))', border: '1px solid hsl(var(--border) / 0.4)', padding: '0 3px', color: 'hsl(var(--muted-foreground))' }}
                   title={`${friend.playedOnList}/${totalInList} played`}
                 >
                   {friend.playedOnList}
