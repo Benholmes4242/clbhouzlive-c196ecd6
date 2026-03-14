@@ -5,7 +5,7 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Crown, Cog, Rocket, ChevronDown, ChevronUp, ChevronRight } from 'lucide-react';
+import { Trophy, TrendingUp, Rocket, ChevronDown, ChevronUp, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollegeAlumni, type CollegeAlumnus } from '../../hooks/useCollegeAlumni';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
@@ -63,7 +63,6 @@ function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
         className={cn(
           "flex overflow-hidden",
           "bg-card rounded-2xl border border-border/50",
-          "hover:border-primary/30 hover:shadow-md",
           "active:scale-[0.98] transition-all"
         )}
         style={{
@@ -83,6 +82,7 @@ function AlumniRow({ alumnus, index, tierAccent }: AlumniRowProps) {
               alt={fullName}
               className="w-full h-full object-cover object-top"
               loading="lazy"
+              onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/20 flex items-center justify-center">
@@ -162,7 +162,7 @@ function Section({ title, subtitle, icon: Icon, iconColor, alumni, defaultExpand
             <motion.div
               animate={{ rotate: isExpanded ? 180 : 0 }}
               transition={{ duration: 0.2 }}
-              className="text-muted-foreground/40 group-hover:text-foreground transition-colors"
+              className="text-muted-foreground/40"
             >
               <ChevronDown className="w-4 h-4" />
             </motion.div>
@@ -170,11 +170,11 @@ function Section({ title, subtitle, icon: Icon, iconColor, alumni, defaultExpand
         </div>
       </button>
       
-      <motion.div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }} initial={false} animate={{ height: 'auto' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {displayedAlumni.map((alumnus, index) => (
           <AlumniRow key={alumnus.id} alumnus={alumnus} index={index} tierAccent={tierAccent} />
         ))}
-      </motion.div>
+      </div>
       
       {hasMore && (
         <button
@@ -220,10 +220,10 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
     alumni.forEach(a => {
       if ((a.world_ranking && a.world_ranking <= 50) || (a.wins || 0) > 0) {
         headliners.push(a);
-      } else if ((a.cuts_made || 0) >= 5 || (a.earnings || 0) >= 100_000) {
+      } else if ((a.cuts_made || 0) >= 3 || (a.earnings || 0) >= 75_000) {
         engineRoom.push(a);
-      } else if ((a.earnings || 0) > 0) {
-        pipeline.push(a);
+      } else {
+        pipeline.push(a); // always show — they're on tour
       }
     });
     
@@ -250,9 +250,9 @@ export function AlumniDepthChart({ normalizedName, className }: AlumniDepthChart
   
   return (
     <div className={className}>
-      <Section title="Headliners" subtitle="Elite performers and winners" icon={Crown} iconColor="text-[#f59e0b]" alumni={headliners} defaultExpanded={true} tierAccent="amber" />
-      <Section title="Engine Room" subtitle="Reliable contributors making cuts" icon={Cog} iconColor="text-blue-400" alumni={engineRoom} defaultExpanded={engineRoom.length <= 5} tierAccent="blue" />
-      <Section title="Pipeline" subtitle="Rising talent building careers" icon={Rocket} iconColor="text-[#22C55E]" alumni={pipeline} defaultExpanded={false} tierAccent="green" />
+      <Section title="Stars" subtitle="Top ranked & winners" icon={Trophy} iconColor="text-amber-400" alumni={headliners} defaultExpanded={true} tierAccent="amber" />
+      <Section title="Regulars" subtitle="Consistent performers on tour" icon={TrendingUp} iconColor="text-blue-400" alumni={engineRoom} defaultExpanded={engineRoom.length <= 5} tierAccent="blue" />
+      <Section title="Rising" subtitle="Building their tour career" icon={Rocket} iconColor="text-emerald-500" alumni={pipeline} defaultExpanded={false} tierAccent="green" />
     </div>
   );
 }

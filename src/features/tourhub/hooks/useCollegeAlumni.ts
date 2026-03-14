@@ -49,11 +49,11 @@ export function useCollegeAlumni(normalizedName: string | undefined, options?: {
       
       if (!players?.length) return [];
       
-      // Get their stats
+      // Get their stats — include cuts_made and wins columns directly
       const playerIds = players.map(p => p.id);
       const { data: stats, error: statsError } = await supabase
         .from('sr_player_statistics')
-        .select('player_id, raw_data')
+        .select('player_id, cuts_made, wins, raw_data')
         .eq('season_id', seasonId)
         .in('player_id', playerIds);
       
@@ -62,10 +62,11 @@ export function useCollegeAlumni(normalizedName: string | undefined, options?: {
       }
       
       // Merge stats into players
-      const statsMap = new Map(stats?.map(s => [s.player_id, s.raw_data]) || []);
+      const statsMap = new Map(stats?.map(s => [s.player_id, s]) || []);
       
       const alumni: CollegeAlumnus[] = players.map(p => {
-        const rawData = statsMap.get(p.id) as Record<string, unknown> | undefined;
+        const s = statsMap.get(p.id);
+        const rawData = s?.raw_data as Record<string, unknown> | undefined;
         const statistics = (rawData?.statistics || {}) as Record<string, unknown>;
         
         return {
@@ -79,8 +80,8 @@ export function useCollegeAlumni(normalizedName: string | undefined, options?: {
           college: p.college || '',
           world_ranking: typeof statistics.world_rank === 'number' ? statistics.world_rank : null,
           earnings: typeof statistics.earnings === 'number' ? statistics.earnings : 0,
-          wins: typeof statistics.first_place === 'number' ? statistics.first_place : 0,
-          cuts_made: typeof statistics.cuts_made === 'number' ? statistics.cuts_made : 0,
+          wins: typeof s?.wins === 'number' ? s.wins : (typeof statistics.first_place === 'number' ? statistics.first_place : 0),
+          cuts_made: typeof s?.cuts_made === 'number' ? s.cuts_made : (typeof statistics.cuts_made === 'number' ? statistics.cuts_made : 0),
           top_10s: typeof statistics.top_10 === 'number' ? statistics.top_10 : 0,
         };
       });
@@ -88,7 +89,6 @@ export function useCollegeAlumni(normalizedName: string | undefined, options?: {
       // Sort by selected metric
       alumni.sort((a, b) => {
         if (orderBy === 'world_ranking') {
-          // Lower ranking is better, nulls go to end
           const aRank = a.world_ranking || 9999;
           const bRank = b.world_ranking || 9999;
           return aRank - bRank;
