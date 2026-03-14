@@ -418,7 +418,8 @@ const ClubhouseContent = () => {
       ) : null}
 
       {/* ═══ TOURNAMENT RESULT OVERLAY (comments/more options only — card renders inline in feed) ═══ */}
-      {activePost && posts.length > 0 && activePost.postType === 'tournament_result' && (
+      {activePost && posts.length > 0 &&
+        (activePost.postType === 'tournament_result' || activePost.postType === 'tournament_live') && (
         <>
           {/* Comments sheet for tournament posts */}
           <CommentsSheet
