@@ -9,7 +9,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useCollegeSeasonStats, type CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
-import { useCollegeStatusMap, useTopMovers } from '../../hooks/useCollegeStatus';
+import { useTopMovers } from '../../hooks/useCollegeStatus';
 import { useBatchCollegeAlumni } from '../../hooks/useBatchCollegeAlumni';
 import { FranchiseCard } from './FranchiseCard';
 import { FranchiseMovers } from './FranchiseMovers';
@@ -44,7 +44,6 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
 
   const { data: allStats, isLoading, error } = useCollegeSeasonStats();
   const { data: collegeMap } = useCollegeMediaMap();
-  const statusMap = useCollegeStatusMap();
   const { data: moverInfo } = useTopMovers();
 
   const { sortedStats, maxValue } = useMemo(() => {
@@ -147,7 +146,6 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
             ) : sortedStats.length > 0 ? (
               <>
                 {sortedStats.map((collegeStats, index) => {
-                  const status = statusMap.get(collegeStats.normalized_name) || null;
                   const moverData = moverInfo?.moverData?.get(collegeStats.normalized_name);
                   const momentum = moverData ? {
                     rankChange: moverData.rankChange,
@@ -164,7 +162,6 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
                       rank={index + 1}
                       maxValue={maxValue}
                       activeMetric={activeMetric}
-                      status={status}
                       momentum={momentum}
                       alumni={alumni}
                       animationDelay={index * 0.03}

@@ -11,7 +11,7 @@ import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeads
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import type { CollegeSeasonStats } from '../../hooks/useCollegeStats';
 import type { CollegeMedia } from '../../hooks/useCollegeMedia';
-import type { CollegeStatus, CollegeMomentum } from '../../hooks/useCollegeStatus';
+import type { CollegeMomentum } from '../../hooks/useCollegeStatus';
 import type { AlumniFace } from '../../hooks/useBatchCollegeAlumni';
 
 interface FranchiseCardProps {
@@ -21,7 +21,6 @@ interface FranchiseCardProps {
   maxValue?: number;
   activeMetric?: 'earnings' | 'wins' | 'top10s';
   previousRank?: number;
-  status?: CollegeStatus | null;
   momentum?: CollegeMomentum | null;
   alumni?: AlumniFace[];
   className?: string;
@@ -30,7 +29,6 @@ interface FranchiseCardProps {
   deltas?: {
     earnings_delta: number;
     wins_delta: number;
-    cuts_delta: number;
     top10_delta: number;
     earnings_rank_change: number | null;
   };
@@ -61,7 +59,7 @@ function getInitials(fullName: string): string {
 
 export function FranchiseCard({
   stats, college, rank, activeMetric = 'earnings',
-  status, momentum, alumni, className, animationDelay = 0,
+  momentum, alumni, className, animationDelay = 0,
   isDelta = false, deltas,
 }: FranchiseCardProps) {
   const displayName = college?.short_name || college?.college_name || stats.normalized_name;

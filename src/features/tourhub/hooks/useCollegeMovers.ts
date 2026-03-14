@@ -11,7 +11,6 @@ export interface CollegeWeeklyMover {
   normalized_name: string;
   earnings_delta: number;
   wins_delta: number;
-  cuts_delta: number;
   top10_delta: number;
   earnings_rank_this_week: number | null;
   earnings_rank_last_week: number | null;
@@ -33,7 +32,7 @@ export interface CollegeRivalry {
  */
 export function useCollegeWeeklyMovers(options?: {
   direction?: 'up' | 'down';
-  metric?: 'earnings' | 'wins' | 'cuts' | 'top10s';
+  metric?: 'earnings' | 'wins' | 'top10s';
   limit?: number;
 }) {
   const { direction = 'up', metric = 'earnings', limit = 10 } = options || {};
@@ -61,7 +60,6 @@ export function useCollegeWeeklyMovers(options?: {
       const deltaColumn = {
         earnings: 'earnings_delta',
         wins: 'wins_delta',
-        cuts: 'cuts_delta',
         top10s: 'top10_delta',
       }[metric];
       

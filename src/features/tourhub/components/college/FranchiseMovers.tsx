@@ -8,7 +8,6 @@ import { TrendingUp, TrendingDown, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCollegeWeeklyMovers } from '../../hooks/useCollegeMovers';
 import { useCollegeMediaMap } from '../../hooks/useCollegeMedia';
-import { useCollegeStatusMap } from '../../hooks/useCollegeStatus';
 import { useCollegeSeasonStats } from '../../hooks/useCollegeStats';
 import { useBatchCollegeAlumni } from '../../hooks/useBatchCollegeAlumni';
 import { FranchiseCard } from './FranchiseCard';
@@ -26,7 +25,6 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
   const { data: movers, isLoading } = useCollegeWeeklyMovers({ direction, limit });
   const { data: collegeMap } = useCollegeMediaMap();
   const { data: allStats } = useCollegeSeasonStats();
-  const statusMap = useCollegeStatusMap();
 
   const statsMap = useMemo(() => {
     if (!allStats) return new Map();
@@ -48,7 +46,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
         const start = new Date(weekStart);
         const end = new Date(start);
         end.setDate(end.getDate() + 6);
-        return `Week of ${format(start, 'MMM d')} - ${format(end, 'd, yyyy')}`;
+        return `Week of ${format(start, 'MMM d')} – ${format(end, 'MMM d, yyyy')}`;
       })()
     : null;
 
@@ -66,7 +64,8 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
         className="flex items-stretch overflow-hidden"
         style={{
           borderRadius: 16,
-          background: 'transparent',
+          background: 'hsl(var(--card))',
+          border: '1px solid hsl(var(--border) / 0.5)',
           padding: 4,
           marginBottom: 16,
         }}
@@ -116,7 +115,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
         >
           {isLoading ? (
             Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-card/50 border border-border/30 animate-pulse" style={{ height: 110, borderRadius: 16 }} />
+              <div key={i} className="bg-muted/40 animate-pulse" style={{ minHeight: 110, borderRadius: 16 }} />
             ))
           ) : enrichedMovers.length > 0 ? (
             enrichedMovers.map((mover, idx) => {
@@ -135,7 +134,6 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
                   deltas={{
                     earnings_delta: mover.earnings_delta,
                     wins_delta: mover.wins_delta,
-                    cuts_delta: mover.cuts_delta,
                     top10_delta: mover.top10_delta,
                     earnings_rank_change: mover.earnings_rank_change,
                   }}
@@ -150,7 +148,7 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
                <p style={{ fontSize: 13, fontWeight: 400, marginTop: 4 }} className="text-muted-foreground/70">
                  {direction === 'up'
                    ? 'No colleges climbed the rankings this week.'
-                   : 'No colleges dropped in the rankings this week. Check back next Monday.'}
+                   : 'No colleges dropped in the rankings this week.'}
                </p>
             </div>
           )}
