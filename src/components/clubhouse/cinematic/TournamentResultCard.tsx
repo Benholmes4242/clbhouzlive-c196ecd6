@@ -1,115 +1,197 @@
 /**
- * TournamentResultCard — SESSION 7 full redesign.
- * Full-bleed 100dvh cinematic card with parallax drift, gradient overlays,
- * top bar, overlaid tournament name, glass card with winner/stats/podium/engagement.
+ * TournamentResultCard v2 — Cinematic feed moment.
+ * Winner portrait as full-bleed hero. AI insight strip. Leaderboard + stats. Engagement CTA.
  */
 
-import React, { useRef, useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import type { TournamentResultFeedPost, TournamentResultMeta, PodiumRow as PodiumRowType } from '@/components/media-system/types/media';
+import type {
+  TournamentResultFeedPost,
+  TournamentResultMeta,
+  PodiumRow as PodiumRowType,
+} from '@/components/media-system/types/media';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
-// ─── Keyframe styles injected once ───
-const STYLE_ID = 'trcard-keyframes';
+// ─── Keyframes ────────────────────────────────────────────────────────────────
+
+const STYLE_ID = 'trc-v2-keyframes';
 function ensureKeyframes() {
   if (document.getElementById(STYLE_ID)) return;
   const s = document.createElement('style');
   s.id = STYLE_ID;
   s.textContent = `
-    @keyframes trcard-fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes trcard-slideIn { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: translateX(0); } }
-    @keyframes trcard-pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(2); opacity: 0; } }
-    @keyframes trcard-glowPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(249,115,22,0); } 50% { box-shadow: 0 0 0 6px rgba(249,115,22,0.15); } }
-    @keyframes trcard-heartPop { 0% { transform: scale(1); } 25% { transform: scale(1.5); } 60% { transform: scale(0.9); } 100% { transform: scale(1); } }
+    @keyframes trc-fadeUp   { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes trc-fadeIn   { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes trc-slideIn  { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes trc-heartPop { 0% { transform: scale(1); } 30% { transform: scale(1.6); } 70% { transform: scale(0.9); } 100% { transform: scale(1); } }
+    @keyframes trc-ctaPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(249,115,22,0); } 60% { box-shadow: 0 0 0 8px rgba(249,115,22,0.12); } }
+    @keyframes trc-shimmer  { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
   `;
   document.head.appendChild(s);
 }
 
-// ─── Tour gradient fallbacks ───
-const TOUR_FALLBACKS: Record<string, string> = {
-  pga: 'linear-gradient(160deg, #1e3a5f, #0f1f3d)',
-  liv: 'linear-gradient(160deg, #3f1f1f, #1f0f0f)',
-  euro: 'linear-gradient(160deg, #1a3f2a, #0f1f15)',
-  dpw: 'linear-gradient(160deg, #1a3f2a, #0f1f15)',
-  lpga: 'linear-gradient(160deg, #3f1a2a, #1f0f15)',
-  kft: 'linear-gradient(160deg, #3f2a1a, #1f150f)',
-  champ: 'linear-gradient(160deg, #3f2a1a, #1f150f)',
+// ─── Tour identity system ──────────────────────────────────────────────────────
+
+interface TourIdentity {
+  label: string;
+  accentColor: string;
+  gradient: string;
+  badgeBg: string;
+}
+
+const TOUR_IDENTITY: Record<string, TourIdentity> = {
+  pga:   { label: 'PGA TOUR',   accentColor: '#3B82F6', gradient: 'linear-gradient(180deg, #0a1628 0%, #071020 100%)', badgeBg: 'rgba(59,130,246,0.18)' },
+  liv:   { label: 'LIV GOLF',   accentColor: '#EF4444', gradient: 'linear-gradient(180deg, #1a0a0a 0%, #100505 100%)', badgeBg: 'rgba(239,68,68,0.18)' },
+  euro:  { label: 'DP WORLD',   accentColor: '#22C55E', gradient: 'linear-gradient(180deg, #091a0f 0%, #05100a 100%)', badgeBg: 'rgba(34,197,94,0.18)' },
+  dpw:   { label: 'DP WORLD',   accentColor: '#22C55E', gradient: 'linear-gradient(180deg, #091a0f 0%, #05100a 100%)', badgeBg: 'rgba(34,197,94,0.18)' },
+  lpga:  { label: 'LPGA',       accentColor: '#EC4899', gradient: 'linear-gradient(180deg, #1a0912 0%, #10050b 100%)', badgeBg: 'rgba(236,72,153,0.18)' },
+  kft:   { label: 'KORN FERRY', accentColor: '#F59E0B', gradient: 'linear-gradient(180deg, #1a1005 0%, #100a03 100%)', badgeBg: 'rgba(245,158,11,0.18)' },
+  champ: { label: 'CHAMPIONS',  accentColor: '#A78BFA', gradient: 'linear-gradient(180deg, #10091a 0%, #080510 100%)', badgeBg: 'rgba(167,139,250,0.18)' },
 };
 
-// ─── Tour label helper ───
-function getTourLabel(slug: string): string {
-  const map: Record<string, string> = {
-    pga: 'PGA TOUR', liv: 'LIV GOLF', euro: 'DP WORLD', dpw: 'DP WORLD',
-    lpga: 'LPGA', champ: 'CHAMPIONS', kft: 'KORN FERRY',
+function getTourIdentity(slug: string): TourIdentity {
+  return TOUR_IDENTITY[slug] ?? {
+    label: slug.toUpperCase(),
+    accentColor: '#F97316',
+    gradient: 'linear-gradient(180deg, #111827 0%, #0a0f1a 100%)',
+    badgeBg: 'rgba(249,115,22,0.18)',
   };
-  return map[slug] || slug.toUpperCase();
 }
 
-// ─── Avatar with fallback ───
-function WinnerAvatar({ src, name, size }: { src: string | null; name: string; size: number }) {
-  const [currentSrc, setCurrentSrc] = useState(src);
-  const [error, setError] = useState(false);
-  const initials = name.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() || '').slice(0, 2).join('') || '?';
+// ─── AI Insight generator (client-side, from available stats) ─────────────────
 
-  useEffect(() => { setCurrentSrc(src); setError(false); }, [src]);
+function generateWinnerInsight(meta: TournamentResultMeta): string {
+  const name = meta.winner_name.split(' ').pop() ?? meta.winner_name;
+  const score = meta.winner_score_display;
+  const birdies = meta.stat_birdies;
+  const eagles = meta.stat_eagles;
+  const bogeys = meta.stat_bogeys;
+  const putts = meta.stat_putts;
+  const fairways = meta.stat_fairways_pct;
+  const gir = meta.stat_gir_pct;
+  const driving = meta.stat_driving_distance;
+  const winnerBy = meta.winner_by;
+  const podium = meta.podium_rows;
+
+  const fragments: string[] = [];
+
+  if (birdies != null && birdies >= 25) {
+    fragments.push(`${name} torched the field with ${birdies} birdies across 72 holes — one of the most aggressive winning performances of the season.`);
+  } else if (birdies != null && birdies >= 20) {
+    fragments.push(`${name}'s ${birdies}-birdie week at ${score} was a masterclass in attacking golf.`);
+  }
+
+  if (eagles != null && eagles >= 2) {
+    fragments.push(`${name} made ${eagles} eagles this week — a rare display of power that proved decisive at ${score}.`);
+  }
+
+  if (bogeys != null && bogeys <= 3 && birdies != null && birdies >= 15) {
+    fragments.push(`Just ${bogeys} bogey${bogeys === 1 ? '' : 's'} all week. ${name}'s ${score} was built on relentless consistency.`);
+  }
+
+  if (putts != null && putts < 1.6) {
+    fragments.push(`${name} averaged just ${putts.toFixed(2)} putts per hole — the putter was the weapon that unlocked ${score}.`);
+  }
+
+  if (gir != null && gir >= 78 && fairways != null && fairways >= 70) {
+    fragments.push(`${name} hit ${Math.round(gir)}% of greens and ${Math.round(fairways)}% of fairways — pure ball-striking dominance at ${score}.`);
+  }
+
+  if (driving != null && driving >= 320) {
+    fragments.push(`${name}'s ${driving}-yard average off the tee gave the field no answer. Bombed to ${score}.`);
+  }
+
+  if (winnerBy && (winnerBy.toLowerCase().includes('playoff') || winnerBy.toLowerCase().includes('p/o'))) {
+    fragments.push(`${name} refused to lose. After finishing tied at ${score}, the playoff proved what the final leaderboard couldn't — composure under fire.`);
+  } else if (winnerBy && winnerBy.includes('1')) {
+    const runner = podium?.[0]?.players?.[0]?.name?.split(' ').pop() ?? 'the field';
+    fragments.push(`Just one shot separated ${name} from ${runner} at the end. A ${score} victory that wasn't decided until the final hole.`);
+  } else if (winnerBy && (winnerBy.includes('3') || winnerBy.includes('4') || winnerBy.includes('5'))) {
+    fragments.push(`A convincing ${winnerBy} wire-to-wire? Not quite — but ${name}'s ${score} made it look effortless down the stretch.`);
+  }
+
+  if (fragments.length === 0 && birdies != null) {
+    const ratio = bogeys != null && bogeys > 0 ? (birdies / bogeys).toFixed(1) : null;
+    if (ratio) {
+      fragments.push(`${birdies} birdies, ${bogeys} bogeys. A ${ratio}:1 ratio tells the story of ${name}'s ${score} winning week.`);
+    } else {
+      fragments.push(`${name} fired ${birdies} birdies en route to ${score}. The rest of the field never found an answer.`);
+    }
+  }
+
+  return fragments[0] ?? `${name} wins at ${score}. The conversation starts now.`;
+}
+
+// ─── Winner avatar (hero size) ────────────────────────────────────────────────
+
+function HeroAvatar({ src, name }: { src: string | null; name: string }) {
+  const [imgSrc, setImgSrc] = useState(src);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => { setImgSrc(src); setFailed(false); }, [src]);
+
+  const initials = name.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() ?? '').slice(0, 2).join('');
+
+  if (imgSrc && !failed) {
+    return (
+      <img
+        src={imgSrc}
+        alt={name}
+        draggable={false}
+        onError={() => {
+          if (imgSrc !== PLAYER_SILHOUETTE_URL) setImgSrc(PLAYER_SILHOUETTE_URL);
+          else setFailed(true);
+        }}
+        style={{
+          position: 'absolute', inset: 0, width: '100%', height: '100%',
+          objectFit: 'cover', objectPosition: 'top center',
+        }}
+      />
+    );
+  }
 
   return (
     <div style={{
-      width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
-      border: '2px solid rgba(251,146,60,0.8)',
-      boxShadow: '0 0 16px rgba(251,146,60,0.5), 0 0 32px rgba(251,146,60,0.2)',
-      position: 'relative',
-      background: 'rgba(255,255,255,0.08)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      position: 'absolute', inset: 0, display: 'flex',
+      alignItems: 'center', justifyContent: 'center',
+      fontSize: 72, fontWeight: 700, color: 'rgba(255,255,255,0.2)',
+      letterSpacing: 4,
     }}>
-      {currentSrc && !error ? (
+      <span>{initials}</span>
+    </div>
+  );
+}
+
+// ─── Small avatar for leaderboard rows ───────────────────────────────────────
+
+function RowAvatar({ src, name, size = 34 }: { src: string | null; name: string; size?: number }) {
+  const [imgSrc, setImgSrc] = useState(src);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => { setImgSrc(src); setFailed(false); }, [src]);
+  const initials = name.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() ?? '').slice(0, 2).join('');
+
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: '50%',
+      background: 'rgba(255,255,255,0.08)', overflow: 'hidden',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      flexShrink: 0,
+    }}>
+      {imgSrc && !failed ? (
         <img
-          src={currentSrc}
-          alt={name}
-          onError={() => {
-            if (currentSrc !== PLAYER_SILHOUETTE_URL) setCurrentSrc(PLAYER_SILHOUETTE_URL);
-            else setError(true);
-          }}
+          src={imgSrc} alt={name} draggable={false}
+          onError={() => { if (imgSrc !== PLAYER_SILHOUETTE_URL) setImgSrc(PLAYER_SILHOUETTE_URL); else setFailed(true); }}
           style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
         />
       ) : (
-        <span style={{ fontSize: Math.round(size * 0.32), fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>{initials}</span>
+        <span style={{ fontSize: size * 0.36, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>{initials}</span>
       )}
     </div>
   );
 }
 
-// ─── Small avatar for podium rows ───
-function SmallAvatar({ src, name, size }: { src: string | null; name: string; size: number }) {
-  const [currentSrc, setCurrentSrc] = useState(src);
-  const [error, setError] = useState(false);
-  const initials = name.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() || '').slice(0, 2).join('') || '?';
+// ─── Props ────────────────────────────────────────────────────────────────────
 
-  useEffect(() => { setCurrentSrc(src); setError(false); }, [src]);
-
-  return (
-    <div style={{
-      width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
-      outline: '2px solid rgba(12,15,20,0.95)',
-      outlineOffset: 0,
-      border: 'none',
-      background: 'rgba(12,15,20,0.95)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-    }}>
-      {currentSrc && !error ? (
-        <img src={currentSrc} alt={name}
-          onError={() => { if (currentSrc !== PLAYER_SILHOUETTE_URL) setCurrentSrc(PLAYER_SILHOUETTE_URL); else setError(true); }}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
-        />
-      ) : (
-        <span style={{ fontSize: Math.round(size * 0.35), fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>{initials}</span>
-      )}
-    </div>
-  );
-}
-
-// ─── Props ───
 export interface TournamentResultCardProps {
   post: TournamentResultFeedPost;
   isActive: boolean;
@@ -122,37 +204,31 @@ export interface TournamentResultCardProps {
   commentCountOverride?: number;
 }
 
-// ─── Main Component ───
+// ─── Main component ───────────────────────────────────────────────────────────
+
 export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
-  post, isActive, isVisible, onLike, onComment, onShare, onViewResults, likeOverride, commentCountOverride,
+  post, isActive, onLike, onComment, onViewResults,
+  likeOverride, commentCountOverride,
 }) => {
   const navigate = useNavigate();
   const meta = post.tournamentMeta;
   const isLiked = likeOverride?.isLiked ?? post.isLikedByMe;
   const likeCount = likeOverride?.count ?? post.likeCount;
   const commentCount = commentCountOverride ?? post.commentCount;
-
-  const hasImage = !!meta.course_image_url;
-  const hasVenue = !!(meta.venue_name || meta.venue_city);
-  const hasPodium = meta.podium_rows && meta.podium_rows.length > 0;
-
-  // Heart pop state
+  const tour = getTourIdentity(meta.tour_slug);
   const [heartPopping, setHeartPopping] = useState(false);
 
-  // Inject keyframes
-  useEffect(() => { ensureKeyframes(); }, []);
-
-  // Parallax drift via rAF
-  const imgRef = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!isActive) return;
     let raf: number;
     const start = performance.now();
     const tick = () => {
-      const elapsed = (performance.now() - start) / 1000;
-      const offset = Math.sin(elapsed * 0.15) * 12;
-      if (imgRef.current) {
-        imgRef.current.style.transform = `translateX(${offset}px)`;
+      const t = (performance.now() - start) / 1000;
+      const drift = Math.sin(t * 0.12) * 8;
+      const scale = 1 + Math.abs(Math.sin(t * 0.08)) * 0.015;
+      if (heroRef.current) {
+        heroRef.current.style.transform = `translateX(${drift}px) scale(${scale})`;
       }
       raf = requestAnimationFrame(tick);
     };
@@ -160,338 +236,379 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
     return () => cancelAnimationFrame(raf);
   }, [isActive]);
 
-  // No longer needed — grid always renders all 8 chips
+  useEffect(() => { ensureKeyframes(); }, []);
+
+  const insight = useMemo(() => generateWinnerInsight(meta), [meta]);
+
+  const resolvePhoto = useCallback((name: string, photoUrl?: string | null) =>
+    photoUrl || getPlayerHeadshotUrl(name, meta.tour_slug) || PLAYER_SILHOUETTE_URL,
+  [meta.tour_slug]);
+
+  const handleLike = useCallback(() => {
+    setHeartPopping(true);
+    setTimeout(() => setHeartPopping(false), 500);
+    onLike();
+  }, [onLike]);
 
   const handleViewResults = useCallback(() => {
     if (onViewResults) onViewResults();
     else navigate(`/tourhub/tournament/${meta.tournament_id}`);
   }, [onViewResults, navigate, meta.tournament_id]);
 
-  const handleLike = useCallback(() => {
-    setHeartPopping(true);
-    setTimeout(() => setHeartPopping(false), 400);
-    onLike();
-  }, [onLike]);
+  const podiumRows = meta.podium_rows?.slice(0, 5) ?? [];
 
-  const resolvePhoto = (name: string, photoUrl?: string | null) =>
-    photoUrl || getPlayerHeadshotUrl(name, meta.tour_slug) || PLAYER_SILHOUETTE_URL;
-
-  // Score stat chip colours
-  const STAT_COLORS: Record<string, { color: string; bg: string; border: string; glow: string }> = {
-    eagles: { color: '#F59E0B', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.25)', glow: 'rgba(245,158,11,0.15)' },
-    birdies: { color: '#22C55E', bg: 'rgba(34,197,94,0.08)', border: 'rgba(34,197,94,0.25)', glow: 'rgba(34,197,94,0.15)' },
-    pars: { color: '#94A3B8', bg: 'rgba(148,163,184,0.08)', border: 'rgba(148,163,184,0.25)', glow: 'rgba(148,163,184,0.15)' },
-    bogeys: { color: '#EF4444', bg: 'rgba(239,68,68,0.08)', border: 'rgba(239,68,68,0.25)', glow: 'rgba(239,68,68,0.15)' },
-  };
+  const winnerPhotoSrc = meta.winner_photo_url
+    || getPlayerHeadshotUrl(meta.winner_name, meta.tour_slug)
+    || null;
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100dvh', background: '#000', overflow: 'hidden' }}>
+    <div style={{
+      position: 'relative', width: '100%', height: '100dvh',
+      background: '#000', overflow: 'hidden',
+      display: 'flex', flexDirection: 'column',
+    }}>
 
-      {/* ── LAYER 1: Course image with parallax drift ── */}
-      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
-        <div ref={imgRef} style={{ position: 'absolute', top: '-5%', left: '-8%', width: '116%', height: '110%' }}>
-          {hasImage ? (
-            <img
-              src={meta.course_image_url!}
-              alt={meta.venue_name || meta.tournament_name}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.88) saturate(1.1)' }}
-              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-            />
-          ) : (
-            <div style={{ width: '100%', height: '100%', background: TOUR_FALLBACKS[meta.tour_slug] || 'linear-gradient(160deg, #1a1f2e, #0d0f18)' }} />
+      {/* ZONE 1 — HERO (top 50%) */}
+      <div style={{
+        position: 'relative', flex: '0 0 50%', overflow: 'hidden',
+      }}>
+        <div ref={heroRef} style={{
+          position: 'absolute', inset: '-10px',
+          background: tour.gradient,
+          willChange: 'transform',
+          transition: 'transform 0.1s linear',
+        }}>
+          <HeroAvatar src={winnerPhotoSrc} name={meta.winner_name} />
+        </div>
+
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: '60%',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 40%, transparent 100%)',
+          pointerEvents: 'none',
+        }} />
+
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0, height: '25%',
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 100%)',
+          pointerEvents: 'none',
+        }} />
+
+        {/* Tour badge */}
+        <div style={{
+          position: 'absolute',
+          top: 'max(env(safe-area-inset-top, 0px), 12px)',
+          left: 16,
+          animation: 'trc-fadeIn 0.6s ease-out both',
+          animationDelay: '0.2s',
+        }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            background: tour.badgeBg,
+            backdropFilter: 'blur(12px)',
+            borderRadius: 20, padding: '5px 12px',
+            border: `1px solid ${tour.accentColor}33`,
+          }}>
+            <div style={{
+              width: 7, height: 7, borderRadius: '50%',
+              background: tour.accentColor,
+              boxShadow: `0 0 6px ${tour.accentColor}`,
+            }} />
+            <span style={{
+              fontSize: 11, fontWeight: 700, letterSpacing: 1.2,
+              color: 'rgba(255,255,255,0.9)', textTransform: 'uppercase' as const,
+            }}>
+              {meta.tour_name || tour.label}
+            </span>
+          </div>
+        </div>
+
+        {/* Winner name + score */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0,
+          padding: '0 20px 16px',
+          animation: 'trc-fadeUp 0.7s ease-out both',
+          animationDelay: '0.3s',
+        }}>
+          {(meta.venue_name || meta.venue_city) && (
+            <div style={{
+              fontSize: 12, color: 'rgba(255,255,255,0.5)',
+              letterSpacing: 0.5, marginBottom: 4,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
+            }}>
+              {[meta.venue_name, meta.venue_city].filter(Boolean).join(' · ')}
+            </div>
           )}
+
+          <div style={{
+            fontSize: 'clamp(15px, 4.2vw, 20px)', fontWeight: 600,
+            color: 'rgba(255,255,255,0.85)', lineHeight: 1.25,
+            marginBottom: 10, maxWidth: '90%',
+            display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const,
+            overflow: 'hidden',
+          }}>
+            {meta.tournament_name}
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' as const }}>
+            <div style={{
+              fontSize: 'clamp(26px, 7.5vw, 36px)', fontWeight: 800,
+              color: '#fff', lineHeight: 1.1, letterSpacing: -0.5,
+            }}>
+              {meta.winner_name}
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{
+                fontSize: 'clamp(22px, 6vw, 30px)', fontWeight: 700,
+                color: tour.accentColor, lineHeight: 1,
+              }}>
+                {meta.winner_score_display || 'E'}
+              </span>
+              {meta.winner_by && (
+                <span style={{
+                  fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.7)',
+                  background: `${tour.accentColor}22`, border: `1px solid ${tour.accentColor}44`,
+                  borderRadius: 6, padding: '2px 8px',
+                }}>
+                  {meta.winner_by}
+                </span>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* ── LAYER 2: Gradient overlays ── */}
-      {/* Top fade */}
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '45%', background: 'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%)', pointerEvents: 'none', zIndex: 1 }} />
-      {/* Bottom fade (strong) */}
-      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '80%', background: 'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.80) 30%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0.2) 75%, transparent 100%)', pointerEvents: 'none', zIndex: 1 }} />
-
-      {/* ── LAYER 3: Foreground content ── */}
-      <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
-
-        {/* ── TOP BAR ── */}
+      {/* ZONE 2 — AI INTELLIGENCE STRIP */}
+      <div style={{
+        flex: '0 0 auto', padding: '10px 20px',
+        background: 'rgba(255,255,255,0.03)',
+        borderTop: `1px solid ${tour.accentColor}22`,
+        borderBottom: '1px solid rgba(255,255,255,0.04)',
+        display: 'flex', alignItems: 'flex-start', gap: 10,
+        animation: 'trc-fadeIn 0.6s ease-out both',
+        animationDelay: '0.5s',
+      }}>
         <div style={{
-          position: 'absolute', top: 'max(env(safe-area-inset-top, 0px), 56px)', left: 16, right: 16, zIndex: 10,
-          display: 'flex', justifyContent: 'flex-start', alignItems: 'center',
-          animation: 'trcard-fadeUp 0.5s ease-out both',
-          animationDelay: '0ms',
+          flex: '0 0 auto', width: 22, height: 22,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 13, marginTop: 1,
         }}>
-          {/* Tour badge pill */}
+          ⚡
+        </div>
+        <div style={{
+          fontSize: 13, lineHeight: 1.45, color: 'rgba(255,255,255,0.72)',
+          fontStyle: 'italic' as const,
+        }}>
+          {insight}
+        </div>
+      </div>
+
+      {/* ZONE 3 — ENGAGEMENT ZONE */}
+      <div style={{
+        flex: '1 1 auto', display: 'flex', flexDirection: 'column',
+        overflow: 'hidden', background: 'rgba(0,0,0,0.95)',
+      }}>
+
+        {/* Leaderboard */}
+        <div style={{
+          flex: '1 1 auto', overflow: 'auto',
+          WebkitOverflowScrolling: 'touch' as const,
+          padding: '8px 16px 0',
+        }}>
           <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255,255,255,0.18)', borderRadius: 20, padding: '5px 12px',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            marginBottom: 8,
           }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 0.8 }}>
-              {meta.tour_name || getTourLabel(meta.tour_slug)}
+            <span style={{
+              fontSize: 11, fontWeight: 700, letterSpacing: 1.5,
+              color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const,
+            }}>
+              Final Leaderboard
+            </span>
+            <button
+              onClick={handleViewResults}
+              style={{
+                fontSize: 11, fontWeight: 600, color: tour.accentColor,
+                background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+              }}
+            >
+              Full results →
+            </button>
+          </div>
+
+          {/* Winner row */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            padding: '8px 0',
+            borderBottom: podiumRows.length > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+            background: `${tour.accentColor}08`,
+            animation: 'trc-slideIn 0.5s ease-out both',
+            animationDelay: '0.6s',
+          }}>
+            <span style={{ width: 26, textAlign: 'center' as const, fontSize: 13, fontWeight: 700, color: tour.accentColor }}>1</span>
+            <RowAvatar src={winnerPhotoSrc} name={meta.winner_name} />
+            <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+              {meta.winner_name}
+            </span>
+            <span style={{ fontSize: 14, fontWeight: 700, color: tour.accentColor, fontVariantNumeric: 'tabular-nums' as const }}>
+              {meta.winner_score_display || 'E'}
             </span>
           </div>
 
-        </div>
+          {/* Podium rows 2–5 */}
+          {podiumRows.slice(0, 4).map((row, idx) => {
+            const isTied = row.isTied && row.players.length > 1;
+            const primary = row.players[0];
+            const stackedAvatars = row.players.slice(0, 4);
 
-        {/* ── SPACER — push tournament name to bottom of image area ── */}
-        <div style={{ flex: '0 0 32%' }} />
-
-        {/* ── TOURNAMENT NAME (overlaid on image) ── */}
-        <div style={{
-          position: 'relative', zIndex: 10, padding: '0 20px 12px',
-          animation: 'trcard-fadeUp 0.5s ease-out both',
-          animationDelay: '100ms',
-        }}>
-          {hasVenue && (
-            <p style={{
-              fontSize: 11, fontWeight: 600, color: 'rgba(251,146,60,0.9)',
-              letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4,
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-            }}>
-              {[meta.venue_name, meta.venue_city].filter(Boolean).join(' · ')}
-            </p>
-          )}
-          <h2 style={{
-            fontSize: 26, fontWeight: 800, color: '#fff', lineHeight: 1.15,
-            letterSpacing: -0.5, margin: 0,
-            textShadow: '0 2px 12px rgba(0,0,0,0.5)',
-            overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const,
-          }}>
-            {meta.tournament_name}
-          </h2>
-        </div>
-
-        {/* ── GLASS CARD ── */}
-        <div style={{
-          margin: '0 16px 0',
-          background: 'rgba(20,24,32,0.76)',
-          backdropFilter: 'blur(28px) saturate(160%)', WebkitBackdropFilter: 'blur(28px) saturate(160%)',
-          border: '1px solid rgba(255,255,255,0.09)',
-          borderTop: '1px solid rgba(255,255,255,0.15)',
-          borderRadius: 20,
-          overflow: 'hidden',
-          animation: 'trcard-fadeUp 0.5s ease-out both',
-          animationDelay: '200ms',
-        }}>
-          {/* Top accent line */}
-          <div style={{ height: 2, width: '100%', background: 'linear-gradient(90deg, #F97316 0%, rgba(249,115,22,0.3) 60%, transparent 100%)' }} />
-
-          {/* ── Winner block ── */}
-          <div style={{
-            padding: '20px 20px 18px',
-            borderBottom: '1px solid rgba(255,255,255,0.06)',
-            display: 'flex', alignItems: 'center', gap: 14,
-            animation: 'trcard-slideIn 0.5s ease-out both',
-            animationDelay: '300ms',
-          }}>
-            <WinnerAvatar
-              src={meta.winner_photo_url || getPlayerHeadshotUrl(meta.winner_name, meta.tour_slug) || PLAYER_SILHOUETTE_URL}
-              name={meta.winner_name}
-              size={60}
-            />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 20, fontWeight: 800, color: '#fff', letterSpacing: -0.3, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {meta.winner_name}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
-                <span style={{
-                  fontSize: 22, fontWeight: 800, lineHeight: 1,
-                  color: '#fff',
-                }}>
-                  {meta.winner_score_display || 'E'}
-                </span>
-                {meta.winner_by && (
-                  <span style={{
-                    fontSize: 11, fontWeight: 600, color: '#F97316',
-                    background: 'rgba(249,115,22,0.12)', border: '1px solid rgba(249,115,22,0.25)',
-                    borderRadius: 10, padding: '2px 8px',
-                  }}>
-                    {meta.winner_by}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* ── Stats 2×4 grid ── */}
-          <div style={{ padding: '16px 20px 0' }}>
-            <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 8 }}>
-              Tournament Stats
-            </div>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
-              gap: 4,
-              paddingBottom: 12,
-            }}>
-              {/* Row 1 — tournament stats (always show, dim if 0) */}
-              <StatGlowChip value={meta.stat_eagles} label={meta.stat_eagles === 1 ? 'Eagle' : 'Eagles'} {...STAT_COLORS.eagles} dimmed={meta.stat_eagles === 0} />
-              <StatGlowChip value={meta.stat_birdies} label="Birdies" {...STAT_COLORS.birdies} dimmed={meta.stat_birdies === 0} />
-              <StatGlowChip value={meta.stat_pars} label="Pars" {...STAT_COLORS.pars} dimmed={meta.stat_pars === 0} />
-              <StatGlowChip value={meta.stat_bogeys} label="Bogeys" {...STAT_COLORS.bogeys} dimmed={meta.stat_bogeys === 0} />
-
-              {/* Row 2 — performance stats (placeholder if null) */}
-              <PerfChip value={meta.stat_driving_distance != null ? String(meta.stat_driving_distance) : null} label="DRIVER" suffix="yds" />
-              <PerfChip value={meta.stat_fairways_pct != null ? String(Math.round(meta.stat_fairways_pct)) : null} label="FAIRWAYS" suffix="%" />
-              <PerfChip value={meta.stat_gir_pct != null ? String(Math.round(meta.stat_gir_pct)) : null} label="GIR" suffix="%" />
-              <PerfChip value={meta.stat_putts != null ? meta.stat_putts.toFixed(2) : null} label="PUTTS" suffix="" />
-            </div>
-          </div>
-
-          {/* ── Leaderboard rows ── */}
-          {hasPodium && (
-            <div style={{ padding: '0 20px 18px' }}>
-              {meta.podium_rows.slice(0, 2).map((row) => (
-                <PodiumRunnerRow key={row.position} row={row} resolvePhoto={resolvePhoto} />
-              ))}
-            </div>
-          )}
-
-          {/* ── Engagement bar ── */}
-          <div style={{
-            borderTop: '1px solid rgba(255,255,255,0.07)',
-            background: 'rgba(0,0,0,0.3)',
-            display: 'flex', gap: 8, padding: '14px 20px', alignItems: 'center',
-          }}>
-            {/* Like button */}
-            <button onClick={handleLike} style={{
-              display: 'flex', alignItems: 'center', gap: 5, borderRadius: 22, padding: '8px 14px',
-              background: isLiked ? 'rgba(249,115,22,0.18)' : 'rgba(255,255,255,0.07)',
-              border: `1px solid ${isLiked ? 'rgba(249,115,22,0.45)' : 'rgba(255,255,255,0.12)'}`,
-              color: isLiked ? '#F97316' : 'rgba(255,255,255,0.7)',
-              cursor: 'pointer', lineHeight: 1,
-            }}>
-              <span style={{
-                fontSize: 15,
-                animation: heartPopping ? 'trcard-heartPop 0.4s ease-out' : undefined,
-                display: 'inline-block',
+            return (
+              <div key={`${row.position}-${idx}`} style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '7px 0',
+                borderBottom: '1px solid rgba(255,255,255,0.03)',
+                animation: 'trc-slideIn 0.5s ease-out both',
+                animationDelay: `${0.65 + idx * 0.08}s`,
               }}>
-                {isLiked ? '♥' : '♡'}
-              </span>
-              <span style={{ fontSize: 13, fontWeight: 700 }}>{likeCount}</span>
-            </button>
+                <span style={{
+                  width: 26, textAlign: 'center' as const, fontSize: 13, fontWeight: 600,
+                  color: 'rgba(255,255,255,0.45)',
+                }}>
+                  {row.isTied ? `T${row.position}` : row.position}
+                </span>
 
-            {/* Join conversation button */}
-            <button onClick={onComment} style={{
-              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-              background: 'linear-gradient(135deg, rgba(249,115,22,0.22), rgba(234,88,12,0.15))',
-              border: '1px solid rgba(249,115,22,0.35)', borderRadius: 22, padding: '8px 8px',
-              color: '#FB923C', fontSize: 13, fontWeight: 700, cursor: 'pointer',
-              animation: 'trcard-glowPulse 3s ease-in-out infinite',
-              minWidth: 0, overflow: 'hidden',
-            }}>
-              <span style={{ fontSize: 14, flexShrink: 0 }}>💬</span>
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Join the conversation</span>
-              {commentCount > 0 && (
-                <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(251,146,60,0.6)' }}>{commentCount}</span>
-              )}
-            </button>
+                {isTied ? (
+                  <div style={{ display: 'flex', alignItems: 'center', marginLeft: 0 }}>
+                    {stackedAvatars.map((p, i) => (
+                      <div key={i} style={{
+                        marginLeft: i === 0 ? 0 : -10,
+                        zIndex: stackedAvatars.length - i,
+                        borderRadius: '50%',
+                        border: '2px solid rgba(0,0,0,0.95)',
+                      }}>
+                        <RowAvatar src={resolvePhoto(p.name, p.photoUrl)} name={p.name} size={30} />
+                      </div>
+                    ))}
+                    {row.players.length > 4 && (
+                      <div style={{
+                        marginLeft: -8, zIndex: 0,
+                        width: 30, height: 30, borderRadius: '50%',
+                        background: 'rgba(255,255,255,0.08)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)',
+                        border: '2px solid rgba(0,0,0,0.95)',
+                      }}>
+                        +{row.players.length - 4}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <RowAvatar src={resolvePhoto(primary.name, primary.photoUrl)} name={primary.name} />
+                )}
 
-            {/* View Results button */}
-            <button onClick={handleViewResults} style={{
-              background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
-              borderRadius: 22, padding: '8px 12px', color: 'rgba(255,255,255,0.65)',
-              fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap', cursor: 'pointer',
-            }}>
-              Results →
-            </button>
-          </div>
+                <span style={{
+                  flex: 1, fontSize: 13, fontWeight: 500,
+                  color: 'rgba(255,255,255,0.8)',
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
+                }}>
+                  {isTied ? `${row.players.length}-Way Tie` : primary.name}
+                </span>
+                <span style={{
+                  fontSize: 13, fontWeight: 600,
+                  color: 'rgba(255,255,255,0.6)',
+                  fontVariantNumeric: 'tabular-nums' as const,
+                }}>
+                  {primary.score || 'E'}
+                </span>
+              </div>
+            );
+          })}
         </div>
 
-        {/* ── Bottom gap for nav bar ── */}
-        <div style={{ height: 'max(env(safe-area-inset-bottom, 0px), 16px)', flexShrink: 0 }} />
+        {/* Stats strip */}
+        {(meta.stat_birdies != null || meta.stat_eagles != null) && (
+          <div style={{
+            flex: '0 0 auto', display: 'flex', gap: 2,
+            padding: '8px 16px',
+            borderTop: '1px solid rgba(255,255,255,0.04)',
+            overflowX: 'auto' as const,
+            animation: 'trc-fadeIn 0.5s ease-out both',
+            animationDelay: '0.9s',
+          }}>
+            {[
+              { v: meta.stat_eagles,  label: 'Eagles',  color: '#F59E0B', show: meta.stat_eagles != null && meta.stat_eagles > 0 },
+              { v: meta.stat_birdies, label: 'Birdies', color: '#22C55E', show: meta.stat_birdies != null },
+              { v: meta.stat_pars,    label: 'Pars',    color: '#94A3B8', show: meta.stat_pars != null },
+              { v: meta.stat_bogeys,  label: 'Bogeys',  color: '#EF4444', show: meta.stat_bogeys != null },
+            ].filter(s => s.show).map(stat => (
+              <div key={stat.label} style={{
+                flex: 1, textAlign: 'center' as const, padding: '4px 0',
+                borderRadius: 8, background: `${stat.color}0A`,
+              }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: stat.color }}>{stat.v}</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: 0.5, marginTop: 1 }}>{stat.label}</div>
+              </div>
+            ))}
+            {meta.stat_driving_distance != null && (
+              <div style={{
+                flex: 1, textAlign: 'center' as const, padding: '4px 0',
+                borderRadius: 8, background: 'rgba(255,255,255,0.03)',
+              }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>
+                  {meta.stat_driving_distance}<span style={{ fontSize: 10, fontWeight: 500 }}>yds</span>
+                </div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: 0.5, marginTop: 1 }}>Driver</div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* CTA bar */}
+        <div style={{
+          flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: 6,
+          padding: '10px 16px',
+          paddingBottom: 'max(env(safe-area-inset-bottom, 10px), 10px)',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+        }}>
+          <button onClick={handleLike} style={{
+            display: 'flex', alignItems: 'center', gap: 5,
+            background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 10,
+            padding: '8px 14px', cursor: 'pointer', color: isLiked ? '#EF4444' : 'rgba(255,255,255,0.6)',
+            fontSize: 14, fontWeight: 600, transition: 'color 0.2s',
+            animation: heartPopping ? 'trc-heartPop 0.5s ease-out' : 'none',
+          }}>
+            <span style={{ fontSize: 18 }}>
+              {isLiked ? '♥' : '♡'}
+            </span>
+            {likeCount}
+          </button>
+
+          <button onClick={onComment} style={{
+            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            background: tour.accentColor, border: 'none', borderRadius: 10,
+            padding: '10px 16px', cursor: 'pointer', color: '#fff',
+            fontSize: 14, fontWeight: 700, letterSpacing: 0.3,
+            animation: 'trc-ctaPulse 2.5s ease-in-out infinite',
+            animationDelay: '1.5s',
+          }}>
+            <span>💬</span>
+            <span style={{
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
+            }}>
+              Join the conversation
+            </span>
+            {commentCount > 0 && (
+              <span style={{
+                background: 'rgba(0,0,0,0.2)', borderRadius: 8,
+                padding: '1px 7px', fontSize: 12, fontWeight: 600,
+              }}>
+                {commentCount}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
 };
-
-// ─── Score stat chip with glow ───
-function StatGlowChip({ value, label, color, bg, border, glow, dimmed }: {
-  value: number; label: string; color: string; bg: string; border: string; glow: string; dimmed?: boolean;
-}) {
-  const opacity = dimmed ? 0.4 : 1;
-  return (
-     <div style={{
-       borderRadius: 12, padding: '10px 0',
-       background: bg, border: `1px solid ${border}`,
-       boxShadow: dimmed ? 'none' : `0 0 12px ${glow}`,
-       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-       opacity, minWidth: 0, overflow: 'hidden',
-     }}>
-       <span style={{ fontSize: 'clamp(14px, 4.5vw, 20px)', fontWeight: 800, color, lineHeight: 1 }}>{value}</span>
-       <span style={{ fontSize: 'clamp(8px, 2.2vw, 9px)', fontWeight: 700, color: 'rgba(255,255,255,0.45)', letterSpacing: 0.8, textTransform: 'uppercase' }}>{label}</span>
-     </div>
-   );
-}
-
-// ─── Performance stat chip (neutral) ───
-function PerfChip({ value, label, suffix }: { value: string | null; label: string; suffix: string }) {
-  const isNull = value === null;
-  return (
-    <div style={{
-      borderRadius: 12, padding: '10px 0',
-      background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)',
-      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-      opacity: isNull ? 0.4 : 1, minWidth: 0, overflow: 'hidden',
-    }}>
-      <span style={{ fontSize: 'clamp(12px, 3.8vw, 16px)', fontWeight: 800, color: 'rgba(255,255,255,0.9)', lineHeight: 1 }}>
-        {isNull ? '—' : (
-          <>
-            {value}
-            {suffix && <span style={{ fontSize: 'clamp(8px, 2.2vw, 10px)', fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>{suffix}</span>}
-          </>
-        )}
-      </span>
-      <span style={{ fontSize: 'clamp(8px, 2.2vw, 9px)', fontWeight: 700, color: 'rgba(255,255,255,0.45)', letterSpacing: 0.8, textTransform: 'uppercase' }}>{label}</span>
-    </div>
-  );
-}
-
-// ─── Podium runner row ───
-function PodiumRunnerRow({ row, resolvePhoto }: { row: PodiumRowType; resolvePhoto: (name: string, photoUrl?: string | null) => string }) {
-  const isSingle = !row.isTied || row.players.length === 1;
-  const player = row.players[0];
-  const shownAvatars = row.players.slice(0, 5);
-
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: 10,
-      borderTop: '1px solid rgba(255,255,255,0.05)', padding: '9px 0',
-    }}>
-      {/* Position */}
-      <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.35)', width: 24, textAlign: 'center', flexShrink: 0 }}>
-        {row.isTied ? `T${row.position}` : row.position}
-      </span>
-
-      {/* Avatars */}
-      {isSingle ? (
-        <SmallAvatar src={resolvePhoto(player.name, player.photoUrl)} name={player.name} size={32} />
-      ) : (
-        <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-          {shownAvatars.map((p, i) => (
-            <div key={i} style={{ marginLeft: i === 0 ? 0 : -10, position: 'relative', zIndex: shownAvatars.length - i }}>
-              <SmallAvatar src={resolvePhoto(p.name, p.photoUrl)} name={p.name} size={32} />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Name */}
-      {isSingle ? (
-        <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.8)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {player.name}
-        </span>
-      ) : (
-        <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.35)', flex: 1 }}>
-          {row.players.length}-Way Tie
-        </span>
-      )}
-
-      {/* Score */}
-      <span style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.9)', flexShrink: 0 }}>
-        {player.score || 'E'}
-      </span>
-    </div>
-  );
-}
 
 export default TournamentResultCard;
