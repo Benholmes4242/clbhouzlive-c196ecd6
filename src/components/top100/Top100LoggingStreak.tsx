@@ -155,16 +155,21 @@ export const Top100LoggingStreak: React.FC<Top100LoggingStreakProps> = ({
               <div
                 className={cn(
                   'w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium transition-all',
-                  hasLog
-                    ? 'bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-600 shadow-[0_0_8px_rgba(62,189,147,0.3)]'
-                    : isCurrent
+                  !hasLog && isCurrent
                     ? 'bg-muted/80 border-2 border-dashed border-primary/40 text-muted-foreground animate-[pulse_3s_ease-in-out_infinite]'
-                    : 'bg-muted/40 text-muted-foreground/50 border border-dashed border-muted-foreground/20'
+                    : !hasLog
+                    ? 'bg-muted/40 text-muted-foreground/50 border border-dashed border-muted-foreground/20'
+                    : ''
                 )}
+                style={hasLog ? {
+                  background: 'hsl(var(--accent-amber) / 0.15)',
+                  color: 'hsl(var(--accent-amber))',
+                  boxShadow: '0 0 8px hsl(var(--accent-amber) / 0.3)',
+                } : undefined}
                 aria-hidden="true"
               >
                 {hasLog ? (
-                  <span className="text-emerald-600">✓</span>
+                  <span style={{ color: 'hsl(var(--accent-amber))' }}>✓</span>
                 ) : null}
               </div>
               <span 

@@ -178,7 +178,7 @@ const RegionalNode: React.FC<RegionalNodeProps> = ({ region, index, onClick }) =
           
           {/* Status */}
           {isComplete && (
-            <span className="text-sm font-semibold text-[#334E3D] flex-shrink-0">
+            <span className="text-sm font-semibold text-foreground flex-shrink-0">
               Complete
             </span>
           )}

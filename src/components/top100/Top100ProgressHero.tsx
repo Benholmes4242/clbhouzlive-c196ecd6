@@ -28,8 +28,7 @@ const BADGE_IMAGES: Record<number, string> = {
   400: grandslamBadgeImage,
 };
 
-// Season color - Pre-Season mint
-const SEASON_COLOR = '#3EBD93';
+const SEASON_COLOR = 'hsl(var(--accent-amber))';
 
 export interface Top100ProgressHeroProps {
   displayName: string | null;

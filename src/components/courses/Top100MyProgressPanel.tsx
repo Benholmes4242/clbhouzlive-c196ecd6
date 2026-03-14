@@ -294,7 +294,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
               <button
                 type="button"
                 onClick={() => openMilestoneSheet(data.next_milestone!.threshold)}
-                className="w-full max-w-sm bg-card border border-border/60 rounded-full py-2.5 px-4 flex flex-col gap-2 hover:bg-muted/30 active:scale-[0.98] transition-all"
+                className="w-full max-w-sm bg-card border border-border/60 rounded-2xl py-2.5 px-4 flex flex-col gap-2 active:scale-[0.98] active:opacity-80 transition-all"
               >
                 <p className="text-sm font-medium text-center text-foreground whitespace-nowrap">
                   <span className="font-semibold">

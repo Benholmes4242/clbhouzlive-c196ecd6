@@ -40,7 +40,7 @@ function StatItem({
       </p>
       {/* Micro-delta line (A4) */}
       {showDelta && (
-        <p className="text-[10px] font-medium text-emerald-500">
+        <p className="text-[10px] font-medium" style={{ color: 'hsl(var(--accent-amber))' }}>
           {deltaPrefix}{delta} this year
         </p>
       )}

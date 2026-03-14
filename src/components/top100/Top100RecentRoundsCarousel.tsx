@@ -192,7 +192,7 @@ export function Top100RecentRoundsCarousel({
             variant="outline"
             size="sm"
             onClick={onAddRound}
-            className="w-full rounded-full border-dashed border-border hover:border-border/80 hover:bg-muted/30 transition-colors"
+            className="w-full rounded-2xl border-dashed border-border active:opacity-70 transition-opacity"
           >
             <Plus className="w-4 h-4 mr-1.5" />
             Add another Top 100 round

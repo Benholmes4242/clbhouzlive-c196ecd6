@@ -108,7 +108,7 @@ const Top100FriendsActivityCard: React.FC<Top100FriendsActivityCardProps> = ({
           <div
             key={friend.friend_id}
             onClick={() => navigate(`/profile/${friend.friend_id}?tab=top100`)}
-            className="px-5 py-3 flex items-center justify-between hover:bg-muted/30 active:scale-[0.98] transition-all cursor-pointer border-b last:border-b-0 border-border/40"
+            className="px-5 py-3 flex items-center justify-between active:bg-muted/30 active:scale-[0.98] transition-all cursor-pointer border-b last:border-b-0 border-border/40"
           >
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <SquircleAvatar

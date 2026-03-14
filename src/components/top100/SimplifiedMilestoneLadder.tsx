@@ -207,7 +207,7 @@ const MilestoneRow: React.FC<MilestoneRowProps> = ({
               !milestone.isUnlocked && "opacity-40 grayscale-[60%]"
             )}
             style={milestone.isUnlocked ? {
-              filter: 'drop-shadow(0 4px 20px rgba(212, 168, 83, 0.3))',
+              filter: 'drop-shadow(0 4px 20px hsl(var(--accent-amber) / 0.3))',
             } : undefined}
           />
         </motion.div>

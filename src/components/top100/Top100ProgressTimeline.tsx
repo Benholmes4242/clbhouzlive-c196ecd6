@@ -204,7 +204,7 @@ export const Top100ProgressTimeline: React.FC<Top100ProgressTimelineProps> = ({
                     className={cn(
                       'w-full flex items-center justify-between py-3 px-2 -mx-2 rounded-lg',
                       'text-left transition-all duration-100 cursor-pointer',
-                      'hover:bg-muted/50 active:bg-muted/80 active:scale-[0.995]'
+                      'active:bg-muted/50 active:scale-[0.995]'
                     )}
                   >
                     <span className="text-sm font-medium text-foreground truncate pr-3 flex-1">
