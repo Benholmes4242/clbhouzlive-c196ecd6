@@ -394,7 +394,7 @@ export function CollegeProfilePage() {
           </motion.section>
         )}
 
-        {/* Alumni Depth Chart — 28px from rivals */}
+        {/* Alumni on Tour — 28px from rivals */}
         {stats && (
           <motion.section
             variants={sectionVariants}
@@ -405,10 +405,10 @@ export function CollegeProfilePage() {
              style={{ marginTop: '24px' }}
           >
             <h2 style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }} className="text-foreground">
-              Alumni Depth Chart
+              Alumni on Tour
             </h2>
             <p className="text-muted-foreground" style={{ fontSize: '13px', fontWeight: 400, marginTop: '4px', marginBottom: '20px' }}>
-              Current PGA Tour players ranked by contribution
+              Every pro from this program
             </p>
             <AlumniDepthChart normalizedName={collegeSlug || ''} />
           </motion.section>
