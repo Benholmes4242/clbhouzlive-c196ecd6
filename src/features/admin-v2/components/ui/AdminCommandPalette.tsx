@@ -215,7 +215,7 @@ export function AdminCommandPalette({ open, onClose }: AdminCommandPaletteProps)
       />
 
       {/* Palette */}
-      <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] px-4 pointer-events-none">
+      <div role="dialog" aria-modal="true" aria-label="Command palette" className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] px-4 pointer-events-none">
         <Command
           className="w-full max-w-lg rounded-2xl border border-border/60 bg-card shadow-2xl pointer-events-auto overflow-hidden"
           shouldFilter={false}

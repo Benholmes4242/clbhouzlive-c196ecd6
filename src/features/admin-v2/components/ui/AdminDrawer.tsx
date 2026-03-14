@@ -56,6 +56,9 @@ export function AdminDrawer({
           <motion.div
             ref={drawerRef}
             tabIndex={-1}
+            role="dialog"
+            aria-modal="true"
+            aria-label={title}
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}

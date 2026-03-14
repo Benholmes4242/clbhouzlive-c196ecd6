@@ -259,7 +259,7 @@ export function AdminTable<T>({
             ) : data.length === 0 ? (
               <TableEmpty title={emptyTitle} description={emptyDescription} icon={emptyIcon} cols={colCount} />
             ) : (
-              table.getRowModel().rows.map(row => {
+              table.getRowModel().rows.map((row, index) => {
                 const isSelected = selectedIds?.has(row.id);
                 return (
                   <tr
@@ -280,7 +280,16 @@ export function AdminTable<T>({
                           onChange={(e) => {
                             if (!onSelectChange) return;
                             const next = new Set(selectedIds);
-                            e.target.checked ? next.add(row.id) : next.delete(row.id);
+                            if (e.nativeEvent instanceof MouseEvent && e.nativeEvent.shiftKey && lastSelectedIndex !== null) {
+                              const startIdx = Math.min(lastSelectedIndex, index);
+                              const endIdx   = Math.max(lastSelectedIndex, index);
+                              table.getRowModel().rows.slice(startIdx, endIdx + 1).forEach(r => {
+                                e.target.checked ? next.add(r.id) : next.delete(r.id);
+                              });
+                            } else {
+                              e.target.checked ? next.add(row.id) : next.delete(row.id);
+                            }
+                            setLastSelectedIndex(index);
                             onSelectChange(next);
                           }}
                           onClick={(e) => e.stopPropagation()}

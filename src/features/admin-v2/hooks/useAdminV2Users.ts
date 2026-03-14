@@ -194,9 +194,10 @@ export function useAdminV2Users() {
   }), [allUsers]);
 
   return {
-    users:         paginated,
-    allCount:      allUsers.length,
-    filteredCount: filtered.length,
+    users:            paginated,
+    allFilteredUsers: filtered,
+    allCount:         allUsers.length,
+    filteredCount:    filtered.length,
     isLoading,
     refetch,
     search,      setSearch: handleSearch,

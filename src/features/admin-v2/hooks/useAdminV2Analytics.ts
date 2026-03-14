@@ -176,9 +176,9 @@ async function fetchContentAnalytics(period: AnalyticsPeriod): Promise<ContentAn
     totalReviews:  totalReviewsRes.count ?? 0,
     postsThisPeriod:   posts.data?.length ?? 0,
     reviewsThisPeriod: reviews.data?.length ?? 0,
-    topReviewedCourses: topRatings.map((r: any) => ({
-      name:      courseNameMap.get(r.course_id)?.name ?? 'Unknown',
-      country:   courseNameMap.get(r.course_id)?.country ?? '',
+    topReviewedCourses: topRatings.map(r => ({
+      name:      courseNameMap.get(r.course_id ?? '')?.name ?? 'Unknown',
+      country:   courseNameMap.get(r.course_id ?? '')?.country ?? '',
       count:     r.review_count ?? 0,
       avgRating: r.avg_overall_score ?? 0,
     })),
