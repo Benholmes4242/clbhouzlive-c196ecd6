@@ -53,11 +53,9 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.15, delay: index * 0.03 }}
-      className="rounded-[14px] p-3 cursor-pointer group transition-shadow hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
+      className="rounded-[14px] p-3 cursor-pointer group transition-shadow bg-card border border-border/30"
       style={{
-        background: 'white',
-        border: '1px solid rgba(0,0,0,0.04)',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+        boxShadow: '0 1px 3px hsl(var(--foreground) / 0.04)',
       }}
       onClick={handleCourseClick}
     >
@@ -88,7 +86,7 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
             <span className="font-semibold text-foreground">{friends.length} friends</span>
             <span className="text-muted-foreground"> played</span>
           </p>
-          <p className="text-sm font-semibold mt-0.5" style={{ color: '#40916C' }}>
+          <p className="text-sm font-semibold mt-0.5 text-foreground">
             {courseName}
           </p>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -102,7 +100,7 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
             src={thumbnailUrl || '/placeholder.svg'}
             alt={courseName}
             className="w-14 h-14 rounded-[10px] object-cover"
-            style={{ border: '1px solid rgba(0,0,0,0.04)' }}
+            style={{ border: '1px solid hsl(var(--border) / 0.3)' }}
             onError={(e) => { e.currentTarget.src = '/placeholder.svg'; }}
           />
         </div>
@@ -113,7 +111,7 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
         <button
           onClick={toggleExpand}
           className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground mt-2 pt-2 transition-colors"
-          style={{ borderTop: '1px solid rgba(0,0,0,0.04)' }}
+          style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}
         >
           {isExpanded ? 'Hide friends' : `Show ${friends.length} friends`}
           <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
@@ -156,7 +154,7 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
                       <ClubhouseLogo size="xs" />
                       <span className={cn(
                         "text-sm font-semibold tabular-nums",
-                        friend.rating >= 9.0 ? 'text-amber-500' : 'text-foreground'
+                        friend.rating >= 9.0 ? 'text-accent-amber' : 'text-foreground'
                       )}>{friend.rating.toFixed(1)}</span>
                     </div>
                   ) : (
