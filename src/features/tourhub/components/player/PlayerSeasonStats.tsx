@@ -20,7 +20,7 @@ const TOUR_AVG = {
   birdiesPerRound: 3.8,
 } as const;
 
-function fmt(value: number | null | undefined, type?: 'decimal' | 'percent' | 'yards' | 'currency' | 'signed'): string {
+function fmt(value: number | null | undefined, type?: 'decimal' | 'percent' | 'yards' | 'currency' | 'signed' | 'putting'): string {
   if (value === null || value === undefined) return '—';
   switch (type) {
     case 'decimal': return value.toFixed(2);
