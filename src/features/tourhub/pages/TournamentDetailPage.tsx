@@ -3,7 +3,7 @@
  */
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { Trophy, Clock, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
@@ -164,11 +164,9 @@ export function TournamentDetailPage() {
       <TourHubShell immersive>
         <div className="animate-pulse">
           <div 
+            className="animate-pulse bg-muted"
             style={{ 
-              minHeight: 'calc(45dvh + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
-              background: 'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--background)) 50%, hsl(var(--muted)) 75%)',
-              backgroundSize: '200% 100%',
-              animation: 'shimmer 1.5s infinite',
+              minHeight: 'calc(45dvh + var(--sat, env(safe-area-inset-top, 0px)))',
             }}
           />
           <div className="space-y-4 mt-6 px-4">
@@ -184,7 +182,7 @@ export function TournamentDetailPage() {
   // TD-02: Error state with retry
   if (!tournament) {
     return (
-      <TourHubShell>
+      <TourHubShell immersive>
         <div className="pt-6 px-4">
           <div className="flex items-center justify-center py-20">
             <div className="text-center space-y-4">
@@ -198,9 +196,9 @@ export function TournamentDetailPage() {
                 >
                   Retry
                 </button>
-                <a href="/tourhub?tab=schedule" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link to="/tourhub?tab=schedule" className="text-sm text-muted-foreground active:opacity-70 transition-opacity">
                   Back to Schedule
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -352,7 +350,7 @@ export function TournamentDetailPage() {
           imageUrl={heroImageUrl}
         />
         
-        <div className="px-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
+        <div className="px-4" style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
           {/* Status bar */}
           <div className="pt-5">
             {isLive && (
