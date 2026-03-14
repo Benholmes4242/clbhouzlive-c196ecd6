@@ -99,7 +99,7 @@ export const Top100ListFilterChips: React.FC<Top100ListFilterChipsProps> = ({
                   className={`cursor-pointer transition-colors duration-100 ${
                     isActive 
                       ? 'bg-muted/50 border border-border text-foreground font-medium' 
-                      : 'text-muted-foreground hover:bg-muted/50'
+                      : 'text-muted-foreground'
                   }`}
                 >
                   <span className="flex items-center gap-2">
