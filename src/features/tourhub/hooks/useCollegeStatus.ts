@@ -199,8 +199,7 @@ export function useCollegeHeadToHead(
     if (statsA.wins_total > statsB.wins_total) winsA++;
     else if (statsB.wins_total > statsA.wins_total) winsB++;
     
-    if (statsA.cuts_total > statsB.cuts_total) winsA++;
-    else if (statsB.cuts_total > statsA.cuts_total) winsB++;
+    
     
     if (statsA.top10_total > statsB.top10_total) winsA++;
     else if (statsB.top10_total > statsA.top10_total) winsB++;

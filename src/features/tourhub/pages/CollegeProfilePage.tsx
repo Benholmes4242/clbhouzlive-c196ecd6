@@ -8,6 +8,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
+import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { 
   FranchiseStoryStrip,
   AlumniDepthChart, 
@@ -70,8 +71,6 @@ export function CollegeProfilePage() {
     return idx >= 0 ? idx + 1 : null;
   })();
 
-  // Scroll position handled by centralized ScrollRestoration component
-
   // Pull-to-refresh handlers
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (window.scrollY <= 0) {
@@ -115,8 +114,6 @@ export function CollegeProfilePage() {
     setCompareOpen(false);
   }, [collegeSlug]);
   
-  
-  
   const handleCompareClick = () => {
     if (!compareCollege2 && firstRival) {
       setCompareCollege2(firstRival);
@@ -154,7 +151,7 @@ export function CollegeProfilePage() {
       {/* Immersive Brand Color Hero */}
       <div
         className="relative overflow-hidden"
-        style={{ height: '45dvh' }}
+        style={{ height: 'calc(45dvh + var(--sat, env(safe-area-inset-top, 0px)))' }}
       >
         {/* Brand gradient background with Ken Burns */}
         <motion.div
@@ -186,7 +183,7 @@ export function CollegeProfilePage() {
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
           aria-label="Open tour menu"
           className="absolute z-30 flex items-center justify-center"
-          style={{ width: 44, height: 44, top: 56, left: 16 }}
+          style={{ width: 44, height: 44, top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)', left: 16 }}
         >
           <Menu className="w-[24px] h-[24px] text-white" style={{ strokeWidth: 1.5, filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }} />
         </button>
@@ -226,15 +223,15 @@ export function CollegeProfilePage() {
                 className="flex items-center gap-1.5"
                 style={{ marginTop: '4px', marginBottom: '12px' }}
               >
-                <Crown className="w-4 h-4" style={{ color: 'rgba(245, 158, 11, 0.9)' }} />
+                <Crown className="w-4 h-4" style={{ color: 'hsl(var(--accent-amber) / 0.9)' }} />
                 <span style={{
                   fontSize: '12px',
                   fontWeight: 700,
                   letterSpacing: '1.2px',
                   textTransform: 'uppercase' as const,
-                  color: 'rgba(245, 158, 11, 0.9)',
+                  color: 'hsl(var(--accent-amber) / 0.9)',
                 }}>
-                  #{collegeRank} This Season
+                  #{collegeRank} by Earnings
                 </span>
               </motion.div>
             )}
@@ -327,7 +324,7 @@ export function CollegeProfilePage() {
       {/* Back link */}
       <div className="px-4" style={{ marginTop: 12 }}>
         <button
-          onClick={() => navigate('/tourhub/college-golf', { replace: true })}
+          onClick={() => navigate('/tourhub/college-golf')}
           className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
         >
           <ChevronLeft size={14} />
@@ -336,7 +333,7 @@ export function CollegeProfilePage() {
       </div>
 
       {/* Content sections */}
-      <div className="w-full max-w-5xl mx-auto px-4" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
+      <div className="w-full max-w-5xl mx-auto px-4" style={{ paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
         {/* Compare Button — 16px from stats bar */}
         {stats && firstRival && (
           <motion.div
@@ -460,12 +457,6 @@ export function CollegeProfilePage() {
   );
 }
 
-function formatCurrency(amount: number): string {
-  if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;
-  if (amount >= 1_000) return `$${(amount / 1_000).toFixed(0)}K`;
-  return `$${amount.toFixed(0)}`;
-}
-
 function GlassStatCell({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center">
@@ -481,7 +472,7 @@ function GlassStatCell({ label, value, highlight = false }: { label: string; val
         fontSize: 18,
         fontWeight: 700,
         fontVariantNumeric: 'tabular-nums',
-        color: highlight ? 'rgba(245, 158, 11, 0.9)' : undefined,
+        color: highlight ? 'hsl(var(--accent-amber) / 0.9)' : undefined,
         marginTop: 2,
       }}>
         {value}
