@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
@@ -6,6 +6,7 @@ import AdminV2Sidebar from './components/shell/AdminV2Sidebar';
 import AdminV2Header from './components/shell/AdminV2Header';
 import AdminV2Loading from './components/ui/AdminV2Loading';
 import AdminV2AccessDenied from './components/ui/AdminV2AccessDenied';
+import { AdminCommandPalette } from './components/ui';
 
 // Lazy-loaded pages
 const DashboardPage        = lazy(() => import('./pages/DashboardPage'));
@@ -47,6 +48,18 @@ const PageSkeleton = () => (
 export default function AdminV2Shell() {
   const { role, loading } = usePanelRole();
   const can = panelCan(role);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setPaletteOpen(v => !v);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
 
   // Full-screen loading while role resolves
   if (loading) return <AdminV2Loading />;
@@ -63,7 +76,7 @@ export default function AdminV2Shell() {
 
       {/* Header — top right */}
       <div className="border-b border-border/60">
-        <AdminV2Header />
+        <AdminV2Header onOpenPalette={() => setPaletteOpen(true)} />
       </div>
 
       {/* Main content — bottom right, scrollable */}
@@ -110,6 +123,9 @@ export default function AdminV2Shell() {
           </Routes>
         </Suspense>
       </main>
+
+      {/* Command Palette — portal-level, always mounted */}
+      <AdminCommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
     </div>
   );
 }

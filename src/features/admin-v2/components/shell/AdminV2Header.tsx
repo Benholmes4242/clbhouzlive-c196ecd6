@@ -47,7 +47,11 @@ function useBreadcrumbs() {
   }));
 }
 
-export default function AdminV2Header() {
+interface AdminV2HeaderProps {
+  onOpenPalette: () => void;
+}
+
+export default function AdminV2Header({ onOpenPalette }: AdminV2HeaderProps) {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { data: profile } = useUserProfile(user?.id);
@@ -84,7 +88,7 @@ export default function AdminV2Header() {
       <div className="flex items-center gap-2">
         {/* ⌘K trigger */}
         <button
-          onClick={() => {/* TODO Sprint 9: open command palette */}}
+          onClick={onOpenPalette}
           className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[12px] text-muted-foreground hover:text-foreground transition-all"
           style={{ borderColor: 'hsl(var(--border) / 0.6)', background: 'hsl(var(--muted) / 0.3)' }}
           aria-label="Open command palette"
