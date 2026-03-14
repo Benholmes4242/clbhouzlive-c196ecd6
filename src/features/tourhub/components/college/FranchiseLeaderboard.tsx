@@ -162,7 +162,6 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
                       rank={index + 1}
                       maxValue={maxValue}
                       activeMetric={activeMetric}
-                      activeMetric={activeMetric}
                       momentum={momentum}
                       alumni={alumni}
                       animationDelay={index * 0.03}
