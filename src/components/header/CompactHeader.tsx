@@ -153,7 +153,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         )}
         style={{
           top: 0,
-          background: '#F8FAFC',
+          background: 'hsl(var(--background))',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           height: `${contentHeight}px`,
