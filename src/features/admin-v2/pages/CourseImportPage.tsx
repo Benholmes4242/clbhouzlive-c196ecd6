@@ -155,6 +155,10 @@ function DropZone({ onFile }: { onFile: (file: File) => void }) {
         <p className="text-xs text-muted-foreground mt-1">
           or click to browse · Required: name, country, continent
         </p>
+        <p className="text-[10px] text-muted-foreground/70 mt-0.5">
+          Valid continents: {VALID_CONTINENTS.join(', ')}
+        </p>
+        </p>
       </div>
       <input
         ref={inputRef}
