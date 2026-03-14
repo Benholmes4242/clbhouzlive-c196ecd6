@@ -3,8 +3,8 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Search, MapPin, X, ChevronDown, RefreshCw } from 'lucide-react';
+
+import { Search, MapPin, X, ChevronDown, RefreshCw, AlertCircle } from 'lucide-react';
 import VirtualizedCourseList from './VirtualizedCourseList';
 import { YourNetworkSection } from './network';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -210,17 +210,20 @@ const InlineLoadingSkeleton = () => (
 
 const ErrorState = ({ onRetry }: { onRetry: () => void }) => (
   <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
-    <div className="w-10 h-10 rounded-full border border-dashed border-destructive/40 flex items-center justify-center text-destructive mb-1">
-      <X className="w-4 h-4" />
+    <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-destructive/10 flex items-center justify-center">
+      <AlertCircle className="w-6 h-6 text-destructive" />
     </div>
     <h3 className="text-sm font-semibold">Unable to load courses</h3>
     <p className="text-sm text-muted-foreground max-w-xs">
       We couldn't fetch the courses. Please check your connection and try again.
     </p>
-    <Button variant="outline" size="sm" className="mt-2 gap-1.5" onClick={onRetry}>
+    <button
+      onClick={onRetry}
+      className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-card border border-border/50 text-foreground active:scale-[0.98] transition-transform"
+    >
       <ChevronDown className="h-4 w-4 rotate-180" />
       Retry
-    </Button>
+    </button>
   </div>
 );
 
@@ -228,7 +231,7 @@ const InlineRetryCard = ({ onRetry }: { onRetry: () => void }) => (
   <div className="max-w-md mx-auto mt-4">
     <button
       onClick={onRetry}
-      className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-sq-sm bg-card border border-border text-sm text-muted-foreground hover:text-foreground hover:border-border/80 transition-colors active:scale-[0.98]"
+      className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-xl bg-card border border-border text-sm text-muted-foreground transition-colors active:scale-[0.98] active:opacity-70"
     >
       <RefreshCw className="w-3.5 h-3.5" />
       Couldn't load more courses · Tap to retry
@@ -424,7 +427,7 @@ const CourseExplorer = () => {
 
 
   return (
-    <div className="w-full space-y-block">
+    <div className="w-full space-y-5">
       {/* Your Network Section - Shows activity from friends */}
       <YourNetworkSection className="mt-2" />
 
@@ -435,7 +438,7 @@ const CourseExplorer = () => {
           placeholder="Search by name, county or area…"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 pr-10 h-11 rounded-sq-sm bg-card border border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border transition-all duration-150 text-base placeholder:text-[15px]"
+          className="pl-10 pr-10 h-12 rounded-2xl bg-muted/50 border border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border/60 focus-visible:border-border transition-all duration-150 text-base placeholder:text-[15px]"
           aria-label="Search golf courses"
           role="searchbox"
         />
@@ -447,7 +450,7 @@ const CourseExplorer = () => {
         {searchTerm && (
           <button
             onClick={() => setSearchTerm('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 text-muted-foreground active:opacity-70 transition-opacity"
             aria-label="Clear search"
           >
             <X className="h-4 w-4" />
@@ -464,7 +467,7 @@ const CourseExplorer = () => {
             setSelectedSubregion('all');
           }}>
             <SelectTrigger 
-              className="h-11 w-full rounded-sq-sm justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98] bg-card border-border text-[hsl(210,13%,18%)]"
+              className="h-11 w-full rounded-2xl justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 bg-card border-border text-foreground"
               aria-label="Select region"
             >
               <div className="flex items-center">
@@ -490,7 +493,7 @@ const CourseExplorer = () => {
             disabled={selectedRegion === PRIMARY_REGIONS.ALL || !SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length}
           >
             <SelectTrigger 
-              className="h-11 w-full rounded-sq-sm justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed bg-card border-border text-[hsl(210,13%,18%)]"
+              className="h-11 w-full rounded-2xl justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed bg-card border-border text-foreground"
               aria-label="Select sub-region"
             >
               <SelectValue placeholder={selectedRegion === PRIMARY_REGIONS.ALL ? "Choose a region first" : "All sub-regions"} />
@@ -510,7 +513,7 @@ const CourseExplorer = () => {
       {/* Context row with sort */}
       {!isLoading && totalCount > 0 && (
         <div className="flex items-center justify-between gap-3 pt-2">
-          <p className="text-xs text-muted-foreground flex-1">
+          <p className="text-sm text-muted-foreground flex-1" style={{ fontSize: 13 }}>
             {hasSearch ? (
               <>
                 Results for "{debouncedSearch}" {selectedRegion === PRIMARY_REGIONS.ALL
@@ -547,22 +550,20 @@ const CourseExplorer = () => {
         <ErrorState onRetry={() => refetch()} />
       ) : allCourses.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center gap-3 animate-in fade-in duration-300">
-          <div className="w-10 h-10 rounded-full border border-dashed border-muted-foreground/40 flex items-center justify-center text-muted-foreground mb-1">
-            <Search className="w-4 h-4" />
+          <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-muted flex items-center justify-center">
+            <Search className="w-5 h-5 text-muted-foreground" />
           </div>
           <h3 className="text-sm font-semibold">No courses found</h3>
           <p className="text-sm text-muted-foreground max-w-xs">
             Try a different search or broaden your filters.
           </p>
           {hasActiveFilters && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-2 gap-1.5"
+            <button
               onClick={handleResetFilters}
+              className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-card border border-border/50 text-foreground active:scale-[0.98] transition-transform"
             >
               Reset filters
-            </Button>
+            </button>
           )}
         </div>
       ) : (

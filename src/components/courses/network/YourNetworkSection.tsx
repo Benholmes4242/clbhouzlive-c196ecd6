@@ -55,7 +55,7 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
         </h2>
         <button
           onClick={handleViewAll}
-          className="py-2.5 px-1 text-[13px] text-muted-foreground font-medium hover:text-foreground active:scale-[0.97] transition-all flex items-center gap-0.5"
+          className="py-2.5 px-1 text-[13px] text-muted-foreground font-medium active:scale-[0.97] active:opacity-70 transition-all flex items-center gap-0.5"
         >
           View all
           <ChevronRight size={14} />
@@ -80,7 +80,7 @@ export const YourNetworkSection: React.FC<YourNetworkSectionProps> = ({ classNam
       ) : (
         // Fallback for no highlights: Show subtle CTA
         friends.length < 3 && (
-          <div className="mt-3 p-3 rounded-lg bg-muted/50 text-center">
+          <div className="mt-3 p-3 rounded-xl bg-card border border-border/50 text-center">
             <p className="text-sm text-muted-foreground">
               Add friends to see their activity
             </p>
