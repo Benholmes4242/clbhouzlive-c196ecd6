@@ -94,12 +94,12 @@ export const Top100ListLeaderboard: React.FC<Top100ListLeaderboardProps> = ({
           <p className="mt-2 text-sm text-muted-foreground max-w-[260px] mx-auto">
             Start rating courses to set the pace for your friends.
           </p>
-          <Button
+          <button
             onClick={() => navigate('/courses')}
-            className="w-full max-w-[260px] h-11 rounded-sq-sm mt-4"
+            className="w-full max-w-[260px] h-11 rounded-2xl mt-4 bg-foreground text-background text-sm font-semibold active:scale-[0.97] transition-transform"
           >
             Explore courses
-          </Button>
+          </button>
         </motion.div>
       </section>
     );
