@@ -36,6 +36,26 @@ export function FeedItem({
   const isMultiMedia = post.mediaItems.length > 1;
   const media = post.mediaItems[0];
 
+  // Live tournament cards render as full-bleed inline items
+  if (post.postType === 'tournament_live') {
+    return (
+      <div
+        ref={ref}
+        className="relative w-full flex-shrink-0"
+        style={{ height: '100dvh' }}
+      >
+        <TournamentLiveCard
+          post={post as TournamentLiveFeedPost}
+          isActive={isActive}
+          onLike={onLike ? () => onLike(post) : () => {}}
+          onComment={onComment ?? (() => {})}
+          likeOverride={getLikeState ? getLikeState(post) : undefined}
+          commentCountOverride={getCommentCount ? getCommentCount(post) : undefined}
+        />
+      </div>
+    );
+  }
+
   // Tournament result cards render as full-bleed inline items
   if (post.postType === 'tournament_result' && post.tournamentMeta) {
     return (
