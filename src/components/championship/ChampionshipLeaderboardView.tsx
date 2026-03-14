@@ -66,8 +66,8 @@ const LeaderboardLoadingSkeleton = () => (
   <div className="space-y-2">
     {[1, 2, 3].map((i) => (
       <div key={i} className="flex items-center gap-3 p-3 rounded-xl animate-pulse">
-        <Skeleton className="w-7 h-7 rounded-full" />
-        <Skeleton className="w-10 h-10 rounded-full" />
+        <Skeleton className="w-7 h-7 rounded" />
+        <Skeleton className="w-10 h-10 rounded-lg" />
         <div className="flex-1 space-y-1.5">
           <Skeleton className="h-4 w-32" />
           <Skeleton className="h-3 w-24" />
