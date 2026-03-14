@@ -144,7 +144,7 @@ export function Top100RecentRoundsCarousel({
                 'h-10 w-10 rounded-full flex items-center justify-center transition-all duration-200',
                 current === 0
                   ? 'bg-muted text-muted-foreground/30 cursor-not-allowed'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground active:scale-95'
+                  : 'bg-muted text-muted-foreground active:scale-95 active:opacity-70'
               )}
               aria-label="Previous round"
             >
