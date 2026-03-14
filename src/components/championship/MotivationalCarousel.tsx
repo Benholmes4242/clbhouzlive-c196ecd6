@@ -45,16 +45,17 @@ export const MotivationalCarousel: React.FC<Props> = ({
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  const amberColor = 'hsl(var(--accent-amber))';
   const messages: MotivationalMessage[] = [];
 
   if (isInTop3 && currentRank) {
     messages.push({
       id: 'top3',
       icon: Award,
-      iconColor: '#D4A853',
+      iconColor: amberColor,
       message:
         currentRank === 1
-          ? "You're leading the pack! 👑"
+          ? "You're leading the pack!"
           : `You're #${currentRank}! Just ${currentRank - 1} spot${currentRank > 2 ? 's' : ''} from the top`,
       subMessage: 'Keep up the incredible pace',
       priority: 100,
@@ -63,7 +64,7 @@ export const MotivationalCarousel: React.FC<Props> = ({
     messages.push({
       id: 'top10',
       icon: TrendingUp,
-      iconColor: '#D4A853',
+      iconColor: amberColor,
       message: `You're #${currentRank} — in the top 10!`,
       subMessage: coursesToNextRank
         ? `${coursesToNextRank} course${coursesToNextRank > 1 ? 's' : ''} to climb higher`
@@ -76,7 +77,7 @@ export const MotivationalCarousel: React.FC<Props> = ({
     messages.push({
       id: 'friend-ahead',
       icon: Users,
-      iconColor: '#D4A853',
+      iconColor: amberColor,
       message: `${friendAhead.name} is ${friendAhead.coursesAhead} course${friendAhead.coursesAhead > 1 ? 's' : ''} ahead`,
       subMessage: 'Complete more courses to catch up!',
       priority: 80,
@@ -87,7 +88,7 @@ export const MotivationalCarousel: React.FC<Props> = ({
     messages.push({
       id: 'friend-behind',
       icon: Users,
-      iconColor: '#D4A853',
+      iconColor: amberColor,
       message: `You're ${friendBehind.coursesBehind} course${friendBehind.coursesBehind > 1 ? 's' : ''} ahead of ${friendBehind.name}`,
       subMessage: 'Stay ahead — keep logging courses!',
       priority: 70,
@@ -98,7 +99,7 @@ export const MotivationalCarousel: React.FC<Props> = ({
     messages.push({
       id: 'rival',
       icon: Target,
-      iconColor: '#D4A853',
+      iconColor: amberColor,
       message: `Your rival ${rivalAhead.name} is #${rivalAhead.rank}`,
       subMessage: `${rivalAhead.coursesAhead} course${rivalAhead.coursesAhead > 1 ? 's' : ''} to overtake them`,
       priority: 85,
@@ -109,8 +110,8 @@ export const MotivationalCarousel: React.FC<Props> = ({
     messages.push({
       id: 'streak',
       icon: Flame,
-      iconColor: '#D4A853',
-      message: `${streak}-day streak! 🔥`,
+      iconColor: amberColor,
+      message: `${streak}-day streak!`,
       subMessage: 'Keep it going — play tomorrow!',
       priority: 60,
     });
@@ -120,7 +121,7 @@ export const MotivationalCarousel: React.FC<Props> = ({
     messages.push({
       id: 'close-to-rank',
       icon: Sparkles,
-      iconColor: '#D4A853',
+      iconColor: amberColor,
       message: `Just ${coursesToNextRank} course${coursesToNextRank > 1 ? 's' : ''} to move up!`,
       subMessage: "You're so close to the next rank",
       priority: 75,
@@ -131,7 +132,7 @@ export const MotivationalCarousel: React.FC<Props> = ({
     messages.push({
       id: 'generic',
       icon: TrendingUp,
-      iconColor: '#D4A853',
+      iconColor: amberColor,
       message: currentRank
         ? `You're #${currentRank} of ${totalPlayers} players`
         : 'Log courses to join the leaderboard!',
@@ -157,14 +158,16 @@ export const MotivationalCarousel: React.FC<Props> = ({
 
   const Icon = currentMessage.icon;
 
-  // Highlight rank numbers in the message with gold
+  // Highlight rank numbers — #1 gets amber, all others get muted-foreground
   const renderMessage = (msg: string) => {
-    return msg.replace(/#(\d+)/g, '<gold>#$1</gold>').split(/(<gold>.*?<\/gold>)/).map((part, i) => {
-      const match = part.match(/^<gold>(.*)<\/gold>$/);
+    return msg.replace(/#(\d+)/g, '<rank>#$1</rank>').split(/(<rank>.*?<\/rank>)/).map((part, i) => {
+      const match = part.match(/^<rank>#(\d+)<\/rank>$/);
       if (match) {
+        const rankNum = parseInt(match[1], 10);
+        const color = rankNum === 1 ? 'hsl(var(--accent-amber))' : 'hsl(var(--muted-foreground))';
         return (
-          <span key={i} className="font-extrabold" style={{ color: '#D4A853', fontSize: '20px' }}>
-            {match[1]}
+          <span key={i} className="font-extrabold" style={{ color, fontSize: '20px' }}>
+            #{match[1]}
           </span>
         );
       }
@@ -176,8 +179,8 @@ export const MotivationalCarousel: React.FC<Props> = ({
     <div
       className="relative overflow-hidden px-5 py-4"
       style={{
-        background: 'linear-gradient(135deg, rgba(212, 168, 83, 0.06), rgba(212, 168, 83, 0.02))',
-        borderLeft: '3px solid #D4A853',
+        background: 'hsl(var(--accent-amber) / 0.05)',
+        borderLeft: '3px solid hsl(var(--accent-amber))',
         borderRadius: '16px',
         boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
       }}
@@ -190,11 +193,11 @@ export const MotivationalCarousel: React.FC<Props> = ({
           style={{
             width: 40,
             height: 40,
-            backgroundColor: 'rgba(212, 168, 83, 0.12)',
-            boxShadow: '0 0 8px rgba(212, 168, 83, 0.15)',
+            backgroundColor: 'hsl(var(--accent-amber) / 0.12)',
+            boxShadow: '0 0 8px hsl(var(--accent-amber) / 0.15)',
           }}
         >
-          <Icon className="w-5 h-5" style={{ color: '#D4A853' }} />
+          <Icon className="w-5 h-5" style={{ color: amberColor }} />
         </div>
 
         {/* Text */}
@@ -227,12 +230,12 @@ export const MotivationalCarousel: React.FC<Props> = ({
                     ? {
                         width: '16px',
                         height: '4px',
-                        backgroundColor: '#D4A853',
+                        backgroundColor: 'hsl(var(--accent-amber))',
                       }
                     : {
                         width: '4px',
                         height: '4px',
-                        backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                        backgroundColor: 'hsl(var(--border))',
                       }),
                 }}
               />
