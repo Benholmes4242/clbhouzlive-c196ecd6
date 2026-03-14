@@ -170,13 +170,11 @@ function Section({ title, subtitle, icon: Icon, iconColor, alumni, defaultExpand
         </div>
       </button>
       
-      <AnimatePresence initial={false}>
-        <motion.div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }} initial={false} animate={{ height: 'auto' }}>
-          {displayedAlumni.map((alumnus, index) => (
-            <AlumniRow key={alumnus.id} alumnus={alumnus} index={index} tierAccent={tierAccent} />
-          ))}
-        </motion.div>
-      </AnimatePresence>
+      <motion.div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }} initial={false} animate={{ height: 'auto' }}>
+        {displayedAlumni.map((alumnus, index) => (
+          <AlumniRow key={alumnus.id} alumnus={alumnus} index={index} tierAccent={tierAccent} />
+        ))}
+      </motion.div>
       
       {hasMore && (
         <button
