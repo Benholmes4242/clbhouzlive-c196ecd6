@@ -11,6 +11,7 @@ import type {
   PodiumRow as PodiumRowType,
 } from '@/components/media-system/types/media';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 // ─── Keyframes ────────────────────────────────────────────────────────────────
 
@@ -162,31 +163,18 @@ function HeroAvatar({ src, name }: { src: string | null; name: string }) {
   );
 }
 
-// ─── Small avatar for leaderboard rows ───────────────────────────────────────
+// ─── Small avatar for leaderboard rows (squircle) ───────────────────────────
 
 function RowAvatar({ src, name, size = 34 }: { src: string | null; name: string; size?: number }) {
-  const [imgSrc, setImgSrc] = useState(src);
-  const [failed, setFailed] = useState(false);
-  useEffect(() => { setImgSrc(src); setFailed(false); }, [src]);
   const initials = name.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() ?? '').slice(0, 2).join('');
-
   return (
-    <div style={{
-      width: size, height: size, borderRadius: '50%',
-      background: 'rgba(255,255,255,0.08)', overflow: 'hidden',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      flexShrink: 0,
-    }}>
-      {imgSrc && !failed ? (
-        <img
-          src={imgSrc} alt={name} draggable={false}
-          onError={() => { if (imgSrc !== PLAYER_SILHOUETTE_URL) setImgSrc(PLAYER_SILHOUETTE_URL); else setFailed(true); }}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
-        />
-      ) : (
-        <span style={{ fontSize: size * 0.36, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>{initials}</span>
-      )}
-    </div>
+    <SquircleAvatar
+      src={src}
+      alt={name}
+      size={size}
+      fallback={initials}
+      hideRing
+    />
   );
 }
 
@@ -482,8 +470,9 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
                       <div key={i} style={{
                         marginLeft: i === 0 ? 0 : -10,
                         zIndex: stackedAvatars.length - i,
-                        borderRadius: '50%',
+                        borderRadius: '34%',
                         border: '2px solid rgba(0,0,0,0.95)',
+                        overflow: 'hidden',
                       }}>
                         <RowAvatar src={resolvePhoto(p.name, p.photoUrl)} name={p.name} size={30} />
                       </div>
@@ -491,7 +480,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
                     {row.players.length > 4 && (
                       <div style={{
                         marginLeft: -8, zIndex: 0,
-                        width: 30, height: 30, borderRadius: '50%',
+                        width: 30, height: 30, borderRadius: '34%',
                         background: 'rgba(255,255,255,0.08)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)',
