@@ -382,9 +382,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             12, 14,
             16, 18,
           ],
-          'circle-color': 'rgba(255, 255, 255, 0.5)',
+          'circle-color': 'rgba(0, 0, 0, 0)',
           'circle-stroke-width': 1.5,
-          'circle-stroke-color': 'rgba(0, 0, 0, 0.2)',
+          'circle-stroke-color': 'rgba(255, 255, 255, 0.65)',
           'circle-opacity': 1.0,
           'circle-opacity-transition': { duration: 300, delay: 0 },
         },
@@ -424,9 +424,9 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             12, 14,
             16, 18,
           ],
-          'circle-color': 'rgba(255,255,255,0.95)',
-          'circle-stroke-width': 2.5,
-          'circle-stroke-color': WANT_TO_PLAY_COLOR,
+          'circle-color': WANT_TO_PLAY_COLOR,
+          'circle-stroke-width': 2,
+          'circle-stroke-color': 'rgba(255,255,255,0.8)',
           'circle-opacity-transition': { duration: 300, delay: 0 },
         },
       });
@@ -643,11 +643,11 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
               <span className="text-[11px] font-medium text-white/90">Played</span>
             </div>
             <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
-              <span className="inline-block h-2.5 w-2.5 rounded-full border-2 bg-transparent shadow-[0_0_4px_rgba(34,197,94,0.4)]" style={{ borderColor: WANT_TO_PLAY_COLOR }} aria-hidden="true" />
+              <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: WANT_TO_PLAY_COLOR }} aria-hidden="true" />
               <span className="text-[11px] font-medium text-white/90">Want to Play</span>
             </div>
             <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
-              <span className="inline-block h-2.5 w-2.5 rounded-full border-[1.5px] border-white/60 bg-white/50" aria-hidden="true" />
+              <span className="inline-block h-2.5 w-2.5 rounded-full border-[1.5px] border-white/65 bg-transparent" aria-hidden="true" />
               <span className="text-[11px] font-medium text-white/90">Not Played</span>
             </div>
           </div>
