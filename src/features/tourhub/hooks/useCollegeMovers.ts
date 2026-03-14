@@ -60,7 +60,6 @@ export function useCollegeWeeklyMovers(options?: {
       const deltaColumn = {
         earnings: 'earnings_delta',
         wins: 'wins_delta',
-        cuts: 'cuts_delta',
         top10s: 'top10_delta',
       }[metric];
       

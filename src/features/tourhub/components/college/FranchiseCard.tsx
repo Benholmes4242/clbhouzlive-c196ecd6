@@ -59,7 +59,7 @@ function getInitials(fullName: string): string {
 
 export function FranchiseCard({
   stats, college, rank, activeMetric = 'earnings',
-  status, momentum, alumni, className, animationDelay = 0,
+  momentum, alumni, className, animationDelay = 0,
   isDelta = false, deltas,
 }: FranchiseCardProps) {
   const displayName = college?.short_name || college?.college_name || stats.normalized_name;
