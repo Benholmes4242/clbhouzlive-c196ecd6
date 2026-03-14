@@ -493,7 +493,7 @@ const CourseExplorer = () => {
             disabled={selectedRegion === PRIMARY_REGIONS.ALL || !SUBREGIONS[selectedRegion as Exclude<PrimaryRegionKey, 'all'>]?.length}
           >
             <SelectTrigger 
-              className="h-11 w-full rounded-sq-sm justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed bg-card border-border text-[hsl(210,13%,18%)]"
+              className="h-11 w-full rounded-2xl justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed bg-card border-border text-foreground"
               aria-label="Select sub-region"
             >
               <SelectValue placeholder={selectedRegion === PRIMARY_REGIONS.ALL ? "Choose a region first" : "All sub-regions"} />
