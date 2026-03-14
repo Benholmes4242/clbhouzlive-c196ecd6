@@ -29,7 +29,6 @@ interface FranchiseCardProps {
   deltas?: {
     earnings_delta: number;
     wins_delta: number;
-    cuts_delta: number;
     top10_delta: number;
     earnings_rank_change: number | null;
   };
