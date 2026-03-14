@@ -647,7 +647,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
               <span className="text-[11px] font-medium text-white/90">Want to Play</span>
             </div>
             <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
-              <span className="inline-block h-2.5 w-2.5 rounded-full border-[1.5px] border-white/60 bg-white/50" aria-hidden="true" />
+              <span className="inline-block h-2.5 w-2.5 rounded-full border-[1.5px] border-white/65 bg-transparent" aria-hidden="true" />
               <span className="text-[11px] font-medium text-white/90">Not Played</span>
             </div>
           </div>
