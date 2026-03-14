@@ -467,7 +467,7 @@ const CourseExplorer = () => {
             setSelectedSubregion('all');
           }}>
             <SelectTrigger 
-              className="h-11 w-full rounded-sq-sm justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 active:scale-[0.98] bg-card border-border text-[hsl(210,13%,18%)]"
+              className="h-11 w-full rounded-2xl justify-between text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:border-border data-[state=open]:ring-0 transition-all duration-150 bg-card border-border text-foreground"
               aria-label="Select region"
             >
               <div className="flex items-center">
