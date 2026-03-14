@@ -101,8 +101,7 @@ export function PlayerInfoCard({ player }: PlayerInfoCardProps) {
 
   return (
     <div className="px-4 py-6">
-      {/* Section header — 22px / 700 / -0.3px */}
-      {/* Section header — 11px / 700 / uppercase / muted */}
+      {/* Section header */}
       <div className="flex items-center gap-2" style={{ marginBottom: '16px' }}>
         <User className="w-4 h-4 text-muted-foreground" />
         <h2 className="text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
