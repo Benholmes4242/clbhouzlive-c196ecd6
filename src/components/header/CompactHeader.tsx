@@ -247,7 +247,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                 "p-0 flex items-center justify-center rounded-full active:scale-[0.94] transition-all",
                 "h-11 w-11",
                 useLightTheme
-                  ? "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  ? "text-muted-foreground"
                   : "hover:bg-[hsl(var(--clubhouse-active-bg))]"
               )}
               style={{ 
