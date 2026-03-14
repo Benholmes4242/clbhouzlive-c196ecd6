@@ -388,7 +388,7 @@ const Top100List = () => {
   const unplayedCount = courses?.filter(c => !playedCourseIds.has(c.id)).length || 0;
 
   return (
-    <PageRoot className="min-h-screen bg-[var(--bg-page)]" immersive immersiveStatusBar>
+    <PageRoot className="min-h-screen bg-background" immersive immersiveStatusBar>
       {/* 1. Full-bleed Hero + Progress Slab - MUST be direct child of PageRoot */}
       {listSummary && (
         <Top100HeroShell
