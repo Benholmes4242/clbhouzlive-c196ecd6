@@ -87,7 +87,7 @@ export const Top100ListProgressCard: React.FC<Top100ListProgressCardProps> = ({
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <div 
-            className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+            className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
             style={{ backgroundColor: `${theme.ringColor}1A` }}
           >
             <Target className="w-5 h-5" style={{ color: theme.ringColor }} />
