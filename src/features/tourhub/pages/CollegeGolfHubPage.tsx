@@ -12,13 +12,12 @@ import { useCollegeSeasonStats, type CollegeSeasonStats } from '../hooks/useColl
 import { useCollegeMediaMap } from '../hooks/useCollegeMedia';
 import { useHeroAlumni } from '../hooks/useBatchCollegeAlumni';
 
-type MetricTab = 'earnings' | 'wins' | 'cuts' | 'top10s';
-const VALID_METRICS = new Set<string>(['earnings', 'wins', 'cuts', 'top10s']);
+type MetricTab = 'earnings' | 'wins' | 'top10s';
+const VALID_METRICS = new Set<string>(['earnings', 'wins', 'top10s']);
 
 function getMetricValue(s: CollegeSeasonStats, metric: MetricTab): number {
   switch (metric) {
     case 'wins': return s.wins_total;
-    case 'cuts': return s.cuts_total;
     case 'top10s': return s.top10_total;
     default: return s.earnings_total;
   }
