@@ -189,6 +189,11 @@ export function AdminTable<T>({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
 
+  // Reset shift-click anchor when data changes (search/filter/page change)
+  useEffect(() => {
+    setLastSelectedIndex(null);
+  }, [data]);
+
   const table = useReactTable({
     data,
     columns,
