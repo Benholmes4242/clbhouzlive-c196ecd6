@@ -147,7 +147,6 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
               <>
                 {sortedStats.map((collegeStats, index) => {
                   const moverData = moverInfo?.moverData?.get(collegeStats.normalized_name);
-                  const moverData = moverInfo?.moverData?.get(collegeStats.normalized_name);
                   const momentum = moverData ? {
                     rankChange: moverData.rankChange,
                     earningsDelta: moverData.earningsDelta,
