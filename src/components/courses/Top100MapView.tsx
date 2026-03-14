@@ -326,7 +326,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
           'circle-stroke-color': [
             'case',
             ['>', ['/', ['get', 'played_count'], ['get', 'point_count']], 0.5],
-            seasonColor + '99', // 60% opacity
+            PLAYED_COLOR + '99', // 60% opacity
             'rgba(255, 255, 255, 0.15)',
           ],
         },
