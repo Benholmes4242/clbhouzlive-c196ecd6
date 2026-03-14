@@ -124,6 +124,9 @@ export interface TourPlayerStatistics {
   greens_in_reg: number | null;
   putting_average: number | null;
   sand_saves: number | null;
+  holes_per_eagle: number | null;
+  holes_proximity_avg: string | null;
+  total_driving: number | null;
   // Extracted from raw_data
   world_rank: number | null;
   earnings: number | null;

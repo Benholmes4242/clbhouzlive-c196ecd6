@@ -9,6 +9,16 @@ import { TrendingUp, Trophy, Target, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TourPlayerStatistics } from '../../hooks/useTourHubData';
 
+// Tour averages — 2026 PGA Tour season
+const TOUR_AVG = {
+  drivingDistance: 301.8,
+  drivingAccuracy: 59.0,
+  gir: 68.5,
+  puttingAverage: 1.790,
+  sandSaves: 49.5,
+  scrambling: 56.8,
+} as const;
+
 function fmt(value: number | null | undefined, type?: 'decimal' | 'percent' | 'yards' | 'currency' | 'signed'): string {
   if (value === null || value === undefined) return '—';
   switch (type) {
@@ -229,10 +239,63 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
 
           {activeTab === 'Ball Striking' && (
             <div>
-              <SubSectionLabel icon={Target} label="OFF THE TEE & APPROACH" style={{ marginTop: 0 }} />
-              <StatRow label="Driving Distance" value={fmt(playerStats.driving_distance, 'yards')} />
-              <StatRow label="Driving Accuracy" value={fmt(playerStats.driving_accuracy, 'percent')} />
-              <StatRow label="Greens in Regulation" value={fmt(playerStats.greens_in_reg, 'percent')} />
+              <SubSectionLabel icon={Target} label="OFF THE TEE" style={{ marginTop: 0 }} />
+              <StatRow
+                label="Driving Distance"
+                value={fmt(playerStats.driving_distance, 'yards')}
+                trend={playerStats.driving_distance
+                  ? playerStats.driving_distance > TOUR_AVG.drivingDistance ? 'positive'
+                    : playerStats.driving_distance < 290 ? 'negative'
+                    : null
+                  : null}
+                barPercent={playerStats.driving_distance
+                  ? Math.max(0, ((playerStats.driving_distance - 267) / (328 - 267)) * 100)
+                  : undefined}
+                barIndex={0}
+              />
+              <StatRow
+                label="Driving Accuracy"
+                value={fmt(playerStats.driving_accuracy, 'percent')}
+                trend={playerStats.driving_accuracy
+                  ? playerStats.driving_accuracy > TOUR_AVG.drivingAccuracy ? 'positive'
+                    : playerStats.driving_accuracy < 52 ? 'negative'
+                    : null
+                  : null}
+                barPercent={playerStats.driving_accuracy ?? undefined}
+                barIndex={1}
+              />
+
+              <SubSectionLabel icon={Target} label="APPROACH" style={{ marginTop: 24 }} />
+              <StatRow
+                label="Greens in Regulation"
+                value={fmt(playerStats.greens_in_reg, 'percent')}
+                trend={playerStats.greens_in_reg
+                  ? playerStats.greens_in_reg > TOUR_AVG.gir ? 'positive'
+                    : playerStats.greens_in_reg < 62 ? 'negative'
+                    : null
+                  : null}
+                barPercent={playerStats.greens_in_reg ?? undefined}
+                barIndex={2}
+              />
+              <StatRow
+                label="Proximity to Hole"
+                value={playerStats.holes_proximity_avg || '—'}
+                barIndex={3}
+              />
+
+              <SubSectionLabel icon={Target} label="OVERALL" style={{ marginTop: 24 }} />
+              <StatRow
+                label="Total Driving"
+                value={playerStats.total_driving ? `#${playerStats.total_driving}` : '—'}
+                barIndex={4}
+              />
+              <StatRow
+                label="Eagles"
+                value={playerStats.holes_per_eagle
+                  ? `1 per ${playerStats.holes_per_eagle} holes`
+                  : '—'}
+                barIndex={5}
+              />
             </div>
           )}
 
