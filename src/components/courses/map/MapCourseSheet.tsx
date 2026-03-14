@@ -144,18 +144,20 @@ export const MapCourseSheet: React.FC<MapCourseSheetProps> = ({
     return labels[scopeKey] || 'Global';
   };
 
-  const getStatusLabel = (): { text: string; className: string; icon?: React.ReactNode } => {
+  const getStatusLabel = (): { text: string; className: string; icon?: React.ReactNode; style?: React.CSSProperties } => {
     if (course?.user_has_rated) {
       return { 
         text: 'Played', 
-        className: 'bg-emerald-500/95 text-white shadow-sm',
+        className: 'text-white',
+        style: { background: '#f59e0b', boxShadow: '0 2px 8px rgba(245,158,11,0.3)' },
         icon: <Check className="h-3 w-3 mr-1" />
       };
     }
     if (isWantToPlay) {
       return { 
         text: 'Want to Play', 
-        className: 'bg-[#F7931E]/95 text-white shadow-[0_2px_8px_rgba(247,147,30,0.3)]',
+        className: 'text-white',
+        style: { background: '#22c55e', boxShadow: '0 2px 8px rgba(34,197,94,0.3)' },
         icon: <Bookmark className="h-3 w-3 mr-1 fill-current" />
       };
     }
