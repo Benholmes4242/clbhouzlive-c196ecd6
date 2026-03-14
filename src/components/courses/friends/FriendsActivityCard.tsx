@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -70,12 +71,12 @@ const FriendsActivityCard: React.FC<FriendsActivityCardProps> = ({ leaderboard, 
               }}
             >
               {/* Avatar */}
-              <img
-                src={entry.avatarUrl || '/placeholder.svg'}
+              <SquircleAvatar
+                size={40}
+                src={entry.avatarUrl}
                 alt={entry.friendName}
-                className="w-10 h-10 rounded-full object-cover shrink-0"
-                style={{ border: '1px solid rgba(0,0,0,0.06)' }}
-                onError={(e) => { e.currentTarget.src = '/placeholder.svg'; }}
+                fallback={entry.friendName.charAt(0)}
+                hideRing
               />
 
               {/* Info */}

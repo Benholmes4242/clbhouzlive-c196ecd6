@@ -1,4 +1,5 @@
 import React from 'react';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -46,12 +47,13 @@ const ActivityFeedItem: React.FC<ActivityFeedItemProps> = ({
           className="shrink-0 focus:outline-none"
           onClick={handleFriendClick}
         >
-          <img
-            src={hit.friend_profile.profile_photo_url || '/placeholder.svg'}
-            alt={friendName}
-            className="w-9 h-9 rounded-full object-cover"
-            onError={(e) => { e.currentTarget.src = '/placeholder.svg'; }}
-          />
+            <SquircleAvatar
+              size={36}
+              src={hit.friend_profile.profile_photo_url}
+              alt={friendName}
+              fallback={friendName.charAt(0)}
+              hideRing
+            />
         </button>
 
         {/* Content */}

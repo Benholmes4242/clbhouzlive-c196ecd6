@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ChevronDown } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
@@ -70,12 +71,13 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
               style={{ zIndex: 10 - idx }}
               onClick={(e) => handleFriendClick(f.friend_profile.username, e)}
             >
-              <img
-                src={f.friend_profile.profile_photo_url || '/placeholder.svg'}
-                alt={f.friend_profile.display_name || f.friend_profile.username}
-                className="w-9 h-9 rounded-full object-cover ring-2 ring-white"
-                onError={(e) => { e.currentTarget.src = '/placeholder.svg'; }}
-              />
+                <SquircleAvatar
+                  size={36}
+                  src={f.friend_profile.profile_photo_url}
+                  alt={f.friend_profile.display_name || f.friend_profile.username}
+                  fallback={(f.friend_profile.display_name || f.friend_profile.username || '?').charAt(0)}
+                  hideRing
+                />
             </button>
           ))}
         </div>
@@ -138,12 +140,13 @@ const ActivityCluster: React.FC<ActivityClusterProps> = ({
                   onClick={(e) => handleFriendClick(friend.friend_profile.username, e)}
                 >
                   <div className="flex items-center gap-2 min-w-0">
-                    <img
-                      src={friend.friend_profile.profile_photo_url || '/placeholder.svg'}
-                      alt={friend.friend_profile.display_name || friend.friend_profile.username}
-                      className="w-7 h-7 rounded-full object-cover shrink-0"
-                      onError={(e) => { e.currentTarget.src = '/placeholder.svg'; }}
-                    />
+                      <SquircleAvatar
+                        size={28}
+                        src={friend.friend_profile.profile_photo_url}
+                        alt={friend.friend_profile.display_name || friend.friend_profile.username}
+                        fallback={(friend.friend_profile.display_name || friend.friend_profile.username || '?').charAt(0)}
+                        hideRing
+                      />
                     <p className="text-sm font-medium text-foreground truncate">
                       {friend.friend_profile.display_name || friend.friend_profile.username}
                     </p>
