@@ -184,7 +184,7 @@ export function ScheduleTourFilter({
                     {count}
                   </span>
 
-                  {isActive && <AnimatedCheck color="white" />}
+                  
                 </motion.button>
               );
             })}
