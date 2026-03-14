@@ -89,11 +89,12 @@ const FriendsHeroCourseCard: React.FC<FriendsHeroCourseCardProps> = ({ course, f
       {/* Played by row below image */}
       <div className="flex items-center gap-2 px-4 py-2">
         <button onClick={handleFriendClick} className="shrink-0">
-          <img
-            src={mostRecentFriend.friend_profile.profile_photo_url || '/placeholder.svg'}
+          <SquircleAvatar
+            size={24}
+            src={mostRecentFriend.friend_profile.profile_photo_url}
             alt={friendName}
-            className="w-6 h-6 rounded-full object-cover"
-            onError={(e) => { e.currentTarget.src = '/placeholder.svg'; }}
+            fallback={friendName.charAt(0)}
+            hideRing
           />
         </button>
         <p className="text-sm text-muted-foreground">
