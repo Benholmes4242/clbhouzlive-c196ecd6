@@ -637,7 +637,7 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
             <div className="glass-card flex items-center gap-1.5 px-3 py-2 rounded-full">
               <span 
                 className="inline-block h-2.5 w-2.5 rounded-full shadow-sm" 
-                style={{ backgroundColor: seasonColor }}
+                style={{ backgroundColor: PLAYED_COLOR }}
                 aria-hidden="true" 
               />
               <span className="text-[11px] font-medium text-white/90">Played</span>
