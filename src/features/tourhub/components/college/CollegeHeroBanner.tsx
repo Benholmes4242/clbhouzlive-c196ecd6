@@ -16,23 +16,32 @@ import type { CollegeMedia } from '../../hooks/useCollegeMedia';
 interface CollegeHeroBannerProps {
   stats: CollegeSeasonStats;
   college: CollegeMedia | null;
+  activeMetric: 'earnings' | 'wins' | 'cuts' | 'top10s';
   className?: string;
 }
 
-export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBannerProps) {
+const METRIC_LABELS: Record<string, string> = {
+  earnings: '#1 by Earnings',
+  wins:     '#1 by Wins',
+  cuts:     '#1 by Cuts Made',
+  top10s:   '#1 by Top 10s',
+};
+
+export function CollegeHeroBanner({ stats, college, activeMetric, className }: CollegeHeroBannerProps) {
   const displayName = college?.short_name || college?.college_name || stats.normalized_name;
   const gradientCSS = getCollegeGradientCSS(stats.normalized_name);
+  const logoUrl = getCollegeLogoUrl(college?.college_name || stats.normalized_name);
 
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        key={stats.normalized_name}
+        key={`${stats.normalized_name}-${activeMetric}`}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.4 }}
         className={cn('relative overflow-hidden', className)}
-        style={{ height: '45dvh' }}
+        style={{ height: 'calc(45dvh + var(--sat, env(safe-area-inset-top, 0px)))' }}
       >
         {/* Background gradient with Ken Burns */}
         <motion.div
@@ -63,18 +72,18 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
         <Link
           to={`/tourhub/college-golf/${stats.normalized_name}`}
           className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8 pt-20"
-          style={{ minHeight: '45dvh' }}
+          style={{ minHeight: 'calc(45dvh + var(--sat, env(safe-area-inset-top, 0px)))' }}
         >
-          {/* Logo — 110×110 centered */}
+          {/* Logo — 140×140 centered */}
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.15 }}
             className="mb-4"
           >
-            {getCollegeLogoUrl(college?.college_name || stats.normalized_name) ? (
+            {logoUrl ? (
               <img
-                src={getCollegeLogoUrl(college?.college_name || stats.normalized_name)!}
+                src={logoUrl}
                 alt={displayName}
                 className="object-contain"
                 style={{
@@ -93,7 +102,7 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
             )}
           </motion.div>
 
-          {/* #1 Badge — 12px, 700, amber */}
+          {/* #1 Badge — contextual per active metric */}
           <motion.div
             initial={{ y: 8, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -111,7 +120,7 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
                 color: 'rgba(245, 158, 11, 0.9)',
               }}
             >
-              #1 This Season
+              {METRIC_LABELS[activeMetric] || '#1 This Season'}
             </span>
           </motion.div>
 
@@ -164,9 +173,9 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
               maxWidth: 320,
             }}
           >
-            <StatCell label="EARNINGS" value={formatCurrency(stats.earnings_total)} />
+            <StatCell label="EARNINGS" value={formatCurrency(stats.earnings_total)} isActive={activeMetric === 'earnings'} />
             <div style={{ width: 1, background: 'rgba(255,255,255,0.1)' }} />
-            <StatCell label="WINS" value={String(stats.wins_total)} />
+            <StatCell label="WINS" value={String(stats.wins_total)} isActive={activeMetric === 'wins'} />
             <div style={{ width: 1, background: 'rgba(255,255,255,0.1)' }} />
             <StatCell label="ALUMNI" value={String(stats.player_count)} icon={<Users style={{ width: 14, height: 14, color: 'rgba(255,255,255,0.5)' }} />} />
           </motion.div>
@@ -176,10 +185,10 @@ export function CollegeHeroBanner({ stats, college, className }: CollegeHeroBann
   );
 }
 
-function StatCell({ label, value, icon }: { label: string; value: string; icon?: React.ReactNode }) {
+function StatCell({ label, value, icon, isActive }: { label: string; value: string; icon?: React.ReactNode; isActive?: boolean }) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center">
-    <span
+      <span
         style={{
           fontSize: 10,
           fontWeight: 600,
@@ -194,10 +203,11 @@ function StatCell({ label, value, icon }: { label: string; value: string; icon?:
         {icon}
         <span
           style={{
-            fontSize: 17,
+            fontSize: isActive ? 19 : 17,
             fontWeight: 700,
-            color: 'white',
+            color: isActive ? 'rgba(245,158,11,0.95)' : 'white',
             fontVariantNumeric: 'tabular-nums',
+            transition: 'all 0.2s ease',
           }}
         >
           {value}

@@ -54,7 +54,6 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
           border: '1px solid hsl(var(--border) / 0.5)',
           borderRadius: 16,
           padding: '12px 16px',
-          
         }}
       >
         {/* Stacked squircle avatars — 32×32, 34% radius, 2px white border, -8px overlap */}
@@ -69,7 +68,7 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
                   width: 32,
                   height: 32,
                   borderRadius: '34%',
-                  border: '2px solid white',
+                  border: '2px solid hsl(var(--card))',
                   marginLeft: i === 0 ? 0 : -8,
                   zIndex: MAX_VISIBLE - i,
                   position: 'relative',
@@ -100,7 +99,7 @@ export function AlumniFaceStrip({ alumni, collegeName, collegeSlug, totalAlumniC
                 width: 32,
                 height: 32,
                 borderRadius: '34%',
-                border: '2px solid white',
+                border: '2px solid hsl(var(--card))',
                 marginLeft: -8,
                 position: 'relative',
               }}
