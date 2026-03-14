@@ -58,7 +58,7 @@ export const NetworkAvatarStrip: React.FC<NetworkAvatarStripProps> = ({
           <button
             key={friend.id}
             onClick={() => handleAvatarClick(friend.id)}
-            className="flex-shrink-0 transition-transform duration-100 ease-out active:scale-95 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-border rounded-[34%]"
+            className="flex-shrink-0 active:scale-95 transition-transform duration-100 ease-out focus:outline-none focus:ring-2 focus:ring-border rounded-[34%]"
             aria-label={`View ${friend.display_name || friend.username}'s profile`}
           >
             <SquircleAvatar
