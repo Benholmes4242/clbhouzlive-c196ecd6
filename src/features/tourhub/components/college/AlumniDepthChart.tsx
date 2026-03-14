@@ -25,7 +25,7 @@ interface AlumniRowProps {
 }
 
 const tierBorderColor: Record<TierAccent, string> = {
-  amber: '#f59e0b',
+  amber: 'hsl(var(--accent-amber))',
   blue: '#60A5FA',
   green: '#22C55E',
 };
