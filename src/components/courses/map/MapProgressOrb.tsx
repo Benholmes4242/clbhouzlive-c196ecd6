@@ -99,7 +99,7 @@ export const MapProgressOrb: React.FC<MapProgressOrbProps> = ({
           exit={{ scale: 0.8, opacity: 0 }}
           transition={{ type: 'spring', damping: 20, stiffness: 300 }}
           onClick={handleToggle}
-          className="glass-card relative flex items-center justify-center w-12 h-12 rounded-full hover:bg-white/15 active:scale-95 transition-all duration-150"
+          className="glass-card relative flex items-center justify-center w-12 h-12 rounded-full active:scale-95 active:bg-white/15 transition-all duration-150"
         >
           {/* Progress ring - dynamic season color */}
           <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 48 48">
