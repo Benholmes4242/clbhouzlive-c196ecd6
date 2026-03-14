@@ -61,7 +61,7 @@ export function useTournamentLiveFeed(): {
         tournamentId:    tournament.id,
         tournamentName:  tournament.name,
         tourSlug:        tournament.tourSlug,
-        tourName:        tournament.tourSlug.toUpperCase(),
+        tourName:        ({ pga: 'PGA TOUR', liv: 'LIV GOLF', euro: 'DP WORLD', lpga: 'LPGA', kft: 'KORN FERRY', champ: 'CHAMPIONS' } as Record<string, string>)[tournament.tourSlug] ?? tournament.tourSlug.toUpperCase(),
         venueName:       tournament.venueName,
         venueCity:       tournament.venueCity,
         currentRound:    tournament.currentRound ?? 1,
