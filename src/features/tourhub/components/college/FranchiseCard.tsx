@@ -64,7 +64,7 @@ export function FranchiseCard({
 }: FranchiseCardProps) {
   const displayName = college?.short_name || college?.college_name || stats.normalized_name;
   const slug = stats.normalized_name;
-  const isTopThree = rank !== undefined && rank <= 3;
+  
   const momentumRising = momentum?.isRising ?? false;
   const logoUrl = getCollegeLogoUrl(college?.college_name || stats.normalized_name);
 
@@ -161,16 +161,12 @@ export function FranchiseCard({
               style={{
                 top: 8,
                 left: 10,
-                width: isTopThree ? 24 : 'auto',
-                height: isTopThree ? 24 : 'auto',
-                borderRadius: isTopThree ? '50%' : 4,
-                background: rank === 1 ? 'hsl(var(--accent-amber))'
-                  : rank === 2 ? 'rgba(148,163,184,0.9)'
-                  : rank === 3 ? 'rgba(194,135,90,0.9)'
-                  : 'transparent',
-                color: isTopThree ? 'white' : 'hsl(var(--muted-foreground) / 0.6)',
-                fontSize: isTopThree ? 11 : 12,
-                fontWeight: isTopThree ? 700 : 600,
+                background: 'transparent',
+                color: rank === 1
+                  ? 'hsl(var(--accent-amber))'
+                  : 'hsl(var(--muted-foreground) / 0.6)',
+                fontSize: 12,
+                fontWeight: rank === 1 ? 700 : 600,
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
