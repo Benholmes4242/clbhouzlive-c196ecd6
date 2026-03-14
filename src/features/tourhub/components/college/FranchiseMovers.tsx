@@ -59,21 +59,16 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
         </div>
       )}
 
-      {/* Rising / Falling toggle — rounded-2xl container */}
+      {/* Rising / Falling toggle — Tier 2 pill tabs */}
       <div
-        className="flex items-stretch overflow-hidden"
-        style={{
-          borderRadius: 16,
-          background: 'hsl(var(--card))',
-          border: '1px solid hsl(var(--border) / 0.5)',
-          padding: 4,
-          marginBottom: 16,
-        }}
+        className="flex items-center gap-2"
+        role="tablist"
+        style={{ marginBottom: 16 }}
       >
         {[
-          { value: 'up' as Direction, label: 'Rising', icon: TrendingUp, iconColor: '#22C55E' },
-          { value: 'down' as Direction, label: 'Falling', icon: TrendingDown, iconColor: '#EF4444' },
-        ].map(({ value, label, icon: Icon, iconColor }) => {
+          { value: 'up' as Direction, label: 'Rising', icon: TrendingUp },
+          { value: 'down' as Direction, label: 'Falling', icon: TrendingDown },
+        ].map(({ value, label, icon: Icon }) => {
           const isSelected = direction === value;
           return (
             <button
@@ -81,21 +76,17 @@ export function FranchiseMovers({ limit = 8, className }: FranchiseMoversProps) 
               role="tab"
               aria-selected={isSelected}
               onClick={() => setDirection(value)}
-              className={cn(
-                'relative flex-1 flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-[0.98] transition-all duration-200',
-              )}
+              className="flex items-center gap-1.5 whitespace-nowrap active:scale-[0.97] transition-all duration-200"
               style={{
-                borderRadius: 12,
-                padding: 10,
-                minHeight: 44,
-                fontSize: 14,
+                borderRadius: 20,
+                padding: '8px 16px',
+                fontSize: 13,
                 fontWeight: isSelected ? 600 : 500,
                 color: isSelected ? 'hsl(var(--background))' : 'hsl(var(--muted-foreground))',
-                background: isSelected ? 'hsl(var(--foreground))' : 'transparent',
-                boxShadow: 'none',
+                background: isSelected ? 'hsl(var(--foreground))' : 'hsl(var(--muted))',
               }}
             >
-              <Icon className="w-4 h-4" style={{ color: isSelected ? 'white' : iconColor }} />
+              <Icon className="w-3.5 h-3.5" />
               {label}
             </button>
           );
