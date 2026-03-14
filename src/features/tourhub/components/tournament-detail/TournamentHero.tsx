@@ -3,8 +3,8 @@
  */
 
 import { format, isSameMonth } from 'date-fns';
-import { MapPin, Calendar, DollarSign, Flag, Ruler, Clock, CheckCircle2, Menu } from 'lucide-react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { MapPin, Calendar, DollarSign, Flag, Ruler, Clock, CheckCircle2, Menu, Target } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { openTourNav } from '../../contexts/TourNavContext';
 import type { TourTournament } from '../../hooks/useTourHubData';
@@ -51,8 +51,8 @@ function StatusBadge({ status }: { status: string }) {
     >
       {c.pulse && (
         <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22C55E] opacity-75" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#22C55E]" />
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: '#22C55E' }} />
+          <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: '#22C55E' }} />
         </span>
       )}
       {!c.pulse && c.icon}
@@ -88,9 +88,6 @@ function formatDateRange(startDate: string, endDate: string): string {
 }
 
 export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
-  const { scrollY } = useScroll();
-  const imageY = useTransform(scrollY, [0, 400], [0, 60]);
-
   const formattedPurse = tournament.purse 
     ? `$${(tournament.purse / 1_000_000).toFixed(1)}M`
     : null;
@@ -99,33 +96,34 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
     <div className="relative overflow-hidden">
       <motion.div 
         className="relative overflow-hidden"
-        style={{ minHeight: 'calc(45dvh + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))' }}
+        style={{ minHeight: 'calc(45dvh + var(--sat, env(safe-area-inset-top, 0px)))' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       >
-        {/* Background image with Ken Burns + parallax */}
+        {/* Background with Ken Burns */}
         <motion.div
           className="absolute inset-0"
           initial={{ scale: 1.06 }}
           animate={{ scale: 1 }}
           transition={{ duration: 15, ease: 'linear' }}
-          style={{ y: imageY }}
         >
-          {imageUrl ? (
+          {/* Always render fallback gradient */}
+          <div 
+            className="w-full h-full absolute inset-0" 
+            style={{
+              background: 'linear-gradient(135deg, hsl(var(--foreground)) 0%, hsl(220, 30%, 20%) 50%, hsl(var(--foreground)) 100%)',
+            }}
+          />
+          {/* Layer image on top if available */}
+          {imageUrl && (
             <img 
               src={imageUrl}
               alt={tournament.venue_name || tournament.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover absolute inset-0"
               loading="eager"
               fetchPriority="high"
-            />
-          ) : (
-            <div 
-              className="w-full h-full" 
-              style={{
-                background: 'linear-gradient(135deg, hsl(var(--foreground)) 0%, hsl(220, 30%, 20%) 50%, hsl(var(--foreground)) 100%)',
-              }}
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
             />
           )}
         </motion.div>
@@ -143,7 +141,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
           aria-label="Open tour menu"
           className="fixed z-30 flex items-center justify-center"
-          style={{ width: 44, height: 44, top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: 16 }}
+          style={{ width: 44, height: 44, top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)', left: 16 }}
         >
           <Menu
             className="w-[24px] h-[24px] text-white"
@@ -154,7 +152,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
         {/* Status Badge - top-right */}
         <motion.div 
           className="absolute right-4 z-10"
-          style={{ top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 8px)' }}
+          style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 8px)' }}
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.4 }}
@@ -232,7 +230,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
             
             {tournament.venue_par && (
               <HeroPill>
-                <Flag className="w-3.5 h-3.5" />
+                <Target className="w-3.5 h-3.5" />
                 <span>Par {tournament.venue_par}</span>
               </HeroPill>
             )}
