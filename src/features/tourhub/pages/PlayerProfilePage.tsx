@@ -203,7 +203,7 @@ export function PlayerProfilePage() {
             className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
           >
             <ChevronLeft size={14} />
-            Players
+            Back
           </button>
         </div>
 

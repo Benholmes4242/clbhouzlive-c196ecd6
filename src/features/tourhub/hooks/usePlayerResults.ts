@@ -44,6 +44,7 @@ export function usePlayerResults(playerId: string | undefined, limit = 10) {
           )
         `)
         .eq('player_id', playerId)
+        // TODO: order by tournament.end_date when Supabase supports ordering by joined column
         .order('created_at', { ascending: false })
         .limit(limit);
       
