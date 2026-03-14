@@ -62,6 +62,7 @@ export function CollegeProfilePage() {
   const rivalSlugs = rivalries?.map(r => r.rivalNormalizedName) ?? [];
   const firstRival = rivalSlugs[0] ?? null;
   const gradientCSS = collegeSlug ? getCollegeGradientCSS(collegeSlug) : null;
+  const logoUrl = getCollegeLogoUrl(college?.college_name || collegeSlug);
 
   // Compute this college's rank by earnings
   const collegeRank = (() => {
@@ -190,13 +191,13 @@ export function CollegeProfilePage() {
 
         {/* Content — centered */}
         {isLoading ? (
-          <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8 pt-20">
-            <div className="w-[140px] h-[140px] rounded-full bg-white/10 animate-pulse mb-4" />
+          <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8" style={{ paddingTop: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 80px)' }}>
+            <div className="w-[140px] h-[140px] bg-white/10 animate-pulse mb-4" style={{ borderRadius: '34%' }} />
             <div className="h-8 w-48 bg-white/10 rounded animate-pulse mb-2" />
             <div className="h-4 w-32 bg-white/10 rounded animate-pulse" />
           </div>
-        ) : college ? (
-          <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8 pt-20">
+        ) : (college || stats) ? (
+          <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8" style={{ paddingTop: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 80px)' }}>
             {/* Season label */}
             <motion.span
               initial={{ opacity: 0 }}
@@ -243,9 +244,9 @@ export function CollegeProfilePage() {
               transition={{ duration: 0.4, delay: 0.15 }}
               style={{ marginBottom: '16px' }}
             >
-              {getCollegeLogoUrl(college?.college_name || collegeSlug) && !heroImgError ? (
+              {logoUrl && !heroImgError ? (
                 <img
-                  src={getCollegeLogoUrl(college?.college_name || collegeSlug)!}
+                  src={logoUrl}
                   alt={displayName}
                   className="object-contain"
                   style={{
@@ -316,7 +317,7 @@ export function CollegeProfilePage() {
             <div style={{ width: 1 }} className="bg-border/50" />
             <GlassStatCell label="WINS" value={String(stats.wins_total)} highlight={stats.wins_total > 0} />
             <div style={{ width: 1 }} className="bg-border/50" />
-            <GlassStatCell label="ALUMNI" value={String(stats.player_count)} />
+            <GlassStatCell label="TOP 10s" value={String(stats.top10_total)} highlight={stats.top10_total > 0} />
           </motion.div>
         </div>
       )}
