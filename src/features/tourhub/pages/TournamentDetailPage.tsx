@@ -196,9 +196,9 @@ export function TournamentDetailPage() {
                 >
                   Retry
                 </button>
-                <a href="/tourhub?tab=schedule" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <Link to="/tourhub?tab=schedule" className="text-sm text-muted-foreground active:opacity-70 transition-opacity">
                   Back to Schedule
-                </a>
+                </Link>
               </div>
             </div>
           </div>
