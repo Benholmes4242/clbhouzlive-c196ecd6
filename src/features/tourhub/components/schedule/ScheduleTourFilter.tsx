@@ -151,16 +151,6 @@ export function ScheduleTourFilter({
                     />
                   )}
 
-                  <div
-                    className="w-9 rounded-[34%] aspect-[1/1.05] flex items-center justify-center text-xs font-bold tabular-nums"
-                    style={{
-                      background: isActive ? 'rgba(255,255,255,0.2)' : 'hsl(var(--muted))',
-                      color: isActive ? 'white' : 'hsl(var(--muted-foreground))',
-                    }}
-                  >
-                    {count}
-                  </div>
-
                   <div className="flex-1">
                     <p
                       style={{
@@ -181,6 +171,18 @@ export function ScheduleTourFilter({
                       {tour.description}
                     </p>
                   </div>
+
+                  <span
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 600,
+                      fontVariantNumeric: 'tabular-nums',
+                      color: isActive ? 'rgba(255,255,255,0.65)' : 'hsl(var(--muted-foreground) / 0.6)',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {count}
+                  </span>
 
                   {isActive && <AnimatedCheck color="white" />}
                 </motion.button>
