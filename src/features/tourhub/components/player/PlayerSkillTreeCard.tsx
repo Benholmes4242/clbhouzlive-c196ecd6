@@ -32,13 +32,6 @@ const SKILL_ICON_BG: Record<SkillAttributeKey, { bg: string; text: string }> = {
   consistency: { bg: 'bg-muted', text: 'text-muted-foreground' },
 };
 
-const SKILL_ACCENT_COLORS: Record<SkillAttributeKey, string> = {
-  power: '#EF4444',
-  precision: '#F59E0B',
-  scoring: '#10B981',
-  recovery: '#14B8A6',
-  consistency: '#A855F7',
-};
 
 /** Canonical row labels and units */
 const ROW_CONFIG: Record<SkillAttributeKey, { label: string; unit: string }> = {
