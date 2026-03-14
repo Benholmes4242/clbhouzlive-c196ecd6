@@ -97,7 +97,7 @@ const InitialErrorState = ({ onRetry }: { onRetry: () => void }) => (
     <p className="text-sm text-muted-foreground mb-4">Check your connection and try again</p>
     <button
       onClick={onRetry}
-      className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 active:scale-[0.97] transition-all"
+      className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium active:scale-[0.97] active:opacity-90 transition-all"
     >
       Retry
     </button>
