@@ -78,14 +78,27 @@ async function fetchKpis(): Promise<DashboardKpis> {
   const startOfYesterday = new Date(startOfToday.getTime() - 86_400_000);
 
   const [
-    allUsers,
+    totalUsersRes,
+    todayUsersRes,
+    yesterdayUsersRes,
     usersLast14d,
     active24h,
     activePrev24h,
     postsToday,
     postsYesterday,
   ] = await Promise.all([
-    supabase.from('user_profiles').select('id, created_at').is('deleted_at', null),
+    supabase.from('user_profiles')
+      .select('id', { count: 'exact', head: true })
+      .is('deleted_at', null),
+    supabase.from('user_profiles')
+      .select('id', { count: 'exact', head: true })
+      .is('deleted_at', null)
+      .gte('created_at', startOfToday.toISOString()),
+    supabase.from('user_profiles')
+      .select('id', { count: 'exact', head: true })
+      .is('deleted_at', null)
+      .gte('created_at', startOfYesterday.toISOString())
+      .lt('created_at', startOfToday.toISOString()),
     supabase.from('user_profiles').select('created_at')
       .gte('created_at', fourteenAgo.toISOString()).is('deleted_at', null),
     supabase.from('analytics_events').select('user_id')
@@ -101,15 +114,10 @@ async function fetchKpis(): Promise<DashboardKpis> {
       .lt('created_at', startOfToday.toISOString()),
   ]);
 
-  const totalCount = (allUsers.data ?? []).length;
-  const trend      = buildDailyBuckets(usersLast14d.data ?? [], 14);
-
-  const todayUsers = (allUsers.data ?? []).filter(
-    u => new Date(u.created_at) >= startOfToday
-  ).length;
-  const yesterdayUsers = (allUsers.data ?? []).filter(
-    u => new Date(u.created_at) >= startOfYesterday && new Date(u.created_at) < startOfToday
-  ).length;
+  const totalCount     = totalUsersRes.count ?? 0;
+  const todayUsers     = todayUsersRes.count ?? 0;
+  const yesterdayUsers = yesterdayUsersRes.count ?? 0;
+  const trend          = buildDailyBuckets(usersLast14d.data ?? [], 14);
 
   const active24hCount     = uniqueCount((active24h.data ?? []) as { user_id: string }[]);
   const activePrev24hCount = uniqueCount((activePrev24h.data ?? []) as { user_id: string }[]);
@@ -157,9 +165,9 @@ async function fetchActivityTrend(days = 14): Promise<ActivityTrendDay[]> {
   const iso = startDate.toISOString();
 
   const [users, posts, reviews] = await Promise.all([
-    supabase.from('user_profiles').select('created_at').gte('created_at', iso).is('deleted_at', null),
-    supabase.from('posts').select('created_at').gte('created_at', iso),
-    supabase.from('course_ratings').select('created_at').gte('created_at', iso),
+    supabase.from('user_profiles').select('created_at').gte('created_at', iso).is('deleted_at', null).limit(5000),
+    supabase.from('posts').select('created_at').gte('created_at', iso).limit(5000),
+    supabase.from('course_ratings').select('created_at').gte('created_at', iso).limit(5000),
   ]);
 
   const buckets: Record<string, ActivityTrendDay> = {};

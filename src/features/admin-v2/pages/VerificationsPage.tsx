@@ -275,7 +275,7 @@ export default function VerificationsPage() {
 
   const filtered = data.filter(v => {
     if (activeFilter === 'pending')  return v.status === 'pending';
-    if (activeFilter === 'approved') return v.status === 'approved';
+    if (activeFilter === 'approved') return v.status === 'approved' || v.status === 'accepted';
     if (activeFilter === 'rejected') return v.status === 'rejected' || v.status === 'declined';
     if (activeFilter === 'business') return v.type === 'business';
     if (activeFilter === 'golfer')   return v.type === 'golfer';
