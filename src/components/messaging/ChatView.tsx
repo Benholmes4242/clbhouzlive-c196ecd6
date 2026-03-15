@@ -526,7 +526,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             </h2>
             <p className="text-[11px] truncate text-muted-foreground">
               {isTyping ? (
-                <span className="text-primary">typing...</span>
+                <span className="text-[hsl(35,80%,43%)]">typing...</span>
               ) : 
                isGroupChat && conversation ? `${conversation.participants.length} members` :
                otherUserPresence?.status === 'online' ? (
