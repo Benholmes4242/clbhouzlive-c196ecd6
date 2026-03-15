@@ -90,6 +90,11 @@ export function usePreloader(posts: FeedPost[]) {
             const text = await response.text();
             manifestTextCache.set(url, text);
             warmedManifests.current.add(url);
+            // Cap to prevent unbounded growth
+            if (warmedManifests.current.size > 100) {
+              const entries = Array.from(warmedManifests.current);
+              warmedManifests.current = new Set(entries.slice(-80));
+            }
           } catch {
             // Silent — speculative
           }
