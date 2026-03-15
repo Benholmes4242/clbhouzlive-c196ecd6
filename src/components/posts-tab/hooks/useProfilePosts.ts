@@ -43,7 +43,7 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
 
       if (error) {
         console.error('[ProfilePosts] RPC error:', error);
-        return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
+        throw error;
       }
 
       if (!data || data.length === 0) {
@@ -82,6 +82,9 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
     });
   }, [query.data]);
 
+  // NOTE: postCounts reflects only currently-loaded pages, not the full total.
+  // Counts increment as more pages are fetched via infinite scroll.
+  // To show a true total, the RPC would need to return a separate count field.
   const postCounts = useMemo<PostCounts>(() => {
     const counts = { total: 0, videos: 0, photos: 0, reviews: 0 };
     for (const post of allPosts) {

@@ -3,14 +3,8 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { Star, Play, Heart, MessageCircle } from 'lucide-react';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 import { formatDistanceToNow } from 'date-fns';
-import { getScoreTier } from '@/utils/getScoreTier';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-
-function formatCompact(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return String(n);
-}
+import { formatCompact } from './utils';
 
 interface ReviewCardProps {
   post: FeedPost;
@@ -30,13 +24,12 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
   const location = [review.courseRegion, review.courseCountry].filter(Boolean).join(', ');
 
-  // Use canonical rating color palette
-  const tierData = getScoreTier(review.rating);
-  const accentColor = tierData.isOutstanding ? '#f59e0b' : tierData.accent;
+  // Unified amber accent for all rating tiers
+  const accentColor = '#f59e0b';
 
   return (
     <div
-      className="bg-card overflow-hidden cursor-pointer"
+      className="bg-card overflow-hidden cursor-pointer active:scale-[0.99] transition-transform"
       onClick={() => {
         if (allPosts && postIndex != null) {
           useFullscreenFeed.getState().open({
@@ -47,7 +40,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
         }
       }}
     >
-      {/* Accent stripe — uses canonical rating color */}
+      {/* Accent stripe — unified amber */}
       <div className="h-px" style={{ backgroundColor: accentColor }} />
 
       {/* Course info header */}
@@ -112,7 +105,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
           {!expanded && post.caption.length > 100 && (
             <button
               onClick={(e) => { e.stopPropagation(); setExpanded(true); }}
-              className="text-xs font-semibold text-muted-foreground mt-0.5"
+              className="text-xs font-semibold text-[#d97706] mt-0.5"
             >
               See more
             </button>
@@ -120,7 +113,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
           {expanded && post.caption.length > 100 && (
             <button
               onClick={(e) => { e.stopPropagation(); setExpanded(false); }}
-              className="text-sm font-semibold text-muted-foreground mt-0.5"
+              className="text-xs font-semibold text-[#d97706] mt-0.5"
             >
               less
             </button>

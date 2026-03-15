@@ -4,23 +4,12 @@ import { Play, Heart, MessageCircle, Share2 } from 'lucide-react';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 import { formatDistanceToNow } from 'date-fns';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-
-function formatCompact(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return String(n);
-}
+import { formatCompact, formatDuration } from './utils';
 
 interface LongFormCardProps {
   post: FeedPost;
   allPosts?: FeedPost[];
   postIndex?: number;
-}
-
-function formatDuration(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
 export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, postIndex }) => {
@@ -32,7 +21,7 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
 
   return (
     <div
-      className="bg-card overflow-hidden border-b border-border/50 cursor-pointer"
+      className="bg-card overflow-hidden border-b border-border/50 cursor-pointer active:scale-[0.99] transition-transform"
       onClick={() => {
         if (allPosts && postIndex != null) {
           useFullscreenFeed.getState().open({
@@ -91,7 +80,7 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
           {!expanded && post.caption.length > 100 && (
             <button
               onClick={(e) => { e.stopPropagation(); setExpanded(true); }}
-              className="text-xs font-semibold text-muted-foreground mt-0.5"
+              className="text-xs font-semibold text-[#d97706] mt-0.5"
             >
               See more
             </button>
@@ -99,7 +88,7 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
           {expanded && post.caption.length > 100 && (
             <button
               onClick={(e) => { e.stopPropagation(); setExpanded(false); }}
-              className="text-sm font-semibold text-muted-foreground mt-0.5"
+              className="text-xs font-semibold text-[#d97706] mt-0.5"
             >
               less
             </button>
