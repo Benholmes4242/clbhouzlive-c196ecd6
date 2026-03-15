@@ -174,7 +174,7 @@ function LeaderboardRow({
 
       {/* Name */}
       <span style={{
-        flex: 1, fontSize: 13, fontWeight: isLeader ? 600 : 400,
+        flex: 1, fontSize: isLeader ? 'clamp(12px, 3.5vw, 14px)' : 'clamp(11px, 3vw, 13px)', fontWeight: isLeader ? 600 : 400,
         color: 'rgba(255,255,255,0.92)', overflow: 'hidden',
         textOverflow: 'ellipsis', whiteSpace: 'nowrap',
       }}>
