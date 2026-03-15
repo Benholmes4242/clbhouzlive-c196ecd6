@@ -109,7 +109,7 @@ const ClubsCard: React.FC<ClubsCardProps> = ({
           <span className="text-sm font-semibold text-foreground">{homeClub.name}</span>
           <span className={cn(
             'px-2 py-0.5 text-xs font-semibold rounded-full',
-            'border border-primary/20 bg-primary/5 text-primary'
+            'border border-[#f5a623]/30 bg-[#f5a623]/8 text-[#d97706]'
           )}>
             Home club
           </span>
