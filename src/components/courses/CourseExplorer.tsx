@@ -544,6 +544,7 @@ const CourseExplorer = () => {
           />
         </div>
       )}
+      </div>
 
       {/* Results */}
       <div ref={listTopRef} />
