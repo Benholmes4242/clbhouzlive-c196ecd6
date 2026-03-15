@@ -257,12 +257,10 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
                 <span 
                   className="text-3xl sm:text-4xl font-bold tabular-nums leading-none"
                   style={{ 
-                    background: isOutstanding 
-                      ? `linear-gradient(135deg, ${ratingColors.main} 0%, #fbbf24 100%)` 
-                      : 'transparent',
-                    WebkitBackgroundClip: isOutstanding ? 'text' : 'unset',
-                    WebkitTextFillColor: isOutstanding ? 'transparent' : ratingColors.main,
-                    color: isOutstanding ? 'transparent' : ratingColors.main,
+                  background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    color: 'transparent',
                   }}
                 >
                   {formattedRating}
