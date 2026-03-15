@@ -128,7 +128,7 @@ export const VoiceRecordButton: React.FC<VoiceRecordButtonProps> = ({
         
         <button
           onClick={handleSend}
-          className="p-2 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-colors"
+          className="p-2 bg-[hsl(38,92%,50%)] text-white rounded-full hover:bg-[hsl(36,84%,46%)] transition-colors"
           aria-label="Send voice note"
         >
           <Send size={18} />
