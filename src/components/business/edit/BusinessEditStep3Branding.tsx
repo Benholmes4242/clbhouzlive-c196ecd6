@@ -154,7 +154,7 @@ export function BusinessEditStep3Branding({
                 </div>
               </div>
             ) : (
-              <div className="aspect-[3.2/1] rounded-xl border-2 border-dashed border-border bg-muted flex flex-col items-center justify-center hover:border-primary/40 hover:bg-primary/5 transition-colors">
+              <div className="aspect-[3.2/1] rounded-xl border-2 border-dashed border-border bg-muted flex flex-col items-center justify-center hover:border-[#f59e0b]/40 hover:bg-[#f59e0b]/5 transition-colors">
                 <div className="w-12 h-12 rounded-full bg-muted border border-border flex items-center justify-center mb-2">
                   <Camera className="w-5 h-5 text-muted-foreground" />
                 </div>
