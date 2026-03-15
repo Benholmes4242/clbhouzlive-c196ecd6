@@ -40,9 +40,9 @@ function getTourSlugForTeeTimes(tourName: string): string | null {
   const map: Record<string, string | null> = {
     'PGA': 'pga',
     'LPGA': 'lpga',
-    'EURO': 'eur',
-    'DP': 'eur',
-    'CHAMP': 'champions-tour',
+    'EURO': 'euro',
+    'DP': 'euro',
+    'CHAMP': 'champ',
     'PGAD': 'pgad',
     'LIV': 'liv',     // LIV DOES have tee times
     'OLY': null,
