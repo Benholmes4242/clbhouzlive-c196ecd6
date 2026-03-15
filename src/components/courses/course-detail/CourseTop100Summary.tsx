@@ -33,7 +33,6 @@ export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
   // TODO: return null when no data instead of skeleton
   if (!data || !data.lists || data.lists.length === 0) {
     return null;
-    );
   }
 
   const club = getTop100Club(data.total_top100_rated ?? data.total_played_top100);
