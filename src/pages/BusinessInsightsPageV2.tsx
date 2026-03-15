@@ -84,14 +84,14 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
             <div className="mt-2 flex items-center gap-1 justify-center md:justify-start">
               <span className={cn(
                 "text-xs font-medium",
-                reviewStats.reviewTrend >= 0 ? "text-primary" : "text-destructive"
+                reviewStats.reviewTrend >= 0 ? "text-[hsl(35,80%,43%)]" : "text-destructive"
               )}>
                 {reviewStats.recentReviews} new this month
               </span>
               {reviewStats.reviewTrend !== 0 && (
                 <span className={cn(
                   "text-xs",
-                  reviewStats.reviewTrend > 0 ? "text-primary" : "text-destructive"
+                  reviewStats.reviewTrend > 0 ? "text-[hsl(35,80%,43%)]" : "text-destructive"
                 )}>
                   ({reviewStats.reviewTrend > 0 ? '+' : ''}{reviewStats.reviewTrend}%)
                 </span>
@@ -107,7 +107,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
               <span className="text-xs text-muted-foreground w-5 text-right">{item.score}</span>
               <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                 <div
-                  className="h-full rounded-full transition-all bg-primary"
+                  className="h-full rounded-full transition-all bg-[hsl(38,92%,50%)]"
                   style={{ width: `${(item.count / maxCount) * 100}%` }}
                 />
               </div>
@@ -135,7 +135,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
       {/* Action prompts */}
       <div className="flex flex-col sm:flex-row gap-2">
         {reviewStats.unrespondedCount > 0 && (
-          <div className="flex items-center gap-2 text-xs text-primary">
+          <div className="flex items-center gap-2 text-xs text-[hsl(35,80%,43%)]">
             <MessageCircle className="h-3.5 w-3.5" />
             <span>{reviewStats.unrespondedCount} review{reviewStats.unrespondedCount !== 1 ? 's' : ''} awaiting your response</span>
           </div>
@@ -160,7 +160,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
                 </p>
               </div>
               <div className="flex items-center gap-1 flex-shrink-0">
-                <Star className="h-3 w-3 text-primary fill-primary" />
+                <Star className="h-3 w-3 text-[hsl(38,92%,50%)] fill-[hsl(38,92%,50%)]" />
                 <span className="text-sm font-medium text-foreground">{course.avgRating}</span>
               </div>
             </button>
@@ -172,7 +172,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
       {reviewStats.courses.length > 0 && (
         <button
           onClick={() => navigate(`/courses/${reviewStats.courses[0].id}?tab=reviews`)}
-          className="text-[0.8rem] hover:underline text-primary"
+          className="text-[0.8rem] hover:underline text-[hsl(35,80%,43%)]"
         >
           View all reviews ›
         </button>
@@ -233,7 +233,7 @@ const BusinessInsightsPageV2 = () => {
       <PageRoot className="min-h-screen bg-background">
         <div className="max-w-xl mx-auto mt-10 text-center px-4">
           <p className="text-muted-foreground">Business not found</p>
-          <Button onClick={() => navigate('/')} className="mt-4">Go home</Button>
+          <Button onClick={() => navigate('/')} className="mt-4 bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0">Go home</Button>
         </div>
       </PageRoot>
     );
@@ -264,7 +264,7 @@ const BusinessInsightsPageV2 = () => {
         <div className="flex items-center px-4 h-14">
           <button
             onClick={() => navigate(-1)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-muted-foreground active:text-foreground transition-colors"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-foreground active:scale-[0.97] transition-transform"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -283,7 +283,7 @@ const BusinessInsightsPageV2 = () => {
                 className={cn(
                   "px-3 md:px-4 py-1.5 text-[0.8rem] rounded-full transition-colors",
                   dateRange === range 
-                    ? "bg-primary text-primary-foreground font-medium" 
+                    ? "bg-[hsl(38,92%,50%)] text-white font-medium" 
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >

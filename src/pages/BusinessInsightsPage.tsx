@@ -1,3 +1,4 @@
+// TODO: DEAD CODE — route /business/insights is legacy. All navigation uses /business/:id/insights (BusinessInsightsPageV2). Flag for deletion.
 import { useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useProfileData } from '@/hooks/useProfileData';
@@ -45,7 +46,7 @@ const BusinessInsightsPage = () => {
     return (
       <PageRoot className="min-h-screen bg-background">
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[hsl(38,92%,50%)]" />
         </div>
       </PageRoot>
     );
@@ -154,7 +155,7 @@ const BusinessInsightsPage = () => {
                 onClick={() => setRange(r)}
                 className={`px-4 py-1.5 text-sm rounded-full transition-colors ${
                   range === r 
-                    ? 'bg-primary text-primary-foreground shadow-sm font-medium' 
+                    ? 'bg-[hsl(38,92%,50%)] text-white shadow-sm font-medium' 
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
