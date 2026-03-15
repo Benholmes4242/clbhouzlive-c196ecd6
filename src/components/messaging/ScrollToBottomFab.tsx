@@ -17,7 +17,7 @@
        onClick={onClick}
       className={cn(
         "w-10 h-10 bg-background rounded-full shadow-lg flex items-center justify-center z-20",
-        "active:scale-95 transition-transform hover:bg-muted",
+        "active:scale-[0.97] transition-transform hover:bg-muted",
         className
       )}
     >
