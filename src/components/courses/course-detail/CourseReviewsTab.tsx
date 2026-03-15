@@ -431,13 +431,13 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         <div className="flex flex-col items-center gap-1">
           <span
             className="text-[40px] font-extrabold leading-none tabular-nums"
-            style={{ color: getRatingTheme(communityScore).accent }}
+            style={{ color: '#d97706' }}
           >
             {communityScore.toFixed(1)}
           </span>
           <span
             className="text-sm font-bold uppercase tracking-[0.05em]"
-            style={{ color: getRatingTheme(communityScore).accent }}
+            style={{ color: '#d97706' }}
           >
             {getScoreTier(communityScore).label}
           </span>
