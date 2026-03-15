@@ -296,7 +296,7 @@ const BusinessProfilePage: React.FC = () => {
           {isOwner && (
             <button
               onClick={() => heroFileInputRef.current?.click()}
-              className="absolute bottom-3 right-3 h-11 w-11 flex items-center justify-center rounded-full active:scale-[0.95] transition-transform z-10 pointer-events-auto"
+              className="absolute bottom-3 right-3 h-11 w-11 flex items-center justify-center rounded-full active:scale-[0.97] transition-transform z-10 pointer-events-auto"
               style={{
                 background: 'rgba(0, 0, 0, 0.45)',
                 backdropFilter: 'blur(24px) saturate(180%)',
