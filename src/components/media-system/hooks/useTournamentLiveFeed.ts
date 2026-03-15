@@ -105,7 +105,7 @@ export function useTournamentLiveFeed(): {
           return true;
         })
         .sort((a, b) => a.position - b.position)
-        .slice(0, 4)
+        .slice(0, 10)
         .map(p => ({
           position:     p.position,
           positionTied: false,
