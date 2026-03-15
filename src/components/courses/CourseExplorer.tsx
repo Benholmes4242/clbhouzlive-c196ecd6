@@ -513,10 +513,11 @@ const CourseExplorer = () => {
           </Select>
         </div>
       </div>
+      </div>
 
-      {/* Context row with sort */}
+      {/* Context row with sort — scrolls with content */}
       {!isLoading && totalCount > 0 && (
-        <div className="flex items-center justify-between gap-3 pt-2">
+        <div className="flex items-center justify-between gap-3 pt-2 px-4">
           <p className="text-sm text-muted-foreground flex-1" style={{ fontSize: 13 }}>
             {hasSearch ? (
               <>
@@ -544,7 +545,6 @@ const CourseExplorer = () => {
           />
         </div>
       )}
-      </div>
 
       {/* Results */}
       <div className="px-4">
