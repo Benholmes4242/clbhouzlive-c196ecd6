@@ -111,7 +111,7 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
             {/* Upload button badge */}
             <div className={cn(
               "absolute -bottom-1 -right-1 w-10 h-10 rounded-full shadow-lg flex items-center justify-center",
-              "bg-primary text-primary-foreground",
+              "bg-[hsl(38,92%,50%)] text-white",
               "group-hover:scale-110 transition-transform"
             )}>
               <Plus className="w-5 h-5" />
