@@ -379,7 +379,7 @@ export function ConversationList({
               try { localStorage.setItem('swipeHintDismissed', 'true'); }
               catch { /* silent fail in WebView */ }
             }}
-            className="ml-2 font-medium text-primary"
+            className="ml-2 font-medium text-[hsl(35,80%,43%)]"
           >
             Got it
           </button>
