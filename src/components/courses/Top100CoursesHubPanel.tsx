@@ -177,13 +177,15 @@ const Top100CoursesHubPanel = () => {
   return (
     <div className="space-y-5">
       {/* Top 100 Journey Hero - Premium progress module */}
-      <div className="px-4">
-        <Top100JourneyHero
-          completedCourses={totalRated}
-          totalCoursesInStartedLists={totalCoursesInStartedLists}
-          listCount={listsCount}
-        />
+      {user && (
+        <div className="px-4">
+          <Top100JourneyHero
+            completedCourses={totalRated}
+            totalCoursesInStartedLists={totalCoursesInStartedLists}
+            listCount={listsCount}
+          />
         </div>
+      )}
 
       {/* Controls Section - sticky search + filters */}
       <div
