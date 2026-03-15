@@ -734,7 +734,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                         cy="160"
                         r="140"
                         fill="none"
-                        stroke="#E6F7F1"
+                        stroke="hsl(var(--muted))"
                         strokeWidth="8"
                         strokeLinecap="round"
                       />
