@@ -497,7 +497,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                       <div style={{ display: 'flex', flexShrink: 0 }}>
                         {shown.map((p, idx) => (
                           <div key={idx} style={{ marginLeft: idx === 0 ? 0 : -14, position: 'relative', zIndex: shown.length - idx }}>
-                            <RowAvatar name={p.playerName} photoUrl={p.photoUrl} tourSlug={meta.tourSlug} size={44} />
+                            <RowAvatar name={p.playerName} photoUrl={p.photoUrl} tourSlug={meta.tourSlug} size={52} />
                           </div>
                         ))}
                       </div>
