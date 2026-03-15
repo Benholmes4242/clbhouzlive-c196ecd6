@@ -78,7 +78,7 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
         <button
           type="button"
           onClick={() => setExpanded(true)}
-          className="text-sm text-[#334E3D] font-medium active:opacity-70 transition-opacity min-h-[44px] px-1"
+          className="text-sm text-[#d97706] font-medium active:opacity-70 transition-opacity min-h-[44px] px-1"
         >
           Reply
         </button>
