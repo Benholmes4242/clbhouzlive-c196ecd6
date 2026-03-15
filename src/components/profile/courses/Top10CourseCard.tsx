@@ -83,7 +83,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   
   // Get tier info for rating display
   const tierData = rating !== undefined ? getScoreTier(rating) : null;
-  const isOutstanding = tierData?.tier === 'outstanding';
+  // All tiers now use unified amber
   
   // Location subtitle
   const heroSubtitle = course.sub_country || course.country;
