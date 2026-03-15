@@ -31,7 +31,7 @@ export function BioWebsitesSection({
           maxLength={BIO_MAX}
           rows={4}
           placeholder="Tell the Clbhouz community about yourself and your golf game…"
-          className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors resize-none"
+          className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors resize-none"
         />
         {bioError && <p className="text-[12px] text-destructive mt-1">{bioError}</p>}
       </div>
