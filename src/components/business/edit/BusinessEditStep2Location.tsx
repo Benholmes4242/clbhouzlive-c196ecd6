@@ -121,7 +121,7 @@ export function BusinessEditStep2Location({
                   />
                   <div className="px-3 py-2.5 flex items-center justify-between bg-card border-t border-border">
                     <div className="flex items-center gap-2 text-[13px] min-w-0">
-                      <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                      <MapPin className="h-4 w-4 text-[#f59e0b] flex-shrink-0" />
                       <span className="truncate text-foreground">
                         {address.city && address.country ? `${address.city}, ${address.country}` : address.label}
                       </span>
