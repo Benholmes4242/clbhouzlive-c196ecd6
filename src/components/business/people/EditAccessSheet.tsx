@@ -90,7 +90,7 @@ export function EditAccessSheet({
               <RadioGroup value={editAccess} onValueChange={setEditAccess}>
                 {availableAccessOptions.map((opt) => (
                   <label key={opt.value} htmlFor={`${idPrefix}-${opt.value}`} className="flex items-start gap-3 py-3 min-h-[44px] cursor-pointer">
-                    <RadioGroupItem value={opt.value} id={`${idPrefix}-${opt.value}`} className="mt-0.5" />
+                    <RadioGroupItem value={opt.value} id={`${idPrefix}-${opt.value}`} className="mt-0.5 border-[#f59e0b] text-[#f59e0b] data-[state=checked]:border-[#f59e0b] data-[state=checked]:text-[#f59e0b]" />
                     <div className="flex-1">
                       <span className="text-sm font-medium">{opt.label}</span>
                       <p className="text-xs text-muted-foreground mt-0.5">{opt.description}</p>
@@ -119,7 +119,7 @@ export function EditAccessSheet({
                 className={cn(
                   "w-full min-h-[50px] rounded-2xl text-[15px] font-semibold active:opacity-80 transition-opacity",
                   hasChanges
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-[#f59e0b] text-white"
                     : "opacity-40 bg-muted text-muted-foreground cursor-not-allowed"
                 )}
               >
