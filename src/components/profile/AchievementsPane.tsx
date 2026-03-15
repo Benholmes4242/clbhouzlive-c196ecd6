@@ -1230,7 +1230,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       </div>
                       
                       {/* Achievement Title under badge */}
-                      <h4 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mt-3 mb-1">
+                      <h4 className="text-2xl font-bold text-foreground mt-3 mb-1">
                         {mostRecentAchievement.title}
                       </h4>
                       
