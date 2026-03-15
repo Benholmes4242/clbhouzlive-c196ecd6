@@ -624,7 +624,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         <section className="px-4 pt-4 pb-6">
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
-              No more reviews yet.
+              You've seen all {filteredReviews.length} {filteredReviews.length === 1 ? 'review' : 'reviews'}.
             </p>
             {!myReview && (
               <button

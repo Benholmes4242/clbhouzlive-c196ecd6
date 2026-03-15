@@ -116,7 +116,7 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
             type="button"
             onClick={handleSubmit}
             disabled={!text.trim() || isSubmitting}
-            className="bg-[#334E3D] text-white min-h-[40px] rounded-full px-4 text-sm font-medium active:scale-[0.97] transition-transform disabled:opacity-50"
+            className="bg-[#f59e0b] text-white min-h-[40px] rounded-full px-4 text-sm font-medium active:scale-[0.97] transition-transform disabled:opacity-50"
           >
             {isSubmitting ? 'Posting…' : 'Post response'}
           </button>

@@ -127,13 +127,10 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           </div>
         </div>
 
-        {/* Score badge - tier-specific slate blue, amber for Outstanding */}
+        {/* Score badge */}
         <div
-          className={cn(
-            "px-2.5 py-1 rounded-lg text-sm font-bold text-white",
-            score >= 9 && 'bg-[#f59e0b]'
-          )}
-          style={score < 9 ? { backgroundColor: getScoreTier(score).accent } : undefined}
+          className="px-2.5 py-1 rounded-lg text-sm font-bold text-white"
+          style={{ background: 'linear-gradient(135deg, #f59e0b, #fbbf24)' }}
         >
           {score.toFixed(1)}
         </div>
