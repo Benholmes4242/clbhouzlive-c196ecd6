@@ -19,8 +19,8 @@ export function WizardSuccessScreen({ username }: Props) {
   return (
     <div className="fixed inset-0 z-[101] flex flex-col items-center justify-center bg-background">
       <div className="flex flex-col items-center gap-4 animate-in fade-in zoom-in-75 duration-500">
-        <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-          <CheckCircle2 size={44} className="text-primary" strokeWidth={1.5} />
+        <div className="w-20 h-20 rounded-full bg-[hsl(38,92%,50%)]/10 flex items-center justify-center">
+          <CheckCircle2 size={44} className="text-[hsl(38,92%,50%)]" strokeWidth={1.5} />
         </div>
         <div className="text-center">
           <p className="text-[22px] font-bold text-foreground tracking-tight">

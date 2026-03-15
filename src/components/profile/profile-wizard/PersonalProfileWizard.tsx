@@ -90,7 +90,7 @@ export function PersonalProfileWizard() {
   if (loading) {
     return createPortal(
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background">
-        <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+        <div className="w-8 h-8 rounded-full border-2 border-[hsl(38,92%,50%)] border-t-transparent animate-spin" />
       </div>,
       document.body
     );

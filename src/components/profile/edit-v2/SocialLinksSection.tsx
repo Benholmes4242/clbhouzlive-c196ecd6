@@ -19,7 +19,7 @@ interface Props {
   onYoutubeChange: (v: string) => void;
 }
 
-const INPUT_CLS = 'flex-1 bg-muted border-0 rounded-r-xl px-3 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors';
+const INPUT_CLS = 'flex-1 bg-muted border-0 rounded-r-xl px-3 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors';
 const PREFIX_CLS = 'flex items-center justify-center w-11 bg-muted rounded-l-xl text-muted-foreground shrink-0 self-stretch';
 
 function SocialRow({

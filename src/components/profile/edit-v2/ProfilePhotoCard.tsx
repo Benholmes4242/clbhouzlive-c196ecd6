@@ -111,7 +111,7 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
             {/* Upload button badge */}
             <div className={cn(
               "absolute -bottom-1 -right-1 w-10 h-10 rounded-full shadow-lg flex items-center justify-center",
-              "bg-primary text-primary-foreground",
+              "bg-[hsl(38,92%,50%)] text-white",
               "group-hover:scale-110 transition-transform"
             )}>
               <Plus className="w-5 h-5" />
@@ -135,7 +135,7 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
               <button
                 type="button"
                 onClick={handleClick}
-                className="text-sm font-medium text-primary hover:text-primary/80 transition-colors block"
+                className="text-sm font-medium text-[hsl(36,77%,49%)] hover:text-[hsl(36,77%,49%)]/80 transition-colors block"
               >
                 Change photo
               </button>
@@ -168,7 +168,7 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
           onOpenChange={handleCropperClose}
           image={cropperImage}
           aspectRatio={PROFILE_ASPECT_RATIO}
-          cropShape="round"
+          cropShape="rect"
           title="Crop Profile Photo"
           onCropComplete={handleCropComplete}
         />

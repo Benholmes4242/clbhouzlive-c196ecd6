@@ -10,8 +10,8 @@ interface HeaderPhotoCardProps {
   onRemove?: () => void;
 }
 
-// Header aspect ratio: full width x 200px height (4:1 ratio for mobile, 1600×400px recommended)
-const HEADER_ASPECT_RATIO = 4 / 1;
+// Matches profile hero: full-width × clamp(200px, 28vw, 280px). ~2:1 on mobile.
+const HEADER_ASPECT_RATIO = 2 / 1;
 
 export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
   currentUrl,
@@ -72,7 +72,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
             <button
               type="button"
               onClick={handleClick}
-              className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+              className="text-sm font-medium text-[hsl(36,77%,49%)] hover:text-[hsl(36,77%,49%)]/80 transition-colors"
             >
               Change
             </button>
@@ -98,7 +98,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
           "group",
           displayUrl 
             ? "border-transparent" 
-            : "border-border hover:border-primary/50 hover:bg-primary/5"
+            : "border-border hover:border-[hsl(38,92%,50%)]/50 hover:bg-[hsl(38,92%,50%)]/5"
         )}
       >
         {displayUrl ? (
@@ -116,14 +116,14 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
           </>
         ) : (
           <div className="text-center p-6">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
-              <Camera className="w-8 h-8 text-primary" />
+            <div className="w-16 h-16 rounded-full bg-[hsl(38,92%,50%)]/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-[hsl(38,92%,50%)]/20 transition-colors">
+              <Camera className="w-8 h-8 text-[hsl(38,92%,50%)]" />
             </div>
             <p className="text-sm font-medium text-foreground mb-1">
               Upload header photo
             </p>
             <p className="text-xs text-muted-foreground">
-              Recommended: 1600×400px • JPG, PNG or WebP
+              Recommended: 1600×800px • JPG, PNG or WebP
             </p>
           </div>
         )}

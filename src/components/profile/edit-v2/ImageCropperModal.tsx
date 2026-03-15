@@ -197,7 +197,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
               min={1}
               max={3}
               step={0.1}
-              className="flex-1 [&_[role=slider]]:bg-primary [&_.bg-primary]:bg-primary"
+              className="flex-1 [&_[role=slider]]:bg-[hsl(38,92%,50%)] [&_.bg-primary]:bg-[hsl(38,92%,50%)]"
             />
             <ZoomIn className="w-4 h-4 text-[#64748b] flex-shrink-0" />
           </div>
@@ -232,7 +232,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
                 size="sm"
                 onClick={handleSave}
                 disabled={isSaving}
-                className="gap-1.5 bg-primary text-white hover:bg-primary/90"
+                className="gap-1.5 bg-[hsl(38,92%,50%)] text-white hover:bg-[hsl(38,85%,45%)]"
               >
                 <Check className="w-4 h-4" />
                 {isSaving ? 'Saving...' : 'Apply'}
