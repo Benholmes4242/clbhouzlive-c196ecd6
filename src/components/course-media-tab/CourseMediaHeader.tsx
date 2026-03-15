@@ -32,7 +32,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
           <Camera className="w-3.5 h-3.5" />
-          <span>
+          <span className="animate-in fade-in duration-300">
             <span className="font-semibold text-foreground">{mediaCounts.photos}</span> photos
             {' · '}
             <span className="font-semibold text-foreground">{mediaCounts.videos}</span> videos
@@ -40,7 +40,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
         </div>
         <button
           onClick={() => navigate(`/courses/${courseId}/rate`)}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-foreground text-background"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold border border-[#f59e0b] text-[#d97706] hover:bg-amber-50 active:scale-[0.97] transition-all min-h-[36px]"
         >
           <Plus className="w-3.5 h-3.5" />
           Add media
@@ -54,10 +54,10 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
             key={key}
             onClick={() => onFilterChange(key)}
             className={cn(
-              'min-h-[36px] px-4 rounded-full text-sm font-semibold transition-colors',
+              'min-h-[44px] px-4 rounded-full text-sm font-semibold transition-colors',
               activeFilter === key
-                ? 'bg-foreground text-background shadow-sm'
-                : 'bg-muted text-muted-foreground'
+                ? 'bg-[#f59e0b] text-white shadow-sm'
+                : 'bg-muted text-muted-foreground hover:bg-muted/80'
             )}
           >
             {label}
