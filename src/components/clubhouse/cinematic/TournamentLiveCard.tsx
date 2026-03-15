@@ -491,7 +491,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
         {meta.leaderboard?.length >= 2 && (() => {
           const distinctByPos = Array.from(
             new Map(meta.leaderboard.map(e => [e.position, e])).values()
-          ).slice(1, 3);
+          ).filter(e => e.position > 1).slice(0, 2);
 
           return (
             <div style={{ marginTop: 4, borderTop: '1px solid rgba(255,255,255,0.06)', padding: '4px 0 10px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
