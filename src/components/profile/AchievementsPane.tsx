@@ -1072,7 +1072,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                         <div className="text-xs font-medium mb-1 text-foreground">
                           {tier.name}
                         </div>
-                        <div className="text-xs text-black dark:text-white">
+                        <div className="text-xs text-foreground">
                           {tier.minXP.toLocaleString()} XP
                         </div>
                       </div>
