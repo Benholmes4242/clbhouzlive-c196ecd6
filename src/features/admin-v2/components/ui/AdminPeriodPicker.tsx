@@ -16,17 +16,16 @@ interface AdminPeriodPickerProps {
 
 export function AdminPeriodPicker({ value, onChange }: AdminPeriodPickerProps) {
   return (
-    <div className="flex items-center gap-1 rounded-xl bg-muted/40 p-1">
+    <div className="flex items-center gap-1 p-1" style={{ background: '#F1F5F9', borderRadius: 12 }}>
       {OPTIONS.map(opt => (
         <button
           key={opt.value}
           onClick={() => onChange(opt.value)}
-          className={cn(
-            'px-3 py-1 rounded-md text-[12px] font-semibold transition-all duration-100',
-            value === opt.value
-              ? 'bg-foreground text-background shadow-sm'
-              : 'text-muted-foreground hover:text-foreground',
-          )}
+          className="px-3 py-1 text-[12px] font-semibold transition-all duration-100"
+          style={value === opt.value
+            ? { background: '#FFF7ED', color: '#F5A623', borderRadius: 8, border: '1px solid #FED7AA' }
+            : { color: '#64748B', borderRadius: 8, border: '1px solid transparent' }
+          }
         >
           {opt.label}
         </button>
