@@ -193,7 +193,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
     // Handle specific achievement types with different progress formats
     switch (achievement.title) {
       case "Single-Figure Handicap":
-        const currentHandicap = 12.3; // Mock current handicap
+        const currentHandicap = 12.3; // TODO: Use real userHandicap prop
         const targetHandicap = 9;
         const percentage = Math.max(0, (currentHandicap - targetHandicap) / currentHandicap * 100);
         const remaining = (currentHandicap - targetHandicap).toFixed(1);
