@@ -667,10 +667,10 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode, on
                     className={cn(
                       "h-11 flex-1 font-medium active:scale-[0.95] transition-transform",
                       friendStatus === 'friends'
-                        ? "border-primary/30 bg-primary/10 text-primary"
+                        ? "border-[#f5a623]/30 bg-[#f5a623]/10 text-[#d97706]"
                         : friendStatus === 'pending'
                         ? "border-border bg-muted/50 text-muted-foreground"
-                        : "border-primary/50 text-primary hover:bg-primary/10"
+                        : "border-[#f5a623]/40 text-[#d97706] hover:bg-[#f5a623]/10"
                     )}
                     disabled={friendLoading || friendStatus === 'friends' || friendStatus === 'pending'}
                     onClick={handleFriendAction}
