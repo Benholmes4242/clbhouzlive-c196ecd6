@@ -209,6 +209,7 @@ export function SettingsPageV2() {
             icon={<Lock size={18} />}
             title="Change Password"
             disabled={isOAuthUser}
+            iconTheme="security"
             onClick={() => !isOAuthUser && open('password')}
           />
         </SettingsSection>
