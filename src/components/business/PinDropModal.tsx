@@ -220,7 +220,7 @@ export const PinDropModal: React.FC<PinDropModalProps> = ({
           <button
             type="button"
             onClick={handleCenterOnMe}
-            className="text-xs text-primary hover:underline mt-2 flex items-center gap-1"
+            className="text-xs text-[#d97706] hover:underline mt-2 flex items-center gap-1"
           >
             <Target className="h-3 w-3" />
             Use my current location
