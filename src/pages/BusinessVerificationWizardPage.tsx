@@ -259,8 +259,14 @@ export default function BusinessVerificationWizardPage() {
         return (
           <div className="space-y-4 mt-4 pl-7">
             <div className="flex gap-2">
-              <Button type="button" variant={creatorContactType === 'email' ? 'default' : 'outline'} size="sm" onClick={() => setCreatorContactType('email')}>Email</Button>
-              <Button type="button" variant={creatorContactType === 'phone' ? 'default' : 'outline'} size="sm" onClick={() => setCreatorContactType('phone')}>Phone</Button>
+              <button type="button" onClick={() => setCreatorContactType('email')}
+                className={`px-4 py-2 text-sm font-medium rounded-xl transition-colors min-h-[44px] ${creatorContactType === 'email' ? 'bg-[hsl(38,92%,50%)] text-white' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}>
+                Email
+              </button>
+              <button type="button" onClick={() => setCreatorContactType('phone')}
+                className={`px-4 py-2 text-sm font-medium rounded-xl transition-colors min-h-[44px] ${creatorContactType === 'phone' ? 'bg-[hsl(38,92%,50%)] text-white' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}>
+                Phone
+              </button>
             </div>
             {creatorContactType === 'email' ? (
               <div className="space-y-2">
