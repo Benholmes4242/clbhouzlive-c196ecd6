@@ -891,7 +891,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                   </div>
                   
                   {/* XP Progress Text */}
-                  <div className="text-base text-green-500 leading-tight">
+                  <div className="text-base text-[#d97706] leading-tight">
                     {(nextTier.minXP - totalXP).toLocaleString()} XP to {nextTier.name.split(" ")[0].toLowerCase()} ring
                   </div>
                   
