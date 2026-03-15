@@ -489,8 +489,13 @@ const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
         ))}
       </div>
 
-      {/* Sentinel for infinite scroll - no visible spinner */}
+      {/* Sentinel for infinite scroll */}
       {hasNextPage && <div ref={sentinelRef} className="h-1" />}
+      {isFetchingNextPage && (
+        <div className="flex justify-center py-4">
+          <div className="w-5 h-5 rounded-full border-2 border-[#f59e0b] border-t-transparent animate-spin" />
+        </div>
+      )}
 
       {/* Footer count */}
       {showStatus && displayTotal > 0 && (
