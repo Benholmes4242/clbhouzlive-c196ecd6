@@ -187,6 +187,7 @@ export function SettingsPageV2() {
           <SettingsChevronRow
             icon={<UserX size={18} />}
             title="Blocked Users"
+            iconTheme="privacy"
             onClick={() => open('blocked')}
           />
         </SettingsSection>
