@@ -1328,7 +1328,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                   
                                   {/* Text stacked underneath */}
                                   <div className="text-center">
-                                    <h4 className={`font-semibold mb-1 ${isMobile ? 'text-xs leading-tight' : 'text-sm'} ${achievement.isEarned ? 'text-blue-700 dark:text-blue-300' : 'text-muted-foreground'}`}>
+                                    <h4 className={`font-semibold mb-1 ${isMobile ? 'text-xs leading-tight' : 'text-sm'} ${achievement.isEarned ? 'text-[#d97706]' : 'text-muted-foreground'}`}>
                                       {achievement.title.toUpperCase()}
                                     </h4>
                                      <p className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
