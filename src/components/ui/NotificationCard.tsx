@@ -123,7 +123,7 @@ export const notificationButtonStyles = {
   base: "inline-flex items-center justify-center rounded-sq-xs border px-3 h-9 text-xs font-medium transition-colors gap-1.5 active:scale-[0.93]",
   
   // Primary — brand primary
-  primary: "border-primary/30 bg-primary/10 text-primary hover:bg-primary/20",
+  primary: "border-[hsl(38,92%,50%)]/30 bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)] hover:bg-[hsl(38,92%,50%)]/20",
   
   // Secondary
   secondary: "border-border bg-background text-foreground/80 hover:bg-muted/50",
@@ -132,10 +132,10 @@ export const notificationButtonStyles = {
   destructive: "border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20",
   
   // Support — brand accent
-  support: "border-primary bg-primary/10 text-primary hover:bg-primary/20",
+  support: "border-[hsl(38,92%,50%)] bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)] hover:bg-[hsl(38,92%,50%)]/20",
   
   // Status pills (non-interactive)
-  statusSuccess: "border-primary/30 bg-primary/10 text-primary",
+  statusSuccess: "border-[hsl(38,92%,50%)]/30 bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)]",
   statusError: "border-destructive/30 bg-destructive/10 text-destructive",
   statusMuted: "border-border bg-muted text-muted-foreground",
   statusPending: "border-amber-500/30 bg-amber-500/10 text-amber-600",

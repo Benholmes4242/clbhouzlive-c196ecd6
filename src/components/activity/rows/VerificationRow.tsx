@@ -137,7 +137,7 @@ export const VerificationRow: React.FC<RowProps> = ({
           avatar={<AvatarWithBadge notification={notification} badgeIcon={getNotificationBadgeIcon(type)} />}
           title={<span className={cn(showOrange ? "font-semibold" : "font-medium")}>{BUSINESS_VERIFICATION_COPY.approved.title}</span>}
           subtext={BUSINESS_VERIFICATION_COPY.approved.body} meta={notification.time_ago}
-          actions={<span className={cn(basePillClass, "border-primary/30 bg-primary/10 text-primary")}><VerifiedBadge size="sm" />Verified</span>}
+          actions={<span className={cn(basePillClass, "border-[hsl(38,92%,50%)]/30 bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)]")}><VerifiedBadge size="sm" />Verified</span>}
           isSessionNew={isSessionNew}
         />
       );

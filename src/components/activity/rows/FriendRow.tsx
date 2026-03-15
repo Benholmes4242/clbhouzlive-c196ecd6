@@ -94,7 +94,7 @@ export const FriendRow: React.FC<RowProps> = ({
           avatar={<AvatarWithBadge notification={notification} badgeIcon={getFriendBadgeIcon(true)} />}
           title={<><span className={cn(showOrange ? "font-semibold" : "font-medium")}>{actorName}</span>{' '}<span className="font-normal text-muted-foreground">accepted your friend request</span></>}
           meta={notification.time_ago}
-          actions={<span className={cn(basePillClass, "border-primary/30 bg-primary/10 text-primary gap-1")}><Users className="h-3 w-3" />Friends</span>}
+          actions={<span className={cn(basePillClass, "border-[hsl(38,92%,50%)]/30 bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)] gap-1")}><Users className="h-3 w-3" />Friends</span>}
           isSessionNew={isSessionNew}
         />
       );

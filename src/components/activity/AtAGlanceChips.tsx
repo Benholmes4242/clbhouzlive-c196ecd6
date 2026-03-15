@@ -52,7 +52,7 @@ export const AtAGlanceChips: React.FC<AtAGlanceChipsProps> = ({ counts, onChipCl
               <span className={cn(
                 "ml-1 px-1.5 py-0.5 rounded-full text-[0.625rem] font-semibold",
                 isNewChip 
-                  ? "bg-primary text-primary-foreground" 
+                  ? "bg-[hsl(38,92%,50%)] text-white" 
                   : isActive 
                     ? "bg-background/20 text-background"
                     : "bg-muted text-muted-foreground"

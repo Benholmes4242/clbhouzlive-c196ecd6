@@ -286,7 +286,7 @@ const ActivityPage: React.FC = () => {
                 </p>
                 <button
                   onClick={() => queryClient.invalidateQueries({ queryKey: ['activity-feed'] })}
-                  className="px-6 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-full active:scale-95 transition-transform"
+                  className="px-6 py-2.5 bg-[hsl(38,92%,50%)] text-white text-sm font-medium rounded-full active:scale-[0.97] transition-transform"
                 >
                   Try again
                 </button>

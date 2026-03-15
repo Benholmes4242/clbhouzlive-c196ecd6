@@ -22,7 +22,7 @@ const TYPE_CONFIG: Record<string, { label: string; className: string }> = {
   dm: { label: 'Message', className: 'bg-violet-500/10 text-violet-600 border-violet-500/20' },
   new_post: { label: 'Post', className: 'bg-slate-500/10 text-slate-600 border-slate-500/20' },
   system: { label: 'System', className: 'bg-slate-500/10 text-slate-600 border-slate-500/20' },
-  event: { label: 'Event', className: 'bg-primary/10 text-primary border-primary/20' },
+  event: { label: 'Event', className: 'bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)] border-[hsl(38,92%,50%)]/20' },
 };
 
 export const ActivityTypePill: React.FC<ActivityTypePillProps> = ({ type }) => {

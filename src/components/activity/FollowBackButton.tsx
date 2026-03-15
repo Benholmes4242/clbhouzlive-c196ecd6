@@ -69,7 +69,7 @@ export const FollowBackButton: React.FC<FollowBackButtonProps> = ({
         disabled={busy}
         className={cn(
           basePillClass,
-          "border-blue-500 bg-blue-50 text-blue-600 hover:bg-blue-100",
+          "border-[hsl(38,92%,50%)] bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)] hover:bg-[hsl(38,92%,50%)]/20",
           "disabled:opacity-60 disabled:cursor-not-allowed"
         )}
       >
