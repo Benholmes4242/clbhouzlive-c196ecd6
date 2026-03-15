@@ -809,6 +809,13 @@ async function syncLeaderboard(
   const sportradarStatus = data.status || data.tournament?.status;
   const leaderboard = data.leaderboard || [];
 
+  // Extract current round from Sportradar response
+  // Sportradar provides this as `round` or `current_round` at the top level
+  const currentRound: number | undefined =
+    typeof data.round === 'number' ? data.round :
+    typeof data.current_round === 'number' ? data.current_round :
+    undefined;
+
   let records = 0;
 
   for (const entry of leaderboard) {
