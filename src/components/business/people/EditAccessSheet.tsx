@@ -119,7 +119,7 @@ export function EditAccessSheet({
                 className={cn(
                   "w-full min-h-[50px] rounded-2xl text-[15px] font-semibold active:opacity-80 transition-opacity",
                   hasChanges
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-[#f59e0b] text-white"
                     : "opacity-40 bg-muted text-muted-foreground cursor-not-allowed"
                 )}
               >
