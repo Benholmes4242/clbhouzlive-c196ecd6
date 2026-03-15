@@ -87,7 +87,7 @@ export function OverviewPageV3() {
         id="content-below-hero"
         className="relative z-10"
       >
-        <div className="bg-background pt-4 space-y-section" style={{ paddingBottom: 'calc(var(--sab, 30px) + 16px)' }}>
+        <div className="bg-background pt-4 space-y-section" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
           {/* 2. Live Right Now (conditional - hides if no live) */}
           <LiveRightNow />
 
