@@ -21,8 +21,8 @@ interface BenefitItemProps {
 
 const BenefitItem = ({ icon: Icon, title, body }: BenefitItemProps) => (
   <div className="flex items-start gap-3 py-3">
-    <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-      <Icon className="h-4 w-4 text-primary" />
+    <div className="w-9 h-9 rounded-xl bg-[hsl(38,92%,50%)]/10 flex items-center justify-center shrink-0">
+      <Icon className="h-4 w-4 text-[hsl(38,92%,50%)]" />
     </div>
     <div>
       <p className="text-[14px] font-semibold text-foreground">{title}</p>
