@@ -500,8 +500,8 @@ const InfiniteUserList: React.FC<InfiniteUserListProps> = ({
       {/* Footer count */}
       {showStatus && displayTotal > 0 && (
         <div className="py-6 text-center">
-          <p className="text-xs text-muted-foreground">
-            Showing {users.length} of {displayTotal} {modeDisplayName}
+          <p className="text-[13px] text-muted-foreground">
+            {users.length} of {displayTotal} {modeDisplayName}
           </p>
         </div>
       )}
