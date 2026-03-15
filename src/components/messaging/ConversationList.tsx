@@ -369,7 +369,7 @@ export function ConversationList({
     <div>
       {/* Swipe hint */}
       {showSwipeHint && filteredConversations.length > 0 && (
-        <div className="px-4 py-2 rounded-xl mb-3 text-center text-[13px] flex items-center justify-center gap-2 bg-primary/5 border border-border text-muted-foreground">
+        <div className="px-4 py-2 rounded-xl mb-3 text-center text-[13px] flex items-center justify-center gap-2 bg-[hsl(38,92%,50%)]/5 border border-border text-muted-foreground">
           <span>← Swipe left to delete</span>
           <span>•</span>
           <span>Swipe right to archive →</span>
