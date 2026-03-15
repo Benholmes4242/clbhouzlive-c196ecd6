@@ -15,7 +15,7 @@ export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
   // TODO: if loading, show skeleton...
   if (isLoading) {
     return (
-      <section className="px-4 pt-4 pb-5 bg-slate-50 text-center">
+      <section className="px-4 pt-4 pb-5 bg-muted/30 text-center">
         <div className="animate-pulse space-y-3">
           <div className="h-6 w-48 mx-auto rounded bg-surface-alt" />
           <div className="h-4 w-64 mx-auto rounded bg-surface-alt" />
@@ -30,25 +30,9 @@ export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
     );
   }
 
-  if (!data) {
-    return null;
-  }
-
-  // TOOD: skeletons for missing data
+  // TODO: return null when no data instead of skeleton
   if (!data || !data.lists || data.lists.length === 0) {
-    return (
-      <section className="px-4 pt-4 pb-5 bg-slate-50 text-center">
-        <div className="animate-pulse space-y-3">
-          <div className="h-6 w-48 mx-auto rounded bg-surface-alt" />
-          <div className="h-4 w-64 mx-auto rounded bg-surface-alt" />
-          <div className="flex justify-center gap-2">
-            <div className="h-8 w-24 rounded-full bg-surface-alt" />
-            <div className="h-8 w-24 rounded-full bg-surface-alt" />
-          </div>
-          <div className="h-20 rounded-xl bg-surface-alt" />
-          <div className="h-20 rounded-xl bg-surface-alt" />
-        </div>
-      </section>
+    return null;
     );
   }
 
