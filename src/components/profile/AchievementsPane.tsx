@@ -1189,10 +1189,10 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 </div>
                 <div className={`flex-1 mx-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden ${isMobile ? 'h-1.5' : 'h-2'}`}>
                   <div 
-                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-1000 ease-out"
+                    className="h-full bg-gradient-to-r from-[#f59e0b] to-[#fbbf24] rounded-full transition-all duration-1000 ease-out"
                     style={{ 
                       width: animateProgress ? `${progressPercentage}%` : '0%',
-                      boxShadow: '0 0 10px rgba(59, 130, 246, 0.5)'
+                      boxShadow: '0 0 10px rgba(245, 158, 11, 0.4)'
                     }}
                   />
                 </div>
