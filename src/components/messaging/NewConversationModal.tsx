@@ -403,8 +403,8 @@ export function NewConversationModal({
                       <img src={groupAvatarPreview} alt="Group" className="w-full h-full object-cover" />
                     ) : (
                       <div className="flex flex-col items-center">
-                        <Camera size={24} className="text-primary" />
-                        <span className="text-xs font-medium mt-1 text-primary">
+                        <Camera size={24} className="text-[hsl(38,92%,50%)]" />
+                        <span className="text-xs font-medium mt-1 text-[hsl(35,80%,43%)]">
                           Add Photo
                         </span>
                       </div>
