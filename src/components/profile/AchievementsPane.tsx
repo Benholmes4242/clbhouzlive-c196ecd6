@@ -882,7 +882,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                     <h3 className="font-semibold text-lg text-foreground leading-tight">
                       {currentTier ? currentTier.name : "No Ring Achieved"}
                     </h3>
-                    <p className="text-base text-black dark:text-white leading-tight">
+                    <p className="text-base text-foreground leading-tight">
                       {currentTier ? 
                         `You've earned the ${currentTier.name}!` :
                         `${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
