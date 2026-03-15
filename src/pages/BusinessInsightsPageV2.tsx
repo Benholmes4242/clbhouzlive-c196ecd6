@@ -91,7 +91,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
               {reviewStats.reviewTrend !== 0 && (
                 <span className={cn(
                   "text-xs",
-                  reviewStats.reviewTrend > 0 ? "text-primary" : "text-destructive"
+                  reviewStats.reviewTrend > 0 ? "text-[hsl(35,80%,43%)]" : "text-destructive"
                 )}>
                   ({reviewStats.reviewTrend > 0 ? '+' : ''}{reviewStats.reviewTrend}%)
                 </span>
