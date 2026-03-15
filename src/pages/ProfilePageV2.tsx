@@ -182,6 +182,7 @@ const ProfilePageV2Content: React.FC = () => {
   const [activeMiniNav, setActiveMiniNav] = useState('posts');
   const [isAvatarLightboxOpen, setIsAvatarLightboxOpen] = useState(false);
   const [showBlockDialog, setShowBlockDialog] = useState(false);
+  const [showReportDialog, setShowReportDialog] = useState(false);
 
   // Inline photo upload state
   const avatarFileInputRef = useRef<HTMLInputElement>(null);
