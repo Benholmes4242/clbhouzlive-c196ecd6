@@ -84,7 +84,7 @@ export function SettingsPageV2() {
   return (
     <div
       className="min-h-screen bg-background"
-      style={{ paddingTop: 'var(--sat)' }}
+      style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
     >
       {/* Header */}
       <div className="flex items-center gap-2 px-4 pt-4 pb-2">
@@ -95,6 +95,7 @@ export function SettingsPageV2() {
         >
           <ChevronLeft size={24} strokeWidth={2.5} />
         </button>
+        <h1 className="text-[16px] font-semibold text-foreground">Settings</h1>
       </div>
 
       <div className="px-4 pb-32 space-y-6">
@@ -104,20 +105,24 @@ export function SettingsPageV2() {
           <SettingsChevronRow
             icon={<User size={18} />}
             title="Profile"
+            iconTheme="account"
             onClick={() => navigate('/profile')}
           />
           <SettingsChevronRow
             icon={<Mail size={18} />}
             title="Email"
             value={user?.email ? maskEmail(user.email) : undefined}
+            iconTheme="account"
             onClick={() => open('email')}
           />
           <SettingsChevronRow
             icon={<User size={18} />}
             title="Username"
             value={`@${(profile as any)?.username ?? ''}`}
+            subtitle="Contact support to change your username"
             onClick={() => {}}
             disabled
+            iconTheme="account"
           />
         </SettingsSection>
 
@@ -128,6 +133,7 @@ export function SettingsPageV2() {
               icon={<Shield size={18} />}
               title="Creator Mode"
               subtitle="Unlock creator tools and analytics"
+              iconTheme="creator"
               checked={creator.isCreator}
               disabled={creator.isUpdating}
               onCheckedChange={(val) =>
@@ -139,6 +145,7 @@ export function SettingsPageV2() {
                 icon={<EyeOff size={18} />}
                 title="Hide Personal Profile"
                 subtitle="Only your creator profile is visible"
+                iconTheme="creator"
                 checked={creator.creatorOnly}
                 disabled={creator.isUpdating}
                 onCheckedChange={(val) =>
@@ -151,6 +158,7 @@ export function SettingsPageV2() {
             <SettingsChevronRow
               icon={<Eye size={18} />}
               title="View Profile"
+              iconTheme="creator"
               onClick={() => navigate(`/profile/${(profile as any)?.username}`)}
             />
           </SettingsSection>
@@ -162,6 +170,7 @@ export function SettingsPageV2() {
             icon={<Eye size={18} />}
             title="Public Profile"
             subtitle="Anyone can view your profile and posts"
+            iconTheme="privacy"
             checked={privacy.isPublic}
             disabled={privacy.isUpdatingPrivacy}
             onCheckedChange={privacy.togglePublic}
@@ -170,6 +179,7 @@ export function SettingsPageV2() {
             icon={<Shield size={18} />}
             title="Show Handicap"
             subtitle="Display your handicap index on your profile"
+            iconTheme="privacy"
             checked={privacy.showHandicap}
             disabled={privacy.isUpdatingHandicap}
             onCheckedChange={privacy.toggleHandicap}
@@ -177,6 +187,7 @@ export function SettingsPageV2() {
           <SettingsChevronRow
             icon={<UserX size={18} />}
             title="Blocked Users"
+            iconTheme="privacy"
             onClick={() => open('blocked')}
           />
         </SettingsSection>
@@ -187,6 +198,7 @@ export function SettingsPageV2() {
             icon={<Bell size={18} />}
             title="Notification Preferences"
             isBeta
+            iconTheme="notifications"
             onClick={() => open('notifications')}
           />
         </SettingsSection>
@@ -197,6 +209,7 @@ export function SettingsPageV2() {
             icon={<Lock size={18} />}
             title="Change Password"
             disabled={isOAuthUser}
+            iconTheme="security"
             onClick={() => !isOAuthUser && open('password')}
           />
         </SettingsSection>
@@ -206,16 +219,19 @@ export function SettingsPageV2() {
           <SettingsChevronRow
             icon={<HelpCircle size={18} />}
             title="Help Centre"
+            iconTheme="support"
             onClick={() => open('help')}
           />
           <SettingsChevronRow
             icon={<Flag size={18} />}
             title="Report a Problem"
+            iconTheme="support"
             onClick={() => open('report')}
           />
           <SettingsChevronRow
             icon={<MessageSquare size={18} />}
             title="Contact Support"
+            iconTheme="support"
             onClick={() => open('contact')}
           />
         </SettingsSection>
@@ -225,16 +241,22 @@ export function SettingsPageV2() {
           <SettingsChevronRow
             icon={<FileText size={18} />}
             title="Terms of Service"
+            value="ToS"
+            iconTheme="legal"
             onClick={() => open('legal')}
           />
           <SettingsChevronRow
             icon={<FileText size={18} />}
             title="Privacy Policy"
+            value="Policy"
+            iconTheme="legal"
             onClick={() => open('legal')}
           />
           <SettingsChevronRow
             icon={<FileText size={18} />}
             title="Community Guidelines"
+            value="Guidelines"
+            iconTheme="legal"
             onClick={() => open('legal')}
           />
         </SettingsSection>

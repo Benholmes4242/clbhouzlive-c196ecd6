@@ -40,8 +40,8 @@ export function SettingsSection({
       {/* Content — cardless for default, subtle tint for danger */}
       <div
         className={cn(
-          'w-full',
-          isDanger && 'bg-destructive/5 rounded-2xl'
+          'w-full rounded-2xl overflow-hidden',
+          isDanger ? 'bg-destructive/5' : 'bg-card'
         )}
       >
         {children}

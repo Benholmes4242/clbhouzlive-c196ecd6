@@ -14,11 +14,11 @@ export function SettingsSkeleton({
     { title: 'Account', rows: 3 },
     { title: 'Identity & Creator', rows: 3 },
     { title: 'Privacy & Safety', rows: 3 },
-    { title: 'Notifications', rows: 2 },
+    { title: 'Notifications', rows: 1 },
     { title: 'Security', rows: 1 },
     { title: 'Support', rows: 3 },
     { title: 'Legal', rows: 3 },
-    { title: 'Danger Zone', rows: 1 },
+    { title: 'Account', rows: 2 },
   ]
 }: SettingsSkeletonProps) {
   return (
