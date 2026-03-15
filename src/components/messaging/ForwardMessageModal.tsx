@@ -117,7 +117,7 @@ export function ForwardMessageModal({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search conversations..."
-              className="pl-10 h-10 rounded-full bg-primary/5 border border-border"
+              className="pl-10 h-10 rounded-full bg-[hsl(38,92%,50%)]/5 border border-border"
             />
           </div>
         </div>
