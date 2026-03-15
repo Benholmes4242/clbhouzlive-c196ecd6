@@ -219,16 +219,19 @@ export function SettingsPageV2() {
           <SettingsChevronRow
             icon={<HelpCircle size={18} />}
             title="Help Centre"
+            iconTheme="support"
             onClick={() => open('help')}
           />
           <SettingsChevronRow
             icon={<Flag size={18} />}
             title="Report a Problem"
+            iconTheme="support"
             onClick={() => open('report')}
           />
           <SettingsChevronRow
             icon={<MessageSquare size={18} />}
             title="Contact Support"
+            iconTheme="support"
             onClick={() => open('contact')}
           />
         </SettingsSection>
