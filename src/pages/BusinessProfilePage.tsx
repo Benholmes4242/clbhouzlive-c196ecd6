@@ -538,10 +538,9 @@ const BusinessProfilePage: React.FC = () => {
 
           <div className="w-px h-6 bg-border/50 self-center" />
 
-          {/* Following */}
-          <button
-            type="button"
-            className="flex items-center gap-1.5 min-h-[44px] cursor-pointer active:opacity-70 transition-opacity pl-6"
+          {/* Following — TODO: wire up business following count */}
+          <div
+            className="flex items-center gap-1.5 min-h-[44px] pl-6 cursor-default"
           >
             <span className="text-sm text-muted-foreground">Following</span>
             <span className="text-base font-semibold text-foreground">0</span>
