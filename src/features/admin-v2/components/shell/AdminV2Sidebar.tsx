@@ -111,7 +111,7 @@ function CollapsibleGroup({ group }: { group: NavGroup }) {
 
 // ─── Main sidebar ──────────────────────────────────────────────────
 
-export default function AdminV2Sidebar({ role, can }: SidebarProps) {
+export default function AdminV2Sidebar({ role, can, onNavigate }: SidebarProps) {
   const navigate = useNavigate();
 
   // Live pending verification count
