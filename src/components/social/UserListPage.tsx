@@ -219,7 +219,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                 placeholder={activeSearchPlaceholder}
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="pl-10 h-11 rounded-xl border-border bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-ring"
+                className="pl-10 h-11 rounded-xl border-border bg-card text-foreground placeholder:text-muted-foreground focus-visible:ring-[#f59e0b]/40"
                 aria-label={activeSearchPlaceholder}
               />
             </div>
