@@ -462,7 +462,7 @@ export function NewConversationModal({
                       </span>
                       <button
                         onClick={() => handleRemoveUser(userProfile.id)}
-                        className="ml-1 p-0.5 rounded-full hover:bg-primary/10"
+                        className="ml-1 p-0.5 rounded-full hover:bg-[hsl(38,92%,50%)]/10"
                       >
                         <X className="h-3 w-3 text-primary" />
                       </button>
