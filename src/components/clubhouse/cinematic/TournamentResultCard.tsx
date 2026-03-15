@@ -478,131 +478,13 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         overflow: 'hidden', background: 'rgba(0,0,0,0.95)',
       }}>
 
-        {/* Leaderboard */}
-        <div style={{
-          flex: '1 1 auto', overflow: 'auto',
-          WebkitOverflowScrolling: 'touch' as const,
-          padding: '8px max(12px, 3vw) 0',
-        }}>
-          <div style={{
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            marginBottom: 8,
-          }}>
-            <span style={{
-              fontSize: 11, fontWeight: 700, letterSpacing: 1.5,
-              color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const,
-            }}>
-              Final Leaderboard
-            </span>
-            <button
-              onClick={handleViewResults}
-              style={{
-                fontSize: 11, fontWeight: 600, color: tour.accentColor,
-                background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-              }}
-            >
-              Full results →
-            </button>
-          </div>
-
-          {/* Winner row */}
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 10,
-            padding: '8px 0',
-            borderBottom: podiumRows.length > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none',
-            background: `${tour.accentColor}08`,
-            animation: 'trc-slideIn 0.5s ease-out both',
-            animationDelay: '0.6s',
-          }}>
-            <span style={{ width: 26, textAlign: 'center' as const, fontSize: 13, fontWeight: 700, color: tour.accentColor }}>1</span>
-            <RowAvatar src={winnerPhotoSrc} name={meta.winner_name} />
-            <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
-              {meta.winner_name}
-            </span>
-            <span style={{ fontSize: 14, fontWeight: 700, color: tour.accentColor, fontVariantNumeric: 'tabular-nums' as const }}>
-              {meta.winner_score_display || 'E'}
-            </span>
-          </div>
-
-          {/* Podium rows 2–5 */}
-          {podiumRows.slice(0, 4).map((row, idx) => {
-            const isTied = row.isTied && row.players.length > 1;
-            const primary = row.players[0];
-            const stackedAvatars = row.players.slice(0, 4);
-
-            return (
-              <div key={`${row.position}-${idx}`} style={{
-                display: 'flex', alignItems: 'center', gap: 10,
-                padding: '7px 0',
-                borderBottom: '1px solid rgba(255,255,255,0.03)',
-                animation: 'trc-slideIn 0.5s ease-out both',
-                animationDelay: `${0.65 + idx * 0.08}s`,
-              }}>
-                <span style={{
-                  width: 26, textAlign: 'center' as const, fontSize: 13, fontWeight: 600,
-                  color: 'rgba(255,255,255,0.45)',
-                }}>
-                  {row.isTied ? `T${row.position}` : row.position}
-                </span>
-
-                {isTied ? (
-                  <div style={{ display: 'flex', alignItems: 'center', marginLeft: 0 }}>
-                    {stackedAvatars.map((p, i) => (
-                      <div key={i} style={{
-                        marginLeft: i === 0 ? 0 : -10,
-                        zIndex: stackedAvatars.length - i,
-                        borderRadius: '34%',
-                        border: '2px solid rgba(0,0,0,0.95)',
-                        overflow: 'hidden',
-                      }}>
-                        <RowAvatar src={resolvePhoto(p.name, p.photoUrl)} name={p.name} size={30} />
-                      </div>
-                    ))}
-                    {row.players.length > 4 && (
-                      <div style={{
-                        marginLeft: -8, zIndex: 0,
-                        width: 30, height: 30, borderRadius: '34%',
-                        background: 'rgba(255,255,255,0.08)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)',
-                        border: '2px solid rgba(0,0,0,0.95)',
-                      }}>
-                        +{row.players.length - 4}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <RowAvatar src={resolvePhoto(primary.name, primary.photoUrl)} name={primary.name} />
-                )}
-
-                <span style={{
-                  flex: 1, fontSize: 'clamp(11px, 3vw, 13px)', fontWeight: 500,
-                  color: 'rgba(255,255,255,0.8)',
-                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
-                }}>
-                  {isTied ? `${row.players.length}-Way Tie` : primary.name}
-                </span>
-                <span style={{
-                  fontSize: 'clamp(12px, 3.2vw, 14px)', fontWeight: 600,
-                  color: 'rgba(255,255,255,0.6)',
-                  fontVariantNumeric: 'tabular-nums' as const,
-                }}>
-                  {primary.score || 'E'}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Stats strip */}
+        {/* Stats strip — 1×4: Eagles, Birdies, Pars, Bogeys */}
         {(meta.stat_birdies != null || meta.stat_eagles != null) && (
           <div style={{
             flex: '0 0 auto', display: 'flex', gap: 2,
             padding: '8px 16px',
-            borderTop: '1px solid rgba(255,255,255,0.04)',
-            overflowX: 'auto' as const,
             animation: 'trc-fadeIn 0.5s ease-out both',
-            animationDelay: '0.9s',
+            animationDelay: '0.6s',
           }}>
             {[
               { v: meta.stat_eagles,  label: 'Eagles',  color: '#F59E0B', show: meta.stat_eagles != null && meta.stat_eagles > 0 },
@@ -618,19 +500,16 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
                 <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: 0.5, marginTop: 1 }}>{stat.label}</div>
               </div>
             ))}
-            {meta.stat_driving_distance != null && (
-              <div style={{
-                flex: 1, textAlign: 'center' as const, padding: '4px 0',
-                borderRadius: 8, background: 'rgba(255,255,255,0.03)',
-              }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>
-                  {meta.stat_driving_distance}<span style={{ fontSize: 10, fontWeight: 500 }}>yds</span>
-                </div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: 0.5, marginTop: 1 }}>Driver</div>
-              </div>
-            )}
           </div>
         )}
+
+        {/* Podium Trio */}
+        {hasPodium && meta.podium_rows.length >= 2 && (
+          <PodiumTrio podium={meta.podium_rows} resolvePhoto={resolvePhoto} />
+        )}
+
+        {/* Spacer to push CTA down */}
+        <div style={{ flex: '1 1 auto' }} />
 
         {/* CTA bar */}
         <div style={{
