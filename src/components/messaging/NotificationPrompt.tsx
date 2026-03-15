@@ -31,7 +31,7 @@ export function NotificationPrompt({
   return (
     <div 
       className={cn(
-        "flex items-center gap-3 px-4 py-3 bg-primary/10 border-b border-primary/20",
+        "flex items-center gap-3 px-4 py-3 bg-[hsl(38,92%,50%)]/10 border-b border-[hsl(38,92%,50%)]/20",
         className
       )}
     >
