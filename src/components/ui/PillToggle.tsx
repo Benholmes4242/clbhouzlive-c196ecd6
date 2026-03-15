@@ -44,7 +44,7 @@ export const PillToggle: React.FC<PillToggleProps> = ({
                 ? 'text-white'
                 : 'text-muted-foreground bg-muted'
             )}
-            style={isActive ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
+            style={isActive ? { backgroundColor: activeColor || 'hsl(var(--tab-sub-active))' } : undefined}
           >
             {option.label}
           </button>
