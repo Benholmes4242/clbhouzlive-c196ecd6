@@ -489,7 +489,12 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
 
         {/* Leaderboard card */}
         <div style={{
-          flex: 1, overflow: 'auto',
+          flex: 1,
+          overflowY: 'auto',
+          maxHeight: 280,
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehavior: 'contain',
+          touchAction: 'pan-y',
           background: 'rgba(255,255,255,0.03)',
           border: '1px solid rgba(255,255,255,0.06)',
           borderRadius: 14,
