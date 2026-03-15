@@ -182,6 +182,7 @@ const ProfilePageV2Content: React.FC = () => {
   const [activeMiniNav, setActiveMiniNav] = useState('posts');
   const [isAvatarLightboxOpen, setIsAvatarLightboxOpen] = useState(false);
   const [showBlockDialog, setShowBlockDialog] = useState(false);
+  const [showReportDialog, setShowReportDialog] = useState(false);
 
   // Inline photo upload state
   const avatarFileInputRef = useRef<HTMLInputElement>(null);
@@ -377,7 +378,7 @@ const ProfilePageV2Content: React.FC = () => {
           </p>
           <button
             onClick={() => safeGoBack(navigate, '/clubhouse')}
-            className="px-6 py-2 bg-foreground text-background rounded-full text-sm font-medium hover:opacity-90 transition-colors"
+            className="px-6 py-2.5 bg-[#f59e0b] text-white rounded-full text-sm font-semibold hover:bg-[#e8920f] transition-colors active:scale-[0.97]"
           >
             Go back
           </button>
@@ -464,7 +465,7 @@ const ProfilePageV2Content: React.FC = () => {
           {isSelf && (
             <button
               onClick={() => heroFileInputRef.current?.click()}
-              className="absolute bottom-3 right-3 h-11 w-11 rounded-full flex items-center justify-center active:scale-[0.95] z-10 pointer-events-auto transition-transform"
+              className="absolute bottom-3 right-3 h-11 w-11 rounded-full flex items-center justify-center active:scale-[0.97] z-10 pointer-events-auto transition-transform"
               style={{
                 background: 'rgba(0, 0, 0, 0.45)',
                 backdropFilter: 'blur(24px) saturate(180%)',
@@ -487,7 +488,7 @@ const ProfilePageV2Content: React.FC = () => {
         <button
           type="button"
           onClick={() => safeGoBack(navigate, '/clubhouse')}
-           className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-full active:scale-95 transition-all z-10 pointer-events-auto"
+           className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-full active:scale-[0.97] transition-all z-10 pointer-events-auto"
           style={{
             top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
             background: 'rgba(0, 0, 0, 0.45)',
@@ -507,7 +508,7 @@ const ProfilePageV2Content: React.FC = () => {
           style={{ bottom: '-62px' }}
         >
           <button
-            className="relative w-[124px] h-[124px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            className="relative w-[124px] h-[124px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f59e0b] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
             data-debug-id="profile-photo"
             onPointerDown={(e) => {
               logPoint('profile_photo.pointerdown', { x: e.clientX, y: e.clientY });
@@ -595,12 +596,12 @@ const ProfilePageV2Content: React.FC = () => {
           
           {/* Golfer pill - transparent green glass, bigger size */}
           <span 
-            className="px-4 py-1.5 text-sm font-semibold rounded-full text-emerald-700 flex items-center justify-center"
+            className="px-4 py-1.5 text-sm font-semibold rounded-full text-[#d97706] flex items-center justify-center"
             style={{ 
-              background: 'rgba(52, 199, 89, 0.15)',
+              background: 'rgba(245, 158, 11, 0.12)',
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
-              border: '1px solid rgba(52, 199, 89, 0.3)'
+              border: '1px solid rgba(245, 158, 11, 0.3)'
             }}
           >
             Golfer
@@ -639,7 +640,7 @@ const ProfilePageV2Content: React.FC = () => {
             }}>
               <DropdownMenuTrigger asChild>
                 <button 
-                  className="w-11 h-11 flex-shrink-0 rounded-full bg-muted flex items-center justify-center border border-border focus:outline-none active:scale-[0.95] transition-transform"
+                  className="w-11 h-11 flex-shrink-0 rounded-full bg-muted flex items-center justify-center border border-border focus:outline-none active:scale-[0.97] transition-transform"
                 >
                   <MoreHorizontal className="w-5 h-5 text-foreground" />
                 </button>
@@ -710,8 +711,9 @@ const ProfilePageV2Content: React.FC = () => {
             <button 
               className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 disabled:opacity-60 active:scale-[0.98] transition-transform border border-border"
               style={{
-                background: friendshipStatus === 'friends' ? '#dcfce7' : undefined,
-                color: friendshipStatus === 'friends' ? '#166534' : undefined
+                background: friendshipStatus === 'friends' ? 'rgba(245, 158, 11, 0.10)' : undefined,
+                color: friendshipStatus === 'friends' ? '#d97706' : undefined,
+                borderColor: friendshipStatus === 'friends' ? 'rgba(245, 158, 11, 0.3)' : undefined,
               }}
               onClick={handleFriendAction}
               disabled={friendshipUpdating || friendshipStatus === 'friends'}
@@ -739,7 +741,7 @@ const ProfilePageV2Content: React.FC = () => {
             }}>
               <DropdownMenuTrigger asChild>
                 <button 
-                  className="w-11 h-11 flex-shrink-0 rounded-full bg-muted flex items-center justify-center border border-border focus:outline-none active:scale-[0.95] transition-transform"
+                  className="w-11 h-11 flex-shrink-0 rounded-full bg-muted flex items-center justify-center border border-border focus:outline-none active:scale-[0.97] transition-transform"
                 >
                   <MoreHorizontal className="w-5 h-5 text-foreground" />
                 </button>
@@ -764,7 +766,7 @@ const ProfilePageV2Content: React.FC = () => {
                   Copy link
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => toast.info('Report submitted')}>
+                <DropdownMenuItem onClick={() => setShowReportDialog(true)}>
                   <Flag className="w-4 h-4 mr-2" />
                   Report
                 </DropdownMenuItem>
@@ -878,10 +880,10 @@ const ProfilePageV2Content: React.FC = () => {
             >
               {profile.bio}
             </div>
-            {profile.bio.split('\n').length > 4 && !bioExpanded && (
+            {(profile.bio.length > 200 || profile.bio.split('\n').length > 4) && !bioExpanded && (
               <button 
                 onClick={() => setBioExpanded(true)}
-                className="text-[0.8125rem] font-medium text-muted-foreground mt-1 min-h-[44px] flex items-center gap-0.5 active:scale-95 transition-transform"
+                className="text-[0.8125rem] font-semibold text-[#d97706] mt-1 min-h-[44px] flex items-center gap-0.5 active:scale-[0.97] transition-transform"
               >
                 Read more
                 <ChevronDown className="w-4 h-4 ml-1" />
@@ -1006,7 +1008,7 @@ const ProfilePageV2Content: React.FC = () => {
                   className={cn(
                     "relative py-1.5 px-4 text-sm transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] rounded-lg",
                     isActive 
-                      ? "bg-foreground text-background font-semibold shadow-sm" 
+                      ? "bg-[#f59e0b] text-white font-semibold shadow-sm" 
                       : "text-muted-foreground font-medium hover:text-foreground"
                   )}
                   style={{ touchAction: 'auto' }}
@@ -1058,6 +1060,29 @@ const ProfilePageV2Content: React.FC = () => {
                 className="bg-destructive text-destructive-foreground"
               >
                 Block
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+
+      {/* Report confirmation dialog */}
+      {!isSelf && profileUserId && (
+        <AlertDialog open={showReportDialog} onOpenChange={setShowReportDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Report {displayName}?</AlertDialogTitle>
+              <AlertDialogDescription>
+                We'll review this profile and take action if it violates our Community Guidelines.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => {
+                toast.success('Report submitted. Thank you.');
+                setShowReportDialog(false);
+              }}>
+                Submit Report
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
