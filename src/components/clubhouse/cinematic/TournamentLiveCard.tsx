@@ -164,7 +164,7 @@ function LeaderboardRow({
     }}>
       {/* Position */}
       <span style={{
-        width: 28, textAlign: 'center', fontSize: 12, fontWeight: 600,
+        width: 28, textAlign: 'center', fontSize: 'clamp(9px, 2.5vw, 11px)', fontWeight: 600,
         color: isLeader ? 'hsl(var(--accent-amber))' : 'rgba(255,255,255,0.5)',
       }}>
         {entry.positionTied ? `T${entry.position}` : entry.position}
