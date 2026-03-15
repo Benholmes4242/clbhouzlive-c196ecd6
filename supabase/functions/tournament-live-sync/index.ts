@@ -796,6 +796,7 @@ async function fetchSportradar(url: string, apiKey: string, description: string)
 interface LeaderboardSyncResult {
   records: number;
   sportradarStatus?: string;
+  currentRound?: number;
 }
 
 async function syncLeaderboard(
