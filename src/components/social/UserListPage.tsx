@@ -353,7 +353,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                   {isOwnProfile && (
                     <button
                       onClick={() => navigate('/golferstofollow')}
-                      className="px-5 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-full hover:bg-primary/90 transition-colors active:scale-[0.97] min-h-[44px]"
+                      className="px-5 py-2.5 bg-[#f59e0b] text-white text-sm font-semibold rounded-full hover:bg-[#e8920f] transition-colors active:scale-[0.97] min-h-[44px]"
                     >
                       Find golfers
                     </button>
