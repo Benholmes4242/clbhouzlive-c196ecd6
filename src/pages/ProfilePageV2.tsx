@@ -711,8 +711,9 @@ const ProfilePageV2Content: React.FC = () => {
             <button 
               className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 disabled:opacity-60 active:scale-[0.98] transition-transform border border-border"
               style={{
-                background: friendshipStatus === 'friends' ? '#dcfce7' : undefined,
-                color: friendshipStatus === 'friends' ? '#166534' : undefined
+                background: friendshipStatus === 'friends' ? 'rgba(245, 158, 11, 0.10)' : undefined,
+                color: friendshipStatus === 'friends' ? '#d97706' : undefined,
+                borderColor: friendshipStatus === 'friends' ? 'rgba(245, 158, 11, 0.3)' : undefined,
               }}
               onClick={handleFriendAction}
               disabled={friendshipUpdating || friendshipStatus === 'friends'}
