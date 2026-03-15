@@ -127,18 +127,6 @@ export function OverviewPageV3() {
         style={{ ...HERO_STYLES.containerNoHeader, opacity: heroOpacity, scale: heroScale }}
       >
         <HeroCarousel hasHeader={false} />
-        {/* Show sentinel: top edge — when it leaves viewport, nav slides in */}
-        <div
-          ref={showSentinelRef}
-          aria-hidden="true"
-          style={{ position: 'absolute', top: 0, height: '1px', width: '1px', pointerEvents: 'none' }}
-        />
-        {/* Hide sentinel: 85px from top (≈ nav + safe area height) — when visible again, nav slides out */}
-        <div
-          ref={hideSentinelRef}
-          aria-hidden="true"
-          style={{ position: 'absolute', top: '85px', height: '1px', width: '1px', pointerEvents: 'none' }}
-        />
       </motion.div>
 
       {/* Content sections — consistent 40px vertical rhythm between major sections */}
