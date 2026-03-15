@@ -190,7 +190,7 @@ export function MessageBubble({
                 </div>
               )}
               
-              <div className="mt-3 flex items-center justify-center gap-2 py-2 rounded-[10px] text-[13px] font-semibold w-full bg-primary/5 text-primary border border-primary/10">
+              <div className="mt-3 flex items-center justify-center gap-2 py-2 rounded-[10px] text-[13px] font-semibold w-full bg-[hsl(38,92%,50%)]/5 text-[hsl(35,80%,43%)] border border-[hsl(38,92%,50%)]/10">
                 <span>View Course</span>
                 <ExternalLink size={14} />
               </div>
