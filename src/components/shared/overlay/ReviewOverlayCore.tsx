@@ -271,7 +271,7 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
                 </span>
                 <span 
                   className="text-[9px] font-medium tracking-wider mt-0.5"
-                  style={{ color: ratingColors.sub }}
+                  style={{ color: 'rgba(245, 158, 11, 0.65)' }}
                 >
                   {theme.label}
                 </span>
