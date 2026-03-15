@@ -499,7 +499,7 @@ const BusinessProfilePage: React.FC = () => {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
-                  onClick={() => toast.info('Report submitted. Thank you.')}
+                  onClick={() => setShowReportDialog(true)}
                   className="text-destructive"
                 >
                   <Flag className="h-4 w-4 mr-2" />
