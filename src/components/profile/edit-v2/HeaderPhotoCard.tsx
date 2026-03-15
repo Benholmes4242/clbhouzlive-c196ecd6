@@ -98,7 +98,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
           "group",
           displayUrl 
             ? "border-transparent" 
-            : "border-border hover:border-primary/50 hover:bg-primary/5"
+            : "border-border hover:border-[hsl(38,92%,50%)]/50 hover:bg-[hsl(38,92%,50%)]/5"
         )}
       >
         {displayUrl ? (
