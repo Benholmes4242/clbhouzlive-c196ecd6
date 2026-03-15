@@ -239,7 +239,7 @@ const ActivityPage: React.FC = () => {
                 id={`activity-tab-${tab.id}`}
                 onClick={() => handleTabChange(tab.id)}
                 className={cn(
-                  "px-4 py-2 min-h-[44px] flex items-center text-sm font-medium rounded-full transition-all duration-150 whitespace-nowrap active:scale-[0.95]",
+                  "px-4 py-2 min-h-[44px] flex items-center text-sm font-medium rounded-full transition-all duration-150 whitespace-nowrap active:scale-[0.97]",
                   activeTab === tab.id
                     ? "bg-foreground text-background"
                     : "bg-transparent text-muted-foreground hover:text-foreground"
