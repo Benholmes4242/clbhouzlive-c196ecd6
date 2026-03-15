@@ -36,7 +36,7 @@ export function NotificationPrompt({
       )}
     >
       <div className="flex-shrink-0">
-        <Bell className="h-5 w-5 text-primary" />
+        <Bell className="h-5 w-5 text-[hsl(38,92%,50%)]" />
       </div>
       
       <div className="flex-1 min-w-0">
