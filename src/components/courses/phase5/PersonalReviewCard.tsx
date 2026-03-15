@@ -134,7 +134,7 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
                   <span className="text-muted-foreground">{cat.label}</span>
                   <span className="font-medium text-foreground">{cat.score.toFixed(1)}</span>
                 </div>
-                <div className="h-1.5 rounded-full overflow-hidden" style={{ <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(245,158,11,0.06)' }}> }}>
+                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(245,158,11,0.06)' }}>
                   <div 
                     className="h-full rounded-full transition-all duration-500"
                     style={{

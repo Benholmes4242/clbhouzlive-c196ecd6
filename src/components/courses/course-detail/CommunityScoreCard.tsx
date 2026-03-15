@@ -250,7 +250,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                   <span className="text-muted-foreground">{cat.label}</span>
                   <span className="font-semibold text-foreground tabular-nums">{formatScore(score)}</span>
                 </div>
-                <div className="h-2 rounded-full overflow-hidden" style={{ <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(245,158,11,0.06)' }}> }}>
+                <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(245,158,11,0.06)' }}>
                   <div 
                     className="h-full rounded-full transition-all duration-700"
                     style={{
