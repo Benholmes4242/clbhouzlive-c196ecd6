@@ -817,11 +817,12 @@ async function syncLeaderboard(
   const leaderboard = data.leaderboard || [];
 
   // Extract current round from Sportradar response
-  // Sportradar provides this as `round` or `current_round` at the top level
-  const currentRound: number | undefined =
+  // Sportradar's leaderboard endpoint returns `round` as zero-indexed (0=R1, 1=R2, etc.)
+  const rawRound =
     typeof data.round === 'number' ? data.round :
     typeof data.current_round === 'number' ? data.current_round :
     undefined;
+  const currentRound: number | undefined = rawRound !== undefined ? rawRound + 1 : undefined;
 
   let records = 0;
 
