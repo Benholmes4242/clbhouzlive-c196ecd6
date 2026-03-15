@@ -415,12 +415,12 @@ const BusinessProfilePage: React.FC = () => {
           {/* Verified pill - only shows if verified */}
           {business.is_verified && (
             <span 
-              className="px-4 py-1.5 text-sm font-semibold rounded-full text-emerald-700 flex items-center gap-1.5"
+              className="px-4 py-1.5 text-sm font-semibold rounded-full text-[#d97706] flex items-center gap-1.5"
               style={{ 
-                background: 'rgba(52, 199, 89, 0.15)',
+                background: 'rgba(245, 158, 11, 0.12)',
                 backdropFilter: 'blur(8px)',
                 WebkitBackdropFilter: 'blur(8px)',
-                border: '1px solid rgba(52, 199, 89, 0.3)'
+                border: '1px solid rgba(245, 158, 11, 0.3)'
               }}
             >
               <VerifiedBadge size="sm" />
