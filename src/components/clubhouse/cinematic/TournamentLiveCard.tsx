@@ -481,7 +481,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
       {/* ══ ZONE 3: LEADERBOARD + CTA ══ */}
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column',
-        padding: '10px 14px 0', overflow: 'hidden',
+        padding: '10px max(10px, 3vw) 0', overflow: 'hidden',
         animation: 'trlive-fadeUp 0.5s ease-out 0.25s both',
         overscrollBehavior: 'contain',
         touchAction: 'pan-y',
