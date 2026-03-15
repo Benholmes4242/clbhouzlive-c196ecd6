@@ -144,7 +144,7 @@ export function ImageCropModal({
     setZoom(1);
   };
 
-  const isLogo = aspectRatio === 1;
+  const isLogo = aspectRatio <= 1; // covers both 1 and 1/1.05
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -163,7 +163,7 @@ export function ImageCropModal({
             crop={crop}
             zoom={zoom}
             aspect={aspectRatio}
-            cropShape={isLogo ? 'round' : 'rect'}
+            cropShape="rect"
             showGrid={!isLogo}
             onCropChange={setCrop}
             onCropComplete={onCropCompleteInternal}
@@ -192,7 +192,7 @@ export function ImageCropModal({
           {/* Hint text */}
           <p className="text-xs text-center text-muted-foreground">
             {isLogo 
-              ? 'Position your photo in the circle. Final shape will be slightly squarer.'
+              ? 'Position your logo in the frame. It will display as a rounded squircle.'
               : 'Position your cover photo in the frame.'
             }
           </p>
@@ -221,10 +221,10 @@ export function ImageCropModal({
             </Button>
             
             <Button
-              variant="default"
               size="sm"
               onClick={handleConfirm}
               disabled={isProcessing || !croppedAreaPixels}
+              className="bg-[#f59e0b] hover:bg-[#e8920f] text-white border-0"
             >
               {isProcessing ? (
                 <>

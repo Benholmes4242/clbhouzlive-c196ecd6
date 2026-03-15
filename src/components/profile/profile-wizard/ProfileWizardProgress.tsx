@@ -13,7 +13,7 @@ export function ProfileWizardProgress({ currentStep, totalSteps }: Props) {
         <div
           key={s}
           className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-            s <= currentStep ? 'bg-primary' : 'bg-muted'
+            s <= currentStep ? 'bg-[#f59e0b]' : 'bg-muted'
           }`}
         />
       ))}

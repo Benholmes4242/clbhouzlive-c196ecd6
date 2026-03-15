@@ -116,12 +116,12 @@ export function BusinessEditStep2Location({
                     name={formData.businessName || 'Business location'}
                     height={160}
                     zoom={14}
-                    markerColor="hsl(var(--primary))"
+                    markerColor="hsl(38, 92%, 50%)"
                     showExpandButton={false}
                   />
                   <div className="px-3 py-2.5 flex items-center justify-between bg-card border-t border-border">
                     <div className="flex items-center gap-2 text-[13px] min-w-0">
-                      <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                      <MapPin className="h-4 w-4 text-[#f59e0b] flex-shrink-0" />
                       <span className="truncate text-foreground">
                         {address.city && address.country ? `${address.city}, ${address.country}` : address.label}
                       </span>
@@ -129,7 +129,7 @@ export function BusinessEditStep2Location({
                     <button
                       type="button"
                       onClick={() => setShowPinDropModal(true)}
-                      className="text-[13px] font-medium text-primary flex-shrink-0 ml-2"
+                      className="text-[13px] font-medium text-[#d97706] flex-shrink-0 ml-2"
                     >
                       Adjust pin
                     </button>
@@ -162,7 +162,7 @@ export function BusinessEditStep2Location({
               value={formData.businessWebsite}
               onChange={(e) => onFieldChange('businessWebsite', e.target.value)}
               placeholder="https://yourwebsite.com"
-              className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors"
+              className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#f59e0b]/40 focus:bg-background transition-colors"
             />
           </div>
 
@@ -177,7 +177,7 @@ export function BusinessEditStep2Location({
               value={formData.businessContactEmail}
               onChange={(e) => onFieldChange('businessContactEmail', e.target.value)}
               placeholder="contact@business.com"
-              className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors"
+              className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#f59e0b]/40 focus:bg-background transition-colors"
             />
           </div>
 

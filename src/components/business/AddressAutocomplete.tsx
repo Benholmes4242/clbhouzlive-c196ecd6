@@ -274,7 +274,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       {showPrecisionWarning && (
         <div className="mt-3 p-3 rounded-sq-sm bg-muted border border-border">
           <div className="flex items-start gap-2">
-            <AlertTriangle className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="h-4 w-4 text-[#f59e0b] flex-shrink-0 mt-0.5" />
             <div className="flex-1">
               <p className="text-sm font-medium text-foreground">That location is too general</p>
               <p className="text-xs text-foreground mt-0.5">
@@ -312,7 +312,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         <button
           type="button"
           onClick={onDropPinClick}
-          className="text-xs text-primary hover:underline mt-1.5 block"
+          className="text-xs text-[#d97706] hover:underline mt-1.5 block"
         >
           Can't find your exact address? Drop a pin
         </button>
@@ -333,7 +333,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
               >
                 <MapPin className={cn(
                   "h-4 w-4 shrink-0 mt-0.5",
-                  isPrecise ? "text-primary" : "text-muted-foreground"
+                  isPrecise ? "text-[#d97706]" : "text-muted-foreground"
                 )} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{result.primary}</p>
@@ -359,7 +359,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
               <button
                 type="button"
                 onClick={onDropPinClick}
-                className="text-primary hover:underline"
+                className="text-[#d97706] hover:underline"
               >
                 drop a pin on the map
               </button>

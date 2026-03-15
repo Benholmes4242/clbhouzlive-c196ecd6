@@ -17,7 +17,10 @@ export function ProfileWizardHeader({ title, currentStep, totalSteps, onBack, on
   return (
     <div
       className="flex items-center justify-between px-4 bg-background border-b border-border"
-      style={{ paddingTop: 'var(--sat)', height: `calc(var(--sat) + 56px)` }}
+      style={{
+        paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+        height: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
+      }}
     >
       <button
         onClick={isFirstStep ? onClose : onBack}

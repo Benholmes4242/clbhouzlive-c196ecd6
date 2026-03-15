@@ -55,7 +55,7 @@ export const PinDropModal: React.FC<PinDropModalProps> = ({
 
     // Create draggable marker
     marker.current = new mapboxgl.Marker({
-      color: 'hsl(var(--primary))',
+      color: 'hsl(38, 92%, 50%)',
       draggable: true,
     })
       .setLngLat([center.lng, center.lat])
@@ -220,7 +220,7 @@ export const PinDropModal: React.FC<PinDropModalProps> = ({
           <button
             type="button"
             onClick={handleCenterOnMe}
-            className="text-xs text-primary hover:underline mt-2 flex items-center gap-1"
+            className="text-xs text-[#d97706] hover:underline mt-2 flex items-center gap-1"
           >
             <Target className="h-3 w-3" />
             Use my current location
@@ -235,7 +235,7 @@ export const PinDropModal: React.FC<PinDropModalProps> = ({
           <div className="flex items-center justify-between gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 text-sm">
-                <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                <MapPin className="h-4 w-4 text-[#f59e0b] flex-shrink-0" />
                 {isReverseGeocoding ? (
                   <span className="text-muted-foreground">Finding address...</span>
                 ) : (
@@ -243,7 +243,7 @@ export const PinDropModal: React.FC<PinDropModalProps> = ({
                 )}
               </div>
             </div>
-            <Button onClick={handleConfirm} disabled={!pinPosition}>
+            <Button onClick={handleConfirm} disabled={!pinPosition} className="bg-[#f59e0b] hover:bg-[#e8920f] text-white border-0">
               Use this location
             </Button>
           </div>

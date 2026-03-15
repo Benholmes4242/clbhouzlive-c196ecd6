@@ -1,3 +1,8 @@
+/**
+ * @deprecated DEAD CODE — replaced by BusinessEditWizard.
+ * The route /business/:id/edit maps to BusinessEditWizard, not this file.
+ * TODO: DELETE this file in a dedicated cleanup pass.
+ */
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';

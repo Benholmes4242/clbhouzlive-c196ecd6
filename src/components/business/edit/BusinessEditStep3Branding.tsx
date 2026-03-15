@@ -72,7 +72,7 @@ export function BusinessEditStep3Branding({
                 fallback={businessName?.[0] || 'B'}
                 size={96}
               />
-              <label className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center cursor-pointer shadow-sm hover:bg-primary/90 transition-colors">
+              <label className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-[#f59e0b] text-white flex items-center justify-center cursor-pointer shadow-sm hover:bg-[#e8920f] transition-colors">
                 <input
                   ref={logoInputRef}
                   type="file"
@@ -154,7 +154,7 @@ export function BusinessEditStep3Branding({
                 </div>
               </div>
             ) : (
-              <div className="aspect-[3.2/1] rounded-xl border-2 border-dashed border-border bg-muted flex flex-col items-center justify-center hover:border-primary/40 hover:bg-primary/5 transition-colors">
+              <div className="aspect-[3.2/1] rounded-xl border-2 border-dashed border-border bg-muted flex flex-col items-center justify-center hover:border-[#f59e0b]/40 hover:bg-[#f59e0b]/5 transition-colors">
                 <div className="w-12 h-12 rounded-full bg-muted border border-border flex items-center justify-center mb-2">
                   <Camera className="w-5 h-5 text-muted-foreground" />
                 </div>
@@ -201,7 +201,7 @@ export function BusinessEditStep3Branding({
             setLogoCropModalOpen(open);
           }}
           imageSrc={selectedLogoImage}
-          aspectRatio={1}
+          aspectRatio={1 / 1.05}
           onCropComplete={(croppedFile) => {
             setPendingLogoFile(croppedFile);
             setPendingRemoveLogo(false);
