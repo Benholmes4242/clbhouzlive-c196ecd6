@@ -233,7 +233,7 @@ export default function AdminV2Sidebar({ role, can, onNavigate }: SidebarProps) 
 
         {/* Dev tools — collapsible */}
         {can.manageAdmins && (
-          <CollapsibleGroup group={toolsGroup} />
+          <CollapsibleGroup group={toolsGroup} onNavigate={onNavigate} />
         )}
       </nav>
 
