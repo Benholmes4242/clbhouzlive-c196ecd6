@@ -234,8 +234,6 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
     // Derive tour slug from event_type or season
     const eventType  = (tournament.event_type || '').toLowerCase();
     const tourName   = (tournament.name       || '').toLowerCase();
-    // Sportradar sets event_type = 'stroke' for all tours — cannot rely on it alone.
-    // Check tournament name and season_id as additional signals.
     const tourSlug =
       tourName.includes('liv golf')                                                     ? 'liv'   :
       tourName.includes('lpga')                                                         ? 'lpga'  :
@@ -247,7 +245,7 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
       eventType.includes('european') || eventType.includes('dp')                       ? 'euro'  :
       eventType.includes('lpga')                                                        ? 'lpga'  :
       eventType.includes('champions')                                                   ? 'champ' :
-      'pga'; // genuine fallback — only after all name and event_type checks fail
+      'pga';
     
     const estimatedRound = (tournament as any).current_round
       ?? (tournament.cut_round ? Math.min(tournament.cut_round, 4) : 1);
@@ -258,6 +256,29 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
       chasePack, 
       volatility
     );
+
+    // Fetch leader scorecard stats
+    let leaderStats: LiveArenaTournament['leaderStats'] = null;
+    if (leader) {
+      const { data: scorecardData } = await supabase
+        .from('sr_scorecards')
+        .select('birdies, eagles, bogeys, pars, round_score, round_number')
+        .eq('tournament_id', tournament.id)
+        .eq('player_id', leader.playerId)
+        .order('round_number', { ascending: true });
+
+      if (scorecardData && scorecardData.length > 0) {
+        leaderStats = {
+          totalBirdies: scorecardData.reduce((sum, r) => sum + (r.birdies ?? 0), 0),
+          totalEagles:  scorecardData.reduce((sum, r) => sum + (r.eagles  ?? 0), 0),
+          totalBogeys:  scorecardData.reduce((sum, r) => sum + (r.bogeys  ?? 0), 0),
+          totalPars:    scorecardData.reduce((sum, r) => sum + (r.pars    ?? 0), 0),
+          rounds:       [1, 2, 3, 4].map(n =>
+            scorecardData.find(r => r.round_number === n)?.round_score ?? null
+          ),
+        };
+      }
+    }
 
     results.push({
       id: tournament.id,
@@ -279,6 +300,7 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
       volatilityIndex: volatility,
       scoreSpread,
       momentumTags,
+      leaderStats,
     });
   }
 
