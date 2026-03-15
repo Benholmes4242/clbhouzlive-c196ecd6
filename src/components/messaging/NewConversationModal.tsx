@@ -464,7 +464,7 @@ export function NewConversationModal({
                         onClick={() => handleRemoveUser(userProfile.id)}
                         className="ml-1 p-0.5 rounded-full hover:bg-[hsl(38,92%,50%)]/10"
                       >
-                        <X className="h-3 w-3 text-primary" />
+                        <X className="h-3 w-3 text-[hsl(35,80%,43%)]" />
                       </button>
                     </Badge>
                   ))}
