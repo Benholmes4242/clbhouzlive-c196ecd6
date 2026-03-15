@@ -108,24 +108,36 @@ export default function TourPlayersPage() {
   const handleSyncAllTours = async () => {
     if (syncingAllTours) return;
     setSyncingAllTours(true);
-    let successCount = 0;
+    const results: { tour: string; ok: boolean; message?: string }[] = [];
 
     for (const tourId of ALL_TOUR_IDS) {
       setSyncProgress(TOUR_SYNC_LABELS[tourId]);
       try {
-        const { error } = await supabase.functions.invoke('sportradar-sync', {
+        const { data, error } = await supabase.functions.invoke('sportradar-sync', {
           body: { action: 'players', tourId, year: 2026, seasonYear: 2026, roundType: 'stroke' },
         });
-        if (!error) successCount++;
-      } catch (e) {
-        console.error(`[SyncAllTours] Failed for ${tourId}:`, e);
+        if (error) throw new Error(error.message);
+        if (data?.error) throw new Error(data.error);
+        results.push({ tour: TOUR_SYNC_LABELS[tourId], ok: true, message: data?.message });
+      } catch (e: any) {
+        console.error(`[SyncAllTours] ${tourId} failed:`, e.message);
+        results.push({ tour: TOUR_SYNC_LABELS[tourId], ok: false, message: e.message });
       }
     }
 
     setSyncingAllTours(false);
     setSyncProgress('');
     queryClient.invalidateQueries({ queryKey: ['admin-v2', 'tour', 'players'] });
-    toast.success(`Player sync complete across ${successCount}/6 tours`);
+
+    const succeeded = results.filter(r => r.ok).map(r => r.tour);
+    const failed = results.filter(r => !r.ok).map(r => r.tour);
+
+    if (failed.length === 0) {
+      toast.success('All 6 tours synced successfully');
+    } else {
+      if (succeeded.length > 0) toast.success(`${succeeded.length}/6 tours synced: ${succeeded.join(', ')}`);
+      toast.error(`Failed: ${failed.join(', ')} — check console for details`);
+    }
   };
 
   /* ── Data fetch ──────────────────────────────────────── */
