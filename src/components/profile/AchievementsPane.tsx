@@ -824,13 +824,13 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 {/* Mobile Progress Ring - Left Side */}
                 <div className="relative flex-shrink-0">
                   <div className="relative w-32 h-32">
-                    <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 128 128" style={{ filter: 'blur(1px) drop-shadow(0 0 15px #10B98160)' }}>
+                    <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 128 128" style={{ filter: 'blur(1px) drop-shadow(0 0 15px rgba(245,158,11,0.4))' }}>
                       {/* Gradient definition */}
                       <defs>
-                        <linearGradient id="greenProgressGradientMobile" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#10B981" />
-                          <stop offset="50%" stopColor="#34D399" />
-                          <stop offset="100%" stopColor="#6EE7B7" />
+                        <linearGradient id="amberProgressGradientMobile" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#f59e0b" />
+                          <stop offset="50%" stopColor="#fbbf24" />
+                          <stop offset="100%" stopColor="#fcd34d" />
                         </linearGradient>
                       </defs>
                       
