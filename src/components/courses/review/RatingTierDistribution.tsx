@@ -57,9 +57,6 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
       {distributionItems.map((item) => {
         const percentage = (item.count / maxCount) * 100;
         const hasCount = item.count > 0;
-        
-        // Use per-tier color from the central theme system
-        const barColor = hasCount ? item.color : EMPTY_COLOR;
 
         return (
           <div key={item.key} className="flex items-center gap-2">
@@ -74,7 +71,9 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
                 className="h-full rounded-full transition-all duration-300"
                 style={{
                   width: `${percentage}%`,
-                  backgroundColor: barColor,
+                  background: hasCount
+                    ? 'linear-gradient(to right, #f59e0b, #fbbf24)'
+                    : '#f3f4f6',
                 }}
               />
             </div>
