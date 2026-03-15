@@ -449,9 +449,9 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
             {isAdmin && (
               <button
                 onClick={() => setIsAddMembersOpen(true)}
-              className="flex items-center gap-1 text-[13px] font-semibold active:opacity-70 transition-opacity text-primary"
+              className="flex items-center gap-1 text-[13px] font-semibold active:opacity-70 transition-opacity text-[hsl(35,80%,43%)]"
             >
-              <UserPlus size={14} className="text-primary" />
+              <UserPlus size={14} className="text-[hsl(35,80%,43%)]" />
                 Add
               </button>
             )}
