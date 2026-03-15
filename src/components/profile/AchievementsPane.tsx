@@ -762,7 +762,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       <div className="text-5xl font-bold text-foreground mb-3">
                         {totalXP.toLocaleString()} XP
                       </div>
-                      <div className="text-base font-medium text-center leading-tight max-w-[200px] text-green-500">
+                      <div className="text-base font-medium text-center leading-tight max-w-[200px] text-[#d97706]">
                         {(nextTier.minXP - totalXP).toLocaleString()} XP remaining to unlock your {nextTier.name.split(' ')[0].toLowerCase()} ring
                       </div>
                     </div>
