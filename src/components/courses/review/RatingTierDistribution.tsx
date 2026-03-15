@@ -66,7 +66,7 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
             </span>
 
             {/* Bar track */}
-            <div className="flex-1 h-[6px] rounded-full overflow-hidden" style={{ background: 'rgba(245,158,11,0.1)' }}>
+            <div className="flex-1 h-[6px] rounded-full overflow-hidden" style={{ background: 'rgba(245,158,11,0.06)' }}>
               <div
                 className="h-full rounded-full transition-all duration-300"
                 style={{
