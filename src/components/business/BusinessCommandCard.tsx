@@ -195,7 +195,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
 
             {/* Pending verification subtext */}
             {verificationState === 'pending' && (
-              <p className="text-[12px] text-primary/70 mt-1">
+              <p className="text-[12px] text-[hsl(35,80%,43%)]/70 mt-1">
                 {needsDomainVerification ? 'Action required: verify your domain' : 'Pending verification'}
               </p>
             )}
