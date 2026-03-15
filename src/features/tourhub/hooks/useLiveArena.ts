@@ -26,6 +26,8 @@ export interface LiveArenaPlayer {
     lastName: string;
     fullName: string;
     photoUrl: string | null;
+    headshotOverride: string | null;
+    tourCode: string | null;
     country: string | null;
   };
 }
