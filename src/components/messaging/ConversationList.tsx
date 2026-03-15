@@ -113,8 +113,8 @@ function ConversationSkeleton() {
 function EmptyState({ onNewConversation }: { onNewConversation?: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
-      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-        <MessageCircle className="h-8 w-8 text-primary/50" />
+      <div className="w-16 h-16 rounded-full bg-[hsl(38,92%,50%)]/10 flex items-center justify-center mb-4">
+        <MessageCircle className="h-8 w-8 text-[hsl(38,92%,50%)]/50" />
       </div>
       <h3 className="font-semibold text-foreground text-lg mb-1">No messages yet</h3>
       <p className="text-sm text-muted-foreground mb-6 max-w-[240px]">
