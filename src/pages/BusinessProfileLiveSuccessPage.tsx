@@ -39,7 +39,7 @@ const BusinessProfileLiveSuccessPage = () => {
     } else if (businessId) {
       navigate(`/business/${businessId}`);
     } else {
-      navigate('/business/manage');
+      navigate('/businesses/manage');
     }
   };
 
