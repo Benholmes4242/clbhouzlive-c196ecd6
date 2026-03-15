@@ -183,7 +183,7 @@ const Top100CoursesHubPanel = () => {
           totalCoursesInStartedLists={totalCoursesInStartedLists}
           listCount={listsCount}
         />
-      )}
+        </div>
 
       {/* Controls Section - sticky search + filters */}
       <div
