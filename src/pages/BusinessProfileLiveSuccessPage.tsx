@@ -20,7 +20,7 @@ const BusinessProfileLiveSuccessPage = () => {
 
   // If no state, redirect to manage page
   if (!state?.businessId) {
-    navigate('/business/manage', { replace: true });
+    navigate('/businesses/manage', { replace: true });
     return null;
   }
 
