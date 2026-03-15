@@ -283,7 +283,7 @@ const BusinessInsightsPageV2 = () => {
                 className={cn(
                   "px-3 md:px-4 py-1.5 text-[0.8rem] rounded-full transition-colors",
                   dateRange === range 
-                    ? "bg-primary text-primary-foreground font-medium" 
+                    ? "bg-[hsl(38,92%,50%)] text-white font-medium" 
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
