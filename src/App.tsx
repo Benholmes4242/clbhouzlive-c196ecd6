@@ -74,8 +74,7 @@ import { useCourseRatingsRealtime } from '@/hooks/useCourseRatingsRealtime';
 
 
 
-// Lazy-load ProfilePage and Discover for smaller initial bundle
-const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+// Lazy-load Discover for smaller initial bundle
 const Discover = lazy(() => import("./pages/Discover"));
 import ErrorLogPage from "./pages/ErrorLogPage";
 import { HeaderProvider } from '@/contexts/GlobalHeaderContext';
@@ -100,7 +99,7 @@ const Signup = lazy(() => import("./pages/Signup"));
 const Clubhouse = lazy(() => import("./pages/Clubhouse"));
 const WatchPage = lazy(() => import("./pages/WatchPage"));
 const AccountTypeOnboarding = lazy(() => import("./pages/onboarding/AccountTypeOnboarding"));
-const ProfileTestPage = lazy(() => import("./pages/ProfileTestPage"));
+
 
 const EditProfilePage = lazy(() => import("./pages/EditProfilePage"));
 const ProfileHandicapView = lazy(() => import("./pages/ProfileHandicapView"));
@@ -285,7 +284,7 @@ function AppRoutes() {
         <Route path="/profile/quest/index" element={<Suspense fallback={<ProfileSkeleton />}><QuestIndexView /></Suspense>} />
         <Route path="/profile/quest/replay" element={<Navigate to="/achievements" replace />} />
         <Route path="/edit-profile" element={<Suspense fallback={<ProfileSkeleton />}><EditProfilePage /></Suspense>} />
-        <Route path="/profile-test" element={<Suspense fallback={<ProfileSkeleton />}><ProfileTestPage /></Suspense>} />
+        
         
         <Route path="/profile/:username" element={<ProfileWrapped />} />
         <Route path="/profile/:username/reviews" element={<Suspense fallback={<ProfileSkeleton />}><UserReviewsPage /></Suspense>} />

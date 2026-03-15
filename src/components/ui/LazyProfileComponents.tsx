@@ -6,7 +6,7 @@ export const LazyPostsTabContent = lazy(() => import('@/components/posts-tab/Pos
 export const LazyProfileCoursesTab = lazy(() => 
   import('@/components/profile/ProfileCoursesTab').then(m => ({ default: m.ProfileCoursesTab }))
 );
-export const LazyAchievementsPane = lazy(() => import('@/components/profile/AchievementsPane'));
+
 export const LazyHandicapSection = lazy(() => import('@/components/profile/HandicapSection'));
 export const LazyProfileSectionCarousel = lazy(() => import('@/components/profile/ProfileSectionCarousel'));
 export const LazyLatestHighlights = lazy(() => import('@/components/courses/highlights/LatestHighlights'));
