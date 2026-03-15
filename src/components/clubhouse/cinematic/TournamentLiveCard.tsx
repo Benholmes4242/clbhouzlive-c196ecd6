@@ -112,8 +112,8 @@ function LeaderPhoto({ src, name }: { src: string | null; name: string }) {
   );
 }
 
-// ─── Podium avatar (squircle) ─────────────────────────────────────────────────
-function PodiumAvatar({ name, photoUrl, tourSlug, size = 44 }: {
+// ─── Row avatar (squircle, used by 2nd/3rd rows) ─────────────────────────────
+function RowAvatar({ name, photoUrl, tourSlug, size = 32 }: {
   name: string; photoUrl: string | null; tourSlug: string; size?: number;
 }) {
   const src = photoUrl || getPlayerHeadshotUrl(name, tourSlug) || null;
@@ -129,98 +129,19 @@ function PodiumAvatar({ name, photoUrl, tourSlug, size = 44 }: {
   );
 }
 
-// ─── Podium trio (static, no scroll) ──────────────────────────────────────────
-function PodiumTrio({ entries, tourSlug }: {
-  entries: LiveLeaderboardEntry[];
-  tourSlug: string;
-}) {
-  const first  = entries[0];
-  const second = entries[1];
-  const third  = entries[2];
-  if (!first) return null;
-
-  const medals       = ['', '🥇', '🥈', '🥉'];
-  const scoreColors  = ['', '#F59E0B', '#94A3B8', '#CD7C2F'];
-  const platforms    = [0, 44, 28, 18]; // unused[0], 1st, 2nd, 3rd
-  const avatarSizes  = [0, 52, 44, 40];
-
-  const Slot = ({ entry, rank }: { entry?: LiveLeaderboardEntry; rank: 1 | 2 | 3 }) => {
-    const isWinner = rank === 1;
-    const size = avatarSizes[rank];
-    const platform = platforms[rank];
-
-    return (
-      <div style={{
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-        flex: 1, gap: 3, alignSelf: 'flex-end',
-      }}>
-        <span style={{ fontSize: isWinner ? 18 : 14, marginBottom: 2 }}>{medals[rank]}</span>
-
-        {/* Avatar */}
-        <div style={{
-          width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
-          border: `2px solid ${isWinner ? 'rgba(245,158,11,0.8)' : 'rgba(255,255,255,0.15)'}`,
-          boxShadow: isWinner ? '0 0 20px rgba(245,158,11,0.4), 0 0 40px rgba(245,158,11,0.15)' : 'none',
-          background: 'rgba(255,255,255,0.05)',
-        }}>
-          {entry ? (
-            <PodiumAvatar name={entry.playerName} photoUrl={entry.photoUrl} tourSlug={tourSlug} size={size} />
-          ) : (
-            <div style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.05)' }} />
-          )}
-        </div>
-
-        {/* Last name only */}
-        <span style={{
-          fontSize: isWinner ? 11 : 10, fontWeight: 700,
-          color: 'rgba(255,255,255,0.85)', textAlign: 'center',
-          maxWidth: size + 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-        }}>
-          {entry ? entry.playerName.split(' ').slice(-1)[0] : '—'}
-        </span>
-
-        {/* Score */}
-        <span style={{ fontSize: isWinner ? 14 : 12, fontWeight: 800, color: scoreColors[rank] }}>
-          {entry?.scoreDisplay || '—'}
-        </span>
-
-        {/* Thru */}
-        <span style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.35)' }}>
-          {entry?.thru ? `Thru ${entry.thru}` : ''}
-        </span>
-
-        {/* Platform block */}
-        <div style={{
-          width: '85%', height: platform, borderRadius: '6px 6px 0 0',
-          background: isWinner
-            ? 'linear-gradient(180deg, rgba(245,158,11,0.3) 0%, rgba(245,158,11,0.08) 100%)'
-            : 'rgba(255,255,255,0.06)',
-          border: `1px solid ${isWinner ? 'rgba(245,158,11,0.25)' : 'rgba(255,255,255,0.08)'}`,
-          borderBottom: 'none', marginTop: 4,
-        }} />
-      </div>
-    );
-  };
-
+// ─── Performance chip ─────────────────────────────────────────────────────────
+function PerfChip({ value, label, suffix }: { value: string | null; label: string; suffix: string }) {
   return (
     <div style={{
-      padding: '14px 16px 0',
-      borderTop: '1px solid rgba(255,255,255,0.07)',
-      touchAction: 'none',
+      borderRadius: 12, padding: '10px 0',
+      background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+      opacity: value === null ? 0.4 : 1,
     }}>
-      <div style={{
-        fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.3)',
-        letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 10,
-      }}>
-        Top 3
-      </div>
-
-      {/* Order: 2nd | 1st | 3rd */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4 }}>
-        <Slot entry={second} rank={2} />
-        <Slot entry={first}  rank={1} />
-        <Slot entry={third}  rank={3} />
-      </div>
+      <span style={{ fontSize: 'clamp(12px, 3.8vw, 15px)', fontWeight: 800, color: 'rgba(255,255,255,0.9)', lineHeight: 1 }}>
+        {value === null ? '—' : <>{value}{suffix && <span style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>{suffix}</span>}</>}
+      </span>
+      <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: 0.8, textTransform: 'uppercase' }}>{label}</span>
     </div>
   );
 }
