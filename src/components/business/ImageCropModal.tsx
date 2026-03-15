@@ -163,7 +163,7 @@ export function ImageCropModal({
             crop={crop}
             zoom={zoom}
             aspect={aspectRatio}
-            cropShape={isLogo ? 'round' : 'rect'}
+            cropShape="rect"
             showGrid={!isLogo}
             onCropChange={setCrop}
             onCropComplete={onCropCompleteInternal}
