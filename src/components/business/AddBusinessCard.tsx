@@ -17,8 +17,8 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
         className="flex flex-col items-center justify-center py-20 px-6 text-center"
       >
         {/* Icon */}
-        <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-5">
-          <Building2 className="w-8 h-8 text-primary" />
+        <div className="w-16 h-16 rounded-2xl bg-[hsl(38,92%,50%)]/10 flex items-center justify-center mb-5">
+          <Building2 className="w-8 h-8 text-[hsl(38,92%,50%)]" />
         </div>
 
         <h2 className="text-[18px] font-bold text-foreground mb-2">
