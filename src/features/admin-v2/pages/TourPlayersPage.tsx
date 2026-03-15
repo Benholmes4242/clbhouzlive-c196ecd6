@@ -311,9 +311,14 @@ export default function TourPlayersPage() {
         title="Tour Players"
         description="Sportradar player database"
         action={
-          <AdminButton variant="outline" icon={RefreshCw} size="sm" loading={isLoading} onClick={() => refetch()}>
-            Refresh
-          </AdminButton>
+          <div className="flex items-center gap-2">
+            <AdminButton variant="outline" icon={RefreshCw} size="sm" loading={isLoading} onClick={() => refetch()}>
+              Refresh
+            </AdminButton>
+            <AdminButton variant="primary" icon={Zap} size="sm" disabled={syncingAllTours} onClick={handleSyncAllTours}>
+              {syncingAllTours ? <><span className="animate-pulse">{syncProgress}…</span></> : 'Sync All Tours'}
+            </AdminButton>
+          </div>
         }
       />
 
