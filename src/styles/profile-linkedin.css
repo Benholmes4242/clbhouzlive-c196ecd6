@@ -16,9 +16,8 @@
   --pf-text-secondary: #5E666D;
   --pf-text-tertiary: #97A1AA;
   
-  /* Accent colors */
-  --pf-accent-blue: #0A66C2;
-  --pf-accent-orange: #F7931E;
+  /* Accent colors — amber unified (Gap 9) */
+  --pf-accent-amber: #d97706;
   
   /* Card surfaces */
   --pf-card-bg: #FFFFFF;
@@ -31,7 +30,7 @@
   --pf-pill-border: rgba(15, 15, 15, 0.08);
   
   /* Buttons */
-  --pf-btn-primary-bg: var(--pf-accent-blue);
+  --pf-btn-primary-bg: #0A66C2;
   --pf-btn-primary-text: #FFFFFF;
   --pf-btn-secondary-bg: #FFFFFF;
   --pf-btn-secondary-border: rgba(15, 15, 15, 0.15);
@@ -127,16 +126,17 @@
   color: var(--pf-text-secondary);
 }
 
+/* Gap 5: HCP pill — amber instead of grey */
 .profile-linkedin .pf-hcp-pill {
   display: inline-flex;
   align-items: center;
   padding: 6px 10px;
   border-radius: 999px;
-  background: var(--pf-pill-bg);
-  border: 1px solid var(--pf-pill-border);
+  background: rgba(245, 166, 35, 0.12);
+  border: 1px solid rgba(245, 166, 35, 0.25);
   font-size: 13px;
   font-weight: 700;
-  color: var(--pf-text-primary);
+  color: #d97706;
 }
 
 /* ========================================
@@ -298,10 +298,11 @@
   color: var(--pf-text-primary);
 }
 
+/* Gap 9: section links use amber */
 .profile-linkedin .pf-section-link {
   font-size: 14px;
   font-weight: 500;
-  color: var(--pf-accent-blue);
+  color: var(--pf-accent-amber);
   cursor: pointer;
 }
 
@@ -327,11 +328,12 @@
   -webkit-line-clamp: unset;
 }
 
+/* Gap 9: see more uses amber */
 .profile-linkedin .pf-see-more {
   margin-top: 8px;
   font-size: 14px;
   font-weight: 500;
-  color: var(--pf-accent-blue);
+  color: var(--pf-accent-amber);
   cursor: pointer;
   background: none;
   border: none;
@@ -424,16 +426,16 @@
   color: var(--pf-text-secondary);
 }
 
-.profile-linkedin .pf-achievement-status {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 8px;
-  border-radius: 999px;
-  background: rgba(110, 146, 119, 0.12);
-  color: #4A6B50;
-  font-size: 11px;
-  font-weight: 500;
-  margin-top: auto;
+/* Gap 12: right-edge fade for achievements scroll */
+.profile-linkedin .pf-scroll-fade-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 40px;
+  background: linear-gradient(to right, rgba(255,255,255,0), #fff);
+  pointer-events: none;
+  border-radius: 0 12px 12px 0;
 }
 
 /* ========================================
@@ -464,9 +466,12 @@
   color: var(--pf-text-primary);
 }
 
+/* Gap 10: active tab — white pill with shadow instead of near-invisible grey */
 .profile-linkedin .pf-tab.active {
-  background: rgba(15, 15, 15, 0.06);
+  background: #fff;
   color: var(--pf-text-primary);
+  box-shadow: 0 2px 8px rgba(15, 15, 15, 0.08);
+  font-weight: 600;
 }
 
 /* ========================================
@@ -482,12 +487,14 @@
   display: flex;
   justify-content: space-between;
   padding: 16px;
-  padding-top: max(env(safe-area-inset-top), 16px);
+  /* Gap 1: 47px minimum fallback for safe area */
+  padding-top: max(env(safe-area-inset-top, 0px), 47px);
 }
 
+/* Gap 2: 44×44 tap target */
 .profile-linkedin .pf-nav-btn {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
