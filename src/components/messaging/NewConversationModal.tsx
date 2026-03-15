@@ -235,9 +235,9 @@ export function NewConversationModal({
         }
       }}
       className={cn(
-        "w-full flex items-center gap-3 px-4 py-3 transition-colors text-left active:bg-primary/10 border-b border-border/30",
+        "w-full flex items-center gap-3 px-4 py-3 transition-colors text-left active:bg-[hsl(38,92%,50%)]/10 border-b border-border/30",
         isLoading && "opacity-50 pointer-events-none",
-        isSelected && "bg-primary/5"
+        isSelected && "bg-[hsl(38,92%,50%)]/5"
       )}
     >
       {showCheckbox && (
