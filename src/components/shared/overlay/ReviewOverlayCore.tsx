@@ -242,7 +242,7 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
               WebkitBackdropFilter: 'blur(16px) saturate(150%)',
               padding: '12px 16px',
               borderRadius: '0.75rem',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(210, 180, 97, 0.3)',
             }}
           >
             {/* ROW 1: Course Name + Rating Number (compact) */}
