@@ -409,7 +409,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
       {/* ══ ZONE 2: VOLATILITY BANNER (conditional) ══ */}
       {volatilityBanner && (
         <div style={{
-          padding: '8px 18px',
+          padding: '8px max(10px, 3vw)',
           borderTop: '1px solid hsl(var(--accent-amber) / 0.12)',
           borderBottom: '1px solid hsl(var(--accent-amber) / 0.12)',
           background: 'hsl(var(--accent-amber) / 0.05)',
