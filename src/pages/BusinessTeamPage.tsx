@@ -254,7 +254,7 @@ export default function BusinessTeamPage() {
         {/* Invite CTA */}
         {canManage && (
           <Button 
-            className="w-full" 
+            className="w-full bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0" 
             onClick={() => navigate(`/business/${businessId}/team/invite`)}
           >
             <Plus className="h-4 w-4 mr-2" />

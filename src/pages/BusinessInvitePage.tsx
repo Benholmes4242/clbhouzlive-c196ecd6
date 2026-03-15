@@ -123,7 +123,7 @@ export default function BusinessInvitePage() {
           </Button>
           <Button
             type="submit"
-            className="flex-1"
+            className="flex-1 bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0"
             disabled={!email.trim() || createInvite.isPending}
           >
             {createInvite.isPending ? 'Sending...' : 'Send invite'}
