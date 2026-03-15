@@ -246,12 +246,12 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
           initial={{ scaleX: 0, opacity: 0 }}
           animate={{ scaleX: 1, opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="absolute top-0 left-0 right-0 h-px origin-left"
-          style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(245,158,11,0.8) 30%, rgba(245,158,11,1) 50%, rgba(245,158,11,0.8) 70%, transparent 100%)' }}
+          className="absolute left-0 right-0 h-px origin-left"
+          style={{ top: 'max(env(safe-area-inset-top, 0px), 47px)', background: 'linear-gradient(90deg, transparent 0%, rgba(245,158,11,0.8) 30%, rgba(245,158,11,1) 50%, rgba(245,158,11,0.8) 70%, transparent 100%)' }}
         />
 
         {/* Drag handle */}
-        <div className="flex justify-center shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)', marginTop: 10 }}>
+        <div className="flex justify-center shrink-0" style={{ paddingTop: 8 }}>
           <motion.div
             initial={{ scaleX: 0.3, opacity: 0 }}
             animate={{ scaleX: 1, opacity: 1 }}
