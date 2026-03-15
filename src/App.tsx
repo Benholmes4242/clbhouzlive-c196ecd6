@@ -99,7 +99,7 @@ const Signup = lazy(() => import("./pages/Signup"));
 const Clubhouse = lazy(() => import("./pages/Clubhouse"));
 const WatchPage = lazy(() => import("./pages/WatchPage"));
 const AccountTypeOnboarding = lazy(() => import("./pages/onboarding/AccountTypeOnboarding"));
-const ProfileTestPage = lazy(() => import("./pages/ProfileTestPage"));
+
 
 const EditProfilePage = lazy(() => import("./pages/EditProfilePage"));
 const ProfileHandicapView = lazy(() => import("./pages/ProfileHandicapView"));
