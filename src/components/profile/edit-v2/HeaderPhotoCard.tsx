@@ -10,8 +10,8 @@ interface HeaderPhotoCardProps {
   onRemove?: () => void;
 }
 
-// Header aspect ratio: full width x 200px height (4:1 ratio for mobile, 1600×400px recommended)
-const HEADER_ASPECT_RATIO = 4 / 1;
+// Matches profile hero: full-width × clamp(200px, 28vw, 280px). ~2:1 on mobile.
+const HEADER_ASPECT_RATIO = 2 / 1;
 
 export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
   currentUrl,
