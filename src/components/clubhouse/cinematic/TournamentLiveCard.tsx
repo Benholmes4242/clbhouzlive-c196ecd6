@@ -523,7 +523,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           </div>
 
           {/* Rows */}
-          {meta.leaderboard.slice(0, 6).map((entry) => (
+          {meta.leaderboard.slice(0, 4).map((entry) => (
             <LeaderboardRow
               key={entry.playerId}
               entry={entry}
