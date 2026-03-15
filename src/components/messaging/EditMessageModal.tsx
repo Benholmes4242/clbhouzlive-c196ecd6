@@ -68,7 +68,7 @@ export function EditMessageModal({
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Edit your message..."
-            className="min-h-[100px] resize-none rounded-2xl border-border focus:border-primary/40 focus:ring-primary/20"
+            className="min-h-[100px] resize-none rounded-2xl border-border focus:border-[hsl(38,92%,50%)]/40 focus:ring-[hsl(38,92%,50%)]/20"
             autoFocus
           />
 
