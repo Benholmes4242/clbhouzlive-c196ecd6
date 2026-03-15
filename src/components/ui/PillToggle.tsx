@@ -12,6 +12,7 @@ interface PillToggleProps {
   onSelect: (id: string) => void;
   size?: 'default' | 'small';
   className?: string;
+  activeColor?: string;
 }
 
 /**
