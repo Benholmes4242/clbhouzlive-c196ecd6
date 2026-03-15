@@ -118,14 +118,32 @@ function RowAvatar({ name, photoUrl, tourSlug, size = 32 }: {
 }) {
   const src = photoUrl || getPlayerHeadshotUrl(name, tourSlug) || null;
   const initials = name.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() ?? '').slice(0, 2).join('');
+  const heightBoosted = Math.round(size * 1.14);
   return (
-    <SquircleAvatar
-      src={src}
-      alt={name}
-      size={size}
-      fallback={initials}
-      hideRing
-    />
+    <div style={{
+      width: size, height: heightBoosted, borderRadius: '22%', overflow: 'hidden',
+      background: 'rgba(255,255,255,0.06)', flexShrink: 0,
+    }}>
+      {src ? (
+        <img
+          src={src}
+          alt={name}
+          style={{
+            width: '100%', height: '100%',
+            objectFit: 'cover', objectPosition: 'center 15%',
+          }}
+          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+        />
+      ) : (
+        <div style={{
+          width: '100%', height: '100%',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: size * 0.36, fontWeight: 700, color: 'rgba(255,255,255,0.4)',
+        }}>
+          {initials}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -527,9 +545,10 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           {/* Like */}
           <button onClick={handleLike} style={{
             display: 'flex', alignItems: 'center', gap: 4,
-            background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer',
-            borderRadius: 20, padding: '8px 14px',
-            fontSize: 14, color: isLiked ? '#F87171' : 'rgba(255,255,255,0.7)',
+            background: isLiked ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.07)',
+            border: `1px solid ${isLiked ? 'rgba(245,158,11,0.45)' : 'rgba(255,255,255,0.12)'}`,
+            cursor: 'pointer', borderRadius: 20, padding: '8px 14px',
+            fontSize: 14, color: isLiked ? '#F59E0B' : 'rgba(255,255,255,0.7)',
             animation: heartPopping ? 'trlive-heartPop 0.4s ease-out' : undefined,
           }}>
             <span style={{ fontSize: 16 }}>
@@ -557,7 +576,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           {/* Leaderboard link */}
           <button onClick={handleWatchLive} style={{
             background: 'transparent', border: 'none',
-            color: '#F97316', fontSize: 12, fontWeight: 700,
+            color: '#F59E0B', fontSize: 12, fontWeight: 700,
             whiteSpace: 'nowrap', cursor: 'pointer', padding: '8px 4px',
             flexShrink: 0,
           }}>
