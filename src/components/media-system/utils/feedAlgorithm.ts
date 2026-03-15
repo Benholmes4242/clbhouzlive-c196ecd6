@@ -89,20 +89,12 @@ export function injectLiveTournamentCards(
 
   if (!newLivePosts.length) return filtered;
 
-  // Step 3 — sort live posts by tour priority before interleaving
-  newLivePosts.sort((a, b) => {
-    const aPriority = (a as any).liveMeta?.tourPriority ?? 99;
-    const bPriority = (b as any).liveMeta?.tourPriority ?? 99;
-    return aPriority - bPriority;
-  });
-
-  // Step 4 — interleave tournament cards at position 4 within every 10-post block.
-  // Pattern: slots 4, 14, 24, 34...
+  // Step 3 — build regular and tournament arrays from filtered posts
   const BLOCK_SIZE        = 10;
   const SLOT_WITHIN_BLOCK = 4;
 
   const regular: FeedPost[]    = [];
-  const tournament: FeedPost[] = [...newLivePosts];
+  const tournament: FeedPost[] = [];
 
   for (const post of filtered) {
     if (post.postType === 'tournament_result' || post.postType === 'tournament_live') {
@@ -111,6 +103,20 @@ export function injectLiveTournamentCards(
       regular.push(post);
     }
   }
+
+  // Merge new live posts and existing tournament posts into one array,
+  // then sort the whole thing by priority so PGA always beats LIV
+  // regardless of which render cycle each card was first seen in.
+  tournament.push(...newLivePosts);
+  tournament.sort((a, b) => {
+    const aPriority = (a as any).liveMeta?.tourPriority
+      ?? (a as any).tournamentMeta?.tour_priority
+      ?? 99;
+    const bPriority = (b as any).liveMeta?.tourPriority
+      ?? (b as any).tournamentMeta?.tour_priority
+      ?? 99;
+    return aPriority - bPriority;
+  });
 
   const result: FeedPost[] = [];
   let regularIdx    = 0;
