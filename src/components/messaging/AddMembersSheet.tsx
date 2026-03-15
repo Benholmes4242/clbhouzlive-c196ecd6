@@ -135,7 +135,7 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
                 <span>{user.display_name || user.username}</span>
                 <button 
                   onClick={() => toggleUser(user)}
-                  className="hover:text-primary/80"
+                  className="hover:text-[hsl(35,80%,43%)]/80"
                 >
                   ×
                 </button>
