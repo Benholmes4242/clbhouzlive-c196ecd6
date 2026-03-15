@@ -138,6 +138,13 @@ export interface TournamentLiveMeta {
   leaderboard:    LiveLeaderboardEntry[];
   lastUpdated:    string;
   tourPriority:   number;
+  leaderStats: {
+    totalBirdies: number;
+    totalEagles:  number;
+    totalBogeys:  number;
+    totalPars:    number;
+    rounds:       (number | null)[];
+  } | null;
 }
 
 /** Live tournament feed post — client-side synthetic, never stored in DB */

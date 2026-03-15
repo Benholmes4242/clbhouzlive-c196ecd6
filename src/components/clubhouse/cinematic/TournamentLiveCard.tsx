@@ -28,10 +28,7 @@ function ensureKeyframes() {
 }
 
 // ─── Score colour helper ──────────────────────────────────────────────────────
-function scoreColor(display: string): string {
-  if (!display || display === 'E') return 'rgba(255,255,255,0.9)';
-  if (display.startsWith('-')) return '#34D399';
-  if (display.startsWith('+')) return '#F87171';
+function scoreColor(_display: string): string {
   return 'rgba(255,255,255,0.9)';
 }
 
@@ -41,6 +38,43 @@ function roundLabel(round: number, total: number): string {
   if (round === 3)     return 'Moving Day';
   if (round === 2)     return 'Cut Day';
   return `Round ${round}`;
+}
+
+// ─── Round chip (for leader stats strip) ──────────────────────────────────────
+function RoundChip({ round, score }: { round: number; score: number | null }) {
+  const display = score == null ? '—'
+    : score > 0 ? `+${score}`
+    : score === 0 ? 'E'
+    : `${score}`;
+  return (
+    <div style={{
+      flex: 1, padding: '7px 4px',
+      background: 'rgba(255,255,255,0.03)',
+      border: '1px solid rgba(255,255,255,0.07)',
+      borderRadius: 10,
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+    }}>
+      <span style={{ fontSize: 14, fontWeight: 800, color: 'rgba(255,255,255,0.85)', lineHeight: 1 }}>{display}</span>
+      <span style={{ fontSize: 8.5, fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: 0.6, textTransform: 'uppercase' }}>R{round}</span>
+    </div>
+  );
+}
+
+// ─── Live stat chip (for leader stats strip) ─────────────────────────────────
+function LiveStatChip({ value, label, color, bg, border }: {
+  value: number; label: string; color: string; bg: string; border: string;
+}) {
+  return (
+    <div style={{
+      flex: 1, padding: '7px 4px',
+      background: bg, border: `1px solid ${border}`,
+      borderRadius: 10,
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+    }}>
+      <span style={{ fontSize: 15, fontWeight: 800, color, lineHeight: 1 }}>{value}</span>
+      <span style={{ fontSize: 8.5, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: 0.6, textTransform: 'uppercase' }}>{label}</span>
+    </div>
+  );
 }
 
 // ─── Leader photo ─────────────────────────────────────────────────────────────
@@ -282,17 +316,19 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           padding: '52px 16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           animation: 'trlive-fadeIn 0.4s ease-out',
         }}>
-          {/* LIVE pill */}
+          {/* LIVE pill — green */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: 6,
-            background: 'rgba(239,68,68,0.85)', backdropFilter: 'blur(8px)',
+            background: 'rgba(34,197,94,0.15)', backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(34,197,94,0.40)',
             padding: '5px 12px', borderRadius: 20,
-            fontSize: 11, fontWeight: 800, color: '#fff',
+            fontSize: 11, fontWeight: 800, color: '#22C55E',
             letterSpacing: '0.08em',
           }}>
             <div style={{
               width: 7, height: 7, borderRadius: '50%',
-              background: '#fff',
+              background: '#22C55E',
+              boxShadow: '0 0 6px 2px rgba(34,197,94,0.45)',
               animation: 'trlive-livePulse 1.5s ease-in-out infinite',
             }} />
             LIVE
@@ -386,6 +422,57 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
         </div>
       )}
 
+      {/* ══ LEADER STATS STRIP ══ */}
+      {meta.leaderStats && (
+        <div style={{
+          flexShrink: 0,
+          margin: '6px 16px 0',
+          animation: 'trlive-fadeUp 0.5s ease-out both',
+          animationDelay: '180ms',
+        }}>
+          {/* Round scores row */}
+          <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
+            {meta.leaderStats.rounds.map((score, i) => (
+              <RoundChip key={i} round={i + 1} score={score} />
+            ))}
+          </div>
+
+          {/* Birdies / Eagles / Pars / Bogeys row */}
+          <div style={{ display: 'flex', gap: 4 }}>
+            {meta.leaderStats.totalEagles > 0 && (
+              <LiveStatChip
+                value={meta.leaderStats.totalEagles}
+                label={meta.leaderStats.totalEagles === 1 ? 'Eagle' : 'Eagles'}
+                color="#F59E0B"
+                bg="rgba(245,158,11,0.08)"
+                border="rgba(245,158,11,0.25)"
+              />
+            )}
+            <LiveStatChip
+              value={meta.leaderStats.totalBirdies}
+              label="Birdies"
+              color="#22C55E"
+              bg="rgba(34,197,94,0.08)"
+              border="rgba(34,197,94,0.25)"
+            />
+            <LiveStatChip
+              value={meta.leaderStats.totalPars}
+              label="Pars"
+              color="#94A3B8"
+              bg="rgba(148,163,184,0.08)"
+              border="rgba(148,163,184,0.25)"
+            />
+            <LiveStatChip
+              value={meta.leaderStats.totalBogeys}
+              label="Bogeys"
+              color="#EF4444"
+              bg="rgba(239,68,68,0.08)"
+              border="rgba(239,68,68,0.25)"
+            />
+          </div>
+        </div>
+      )}
+
       {/* ══ ZONE 3: LEADERBOARD + CTA ══ */}
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column',
@@ -400,26 +487,14 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           border: '1px solid rgba(255,255,255,0.06)',
           borderRadius: 14,
         }}>
-          {/* Header row */}
+          {/* Header row — just label, no momentum pills (shown in top badge) */}
           <div style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             padding: '10px 12px 6px',
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>
-                Leaderboard
-              </span>
-              {meta.momentumTags.slice(0, 2).map(tag => (
-                <span key={tag} style={{
-                  fontSize: 10, fontWeight: 600,
-                  color: 'hsl(var(--accent-amber))',
-                  background: 'hsl(var(--accent-amber) / 0.12)',
-                  padding: '2px 7px', borderRadius: 8,
-                }}>
-                  {tag}
-                </span>
-              ))}
-            </div>
+            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: 1.2, textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>
+              Leaderboard
+            </span>
 
             <button
               onClick={handleWatchLive}

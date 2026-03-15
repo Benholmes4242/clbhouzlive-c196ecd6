@@ -55,11 +55,20 @@ export interface LiveArenaTournament {
   chasePack: LiveArenaPlayer[];
   
   // Volatility metrics
-  volatilityIndex: number; // 0-100, higher = tighter race
-  scoreSpread: number; // Shots between 1st and 5th
+  volatilityIndex: number;
+  scoreSpread: number;
   
   // Momentum tags
   momentumTags: string[];
+  
+  // Leader scorecard stats
+  leaderStats: {
+    totalBirdies: number;
+    totalEagles:  number;
+    totalBogeys:  number;
+    totalPars:    number;
+    rounds:       (number | null)[];
+  } | null;
 }
 
 type MomentumTag = 'Tight Race' | 'Runaway Leader' | 'Final Round' | 'Moving Day' | 'Cut Day' | 'Playoff Potential';
