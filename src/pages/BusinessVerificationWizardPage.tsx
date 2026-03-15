@@ -307,7 +307,7 @@ export default function BusinessVerificationWizardPage() {
             key={s}
             className={cn(
               'h-2.5 w-2.5 rounded-full transition-colors',
-              s === step ? 'bg-primary shadow-sm ring-2 ring-primary/20' : 'bg-muted-foreground/30'
+              s === step ? 'bg-[hsl(38,92%,50%)] shadow-sm ring-2 ring-[hsl(38,92%,50%)]/20' : 'bg-muted-foreground/30'
             )}
           />
         ))}
