@@ -315,12 +315,14 @@ async function syncTournament(
   // ── Sync leaderboard ─────────────────────────────────────────────
   let leaderboardRecords = 0;
   let sportradarStatus: string | undefined;
+  let currentRound: number | undefined;
   let syncError: string | undefined;
 
   try {
     const result = await syncLeaderboard(supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id);
     leaderboardRecords = result.records;
     sportradarStatus = result.sportradarStatus;
+    currentRound = result.currentRound;
   } catch (error) {
     syncError = error.message;
     console.error(`[LiveSync] Leaderboard error for ${tournament.name}:`, error.message);
@@ -468,6 +470,7 @@ async function syncTournament(
 
     const updatePayload: any = { status: 'closed', last_live_sync: new Date().toISOString() };
     if (winnerId) updatePayload.winner_id = winnerId;
+    if (currentRound !== undefined) updatePayload.current_round = currentRound;
 
     const { error: closeError } = await supabase
       .from('sr_tournaments')
@@ -545,10 +548,14 @@ async function syncTournament(
       }
     }
   } else {
-    // Update last_live_sync timestamp
+    // Update last_live_sync timestamp and current_round
+    const updatePayload: any = { last_live_sync: new Date().toISOString() };
+    if (currentRound !== undefined) {
+      updatePayload.current_round = currentRound;
+    }
     await supabase
       .from('sr_tournaments')
-      .update({ last_live_sync: new Date().toISOString() })
+      .update(updatePayload)
       .eq('id', tournament.id);
   }
 
@@ -796,6 +803,7 @@ async function fetchSportradar(url: string, apiKey: string, description: string)
 interface LeaderboardSyncResult {
   records: number;
   sportradarStatus?: string;
+  currentRound?: number;
 }
 
 async function syncLeaderboard(
@@ -807,6 +815,13 @@ async function syncLeaderboard(
 
   const sportradarStatus = data.status || data.tournament?.status;
   const leaderboard = data.leaderboard || [];
+
+  // Extract current round from Sportradar response
+  // Sportradar provides this as `round` or `current_round` at the top level
+  const currentRound: number | undefined =
+    typeof data.round === 'number' ? data.round :
+    typeof data.current_round === 'number' ? data.current_round :
+    undefined;
 
   let records = 0;
 
@@ -882,5 +897,5 @@ async function syncLeaderboard(
     }
   }
 
-  return { records, sportradarStatus };
+  return { records, sportradarStatus, currentRound };
 }
