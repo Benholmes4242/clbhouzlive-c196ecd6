@@ -5,6 +5,7 @@ import {
   attachMedia,
   detachMedia,
   destroyAll,
+  destroyPreCreated,
   promotePreCreated,
   recoverMediaError,
   retryLoad,
@@ -98,6 +99,7 @@ export function useVideoPool() {
 
     return () => {
       destroyAll();
+      destroyPreCreated();
       segmentCache.clear();
       recoveryState.current.forEach((state) => {
         clearTimeout(state.timeout);
@@ -154,7 +156,7 @@ export function useVideoPool() {
       console.error('[Pool] safePlay failed:', error);
       return false;
     }
-  }, []);
+  }, [getStore]);
 
   // ── Core assign function (full recycle sequence) ──────────────────
   const assign = useCallback(

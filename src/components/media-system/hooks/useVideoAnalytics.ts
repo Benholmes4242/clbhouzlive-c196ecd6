@@ -37,5 +37,5 @@ export function useVideoAnalytics(
         watchStartRef.current = null;
       }
     };
-  }, [isActive, post?.id]);
+  }, [isActive, post?.id, videoElement]);
 }
