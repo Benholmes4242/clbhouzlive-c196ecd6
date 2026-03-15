@@ -766,7 +766,7 @@ const ProfilePageV2Content: React.FC = () => {
                   Copy link
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => toast.info('Report submitted')}>
+                <DropdownMenuItem onClick={() => setShowReportDialog(true)}>
                   <Flag className="w-4 h-4 mr-2" />
                   Report
                 </DropdownMenuItem>
