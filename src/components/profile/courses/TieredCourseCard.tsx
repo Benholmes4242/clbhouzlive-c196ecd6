@@ -71,7 +71,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
         {/* Trophy Chartreus accent line - prominent 2px */}
         <div 
           className="absolute top-0 left-0 right-0 h-[2px]" 
-          style={{ background: 'linear-gradient(90deg, rgba(193, 168, 76, 0.4) 0%, #C1A84C 50%, rgba(193, 168, 76, 0.4) 100%)' }} 
+          style={{ background: 'linear-gradient(90deg, rgba(245, 158, 11, 0.3) 0%, #f59e0b 50%, rgba(245, 158, 11, 0.3) 100%)' }} 
         />
         
         <div className="flex">
