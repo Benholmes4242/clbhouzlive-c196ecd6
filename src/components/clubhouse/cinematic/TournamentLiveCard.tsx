@@ -485,7 +485,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                 return (
                   <div key={i} style={{
                     display: 'flex', alignItems: 'center', gap: 10,
-                    padding: '11px 20px',
+                    padding: 'clamp(11px, 2.5vh, 22px) 20px',
                   }}>
                     {/* Position */}
                     <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.35)', width: 22, flexShrink: 0, textAlign: 'center' }}>
