@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Users, RefreshCw, ArrowUpDown, ArrowUp, ArrowDown, Camera, Globe, Zap } from 'lucide-react';
+import { Users, RefreshCw, ArrowUpDown, ArrowUp, ArrowDown, Camera, Globe, Zap, Upload, Trash2, Loader2, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { createColumnHelper } from '@tanstack/react-table';
@@ -14,6 +14,11 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Sheet, SheetContent, SheetHeader, SheetTitle,
+} from '@/components/ui/sheet';
 
 /* ── Tour config ─────────────────────────────────────────── */
 const TOURS: Record<string, { label: string; color: string }> = {
@@ -51,7 +56,7 @@ interface PlayerRow {
 type SortKey = 'name_asc' | 'name_desc' | 'country_asc' | 'updated_desc' | 'updated_asc';
 
 /* ── Headshot sub-component with multi-tour fallback ───── */
-function PlayerAvatar({ player }: { player: PlayerRow }) {
+function PlayerAvatar({ player, cacheBust }: { player: PlayerRow; cacheBust?: number }) {
   const tourCodes = player.tourCodes?.length
     ? player.tourCodes.map(normalizeTourCode)
     : ['pga'];
@@ -62,8 +67,9 @@ function PlayerAvatar({ player }: { player: PlayerRow }) {
 
   const src = useMemo(() => {
     if (exhausted || !displayName) return PLAYER_SILHOUETTE_URL;
-    return getPlayerHeadshotUrl(displayName, tourCodes[urlIndex] || 'pga', player.headshotOverride);
-  }, [displayName, tourCodes, urlIndex, exhausted, player.headshotOverride]);
+    const base = getPlayerHeadshotUrl(displayName, tourCodes[urlIndex] || 'pga', player.headshotOverride);
+    return cacheBust ? `${base}${base.includes('?') ? '&' : '?'}cb=${cacheBust}` : base;
+  }, [displayName, tourCodes, urlIndex, exhausted, player.headshotOverride, cacheBust]);
 
   const handleError = useCallback(() => {
     if (urlIndex < tourCodes.length - 1) {
@@ -85,6 +91,224 @@ function PlayerAvatar({ player }: { player: PlayerRow }) {
   );
 }
 
+/* ── PhotoManagementSheet ──────────────────────────────── */
+interface PhotoSheetProps {
+  player: PlayerRow | null;
+  open: boolean;
+  onClose: () => void;
+  headshotCacheBust: number;
+  onCacheBust: () => void;
+}
+
+function PhotoManagementSheet({ player, open, onClose, headshotCacheBust, onCacheBust }: PhotoSheetProps) {
+  const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [removing, setRemoving] = useState(false);
+  const [savingOverride, setSavingOverride] = useState(false);
+  const [overrideValue, setOverrideValue] = useState('');
+
+  // Sync override field when player changes
+  React.useEffect(() => {
+    setOverrideValue(player?.headshotOverride ?? '');
+  }, [player?.id, player?.headshotOverride]);
+
+  if (!player) return null;
+
+  const displayName = player.fullName || `${player.firstName || ''} ${player.lastName || ''}`.trim() || 'Unknown';
+  const primaryTourCode = player.tourCodes?.[0] ? normalizeTourCode(player.tourCodes[0]) : 'pga';
+  const tourLabels = player.tourCodes?.map(tc => TOURS[normalizeTourCode(tc)]?.label || tc).join(', ') || 'No tour';
+
+  const previewSrc = (() => {
+    const base = getPlayerHeadshotUrl(displayName, primaryTourCode, player.headshotOverride);
+    return headshotCacheBust ? `${base}${base.includes('?') ? '&' : '?'}cb=${headshotCacheBust}` : base;
+  })();
+
+  const invalidateAndBust = () => {
+    queryClient.invalidateQueries({ queryKey: ['admin-v2', 'tour', 'players'] });
+    onCacheBust();
+  };
+
+  const handleSaveOverride = async () => {
+    setSavingOverride(true);
+    try {
+      const val = overrideValue.trim() || null;
+      const { error } = await supabase
+        .from('sr_players')
+        .update({ headshot_override: val } as any)
+        .eq('id', player.id);
+      if (error) throw error;
+      toast.success('Headshot override saved');
+      invalidateAndBust();
+    } catch (e: any) {
+      toast.error(`Failed to save override: ${e.message}`);
+    } finally {
+      setSavingOverride(false);
+    }
+  };
+
+  const handleUpload = async (file: File) => {
+    setUploading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Not authenticated');
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('playerName', player.headshotOverride || displayName);
+      formData.append('tourCode', primaryTourCode);
+      formData.append('oldTourCode', primaryTourCode);
+
+      const resp = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/manage-player-headshot`,
+        {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session.access_token}` },
+          body: formData,
+        }
+      );
+      const result = await resp.json();
+      if (!resp.ok) throw new Error(result.error || 'Upload failed');
+
+      toast.success('Headshot uploaded');
+      invalidateAndBust();
+    } catch (e: any) {
+      toast.error(`Upload failed: ${e.message}`);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemove = async () => {
+    setRemoving(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Not authenticated');
+
+      const resp = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/manage-player-headshot`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            playerName: player.headshotOverride || displayName,
+            tourCode: primaryTourCode,
+          }),
+        }
+      );
+      const result = await resp.json();
+      if (!resp.ok) throw new Error(result.error || 'Delete failed');
+
+      toast.success('Headshot removed');
+      invalidateAndBust();
+    } catch (e: any) {
+      toast.error(`Remove failed: ${e.message}`);
+    } finally {
+      setRemoving(false);
+    }
+  };
+
+  return (
+    <Sheet open={open} onOpenChange={v => { if (!v) onClose(); }}>
+      <SheetContent side="bottom" className="rounded-t-2xl px-4 pb-8">
+        {/* Drag handle */}
+        <div className="flex justify-center pt-2.5 pb-1">
+          <div className="w-9 h-1 rounded-full bg-muted-foreground/30" />
+        </div>
+
+        <SheetHeader className="pb-4">
+          <SheetTitle className="text-base font-semibold text-foreground">Manage Headshot</SheetTitle>
+        </SheetHeader>
+
+        <div className="flex flex-col items-center gap-5">
+          {/* Large preview */}
+          <div className="w-28 h-28 rounded-2xl overflow-hidden bg-muted border border-border">
+            <img
+              src={previewSrc}
+              alt={displayName}
+              className="w-full h-full object-cover object-top"
+              onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+            />
+          </div>
+
+          {/* Name and tours */}
+          <div className="text-center">
+            <p className="text-sm font-semibold text-foreground">{displayName}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{tourLabels}</p>
+          </div>
+
+          {/* Headshot Override field */}
+          <div className="w-full space-y-1.5">
+            <label className="text-xs font-semibold text-foreground">Headshot Override</label>
+            <div className="flex gap-2">
+              <Input
+                value={overrideValue}
+                onChange={e => setOverrideValue(e.target.value)}
+                placeholder={displayName}
+                className="text-sm focus:border-[hsl(38,92%,50%)] focus:ring-[3px] focus:ring-[hsla(38,92%,50%,0.10)]"
+              />
+              <Button
+                variant="default"
+                size="sm"
+                disabled={savingOverride}
+                onClick={handleSaveOverride}
+                className="shrink-0"
+              >
+                {savingOverride ? <Loader2 className="w-4 h-4 animate-spin" /> : <Pencil className="w-4 h-4" />}
+              </Button>
+            </div>
+            <p className="text-[11px] text-muted-foreground leading-snug">
+              If the R2 filename doesn't match the player's full name, enter the correct filename here (without .webp).
+            </p>
+          </div>
+
+          {/* Action buttons */}
+          <div className="w-full space-y-2.5">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={e => {
+                const file = e.target.files?.[0];
+                if (file) handleUpload(file);
+                e.target.value = '';
+              }}
+            />
+            <Button
+              variant="default"
+              className="w-full"
+              disabled={uploading}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {uploading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
+              Upload New Photo
+            </Button>
+            <Button
+              variant="destructive"
+              className="w-full"
+              disabled={removing}
+              onClick={handleRemove}
+            >
+              {removing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
+              Remove Photo
+            </Button>
+            <Button variant="outline" className="w-full" onClick={onClose}>
+              Cancel
+            </Button>
+          </div>
+        </div>
+
+        {/* Safe area spacer */}
+        <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />
+      </SheetContent>
+    </Sheet>
+  );
+}
+
 /* ── Column helper ───────────────────────────────────────── */
 const col = createColumnHelper<PlayerRow>();
 
@@ -96,6 +320,8 @@ export default function TourPlayersPage() {
   const [tourFilter, setTourFilter] = useState<string>('all');
   const [syncingAllTours, setSyncingAllTours] = useState(false);
   const [syncProgress, setSyncProgress] = useState('');
+  const [photoPlayer, setPhotoPlayer] = useState<PlayerRow | null>(null);
+  const [headshotCacheBust, setHeadshotCacheBust] = useState(0);
   const PAGE_SIZE = 25;
   const queryClient = useQueryClient();
 
@@ -258,7 +484,19 @@ export default function TourPlayersPage() {
       id: 'avatar',
       header: '',
       size: 48,
-      cell: ({ row }) => <PlayerAvatar player={row.original} />,
+      cell: ({ row }) => {
+        const player = row.original;
+        return (
+          <button
+            type="button"
+            title="Manage photo"
+            onClick={(e) => { e.stopPropagation(); setPhotoPlayer(player); }}
+            className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-muted/60 transition-colors"
+          >
+            <PlayerAvatar player={player} cacheBust={headshotCacheBust} />
+          </button>
+        );
+      },
     }),
     col.accessor('fullName', {
       header: () => (
@@ -325,7 +563,7 @@ export default function TourPlayersPage() {
         );
       },
     }),
-  ], [sortBy]);
+  ], [sortBy, headshotCacheBust]);
 
   /* ── Render ────────────────────────────────────────── */
   return (
@@ -404,6 +642,14 @@ export default function TourPlayersPage() {
         emptyTitle="No players found"
         emptyIcon={Users}
         pagination={{ page, pageSize: PAGE_SIZE, total: filtered.length, onPageChange: setPage }}
+      />
+
+      <PhotoManagementSheet
+        player={photoPlayer}
+        open={!!photoPlayer}
+        onClose={() => setPhotoPlayer(null)}
+        headshotCacheBust={headshotCacheBust}
+        onCacheBust={() => setHeadshotCacheBust(p => p + 1)}
       />
     </div>
   );
