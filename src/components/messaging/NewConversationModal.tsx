@@ -457,7 +457,7 @@ export function NewConversationModal({
                         fallback={getInitials(userProfile.display_name, userProfile.username)}
                         hideRing
                       />
-                      <span className="max-w-[100px] truncate text-sm text-primary">
+                      <span className="max-w-[100px] truncate text-sm text-[hsl(35,80%,43%)]">
                         {userProfile.display_name || userProfile.username}
                       </span>
                       <button
