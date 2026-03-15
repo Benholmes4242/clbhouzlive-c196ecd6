@@ -501,7 +501,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             onTouchEnd={(e) => { onCardTouchEnd(e); }}
             style={{ 
               position: 'absolute',
-              bottom: isLive ? 20 : (isExpanded ? 16 : 32),
+              bottom: isExpanded ? 16 : 20,
               left: isExpanded ? 12 : 16,
               ...(isExpanded
                 ? { right: 12, top: 'max(env(safe-area-inset-top, 20px) + 120px, 160px)' }
@@ -529,12 +529,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
           >
-            {/* Pill handle affordance for non-live collapsed cards */}
-            {!isExpanded && !isLive && (
-              <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: '8px', marginTop: '-8px' }}>
-                <div style={{ width: '32px', height: '3px', borderRadius: '2px', background: 'rgba(255,255,255,0.25)' }} />
-              </div>
-            )}
 
             {/* ─── COMPLETED: tournament name goes straight to top ─── */}
             {isCompleted ? (
