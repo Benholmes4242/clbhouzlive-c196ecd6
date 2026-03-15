@@ -161,28 +161,22 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
             <div 
               className="inline-flex items-center gap-2 px-3 py-2 rounded-full"
               style={{
-                background: isOutstanding 
-                  ? 'rgba(245, 158, 11, 0.12)' 
-                  : 'rgba(255,255,255,0.12)',
+                background: 'rgba(245, 158, 11, 0.12)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
-                border: isOutstanding 
-                  ? '1px solid rgba(245, 158, 11, 0.35)' 
-                  : '1px solid rgba(255,255,255,0.15)',
-                boxShadow: isOutstanding 
-                  ? '0 0 16px rgba(245, 158, 11, 0.25), inset 0 1px 0 rgba(245, 158, 11, 0.2)' 
-                  : 'none',
+                border: '1px solid rgba(245, 158, 11, 0.35)',
+                boxShadow: '0 0 16px rgba(245, 158, 11, 0.2), inset 0 1px 0 rgba(245, 158, 11, 0.15)',
               }}
             >
               <span 
                 className="font-bold text-lg"
-                style={{ color: isOutstanding ? '#f59e0b' : '#ffffff' }}
+                style={{ color: '#f59e0b' }}
               >
                 {rating === 10 ? '10' : rating.toFixed(1)}
               </span>
               <span 
                 className="text-xs font-medium tracking-wide uppercase"
-                style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.8)' : 'rgba(255, 255, 255, 0.6)' }}
+                style={{ color: 'rgba(245, 158, 11, 0.75)' }}
               >
                 {tierData.label}
               </span>
