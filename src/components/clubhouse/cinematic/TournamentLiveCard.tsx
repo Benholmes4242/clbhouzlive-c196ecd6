@@ -433,6 +433,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           margin: '6px 16px 0',
           animation: 'trlive-fadeUp 0.5s ease-out both',
           animationDelay: '180ms',
+          touchAction: 'none',
         }}>
           {/* Round scores row */}
           <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
