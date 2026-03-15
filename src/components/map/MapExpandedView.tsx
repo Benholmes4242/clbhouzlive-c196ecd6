@@ -191,7 +191,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
               </Button>
             )}
             <Button
-              className={isIOS ? "flex-1" : "flex-1 bg-foreground text-background hover:bg-foreground/90"}
+              className={isIOS ? "flex-1" : "flex-1 bg-[#f59e0b] text-white hover:bg-[#e8920f]"}
               variant={isIOS ? 'outline' : 'default'}
               onClick={() => window.open(googleMapsUrl, '_blank')}
             >

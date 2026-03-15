@@ -544,7 +544,7 @@ const BusinessProfilePage: React.FC = () => {
           >
             <span className="text-sm text-muted-foreground">Following</span>
             <span className="text-base font-semibold text-foreground">0</span>
-          </button>
+          </div>
         </div>
       </div>
 

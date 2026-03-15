@@ -70,7 +70,7 @@ export default function BusinessFollowersPage() {
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-muted-foreground active:text-foreground transition-colors"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-foreground active:scale-[0.97] transition-transform"
             aria-label="Back"
           >
             <ChevronLeft className="w-5 h-5" />
