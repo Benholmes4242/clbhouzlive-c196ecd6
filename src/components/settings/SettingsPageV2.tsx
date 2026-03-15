@@ -145,6 +145,7 @@ export function SettingsPageV2() {
                 icon={<EyeOff size={18} />}
                 title="Hide Personal Profile"
                 subtitle="Only your creator profile is visible"
+                iconTheme="creator"
                 checked={creator.creatorOnly}
                 disabled={creator.isUpdating}
                 onCheckedChange={(val) =>
