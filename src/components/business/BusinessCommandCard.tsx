@@ -256,7 +256,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                     <Users className="h-4 w-4 text-muted-foreground" />
                     Manage team
                     {(pendingRequestsCount ?? 0) > 0 && (
-                      <span className="ml-auto h-2 w-2 rounded-full bg-primary" />
+                      <span className="ml-auto h-2 w-2 rounded-full bg-[hsl(38,92%,50%)]" />
                     )}
                   </DropdownMenuItem>
 
