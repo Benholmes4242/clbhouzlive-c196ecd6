@@ -200,7 +200,7 @@ export function ShareContentModal({
       onClose={handleClose}
       zIndexBase={1500}
     >
-      <div className="px-4 pb-6" style={{ maxHeight: 'calc(85vh - 40px)', overflowY: 'auto' }}>
+      <div className="px-4" style={{ maxHeight: 'calc(85vh - 40px)', overflowY: 'auto', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}>
         {/* Title */}
         <h2 className="text-lg font-semibold text-foreground mb-4">Share Golf Content</h2>
         
@@ -287,7 +287,7 @@ export function ShareContentModal({
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{course.name}</p>
+                        <p className="font-medium text-sm truncate text-foreground">{course.name}</p>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           {(course.region || course.country) && (
                             <span className="flex items-center gap-1">
