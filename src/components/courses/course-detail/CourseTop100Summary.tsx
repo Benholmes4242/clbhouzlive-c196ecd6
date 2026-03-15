@@ -52,7 +52,7 @@ export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
   ].filter(Boolean);
 
   return (
-    <section className="px-4 pt-4 pb-5 bg-slate-50 text-center">
+    <section className="px-4 pt-4 pb-5 bg-muted/30 text-center">
       {/* Header */}
       <div className="mb-3">
         <h2 className="text-lg font-semibold text-foreground mb-1">
