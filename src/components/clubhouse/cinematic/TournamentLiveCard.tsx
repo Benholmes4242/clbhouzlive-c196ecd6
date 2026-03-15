@@ -286,6 +286,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
       {/* ══ ZONE 1: HERO — leader portrait ══ */}
       <div style={{
         position: 'relative', flex: '0 0 46%', overflow: 'hidden',
+        touchAction: 'none',
       }}>
 
         {/* Portrait */}
