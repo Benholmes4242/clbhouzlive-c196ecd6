@@ -5,7 +5,6 @@ import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { cn } from '@/lib/utils';
 import { getRatingTheme } from '@/lib/globalAchievementMilestoneSystem';
-import { getScoreTier } from '@/utils/getScoreTier';
 
 import { RatingTierDistribution, RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';
 
