@@ -31,6 +31,8 @@ const IMPORTANT_NOTIFICATION_TYPES = new Set([
   'trip_updated',
   // Friend course review notifications
   'friend_course_review',
+  // Admin invite
+  'admin_invite',
 ]);
 
 interface RealtimeNotification {
