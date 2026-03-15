@@ -170,7 +170,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
 
             {/* "Posting as" badge */}
             {isActive && (
-              <span className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20">
+              <span className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)] border border-[hsl(38,92%,50%)]/20">
                 <Zap className="w-3 h-3" />
                 Posting as this business
               </span>
