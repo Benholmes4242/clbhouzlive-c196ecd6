@@ -229,6 +229,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
         {/* Portrait */}
         <div ref={heroRef} style={{
           position: 'absolute', inset: '-8px',
+          marginTop: '8%',
           willChange: 'transform', transition: 'transform 0.3s ease-out',
         }}>
           {leader && <LeaderPhoto src={leaderPhotoSrc} name={leader.playerName} />}
