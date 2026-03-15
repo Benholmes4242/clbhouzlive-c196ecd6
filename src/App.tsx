@@ -440,9 +440,9 @@ const queryClient = new QueryClient({
     } : {
       retry: 1,
       refetchOnWindowFocus: false,
-      staleTime: 0, // Always fetch fresh data
-      gcTime: 60 * 1000, // 1 minute cache
-      refetchOnMount: 'always',
+      staleTime: 60_000, // 1 minute — safe fallback, never 0 at scale
+      gcTime: 5 * 60 * 1000,
+      refetchOnMount: false,
       refetchOnReconnect: 'always',
       networkMode: 'always'
     },
