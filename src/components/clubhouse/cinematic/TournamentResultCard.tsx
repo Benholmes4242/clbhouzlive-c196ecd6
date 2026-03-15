@@ -11,7 +11,7 @@ import type {
   PodiumRow as PodiumRowType,
 } from '@/components/media-system/types/media';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
-import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+
 
 // ─── Keyframes ────────────────────────────────────────────────────────────────
 
