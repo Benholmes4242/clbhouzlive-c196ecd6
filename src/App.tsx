@@ -74,8 +74,7 @@ import { useCourseRatingsRealtime } from '@/hooks/useCourseRatingsRealtime';
 
 
 
-// Lazy-load ProfilePage and Discover for smaller initial bundle
-const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+// Lazy-load Discover for smaller initial bundle
 const Discover = lazy(() => import("./pages/Discover"));
 import ErrorLogPage from "./pages/ErrorLogPage";
 import { HeaderProvider } from '@/contexts/GlobalHeaderContext';
