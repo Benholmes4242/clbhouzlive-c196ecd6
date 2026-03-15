@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
+import { Trophy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTop100ProgressForUser, type Top100RecentRound } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
