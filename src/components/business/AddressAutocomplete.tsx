@@ -312,7 +312,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         <button
           type="button"
           onClick={onDropPinClick}
-          className="text-xs text-primary hover:underline mt-1.5 block"
+          className="text-xs text-[#d97706] hover:underline mt-1.5 block"
         >
           Can't find your exact address? Drop a pin
         </button>
