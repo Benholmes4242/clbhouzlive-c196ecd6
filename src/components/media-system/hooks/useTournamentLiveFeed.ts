@@ -54,11 +54,11 @@ async function getOrCreateLivePost(tournamentId: string, _tournamentName: string
     .from('posts')
     .insert({
       user_id:       SYSTEM_USER_ID,
-      actor_type:    'system',
       actor_id:      SYSTEM_USER_ID,
+      actor_type:    'system',
       post_type:     'tournament_live',
       content:       tournamentId,
-      visibility:    'public',
+      visibility:    'anyone' as const,
       categories:    [],
       badges:        [],
       like_count:    0,
