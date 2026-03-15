@@ -508,7 +508,7 @@ const ProfilePageV2Content: React.FC = () => {
           style={{ bottom: '-62px' }}
         >
           <button
-            className="relative w-[124px] h-[124px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            className="relative w-[124px] h-[124px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f59e0b] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
             data-debug-id="profile-photo"
             onPointerDown={(e) => {
               logPoint('profile_photo.pointerdown', { x: e.clientX, y: e.clientY });
