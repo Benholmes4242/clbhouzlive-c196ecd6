@@ -225,7 +225,7 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
             {isOwnProfile && (
               <button
                 onClick={() => navigate('/courses')}
-                className="px-5 py-2.5 bg-card text-foreground text-sm font-semibold rounded-lg border border-border/60 hover:bg-muted transition-colors min-h-[44px] active:scale-[0.98]"
+                className="px-5 py-2.5 bg-[#f59e0b] text-white text-sm font-semibold rounded-full hover:bg-[#e8920f] transition-colors min-h-[44px] active:scale-[0.97]"
               >
                 Explore Courses
               </button>
