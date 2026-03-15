@@ -810,7 +810,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-foreground`}>
                   Achievements
                 </h1>
-                <p className={`${isMobile ? 'text-sm' : 'text-base'} text-black dark:text-white mt-1`}>
+                <p className={`${isMobile ? 'text-sm' : 'text-base'} text-foreground mt-1`}>
                   Defining your game through achievement
                 </p>
               </div>
