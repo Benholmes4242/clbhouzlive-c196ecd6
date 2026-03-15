@@ -118,7 +118,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
             <div className="flex items-center gap-2">
               <span className="font-semibold text-foreground">{user.name}</span>
               {isMine && (
-                <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
+                <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-[#f59e0b]/10 text-[#d97706]">
                   You
                 </span>
               )}
