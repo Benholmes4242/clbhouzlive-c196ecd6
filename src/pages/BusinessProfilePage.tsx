@@ -640,7 +640,7 @@ const BusinessProfilePage: React.FC = () => {
                   className={cn(
                     "relative flex-1 min-h-[44px] transition-all duration-200 whitespace-nowrap active:scale-[0.98]",
                     isActive 
-                      ? "bg-foreground text-background rounded-lg px-4 py-1.5 text-sm font-semibold shadow-sm" 
+                      ? "bg-[#f59e0b] text-white rounded-lg px-4 py-1.5 text-sm font-semibold shadow-sm" 
                       : "text-muted-foreground px-4 py-1.5 text-sm font-medium hover:text-foreground"
                   )}
                 >
