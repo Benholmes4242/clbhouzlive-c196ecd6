@@ -339,7 +339,9 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
   // Auto-scroll to bottom on new messages
   useEffect(() => {
     if (messages.length > prevMessagesLengthRef.current) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      requestAnimationFrame(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      });
     }
     prevMessagesLengthRef.current = messages.length;
   }, [messages.length]);
@@ -438,7 +440,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
        AppLog.warn('[ChatView]', 'Navigate-to-message: element not found for', messageId);
        return;
      }
-     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+     element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
      setHighlightedMessageId(messageId);
      clearTimeout(highlightTimerRef.current);
      highlightTimerRef.current = setTimeout(() => setHighlightedMessageId(null), 2000);
