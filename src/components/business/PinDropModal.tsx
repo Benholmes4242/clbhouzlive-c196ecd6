@@ -55,7 +55,7 @@ export const PinDropModal: React.FC<PinDropModalProps> = ({
 
     // Create draggable marker
     marker.current = new mapboxgl.Marker({
-      color: 'hsl(var(--primary))',
+      color: 'hsl(38, 92%, 50%)',
       draggable: true,
     })
       .setLngLat([center.lng, center.lat])
