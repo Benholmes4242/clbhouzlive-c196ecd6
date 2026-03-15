@@ -44,7 +44,7 @@ const BusinessProfileLiveSuccessPage = () => {
   };
 
   const handleGoToDashboard = () => {
-    navigate('/business/manage');
+    navigate('/businesses/manage');
   };
 
   return (

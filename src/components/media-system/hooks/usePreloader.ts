@@ -110,6 +110,11 @@ export function usePreloader(posts: FeedPost[]) {
           const img = new Image();
           img.src = thumb;
           warmedPosters.current.add(thumb);
+          // Cap to prevent unbounded growth
+          if (warmedPosters.current.size > 100) {
+            const entries = Array.from(warmedPosters.current);
+            warmedPosters.current = new Set(entries.slice(-80));
+          }
         }
       }
 
