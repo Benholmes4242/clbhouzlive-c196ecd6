@@ -388,7 +388,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
           <button
             type="button"
             onClick={() => refetch()}
-            className="rounded-full bg-emerald-600 text-white text-sm font-medium px-5 py-2 active:scale-[0.98] transition-all min-h-[44px]"
+            className="rounded-full bg-[#f59e0b] text-white text-sm font-semibold px-5 py-2 active:scale-[0.98] transition-all min-h-[44px] hover:bg-[#e8920f]"
           >
             Try Again
           </button>
