@@ -150,11 +150,11 @@ function SwipeableConversationRow({
         role="listitem"
         aria-label={`Open conversation: ${displayTitle}`}
       >
-        <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-primary">
+        <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-[hsl(38,92%,50%)]">
           <div className="flex items-center gap-[2px]">
-            <div className="w-[2px] h-1.5 bg-primary-foreground rounded-full" />
-            <div className="w-[2px] h-2.5 bg-primary-foreground rounded-full" />
-            <div className="w-[2px] h-1.5 bg-primary-foreground rounded-full" />
+            <div className="w-[2px] h-1.5 bg-white rounded-full" />
+            <div className="w-[2px] h-2.5 bg-white rounded-full" />
+            <div className="w-[2px] h-1.5 bg-white rounded-full" />
           </div>
         </div>
         
