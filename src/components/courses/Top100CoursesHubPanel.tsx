@@ -319,6 +319,7 @@ const Top100CoursesHubPanel = () => {
         />
       )}
       </div>
+    </div>
   );
 };
 
