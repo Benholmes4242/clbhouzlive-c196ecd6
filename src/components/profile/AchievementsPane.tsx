@@ -72,8 +72,8 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
   const totalTop100Played = top100Progress?.totalTop100Played ?? 0;
   
   // Mock data for XP system (can be replaced later)
-  const totalXP = 2500;
-  const nextMilestone = 10000;
+  const totalXP = 2500; // TODO: Replace with real XP from user data
+  const nextMilestone = 10000; // TODO: Replace with real next milestone from user data
   const progressPercentage = (totalXP / nextMilestone) * 100;
   
   // XP Tier System
@@ -193,7 +193,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
     // Handle specific achievement types with different progress formats
     switch (achievement.title) {
       case "Single-Figure Handicap":
-        const currentHandicap = 12.3; // Mock current handicap
+        const currentHandicap = 12.3; // TODO: Use real userHandicap prop
         const targetHandicap = 9;
         const percentage = Math.max(0, (currentHandicap - targetHandicap) / currentHandicap * 100);
         const remaining = (currentHandicap - targetHandicap).toFixed(1);
@@ -203,7 +203,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
         };
       
       case "Birdie Blitz":
-        const currentBirdies = 2;
+        const currentBirdies = 2; // TODO: Connect to real round data
         const targetBirdies = 3;
         const birdiePercentage = (currentBirdies / targetBirdies) * 100;
         return {
@@ -212,7 +212,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
         };
       
       case "No Bogey Round":
-        const bestBogeys = 2;
+        const bestBogeys = 2; // TODO: Connect to real round data
         const targetBogeys = 0;
         const bogeyPercentage = Math.max(0, (4 - bestBogeys) / 4 * 100); // Assuming 4 is starting point
         return {
@@ -718,13 +718,13 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 {/* Large Progress Ring on the Left */}
                 <div className="relative flex-shrink-0">
                   <div className="relative w-80 h-80">
-                    <svg className="w-80 h-80 transform -rotate-90" viewBox="0 0 320 320" style={{ filter: 'blur(0.2px) drop-shadow(0 0 8px #10B98130)' }}>
+                    <svg className="w-80 h-80 transform -rotate-90" viewBox="0 0 320 320" style={{ filter: 'blur(0.2px) drop-shadow(0 0 8px rgba(245,158,11,0.2))' }}>
                       {/* Gradient definition */}
                       <defs>
-                        <linearGradient id="greenProgressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#10B981" />
-                          <stop offset="50%" stopColor="#34D399" />
-                          <stop offset="100%" stopColor="#6EE7B7" />
+                        <linearGradient id="amberProgressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#f59e0b" />
+                          <stop offset="50%" stopColor="#fbbf24" />
+                          <stop offset="100%" stopColor="#fcd34d" />
                         </linearGradient>
                       </defs>
                       
@@ -734,7 +734,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                         cy="160"
                         r="140"
                         fill="none"
-                        stroke="#E6F7F1"
+                        stroke="hsl(var(--muted))"
                         strokeWidth="8"
                         strokeLinecap="round"
                       />
@@ -744,7 +744,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                         cx="160"
                         cy="160"
                         r="140"
-                        stroke="#10B981"
+                        stroke="#f59e0b"
                         strokeWidth="8"
                         fill="none"
                         strokeDasharray={`${140 * 2 * Math.PI}`}
@@ -762,7 +762,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       <div className="text-5xl font-bold text-foreground mb-3">
                         {totalXP.toLocaleString()} XP
                       </div>
-                      <div className="text-base font-medium text-center leading-tight max-w-[200px] text-green-500">
+                      <div className="text-base font-medium text-center leading-tight max-w-[200px] text-[#d97706]">
                         {(nextTier.minXP - totalXP).toLocaleString()} XP remaining to unlock your {nextTier.name.split(' ')[0].toLowerCase()} ring
                       </div>
                     </div>
@@ -773,10 +773,10 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 <div className="flex-1 flex flex-col justify-center">
                   {/* Ring Achievement Status - Centered with ring */}
                   <div className="space-y-3 mb-8">
-                    <h3 className="font-semibold text-2xl text-black dark:text-white text-center">
+                    <h3 className="font-semibold text-2xl text-foreground text-center">
                       {currentTier ? currentTier.name : 'No Ring Achieved'}
                     </h3>
-                    <p className="text-base text-black dark:text-white text-center">
+                    <p className="text-base text-foreground text-center">
                       {currentTier ? 
                         `Congratulations! You've earned the ${currentTier.name}!` :
                         `Reach ${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
@@ -786,9 +786,9 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                   
                   {/* XP Earned This Month - Below centered content */}
                   <div className="flex items-center justify-center gap-3">
-                    <div className="flex items-center gap-3 text-green-600 relative px-4 py-2">
-                      {/* Light green glow across entire section */}
-                      <div className="absolute inset-0 bg-green-400/40 rounded-lg blur-md shadow-lg shadow-green-300/50"></div>
+                      <div className="flex items-center gap-3 text-[#d97706] relative px-4 py-2">
+                        {/* Amber glow across entire section */}
+                        <div className="absolute inset-0 bg-[#f59e0b]/20 rounded-lg blur-md shadow-lg shadow-[#f59e0b]/20"></div>
                       <span className="text-sm font-medium relative z-10">XP earned this month</span>
                       <div className="flex items-center gap-1 relative z-10">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -807,10 +807,10 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
           {!isMobile && (
             <div className="flex justify-center items-center px-6 pb-8">
               <div className="text-center">
-                <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
+                <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-foreground`}>
                   Achievements
                 </h1>
-                <p className={`${isMobile ? 'text-sm' : 'text-base'} text-black dark:text-white mt-1`}>
+                <p className={`${isMobile ? 'text-sm' : 'text-base'} text-foreground mt-1`}>
                   Defining your game through achievement
                 </p>
               </div>
@@ -824,13 +824,13 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 {/* Mobile Progress Ring - Left Side */}
                 <div className="relative flex-shrink-0">
                   <div className="relative w-32 h-32">
-                    <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 128 128" style={{ filter: 'blur(1px) drop-shadow(0 0 15px #10B98160)' }}>
+                    <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 128 128" style={{ filter: 'blur(1px) drop-shadow(0 0 15px rgba(245,158,11,0.4))' }}>
                       {/* Gradient definition */}
                       <defs>
-                        <linearGradient id="greenProgressGradientMobile" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#10B981" />
-                          <stop offset="50%" stopColor="#34D399" />
-                          <stop offset="100%" stopColor="#6EE7B7" />
+                        <linearGradient id="amberProgressGradientMobile" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#f59e0b" />
+                          <stop offset="50%" stopColor="#fbbf24" />
+                          <stop offset="100%" stopColor="#fcd34d" />
                         </linearGradient>
                       </defs>
                       
@@ -840,7 +840,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                         cy="64"
                         r="56"
                         fill="none"
-                        stroke="#E6F7F1"
+                        stroke="hsl(var(--muted))"
                         strokeWidth="5"
                         strokeLinecap="round"
                       />
@@ -850,7 +850,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                         cx="64"
                         cy="64"
                         r="56"
-                        stroke="#10B981"
+                        stroke="#f59e0b"
                         strokeWidth="5"
                         fill="none"
                         strokeDasharray={`${56 * 2 * Math.PI}`}
@@ -879,10 +879,10 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 <div className="flex flex-col justify-center flex-1 space-y-2">
                   {/* Ring Achievement Status */}
                   <div className="space-y-1">
-                    <h3 className="font-semibold text-lg text-black dark:text-white leading-tight">
+                    <h3 className="font-semibold text-lg text-foreground leading-tight">
                       {currentTier ? currentTier.name : "No Ring Achieved"}
                     </h3>
-                    <p className="text-base text-black dark:text-white leading-tight">
+                    <p className="text-base text-foreground leading-tight">
                       {currentTier ? 
                         `You've earned the ${currentTier.name}!` :
                         `${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
@@ -891,14 +891,14 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                   </div>
                   
                   {/* XP Progress Text */}
-                  <div className="text-base text-green-500 leading-tight">
+                  <div className="text-base text-[#d97706] leading-tight">
                     {(nextTier.minXP - totalXP).toLocaleString()} XP to {nextTier.name.split(" ")[0].toLowerCase()} ring
                   </div>
                   
                    {/* Monthly Gain */}
                    <div className="flex items-center gap-2">
-                     <div className="flex items-center gap-2 text-green-600 relative px-3 py-2">
-                       <div className="absolute inset-0 bg-green-400/30 rounded blur-sm"></div>
+                     <div className="flex items-center gap-2 text-[#d97706] relative px-3 py-2">
+                       <div className="absolute inset-0 bg-[#f59e0b]/20 rounded blur-sm"></div>
                        <span className="text-base font-medium relative z-10">Monthly Gain:</span>
                        <span className="font-bold relative z-10 text-base">450 XP</span>
                        <MdOutlineTrendingUp className="w-6 h-6 relative z-10" />
@@ -914,10 +914,10 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
             <div className="px-4 pb-6">
               {/* Achievements Title */}
               <div className="text-center mb-6">
-                <h1 className="text-xl font-bold text-black dark:text-white">
+                <h1 className="text-xl font-bold text-foreground">
                   Achievements
                 </h1>
-                <p className="text-sm text-black dark:text-white mt-1">
+                <p className="text-sm text-foreground mt-1">
                   Defining your game through achievement
                 </p>
               </div>
@@ -987,10 +987,10 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                             </div>
                           )}
                         </div>
-                        <div className="text-base font-medium mb-1 text-black dark:text-white">
+                        <div className="text-base font-medium mb-1 text-foreground">
                           {tier.name}
                         </div>
-                        <div className="text-base text-black dark:text-white">
+                        <div className="text-base text-foreground">
                           {tier.minXP.toLocaleString()} XP
                         </div>
                       </div>
@@ -1069,10 +1069,10 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                               </div>
                            )}
                         </div>
-                        <div className="text-xs font-medium mb-1 text-black dark:text-white">
+                        <div className="text-xs font-medium mb-1 text-foreground">
                           {tier.name}
                         </div>
-                        <div className="text-xs text-black dark:text-white">
+                        <div className="text-xs text-foreground">
                           {tier.minXP.toLocaleString()} XP
                         </div>
                       </div>
@@ -1104,7 +1104,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       onClick={() => setActiveFilter(key)}
                       className={`gap-2 px-3 py-2 rounded-full transition-all duration-200 text-sm ${
                         activeFilter === key 
-                          ? 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600' 
+                          ? 'bg-[#f59e0b] text-white hover:bg-[#e8920f]' 
                           : ''
                       }`}
                     >
@@ -1133,7 +1133,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       onClick={() => setActiveFilter(key)}
                       className={`gap-2 px-4 py-2 rounded-full transition-all duration-200 ${
                         activeFilter === key 
-                          ? 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600' 
+                          ? 'bg-[#f59e0b] text-white hover:bg-[#e8920f]' 
                           : ''
                       }`}
                     >
@@ -1189,10 +1189,10 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 </div>
                 <div className={`flex-1 mx-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden ${isMobile ? 'h-1.5' : 'h-2'}`}>
                   <div 
-                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-1000 ease-out"
+                    className="h-full bg-gradient-to-r from-[#f59e0b] to-[#fbbf24] rounded-full transition-all duration-1000 ease-out"
                     style={{ 
                       width: animateProgress ? `${progressPercentage}%` : '0%',
-                      boxShadow: '0 0 10px rgba(59, 130, 246, 0.5)'
+                      boxShadow: '0 0 10px rgba(245, 158, 11, 0.4)'
                     }}
                   />
                 </div>
@@ -1230,22 +1230,22 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       </div>
                       
                       {/* Achievement Title under badge */}
-                      <h4 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mt-3 mb-1">
+                      <h4 className="text-2xl font-bold text-foreground mt-3 mb-1">
                         {mostRecentAchievement.title}
                       </h4>
                       
                       {/* XP below title in green */}
                       <div className="text-center">
-                        <span className="text-green-500 font-bold text-lg">+{mostRecentAchievement.xp} XP</span>
+                        <span className="text-[#d97706] font-bold text-lg">+{mostRecentAchievement.xp} XP</span>
                       </div>
                     </div>
                     
                     {/* Latest Achievement Details */}
                     <div className="flex-1">
-                      <h3 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white mb-3 mt-2`}>Latest Achievement</h3>
+                      <h3 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-foreground mb-3 mt-2`}>Latest Achievement</h3>
                       
-                      <div className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">
-                        <span className="text-green-500 font-bold">+{mostRecentAchievement.xp} XP</span>
+                      <div className="text-2xl font-bold text-foreground mb-4">
+                        <span className="text-[#d97706] font-bold">+{mostRecentAchievement.xp} XP</span>
                       </div>
                       
                       {/* Share Button */}
@@ -1277,7 +1277,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
               <div className="p-6">
                 {/* Section Header with Icon */}
                   <div className={`flex items-center justify-center gap-3 ${isMobile ? 'mb-3' : 'mb-6'}`}>
-                    <h3 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-gray-800 dark:text-gray-200`}>
+                    <h3 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-foreground`}>
                       Experience & Exploration Achievements
                     </h3>
                   </div>
@@ -1328,18 +1328,18 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                   
                                   {/* Text stacked underneath */}
                                   <div className="text-center">
-                                    <h4 className={`font-semibold mb-1 ${isMobile ? 'text-xs leading-tight' : 'text-sm'} ${achievement.isEarned ? 'text-blue-700 dark:text-blue-300' : 'text-muted-foreground'}`}>
+                                    <h4 className={`font-semibold mb-1 ${isMobile ? 'text-xs leading-tight' : 'text-sm'} ${achievement.isEarned ? 'text-[#d97706]' : 'text-muted-foreground'}`}>
                                       {achievement.title.toUpperCase()}
                                     </h4>
-                                     <p className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+                                     <p className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium ${achievement.isEarned ? 'text-[#d97706]' : 'text-muted-foreground'}`}>
                                        +{achievement.xp} XP
                                      </p>
                                   </div>
                                   
                                    {/* Smart Nudge Label */}
                                    {nudgeText && (
-                                     <div className="mt-2 px-2 py-1 bg-orange-100 dark:bg-orange-900/30 rounded-full border border-orange-300 dark:border-orange-700">
-                                       <p className="text-xs font-medium text-orange-700 dark:text-orange-300 leading-tight">
+                                     <div className="mt-2 px-2 py-1 bg-[#f59e0b]/10 rounded-full border border-[#f59e0b]/30">
+                                       <p className="text-xs font-medium text-[#d97706] leading-tight">
                                          🎯 {nudgeText}
                                        </p>
                                      </div>
@@ -1348,7 +1348,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                
                                {/* Progress indicator for near-unlock achievements */}
                                {isNearUnlock && (
-                                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full animate-ping"></div>
+                                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#f59e0b] rounded-full animate-ping"></div>
                                )}
                              </div>
                       );
@@ -1365,7 +1365,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
               <div className="p-6">
                 {/* Section Header with Icon */}
                   <div className={`flex items-center justify-center gap-3 ${isMobile ? 'mb-3' : 'mb-6'}`}>
-                    <h3 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-gray-800 dark:text-gray-200`}>
+                    <h3 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-foreground`}>
                       Skill & Performance Achievements
                     </h3>
                   </div>
@@ -1416,18 +1416,18 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                   
                                   {/* Text stacked underneath */}
                                   <div className="text-center">
-                                    <h4 className={`font-semibold mb-1 ${isMobile ? 'text-xs leading-tight' : 'text-sm'} ${achievement.isEarned ? 'text-green-700 dark:text-green-300' : 'text-muted-foreground'}`}>
+                                    <h4 className={`font-semibold mb-1 ${isMobile ? 'text-xs leading-tight' : 'text-sm'} ${achievement.isEarned ? 'text-[#d97706]' : 'text-muted-foreground'}`}>
                                       {achievement.title.toUpperCase()}
                                     </h4>
-                                    <p className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+                                    <p className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium ${achievement.isEarned ? 'text-[#d97706]' : 'text-muted-foreground'}`}>
                                       +{achievement.xp} XP
                                     </p>
                                   </div>
                                   
                                   {/* Smart Nudge Label */}
                                   {nudgeText && (
-                                    <div className="mt-2 px-2 py-1 bg-orange-100 dark:bg-orange-900/30 rounded-full border border-orange-300 dark:border-orange-700">
-                                      <p className="text-xs font-medium text-orange-700 dark:text-orange-300 leading-tight">
+                                    <div className="mt-2 px-2 py-1 bg-[#f59e0b]/10 rounded-full border border-[#f59e0b]/30">
+                                      <p className="text-xs font-medium text-[#d97706] leading-tight">
                                         🎯 {nudgeText}
                                       </p>
                                     </div>
@@ -1436,7 +1436,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                               
                                {/* Progress indicator for near-unlock achievements */}
                                {isNearUnlock && (
-                                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full animate-ping"></div>
+                                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#f59e0b] rounded-full animate-ping"></div>
                                )}
                              </div>
                       );
