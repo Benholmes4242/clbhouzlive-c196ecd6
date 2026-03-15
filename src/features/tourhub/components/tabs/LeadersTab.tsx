@@ -236,13 +236,14 @@ export function LeadersTab() {
       <div className="px-4" style={{ paddingTop: 8, paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 80px)' }}>
         {/* Category selector — sticky */}
         <div
-          className="sticky top-0 z-20 -mx-4 px-4 pt-3 pb-2"
+          className="sticky top-0 z-20 -mx-4 px-4 pb-2"
           style={{
             background: 'hsl(var(--background) / 0.95)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
             borderBottom: '1px solid hsl(var(--border) / 0.15)',
             marginTop: '12px',
+            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
           }}
         >
           <LeadersCategorySheet

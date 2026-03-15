@@ -519,7 +519,7 @@ export function PlayersTab() {
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           borderBottom: '1px solid hsl(var(--border) / 0.15)',
-          paddingTop: '12px',
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
           paddingBottom: '10px',
           marginTop: '16px',
         }}

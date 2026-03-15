@@ -491,9 +491,10 @@ export function ScheduleTab() {
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
             borderBottom: '1px solid hsl(var(--border) / 0.15)',
+            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
           }}
         >
-          <div className="pt-3 pb-1">
+          <div className="pb-1">
             <ScheduleFilterPills
               activeFilter={filter}
               onFilterChange={setFilter}
