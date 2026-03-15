@@ -63,7 +63,7 @@ export function BioWebsitesSection({
           {websites.length < 3 && (
             <button
               onClick={onAddWebsite}
-              className="flex items-center gap-2 text-primary text-[14px] font-medium min-h-[44px]"
+              className="flex items-center gap-2 text-[hsl(36,77%,49%)] text-[14px] font-medium min-h-[44px]"
             >
               <Plus size={16} />
               Add website

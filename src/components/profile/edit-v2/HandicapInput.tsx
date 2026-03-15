@@ -21,7 +21,7 @@ export function HandicapInput({ value, onChange }: Props) {
           value={value}
           onChange={handleChange}
           placeholder="e.g. 8.4 or +1.2"
-          className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors"
+          className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
         />
         {value && (
           <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[13px] text-muted-foreground">

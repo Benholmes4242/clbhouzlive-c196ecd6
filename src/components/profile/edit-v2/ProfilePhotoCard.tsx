@@ -168,7 +168,7 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
           onOpenChange={handleCropperClose}
           image={cropperImage}
           aspectRatio={PROFILE_ASPECT_RATIO}
-          cropShape="round"
+          cropShape="rect"
           title="Crop Profile Photo"
           onCropComplete={handleCropComplete}
         />

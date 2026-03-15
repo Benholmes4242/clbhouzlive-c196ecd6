@@ -35,6 +35,7 @@ export function PrivacySection({ isPublic, onChange }: Props) {
         checked={isPublic}
         onCheckedChange={onChange}
         onClick={(e) => e.stopPropagation()}
+        className="data-[state=checked]:bg-[hsl(38,92%,50%)]"
       />
     </div>
   );

@@ -79,7 +79,7 @@ export function PhotosIdentityStep({
                 maxLength={USERNAME_MAX}
                 readOnly={usernameIsLocked}
                 placeholder="username"
-                className={`w-full bg-muted border-0 rounded-xl pl-8 pr-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors ${usernameIsLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`w-full bg-muted border-0 rounded-xl pl-8 pr-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors ${usernameIsLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
               />
             </div>
           </div>

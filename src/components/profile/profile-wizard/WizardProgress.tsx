@@ -11,7 +11,7 @@ export function WizardProgress({ step }: Props) {
         <div
           key={s}
           className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-            s <= step ? 'bg-primary' : 'bg-muted'
+            s <= step ? 'bg-[hsl(38,92%,50%)]' : 'bg-muted'
           }`}
         />
       ))}

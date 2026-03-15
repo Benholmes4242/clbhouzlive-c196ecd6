@@ -26,7 +26,7 @@ export function LocationSection({ country, city, onCountryChange, onCityChange }
         value={country}
         onChange={(e) => onCountryChange(e.target.value)}
         placeholder="Country"
-        className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors"
+        className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
       />
     </div>
   );

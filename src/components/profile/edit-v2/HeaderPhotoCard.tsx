@@ -123,7 +123,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
               Upload header photo
             </p>
             <p className="text-xs text-muted-foreground">
-              Recommended: 1600×400px • JPG, PNG or WebP
+              Recommended: 1600×800px • JPG, PNG or WebP
             </p>
           </div>
         )}
