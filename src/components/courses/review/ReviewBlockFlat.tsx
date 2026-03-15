@@ -1,6 +1,5 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { getScoreTier } from '@/utils/getScoreTier';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ThumbButton } from '@/components/common/ThumbButton';
 import { ExpandableText } from '@/components/common/ExpandableText';
