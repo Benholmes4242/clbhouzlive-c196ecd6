@@ -5,7 +5,6 @@ import { usePaginatedFollowers, usePaginatedFollowing } from '@/hooks/useSocialL
 import { useUserByUsername } from '@/hooks/useUserByUsername';
 import { UserListPage } from '@/components/social/UserListPage';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { Loader2 } from 'lucide-react';
 
 const FollowersListPage = () => {
   const { username } = useParams<{ username: string }>();
