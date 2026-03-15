@@ -53,7 +53,7 @@ export const FollowBackButton: React.FC<FollowBackButtonProps> = ({
   if (isFollowing === 'following') {
     return (
       <div className="min-h-[44px] flex items-center">
-        <span className={cn(basePillClass, "border-blue-200 bg-blue-50 text-blue-500 gap-1")}>
+        <span className={cn(basePillClass, "border-[hsl(38,92%,50%)]/30 bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)] gap-1")}>
           <Check className="h-3 w-3" />
           Following
         </span>
