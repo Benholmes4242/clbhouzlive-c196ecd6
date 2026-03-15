@@ -161,7 +161,7 @@ export function MessageBubble({
                     return (
                       <div className="glass-badge-tight shadow-lg">
                         <CountryFlag country={flagCountry} size="md" />
-                        <span className="text-primary-foreground">#{course.country_rank}</span>
+                        <span className="text-white">#{course.country_rank}</span>
                       </div>
                     );
                   })()}
