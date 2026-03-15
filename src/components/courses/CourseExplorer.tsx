@@ -547,6 +547,7 @@ const CourseExplorer = () => {
       </div>
 
       {/* Results */}
+      <div className="px-4">
       <div ref={listTopRef} />
       
       {isLoading ? (
@@ -596,6 +597,7 @@ const CourseExplorer = () => {
           )}
         </>
       )}
+      </div>
     </div>
   );
 };
