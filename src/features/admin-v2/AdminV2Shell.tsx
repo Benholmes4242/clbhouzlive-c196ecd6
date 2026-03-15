@@ -85,7 +85,7 @@ export default function AdminV2Shell() {
       style={{
         display: 'grid',
         gridTemplateColumns: sidebarOpen && !isMobile ? '260px 1fr' : '1fr',
-        gridTemplateRows: '52px 1fr',
+        gridTemplateRows: 'calc(52px + env(safe-area-inset-top, 0px)) 1fr',
         height: '100dvh',
         overflow: 'hidden',
         position: 'relative',
@@ -109,6 +109,7 @@ export default function AdminV2Shell() {
         ...(isMobile ? {
           position: 'fixed', top: 0, left: 0, bottom: 0,
           width: 260, zIndex: 50,
+          paddingTop: 'env(safe-area-inset-top, 0px)',
           transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
           transition: 'transform 0.25s cubic-bezier(0.22, 1, 0.36, 1)',
         } : {
