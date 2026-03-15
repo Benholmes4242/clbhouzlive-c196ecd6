@@ -254,7 +254,7 @@ const Top100CoursesHubPanel = () => {
             </Select>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* Rankings List */}
       {isLoading ? (
