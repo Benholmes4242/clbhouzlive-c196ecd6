@@ -123,12 +123,6 @@ export interface RatingTheme {
 const RATING_AMBER = '#f59e0b';    // amber-500 for Outstanding
 const RATING_AMBER_LIGHT = '#fbbf24'; // amber-400 for gradient end
 
-// All tiers now use amber — unified single-color rating system
-const fairTheme = amberTheme;
-const goodTheme = amberTheme;
-const veryGoodTheme = amberTheme;
-const excellentTheme = amberTheme;
-
 // Outstanding uses Amber/Orange gradient styling
 const amberTheme = {
   accent: RATING_AMBER,
