@@ -179,27 +179,27 @@ export function CollegeHeroBanner({ stats, college, activeMetric, className }: C
   );
 }
 
-function StatCell({ label, value, icon, isActive }: { label: string; value: string; icon?: React.ReactNode; isActive?: boolean }) {
+function HubStatCell({ label, value, isActive }: { label: string; value: string; isActive?: boolean }) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center">
       <span
+        className="text-muted-foreground"
         style={{
           fontSize: 10,
           fontWeight: 600,
           letterSpacing: '0.5px',
           textTransform: 'uppercase',
-          color: 'rgba(255,255,255,0.5)',
         }}
       >
         {label}
       </span>
       <div className="flex items-center gap-1 mt-1">
-        {icon}
         <span
+          className={isActive ? '' : 'text-foreground'}
           style={{
             fontSize: isActive ? 19 : 17,
             fontWeight: 700,
-            color: isActive ? 'rgba(245,158,11,0.95)' : 'white',
+            ...(isActive ? { color: 'hsl(var(--accent-amber))' } : {}),
             fontVariantNumeric: 'tabular-nums',
             transition: 'all 0.2s ease',
           }}
