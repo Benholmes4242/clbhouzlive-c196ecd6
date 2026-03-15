@@ -301,7 +301,7 @@ export function MessageBubble({
             "px-[14px] py-[10px] break-words relative group backdrop-blur-[12px]",
             isPressed && "opacity-80",
             isOwnMessage 
-              ? "rounded-[18px_18px_4px_18px] bg-primary/[0.08] border border-primary/[0.12]"
+              ? "rounded-[18px_18px_4px_18px] bg-[hsl(38,92%,50%)]/[0.08] border border-[hsl(38,92%,50%)]/[0.12]"
               : "rounded-[18px_18px_18px_4px] bg-background/80 border border-border/40"
           )}
           onTouchCancel={() => setIsPressed(false)}
