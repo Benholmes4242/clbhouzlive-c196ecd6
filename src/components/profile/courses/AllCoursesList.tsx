@@ -237,7 +237,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
             {isOwnProfile && (
               <button
                 onClick={() => navigate('/courses')}
-                className="px-5 py-2 bg-foreground text-background text-sm font-medium rounded-full hover:bg-foreground/90 transition-colors min-h-[44px] active:scale-[0.98]"
+                className="px-5 py-2.5 bg-[#f59e0b] text-white text-sm font-semibold rounded-full hover:bg-[#e8920f] transition-colors min-h-[44px] active:scale-[0.97]"
               >
                 {filter === 'highest-rated' ? 'Rate a Course' : 'Log a Course'}
               </button>
