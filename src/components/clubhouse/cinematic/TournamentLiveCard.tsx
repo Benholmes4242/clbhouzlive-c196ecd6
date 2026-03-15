@@ -286,6 +286,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
       {/* ══ ZONE 1: HERO — leader portrait ══ */}
       <div style={{
         position: 'relative', flex: '0 0 46%', overflow: 'hidden',
+        touchAction: 'none',
       }}>
 
         {/* Portrait */}
@@ -432,6 +433,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           margin: '6px 16px 0',
           animation: 'trlive-fadeUp 0.5s ease-out both',
           animationDelay: '180ms',
+          touchAction: 'none',
         }}>
           {/* Round scores row */}
           <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
@@ -481,11 +483,18 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
         flex: 1, display: 'flex', flexDirection: 'column',
         padding: '10px 14px 0', overflow: 'hidden',
         animation: 'trlive-fadeUp 0.5s ease-out 0.25s both',
+        overscrollBehavior: 'contain',
+        touchAction: 'pan-y',
       }}>
 
         {/* Leaderboard card */}
         <div style={{
-          flex: 1, overflow: 'auto',
+          flex: 1,
+          overflowY: 'auto',
+          maxHeight: 280,
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehavior: 'contain',
+          touchAction: 'pan-y',
           background: 'rgba(255,255,255,0.03)',
           border: '1px solid rgba(255,255,255,0.06)',
           borderRadius: 14,
@@ -526,7 +535,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           </div>
 
           {/* Rows */}
-          {meta.leaderboard.slice(0, 4).map((entry) => (
+          {meta.leaderboard.slice(0, 10).map((entry) => (
             <LeaderboardRow
               key={entry.playerId}
               entry={entry}
