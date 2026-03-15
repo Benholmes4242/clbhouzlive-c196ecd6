@@ -424,7 +424,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
               onClick={handleToggleMute}
               className="relative w-[50px] h-[28px] rounded-full transition-colors duration-200"
               style={{
-                background: isMuted ? 'hsl(var(--muted))' : 'hsl(var(--primary))',
+                background: isMuted ? 'hsl(var(--muted))' : '#f59e0b',
               }}
             >
               <div
