@@ -136,8 +136,8 @@ function EmptyState({ onNewConversation }: { onNewConversation?: () => void }) {
 function NoResults({ query }: { query: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
-        <MessageCircle className="h-6 w-6 text-primary/50" />
+      <div className="w-12 h-12 rounded-full bg-[hsl(38,92%,50%)]/10 flex items-center justify-center mb-3">
+        <MessageCircle className="h-6 w-6 text-[hsl(38,92%,50%)]/50" />
       </div>
       <h3 className="font-medium text-foreground mb-1">No results found</h3>
       <p className="text-sm text-muted-foreground">
