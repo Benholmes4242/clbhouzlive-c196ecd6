@@ -72,7 +72,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
             <button
               type="button"
               onClick={handleClick}
-              className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+              className="text-sm font-medium text-[hsl(36,77%,49%)] hover:text-[hsl(36,77%,49%)]/80 transition-colors"
             >
               Change
             </button>
