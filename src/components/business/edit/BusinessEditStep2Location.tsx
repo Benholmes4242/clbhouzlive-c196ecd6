@@ -129,7 +129,7 @@ export function BusinessEditStep2Location({
                     <button
                       type="button"
                       onClick={() => setShowPinDropModal(true)}
-                      className="text-[13px] font-medium text-primary flex-shrink-0 ml-2"
+                      className="text-[13px] font-medium text-[#d97706] flex-shrink-0 ml-2"
                     >
                       Adjust pin
                     </button>
