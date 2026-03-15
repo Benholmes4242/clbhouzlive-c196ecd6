@@ -314,10 +314,10 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
-                  className="absolute bottom-1 right-1 w-8 h-8 rounded-full flex items-center justify-center shadow-md active:scale-[0.95] transition-transform disabled:opacity-50"
-                  style={{ background: 'hsl(var(--primary))' }}
+                  className="absolute bottom-1 right-1 w-8 h-8 rounded-full flex items-center justify-center shadow-md active:scale-[0.97] transition-transform disabled:opacity-50"
+                  style={{ background: '#f59e0b' }}
                 >
-                  <Camera size={16} className="text-primary-foreground" />
+                  <Camera size={16} className="text-white" />
                 </button>
                 <input
                   ref={fileInputRef}
