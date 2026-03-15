@@ -315,12 +315,14 @@ async function syncTournament(
   // ── Sync leaderboard ─────────────────────────────────────────────
   let leaderboardRecords = 0;
   let sportradarStatus: string | undefined;
+  let currentRound: number | undefined;
   let syncError: string | undefined;
 
   try {
     const result = await syncLeaderboard(supabase, sportradarApiKey, tour, year, tournament.sr_id, tournament.id);
     leaderboardRecords = result.records;
     sportradarStatus = result.sportradarStatus;
+    currentRound = result.currentRound;
   } catch (error) {
     syncError = error.message;
     console.error(`[LiveSync] Leaderboard error for ${tournament.name}:`, error.message);
