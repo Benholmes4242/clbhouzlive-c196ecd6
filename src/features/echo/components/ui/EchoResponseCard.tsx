@@ -168,12 +168,12 @@ export function EchoResponseCard({
         {!isStreaming && (
           <button
             onClick={handleCopy}
-            className={`flex items-center gap-1.5 mt-2 px-2 py-1 rounded-lg text-[12px] font-medium active:bg-primary/5 transition-all ${copied ? 'text-primary' : 'text-muted-foreground'}`}
+            className={`flex items-center gap-1.5 mt-2 px-2 py-1 rounded-lg text-[12px] font-medium active:bg-[hsl(38,92%,50%)]/5 transition-all ${copied ? 'text-[hsl(35,80%,43%)]' : 'text-muted-foreground'}`}
             aria-label="Copy response to clipboard"
           >
             {copied ? (
               <>
-                <Check className="w-3.5 h-3.5 text-primary" />
+                <Check className="w-3.5 h-3.5 text-[hsl(35,80%,43%)]" />
                 <span>Copied</span>
               </>
             ) : (
