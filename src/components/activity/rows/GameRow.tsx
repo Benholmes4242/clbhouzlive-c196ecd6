@@ -58,7 +58,7 @@ export const GameRow: React.FC<RowProps> = ({
           subtext={`Your request to join ${courseName} was accepted`} meta={notification.time_ago}
           actions={
             <div className="flex items-center gap-2">
-              <span className={cn(basePillClass, "border-primary/30 bg-primary/10 text-primary")}><CheckCircle2 className="h-3 w-3" />Accepted</span>
+              <span className={cn(basePillClass, "border-[hsl(38,92%,50%)]/30 bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)]")}><CheckCircle2 className="h-3 w-3" />Accepted</span>
               {viewGameBtn()}
             </div>
           }
