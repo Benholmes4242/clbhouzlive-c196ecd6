@@ -220,13 +220,13 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
             <div className="flex flex-col items-center justify-center mb-4">
               <span 
                 className="text-5xl font-bold"
-                style={{ color: isOutstanding ? '#f59e0b' : '#9ca3af' }}
+                style={{ color: '#f59e0b' }}
               >
                 {rating === 10 ? '10' : rating.toFixed(1)}
               </span>
               <span 
                 className="text-sm font-semibold uppercase tracking-wider mt-1"
-                style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.8)' : 'rgba(156, 163, 175, 0.8)' }}
+                style={{ color: 'rgba(245, 158, 11, 0.75)' }}
               >
                 {tierData.label}
               </span>
