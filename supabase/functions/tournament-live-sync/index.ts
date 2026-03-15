@@ -547,10 +547,14 @@ async function syncTournament(
       }
     }
   } else {
-    // Update last_live_sync timestamp
+    // Update last_live_sync timestamp and current_round
+    const updatePayload: any = { last_live_sync: new Date().toISOString() };
+    if (currentRound !== undefined) {
+      updatePayload.current_round = currentRound;
+    }
     await supabase
       .from('sr_tournaments')
-      .update({ last_live_sync: new Date().toISOString() })
+      .update(updatePayload)
       .eq('id', tournament.id);
   }
 
