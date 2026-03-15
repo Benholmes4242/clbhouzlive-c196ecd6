@@ -91,7 +91,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
       data-review-id={review.id}
       className={cn(
         'bg-card rounded-2xl border p-5 transition-all',
-        isMine ? 'border-green-200 ring-1 ring-green-100' : 'border-border',
+        isMine ? 'border-[#f59e0b]/40 ring-1 ring-[#f59e0b]/10' : 'border-border',
         isHighlighted && 'animate-soft-pulse'
       )}
     >
