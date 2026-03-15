@@ -64,7 +64,7 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
             onClick();
           }
         }}
-        className="flex-1 flex items-start gap-3 text-left min-w-0 min-h-[44px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
+        className="flex-1 flex items-start gap-3 text-left min-w-0 min-h-[44px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(38,92%,50%)]/40 focus-visible:ring-offset-2 rounded-sm"
       >
         {/* Avatar */}
         <div className="shrink-0" aria-hidden="true">{avatar}</div>
