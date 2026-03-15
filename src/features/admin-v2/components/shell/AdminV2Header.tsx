@@ -65,7 +65,22 @@ export default function AdminV2Header({ onOpenPalette, onToggleSidebar, sidebarO
 
   return (
     <div className="h-full flex items-center justify-between px-4">
-      {/* Left: Breadcrumb */}
+      {/* Left: Toggle + Breadcrumb */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={onToggleSidebar}
+          aria-label="Toggle sidebar"
+          className="flex items-center justify-center w-[34px] h-[34px] rounded-lg flex-shrink-0 bg-transparent cursor-pointer"
+          style={{
+            border: '1px solid hsl(var(--border) / 0.3)',
+            color: 'hsl(var(--muted-foreground))',
+          }}
+        >
+          {sidebarOpen
+            ? <PanelLeftClose className="w-4 h-4" />
+            : <PanelLeft className="w-4 h-4" />
+          }
+        </button>
       <nav className="flex items-center gap-1 text-sm">
         <Link to="/admin-v2/dashboard" className="text-muted-foreground hover:text-foreground transition-colors font-medium">
           Admin
