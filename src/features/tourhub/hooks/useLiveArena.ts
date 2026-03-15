@@ -26,6 +26,8 @@ export interface LiveArenaPlayer {
     lastName: string;
     fullName: string;
     photoUrl: string | null;
+    headshotOverride: string | null;
+    tourCode: string | null;
     country: string | null;
   };
 }
@@ -162,6 +164,8 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
         last_name,
         full_name,
         photo_url,
+        headshot_override,
+        tour_codes,
         country
       )
     `)
@@ -202,6 +206,8 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
         lastName: entry.player?.last_name || '',
         fullName: entry.player?.full_name || 'Unknown',
         photoUrl: entry.player?.photo_url || null,
+        headshotOverride: entry.player?.headshot_override ?? null,
+        tourCode: entry.player?.tour_codes?.[0] ?? null,
         country: entry.player?.country || null,
       },
     }));
