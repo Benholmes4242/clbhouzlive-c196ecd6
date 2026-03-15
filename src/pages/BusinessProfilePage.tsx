@@ -318,7 +318,7 @@ const BusinessProfilePage: React.FC = () => {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-full active:scale-95 transition-all z-10 pointer-events-auto"
+          className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-full active:scale-[0.97] transition-all z-10 pointer-events-auto"
           style={{
             top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
             background: 'rgba(0, 0, 0, 0.45)',
