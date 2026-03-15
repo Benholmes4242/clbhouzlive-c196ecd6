@@ -524,7 +524,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
         {/* Your review section */}
         {filteredMyReview && (
           <div className="mb-4">
-            <p className="mb-3 text-xs font-medium tracking-wide text-muted-foreground">
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground/60">
               Your review
             </p>
             <ReviewBlockFlat
