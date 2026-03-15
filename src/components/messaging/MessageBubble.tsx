@@ -290,7 +290,7 @@ export function MessageBubble({
       <div className={cn("flex flex-col max-w-[75%]", isOwnMessage ? "items-end" : "items-start")}>
         {/* Sender name for groups */}
         {!isOwnMessage && showSenderInfo && (
-          <span className="text-[12px] font-semibold text-primary/80 mb-0.5 px-1">
+          <span className="text-[12px] font-semibold text-[hsl(35,80%,43%)]/80 mb-0.5 px-1">
             {senderName}
           </span>
         )}
