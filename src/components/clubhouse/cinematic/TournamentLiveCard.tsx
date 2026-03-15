@@ -54,8 +54,8 @@ function RoundChip({ round, score }: { round: number; score: number | null }) {
       borderRadius: 10,
       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
     }}>
-      <span style={{ fontSize: 14, fontWeight: 800, color: 'rgba(255,255,255,0.85)', lineHeight: 1 }}>{display}</span>
-      <span style={{ fontSize: 8.5, fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: 0.6, textTransform: 'uppercase' }}>R{round}</span>
+      <span style={{ fontSize: 'clamp(12px, 3.5vw, 14px)', fontWeight: 800, color: 'rgba(255,255,255,0.85)', lineHeight: 1 }}>{display}</span>
+      <span style={{ fontSize: 'clamp(7px, 2vw, 8.5px)', fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: 0.6, textTransform: 'uppercase' }}>R{round}</span>
     </div>
   );
 }
@@ -71,8 +71,8 @@ function LiveStatChip({ value, label, color, bg, border }: {
       borderRadius: 10,
       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
     }}>
-      <span style={{ fontSize: 15, fontWeight: 800, color, lineHeight: 1 }}>{value}</span>
-      <span style={{ fontSize: 8.5, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: 0.6, textTransform: 'uppercase' }}>{label}</span>
+      <span style={{ fontSize: 'clamp(12px, 3.5vw, 14px)', fontWeight: 800, color, lineHeight: 1 }}>{value}</span>
+      <span style={{ fontSize: 'clamp(7px, 2vw, 8.5px)', fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: 0.6, textTransform: 'uppercase' }}>{label}</span>
     </div>
   );
 }
@@ -164,7 +164,7 @@ function LeaderboardRow({
     }}>
       {/* Position */}
       <span style={{
-        width: 28, textAlign: 'center', fontSize: 12, fontWeight: 600,
+        width: 28, textAlign: 'center', fontSize: 'clamp(9px, 2.5vw, 11px)', fontWeight: 600,
         color: isLeader ? 'hsl(var(--accent-amber))' : 'rgba(255,255,255,0.5)',
       }}>
         {entry.positionTied ? `T${entry.position}` : entry.position}
@@ -174,7 +174,7 @@ function LeaderboardRow({
 
       {/* Name */}
       <span style={{
-        flex: 1, fontSize: 13, fontWeight: isLeader ? 600 : 400,
+        flex: 1, fontSize: isLeader ? 'clamp(12px, 3.5vw, 14px)' : 'clamp(11px, 3vw, 13px)', fontWeight: isLeader ? 600 : 400,
         color: 'rgba(255,255,255,0.92)', overflow: 'hidden',
         textOverflow: 'ellipsis', whiteSpace: 'nowrap',
       }}>
@@ -183,14 +183,14 @@ function LeaderboardRow({
 
       {/* Thru */}
       {entry.thru && (
-        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', minWidth: 24, textAlign: 'center' }}>
+        <span style={{ fontSize: 'clamp(9px, 2.5vw, 11px)', color: 'rgba(255,255,255,0.35)', minWidth: 24, textAlign: 'center' }}>
           {entry.thru === '18' || entry.thru === 'F' ? 'F' : entry.thru}
         </span>
       )}
 
       {/* Score */}
       <span style={{
-        fontSize: 14, fontWeight: 700, minWidth: 36, textAlign: 'right',
+        fontSize: isLeader ? 'clamp(13px, 3.5vw, 15px)' : 'clamp(11px, 3vw, 13px)', fontWeight: 700, minWidth: 36, textAlign: 'right',
         color: scoreColor(entry.scoreDisplay),
         fontVariantNumeric: 'tabular-nums',
       }}>
@@ -359,14 +359,14 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
         }}>
           {/* Venue */}
           {(meta.venueName || meta.venueCity) && (
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 3, letterSpacing: '0.02em' }}>
+            <div style={{ fontSize: 'clamp(9px, 2.5vw, 11px)', color: 'rgba(255,255,255,0.4)', marginBottom: 3, letterSpacing: '0.02em' }}>
               {[meta.venueName, meta.venueCity].filter(Boolean).join(' · ')}
             </div>
           )}
 
           {/* Tournament name */}
           <div style={{
-            fontSize: 17, fontWeight: 700, color: 'rgba(255,255,255,0.95)',
+            fontSize: 'clamp(11px, 3vw, 13px)', fontWeight: 700, color: 'rgba(255,255,255,0.95)',
             letterSpacing: '-0.01em', marginBottom: 8, lineHeight: 1.2,
           }}>
             {meta.tournamentName}
@@ -409,7 +409,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
       {/* ══ ZONE 2: VOLATILITY BANNER (conditional) ══ */}
       {volatilityBanner && (
         <div style={{
-          padding: '8px 18px',
+          padding: '8px max(10px, 3vw)',
           borderTop: '1px solid hsl(var(--accent-amber) / 0.12)',
           borderBottom: '1px solid hsl(var(--accent-amber) / 0.12)',
           background: 'hsl(var(--accent-amber) / 0.05)',
@@ -430,7 +430,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
       ) && (
         <div style={{
           flexShrink: 0,
-          margin: '6px 16px 0',
+          margin: '6px max(10px, 3vw) 0',
           animation: 'trlive-fadeUp 0.5s ease-out both',
           animationDelay: '180ms',
           touchAction: 'none',
@@ -481,7 +481,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
       {/* ══ ZONE 3: LEADERBOARD + CTA ══ */}
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column',
-        padding: '10px 14px 0', overflow: 'hidden',
+        padding: '10px max(10px, 3vw) 0', overflow: 'hidden',
         animation: 'trlive-fadeUp 0.5s ease-out 0.25s both',
         overscrollBehavior: 'contain',
         touchAction: 'pan-y',
@@ -568,10 +568,14 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           {/* Join conversation */}
           <button onClick={onComment} style={{
             flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            background: 'hsl(var(--accent-amber))', border: 'none', cursor: 'pointer',
-            borderRadius: 22, padding: '10px 16px',
-            fontSize: 14, fontWeight: 700, color: '#000',
-            animation: 'trlive-ctaPulse 2.5s ease-in-out infinite',
+            background: 'linear-gradient(180deg, rgba(251,191,36,0.6) 0%, rgba(245,158,11,0.42) 50%, rgba(180,115,0,0.5) 100%)',
+            border: '1px solid rgba(251,191,36,0.5)',
+            borderTop: '1px solid rgba(255,240,180,0.35)',
+            borderRadius: 14, padding: '10px 12px', cursor: 'pointer',
+            fontSize: 'clamp(12px, 3.2vw, 14px)', fontWeight: 700, color: '#fff',
+            animation: 'trlive-ctaPulse 3.5s ease-in-out infinite',
+            boxShadow: '0 2px 12px rgba(245,158,11,0.3), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.15)',
+            textShadow: '0 1px 2px rgba(0,0,0,0.25)',
           }}>
             💬
             <span>Join the conversation</span>

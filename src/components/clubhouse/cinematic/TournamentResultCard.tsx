@@ -323,7 +323,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
           )}
 
           <div style={{
-            fontSize: 'clamp(15px, 4.2vw, 20px)', fontWeight: 600,
+            fontSize: 'clamp(16px, 4.5vw, 20px)', fontWeight: 600,
             color: 'rgba(255,255,255,0.85)', lineHeight: 1.25,
             marginBottom: 10, maxWidth: '90%',
             display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const,
@@ -334,7 +334,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' as const }}>
             <div style={{
-              fontSize: 'clamp(26px, 7.5vw, 36px)', fontWeight: 800,
+              fontSize: 'clamp(20px, 5.5vw, 26px)', fontWeight: 800,
               color: '#fff', lineHeight: 1.1, letterSpacing: -0.5,
             }}>
               {meta.winner_name}
@@ -342,7 +342,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{
-                fontSize: 'clamp(22px, 6vw, 30px)', fontWeight: 700,
+                fontSize: 'clamp(18px, 5vw, 22px)', fontWeight: 700,
                 color: tour.accentColor, lineHeight: 1,
               }}>
                 {meta.winner_score_display || 'E'}
@@ -396,7 +396,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         <div style={{
           flex: '1 1 auto', overflow: 'auto',
           WebkitOverflowScrolling: 'touch' as const,
-          padding: '8px 16px 0',
+          padding: '8px max(12px, 3vw) 0',
         }}>
           <div style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -490,14 +490,14 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
                 )}
 
                 <span style={{
-                  flex: 1, fontSize: 13, fontWeight: 500,
+                  flex: 1, fontSize: 'clamp(11px, 3vw, 13px)', fontWeight: 500,
                   color: 'rgba(255,255,255,0.8)',
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
                 }}>
                   {isTied ? `${row.players.length}-Way Tie` : primary.name}
                 </span>
                 <span style={{
-                  fontSize: 13, fontWeight: 600,
+                  fontSize: 'clamp(12px, 3.2vw, 14px)', fontWeight: 600,
                   color: 'rgba(255,255,255,0.6)',
                   fontVariantNumeric: 'tabular-nums' as const,
                 }}>
@@ -568,11 +568,15 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
           <button onClick={onComment} style={{
             flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            background: tour.accentColor, border: 'none', borderRadius: 10,
-            padding: '10px 16px', cursor: 'pointer', color: '#fff',
-            fontSize: 14, fontWeight: 700, letterSpacing: 0.3,
+            background: 'linear-gradient(180deg, rgba(251,146,60,0.55) 0%, rgba(234,88,12,0.38) 50%, rgba(194,65,12,0.45) 100%)',
+            border: '1px solid rgba(251,146,60,0.5)',
+            borderTop: '1px solid rgba(255,200,150,0.35)',
+            borderRadius: 22, padding: '8px 8px', cursor: 'pointer', color: '#fff',
+            fontSize: 'clamp(11px, 3vw, 13px)', fontWeight: 700, letterSpacing: 0.3,
             animation: 'trc-ctaPulse 2.5s ease-in-out infinite',
             animationDelay: '1.5s',
+            boxShadow: '0 2px 12px rgba(249,115,22,0.3), inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -1px 0 rgba(0,0,0,0.15)',
+            textShadow: '0 1px 2px rgba(0,0,0,0.3)',
           }}>
             <span>💬</span>
             <span style={{
