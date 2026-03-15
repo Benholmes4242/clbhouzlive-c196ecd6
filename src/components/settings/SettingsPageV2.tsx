@@ -105,20 +105,24 @@ export function SettingsPageV2() {
           <SettingsChevronRow
             icon={<User size={18} />}
             title="Profile"
+            iconTheme="account"
             onClick={() => navigate('/profile')}
           />
           <SettingsChevronRow
             icon={<Mail size={18} />}
             title="Email"
             value={user?.email ? maskEmail(user.email) : undefined}
+            iconTheme="account"
             onClick={() => open('email')}
           />
           <SettingsChevronRow
             icon={<User size={18} />}
             title="Username"
             value={`@${(profile as any)?.username ?? ''}`}
+            subtitle="Contact support to change your username"
             onClick={() => {}}
             disabled
+            iconTheme="account"
           />
         </SettingsSection>
 
