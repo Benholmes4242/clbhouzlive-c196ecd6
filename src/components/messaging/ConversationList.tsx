@@ -291,8 +291,8 @@ export function ConversationList({
             {/* Avatar - Group icon or user photo */}
             <div className="relative flex-shrink-0">
               {isGroup && !avatarUrl ? (
-                <div className="w-12 h-12 rounded-full flex items-center justify-center bg-primary">
-                  <Users className="w-5 h-5 text-primary-foreground" />
+                <div className="w-12 h-12 rounded-full flex items-center justify-center bg-[hsl(38,92%,50%)]">
+                  <Users className="w-5 h-5 text-white" />
                 </div>
               ) : (
                 <SquircleAvatar
