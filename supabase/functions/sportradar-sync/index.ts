@@ -364,9 +364,27 @@ async function syncPlayers(supabase: any, apiKey: string, tour: string, year: nu
   };
   const currentTourCode = tourCodeMap[tour.toLowerCase()] || tour;
 
-  const url = `${getTourBaseUrl(tour)}/${year}/players/profiles.json`;
-  const data = await fetchSportradar(url, apiKey, 'Players');
-  const players = data.players || [];
+  // Sportradar URL slugs may differ from the tourId we receive
+  const tourUrlSlugMap: Record<string, string> = {
+    pga: 'pga', eur: 'euro', lpga: 'lpga', pgad: 'pgad',
+    liv: 'liv', 'champions-tour': 'champ',
+  };
+  const urlSlug = tourUrlSlugMap[tour.toLowerCase()] || tour.toLowerCase();
+
+  const url = `${getTourBaseUrl(urlSlug)}/${year}/players/profiles.json`;
+
+  let data: any;
+  try {
+    data = await fetchSportradar(url, apiKey, 'Players');
+  } catch (err: any) {
+    if (err.message?.includes('404') || err.message?.includes('not found')) {
+      console.warn(`[syncPlayers] No players endpoint for tour '${tour}' (${url}) — skipping`);
+      return { records: 0, message: `Tour '${tour}' has no players endpoint — skipped` };
+    }
+    throw err;
+  }
+
+  const players = data?.players || [];
   let totalRecords = 0;
 
   for (const player of players) {
