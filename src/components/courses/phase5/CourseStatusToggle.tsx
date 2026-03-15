@@ -10,7 +10,7 @@ import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
 import { useNavigate, Link } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
-import { getScoreTier } from '@/utils/getScoreTier';
+
 
 interface CourseStatusToggleProps {
   courseId: string;
@@ -76,12 +76,8 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
   const isWantToPlay = status.status === 'want_to_play';
   const hasNoSelection = status.status === 'none';
   
-  const scoreTier = userRating ? getScoreTier(userRating) : null;
-  const isOutstanding = scoreTier?.isOutstanding ?? false;
-  
-  // Gray for Fair→Excellent, Amber for Outstanding
-  const playedBgColor = isOutstanding ? 'bg-[#f59e0b]' : 'bg-[#9ca3af]';
-  const playedShadowColor = isOutstanding ? 'shadow-[#f59e0b]/25' : 'shadow-[#9ca3af]/25';
+  const playedBgColor = 'bg-[#f59e0b]';
+  const playedShadowColor = 'shadow-[#f59e0b]/25';
 
   return (
     <div className={cn("space-y-3", className)}>

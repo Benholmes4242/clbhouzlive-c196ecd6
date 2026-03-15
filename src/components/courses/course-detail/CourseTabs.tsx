@@ -46,7 +46,7 @@ export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: Cou
                   ? "text-background" 
                   : "text-muted-foreground"
               )}
-              style={isActive ? { backgroundColor: 'hsl(var(--foreground))' } : undefined}
+              style={isActive ? { backgroundColor: 'hsl(var(--foreground, 0 0% 9%))' } : undefined}
             >
               {getLabel(tab)}
             </button>

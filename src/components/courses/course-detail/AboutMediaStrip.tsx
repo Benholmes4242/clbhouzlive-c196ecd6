@@ -107,11 +107,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     return (
       <>
         <div className="flex items-center justify-between mb-3 px-4">
-          <div>
-            <p className="text-[11px] font-semibold tracking-[0.12em] uppercase text-muted-foreground">
-              Course media
-            </p>
-          </div>
+          <SectionHeading title="Media" />
         </div>
         <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0 grid grid-cols-3 gap-[1px]">
           {Array.from({ length: maxItems }).map((_, i) => (

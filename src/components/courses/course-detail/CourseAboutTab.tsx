@@ -143,7 +143,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           <div className="space-y-2">
             <Button 
               onClick={handleRateClick}
-              className="w-full justify-center h-11 rounded-sq-sm bg-muted text-foreground border-0 active:scale-[0.98]"
+              className="w-full justify-center h-11 rounded-xl bg-[#f59e0b] text-white font-semibold hover:bg-[#e8920f] active:scale-[0.98] transition-colors"
               variant="outline"
             >
               {rateButtonLabel}
@@ -246,13 +246,13 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </div>
         
         {coordsLoading && (
-          <div className="px-5 md:px-4">
+          <div className="px-4">
             <div className="w-full h-[200px] bg-muted animate-pulse rounded-sq-md border border-border" />
           </div>
         )}
 
         {coords && (
-          <div className="px-5 md:px-4">
+          <div className="px-4">
             <LocationMapCard
               lat={coords.lat}
               lng={coords.lng}
@@ -279,7 +279,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           <p className="text-base text-muted-foreground mb-3">
             Add your rating to see how it compares with the clbhouz community.
           </p>
-          <Button onClick={handleRateClick} className="w-full bg-muted text-foreground border-0 active:scale-[0.98]" variant="outline">
+          <Button onClick={handleRateClick} className="w-full h-11 rounded-xl bg-[#f59e0b] text-white font-semibold hover:bg-[#e8920f] active:scale-[0.98] transition-colors" variant="outline">
             Rate this course
           </Button>
         </section>

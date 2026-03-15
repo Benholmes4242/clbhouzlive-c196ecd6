@@ -5,7 +5,6 @@ import { CourseRatingAggregate } from '@/hooks/useCourseRatingAggregates';
 import { UserCourseRating } from '@/hooks/useUserCourseRating';
 import { cn } from '@/lib/utils';
 import { getRatingTheme } from '@/lib/globalAchievementMilestoneSystem';
-import { getScoreTier } from '@/utils/getScoreTier';
 
 import { RatingTierDistribution, RatingTierDistributionData } from '@/components/courses/review/RatingTierDistribution';
 
@@ -61,7 +60,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         </p>
         <Button
           onClick={onRateClick}
-          className="px-5 py-2.5 bg-card text-foreground text-sm font-medium rounded-full hover:bg-muted transition-colors shadow-sm active:scale-[0.98] border border-border/60"
+          className="px-6 py-2.5 bg-[#f59e0b] text-white text-sm font-semibold rounded-full hover:bg-[#e8920f] transition-colors shadow-sm active:scale-[0.97] min-h-[44px]"
         >
           Rate this course
         </Button>
@@ -174,17 +173,8 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                 />
                 <defs>
                   <linearGradient id="communityScoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    {communityAverage >= 9 ? (
-                      <>
-                       <stop offset="0%" stopColor="#f59e0b" />
-                       <stop offset="100%" stopColor="#fbbf24" />
-                      </>
-                    ) : (
-                      <>
-                       <stop offset="0%" stopColor={getRatingTheme(communityAverage).accent} />
-                       <stop offset="100%" stopColor={getRatingTheme(communityAverage).accent} />
-                      </>
-                    )}
+                    <stop offset="0%" stopColor="#f59e0b" />
+                    <stop offset="100%" stopColor="#fbbf24" />
                   </linearGradient>
                 </defs>
               </svg>
@@ -196,7 +186,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
             </div>
             <span 
               className="mt-2 text-base font-semibold uppercase tracking-wide"
-              style={{ color: getRatingTheme(communityAverage).accent }}
+              style={{ color: '#d97706' }}
             >
               {tierLabel}
             </span>
