@@ -12,6 +12,7 @@ interface PillToggleProps {
   onSelect: (id: string) => void;
   size?: 'default' | 'small';
   className?: string;
+  activeColor?: string;
 }
 
 /**
@@ -24,6 +25,7 @@ export const PillToggle: React.FC<PillToggleProps> = ({
   onSelect, 
   size = 'default',
   className,
+  activeColor,
 }) => {
   const textClass = size === 'small' ? 'text-xs' : 'text-sm';
   
@@ -42,7 +44,7 @@ export const PillToggle: React.FC<PillToggleProps> = ({
                 ? 'text-white'
                 : 'text-muted-foreground bg-muted'
             )}
-            style={isActive ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
+            style={isActive ? { backgroundColor: activeColor || 'hsl(var(--tab-sub-active))' } : undefined}
           >
             {option.label}
           </button>
