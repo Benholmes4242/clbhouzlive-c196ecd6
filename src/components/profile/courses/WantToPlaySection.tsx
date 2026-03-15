@@ -106,7 +106,7 @@ const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
           <div className="flex items-center gap-1.5 px-2">
             <button
               onClick={handleReview}
-              className="text-[11px] font-medium px-2.5 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg transition-colors min-h-[44px] active:scale-[0.98]"
+              className="text-[11px] font-semibold px-2.5 bg-[#f5a623]/10 hover:bg-[#f5a623]/20 text-[#d97706] rounded-lg transition-colors min-h-[44px] active:scale-[0.97]"
               title="Review this course"
             >
               Review
