@@ -102,7 +102,7 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
       {onMenuClick && (
         <button
           type="button"
-          className="shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2 rounded-full hover:bg-muted/50 active:opacity-60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          className="shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2 rounded-full hover:bg-muted/50 active:opacity-60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(38,92%,50%)]/40 focus-visible:ring-offset-2"
           onClick={(e) => {
             e.stopPropagation();
             onMenuClick();
