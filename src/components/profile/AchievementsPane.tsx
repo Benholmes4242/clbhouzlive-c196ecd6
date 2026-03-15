@@ -807,7 +807,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
           {!isMobile && (
             <div className="flex justify-center items-center px-6 pb-8">
               <div className="text-center">
-                <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
+                <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-foreground`}>
                   Achievements
                 </h1>
                 <p className={`${isMobile ? 'text-sm' : 'text-base'} text-black dark:text-white mt-1`}>
