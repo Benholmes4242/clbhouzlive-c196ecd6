@@ -40,7 +40,10 @@ const Top100LeaderboardPanel = () => {
   return (
     <div className="w-full pb-6">
       <Tabs value={view} onValueChange={handleViewChange} className="w-full">
-        <div className="px-3">
+        <div
+          className="sticky top-0 z-10 bg-background pb-2 pt-1 px-3"
+          style={{ borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
+        >
           <TabsList className="bg-transparent border-0 px-0 py-0 gap-2 w-full flex justify-center">
             {tabs.map((tab) => (
               <TabsTrigger
