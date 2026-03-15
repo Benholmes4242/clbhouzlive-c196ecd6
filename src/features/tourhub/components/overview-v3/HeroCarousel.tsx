@@ -1185,38 +1185,6 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
         ))}
       </AnimatePresence>
 
-      {/* Scroll indicator — collapsed or live slides */}
-      {(!isExpanded || slides[currentIndex]?.type === 'live') && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 0.5 }}
-          style={{
-            position: 'absolute',
-            bottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 16px)',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '4px',
-            pointerEvents: 'none',
-            zIndex: 5,
-            opacity: isExpanded ? 0 : 1,
-            transition: 'opacity 0.2s',
-          }}
-        >
-          <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '1.2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)' }}>
-            Explore
-          </span>
-          <motion.div
-            animate={{ y: [0, 4, 0] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <ChevronDown size={16} style={{ color: 'rgba(255,255,255,0.45)' }} />
-          </motion.div>
-        </motion.div>
-      )}
     </div>
   );
 }
