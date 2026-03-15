@@ -99,6 +99,7 @@ export function useVideoPool() {
 
     return () => {
       destroyAll();
+      destroyPreCreated();
       segmentCache.clear();
       recoveryState.current.forEach((state) => {
         clearTimeout(state.timeout);
