@@ -453,12 +453,12 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
       {/* Capsule Container - Enhanced glass effect */}
       <motion.div
         ref={capsuleRef}
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ 
           opacity: isVisible ? 1 : 0, 
-          y: isVisible ? 0 : 20 
+          y: isVisible ? 0 : 8 
         }}
-        transition={{ duration: 0.2, ease: 'easeOut' }}
+        transition={{ duration: 0.12, ease: 'easeOut' }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         className={cn(
