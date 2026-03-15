@@ -135,7 +135,7 @@ function SwipeableConversationRow({
           className="w-full h-full flex items-center justify-center"
           aria-label="Delete conversation"
         >
-          <Trash2 className="w-5 h-5 text-primary-foreground" />
+          <Trash2 className="w-5 h-5 text-white" />
         </button>
       </div>
       
