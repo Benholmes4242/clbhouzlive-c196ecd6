@@ -198,6 +198,7 @@ export function SettingsPageV2() {
             icon={<Bell size={18} />}
             title="Notification Preferences"
             isBeta
+            iconTheme="notifications"
             onClick={() => open('notifications')}
           />
         </SettingsSection>
