@@ -203,7 +203,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
         };
       
       case "Birdie Blitz":
-        const currentBirdies = 2;
+        const currentBirdies = 2; // TODO: Connect to real round data
         const targetBirdies = 3;
         const birdiePercentage = (currentBirdies / targetBirdies) * 100;
         return {
