@@ -486,8 +486,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                           <span
                             className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-[1px] rounded-lg"
                             style={{
-                             color: 'hsl(var(--primary))',
-                               background: 'hsl(var(--primary) / 0.08)',
+                             color: '#d97706',
+                               background: 'rgba(245, 158, 11, 0.08)',
                              }}
                           >
                             {participant.user_id === conversation.created_by ? (
