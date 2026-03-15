@@ -1,3 +1,4 @@
+// TODO: rebuild using UserListPage component to match personal profile followers UI
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
