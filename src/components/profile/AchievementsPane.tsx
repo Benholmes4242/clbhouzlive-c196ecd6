@@ -72,8 +72,8 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
   const totalTop100Played = top100Progress?.totalTop100Played ?? 0;
   
   // Mock data for XP system (can be replaced later)
-  const totalXP = 2500;
-  const nextMilestone = 10000;
+  const totalXP = 2500; // TODO: Replace with real XP from user data
+  const nextMilestone = 10000; // TODO: Replace with real next milestone from user data
   const progressPercentage = (totalXP / nextMilestone) * 100;
   
   // XP Tier System
