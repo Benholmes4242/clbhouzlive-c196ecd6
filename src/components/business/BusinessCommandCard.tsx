@@ -415,7 +415,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   <Users className="h-3.5 w-3.5" />
                   Manage team
                   {(pendingRequestsCount ?? 0) > 0 && (
-                    <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-card" />
+                    <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-[hsl(38,92%,50%)] ring-2 ring-card" />
                   )}
                 </Button>
               )}

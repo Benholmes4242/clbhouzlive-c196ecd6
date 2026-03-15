@@ -87,7 +87,7 @@ export const CreateBusinessProfileIntroModal: React.FC<CreateBusinessProfileIntr
               onContinue();
               onClose();
             }}
-            className="w-full bg-primary text-primary-foreground min-h-[50px] rounded-2xl text-[15px] font-semibold active:opacity-80 transition-opacity"
+            className="w-full bg-[hsl(38,92%,50%)] text-white min-h-[50px] rounded-2xl text-[15px] font-semibold hover:bg-[hsl(36,84%,46%)] active:scale-[0.97] transition-all"
           >
             Get Started
           </button>

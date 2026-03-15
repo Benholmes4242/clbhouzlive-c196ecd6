@@ -31,7 +31,7 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
 
         <button
           onClick={onClick}
-          className="bg-primary text-primary-foreground min-h-[50px] rounded-2xl px-8 text-[15px] font-semibold active:opacity-80 transition-opacity"
+          className="bg-[hsl(38,92%,50%)] text-white min-h-[50px] rounded-2xl px-8 text-[15px] font-semibold hover:bg-[hsl(36,84%,46%)] active:scale-[0.97] transition-all"
         >
           Create Business Profile
         </button>
