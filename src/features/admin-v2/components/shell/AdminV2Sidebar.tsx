@@ -225,7 +225,7 @@ export default function AdminV2Sidebar({ role, can, onNavigate }: SidebarProps) 
             <SectionLabel label={group.label} />
             <div className="space-y-0.5">
               {group.items.map(item => (
-                <SidebarLink key={item.to} item={item} />
+                <SidebarLink key={item.to} item={item} onNavigate={onNavigate} />
               ))}
             </div>
           </div>
