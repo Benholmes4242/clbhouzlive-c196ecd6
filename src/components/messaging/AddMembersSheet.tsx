@@ -171,8 +171,8 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
                     )}
                   </div>
                   {isSelected && (
-                    <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                      <Check size={14} className="text-primary-foreground" />
+                    <div className="w-6 h-6 bg-[hsl(38,92%,50%)] rounded-full flex items-center justify-center">
+                      <Check size={14} className="text-white" />
                     </div>
                   )}
                 </button>

@@ -634,7 +634,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             >
               <ChevronDown className="w-[18px] h-[18px] text-foreground/60" />
               {unreadBelowCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-primary rounded-full text-[10px] font-bold text-primary-foreground flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-[hsl(38,92%,50%)] rounded-full text-[10px] font-bold text-white flex items-center justify-center">
                   {unreadBelowCount > 99 ? '99+' : unreadBelowCount}
                 </span>
               )}

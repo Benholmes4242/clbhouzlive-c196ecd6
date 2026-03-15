@@ -408,7 +408,7 @@ export function MessageBubble({
         )}
         
         <ContextMenuItem onClick={handleStar} className="gap-3 py-2.5 cursor-pointer">
-          <Star className={cn("h-4 w-4", isSaved && "fill-current text-primary")} />
+          <Star className={cn("h-4 w-4", isSaved && "fill-current text-[hsl(38,92%,50%)]")} />
           {isSaved ? "Remove from Picks" : "Caddie's Pick ⛳"}
         </ContextMenuItem>
         

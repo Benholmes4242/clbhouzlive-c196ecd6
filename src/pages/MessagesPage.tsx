@@ -116,7 +116,7 @@ function MessagesPageInner() {
           <p className="text-muted-foreground">Please log in to view messages.</p>
           <Button 
             onClick={() => navigate('/auth')} 
-            className="mt-4 rounded-full"
+            className="mt-4 rounded-full bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0"
           >
             Log in
           </Button>

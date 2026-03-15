@@ -509,8 +509,8 @@ export function NewConversationModal({
                 className={cn(
                   "w-full h-[48px] flex items-center justify-center gap-2 text-[14px] font-semibold transition-all active:scale-[0.97] rounded-[14px]",
                   isGroupValid
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-primary/15 text-primary/40"
+                    ? "bg-[hsl(38,92%,50%)] text-white"
+                    : "bg-[hsl(38,92%,50%)]/15 text-[hsl(38,92%,50%)]/40"
                 )}
               >
                 {creatingGroup ? (

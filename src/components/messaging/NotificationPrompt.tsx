@@ -58,7 +58,7 @@ export function NotificationPrompt({
           size="sm"
           onClick={handleEnable}
           disabled={isEnabling}
-          className="bg-primary hover:bg-primary/90"
+          className="bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0"
         >
           {isEnabling ? 'Enabling...' : 'Enable'}
         </Button>

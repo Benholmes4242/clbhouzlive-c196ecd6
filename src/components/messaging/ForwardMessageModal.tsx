@@ -162,7 +162,7 @@ export function ForwardMessageModal({
                     {display.name}
                   </span>
                   {isForwarding && (
-                    <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                    <Loader2 className="w-5 h-5 text-[hsl(38,92%,50%)] animate-spin" />
                   )}
                 </button>
               );

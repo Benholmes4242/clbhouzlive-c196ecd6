@@ -339,12 +339,12 @@ export function MessageInput({
           <button 
             onClick={handleSend}
             disabled={(!hasText && !mediaPreview) || disabled || uploading}
-            className="w-10 h-10 rounded-full bg-primary flex items-center justify-center transition-all flex-shrink-0 active:scale-95 disabled:opacity-50"
+            className="w-10 h-10 rounded-full bg-[hsl(38,92%,50%)] flex items-center justify-center transition-all flex-shrink-0 active:scale-[0.97] disabled:opacity-50"
           >
             {uploading ? (
-              <Loader2 className="w-5 h-5 text-primary-foreground animate-spin" />
+              <Loader2 className="w-5 h-5 text-white animate-spin" />
             ) : (
-              <Send className="w-5 h-5 text-primary-foreground" />
+              <Send className="w-5 h-5 text-white" />
             )}
           </button>
         ) : onSendVoiceNote ? (

@@ -398,7 +398,7 @@ export function ConversationList({
         <div className="mt-4">
           <button
             onClick={() => setShowArchived(!showArchived)}
-            className="w-full flex items-center justify-between px-4 py-3 bg-primary/5 rounded-xl text-muted-foreground"
+            className="w-full flex items-center justify-between px-4 py-3 bg-[hsl(38,92%,50%)]/5 rounded-xl text-muted-foreground"
           >
             <div className="flex items-center gap-2">
               <Archive size={18} />

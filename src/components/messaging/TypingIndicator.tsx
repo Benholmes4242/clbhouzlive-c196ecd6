@@ -27,9 +27,9 @@ export function TypingIndicator({ typingUsers, className }: TypingIndicatorProps
       <div className="px-4 py-3 rounded-[16px] rounded-bl-[4px] bg-background/45 border border-border/20">
         <div className="flex items-center gap-2">
           <div className="flex gap-1">
-            <div className="w-2 h-2 rounded-full animate-bounce bg-primary" style={{ animationDelay: '0ms' }} />
-            <div className="w-2 h-2 rounded-full animate-bounce bg-primary" style={{ animationDelay: '150ms' }} />
-            <div className="w-2 h-2 rounded-full animate-bounce bg-primary" style={{ animationDelay: '300ms' }} />
+            <div className="w-2 h-2 rounded-full animate-bounce bg-[hsl(38,92%,50%)]" style={{ animationDelay: '0ms' }} />
+            <div className="w-2 h-2 rounded-full animate-bounce bg-[hsl(38,92%,50%)]" style={{ animationDelay: '150ms' }} />
+            <div className="w-2 h-2 rounded-full animate-bounce bg-[hsl(38,92%,50%)]" style={{ animationDelay: '300ms' }} />
           </div>
           <span className="text-[13px] italic ml-1 text-muted-foreground">
             {getTypingText()}

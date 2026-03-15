@@ -84,7 +84,7 @@ export function EditMessageModal({
             <Button
               onClick={handleSave}
               disabled={!content.trim() || content === originalContent || saving}
-              className="flex-1 h-12 rounded-full bg-primary hover:bg-primary/90"
+              className="flex-1 h-12 rounded-full bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0"
             >
               <Check className="w-4 h-4 mr-2" />
               {saving ? 'Saving...' : 'Save'}

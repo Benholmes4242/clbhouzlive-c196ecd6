@@ -181,7 +181,7 @@ export const VoiceRecordButton: React.FC<VoiceRecordButtonProps> = ({
       className={cn(
         "p-2.5 rounded-full transition-all flex-shrink-0",
         "text-muted-foreground hover:text-foreground hover:bg-muted",
-        "active:scale-95 active:bg-primary active:text-primary-foreground",
+        "active:scale-[0.97] active:bg-[hsl(38,92%,50%)] active:text-white",
         disabled && "opacity-50 cursor-not-allowed"
       )}
       title="Hold to record voice note"

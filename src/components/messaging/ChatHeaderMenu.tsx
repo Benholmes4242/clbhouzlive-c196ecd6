@@ -155,8 +155,8 @@
      <>
        <DropdownMenu>
        <DropdownMenuTrigger asChild>
-          <button className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center active:bg-primary/5 transition-colors focus:outline-none">
-            <MoreVertical className="w-5 h-5 text-primary" />
+           <button className="w-10 h-10 -mr-2 rounded-full flex items-center justify-center active:bg-[hsl(38,92%,50%)]/5 transition-colors focus:outline-none">
+             <MoreVertical className="w-5 h-5 text-foreground" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent 
