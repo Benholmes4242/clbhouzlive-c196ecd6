@@ -287,7 +287,7 @@ export function ShareContentModal({
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{course.name}</p>
+                        <p className="font-medium text-sm truncate text-foreground">{course.name}</p>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           {(course.region || course.country) && (
                             <span className="flex items-center gap-1">

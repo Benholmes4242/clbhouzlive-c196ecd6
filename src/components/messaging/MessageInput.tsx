@@ -217,7 +217,7 @@ export function MessageInput({
     <div 
       className="flex-none px-4 pt-2 bg-background/80 backdrop-blur-xl border-t border-border/20"
       style={{
-        paddingBottom: 'calc(var(--sab, 0px) + 8px)',
+        paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
       }}
     >
       {/* Reply preview */}
