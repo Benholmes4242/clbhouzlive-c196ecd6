@@ -172,13 +172,17 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
                 <div className="flex flex-col items-center gap-0 flex-shrink-0">
                   <span 
                     className="text-lg font-bold tabular-nums leading-none"
-                    style={{ color: ratingColors.main }}
+                    style={{
+                      background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                    }}
                   >
                     {formattedRating}
                   </span>
                   <span 
                     className="text-[8px] font-medium tracking-wider truncate max-w-[48px]"
-                    style={{ color: ratingColors.sub }}
+                    style={{ color: 'rgba(245, 158, 11, 0.65)' }}
                   >
                     {theme.label}
                   </span>
