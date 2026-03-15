@@ -452,7 +452,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           const putts = s.putts as number | null ?? null;
           if (dd == null && fw == null && gir == null && putts == null) return null;
           return (
-            <div style={{ padding: '0 16px 14px' }}>
+            <div style={{ padding: 'clamp(10px, 1.5vh, 18px) 16px clamp(10px, 1.5vh, 18px)' }}>
               <div style={{
                 fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.3)',
                 letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 8,
@@ -476,7 +476,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           ).slice(1, 3);
 
           return (
-            <div style={{ marginTop: 4, borderTop: '1px solid rgba(255,255,255,0.06)', padding: '4px 0 10px' }}>
+            <div style={{ marginTop: 4, borderTop: '1px solid rgba(255,255,255,0.06)', padding: '4px 0 10px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               {distinctByPos.map((entry, i) => {
                 const tiedEntries = meta.leaderboard.filter(e => e.position === entry.position);
                 const isTie = tiedEntries.length > 1;
@@ -485,7 +485,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                 return (
                   <div key={i} style={{
                     display: 'flex', alignItems: 'center', gap: 10,
-                    padding: '11px 20px',
+                    padding: 'clamp(11px, 2.5vh, 22px) 20px',
                   }}>
                     {/* Position */}
                     <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.35)', width: 22, flexShrink: 0, textAlign: 'center' }}>
@@ -497,12 +497,12 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                       <div style={{ display: 'flex', flexShrink: 0 }}>
                         {shown.map((p, idx) => (
                           <div key={idx} style={{ marginLeft: idx === 0 ? 0 : -14, position: 'relative', zIndex: shown.length - idx }}>
-                            <RowAvatar name={p.playerName} photoUrl={p.photoUrl} tourSlug={meta.tourSlug} size={44} />
+                            <RowAvatar name={p.playerName} photoUrl={p.photoUrl} tourSlug={meta.tourSlug} size={52} />
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <RowAvatar name={entry.playerName} photoUrl={entry.photoUrl} tourSlug={meta.tourSlug} size={44} />
+                      <RowAvatar name={entry.playerName} photoUrl={entry.photoUrl} tourSlug={meta.tourSlug} size={52} />
                     )}
 
                     {/* Name or tie label */}
@@ -532,8 +532,6 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           );
         })()}
 
-        {/* Spacer */}
-        <div style={{ flex: 1 }} />
 
         {/* CTA bar */}
         <div style={{
