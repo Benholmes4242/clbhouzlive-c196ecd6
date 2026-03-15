@@ -5,7 +5,6 @@ import { usePaginatedFriends } from '@/hooks/useSocialLists';
 import { useUserByUsername } from '@/hooks/useUserByUsername';
 import { UserListPage } from '@/components/social/UserListPage';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { Loader2 } from 'lucide-react';
 
 const FriendsListPage = () => {
   const { username } = useParams<{ username: string }>();
