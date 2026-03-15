@@ -30,13 +30,13 @@ function AuditActionPill({ action }: { action: string }) {
 
   return (
     <span
-      className={cn(
-        'inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide uppercase',
-        isCreate && 'bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-400',
-        isDelete && 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400',
-        isUpdate && 'bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400',
-        !isCreate && !isDelete && !isUpdate && 'bg-muted text-muted-foreground',
-      )}
+      className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide uppercase"
+      style={
+        isCreate ? { background: '#F0FDF4', color: '#17C964' }
+        : isDelete ? { background: '#FFF1F2', color: '#F31260' }
+        : isUpdate ? { background: '#EFF6FF', color: '#1D6FF5' }
+        : { background: '#F1F5F9', color: '#94A3B8' }
+      }
     >
       {isCreate ? 'CREATE' : isDelete ? 'DELETE' : isUpdate ? 'UPDATE' : 'SYS'}
     </span>
@@ -64,10 +64,13 @@ function QueueCard({
 
   if (isLoading) {
     return (
-      <div className="rounded-xl border border-border/60 bg-card p-5 space-y-3 animate-pulse">
-        <div className="h-8 w-8 rounded-lg bg-muted" />
-        <div className="h-6 w-12 rounded bg-muted" />
-        <div className="h-4 w-24 rounded bg-muted" />
+      <div
+        className="p-5 space-y-3 animate-pulse"
+        style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14 }}
+      >
+        <div className="h-8 w-8 rounded-lg" style={{ background: '#F1F5F9' }} />
+        <div className="h-6 w-12 rounded" style={{ background: '#F1F5F9' }} />
+        <div className="h-4 w-24 rounded" style={{ background: '#F1F5F9' }} />
       </div>
     );
   }
@@ -77,26 +80,31 @@ function QueueCard({
   return (
     <button
       onClick={() => navigate(href)}
-      className={cn(
-        'w-full text-left rounded-xl border p-5 transition-all duration-150 active:scale-[0.98]',
-        hasItems && variant === 'danger'
-          ? 'border-red-200 bg-red-50/50 dark:border-red-500/20 dark:bg-red-500/5 hover:shadow-sm'
-          : hasItems && variant === 'warning'
-            ? 'border-yellow-200 bg-yellow-50/50 dark:border-yellow-500/20 dark:bg-yellow-500/5 hover:shadow-sm'
-            : 'border-border/60 bg-card hover:border-border hover:shadow-sm',
-      )}
+      className="w-full text-left p-5 transition-all duration-150 active:scale-[0.98]"
+      style={{
+        borderRadius: 14,
+        background: hasItems && variant === 'danger' ? '#FFF1F2'
+          : hasItems && variant === 'warning' ? '#FFF7ED'
+          : '#FFFFFF',
+        border: `1px solid ${
+          hasItems && variant === 'danger' ? '#FECDD3'
+          : hasItems && variant === 'warning' ? '#FED7AA'
+          : '#E2E8F0'
+        }`,
+        boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03)',
+      }}
     >
       <div className="flex items-center justify-between mb-3">
-        <div className="h-8 w-8 rounded-lg bg-muted/60 flex items-center justify-center">
-          <Icon className="h-4 w-4" style={{ color: variant === 'danger' ? 'hsl(var(--destructive))' : variant === 'warning' ? '#f59e0b' : 'hsl(var(--muted-foreground))' }} />
+        <div className="h-8 w-8 rounded-lg flex items-center justify-center" style={{ background: '#F1F5F9' }}>
+          <Icon className="h-4 w-4" style={{ color: variant === 'danger' ? '#F31260' : variant === 'warning' ? '#F5A623' : '#94A3B8' }} />
         </div>
-        <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+        <ArrowRight className="h-3.5 w-3.5" style={{ color: '#94A3B8' }} />
       </div>
       <div>
-        <span className="text-2xl font-bold text-foreground tracking-tight">
+        <span style={{ fontSize: 24, fontWeight: 700, color: '#0F172A', letterSpacing: -0.5 }}>
           {count}
         </span>
-        <p className="text-[12.5px] text-muted-foreground mt-0.5">{label}</p>
+        <p style={{ fontSize: 12.5, color: '#64748B', marginTop: 2 }}>{label}</p>
       </div>
     </button>
   );
@@ -108,7 +116,7 @@ function QuickAction({
   label,
   icon: Icon,
   href,
-  color = 'hsl(var(--muted-foreground))',
+  color = '#94A3B8',
 }: {
   label: string;
   icon: React.ElementType;
@@ -119,12 +127,20 @@ function QuickAction({
   return (
     <button
       onClick={() => navigate(href)}
-      className="flex flex-col items-center gap-2.5 p-4 rounded-xl border border-border/60 bg-card hover:border-border hover:shadow-sm transition-all duration-150 active:scale-[0.97] group"
+      className="flex flex-col items-center gap-2.5 p-4 transition-all duration-150 active:scale-[0.97] group"
+      style={{
+        borderRadius: 14,
+        background: '#FFFFFF',
+        border: '1px solid #E2E8F0',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+      }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = '#CBD5E1'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.06)'; }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'; }}
     >
-      <div className="h-9 w-9 rounded-lg bg-muted/60 flex items-center justify-center group-hover:bg-muted transition-colors">
+      <div className="h-9 w-9 rounded-lg flex items-center justify-center" style={{ background: `${color}18` }}>
         <Icon className="h-4.5 w-4.5" style={{ color }} />
       </div>
-      <span className="text-[12px] font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+      <span style={{ fontSize: 12, fontWeight: 500, color: '#64748B' }}>
         {label}
       </span>
     </button>
@@ -136,13 +152,13 @@ function QuickAction({
 const ChartTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-border/60 bg-card px-3 py-2 shadow-lg">
-      <p className="text-[11px] text-muted-foreground mb-1">{label}</p>
+    <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', padding: '8px 12px' }}>
+      <p style={{ fontSize: 11, color: '#94A3B8', marginBottom: 4 }}>{label}</p>
       {payload.map((p: any) => (
-        <div key={p.name} className="flex items-center gap-2 text-[12px]">
+        <div key={p.name} className="flex items-center gap-2" style={{ fontSize: 12 }}>
           <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
-          <span className="text-muted-foreground">{p.name}:</span>
-          <span className="font-semibold text-foreground">{p.value}</span>
+          <span style={{ color: '#64748B' }}>{p.name}:</span>
+          <span style={{ fontWeight: 600, color: '#0F172A' }}>{p.value}</span>
         </div>
       ))}
     </div>
@@ -163,7 +179,8 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="p-6 space-y-8 max-w-[1400px]">
+    <div style={{ padding: '24px 24px 40px', background: '#F8FAFC', minHeight: '100%' }}>
+      <div className="space-y-8 max-w-[1400px]">
 
       {/* Page header */}
       <AdminPageHeader
@@ -192,6 +209,7 @@ export default function DashboardPage() {
             delta={kpis.data?.totalUsers.delta}
             deltaLabel="vs yesterday"
             icon={Users}
+            iconColor="#F5A623"
             trend={kpis.data?.totalUsers.trend}
             isLoading={kpis.isLoading}
           />
@@ -201,6 +219,7 @@ export default function DashboardPage() {
             delta={kpis.data?.newUsersToday.delta}
             deltaLabel="vs yesterday"
             icon={UserPlus}
+            iconColor="#1D6FF5"
             isLoading={kpis.isLoading}
           />
           <AdminKpiCard
@@ -209,6 +228,7 @@ export default function DashboardPage() {
             delta={kpis.data?.activeUsers24h.delta}
             deltaLabel="vs prior 24h"
             icon={Activity}
+            iconColor="#17C964"
             isLoading={kpis.isLoading}
           />
           <AdminKpiCard
@@ -217,6 +237,7 @@ export default function DashboardPage() {
             delta={kpis.data?.postsToday.delta}
             deltaLabel="vs yesterday"
             icon={FileText}
+            iconColor="#7C3AED"
             isLoading={kpis.isLoading}
           />
         </div>
@@ -259,19 +280,18 @@ export default function DashboardPage() {
           {/* Series toggles */}
           <div className="flex items-center gap-1.5">
             {([
-              { key: 'users',   label: 'Signups', color: '#f59e0b' },
-              { key: 'posts',   label: 'Posts',   color: '#3b82f6' },
-              { key: 'reviews', label: 'Reviews', color: '#22c55e' },
+              { key: 'users',   label: 'Signups', color: '#F5A623' },
+              { key: 'posts',   label: 'Posts',   color: '#1D6FF5' },
+              { key: 'reviews', label: 'Reviews', color: '#17C964' },
             ] as const).map(s => (
               <button
                 key={s.key}
                 onClick={() => toggleSeries(s.key)}
-                className={cn(
-                  'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium transition-all',
-                  seriesVisible[s.key]
-                    ? 'bg-foreground/10 text-foreground'
-                    : 'bg-muted/40 text-muted-foreground/50',
-                )}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-medium transition-all"
+                style={seriesVisible[s.key]
+                  ? { background: '#F1F5F9', color: '#334155', borderRadius: 20 }
+                  : { color: '#94A3B8', borderRadius: 20, opacity: 0.5 }
+                }
               >
                 <span className="w-2 h-2 rounded-full" style={{ backgroundColor: s.color, opacity: seriesVisible[s.key] ? 1 : 0.3 }} />
                 {s.label}
@@ -280,38 +300,38 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border/60 bg-card p-5">
+        <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
           {trend.isLoading ? (
-            <div className="h-[260px] animate-pulse bg-muted/30 rounded-lg" />
+            <div className="h-[260px] animate-pulse rounded-lg" style={{ background: '#F1F5F9' }} />
           ) : (
             <ResponsiveContainer width="100%" height={260}>
               <AreaChart data={trend.data ?? []}>
                 <defs>
                   <linearGradient id="grad-users" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.15} />
-                    <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#F5A623" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#F5A623" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="grad-posts" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.15} />
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#1D6FF5" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#1D6FF5" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="grad-reviews" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#22c55e" stopOpacity={0.15} />
-                    <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#17C964" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#17C964" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} />
-                <XAxis dataKey="date" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" tickLine={false} axisLine={false} width={32} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#94A3B8' }} tickLine={false} axisLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: '#94A3B8' }} tickLine={false} axisLine={false} width={32} />
                 <Tooltip content={<ChartTooltip />} />
                 {seriesVisible.users && (
-                  <Area type="monotone" dataKey="users" name="Signups" stroke="#f59e0b" fill="url(#grad-users)" strokeWidth={2} dot={false} />
+                  <Area type="monotone" dataKey="users" name="Signups" stroke="#F5A623" fill="url(#grad-users)" strokeWidth={2} dot={false} />
                 )}
                 {seriesVisible.posts && (
-                  <Area type="monotone" dataKey="posts" name="Posts" stroke="#3b82f6" fill="url(#grad-posts)" strokeWidth={2} dot={false} />
+                  <Area type="monotone" dataKey="posts" name="Posts" stroke="#1D6FF5" fill="url(#grad-posts)" strokeWidth={2} dot={false} />
                 )}
                 {seriesVisible.reviews && (
-                  <Area type="monotone" dataKey="reviews" name="Reviews" stroke="#22c55e" fill="url(#grad-reviews)" strokeWidth={2} dot={false} />
+                  <Area type="monotone" dataKey="reviews" name="Reviews" stroke="#17C964" fill="url(#grad-reviews)" strokeWidth={2} dot={false} />
                 )}
               </AreaChart>
             </ResponsiveContainer>
@@ -335,40 +355,40 @@ export default function DashboardPage() {
             </AdminButton>
           }
         />
-        <div className="rounded-xl border border-border/60 bg-card">
+        <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
           {audit.isLoading ? (
-            <div className="divide-y divide-border/40">
+            <div>
               {[1, 2, 3, 4, 5].map(i => (
-                <div key={i} className="flex items-center gap-4 px-5 py-3.5 animate-pulse">
-                  <div className="h-5 w-16 rounded bg-muted" />
-                  <div className="h-4 w-48 rounded bg-muted" />
-                  <div className="h-4 w-24 rounded bg-muted ml-auto" />
+                <div key={i} className="flex items-center gap-4 px-5 py-3.5 animate-pulse" style={{ borderBottom: '1px solid #F1F5F9' }}>
+                  <div className="h-5 w-16 rounded" style={{ background: '#F1F5F9' }} />
+                  <div className="h-4 w-48 rounded" style={{ background: '#F1F5F9' }} />
+                  <div className="h-4 w-24 rounded ml-auto" style={{ background: '#F1F5F9' }} />
                 </div>
               ))}
             </div>
           ) : !audit.data?.length ? (
             <div className="py-12 flex flex-col items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                <Shield className="h-5 w-5 text-muted-foreground" />
+              <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ background: '#F1F5F9' }}>
+                <Shield className="h-5 w-5" style={{ color: '#94A3B8' }} />
               </div>
-              <p className="text-sm text-muted-foreground">No recent admin activity</p>
+              <p style={{ fontSize: 14, color: '#64748B' }}>No recent admin activity</p>
             </div>
           ) : (
-            <div className="divide-y divide-border/40">
+            <div>
               {audit.data.map(entry => (
-                <div key={entry.id} className="flex items-center gap-4 px-5 py-3.5">
+                <div key={entry.id} className="flex items-center gap-4 px-5 py-3.5" style={{ borderBottom: '1px solid #F1F5F9' }}>
                   <AuditActionPill action={entry.action} />
                   <div className="flex-1 min-w-0">
-                    <span className="text-[13px] font-medium text-foreground">
+                    <span style={{ fontSize: 13, fontWeight: 500, color: '#334155' }}>
                       {entry.action.replace(/_/g, ' ')}
                     </span>
                     {entry.targetEmail && (
-                      <span className="text-[12px] text-muted-foreground ml-2">
+                      <span className="ml-2" style={{ fontSize: 12, fontFamily: 'monospace', color: '#64748B' }}>
                         {entry.targetEmail}
                       </span>
                     )}
                   </div>
-                  <span className="text-[11px] text-muted-foreground whitespace-nowrap flex items-center gap-1">
+                  <span className="whitespace-nowrap flex items-center gap-1" style={{ fontSize: 11, color: '#94A3B8' }}>
                     <Clock className="h-3 w-3" />
                     {formatDistanceToNow(new Date(entry.createdAt), { addSuffix: true })}
                   </span>
@@ -383,17 +403,18 @@ export default function DashboardPage() {
       <section className="space-y-3">
         <AdminSectionHeader title="Quick Actions" />
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-          <QuickAction label="Users" icon={Users} href="/admin-v2/users" color="#6366f1" />
-          <QuickAction label="Courses" icon={MapPin} href="/admin-v2/courses" color="#22c55e" />
-          <QuickAction label="Import" icon={Upload} href="/admin-v2/courses/import" color="#f59e0b" />
-          <QuickAction label="Verifications" icon={CheckCircle} href="/admin-v2/verifications" color="#3b82f6" />
-          <QuickAction label="Tour Data" icon={Trophy} href="/admin-v2/tour" color="#eab308" />
-          <QuickAction label="Businesses" icon={Building2} href="/admin-v2/businesses" color="#ec4899" />
-          <QuickAction label="Audit Log" icon={ClipboardList} href="/admin-v2/audit" color="#8b5cf6" />
-          <QuickAction label="Settings" icon={Settings} href="/admin-v2/settings" color="#64748b" />
+          <QuickAction label="Users" icon={Users} href="/admin-v2/users" color="#7C3AED" />
+          <QuickAction label="Courses" icon={MapPin} href="/admin-v2/courses" color="#17C964" />
+          <QuickAction label="Import" icon={Upload} href="/admin-v2/courses/import" color="#F5A623" />
+          <QuickAction label="Verifications" icon={CheckCircle} href="/admin-v2/verifications" color="#1D6FF5" />
+          <QuickAction label="Tour Data" icon={Trophy} href="/admin-v2/tour" color="#F5A623" />
+          <QuickAction label="Businesses" icon={Building2} href="/admin-v2/businesses" color="#F31260" />
+          <QuickAction label="Audit Log" icon={ClipboardList} href="/admin-v2/audit" color="#7C3AED" />
+          <QuickAction label="Settings" icon={Settings} href="/admin-v2/settings" color="#64748B" />
         </div>
       </section>
 
+      </div>
     </div>
   );
 }
