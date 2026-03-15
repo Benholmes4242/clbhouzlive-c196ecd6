@@ -378,7 +378,7 @@ const ProfilePageV2Content: React.FC = () => {
           </p>
           <button
             onClick={() => safeGoBack(navigate, '/clubhouse')}
-            className="px-6 py-2 bg-foreground text-background rounded-full text-sm font-medium hover:opacity-90 transition-colors"
+            className="px-6 py-2.5 bg-[#f59e0b] text-white rounded-full text-sm font-semibold hover:bg-[#e8920f] transition-colors active:scale-[0.97]"
           >
             Go back
           </button>
