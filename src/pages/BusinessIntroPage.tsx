@@ -161,7 +161,7 @@ const BusinessIntroPage: React.FC = () => {
           </button>
           <Button
             onClick={handleContinue}
-            className="flex-[1.5] h-11 bg-[#334E3D] hover:bg-[#334E3D]/90 text-white rounded-full font-semibold"
+            className="flex-[1.5] h-11 bg-[#f59e0b] hover:bg-[#e8920f] text-white rounded-full font-semibold active:scale-[0.97] transition-all"
           >
             Continue to business details
           </Button>

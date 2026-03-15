@@ -44,7 +44,7 @@ export function ProfileSuccessScreen({ redirectTo, message, title, subtitle, onV
         {(onViewProfile || onDone) && (
           <div className="flex gap-3 mt-4">
             {onViewProfile && (
-              <button onClick={onViewProfile} className="px-4 py-2 text-sm font-medium rounded-xl bg-primary text-primary-foreground">
+              <button onClick={onViewProfile} className="px-4 py-2 text-sm font-medium rounded-xl bg-[#f59e0b] text-white hover:bg-[#e8920f] active:scale-[0.97] transition-all">
                 View Profile
               </button>
             )}
