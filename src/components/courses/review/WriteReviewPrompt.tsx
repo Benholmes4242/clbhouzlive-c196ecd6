@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Star } from 'lucide-react';
 
 interface WriteReviewPromptProps {
@@ -24,15 +23,13 @@ export const WriteReviewPrompt: React.FC<WriteReviewPromptProps> = ({
           <p className="mt-0.5 text-xs text-muted-foreground">
             Rate this course to help the community.
           </p>
-          <Button
+          <button
             type="button"
-            variant="outline"
-            size="sm"
-            className="mt-3 h-9 active:scale-[0.98] transition-transform"
             onClick={onRateClick}
+            className="mt-3 h-9 inline-flex items-center px-4 rounded-lg text-sm font-semibold bg-[#f59e0b] text-white hover:bg-[#e8920f] active:scale-[0.97] transition-all"
           >
             Rate this course
-          </Button>
+          </button>
         </div>
       </div>
     </div>

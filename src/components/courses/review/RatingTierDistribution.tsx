@@ -1,5 +1,4 @@
 import React from 'react';
-import { getRatingTheme } from '@/lib/globalAchievementMilestoneSystem';
 
 export type RatingTierKey = 'OUTSTANDING' | 'EXCELLENT' | 'VERY_GOOD' | 'GOOD' | 'FAIR';
 
@@ -17,37 +16,21 @@ interface RatingTierDistributionProps {
   activeTier?: RatingTierKey;
 }
 
-// Tier configuration with labels and sample scores for color lookup
-const TIER_CONFIG: Array<{ key: RatingTierKey; dataKey: keyof RatingTierDistributionData; label: string; sampleScore: number }> = [
-  { key: 'OUTSTANDING', dataKey: 'outstanding', label: 'Outstanding', sampleScore: 9.5 },
-  { key: 'EXCELLENT', dataKey: 'excellent', label: 'Excellent', sampleScore: 8.5 },
-  { key: 'VERY_GOOD', dataKey: 'veryGood', label: 'Very Good', sampleScore: 7.5 },
-  { key: 'GOOD', dataKey: 'good', label: 'Good', sampleScore: 6.5 },
-  { key: 'FAIR', dataKey: 'fair', label: 'Fair', sampleScore: 5.0 },
+const TIER_CONFIG: Array<{ key: RatingTierKey; dataKey: keyof RatingTierDistributionData; label: string }> = [
+  { key: 'OUTSTANDING', dataKey: 'outstanding', label: 'Outstanding' },
+  { key: 'EXCELLENT', dataKey: 'excellent', label: 'Excellent' },
+  { key: 'VERY_GOOD', dataKey: 'veryGood', label: 'Very Good' },
+  { key: 'GOOD', dataKey: 'good', label: 'Good' },
+  { key: 'FAIR', dataKey: 'fair', label: 'Fair' },
 ];
 
-const EMPTY_COLOR = '#f3f4f6';       // gray-100
-
-/**
- * Simplified Rating Tier Distribution Component
- * 
- * Displays Outstanding/Excellent/Very Good/Good/Fair bars with counts.
- * 
- * Design rules:
- * - Outstanding tier ALWAYS uses Amber (regardless of count/dominance)
- * - All other tiers use Gray
- * - Empty bars use light grey
- * - Clean, calm hierarchy: Amber = exceptional, Gray = everything else
- */
 export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
   distribution,
 }) => {
-  // Build distribution items
-  const distributionItems = TIER_CONFIG.map(({ key, dataKey, label, sampleScore }) => ({
+  const distributionItems = TIER_CONFIG.map(({ key, dataKey, label }) => ({
     key,
     label,
     count: distribution[dataKey],
-    color: getRatingTheme(sampleScore).accent,
   }));
 
   const maxCount = Math.max(...distributionItems.map(d => d.count), 1);
@@ -60,12 +43,10 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
 
         return (
           <div key={item.key} className="flex items-center gap-2">
-            {/* Label - consistent width */}
             <span className="w-[76px] text-[13px] text-muted-foreground shrink-0">
               {item.label}
             </span>
 
-            {/* Bar track */}
             <div className="flex-1 h-[6px] rounded-full overflow-hidden" style={{ background: 'rgba(245,158,11,0.06)' }}>
               <div
                 className="h-full rounded-full transition-all duration-300"
@@ -78,7 +59,6 @@ export const RatingTierDistribution: React.FC<RatingTierDistributionProps> = ({
               />
             </div>
 
-            {/* Count - tabular numerals for alignment */}
             <span className="w-6 text-right text-xs text-muted-foreground/60 tabular-nums shrink-0">
               {item.count}
             </span>
