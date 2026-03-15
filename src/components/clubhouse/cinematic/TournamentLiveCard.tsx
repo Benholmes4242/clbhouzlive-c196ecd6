@@ -1,6 +1,6 @@
 /**
  * TournamentLiveCard — Live tournament feed card.
- * Full-bleed leader portrait. Real-time leaderboard. Pulsing LIVE badge.
+ * Full-bleed leader portrait. Static podium trio. Pulsing LIVE badge.
  */
 
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
@@ -20,7 +20,6 @@ function ensureKeyframes() {
     @keyframes trlive-fadeUp   { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes trlive-fadeIn   { from { opacity: 0; } to { opacity: 1; } }
     @keyframes trlive-livePulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.85); } }
-    @keyframes trlive-rowFlash { 0% { background: hsl(var(--accent-amber) / 0.18); } 100% { background: transparent; } }
     @keyframes trlive-ctaPulse { 0%,100% { box-shadow: 0 0 0 0 hsl(var(--accent-amber) / 0); } 60% { box-shadow: 0 0 0 8px hsl(var(--accent-amber) / 0.1); } }
     @keyframes trlive-heartPop { 0% { transform: scale(1); } 30% { transform: scale(1.6); } 70% { transform: scale(0.9); } 100% { transform: scale(1); } }
   `;
@@ -113,8 +112,11 @@ function LeaderPhoto({ src, name }: { src: string | null; name: string }) {
   );
 }
 
-// ─── Row avatar (squircle) ────────────────────────────────────────────────────
-function RowAvatar({ src, name, size = 30 }: { src: string | null; name: string; size?: number }) {
+// ─── Podium avatar (squircle) ─────────────────────────────────────────────────
+function PodiumAvatar({ name, photoUrl, tourSlug, size = 44 }: {
+  name: string; photoUrl: string | null; tourSlug: string; size?: number;
+}) {
+  const src = photoUrl || getPlayerHeadshotUrl(name, tourSlug) || null;
   const initials = name.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() ?? '').slice(0, 2).join('');
   return (
     <SquircleAvatar
@@ -127,75 +129,98 @@ function RowAvatar({ src, name, size = 30 }: { src: string | null; name: string;
   );
 }
 
-// ─── Leaderboard row with flash animation on update ───────────────────────────
-function LeaderboardRow({
-  entry,
-  isLeader,
-  flashKey,
-  tourSlug,
-}: {
-  entry: LiveLeaderboardEntry;
-  isLeader: boolean;
-  flashKey: number;
+// ─── Podium trio (static, no scroll) ──────────────────────────────────────────
+function PodiumTrio({ entries, tourSlug }: {
+  entries: LiveLeaderboardEntry[];
   tourSlug: string;
 }) {
-  const [flashing, setFlashing] = useState(false);
-  const prevFlashKey = useRef(flashKey);
+  const first  = entries[0];
+  const second = entries[1];
+  const third  = entries[2];
+  if (!first) return null;
 
-  useEffect(() => {
-    if (flashKey !== prevFlashKey.current) {
-      prevFlashKey.current = flashKey;
-      setFlashing(true);
-      const t = setTimeout(() => setFlashing(false), 800);
-      return () => clearTimeout(t);
-    }
-  }, [flashKey]);
+  const medals       = ['', '🥇', '🥈', '🥉'];
+  const scoreColors  = ['', '#F59E0B', '#94A3B8', '#CD7C2F'];
+  const platforms    = [0, 44, 28, 18]; // unused[0], 1st, 2nd, 3rd
+  const avatarSizes  = [0, 52, 44, 40];
 
-  const photoSrc = entry.photoUrl || getPlayerHeadshotUrl(entry.playerName, tourSlug) || null;
+  const Slot = ({ entry, rank }: { entry?: LiveLeaderboardEntry; rank: 1 | 2 | 3 }) => {
+    const isWinner = rank === 1;
+    const size = avatarSizes[rank];
+    const platform = platforms[rank];
+
+    return (
+      <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        flex: 1, gap: 3, alignSelf: 'flex-end',
+      }}>
+        <span style={{ fontSize: isWinner ? 18 : 14, marginBottom: 2 }}>{medals[rank]}</span>
+
+        {/* Avatar */}
+        <div style={{
+          width: size, height: size, borderRadius: '34%', overflow: 'hidden', flexShrink: 0,
+          border: `2px solid ${isWinner ? 'rgba(245,158,11,0.8)' : 'rgba(255,255,255,0.15)'}`,
+          boxShadow: isWinner ? '0 0 20px rgba(245,158,11,0.4), 0 0 40px rgba(245,158,11,0.15)' : 'none',
+          background: 'rgba(255,255,255,0.05)',
+        }}>
+          {entry ? (
+            <PodiumAvatar name={entry.playerName} photoUrl={entry.photoUrl} tourSlug={tourSlug} size={size} />
+          ) : (
+            <div style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.05)' }} />
+          )}
+        </div>
+
+        {/* Last name only */}
+        <span style={{
+          fontSize: isWinner ? 11 : 10, fontWeight: 700,
+          color: 'rgba(255,255,255,0.85)', textAlign: 'center',
+          maxWidth: size + 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        }}>
+          {entry ? entry.playerName.split(' ').slice(-1)[0] : '—'}
+        </span>
+
+        {/* Score */}
+        <span style={{ fontSize: isWinner ? 14 : 12, fontWeight: 800, color: scoreColors[rank] }}>
+          {entry?.scoreDisplay || '—'}
+        </span>
+
+        {/* Thru */}
+        <span style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.35)' }}>
+          {entry?.thru ? `Thru ${entry.thru}` : ''}
+        </span>
+
+        {/* Platform block */}
+        <div style={{
+          width: '85%', height: platform, borderRadius: '6px 6px 0 0',
+          background: isWinner
+            ? 'linear-gradient(180deg, rgba(245,158,11,0.3) 0%, rgba(245,158,11,0.08) 100%)'
+            : 'rgba(255,255,255,0.06)',
+          border: `1px solid ${isWinner ? 'rgba(245,158,11,0.25)' : 'rgba(255,255,255,0.08)'}`,
+          borderBottom: 'none', marginTop: 4,
+        }} />
+      </div>
+    );
+  };
 
   return (
     <div style={{
-      display: 'flex', alignItems: 'center', gap: 8,
-      padding: '7px 10px',
-      borderBottom: '1px solid rgba(255,255,255,0.04)',
-      background: isLeader ? 'hsl(var(--accent-amber) / 0.06)' : 'transparent',
-      animation: flashing ? 'trlive-rowFlash 0.8s ease-out' : undefined,
-      transition: 'background 0.3s ease',
+      padding: '14px 16px 0',
+      borderTop: '1px solid rgba(255,255,255,0.07)',
+      touchAction: 'none',
     }}>
-      {/* Position */}
-      <span style={{
-        width: 28, textAlign: 'center', fontSize: 'clamp(9px, 2.5vw, 11px)', fontWeight: 600,
-        color: isLeader ? 'hsl(var(--accent-amber))' : 'rgba(255,255,255,0.5)',
+      <div style={{
+        fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.3)',
+        letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 10,
       }}>
-        {entry.positionTied ? `T${entry.position}` : entry.position}
-      </span>
+        Top 3
+      </div>
 
-      <RowAvatar src={photoSrc} name={entry.playerName} size={30} />
-
-      {/* Name */}
-      <span style={{
-        flex: 1, fontSize: isLeader ? 'clamp(12px, 3.5vw, 14px)' : 'clamp(11px, 3vw, 13px)', fontWeight: isLeader ? 600 : 400,
-        color: 'rgba(255,255,255,0.92)', overflow: 'hidden',
-        textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-      }}>
-        {entry.playerName}
-      </span>
-
-      {/* Thru */}
-      {entry.thru && (
-        <span style={{ fontSize: 'clamp(9px, 2.5vw, 11px)', color: 'rgba(255,255,255,0.35)', minWidth: 24, textAlign: 'center' }}>
-          {entry.thru === '18' || entry.thru === 'F' ? 'F' : entry.thru}
-        </span>
-      )}
-
-      {/* Score */}
-      <span style={{
-        fontSize: isLeader ? 'clamp(13px, 3.5vw, 15px)' : 'clamp(11px, 3vw, 13px)', fontWeight: 700, minWidth: 36, textAlign: 'right',
-        color: scoreColor(entry.scoreDisplay),
-        fontVariantNumeric: 'tabular-nums',
-      }}>
-        {entry.scoreDisplay}
-      </span>
+      {/* Order: 2nd | 1st | 3rd */}
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4 }}>
+        <Slot entry={second} rank={2} />
+        <Slot entry={first}  rank={1} />
+        <Slot entry={third}  rank={3} />
+      </div>
     </div>
   );
 }
@@ -221,17 +246,8 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
   const commentCount = commentCountOverride  ?? post.commentCount;
 
   const [heartPopping, setHeartPopping] = useState(false);
-  const [flashKey, setFlashKey] = useState(0);
-  const prevLastUpdated = useRef(meta.lastUpdated);
 
   useEffect(() => { ensureKeyframes(); }, []);
-
-  useEffect(() => {
-    if (meta.lastUpdated !== prevLastUpdated.current) {
-      prevLastUpdated.current = meta.lastUpdated;
-      setFlashKey(k => k + 1);
-    }
-  }, [meta.lastUpdated]);
 
   // Parallax on leader photo
   const heroRef = useRef<HTMLDivElement>(null);
@@ -478,78 +494,42 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
         </div>
       )}
 
-      {/* ══ ZONE 3: LEADERBOARD + CTA ══ */}
+      {/* ══ ZONE 3: PODIUM + CTA ══ */}
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column',
-        padding: '10px max(10px, 3vw) 0', overflow: 'hidden',
+        overflow: 'hidden',
         animation: 'trlive-fadeUp 0.5s ease-out 0.25s both',
-        overscrollBehavior: 'contain',
-        touchAction: 'pan-y',
+        touchAction: 'none',
       }}>
 
-        {/* Leaderboard card */}
-        <div style={{
-          flex: 1,
-          overflowY: 'auto',
-          maxHeight: 280,
-          WebkitOverflowScrolling: 'touch',
-          overscrollBehavior: 'contain',
-          touchAction: 'pan-y',
-          background: 'rgba(255,255,255,0.03)',
-          border: '1px solid rgba(255,255,255,0.06)',
-          borderRadius: 14,
-        }}>
-          {/* Header row — just label, no momentum pills (shown in top badge) */}
-          <div style={{
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            padding: '10px 12px 6px',
-          }}>
-            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: 1.2, textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>
-              Leaderboard
-            </span>
+        {/* Podium trio — static, no scroll */}
+        {meta.leaderboard?.length >= 1 && (
+          <PodiumTrio entries={meta.leaderboard.slice(0, 3)} tourSlug={meta.tourSlug} />
+        )}
 
-            <button
-              onClick={handleWatchLive}
-              style={{
-                background: 'none', border: 'none', cursor: 'pointer',
-                fontSize: 11, fontWeight: 600, color: 'hsl(var(--accent-amber))',
-              }}
-            >
-              Full leaderboard →
-            </button>
-          </div>
+        {/* Full leaderboard link */}
+        <button
+          onClick={handleWatchLive}
+          style={{
+            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            gap: 6, padding: '12px 0 4px',
+            background: 'transparent', border: 'none', cursor: 'pointer',
+            fontSize: 12, fontWeight: 700,
+            color: 'rgba(255,255,255,0.4)',
+            letterSpacing: 0.5,
+          }}
+        >
+          Full leaderboard
+          <span style={{ fontSize: 11, opacity: 0.6 }}>→</span>
+        </button>
 
-          {/* Column headers */}
-          <div style={{
-            display: 'flex', padding: '4px 10px', gap: 8,
-            fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.3)',
-            textTransform: 'uppercase', letterSpacing: '0.06em',
-          }}>
-            <span style={{ width: 28, textAlign: 'center' }}>#</span>
-            <span style={{ width: 30 }} />
-            <span style={{ flex: 1 }}>Player</span>
-            {meta.leaderboard.some(e => e.thru) && (
-              <span style={{ minWidth: 24, textAlign: 'center' }}>Thru</span>
-            )}
-            <span style={{ minWidth: 36, textAlign: 'right' }}>Score</span>
-          </div>
-
-          {/* Rows */}
-          {meta.leaderboard.slice(0, 10).map((entry) => (
-            <LeaderboardRow
-              key={entry.playerId}
-              entry={entry}
-              isLeader={entry.position === 1}
-              flashKey={flashKey}
-              tourSlug={meta.tourSlug}
-            />
-          ))}
-        </div>
+        {/* Spacer */}
+        <div style={{ flex: 1 }} />
 
         {/* CTA bar */}
         <div style={{
           display: 'flex', alignItems: 'center', gap: 10,
-          padding: '10px 0 20px', flexShrink: 0,
+          padding: '10px max(10px, 3vw) 20px', flexShrink: 0,
         }}>
           {/* Like */}
           <button onClick={handleLike} style={{
