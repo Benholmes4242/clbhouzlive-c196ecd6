@@ -228,11 +228,12 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
     // Sportradar sets event_type = 'stroke' for all tours — cannot rely on it alone.
     // Check tournament name and season_id as additional signals.
     const tourSlug =
-      tourName.includes('liv')                                                         ? 'liv'   :
-      tourName.includes('lpga')                                                        ? 'lpga'  :
-      tourName.includes('champions') || tourName.includes('pga tour champions')        ? 'champ' :
+      tourName.includes('liv golf')                                                     ? 'liv'   :
+      tourName.includes('lpga')                                                         ? 'lpga'  :
       tourName.includes('korn ferry') || tourName.includes('kft')                      ? 'kft'   :
       tourName.includes('dp world') || tourName.includes('european tour')              ? 'euro'  :
+      tourName.includes('pga tour champions') || tourName === 'champions tour'         ? 'champ' :
+      tourName.includes('liv')                                                          ? 'liv'   :
       eventType.includes('liv')                                                         ? 'liv'   :
       eventType.includes('european') || eventType.includes('dp')                       ? 'euro'  :
       eventType.includes('lpga')                                                        ? 'lpga'  :
