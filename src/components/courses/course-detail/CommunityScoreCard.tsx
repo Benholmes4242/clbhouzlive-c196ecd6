@@ -173,17 +173,8 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                 />
                 <defs>
                   <linearGradient id="communityScoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    {communityAverage >= 9 ? (
-                      <>
-                       <stop offset="0%" stopColor="#f59e0b" />
-                       <stop offset="100%" stopColor="#fbbf24" />
-                      </>
-                    ) : (
-                      <>
-                       <stop offset="0%" stopColor={getRatingTheme(communityAverage).accent} />
-                       <stop offset="100%" stopColor={getRatingTheme(communityAverage).accent} />
-                      </>
-                    )}
+                    <stop offset="0%" stopColor="#f59e0b" />
+                    <stop offset="100%" stopColor="#fbbf24" />
                   </linearGradient>
                 </defs>
               </svg>
