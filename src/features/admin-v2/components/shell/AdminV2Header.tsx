@@ -49,9 +49,11 @@ function useBreadcrumbs() {
 
 interface AdminV2HeaderProps {
   onOpenPalette: () => void;
+  onToggleSidebar: () => void;
+  sidebarOpen: boolean;
 }
 
-export default function AdminV2Header({ onOpenPalette }: AdminV2HeaderProps) {
+export default function AdminV2Header({ onOpenPalette, onToggleSidebar, sidebarOpen }: AdminV2HeaderProps) {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { data: profile } = useUserProfile(user?.id);
