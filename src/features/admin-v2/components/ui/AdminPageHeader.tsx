@@ -17,16 +17,16 @@ export function AdminPageHeader({
   className,
 }: AdminPageHeaderProps) {
   return (
-    <div className={cn('flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4', className)}>
+    <div className={cn('flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6', className)}>
       <div className="space-y-1">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0F172A', letterSpacing: -0.5 }}>
             {title}
           </h1>
           {meta}
         </div>
         {description && (
-          <p className="text-sm text-muted-foreground max-w-xl">
+          <p style={{ fontSize: 13, color: '#64748B', marginTop: 4 }} className="max-w-xl">
             {description}
           </p>
         )}

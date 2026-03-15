@@ -81,7 +81,7 @@ export default function AdminV2Shell() {
 
   return (
     <div
-      className="min-h-screen bg-background"
+      className="min-h-screen"
       style={{
         display: 'grid',
         gridTemplateColumns: sidebarOpen && !isMobile ? '260px 1fr' : '1fr',
@@ -89,6 +89,7 @@ export default function AdminV2Shell() {
         height: '100dvh',
         overflow: 'hidden',
         position: 'relative',
+        background: '#F8FAFC',
       }}
     >
       {/* Mobile backdrop */}
@@ -126,7 +127,7 @@ export default function AdminV2Shell() {
       </div>
 
       {/* Header */}
-      <div className="border-b border-border/60">
+      <div style={{ borderBottom: '1px solid #E2E8F0' }}>
         <AdminV2Header
           onOpenPalette={() => setPaletteOpen(true)}
           onToggleSidebar={() => setSidebarOpen(v => !v)}
