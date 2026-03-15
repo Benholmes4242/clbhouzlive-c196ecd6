@@ -465,7 +465,7 @@ const ProfilePageV2Content: React.FC = () => {
           {isSelf && (
             <button
               onClick={() => heroFileInputRef.current?.click()}
-              className="absolute bottom-3 right-3 h-11 w-11 rounded-full flex items-center justify-center active:scale-[0.95] z-10 pointer-events-auto transition-transform"
+              className="absolute bottom-3 right-3 h-11 w-11 rounded-full flex items-center justify-center active:scale-[0.97] z-10 pointer-events-auto transition-transform"
               style={{
                 background: 'rgba(0, 0, 0, 0.45)',
                 backdropFilter: 'blur(24px) saturate(180%)',
