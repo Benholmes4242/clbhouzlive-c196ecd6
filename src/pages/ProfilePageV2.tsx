@@ -880,10 +880,10 @@ const ProfilePageV2Content: React.FC = () => {
             >
               {profile.bio}
             </div>
-            {profile.bio.split('\n').length > 4 && !bioExpanded && (
+            {(profile.bio.length > 200 || profile.bio.split('\n').length > 4) && !bioExpanded && (
               <button 
                 onClick={() => setBioExpanded(true)}
-                className="text-[0.8125rem] font-medium text-muted-foreground mt-1 min-h-[44px] flex items-center gap-0.5 active:scale-95 transition-transform"
+                className="text-[0.8125rem] font-semibold text-[#d97706] mt-1 min-h-[44px] flex items-center gap-0.5 active:scale-[0.97] transition-transform"
               >
                 Read more
                 <ChevronDown className="w-4 h-4 ml-1" />
