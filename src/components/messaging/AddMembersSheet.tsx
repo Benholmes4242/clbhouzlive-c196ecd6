@@ -157,7 +157,7 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
                   onClick={() => toggleUser(user)}
                   className={cn(
                     "w-full flex items-center gap-3 p-3 rounded-lg transition-colors",
-                    isSelected ? "bg-primary/5" : "hover:bg-muted"
+                    isSelected ? "bg-[hsl(38,92%,50%)]/5" : "hover:bg-muted"
                   )}
                 >
                   <Avatar className="w-10 h-10">
