@@ -14,6 +14,7 @@ import {
 interface SidebarProps {
   role: PanelRole;
   can: { viewUsers: boolean; manageAdmins: boolean; dangerousOps: boolean };
+  onNavigate?: () => void;
 }
 
 interface NavItem {
