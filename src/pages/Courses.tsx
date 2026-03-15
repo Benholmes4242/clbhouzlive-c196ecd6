@@ -5,7 +5,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 const Courses = () => {
   return (
     <PageRoot className="min-h-screen bg-background" hasBottomNav>
-      <main className="px-4 md:container md:mx-auto md:px-0">
+      <main className="md:container md:mx-auto md:px-0">
         <div className="max-w-6xl mx-auto">
           <CoursesContent />
         </div>

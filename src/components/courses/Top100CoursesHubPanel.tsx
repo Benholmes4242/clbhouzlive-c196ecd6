@@ -178,16 +178,18 @@ const Top100CoursesHubPanel = () => {
     <div className="space-y-5">
       {/* Top 100 Journey Hero - Premium progress module */}
       {user && (
-        <Top100JourneyHero
-          completedCourses={totalRated}
-          totalCoursesInStartedLists={totalCoursesInStartedLists}
-          listCount={listsCount}
-        />
+        <div className="px-4">
+          <Top100JourneyHero
+            completedCourses={totalRated}
+            totalCoursesInStartedLists={totalCoursesInStartedLists}
+            listCount={listsCount}
+          />
+        </div>
       )}
 
       {/* Controls Section - sticky search + filters */}
       <div
-        className="sticky top-0 z-10 bg-background pb-3 space-y-3"
+        className="sticky top-0 z-10 bg-background pb-3 px-4 space-y-3"
         style={{ borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
       >
         {/* Search */}
@@ -257,6 +259,7 @@ const Top100CoursesHubPanel = () => {
       </div>
 
       {/* Rankings List */}
+      <div className="px-4">
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in">
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -315,6 +318,7 @@ const Top100CoursesHubPanel = () => {
           onCourseClick={handleCourseClick}
         />
       )}
+      </div>
     </div>
   );
 };
