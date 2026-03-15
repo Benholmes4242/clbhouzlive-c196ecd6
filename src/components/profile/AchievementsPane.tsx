@@ -786,9 +786,9 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                   
                   {/* XP Earned This Month - Below centered content */}
                   <div className="flex items-center justify-center gap-3">
-                    <div className="flex items-center gap-3 text-green-600 relative px-4 py-2">
-                      {/* Light green glow across entire section */}
-                      <div className="absolute inset-0 bg-green-400/40 rounded-lg blur-md shadow-lg shadow-green-300/50"></div>
+                      <div className="flex items-center gap-3 text-[#d97706] relative px-4 py-2">
+                        {/* Amber glow across entire section */}
+                        <div className="absolute inset-0 bg-[#f59e0b]/20 rounded-lg blur-md shadow-lg shadow-[#f59e0b]/20"></div>
                       <span className="text-sm font-medium relative z-10">XP earned this month</span>
                       <div className="flex items-center gap-1 relative z-10">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
