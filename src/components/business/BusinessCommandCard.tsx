@@ -262,7 +262,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
 
                   {/* Verification menu item - state-based */}
                   {verificationState === 'verified' ? (
-                    <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] text-primary opacity-50 cursor-default">
+                    <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] text-[hsl(35,80%,43%)] opacity-50 cursor-default">
                       <CheckCircle className="h-4 w-4" />
                       Verified
                     </DropdownMenuItem>
