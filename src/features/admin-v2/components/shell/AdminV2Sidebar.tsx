@@ -208,7 +208,13 @@ export default function AdminV2Sidebar({ role, can, onNavigate }: SidebarProps) 
   return (
     <div className="h-full flex flex-col bg-card">
       {/* Logo / Brand */}
-      <div className="h-[52px] flex items-center gap-3 px-4 border-b border-border/60 flex-shrink-0">
+      <div
+        className="flex items-center gap-3 px-4 border-b border-border/60 flex-shrink-0"
+        style={{
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+          height: 'calc(52px + max(env(safe-area-inset-top, 0px), 47px))',
+        }}
+      >
         <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'hsl(var(--accent-amber))' }}>
           <Shield className="w-4 h-4 text-background" />
         </div>
