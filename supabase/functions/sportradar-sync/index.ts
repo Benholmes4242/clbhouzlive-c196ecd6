@@ -357,12 +357,29 @@ async function syncSchedule(supabase: any, apiKey: string, tour: string, year: n
 // Captures new fields: abbr_name, handedness, gender, is_amateur, is_member
 // ============================================================================
 async function syncPlayers(supabase: any, apiKey: string, tour: string, year: number) {
+  // Map Sportradar API tour slugs to our internal tour_codes
+  const tourCodeMap: Record<string, string> = {
+    pga: 'pga', eur: 'EURO', lpga: 'LPGA', pgad: 'PGAD',
+    liv: 'LIV', 'champions-tour': 'CHAMP',
+  };
+  const currentTourCode = tourCodeMap[tour.toLowerCase()] || tour;
+
   const url = `${getTourBaseUrl(tour)}/${year}/players/profiles.json`;
   const data = await fetchSportradar(url, apiKey, 'Players');
   const players = data.players || [];
   let totalRecords = 0;
 
   for (const player of players) {
+    // Fetch existing tour_codes so we can merge (not overwrite)
+    const { data: existing } = await supabase
+      .from('sr_players')
+      .select('tour_codes')
+      .eq('sr_id', player.id)
+      .maybeSingle();
+
+    const existingCodes: string[] = existing?.tour_codes || [];
+    const mergedCodes = Array.from(new Set([...existingCodes, currentTourCode]));
+
     const { error } = await supabase.from('sr_players').upsert({
       sr_id: player.id,
       first_name: player.first_name,
@@ -382,12 +399,13 @@ async function syncPlayers(supabase: any, apiKey: string, tour: string, year: nu
       gender: player.gender,
       is_amateur: player.amateur || false,
       is_member: player.member || false,
+      tour_codes: mergedCodes,
       raw_data: player,
     }, { onConflict: 'sr_id' });
     if (!error) totalRecords++;
   }
 
-  return { records: totalRecords, message: `Synced ${totalRecords} players` };
+  return { records: totalRecords, message: `Synced ${totalRecords} ${currentTourCode} players, tour_codes merged` };
 }
 
 // ============================================================================
