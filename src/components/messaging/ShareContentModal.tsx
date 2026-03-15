@@ -200,7 +200,7 @@ export function ShareContentModal({
       onClose={handleClose}
       zIndexBase={1500}
     >
-      <div className="px-4 pb-6" style={{ maxHeight: 'calc(85vh - 40px)', overflowY: 'auto' }}>
+      <div className="px-4" style={{ maxHeight: 'calc(85vh - 40px)', overflowY: 'auto', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}>
         {/* Title */}
         <h2 className="text-lg font-semibold text-foreground mb-4">Share Golf Content</h2>
         
