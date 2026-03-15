@@ -424,27 +424,31 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
       }}>
 
         {/* Performance averages */}
-        {meta.leaderStats && (
-          meta.leaderStats.drivingDistance != null ||
-          meta.leaderStats.fairwaysPct != null ||
-          meta.leaderStats.girPct != null ||
-          meta.leaderStats.putts != null
-        ) && (
-          <div style={{ padding: '0 16px 14px' }}>
-            <div style={{
-              fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.3)',
-              letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 8,
-            }}>
-              Performance Averages
+        {(() => {
+          const s = meta.leaderStats as Record<string, unknown> | null;
+          if (!s) return null;
+          const dd = s.drivingDistance as number | null ?? null;
+          const fw = s.fairwaysPct as number | null ?? null;
+          const gir = s.girPct as number | null ?? null;
+          const putts = s.putts as number | null ?? null;
+          if (dd == null && fw == null && gir == null && putts == null) return null;
+          return (
+            <div style={{ padding: '0 16px 14px' }}>
+              <div style={{
+                fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.3)',
+                letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 8,
+              }}>
+                Performance Averages
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4 }}>
+                <PerfChip value={dd != null ? String(dd) : null} label="DRIVER" suffix="yds" />
+                <PerfChip value={fw != null ? String(Math.round(fw)) : null} label="FAIRWAYS" suffix="%" />
+                <PerfChip value={gir != null ? String(Math.round(gir)) : null} label="GIR" suffix="%" />
+                <PerfChip value={putts != null ? putts.toFixed(2) : null} label="PUTTS" suffix="" />
+              </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4 }}>
-              <PerfChip value={meta.leaderStats?.drivingDistance != null ? String(meta.leaderStats.drivingDistance) : null} label="DRIVER" suffix="yds" />
-              <PerfChip value={meta.leaderStats?.fairwaysPct != null ? String(Math.round(meta.leaderStats.fairwaysPct)) : null} label="FAIRWAYS" suffix="%" />
-              <PerfChip value={meta.leaderStats?.girPct != null ? String(Math.round(meta.leaderStats.girPct)) : null} label="GIR" suffix="%" />
-              <PerfChip value={meta.leaderStats?.putts != null ? meta.leaderStats.putts.toFixed(2) : null} label="PUTTS" suffix="" />
-            </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* 2nd and 3rd place rows */}
         {meta.leaderboard?.length >= 2 && (() => {
