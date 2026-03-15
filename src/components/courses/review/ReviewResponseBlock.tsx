@@ -28,7 +28,7 @@ interface ResponseDisplayProps {
 
 export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({ response }) => {
   return (
-    <div className="ml-4 mt-3 pl-4 border-l-2 border-[#334E3D]">
+    <div className="ml-4 mt-3 pl-4 border-l-2 border-amber-300">
       <div className="flex items-center gap-2 mb-1.5">
         {response.business_logo_url ? (
           <SquircleAvatar
@@ -78,7 +78,7 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
         <button
           type="button"
           onClick={() => setExpanded(true)}
-          className="text-sm text-[#334E3D] font-medium active:opacity-70 transition-opacity min-h-[44px] px-1"
+          className="text-sm text-[#d97706] font-medium active:opacity-70 transition-opacity min-h-[44px] px-1"
         >
           Reply
         </button>
@@ -116,7 +116,7 @@ export const ReplyForm: React.FC<ReplyFormProps> = ({
             type="button"
             onClick={handleSubmit}
             disabled={!text.trim() || isSubmitting}
-            className="bg-[#334E3D] text-white min-h-[40px] rounded-full px-4 text-sm font-medium active:scale-[0.97] transition-transform disabled:opacity-50"
+            className="bg-[#f59e0b] text-white min-h-[40px] rounded-full px-4 text-sm font-medium active:scale-[0.97] transition-transform disabled:opacity-50"
           >
             {isSubmitting ? 'Posting…' : 'Post response'}
           </button>

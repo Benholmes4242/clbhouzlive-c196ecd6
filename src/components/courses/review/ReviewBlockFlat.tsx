@@ -1,6 +1,5 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { getScoreTier } from '@/utils/getScoreTier';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ThumbButton } from '@/components/common/ThumbButton';
 import { ExpandableText } from '@/components/common/ExpandableText';
@@ -92,7 +91,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
       data-review-id={review.id}
       className={cn(
         'bg-card rounded-2xl border p-5 transition-all',
-        isMine ? 'border-green-200 ring-1 ring-green-100' : 'border-border',
+        isMine ? 'border-[#f59e0b]/40 ring-1 ring-[#f59e0b]/10' : 'border-border',
         isHighlighted && 'animate-soft-pulse'
       )}
     >
@@ -119,7 +118,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
             <div className="flex items-center gap-2">
               <span className="font-semibold text-foreground">{user.name}</span>
               {isMine && (
-                <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
+                <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-[#f59e0b]/10 text-[#d97706]">
                   You
                 </span>
               )}
@@ -128,13 +127,10 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
           </div>
         </div>
 
-        {/* Score badge - tier-specific slate blue, amber for Outstanding */}
+        {/* Score badge */}
         <div
-          className={cn(
-            "px-2.5 py-1 rounded-lg text-sm font-bold text-white",
-            score >= 9 && 'bg-[#f59e0b]'
-          )}
-          style={score < 9 ? { backgroundColor: getScoreTier(score).accent } : undefined}
+          className="px-2.5 py-1 rounded-lg text-sm font-bold text-white"
+          style={{ background: 'linear-gradient(135deg, #f59e0b, #fbbf24)' }}
         >
           {score.toFixed(1)}
         </div>

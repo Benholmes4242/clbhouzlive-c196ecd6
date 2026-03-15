@@ -18,56 +18,21 @@ const FILTER_OPTIONS: { key: ScoreTier; label: string; sampleScore: number }[] =
   { key: 'fair', label: 'Fair', sampleScore: 5.0 },
 ];
 
-// Tier-specific color configurations - UNIFIED GRAY/AMBER SYSTEM
-// Outstanding uses Amber, everything else uses Gray
-const tierConfig: Record<ScoreTier, { 
-  bg: string; 
-  text: string; 
-  activeBg: string; 
-  activeText: string;
-  border: string;
-  activeBorder: string;
-}> = {
-  outstanding: { 
-    bg: 'bg-[#f59e0b]', 
-    text: 'text-white', 
-    activeBg: 'bg-[#f59e0b]', 
-    activeText: 'text-white',
-    border: 'border-[#f59e0b]',
-    activeBorder: 'border-[#f59e0b]',
-  },
-  excellent: { 
-    bg: 'bg-[#1e293b]/10', 
-    text: 'text-[#1e293b]', 
-    activeBg: 'bg-[#1e293b]', 
-    activeText: 'text-white',
-    border: 'border-[#1e293b]/20',
-    activeBorder: 'border-[#1e293b]',
-  },
-  veryGood: { 
-    bg: 'bg-[#475569]/10', 
-    text: 'text-[#475569]', 
-    activeBg: 'bg-[#475569]', 
-    activeText: 'text-white',
-    border: 'border-[#475569]/20',
-    activeBorder: 'border-[#475569]',
-  },
-  good: { 
-    bg: 'bg-[#64748b]/10', 
-    text: 'text-[#64748b]', 
-    activeBg: 'bg-[#64748b]', 
-    activeText: 'text-white',
-    border: 'border-[#64748b]/20',
-    activeBorder: 'border-[#64748b]',
-  },
-  fair: { 
-    bg: 'bg-[#94a3b8]/10', 
-    text: 'text-[#94a3b8]', 
-    activeBg: 'bg-[#94a3b8]', 
-    activeText: 'text-white',
-    border: 'border-[#94a3b8]/20',
-    activeBorder: 'border-[#94a3b8]',
-  },
+const amberConfig = {
+  bg: 'bg-[#f59e0b]/10',
+  text: 'text-[#d97706]',
+  activeBg: 'bg-[#f59e0b]',
+  activeText: 'text-white',
+  border: 'border-[#f59e0b]/30',
+  activeBorder: 'border-[#f59e0b]',
+};
+
+const tierConfig: Record<ScoreTier, typeof amberConfig> = {
+  outstanding: amberConfig,
+  excellent:   amberConfig,
+  veryGood:    amberConfig,
+  good:        amberConfig,
+  fair:        amberConfig,
 };
 
 export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
