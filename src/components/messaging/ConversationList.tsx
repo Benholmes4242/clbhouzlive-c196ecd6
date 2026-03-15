@@ -81,12 +81,12 @@ function ConversationTypingOrPreview({ conversationId, preview, isActive }: { co
       : `${typingUsers.length} people typing...`;
     
     return (
-      <span className="text-primary italic flex items-center gap-1">
+      <span className="text-[hsl(35,80%,43%)] italic flex items-center gap-1">
         {text}
         <span className="inline-flex gap-0.5">
-          <span className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-          <span className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-          <span className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          <span className="w-1 h-1 bg-[hsl(38,92%,50%)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+          <span className="w-1 h-1 bg-[hsl(38,92%,50%)] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+          <span className="w-1 h-1 bg-[hsl(38,92%,50%)] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
         </span>
       </span>
     );
