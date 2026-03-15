@@ -64,7 +64,7 @@ export default function AdminV2Header({ onOpenPalette, onToggleSidebar, sidebarO
   const avatarUrl = profile?.profile_photo_url ?? null;
 
   return (
-    <div className="h-full flex items-center justify-between px-4">
+    <div className="h-full flex items-center justify-between px-4" style={{ paddingTop: 'env(safe-area-inset-top, 0px)', height: 'calc(52px + env(safe-area-inset-top, 0px))' }}>
       {/* Left: Toggle + Breadcrumb */}
       <div className="flex items-center gap-2">
         <button
