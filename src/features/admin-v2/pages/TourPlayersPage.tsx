@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Users, RefreshCw, ArrowUpDown, ArrowUp, ArrowDown, Camera, Globe } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Users, RefreshCw, ArrowUpDown, ArrowUp, ArrowDown, Camera, Globe, Zap } from 'lucide-react';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { createColumnHelper } from '@tanstack/react-table';
 import { formatDistanceToNow } from 'date-fns';
