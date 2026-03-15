@@ -128,27 +128,23 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
         {/* Category breakdown as mini bars */}
         {categories.length > 0 && (
           <div className="flex-1 grid grid-cols-2 gap-x-4 gap-y-2">
-            {categories.map(cat => {
-              const isOutstanding = cat.score >= 9;
-              const barColorClass = isOutstanding 
-               ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]' 
-               : 'bg-[#d1d5db]';
-              
-              return (
-                <div key={cat.label} className="space-y-1">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">{cat.label}</span>
-                    <span className="font-medium text-foreground">{cat.score.toFixed(1)}</span>
-                  </div>
-                  <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(245,158,11,0.1)' }}>
-                    <div 
-                      className={`h-full ${barColorClass} rounded-full transition-all duration-500`}
-                      style={{ width: `${(cat.score / 10) * 100}%` }}
-                    />
-                  </div>
+            {categories.map(cat => (
+              <div key={cat.label} className="space-y-1">
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">{cat.label}</span>
+                  <span className="font-medium text-foreground">{cat.score.toFixed(1)}</span>
                 </div>
-              );
-            })}
+                <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(245,158,11,0.1)' }}>
+                  <div 
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${(cat.score / 10) * 100}%`,
+                      background: 'linear-gradient(to right, #f59e0b, #fbbf24)',
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>

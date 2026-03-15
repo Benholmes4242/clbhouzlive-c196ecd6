@@ -243,10 +243,6 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         <div className="border-t border-border p-5 grid grid-cols-2 gap-4">
           {categories.map((cat) => {
             const score = cat.score || 0;
-            const tierData = getScoreTier(score);
-            const barColorClass = tierData.isOutstanding 
-             ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]' 
-             : tierData.barFill;
             
             return (
               <div key={cat.id} className="space-y-1.5">
@@ -256,8 +252,11 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
                 </div>
                 <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(245,158,11,0.1)' }}>
                   <div 
-                    className={`h-full ${barColorClass} rounded-full transition-all duration-700`}
-                    style={{ width: `${(score / 10) * 100}%` }}
+                    className="h-full rounded-full transition-all duration-700"
+                    style={{
+                      width: `${(score / 10) * 100}%`,
+                      background: 'linear-gradient(to right, #f59e0b, #fbbf24)',
+                    }}
                   />
                 </div>
               </div>
