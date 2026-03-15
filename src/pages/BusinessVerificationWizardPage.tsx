@@ -259,8 +259,14 @@ export default function BusinessVerificationWizardPage() {
         return (
           <div className="space-y-4 mt-4 pl-7">
             <div className="flex gap-2">
-              <Button type="button" variant={creatorContactType === 'email' ? 'default' : 'outline'} size="sm" onClick={() => setCreatorContactType('email')}>Email</Button>
-              <Button type="button" variant={creatorContactType === 'phone' ? 'default' : 'outline'} size="sm" onClick={() => setCreatorContactType('phone')}>Phone</Button>
+              <button type="button" onClick={() => setCreatorContactType('email')}
+                className={`px-4 py-2 text-sm font-medium rounded-xl transition-colors min-h-[44px] ${creatorContactType === 'email' ? 'bg-[hsl(38,92%,50%)] text-white' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}>
+                Email
+              </button>
+              <button type="button" onClick={() => setCreatorContactType('phone')}
+                className={`px-4 py-2 text-sm font-medium rounded-xl transition-colors min-h-[44px] ${creatorContactType === 'phone' ? 'bg-[hsl(38,92%,50%)] text-white' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}>
+                Phone
+              </button>
             </div>
             {creatorContactType === 'email' ? (
               <div className="space-y-2">
@@ -307,7 +313,7 @@ export default function BusinessVerificationWizardPage() {
             key={s}
             className={cn(
               'h-2.5 w-2.5 rounded-full transition-colors',
-              s === step ? 'bg-primary shadow-sm ring-2 ring-primary/20' : 'bg-muted-foreground/30'
+              s === step ? 'bg-[hsl(38,92%,50%)] shadow-sm ring-2 ring-[hsl(38,92%,50%)]/20' : 'bg-muted-foreground/30'
             )}
           />
         ))}
@@ -325,7 +331,7 @@ export default function BusinessVerificationWizardPage() {
         <div className="flex items-center px-4 h-14">
           <button
             onClick={handleBack}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-muted-foreground active:text-foreground transition-colors"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-foreground active:scale-[0.97] transition-transform"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -410,10 +416,10 @@ export default function BusinessVerificationWizardPage() {
                       <label
                         className={cn(
                           'flex items-start gap-3 p-3 rounded-sq-sm border cursor-pointer transition-colors',
-                          isSelected ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/30'
+                          isSelected ? 'border-[hsl(38,92%,50%)] bg-[hsl(38,92%,50%)]/5' : 'border-border hover:bg-muted/30'
                         )}
                       >
-                        <RadioGroupItem value={option.id} className="mt-0.5" />
+                        <RadioGroupItem value={option.id} className="mt-0.5 border-[hsl(38,92%,50%)] text-[hsl(38,92%,50%)] data-[state=checked]:border-[hsl(38,92%,50%)] data-[state=checked]:text-[hsl(38,92%,50%)]" />
                         <Icon className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0" />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-foreground">{option.label}</p>
@@ -472,7 +478,7 @@ export default function BusinessVerificationWizardPage() {
                     </SelectContent>
                   </Select>
                   {role === 'owner' && (
-                    <p className="text-[10px] text-primary font-medium">Owners are typically verified fastest.</p>
+                    <p className="text-[10px] text-[hsl(35,80%,43%)] font-medium">Owners are typically verified fastest.</p>
                   )}
                 </div>
 

@@ -115,7 +115,7 @@ const BusinessVerificationStatusPage = () => {
         <div className="flex items-center px-4 h-14">
           <button
             onClick={() => navigate(-1)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-muted-foreground active:text-foreground transition-colors"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-foreground active:scale-[0.97] transition-transform"
             aria-label="Go back"
           >
             <ChevronLeft className="w-5 h-5" />
@@ -135,8 +135,8 @@ const BusinessVerificationStatusPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-              <Clock className="h-8 w-8 text-primary" />
+            <div className="h-16 w-16 rounded-full bg-[hsl(38,92%,50%)]/10 flex items-center justify-center mx-auto mb-4">
+              <Clock className="h-8 w-8 text-[hsl(38,92%,50%)]" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">
               Verification pending
@@ -159,7 +159,7 @@ const BusinessVerificationStatusPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+            <div className="h-16 w-16 rounded-full bg-[hsl(38,92%,50%)]/10 flex items-center justify-center mx-auto mb-4">
               <VerifiedBadge size="xl" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">
