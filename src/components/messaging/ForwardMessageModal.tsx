@@ -141,7 +141,7 @@ export function ForwardMessageModal({
                   disabled={forwarding !== null}
                   className={cn(
                     "w-full flex items-center gap-3 px-4 py-3 transition-colors",
-                    "hover:bg-primary/5 active:bg-primary/10",
+                    "hover:bg-[hsl(38,92%,50%)]/5 active:bg-[hsl(38,92%,50%)]/10",
                     forwarding !== null && forwarding !== conv.id && "opacity-50"
                   )}
                 >
