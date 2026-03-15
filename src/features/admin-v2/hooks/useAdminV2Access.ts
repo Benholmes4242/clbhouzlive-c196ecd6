@@ -36,7 +36,7 @@ export interface TeamMember {
 
 export interface InviteRow {
   id:         string;
-  email:      string;
+  email:      string | null;
   role:       string | null;
   status:     string;
   invitedBy:  string;
@@ -44,6 +44,11 @@ export interface InviteRow {
   expiresAt:  string;
   acceptedAt: string | null;
   notes:      string | null;
+  invitedUserId: string | null;
+  // Hydrated profile data
+  displayName: string | null;
+  username:    string | null;
+  avatarUrl:   string | null;
 }
 
 // ─── Verification fetchers ─────────────────────────────────────────────────
