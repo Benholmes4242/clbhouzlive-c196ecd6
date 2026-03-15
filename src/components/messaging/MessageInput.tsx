@@ -223,8 +223,8 @@ export function MessageInput({
       {/* Reply preview */}
       {replyingTo && (
         <div className="flex items-center justify-between gap-2 px-4 py-2 mb-2 bg-background rounded-[18px] shadow-sm">
-          <div className="flex-1 min-w-0 pl-2 border-l-2 border-primary">
-            <span className="text-[12px] font-semibold text-primary">
+          <div className="flex-1 min-w-0 pl-2 border-l-2 border-[hsl(38,92%,50%)]">
+            <span className="text-[12px] font-semibold text-[hsl(35,80%,43%)]">
               Replying to {replyToName}
             </span>
             <p className="text-[13px] text-muted-foreground truncate">
