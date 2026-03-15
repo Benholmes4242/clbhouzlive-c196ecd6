@@ -415,7 +415,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
         </div>
       )}
 
-      {/* ══ ZONE 3: PODIUM + CTA ══ */}
+      {/* ══ ZONE 3: PERFORMANCE + CHASERS + CTA ══ */}
       <div style={{
         flex: 1, display: 'flex', flexDirection: 'column',
         overflow: 'hidden',
@@ -423,10 +423,91 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
         touchAction: 'none',
       }}>
 
-        {/* Podium trio — static, no scroll */}
-        {meta.leaderboard?.length >= 1 && (
-          <PodiumTrio entries={meta.leaderboard.slice(0, 3)} tourSlug={meta.tourSlug} />
+        {/* Performance averages */}
+        {meta.leaderStats && (
+          meta.leaderStats.drivingDistance != null ||
+          meta.leaderStats.fairwaysPct != null ||
+          meta.leaderStats.girPct != null ||
+          meta.leaderStats.putts != null
+        ) && (
+          <div style={{ padding: '0 16px 14px' }}>
+            <div style={{
+              fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.3)',
+              letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 8,
+            }}>
+              Performance Averages
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4 }}>
+              <PerfChip value={meta.leaderStats?.drivingDistance != null ? String(meta.leaderStats.drivingDistance) : null} label="DRIVER" suffix="yds" />
+              <PerfChip value={meta.leaderStats?.fairwaysPct != null ? String(Math.round(meta.leaderStats.fairwaysPct)) : null} label="FAIRWAYS" suffix="%" />
+              <PerfChip value={meta.leaderStats?.girPct != null ? String(Math.round(meta.leaderStats.girPct)) : null} label="GIR" suffix="%" />
+              <PerfChip value={meta.leaderStats?.putts != null ? meta.leaderStats.putts.toFixed(2) : null} label="PUTTS" suffix="" />
+            </div>
+          </div>
         )}
+
+        {/* 2nd and 3rd place rows */}
+        {meta.leaderboard?.length >= 2 && (() => {
+          const distinctByPos = Array.from(
+            new Map(meta.leaderboard.map(e => [e.position, e])).values()
+          ).slice(1, 3);
+
+          return (
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '4px 0 10px' }}>
+              {distinctByPos.map((entry, i) => {
+                const tiedEntries = meta.leaderboard.filter(e => e.position === entry.position);
+                const isTie = tiedEntries.length > 1;
+                const shown = tiedEntries.slice(0, 5);
+
+                return (
+                  <div key={i} style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '8px 20px',
+                  }}>
+                    {/* Position */}
+                    <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.35)', width: 22, flexShrink: 0, textAlign: 'center' }}>
+                      {entry.positionTied ? `T${entry.position}` : entry.position}
+                    </span>
+
+                    {/* Avatar(s) */}
+                    {isTie ? (
+                      <div style={{ display: 'flex', flexShrink: 0 }}>
+                        {shown.map((p, idx) => (
+                          <div key={idx} style={{ marginLeft: idx === 0 ? 0 : -10, position: 'relative', zIndex: shown.length - idx }}>
+                            <RowAvatar name={p.playerName} photoUrl={p.photoUrl} tourSlug={meta.tourSlug} size={32} />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <RowAvatar name={entry.playerName} photoUrl={entry.photoUrl} tourSlug={meta.tourSlug} size={32} />
+                    )}
+
+                    {/* Name or tie label */}
+                    {isTie ? (
+                      <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.35)', flex: 1 }}>
+                        {tiedEntries.length}-way tie
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.8)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {entry.playerName}
+                      </span>
+                    )}
+
+                    {/* Thru */}
+                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', flexShrink: 0, marginRight: 8 }}>
+                      {entry.thru}
+                    </span>
+
+                    {/* Score */}
+                    <span style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.9)', flexShrink: 0, minWidth: 36, textAlign: 'right' }}>
+                      {entry.scoreDisplay}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
 
         {/* Full leaderboard link */}
         <button
