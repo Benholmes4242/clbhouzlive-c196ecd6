@@ -158,18 +158,104 @@ function HeroAvatar({ src, name }: { src: string | null; name: string }) {
   );
 }
 
-// ─── Small avatar for leaderboard rows (squircle) ───────────────────────────
+// ─── Podium Trio ─────────────────────────────────────────────────────────────
 
-function RowAvatar({ src, name, size = 34 }: { src: string | null; name: string; size?: number }) {
-  const initials = name.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() ?? '').slice(0, 2).join('');
+function PodiumTrio({ podium, resolvePhoto }: {
+  podium: PodiumRowType[];
+  resolvePhoto: (name: string, photoUrl?: string | null) => string;
+}) {
+  const second = podium.find(r => r.position === 2) ?? podium[1];
+  const third = podium.find(r => r.position === 3) ?? podium[2];
+  const winner = podium.find(r => r.position === 1) ?? podium[0];
+
+  if (!winner) return null;
+
+  const getPlayer = (row?: PodiumRowType) => row?.players?.[0];
+  const w = getPlayer(winner);
+  const s = getPlayer(second);
+  const t = getPlayer(third);
+
+  const PodiumSlot = ({
+    player, row, rank, avatarSize, platformHeight, isWinner
+  }: {
+    player?: { name: string; score?: string; photoUrl?: string | null };
+    row?: PodiumRowType;
+    rank: number;
+    avatarSize: number;
+    platformHeight: number;
+    isWinner?: boolean;
+  }) => {
+    const medals = ['', '🥇', '🥈', '🥉'];
+    const colors = ['', '#F59E0B', '#94A3B8', '#CD7C2F'];
+    const scoreColor = colors[rank] || 'rgba(255,255,255,0.7)';
+
+    return (
+      <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        flex: 1, gap: 4, alignSelf: 'flex-end',
+      }}>
+        <span style={{ fontSize: isWinner ? 18 : 14, marginBottom: 2 }}>{medals[rank]}</span>
+        <div style={{
+          width: avatarSize, height: avatarSize, borderRadius: '34%', overflow: 'hidden',
+          border: `2px solid ${isWinner ? 'rgba(245,158,11,0.7)' : 'rgba(255,255,255,0.15)'}`,
+          boxShadow: isWinner ? '0 0 16px rgba(245,158,11,0.35)' : 'none',
+          background: 'rgba(255,255,255,0.05)',
+          flexShrink: 0,
+        }}>
+          {player ? (
+            <img
+              src={resolvePhoto(player.name, player.photoUrl)}
+              alt={player.name}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
+              onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+            />
+          ) : (
+            <div style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.05)' }} />
+          )}
+        </div>
+        <span style={{
+          fontSize: isWinner ? 11 : 10, fontWeight: 700, color: 'rgba(255,255,255,0.85)',
+          textAlign: 'center', maxWidth: avatarSize + 8,
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        }}>
+          {player ? player.name.split(' ').slice(-1)[0] : '—'}
+          {row?.isTied && row.players.length > 1 && (
+            <span style={{ fontSize: 8, color: 'rgba(255,255,255,0.4)' }}> +{row.players.length - 1}</span>
+          )}
+        </span>
+        <span style={{ fontSize: isWinner ? 13 : 11, fontWeight: 800, color: scoreColor }}>
+          {player?.score || '—'}
+        </span>
+        <div style={{
+          width: '85%', height: platformHeight, borderRadius: '6px 6px 0 0',
+          background: isWinner
+            ? 'linear-gradient(180deg, rgba(245,158,11,0.25) 0%, rgba(245,158,11,0.08) 100%)'
+            : 'rgba(255,255,255,0.06)',
+          border: `1px solid ${isWinner ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.08)'}`,
+          borderBottom: 'none',
+          marginTop: 4,
+        }} />
+      </div>
+    );
+  };
+
   return (
-    <SquircleAvatar
-      src={src}
-      alt={name}
-      size={size}
-      fallback={initials}
-      hideRing
-    />
+    <div style={{
+      padding: '12px 16px 0',
+      borderTop: '1px solid rgba(255,255,255,0.06)',
+    }}>
+      <div style={{
+        fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.3)',
+        letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 10,
+      }}>
+        Podium
+      </div>
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4 }}>
+        <PodiumSlot player={s} row={second} rank={2} avatarSize={44} platformHeight={28} />
+        <PodiumSlot player={w} row={winner} rank={1} avatarSize={52} platformHeight={44} isWinner />
+        <PodiumSlot player={t} row={third}  rank={3} avatarSize={40} platformHeight={18} />
+      </div>
+    </div>
   );
 }
 
