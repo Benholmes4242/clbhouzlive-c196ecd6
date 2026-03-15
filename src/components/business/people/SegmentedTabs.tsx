@@ -30,7 +30,7 @@ export function SegmentedTabs({ tabs, activeTab, onTabChange }: SegmentedTabsPro
                   ? "text-white"
                   : "text-muted-foreground bg-muted"
               )}
-              style={isActive ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
+              style={isActive ? { backgroundColor: '#f59e0b' } : undefined}
             >
               {tab.label}
               {tab.count !== undefined && tab.count > 0 && (

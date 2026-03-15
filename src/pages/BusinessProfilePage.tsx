@@ -37,6 +37,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 // Tab content components
 import PostsTabContent from '@/components/posts-tab/PostsTabContent';
@@ -77,6 +87,7 @@ const BusinessProfilePage: React.FC = () => {
   const [bioExpanded, setBioExpanded] = useState(false);
   const [isBioClamped, setIsBioClamped] = useState(false);
   const [isAvatarLightboxOpen, setIsAvatarLightboxOpen] = useState(false);
+  const [showReportDialog, setShowReportDialog] = useState(false);
   const bioRef = useRef<HTMLParagraphElement>(null);
 
   // File selected handlers — open crop modal
@@ -296,7 +307,7 @@ const BusinessProfilePage: React.FC = () => {
           {isOwner && (
             <button
               onClick={() => heroFileInputRef.current?.click()}
-              className="absolute bottom-3 right-3 h-11 w-11 flex items-center justify-center rounded-full active:scale-[0.95] transition-transform z-10 pointer-events-auto"
+              className="absolute bottom-3 right-3 h-11 w-11 flex items-center justify-center rounded-full active:scale-[0.97] transition-transform z-10 pointer-events-auto"
               style={{
                 background: 'rgba(0, 0, 0, 0.45)',
                 backdropFilter: 'blur(24px) saturate(180%)',
@@ -318,7 +329,7 @@ const BusinessProfilePage: React.FC = () => {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-full active:scale-95 transition-all z-10 pointer-events-auto"
+          className="absolute left-4 flex h-11 w-11 items-center justify-center rounded-full active:scale-[0.97] transition-all z-10 pointer-events-auto"
           style={{
             top: 'calc(1rem + max(var(--sat, env(safe-area-inset-top, 0px)), 47px))',
             background: 'rgba(0, 0, 0, 0.45)',
@@ -335,7 +346,7 @@ const BusinessProfilePage: React.FC = () => {
         {/* Avatar - unified button, left-aligned */}
         <div className="absolute left-5 z-20 pointer-events-auto" style={{ bottom: '-62px' }}>
           <button
-            className="relative w-[124px] h-[124px] block cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            className="relative w-[124px] h-[124px] block cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f59e0b] focus-visible:ring-offset-2 rounded-[34%] transition-transform hover:scale-[1.02] active:scale-[0.98]"
             onClick={() => {
               if (isOwner) {
                 logoFileInputRef.current?.click();
@@ -415,12 +426,12 @@ const BusinessProfilePage: React.FC = () => {
           {/* Verified pill - only shows if verified */}
           {business.is_verified && (
             <span 
-              className="px-4 py-1.5 text-sm font-semibold rounded-full text-emerald-700 flex items-center gap-1.5"
+              className="px-4 py-1.5 text-sm font-semibold rounded-full text-[#d97706] flex items-center gap-1.5"
               style={{ 
-                background: 'rgba(52, 199, 89, 0.15)',
+                background: 'rgba(245, 158, 11, 0.12)',
                 backdropFilter: 'blur(8px)',
                 WebkitBackdropFilter: 'blur(8px)',
-                border: '1px solid rgba(52, 199, 89, 0.3)'
+                border: '1px solid rgba(245, 158, 11, 0.3)'
               }}
             >
               <VerifiedBadge size="sm" />
@@ -465,7 +476,7 @@ const BusinessProfilePage: React.FC = () => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button 
-              className="min-h-[44px] min-w-[44px] flex-shrink-0 rounded-full flex items-center justify-center bg-card border border-border active:scale-[0.95] transition-transform"
+              className="min-h-[44px] min-w-[44px] flex-shrink-0 rounded-full flex items-center justify-center bg-card border border-border active:scale-[0.97] transition-transform"
             >
               <MoreHorizontal className="w-5 h-5 text-foreground" />
             </button>
@@ -499,7 +510,7 @@ const BusinessProfilePage: React.FC = () => {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
-                  onClick={() => toast.info('Report submitted. Thank you.')}
+                  onClick={() => setShowReportDialog(true)}
                   className="text-destructive"
                 >
                   <Flag className="h-4 w-4 mr-2" />
@@ -538,14 +549,13 @@ const BusinessProfilePage: React.FC = () => {
 
           <div className="w-px h-6 bg-border/50 self-center" />
 
-          {/* Following */}
-          <button
-            type="button"
-            className="flex items-center gap-1.5 min-h-[44px] cursor-pointer active:opacity-70 transition-opacity pl-6"
+          {/* Following — TODO: wire up business following count */}
+          <div
+            className="flex items-center gap-1.5 min-h-[44px] pl-6 cursor-default"
           >
             <span className="text-sm text-muted-foreground">Following</span>
             <span className="text-base font-semibold text-foreground">0</span>
-          </button>
+          </div>
         </div>
       </div>
 
@@ -569,7 +579,7 @@ const BusinessProfilePage: React.FC = () => {
               {(isBioClamped || bioExpanded) && (
                  <button
                    onClick={() => setBioExpanded(!bioExpanded)}
-                   className="text-[0.8125rem] font-medium text-muted-foreground mt-1 min-h-[44px] flex items-center gap-0.5 active:scale-95 transition-transform"
+                   className="text-[0.8125rem] font-semibold text-[#d97706] mt-1 min-h-[44px] flex items-center gap-0.5 active:scale-[0.97] transition-transform"
                  >
                   {bioExpanded ? 'Show less' : 'Show more'}
                 </button>
@@ -640,7 +650,7 @@ const BusinessProfilePage: React.FC = () => {
                   className={cn(
                     "relative flex-1 min-h-[44px] transition-all duration-200 whitespace-nowrap active:scale-[0.98]",
                     isActive 
-                      ? "bg-foreground text-background rounded-lg px-4 py-1.5 text-sm font-semibold shadow-sm" 
+                      ? "bg-[#f59e0b] text-white rounded-lg px-4 py-1.5 text-sm font-semibold shadow-sm" 
                       : "text-muted-foreground px-4 py-1.5 text-sm font-medium hover:text-foreground"
                   )}
                 >
@@ -673,6 +683,27 @@ const BusinessProfilePage: React.FC = () => {
         fallbackInitial={initials}
       />
 
+      {/* Report Dialog */}
+      <AlertDialog open={showReportDialog} onOpenChange={setShowReportDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Report {business?.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              We'll review this profile and take action if it violates our Community Guidelines.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => {
+              toast.success('Report submitted. Thank you.');
+              setShowReportDialog(false);
+            }}>
+              Submit Report
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Hidden file inputs */}
       <input ref={logoFileInputRef} type="file" accept="image/*" onChange={handleLogoFileSelected} className="hidden" />
       <input ref={heroFileInputRef} type="file" accept="image/*" onChange={handleCoverFileSelected} className="hidden" />
@@ -683,7 +714,7 @@ const BusinessProfilePage: React.FC = () => {
           open={isCropModalOpen}
           onOpenChange={handleCropCancel}
           imageSrc={cropImageSrc}
-          aspectRatio={cropMode === 'cover' ? window.innerWidth / (window.innerHeight * 0.35) : 1}
+          aspectRatio={cropMode === 'cover' ? window.innerWidth / (window.innerHeight * 0.35) : 1 / 1.05}
           onCropComplete={handleCropComplete}
           title={cropMode === 'cover' ? 'Crop Cover Photo' : 'Crop Logo'}
         />
