@@ -116,8 +116,8 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
           </>
         ) : (
           <div className="text-center p-6">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
-              <Camera className="w-8 h-8 text-primary" />
+            <div className="w-16 h-16 rounded-full bg-[hsl(38,92%,50%)]/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-[hsl(38,92%,50%)]/20 transition-colors">
+              <Camera className="w-8 h-8 text-[hsl(38,92%,50%)]" />
             </div>
             <p className="text-sm font-medium text-foreground mb-1">
               Upload header photo
