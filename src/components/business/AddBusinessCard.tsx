@@ -17,8 +17,8 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
         className="flex flex-col items-center justify-center py-20 px-6 text-center"
       >
         {/* Icon */}
-        <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-5">
-          <Building2 className="w-8 h-8 text-primary" />
+        <div className="w-16 h-16 rounded-2xl bg-[hsl(38,92%,50%)]/10 flex items-center justify-center mb-5">
+          <Building2 className="w-8 h-8 text-[hsl(38,92%,50%)]" />
         </div>
 
         <h2 className="text-[18px] font-bold text-foreground mb-2">
@@ -31,7 +31,7 @@ export function AddBusinessCard({ onClick, isFirst = false }: AddBusinessCardPro
 
         <button
           onClick={onClick}
-          className="bg-primary text-primary-foreground min-h-[50px] rounded-2xl px-8 text-[15px] font-semibold active:opacity-80 transition-opacity"
+          className="bg-[hsl(38,92%,50%)] text-white min-h-[50px] rounded-2xl px-8 text-[15px] font-semibold hover:bg-[hsl(36,84%,46%)] active:scale-[0.97] transition-all"
         >
           Create Business Profile
         </button>

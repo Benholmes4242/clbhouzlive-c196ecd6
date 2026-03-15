@@ -1,3 +1,5 @@
+// TODO: DEPRECATED — This page is only reached from BusinessProfileLiveSuccessPage.
+// Replace references with /businesses/manage route (BusinessEditWizard) and delete this file.
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';

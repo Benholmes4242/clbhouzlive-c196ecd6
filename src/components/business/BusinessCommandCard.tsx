@@ -170,7 +170,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
 
             {/* "Posting as" badge */}
             {isActive && (
-              <span className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-primary/10 text-primary border border-primary/20">
+              <span className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)] border border-[hsl(38,92%,50%)]/20">
                 <Zap className="w-3 h-3" />
                 Posting as this business
               </span>
@@ -195,7 +195,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
 
             {/* Pending verification subtext */}
             {verificationState === 'pending' && (
-              <p className="text-[12px] text-primary/70 mt-1">
+              <p className="text-[12px] text-[hsl(35,80%,43%)]/70 mt-1">
                 {needsDomainVerification ? 'Action required: verify your domain' : 'Pending verification'}
               </p>
             )}
@@ -256,18 +256,18 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                     <Users className="h-4 w-4 text-muted-foreground" />
                     Manage team
                     {(pendingRequestsCount ?? 0) > 0 && (
-                      <span className="ml-auto h-2 w-2 rounded-full bg-primary" />
+                      <span className="ml-auto h-2 w-2 rounded-full bg-[hsl(38,92%,50%)]" />
                     )}
                   </DropdownMenuItem>
 
                   {/* Verification menu item - state-based */}
                   {verificationState === 'verified' ? (
-                    <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] text-primary opacity-50 cursor-default">
+                    <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] text-[hsl(35,80%,43%)] opacity-50 cursor-default">
                       <CheckCircle className="h-4 w-4" />
                       Verified
                     </DropdownMenuItem>
                   ) : verificationState === 'pending' ? (
-                    <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] text-primary/70 opacity-50 cursor-default">
+                    <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] text-[hsl(35,80%,43%)]/70 opacity-50 cursor-default">
                       <Clock className="h-4 w-4" />
                       Verification pending
                     </DropdownMenuItem>
@@ -367,13 +367,12 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
         <div className="flex items-center gap-2 p-4 pt-3">
           {needsDomainVerification ? (
             <Button
-              variant="default"
               size="sm"
               onClick={(e) => {
                 e.stopPropagation();
                 navigate(`/business/${business.id}/verify-domain`);
               }}
-              className="gap-1.5 min-h-[44px] flex-1 active:scale-[0.97] transition-all rounded-xl"
+              className="gap-1.5 min-h-[44px] flex-1 active:scale-[0.97] transition-all rounded-xl bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0"
             >
               <Mail className="h-3.5 w-3.5" />
               Verify domain now
@@ -416,7 +415,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                   <Users className="h-3.5 w-3.5" />
                   Manage team
                   {(pendingRequestsCount ?? 0) > 0 && (
-                    <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-card" />
+                    <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-[hsl(38,92%,50%)] ring-2 ring-card" />
                   )}
                 </Button>
               )}
