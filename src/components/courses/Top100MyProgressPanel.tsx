@@ -158,8 +158,21 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   
   if (!effectiveUserId) {
     return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">Sign in to track your Top 100 progress</p>
+      <div className="flex flex-col items-center justify-center py-20 px-6 text-center gap-4">
+        <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ backgroundColor: 'hsl(var(--accent-amber) / 0.1)' }}>
+          <Trophy className="w-7 h-7" style={{ color: 'hsl(var(--accent-amber))' }} />
+        </div>
+        <div>
+          <p className="text-base font-semibold text-foreground">Track your Top 100 journey</p>
+          <p className="mt-1 text-sm text-muted-foreground">Sign in to see your progress across the world's best courses.</p>
+        </div>
+        <button
+          onClick={() => navigate('/auth')}
+          className="h-11 px-6 text-sm font-semibold text-white rounded-full hover:opacity-90 active:scale-[0.97] transition-all"
+          style={{ backgroundColor: 'hsl(var(--accent-amber))' }}
+        >
+          Sign in
+        </button>
       </div>
     );
   }

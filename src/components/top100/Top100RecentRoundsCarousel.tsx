@@ -83,15 +83,15 @@ export function Top100RecentRoundsCarousel({
               : 'No Top 100 rounds recorded yet.'}
           </p>
           {isOwnProfile && onAddRound && (
-            <Button
-              variant="default"
-              size="sm"
+            <button
+              type="button"
               onClick={onAddRound}
-              className="rounded-full"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold text-white rounded-full hover:opacity-90 active:scale-[0.97] transition-all min-h-[44px]"
+              style={{ backgroundColor: 'hsl(var(--accent-amber))' }}
             >
-              <Plus className="w-4 h-4 mr-1.5" />
+              <Plus className="w-4 h-4" />
               Log your first round
-            </Button>
+            </button>
           )}
         </div>
       </section>
