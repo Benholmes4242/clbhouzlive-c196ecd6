@@ -175,22 +175,45 @@ async function fetchTeam(): Promise<TeamMember[]> {
 async function fetchInvites(): Promise<InviteRow[]> {
   const { data, error } = await supabase
     .from('admin_invitations')
-    .select('id, email, role, status, invited_by, created_at, expires_at, accepted_at, notes')
+    .select('id, email, role, status, invited_by, created_at, expires_at, accepted_at, notes, invited_user_id')
     .order('created_at', { ascending: false });
 
   if (error) throw error;
+  if (!data?.length) return [];
 
-  return (data ?? []).map(r => ({
-    id:         r.id,
-    email:      r.email,
-    role:       r.role,
-    status:     r.status,
-    invitedBy:  r.invited_by,
-    createdAt:  r.created_at,
-    expiresAt:  r.expires_at,
-    acceptedAt: r.accepted_at,
-    notes:      r.notes,
-  }));
+  // Hydrate profiles for invites that have invited_user_id
+  const userIds = data
+    .map(r => (r as any).invited_user_id)
+    .filter(Boolean) as string[];
+
+  let profileMap = new Map<string, { display_name: string | null; username: string | null; profile_photo_url: string | null }>();
+  if (userIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('user_profiles')
+      .select('id, display_name, username, profile_photo_url')
+      .in('id', userIds);
+    profileMap = new Map((profiles ?? []).map(p => [p.id, p]));
+  }
+
+  return data.map(r => {
+    const userId = (r as any).invited_user_id;
+    const profile = userId ? profileMap.get(userId) : null;
+    return {
+      id:            r.id,
+      email:         r.email,
+      role:          r.role,
+      status:        r.status,
+      invitedBy:     r.invited_by,
+      createdAt:     r.created_at,
+      expiresAt:     r.expires_at,
+      acceptedAt:    r.accepted_at,
+      notes:         r.notes,
+      invitedUserId: userId ?? null,
+      displayName:   profile?.display_name ?? null,
+      username:      profile?.username ?? null,
+      avatarUrl:     profile?.profile_photo_url ?? null,
+    };
+  });
 }
 
 // ─── Hooks ────────────────────────────────────────────────────────────────────
