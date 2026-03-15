@@ -11,7 +11,7 @@ export default function SettingsPage() {
   const { user }  = useSupabaseSession();
 
   return (
-    <div className="p-6 max-w-3xl mx-auto space-y-8">
+    <div style={{ padding: 24, background: '#F8FAFC', minHeight: '100%' }} className="max-w-3xl mx-auto space-y-8">
 
       <AdminPageHeader title="Settings" description="Account and admin preferences" />
 

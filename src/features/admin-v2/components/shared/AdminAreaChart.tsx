@@ -9,13 +9,13 @@ import {
 export const AdminChartTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-border/60 bg-card px-3 py-2 shadow-lg">
-      <p className="text-[11px] font-medium text-muted-foreground mb-1">{label}</p>
+    <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.08)', padding: '8px 12px' }}>
+      <p style={{ fontSize: 11, color: '#94A3B8', marginBottom: 4 }}>{label}</p>
       {payload.map((p: any) => (
-        <div key={p.name} className="flex items-center gap-2 text-[12px]">
+        <div key={p.name} className="flex items-center gap-2" style={{ fontSize: 12 }}>
           <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
-          <span className="text-muted-foreground">{p.name}:</span>
-          <span className="font-semibold text-foreground">{p.value?.toLocaleString()}</span>
+          <span style={{ color: '#64748B' }}>{p.name}:</span>
+          <span style={{ fontWeight: 600, color: '#0F172A' }}>{p.value?.toLocaleString()}</span>
         </div>
       ))}
     </div>
@@ -25,14 +25,14 @@ export const AdminChartTooltip = ({ active, payload, label }: any) => {
 // ─── Standard axis props ──────────────────────────────────────────────────────
 
 export const xAxisProps = {
-  tick: { fontSize: 11, fill: 'hsl(var(--muted-foreground))' },
+  tick: { fontSize: 11, fill: '#94A3B8' },
   axisLine: false,
   tickLine: false,
   interval: 'preserveStartEnd' as const,
 };
 
 export const yAxisProps = {
-  tick: { fontSize: 11, fill: 'hsl(var(--muted-foreground))' },
+  tick: { fontSize: 11, fill: '#94A3B8' },
   axisLine: false,
   tickLine: false,
   allowDecimals: false,
@@ -41,7 +41,7 @@ export const yAxisProps = {
 
 export const gridProps = {
   strokeDasharray: '3 3',
-  stroke: 'hsl(var(--border) / 0.4)',
+  stroke: '#F1F5F9',
   vertical: false,
 };
 
@@ -49,7 +49,7 @@ export const gridProps = {
 
 export function ChartSkeleton({ height = 200 }: { height?: number }) {
   return (
-    <div className="w-full rounded-lg bg-muted/30 animate-pulse" style={{ height }} />
+    <div className="w-full rounded-lg animate-pulse" style={{ height, background: '#F1F5F9' }} />
   );
 }
 
@@ -64,7 +64,7 @@ interface SingleAreaChartProps {
 
 export function SingleAreaChart({
   data,
-  color = 'hsl(var(--accent-amber))',
+  color = '#F5A623',
   height = 180,
   name = 'Value',
 }: SingleAreaChartProps) {

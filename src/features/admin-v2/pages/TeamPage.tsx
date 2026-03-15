@@ -117,7 +117,7 @@ export default function TeamPage() {
   const limitedAdmins = data.filter(m => m.role !== 'full');
 
   return (
-    <div className="p-6 max-w-3xl mx-auto space-y-6">
+    <div style={{ padding: 24, background: '#F8FAFC', minHeight: '100%' }} className="max-w-3xl mx-auto space-y-6">
 
       <AdminPageHeader
         title="Team & Roles"

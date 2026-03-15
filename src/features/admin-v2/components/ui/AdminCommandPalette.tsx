@@ -143,21 +143,19 @@ function CmdRow({
     <CommandItem
       value={item.label + (item.description ?? '') + (item.keywords?.join(' ') ?? '')}
       onSelect={() => onSelect(item)}
-      className={cn(
-        'flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors',
-        'text-[13px] text-foreground',
-      )}
+      className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors text-[13px]"
+      style={{ color: '#334155' }}
     >
-      <div className="w-8 h-8 rounded-lg bg-muted/60 flex items-center justify-center flex-shrink-0">
-        <Icon className="w-4 h-4 text-muted-foreground" />
+      <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: '#F1F5F9' }}>
+        <Icon className="w-4 h-4" style={{ color: '#94A3B8' }} />
       </div>
       <div className="flex-1 min-w-0">
         <span className="block truncate">{item.label}</span>
         {item.description && (
-          <span className="block text-[11px] text-muted-foreground truncate">{item.description}</span>
+          <span className="block text-[11px] truncate" style={{ color: '#94A3B8' }}>{item.description}</span>
         )}
       </div>
-      <ArrowRight className="w-3.5 h-3.5 text-muted-foreground/40 flex-shrink-0" />
+      <ArrowRight className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#CBD5E1' }} />
     </CommandItem>
   );
 }
@@ -210,31 +208,38 @@ export function AdminCommandPalette({ open, onClose }: AdminCommandPaletteProps)
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-50 bg-background/60 backdrop-blur-sm"
+        className="fixed inset-0 z-50"
+        style={{ background: 'rgba(15,23,42,0.5)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
         onClick={onClose}
       />
 
       {/* Palette */}
       <div role="dialog" aria-modal="true" aria-label="Command palette" className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] px-4 pointer-events-none">
         <Command
-          className="w-full max-w-lg rounded-2xl border border-border/60 bg-card shadow-2xl pointer-events-auto overflow-hidden"
+          className="w-full max-w-lg pointer-events-auto overflow-hidden"
+          style={{
+            background: '#FFFFFF',
+            border: '1px solid #E2E8F0',
+            borderRadius: 20,
+            boxShadow: '0 24px 48px rgba(0,0,0,0.12), 0 8px 16px rgba(0,0,0,0.06)',
+          }}
           shouldFilter={false}
         >
           {/* Search input */}
-          <div className="flex items-center gap-2 px-1 border-b border-border/40">
+          <div className="flex items-center gap-2 px-1" style={{ borderBottom: '1px solid #E2E8F0' }}>
             <CommandInput
               value={query}
               onValueChange={setQuery}
               placeholder="Search pages, users, courses…"
-              className="text-[14px]"
+              style={{ fontSize: 16, fontWeight: 500, color: '#0F172A' }}
             />
             {isLoading && (
-              <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-foreground rounded-full animate-spin flex-shrink-0 mr-2" />
+              <div className="w-4 h-4 border-2 rounded-full animate-spin flex-shrink-0 mr-2" style={{ borderColor: '#E2E8F0', borderTopColor: '#0F172A' }} />
             )}
             <button
               onClick={onClose}
-              className="px-1.5 py-0.5 rounded text-[10px] font-mono text-muted-foreground mr-2 flex-shrink-0"
-              style={{ background: 'hsl(var(--muted) / 0.6)', border: '1px solid hsl(var(--border) / 0.4)' }}
+              className="px-1.5 py-0.5 rounded flex-shrink-0 mr-2"
+              style={{ background: '#F1F5F9', border: '1px solid #E2E8F0', borderRadius: 6, fontSize: 10, fontFamily: 'monospace', color: '#64748B' }}
             >
               esc
             </button>
@@ -251,7 +256,8 @@ export function AdminCommandPalette({ open, onClose }: AdminCommandPaletteProps)
 
             {/* Recent — shown when no query */}
             {showRecent && (
-              <CommandGroup heading="Recent">
+              <CommandGroup>
+                <div className="px-3 py-1.5" style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#94A3B8' }}>Recent</div>
                 {recentItems.map(item => (
                   <CmdRow key={item.id} item={item} onSelect={handleSelect} />
                 ))}
@@ -260,7 +266,8 @@ export function AdminCommandPalette({ open, onClose }: AdminCommandPaletteProps)
 
             {/* All pages — shown when no query */}
             {!query.trim() && (
-              <CommandGroup heading="Pages">
+              <CommandGroup>
+                <div className="px-3 py-1.5" style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#94A3B8' }}>Pages</div>
                 {PAGES.map(item => (
                   <CmdRow key={item.id} item={item} onSelect={handleSelect} />
                 ))}
@@ -269,7 +276,8 @@ export function AdminCommandPalette({ open, onClose }: AdminCommandPaletteProps)
 
             {/* Filtered pages — shown with query */}
             {query.trim() && filteredPages.length > 0 && (
-              <CommandGroup heading="Pages">
+              <CommandGroup>
+                <div className="px-3 py-1.5" style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#94A3B8' }}>Pages</div>
                 {filteredPages.map(item => (
                   <CmdRow key={item.id} item={item} onSelect={handleSelect} />
                 ))}
@@ -278,7 +286,8 @@ export function AdminCommandPalette({ open, onClose }: AdminCommandPaletteProps)
 
             {/* Live users */}
             {showLive && users.length > 0 && (
-              <CommandGroup heading="Users">
+              <CommandGroup>
+                <div className="px-3 py-1.5" style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#94A3B8' }}>Users</div>
                 {users.map(item => (
                   <CmdRow key={item.id} item={item} onSelect={handleSelect} />
                 ))}
@@ -287,7 +296,8 @@ export function AdminCommandPalette({ open, onClose }: AdminCommandPaletteProps)
 
             {/* Live courses */}
             {showLive && courses.length > 0 && (
-              <CommandGroup heading="Courses">
+              <CommandGroup>
+                <div className="px-3 py-1.5" style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#94A3B8' }}>Courses</div>
                 {courses.map(item => (
                   <CmdRow key={item.id} item={item} onSelect={handleSelect} />
                 ))}
@@ -296,17 +306,17 @@ export function AdminCommandPalette({ open, onClose }: AdminCommandPaletteProps)
           </CommandList>
 
           {/* Footer */}
-          <div className="flex items-center gap-4 px-4 py-2 border-t border-border/40 text-[11px] text-muted-foreground">
+          <div className="flex items-center gap-4 px-4 py-2" style={{ borderTop: '1px solid #E2E8F0', fontSize: 11, color: '#94A3B8' }}>
             <span className="flex items-center gap-1">
-              <kbd className="px-1 py-0.5 rounded font-mono text-[10px] bg-muted/60">↑↓</kbd>
+              <kbd className="px-1 py-0.5 rounded text-[10px]" style={{ fontFamily: 'monospace', background: '#F1F5F9', border: '1px solid #E2E8F0', color: '#64748B' }}>↑↓</kbd>
               Navigate
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1 py-0.5 rounded font-mono text-[10px] bg-muted/60">↵</kbd>
+              <kbd className="px-1 py-0.5 rounded text-[10px]" style={{ fontFamily: 'monospace', background: '#F1F5F9', border: '1px solid #E2E8F0', color: '#64748B' }}>↵</kbd>
               Open
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1 py-0.5 rounded font-mono text-[10px] bg-muted/60">esc</kbd>
+              <kbd className="px-1 py-0.5 rounded text-[10px]" style={{ fontFamily: 'monospace', background: '#F1F5F9', border: '1px solid #E2E8F0', color: '#64748B' }}>esc</kbd>
               Close
             </span>
           </div>

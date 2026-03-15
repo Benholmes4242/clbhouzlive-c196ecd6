@@ -12,7 +12,7 @@ const ASSET_SECTIONS = [
 export default function AssetsPage() {
   const navigate = useNavigate();
   return (
-    <div className="p-6 max-w-3xl mx-auto space-y-6">
+    <div style={{ padding: 24, background: '#F8FAFC', minHeight: '100%' }} className="max-w-3xl mx-auto space-y-6">
       <AdminPageHeader title="Asset Manager" description="Logos, flags, and media files" />
       <div className="space-y-3">
         {ASSET_SECTIONS.map(section => {
