@@ -102,7 +102,7 @@ function CollapsibleGroup({ group, onNavigate }: { group: NavGroup; onNavigate?:
       {open && (
         <div className="mt-0.5 space-y-0.5">
           {group.items.map(item => (
-            <SidebarLink key={item.to} item={item} />
+            <SidebarLink key={item.to} item={item} onNavigate={onNavigate} />
           ))}
         </div>
       )}
