@@ -159,7 +159,7 @@ const BusinessVerificationStatusPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+            <div className="h-16 w-16 rounded-full bg-[hsl(38,92%,50%)]/10 flex items-center justify-center mx-auto mb-4">
               <VerifiedBadge size="xl" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">

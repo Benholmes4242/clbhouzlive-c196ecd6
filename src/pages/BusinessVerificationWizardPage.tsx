@@ -478,7 +478,7 @@ export default function BusinessVerificationWizardPage() {
                     </SelectContent>
                   </Select>
                   {role === 'owner' && (
-                    <p className="text-[10px] text-primary font-medium">Owners are typically verified fastest.</p>
+                    <p className="text-[10px] text-[hsl(35,80%,43%)] font-medium">Owners are typically verified fastest.</p>
                   )}
                 </div>
 
