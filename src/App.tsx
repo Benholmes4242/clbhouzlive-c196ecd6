@@ -184,14 +184,13 @@ const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 const InsightsPage = lazy(() => import("./pages/InsightsPage"));
 
 const BusinessDirectoryPage = lazy(() => import("./pages/BusinessDirectoryPage"));
-const BusinessInsightsPage = lazy(() => import("./pages/BusinessInsightsPage"));
 const BusinessInsightsPageV2 = lazy(() => import("./pages/BusinessInsightsPageV2"));
 const BusinessProfilePage = lazy(() => import("./pages/BusinessProfilePage"));
 const BusinessFollowersPage = lazy(() => import("./pages/BusinessFollowersPage"));
 const MyBusinessesPage = lazy(() => import("./pages/MyBusinessesPage"));
 const BusinessCreatePage = lazy(() => import("./pages/BusinessCreatePage"));
 const BusinessIntroPage = lazy(() => import("./pages/BusinessIntroPage"));
-const BusinessManagePage = lazy(() => import("./pages/BusinessManagePage"));
+const BusinessEditWizard = lazy(() => import("./components/business/edit/BusinessEditWizard"));
 const BusinessEditWizard = lazy(() => import("./components/business/edit/BusinessEditWizard"));
 const BusinessProfileLiveSuccessPage = lazy(() => import("./pages/BusinessProfileLiveSuccessPage"));
 const BusinessVerificationAboutPage = lazy(() => import("./pages/BusinessVerificationAboutPage"));
