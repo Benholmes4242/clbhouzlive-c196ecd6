@@ -474,7 +474,7 @@ export default function CoursesPage() {
   ];
 
   return (
-    <div className="p-6 space-y-6 max-w-[1400px] mx-auto">
+    <div style={{ padding: 24, background: '#F8FAFC', minHeight: '100%' }} className="space-y-6 max-w-[1400px] mx-auto">
 
       {/* Header */}
       <AdminPageHeader
