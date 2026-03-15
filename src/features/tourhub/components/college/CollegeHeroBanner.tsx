@@ -5,7 +5,7 @@
 
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Users } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils/formatCurrency';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
@@ -156,56 +156,50 @@ export function CollegeHeroBanner({ stats, college, activeMetric, className }: C
             {stats.player_count} alumni on the PGA Tour
           </motion.p>
 
-          {/* Stats Grid — 3 cols in dark container */}
-          <motion.div
-            initial={{ y: 8, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.3, delay: 0.3 }}
-            className="flex items-stretch mx-4"
-            style={{
-              background: 'rgba(0,0,0,0.25)',
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: 12,
-              padding: '12px 0',
-              width: '100%',
-              maxWidth: 320,
-            }}
-          >
-            <StatCell label="EARNINGS" value={formatCurrency(stats.earnings_total)} isActive={activeMetric === 'earnings'} />
-            <div style={{ width: 1, background: 'rgba(255,255,255,0.1)' }} />
-            <StatCell label="WINS" value={String(stats.wins_total)} isActive={activeMetric === 'wins'} />
-            <div style={{ width: 1, background: 'rgba(255,255,255,0.1)' }} />
-            <StatCell label="ALUMNI" value={String(stats.player_count)} icon={<Users style={{ width: 14, height: 14, color: 'rgba(255,255,255,0.5)' }} />} />
-          </motion.div>
         </Link>
       </motion.div>
+
+      {/* Stats Bar — overlaps hero bottom, matches CollegeProfilePage pattern */}
+      <div className="relative z-10 mx-4" style={{ marginTop: '-24px' }}>
+        <motion.div
+          className="flex items-stretch rounded-2xl border border-border/50 bg-card"
+          style={{ padding: '12px 0' }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.3 }}
+        >
+          <HubStatCell label="EARNINGS" value={formatCurrency(stats.earnings_total)} isActive={activeMetric === 'earnings'} />
+          <div style={{ width: 1 }} className="bg-border/50" />
+          <HubStatCell label="WINS" value={String(stats.wins_total)} isActive={activeMetric === 'wins'} />
+          <div style={{ width: 1 }} className="bg-border/50" />
+          <HubStatCell label="ALUMNI" value={String(stats.player_count)} />
+        </motion.div>
+      </div>
     </AnimatePresence>
   );
 }
 
-function StatCell({ label, value, icon, isActive }: { label: string; value: string; icon?: React.ReactNode; isActive?: boolean }) {
+function HubStatCell({ label, value, isActive }: { label: string; value: string; isActive?: boolean }) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center">
       <span
+        className="text-muted-foreground"
         style={{
           fontSize: 10,
           fontWeight: 600,
           letterSpacing: '0.5px',
           textTransform: 'uppercase',
-          color: 'rgba(255,255,255,0.5)',
         }}
       >
         {label}
       </span>
       <div className="flex items-center gap-1 mt-1">
-        {icon}
         <span
+          className={isActive ? '' : 'text-foreground'}
           style={{
             fontSize: isActive ? 19 : 17,
             fontWeight: 700,
-            color: isActive ? 'rgba(245,158,11,0.95)' : 'white',
+            ...(isActive ? { color: 'hsl(var(--accent-amber))' } : {}),
             fontVariantNumeric: 'tabular-nums',
             transition: 'all 0.2s ease',
           }}
