@@ -308,8 +308,8 @@ export function MessageBubble({
         >
           {/* Reply preview */}
           {replyToMessage && (
-            <div className="mb-2 pl-2 border-l-2 border-primary/40 bg-foreground/[0.03] rounded-r-lg py-1.5 pr-2">
-              <p className="text-[12px] font-semibold text-primary/70">
+            <div className="mb-2 pl-2 border-l-2 border-[hsl(38,92%,50%)]/40 bg-foreground/[0.03] rounded-r-lg py-1.5 pr-2">
+              <p className="text-[12px] font-semibold text-[hsl(35,80%,43%)]/70">
                 {replyToMessage.sender?.display_name || replyToMessage.sender?.username || 'You'}
               </p>
               <p className="text-[13px] text-muted-foreground truncate">
