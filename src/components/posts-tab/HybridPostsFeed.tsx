@@ -4,7 +4,7 @@ import { LongFormCard } from './LongFormCard';
 import { ReviewCard } from './ReviewCard';
 import { CompactGridRow } from './CompactGridRow';
 import { PostsFeedSkeleton } from './PostsFeedSkeleton';
-import { Loader2, RefreshCw } from 'lucide-react';
+import { Loader2, RefreshCw, Film } from 'lucide-react';
 
 type PostKind = 'longform' | 'review' | 'compact';
 
@@ -95,7 +95,6 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
 
       if (compactIndex < compactPosts.length) {
         const chunk = compactPosts.slice(compactIndex, compactIndex + 3);
-        // Use the global index of the first post in the chunk
         result.push({
           kind: 'compact-group',
           posts: chunk.map((c) => c.post),
@@ -115,13 +114,17 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
 
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 gap-3">
-        <p className="text-sm text-muted-foreground">Something went wrong</p>
+      <div className="flex flex-col items-center justify-center py-16 gap-4 px-6 text-center">
+        <p className="text-sm text-muted-foreground">
+          Couldn't load posts
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Please check your connection and try again.
+        </p>
         <button
           onClick={() => refetch()}
-          className="flex items-center gap-2 text-sm text-primary hover:underline"
+          className="h-11 px-5 rounded-full text-sm font-semibold bg-[#f59e0b] text-white hover:bg-[#e8920f] active:scale-[0.97] transition-all"
         >
-          <RefreshCw className="w-4 h-4" />
           Try again
         </button>
       </div>
@@ -130,7 +133,10 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
 
   if (posts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 gap-2 px-6 text-center">
+      <div className="flex flex-col items-center justify-center py-20 gap-3 px-6 text-center">
+        <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+          <Film className="w-5 h-5 text-muted-foreground" />
+        </div>
         <p className="text-sm font-medium text-foreground">No posts yet</p>
         {isOwnProfile && (
           <p className="text-xs text-muted-foreground">Share your first moment on the course</p>
@@ -166,7 +172,7 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
 
       {isFetchingNextPage && (
         <div className="flex justify-center py-4">
-          <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+          <Loader2 className="w-5 h-5 animate-spin text-[#f59e0b]" />
         </div>
       )}
     </div>

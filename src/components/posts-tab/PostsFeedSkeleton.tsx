@@ -1,4 +1,5 @@
 import React from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const PostsFeedSkeleton: React.FC = () => {
   return (
@@ -21,7 +22,7 @@ export const PostsFeedSkeleton: React.FC = () => {
 
       {/* Review skeleton */}
       <div className="bg-muted overflow-hidden">
-        <div className="h-[3px] bg-muted-foreground/10" />
+        <div className="h-[3px]" style={{ backgroundColor: 'rgba(245, 158, 11, 0.4)' }} />
         <div className="px-3 py-2 space-y-2">
           <div className="h-4 bg-muted-foreground/10 rounded w-2/3" />
           <div className="h-3 bg-muted-foreground/10 rounded w-1/3" />
