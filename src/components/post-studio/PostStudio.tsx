@@ -17,6 +17,7 @@ import { AudiencePanel } from './panels/AudiencePanel';
 import { SchedulePanel } from './panels/SchedulePanel';
 import { DraftsPanel } from './panels/DraftsPanel';
 import { SPRING, DURATION } from './constants';
+import { BG_BASE, AMBER_LINE, AMBER_DIM, TEXT_PRIMARY, TEXT_SECONDARY } from './tokens';
 import type { PostStudioProps, StudioStep, StudioMediaItem } from './types';
 
 // ─── Screen order for directional transitions ───────────────────────────────
@@ -116,26 +117,28 @@ function DiscardConfirmation({
         />
         <div className="p-6 text-center space-y-5">
           <div className="space-y-1.5">
-            <h3 className="text-white font-semibold text-base tracking-tight">Discard post?</h3>
-            <p className="text-white/50 text-sm leading-relaxed">
+            <h3 className="font-semibold text-base tracking-tight" style={{ color: TEXT_PRIMARY }}>Discard post?</h3>
+            <p className="text-sm leading-relaxed" style={{ color: TEXT_SECONDARY }}>
               Your content will be lost and cannot be recovered.
             </p>
           </div>
           <div className="flex flex-col gap-2.5">
-            <button
+            <motion.button
+              whileTap={{ scale: 0.97 }}
               onClick={onDiscard}
               className="w-full py-3.5 rounded-2xl font-semibold text-sm text-white min-h-[52px]"
-              style={{ background: 'rgba(239,68,68,0.20)', border: '1px solid rgba(239,68,68,0.35)' }}
+              style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.35)' }}
             >
               Discard
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.97 }}
               onClick={onCancel}
               className="w-full py-3.5 rounded-2xl font-semibold text-sm min-h-[52px]"
               style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.85)' }}
             >
               Keep editing
-            </button>
+            </motion.button>
           </div>
         </div>
       </motion.div>
@@ -225,7 +228,7 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
         exit={{ opacity: 0 }}
         transition={{ duration: DURATION.backdrop }}
         className="fixed inset-0 z-[9998]"
-        style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
+        style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(24px)' }}
         onClick={handleClose}
       />
 
@@ -238,7 +241,7 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
         className="fixed inset-0 z-[9999] flex flex-col overflow-hidden"
         style={{
           top: 0,
-          background: '#0D0D0D',
+          background: BG_BASE,
         }}
       >
         {/* Ambient amber top line — brand identity */}
@@ -247,7 +250,7 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
           animate={{ scaleX: 1, opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="absolute left-0 right-0 h-px origin-left"
-          style={{ top: 'max(env(safe-area-inset-top, 0px), 47px)', background: 'linear-gradient(90deg, transparent 0%, rgba(245,158,11,0.8) 30%, rgba(245,158,11,1) 50%, rgba(245,158,11,0.8) 70%, transparent 100%)' }}
+          style={{ top: 'max(env(safe-area-inset-top, 0px), 47px)', background: AMBER_LINE }}
         />
 
         {/* Drag handle */}
@@ -256,8 +259,8 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
             initial={{ scaleX: 0.3, opacity: 0 }}
             animate={{ scaleX: 1, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.4 }}
-            className="w-10 h-1 rounded-full"
-            style={{ background: 'rgba(245,158,11,0.4)' }}
+            className="w-12 rounded-full"
+            style={{ height: 6, background: 'rgba(245,158,11,0.35)' }}
           />
         </div>
 
