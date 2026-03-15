@@ -395,8 +395,8 @@ export function NewConversationModal({
                       width: '80px',
                       aspectRatio: '1 / 1.05',
                       borderRadius: '34%',
-                      border: '2px dashed hsl(var(--primary))',
-                      background: groupAvatarPreview ? 'transparent' : 'hsl(var(--primary) / 0.05)',
+                      border: '2px dashed #f59e0b',
+                      background: groupAvatarPreview ? 'transparent' : 'rgba(245, 158, 11, 0.05)',
                     }}
                   >
                     {groupAvatarPreview ? (
