@@ -212,7 +212,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
         };
       
       case "No Bogey Round":
-        const bestBogeys = 2;
+        const bestBogeys = 2; // TODO: Connect to real round data
         const targetBogeys = 0;
         const bogeyPercentage = Math.max(0, (4 - bestBogeys) / 4 * 100); // Assuming 4 is starting point
         return {
