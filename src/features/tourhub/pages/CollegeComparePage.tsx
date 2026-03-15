@@ -32,7 +32,7 @@ export function CollegeComparePage() {
         <button
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
           aria-label="Open tour menu"
-          className="absolute z-30 flex items-center justify-center"
+          className="fixed z-30 flex items-center justify-center"
           style={{ width: 44, height: 44, top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)', left: 16 }}
         >
           <Menu className="w-[24px] h-[24px] text-foreground" style={{ strokeWidth: 1.5 }} />
