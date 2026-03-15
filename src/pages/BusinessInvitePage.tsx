@@ -86,7 +86,7 @@ export default function BusinessInvitePage() {
                   onClick={() => setRole(r.value)}
                   className={`w-full flex items-center gap-3 p-4 rounded-sq-md border transition-all text-left ${
                     isSelected
-                      ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
+                      ? 'border-[hsl(38,92%,50%)] bg-[hsl(38,92%,50%)]/5 ring-1 ring-[hsl(38,92%,50%)]/20'
                       : 'border-border hover:border-muted-foreground/30 hover:bg-muted/30'
                   }`}
                 >
