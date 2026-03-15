@@ -151,7 +151,7 @@ export function EchoResponseCard({
           {/* Streaming cursor */}
           {isStreaming && (
             <span 
-              className="inline-block w-[3px] h-4 rounded-full ml-1 bg-primary"
+              className="inline-block w-[3px] h-4 rounded-full ml-1 bg-[hsl(38,92%,50%)]"
               style={{
                 animation: prefersReduced ? 'none' : 'echoCursorBlink 1s ease-in-out infinite',
               }}
