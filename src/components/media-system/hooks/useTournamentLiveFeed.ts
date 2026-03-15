@@ -38,42 +38,22 @@ const SYSTEM_USER_ID = 'b8437384-291a-4d85-b81f-24c1068235dd';
  * to a valid UUID. Uses `content` field to store tournament_id as a
  * lookup key — avoids needing a separate junction table.
  */
-async function getOrCreateLivePost(tournamentId: string, _tournamentName: string): Promise<string> {
-  // Check if a post already exists for this tournament
-  const { data: existing } = await supabase
-    .from('posts')
-    .select('id')
-    .eq('post_type', 'tournament_live')
-    .eq('content', tournamentId)
-    .maybeSingle();
+async function getOrCreateLivePost(tournamentId: string, tournamentName: string): Promise<string> {
+  try {
+    const { data, error } = await supabase.functions.invoke('upsert-live-tournament-post', {
+      body: { tournamentId, tournamentName },
+    });
 
-  if (existing?.id) return existing.id;
+    if (error || !data?.postId) {
+      console.warn('[useTournamentLiveFeed] Edge function failed:', error);
+      return crypto.randomUUID(); // graceful fallback — card shows but comments won't persist
+    }
 
-  // Create a new post for this live tournament
-  const { data: created, error } = await supabase
-    .from('posts')
-    .insert({
-      user_id:       SYSTEM_USER_ID,
-      actor_id:      SYSTEM_USER_ID,
-      actor_type:    'system',
-      post_type:     'tournament_live',
-      content:       tournamentId,
-      visibility:    'anyone' as const,
-      categories:    [],
-      badges:        [],
-      like_count:    0,
-      comment_count: 0,
-      status:        'published',
-    })
-    .select('id')
-    .single();
-
-  if (error || !created) {
-    console.warn('[useTournamentLiveFeed] Could not create live post:', error);
+    return data.postId;
+  } catch (err) {
+    console.warn('[useTournamentLiveFeed] Could not create live post:', err);
     return crypto.randomUUID();
   }
-
-  return created.id;
 }
 
 export function useTournamentLiveFeed(): {

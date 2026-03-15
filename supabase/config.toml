@@ -184,3 +184,6 @@ verify_jwt = false
 
 [functions.inject-tournament-post]
 verify_jwt = false
+
+[functions.upsert-live-tournament-post]
+verify_jwt = false
