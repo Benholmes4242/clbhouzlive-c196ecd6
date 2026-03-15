@@ -273,7 +273,7 @@ export const TrophyCase: React.FC<TrophyCaseProps> = ({
                   {/* Region badge */}
                   <div className="relative mb-2">
                     {r.isUnlocked && (
-                      <div className="absolute inset-0 rounded-full bg-emerald-400/15 blur-md scale-110" />
+                      <div className="absolute inset-0 rounded-full bg-amber-400/15 blur-md scale-110" />
                     )}
                     <img
                       src={badgeImage}

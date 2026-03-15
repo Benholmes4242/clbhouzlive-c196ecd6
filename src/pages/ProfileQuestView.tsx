@@ -240,11 +240,11 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
       {/* Read-only header when viewing another user's quest */}
       {!isOwnProfile && (
         <header className="sticky top-0 z-50 flex items-center gap-3 px-4 h-14 bg-background/80 backdrop-blur-lg border-b border-border/60"
-          style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+          style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
         >
           <button
             onClick={() => navigate(-1)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full hover:bg-muted active:scale-[0.95] transition-transform"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full hover:bg-muted active:scale-[0.97] transition-transform"
             aria-label="Go back"
           >
             <ArrowLeft className="w-5 h-5 text-foreground" />
