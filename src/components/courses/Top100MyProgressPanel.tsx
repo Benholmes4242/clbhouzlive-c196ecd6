@@ -59,10 +59,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   const isOwnProfile = !userId || userId === session?.user?.id;
   const prevTotalRef = useRef<number | null>(null);
 
-  // Scroll to top on mount (required behavior - always start at top)
-  useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-  }, []);
+  // Removed disruptive window.scrollTo — tab scroll is managed by parent
   const [achievementSheetData, setAchievementSheetData] = useState<AchievementData | null>(null);
   const [isAchievementSheetOpen, setIsAchievementSheetOpen] = useState(false);
 
