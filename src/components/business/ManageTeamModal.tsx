@@ -169,7 +169,7 @@ export function ManageTeamModal({
                     />
                   </div>
 
-                  <Button onClick={tm.handleAddMember} disabled={tm.adding} className="w-full">
+                  <Button onClick={tm.handleAddMember} disabled={tm.adding} className="w-full bg-[#f59e0b] hover:bg-[#e8920f] text-white border-0">
                     {tm.adding ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                     Add
                   </Button>
