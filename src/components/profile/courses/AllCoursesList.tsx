@@ -177,10 +177,11 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   if (isLoading) {
     return (
       <div ref={sectionRef} className="py-4">
-        <h3 className="text-base font-semibold text-foreground mb-3">Course History</h3>
+        <div className="h-5 w-32 bg-muted rounded mb-1 animate-pulse" />
+        <div className="h-3 w-48 bg-muted rounded mb-4 animate-pulse" />
         <div className="space-y-2">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-18 bg-muted/50 rounded-xl animate-pulse" />
+            <div key={i} className="h-20 bg-muted rounded-xl animate-pulse" />
           ))}
         </div>
       </div>
@@ -237,7 +238,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
             {isOwnProfile && (
               <button
                 onClick={() => navigate('/courses')}
-                className="px-5 py-2 bg-foreground text-background text-sm font-medium rounded-full hover:bg-foreground/90 transition-colors min-h-[44px] active:scale-[0.98]"
+                className="px-5 py-2.5 bg-[#f59e0b] text-white text-sm font-semibold rounded-full hover:bg-[#e8920f] transition-colors min-h-[44px] active:scale-[0.97]"
               >
                 {filter === 'highest-rated' ? 'Rate a Course' : 'Log a Course'}
               </button>

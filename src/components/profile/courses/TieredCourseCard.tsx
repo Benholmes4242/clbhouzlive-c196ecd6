@@ -1,7 +1,7 @@
 /**
  * TieredCourseCard - Visual hierarchy cards for All Courses Played
  * 
- * Updated with Chartreus gold (#C1A84C) for Top 100 courses.
+ * Updated with Amber (#f59e0b) for Top 100 courses.
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -31,7 +31,7 @@ interface TieredCourseCardProps {
 
 /**
  * Tiered course card with clear visual hierarchy:
- * - Top 100: Larger cards with Chartreus accent (#C1A84C), trophy icon, strong visual weight
+ * - Top 100: Larger cards with Amber accent (#f59e0b), trophy icon, strong visual weight
  * - Non-Top-100: Slightly smaller, muted styling - still readable
  */
 export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
@@ -71,7 +71,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
         {/* Trophy Chartreus accent line - prominent 2px */}
         <div 
           className="absolute top-0 left-0 right-0 h-[2px]" 
-          style={{ background: 'linear-gradient(90deg, rgba(193, 168, 76, 0.4) 0%, #C1A84C 50%, rgba(193, 168, 76, 0.4) 100%)' }} 
+          style={{ background: 'linear-gradient(90deg, rgba(245, 158, 11, 0.3) 0%, #f59e0b 50%, rgba(245, 158, 11, 0.3) 100%)' }} 
         />
         
         <div className="flex">
@@ -91,7 +91,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             {/* Top 100 icon overlay - Chartreus */}
             <div 
               className="absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center shadow-sm"
-              style={{ backgroundColor: 'rgba(193, 168, 76, 0.95)' }}
+              style={{ backgroundColor: '#f59e0b' }}
             >
               <Trophy className="w-3 h-3 text-white" />
             </div>

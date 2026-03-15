@@ -67,8 +67,31 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12 min-h-[400px]">
-        <div className="text-muted-foreground">Loading...</div>
+      <div className="pb-2 space-y-7 animate-pulse">
+        {/* Journey summary skeleton */}
+        <div className="p-6 flex flex-col items-center gap-4">
+          <div className="h-3 w-28 bg-muted rounded" />
+          <div className="h-12 w-16 bg-muted rounded" />
+          <div className="h-3 w-20 bg-muted rounded" />
+          <div className="flex gap-8 mt-2">
+            <div className="h-8 w-20 bg-muted rounded" />
+            <div className="h-8 w-20 bg-muted rounded" />
+          </div>
+        </div>
+        {/* Top 10 carousel skeleton */}
+        <div className="px-4 space-y-3">
+          <div className="h-5 w-36 bg-muted rounded" />
+          <div className="flex gap-4">
+            <div className="flex-shrink-0 w-[227px] h-[292px] bg-muted rounded-[22px]" />
+            <div className="flex-shrink-0 w-[227px] h-[292px] bg-muted rounded-[22px]" />
+          </div>
+        </div>
+        {/* Course list skeleton */}
+        <div className="px-0 space-y-2">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="h-20 bg-muted rounded-xl mx-0" />
+          ))}
+        </div>
       </div>
     );
   }

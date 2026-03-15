@@ -106,7 +106,7 @@ const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
           <div className="flex items-center gap-1.5 px-2">
             <button
               onClick={handleReview}
-              className="text-[11px] font-medium px-2.5 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg transition-colors min-h-[44px] active:scale-[0.98]"
+              className="text-[11px] font-semibold px-2.5 bg-[#f5a623]/10 hover:bg-[#f5a623]/20 text-[#d97706] rounded-lg transition-colors min-h-[44px] active:scale-[0.97]"
               title="Review this course"
             >
               Review
@@ -225,7 +225,7 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
             {isOwnProfile && (
               <button
                 onClick={() => navigate('/courses')}
-                className="px-5 py-2.5 bg-card text-foreground text-sm font-semibold rounded-lg border border-border/60 hover:bg-muted transition-colors min-h-[44px] active:scale-[0.98]"
+                className="px-5 py-2.5 bg-[#f59e0b] text-white text-sm font-semibold rounded-full hover:bg-[#e8920f] transition-colors min-h-[44px] active:scale-[0.97]"
               >
                 Explore Courses
               </button>
@@ -327,9 +327,9 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
                 }}
                 className={cn(
                   'h-1.5 rounded-full transition-all duration-200',
-                  idx === batchIndex
-                    ? 'w-5 bg-foreground'
-                    : 'w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                    idx === batchIndex
+                    ? 'w-5 bg-[#f59e0b]'
+                    : 'w-1.5 bg-[#f59e0b]/25 hover:bg-[#f59e0b]/50'
                 )}
               />
             ))}

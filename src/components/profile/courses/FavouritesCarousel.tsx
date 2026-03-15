@@ -304,7 +304,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
                 key={i}
                 className={cn(
                   "rounded-full transition-all duration-300",
-                  isActive ? "w-5 h-1.5 bg-primary" : "w-1.5 h-1.5 bg-primary/30"
+                  isActive ? "w-5 h-1.5 bg-[#f59e0b]" : "w-1.5 h-1.5 bg-[#f59e0b]/30"
                 )}
               />
             );
@@ -317,7 +317,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
         <div className="pt-4 px-4">
           <button
             onClick={handleShare}
-            className="w-full py-2.5 text-sm font-semibold text-foreground bg-card hover:bg-muted rounded-lg border border-border/60 transition-colors flex items-center justify-center gap-2 min-h-[44px] active:scale-[0.98]"
+            className="w-full py-2.5 text-sm font-semibold text-[#d97706] bg-[#f5a623]/[0.08] hover:bg-[#f5a623]/[0.15] rounded-xl border border-[#f5a623]/25 transition-colors flex items-center justify-center gap-2 min-h-[44px] active:scale-[0.97]"
           >
             <Share2 className="w-4 h-4" />
             Share your Top 10

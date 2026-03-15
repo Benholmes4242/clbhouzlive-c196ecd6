@@ -83,7 +83,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   
   // Get tier info for rating display
   const tierData = rating !== undefined ? getScoreTier(rating) : null;
-  const isOutstanding = tierData?.tier === 'outstanding';
+  // All tiers now use unified amber
   
   // Location subtitle
   const heroSubtitle = course.sub_country || course.country;
@@ -161,28 +161,22 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
             <div 
               className="inline-flex items-center gap-2 px-3 py-2 rounded-full"
               style={{
-                background: isOutstanding 
-                  ? 'rgba(245, 158, 11, 0.12)' 
-                  : 'rgba(255,255,255,0.12)',
+                background: 'rgba(245, 158, 11, 0.12)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
-                border: isOutstanding 
-                  ? '1px solid rgba(245, 158, 11, 0.35)' 
-                  : '1px solid rgba(255,255,255,0.15)',
-                boxShadow: isOutstanding 
-                  ? '0 0 16px rgba(245, 158, 11, 0.25), inset 0 1px 0 rgba(245, 158, 11, 0.2)' 
-                  : 'none',
+                border: '1px solid rgba(245, 158, 11, 0.35)',
+                boxShadow: '0 0 16px rgba(245, 158, 11, 0.2), inset 0 1px 0 rgba(245, 158, 11, 0.15)',
               }}
             >
               <span 
                 className="font-bold text-lg"
-                style={{ color: isOutstanding ? '#f59e0b' : '#ffffff' }}
+                style={{ color: '#f59e0b' }}
               >
                 {rating === 10 ? '10' : rating.toFixed(1)}
               </span>
               <span 
                 className="text-xs font-medium tracking-wide uppercase"
-                style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.8)' : 'rgba(255, 255, 255, 0.6)' }}
+                style={{ color: 'rgba(245, 158, 11, 0.75)' }}
               >
                 {tierData.label}
               </span>
@@ -226,13 +220,13 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
             <div className="flex flex-col items-center justify-center mb-4">
               <span 
                 className="text-5xl font-bold"
-                style={{ color: isOutstanding ? '#f59e0b' : '#9ca3af' }}
+                style={{ color: '#f59e0b' }}
               >
                 {rating === 10 ? '10' : rating.toFixed(1)}
               </span>
               <span 
                 className="text-sm font-semibold uppercase tracking-wider mt-1"
-                style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.8)' : 'rgba(156, 163, 175, 0.8)' }}
+                style={{ color: 'rgba(245, 158, 11, 0.75)' }}
               >
                 {tierData.label}
               </span>
@@ -289,13 +283,9 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
               onClick={handleReadFullReview}
               className="flex-1 py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1 transition-all active:scale-[0.98]"
               style={{
-                background: isOutstanding 
-                  ? 'linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)' 
-                  : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
-                boxShadow: isOutstanding 
-                  ? '0 4px 14px rgba(251,191,36,0.25)' 
-                  : '0 4px 14px rgba(107,114,128,0.25)',
-                color: isOutstanding ? '#000' : '#fff',
+                background: 'linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)',
+                boxShadow: '0 4px 14px rgba(251,191,36,0.25)',
+                color: '#000',
               }}
             >
               Read Full Review
