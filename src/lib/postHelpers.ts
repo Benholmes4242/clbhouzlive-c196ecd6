@@ -113,11 +113,8 @@ function getTierKey(score: number): string {
  * Matches course-detail tier palette: Outstanding (amber), Excellent→Fair (graduated slate).
  */
 export function getOverlayRatingColors(score: number): { main: string; sub: string } {
-  if (score >= 9) return { main: '#f59e0b', sub: 'rgba(245, 158, 11, 0.6)' };
-  if (score >= 8) return { main: '#e2e8f0', sub: 'rgba(226, 232, 240, 0.6)' };
-  if (score >= 7) return { main: '#cbd5e1', sub: 'rgba(203, 213, 225, 0.6)' };
-  if (score >= 6) return { main: '#94a3b8', sub: 'rgba(148, 163, 184, 0.6)' };
-  return { main: '#64748b', sub: 'rgba(100, 116, 139, 0.6)' };
+  // ALL tiers now use amber — consistent with course detail page
+  return { main: '#f59e0b', sub: 'rgba(245,158,11,0.6)' };
 }
 
 /**

@@ -123,47 +123,6 @@ export interface RatingTheme {
 const RATING_AMBER = '#f59e0b';    // amber-500 for Outstanding
 const RATING_AMBER_LIGHT = '#fbbf24'; // amber-400 for gradient end
 
-// Per-tier slate blue themes (progressively darker)
-const fairTheme = {
-  accent: '#94a3b8',
-  bgLight: '#94a3b80D',
-  bgDark: '#94a3b81A',
-  bgClass: 'bg-[#94a3b8]/10',
-  borderClass: 'border-[#94a3b8]/20',
-  textClass: 'text-[#94a3b8]',
-  barFillClass: 'bg-[#94a3b8]',
-};
-
-const goodTheme = {
-  accent: '#64748b',
-  bgLight: '#64748b0D',
-  bgDark: '#64748b1A',
-  bgClass: 'bg-[#64748b]/10',
-  borderClass: 'border-[#64748b]/20',
-  textClass: 'text-[#64748b]',
-  barFillClass: 'bg-[#64748b]',
-};
-
-const veryGoodTheme = {
-  accent: '#475569',
-  bgLight: '#4755690D',
-  bgDark: '#4755691A',
-  bgClass: 'bg-[#475569]/10',
-  borderClass: 'border-[#475569]/20',
-  textClass: 'text-[#475569]',
-  barFillClass: 'bg-[#475569]',
-};
-
-const excellentTheme = {
-  accent: '#1e293b',
-  bgLight: '#1e293b0D',
-  bgDark: '#1e293b1A',
-  bgClass: 'bg-[#1e293b]/10',
-  borderClass: 'border-[#1e293b]/20',
-  textClass: 'text-[#1e293b]',
-  barFillClass: 'bg-[#1e293b]',
-};
-
 // Outstanding uses Amber/Orange gradient styling
 const amberTheme = {
   accent: RATING_AMBER,
@@ -175,6 +134,12 @@ const amberTheme = {
   barFillClass: 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]',
   gradient: 'linear-gradient(to right, #f59e0b, #fbbf24)',
 };
+
+// All tiers now use amber — unified single-color rating system
+const fairTheme = amberTheme;
+const goodTheme = amberTheme;
+const veryGoodTheme = amberTheme;
+const excellentTheme = amberTheme;
 
 export const COURSE_RATING_THEMES: Record<RatingTier, RatingTheme> = {
   FAIR: {
