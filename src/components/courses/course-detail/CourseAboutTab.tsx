@@ -143,7 +143,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
           <div className="space-y-2">
             <Button 
               onClick={handleRateClick}
-              className="w-full justify-center h-11 rounded-sq-sm bg-muted text-foreground border-0 active:scale-[0.98]"
+              className="w-full justify-center h-11 rounded-xl bg-[#f59e0b] text-white font-semibold hover:bg-[#e8920f] active:scale-[0.98] transition-colors"
               variant="outline"
             >
               {rateButtonLabel}
