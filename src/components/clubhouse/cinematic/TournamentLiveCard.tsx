@@ -502,7 +502,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                         ))}
                       </div>
                     ) : (
-                      <RowAvatar name={entry.playerName} photoUrl={entry.photoUrl} tourSlug={meta.tourSlug} size={44} />
+                      <RowAvatar name={entry.playerName} photoUrl={entry.photoUrl} tourSlug={meta.tourSlug} size={52} />
                     )}
 
                     {/* Name or tie label */}
