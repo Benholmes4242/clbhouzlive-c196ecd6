@@ -28,7 +28,7 @@ interface ResponseDisplayProps {
 
 export const ResponseDisplay: React.FC<ResponseDisplayProps> = ({ response }) => {
   return (
-    <div className="ml-4 mt-3 pl-4 border-l-2 border-[#334E3D]">
+    <div className="ml-4 mt-3 pl-4 border-l-2 border-amber-300">
       <div className="flex items-center gap-2 mb-1.5">
         {response.business_logo_url ? (
           <SquircleAvatar
