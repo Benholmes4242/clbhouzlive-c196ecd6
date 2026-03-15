@@ -470,6 +470,7 @@ async function syncTournament(
 
     const updatePayload: any = { status: 'closed', last_live_sync: new Date().toISOString() };
     if (winnerId) updatePayload.winner_id = winnerId;
+    if (currentRound !== undefined) updatePayload.current_round = currentRound;
 
     const { error: closeError } = await supabase
       .from('sr_tournaments')
