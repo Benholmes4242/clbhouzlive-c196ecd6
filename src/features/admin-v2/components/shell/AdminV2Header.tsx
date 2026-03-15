@@ -3,7 +3,7 @@ import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { ChevronRight, Search, ExternalLink } from 'lucide-react';
+import { ChevronRight, Search, ExternalLink, PanelLeft, PanelLeftClose } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // Route → readable breadcrumb label map
