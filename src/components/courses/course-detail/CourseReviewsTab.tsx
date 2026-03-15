@@ -494,7 +494,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                 key={option.value}
                 value={option.value}
                 className="min-h-[36px] px-4 rounded-full text-sm font-semibold transition-all active:scale-[0.97] border-0 shadow-none
-                  data-[state=active]:text-white data-[state=active]:shadow-none data-[state=active]:bg-[hsl(215,16%,35%)]
+                  data-[state=active]:text-white data-[state=active]:shadow-none data-[state=active]:bg-[#f59e0b]
                   data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground"
               >
                 {option.label}
