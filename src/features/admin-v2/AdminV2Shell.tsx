@@ -49,6 +49,8 @@ export default function AdminV2Shell() {
   const { role, loading } = usePanelRole();
   const can = panelCan(role);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 768);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -61,6 +63,16 @@ export default function AdminV2Shell() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (!mobile) setSidebarOpen(true);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Full-screen loading while role resolves
   if (loading) return <AdminV2Loading />;
 
@@ -68,63 +80,90 @@ export default function AdminV2Shell() {
   if (role === 'none' || role === 'unknown') return <AdminV2AccessDenied role={role} />;
 
   return (
-    <div className="min-h-screen grid grid-cols-[260px_1fr] grid-rows-[52px_1fr] bg-background">
-      {/* Sidebar — spans both rows */}
-      <div className="row-span-2 border-r border-border/60 overflow-hidden">
-        <AdminV2Sidebar role={role} can={can} />
+    <div
+      className="min-h-screen bg-background"
+      style={{
+        display: 'grid',
+        gridTemplateColumns: sidebarOpen && !isMobile ? '260px 1fr' : '1fr',
+        gridTemplateRows: '52px 1fr',
+        height: '100dvh',
+        overflow: 'hidden',
+        position: 'relative',
+      }}
+    >
+      {/* Mobile backdrop */}
+      {sidebarOpen && isMobile && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 40,
+            background: 'rgba(0,0,0,0.5)',
+            backdropFilter: 'blur(2px)',
+            WebkitBackdropFilter: 'blur(2px)',
+          }}
+        />
+      )}
+
+      {/* Sidebar panel */}
+      <div style={{
+        ...(isMobile ? {
+          position: 'fixed', top: 0, left: 0, bottom: 0,
+          width: 260, zIndex: 50,
+          transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
+          transition: 'transform 0.25s cubic-bezier(0.22, 1, 0.36, 1)',
+        } : {
+          gridRow: '1 / 3',
+          display: sidebarOpen ? 'flex' : 'none',
+          flexDirection: 'column' as const,
+        }),
+      }}>
+        <AdminV2Sidebar
+          role={role}
+          can={can}
+          onNavigate={() => { if (isMobile) setSidebarOpen(false); }}
+        />
       </div>
 
-      {/* Header — top right */}
+      {/* Header */}
       <div className="border-b border-border/60">
-        <AdminV2Header onOpenPalette={() => setPaletteOpen(true)} />
+        <AdminV2Header
+          onOpenPalette={() => setPaletteOpen(true)}
+          onToggleSidebar={() => setSidebarOpen(v => !v)}
+          sidebarOpen={sidebarOpen}
+        />
       </div>
 
-      {/* Main content — bottom right, scrollable */}
+      {/* Main content */}
       <main className="overflow-y-auto">
         <Suspense fallback={<PageSkeleton />}>
           <Routes>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
-
-            {/* Analytics */}
             <Route path="analytics/platform" element={can.manageAdmins ? <PlatformAnalytics /> : <AdminV2AccessDenied role={role} />} />
             <Route path="analytics/content" element={can.manageAdmins ? <ContentAnalytics /> : <AdminV2AccessDenied role={role} />} />
             <Route path="analytics/auth" element={can.manageAdmins ? <AuthAnalytics /> : <AdminV2AccessDenied role={role} />} />
-
-            {/* Users & Access */}
             <Route path="users" element={can.manageAdmins ? <UsersPage /> : <AdminV2AccessDenied role={role} />} />
             <Route path="verifications" element={can.manageAdmins ? <VerificationsPage /> : <AdminV2AccessDenied role={role} />} />
             <Route path="team" element={can.manageAdmins ? <TeamPage /> : <AdminV2AccessDenied role={role} />} />
             <Route path="invites" element={can.manageAdmins ? <InvitesPage /> : <AdminV2AccessDenied role={role} />} />
-
-            {/* Content — available to all admin roles */}
             <Route path="courses" element={<CoursesPage />} />
             <Route path="courses/import" element={<CourseImportPage />} />
             <Route path="tour" element={can.manageAdmins ? <TourPage /> : <AdminV2AccessDenied role={role} />} />
             <Route path="tour/players" element={can.manageAdmins ? <TourPlayersPage /> : <AdminV2AccessDenied role={role} />} />
             <Route path="businesses" element={can.manageAdmins ? <BusinessesPage /> : <AdminV2AccessDenied role={role} />} />
-
-            {/* Assets */}
             <Route path="assets" element={can.manageAdmins ? <AssetsPage /> : <AdminV2AccessDenied role={role} />} />
             <Route path="assets/logos" element={can.manageAdmins ? <LogosPage /> : <AdminV2AccessDenied role={role} />} />
             <Route path="assets/college-logos" element={can.manageAdmins ? <CollegeLogosPage /> : <AdminV2AccessDenied role={role} />} />
             <Route path="assets/flags" element={can.manageAdmins ? <FlagsPage /> : <AdminV2AccessDenied role={role} />} />
-
-            {/* System */}
             <Route path="audit" element={can.manageAdmins ? <AuditPage /> : <AdminV2AccessDenied role={role} />} />
             <Route path="settings" element={<SettingsPage />} />
-
-            {/* Dev Tools */}
             <Route path="tools/geocoding" element={can.manageAdmins ? <GeocodingPage /> : <AdminV2AccessDenied role={role} />} />
             <Route path="tools/testlab" element={can.manageAdmins ? <TestLabPage /> : <AdminV2AccessDenied role={role} />} />
-
-            {/* Catch-all */}
             <Route path="*" element={<Navigate to="dashboard" replace />} />
           </Routes>
         </Suspense>
       </main>
 
-      {/* Command Palette — portal-level, always mounted */}
       <AdminCommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
     </div>
   );

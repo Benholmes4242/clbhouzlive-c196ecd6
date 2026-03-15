@@ -3,7 +3,7 @@ import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { ChevronRight, Search, ExternalLink } from 'lucide-react';
+import { ChevronRight, Search, ExternalLink, PanelLeft, PanelLeftClose } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // Route → readable breadcrumb label map
@@ -49,9 +49,11 @@ function useBreadcrumbs() {
 
 interface AdminV2HeaderProps {
   onOpenPalette: () => void;
+  onToggleSidebar: () => void;
+  sidebarOpen: boolean;
 }
 
-export default function AdminV2Header({ onOpenPalette }: AdminV2HeaderProps) {
+export default function AdminV2Header({ onOpenPalette, onToggleSidebar, sidebarOpen }: AdminV2HeaderProps) {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { data: profile } = useUserProfile(user?.id);
@@ -63,7 +65,22 @@ export default function AdminV2Header({ onOpenPalette }: AdminV2HeaderProps) {
 
   return (
     <div className="h-full flex items-center justify-between px-4">
-      {/* Left: Breadcrumb */}
+      {/* Left: Toggle + Breadcrumb */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={onToggleSidebar}
+          aria-label="Toggle sidebar"
+          className="flex items-center justify-center w-[34px] h-[34px] rounded-lg flex-shrink-0 bg-transparent cursor-pointer"
+          style={{
+            border: '1px solid hsl(var(--border) / 0.3)',
+            color: 'hsl(var(--muted-foreground))',
+          }}
+        >
+          {sidebarOpen
+            ? <PanelLeftClose className="w-4 h-4" />
+            : <PanelLeft className="w-4 h-4" />
+          }
+        </button>
       <nav className="flex items-center gap-1 text-sm">
         <Link to="/admin-v2/dashboard" className="text-muted-foreground hover:text-foreground transition-colors font-medium">
           Admin
@@ -83,6 +100,7 @@ export default function AdminV2Header({ onOpenPalette }: AdminV2HeaderProps) {
           </React.Fragment>
         ))}
       </nav>
+      </div>
 
       {/* Right: Command bar trigger + Avatar */}
       <div className="flex items-center gap-2">

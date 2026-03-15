@@ -14,6 +14,7 @@ import {
 interface SidebarProps {
   role: PanelRole;
   can: { viewUsers: boolean; manageAdmins: boolean; dangerousOps: boolean };
+  onNavigate?: () => void;
 }
 
 interface NavItem {
@@ -34,12 +35,13 @@ interface NavGroup {
 
 // ─── Individual nav link ───────────────────────────────────────────
 
-function SidebarLink({ item }: { item: NavItem }) {
+function SidebarLink({ item, onNavigate }: { item: NavItem; onNavigate?: () => void }) {
   const Icon = item.icon;
   return (
     <NavLink
       to={item.to}
       end
+      onClick={() => onNavigate?.()}
       className={({ isActive }) =>
         cn(
           'group flex items-center justify-between gap-2.5 px-3 py-2 rounded-lg text-[13.5px] font-medium transition-all duration-100',
@@ -74,7 +76,7 @@ function SectionLabel({ label }: { label: string }) {
 
 // ─── Collapsible group (Tools) ─────────────────────────────────────
 
-function CollapsibleGroup({ group }: { group: NavGroup }) {
+function CollapsibleGroup({ group, onNavigate }: { group: NavGroup; onNavigate?: () => void }) {
   const [open, setOpen] = useState(() => {
     try {
       const stored = localStorage.getItem(`admin-v2-group-${group.id}`);
@@ -100,7 +102,7 @@ function CollapsibleGroup({ group }: { group: NavGroup }) {
       {open && (
         <div className="mt-0.5 space-y-0.5">
           {group.items.map(item => (
-            <SidebarLink key={item.to} item={item} />
+            <SidebarLink key={item.to} item={item} onNavigate={onNavigate} />
           ))}
         </div>
       )}
@@ -110,7 +112,7 @@ function CollapsibleGroup({ group }: { group: NavGroup }) {
 
 // ─── Main sidebar ──────────────────────────────────────────────────
 
-export default function AdminV2Sidebar({ role, can }: SidebarProps) {
+export default function AdminV2Sidebar({ role, can, onNavigate }: SidebarProps) {
   const navigate = useNavigate();
 
   // Live pending verification count
@@ -223,7 +225,7 @@ export default function AdminV2Sidebar({ role, can }: SidebarProps) {
             <SectionLabel label={group.label} />
             <div className="space-y-0.5">
               {group.items.map(item => (
-                <SidebarLink key={item.to} item={item} />
+                <SidebarLink key={item.to} item={item} onNavigate={onNavigate} />
               ))}
             </div>
           </div>
@@ -231,7 +233,7 @@ export default function AdminV2Sidebar({ role, can }: SidebarProps) {
 
         {/* Dev tools — collapsible */}
         {can.manageAdmins && (
-          <CollapsibleGroup group={toolsGroup} />
+          <CollapsibleGroup group={toolsGroup} onNavigate={onNavigate} />
         )}
       </nav>
 

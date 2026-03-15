@@ -1,7 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { usePanelRole } from '@/hooks/usePanelRole';
-import { ShieldCheckIcon } from '@heroicons/react/24/outline';
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { useModalState } from '@/hooks/useModalDetector';
@@ -55,9 +53,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const { activeTab, handleTabClick, handlePrefetch } = useNavigationHandlers();
   const isDesktop = useIsDesktop();
   const openPostStudio = usePostStudioStore((s) => s.openPostStudio);
-  const navigate = useNavigate();
-  const { role: adminRole } = usePanelRole();
-  const isAdminUser = adminRole === 'full' || adminRole === 'limited';
+  
   
   const navRef = useRef<HTMLDivElement>(null);
   
@@ -167,38 +163,15 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 transition: 'all var(--motion-slow) cubic-bezier(0.22, 1, 0.36, 1)',
               }}
             >
-              <div className="flex w-full">
-                <div className="flex-1">
-                  <NavigationBar
-                    activeTab={activeTab}
-                    onTabClick={handleTabClickWithCamera}
-                    onPrefetch={handleNavPrefetch}
-                    variant={isClubhouseRoute ? 'clubhouse' : 'default'}
-                    isDimmed={false}
-                    useAmberActive={isWarmGradientRoute}
-                    showBorder={false}
-                  />
-                </div>
-                {isAdminUser && (
-                  <button
-                    onClick={() => navigate('/admin-v2/dashboard')}
-                    className={cn(
-                      "flex-shrink-0 w-14 flex flex-col items-center justify-center gap-1 py-1.5 rounded-xl",
-                      "active:scale-95 focus:outline-none"
-                    )}
-                    style={{ transition: 'all 150ms ease' }}
-                    aria-label="Admin"
-                  >
-                    <span className="relative">
-                      <ShieldCheckIcon className="w-6 h-6 text-muted-foreground" />
-                      <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full" style={{ background: 'hsl(var(--accent-amber))' }} />
-                    </span>
-                    <span className="text-[10px] font-medium text-muted-foreground">
-                      Admin
-                    </span>
-                  </button>
-                )}
-              </div>
+              <NavigationBar
+                activeTab={activeTab}
+                onTabClick={handleTabClickWithCamera}
+                onPrefetch={handleNavPrefetch}
+                variant={isClubhouseRoute ? 'clubhouse' : 'default'}
+                isDimmed={false}
+                useAmberActive={isWarmGradientRoute}
+                showBorder={false}
+              />
             </div>
           </motion.div>
         )}
