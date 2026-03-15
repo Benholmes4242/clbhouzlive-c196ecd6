@@ -144,7 +144,7 @@ export function BusinessInfoSection({
                   onChange={(e) => setBusinessName(e.target.value)}
                   placeholder={category ? 'Enter your business name' : 'Select a category first'}
                   disabled={!category}
-                  className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#f59e0b]/40 focus:bg-background transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 <p className="text-[12px] text-muted-foreground">
                   This is shown publicly on your profile and in search.
