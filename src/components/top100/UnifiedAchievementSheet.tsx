@@ -435,7 +435,7 @@ export function UnifiedAchievementSheet({
               'shadow-2xl'
             )}
             style={{
-              paddingBottom: 'env(safe-area-inset-bottom)',
+              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
             }}
           >
             {/* 1. Drag handle */}

@@ -244,7 +244,7 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
         >
           <button
             onClick={() => navigate(-1)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full hover:bg-muted active:scale-[0.95] transition-transform"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full hover:bg-muted active:scale-[0.97] transition-transform"
             aria-label="Go back"
           >
             <ArrowLeft className="w-5 h-5 text-foreground" />
