@@ -914,7 +914,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
             <div className="px-4 pb-6">
               {/* Achievements Title */}
               <div className="text-center mb-6">
-                <h1 className="text-xl font-bold text-black dark:text-white">
+                <h1 className="text-xl font-bold text-foreground">
                   Achievements
                 </h1>
                 <p className="text-sm text-black dark:text-white mt-1">
