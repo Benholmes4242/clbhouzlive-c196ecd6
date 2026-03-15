@@ -233,7 +233,7 @@ const BusinessInsightsPageV2 = () => {
       <PageRoot className="min-h-screen bg-background">
         <div className="max-w-xl mx-auto mt-10 text-center px-4">
           <p className="text-muted-foreground">Business not found</p>
-          <Button onClick={() => navigate('/')} className="mt-4">Go home</Button>
+          <Button onClick={() => navigate('/')} className="mt-4 bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0">Go home</Button>
         </div>
       </PageRoot>
     );

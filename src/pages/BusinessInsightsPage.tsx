@@ -155,7 +155,7 @@ const BusinessInsightsPage = () => {
                 onClick={() => setRange(r)}
                 className={`px-4 py-1.5 text-sm rounded-full transition-colors ${
                   range === r 
-                    ? 'bg-primary text-primary-foreground shadow-sm font-medium' 
+                    ? 'bg-[hsl(38,92%,50%)] text-white shadow-sm font-medium' 
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
