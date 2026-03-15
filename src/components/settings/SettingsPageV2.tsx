@@ -158,6 +158,7 @@ export function SettingsPageV2() {
             <SettingsChevronRow
               icon={<Eye size={18} />}
               title="View Profile"
+              iconTheme="creator"
               onClick={() => navigate(`/profile/${(profile as any)?.username}`)}
             />
           </SettingsSection>
