@@ -274,7 +274,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       {showPrecisionWarning && (
         <div className="mt-3 p-3 rounded-sq-sm bg-muted border border-border">
           <div className="flex items-start gap-2">
-            <AlertTriangle className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="h-4 w-4 text-[#f59e0b] flex-shrink-0 mt-0.5" />
             <div className="flex-1">
               <p className="text-sm font-medium text-foreground">That location is too general</p>
               <p className="text-xs text-foreground mt-0.5">
