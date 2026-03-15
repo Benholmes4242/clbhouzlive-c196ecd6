@@ -57,7 +57,7 @@ export function PhotosIdentityStep({
               maxLength={DISPLAY_NAME_MAX}
               onChange={(e) => onFieldChange('displayName', e.target.value)}
               placeholder="Your full name"
-              className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors"
+              className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
             />
             {displayNameError && (
               <p className="text-[12px] text-destructive mt-1">{displayNameError}</p>
