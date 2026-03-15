@@ -246,7 +246,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         </div>
         
         {coordsLoading && (
-          <div className="px-5 md:px-4">
+          <div className="px-4">
             <div className="w-full h-[200px] bg-muted animate-pulse rounded-sq-md border border-border" />
           </div>
         )}
