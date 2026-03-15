@@ -11,7 +11,7 @@ import type {
   PodiumRow as PodiumRowType,
 } from '@/components/media-system/types/media';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
-
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 // ─── Keyframes ────────────────────────────────────────────────────────────────
 
@@ -158,104 +158,18 @@ function HeroAvatar({ src, name }: { src: string | null; name: string }) {
   );
 }
 
-// ─── Podium Trio ─────────────────────────────────────────────────────────────
+// ─── Small avatar for leaderboard rows (squircle) ───────────────────────────
 
-function PodiumTrio({ podium, resolvePhoto }: {
-  podium: PodiumRowType[];
-  resolvePhoto: (name: string, photoUrl?: string | null) => string;
-}) {
-  const second = podium.find(r => r.position === 2) ?? podium[1];
-  const third = podium.find(r => r.position === 3) ?? podium[2];
-  const winner = podium.find(r => r.position === 1) ?? podium[0];
-
-  if (!winner) return null;
-
-  const getPlayer = (row?: PodiumRowType) => row?.players?.[0];
-  const w = getPlayer(winner);
-  const s = getPlayer(second);
-  const t = getPlayer(third);
-
-  const PodiumSlot = ({
-    player, row, rank, avatarSize, platformHeight, isWinner
-  }: {
-    player?: { name: string; score?: string; photoUrl?: string | null };
-    row?: PodiumRowType;
-    rank: number;
-    avatarSize: number;
-    platformHeight: number;
-    isWinner?: boolean;
-  }) => {
-    const medals = ['', '🥇', '🥈', '🥉'];
-    const colors = ['', '#F59E0B', '#94A3B8', '#CD7C2F'];
-    const scoreColor = colors[rank] || 'rgba(255,255,255,0.7)';
-
-    return (
-      <div style={{
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-        flex: 1, gap: 4, alignSelf: 'flex-end',
-      }}>
-        <span style={{ fontSize: isWinner ? 18 : 14, marginBottom: 2 }}>{medals[rank]}</span>
-        <div style={{
-          width: avatarSize, height: avatarSize, borderRadius: '34%', overflow: 'hidden',
-          border: `2px solid ${isWinner ? 'rgba(245,158,11,0.7)' : 'rgba(255,255,255,0.15)'}`,
-          boxShadow: isWinner ? '0 0 16px rgba(245,158,11,0.35)' : 'none',
-          background: 'rgba(255,255,255,0.05)',
-          flexShrink: 0,
-        }}>
-          {player ? (
-            <img
-              src={resolvePhoto(player.name, player.photoUrl)}
-              alt={player.name}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
-              onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-            />
-          ) : (
-            <div style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.05)' }} />
-          )}
-        </div>
-        <span style={{
-          fontSize: isWinner ? 11 : 10, fontWeight: 700, color: 'rgba(255,255,255,0.85)',
-          textAlign: 'center', maxWidth: avatarSize + 8,
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-        }}>
-          {player ? player.name.split(' ').slice(-1)[0] : '—'}
-          {row?.isTied && row.players.length > 1 && (
-            <span style={{ fontSize: 8, color: 'rgba(255,255,255,0.4)' }}> +{row.players.length - 1}</span>
-          )}
-        </span>
-        <span style={{ fontSize: isWinner ? 13 : 11, fontWeight: 800, color: scoreColor }}>
-          {player?.score || '—'}
-        </span>
-        <div style={{
-          width: '85%', height: platformHeight, borderRadius: '6px 6px 0 0',
-          background: isWinner
-            ? 'linear-gradient(180deg, rgba(245,158,11,0.25) 0%, rgba(245,158,11,0.08) 100%)'
-            : 'rgba(255,255,255,0.06)',
-          border: `1px solid ${isWinner ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.08)'}`,
-          borderBottom: 'none',
-          marginTop: 4,
-        }} />
-      </div>
-    );
-  };
-
+function RowAvatar({ src, name, size = 34 }: { src: string | null; name: string; size?: number }) {
+  const initials = name.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() ?? '').slice(0, 2).join('');
   return (
-    <div style={{
-      padding: '12px 16px 0',
-      borderTop: '1px solid rgba(255,255,255,0.06)',
-    }}>
-      <div style={{
-        fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.3)',
-        letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 10,
-      }}>
-        Podium
-      </div>
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4 }}>
-        <PodiumSlot player={s} row={second} rank={2} avatarSize={44} platformHeight={28} />
-        <PodiumSlot player={w} row={winner} rank={1} avatarSize={52} platformHeight={44} isWinner />
-        <PodiumSlot player={t} row={third}  rank={3} avatarSize={40} platformHeight={18} />
-      </div>
-    </div>
+    <SquircleAvatar
+      src={src}
+      alt={name}
+      size={size}
+      fallback={initials}
+      hideRing
+    />
   );
 }
 
@@ -324,7 +238,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
     else navigate(`/tourhub/tournament/${meta.tournament_id}`);
   }, [onViewResults, navigate, meta.tournament_id]);
 
-  const hasPodium = (meta.podium_rows?.length ?? 0) >= 2;
+  const podiumRows = meta.podium_rows?.slice(0, 5) ?? [];
 
   const winnerPhotoSrc = meta.winner_photo_url
     || getPlayerHeadshotUrl(meta.winner_name, meta.tour_slug)
@@ -478,13 +392,131 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         overflow: 'hidden', background: 'rgba(0,0,0,0.95)',
       }}>
 
-        {/* Stats strip — 1×4: Eagles, Birdies, Pars, Bogeys */}
+        {/* Leaderboard */}
+        <div style={{
+          flex: '1 1 auto', overflow: 'auto',
+          WebkitOverflowScrolling: 'touch' as const,
+          padding: '8px max(12px, 3vw) 0',
+        }}>
+          <div style={{
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            marginBottom: 8,
+          }}>
+            <span style={{
+              fontSize: 11, fontWeight: 700, letterSpacing: 1.5,
+              color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const,
+            }}>
+              Final Leaderboard
+            </span>
+            <button
+              onClick={handleViewResults}
+              style={{
+                fontSize: 11, fontWeight: 600, color: tour.accentColor,
+                background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+              }}
+            >
+              Full results →
+            </button>
+          </div>
+
+          {/* Winner row */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            padding: '8px 0',
+            borderBottom: podiumRows.length > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+            background: `${tour.accentColor}08`,
+            animation: 'trc-slideIn 0.5s ease-out both',
+            animationDelay: '0.6s',
+          }}>
+            <span style={{ width: 26, textAlign: 'center' as const, fontSize: 13, fontWeight: 700, color: tour.accentColor }}>1</span>
+            <RowAvatar src={winnerPhotoSrc} name={meta.winner_name} />
+            <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+              {meta.winner_name}
+            </span>
+            <span style={{ fontSize: 14, fontWeight: 700, color: tour.accentColor, fontVariantNumeric: 'tabular-nums' as const }}>
+              {meta.winner_score_display || 'E'}
+            </span>
+          </div>
+
+          {/* Podium rows 2–5 */}
+          {podiumRows.slice(0, 4).map((row, idx) => {
+            const isTied = row.isTied && row.players.length > 1;
+            const primary = row.players[0];
+            const stackedAvatars = row.players.slice(0, 4);
+
+            return (
+              <div key={`${row.position}-${idx}`} style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '7px 0',
+                borderBottom: '1px solid rgba(255,255,255,0.03)',
+                animation: 'trc-slideIn 0.5s ease-out both',
+                animationDelay: `${0.65 + idx * 0.08}s`,
+              }}>
+                <span style={{
+                  width: 26, textAlign: 'center' as const, fontSize: 13, fontWeight: 600,
+                  color: 'rgba(255,255,255,0.45)',
+                }}>
+                  {row.isTied ? `T${row.position}` : row.position}
+                </span>
+
+                {isTied ? (
+                  <div style={{ display: 'flex', alignItems: 'center', marginLeft: 0 }}>
+                    {stackedAvatars.map((p, i) => (
+                      <div key={i} style={{
+                        marginLeft: i === 0 ? 0 : -10,
+                        zIndex: stackedAvatars.length - i,
+                        borderRadius: '34%',
+                        border: '2px solid rgba(0,0,0,0.95)',
+                        overflow: 'hidden',
+                      }}>
+                        <RowAvatar src={resolvePhoto(p.name, p.photoUrl)} name={p.name} size={30} />
+                      </div>
+                    ))}
+                    {row.players.length > 4 && (
+                      <div style={{
+                        marginLeft: -8, zIndex: 0,
+                        width: 30, height: 30, borderRadius: '34%',
+                        background: 'rgba(255,255,255,0.08)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)',
+                        border: '2px solid rgba(0,0,0,0.95)',
+                      }}>
+                        +{row.players.length - 4}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <RowAvatar src={resolvePhoto(primary.name, primary.photoUrl)} name={primary.name} />
+                )}
+
+                <span style={{
+                  flex: 1, fontSize: 'clamp(11px, 3vw, 13px)', fontWeight: 500,
+                  color: 'rgba(255,255,255,0.8)',
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
+                }}>
+                  {isTied ? `${row.players.length}-Way Tie` : primary.name}
+                </span>
+                <span style={{
+                  fontSize: 'clamp(12px, 3.2vw, 14px)', fontWeight: 600,
+                  color: 'rgba(255,255,255,0.6)',
+                  fontVariantNumeric: 'tabular-nums' as const,
+                }}>
+                  {primary.score || 'E'}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Stats strip */}
         {(meta.stat_birdies != null || meta.stat_eagles != null) && (
           <div style={{
             flex: '0 0 auto', display: 'flex', gap: 2,
             padding: '8px 16px',
+            borderTop: '1px solid rgba(255,255,255,0.04)',
+            overflowX: 'auto' as const,
             animation: 'trc-fadeIn 0.5s ease-out both',
-            animationDelay: '0.6s',
+            animationDelay: '0.9s',
           }}>
             {[
               { v: meta.stat_eagles,  label: 'Eagles',  color: '#F59E0B', show: meta.stat_eagles != null && meta.stat_eagles > 0 },
@@ -500,16 +532,19 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
                 <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: 0.5, marginTop: 1 }}>{stat.label}</div>
               </div>
             ))}
+            {meta.stat_driving_distance != null && (
+              <div style={{
+                flex: 1, textAlign: 'center' as const, padding: '4px 0',
+                borderRadius: 8, background: 'rgba(255,255,255,0.03)',
+              }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>
+                  {meta.stat_driving_distance}<span style={{ fontSize: 10, fontWeight: 500 }}>yds</span>
+                </div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: 0.5, marginTop: 1 }}>Driver</div>
+              </div>
+            )}
           </div>
         )}
-
-        {/* Podium Trio */}
-        {hasPodium && meta.podium_rows.length >= 2 && (
-          <PodiumTrio podium={meta.podium_rows} resolvePhoto={resolvePhoto} />
-        )}
-
-        {/* Spacer to push CTA down */}
-        <div style={{ flex: '1 1 auto' }} />
 
         {/* CTA bar */}
         <div style={{
