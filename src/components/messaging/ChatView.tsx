@@ -530,7 +530,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
               ) : 
                isGroupChat && conversation ? `${conversation.participants.length} members` :
                otherUserPresence?.status === 'online' ? (
-                <span className="text-primary">online</span>
+                <span className="text-emerald-500">online</span>
               ) : 
                otherUserPresence?.status === 'away' ? 'away' : 
                otherUserPresence?.last_seen_at 
