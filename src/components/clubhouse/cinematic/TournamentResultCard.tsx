@@ -323,7 +323,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
           )}
 
           <div style={{
-            fontSize: 'clamp(15px, 4.2vw, 20px)', fontWeight: 600,
+            fontSize: 'clamp(16px, 4.5vw, 20px)', fontWeight: 600,
             color: 'rgba(255,255,255,0.85)', lineHeight: 1.25,
             marginBottom: 10, maxWidth: '90%',
             display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const,
