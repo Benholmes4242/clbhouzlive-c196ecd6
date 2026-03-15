@@ -206,6 +206,8 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
         lastName: entry.player?.last_name || '',
         fullName: entry.player?.full_name || 'Unknown',
         photoUrl: entry.player?.photo_url || null,
+        headshotOverride: entry.player?.headshot_override ?? null,
+        tourCode: entry.player?.tour_codes?.[0] ?? null,
         country: entry.player?.country || null,
       },
     }));

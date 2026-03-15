@@ -59,7 +59,11 @@ export function useTournamentLiveFeed(): {
           positionTied: false,
           playerId:     p.playerId,
           playerName:   p.player.fullName,
-          photoUrl:     p.player.photoUrl || getPlayerHeadshotUrl(p.player.fullName, tournament.tourSlug) || null,
+          photoUrl:     getPlayerHeadshotUrl(
+            p.player.fullName,
+            p.player.tourCode ?? tournament.tourSlug,
+            p.player.headshotOverride
+          ) || null,
           country:      p.player.country,
           scoreDisplay: p.scoreDisplay,
           score:        p.score,
