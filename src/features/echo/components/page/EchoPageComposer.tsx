@@ -136,10 +136,10 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
           ) : canSend ? (
             <button
               onClick={handleButtonClick}
-              className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-95 bg-primary"
+              className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-[0.97] bg-[hsl(38,92%,50%)]"
               aria-label="Send message"
             >
-              <ArrowUp className="w-4 h-4 text-primary-foreground" />
+              <ArrowUp className="w-4 h-4 text-white" />
             </button>
           ) : isSupported ? (
             <button
