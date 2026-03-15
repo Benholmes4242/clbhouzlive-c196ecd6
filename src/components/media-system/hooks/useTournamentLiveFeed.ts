@@ -3,9 +3,14 @@
  *
  * Wraps useLiveArena and useLeaderboardRealtime to produce
  * TournamentLiveFeedPost objects for injection into the Clubhouse feed.
+ *
+ * Each live tournament gets a real DB post (upserted once) so that
+ * comments, likes, etc. work with valid UUIDs.
  */
 
 import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { useLiveArena } from '@/features/tourhub/hooks/useLiveArena';
 import { useMultiLeaderboardRealtime } from '@/features/tourhub/hooks/useLeaderboardRealtime';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
@@ -21,20 +26,87 @@ const TOUR_PRIORITY: Record<string, number> = {
   kft:   6,
 };
 
-const LIVE_CARD_USER_ID = 'system-live-tournament';
+const TOUR_DISPLAY_LABELS: Record<string, string> = {
+  pga: 'PGA TOUR', liv: 'LIV GOLF', euro: 'DP WORLD',
+  lpga: 'LPGA', kft: 'KORN FERRY', champ: 'CHAMPIONS',
+};
+
+const SYSTEM_USER_ID = 'b8437384-291a-4d85-b81f-24c1068235dd';
+
+/**
+ * Get or create a real DB post for a live tournament so comments attach
+ * to a valid UUID. Uses `content` field to store tournament_id as a
+ * lookup key — avoids needing a separate junction table.
+ */
+async function getOrCreateLivePost(tournamentId: string, _tournamentName: string): Promise<string> {
+  // Check if a post already exists for this tournament
+  const { data: existing } = await supabase
+    .from('posts')
+    .select('id')
+    .eq('post_type', 'tournament_live')
+    .eq('content', tournamentId)
+    .maybeSingle();
+
+  if (existing?.id) return existing.id;
+
+  // Create a new post for this live tournament
+  const { data: created, error } = await supabase
+    .from('posts')
+    .insert({
+      user_id:       SYSTEM_USER_ID,
+      actor_id:      SYSTEM_USER_ID,
+      actor_type:    'system',
+      post_type:     'tournament_live',
+      content:       tournamentId,
+      visibility:    'anyone' as const,
+      categories:    [],
+      badges:        [],
+      like_count:    0,
+      comment_count: 0,
+      status:        'published',
+    })
+    .select('id')
+    .single();
+
+  if (error || !created) {
+    console.warn('[useTournamentLiveFeed] Could not create live post:', error);
+    return crypto.randomUUID();
+  }
+
+  return created.id;
+}
 
 export function useTournamentLiveFeed(): {
   livePosts:     TournamentLiveFeedPost[];
   liveTourSlugs: string[];
   isLoading:     boolean;
 } {
-  const { data: arenaData, isLoading } = useLiveArena();
+  const { data: arenaData, isLoading: arenaLoading } = useLiveArena();
 
   const liveIds = useMemo(
     () => (arenaData ?? []).map(t => t.id),
     [arenaData]
   );
   useMultiLeaderboardRealtime(liveIds);
+
+  // Fetch or create real post IDs for each live tournament
+  const postIdsQuery = useQuery({
+    queryKey: ['live-tournament-post-ids', liveIds.join(',')],
+    queryFn:  async () => {
+      if (!liveIds.length) return {} as Record<string, string>;
+      const entries = await Promise.all(
+        (arenaData ?? []).map(async t => {
+          const postId = await getOrCreateLivePost(t.id, t.name);
+          return [t.id, postId] as [string, string];
+        })
+      );
+      return Object.fromEntries(entries);
+    },
+    enabled:   !!arenaData?.length,
+    staleTime: 5 * 60_000,
+  });
+
+  const postIdMap = postIdsQuery.data ?? {};
 
   const livePosts = useMemo((): TournamentLiveFeedPost[] => {
     if (!arenaData?.length) return [];
@@ -75,7 +147,7 @@ export function useTournamentLiveFeed(): {
         tournamentId:    tournament.id,
         tournamentName:  tournament.name,
         tourSlug:        tournament.tourSlug,
-        tourName:        ({ pga: 'PGA TOUR', liv: 'LIV GOLF', euro: 'DP WORLD', lpga: 'LPGA', kft: 'KORN FERRY', champ: 'CHAMPIONS' } as Record<string, string>)[tournament.tourSlug] ?? tournament.tourSlug.toUpperCase(),
+        tourName:        TOUR_DISPLAY_LABELS[tournament.tourSlug] ?? tournament.tourSlug.toUpperCase(),
         venueName:       tournament.venueName,
         venueCity:       tournament.venueCity,
         currentRound:    tournament.currentRound ?? 1,
@@ -89,11 +161,13 @@ export function useTournamentLiveFeed(): {
         tourPriority:    TOUR_PRIORITY[tournament.tourSlug] ?? 99,
       };
 
+      const realPostId = postIdMap[tournament.id] ?? crypto.randomUUID();
+
       return {
-        id:              `live-tournament-${tournament.id}`,
-        userId:          LIVE_CARD_USER_ID,
+        id:              realPostId,
+        userId:          SYSTEM_USER_ID,
         actorType:       'system',
-        actorId:         LIVE_CARD_USER_ID,
+        actorId:         SYSTEM_USER_ID,
         username:        'clbhouz',
         displayName:     'clbhouz',
         avatarUrl:       '',
@@ -113,12 +187,16 @@ export function useTournamentLiveFeed(): {
         liveMeta:        meta,
       };
     });
-  }, [arenaData]);
+  }, [arenaData, postIdMap]);
 
   const liveTourSlugs = useMemo(
     () => (arenaData ?? []).map(t => t.tourSlug),
     [arenaData]
   );
 
-  return { livePosts, liveTourSlugs, isLoading };
+  return {
+    livePosts,
+    liveTourSlugs,
+    isLoading: arenaLoading || postIdsQuery.isLoading,
+  };
 }
