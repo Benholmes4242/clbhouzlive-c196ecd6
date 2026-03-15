@@ -323,8 +323,42 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                   {leader.playerName}
                 </div>
                 <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
-                  Leads the field
+                  {isTiedFirst ? `Tied for the lead (${coLeaders.length}-way)` : 'Leads the field'}
                 </div>
+                {isTiedFirst && (
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 8, marginTop: 6,
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      {coLeaders
+                        .filter(e => e.playerName !== leader!.playerName)
+                        .slice(0, 4)
+                        .map((co, i) => (
+                          <div key={i} style={{
+                            marginLeft: i === 0 ? 0 : -10,
+                            position: 'relative', zIndex: 10 - i,
+                          }}>
+                            <RowAvatar name={co.playerName} photoUrl={co.photoUrl} tourSlug={meta.tourSlug} size={28} />
+                          </div>
+                        ))
+                      }
+                    </div>
+                    <span style={{
+                      fontSize: 11, fontWeight: 600,
+                      color: 'rgba(255,255,255,0.55)',
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      maxWidth: 160,
+                    }}>
+                      {coLeaders
+                        .filter(e => e.playerName !== leader!.playerName)
+                        .slice(0, 3)
+                        .map(e => e.playerName.split(' ').slice(-1)[0])
+                        .join(', ')
+                      }
+                      {coLeaders.filter(e => e.playerName !== leader!.playerName).length > 3 && ' +more'}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div style={{ textAlign: 'right' }}>
