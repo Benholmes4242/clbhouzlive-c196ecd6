@@ -193,3 +193,6 @@ verify_jwt = false
 
 [functions.accept-admin-invite]
 verify_jwt = false
+
+[functions.log-web-vitals]
+verify_jwt = false
