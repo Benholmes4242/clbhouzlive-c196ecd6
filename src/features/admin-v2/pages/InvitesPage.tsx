@@ -1,12 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { format, formatDistanceToNow, isPast } from 'date-fns';
-import { Mail, Send, X, RefreshCw, Clock, CheckCircle } from 'lucide-react';
+import { Mail, Send, X, RefreshCw, Clock, CheckCircle, Search, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 import { useAdminV2Invites, type InviteRow } from '../hooks/useAdminV2Access';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import {
   AdminPageHeader, AdminFilterBar, AdminStatusPill,
   AdminButton, AdminKpiCard,
 } from '../components/ui';
+
+// ─── User search hook ─────────────────────────────────────────────────────────
+
+interface SearchResult {
+  id: string;
+  display_name: string | null;
+  username: string | null;
+  profile_photo_url: string | null;
+}
+
+function useUserSearch(query: string) {
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    if (query.length < 2) {
+      setResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    debounceRef.current = setTimeout(async () => {
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url')
+        .or(`display_name.ilike.%${query}%,username.ilike.%${query}%`)
+        .limit(8);
+
+      setResults(data ?? []);
+      setIsSearching(false);
+    }, 250);
+
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, [query]);
+
+  return { results, isSearching };
+}
 
 // ─── New invite form ──────────────────────────────────────────────────────────
 
@@ -14,20 +57,26 @@ function NewInviteForm({
   onSubmit,
   isPending,
 }: {
-  onSubmit: (email: string, role: string, notes: string) => void;
+  onSubmit: (userId: string, role: string) => void;
   isPending: boolean;
 }) {
-  const [email, setEmail] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedUser, setSelectedUser] = useState<SearchResult | null>(null);
   const [role, setRole] = useState<'full' | 'limited'>('limited');
-  const [notes, setNotes] = useState('');
   const [open, setOpen] = useState(false);
+  const { results, isSearching } = useUserSearch(searchQuery);
 
   const handleSubmit = () => {
-    if (!email.trim()) return;
-    onSubmit(email.trim(), role, notes);
-    setEmail('');
-    setNotes('');
+    if (!selectedUser) return;
+    onSubmit(selectedUser.id, role);
+    setSelectedUser(null);
+    setSearchQuery('');
     setOpen(false);
+  };
+
+  const handleSelectUser = (user: SearchResult) => {
+    setSelectedUser(user);
+    setSearchQuery('');
   };
 
   if (!open) {
@@ -42,23 +91,85 @@ function NewInviteForm({
     <div className="rounded-xl border border-border/60 bg-card p-5 space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-[14px] font-semibold text-foreground">New Invite</p>
-        <button onClick={() => setOpen(false)} className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-muted transition-colors">
+        <button onClick={() => { setOpen(false); setSelectedUser(null); setSearchQuery(''); }} className="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-muted transition-colors">
           <X className="h-4 w-4 text-muted-foreground" />
         </button>
       </div>
 
       <div className="space-y-3">
+        {/* User search */}
         <div className="space-y-1.5">
-          <label className="text-[12px] font-medium text-muted-foreground">Email address</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="teammate@example.com"
-            className="w-full h-10 px-3 rounded-lg border border-border/60 bg-background text-[13.5px] text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-border/40"
-          />
+          <label className="text-[12px] font-medium text-muted-foreground">Search user</label>
+          {selectedUser ? (
+            <div className="flex items-center gap-3 p-2.5 rounded-lg border border-border/60 bg-background">
+              <SquircleAvatar
+                src={selectedUser.profile_photo_url}
+                alt={selectedUser.display_name || selectedUser.username || ''}
+                size={32}
+                fallback={(selectedUser.display_name || selectedUser.username || '?').charAt(0)}
+                hideRing
+              />
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-semibold text-foreground truncate">{selectedUser.display_name || selectedUser.username}</p>
+                {selectedUser.username && selectedUser.display_name && (
+                  <p className="text-[11px] text-muted-foreground">@{selectedUser.username}</p>
+                )}
+              </div>
+              <button
+                onClick={() => setSelectedUser(null)}
+                className="h-6 w-6 flex items-center justify-center rounded-md hover:bg-muted transition-colors"
+              >
+                <X className="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
+            </div>
+          ) : (
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by name or username..."
+                className="w-full h-10 pl-9 pr-3 rounded-lg border border-border/60 bg-background text-[13.5px] text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-border/40"
+                autoFocus
+              />
+              {/* Search results dropdown */}
+              {searchQuery.length >= 2 && (
+                <div className="absolute z-10 top-full mt-1 w-full rounded-xl border border-border/60 bg-card shadow-lg overflow-hidden max-h-64 overflow-y-auto">
+                  {isSearching ? (
+                    <div className="p-4 text-center text-[12px] text-muted-foreground">Searching...</div>
+                  ) : results.length === 0 ? (
+                    <div className="p-4 text-center text-[12px] text-muted-foreground">No users found</div>
+                  ) : (
+                    results.map(user => (
+                      <button
+                        key={user.id}
+                        onClick={() => handleSelectUser(user)}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-muted/50 transition-colors text-left"
+                      >
+                        <SquircleAvatar
+                          src={user.profile_photo_url}
+                          alt={user.display_name || user.username || ''}
+                          size={32}
+                          fallback={(user.display_name || user.username || '?').charAt(0)}
+                          hideRing
+                        />
+                        <div className="min-w-0">
+                          <p className="text-[13px] font-medium text-foreground truncate">{user.display_name || user.username}</p>
+                          {user.username && (
+                            <p className="text-[11px] text-muted-foreground">@{user.username}</p>
+                          )}
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
+        {/* Role selector */}
         <div className="space-y-1.5">
           <label className="text-[12px] font-medium text-muted-foreground">Role</label>
           <div className="grid grid-cols-2 gap-2">
@@ -81,24 +192,20 @@ function NewInviteForm({
             ))}
           </div>
         </div>
-
-        <div className="space-y-1.5">
-          <label className="text-[12px] font-medium text-muted-foreground">Note (optional)</label>
-          <input
-            type="text"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="e.g. Course data manager"
-            className="w-full h-10 px-3 rounded-lg border border-border/60 bg-background text-[13.5px] text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-border/40"
-          />
-        </div>
       </div>
 
       <div className="flex gap-2">
-        <AdminButton variant="primary" icon={Send} loading={isPending} onClick={handleSubmit} className="flex-1">
+        <AdminButton
+          variant="primary"
+          icon={Send}
+          loading={isPending}
+          onClick={handleSubmit}
+          className="flex-1"
+          disabled={!selectedUser}
+        >
           Send Invite
         </AdminButton>
-        <AdminButton variant="outline" onClick={() => setOpen(false)}>
+        <AdminButton variant="outline" onClick={() => { setOpen(false); setSelectedUser(null); setSearchQuery(''); }}>
           Cancel
         </AdminButton>
       </div>
@@ -132,21 +239,37 @@ function InviteCard({
         ? <AdminStatusPill status="inactive" label="Cancelled" />
         : <AdminStatusPill status="pending" label="Pending" />;
 
+  // Display name: use hydrated profile for user invites, fall back to email for legacy
+  const displayLabel = invite.displayName || invite.username
+    ? (invite.displayName || `@${invite.username}`)
+    : invite.email || 'Unknown user';
+
   return (
     <div className="flex items-center gap-4 px-4 py-3.5">
       <div className={cn(
-        'w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0',
+        'w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden',
         isAccepted ? 'bg-green-50 dark:bg-green-500/15' : 'bg-muted',
       )}>
-        {isAccepted
-          ? <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
-          : <Mail className="h-4 w-4 text-muted-foreground" />
-        }
+        {invite.avatarUrl ? (
+          <SquircleAvatar
+            src={invite.avatarUrl}
+            alt={displayLabel}
+            size={36}
+            fallback={displayLabel.charAt(0)}
+            hideRing
+          />
+        ) : isAccepted ? (
+          <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+        ) : invite.invitedUserId ? (
+          <User className="h-4 w-4 text-muted-foreground" />
+        ) : (
+          <Mail className="h-4 w-4 text-muted-foreground" />
+        )}
       </div>
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <p className="text-[13.5px] font-semibold text-foreground truncate">{invite.email}</p>
+          <p className="text-[13.5px] font-semibold text-foreground truncate">{displayLabel}</p>
           {statusEl}
           {invite.role && (
             <span className="text-[11px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
@@ -207,7 +330,7 @@ export default function InvitesPage() {
 
       {/* New invite form */}
       <NewInviteForm
-        onSubmit={(email, role, notes) => createMutation.mutate({ email, role, notes })}
+        onSubmit={(userId, role) => createMutation.mutate({ invitedUserId: userId, role })}
         isPending={createMutation.isPending}
       />
 

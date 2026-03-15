@@ -6,6 +6,7 @@ import { VerificationRow } from './rows/VerificationRow';
 import { GameRow } from './rows/GameRow';
 import { ReviewRow } from './rows/ReviewRow';
 import { SystemRow } from './rows/SystemRow';
+import { AdminInviteRow } from './rows/AdminInviteRow';
 
 interface ActivityNotificationRowProps {
   notification: ActivityNotification;
@@ -47,6 +48,7 @@ const SYSTEM_TYPES = new Set(['system', 'app_update', 'achievement', 'achievemen
 export const ActivityNotificationRow: React.FC<ActivityNotificationRowProps> = (props) => {
   const { type } = props.notification;
 
+  if (type === 'admin_invite') return <AdminInviteRow {...props} />;
   if (FRIEND_TYPES.has(type)) return <FriendRow {...props} />;
   if (VERIFICATION_TYPES.has(type)) return <VerificationRow {...props} />;
   if (GAME_TYPES.has(type)) return <GameRow {...props} />;

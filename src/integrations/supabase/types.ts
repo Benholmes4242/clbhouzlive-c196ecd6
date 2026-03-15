@@ -123,10 +123,11 @@ export type Database = {
         Row: {
           accepted_at: string | null
           created_at: string
-          email: string
+          email: string | null
           expires_at: string
           id: string
           invited_by: string
+          invited_user_id: string | null
           notes: string | null
           role: string | null
           status: string
@@ -136,10 +137,11 @@ export type Database = {
         Insert: {
           accepted_at?: string | null
           created_at?: string
-          email: string
+          email?: string | null
           expires_at?: string
           id?: string
           invited_by: string
+          invited_user_id?: string | null
           notes?: string | null
           role?: string | null
           status?: string
@@ -149,10 +151,11 @@ export type Database = {
         Update: {
           accepted_at?: string | null
           created_at?: string
-          email?: string
+          email?: string | null
           expires_at?: string
           id?: string
           invited_by?: string
+          invited_user_id?: string | null
           notes?: string | null
           role?: string | null
           status?: string

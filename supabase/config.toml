@@ -187,3 +187,9 @@ verify_jwt = false
 
 [functions.upsert-live-tournament-post]
 verify_jwt = false
+
+[functions.send-admin-invite]
+verify_jwt = false
+
+[functions.accept-admin-invite]
+verify_jwt = false

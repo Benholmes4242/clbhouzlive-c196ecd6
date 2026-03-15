@@ -102,7 +102,9 @@ export type ActivityType =
   // System
   | 'system'
   | 'app_update'
-  | 'tip';
+  | 'tip'
+  // Admin
+  | 'admin_invite';
 
 // Actor types for normalized model
 export type ActorType = 'user' | 'club' | 'course' | 'system';
