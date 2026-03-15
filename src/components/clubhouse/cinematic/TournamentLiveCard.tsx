@@ -183,7 +183,7 @@ function LeaderboardRow({
 
       {/* Thru */}
       {entry.thru && (
-        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', minWidth: 24, textAlign: 'center' }}>
+        <span style={{ fontSize: 'clamp(9px, 2.5vw, 11px)', color: 'rgba(255,255,255,0.35)', minWidth: 24, textAlign: 'center' }}>
           {entry.thru === '18' || entry.thru === 'F' ? 'F' : entry.thru}
         </span>
       )}
