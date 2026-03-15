@@ -431,6 +431,10 @@ const CourseExplorer = () => {
       {/* Your Network Section - Shows activity from friends */}
       <YourNetworkSection className="mt-2" />
 
+      <div
+        className="sticky top-0 z-10 bg-background pb-3 space-y-5"
+        style={{ borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
+      >
       {/* Search */}
       <div className="relative max-w-xl mx-auto">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4 z-10" aria-hidden="true" />
