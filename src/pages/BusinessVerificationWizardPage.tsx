@@ -413,7 +413,7 @@ export default function BusinessVerificationWizardPage() {
                           isSelected ? 'border-[hsl(38,92%,50%)] bg-[hsl(38,92%,50%)]/5' : 'border-border hover:bg-muted/30'
                         )}
                       >
-                        <RadioGroupItem value={option.id} className="mt-0.5" />
+                        <RadioGroupItem value={option.id} className="mt-0.5 border-[hsl(38,92%,50%)] text-[hsl(38,92%,50%)] data-[state=checked]:border-[hsl(38,92%,50%)] data-[state=checked]:text-[hsl(38,92%,50%)]" />
                         <Icon className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0" />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-foreground">{option.label}</p>
