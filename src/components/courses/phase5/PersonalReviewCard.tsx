@@ -140,7 +140,7 @@ export const PersonalReviewCard: React.FC<PersonalReviewCardProps> = ({
                     <span className="text-muted-foreground">{cat.label}</span>
                     <span className="font-medium text-foreground">{cat.score.toFixed(1)}</span>
                   </div>
-                  <div className="h-1.5 bg-secondatransparentd-full overflow-hidden">
+                  <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(245,158,11,0.1)' }}>
                     <div 
                       className={`h-full ${barColorClass} rounded-full transition-all duration-500`}
                       style={{ width: `${(cat.score / 10) * 100}%` }}

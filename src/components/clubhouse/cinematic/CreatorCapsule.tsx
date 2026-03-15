@@ -430,7 +430,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   );
 
   // Determine border color based on mode
-  const borderColor = isReview && isOutstanding 
+  const borderColor = isReview
     ? 'rgba(210, 180, 97, 0.3)' 
     : 'rgba(255, 255, 255, 0.08)';
 
