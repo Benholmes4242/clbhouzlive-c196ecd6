@@ -339,7 +339,9 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
   // Auto-scroll to bottom on new messages
   useEffect(() => {
     if (messages.length > prevMessagesLengthRef.current) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      requestAnimationFrame(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      });
     }
     prevMessagesLengthRef.current = messages.length;
   }, [messages.length]);
