@@ -133,6 +133,7 @@ export function SettingsPageV2() {
               icon={<Shield size={18} />}
               title="Creator Mode"
               subtitle="Unlock creator tools and analytics"
+              iconTheme="creator"
               checked={creator.isCreator}
               disabled={creator.isUpdating}
               onCheckedChange={(val) =>
