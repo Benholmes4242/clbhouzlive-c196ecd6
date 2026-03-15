@@ -773,7 +773,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 <div className="flex-1 flex flex-col justify-center">
                   {/* Ring Achievement Status - Centered with ring */}
                   <div className="space-y-3 mb-8">
-                    <h3 className="font-semibold text-2xl text-black dark:text-white text-center">
+                    <h3 className="font-semibold text-2xl text-foreground text-center">
                       {currentTier ? currentTier.name : 'No Ring Achieved'}
                     </h3>
                     <p className="text-base text-black dark:text-white text-center">
