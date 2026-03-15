@@ -683,7 +683,7 @@ const BusinessProfilePage: React.FC = () => {
           open={isCropModalOpen}
           onOpenChange={handleCropCancel}
           imageSrc={cropImageSrc}
-          aspectRatio={cropMode === 'cover' ? window.innerWidth / (window.innerHeight * 0.35) : 1}
+          aspectRatio={cropMode === 'cover' ? window.innerWidth / (window.innerHeight * 0.35) : 1 / 1.05}
           onCropComplete={handleCropComplete}
           title={cropMode === 'cover' ? 'Crop Cover Photo' : 'Crop Logo'}
         />
