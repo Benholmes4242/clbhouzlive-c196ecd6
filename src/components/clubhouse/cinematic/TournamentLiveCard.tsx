@@ -452,7 +452,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           const putts = s.putts as number | null ?? null;
           if (dd == null && fw == null && gir == null && putts == null) return null;
           return (
-            <div style={{ padding: '0 16px 14px' }}>
+            <div style={{ padding: 'clamp(10px, 1.5vh, 18px) 16px clamp(10px, 1.5vh, 18px)' }}>
               <div style={{
                 fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.3)',
                 letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 8,
