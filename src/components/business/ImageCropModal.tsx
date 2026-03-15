@@ -144,7 +144,7 @@ export function ImageCropModal({
     setZoom(1);
   };
 
-  const isLogo = aspectRatio === 1;
+  const isLogo = aspectRatio <= 1; // covers both 1 and 1/1.05
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
