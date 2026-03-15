@@ -23,7 +23,6 @@ export function AdminSearchBar({
 }: AdminSearchBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // ⌘F to focus
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
@@ -41,8 +40,7 @@ export function AdminSearchBar({
 
   return (
     <div className={cn('relative', className)}>
-      {/* Search icon */}
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" style={{ color: '#94A3B8' }} />
 
       <input
         ref={inputRef}
@@ -50,31 +48,40 @@ export function AdminSearchBar({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className={cn(
-          'w-full h-10 pl-9 pr-20 rounded-lg border border-border/60 bg-background',
-          'text-[13.5px] text-foreground placeholder:text-muted-foreground',
-          'outline-none focus:border-border focus:ring-2 focus:ring-border/20',
-          'transition-all duration-150',
-        )}
+        className="w-full h-10 pl-9 pr-20 text-[13.5px] outline-none transition-all duration-150"
+        style={{
+          background: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: 10,
+          color: '#334155',
+        }}
+        onFocus={e => {
+          e.currentTarget.style.borderColor = '#F5A623';
+          e.currentTarget.style.boxShadow = '0 0 0 3px rgba(245,166,35,0.1)';
+        }}
+        onBlur={e => {
+          e.currentTarget.style.borderColor = '#E2E8F0';
+          e.currentTarget.style.boxShadow = 'none';
+        }}
       />
 
-      {/* Right side: loading / count / clear */}
       <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
         {isLoading && (
-          <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+          <Loader2 className="w-4 h-4 animate-spin" style={{ color: '#94A3B8' }} />
         )}
         {!isLoading && resultCount !== undefined && value && (
-          <span className="text-[11px] text-muted-foreground tabular-nums">
+          <span className="text-[11px] tabular-nums px-1.5 py-0.5 rounded-full" style={{ background: '#F1F5F9', color: '#64748B' }}>
             {resultCount.toLocaleString()}
           </span>
         )}
         {value && (
           <button
             onClick={() => onChange('')}
-            className="h-5 w-5 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors active:scale-90"
+            className="h-5 w-5 rounded-full flex items-center justify-center transition-colors active:scale-90"
+            style={{ background: '#F1F5F9' }}
             aria-label="Clear search"
           >
-            <X className="w-3 h-3 text-muted-foreground" />
+            <X className="w-3 h-3" style={{ color: '#94A3B8' }} />
           </button>
         )}
       </div>

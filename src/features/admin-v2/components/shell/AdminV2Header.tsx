@@ -64,17 +64,27 @@ export default function AdminV2Header({ onOpenPalette, onToggleSidebar, sidebarO
   const avatarUrl = profile?.profile_photo_url ?? null;
 
   return (
-    <div className="h-full flex items-center justify-between px-4" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)', height: 'calc(52px + max(env(safe-area-inset-top, 0px), 47px))' }}>
+    <div
+      className="h-full flex items-center justify-between px-4"
+      style={{
+        paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+        height: 'calc(52px + max(env(safe-area-inset-top, 0px), 47px))',
+        background: '#FFFFFF',
+      }}
+    >
       {/* Left: Toggle + Breadcrumb */}
       <div className="flex items-center gap-2">
         <button
           onClick={onToggleSidebar}
           aria-label="Toggle sidebar"
-          className="flex items-center justify-center w-[34px] h-[34px] rounded-lg flex-shrink-0 bg-transparent cursor-pointer"
+          className="flex items-center justify-center w-[34px] h-[34px] rounded-[10px] flex-shrink-0 cursor-pointer transition-colors"
           style={{
-            border: '1px solid hsl(var(--border) / 0.3)',
-            color: 'hsl(var(--muted-foreground))',
+            border: '1px solid #E2E8F0',
+            color: '#64748B',
+            background: 'transparent',
           }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#F8FAFC'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
         >
           {sidebarOpen
             ? <PanelLeftClose className="w-4 h-4" />
@@ -82,18 +92,18 @@ export default function AdminV2Header({ onOpenPalette, onToggleSidebar, sidebarO
           }
         </button>
       <nav className="flex items-center gap-1 text-sm">
-        <Link to="/admin-v2/dashboard" className="text-muted-foreground hover:text-foreground transition-colors font-medium">
+        <Link to="/admin-v2/dashboard" style={{ color: '#64748B', fontWeight: 500 }} className="hover:opacity-80 transition-opacity">
           Admin
         </Link>
         {breadcrumbs.map((crumb) => (
           <React.Fragment key={crumb.href}>
-            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40" />
+            <ChevronRight className="w-3.5 h-3.5" style={{ color: '#CBD5E1' }} />
             {crumb.isLast ? (
-              <span className="text-foreground font-semibold">
+              <span style={{ color: '#0F172A', fontWeight: 600 }}>
                 {crumb.label}
               </span>
             ) : (
-              <Link to={crumb.href} className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link to={crumb.href} style={{ color: '#64748B' }} className="hover:opacity-80 transition-opacity">
                 {crumb.label}
               </Link>
             )}
@@ -107,13 +117,15 @@ export default function AdminV2Header({ onOpenPalette, onToggleSidebar, sidebarO
         {/* ⌘K trigger */}
         <button
           onClick={onOpenPalette}
-          className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[12px] text-muted-foreground hover:text-foreground transition-all"
-          style={{ borderColor: 'hsl(var(--border) / 0.6)', background: 'hsl(var(--muted) / 0.3)' }}
+          className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-[10px] text-[12px] transition-all"
+          style={{ border: '1px solid #E2E8F0', background: '#FFFFFF', color: '#64748B' }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#F8FAFC'; e.currentTarget.style.color = '#334155'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = '#FFFFFF'; e.currentTarget.style.color = '#64748B'; }}
           aria-label="Open command palette"
         >
           <Search className="w-3.5 h-3.5" />
           Search...
-          <kbd className="ml-2 px-1.5 py-0.5 rounded text-[10px] font-mono" style={{ background: 'hsl(var(--muted) / 0.6)', border: '1px solid hsl(var(--border) / 0.4)' }}>
+          <kbd className="ml-2 px-1.5 py-0.5 rounded text-[10px] font-mono" style={{ background: '#F1F5F9', border: '1px solid #E2E8F0', color: '#64748B' }}>
             ⌘K
           </kbd>
         </button>
@@ -122,11 +134,14 @@ export default function AdminV2Header({ onOpenPalette, onToggleSidebar, sidebarO
         <div className="relative">
           <button
             onClick={() => setMenuOpen(v => !v)}
-            className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-lg hover:bg-muted/60 transition-colors active:scale-[0.98]"
+            className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-[10px] transition-colors active:scale-[0.98]"
+            style={{ color: '#334155' }}
+            onMouseEnter={e => { e.currentTarget.style.background = '#F8FAFC'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
             aria-label="Admin menu"
           >
             <SquircleAvatar src={avatarUrl} size="xs" />
-            <span className="text-[13px] font-medium text-foreground hidden sm:inline">
+            <span className="text-[13px] font-medium hidden sm:inline" style={{ color: '#0F172A' }}>
               {displayName}
             </span>
           </button>
@@ -136,23 +151,37 @@ export default function AdminV2Header({ onOpenPalette, onToggleSidebar, sidebarO
               {/* Backdrop */}
               <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
               {/* Dropdown */}
-              <div className="absolute right-0 top-full mt-1 w-56 rounded-xl border bg-card shadow-lg z-50 py-1" style={{ borderColor: 'hsl(var(--border) / 0.6)' }}>
-                <div className="px-3 py-2.5 border-b" style={{ borderColor: 'hsl(var(--border) / 0.4)' }}>
-                  <p className="text-sm font-semibold text-foreground">{displayName}</p>
-                  <p className="text-[11px] text-muted-foreground truncate">{user?.email}</p>
+              <div
+                className="absolute right-0 top-full mt-1 w-56 z-50 py-1"
+                style={{
+                  background: '#FFFFFF',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: 12,
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+                }}
+              >
+                <div className="px-3 py-2.5" style={{ borderBottom: '1px solid #F1F5F9' }}>
+                  <p className="text-sm font-semibold" style={{ color: '#0F172A' }}>{displayName}</p>
+                  <p className="text-[11px] truncate" style={{ color: '#64748B' }}>{user?.email}</p>
                 </div>
                 <button
                   onClick={() => { navigate('/profile'); setMenuOpen(false); }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] text-foreground hover:bg-muted/60 transition-colors"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] transition-colors"
+                  style={{ color: '#334155' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#F8FAFC'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
                 >
-                  <ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
+                  <ExternalLink className="w-3.5 h-3.5" style={{ color: '#64748B' }} />
                   View Profile
                 </button>
                 <button
                   onClick={() => { navigate('/clubhouse'); setMenuOpen(false); }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] text-foreground hover:bg-muted/60 transition-colors"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] transition-colors"
+                  style={{ color: '#334155' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#F8FAFC'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
                 >
-                  <ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
+                  <ExternalLink className="w-3.5 h-3.5" style={{ color: '#64748B' }} />
                   Back to App
                 </button>
               </div>

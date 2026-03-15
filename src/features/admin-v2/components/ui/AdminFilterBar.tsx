@@ -17,11 +17,11 @@ interface AdminFilterBarProps {
   className?: string;
 }
 
-const COUNT_COLORS: Record<FilterVariant, string> = {
-  default: 'bg-muted text-muted-foreground',
-  warning: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-500/20 dark:text-yellow-400',
-  danger:  'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400',
-  success: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
+const COUNT_COLORS: Record<FilterVariant, { bg: string; text: string }> = {
+  default: { bg: '#F1F5F9', text: '#64748B' },
+  warning: { bg: '#FFF7ED', text: '#F5A623' },
+  danger:  { bg: '#FFF1F2', text: '#F31260' },
+  success: { bg: '#F0FDF4', text: '#17C964' },
 };
 
 export function AdminFilterBar({ filters, active, onChange, className }: AdminFilterBarProps) {
@@ -30,21 +30,27 @@ export function AdminFilterBar({ filters, active, onChange, className }: AdminFi
       {filters.map((filter) => {
         const isActive = active === filter.id;
         const variant = filter.variant ?? 'default';
+        const countColor = COUNT_COLORS[variant];
 
         return (
           <button
             key={filter.id}
             onClick={() => onChange(filter.id)}
-            className={cn(
-              'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12.5px] font-medium transition-all duration-100 active:scale-[0.97]',
-              isActive
-                ? 'bg-foreground text-background shadow-sm'
-                : 'bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground',
-            )}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold transition-all duration-100 active:scale-[0.97]"
+            style={isActive
+              ? { background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 20, color: '#F5A623' }
+              : { background: '#F1F5F9', border: '1px solid #E2E8F0', borderRadius: 20, color: '#64748B' }
+            }
           >
             {filter.label}
             {filter.count !== undefined && (
-              <span className={cn('min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold', isActive ? 'bg-background/20 text-background' : COUNT_COLORS[variant])}>
+              <span
+                className="min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold"
+                style={isActive
+                  ? { background: 'rgba(245,166,35,0.15)', color: '#F5A623' }
+                  : { background: countColor.bg, color: countColor.text }
+                }
+              >
                 {filter.count > 999 ? '999+' : filter.count}
               </span>
             )}

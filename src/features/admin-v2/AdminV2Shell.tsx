@@ -127,7 +127,7 @@ export default function AdminV2Shell() {
       </div>
 
       {/* Header */}
-      <div className="border-b border-border/60">
+      <div style={{ borderBottom: '1px solid #E2E8F0' }}>
         <AdminV2Header
           onOpenPalette={() => setPaletteOpen(true)}
           onToggleSidebar={() => setSidebarOpen(v => !v)}

@@ -38,16 +38,15 @@ function DeltaPill({ delta, label }: { delta: number; label?: string }) {
 
   return (
     <span
-      className={cn(
-        'inline-flex items-center gap-1 text-[11px] font-semibold',
-        isUp && 'text-green-600 dark:text-green-400',
-        isDown && 'text-red-600 dark:text-red-400',
-        !isUp && !isDown && 'text-muted-foreground',
-      )}
+      className="inline-flex items-center gap-1 font-semibold"
+      style={{
+        fontSize: 11,
+        color: isUp ? '#17C964' : isDown ? '#F31260' : '#94A3B8',
+      }}
     >
       <Icon className="w-3 h-3" />
       {isUp ? '+' : ''}{delta.toFixed(1)}%
-      {label && <span className="text-muted-foreground font-normal ml-0.5">{label}</span>}
+      {label && <span className="font-normal ml-0.5" style={{ color: '#94A3B8' }}>{label}</span>}
     </span>
   );
 }
@@ -65,13 +64,16 @@ const MiniSparkline = ({ data, color }: { data: TrendPoint[]; color: string }) =
 );
 
 const LoadingSkeleton = () => (
-  <div className="rounded-xl border border-border/60 bg-card p-5 flex flex-col gap-3 animate-pulse">
+  <div
+    className="p-5 flex flex-col gap-3 animate-pulse"
+    style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03)' }}
+  >
     <div className="flex items-center justify-between">
-      <div className="h-3 w-20 rounded bg-muted" />
-      <div className="h-8 w-8 rounded-lg bg-muted" />
+      <div className="h-3 w-20 rounded" style={{ background: '#F1F5F9' }} />
+      <div className="h-8 w-8 rounded-[10px]" style={{ background: '#F1F5F9' }} />
     </div>
-    <div className="h-7 w-24 rounded bg-muted" />
-    <div className="h-3 w-16 rounded bg-muted" />
+    <div className="h-7 w-24 rounded" style={{ background: '#F1F5F9' }} />
+    <div className="h-3 w-16 rounded" style={{ background: '#F1F5F9' }} />
   </div>
 );
 
@@ -81,7 +83,7 @@ export function AdminKpiCard({
   delta,
   deltaLabel,
   icon: Icon,
-  iconColor = 'hsl(var(--accent-amber))',
+  iconColor = '#F5A623',
   trend,
   format,
   isLoading,
@@ -97,25 +99,44 @@ export function AdminKpiCard({
       onClick={onClick}
       onKeyDown={onClick ? (e) => e.key === 'Enter' && onClick() : undefined}
       className={cn(
-        'rounded-xl border border-border/60 bg-card p-5 flex flex-col gap-3',
-        onClick && 'cursor-pointer hover:border-border hover:shadow-md transition-all duration-150 active:scale-[0.99]',
+        'p-5 flex flex-col gap-3 transition-all duration-150',
+        onClick && 'cursor-pointer active:scale-[0.99]',
         className,
       )}
+      style={{
+        background: '#FFFFFF',
+        border: '1px solid #E2E8F0',
+        borderRadius: 14,
+        boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03)',
+      }}
+      onMouseEnter={onClick ? (e) => {
+        e.currentTarget.style.borderColor = '#CBD5E1';
+        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.06)';
+        e.currentTarget.style.borderTop = '2px solid #F5A623';
+      } : undefined}
+      onMouseLeave={onClick ? (e) => {
+        e.currentTarget.style.borderColor = '#E2E8F0';
+        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03)';
+        e.currentTarget.style.borderTop = '1px solid #E2E8F0';
+      } : undefined}
     >
       {/* Title row */}
       <div className="flex items-center justify-between">
-        <span className="text-[12px] font-medium text-muted-foreground uppercase tracking-wide">
+        <span style={{ fontSize: 10, fontWeight: 700, color: '#94A3B8', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
           {title}
         </span>
         {Icon && (
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${iconColor}15` }}>
+          <div
+            className="flex items-center justify-center"
+            style={{ width: 36, height: 36, borderRadius: 10, background: `${iconColor}18` }}
+          >
             <Icon className="w-4 h-4" style={{ color: iconColor }} />
           </div>
         )}
       </div>
 
       {/* Value */}
-      <span className="text-[28px] font-bold tracking-tight text-foreground leading-none">
+      <span style={{ fontSize: 32, fontWeight: 800, letterSpacing: -1, lineHeight: 1, color: '#0F172A' }}>
         {formatValue(value, format)}
       </span>
 

@@ -14,17 +14,17 @@ interface AdminButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>
 }
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
-  primary:   'bg-foreground text-background hover:opacity-90',
-  secondary: 'bg-muted text-foreground hover:bg-muted/80',
-  ghost:     'text-muted-foreground hover:bg-muted hover:text-foreground',
-  danger:    'bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600',
-  outline:   'border border-border/60 text-foreground hover:bg-muted hover:border-border',
+  primary:   'bg-[#F5A623] text-white font-semibold hover:bg-[#E8920F] shadow-[0_1px_3px_rgba(245,166,35,0.3)]',
+  secondary: 'bg-[#F1F5F9] text-[#334155] border border-[#E2E8F0] hover:bg-[#E2E8F0]',
+  ghost:     'text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#334155]',
+  danger:    'bg-[#FFF1F2] text-[#F31260] border border-[#FECDD3] hover:bg-[#FFE4E6]',
+  outline:   'border border-[#E2E8F0] text-[#334155] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]',
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {
-  sm: 'h-8 px-3 text-[12.5px] gap-1.5 rounded-lg',
-  md: 'h-9 px-4 text-[13px] gap-2 rounded-lg',
-  lg: 'h-10 px-5 text-[13.5px] gap-2 rounded-xl',
+  sm: 'h-8 px-3 text-[12.5px] gap-1.5 rounded-[10px]',
+  md: 'h-9 px-4 text-[13px] gap-2 rounded-[10px]',
+  lg: 'h-10 px-5 text-[13.5px] gap-2 rounded-[10px]',
 };
 
 export function AdminButton({
@@ -46,7 +46,7 @@ export function AdminButton({
       disabled={isDisabled}
       className={cn(
         'inline-flex items-center justify-center font-medium transition-all duration-100',
-        'active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-border',
+        'active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E2E8F0]',
         'disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100',
         VARIANT_CLASSES[variant],
         SIZE_CLASSES[size],
