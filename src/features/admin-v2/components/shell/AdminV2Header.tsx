@@ -100,6 +100,7 @@ export default function AdminV2Header({ onOpenPalette, onToggleSidebar, sidebarO
           </React.Fragment>
         ))}
       </nav>
+      </div>
 
       {/* Right: Command bar trigger + Avatar */}
       <div className="flex items-center gap-2">

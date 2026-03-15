@@ -35,12 +35,13 @@ interface NavGroup {
 
 // ─── Individual nav link ───────────────────────────────────────────
 
-function SidebarLink({ item }: { item: NavItem }) {
+function SidebarLink({ item, onNavigate }: { item: NavItem; onNavigate?: () => void }) {
   const Icon = item.icon;
   return (
     <NavLink
       to={item.to}
       end
+      onClick={() => onNavigate?.()}
       className={({ isActive }) =>
         cn(
           'group flex items-center justify-between gap-2.5 px-3 py-2 rounded-lg text-[13.5px] font-medium transition-all duration-100',
