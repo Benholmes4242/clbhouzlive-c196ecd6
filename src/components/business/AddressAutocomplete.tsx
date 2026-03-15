@@ -359,7 +359,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
               <button
                 type="button"
                 onClick={onDropPinClick}
-                className="text-primary hover:underline"
+                className="text-[#d97706] hover:underline"
               >
                 drop a pin on the map
               </button>

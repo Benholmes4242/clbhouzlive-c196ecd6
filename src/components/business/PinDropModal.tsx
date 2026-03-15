@@ -243,7 +243,7 @@ export const PinDropModal: React.FC<PinDropModalProps> = ({
                 )}
               </div>
             </div>
-            <Button onClick={handleConfirm} disabled={!pinPosition}>
+            <Button onClick={handleConfirm} disabled={!pinPosition} className="bg-[#f59e0b] hover:bg-[#e8920f] text-white border-0">
               Use this location
             </Button>
           </div>

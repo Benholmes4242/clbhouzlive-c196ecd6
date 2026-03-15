@@ -201,7 +201,7 @@ export function BusinessEditStep3Branding({
             setLogoCropModalOpen(open);
           }}
           imageSrc={selectedLogoImage}
-          aspectRatio={1}
+          aspectRatio={1 / 1.05}
           onCropComplete={(croppedFile) => {
             setPendingLogoFile(croppedFile);
             setPendingRemoveLogo(false);

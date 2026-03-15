@@ -177,7 +177,7 @@ export function BusinessEditStep2Location({
               value={formData.businessContactEmail}
               onChange={(e) => onFieldChange('businessContactEmail', e.target.value)}
               placeholder="contact@business.com"
-              className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors"
+              className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#f59e0b]/40 focus:bg-background transition-colors"
             />
           </div>
 

@@ -186,7 +186,7 @@ export const CountrySelector: React.FC<CountrySelectorProps> = ({
                 >
                   <span>{country.name}</span>
                   {value === country.name && (
-                    <Check className="h-4 w-4 text-primary" />
+                    <Check className="h-4 w-4 text-[#f59e0b]" />
                   )}
                 </button>
               ))

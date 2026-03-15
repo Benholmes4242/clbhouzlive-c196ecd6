@@ -221,10 +221,10 @@ export function ImageCropModal({
             </Button>
             
             <Button
-              variant="default"
               size="sm"
               onClick={handleConfirm}
               disabled={isProcessing || !croppedAreaPixels}
+              className="bg-[#f59e0b] hover:bg-[#e8920f] text-white border-0"
             >
               {isProcessing ? (
                 <>

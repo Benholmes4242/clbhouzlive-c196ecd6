@@ -92,7 +92,7 @@ export function BusinessEditStep1Info({
               onChange={(e) => onFieldChange('businessBio', e.target.value.slice(0, 2500))}
               placeholder="Tell golfers about your business..."
               rows={4}
-              className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors resize-none"
+              className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#f59e0b]/40 focus:bg-background transition-colors resize-none"
             />
             <p className="text-[12px] text-muted-foreground">
               Mention what makes you different — facilities, coaching style, atmosphere, or events.

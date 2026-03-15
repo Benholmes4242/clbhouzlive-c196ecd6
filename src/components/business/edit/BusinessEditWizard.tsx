@@ -379,7 +379,7 @@ export default function BusinessEditWizard() {
           </p>
           <button
             onClick={() => navigate(-1)}
-            className="text-[14px] font-semibold text-primary"
+            className="text-[14px] font-semibold text-[#d97706]"
           >
             Go back
           </button>
