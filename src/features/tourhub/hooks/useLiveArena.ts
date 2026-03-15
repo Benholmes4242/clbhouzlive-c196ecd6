@@ -164,6 +164,8 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
         last_name,
         full_name,
         photo_url,
+        headshot_override,
+        tour_codes,
         country
       )
     `)
