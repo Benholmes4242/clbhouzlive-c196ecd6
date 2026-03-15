@@ -465,7 +465,7 @@ const BusinessProfilePage: React.FC = () => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button 
-              className="min-h-[44px] min-w-[44px] flex-shrink-0 rounded-full flex items-center justify-center bg-card border border-border active:scale-[0.95] transition-transform"
+              className="min-h-[44px] min-w-[44px] flex-shrink-0 rounded-full flex items-center justify-center bg-card border border-border active:scale-[0.97] transition-transform"
             >
               <MoreHorizontal className="w-5 h-5 text-foreground" />
             </button>
