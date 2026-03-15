@@ -15,7 +15,7 @@ export function PrivacySection({ isPublic, onChange }: Props) {
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
           {isPublic
-            ? <Globe size={18} className="text-primary" />
+            ? <Globe size={18} className="text-[hsl(38,92%,50%)]" />
             : <Lock size={18} className="text-muted-foreground" />
           }
         </div>
