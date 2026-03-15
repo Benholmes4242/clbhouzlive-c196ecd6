@@ -10,7 +10,7 @@ import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
 import { useNavigate, Link } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
-import { getScoreTier } from '@/utils/getScoreTier';
+
 
 interface CourseStatusToggleProps {
   courseId: string;
