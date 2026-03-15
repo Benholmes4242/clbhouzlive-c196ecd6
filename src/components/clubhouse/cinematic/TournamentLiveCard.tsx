@@ -532,8 +532,6 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           );
         })()}
 
-        {/* Spacer */}
-        <div style={{ flex: 1 }} />
 
         {/* CTA bar */}
         <div style={{
