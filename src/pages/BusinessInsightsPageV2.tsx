@@ -135,7 +135,7 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
       {/* Action prompts */}
       <div className="flex flex-col sm:flex-row gap-2">
         {reviewStats.unrespondedCount > 0 && (
-          <div className="flex items-center gap-2 text-xs text-primary">
+          <div className="flex items-center gap-2 text-xs text-[hsl(35,80%,43%)]">
             <MessageCircle className="h-3.5 w-3.5" />
             <span>{reviewStats.unrespondedCount} review{reviewStats.unrespondedCount !== 1 ? 's' : ''} awaiting your response</span>
           </div>
