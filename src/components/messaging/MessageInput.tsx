@@ -303,7 +303,7 @@ export function MessageInput({
           title="Share golf content"
           className="w-10 h-10 rounded-full flex items-center justify-center active:bg-muted transition-colors flex-shrink-0"
         >
-          <MapPin className="w-5 h-5 text-primary" />
+          <MapPin className="w-5 h-5 text-[hsl(38,92%,50%)]" />
         </button>
 
         {/* Input container - pill style */}
