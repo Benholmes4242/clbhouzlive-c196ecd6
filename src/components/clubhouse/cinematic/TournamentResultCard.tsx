@@ -342,7 +342,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{
-                fontSize: 'clamp(22px, 6vw, 30px)', fontWeight: 700,
+                fontSize: 'clamp(18px, 5vw, 22px)', fontWeight: 700,
                 color: tour.accentColor, lineHeight: 1,
               }}>
                 {meta.winner_score_display || 'E'}
