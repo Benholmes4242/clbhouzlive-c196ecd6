@@ -184,7 +184,7 @@ export const MapExpandedView: React.FC<MapExpandedViewProps> = ({
           <div className="flex flex-col sm:flex-row gap-3 px-4">
             {isIOS && (
               <Button
-                className="flex-1 bg-foreground text-background hover:bg-foreground/90 shadow-none"
+                className="flex-1 bg-[#f59e0b] text-white hover:bg-[#e8920f] shadow-none"
                 onClick={() => window.open(appleMapsUrl, '_blank')}
               >
                 Open in Apple Maps
