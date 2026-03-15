@@ -90,7 +90,7 @@ export function BusinessInfoSection({
                 <button
                   type="button"
                   onClick={onRequestAccess}
-                  className="text-[13px] font-semibold text-primary mt-2"
+                  className="text-[13px] font-semibold text-[#d97706] mt-2"
                 >
                   Request access to manage this profile
                 </button>
