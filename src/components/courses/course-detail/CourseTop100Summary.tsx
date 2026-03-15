@@ -12,7 +12,7 @@ interface CourseTop100SummaryProps {
 export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
   const { data, isLoading } = useTop100ProgressForUser(userId);
 
-  // TOOD: if loading, show skeleton...
+  // TODO: if loading, show skeleton...
   if (isLoading) {
     return (
       <section className="px-4 pt-4 pb-5 bg-slate-50 text-center">
