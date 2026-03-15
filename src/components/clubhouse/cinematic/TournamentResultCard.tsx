@@ -396,7 +396,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         <div style={{
           flex: '1 1 auto', overflow: 'auto',
           WebkitOverflowScrolling: 'touch' as const,
-          padding: '8px 16px 0',
+          padding: '8px max(12px, 3vw) 0',
         }}>
           <div style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
