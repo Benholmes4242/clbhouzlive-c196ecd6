@@ -89,6 +89,7 @@ export default function AdminV2Shell() {
         height: '100dvh',
         overflow: 'hidden',
         position: 'relative',
+        background: '#F8FAFC',
       }}
     >
       {/* Mobile backdrop */}
