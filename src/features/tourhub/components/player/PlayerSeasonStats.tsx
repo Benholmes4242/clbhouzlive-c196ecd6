@@ -170,8 +170,8 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
 
       {/* Tab bar — secondary pill style */}
       <div
-        className="sticky top-0 z-20 bg-background/95 backdrop-blur-md pb-3 pt-1"
-        style={{ borderBottom: '1px solid hsl(var(--border) / 0.15)' }}
+        className="sticky top-0 z-20 bg-background/95 backdrop-blur-md pb-3"
+        style={{ borderBottom: '1px solid hsl(var(--border) / 0.15)', paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
       >
         <div className="flex gap-1.5" role="tablist" aria-label="Season Performance Stats">
           {TABS.map((tab) => {

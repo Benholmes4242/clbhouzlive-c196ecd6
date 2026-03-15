@@ -80,7 +80,7 @@ export function FranchiseLeaderboard({ limit = 25, className }: FranchiseLeaderb
           background: 'hsl(var(--background) / 0.95)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          paddingTop: 8,
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
           paddingBottom: 8,
           marginBottom: 16,
           borderBottom: '1px solid hsl(var(--border) / 0.15)',
