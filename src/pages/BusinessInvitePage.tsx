@@ -100,7 +100,7 @@ export default function BusinessInvitePage() {
                     <p className="text-sm text-muted-foreground">{r.description}</p>
                   </div>
                   {isSelected && (
-                    <Check className="h-5 w-5 text-primary" />
+                    <Check className="h-5 w-5 text-[hsl(38,92%,50%)]" />
                   )}
                 </button>
               );
