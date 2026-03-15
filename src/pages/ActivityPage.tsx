@@ -239,7 +239,7 @@ const ActivityPage: React.FC = () => {
                 id={`activity-tab-${tab.id}`}
                 onClick={() => handleTabChange(tab.id)}
                 className={cn(
-                  "px-4 py-2 min-h-[44px] flex items-center text-sm font-medium rounded-full transition-all duration-150 whitespace-nowrap active:scale-[0.95]",
+                  "px-4 py-2 min-h-[44px] flex items-center text-sm font-medium rounded-full transition-all duration-150 whitespace-nowrap active:scale-[0.97]",
                   activeTab === tab.id
                     ? "bg-foreground text-background"
                     : "bg-transparent text-muted-foreground hover:text-foreground"
@@ -286,7 +286,7 @@ const ActivityPage: React.FC = () => {
                 </p>
                 <button
                   onClick={() => queryClient.invalidateQueries({ queryKey: ['activity-feed'] })}
-                  className="px-6 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-full active:scale-95 transition-transform"
+                  className="px-6 py-2.5 bg-[hsl(38,92%,50%)] text-white text-sm font-medium rounded-full active:scale-[0.97] transition-transform"
                 >
                   Try again
                 </button>

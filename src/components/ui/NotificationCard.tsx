@@ -64,7 +64,7 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
             onClick();
           }
         }}
-        className="flex-1 flex items-start gap-3 text-left min-w-0 min-h-[44px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
+        className="flex-1 flex items-start gap-3 text-left min-w-0 min-h-[44px] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(38,92%,50%)]/40 focus-visible:ring-offset-2 rounded-sm"
       >
         {/* Avatar */}
         <div className="shrink-0" aria-hidden="true">{avatar}</div>
@@ -102,7 +102,7 @@ export const NotificationCard: React.FC<NotificationCardProps> = ({
       {onMenuClick && (
         <button
           type="button"
-          className="shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2 rounded-full hover:bg-muted/50 active:opacity-60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          className="shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center -mr-2 rounded-full hover:bg-muted/50 active:opacity-60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(38,92%,50%)]/40 focus-visible:ring-offset-2"
           onClick={(e) => {
             e.stopPropagation();
             onMenuClick();
@@ -123,7 +123,7 @@ export const notificationButtonStyles = {
   base: "inline-flex items-center justify-center rounded-sq-xs border px-3 h-9 text-xs font-medium transition-colors gap-1.5 active:scale-[0.93]",
   
   // Primary — brand primary
-  primary: "border-primary/30 bg-primary/10 text-primary hover:bg-primary/20",
+  primary: "border-[hsl(38,92%,50%)]/30 bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)] hover:bg-[hsl(38,92%,50%)]/20",
   
   // Secondary
   secondary: "border-border bg-background text-foreground/80 hover:bg-muted/50",
@@ -132,10 +132,10 @@ export const notificationButtonStyles = {
   destructive: "border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive/20",
   
   // Support — brand accent
-  support: "border-primary bg-primary/10 text-primary hover:bg-primary/20",
+  support: "border-[hsl(38,92%,50%)] bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)] hover:bg-[hsl(38,92%,50%)]/20",
   
   // Status pills (non-interactive)
-  statusSuccess: "border-primary/30 bg-primary/10 text-primary",
+  statusSuccess: "border-[hsl(38,92%,50%)]/30 bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)]",
   statusError: "border-destructive/30 bg-destructive/10 text-destructive",
   statusMuted: "border-border bg-muted text-muted-foreground",
   statusPending: "border-amber-500/30 bg-amber-500/10 text-amber-600",
