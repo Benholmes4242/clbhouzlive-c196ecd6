@@ -324,7 +324,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
     else navigate(`/tourhub/tournament/${meta.tournament_id}`);
   }, [onViewResults, navigate, meta.tournament_id]);
 
-  const podiumRows = meta.podium_rows?.slice(0, 5) ?? [];
+  const hasPodium = (meta.podium_rows?.length ?? 0) >= 2;
 
   const winnerPhotoSrc = meta.winner_photo_url
     || getPlayerHeadshotUrl(meta.winner_name, meta.tour_slug)
