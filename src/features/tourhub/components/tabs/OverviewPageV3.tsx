@@ -13,14 +13,13 @@
  * 7. College Golf Rankings (NEW - preview of college leaderboard)
  */
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import {
   HeroCarousel,
   LiveRightNow,
   UnifiedWorldRankings,
 } from '../overview-v3';
-import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { WhatsComing } from '../overview-v3/WhatsComing';
 import { CollegeRankingsPreview } from '../overview-v3/CollegeRankingsPreview';
 import { SeasonLeaderboards } from '../overview-v3/SeasonLeaderboards';
@@ -34,9 +33,6 @@ import { WifiOff } from 'lucide-react';
 
 export function OverviewPageV3() {
   const { isOnline } = useNetworkStatus();
-  const { hideBottomNav, showBottomNav } = useBottomNavigation();
-  const showSentinelRef = useRef<HTMLDivElement>(null);
-  const hideSentinelRef = useRef<HTMLDivElement>(null);
 
   // Prevent pull-down overscroll bounce on this immersive page
   usePreventOverscroll();
@@ -48,49 +44,6 @@ export function OverviewPageV3() {
 
   // Set transparent status bar with WHITE icons for dark hero image
   useMedianStatusBar("dark", "transparent", true, false);
-
-  // Hide on mount, restore on unmount
-  useEffect(() => {
-    hideBottomNav();
-    return () => { showBottomNav(); };
-  }, [hideBottomNav, showBottomNav]);
-
-  // Two sentinels:
-  // 1. "show" sentinel at top of hero — when it leaves viewport, nav slides in
-  // 2. "hide" sentinel ~85px from top — when it re-enters viewport (scrolling back up), nav slides out
-  useEffect(() => {
-    const showEl = showSentinelRef.current;
-    const hideEl = hideSentinelRef.current;
-    if (!showEl || !hideEl) return;
-
-    const showObserver = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) {
-          // Top sentinel scrolled out → show nav
-          showBottomNav();
-        }
-      },
-      { threshold: 0, rootMargin: '-40px 0px 0px 0px' }
-    );
-
-    const hideObserver = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          // Hide sentinel came back into view (user scrolled back to hero) → hide nav
-          hideBottomNav();
-        }
-      },
-      { threshold: 0 }
-    );
-
-    showObserver.observe(showEl);
-    hideObserver.observe(hideEl);
-
-    return () => {
-      showObserver.disconnect();
-      hideObserver.disconnect();
-    };
-  }, [hideBottomNav, showBottomNav]);
 
   return (
     <motion.div
