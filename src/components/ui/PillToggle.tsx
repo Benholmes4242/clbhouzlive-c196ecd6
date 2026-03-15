@@ -25,6 +25,7 @@ export const PillToggle: React.FC<PillToggleProps> = ({
   onSelect, 
   size = 'default',
   className,
+  activeColor,
 }) => {
   const textClass = size === 'small' ? 'text-xs' : 'text-sm';
   
