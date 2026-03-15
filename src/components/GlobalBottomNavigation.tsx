@@ -54,8 +54,6 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const isDesktop = useIsDesktop();
   const openPostStudio = usePostStudioStore((s) => s.openPostStudio);
   const navigate = useNavigate();
-  const { role: adminRole } = usePanelRole();
-  const isAdminUser = adminRole === 'full' || adminRole === 'limited';
   
   const navRef = useRef<HTMLDivElement>(null);
   
