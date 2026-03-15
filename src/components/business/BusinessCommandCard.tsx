@@ -367,13 +367,12 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
         <div className="flex items-center gap-2 p-4 pt-3">
           {needsDomainVerification ? (
             <Button
-              variant="default"
               size="sm"
               onClick={(e) => {
                 e.stopPropagation();
                 navigate(`/business/${business.id}/verify-domain`);
               }}
-              className="gap-1.5 min-h-[44px] flex-1 active:scale-[0.97] transition-all rounded-xl"
+              className="gap-1.5 min-h-[44px] flex-1 active:scale-[0.97] transition-all rounded-xl bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0"
             >
               <Mail className="h-3.5 w-3.5" />
               Verify domain now
