@@ -240,7 +240,7 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
       eventType.includes('champions')                                                   ? 'champ' :
       'pga'; // genuine fallback — only after all name and event_type checks fail
     
-    const estimatedRound = tournament.current_round
+    const estimatedRound = (tournament as any).current_round
       ?? (tournament.cut_round ? Math.min(tournament.cut_round, 4) : 1);
     
     const momentumTags = generateMomentumTags(
