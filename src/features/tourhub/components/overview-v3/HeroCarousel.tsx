@@ -15,7 +15,7 @@ import React, { useState, useEffect, useRef, useCallback, type ReactNode } from 
 import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronRight, Trophy, Menu, ChevronsUp } from 'lucide-react';
+import { ChevronDown, ChevronRight, Trophy, Menu } from 'lucide-react';
 import { openTourNav } from '../../contexts/TourNavContext';
 
 import { cn } from '@/lib/utils';
@@ -928,12 +928,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
 
             </AnimatePresence>
 
-            {/* ChevronsUp expand affordance on collapsed cards */}
-            {!isExpanded && (
-              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
-                <ChevronsUp size={14} style={{ color: 'rgba(255,255,255,0.35)', animation: 'pulse 2s infinite' }} />
-              </div>
-            )}
 
             {/* Carousel Dots - Inside card, below CTA — fade out when expanded */}
             {totalSlides > 1 && (
