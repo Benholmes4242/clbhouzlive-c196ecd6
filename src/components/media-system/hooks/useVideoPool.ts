@@ -5,6 +5,7 @@ import {
   attachMedia,
   detachMedia,
   destroyAll,
+  destroyPreCreated,
   promotePreCreated,
   recoverMediaError,
   retryLoad,
