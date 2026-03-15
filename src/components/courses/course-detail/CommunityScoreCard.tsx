@@ -186,7 +186,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
             </div>
             <span 
               className="mt-2 text-base font-semibold uppercase tracking-wide"
-              style={{ color: getRatingTheme(communityAverage).accent }}
+              style={{ color: '#d97706' }}
             >
               {tierLabel}
             </span>
