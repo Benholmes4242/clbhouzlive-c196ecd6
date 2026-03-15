@@ -1348,7 +1348,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                
                                {/* Progress indicator for near-unlock achievements */}
                                {isNearUnlock && (
-                                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full animate-ping"></div>
+                                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#f59e0b] rounded-full animate-ping"></div>
                                )}
                              </div>
                       );
