@@ -71,8 +71,8 @@ function LiveStatChip({ value, label, color, bg, border }: {
       borderRadius: 10,
       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
     }}>
-      <span style={{ fontSize: 15, fontWeight: 800, color, lineHeight: 1 }}>{value}</span>
-      <span style={{ fontSize: 8.5, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: 0.6, textTransform: 'uppercase' }}>{label}</span>
+      <span style={{ fontSize: 'clamp(12px, 3.5vw, 14px)', fontWeight: 800, color, lineHeight: 1 }}>{value}</span>
+      <span style={{ fontSize: 'clamp(7px, 2vw, 8.5px)', fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: 0.6, textTransform: 'uppercase' }}>{label}</span>
     </div>
   );
 }
