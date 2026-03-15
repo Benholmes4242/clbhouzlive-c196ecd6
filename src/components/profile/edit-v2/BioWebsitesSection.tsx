@@ -47,7 +47,7 @@ export function BioWebsitesSection({
                 value={site.url}
                 onChange={(e) => onUpdateWebsite(site.id, e.target.value)}
                 placeholder="https://yoursite.com"
-                className="flex-1 bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors"
+                className="flex-1 bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
               />
               <button
                 onClick={() => onRemoveWebsite(site.id)}
