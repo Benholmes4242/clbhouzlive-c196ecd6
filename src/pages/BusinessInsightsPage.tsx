@@ -46,7 +46,7 @@ const BusinessInsightsPage = () => {
     return (
       <PageRoot className="min-h-screen bg-background">
         <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[hsl(38,92%,50%)]" />
         </div>
       </PageRoot>
     );
