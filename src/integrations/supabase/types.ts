@@ -12731,6 +12731,33 @@ export type Database = {
           },
         ]
       }
+      web_vitals: {
+        Row: {
+          id: string
+          metric_name: string
+          path: string | null
+          rating: string | null
+          recorded_at: string | null
+          value: number
+        }
+        Insert: {
+          id?: string
+          metric_name: string
+          path?: string | null
+          rating?: string | null
+          recorded_at?: string | null
+          value: number
+        }
+        Update: {
+          id?: string
+          metric_name?: string
+          path?: string | null
+          rating?: string | null
+          recorded_at?: string | null
+          value?: number
+        }
+        Relationships: []
+      }
       weekly_challenge_ladder: {
         Row: {
           created_at: string | null
