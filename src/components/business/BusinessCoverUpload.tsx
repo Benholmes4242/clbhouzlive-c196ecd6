@@ -94,9 +94,9 @@ export function BusinessCoverUpload({
             )}
           </div>
         ) : (
-          <div className="aspect-[3.2/1] rounded-xl border-2 border-dashed border-border bg-muted flex flex-col items-center justify-center hover:border-primary/40 hover:bg-primary/5 transition-colors">
+          <div className="aspect-[3.2/1] rounded-xl border-2 border-dashed border-border bg-muted flex flex-col items-center justify-center hover:border-[#f59e0b]/40 hover:bg-[#f59e0b]/5 transition-colors">
             {isUploading ? (
-              <Loader2 className="w-6 h-6 text-primary animate-spin" />
+              <Loader2 className="w-6 h-6 text-[#f59e0b] animate-spin" />
             ) : (
               <>
                 <div className="w-12 h-12 rounded-full bg-muted border border-border flex items-center justify-center mb-2">

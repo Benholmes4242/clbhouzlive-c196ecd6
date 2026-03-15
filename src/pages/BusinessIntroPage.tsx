@@ -35,7 +35,8 @@ const BusinessIntroPage: React.FC = () => {
   return (
     <PageRoot className="flex min-h-screen flex-col bg-[#F8FAFC]">
       {/* Header */}
-      <header className="sticky top-0 z-20 border-b border-border/40 bg-background/95 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b border-border/40 bg-background/95 backdrop-blur"
+        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
         <div className="mx-auto w-full max-w-3xl px-4 pt-3 pb-3">
           {/* Back link - slate color */}
           <button
@@ -160,7 +161,7 @@ const BusinessIntroPage: React.FC = () => {
           </button>
           <Button
             onClick={handleContinue}
-            className="flex-[1.5] h-11 bg-[#334E3D] hover:bg-[#334E3D]/90 text-white rounded-full font-semibold"
+            className="flex-[1.5] h-11 bg-[#f59e0b] hover:bg-[#e8920f] text-white rounded-full font-semibold active:scale-[0.97] transition-all"
           >
             Continue to business details
           </Button>

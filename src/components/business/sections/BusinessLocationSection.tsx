@@ -75,7 +75,7 @@ export function BusinessLocationSection({
             value={website}
             onChange={(e) => setWebsite(e.target.value)}
             placeholder="https://yourwebsite.com"
-            className="w-full h-12 pl-11 pr-4 bg-background border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-border"
+            className="w-full h-12 pl-11 pr-4 bg-background border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#f59e0b]/40 focus:border-border"
           />
         </div>
       </div>
@@ -92,7 +92,7 @@ export function BusinessLocationSection({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="contact@business.com"
-            className="w-full h-12 pl-11 pr-4 bg-background border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-border"
+            className="w-full h-12 pl-11 pr-4 bg-background border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#f59e0b]/40 focus:border-border"
           />
         </div>
       </div>

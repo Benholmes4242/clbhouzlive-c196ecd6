@@ -71,7 +71,7 @@ export function BusinessLogoUpload({
           fallback={businessName?.[0] || 'B'}
           size={96}
         />
-        <label className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center cursor-pointer shadow-sm hover:bg-primary/90 transition-colors">
+        <label className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-[#f59e0b] text-white flex items-center justify-center cursor-pointer shadow-sm hover:bg-[#e8920f] transition-colors">
           <input
             ref={fileInputRef}
             type="file"

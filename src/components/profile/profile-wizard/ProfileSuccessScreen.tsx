@@ -27,8 +27,8 @@ export function ProfileSuccessScreen({ redirectTo, message, title, subtitle, onV
   return (
     <div className="fixed inset-0 z-[101] flex flex-col items-center justify-center bg-background">
       <div className="flex flex-col items-center gap-4 animate-in fade-in zoom-in-75 duration-500">
-        <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-          <CheckCircle2 size={44} className="text-primary" strokeWidth={1.5} />
+        <div className="w-20 h-20 rounded-full bg-[#f59e0b]/10 flex items-center justify-center">
+          <CheckCircle2 size={44} className="text-[#f59e0b]" strokeWidth={1.5} />
         </div>
         <div className="text-center">
           <p className="text-[22px] font-bold text-foreground tracking-tight">
@@ -44,7 +44,7 @@ export function ProfileSuccessScreen({ redirectTo, message, title, subtitle, onV
         {(onViewProfile || onDone) && (
           <div className="flex gap-3 mt-4">
             {onViewProfile && (
-              <button onClick={onViewProfile} className="px-4 py-2 text-sm font-medium rounded-xl bg-primary text-primary-foreground">
+              <button onClick={onViewProfile} className="px-4 py-2 text-sm font-medium rounded-xl bg-[#f59e0b] text-white hover:bg-[#e8920f] active:scale-[0.97] transition-all">
                 View Profile
               </button>
             )}
