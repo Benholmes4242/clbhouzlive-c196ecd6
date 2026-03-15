@@ -410,7 +410,7 @@ export default function BusinessVerificationWizardPage() {
                       <label
                         className={cn(
                           'flex items-start gap-3 p-3 rounded-sq-sm border cursor-pointer transition-colors',
-                          isSelected ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/30'
+                          isSelected ? 'border-[hsl(38,92%,50%)] bg-[hsl(38,92%,50%)]/5' : 'border-border hover:bg-muted/30'
                         )}
                       >
                         <RadioGroupItem value={option.id} className="mt-0.5" />
