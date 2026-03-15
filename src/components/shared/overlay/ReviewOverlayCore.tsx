@@ -150,7 +150,7 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
                 backgroundColor: 'rgba(0, 0, 0, 0.35)',
                 backdropFilter: 'blur(12px) saturate(130%)',
                 WebkitBackdropFilter: 'blur(12px) saturate(130%)',
-                borderColor: 'rgba(255, 255, 255, 0.06)',
+                borderColor: 'rgba(210, 180, 97, 0.3)',
                 padding: '6px 8px',
               }}
             >
@@ -172,13 +172,17 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
                 <div className="flex flex-col items-center gap-0 flex-shrink-0">
                   <span 
                     className="text-lg font-bold tabular-nums leading-none"
-                    style={{ color: ratingColors.main }}
+                    style={{
+                      background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                    }}
                   >
                     {formattedRating}
                   </span>
                   <span 
                     className="text-[8px] font-medium tracking-wider truncate max-w-[48px]"
-                    style={{ color: ratingColors.sub }}
+                    style={{ color: 'rgba(245, 158, 11, 0.65)' }}
                   >
                     {theme.label}
                   </span>
@@ -199,7 +203,7 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
                 backgroundColor: 'rgba(0, 0, 0, 0.35)',
                 backdropFilter: 'blur(12px) saturate(130%)',
                 WebkitBackdropFilter: 'blur(12px) saturate(130%)',
-                borderColor: 'rgba(255, 255, 255, 0.06)',
+                borderColor: 'rgba(210, 180, 97, 0.2)',
                 padding: '6px 8px',
               }}
             >
@@ -242,7 +246,7 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
               WebkitBackdropFilter: 'blur(16px) saturate(150%)',
               padding: '12px 16px',
               borderRadius: '0.75rem',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(210, 180, 97, 0.3)',
             }}
           >
             {/* ROW 1: Course Name + Rating Number (compact) */}
@@ -257,19 +261,17 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
                 <span 
                   className="text-3xl sm:text-4xl font-bold tabular-nums leading-none"
                   style={{ 
-                    background: isOutstanding 
-                      ? `linear-gradient(135deg, ${ratingColors.main} 0%, #fbbf24 100%)` 
-                      : 'transparent',
-                    WebkitBackgroundClip: isOutstanding ? 'text' : 'unset',
-                    WebkitTextFillColor: isOutstanding ? 'transparent' : ratingColors.main,
-                    color: isOutstanding ? 'transparent' : ratingColors.main,
+                  background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    color: 'transparent',
                   }}
                 >
                   {formattedRating}
                 </span>
                 <span 
                   className="text-[9px] font-medium tracking-wider mt-0.5"
-                  style={{ color: ratingColors.sub }}
+                  style={{ color: 'rgba(245, 158, 11, 0.65)' }}
                 >
                   {theme.label}
                 </span>
