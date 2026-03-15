@@ -9394,6 +9394,7 @@ export type Database = {
           coverage: string | null
           created_at: string
           currency: string | null
+          current_round: number | null
           cut_round: number | null
           cutline: number | null
           defending_champion: string | null
@@ -9436,6 +9437,7 @@ export type Database = {
           coverage?: string | null
           created_at?: string
           currency?: string | null
+          current_round?: number | null
           cut_round?: number | null
           cutline?: number | null
           defending_champion?: string | null
@@ -9478,6 +9480,7 @@ export type Database = {
           coverage?: string | null
           created_at?: string
           currency?: string | null
+          current_round?: number | null
           cut_round?: number | null
           cutline?: number | null
           defending_champion?: string | null
