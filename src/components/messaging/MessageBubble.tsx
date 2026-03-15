@@ -91,11 +91,13 @@ export function MessageBubble({
   // Handle system messages first
   if (message.message_type === 'system') {
     return (
-      <SystemMessage
-        content={message.content}
-        metadata={message.media_metadata as unknown as SystemMessageMetadata | null}
-        timestamp={message.created_at}
-      />
+      <div className="py-1">
+        <SystemMessage
+          content={message.content}
+          metadata={message.media_metadata as unknown as SystemMessageMetadata | null}
+          timestamp={message.created_at}
+        />
+      </div>
     );
   }
 
