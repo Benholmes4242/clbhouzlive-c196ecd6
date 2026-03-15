@@ -170,6 +170,7 @@ export function SettingsPageV2() {
             icon={<Eye size={18} />}
             title="Public Profile"
             subtitle="Anyone can view your profile and posts"
+            iconTheme="privacy"
             checked={privacy.isPublic}
             disabled={privacy.isUpdatingPrivacy}
             onCheckedChange={privacy.togglePublic}
