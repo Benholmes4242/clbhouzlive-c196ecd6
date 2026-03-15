@@ -135,8 +135,8 @@ const BusinessVerificationStatusPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center"
           >
-            <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-              <Clock className="h-8 w-8 text-primary" />
+            <div className="h-16 w-16 rounded-full bg-[hsl(38,92%,50%)]/10 flex items-center justify-center mx-auto mb-4">
+              <Clock className="h-8 w-8 text-[hsl(38,92%,50%)]" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">
               Verification pending
