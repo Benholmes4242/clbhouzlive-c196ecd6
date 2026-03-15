@@ -424,6 +424,9 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
 
       {/* ══ LEADER STATS STRIP ══ */}
       {meta.leaderStats && (
+        meta.leaderStats.totalBirdies > 0 ||
+        meta.leaderStats.rounds.some(r => r !== null)
+      ) && (
         <div style={{
           flexShrink: 0,
           margin: '6px 16px 0',

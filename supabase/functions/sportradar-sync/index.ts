@@ -810,22 +810,29 @@ async function syncScorecards(
         }
 
         // Also store round-level aggregates if available
-        if (playerId && (playerEntry.score !== undefined || playerEntry.strokes !== undefined)) {
-          // Update the first hole record with round-level data
+        // Sportradar v3 may nest stats at top level OR under .statistics
+        const stats = playerEntry.statistics || {};
+        const hasRoundData = (
+          playerEntry.score !== undefined || playerEntry.strokes !== undefined ||
+          playerEntry.birdies !== undefined || stats.birdies !== undefined
+        );
+        if (playerId && hasRoundData) {
+          const roundUpdate: Record<string, any> = {
+            round_score:   playerEntry.score       ?? stats.score       ?? null,
+            round_strokes: playerEntry.strokes     ?? stats.strokes     ?? null,
+            thru:          playerEntry.thru         ?? stats.thru        ?? null,
+            birdies:       playerEntry.birdies      ?? stats.birdies     ?? null,
+            bogeys:        playerEntry.bogeys       ?? stats.bogeys      ?? null,
+            eagles:        playerEntry.eagles        ?? stats.eagles      ?? null,
+            pars:          playerEntry.pars          ?? stats.pars        ?? null,
+            double_bogeys: playerEntry.double_bogeys ?? stats.double_bogeys ?? null,
+            holes_in_one:  playerEntry.holes_in_one  ?? stats.holes_in_one  ?? null,
+            other_scores:  playerEntry.other_scores  ?? stats.other_scores  ?? null,
+            starting_hole: playerEntry.starting_hole ?? stats.starting_hole ?? null,
+          };
+          console.log(`[Scorecards] Round ${round} stats for ${player.first_name} ${player.last_name}: birdies=${roundUpdate.birdies}, eagles=${roundUpdate.eagles}, score=${roundUpdate.round_score}`);
           await supabase.from('sr_scorecards')
-            .update({
-              round_score: playerEntry.score,
-              round_strokes: playerEntry.strokes,
-              thru: playerEntry.thru,
-              birdies: playerEntry.birdies,
-              bogeys: playerEntry.bogeys,
-              eagles: playerEntry.eagles,
-              pars: playerEntry.pars,
-              double_bogeys: playerEntry.double_bogeys,
-              holes_in_one: playerEntry.holes_in_one,
-              other_scores: playerEntry.other_scores,
-              starting_hole: playerEntry.starting_hole,
-            })
+            .update(roundUpdate)
             .eq('tournament_id', tournament.id)
             .eq('player_id', playerId)
             .eq('round_number', round)
