@@ -1,7 +1,7 @@
 /**
  * TieredCourseCard - Visual hierarchy cards for All Courses Played
  * 
- * Updated with Chartreus gold (#C1A84C) for Top 100 courses.
+ * Updated with Amber (#f59e0b) for Top 100 courses.
  */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
