@@ -241,16 +241,22 @@ export function SettingsPageV2() {
           <SettingsChevronRow
             icon={<FileText size={18} />}
             title="Terms of Service"
+            value="ToS"
+            iconTheme="legal"
             onClick={() => open('legal')}
           />
           <SettingsChevronRow
             icon={<FileText size={18} />}
             title="Privacy Policy"
+            value="Policy"
+            iconTheme="legal"
             onClick={() => open('legal')}
           />
           <SettingsChevronRow
             icon={<FileText size={18} />}
             title="Community Guidelines"
+            value="Guidelines"
+            iconTheme="legal"
             onClick={() => open('legal')}
           />
         </SettingsSection>
