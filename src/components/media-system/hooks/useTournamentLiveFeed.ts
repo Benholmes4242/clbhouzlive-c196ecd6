@@ -139,6 +139,7 @@ export function useTournamentLiveFeed(): {
         leaderboard,
         lastUpdated:     new Date().toISOString(),
         tourPriority:    TOUR_PRIORITY[tournament.tourSlug] ?? 99,
+        leaderStats:     tournament.leaderStats ?? null,
       };
 
       const realPostId = postIdMap[tournament.id] ?? crypto.randomUUID();
