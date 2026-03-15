@@ -928,12 +928,6 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
 
             </AnimatePresence>
 
-            {/* ChevronsUp expand affordance on collapsed cards */}
-            {!isExpanded && (
-              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
-                <ChevronsUp size={14} style={{ color: 'rgba(255,255,255,0.35)', animation: 'pulse 2s infinite' }} />
-              </div>
-            )}
 
             {/* Carousel Dots - Inside card, below CTA — fade out when expanded */}
             {totalSlides > 1 && (
