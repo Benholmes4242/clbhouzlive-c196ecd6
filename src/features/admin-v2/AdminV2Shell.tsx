@@ -81,7 +81,7 @@ export default function AdminV2Shell() {
 
   return (
     <div
-      className="min-h-screen bg-background"
+      className="min-h-screen"
       style={{
         display: 'grid',
         gridTemplateColumns: sidebarOpen && !isMobile ? '260px 1fr' : '1fr',
