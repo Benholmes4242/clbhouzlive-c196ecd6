@@ -118,32 +118,14 @@ function RowAvatar({ name, photoUrl, tourSlug, size = 32 }: {
 }) {
   const src = photoUrl || getPlayerHeadshotUrl(name, tourSlug) || null;
   const initials = name.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() ?? '').slice(0, 2).join('');
-  const heightBoosted = Math.round(size * 1.14);
   return (
-    <div style={{
-      width: size, height: heightBoosted, borderRadius: '22%', overflow: 'hidden',
-      background: 'rgba(255,255,255,0.06)', flexShrink: 0,
-    }}>
-      {src ? (
-        <img
-          src={src}
-          alt={name}
-          style={{
-            width: '100%', height: '100%',
-            objectFit: 'cover', objectPosition: 'center 15%',
-          }}
-          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-        />
-      ) : (
-        <div style={{
-          width: '100%', height: '100%',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: size * 0.36, fontWeight: 700, color: 'rgba(255,255,255,0.4)',
-        }}>
-          {initials}
-        </div>
-      )}
-    </div>
+    <SquircleAvatar
+      src={src}
+      alt={name}
+      size={size}
+      fallback={initials}
+      hideRing
+    />
   );
 }
 
