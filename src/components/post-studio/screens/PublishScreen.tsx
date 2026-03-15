@@ -2,24 +2,15 @@
 // Dark glass cards. Amber CTA. The moment before launch.
 
 import React, { useCallback, useState } from 'react';
-import { Globe, Users, Lock, Clock, Star, ChevronRight, Send, Zap } from 'lucide-react';
+import { Globe, Users, Lock, Clock, Star, ChevronRight, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { StudioHeader } from '../components/StudioHeader';
 import { usePostStudioContext } from '../usePostStudio';
 import { enqueuePostUpload } from '@/uploads/uploadPipeline';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { BG_BASE, BG_CARD, BORDER_CARD, AMBER, AMBER_DEEP, AMBER_GRADIENT, AMBER_DIM, TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY } from '../tokens';
 import type { UploadJobInput } from '@/uploads/types';
-
-const CARD_STYLE: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.04)',
-  border: '1px solid rgba(255,255,255,0.07)',
-  borderRadius: 20,
-};
-
-const ROW_DIVIDER: React.CSSProperties = {
-  borderTop: '1px solid rgba(255,255,255,0.06)',
-};
 
 export function PublishScreen() {
   const { state, setStep, openPanel, onSuccess } = usePostStudioContext();
@@ -74,15 +65,20 @@ export function PublishScreen() {
   const itemCount = state.mediaItems.length;
   const hasCaption = state.caption.trim().length > 0;
 
+  const ROW_DIVIDER: React.CSSProperties = { borderTop: '1px solid rgba(255,255,255,0.06)' };
+
   return (
-    <div className="flex-1 flex flex-col" style={{ background: '#0D0D0D' }}>
+    <div className="flex-1 flex flex-col" style={{ background: BG_BASE }}>
       <StudioHeader title="Review" step="PUBLISH" leftAction={{ label: 'Back', onClick: () => setStep('COMPOSER') }} />
 
       <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
-        <div className="mx-4 mt-4" style={CARD_STYLE}>
-          <div className="flex items-start gap-3 p-4">
+        {/* Post preview card with amber accent bar */}
+        <div className="mx-4 mt-4 relative" style={{ background: BG_CARD, border: BORDER_CARD, borderRadius: 20 }}>
+          {/* Left amber accent bar */}
+          <div className="absolute left-0 rounded-sm" style={{ top: 12, bottom: 12, width: 3, borderRadius: 2, background: `linear-gradient(to bottom, ${AMBER}, ${AMBER_DEEP})` }} />
+          <div className="flex items-start gap-3 p-4 pl-5">
             {firstItem && (
-              <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0" style={{ background: 'rgba(255,255,255,0.06)', boxShadow: '0 4px 12px rgba(0,0,0,0.4)' }}>
+              <div className="w-20 h-20 overflow-hidden shrink-0" style={{ borderRadius: 16, background: 'rgba(255,255,255,0.06)', boxShadow: '0 4px 12px rgba(0,0,0,0.4)' }}>
                 <img src={firstItem.thumbnailUrl || firstItem.previewUrl} alt="" className="w-full h-full object-cover" />
               </div>
             )}
@@ -91,11 +87,11 @@ export function PublishScreen() {
                 {hasCaption ? state.caption : 'No caption'}
               </p>
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.35)' }}>{itemCount} item{itemCount !== 1 ? 's' : ''}</span>
+                <span className="text-[11px] font-medium" style={{ color: TEXT_TERTIARY }}>{itemCount} item{itemCount !== 1 ? 's' : ''}</span>
                 {state.taggedCourses.length > 0 && (
                   <>
                     <span style={{ color: 'rgba(255,255,255,0.15)' }}>·</span>
-                    <span className="text-[11px] font-medium" style={{ color: 'rgba(245,158,11,0.70)' }}>⛳ {state.taggedCourses.map(c => c.courseName).join(', ')}</span>
+                    <span className="text-[11px] font-medium" style={{ color: AMBER_DIM }}>⛳ {state.taggedCourses.map(c => c.courseName).join(', ')}</span>
                   </>
                 )}
                 {state.postType === 'review' && state.reviewRating && (
@@ -109,49 +105,57 @@ export function PublishScreen() {
           </div>
         </div>
 
-        <div className="mx-4 mt-3" style={CARD_STYLE}>
-          <p className="px-4 pt-4 pb-2 text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: 'rgba(255,255,255,0.30)' }}>Settings</p>
+        {/* Settings card */}
+        <div className="mx-4 mt-3" style={{ background: BG_CARD, border: BORDER_CARD, borderRadius: 20 }}>
+          <p className="px-4 pt-4 pb-2 text-[13px] font-medium" style={{ color: TEXT_SECONDARY }}>Before you post</p>
 
           <motion.button whileTap={{ backgroundColor: 'rgba(255,255,255,0.06)' }} onClick={() => openPanel('audience')} className="w-full flex items-center gap-3 px-4 py-4 min-h-[56px] transition-colors" style={ROW_DIVIDER}>
-            <visibilityConfig.Icon className="w-5 h-5 shrink-0" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={1.75} />
+            <visibilityConfig.Icon className="w-5 h-5 shrink-0" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={1.75} />
             <div className="flex-1 text-left">
               <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.80)' }}>Audience</p>
-              <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>{visibilityConfig.desc}</p>
+              <p className="text-xs mt-0.5" style={{ color: TEXT_TERTIARY }}>{visibilityConfig.desc}</p>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-sm font-semibold" style={{ color: '#f59e0b' }}>{visibilityConfig.label}</span>
-              <ChevronRight className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.25)' }} />
+              <span className="text-sm font-semibold" style={{ color: AMBER }}>{visibilityConfig.label}</span>
+              <ChevronRight className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.35)' }} />
             </div>
           </motion.button>
 
           <motion.button whileTap={{ backgroundColor: 'rgba(255,255,255,0.06)' }} onClick={() => openPanel('schedule')} className="w-full flex items-center gap-3 px-4 py-4 min-h-[56px] transition-colors" style={ROW_DIVIDER}>
-            <Clock className="w-5 h-5 shrink-0" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={1.75} />
+            <Clock className="w-5 h-5 shrink-0" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={1.75} />
             <div className="flex-1 text-left">
               <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.80)' }}>Schedule</p>
-              <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>{state.scheduledAt ? 'Scheduled' : 'Post immediately'}</p>
+              <p className="text-xs mt-0.5" style={{ color: TEXT_TERTIARY }}>{state.scheduledAt ? 'Scheduled' : 'Post immediately'}</p>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-medium" style={{ color: state.scheduledAt ? '#f59e0b' : 'rgba(255,255,255,0.35)' }}>
+              <span className="text-xs font-medium" style={{ color: state.scheduledAt ? AMBER : TEXT_TERTIARY }}>
                 {state.scheduledAt ? state.scheduledAt.toLocaleDateString('en-GB', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : 'Now'}
               </span>
-              <ChevronRight className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.25)' }} />
+              <ChevronRight className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.35)' }} />
             </div>
           </motion.button>
 
           {state.postType === 'review' && (
             <div className="flex items-center gap-3 px-4 py-4 min-h-[56px]" style={ROW_DIVIDER}>
-              <Star className="w-5 h-5 shrink-0" style={{ color: '#f59e0b' }} strokeWidth={1.75} fill="rgba(245,158,11,0.30)" />
+              <Star className="w-5 h-5 shrink-0" style={{ color: AMBER }} strokeWidth={1.75} fill="rgba(245,158,11,0.30)" />
               <div className="flex-1 text-left"><p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.80)' }}>Rating</p></div>
-              <span className="text-sm font-semibold" style={{ color: '#f59e0b' }}>{state.reviewRating ? `${state.reviewRating}/5` : 'Not set'}</span>
+              <span className="text-sm font-semibold" style={{ color: AMBER }}>{state.reviewRating ? `${state.reviewRating}/5` : 'Not set'}</span>
             </div>
           )}
         </div>
         <div className="h-6" />
       </div>
 
-      <div className="shrink-0 px-4 pt-3 pb-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)', background: 'rgba(13,13,13,0.97)' }}>
-        <motion.button whileTap={{ scale: 0.97 }} onClick={handlePublish} disabled={isPublishing} className="w-full rounded-2xl font-bold text-base flex items-center justify-center gap-2.5 min-h-[58px] disabled:opacity-60"
-          style={{ background: isPublishing ? 'rgba(245,158,11,0.50)' : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', color: '#0D0D0D', boxShadow: isPublishing ? 'none' : '0 6px 24px rgba(245,158,11,0.45), 0 2px 8px rgba(245,158,11,0.30)' }}>
+      {/* Publish CTA */}
+      <div className="shrink-0 px-4 pt-3 pb-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)', background: 'rgba(8,8,8,0.97)' }}>
+        <motion.button whileTap={{ scale: 0.97 }} onClick={handlePublish} disabled={isPublishing} className="w-full rounded-2xl font-bold flex items-center justify-center gap-2.5 disabled:opacity-60"
+          style={{
+            minHeight: 62,
+            fontSize: 17,
+            background: isPublishing ? 'rgba(245,158,11,0.50)' : AMBER_GRADIENT,
+            color: '#0D0D0D',
+            boxShadow: isPublishing ? 'none' : '0 8px 32px rgba(245,158,11,0.50), 0 2px 8px rgba(245,158,11,0.35), inset 0 1px 0 rgba(255,255,255,0.20)',
+          }}>
           {isPublishing ? (
             <>
               <div className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(0,0,0,0.4)', borderTopColor: 'transparent' }} />

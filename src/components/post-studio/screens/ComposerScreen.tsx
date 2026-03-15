@@ -2,7 +2,7 @@
 // Dark immersive studio. Media front and centre. Tools feel pro, not form-like.
 
 import React, { useCallback, useRef } from 'react';
-import { AtSign, Flag, Scissors, Image as ImageIcon, Star, Plus, ChevronRight } from 'lucide-react';
+import { AtSign, Scissors, Image as ImageIcon, Star, Plus, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StudioHeader } from '../components/StudioHeader';
 import { MediaPreview } from '../components/MediaPreview';
@@ -11,14 +11,9 @@ import { CharacterRing } from '../components/CharacterRing';
 import { ActorSelector } from '../components/ActorSelector';
 import { usePostStudioContext } from '../usePostStudio';
 import { ALLOWED_VIDEO_TYPES, ALLOWED_IMAGE_TYPES, POST_LIMITS } from '../constants';
+import { BG_BASE, BG_CARD, AMBER, AMBER_DEEP, AMBER_DIM, AMBER_GHOST, AMBER_GRADIENT, BORDER_CARD, TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY } from '../tokens';
 import type { StudioMediaItem } from '../types';
 import { toast } from 'sonner';
-
-const CARD_STYLE: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.04)',
-  border: '1px solid rgba(255,255,255,0.07)',
-  borderRadius: 20,
-};
 
 export function ComposerScreen() {
   const {
@@ -79,7 +74,7 @@ export function ComposerScreen() {
   const acceptTypes = [...ALLOWED_VIDEO_TYPES, ...ALLOWED_IMAGE_TYPES].join(',');
 
   return (
-    <div className="flex-1 flex flex-col" style={{ background: '#0D0D0D' }}>
+    <div className="flex-1 flex flex-col" style={{ background: BG_BASE }}>
       <StudioHeader
         title="Compose"
         step="COMPOSER"
@@ -90,19 +85,23 @@ export function ComposerScreen() {
       <input ref={fileInputRef} type="file" accept={acceptTypes} multiple onChange={handleFileSelect} className="hidden" />
 
       <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+        {/* Full-bleed media preview */}
         {activeItem && (
-          <div className="mx-4 mt-3 rounded-[20px] overflow-hidden" style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+          <div className="relative overflow-hidden" style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
             <MediaPreview item={activeItem} onSwipeLeft={handleSwipeLeft} onSwipeRight={handleSwipeRight} />
+            {/* Bottom scrim gradient */}
+            <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: 60, background: `linear-gradient(to top, rgba(8,8,8,0.8), transparent)` }} />
+            {/* Floating trim/cover buttons for video */}
             {activeIsVideo && (
-              <div className="flex items-center gap-2 px-3 py-2" style={{ background: 'rgba(0,0,0,0.70)', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-                <motion.button whileTap={{ scale: 0.93 }} onClick={() => setStep('TRIM')} className="flex items-center gap-1.5 px-3 py-2 rounded-xl min-h-[44px] text-sm font-medium" style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.80)', border: '1px solid rgba(255,255,255,0.10)' }}>
+              <div className="absolute bottom-3 right-3 flex gap-2 z-10">
+                <motion.button whileTap={{ scale: 0.93 }} onClick={() => setStep('TRIM')} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium" style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 12, color: 'rgba(255,255,255,0.85)' }}>
                   <Scissors className="w-4 h-4" strokeWidth={1.75} /> Trim
                 </motion.button>
-                <motion.button whileTap={{ scale: 0.93 }} onClick={() => setStep('POSTER')} className="flex items-center gap-1.5 px-3 py-2 rounded-xl min-h-[44px] text-sm font-medium" style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.80)', border: '1px solid rgba(255,255,255,0.10)' }}>
+                <motion.button whileTap={{ scale: 0.93 }} onClick={() => setStep('POSTER')} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium" style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 12, color: 'rgba(255,255,255,0.85)' }}>
                   <ImageIcon className="w-4 h-4" strokeWidth={1.75} /> Cover
                 </motion.button>
                 {(activeItem.trimStart > 0 || (activeItem.trimEnd !== null && activeItem.trimEnd !== activeItem.duration)) && (
-                  <span className="ml-auto text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: 'rgba(245,158,11,0.20)', color: 'rgba(245,158,11,0.90)' }}>Trimmed</span>
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full self-center" style={{ background: 'rgba(245,158,11,0.20)', color: 'rgba(245,158,11,0.90)' }}>Trimmed</span>
                 )}
               </div>
             )}
@@ -112,16 +111,17 @@ export function ComposerScreen() {
         <ActorSelector />
         <MediaReel items={state.mediaItems} activeIndex={state.activeMediaIndex} onSelect={setActiveMedia} onRemove={removeMedia} onAddMore={() => fileInputRef.current?.click()} />
 
-        <div className="mx-4 mt-3" style={CARD_STYLE}>
+        {/* Caption card */}
+        <div className="mx-4 mt-3" style={{ background: BG_CARD, border: BORDER_CARD, borderRadius: 24 }}>
           <div className="px-4 pt-4 pb-3 relative">
             <textarea
               ref={textareaRef}
               value={state.caption}
               onChange={(e) => setCaption(e.target.value)}
-              placeholder="What happened out there…"
+              placeholder="Tell the story…"
               rows={4}
-              className="w-full text-sm resize-none outline-none min-h-[100px] leading-relaxed"
-              style={{ background: 'transparent', color: 'rgba(255,255,255,0.85)', caretColor: '#f59e0b' }}
+              className="w-full text-sm resize-none outline-none min-h-[120px] leading-relaxed"
+              style={{ background: 'transparent', color: 'rgba(255,255,255,0.85)', caretColor: AMBER }}
               maxLength={POST_LIMITS.MAX_CAPTION_LENGTH + 100}
             />
             <div className="absolute bottom-3 right-4">
@@ -134,7 +134,7 @@ export function ComposerScreen() {
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                 <div className="flex flex-wrap gap-1.5 px-4 py-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                   {state.taggedCourses.map((course) => (
-                    <span key={course.courseId} className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'rgba(245,158,11,0.15)', color: 'rgba(245,158,11,0.90)', border: '1px solid rgba(245,158,11,0.25)' }}>
+                    <span key={course.courseId} className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: AMBER_GHOST, color: 'rgba(245,158,11,0.90)', border: '1px solid rgba(245,158,11,0.25)' }}>
                       ⛳ {course.courseName}
                     </span>
                   ))}
@@ -143,41 +143,57 @@ export function ComposerScreen() {
             )}
           </AnimatePresence>
 
-          <div className="flex items-center gap-2 px-3 py-3 flex-wrap" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-            <motion.button whileTap={{ scale: 0.93 }} onClick={() => openPanel('mention')} className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium min-h-[40px]" style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.60)', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <AtSign className="w-4 h-4" strokeWidth={2} /> Mention
+          {/* Toolbar — hairline separator */}
+          <div className="flex items-center gap-2 px-3 py-3 flex-wrap" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+            {/* Icon-only Mention */}
+            <motion.button whileTap={{ scale: 0.93 }} onClick={() => openPanel('mention')} className="flex items-center justify-center rounded-xl" style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <AtSign className="w-[18px] h-[18px]" strokeWidth={2} style={{ color: 'rgba(255,255,255,0.60)' }} />
             </motion.button>
-            <motion.button whileTap={{ scale: 0.93 }} onClick={() => openPanel('course')} className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium min-h-[40px]" style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.60)', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <Flag className="w-4 h-4" strokeWidth={2} /> Course
+            {/* Icon-only Course with golf flag */}
+            <motion.button whileTap={{ scale: 0.93 }} onClick={() => openPanel('course')} className="flex items-center justify-center rounded-xl" style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <span className="text-base leading-none">⛳</span>
             </motion.button>
+            {/* Review toggle pushed right */}
             <motion.button layout whileTap={{ scale: 0.93 }} onClick={() => setPostType(state.postType === 'standard' ? 'review' : 'standard')} className="ml-auto flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold min-h-[40px]"
-              style={state.postType === 'review' ? { background: 'rgba(245,158,11,0.20)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.35)' } : { background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.45)', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <Star className="w-3.5 h-3.5" strokeWidth={2} fill={state.postType === 'review' ? '#f59e0b' : 'none'} />
+              style={state.postType === 'review' ? { background: AMBER_GHOST, color: AMBER, border: '1px solid rgba(245,158,11,0.35)' } : { background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.45)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <Star className="w-3.5 h-3.5" strokeWidth={2} fill={state.postType === 'review' ? AMBER : 'none'} />
               {state.postType === 'review' ? 'Review' : 'Post'}
             </motion.button>
           </div>
         </div>
 
+        {/* Review rating card */}
         <AnimatePresence>
           {state.postType === 'review' && (
             <motion.div initial={{ height: 0, opacity: 0, y: -8 }} animate={{ height: 'auto', opacity: 1, y: 0 }} exit={{ height: 0, opacity: 0, y: -8 }} transition={{ type: 'spring', damping: 28, stiffness: 360 }} className="overflow-hidden mx-4 mt-2">
-              <div className="p-4 rounded-[20px]" style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.08) 0%, rgba(245,158,11,0.04) 100%)', border: '1px solid rgba(245,158,11,0.20)' }}>
-                <p className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-3" style={{ color: 'rgba(245,158,11,0.70)' }}>Course Rating</p>
-                <div className="flex items-center gap-1">
+              <div className="p-4 rounded-[24px]" style={{ background: `linear-gradient(135deg, ${AMBER_GHOST} 0%, rgba(245,158,11,0.04) 100%)`, border: '1px solid rgba(245,158,11,0.20)' }}>
+                <p className="text-[13px] font-medium mb-3 text-center" style={{ color: AMBER_DIM }}>Course Rating</p>
+                <div className="flex items-center justify-center gap-1">
                   {[1, 2, 3, 4, 5].map((star) => {
                     const isActive = (state.reviewRating ?? 0) >= star;
                     return (
                       <motion.button key={star} whileTap={{ scale: 0.85 }} onClick={() => setReviewRating(star === state.reviewRating ? null : star)} className="flex items-center justify-center" style={{ minWidth: 44, minHeight: 44 }}>
                         <motion.div animate={{ scale: isActive ? 1.15 : 1 }} transition={{ type: 'spring', damping: 20, stiffness: 400 }}>
-                          <Star className="w-8 h-8" strokeWidth={1.5} style={{ fill: isActive ? '#f59e0b' : 'transparent', color: isActive ? '#f59e0b' : 'rgba(255,255,255,0.20)', filter: isActive ? 'drop-shadow(0 0 6px rgba(245,158,11,0.6))' : 'none' }} />
+                          <Star className="w-9 h-9" strokeWidth={1.5} style={{ fill: isActive ? AMBER : 'transparent', color: isActive ? AMBER : 'rgba(255,255,255,0.20)', filter: isActive ? 'drop-shadow(0 0 8px rgba(245,158,11,0.7))' : 'none' }} />
                         </motion.div>
                       </motion.button>
                     );
                   })}
-                  {state.reviewRating && (
-                    <motion.span initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }} className="ml-2 text-sm font-bold" style={{ color: '#f59e0b' }}>{state.reviewRating}/5</motion.span>
-                  )}
                 </div>
+                {/* Animated rating label */}
+                <AnimatePresence>
+                  {state.reviewRating && (
+                    <motion.p
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 6 }}
+                      className="text-3xl font-bold text-center mt-3"
+                      style={{ color: AMBER }}
+                    >
+                      {state.reviewRating}.0 ★
+                    </motion.p>
+                  )}
+                </AnimatePresence>
               </div>
             </motion.div>
           )}
