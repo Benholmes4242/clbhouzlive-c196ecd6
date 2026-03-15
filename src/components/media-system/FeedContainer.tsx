@@ -353,6 +353,14 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
     if (isDragging.current) endDrag();
   }, [endDrag]);
 
+  // Cancel spring animation on unmount to prevent RAF loop on unmounted component
+  useEffect(() => {
+    return () => {
+      cancelSpring.current?.();
+      cancelSpring.current = null;
+    };
+  }, []);
+
   // When refresh completes, spring back
   useEffect(() => {
     if (!isRefreshing && pullDistance > 0) {

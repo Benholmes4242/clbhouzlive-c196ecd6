@@ -10,6 +10,11 @@ export function useSessionCache() {
 
   const save = useCallback((url: string, state: VideoSessionState) => {
     cacheRef.current.set(url, state);
+    // Evict oldest entries beyond 100
+    if (cacheRef.current.size > 100) {
+      const firstKey = cacheRef.current.keys().next().value;
+      if (firstKey) cacheRef.current.delete(firstKey);
+    }
   }, []);
 
   const restore = useCallback((url: string): VideoSessionState | null => {
