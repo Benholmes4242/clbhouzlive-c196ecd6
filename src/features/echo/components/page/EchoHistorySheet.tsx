@@ -328,14 +328,14 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
                     <div className="flex gap-3">
                       <button 
                         onClick={() => setConfirmDelete(null)}
-                        className="flex-1 py-3 bg-muted rounded-xl text-[0.9375rem] font-semibold text-foreground active:scale-95 transition-transform"
+                        className="flex-1 py-3 bg-muted rounded-xl text-[0.9375rem] font-semibold text-foreground active:scale-[0.97] transition-transform"
                       >
                         Cancel
                       </button>
                       <button 
                         onClick={handleConfirmDelete}
                         disabled={deleteConversation.isPending}
-                        className="flex-1 py-3 bg-destructive rounded-xl text-[0.9375rem] font-semibold text-primary-foreground active:scale-95 transition-transform disabled:opacity-50"
+                        className="flex-1 py-3 bg-destructive rounded-xl text-[0.9375rem] font-semibold text-white active:scale-[0.97] transition-transform disabled:opacity-50"
                       >
                         {deleteConversation.isPending ? 'Deleting...' : 'Delete'}
                       </button>

@@ -145,12 +145,12 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
             <button
               onClick={handleMicClick}
               className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-95 border border-border",
+                "w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-[0.97] border border-border",
                 isListening && "animate-pulse bg-destructive border-destructive"
               )}
               aria-label={isListening ? "Stop listening" : "Voice input"}
             >
-              <Mic className={cn("w-4 h-4", isListening ? "text-primary-foreground" : "text-muted-foreground")} />
+              <Mic className={cn("w-4 h-4", isListening ? "text-white" : "text-muted-foreground")} />
             </button>
           ) : (
             <button

@@ -21,7 +21,7 @@ export function EchoThinkingCard() {
           {[0, 1, 2].map((i) => (
             <span
               key={i}
-              className={`w-[6px] h-[6px] rounded-full bg-primary ${
+              className={`w-[6px] h-[6px] rounded-full bg-[hsl(38,92%,50%)] ${
                 prefersReduced ? 'opacity-70' : 'animate-bounce'
               }`}
               style={

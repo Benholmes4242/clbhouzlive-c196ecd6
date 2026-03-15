@@ -17,7 +17,7 @@ export function EchoPendingState({ prompt }: EchoPendingStateProps) {
         {[0, 1, 2].map((i) => (
           <motion.div
             key={i}
-            className="w-2 h-2 rounded-full bg-primary"
+            className="w-2 h-2 rounded-full bg-[hsl(38,92%,50%)]"
             animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1, 0.8] }}
             transition={{
               duration: 1.2,

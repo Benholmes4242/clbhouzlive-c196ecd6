@@ -192,7 +192,7 @@ export function EchoResponseCard({
               <button
                 key={chip}
                 onClick={() => handleFollowUp(chip)}
-                className="flex items-center justify-between gap-2 px-4 py-3 rounded-2xl text-[13px] font-medium active:bg-primary/5 active:scale-[0.98] transition-all duration-150 bg-background border border-border text-foreground font-['DM_Sans']"
+                className="flex items-center justify-between gap-2 px-4 py-3 rounded-2xl text-[13px] font-medium active:bg-[hsl(38,92%,50%)]/5 active:scale-[0.98] transition-all duration-150 bg-background border border-border text-foreground font-['DM_Sans']"
                 aria-label={`Ask: ${chip}`}
               >
                 <span>{chip}</span>

@@ -32,7 +32,7 @@ export function TagChip({ label, onRemove, variant = 'outline', className }: Tag
             e.stopPropagation();
             onRemove();
           }}
-          className="opacity-70 hover:opacity-100 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary rounded-full p-0.5"
+          className="opacity-70 hover:opacity-100 transition-opacity focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)] rounded-full p-0.5"
           aria-label={`Remove tag ${label}`}
         >
           <X className="h-3 w-3" />
