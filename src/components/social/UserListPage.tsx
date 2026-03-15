@@ -631,7 +631,7 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode, on
                   "h-11 flex-1 font-medium active:scale-[0.95] transition-transform",
                   isFollowing
                     ? "border-border bg-muted text-muted-foreground hover:bg-muted/80"
-                    : "border-primary bg-primary/10 text-primary hover:bg-primary/20"
+                    : "border-[#f5a623]/40 bg-[#f5a623]/10 text-[#d97706] hover:bg-[#f5a623]/20"
                 )}
                 disabled={followLoading}
                 onClick={handleFollowToggle}
