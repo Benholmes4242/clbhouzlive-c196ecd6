@@ -200,6 +200,8 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
   }, [navigate, meta.tournamentId]);
 
   const leader = meta.leader;
+  const coLeaders = meta.leaderboard?.filter(e => e.position === 1) ?? [];
+  const isTiedFirst = coLeaders.length > 1;
   const leaderPhotoSrc = leader
     ? leader.photoUrl || getPlayerHeadshotUrl(leader.playerName, meta.tourSlug) || null
     : null;
