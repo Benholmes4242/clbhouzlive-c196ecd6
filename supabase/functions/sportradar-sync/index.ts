@@ -1359,10 +1359,10 @@ async function syncPlayerStatistics(supabase: any, apiKey: string, tour: string,
   const tourUrlMap: Record<string, string> = {
     pga: 'pga',
     lpga: 'lpga',
-    eur: 'eur',
-    euro: 'eur',
-    'champions-tour': 'champions-tour',
-    champ: 'champions-tour',
+    eur: 'euro',
+    euro: 'euro',
+    'champions-tour': 'champ',
+    champ: 'champ',
     liv: 'liv',
   };
   const tourUrlSlug = tourUrlMap[tour] || tour;

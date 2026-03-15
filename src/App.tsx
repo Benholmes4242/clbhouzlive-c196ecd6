@@ -612,16 +612,15 @@ const AppInner: React.FC = () => {
                                           </UploadResilienceProvider>
                                           </MessagingProvider>
                                         </AuthWrapper>
+                                        <Sonner />
+                                        <GlobalBottomNavigation />
+                                        <GlobalPostStudio />
                                       </ErrorBoundary>
                                   </VideoPlaybackProvider>
                                 </TopTenProvider>
                               {/* END REMOVED FullscreenPlayerProvider */}
                             </GlobalAudioProvider>
                           </MediaSystemProvider>
-                          
-                          <Sonner />
-                          <GlobalBottomNavigation />
-                          <GlobalPostStudio />
                         </ActiveActorProvider>
                     
                   </UIProvider>

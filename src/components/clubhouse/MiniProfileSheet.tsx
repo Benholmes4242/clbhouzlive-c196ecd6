@@ -105,7 +105,7 @@ function RecentPostTile({
         alt="User post"
         onHardFail={() => {
           // optional: breadcrumb, not console spam
-          if (process.env.NODE_ENV === 'development') {
+          if (import.meta.env.DEV) {
             console.debug('[MiniProfileSheet] poster hard-fail', media);
           }
         }}

@@ -56,14 +56,14 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   handleReset = () => {
-    this.setState({
-      hasError: false,
-      error: null,
-      errorInfo: null,
-    });
-    
-    // Navigate to home
-    window.location.href = '/';
+    const failCount = parseInt(sessionStorage.getItem('eb_fail') || '0');
+    if (failCount >= 2) {
+      sessionStorage.removeItem('eb_fail');
+      window.location.href = '/';
+      return;
+    }
+    sessionStorage.setItem('eb_fail', String(failCount + 1));
+    this.setState({ hasError: false, error: null, errorInfo: null });
   };
 
   render() {

@@ -388,7 +388,7 @@ export function useMessaging(): UseMessagingReturn {
 
     // Subscribe to new messages — only refetch if message belongs to a known conversation
     const messagesChannel = supabase
-      .channel('conversation-list-messages')
+      .channel(`conversation-list-messages-${user.id}`)
       .on(
         'postgres_changes',
         {
@@ -405,17 +405,17 @@ export function useMessaging(): UseMessagingReturn {
       )
       .subscribe();
 
-    // NOTE: No row-level filter available for conversation membership in Supabase realtime.
-    // This fires on any conversation change globally. fetchConversations is fast (~4 queries)
-    // and the conversations table has low write frequency, so this is acceptable.
+    // Filter by this user's participation row — avoids a thundering herd where every
+    // connected client re-fetches on any global conversation write.
     const conversationsChannel = supabase
-      .channel('conversation-list-conversations')
+      .channel(`conversation-list-participants-${user.id}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'conversations',
+          table: 'conversation_participants',
+          filter: `user_id=eq.${user.id}`,
         },
         () => {
           fetchConversations(true);
