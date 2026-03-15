@@ -53,7 +53,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const { activeTab, handleTabClick, handlePrefetch } = useNavigationHandlers();
   const isDesktop = useIsDesktop();
   const openPostStudio = usePostStudioStore((s) => s.openPostStudio);
-  const navigate = useNavigate();
+  
   
   const navRef = useRef<HTMLDivElement>(null);
   
