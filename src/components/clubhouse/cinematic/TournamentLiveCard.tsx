@@ -94,7 +94,7 @@ function LeaderPhoto({ src, name }: { src: string | null; name: string }) {
         }}
         style={{
           position: 'absolute', inset: 0, width: '100%', height: '100%',
-          objectFit: 'cover', objectPosition: 'top center',
+          objectFit: 'cover', objectPosition: 'center top',
         }}
       />
     );
