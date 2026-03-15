@@ -135,6 +135,12 @@ const amberTheme = {
   gradient: 'linear-gradient(to right, #f59e0b, #fbbf24)',
 };
 
+// All tiers now use amber — unified single-color rating system
+const fairTheme = amberTheme;
+const goodTheme = amberTheme;
+const veryGoodTheme = amberTheme;
+const excellentTheme = amberTheme;
+
 export const COURSE_RATING_THEMES: Record<RatingTier, RatingTheme> = {
   FAIR: {
     key: 'FAIR',
