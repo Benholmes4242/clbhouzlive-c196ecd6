@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
+import { Trophy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTop100ProgressForUser, type Top100RecentRound } from '@/hooks/useTop100ProgressForUser';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -58,10 +59,7 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   const isOwnProfile = !userId || userId === session?.user?.id;
   const prevTotalRef = useRef<number | null>(null);
 
-  // Scroll to top on mount (required behavior - always start at top)
-  useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-  }, []);
+  // Removed disruptive window.scrollTo — tab scroll is managed by parent
   const [achievementSheetData, setAchievementSheetData] = useState<AchievementData | null>(null);
   const [isAchievementSheetOpen, setIsAchievementSheetOpen] = useState(false);
 
@@ -160,8 +158,21 @@ const Top100MyProgressPanel: React.FC<Top100MyProgressPanelProps> = ({ userId })
   
   if (!effectiveUserId) {
     return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">Sign in to track your Top 100 progress</p>
+      <div className="flex flex-col items-center justify-center py-20 px-6 text-center gap-4">
+        <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ backgroundColor: 'hsl(var(--accent-amber) / 0.1)' }}>
+          <Trophy className="w-7 h-7" style={{ color: 'hsl(var(--accent-amber))' }} />
+        </div>
+        <div>
+          <p className="text-base font-semibold text-foreground">Track your Top 100 journey</p>
+          <p className="mt-1 text-sm text-muted-foreground">Sign in to see your progress across the world's best courses.</p>
+        </div>
+        <button
+          onClick={() => navigate('/auth')}
+          className="h-11 px-6 text-sm font-semibold text-white rounded-full hover:opacity-90 active:scale-[0.97] transition-all"
+          style={{ backgroundColor: 'hsl(var(--accent-amber))' }}
+        >
+          Sign in
+        </button>
       </div>
     );
   }
