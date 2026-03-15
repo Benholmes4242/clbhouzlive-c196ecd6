@@ -1236,7 +1236,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                       
                       {/* XP below title in green */}
                       <div className="text-center">
-                        <span className="text-green-500 font-bold text-lg">+{mostRecentAchievement.xp} XP</span>
+                        <span className="text-[#d97706] font-bold text-lg">+{mostRecentAchievement.xp} XP</span>
                       </div>
                     </div>
                     
