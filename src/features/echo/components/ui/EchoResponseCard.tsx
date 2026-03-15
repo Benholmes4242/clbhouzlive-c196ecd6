@@ -118,7 +118,7 @@ export function EchoResponseCard({
                         <span
                           key={`course-${keyIndex++}`}
                           onClick={() => handleCourseClick(courseName)}
-                          className="text-primary font-medium underline decoration-primary underline-offset-2 cursor-pointer hover:opacity-80 transition-opacity"
+                          className="text-[hsl(35,80%,43%)] font-medium underline decoration-[hsl(35,80%,43%)] underline-offset-2 cursor-pointer hover:opacity-80 transition-opacity"
                           role="link"
                           tabIndex={0}
                           aria-label={`View ${courseName}`}
