@@ -85,7 +85,7 @@ export default function AdminV2Shell() {
       style={{
         display: 'grid',
         gridTemplateColumns: sidebarOpen && !isMobile ? '260px 1fr' : '1fr',
-        gridTemplateRows: '52px 1fr',
+        gridTemplateRows: 'calc(52px + env(safe-area-inset-top, 0px)) 1fr',
         height: '100dvh',
         overflow: 'hidden',
         position: 'relative',
