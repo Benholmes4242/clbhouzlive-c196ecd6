@@ -128,29 +128,29 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
           {isStreaming ? (
             <button
               onClick={handleButtonClick}
-              className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-95 bg-foreground"
+              className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-[0.97] bg-foreground"
               aria-label="Stop generating"
             >
-              <Square className="w-3.5 h-3.5 text-primary-foreground fill-primary-foreground" />
+              <Square className="w-3.5 h-3.5 text-background fill-background" />
             </button>
           ) : canSend ? (
             <button
               onClick={handleButtonClick}
-              className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-95 bg-primary"
+              className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-[0.97] bg-[hsl(38,92%,50%)]"
               aria-label="Send message"
             >
-              <ArrowUp className="w-4 h-4 text-primary-foreground" />
+              <ArrowUp className="w-4 h-4 text-white" />
             </button>
           ) : isSupported ? (
             <button
               onClick={handleMicClick}
               className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-95 border border-border",
+                "w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-[0.97] border border-border",
                 isListening && "animate-pulse bg-destructive border-destructive"
               )}
               aria-label={isListening ? "Stop listening" : "Voice input"}
             >
-              <Mic className={cn("w-4 h-4", isListening ? "text-primary-foreground" : "text-muted-foreground")} />
+              <Mic className={cn("w-4 h-4", isListening ? "text-white" : "text-muted-foreground")} />
             </button>
           ) : (
             <button

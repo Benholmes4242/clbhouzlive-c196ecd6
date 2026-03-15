@@ -118,7 +118,7 @@ export function EchoResponseCard({
                         <span
                           key={`course-${keyIndex++}`}
                           onClick={() => handleCourseClick(courseName)}
-                          className="text-primary font-medium underline decoration-primary underline-offset-2 cursor-pointer hover:opacity-80 transition-opacity"
+                          className="text-[hsl(35,80%,43%)] font-medium underline decoration-[hsl(35,80%,43%)] underline-offset-2 cursor-pointer hover:opacity-80 transition-opacity"
                           role="link"
                           tabIndex={0}
                           aria-label={`View ${courseName}`}
@@ -151,7 +151,7 @@ export function EchoResponseCard({
           {/* Streaming cursor */}
           {isStreaming && (
             <span 
-              className="inline-block w-[3px] h-4 rounded-full ml-1 bg-primary"
+              className="inline-block w-[3px] h-4 rounded-full ml-1 bg-[hsl(38,92%,50%)]"
               style={{
                 animation: prefersReduced ? 'none' : 'echoCursorBlink 1s ease-in-out infinite',
               }}
@@ -168,12 +168,12 @@ export function EchoResponseCard({
         {!isStreaming && (
           <button
             onClick={handleCopy}
-            className={`flex items-center gap-1.5 mt-2 px-2 py-1 rounded-lg text-[12px] font-medium active:bg-primary/5 transition-all ${copied ? 'text-primary' : 'text-muted-foreground'}`}
+            className={`flex items-center gap-1.5 mt-2 px-2 py-1 rounded-lg text-[12px] font-medium active:bg-[hsl(38,92%,50%)]/5 transition-all ${copied ? 'text-[hsl(35,80%,43%)]' : 'text-muted-foreground'}`}
             aria-label="Copy response to clipboard"
           >
             {copied ? (
               <>
-                <Check className="w-3.5 h-3.5 text-primary" />
+                <Check className="w-3.5 h-3.5 text-[hsl(35,80%,43%)]" />
                 <span>Copied</span>
               </>
             ) : (
@@ -192,7 +192,7 @@ export function EchoResponseCard({
               <button
                 key={chip}
                 onClick={() => handleFollowUp(chip)}
-                className="flex items-center justify-between gap-2 px-4 py-3 rounded-2xl text-[13px] font-medium active:bg-primary/5 active:scale-[0.98] transition-all duration-150 bg-background border border-border text-foreground font-['DM_Sans']"
+                className="flex items-center justify-between gap-2 px-4 py-3 rounded-2xl text-[13px] font-medium active:bg-[hsl(38,92%,50%)]/5 active:scale-[0.98] transition-all duration-150 bg-background border border-border text-foreground font-['DM_Sans']"
                 aria-label={`Ask: ${chip}`}
               >
                 <span>{chip}</span>

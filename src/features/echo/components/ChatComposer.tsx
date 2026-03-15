@@ -1,3 +1,4 @@
+// TODO: DELETE — dead code (not rendered anywhere)
 /**
  * Chat Composer Component
  * Input area for sending messages

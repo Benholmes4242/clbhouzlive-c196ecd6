@@ -135,7 +135,7 @@ function SwipeableConversationRow({
           className="w-full h-full flex items-center justify-center"
           aria-label="Delete conversation"
         >
-          <Trash2 className="w-5 h-5 text-primary-foreground" />
+          <Trash2 className="w-5 h-5 text-white" />
         </button>
       </div>
       
@@ -150,11 +150,11 @@ function SwipeableConversationRow({
         role="listitem"
         aria-label={`Open conversation: ${displayTitle}`}
       >
-        <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-primary">
+        <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-[hsl(38,92%,50%)]">
           <div className="flex items-center gap-[2px]">
-            <div className="w-[2px] h-1.5 bg-primary-foreground rounded-full" />
-            <div className="w-[2px] h-2.5 bg-primary-foreground rounded-full" />
-            <div className="w-[2px] h-1.5 bg-primary-foreground rounded-full" />
+            <div className="w-[2px] h-1.5 bg-white rounded-full" />
+            <div className="w-[2px] h-2.5 bg-white rounded-full" />
+            <div className="w-[2px] h-1.5 bg-white rounded-full" />
           </div>
         </div>
         
@@ -328,14 +328,14 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
                     <div className="flex gap-3">
                       <button 
                         onClick={() => setConfirmDelete(null)}
-                        className="flex-1 py-3 bg-muted rounded-xl text-[0.9375rem] font-semibold text-foreground active:scale-95 transition-transform"
+                        className="flex-1 py-3 bg-muted rounded-xl text-[0.9375rem] font-semibold text-foreground active:scale-[0.97] transition-transform"
                       >
                         Cancel
                       </button>
                       <button 
                         onClick={handleConfirmDelete}
                         disabled={deleteConversation.isPending}
-                        className="flex-1 py-3 bg-destructive rounded-xl text-[0.9375rem] font-semibold text-primary-foreground active:scale-95 transition-transform disabled:opacity-50"
+                        className="flex-1 py-3 bg-destructive rounded-xl text-[0.9375rem] font-semibold text-white active:scale-[0.97] transition-transform disabled:opacity-50"
                       >
                         {deleteConversation.isPending ? 'Deleting...' : 'Delete'}
                       </button>

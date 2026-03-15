@@ -135,7 +135,7 @@ export function TagInput({
 
   return (
     <div className={cn("relative", className)}>
-      <div className="flex flex-wrap items-center gap-1.5 rounded-sq-sm border border-border bg-background px-2 py-1.5 min-h-[38px] focus-within:ring-2 focus-within:ring-primary">
+      <div className="flex flex-wrap items-center gap-1.5 rounded-sq-sm border border-border bg-background px-2 py-1.5 min-h-[38px] focus-within:ring-2 focus-within:ring-[hsl(38,92%,50%)]/40">
         {value.map((tag, index) => (
           <TagChip key={index} label={tag} onRemove={() => removeTag(index)} variant="solid" />
         ))}

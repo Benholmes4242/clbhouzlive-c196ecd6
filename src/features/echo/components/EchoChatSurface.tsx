@@ -1,3 +1,4 @@
+// TODO: DELETE — dead code (not rendered anywhere)
 /**
  * EchoChatSurface - Shared chat UI component
  * 
