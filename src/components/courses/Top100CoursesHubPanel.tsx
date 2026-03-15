@@ -177,7 +177,7 @@ const Top100CoursesHubPanel = () => {
   return (
     <div className="space-y-5">
       {/* Top 100 Journey Hero - Premium progress module */}
-      {user && (
+      <div className="px-4">
         <Top100JourneyHero
           completedCourses={totalRated}
           totalCoursesInStartedLists={totalCoursesInStartedLists}
