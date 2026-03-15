@@ -917,7 +917,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 <h1 className="text-xl font-bold text-foreground">
                   Achievements
                 </h1>
-                <p className="text-sm text-black dark:text-white mt-1">
+                <p className="text-sm text-foreground mt-1">
                   Defining your game through achievement
                 </p>
               </div>
