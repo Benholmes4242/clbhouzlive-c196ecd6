@@ -386,7 +386,7 @@ export function MessageBubble({
               onClick={() => {
                 handleEmojiSelect(emoji);
               }}
-              className="w-8 h-8 flex items-center justify-center text-lg hover:bg-primary/5 rounded-full active:scale-90 transition-transform"
+              className="w-8 h-8 flex items-center justify-center text-lg hover:bg-[hsl(38,92%,50%)]/5 rounded-full active:scale-[0.97] transition-transform"
             >
               {emoji}
             </button>
