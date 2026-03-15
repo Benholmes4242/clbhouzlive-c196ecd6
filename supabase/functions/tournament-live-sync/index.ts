@@ -890,5 +890,5 @@ async function syncLeaderboard(
     }
   }
 
-  return { records, sportradarStatus };
+  return { records, sportradarStatus, currentRound };
 }
