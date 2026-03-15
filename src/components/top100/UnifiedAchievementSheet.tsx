@@ -449,7 +449,7 @@ export function UnifiedAchievementSheet({
             {/* Close button — 44px tap target */}
             <button
               onClick={onClose}
-              className="absolute top-3 right-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full hover:bg-muted active:scale-[0.95] transition-transform z-10"
+              className="absolute top-3 right-3 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full hover:bg-muted active:scale-[0.97] transition-transform z-10"
               aria-label="Close"
             >
               <X className="w-5 h-5 text-muted-foreground" />
