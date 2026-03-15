@@ -519,8 +519,10 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
 
         {/* CTA bar */}
         <div style={{
-          display: 'flex', alignItems: 'center', gap: 10,
-          padding: '10px max(10px, 3vw) 20px', flexShrink: 0,
+          borderTop: '1px solid rgba(255,255,255,0.07)',
+          background: 'rgba(0,0,0,0.3)',
+          display: 'flex', alignItems: 'center', gap: 8,
+          padding: '14px 16px', flexShrink: 0,
         }}>
           {/* Like */}
           <button onClick={handleLike} style={{
@@ -536,37 +538,30 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
             {likeCount}
           </button>
 
-          {/* Join conversation */}
+          {/* Centre CTA — shorter */}
           <button onClick={onComment} style={{
-            flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            background: 'linear-gradient(180deg, rgba(251,191,36,0.6) 0%, rgba(245,158,11,0.42) 50%, rgba(180,115,0,0.5) 100%)',
-            border: '1px solid rgba(251,191,36,0.5)',
-            borderTop: '1px solid rgba(255,240,180,0.35)',
-            borderRadius: 14, padding: '10px 12px', cursor: 'pointer',
-            fontSize: 'clamp(12px, 3.2vw, 14px)', fontWeight: 700, color: '#fff',
-            animation: 'trlive-ctaPulse 3.5s ease-in-out infinite',
-            boxShadow: '0 2px 12px rgba(245,158,11,0.3), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.15)',
-            textShadow: '0 1px 2px rgba(0,0,0,0.25)',
+            flex: 1,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            background: 'linear-gradient(135deg, rgba(249,115,22,0.22), rgba(234,88,12,0.15))',
+            border: '1px solid rgba(249,115,22,0.35)', borderRadius: 22, padding: '8px 10px',
+            color: '#FB923C', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+            minWidth: 0,
           }}>
-            💬
-            <span>Join the conversation</span>
+            <span style={{ fontSize: 14, flexShrink: 0 }}>💬</span>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Who wins?</span>
             {commentCount > 0 && (
-              <span style={{
-                fontSize: 11, fontWeight: 700,
-                background: 'rgba(0,0,0,0.15)', padding: '1px 6px', borderRadius: 8,
-              }}>
-                {commentCount}
-              </span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(251,146,60,0.6)', flexShrink: 0 }}>{commentCount}</span>
             )}
           </button>
 
-          {/* Watch live */}
+          {/* Leaderboard link */}
           <button onClick={handleWatchLive} style={{
-            background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer',
-            borderRadius: 20, padding: '8px 14px',
-            fontSize: 12, fontWeight: 700, color: 'hsl(var(--accent-amber))',
+            background: 'transparent', border: 'none',
+            color: '#F97316', fontSize: 12, fontWeight: 700,
+            whiteSpace: 'nowrap', cursor: 'pointer', padding: '8px 4px',
+            flexShrink: 0,
           }}>
-            TourHub →
+            Leaderboard →
           </button>
         </div>
       </div>
