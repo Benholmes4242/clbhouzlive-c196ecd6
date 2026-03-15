@@ -91,7 +91,7 @@ export default function BusinessInvitePage() {
                   }`}
                 >
                   <div className={`h-10 w-10 rounded-sq-sm flex items-center justify-center transition-colors ${
-                    isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                    isSelected ? 'bg-[hsl(38,92%,50%)] text-white' : 'bg-muted text-muted-foreground'
                   }`}>
                     <Icon className="h-5 w-5" />
                   </div>
