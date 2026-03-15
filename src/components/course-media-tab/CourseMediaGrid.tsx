@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useRef } from 'react';
-import { Loader2 } from 'lucide-react';
+import { AlertCircle, Camera, Loader2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { CourseMediaTile } from './CourseMediaTile';
 import { CourseMediaLandscapeCard } from './CourseMediaLandscapeCard';
@@ -70,10 +70,14 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-3">
-        <p className="text-sm text-muted-foreground">Something went wrong</p>
+        <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+          <AlertCircle className="w-6 h-6 text-muted-foreground/40" />
+        </div>
+        <p className="text-base font-semibold text-foreground">Couldn't load media</p>
+        <p className="text-sm text-muted-foreground">Please check your connection and try again.</p>
         <button
           onClick={() => refetch()}
-          className="px-4 py-2 rounded-full text-sm font-semibold bg-foreground text-background"
+          className="px-5 py-2.5 rounded-full text-sm font-semibold bg-[#f59e0b] text-white hover:bg-[#e8920f] active:scale-[0.97] transition-all min-h-[44px]"
         >
           Retry
         </button>
@@ -84,8 +88,12 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
   if (posts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-2 px-8 text-center">
+        <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center mb-1">
+          <Camera className="w-7 h-7 text-muted-foreground/40" />
+        </div>
+        <p className="text-base font-semibold text-foreground">No media yet</p>
         <p className="text-sm text-muted-foreground">
-          No media yet — Be the first to share a photo or video from {courseName || 'this course'}
+          Be the first to share a photo or video from {courseName || 'this course'}.
         </p>
       </div>
     );
@@ -131,7 +139,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
       {/* Loading indicator */}
       {isFetchingNextPage && (
         <div className="col-span-3 flex items-center justify-center py-4">
-          <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+          <Loader2 className="w-5 h-5 animate-spin text-[#f59e0b]" />
         </div>
       )}
     </div>

@@ -29,7 +29,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
   return (
     <div
       style={{ gridColumn: '1 / -1' }}
-      className="relative aspect-video overflow-hidden cursor-pointer"
+      className="relative aspect-video overflow-hidden cursor-pointer rounded-[4px] active:scale-[0.99] transition-transform"
       onClick={() => {
         if (allPosts) {
           useFullscreenFeed.getState().open({
@@ -56,6 +56,15 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
           <Film className="w-10 h-10 text-muted-foreground" />
         </div>
       )}
+
+      {/* Bottom gradient overlay */}
+      <div
+        className="absolute bottom-0 left-0 right-0 pointer-events-none"
+        style={{
+          height: '40%',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%)',
+        }}
+      />
 
       {post.avatarUrl && (
         <div className="absolute top-1.5 left-1.5 z-10">
