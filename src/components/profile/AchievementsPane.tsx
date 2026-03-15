@@ -1426,8 +1426,8 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                   
                                   {/* Smart Nudge Label */}
                                   {nudgeText && (
-                                    <div className="mt-2 px-2 py-1 bg-orange-100 dark:bg-orange-900/30 rounded-full border border-orange-300 dark:border-orange-700">
-                                      <p className="text-xs font-medium text-orange-700 dark:text-orange-300 leading-tight">
+                                    <div className="mt-2 px-2 py-1 bg-[#f59e0b]/10 rounded-full border border-[#f59e0b]/30">
+                                      <p className="text-xs font-medium text-[#d97706] leading-tight">
                                         🎯 {nudgeText}
                                       </p>
                                     </div>
