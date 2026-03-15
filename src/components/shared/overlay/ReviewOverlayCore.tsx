@@ -150,7 +150,7 @@ const ReviewOverlayCoreInner: React.FC<ReviewOverlayCoreProps> = ({
                 backgroundColor: 'rgba(0, 0, 0, 0.35)',
                 backdropFilter: 'blur(12px) saturate(130%)',
                 WebkitBackdropFilter: 'blur(12px) saturate(130%)',
-                borderColor: 'rgba(255, 255, 255, 0.06)',
+                borderColor: 'rgba(210, 180, 97, 0.3)',
                 padding: '6px 8px',
               }}
             >
