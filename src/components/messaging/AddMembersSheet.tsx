@@ -130,7 +130,7 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
             {selectedUsers.map(user => (
               <div
                 key={user.id}
-                className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm"
+                className="flex items-center gap-2 bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)] px-3 py-1 rounded-full text-sm"
               >
                 <span>{user.display_name || user.username}</span>
                 <button 
