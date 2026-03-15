@@ -60,7 +60,7 @@ const CommunityScoreCard: React.FC<CommunityScoreCardProps> = ({
         </p>
         <Button
           onClick={onRateClick}
-          className="px-5 py-2.5 bg-card text-foreground text-sm font-medium rounded-full hover:bg-muted transition-colors shadow-sm active:scale-[0.98] border border-border/60"
+          className="px-6 py-2.5 bg-[#f59e0b] text-white text-sm font-semibold rounded-full hover:bg-[#e8920f] transition-colors shadow-sm active:scale-[0.97] min-h-[44px]"
         >
           Rate this course
         </Button>

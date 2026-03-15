@@ -252,7 +252,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         )}
 
         {coords && (
-          <div className="px-5 md:px-4">
+          <div className="px-4">
             <LocationMapCard
               lat={coords.lat}
               lng={coords.lng}

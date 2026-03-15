@@ -105,10 +105,13 @@ export function CourseTop100Summary({ userId }: CourseTop100SummaryProps) {
               </div>
 
               {/* Progress bar */}
-              <div className="h-1.5 rounded-full bg-transparent overflow-hidden">
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(245,158,11,0.06)' }}>
                 <div
-                  className="h-full bg-primary-accent rounded-full transition-all duration-300"
-                  style={{ width: `${percentage}%` }}
+                  className="h-full rounded-full transition-all duration-300"
+                  style={{
+                    width: `${percentage}%`,
+                    background: 'linear-gradient(to right, #f59e0b, #fbbf24)',
+                  }}
                 />
               </div>
 

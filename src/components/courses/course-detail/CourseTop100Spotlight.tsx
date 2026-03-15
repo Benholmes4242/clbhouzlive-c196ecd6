@@ -112,10 +112,13 @@ export const CourseTop100Spotlight: React.FC<CourseTop100SpotlightProps> = ({
                 {bestProgress.played} of {bestProgress.total} played
               </span>
             </div>
-            <div className="h-1.5 rounded-full bg-transparent overflow-hidden">
+            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(245,158,11,0.06)' }}>
               <div
-                className="h-full rounded-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-500"
-                style={{ width: `${(bestProgress.played / bestProgress.total) * 100}%` }}
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  width: `${(bestProgress.played / bestProgress.total) * 100}%`,
+                  background: 'linear-gradient(to right, #f59e0b, #fbbf24)',
+                }}
               />
             </div>
           </div>
