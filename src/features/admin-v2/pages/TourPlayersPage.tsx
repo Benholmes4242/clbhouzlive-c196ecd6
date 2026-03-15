@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Users, RefreshCw, ArrowUpDown, ArrowUp, ArrowDown, Camera, Globe } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Users, RefreshCw, ArrowUpDown, ArrowUp, ArrowDown, Camera, Globe, Zap } from 'lucide-react';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { createColumnHelper } from '@tanstack/react-table';
 import { formatDistanceToNow } from 'date-fns';
@@ -93,7 +94,39 @@ export default function TourPlayersPage() {
   const [page, setPage]           = useState(1);
   const [sortBy, setSortBy]       = useState<SortKey>('name_asc');
   const [tourFilter, setTourFilter] = useState<string>('all');
+  const [syncingAllTours, setSyncingAllTours] = useState(false);
+  const [syncProgress, setSyncProgress] = useState('');
   const PAGE_SIZE = 25;
+  const queryClient = useQueryClient();
+
+  const ALL_TOUR_IDS = ['pga', 'eur', 'lpga', 'pgad', 'liv', 'champions-tour'] as const;
+  const TOUR_SYNC_LABELS: Record<string, string> = {
+    pga: 'PGA Tour', eur: 'DP World Tour', lpga: 'LPGA',
+    pgad: 'Korn Ferry', liv: 'LIV Golf', 'champions-tour': 'Champions',
+  };
+
+  const handleSyncAllTours = async () => {
+    if (syncingAllTours) return;
+    setSyncingAllTours(true);
+    let successCount = 0;
+
+    for (const tourId of ALL_TOUR_IDS) {
+      setSyncProgress(TOUR_SYNC_LABELS[tourId]);
+      try {
+        const { error } = await supabase.functions.invoke('sportradar-sync', {
+          body: { action: 'players', tourId, year: 2026, seasonYear: 2026, roundType: 'stroke' },
+        });
+        if (!error) successCount++;
+      } catch (e) {
+        console.error(`[SyncAllTours] Failed for ${tourId}:`, e);
+      }
+    }
+
+    setSyncingAllTours(false);
+    setSyncProgress('');
+    queryClient.invalidateQueries({ queryKey: ['admin-v2', 'tour', 'players'] });
+    toast.success(`Player sync complete across ${successCount}/6 tours`);
+  };
 
   /* ── Data fetch ──────────────────────────────────────── */
   const { data = [], isLoading, refetch } = useQuery({
@@ -278,9 +311,14 @@ export default function TourPlayersPage() {
         title="Tour Players"
         description="Sportradar player database"
         action={
-          <AdminButton variant="outline" icon={RefreshCw} size="sm" loading={isLoading} onClick={() => refetch()}>
-            Refresh
-          </AdminButton>
+          <div className="flex items-center gap-2">
+            <AdminButton variant="outline" icon={RefreshCw} size="sm" loading={isLoading} onClick={() => refetch()}>
+              Refresh
+            </AdminButton>
+            <AdminButton variant="primary" icon={Zap} size="sm" disabled={syncingAllTours} onClick={handleSyncAllTours}>
+              {syncingAllTours ? <><span className="animate-pulse">{syncProgress}…</span></> : 'Sync All Tours'}
+            </AdminButton>
+          </div>
         }
       />
 
