@@ -251,7 +251,7 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
         />
 
         {/* Drag handle */}
-        <div className="flex justify-center shrink-0" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)', marginTop: 10 }}>
+        <div className="flex justify-center shrink-0" style={{ paddingTop: 8 }}>
           <motion.div
             initial={{ scaleX: 0.3, opacity: 0 }}
             animate={{ scaleX: 1, opacity: 1 }}
