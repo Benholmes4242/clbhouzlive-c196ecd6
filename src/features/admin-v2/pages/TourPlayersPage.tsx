@@ -144,13 +144,24 @@ export default function TourPlayersPage() {
   const { data = [], isLoading, refetch } = useQuery({
     queryKey: ['admin-v2', 'tour', 'players'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('sr_players')
-        .select('id, sr_id, full_name, first_name, last_name, country, country_code, tour_codes, headshot_override, updated_at')
-        .order('full_name', { ascending: true })
-        .limit(1000);
-      if (error) throw error;
-      return (data ?? []).map(p => ({
+      const batchSize = 1000;
+      let offset = 0;
+      let allRows: any[] = [];
+      let hasMore = true;
+
+      while (hasMore) {
+        const { data, error } = await supabase
+          .from('sr_players')
+          .select('id, sr_id, full_name, first_name, last_name, country, country_code, tour_codes, headshot_override, updated_at')
+          .order('full_name', { ascending: true })
+          .range(offset, offset + batchSize - 1);
+        if (error) throw error;
+        allRows = allRows.concat(data ?? []);
+        hasMore = (data?.length ?? 0) === batchSize;
+        offset += batchSize;
+      }
+
+      return allRows.map(p => ({
         id:               p.id,
         srId:             p.sr_id,
         fullName:         p.full_name,
