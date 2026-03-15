@@ -292,14 +292,22 @@ export function useAdminV2Invites() {
   });
 
   const createMutation = useMutation({
-    mutationFn: async ({ email, role, notes }: { email: string; role: string; notes: string }) => {
-      await adminInvite('create_invite', { email, role, notes: notes || undefined });
+    mutationFn: async ({ invitedUserId, role }: { invitedUserId: string; role: string }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase.functions.invoke('send-admin-invite', {
+        body: { invitedUserId, invitedByUserId: user.id, role },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      return data;
     },
     onSuccess: () => {
-      toast.success('Invite sent');
+      toast.success('Invite sent — they\'ll see it in their notifications');
       qc.invalidateQueries({ queryKey: ['admin-v2', 'invites'] });
     },
-    onError: () => toast.error('Failed to send invite'),
+    onError: (err: Error) => toast.error(err.message || 'Failed to send invite'),
   });
 
   const cancelMutation = useMutation({
