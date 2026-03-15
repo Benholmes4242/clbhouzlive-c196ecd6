@@ -31,7 +31,7 @@ interface TieredCourseCardProps {
 
 /**
  * Tiered course card with clear visual hierarchy:
- * - Top 100: Larger cards with Chartreus accent (#C1A84C), trophy icon, strong visual weight
+ * - Top 100: Larger cards with Amber accent (#f59e0b), trophy icon, strong visual weight
  * - Non-Top-100: Slightly smaller, muted styling - still readable
  */
 export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
