@@ -301,7 +301,7 @@ export function AccessRequestsSection({ businessId, businessName, businessAvatar
                       size="sm"
                       onClick={() => setConfirmApprove(request)}
                       disabled={loadingId !== null}
-                      className="h-9 px-3.5 rounded-sq-xs text-[14px] font-semibold"
+                      className="h-9 px-3.5 rounded-sq-xs text-[14px] font-semibold bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0"
                     >
                       {loadingId === request.id ? (
                         <Loader2 className="h-4 w-4 animate-spin" />

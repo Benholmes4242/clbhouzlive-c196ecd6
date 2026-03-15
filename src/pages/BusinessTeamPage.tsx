@@ -131,7 +131,7 @@ export default function BusinessTeamPage() {
         <div className="flex items-center px-4 h-14">
           <button
             onClick={() => navigate(-1)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-muted-foreground active:text-foreground transition-colors"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-foreground active:scale-[0.97] transition-transform"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -219,7 +219,7 @@ export default function BusinessTeamPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="font-medium text-[15px] truncate">{invite.invitee_email}</p>
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-primary/10 text-primary">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)]">
                           Pending
                         </span>
                       </div>
@@ -254,7 +254,7 @@ export default function BusinessTeamPage() {
         {/* Invite CTA */}
         {canManage && (
           <Button 
-            className="w-full" 
+            className="w-full bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0" 
             onClick={() => navigate(`/business/${businessId}/team/invite`)}
           >
             <Plus className="h-4 w-4 mr-2" />

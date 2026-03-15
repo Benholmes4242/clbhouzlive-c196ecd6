@@ -42,7 +42,7 @@ export default function BusinessInvitePage() {
         <div className="flex items-center px-4 h-14">
           <button
             onClick={() => navigate(-1)}
-            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-muted-foreground active:text-foreground transition-colors"
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center -ml-2 text-foreground active:scale-[0.97] transition-transform"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -86,12 +86,12 @@ export default function BusinessInvitePage() {
                   onClick={() => setRole(r.value)}
                   className={`w-full flex items-center gap-3 p-4 rounded-sq-md border transition-all text-left ${
                     isSelected
-                      ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
+                      ? 'border-[hsl(38,92%,50%)] bg-[hsl(38,92%,50%)]/5 ring-1 ring-[hsl(38,92%,50%)]/20'
                       : 'border-border hover:border-muted-foreground/30 hover:bg-muted/30'
                   }`}
                 >
                   <div className={`h-10 w-10 rounded-sq-sm flex items-center justify-center transition-colors ${
-                    isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                    isSelected ? 'bg-[hsl(38,92%,50%)] text-white' : 'bg-muted text-muted-foreground'
                   }`}>
                     <Icon className="h-5 w-5" />
                   </div>
@@ -100,7 +100,7 @@ export default function BusinessInvitePage() {
                     <p className="text-sm text-muted-foreground">{r.description}</p>
                   </div>
                   {isSelected && (
-                    <Check className="h-5 w-5 text-primary" />
+                    <Check className="h-5 w-5 text-[hsl(38,92%,50%)]" />
                   )}
                 </button>
               );
@@ -123,7 +123,7 @@ export default function BusinessInvitePage() {
           </Button>
           <Button
             type="submit"
-            className="flex-1"
+            className="flex-1 bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0"
             disabled={!email.trim() || createInvite.isPending}
           >
             {createInvite.isPending ? 'Sending...' : 'Send invite'}
