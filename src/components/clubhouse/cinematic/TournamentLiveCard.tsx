@@ -190,7 +190,7 @@ function LeaderboardRow({
 
       {/* Score */}
       <span style={{
-        fontSize: 14, fontWeight: 700, minWidth: 36, textAlign: 'right',
+        fontSize: isLeader ? 'clamp(13px, 3.5vw, 15px)' : 'clamp(11px, 3vw, 13px)', fontWeight: 700, minWidth: 36, textAlign: 'right',
         color: scoreColor(entry.scoreDisplay),
         fontVariantNumeric: 'tabular-nums',
       }}>
