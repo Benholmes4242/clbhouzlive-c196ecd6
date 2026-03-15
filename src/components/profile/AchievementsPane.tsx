@@ -1277,7 +1277,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
               <div className="p-6">
                 {/* Section Header with Icon */}
                   <div className={`flex items-center justify-center gap-3 ${isMobile ? 'mb-3' : 'mb-6'}`}>
-                    <h3 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-gray-800 dark:text-gray-200`}>
+                    <h3 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-foreground`}>
                       Experience & Exploration Achievements
                     </h3>
                   </div>
