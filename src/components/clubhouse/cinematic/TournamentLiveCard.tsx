@@ -359,7 +359,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
         }}>
           {/* Venue */}
           {(meta.venueName || meta.venueCity) && (
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 3, letterSpacing: '0.02em' }}>
+            <div style={{ fontSize: 'clamp(9px, 2.5vw, 11px)', color: 'rgba(255,255,255,0.4)', marginBottom: 3, letterSpacing: '0.02em' }}>
               {[meta.venueName, meta.venueCity].filter(Boolean).join(' · ')}
             </div>
           )}
