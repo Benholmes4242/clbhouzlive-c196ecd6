@@ -123,7 +123,7 @@ export const NotificationActionsSheet: React.FC<NotificationActionsSheetProps> =
         <div className="p-2 space-y-1">
           <button
             onClick={handleToggleRead}
-            className="w-full flex items-center gap-3 px-4 min-h-[44px] text-left rounded-sq-sm hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="w-full flex items-center gap-3 px-4 min-h-[44px] text-left rounded-sq-sm hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(38,92%,50%)]/40 focus-visible:ring-offset-2"
             aria-label={isUnread ? 'Mark notification as read' : 'Mark notification as unread'}
           >
             {isUnread ? (
