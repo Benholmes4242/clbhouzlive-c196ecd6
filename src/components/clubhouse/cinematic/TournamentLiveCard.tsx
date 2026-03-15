@@ -514,22 +514,6 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           );
         })()}
 
-        {/* Full leaderboard link */}
-        <button
-          onClick={handleWatchLive}
-          style={{
-            width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            gap: 6, padding: '12px 0 4px',
-            background: 'transparent', border: 'none', cursor: 'pointer',
-            fontSize: 12, fontWeight: 700,
-            color: 'rgba(255,255,255,0.4)',
-            letterSpacing: 0.5,
-          }}
-        >
-          Full leaderboard
-          <span style={{ fontSize: 11, opacity: 0.6 }}>→</span>
-        </button>
-
         {/* Spacer */}
         <div style={{ flex: 1 }} />
 
