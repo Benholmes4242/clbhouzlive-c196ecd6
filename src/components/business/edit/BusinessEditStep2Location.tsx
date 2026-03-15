@@ -116,7 +116,7 @@ export function BusinessEditStep2Location({
                     name={formData.businessName || 'Business location'}
                     height={160}
                     zoom={14}
-                    markerColor="hsl(var(--primary))"
+                    markerColor="hsl(38, 92%, 50%)"
                     showExpandButton={false}
                   />
                   <div className="px-3 py-2.5 flex items-center justify-between bg-card border-t border-border">
