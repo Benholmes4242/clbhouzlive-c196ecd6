@@ -77,6 +77,7 @@ const BusinessProfilePage: React.FC = () => {
   const [bioExpanded, setBioExpanded] = useState(false);
   const [isBioClamped, setIsBioClamped] = useState(false);
   const [isAvatarLightboxOpen, setIsAvatarLightboxOpen] = useState(false);
+  const [showReportDialog, setShowReportDialog] = useState(false);
   const bioRef = useRef<HTMLParagraphElement>(null);
 
   // File selected handlers — open crop modal
