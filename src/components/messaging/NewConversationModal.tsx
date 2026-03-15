@@ -235,9 +235,9 @@ export function NewConversationModal({
         }
       }}
       className={cn(
-        "w-full flex items-center gap-3 px-4 py-3 transition-colors text-left active:bg-primary/10 border-b border-border/30",
+        "w-full flex items-center gap-3 px-4 py-3 transition-colors text-left active:bg-[hsl(38,92%,50%)]/10 border-b border-border/30",
         isLoading && "opacity-50 pointer-events-none",
-        isSelected && "bg-primary/5"
+        isSelected && "bg-[hsl(38,92%,50%)]/5"
       )}
     >
       {showCheckbox && (
@@ -395,16 +395,16 @@ export function NewConversationModal({
                       width: '80px',
                       aspectRatio: '1 / 1.05',
                       borderRadius: '34%',
-                      border: '2px dashed hsl(var(--primary))',
-                      background: groupAvatarPreview ? 'transparent' : 'hsl(var(--primary) / 0.05)',
+                      border: '2px dashed #f59e0b',
+                      background: groupAvatarPreview ? 'transparent' : 'rgba(245, 158, 11, 0.05)',
                     }}
                   >
                     {groupAvatarPreview ? (
                       <img src={groupAvatarPreview} alt="Group" className="w-full h-full object-cover" />
                     ) : (
                       <div className="flex flex-col items-center">
-                        <Camera size={24} className="text-primary" />
-                        <span className="text-xs font-medium mt-1 text-primary">
+                        <Camera size={24} className="text-[hsl(38,92%,50%)]" />
+                        <span className="text-xs font-medium mt-1 text-[hsl(35,80%,43%)]">
                           Add Photo
                         </span>
                       </div>
@@ -448,7 +448,7 @@ export function NewConversationModal({
                     <Badge
                       key={userProfile.id}
                       variant="secondary"
-                      className="gap-1 pr-1 py-1 bg-primary/10 border-0"
+                      className="gap-1 pr-1 py-1 bg-[hsl(38,92%,50%)]/10 border-0"
                     >
                       <SquircleAvatar
                         src={userProfile.profile_photo_url}
@@ -457,14 +457,14 @@ export function NewConversationModal({
                         fallback={getInitials(userProfile.display_name, userProfile.username)}
                         hideRing
                       />
-                      <span className="max-w-[100px] truncate text-sm text-primary">
+                      <span className="max-w-[100px] truncate text-sm text-[hsl(35,80%,43%)]">
                         {userProfile.display_name || userProfile.username}
                       </span>
                       <button
                         onClick={() => handleRemoveUser(userProfile.id)}
-                        className="ml-1 p-0.5 rounded-full hover:bg-primary/10"
+                        className="ml-1 p-0.5 rounded-full hover:bg-[hsl(38,92%,50%)]/10"
                       >
-                        <X className="h-3 w-3 text-primary" />
+                        <X className="h-3 w-3 text-[hsl(35,80%,43%)]" />
                       </button>
                     </Badge>
                   ))}
@@ -509,8 +509,8 @@ export function NewConversationModal({
                 className={cn(
                   "w-full h-[48px] flex items-center justify-center gap-2 text-[14px] font-semibold transition-all active:scale-[0.97] rounded-[14px]",
                   isGroupValid
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-primary/15 text-primary/40"
+                    ? "bg-[hsl(38,92%,50%)] text-white"
+                    : "bg-[hsl(38,92%,50%)]/15 text-[hsl(38,92%,50%)]/40"
                 )}
               >
                 {creatingGroup ? (

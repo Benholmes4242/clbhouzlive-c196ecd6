@@ -516,7 +516,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             />
             {/* Online indicator for DMs */}
             {!isGroupChat && otherUserPresence?.status === 'online' && (
-              <div className="absolute bottom-0 right-0 w-3 h-3 bg-primary rounded-full border-2 border-background" />
+              <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background" />
             )}
           </div>
           
@@ -526,11 +526,11 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             </h2>
             <p className="text-[11px] truncate text-muted-foreground">
               {isTyping ? (
-                <span className="text-primary">typing...</span>
+                <span className="text-[hsl(35,80%,43%)]">typing...</span>
               ) : 
                isGroupChat && conversation ? `${conversation.participants.length} members` :
                otherUserPresence?.status === 'online' ? (
-                <span className="text-primary">online</span>
+                <span className="text-emerald-500">online</span>
               ) : 
                otherUserPresence?.status === 'away' ? 'away' : 
                otherUserPresence?.last_seen_at 
@@ -629,12 +629,12 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           {showScrollToBottom && (
             <button
               onClick={scrollToBottom}
-              className="fixed bottom-28 right-4 w-9 h-9 rounded-full flex items-center justify-center z-20 active:scale-95 transition-transform border border-border"
+              className="fixed bottom-28 right-4 w-9 h-9 rounded-full flex items-center justify-center z-20 active:scale-[0.97] transition-transform border border-border"
               style={{ background: 'hsl(var(--background) / 0.9)' }}
             >
               <ChevronDown className="w-[18px] h-[18px] text-foreground/60" />
               {unreadBelowCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-primary rounded-full text-[10px] font-bold text-primary-foreground flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-[hsl(38,92%,50%)] rounded-full text-[10px] font-bold text-white flex items-center justify-center">
                   {unreadBelowCount > 99 ? '99+' : unreadBelowCount}
                 </span>
               )}

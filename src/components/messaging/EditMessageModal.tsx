@@ -68,7 +68,7 @@ export function EditMessageModal({
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Edit your message..."
-            className="min-h-[100px] resize-none rounded-2xl border-border focus:border-primary/40 focus:ring-primary/20"
+            className="min-h-[100px] resize-none rounded-2xl border-border focus:border-[hsl(38,92%,50%)]/40 focus:ring-[hsl(38,92%,50%)]/20"
             autoFocus
           />
 
@@ -84,7 +84,7 @@ export function EditMessageModal({
             <Button
               onClick={handleSave}
               disabled={!content.trim() || content === originalContent || saving}
-              className="flex-1 h-12 rounded-full bg-primary hover:bg-primary/90"
+              className="flex-1 h-12 rounded-full bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0"
             >
               <Check className="w-4 h-4 mr-2" />
               {saving ? 'Saving...' : 'Save'}

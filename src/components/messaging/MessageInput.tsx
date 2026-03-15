@@ -223,8 +223,8 @@ export function MessageInput({
       {/* Reply preview */}
       {replyingTo && (
         <div className="flex items-center justify-between gap-2 px-4 py-2 mb-2 bg-background rounded-[18px] shadow-sm">
-          <div className="flex-1 min-w-0 pl-2 border-l-2 border-primary">
-            <span className="text-[12px] font-semibold text-primary">
+          <div className="flex-1 min-w-0 pl-2 border-l-2 border-[hsl(38,92%,50%)]">
+            <span className="text-[12px] font-semibold text-[hsl(35,80%,43%)]">
               Replying to {replyToName}
             </span>
             <p className="text-[13px] text-muted-foreground truncate">
@@ -303,7 +303,7 @@ export function MessageInput({
           title="Share golf content"
           className="w-10 h-10 rounded-full flex items-center justify-center active:bg-muted transition-colors flex-shrink-0"
         >
-          <MapPin className="w-5 h-5 text-primary" />
+          <MapPin className="w-5 h-5 text-[hsl(38,92%,50%)]" />
         </button>
 
         {/* Input container - pill style */}
@@ -339,12 +339,12 @@ export function MessageInput({
           <button 
             onClick={handleSend}
             disabled={(!hasText && !mediaPreview) || disabled || uploading}
-            className="w-10 h-10 rounded-full bg-primary flex items-center justify-center transition-all flex-shrink-0 active:scale-95 disabled:opacity-50"
+            className="w-10 h-10 rounded-full bg-[hsl(38,92%,50%)] flex items-center justify-center transition-all flex-shrink-0 active:scale-[0.97] disabled:opacity-50"
           >
             {uploading ? (
-              <Loader2 className="w-5 h-5 text-primary-foreground animate-spin" />
+              <Loader2 className="w-5 h-5 text-white animate-spin" />
             ) : (
-              <Send className="w-5 h-5 text-primary-foreground" />
+              <Send className="w-5 h-5 text-white" />
             )}
           </button>
         ) : onSendVoiceNote ? (

@@ -130,12 +130,12 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
             {selectedUsers.map(user => (
               <div
                 key={user.id}
-                className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm"
+                className="flex items-center gap-2 bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)] px-3 py-1 rounded-full text-sm"
               >
                 <span>{user.display_name || user.username}</span>
                 <button 
                   onClick={() => toggleUser(user)}
-                  className="hover:text-primary/80"
+                  className="hover:text-[hsl(35,80%,43%)]/80"
                 >
                   ×
                 </button>
@@ -157,7 +157,7 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
                   onClick={() => toggleUser(user)}
                   className={cn(
                     "w-full flex items-center gap-3 p-3 rounded-lg transition-colors",
-                    isSelected ? "bg-primary/5" : "hover:bg-muted"
+                    isSelected ? "bg-[hsl(38,92%,50%)]/5" : "hover:bg-muted"
                   )}
                 >
                   <Avatar className="w-10 h-10">
@@ -171,8 +171,8 @@ export const AddMembersSheet: React.FC<AddMembersSheetProps> = ({
                     )}
                   </div>
                   {isSelected && (
-                    <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                      <Check size={14} className="text-primary-foreground" />
+                    <div className="w-6 h-6 bg-[hsl(38,92%,50%)] rounded-full flex items-center justify-center">
+                      <Check size={14} className="text-white" />
                     </div>
                   )}
                 </button>

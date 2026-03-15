@@ -99,7 +99,7 @@
            {/* Cancel button */}
             <button
               onClick={() => onOpenChange(false)}
-              className="w-full py-4 text-center text-primary font-semibold rounded-2xl hover:bg-primary/5 active:bg-primary/10 transition-colors mt-2"
+              className="w-full py-4 text-center text-[hsl(35,80%,43%)] font-semibold rounded-2xl hover:bg-[hsl(38,92%,50%)]/5 active:bg-[hsl(38,92%,50%)]/10 transition-colors mt-2"
             >
              Cancel
            </button>

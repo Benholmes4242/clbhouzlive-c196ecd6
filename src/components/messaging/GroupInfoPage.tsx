@@ -314,10 +314,10 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
-                  className="absolute bottom-1 right-1 w-8 h-8 rounded-full flex items-center justify-center shadow-md active:scale-[0.95] transition-transform disabled:opacity-50"
-                  style={{ background: 'hsl(var(--primary))' }}
+                  className="absolute bottom-1 right-1 w-8 h-8 rounded-full flex items-center justify-center shadow-md active:scale-[0.97] transition-transform disabled:opacity-50"
+                  style={{ background: '#f59e0b' }}
                 >
-                  <Camera size={16} className="text-primary-foreground" />
+                  <Camera size={16} className="text-white" />
                 </button>
                 <input
                   ref={fileInputRef}
@@ -424,7 +424,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
               onClick={handleToggleMute}
               className="relative w-[50px] h-[28px] rounded-full transition-colors duration-200"
               style={{
-                background: isMuted ? 'hsl(var(--muted))' : 'hsl(var(--primary))',
+                background: isMuted ? 'hsl(var(--muted))' : '#f59e0b',
               }}
             >
               <div
@@ -449,9 +449,9 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
             {isAdmin && (
               <button
                 onClick={() => setIsAddMembersOpen(true)}
-              className="flex items-center gap-1 text-[13px] font-semibold active:opacity-70 transition-opacity text-primary"
+              className="flex items-center gap-1 text-[13px] font-semibold active:opacity-70 transition-opacity text-[hsl(35,80%,43%)]"
             >
-              <UserPlus size={14} className="text-primary" />
+              <UserPlus size={14} className="text-[hsl(35,80%,43%)]" />
                 Add
               </button>
             )}
@@ -486,8 +486,8 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                           <span
                             className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-[1px] rounded-lg"
                             style={{
-                             color: 'hsl(var(--primary))',
-                               background: 'hsl(var(--primary) / 0.08)',
+                             color: '#d97706',
+                               background: 'rgba(245, 158, 11, 0.08)',
                              }}
                           >
                             {participant.user_id === conversation.created_by ? (
@@ -550,7 +550,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
 
           {!isCreator && (
             <>
-               <div style={{ height: 1, backgroundColor: 'hsl(var(--primary) / 0.06)' }} />
+               <div style={{ height: 1, backgroundColor: 'rgba(245, 158, 11, 0.06)' }} />
               <button
                 onClick={handleLeaveGroup}
                 className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"
@@ -561,7 +561,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
             </>
           )}
 
-           <div style={{ height: 1, backgroundColor: 'hsl(var(--primary) / 0.06)' }} />
+           <div style={{ height: 1, backgroundColor: 'rgba(245, 158, 11, 0.06)' }} />
           <button
             onClick={() => setIsReportOpen(true)}
             className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"
@@ -572,7 +572,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
 
           {isAdmin && (
             <>
-              <div style={{ height: 1, backgroundColor: 'hsl(var(--primary) / 0.06)' }} />
+              <div style={{ height: 1, backgroundColor: 'rgba(245, 158, 11, 0.06)' }} />
               <button
                 onClick={handleDeleteGroup}
                 className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"

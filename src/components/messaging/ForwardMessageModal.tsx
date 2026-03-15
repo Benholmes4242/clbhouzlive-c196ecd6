@@ -117,7 +117,7 @@ export function ForwardMessageModal({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search conversations..."
-              className="pl-10 h-10 rounded-full bg-primary/5 border border-border"
+              className="pl-10 h-10 rounded-full bg-[hsl(38,92%,50%)]/5 border border-border"
             />
           </div>
         </div>
@@ -141,13 +141,13 @@ export function ForwardMessageModal({
                   disabled={forwarding !== null}
                   className={cn(
                     "w-full flex items-center gap-3 px-4 py-3 transition-colors",
-                    "hover:bg-primary/5 active:bg-primary/10",
+                    "hover:bg-[hsl(38,92%,50%)]/5 active:bg-[hsl(38,92%,50%)]/10",
                     forwarding !== null && forwarding !== conv.id && "opacity-50"
                   )}
                 >
                   {display.isGroup ? (
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center flex-shrink-0">
-                      <Users className="w-5 h-5 text-primary-foreground" />
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[hsl(38,92%,50%)] to-[hsl(36,84%,46%)] flex items-center justify-center flex-shrink-0">
+                      <Users className="w-5 h-5 text-white" />
                     </div>
                   ) : (
                     <SquircleAvatar
@@ -162,7 +162,7 @@ export function ForwardMessageModal({
                     {display.name}
                   </span>
                   {isForwarding && (
-                    <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                    <Loader2 className="w-5 h-5 text-[hsl(38,92%,50%)] animate-spin" />
                   )}
                 </button>
               );

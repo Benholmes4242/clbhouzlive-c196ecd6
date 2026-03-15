@@ -31,12 +31,12 @@ export function NotificationPrompt({
   return (
     <div 
       className={cn(
-        "flex items-center gap-3 px-4 py-3 bg-primary/10 border-b border-primary/20",
+        "flex items-center gap-3 px-4 py-3 bg-[hsl(38,92%,50%)]/10 border-b border-[hsl(38,92%,50%)]/20",
         className
       )}
     >
       <div className="flex-shrink-0">
-        <Bell className="h-5 w-5 text-primary" />
+        <Bell className="h-5 w-5 text-[hsl(38,92%,50%)]" />
       </div>
       
       <div className="flex-1 min-w-0">
@@ -58,7 +58,7 @@ export function NotificationPrompt({
           size="sm"
           onClick={handleEnable}
           disabled={isEnabling}
-          className="bg-primary hover:bg-primary/90"
+          className="bg-[hsl(38,92%,50%)] hover:bg-[hsl(36,84%,46%)] text-white border-0"
         >
           {isEnabling ? 'Enabling...' : 'Enable'}
         </Button>

@@ -49,7 +49,7 @@ function formatMessageTime(dateString: string): string {
 
 function ReadReceipt({ status }: { status: 'sent' | 'delivered' | 'read' }) {
   if (status === 'read') {
-    return <CheckCheck className="w-3.5 h-3.5 text-primary/60" />;
+    return <CheckCheck className="w-3.5 h-3.5 text-[hsl(38,92%,50%)]/60" />;
   }
   if (status === 'delivered') {
     return <CheckCheck className="w-3.5 h-3.5 text-muted-foreground" />;
@@ -128,7 +128,7 @@ export function MessageBubble({
 
         <div className={cn("flex flex-col max-w-[280px]", isOwnMessage ? "items-end" : "items-start")}>
           {!isOwnMessage && showSenderInfo && (
-          <span className="text-[12px] font-semibold text-primary/80 mb-1 px-1">
+          <span className="text-[12px] font-semibold text-[hsl(35,80%,43%)]/80 mb-1 px-1">
               {senderName}
             </span>
           )}
@@ -146,7 +146,7 @@ export function MessageBubble({
               {course.course_image_url ? (
                 <img src={course.course_image_url} alt={course.course_name} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full bg-primary/80 flex items-center justify-center">
+                <div className="w-full h-full bg-[hsl(38,92%,50%)]/80 flex items-center justify-center">
                   <span className="text-4xl">⛳</span>
                 </div>
               )}
@@ -161,7 +161,7 @@ export function MessageBubble({
                     return (
                       <div className="glass-badge-tight shadow-lg">
                         <CountryFlag country={flagCountry} size="md" />
-                        <span className="text-primary-foreground">#{course.country_rank}</span>
+                        <span className="text-white">#{course.country_rank}</span>
                       </div>
                     );
                   })()}
@@ -190,7 +190,7 @@ export function MessageBubble({
                 </div>
               )}
               
-              <div className="mt-3 flex items-center justify-center gap-2 py-2 rounded-[10px] text-[13px] font-semibold w-full bg-primary/5 text-primary border border-primary/10">
+              <div className="mt-3 flex items-center justify-center gap-2 py-2 rounded-[10px] text-[13px] font-semibold w-full bg-[hsl(38,92%,50%)]/5 text-[hsl(35,80%,43%)] border border-[hsl(38,92%,50%)]/10">
                 <span>View Course</span>
                 <ExternalLink size={14} />
               </div>
@@ -290,7 +290,7 @@ export function MessageBubble({
       <div className={cn("flex flex-col max-w-[75%]", isOwnMessage ? "items-end" : "items-start")}>
         {/* Sender name for groups */}
         {!isOwnMessage && showSenderInfo && (
-          <span className="text-[12px] font-semibold text-primary/80 mb-0.5 px-1">
+          <span className="text-[12px] font-semibold text-[hsl(35,80%,43%)]/80 mb-0.5 px-1">
             {senderName}
           </span>
         )}
@@ -301,15 +301,15 @@ export function MessageBubble({
             "px-[14px] py-[10px] break-words relative group backdrop-blur-[12px]",
             isPressed && "opacity-80",
             isOwnMessage 
-              ? "rounded-[18px_18px_4px_18px] bg-primary/[0.08] border border-primary/[0.12]"
+              ? "rounded-[18px_18px_4px_18px] bg-[hsl(38,92%,50%)]/[0.08] border border-[hsl(38,92%,50%)]/[0.12]"
               : "rounded-[18px_18px_18px_4px] bg-background/80 border border-border/40"
           )}
           onTouchCancel={() => setIsPressed(false)}
         >
           {/* Reply preview */}
           {replyToMessage && (
-            <div className="mb-2 pl-2 border-l-2 border-primary/40 bg-foreground/[0.03] rounded-r-lg py-1.5 pr-2">
-              <p className="text-[12px] font-semibold text-primary/70">
+            <div className="mb-2 pl-2 border-l-2 border-[hsl(38,92%,50%)]/40 bg-foreground/[0.03] rounded-r-lg py-1.5 pr-2">
+              <p className="text-[12px] font-semibold text-[hsl(35,80%,43%)]/70">
                 {replyToMessage.sender?.display_name || replyToMessage.sender?.username || 'You'}
               </p>
               <p className="text-[13px] text-muted-foreground truncate">
@@ -386,7 +386,7 @@ export function MessageBubble({
               onClick={() => {
                 handleEmojiSelect(emoji);
               }}
-              className="w-8 h-8 flex items-center justify-center text-lg hover:bg-primary/5 rounded-full active:scale-90 transition-transform"
+              className="w-8 h-8 flex items-center justify-center text-lg hover:bg-[hsl(38,92%,50%)]/5 rounded-full active:scale-[0.97] transition-transform"
             >
               {emoji}
             </button>
@@ -408,7 +408,7 @@ export function MessageBubble({
         )}
         
         <ContextMenuItem onClick={handleStar} className="gap-3 py-2.5 cursor-pointer">
-          <Star className={cn("h-4 w-4", isSaved && "fill-current text-primary")} />
+          <Star className={cn("h-4 w-4", isSaved && "fill-current text-[hsl(38,92%,50%)]")} />
           {isSaved ? "Remove from Picks" : "Caddie's Pick ⛳"}
         </ContextMenuItem>
         

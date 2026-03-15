@@ -81,12 +81,12 @@ function ConversationTypingOrPreview({ conversationId, preview, isActive }: { co
       : `${typingUsers.length} people typing...`;
     
     return (
-      <span className="text-primary italic flex items-center gap-1">
+      <span className="text-[hsl(35,80%,43%)] italic flex items-center gap-1">
         {text}
         <span className="inline-flex gap-0.5">
-          <span className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-          <span className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-          <span className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          <span className="w-1 h-1 bg-[hsl(38,92%,50%)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+          <span className="w-1 h-1 bg-[hsl(38,92%,50%)] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+          <span className="w-1 h-1 bg-[hsl(38,92%,50%)] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
         </span>
       </span>
     );
@@ -113,8 +113,8 @@ function ConversationSkeleton() {
 function EmptyState({ onNewConversation }: { onNewConversation?: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
-      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-        <MessageCircle className="h-8 w-8 text-primary/50" />
+      <div className="w-16 h-16 rounded-full bg-[hsl(38,92%,50%)]/10 flex items-center justify-center mb-4">
+        <MessageCircle className="h-8 w-8 text-[hsl(38,92%,50%)]/50" />
       </div>
       <h3 className="font-semibold text-foreground text-lg mb-1">No messages yet</h3>
       <p className="text-sm text-muted-foreground mb-6 max-w-[240px]">
@@ -123,7 +123,7 @@ function EmptyState({ onNewConversation }: { onNewConversation?: () => void }) {
       {onNewConversation && (
         <button 
           onClick={onNewConversation}
-          className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-full font-semibold active:scale-95 transition-transform"
+          className="flex items-center gap-2 px-6 py-3 bg-[hsl(38,92%,50%)] text-white rounded-full font-semibold active:scale-[0.97] transition-transform"
         >
           <Plus className="h-4 w-4" />
           Start a Chat
@@ -136,8 +136,8 @@ function EmptyState({ onNewConversation }: { onNewConversation?: () => void }) {
 function NoResults({ query }: { query: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
-        <MessageCircle className="h-6 w-6 text-primary/50" />
+      <div className="w-12 h-12 rounded-full bg-[hsl(38,92%,50%)]/10 flex items-center justify-center mb-3">
+        <MessageCircle className="h-6 w-6 text-[hsl(38,92%,50%)]/50" />
       </div>
       <h3 className="font-medium text-foreground mb-1">No results found</h3>
       <p className="text-sm text-muted-foreground">
@@ -283,16 +283,16 @@ export function ConversationList({
             }}
             className={cn(
               "w-full px-4 py-3.5 flex items-center gap-3 text-left transition-colors duration-150",
-              "active:bg-primary/10",
-              isSelected && "bg-primary/5",
+              "active:bg-[hsl(38,92%,50%)]/10",
+              isSelected && "bg-[hsl(38,92%,50%)]/5",
               isArchived && "opacity-70"
             )}
           >
             {/* Avatar - Group icon or user photo */}
             <div className="relative flex-shrink-0">
               {isGroup && !avatarUrl ? (
-                <div className="w-12 h-12 rounded-full flex items-center justify-center bg-primary">
-                  <Users className="w-5 h-5 text-primary-foreground" />
+                <div className="w-12 h-12 rounded-full flex items-center justify-center bg-[hsl(38,92%,50%)]">
+                  <Users className="w-5 h-5 text-white" />
                 </div>
               ) : (
                 <SquircleAvatar
@@ -311,7 +311,7 @@ export function ConversationList({
                 <div className="flex items-center gap-1.5 min-w-0 flex-1">
                   {/* Unread dot */}
                   {hasUnread && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[hsl(38,92%,50%)] flex-shrink-0" />
                   )}
                   <span className={cn(
                     "text-[14px] truncate text-foreground",
@@ -326,7 +326,7 @@ export function ConversationList({
                 <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
                   <span className={cn(
                     "text-[11px] font-normal",
-                    hasUnread ? "text-primary" : "text-muted-foreground"
+                    hasUnread ? "text-[hsl(35,80%,43%)]" : "text-muted-foreground"
                   )}>
                     {formatRelativeTime(conversation.last_message_at)}
                   </span>
@@ -346,8 +346,8 @@ export function ConversationList({
                 </p>
                 
                 {hasUnread && (
-                  <span className="ml-2 min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center bg-primary">
-                    <span className="text-[12px] font-bold text-primary-foreground">
+                   <span className="ml-2 min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center bg-[hsl(38,92%,50%)]">
+                    <span className="text-[12px] font-bold text-white">
                       {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
                     </span>
                   </span>
@@ -369,7 +369,7 @@ export function ConversationList({
     <div>
       {/* Swipe hint */}
       {showSwipeHint && filteredConversations.length > 0 && (
-        <div className="px-4 py-2 rounded-xl mb-3 text-center text-[13px] flex items-center justify-center gap-2 bg-primary/5 border border-border text-muted-foreground">
+        <div className="px-4 py-2 rounded-xl mb-3 text-center text-[13px] flex items-center justify-center gap-2 bg-[hsl(38,92%,50%)]/5 border border-border text-muted-foreground">
           <span>← Swipe left to delete</span>
           <span>•</span>
           <span>Swipe right to archive →</span>
@@ -379,7 +379,7 @@ export function ConversationList({
               try { localStorage.setItem('swipeHintDismissed', 'true'); }
               catch { /* silent fail in WebView */ }
             }}
-            className="ml-2 font-medium text-primary"
+            className="ml-2 font-medium text-[hsl(35,80%,43%)]"
           >
             Got it
           </button>
@@ -398,7 +398,7 @@ export function ConversationList({
         <div className="mt-4">
           <button
             onClick={() => setShowArchived(!showArchived)}
-            className="w-full flex items-center justify-between px-4 py-3 bg-primary/5 rounded-xl text-muted-foreground"
+            className="w-full flex items-center justify-between px-4 py-3 bg-[hsl(38,92%,50%)]/5 rounded-xl text-muted-foreground"
           >
             <div className="flex items-center gap-2">
               <Archive size={18} />
