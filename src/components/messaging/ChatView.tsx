@@ -440,7 +440,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
        AppLog.warn('[ChatView]', 'Navigate-to-message: element not found for', messageId);
        return;
      }
-     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+     element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
      setHighlightedMessageId(messageId);
      clearTimeout(highlightTimerRef.current);
      highlightTimerRef.current = setTimeout(() => setHighlightedMessageId(null), 2000);

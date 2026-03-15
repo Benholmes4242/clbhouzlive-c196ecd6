@@ -218,24 +218,26 @@ export function MessageBubble({
     );
 
     return (
-      <ContextMenu onOpenChange={(open) => { if (open) fetchSavedState(); }}>
-        <ContextMenuTrigger asChild>{courseCardContent}</ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuItem onClick={onReply} className="gap-2">
-            <Reply className="h-4 w-4" />Reply
-          </ContextMenuItem>
-          {isOwnMessage && (
-            <>
-              <ContextMenuItem onClick={onEdit} className="gap-2">
-                <Pencil className="h-4 w-4" />Edit
-              </ContextMenuItem>
-              <ContextMenuItem onClick={onDelete} className="gap-2 text-destructive focus:text-destructive">
-                <Trash2 className="h-4 w-4" />Delete
-              </ContextMenuItem>
-            </>
-          )}
-        </ContextMenuContent>
-      </ContextMenu>
+      <div className="py-1">
+        <ContextMenu onOpenChange={(open) => { if (open) fetchSavedState(); }}>
+          <ContextMenuTrigger asChild>{courseCardContent}</ContextMenuTrigger>
+          <ContextMenuContent>
+            <ContextMenuItem onClick={onReply} className="gap-2">
+              <Reply className="h-4 w-4" />Reply
+            </ContextMenuItem>
+            {isOwnMessage && (
+              <>
+                <ContextMenuItem onClick={onEdit} className="gap-2">
+                  <Pencil className="h-4 w-4" />Edit
+                </ContextMenuItem>
+                <ContextMenuItem onClick={onDelete} className="gap-2 text-destructive focus:text-destructive">
+                  <Trash2 className="h-4 w-4" />Delete
+                </ContextMenuItem>
+              </>
+            )}
+          </ContextMenuContent>
+        </ContextMenu>
+      </div>
     );
   }
 
