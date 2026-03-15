@@ -346,8 +346,8 @@ export function ConversationList({
                 </p>
                 
                 {hasUnread && (
-                  <span className="ml-2 min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center bg-primary">
-                    <span className="text-[12px] font-bold text-primary-foreground">
+                   <span className="ml-2 min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center bg-[hsl(38,92%,50%)]">
+                    <span className="text-[12px] font-bold text-white">
                       {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
                     </span>
                   </span>
