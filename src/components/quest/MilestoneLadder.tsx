@@ -157,7 +157,7 @@ const MilestoneNode: React.FC<MilestoneNodeProps> = ({
           />
           {/* Earned checkmark overlay */}
           {milestone.isUnlocked && (
-            <div className="absolute -right-1 -bottom-1 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center border-2 border-white">
+            <div className="absolute -right-1 -bottom-1 w-5 h-5 rounded-full bg-[#f59e0b] flex items-center justify-center border-2 border-white">
               <Check className="w-3 h-3 text-white" />
             </div>
           )}
