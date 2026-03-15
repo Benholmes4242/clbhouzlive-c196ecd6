@@ -529,7 +529,9 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
             display: 'flex', alignItems: 'center', gap: 4,
             background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer',
             borderRadius: 20, padding: '8px 14px',
-            fontSize: 14, color: isLiked ? '#F87171' : 'rgba(255,255,255,0.7)',
+            fontSize: 14, color: isLiked ? '#F59E0B' : 'rgba(255,255,255,0.7)',
+            border: `1px solid ${isLiked ? 'rgba(245,158,11,0.45)' : 'rgba(255,255,255,0.12)'}`,
+            background: isLiked ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.07)',
             animation: heartPopping ? 'trlive-heartPop 0.4s ease-out' : undefined,
           }}>
             <span style={{ fontSize: 16 }}>
