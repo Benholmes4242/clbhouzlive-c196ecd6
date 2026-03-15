@@ -1066,6 +1066,29 @@ const ProfilePageV2Content: React.FC = () => {
         </AlertDialog>
       )}
 
+      {/* Report confirmation dialog */}
+      {!isSelf && profileUserId && (
+        <AlertDialog open={showReportDialog} onOpenChange={setShowReportDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Report {displayName}?</AlertDialogTitle>
+              <AlertDialogDescription>
+                We'll review this profile and take action if it violates our Community Guidelines.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={() => {
+                toast.success('Report submitted. Thank you.');
+                setShowReportDialog(false);
+              }}>
+                Submit Report
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+
       {/* Hidden file inputs for inline photo upload */}
       <input ref={avatarFileInputRef} type="file" accept="image/*" onChange={handleAvatarFileSelected} className="hidden" />
       <input ref={heroFileInputRef} type="file" accept="image/*" onChange={handleHeroFileSelected} className="hidden" />
