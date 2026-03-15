@@ -430,7 +430,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
       ) && (
         <div style={{
           flexShrink: 0,
-          margin: '6px 16px 0',
+          margin: '6px max(10px, 3vw) 0',
           animation: 'trlive-fadeUp 0.5s ease-out both',
           animationDelay: '180ms',
           touchAction: 'none',
