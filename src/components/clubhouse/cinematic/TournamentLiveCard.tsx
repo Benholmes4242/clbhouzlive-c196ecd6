@@ -366,7 +366,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
 
           {/* Tournament name */}
           <div style={{
-            fontSize: 17, fontWeight: 700, color: 'rgba(255,255,255,0.95)',
+            fontSize: 'clamp(11px, 3vw, 13px)', fontWeight: 700, color: 'rgba(255,255,255,0.95)',
             letterSpacing: '-0.01em', marginBottom: 8, lineHeight: 1.2,
           }}>
             {meta.tournamentName}
