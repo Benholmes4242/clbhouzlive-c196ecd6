@@ -458,7 +458,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           ).slice(1, 3);
 
           return (
-            <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '4px 0 10px' }}>
+            <div style={{ marginTop: 4, borderTop: '1px solid rgba(255,255,255,0.06)', padding: '4px 0 10px' }}>
               {distinctByPos.map((entry, i) => {
                 const tiedEntries = meta.leaderboard.filter(e => e.position === entry.position);
                 const isTie = tiedEntries.length > 1;
@@ -467,7 +467,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                 return (
                   <div key={i} style={{
                     display: 'flex', alignItems: 'center', gap: 10,
-                    padding: '8px 20px',
+                    padding: '11px 20px',
                   }}>
                     {/* Position */}
                     <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.35)', width: 22, flexShrink: 0, textAlign: 'center' }}>
@@ -478,13 +478,13 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                     {isTie ? (
                       <div style={{ display: 'flex', flexShrink: 0 }}>
                         {shown.map((p, idx) => (
-                          <div key={idx} style={{ marginLeft: idx === 0 ? 0 : -10, position: 'relative', zIndex: shown.length - idx }}>
-                            <RowAvatar name={p.playerName} photoUrl={p.photoUrl} tourSlug={meta.tourSlug} size={32} />
+                          <div key={idx} style={{ marginLeft: idx === 0 ? 0 : -14, position: 'relative', zIndex: shown.length - idx }}>
+                            <RowAvatar name={p.playerName} photoUrl={p.photoUrl} tourSlug={meta.tourSlug} size={44} />
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <RowAvatar name={entry.playerName} photoUrl={entry.photoUrl} tourSlug={meta.tourSlug} size={32} />
+                      <RowAvatar name={entry.playerName} photoUrl={entry.photoUrl} tourSlug={meta.tourSlug} size={44} />
                     )}
 
                     {/* Name or tie label */}
