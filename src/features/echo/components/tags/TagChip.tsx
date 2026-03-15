@@ -18,7 +18,7 @@ export function TagChip({ label, onRemove, variant = 'outline', className }: Tag
     <span
       className={cn(
         "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors",
-        variant === 'solid' && "bg-primary/10 text-primary hover:bg-primary/15",
+        variant === 'solid' && "bg-[hsl(38,92%,50%)]/10 text-[hsl(35,80%,43%)] hover:bg-[hsl(38,92%,50%)]/15",
         variant === 'outline' && "bg-white/5 border border-white/10 text-foreground hover:bg-white/8 hover:border-white/15",
         className
       )}
