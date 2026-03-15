@@ -267,7 +267,7 @@ export function BusinessCommandCard({ membership, userId, index = 0, isActive = 
                       Verified
                     </DropdownMenuItem>
                   ) : verificationState === 'pending' ? (
-                    <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] text-primary/70 opacity-50 cursor-default">
+                    <DropdownMenuItem disabled className="gap-2.5 min-h-[44px] text-[hsl(35,80%,43%)]/70 opacity-50 cursor-default">
                       <Clock className="h-4 w-4" />
                       Verification pending
                     </DropdownMenuItem>
