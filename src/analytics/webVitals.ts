@@ -41,7 +41,7 @@ export const initWebVitals = (sendMetric: (name: string, value: number, metric: 
   });
 };
 
-// Analytics sender - logs to console in dev, can be extended for production analytics
+// Analytics sender - logs to console in dev, sends to edge function in production
 export const sendToAnalytics = (name: string, value: number, metric: WebVitalsMetric) => {
   if (!WEB_VITALS_ENABLED) return;
   
@@ -62,8 +62,21 @@ export const sendToAnalytics = (name: string, value: number, metric: WebVitalsMe
     });
   }
   
-  // TODO: Send to analytics backend in production
-  // Example: sendToPostHog('web_vital', { metric: name, value, rating });
+  // Send to Supabase Edge Function in production
+  if (!import.meta.env.DEV) {
+    try {
+      navigator.sendBeacon(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/log-web-vitals`,
+        JSON.stringify({
+          name,
+          value,
+          rating,
+          path: window.location.pathname,
+          ts: Date.now(),
+        })
+      );
+    } catch { /* silent — never crash for analytics */ }
+  }
 };
 
 // Get performance rating based on web vitals thresholds

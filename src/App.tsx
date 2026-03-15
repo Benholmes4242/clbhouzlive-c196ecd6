@@ -184,14 +184,12 @@ const ChallengesPage = lazy(() => import("./pages/ChallengesPage"));
 const InsightsPage = lazy(() => import("./pages/InsightsPage"));
 
 const BusinessDirectoryPage = lazy(() => import("./pages/BusinessDirectoryPage"));
-const BusinessInsightsPage = lazy(() => import("./pages/BusinessInsightsPage"));
 const BusinessInsightsPageV2 = lazy(() => import("./pages/BusinessInsightsPageV2"));
 const BusinessProfilePage = lazy(() => import("./pages/BusinessProfilePage"));
 const BusinessFollowersPage = lazy(() => import("./pages/BusinessFollowersPage"));
 const MyBusinessesPage = lazy(() => import("./pages/MyBusinessesPage"));
 const BusinessCreatePage = lazy(() => import("./pages/BusinessCreatePage"));
 const BusinessIntroPage = lazy(() => import("./pages/BusinessIntroPage"));
-const BusinessManagePage = lazy(() => import("./pages/BusinessManagePage"));
 const BusinessEditWizard = lazy(() => import("./components/business/edit/BusinessEditWizard"));
 const BusinessProfileLiveSuccessPage = lazy(() => import("./pages/BusinessProfileLiveSuccessPage"));
 const BusinessVerificationAboutPage = lazy(() => import("./pages/BusinessVerificationAboutPage"));
@@ -338,8 +336,8 @@ function AppRoutes() {
         <Route path="/businesses/manage" element={<Suspense fallback={<GenericPageSkeleton />}><MyBusinessesPage /></Suspense>} />
         <Route path="/business/intro" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessIntroPage /></Suspense>} />
         <Route path="/business/create" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessCreatePage /></Suspense>} />
-        <Route path="/business/manage" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessManagePage /></Suspense>} />
-        <Route path="/business/insights" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInsightsPage /></Suspense>} />
+        <Route path="/business/manage" element={<Navigate to="/businesses/manage" replace />} />
+        <Route path="/business/insights" element={<Navigate to="/businesses/manage" replace />} />
         <Route path="/business/:id/insights" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessInsightsPageV2 /></Suspense>} />
         <Route path="/business/:id/edit" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessEditWizard /></Suspense>} />
         <Route path="/business/success" element={<Suspense fallback={<GenericPageSkeleton />}><BusinessProfileLiveSuccessPage /></Suspense>} />
@@ -440,9 +438,9 @@ const queryClient = new QueryClient({
     } : {
       retry: 1,
       refetchOnWindowFocus: false,
-      staleTime: 0, // Always fetch fresh data
-      gcTime: 60 * 1000, // 1 minute cache
-      refetchOnMount: 'always',
+      staleTime: 60_000, // 1 minute — safe fallback, never 0 at scale
+      gcTime: 5 * 60 * 1000,
+      refetchOnMount: false,
       refetchOnReconnect: 'always',
       networkMode: 'always'
     },
@@ -612,16 +610,15 @@ const AppInner: React.FC = () => {
                                           </UploadResilienceProvider>
                                           </MessagingProvider>
                                         </AuthWrapper>
+                                        <Sonner />
+                                        <GlobalBottomNavigation />
+                                        <GlobalPostStudio />
                                       </ErrorBoundary>
                                   </VideoPlaybackProvider>
                                 </TopTenProvider>
                               {/* END REMOVED FullscreenPlayerProvider */}
                             </GlobalAudioProvider>
                           </MediaSystemProvider>
-                          
-                          <Sonner />
-                          <GlobalBottomNavigation />
-                          <GlobalPostStudio />
                         </ActiveActorProvider>
                     
                   </UIProvider>

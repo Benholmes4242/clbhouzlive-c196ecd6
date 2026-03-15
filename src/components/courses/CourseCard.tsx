@@ -102,7 +102,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
   const { ref: parallaxRef, offset: parallaxOffset } = useParallax(18);
   
   // Memory monitoring for this component
-  useMemoryMonitor('CourseCard', process.env.NODE_ENV === 'development');
+  useMemoryMonitor('CourseCard', import.meta.env.DEV);
 
   // Check if we're on a profile page to determine modal vs direct navigation
   const isProfilePage = location.pathname.includes('/profile');

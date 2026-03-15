@@ -20,7 +20,7 @@ const BusinessProfileLiveSuccessPage = () => {
 
   // If no state, redirect to manage page
   if (!state?.businessId) {
-    navigate('/business/manage', { replace: true });
+    navigate('/businesses/manage', { replace: true });
     return null;
   }
 
@@ -39,12 +39,12 @@ const BusinessProfileLiveSuccessPage = () => {
     } else if (businessId) {
       navigate(`/business/${businessId}`);
     } else {
-      navigate('/business/manage');
+      navigate('/businesses/manage');
     }
   };
 
   const handleGoToDashboard = () => {
-    navigate('/business/manage');
+    navigate('/businesses/manage');
   };
 
   return (

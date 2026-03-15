@@ -8,7 +8,7 @@ export const USE_VIDEO_PROGRESS_SYNC_V1 = true;
 // Debug flag: Set to true to show ALL achievements as unlocked for Benjamin Holmes
 // Set to false to return to real data
 export const DEBUG_UNLOCK_ALL_ACHIEVEMENTS = false;
-export const DEBUG_ACHIEVEMENTS_USER_EMAIL = 'benjamin@clbhouz.co.uk';
+export const DEBUG_ACHIEVEMENTS_USER_EMAIL = import.meta.env.VITE_DEBUG_USER_EMAIL ?? '';
 
 export const FEATURE_FLAGS = {
   SAFE_AUTOPLAY_V2: USE_SAFE_AUTOPLAY_V2,

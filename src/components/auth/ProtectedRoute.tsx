@@ -41,7 +41,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // If user is not authenticated, redirect to auth page
   if (!user) {
-    console.log('[ProtectedRoute] User not authenticated, redirecting to auth');
+    // Navigate component handles redirect silently
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
@@ -60,7 +60,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // ENFORCE: First-time users must complete onboarding before accessing any protected route
   // Skip this check only for the edit-profile page itself to avoid redirect loops
   if (!skipOnboardingCheck && !onboardingData?.hasCompletedOnboarding) {
-    console.log('[ProtectedRoute] User has not completed onboarding, redirecting to edit-profile');
+    // Navigate component handles redirect silently
     return <Navigate to="/edit-profile" replace />;
   }
 

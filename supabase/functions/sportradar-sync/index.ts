@@ -23,9 +23,9 @@ function getTourSlug(tourName: string): string | null {
   const map: Record<string, string | null> = {
     'PGA': 'pga',
     'LPGA': 'lpga',
-    'EURO': 'eur',
-    'DP': 'eur',
-    'CHAMP': 'champions-tour',
+    'EURO': 'euro',
+    'DP': 'euro',
+    'CHAMP': 'champ',
     'PGAD': 'pgad',
     'LIV': null,    // Sportradar does not provide hole stats for LIV
     'OLY': null,    // Olympics — no hole stats endpoint
@@ -40,9 +40,9 @@ function getTourSlugForTeeTimes(tourName: string): string | null {
   const map: Record<string, string | null> = {
     'PGA': 'pga',
     'LPGA': 'lpga',
-    'EURO': 'eur',
-    'DP': 'eur',
-    'CHAMP': 'champions-tour',
+    'EURO': 'euro',
+    'DP': 'euro',
+    'CHAMP': 'champ',
     'PGAD': 'pgad',
     'LIV': 'liv',     // LIV DOES have tee times
     'OLY': null,
@@ -1359,10 +1359,10 @@ async function syncPlayerStatistics(supabase: any, apiKey: string, tour: string,
   const tourUrlMap: Record<string, string> = {
     pga: 'pga',
     lpga: 'lpga',
-    eur: 'eur',
-    euro: 'eur',
-    'champions-tour': 'champions-tour',
-    champ: 'champions-tour',
+    eur: 'euro',
+    euro: 'euro',
+    'champions-tour': 'champ',
+    champ: 'champ',
     liv: 'liv',
   };
   const tourUrlSlug = tourUrlMap[tour] || tour;
