@@ -254,9 +254,12 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                 We couldn't load {modeDisplayName}. Please try again.
               </p>
               {activeOnRefetch && (
-                <Button variant="outline" size="sm" onClick={activeOnRefetch}>
+                <button
+                  onClick={activeOnRefetch}
+                  className="px-5 py-2.5 bg-[#f59e0b] text-white text-sm font-semibold rounded-full hover:bg-[#e8920f] transition-colors active:scale-[0.97] min-h-[44px]"
+                >
                   Try again
-                </Button>
+                </button>
               )}
             </div>
           )}
