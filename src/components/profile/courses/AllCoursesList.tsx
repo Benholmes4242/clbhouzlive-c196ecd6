@@ -177,10 +177,11 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   if (isLoading) {
     return (
       <div ref={sectionRef} className="py-4">
-        <h3 className="text-base font-semibold text-foreground mb-3">Course History</h3>
+        <div className="h-5 w-32 bg-muted rounded mb-1 animate-pulse" />
+        <div className="h-3 w-48 bg-muted rounded mb-4 animate-pulse" />
         <div className="space-y-2">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-18 bg-muted/50 rounded-xl animate-pulse" />
+            <div key={i} className="h-20 bg-muted rounded-xl animate-pulse" />
           ))}
         </div>
       </div>

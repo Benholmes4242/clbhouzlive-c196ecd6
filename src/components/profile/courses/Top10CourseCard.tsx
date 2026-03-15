@@ -283,13 +283,9 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
               onClick={handleReadFullReview}
               className="flex-1 py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1 transition-all active:scale-[0.98]"
               style={{
-                background: isOutstanding 
-                  ? 'linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)' 
-                  : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
-                boxShadow: isOutstanding 
-                  ? '0 4px 14px rgba(251,191,36,0.25)' 
-                  : '0 4px 14px rgba(107,114,128,0.25)',
-                color: isOutstanding ? '#000' : '#fff',
+                background: 'linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)',
+                boxShadow: '0 4px 14px rgba(251,191,36,0.25)',
+                color: '#000',
               }}
             >
               Read Full Review

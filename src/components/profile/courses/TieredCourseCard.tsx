@@ -91,7 +91,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             {/* Top 100 icon overlay - Chartreus */}
             <div 
               className="absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center shadow-sm"
-              style={{ backgroundColor: 'rgba(193, 168, 76, 0.95)' }}
+              style={{ backgroundColor: '#f59e0b' }}
             >
               <Trophy className="w-3 h-3 text-white" />
             </div>
