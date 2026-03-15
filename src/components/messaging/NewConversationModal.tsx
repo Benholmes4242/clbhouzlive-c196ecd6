@@ -448,7 +448,7 @@ export function NewConversationModal({
                     <Badge
                       key={userProfile.id}
                       variant="secondary"
-                      className="gap-1 pr-1 py-1 bg-primary/10 border-0"
+                      className="gap-1 pr-1 py-1 bg-[hsl(38,92%,50%)]/10 border-0"
                     >
                       <SquircleAvatar
                         src={userProfile.profile_photo_url}
