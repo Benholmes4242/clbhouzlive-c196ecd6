@@ -879,7 +879,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 <div className="flex flex-col justify-center flex-1 space-y-2">
                   {/* Ring Achievement Status */}
                   <div className="space-y-1">
-                    <h3 className="font-semibold text-lg text-black dark:text-white leading-tight">
+                    <h3 className="font-semibold text-lg text-foreground leading-tight">
                       {currentTier ? currentTier.name : "No Ring Achieved"}
                     </h3>
                     <p className="text-base text-black dark:text-white leading-tight">
