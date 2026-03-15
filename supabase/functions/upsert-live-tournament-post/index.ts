@@ -51,7 +51,7 @@ serve(async (req) => {
         actor_id:      SYSTEM_USER_ID,
         post_type:     'tournament_live',
         content:       tournamentId,
-        visibility:    'public',
+        visibility:    'anyone',
         categories:    [],
         badges:        [],
         like_count:    0,
