@@ -423,9 +423,9 @@ const ClubhouseContent = () => {
         <>
           {/* Comments sheet for tournament posts */}
           <CommentsSheet
-            isOpen={commentsOpen && isValidUUID(activePost.id)}
+            isOpen={commentsOpen}
             onClose={closeComments}
-            postId={isValidUUID(activePost.id) ? activePost.id : ''}
+            postId={activePost.id}
             currentUserId={user?.id}
             creatorUserId={activePost.userId}
             creatorName={activePost.displayName}
