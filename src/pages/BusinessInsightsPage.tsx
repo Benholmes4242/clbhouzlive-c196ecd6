@@ -1,3 +1,4 @@
+// TODO: DEAD CODE — route /business/insights is legacy. All navigation uses /business/:id/insights (BusinessInsightsPageV2). Flag for deletion.
 import { useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useProfileData } from '@/hooks/useProfileData';
