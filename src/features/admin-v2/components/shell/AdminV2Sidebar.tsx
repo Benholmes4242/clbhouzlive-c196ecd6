@@ -76,7 +76,7 @@ function SectionLabel({ label }: { label: string }) {
 
 // ─── Collapsible group (Tools) ─────────────────────────────────────
 
-function CollapsibleGroup({ group }: { group: NavGroup }) {
+function CollapsibleGroup({ group, onNavigate }: { group: NavGroup; onNavigate?: () => void }) {
   const [open, setOpen] = useState(() => {
     try {
       const stored = localStorage.getItem(`admin-v2-group-${group.id}`);
