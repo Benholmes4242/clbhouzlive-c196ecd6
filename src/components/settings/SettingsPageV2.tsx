@@ -179,6 +179,7 @@ export function SettingsPageV2() {
             icon={<Shield size={18} />}
             title="Show Handicap"
             subtitle="Display your handicap index on your profile"
+            iconTheme="privacy"
             checked={privacy.showHandicap}
             disabled={privacy.isUpdatingHandicap}
             onCheckedChange={privacy.toggleHandicap}
