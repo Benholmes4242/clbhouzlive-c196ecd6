@@ -568,10 +568,14 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           {/* Join conversation */}
           <button onClick={onComment} style={{
             flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            background: 'hsl(var(--accent-amber))', border: 'none', cursor: 'pointer',
-            borderRadius: 22, padding: '10px 16px',
-            fontSize: 14, fontWeight: 700, color: '#000',
-            animation: 'trlive-ctaPulse 2.5s ease-in-out infinite',
+            background: 'linear-gradient(180deg, rgba(251,191,36,0.6) 0%, rgba(245,158,11,0.42) 50%, rgba(180,115,0,0.5) 100%)',
+            border: '1px solid rgba(251,191,36,0.5)',
+            borderTop: '1px solid rgba(255,240,180,0.35)',
+            borderRadius: 14, padding: '10px 12px', cursor: 'pointer',
+            fontSize: 'clamp(12px, 3.2vw, 14px)', fontWeight: 700, color: '#fff',
+            animation: 'trlive-ctaPulse 3.5s ease-in-out infinite',
+            boxShadow: '0 2px 12px rgba(245,158,11,0.3), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.15)',
+            textShadow: '0 1px 2px rgba(0,0,0,0.25)',
           }}>
             💬
             <span>Join the conversation</span>

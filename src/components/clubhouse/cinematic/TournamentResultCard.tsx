@@ -568,11 +568,15 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
           <button onClick={onComment} style={{
             flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            background: tour.accentColor, border: 'none', borderRadius: 10,
-            padding: '10px 16px', cursor: 'pointer', color: '#fff',
-            fontSize: 14, fontWeight: 700, letterSpacing: 0.3,
+            background: 'linear-gradient(180deg, rgba(251,146,60,0.55) 0%, rgba(234,88,12,0.38) 50%, rgba(194,65,12,0.45) 100%)',
+            border: '1px solid rgba(251,146,60,0.5)',
+            borderTop: '1px solid rgba(255,200,150,0.35)',
+            borderRadius: 22, padding: '8px 8px', cursor: 'pointer', color: '#fff',
+            fontSize: 'clamp(11px, 3vw, 13px)', fontWeight: 700, letterSpacing: 0.3,
             animation: 'trc-ctaPulse 2.5s ease-in-out infinite',
             animationDelay: '1.5s',
+            boxShadow: '0 2px 12px rgba(249,115,22,0.3), inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -1px 0 rgba(0,0,0,0.15)',
+            textShadow: '0 1px 2px rgba(0,0,0,0.3)',
           }}>
             <span>💬</span>
             <span style={{
