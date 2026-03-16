@@ -195,43 +195,7 @@ export function ComposerScreen() {
           </div>
         </div>
 
-        {/* Review rating card */}
-        <AnimatePresence>
-          {state.postType === 'review' && (
-            <motion.div initial={{ height: 0, opacity: 0, y: -8 }} animate={{ height: 'auto', opacity: 1, y: 0 }} exit={{ height: 0, opacity: 0, y: -8 }} transition={{ type: 'spring', damping: 28, stiffness: 360 }} className="overflow-hidden mx-4 mt-2">
-              <div className="p-4 rounded-[24px]" style={{ background: `linear-gradient(135deg, ${AMBER_GHOST} 0%, rgba(245,158,11,0.04) 100%)`, border: '1px solid rgba(245,158,11,0.20)' }}>
-                <p className="text-[13px] font-medium mb-3 text-center" style={{ color: AMBER_DIM }}>Course Rating</p>
-                <div className="flex items-center justify-center gap-1">
-                  {[1, 2, 3, 4, 5].map((star) => {
-                    const isActive = (state.reviewRating ?? 0) >= star;
-                    return (
-                      <motion.button key={star} whileTap={{ scale: 0.85 }} onClick={() => setReviewRating(star === state.reviewRating ? null : star)} className="flex items-center justify-center" style={{ minWidth: 44, minHeight: 44 }}>
-                        <motion.div animate={{ scale: isActive ? 1.15 : 1 }} transition={{ type: 'spring', damping: 20, stiffness: 400 }}>
-                          <Star className="w-9 h-9" strokeWidth={1.5} style={{ fill: isActive ? AMBER : 'transparent', color: isActive ? AMBER : 'rgba(255,255,255,0.20)', filter: isActive ? 'drop-shadow(0 0 8px rgba(245,158,11,0.7))' : 'none' }} />
-                        </motion.div>
-                      </motion.button>
-                    );
-                  })}
-                </div>
-                {/* Animated rating label */}
-                <AnimatePresence>
-                  {state.reviewRating && (
-                    <motion.p
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 6 }}
-                      className="text-3xl font-bold text-center mt-3"
-                      style={{ color: AMBER }}
-                    >
-                      {state.reviewRating}.0 ★
-                    </motion.p>
-                  )}
-                </AnimatePresence>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <div className="h-6" />
+        <div className="h-10" />
       </div>
 
       {/* Studio Shelf — crop, filter, text, music */}
