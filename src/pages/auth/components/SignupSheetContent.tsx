@@ -179,7 +179,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 overflow-y-auto" style={{ maxHeight: '60vh' }}>
       {/* Back button and email display - breadcrumb style */}
       <div 
         className="flex items-center gap-2.5 py-2 px-3 rounded-xl -mx-1"
