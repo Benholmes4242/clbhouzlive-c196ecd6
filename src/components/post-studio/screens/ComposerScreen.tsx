@@ -97,7 +97,7 @@ export function ComposerScreen() {
   return (
     <div className="flex-1 flex flex-col" style={{ background: BG_BASE }}>
       <StudioHeader
-        title="Compose"
+        title="Moment"
         step="COMPOSER"
         leftAction={{ label: 'Back', onClick: () => setStep('MEDIA_PICKER') }}
         rightAction={{ label: 'Review', onClick: () => setStep('PUBLISH'), variant: 'primary', disabled: !isValid }}
