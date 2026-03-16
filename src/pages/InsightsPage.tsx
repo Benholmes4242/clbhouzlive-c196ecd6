@@ -13,6 +13,7 @@ import { useQuery } from '@tanstack/react-query';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useProfileData } from '@/hooks/useProfileData';
 import { supabase } from '@/integrations/supabase/client';
+import { Skeleton } from '@/components/ui/skeleton';
 import { 
   BarChart3, 
   TrendingUp, 
