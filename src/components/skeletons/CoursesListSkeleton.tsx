@@ -8,7 +8,7 @@ import { SkeletonText } from "@/components/ui/skeleton-text"
 export const CoursesListSkeleton = () => {
   return (
     <div className="min-h-screen bg-background page-with-header">
-      <main className="px-4 md:container md:mx-auto md:px-0 pt-[72px] pb-6">
+      <main className="px-4 md:container md:mx-auto md:px-0 pb-6" style={{ paddingTop: 'var(--header-h-mobile, 55px)' }}>
         <div className="max-w-6xl mx-auto">
           <div className="space-y-6">
             {/* Title and subtitle */}
