@@ -11,8 +11,11 @@ export const ClubhouseSkeleton = () => {
         <div className="absolute inset-0 bg-white/8 clb-shimmer-dark" />
         
         {/* Bottom HUD skeleton - matches CreatorCapsule */}
-        <div className="absolute bottom-24 left-3 z-10">
-          <div className="glass-dark rounded-2xl px-4 py-3 min-w-[240px] max-w-[300px] space-y-0.5">
+        <div
+          className="absolute left-3 z-10"
+          style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 85px + 12px)' }}
+        >
+          <div className="glass-dark rounded-2xl px-4 py-3 min-w-[200px] max-w-[75vw] space-y-0.5">
             {/* Avatar + name */}
             <div className="flex items-center gap-2">
               <div className="w-9 h-9 rounded-full bg-white/10 clb-shimmer-dark shrink-0" />
@@ -34,7 +37,10 @@ export const ClubhouseSkeleton = () => {
         </div>
         
         {/* Right rail skeleton */}
-        <div className="absolute right-3 bottom-24 z-10 flex flex-col gap-5">
+        <div
+          className="absolute right-3 z-10 flex flex-col gap-3"
+          style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 85px + 12px)' }}
+        >
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="flex flex-col items-center gap-1">
               <div className="glass-dark w-[50px] h-[50px] rounded-full flex items-center justify-center">

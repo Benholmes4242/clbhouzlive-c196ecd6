@@ -47,7 +47,7 @@ import { UploadResilienceProvider } from '@/contexts/UploadResilienceContext';
 import { useUploadGuard } from '@/hooks/useUploadGuard';
 import { FLAGS } from '@/config/flags';
 import { FEATURE_FLAGS } from '@/config/featureFlags';
-import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
+
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { CoursesListSkeleton } from '@/components/skeletons/CoursesListSkeleton';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';

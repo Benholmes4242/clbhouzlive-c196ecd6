@@ -1,7 +1,7 @@
 import React, { useEffect, lazy, Suspense } from 'react';
 import { useHeader } from '@/contexts/GlobalHeaderContext';
 import { useSearchParams } from 'react-router-dom';
-import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
+import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 
 // Lazy load Clubhouse to avoid static/dynamic import conflict with App.tsx
 const Clubhouse = lazy(() => import('./Clubhouse'));
@@ -17,7 +17,7 @@ const ClubhouseWrapped = () => {
 
   return (
     <>
-      <Suspense fallback={<ClubhouseSkeleton />}>
+      <Suspense fallback={<ClubhouseSkeletonShimmer isVisible={true} isStatic={true} />}>
         <Clubhouse />
       </Suspense>
       {showGlass && (
