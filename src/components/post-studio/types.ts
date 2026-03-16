@@ -183,7 +183,8 @@ export type PostStudioAction =
   | { type: 'SET_DISCARDING'; payload: boolean }
   | { type: 'OPEN_PANEL'; payload: PanelId }
   | { type: 'CLOSE_PANEL' }
-  | { type: 'RESET' };
+  | { type: 'RESET' }
+  | { type: 'UPDATE_MEDIA_EDITS'; payload: { id: string; edits: StudioEdits } };
 
 // ============================================================================
 // PROPS
