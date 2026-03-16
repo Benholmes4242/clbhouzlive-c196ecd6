@@ -91,7 +91,6 @@ export function PersonalProfileWizard() {
   if (loading) {
     return <ProfileSkeleton />;
   }
-  }
 
   return createPortal(
     <>
