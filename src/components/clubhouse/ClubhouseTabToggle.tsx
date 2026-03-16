@@ -52,7 +52,7 @@ export const ClubhouseTabToggle = ({
         aria-selected={activeTab === 'friends'}
         onClick={() => onTabChange('friends')}
         className={cn(
-          "text-sm transition-all duration-200 whitespace-nowrap py-3 px-1 active:scale-[0.97]",
+          "text-sm transition-all duration-200 whitespace-nowrap px-1 min-h-[44px] flex items-center active:scale-[0.97]",
           activeTab === 'friends' 
             ? "text-white opacity-100 font-semibold" 
             : "text-white opacity-50 font-medium"

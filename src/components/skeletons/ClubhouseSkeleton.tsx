@@ -37,7 +37,10 @@ export const ClubhouseSkeleton = () => {
         </div>
         
         {/* Right rail skeleton */}
-        <div className="absolute right-3 bottom-24 z-10 flex flex-col gap-5">
+        <div
+          className="absolute right-3 z-10 flex flex-col gap-3"
+          style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 85px + 12px)' }}
+        >
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="flex flex-col items-center gap-1">
               <div className="glass-dark w-[50px] h-[50px] rounded-full flex items-center justify-center">

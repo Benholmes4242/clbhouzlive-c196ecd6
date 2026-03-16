@@ -373,7 +373,10 @@ const ClubhouseContent = () => {
 
       {/* ═══ MAIN FEED AREA ═══ */}
       {!isLoading && posts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center min-h-screen px-8 text-center">
+        <div
+          className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
+          style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 64px)' }}
+        >
           <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
             <Compass className="w-8 h-8 text-white/30" />
           </div>
