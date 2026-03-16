@@ -63,7 +63,7 @@ export function MentionBottomSheet({ isOpen, onClose, onSelect, query: initialQu
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        className="fixed inset-x-0 bottom-0 z-50 bg-background rounded-t-[20px] border-t border-border/50 max-h-[50vh] flex flex-col"
+        className="fixed bottom-0 z-50 w-full max-w-[480px] left-1/2 -translate-x-1/2 bg-background rounded-t-[20px] border-t border-border/50 max-h-[50vh] flex flex-col"
       >
         <div className="flex justify-center pt-2.5 pb-1">
           <div className="w-9 h-1 rounded-full bg-muted-foreground/30" />

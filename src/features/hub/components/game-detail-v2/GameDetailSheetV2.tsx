@@ -139,7 +139,7 @@ export function GameDetailSheetV2({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
-            className="fixed inset-x-0 bottom-0 z-[10002] flex flex-col rounded-t-[24px] overflow-hidden"
+            className="fixed bottom-0 z-[10002] w-full max-w-[480px] left-1/2 -translate-x-1/2 flex flex-col rounded-t-[24px] overflow-hidden"
             style={{
               height: '95svh',
               maxHeight: '95svh',

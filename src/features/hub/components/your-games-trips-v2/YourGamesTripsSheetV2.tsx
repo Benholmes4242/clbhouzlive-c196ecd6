@@ -196,7 +196,7 @@ export function YourGamesTripsSheetV2({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
-            className={`fixed inset-x-0 bottom-0 z-[10000] flex flex-col rounded-t-[24px] overflow-hidden your-games-trips-sheet-wrapper ${hasStackedSheet ? 'stacked-behind trip-stacked-behind' : ''}`}
+            className={`fixed bottom-0 z-[10000] w-full max-w-[480px] left-1/2 -translate-x-1/2 flex flex-col rounded-t-[24px] overflow-hidden your-games-trips-sheet-wrapper ${hasStackedSheet ? 'stacked-behind trip-stacked-behind' : ''}`}
             style={{
               height: '90svh',
               maxHeight: '90svh',
