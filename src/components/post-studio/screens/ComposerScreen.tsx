@@ -226,9 +226,6 @@ export function ComposerScreen() {
               }}
               maxLength={POST_LIMITS.MAX_CAPTION_LENGTH + 100}
             />
-            <div className="absolute bottom-3 right-4">
-              <CharacterRing count={charCount} />
-            </div>
           </div>
 
           <AnimatePresence>
