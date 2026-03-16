@@ -136,16 +136,16 @@ export function StudioHeader({
         </div>
       </div>
 
-      {/* Progress bar — thicker, more visible */}
+      {/* Progress bar */}
       {showProgress && (
-        <div style={{ height: '3px', background: 'rgba(255,255,255,0.08)' }}>
+        <div style={{ height: '4px', background: 'rgba(255,255,255,0.08)' }}>
           <motion.div
             className="h-full"
             initial={false}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             style={{
-              background: `linear-gradient(90deg, ${AMBER}, ${AMBER_DEEP})`,
+              background: 'rgba(255,255,255,0.90)',
               borderRadius: '0 2px 2px 0',
             }}
           />
