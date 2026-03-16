@@ -47,8 +47,8 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
       <section className="bg-card border border-border rounded-[18px] p-4 md:p-5">
         <h3 className="text-[0.9rem] font-medium text-foreground mb-4">Reviews & reputation</h3>
         <div className="space-y-3 px-4">
-          <div className="h-20 bg-muted animate-pulse rounded-2xl" />
-          <div className="h-20 bg-muted animate-pulse rounded-2xl" />
+          <Skeleton className="h-20 rounded-2xl" />
+          <Skeleton className="h-20 rounded-2xl" />
         </div>
       </section>
     );
