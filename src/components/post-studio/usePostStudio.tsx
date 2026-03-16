@@ -257,6 +257,7 @@ export function PostStudioProvider({
   const openPanel = useCallback((panelId: PanelId) => dispatch({ type: 'OPEN_PANEL', payload: panelId }), []);
   const closePanel = useCallback(() => dispatch({ type: 'CLOSE_PANEL' }), []);
   const setDiscarding = useCallback((value: boolean) => dispatch({ type: 'SET_DISCARDING', payload: value }), []);
+  const setMentionTriggerIndex = useCallback((index: number) => dispatch({ type: 'SET_MENTION_TRIGGER', payload: index }), []);
   const reset = useCallback(() => dispatch({ type: 'RESET' }), []);
 
   const value = useMemo<PostStudioContextValue>(
