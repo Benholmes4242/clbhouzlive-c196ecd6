@@ -56,9 +56,9 @@ function StudioScreenRouter({ onClose }: { onClose: () => void }) {
   );
 }
 
-function renderScreen(step: StudioStep, onSuccessDone: () => void) {
+function renderScreen(step: StudioStep, onSuccessDone: () => void, onClose: () => void) {
   switch (step) {
-    case 'MEDIA_PICKER': return <MediaPickerScreen />;
+    case 'MEDIA_PICKER': return <MediaPickerScreen onClose={onClose} />;
     case 'COMPOSER':     return <ComposerScreen />;
     case 'TRIM':         return <TrimScreen />;
     case 'POSTER':       return <PosterScreen />;
