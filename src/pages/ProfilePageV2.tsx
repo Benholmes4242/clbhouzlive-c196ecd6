@@ -25,6 +25,7 @@ import { toast } from 'sonner';
 import { Trophy, ChevronRight, ChevronDown, MoreHorizontal, Send, UserPlus, Check, ExternalLink, Loader2, ArrowLeft, Pencil, Camera, Share2, Link2, Flag, Ban, Settings, Building2 } from 'lucide-react';
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { PageRoot } from '@/components/layout/PageRoot';
+import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { safeGoBack } from '@/utils/navigation';
@@ -355,11 +356,7 @@ const ProfilePageV2Content: React.FC = () => {
   };
 
   if (authLoading || profileLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-8 h-8 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
-      </div>
-    );
+    return <ProfileSkeleton />;
   }
 
   // Show "Profile unavailable" for deleted or not found profiles
@@ -985,7 +982,7 @@ const ProfilePageV2Content: React.FC = () => {
         {/* Segmented control tabs - matches schedule page exactly */}
         {/* Explicit touch-action and z-index to ensure tappability on mobile */}
         <section 
-          className="px-4 py-2 relative flex justify-center"
+          className="px-4 py-2 relative"
           style={{ 
             touchAction: 'auto',
             pointerEvents: 'auto',
@@ -993,11 +990,7 @@ const ProfilePageV2Content: React.FC = () => {
           }}
         >
           <div 
-            className="inline-flex items-center gap-1"
-            style={{ 
-              touchAction: 'auto',
-              pointerEvents: 'auto'
-            }}
+            className="flex items-center gap-1 w-full"
           >
             {tabs.map((tab) => {
               const isActive = activeSection === tab.id;
@@ -1006,7 +999,7 @@ const ProfilePageV2Content: React.FC = () => {
                   key={tab.id}
                   onClick={() => handleTabChange(tab.id)}
                   className={cn(
-                    "relative py-1.5 px-4 text-sm transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] rounded-lg",
+                    "relative py-1.5 px-2 text-sm transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] rounded-lg flex-1",
                     isActive 
                       ? "bg-[#f59e0b] text-white font-semibold shadow-sm" 
                       : "text-muted-foreground font-medium hover:text-foreground"

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, BarChart3, Star, MessageCircle } from 'lucide-react';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
@@ -46,8 +47,8 @@ const ReviewsSection = ({ businessId, navigate }: { businessId: string; navigate
       <section className="bg-card border border-border rounded-[18px] p-4 md:p-5">
         <h3 className="text-[0.9rem] font-medium text-foreground mb-4">Reviews & reputation</h3>
         <div className="space-y-3 px-4">
-          <div className="h-20 bg-muted animate-pulse rounded-2xl" />
-          <div className="h-20 bg-muted animate-pulse rounded-2xl" />
+          <Skeleton className="h-20 rounded-2xl" />
+          <Skeleton className="h-20 rounded-2xl" />
         </div>
       </section>
     );
@@ -219,9 +220,9 @@ const BusinessInsightsPageV2 = () => {
     return (
       <PageRoot className="min-h-screen bg-background">
         <div className="space-y-4 px-4 pt-4">
-          <div className="h-32 bg-muted animate-pulse rounded-2xl" />
-          <div className="h-24 bg-muted animate-pulse rounded-2xl" />
-          <div className="h-24 bg-muted animate-pulse rounded-2xl" />
+          <Skeleton className="h-32 rounded-2xl" />
+          <Skeleton className="h-24 rounded-2xl" />
+          <Skeleton className="h-24 rounded-2xl" />
         </div>
       </PageRoot>
     );

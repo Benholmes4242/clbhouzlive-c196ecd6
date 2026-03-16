@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Plus, Users, MoreHorizontal, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -158,10 +159,10 @@ export default function BusinessTeamPage() {
               <div className="space-y-3 py-2">
                 {[0, 1, 2].map((i) => (
                   <div key={i} className="flex items-center gap-3 py-2">
-                    <div className="w-11 h-11 rounded-2xl bg-muted animate-pulse shrink-0" />
+                    <Skeleton className="w-11 h-11 rounded-2xl shrink-0" />
                     <div className="flex-1 space-y-2">
-                      <div className="h-4 bg-muted animate-pulse rounded-lg w-1/2" />
-                      <div className="h-3 bg-muted animate-pulse rounded-lg w-1/3" />
+                      <Skeleton className="h-4 w-1/2" />
+                      <Skeleton className="h-3 w-1/3" />
                     </div>
                   </div>
                 ))}
