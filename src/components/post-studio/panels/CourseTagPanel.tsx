@@ -203,7 +203,7 @@ export function CourseTagPanel() {
                   </div>
                 </div>
                 {isTagged && (
-                  <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full shrink-0" style={{ background: AMBER_GHOST, color: AMBER_DIM }}>
+                  <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full shrink-0" style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.40)' }}>
                     Added
                   </span>
                 )}

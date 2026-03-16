@@ -45,8 +45,8 @@ export function MediaReel({ items, activeIndex, onSelect, onRemove, onAddMore }:
       </AnimatePresence>
 
       {items.length < 10 && (
-        <motion.button whileTap={{ scale: 0.93 }} onClick={onAddMore} className="shrink-0 rounded-xl flex items-center justify-center" style={{ width: THUMB, height: THUMB, border: '1.5px dashed rgba(232,152,10,0.30)', background: AMBER_GHOST }}>
-          <Plus className="w-5 h-5" style={{ color: AMBER_DIM }} strokeWidth={2} />
+        <motion.button whileTap={{ scale: 0.93 }} onClick={onAddMore} className="shrink-0 rounded-xl flex items-center justify-center" style={{ width: THUMB, height: THUMB, border: '1.5px dashed rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.04)' }}>
+          <Plus className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
         </motion.button>
       )}
     </div>

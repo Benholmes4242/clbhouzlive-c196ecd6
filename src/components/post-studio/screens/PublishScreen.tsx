@@ -191,7 +191,7 @@ export function PublishScreen() {
               </p>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-[12px] font-medium" style={{ color: state.scheduledAt ? AMBER : TEXT_TERTIARY }}>
+              <span className="text-[12px] font-medium" style={{ color: 'rgba(255,255,255,0.55)' }}>
                 {state.scheduledAt
                   ? state.scheduledAt.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
                   : 'Now'}

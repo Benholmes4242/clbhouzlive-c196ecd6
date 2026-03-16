@@ -210,7 +210,7 @@ export function MentionPanel() {
                   </p>
                 )}
               </div>
-              <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ background: AMBER_GHOST, color: AMBER_DIM }}>
+              <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.45)' }}>
                 {entity.entity_type === 'business' ? 'Club' : 'Golfer'}
               </span>
             </motion.button>

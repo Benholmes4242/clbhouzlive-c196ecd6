@@ -145,8 +145,8 @@ export function DraftsPanel() {
                     {thumbnailUrl ? (
                       <img src={thumbnailUrl} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center" style={{ background: AMBER_GHOST }}>
-                        <FileText className="w-8 h-8" style={{ color: 'rgba(232,152,10,0.50)' }} strokeWidth={1.5} />
+                      <div className="w-full h-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                        <FileText className="w-8 h-8" style={{ color: 'rgba(255,255,255,0.15)' }} strokeWidth={1.5} />
                       </div>
                     )}
 

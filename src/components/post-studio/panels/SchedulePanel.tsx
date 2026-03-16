@@ -155,7 +155,7 @@ export function SchedulePanel() {
                     }}
                   />
                   {state.scheduledAt && (
-                    <p className="px-4 pb-3 text-xs" style={{ color: 'rgba(232,152,10,0.70)' }}>
+                    <p className="px-4 pb-3 text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
                       Will post {state.scheduledAt.toLocaleDateString('en-GB', {
                         weekday: 'long', day: 'numeric', month: 'long',
                         hour: 'numeric', minute: '2-digit',
