@@ -210,7 +210,10 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
             value={username}
             onChange={(e) => handleUsernameChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            onFocus={() => setUsernameFocused(true)}
+            onFocus={(e) => {
+              setUsernameFocused(true);
+              setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+            }}
             onBlur={() => setUsernameFocused(false)}
             placeholder="Username"
             disabled={submitting}
