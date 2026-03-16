@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ExternalLink, ChevronDown, ChevronUp, MapPin, Loader2, Pencil } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import AboutMediaStrip from './AboutMediaStrip';
 import { useCourseCoordinates } from '@/hooks/useCourseCoordinates';
 import { LocationMapCard } from '@/components/map';
@@ -247,7 +248,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         
         {coordsLoading && (
           <div className="px-4">
-            <div className="w-full h-[200px] bg-muted animate-pulse rounded-sq-md border border-border" />
+            <Skeleton className="w-full h-[200px] rounded-sq-md" />
           </div>
         )}
 
