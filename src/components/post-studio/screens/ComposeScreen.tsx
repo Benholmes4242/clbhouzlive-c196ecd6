@@ -575,6 +575,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             onSelect={setActiveMedia}
             onRemove={removeMedia}
             onEdit={handleEdit}
+            onTrim={handleTrim}
+            onCover={handleCover}
             onSetCover={setCoverIndex}
             onAddMore={() => fileInputRef.current?.click()}
           />
