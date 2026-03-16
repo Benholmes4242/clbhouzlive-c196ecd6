@@ -136,11 +136,7 @@ export function LeaderboardListSkeleton({ count = 6 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <div 
           key={i} 
-          className={cn(
-            "flex items-center gap-3 px-4 py-3",
-            shimmerClass
-          )}
-          style={{ animationDelay: `${i * 50}ms` }}
+          className="flex items-center gap-3 px-4 py-3"
         >
           {/* Rank */}
           <Skeleton className="h-5 w-8" />
