@@ -6,6 +6,7 @@
  */
 
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, ChevronLeft } from 'lucide-react';
@@ -155,18 +156,18 @@ export function LeadersTab() {
   // ─── Loading skeleton ───
   if (isLoading) {
     return (
-      <div className="space-y-4 animate-pulse py-4">
-        <div className="rounded-2xl bg-muted/40" style={{ height: '45dvh' }} />
+      <div className="space-y-4 py-4">
+        <Skeleton className="rounded-2xl w-full" style={{ height: '45dvh' }} />
         {/* Runner card skeletons */}
         <div className="flex gap-2 px-4" style={{ marginTop: '-20px', position: 'relative', zIndex: 10 }}>
-          <div className="flex-1 h-[60px] rounded-2xl bg-muted/40 animate-pulse" />
-          <div className="flex-1 h-[60px] rounded-2xl bg-muted/40 animate-pulse" />
+          <Skeleton className="flex-1 h-[60px] rounded-2xl" />
+          <Skeleton className="flex-1 h-[60px] rounded-2xl" />
         </div>
-        <div className="mx-4 mt-3 h-[48px] rounded-2xl bg-muted/40 animate-pulse" />
-        <div className="mx-4 mt-3 h-[72px] rounded-xl bg-muted/40 animate-pulse" />
+        <Skeleton className="mx-4 mt-3 h-[48px] rounded-2xl" />
+        <Skeleton className="mx-4 mt-3 h-[72px] rounded-xl" />
         <div className="rounded-2xl border border-border/30 overflow-hidden mx-4">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-[60px] border-b border-border/20 bg-muted/20" />
+            <Skeleton key={i} className="h-[60px] rounded-none border-b border-border/20" />
           ))}
         </div>
       </div>

@@ -4,6 +4,7 @@
  */
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
 import { Search, X, ChevronDown, ChevronLeft, RefreshCw } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -412,12 +413,12 @@ export function PlayersTab() {
   if (isLoading) {
     return (
       <div className="space-y-4 py-6">
-        <div className="bg-muted/40 animate-pulse" style={{ height: '45dvh' }} />
+        <Skeleton className="w-full" style={{ height: '45dvh' }} />
         <div className="px-4 space-y-3">
-          <div className="bg-muted/40 h-12 rounded-2xl animate-pulse" />
-          <div className="bg-muted/40 h-11 rounded-2xl animate-pulse" />
+          <Skeleton className="h-12 rounded-2xl" />
+          <Skeleton className="h-11 rounded-2xl" />
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-[100px] bg-muted/20 rounded-2xl animate-pulse" />
+            <Skeleton key={i} className="h-[100px] rounded-2xl" />
           ))}
         </div>
       </div>

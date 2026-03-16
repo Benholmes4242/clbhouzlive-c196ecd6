@@ -10,6 +10,7 @@
  */
 
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Search, X, AlertCircle, RefreshCw, ChevronLeft } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -354,12 +355,12 @@ export function ScheduleTab() {
   if (isLoading) {
     return (
       <div className="space-y-6 -mx-4">
-        <div className="animate-pulse bg-muted" style={{ height: '45dvh' }} />
+        <Skeleton className="w-full" style={{ height: '45dvh' }} />
         <div className="px-4 space-y-3">
-          <div className="h-12 bg-muted rounded-xl w-full animate-pulse" />
-          <div className="h-11 bg-muted rounded-xl animate-pulse" />
+          <Skeleton className="h-12 rounded-xl w-full" />
+          <Skeleton className="h-11 rounded-xl" />
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-20 bg-muted rounded-2xl animate-pulse" />
+            <Skeleton key={i} className="h-20 rounded-2xl" />
           ))}
         </div>
       </div>

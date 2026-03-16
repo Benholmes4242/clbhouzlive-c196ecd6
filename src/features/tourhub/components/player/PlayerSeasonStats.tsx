@@ -173,7 +173,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
         className="sticky top-0 z-20 bg-background/95 backdrop-blur-md pb-3"
         style={{ borderBottom: '1px solid hsl(var(--border) / 0.15)', paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
       >
-        <div className="flex gap-1.5" role="tablist" aria-label="Season Performance Stats">
+        <div className="flex gap-1.5 overflow-x-auto scrollbar-hide" role="tablist" aria-label="Season Performance Stats">
           {TABS.map((tab) => {
             const isActive = activeTab === tab;
             return (
@@ -183,7 +183,7 @@ export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
                 aria-selected={isActive}
                 onClick={() => setActiveTab(tab)}
                 className={cn(
-                  "px-3 py-1.5 transition-all text-center",
+                  "px-3 py-1.5 transition-all text-center shrink-0",
                   isActive
                     ? "text-foreground"
                     : "text-muted-foreground"

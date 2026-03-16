@@ -4,6 +4,7 @@
  */
 
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, TrendingUp, AlertCircle, RefreshCw, ChevronLeft } from 'lucide-react';
@@ -107,22 +108,20 @@ export function PlayerProfilePage() {
   if (playerLoading) {
     return (
       <PageRoot className="min-h-screen w-full bg-background" immersive immersiveStatusBar>
-        <div className="animate-pulse">
-          <div style={{ height: '45dvh' }} className="bg-muted" />
-          <div className="bg-card" style={{ padding: '14px 4px', borderBottom: '1px solid hsl(var(--border) / 0.1)' }}>
-            <div className="flex justify-between px-4">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="text-center space-y-1">
-                  <div className="h-3 w-10 bg-muted rounded mx-auto" />
-                  <div className="h-5 w-8 bg-muted rounded mx-auto" />
-                </div>
-              ))}
-            </div>
+        <Skeleton className="w-full" style={{ height: '45dvh' }} />
+        <div className="bg-card" style={{ padding: '14px 4px', borderBottom: '1px solid hsl(var(--border) / 0.1)' }}>
+          <div className="flex justify-between px-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="text-center space-y-1">
+                <Skeleton className="h-3 w-10 mx-auto" />
+                <Skeleton className="h-5 w-8 mx-auto" />
+              </div>
+            ))}
           </div>
-          <div className="px-4 mt-6 space-y-6">
-            <div className="h-48 bg-muted/30 rounded" />
-            <div className="h-64 bg-muted/30 rounded" />
-          </div>
+        </div>
+        <div className="px-4 mt-6 space-y-6">
+          <Skeleton className="h-48 rounded-lg" />
+          <Skeleton className="h-64 rounded-lg" />
         </div>
       </PageRoot>
     );

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Menu, Swords, GitCompare, Crown, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
 import { openTourNav } from '../contexts/TourNavContext';
@@ -188,9 +189,9 @@ export function CollegeProfilePage() {
         {/* Content — centered */}
         {isLoading ? (
           <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8" style={{ paddingTop: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 80px)' }}>
-            <div className="w-[140px] h-[140px] bg-white/10 animate-pulse mb-4" style={{ borderRadius: '34%' }} />
-            <div className="h-8 w-48 bg-white/10 rounded animate-pulse mb-2" />
-            <div className="h-4 w-32 bg-white/10 rounded animate-pulse" />
+            <Skeleton className="w-[140px] h-[140px] bg-white/10 mb-4" style={{ borderRadius: '34%' }} />
+            <Skeleton className="h-8 w-48 bg-white/10 mb-2" />
+            <Skeleton className="h-4 w-32 bg-white/10" />
           </div>
         ) : (college || stats) ? (
           <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8" style={{ paddingTop: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 80px)' }}>

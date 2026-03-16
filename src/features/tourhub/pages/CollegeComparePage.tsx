@@ -1,4 +1,5 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Menu, ChevronLeft } from 'lucide-react';
 import { TourHubShell } from '../components';
 import { CollegeCompareHero } from '../components/college/CollegeCompareHero';
@@ -77,15 +78,15 @@ export function CollegeComparePage() {
               /* Skeleton VS header inside hero */
               <div className="flex items-center w-full max-w-xs">
                 <div className="flex-1 flex flex-col items-center gap-2">
-                  <div className="w-20 h-20 rounded-xl bg-white/10 animate-pulse" />
-                  <div className="h-4 w-24 rounded bg-white/10 animate-pulse" />
+                  <Skeleton className="w-20 h-20 rounded-xl bg-white/10" />
+                  <Skeleton className="h-4 w-24 bg-white/10" />
                 </div>
                 <div className="w-16 flex justify-center">
                   <span className="text-white/30" style={{ fontSize: 16, fontWeight: 800 }}>VS</span>
                 </div>
                 <div className="flex-1 flex flex-col items-center gap-2">
-                  <div className="w-20 h-20 rounded-xl bg-white/10 animate-pulse" />
-                  <div className="h-4 w-24 rounded bg-white/10 animate-pulse" />
+                  <Skeleton className="w-20 h-20 rounded-xl bg-white/10" />
+                  <Skeleton className="h-4 w-24 bg-white/10" />
                 </div>
               </div>
             ) : data ? (
@@ -165,9 +166,9 @@ export function CollegeComparePage() {
           ) : isLoading ? (
             <div style={{ paddingTop: 16 }}>
               {/* Summary card skeleton */}
-              <div className="h-24 rounded-2xl bg-muted animate-pulse mb-4" />
+              <Skeleton className="h-24 rounded-2xl mb-4" />
               {/* Stats skeleton */}
-              <div className="h-48 rounded-2xl bg-muted animate-pulse" />
+              <Skeleton className="h-48 rounded-2xl" />
             </div>
           ) : error ? (
             <div className="text-center py-16">
