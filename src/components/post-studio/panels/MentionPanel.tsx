@@ -28,9 +28,9 @@ export function MentionPanel() {
   const dragControls = useDragControls();
 
   useEffect(() => {
-    const atIndex = state.caption.lastIndexOf('@');
-    if (atIndex >= 0) {
-      const typed = state.caption.slice(atIndex + 1).trim();
+    const triggerIndex = state.mentionTriggerIndex;
+    if (triggerIndex >= 0) {
+      const typed = state.caption.slice(triggerIndex + 1).trim();
       if (typed.length > 0 && typed.length < 20) setQuery(typed);
     }
     setTimeout(() => inputRef.current?.focus(), 100);
