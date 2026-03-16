@@ -223,8 +223,8 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
                       <span className="text-[11px] font-bold text-black">{index + 1}</span>
                     </div>
                     {item.mediaType === 'video' && (
-                      <div className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded-md" style={{ background: 'rgba(0,0,0,0.70)', backdropFilter: 'blur(4px)' }}>
-                        <span className="text-white text-[10px] font-medium">{item.duration ? formatTime(item.duration) : 'Video'}</span>
+                      <div className="absolute bottom-1.5 right-1.5 px-1 py-px rounded" style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)' }}>
+                        <span className="text-[9px] font-semibold" style={{ color: 'rgba(255,255,255,0.90)', letterSpacing: '0.02em' }}>{item.duration ? formatTime(item.duration) : 'Video'}</span>
                       </div>
                     )}
                     <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: index === 0 ? 'inset 0 0 0 2px rgba(245,158,11,0.60)' : 'none' }} />
