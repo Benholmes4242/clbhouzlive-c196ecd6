@@ -124,9 +124,9 @@ export function PublishScreen() {
               )}
               <div className="flex items-center gap-2 flex-wrap">
                 {state.taggedCourses.length > 0 && (
-                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: 'rgba(232,152,10,0.18)', border: '1px solid rgba(232,152,10,0.30)' }}>
-                    <MapPin className="w-3 h-3" style={{ color: AMBER_DIM }} strokeWidth={1.75} />
-                    <span className="text-[11px] font-medium" style={{ color: AMBER_DIM }}>
+                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                    <MapPin className="w-3.5 h-3.5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
+                    <span className="text-[12px] font-medium" style={{ color: 'rgba(255,255,255,0.45)' }}>
                       {state.taggedCourses[0].courseName}
                       {state.taggedCourses.length > 1 && ` +${state.taggedCourses.length - 1}`}
                     </span>
@@ -162,8 +162,8 @@ export function PublishScreen() {
             className="w-full flex items-center gap-3.5 px-4 py-4 min-h-[60px]"
             style={{ background: 'rgba(255,255,255,0.025)', borderTop: '1px solid rgba(255,255,255,0.06)' }}
           >
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(255,255,255,0.07)' }}>
-              <visibilityConfig.Icon className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.60)' }} strokeWidth={1.75} />
+            <div className="w-10 h-10 flex items-center justify-center shrink-0">
+              <visibilityConfig.Icon className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={1.75} />
             </div>
             <div className="flex-1 text-left">
               <p className="text-[13px] font-semibold" style={{ color: TEXT_PRIMARY }}>Audience</p>
@@ -181,8 +181,8 @@ export function PublishScreen() {
             className="w-full flex items-center gap-3.5 px-4 py-4 min-h-[60px]"
             style={{ background: 'rgba(255,255,255,0.025)', borderTop: '1px solid rgba(255,255,255,0.06)' }}
           >
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(255,255,255,0.07)' }}>
-              <Clock className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.60)' }} strokeWidth={1.75} />
+            <div className="w-10 h-10 flex items-center justify-center shrink-0">
+              <Clock className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={1.75} />
             </div>
             <div className="flex-1 text-left">
               <p className="text-[13px] font-semibold" style={{ color: TEXT_PRIMARY }}>Schedule</p>
@@ -231,19 +231,19 @@ export function PublishScreen() {
           whileTap={{ scale: 0.97 }}
           onClick={handlePublish}
           disabled={isPublishing}
-          className="w-full rounded-2xl font-bold flex items-center justify-center gap-2.5 disabled:opacity-60"
+          className="w-full rounded-2xl font-bold flex items-center justify-center gap-2.5 disabled:opacity-40"
           style={{
-            minHeight: 58,
-            fontSize: 16,
+            minHeight: 62,
+            fontSize: 17,
             letterSpacing: '-0.01em',
-            background: isPublishing ? 'rgba(232,152,10,0.45)' : AMBER_GRADIENT,
+            background: isPublishing ? 'rgba(255,255,255,0.50)' : 'rgba(255,255,255,0.96)',
             color: '#0D0D0D',
-            boxShadow: isPublishing ? 'none' : '0 4px 24px rgba(200,135,10,0.40), inset 0 1px 0 rgba(255,255,255,0.15)',
+            boxShadow: isPublishing ? 'none' : '0 4px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,1)',
           }}
         >
           {isPublishing ? (
             <>
-              <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(0,0,0,0.35)', borderTopColor: 'transparent' }} />
+              <div className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(0,0,0,0.25)', borderTopColor: 'transparent' }} />
               Starting upload…
             </>
           ) : (
