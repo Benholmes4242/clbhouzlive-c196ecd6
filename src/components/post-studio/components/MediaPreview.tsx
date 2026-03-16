@@ -78,7 +78,7 @@ export function MediaPreview({ item, onSwipeLeft, onSwipeRight }: MediaPreviewPr
             )}
           </AnimatePresence>
           {item.posterPreviewUrl && (
-            <div className="absolute top-2.5 left-2.5 px-2 py-1 rounded-lg text-[11px] font-semibold" style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', color: 'rgba(255,255,255,0.70)' }}>Cover set</div>
+            <div className="absolute top-2.5 left-2.5 px-2 py-1 rounded-lg text-[11px] font-semibold" style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.70)' }}>Cover set</div>
           )}
           {item.edits && Object.keys(item.edits).some(() => {
             const e = item.edits!;
