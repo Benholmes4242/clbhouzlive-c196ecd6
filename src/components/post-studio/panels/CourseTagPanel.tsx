@@ -113,14 +113,14 @@ export function CourseTagPanel() {
         {state.taggedCourses.length > 0 && (
           <div className="flex flex-wrap gap-1.5 px-5 pb-3">
             {state.taggedCourses.map((course) => (
-              <span key={course.courseId} className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-semibold" style={{ background: AMBER_GHOST, color: 'rgba(232,152,10,0.90)', border: '1px solid rgba(232,152,10,0.25)' }}>
+              <span key={course.courseId} className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-semibold" style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.90)', border: '1px solid rgba(255,255,255,0.14)' }}>
                 ⛳ {course.courseName}
                 <button
                   onClick={() => handleRemove(course.courseId)}
                   className="w-4 h-4 flex items-center justify-center rounded-full"
-                  style={{ background: 'rgba(232,152,10,0.20)' }}
+                  style={{ background: 'rgba(255,255,255,0.12)' }}
                 >
-                  <X className="w-2.5 h-2.5" style={{ color: 'rgba(232,152,10,0.90)' }} strokeWidth={2.5} />
+                  <X className="w-2.5 h-2.5" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={2.5} />
                 </button>
               </span>
             ))}
