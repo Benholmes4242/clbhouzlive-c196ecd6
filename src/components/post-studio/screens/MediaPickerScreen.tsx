@@ -188,11 +188,11 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
                   className="flex items-center gap-2.5 text-sm mb-6"
-                  style={{ color: AMBER_DIM }}
+                  style={{ color: 'rgba(255,255,255,0.45)' }}
                 >
                   <div
                     className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin"
-                    style={{ borderColor: 'rgba(232,152,10,0.35)', borderTopColor: 'transparent' }}
+                    style={{ borderColor: 'rgba(255,255,255,0.25)', borderTopColor: 'transparent' }}
                   />
                   Preparing…
                 </motion.div>
