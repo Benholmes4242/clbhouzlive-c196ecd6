@@ -262,11 +262,11 @@ export function ComposerScreen() {
           {/* Toolbar — hairline separator */}
           <div className="flex items-center gap-2 px-3 py-3 flex-wrap" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
             {/* Icon-only Mention */}
-            <motion.button whileTap={{ scale: 0.93 }} onClick={() => { setMentionTriggerIndex(state.caption.length); openPanel('mention'); }} className="flex items-center justify-center rounded-xl" style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
-              <AtSign className="w-[18px] h-[18px]" strokeWidth={2} style={{ color: 'rgba(255,255,255,0.75)' }} />
+            <motion.button whileTap={{ scale: 0.93 }} onClick={() => { setMentionTriggerIndex(state.caption.length); openPanel('mention'); }} className="flex items-center justify-center" style={{ width: 40, height: 40 }}>
+              <AtSign className="w-[18px] h-[18px]" strokeWidth={2} style={{ color: 'rgba(255,255,255,0.40)' }} />
             </motion.button>
-            <motion.button whileTap={{ scale: 0.93 }} onClick={() => openPanel('course')} className="flex items-center justify-center rounded-xl" style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
-              <span className="text-base leading-none">⛳</span>
+            <motion.button whileTap={{ scale: 0.93 }} onClick={() => openPanel('course')} className="flex items-center justify-center" style={{ width: 40, height: 40 }}>
+              <span className="text-base leading-none" style={{ opacity: 0.55 }}>⛳</span>
             </motion.button>
             {/* Character ring pushed right */}
             <div className="ml-auto flex items-center justify-center" style={{ width: 40, height: 40 }}>
