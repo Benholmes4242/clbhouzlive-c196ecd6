@@ -4,6 +4,7 @@ import { useActiveChallenges } from '@/hooks/useActiveChallenges';
 import { useChallengeProgress } from '@/hooks/useChallengeProgress';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Trophy, Clock, Zap } from 'lucide-react';
 
