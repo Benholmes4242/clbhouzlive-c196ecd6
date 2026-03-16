@@ -66,6 +66,9 @@ export interface StudioMediaItem {
 
   // Validation
   validationError: string | null;
+
+  // Studio edits (crop, filter, text, music)
+  edits?: StudioEdits;
 }
 
 /** Mention token representing an @mention in the caption */
