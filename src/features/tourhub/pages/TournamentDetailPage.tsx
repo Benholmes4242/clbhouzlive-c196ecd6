@@ -163,18 +163,16 @@ export function TournamentDetailPage() {
   if (isLoading) {
     return (
       <TourHubShell immersive>
-        <div className="animate-pulse">
-          <div 
-            className="animate-pulse bg-muted"
-            style={{ 
-              minHeight: 'calc(45dvh + var(--sat, env(safe-area-inset-top, 0px)))',
-            }}
-          />
-          <div className="space-y-4 mt-6 px-4">
-            <div className="h-12 bg-muted rounded-xl" />
-            <div className="h-48 bg-muted rounded-2xl" />
-            <div className="h-32 bg-muted rounded-2xl" />
-          </div>
+        <Skeleton
+          className="w-full"
+          style={{
+            minHeight: 'calc(45dvh + var(--sat, env(safe-area-inset-top, 0px)))',
+          }}
+        />
+        <div className="space-y-4 mt-6 px-4">
+          <Skeleton className="h-12 rounded-xl" />
+          <Skeleton className="h-48 rounded-2xl" />
+          <Skeleton className="h-32 rounded-2xl" />
         </div>
       </TourHubShell>
     );

@@ -166,9 +166,9 @@ export function CollegeComparePage() {
           ) : isLoading ? (
             <div style={{ paddingTop: 16 }}>
               {/* Summary card skeleton */}
-              <div className="h-24 rounded-2xl bg-muted animate-pulse mb-4" />
+              <Skeleton className="h-24 rounded-2xl mb-4" />
               {/* Stats skeleton */}
-              <div className="h-48 rounded-2xl bg-muted animate-pulse" />
+              <Skeleton className="h-48 rounded-2xl" />
             </div>
           ) : error ? (
             <div className="text-center py-16">
