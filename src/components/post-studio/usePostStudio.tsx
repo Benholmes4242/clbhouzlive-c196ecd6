@@ -165,6 +165,9 @@ function postStudioReducer(state: PostStudioState, action: PostStudioAction): Po
     case 'RESET':
       return createInitialState();
 
+    case 'SET_MENTION_TRIGGER':
+      return { ...state, mentionTriggerIndex: action.payload };
+
     default:
       return state;
   }
@@ -198,6 +201,7 @@ interface PostStudioContextValue {
   openPanel: (panelId: PanelId) => void;
   closePanel: () => void;
   setDiscarding: (value: boolean) => void;
+  setMentionTriggerIndex: (index: number) => void;
   reset: () => void;
   onSuccess?: (postId: string) => void;
 }
@@ -253,6 +257,7 @@ export function PostStudioProvider({
   const openPanel = useCallback((panelId: PanelId) => dispatch({ type: 'OPEN_PANEL', payload: panelId }), []);
   const closePanel = useCallback(() => dispatch({ type: 'CLOSE_PANEL' }), []);
   const setDiscarding = useCallback((value: boolean) => dispatch({ type: 'SET_DISCARDING', payload: value }), []);
+  const setMentionTriggerIndex = useCallback((index: number) => dispatch({ type: 'SET_MENTION_TRIGGER', payload: index }), []);
   const reset = useCallback(() => dispatch({ type: 'RESET' }), []);
 
   const value = useMemo<PostStudioContextValue>(
@@ -278,6 +283,7 @@ export function PostStudioProvider({
       openPanel,
       closePanel,
       setDiscarding,
+      setMentionTriggerIndex,
       reset,
       onSuccess,
     }),
@@ -303,6 +309,7 @@ export function PostStudioProvider({
       openPanel,
       closePanel,
       setDiscarding,
+      setMentionTriggerIndex,
       reset,
       onSuccess,
     ]

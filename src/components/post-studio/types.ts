@@ -133,6 +133,7 @@ export interface PostStudioState {
   // UI state
   isDiscarding: boolean;
   activePanelId: PanelId | null;
+  mentionTriggerIndex: number;
 }
 
 /** Initial state factory */
@@ -155,6 +156,7 @@ export function createInitialState(overrides?: Partial<PostStudioState>): PostSt
     isDirty: false,
     isDiscarding: false,
     activePanelId: null,
+    mentionTriggerIndex: -1,
     ...overrides,
   };
 }
@@ -186,7 +188,8 @@ export type PostStudioAction =
   | { type: 'OPEN_PANEL'; payload: PanelId }
   | { type: 'CLOSE_PANEL' }
   | { type: 'RESET' }
-  | { type: 'UPDATE_MEDIA_EDITS'; payload: { id: string; edits: StudioEdits } };
+  | { type: 'UPDATE_MEDIA_EDITS'; payload: { id: string; edits: StudioEdits } }
+  | { type: 'SET_MENTION_TRIGGER'; payload: number };
 
 // ============================================================================
 // PROPS

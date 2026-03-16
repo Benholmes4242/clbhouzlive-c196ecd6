@@ -19,7 +19,7 @@ function isEmail(str: string): boolean {
 }
 
 export function MentionPanel() {
-  const { state, closePanel, setMentions, setCaption } = usePostStudioContext();
+  const { state, closePanel, setMentions, setCaption, setMentionTriggerIndex } = usePostStudioContext();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<TaggableResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -28,9 +28,9 @@ export function MentionPanel() {
   const dragControls = useDragControls();
 
   useEffect(() => {
-    const atIndex = state.caption.lastIndexOf('@');
-    if (atIndex >= 0) {
-      const typed = state.caption.slice(atIndex + 1).trim();
+    const triggerIndex = state.mentionTriggerIndex;
+    if (triggerIndex >= 0) {
+      const typed = state.caption.slice(triggerIndex + 1).trim();
       if (typed.length > 0 && typed.length < 20) setQuery(typed);
     }
     setTimeout(() => inputRef.current?.focus(), 100);
@@ -57,24 +57,32 @@ export function MentionPanel() {
 
   const handleSelect = useCallback((entity: TaggableResult) => {
     const displayName = `@${entity.name}`;
-    const atIndex = state.caption.lastIndexOf('@');
-    // Calculate exact insertion position — don't use indexOf which finds wrong occurrence
-    const insertAt = atIndex >= 0 ? atIndex : state.caption.length + 1;
-    const newCaption = atIndex >= 0
-      ? `${state.caption.slice(0, atIndex)}${displayName} `
-      : `${state.caption} ${displayName} `;
+    const triggerIndex = state.mentionTriggerIndex >= 0 ? state.mentionTriggerIndex : state.caption.length;
+
+    // Replace from trigger index to end of any partial text the user typed after @
+    const afterTrigger = state.caption.slice(triggerIndex);
+    const partialLength = afterTrigger.search(/\s|$/);
+    const replaceEnd = triggerIndex + (partialLength >= 0 ? partialLength : afterTrigger.length);
+
+    const newCaption =
+      state.caption.slice(0, triggerIndex) +
+      displayName + ' ' +
+      state.caption.slice(replaceEnd).trimStart();
+
     const newMention: MentionToken = {
-      start: insertAt,
-      end: insertAt + displayName.length,
+      start: triggerIndex,
+      end: triggerIndex + displayName.length,
       entityId: entity.id,
       displayName: entity.name,
       entityType: entity.entity_type,
       avatarUrl: entity.profile_image_url ?? undefined,
     };
+
     setCaption(newCaption);
     setMentions([...state.mentions, newMention]);
+    setMentionTriggerIndex(-1);
     closePanel();
-  }, [state.caption, state.mentions, setCaption, setMentions, closePanel]);
+  }, [state.caption, state.mentions, state.mentionTriggerIndex, setCaption, setMentions, setMentionTriggerIndex, closePanel]);
 
   return (
     <>
