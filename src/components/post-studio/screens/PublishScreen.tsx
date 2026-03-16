@@ -181,8 +181,8 @@ export function PublishScreen() {
             className="w-full flex items-center gap-3.5 px-4 py-4 min-h-[60px]"
             style={{ background: 'rgba(255,255,255,0.025)', borderTop: '1px solid rgba(255,255,255,0.06)' }}
           >
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(255,255,255,0.07)' }}>
-              <Clock className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.60)' }} strokeWidth={1.75} />
+            <div className="w-10 h-10 flex items-center justify-center shrink-0">
+              <Clock className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={1.75} />
             </div>
             <div className="flex-1 text-left">
               <p className="text-[13px] font-semibold" style={{ color: TEXT_PRIMARY }}>Schedule</p>
