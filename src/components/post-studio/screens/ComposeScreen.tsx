@@ -642,7 +642,13 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         {/* Mention */}
         <motion.button
           whileTap={{ scale: 0.92 }}
-          onClick={() => { setMentionTriggerIndex(state.caption.length); openPanel('mention'); }}
+          onClick={() => {
+            const pos = textareaRef.current?.selectionStart ?? state.caption.length;
+            const newCaption = state.caption.slice(0, pos) + '@' + state.caption.slice(pos);
+            setCaption(newCaption);
+            setMentionTriggerIndex(pos);
+            openPanel('mention');
+          }}
           className="flex items-center justify-center mr-3"
           style={{ width: 40, height: 40 }}
         >

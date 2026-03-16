@@ -67,7 +67,7 @@ export function MentionPanel() {
     const newCaption =
       state.caption.slice(0, triggerIndex) +
       displayName + ' ' +
-      state.caption.slice(replaceEnd).trimStart();
+      state.caption.slice(replaceEnd);
 
     const newMention: MentionToken = {
       start: triggerIndex,
