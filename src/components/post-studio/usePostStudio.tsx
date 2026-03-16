@@ -2,6 +2,7 @@
 // Single useReducer + React Context for the entire studio
 
 import React, { createContext, useContext, useReducer, useCallback, useMemo } from 'react';
+import type { StudioEdits } from '@/types/studio';
 import type {
   PostStudioState,
   PostStudioAction,
