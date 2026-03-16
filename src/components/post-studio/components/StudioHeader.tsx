@@ -13,6 +13,7 @@ interface HeaderAction {
   onClick: () => void;
   disabled?: boolean;
   variant?: 'default' | 'primary';
+  icon?: 'close' | 'back';
 }
 
 interface StudioHeaderProps {
