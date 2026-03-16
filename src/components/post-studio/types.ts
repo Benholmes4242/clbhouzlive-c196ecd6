@@ -133,6 +133,7 @@ export interface PostStudioState {
   // UI state
   isDiscarding: boolean;
   activePanelId: PanelId | null;
+  mentionTriggerIndex: number;
 }
 
 /** Initial state factory */
