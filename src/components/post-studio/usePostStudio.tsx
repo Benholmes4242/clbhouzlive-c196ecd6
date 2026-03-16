@@ -187,6 +187,7 @@ interface PostStudioContextValue {
   setActiveMedia: (index: number) => void;
   updateTrim: (id: string, trimStart: number, trimEnd: number) => void;
   updatePoster: (id: string, posterTimestamp: number, posterPreviewUrl: string | null) => void;
+  updateMediaEdits: (id: string, edits: StudioEdits) => void;
   setCaption: (text: string) => void;
   setMentions: (mentions: MentionToken[]) => void;
   setTaggedCourses: (courses: TaggedCourse[]) => void;
