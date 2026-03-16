@@ -2,7 +2,7 @@
 // Dark immersive studio. Media front and centre. Tools feel pro, not form-like.
 
 import React, { useState, useCallback, useRef } from 'react';
-import { AtSign, Scissors, Image as ImageIcon, Star, Plus, ChevronRight, Wand2 } from 'lucide-react';
+import { AtSign, Scissors, Image as ImageIcon, Plus, ChevronRight, Wand2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StudioHeader } from '../components/StudioHeader';
 import { MediaPreview } from '../components/MediaPreview';
