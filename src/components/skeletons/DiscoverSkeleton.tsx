@@ -3,12 +3,13 @@ import { Skeleton } from "@/components/ui/skeleton"
 export const DiscoverSkeleton = () => {
   return (
     <div className="min-h-screen page-with-header pb-20 bg-background">
-      {/* Top tabs/segmented control */}
+      {/* Top tabs/segmented control — 4 flex-1 pills to match real SegmentedControl */}
       <div className="px-4 pt-4">
-        <div className="flex gap-2 mb-4">
-          <Skeleton className="h-10 w-24 rounded-full" />
-          <Skeleton className="h-10 w-24 rounded-full" />
-          <Skeleton className="h-10 w-24 rounded-full" />
+        <div className="flex gap-1 mb-4">
+          <Skeleton className="h-10 flex-1 rounded-lg" />
+          <Skeleton className="h-10 flex-1 rounded-lg" />
+          <Skeleton className="h-10 flex-1 rounded-lg" />
+          <Skeleton className="h-10 flex-1 rounded-lg" />
         </div>
       </div>
 
@@ -20,19 +21,19 @@ export const DiscoverSkeleton = () => {
       </div>
 
       {/* Hero skeleton */}
-      <div className="mx-4 h-[220px] rounded-2xl bg-muted animate-pulse" />
+      <Skeleton className="mx-4 h-[220px] rounded-2xl" />
 
       {/* Journey card skeleton */}
-      <div className="mx-4 mt-6 h-[160px] rounded-2xl bg-muted/50 animate-pulse" />
+      <Skeleton className="mx-4 mt-6 h-[160px] rounded-2xl" />
 
       {/* Region cards skeleton */}
       <div className="mt-6 px-4 mb-4">
         <Skeleton className="h-6 w-40" />
         <Skeleton className="h-4 w-64 mt-2" />
       </div>
-      <div className="flex gap-3 px-4 overflow-hidden">
+      <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="w-[200px] h-[140px] flex-shrink-0 rounded-2xl bg-muted animate-pulse" />
+          <Skeleton key={i} className="w-[200px] h-[140px] flex-shrink-0 rounded-2xl" />
         ))}
       </div>
 
@@ -40,9 +41,9 @@ export const DiscoverSkeleton = () => {
       <div className="mt-6 px-4 mb-3">
         <Skeleton className="h-5 w-48" />
       </div>
-      <div className="flex gap-3 px-4 overflow-hidden">
+      <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="w-[120px] aspect-[3/4] flex-shrink-0 rounded-xl bg-muted animate-pulse" />
+          <Skeleton key={i} className="w-[120px] aspect-[3/4] flex-shrink-0 rounded-xl" />
         ))}
       </div>
 
@@ -53,7 +54,7 @@ export const DiscoverSkeleton = () => {
       </div>
       <div className="grid grid-cols-2 gap-1 px-1">
         {[1, 2, 3, 4, 5, 6].map((i) => (
-          <div key={i} className="aspect-[3/4] rounded-lg bg-muted animate-pulse" />
+          <Skeleton key={i} className="aspect-[3/4] rounded-lg" />
         ))}
       </div>
     </div>
