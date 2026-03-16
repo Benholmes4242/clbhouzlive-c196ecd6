@@ -101,10 +101,14 @@ export function ComposerScreen() {
     setCaption(val);
     const prev = state.caption;
     if (val.length === prev.length + 1) {
-      const newChar = val[e.target.selectionStart! - 1];
-      if (newChar === '@') openPanel('mention');
+      const cursorPos = e.target.selectionStart! - 1;
+      const newChar = val[cursorPos];
+      if (newChar === '@') {
+        setMentionTriggerIndex(cursorPos);
+        openPanel('mention');
+      }
     }
-  }, [state.caption, setCaption, openPanel]);
+  }, [state.caption, setCaption, openPanel, setMentionTriggerIndex]);
 
   // Render caption with amber @mention highlights
   const highlightedCaption = useMemo(() => {
