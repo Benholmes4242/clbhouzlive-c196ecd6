@@ -235,8 +235,8 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
 
             <AnimatePresence>
               {isProcessing && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center justify-center gap-2.5 py-3 text-sm" style={{ color: AMBER_DIM }}>
-                  <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(232,152,10,0.35)', borderTopColor: 'transparent' }} />
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center justify-center gap-2.5 py-3 text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                  <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(255,255,255,0.25)', borderTopColor: 'transparent' }} />
                   Processing…
                 </motion.div>
               )}
