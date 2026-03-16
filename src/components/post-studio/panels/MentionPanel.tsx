@@ -58,13 +58,17 @@ export function MentionPanel() {
   const handleSelect = useCallback((entity: TaggableResult) => {
     const displayName = `@${entity.name}`;
     const atIndex = state.caption.lastIndexOf('@');
+    // Calculate exact insertion position — don't use indexOf which finds wrong occurrence
+    const insertAt = atIndex >= 0 ? atIndex : state.caption.length + 1;
     const newCaption = atIndex >= 0
       ? `${state.caption.slice(0, atIndex)}${displayName} `
       : `${state.caption} ${displayName} `;
-    const start = newCaption.indexOf(displayName);
     const newMention: MentionToken = {
-      start, end: start + displayName.length, entityId: entity.id,
-      displayName: entity.name, entityType: entity.entity_type,
+      start: insertAt,
+      end: insertAt + displayName.length,
+      entityId: entity.id,
+      displayName: entity.name,
+      entityType: entity.entity_type,
       avatarUrl: entity.profile_image_url ?? undefined,
     };
     setCaption(newCaption);
