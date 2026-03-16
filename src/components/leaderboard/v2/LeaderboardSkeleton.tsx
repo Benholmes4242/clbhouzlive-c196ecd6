@@ -6,8 +6,6 @@ import React from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
-// Shimmer overlay class for premium loading feel
-const shimmerClass = "relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_1.5s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent";
 
 export function LeaderboardHeroSkeleton() {
   // Centered content on page background (no card)
