@@ -15,11 +15,12 @@ const ToolButton = ({ icon, label, active, onClick }: ToolButtonProps) => (
     whileTap={{ scale: 0.97 }}
     className="flex flex-col items-center justify-center gap-1 py-2.5 px-4 rounded-xl transition-all duration-150"
     style={active ? {
-      background: '#f59e0b',
-      color: '#FFFFFF',
+      background: 'linear-gradient(135deg, #F59E0B 0%, #C7870A 100%)',
+      color: '#0D0D0D',
+      boxShadow: '0 2px 10px rgba(200,135,10,0.28)',
     } : {
       background: 'transparent',
-      color: '#AEAEB2',
+      color: 'rgba(255,255,255,0.45)',
     }}
   >
     <div className="transition-colors">
@@ -41,7 +42,7 @@ export default function StudioToolRail({ activeTool, setActiveTool }: StudioTool
     <div
       className="grid grid-cols-4 gap-2.5 px-4 py-2.5 flex-shrink-0"
       style={{
-        background: '#1A1A1A',
+        background: 'rgba(10,10,10,0.98)',
         borderTop: '1px solid rgba(255,255,255,0.1)',
         borderBottom: '1px solid rgba(255,255,255,0.1)',
       }}

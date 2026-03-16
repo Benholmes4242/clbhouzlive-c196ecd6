@@ -24,7 +24,7 @@ const STYLE_PRESETS: { id: TextStyle; label: string; preview: string }[] = [
 ];
 
 const COLORS = [
-  '#FFFFFF', '#0a0a0a', '#FF9C40', '#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6',
+  '#FFFFFF', '#0a0a0a', '#FF9C40', '#3B82F6', '#EF4444', '#10B981', '#E8980A', '#8B5CF6',
   '#F1F5F9', '#6B7280', '#F97316', '#06B6D4', '#EC4899', '#14B8A6', '#D97706', '#6366F1',
 ];
 
@@ -121,9 +121,9 @@ export default function StudioPanelText({
     <div className="flex flex-col h-full">
       {/* Layers header */}
       <div className="px-3 pt-2 pb-1.5 flex items-center gap-2">
-        <Layers className="w-3.5 h-3.5" style={{ color: '#AEAEB2' }} />
-        <span className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: '#AEAEB2' }}>Layers</span>
-        <span className="text-[11px] ml-auto" style={{ color: '#f59e0b' }}>{textBoxes.length}</span>
+        <Layers className="w-3.5 h-3.5" style={{ color: 'rgba(255,255,255,0.45)' }} />
+        <span className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: 'rgba(255,255,255,0.45)' }}>Layers</span>
+        <span className="text-[11px] ml-auto" style={{ color: '#E8980A' }}>{textBoxes.length}</span>
       </div>
       
       {/* Text boxes list OR empty state */}
@@ -134,11 +134,11 @@ export default function StudioPanelText({
             className="w-full py-6 rounded-xl transition-colors flex flex-col items-center justify-center gap-2"
             style={{ background: 'rgba(255,255,255,0.04)' }}
           >
-            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(245,158,11,0.15)' }}>
-              <Type className="w-5 h-5" style={{ color: '#f59e0b' }} />
+            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(232,152,10,0.15)' }}>
+              <Type className="w-5 h-5" style={{ color: '#E8980A' }} />
             </div>
             <span className="text-sm font-medium text-white">Tap to add text overlay</span>
-            <span className="text-[11px]" style={{ color: '#AEAEB2' }}>Add captions, titles, or labels</span>
+            <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.45)' }}>Add captions, titles, or labels</span>
           </button>
         ) : (
           <div className="space-y-1">
@@ -160,14 +160,14 @@ export default function StudioPanelText({
                     }}
                     className="w-full px-2 py-1.5 rounded-md text-left transition-colors cursor-pointer"
                     style={{
-                      border: isSelected ? '1px solid rgba(245,158,11,0.4)' : '1px solid rgba(255,255,255,0.08)',
-                      background: isSelected ? 'rgba(245,158,11,0.08)' : 'transparent',
+                      border: isSelected ? '1px solid rgba(232,152,10,0.4)' : '1px solid rgba(255,255,255,0.08)',
+                      background: isSelected ? 'rgba(232,152,10,0.08)' : 'transparent',
                     }}
                   >
                     <div className="flex items-center justify-between gap-1.5">
                       <div className="flex items-center gap-1.5 flex-1 min-w-0">
                         <span className="text-[13px] font-medium text-white truncate">{box.text}</span>
-                        <span className="text-[10px] flex-shrink-0" style={{ color: '#AEAEB2' }}>
+                        <span className="text-[10px] flex-shrink-0" style={{ color: 'rgba(255,255,255,0.45)' }}>
                           {STYLE_PRESETS.find(p => p.id === box.style)?.label} · {(box.scale * 100).toFixed(0)}%
                         </span>
                       </div>
@@ -176,7 +176,7 @@ export default function StudioPanelText({
                           <button
                             onClick={(e) => { e.stopPropagation(); bringToFront(box.id); }}
                             className="p-0.5"
-                            style={{ color: '#AEAEB2' }}
+                            style={{ color: 'rgba(255,255,255,0.45)' }}
                             title="Bring to front"
                           >
                             <ChevronUp className="w-3 h-3" />
@@ -205,18 +205,18 @@ export default function StudioPanelText({
                         style={{
                           background: 'rgba(255,255,255,0.06)',
                           border: '1px solid rgba(255,255,255,0.12)',
-                          caretColor: '#f59e0b',
+                          caretColor: '#E8980A',
                         }}
                       />
 
                       {/* Hint about positioning */}
-                      <p className="text-center text-[11px]" style={{ color: '#AEAEB2' }}>
+                      <p className="text-center text-[11px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
                         Drag overlays on the preview above to reposition
                       </p>
 
                       {/* Style selector */}
                       <div>
-                        <label className="block text-[11px] font-medium mb-1.5" style={{ color: '#AEAEB2' }}>Style</label>
+                        <label className="block text-[11px] font-medium mb-1.5" style={{ color: 'rgba(255,255,255,0.45)' }}>Style</label>
                         <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-0.5 px-0.5">
                           {STYLE_PRESETS.map(preset => (
                             <button
@@ -224,7 +224,7 @@ export default function StudioPanelText({
                               onClick={() => updateBox(selected.id, { style: preset.id })}
                               className="flex-shrink-0 flex flex-col items-center gap-0.5 px-2.5 py-2 rounded-xl transition-all min-w-[52px]"
                               style={selected.style === preset.id ? {
-                                background: '#f59e0b',
+                                background: '#E8980A',
                                 color: '#FFFFFF',
                               } : {
                                 background: 'rgba(255,255,255,0.08)',
@@ -242,7 +242,7 @@ export default function StudioPanelText({
 
                       {/* Size slider */}
                       <div className="flex items-center gap-2">
-                        <label className="text-[11px] font-medium w-8" style={{ color: '#AEAEB2' }}>Size</label>
+                        <label className="text-[11px] font-medium w-8" style={{ color: 'rgba(255,255,255,0.45)' }}>Size</label>
                         <input
                           type="range"
                           min="0.6"
@@ -265,16 +265,14 @@ export default function StudioPanelText({
                             [&::-moz-range-thumb]:shadow-md"
                           style={{
                             background: 'rgba(255,255,255,0.1)',
-                            // @ts-ignore
-                            '--tw-slider-thumb-bg': '#f59e0b',
                           }}
                         />
-                        <span className="text-[11px] w-8 text-right font-mono" style={{ color: '#AEAEB2' }}>{(selected.scale * 100).toFixed(0)}%</span>
+                        <span className="text-[11px] w-8 text-right font-mono" style={{ color: 'rgba(255,255,255,0.45)' }}>{(selected.scale * 100).toFixed(0)}%</span>
                       </div>
 
                       {/* Color picker */}
                       <div>
-                        <label className="block text-[11px] font-medium mb-1.5" style={{ color: '#AEAEB2' }}>Color</label>
+                        <label className="block text-[11px] font-medium mb-1.5" style={{ color: 'rgba(255,255,255,0.45)' }}>Color</label>
                         <div className="flex gap-1.5 flex-wrap">
                           {COLORS.map(color => (
                             <button
@@ -302,7 +300,7 @@ export default function StudioPanelText({
             <button
               onClick={addTextBox}
               className="w-full py-1.5 mt-0.5 rounded-md transition-colors flex items-center justify-center gap-1 text-[11px]"
-              style={{ color: '#f59e0b' }}
+              style={{ color: '#E8980A' }}
             >
               <Plus className="w-3 h-3" />
               <span className="font-medium">Add another</span>
