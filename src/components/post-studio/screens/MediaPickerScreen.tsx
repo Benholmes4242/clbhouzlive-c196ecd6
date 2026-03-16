@@ -146,7 +146,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
               <div
                 className="absolute inset-0 rounded-full"
                 style={{
-                  background: 'radial-gradient(circle, rgba(245,158,11,0.18) 0%, transparent 70%)',
+                  background: 'radial-gradient(circle, rgba(232,152,10,0.08) 0%, transparent 70%)',
                   transform: 'scale(3.5)',
                 }}
               />
