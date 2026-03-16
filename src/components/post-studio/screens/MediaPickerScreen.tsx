@@ -117,7 +117,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
   return (
     <div className="flex-1 flex flex-col" style={{ background: BG_BASE }}>
       <StudioHeader
-        title="New Post"
+        title="New Moment"
         step="MEDIA_PICKER"
         leftAction={
           onClose
