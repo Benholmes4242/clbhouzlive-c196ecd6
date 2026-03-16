@@ -192,7 +192,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
                 >
                   <div
                     className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin"
-                    style={{ borderColor: 'rgba(245,158,11,0.4)', borderTopColor: 'transparent' }}
+                    style={{ borderColor: 'rgba(232,152,10,0.35)', borderTopColor: 'transparent' }}
                   />
                   Preparing…
                 </motion.div>
@@ -202,8 +202,8 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
         )}
 
         {hasMedia && (
-          <div className="flex-1 flex flex-col justify-center px-5 py-4">
-            <div className="grid grid-cols-3 gap-1.5 mb-4">
+          <div className="flex-1 flex flex-col px-5 pt-5 pb-4">
+            <div className="grid grid-cols-3 gap-2 mb-4">
               <AnimatePresence>
                 {state.mediaItems.map((item, index) => (
                   <motion.div
@@ -218,7 +218,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
                     <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
                     <div
                       className="absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center"
-                      style={{ background: AMBER_GRADIENT, boxShadow: '0 2px 8px rgba(245,158,11,0.5)' }}
+                      style={{ background: AMBER_GRADIENT, boxShadow: '0 2px 8px rgba(200,135,10,0.30)' }}
                     >
                       <span className="text-[11px] font-bold text-black">{index + 1}</span>
                     </div>
@@ -227,7 +227,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
                         <span className="text-[9px] font-semibold leading-none block" style={{ color: 'rgba(255,255,255,0.90)', letterSpacing: '0.02em' }}>{item.duration ? formatTime(item.duration) : 'Video'}</span>
                       </div>
                     )}
-                    <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: index === 0 ? 'inset 0 0 0 2px rgba(245,158,11,0.60)' : 'none' }} />
+                    <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: index === 0 ? 'inset 0 0 0 2px rgba(232,152,10,0.55)' : 'none' }} />
                   </motion.div>
                 ))}
               </AnimatePresence>
@@ -236,7 +236,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
             <AnimatePresence>
               {isProcessing && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center justify-center gap-2.5 py-3 text-sm" style={{ color: AMBER_DIM }}>
-                  <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(245,158,11,0.4)', borderTopColor: 'transparent' }} />
+                  <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(232,152,10,0.35)', borderTopColor: 'transparent' }} />
                   Processing…
                 </motion.div>
               )}
@@ -258,7 +258,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
           }}
         >
           <motion.button whileTap={{ scale: 0.92 }} onClick={() => fileInputRef.current?.click()} disabled={isProcessing} className="flex flex-col items-center gap-1.5 min-w-[60px] min-h-[44px] justify-center disabled:opacity-40">
-            <Layers className="w-6 h-6" style={{ color: 'rgba(245,158,11,0.85)' }} strokeWidth={1.75} />
+            <Layers className="w-6 h-6" style={{ color: 'rgba(232,152,10,0.85)' }} strokeWidth={1.75} />
             <span className="text-[11px] font-semibold" style={{ color: AMBER_DIM, letterSpacing: '0.02em' }}>Gallery</span>
           </motion.button>
 
@@ -273,7 +273,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
           </motion.button>
 
           <motion.button whileTap={{ scale: 0.92 }} onClick={() => openPanel('drafts')} className="flex flex-col items-center gap-1.5 min-w-[60px] min-h-[44px] justify-center">
-            <BookOpen className="w-6 h-6" style={{ color: 'rgba(245,158,11,0.85)' }} strokeWidth={1.75} />
+            <BookOpen className="w-6 h-6" style={{ color: 'rgba(232,152,10,0.85)' }} strokeWidth={1.75} />
             <span className="text-[11px] font-semibold" style={{ color: AMBER_DIM, letterSpacing: '0.02em' }}>Drafts</span>
           </motion.button>
         </div>
