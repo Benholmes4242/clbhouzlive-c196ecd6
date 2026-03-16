@@ -26,6 +26,7 @@ import { clubhouseDebug } from '@/debug/clubhouseDebug';
 import MobileVideoDebugPanel from '@/components/debug/MobileVideoDebugPanel';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
+import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 
 // ── New Media System imports ──
 import { VideoPoolProvider } from '@/components/media-system/VideoPoolProvider';
@@ -154,6 +155,11 @@ const ClubhouseContent = () => {
     logRouteClubhouse();
     clubhouseDebug.pageMount();
     return () => { clubhouseDebug.pageUnmount(); };
+  }, []);
+
+  // Close fullscreen feed overlay when Clubhouse mounts — prevents duplicate action rail
+  useEffect(() => {
+    useFullscreenFeed.getState().close();
   }, []);
   
   useHeaderVariant('glass-dark');
