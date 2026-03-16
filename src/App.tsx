@@ -267,7 +267,7 @@ function AppRoutes() {
       <Routes location={routesLocation}>
         {/* Keep-alive routes - rendered by KeepAliveOutlet, but need placeholder for Router */}
         <Route path="/" element={null} />
-        <Route path="/clubhouse" element={null} />
+        <Route path="/clubhouse" element={<Navigate to="/" replace />} />
         
         <Route path="/auth" element={<AuthWrapped />} />
         <Route path="/auth/callback" element={<Suspense fallback={<GenericPageSkeleton />}><AuthCallback /></Suspense>} />
