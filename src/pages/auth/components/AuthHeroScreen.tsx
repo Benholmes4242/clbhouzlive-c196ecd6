@@ -128,7 +128,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
       />
       
       {/* Content container */}
-      <div className="relative flex-1 flex flex-col px-6 pt-safe">
+      <div className="relative flex-1 flex flex-col px-6 pt-safe overflow-y-auto">
         {/* Logo section - enhanced with larger size and glow */}
         <div 
           className="flex flex-col justify-center items-center gap-3 auth-logo-animate"
