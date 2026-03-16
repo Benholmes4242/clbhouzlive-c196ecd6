@@ -26,7 +26,9 @@ export function MediaReel({ items, activeIndex, onSelect, onRemove, onAddMore }:
         {items.map((item, index) => {
           const isActive = index === activeIndex;
           return (
-            <motion.button key={item.id} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ type: 'spring', damping: 22, stiffness: 380 }} onClick={() => onSelect(index)} className="relative shrink-0 rounded-xl overflow-hidden"
+            <motion.div key={item.id} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ type: 'spring', damping: 22, stiffness: 380 }}
+              onClick={() => onSelect(index)}
+              className="relative shrink-0 rounded-xl overflow-hidden cursor-pointer"
               style={{ width: THUMB, height: THUMB, border: isActive ? '2px solid rgba(245,158,11,0.90)' : '1px solid rgba(255,255,255,0.10)', boxShadow: isActive ? '0 0 8px rgba(200,135,10,0.20)' : 'none', transform: isActive ? 'scale(1.06)' : 'scale(1)', transition: 'transform 0.2s, border 0.2s, box-shadow 0.2s', background: 'rgba(255,255,255,0.05)' }}>
               <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
               {item.mediaType === 'video' && (
@@ -37,7 +39,7 @@ export function MediaReel({ items, activeIndex, onSelect, onRemove, onAddMore }:
               <button onClick={(e) => { e.stopPropagation(); onRemove(item.id); }} className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.75)', border: '1px solid rgba(255,255,255,0.15)' }}>
                 <X className="w-3 h-3 text-white" strokeWidth={2.5} />
               </button>
-            </motion.button>
+            </motion.div>
           );
         })}
       </AnimatePresence>

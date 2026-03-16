@@ -133,5 +133,5 @@ export function injectLiveTournamentCards(
     }
   }
 
-  return result;
+  return deduplicatePosts(result);
 }
