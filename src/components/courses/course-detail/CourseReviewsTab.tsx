@@ -348,39 +348,39 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     return (
       <div className="flex flex-col">
         {/* Score header skeleton */}
-        <section className="px-4 py-4 flex flex-col items-center gap-2 animate-pulse">
-          <div className="h-10 w-16 bg-muted rounded-lg" />
-          <div className="h-4 w-24 bg-muted rounded" />
-          <div className="h-3 w-20 bg-muted rounded" />
+        <section className="px-4 py-4 flex flex-col items-center gap-2">
+          <Skeleton className="h-10 w-16 rounded-lg" />
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-3 w-20" />
         </section>
         {/* Search skeleton */}
-        <section className="px-4 pb-4 animate-pulse">
-          <div className="h-11 w-full bg-muted rounded-xl" />
+        <section className="px-4 pb-4">
+          <Skeleton className="h-11 w-full rounded-xl" />
         </section>
         {/* Sort chips skeleton */}
-        <section className="px-4 pb-4 flex gap-2 justify-center animate-pulse">
-          <div className="h-8 w-24 bg-muted rounded-full" />
-          <div className="h-8 w-28 bg-muted rounded-full" />
-          <div className="h-8 w-24 bg-muted rounded-full" />
+        <section className="px-4 pb-4 flex gap-2 justify-center">
+          <Skeleton className="h-8 w-24 rounded-full" />
+          <Skeleton className="h-8 w-28 rounded-full" />
+          <Skeleton className="h-8 w-24 rounded-full" />
         </section>
         {/* Review card skeletons */}
         <section className="px-4 space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="rounded-2xl bg-card border border-border p-5 animate-pulse">
+            <div key={i} className="rounded-2xl bg-card border border-border p-5">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-muted rounded-lg" />
+                  <Skeleton className="w-10 h-10 rounded-lg" />
                   <div className="space-y-1.5">
-                    <div className="h-4 bg-muted rounded w-28" />
-                    <div className="h-3 bg-muted rounded w-16" />
+                    <Skeleton className="h-4 w-28" />
+                    <Skeleton className="h-3 w-16" />
                   </div>
                 </div>
-                <div className="h-8 w-12 bg-muted rounded-lg" />
+                <Skeleton className="h-8 w-12 rounded-lg" />
               </div>
               <div className="space-y-2">
-                <div className="h-3 bg-muted rounded w-full" />
-                <div className="h-3 bg-muted rounded w-4/5" />
-                <div className="h-3 bg-muted rounded w-3/5" />
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-4/5" />
+                <Skeleton className="h-3 w-3/5" />
               </div>
             </div>
           ))}
