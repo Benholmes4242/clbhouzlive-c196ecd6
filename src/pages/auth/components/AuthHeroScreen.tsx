@@ -133,8 +133,8 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         <div 
           className="flex flex-col justify-center items-center gap-3 auth-logo-animate"
           style={{ 
-            paddingTop: '16vh',
-            paddingBottom: '2.5rem',
+            paddingTop: 'clamp(32px, 12vh, 100px)',
+            paddingBottom: '2rem',
           }}
         >
           {/* Subtle radial glow behind logo */}
