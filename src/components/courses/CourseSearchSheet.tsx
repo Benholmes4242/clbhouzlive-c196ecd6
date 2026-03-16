@@ -463,10 +463,10 @@ function SkeletonList({ rows = 6 }: { rows?: number }) {
     <div className="space-y-2 p-1">
       {Array.from({ length: rows }).map((_, i) => (
         <div key={i} className="flex items-center gap-3 p-3">
-          <div className="w-12 h-12 flex-shrink-0 animate-pulse" style={{ borderRadius: '10px', backgroundColor: 'rgba(0,0,0,0.06)' }} />
+          <Skeleton className="w-12 h-12 flex-shrink-0 rounded-[10px]" />
           <div className="flex-1 space-y-2">
-            <div className="h-4 rounded-lg w-3/4 animate-pulse" style={{ backgroundColor: 'rgba(0,0,0,0.06)' }} />
-            <div className="h-3 rounded-lg w-1/2 animate-pulse" style={{ backgroundColor: 'rgba(0,0,0,0.06)' }} />
+            <Skeleton className="h-4 rounded-lg w-3/4" />
+            <Skeleton className="h-3 rounded-lg w-1/2" />
           </div>
         </div>
       ))}

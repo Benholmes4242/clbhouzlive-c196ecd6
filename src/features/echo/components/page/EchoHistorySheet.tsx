@@ -78,12 +78,12 @@ function HistorySkeleton() {
     <div className="px-4">
       {[...Array(5)].map((_, i) => (
         <div key={i} className="flex items-center gap-3 px-0 py-3.5 border-b border-border/40">
-          <div className="w-10 h-10 rounded-full bg-muted/60 animate-pulse flex-shrink-0" />
+          <Skeleton className="w-10 h-10 rounded-full flex-shrink-0" />
           <div className="flex-1 space-y-2">
-            <div className="h-4 bg-muted/40 animate-pulse rounded-full w-3/4" />
-            <div className="h-3 bg-muted/30 animate-pulse rounded-full w-1/2" />
+            <Skeleton className="h-4 rounded-full w-3/4" />
+            <Skeleton className="h-3 rounded-full w-1/2" />
           </div>
-          <div className="h-3 bg-muted/30 animate-pulse rounded-full w-12" />
+          <Skeleton className="h-3 rounded-full w-12" />
         </div>
       ))}
     </div>
