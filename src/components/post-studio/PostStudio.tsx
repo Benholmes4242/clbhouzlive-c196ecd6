@@ -57,13 +57,12 @@ function StudioScreenRouter({ onClose }: { onClose: () => void }) {
 
 function renderScreen(step: StudioStep, onSuccessDone: () => void, onClose: () => void) {
   switch (step) {
-    case 'MEDIA_PICKER': return <MediaPickerScreen onClose={onClose} />;
-    case 'COMPOSER':     return <ComposerScreen />;
-    case 'TRIM':         return <TrimScreen />;
-    case 'POSTER':       return <PosterScreen />;
-    case 'PUBLISH':      return <PublishScreen />;
-    case 'SUCCESS':      return <SuccessScreen onDone={onSuccessDone} />;
-    default:             return null;
+    case 'COMPOSE':  return <ComposeScreen onClose={onClose} />;
+    case 'TRIM':     return <TrimScreen />;
+    case 'POSTER':   return <PosterScreen />;
+    case 'PUBLISH':  return <PublishScreen />;
+    case 'SUCCESS':  return <SuccessScreen onDone={onSuccessDone} />;
+    default:         return null;
   }
 }
 
