@@ -4,6 +4,7 @@
  */
 
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, TrendingUp, AlertCircle, RefreshCw, ChevronLeft } from 'lucide-react';
