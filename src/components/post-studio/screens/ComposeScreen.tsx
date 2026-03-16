@@ -417,6 +417,16 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     setShelfOpen(true);
   }, [setActiveMedia]);
 
+  const handleTrim = useCallback((index: number) => {
+    setActiveMedia(index);
+    setStep('TRIM');
+  }, [setActiveMedia, setStep]);
+
+  const handleCover = useCallback((index: number) => {
+    setActiveMedia(index);
+    setStep('POSTER');
+  }, [setActiveMedia, setStep]);
+
   return (
     <div className="flex-1 flex flex-col" style={{ background: BG_BASE }}>
       <StudioHeader
