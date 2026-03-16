@@ -5,8 +5,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PostStudioProvider, usePostStudioContext } from './usePostStudio';
-import { MediaPickerScreen } from './screens/MediaPickerScreen';
-import { ComposerScreen } from './screens/ComposerScreen';
+import { ComposeScreen } from './screens/ComposeScreen';
 import { TrimScreen } from './screens/TrimScreen';
 import { PosterScreen } from './screens/PosterScreen';
 import { PublishScreen } from './screens/PublishScreen';
@@ -22,7 +21,7 @@ import type { PostStudioProps, StudioStep, StudioMediaItem } from './types';
 
 // ─── Screen order for directional transitions ───────────────────────────────
 const STEP_ORDER: StudioStep[] = [
-  'MEDIA_PICKER', 'COMPOSER', 'TRIM', 'POSTER', 'PUBLISH', 'SUCCESS',
+  'COMPOSE', 'TRIM', 'POSTER', 'PUBLISH', 'SUCCESS',
 ];
 
 function getDirection(from: StudioStep | null, to: StudioStep): 'forward' | 'backward' {
@@ -58,13 +57,12 @@ function StudioScreenRouter({ onClose }: { onClose: () => void }) {
 
 function renderScreen(step: StudioStep, onSuccessDone: () => void, onClose: () => void) {
   switch (step) {
-    case 'MEDIA_PICKER': return <MediaPickerScreen onClose={onClose} />;
-    case 'COMPOSER':     return <ComposerScreen />;
-    case 'TRIM':         return <TrimScreen />;
-    case 'POSTER':       return <PosterScreen />;
-    case 'PUBLISH':      return <PublishScreen />;
-    case 'SUCCESS':      return <SuccessScreen onDone={onSuccessDone} />;
-    default:             return null;
+    case 'COMPOSE':  return <ComposeScreen onClose={onClose} />;
+    case 'TRIM':     return <TrimScreen />;
+    case 'POSTER':   return <PosterScreen />;
+    case 'PUBLISH':  return <PublishScreen />;
+    case 'SUCCESS':  return <SuccessScreen onDone={onSuccessDone} />;
+    default:         return null;
   }
 }
 
@@ -196,7 +194,7 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
           posterTimestamp: 0, posterPreviewUrl: null, width: null, height: null, validationError: null,
         });
       }
-      if (items.length > 0) { addMedia(items); setStep('COMPOSER'); }
+      if (items.length > 0) { addMedia(items); setStep('COMPOSE'); }
     })();
   }, [initialMedia, addMedia, setStep]);
 

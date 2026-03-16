@@ -25,12 +25,11 @@ interface StudioHeaderProps {
 }
 
 const STEP_PROGRESS: Partial<Record<StudioStep, number>> = {
-  MEDIA_PICKER: 20,
-  COMPOSER:     50,
-  TRIM:         62,
-  POSTER:       68,
-  PUBLISH:      85,
-  SUCCESS:      100,
+  COMPOSE:  40,
+  TRIM:     62,
+  POSTER:   68,
+  PUBLISH:  85,
+  SUCCESS:  100,
 };
 
 export function StudioHeader({

@@ -43,8 +43,8 @@ export function TrimScreen() {
         title="Trim"
         step="TRIM"
         darkMode
-        leftAction={{ label: 'Cancel', onClick: () => setStep('COMPOSER') }}
-        rightAction={{ label: 'Done', onClick: () => setStep('COMPOSER'), variant: 'primary' }}
+        leftAction={{ label: 'Cancel', onClick: () => setStep('COMPOSE') }}
+        rightAction={{ label: 'Done', onClick: () => setStep('COMPOSE'), variant: 'primary' }}
       />
 
       <div className="flex-1 flex items-center justify-center px-5 py-4">
