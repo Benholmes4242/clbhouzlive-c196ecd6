@@ -24,6 +24,7 @@ export function ComposerScreen() {
     updateMediaEdits,
     setMentions,
     setTaggedCourses,
+    setMentionTriggerIndex,
   } = usePostStudioContext();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
