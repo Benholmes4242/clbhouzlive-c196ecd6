@@ -238,6 +238,11 @@ export function PostStudioProvider({
   const setActiveMedia = useCallback((index: number) => dispatch({ type: 'SET_ACTIVE_MEDIA', payload: index }), []);
   const updateTrim = useCallback((id: string, trimStart: number, trimEnd: number) => dispatch({ type: 'UPDATE_MEDIA_TRIM', payload: { id, trimStart, trimEnd } }), []);
   const updatePoster = useCallback((id: string, posterTimestamp: number, posterPreviewUrl: string | null) => dispatch({ type: 'UPDATE_MEDIA_POSTER', payload: { id, posterTimestamp, posterPreviewUrl } }), []);
+  const updateMediaEdits = useCallback(
+    (id: string, edits: StudioEdits) =>
+      dispatch({ type: 'UPDATE_MEDIA_EDITS', payload: { id, edits } }),
+    []
+  );
   const setCaption = useCallback((text: string) => dispatch({ type: 'SET_CAPTION', payload: text }), []);
   const setMentions = useCallback((mentions: MentionToken[]) => dispatch({ type: 'SET_MENTIONS', payload: mentions }), []);
   const setTaggedCourses = useCallback((courses: TaggedCourse[]) => dispatch({ type: 'SET_TAGGED_COURSES', payload: courses }), []);
