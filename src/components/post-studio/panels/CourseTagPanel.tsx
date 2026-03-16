@@ -140,7 +140,7 @@ export function CourseTagPanel() {
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search golf courses…"
               className="flex-1 bg-transparent text-sm outline-none"
-              style={{ color: 'rgba(255,255,255,0.85)', caretColor: 'rgba(232,152,10,0.90)' }}
+              style={{ color: 'rgba(255,255,255,0.85)', caretColor: 'rgba(255,255,255,0.70)' }}
             />
             {query.length > 0 && (
               <button onClick={() => setQuery('')} className="shrink-0">
