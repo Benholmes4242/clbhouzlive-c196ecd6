@@ -41,7 +41,7 @@ export function ActorSelector({ compact = false }: ActorSelectorProps) {
 
         const profile = profileResult.data;
         if (profile?.profile_photo_url) setUserAvatar(profile.profile_photo_url);
-        if (profile?.display_name) setUserName(profile.display_name.slice(0, 10));
+        if (profile?.display_name) setUserName(profile.display_name);
 
         if (membershipsResult.data) {
           const biz = membershipsResult.data
