@@ -445,8 +445,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         className="flex-1 overflow-y-auto"
         style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain' }}
       >
-        {/* Actor selector — who is posting */}
-        <ActorSelector />
+        {/* Actor selector moved to bottom toolbar */}
 
         {/* ── Text input ── */}
         <div className="px-4 pt-3 pb-2 relative">
