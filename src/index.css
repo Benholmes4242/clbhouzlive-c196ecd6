@@ -393,6 +393,15 @@ html.lightbox-open {
   }
 }
 
+/* Neutral base fill for skeletons on light surfaces */
+.clb-skeleton-base {
+  background-color: hsl(var(--muted));
+}
+
+/* DEPRECATED — do not use on new components: */
+/* clb-skeleton, clb-skeleton::before (opacity sweep variant) */
+/* skeleton-shimmer, skeleton-shimmer::after (legacy sweep) */
+
 /* Generic skeleton shimmer - use on any placeholder block */
 .clb-skeleton {
   position: relative;
