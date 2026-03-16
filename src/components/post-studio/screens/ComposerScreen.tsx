@@ -243,14 +243,14 @@ export function ComposerScreen() {
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                 <div className="flex flex-wrap gap-1.5 px-4 py-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                   {state.taggedCourses.map((course) => (
-                    <span key={course.courseId} className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: AMBER_GHOST, color: 'rgba(232,152,10,0.90)', border: '1px solid rgba(232,152,10,0.25)' }}>
+                    <span key={course.courseId} className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.70)', border: '1px solid rgba(255,255,255,0.12)' }}>
                       ⛳ {course.courseName}
                       <button
                         onClick={() => setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId))}
                         className="flex items-center justify-center w-3.5 h-3.5 rounded-full"
-                        style={{ background: 'rgba(232,152,10,0.20)', marginLeft: 1 }}
+                        style={{ background: 'rgba(255,255,255,0.12)', marginLeft: 1 }}
                       >
-                        <X className="w-2 h-2" style={{ color: 'rgba(232,152,10,0.85)' }} strokeWidth={2.5} />
+                        <X className="w-2 h-2" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={2.5} />
                       </button>
                     </span>
                   ))}
