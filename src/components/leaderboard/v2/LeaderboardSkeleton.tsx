@@ -6,8 +6,6 @@ import React from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
-// Shimmer overlay class for premium loading feel
-const shimmerClass = "relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_1.5s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent";
 
 export function LeaderboardHeroSkeleton() {
   // Centered content on page background (no card)
@@ -25,10 +23,7 @@ export function LeaderboardHeroSkeleton() {
 
 export function LeaderboardStatusSkeleton() {
   return (
-    <div className={cn(
-      "mx-4 p-4 rounded-xl border border-border/60 bg-card shadow-sm",
-      shimmerClass
-    )}>
+    <div className="mx-4 p-4 rounded-xl border border-border/60 bg-card shadow-sm">
       <div className="flex items-center gap-4">
         {/* Avatar */}
         <Skeleton className="h-16 w-16 rounded-full" />
@@ -141,11 +136,7 @@ export function LeaderboardListSkeleton({ count = 6 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <div 
           key={i} 
-          className={cn(
-            "flex items-center gap-3 px-4 py-3",
-            shimmerClass
-          )}
-          style={{ animationDelay: `${i * 50}ms` }}
+          className="flex items-center gap-3 px-4 py-3"
         >
           {/* Rank */}
           <Skeleton className="h-5 w-8" />

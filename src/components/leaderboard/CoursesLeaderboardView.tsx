@@ -52,7 +52,7 @@ function readSavedFilters(): SavedFilters | null {
 const CourseLeaderboardSkeleton = () => (
   <div className="flex flex-col">
     {[1, 2, 3].map((i) => (
-      <div key={i} className="flex items-center gap-3 py-3 px-4 border-b border-border animate-pulse">
+      <div key={i} className="flex items-center gap-3 py-3 px-4 border-b border-border">
         <Skeleton className="w-6 h-5 rounded" />
         <Skeleton className="w-14 h-14 rounded-xl" />
         <div className="flex-1 space-y-1.5">
