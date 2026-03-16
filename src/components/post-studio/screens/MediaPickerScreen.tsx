@@ -146,7 +146,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
               <div
                 className="absolute inset-0 rounded-full"
                 style={{
-                  background: 'radial-gradient(circle, rgba(232,152,10,0.08) 0%, transparent 70%)',
+                  background: 'radial-gradient(circle, rgba(200,135,10,0.13) 0%, transparent 70%)',
                   transform: 'scale(3.5)',
                 }}
               />
@@ -155,14 +155,14 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
                 animate={{ scale: [1, 1.08, 1], opacity: [0.3, 0.1, 0.3] }}
                 transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
                 className="absolute inset-0 rounded-full"
-                style={{ border: '1px solid rgba(232,152,10,0.15)' }}
+                style={{ border: '1px solid rgba(200,135,10,0.22)' }}
               />
               <div
                 className="w-32 h-32 rounded-full flex items-center justify-center relative"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(232,152,10,0.14) 0%, rgba(232,152,10,0.05) 100%)',
-                  border: '1px solid rgba(232,152,10,0.18)',
-                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
+                  background: 'linear-gradient(135deg, rgba(200,135,10,0.20) 0%, rgba(200,135,10,0.07) 100%)',
+                  border: '1px solid rgba(200,135,10,0.22)',
+                  boxShadow: '0 0 24px rgba(200,135,10,0.08), inset 0 1px 0 rgba(255,255,255,0.07)',
                 }}
               >
                 <Camera className="w-11 h-11" style={{ color: 'rgba(245,158,11,0.90)' }} strokeWidth={1.5} />
