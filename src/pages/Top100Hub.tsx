@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
