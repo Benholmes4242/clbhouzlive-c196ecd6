@@ -184,7 +184,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.85, opacity: 0 }}
                     transition={{ type: 'spring', damping: 22, stiffness: 380 }}
-                    className="relative aspect-square rounded-2xl overflow-hidden"
+                    className="relative aspect-square rounded-xl overflow-hidden"
                     style={{ background: BG_CARD }}
                   >
                     <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
