@@ -119,9 +119,14 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
       <StudioHeader
         title="New Post"
         step="MEDIA_PICKER"
+        leftAction={
+          onClose
+            ? { label: '', onClick: onClose, icon: 'close' as const }
+            : undefined
+        }
         rightAction={
           hasMedia
-            ? { label: `Next (${mediaCount})`, onClick: () => setStep('COMPOSER'), variant: 'primary' }
+            ? { label: `Next (${mediaCount})`, onClick: () => setStep('COMPOSER'), variant: 'primary' as const }
             : undefined
         }
       />
