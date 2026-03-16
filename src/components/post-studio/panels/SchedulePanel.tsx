@@ -136,8 +136,8 @@ export function SchedulePanel() {
                   style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' }}
                 >
                   <div className="flex items-center gap-2.5 px-4 pt-3 pb-1">
-                    <Calendar className="w-4 h-4 shrink-0" style={{ color: AMBER_DIM }} strokeWidth={1.75} />
-                    <span className="text-[11px] font-semibold uppercase tracking-[1.2px]" style={{ color: AMBER_DIM }}>
+                    <Calendar className="w-4 h-4 shrink-0" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={1.75} />
+                    <span className="text-[11px] font-semibold uppercase tracking-[1.2px]" style={{ color: 'rgba(255,255,255,0.40)' }}>
                       Select date & time
                     </span>
                   </div>
