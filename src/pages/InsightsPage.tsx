@@ -13,6 +13,7 @@ import { useQuery } from '@tanstack/react-query';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useProfileData } from '@/hooks/useProfileData';
 import { supabase } from '@/integrations/supabase/client';
+import { Skeleton } from '@/components/ui/skeleton';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -190,9 +191,9 @@ export default function InsightsPage() {
         {isLoading ? (
           <div className="grid grid-cols-2 gap-3">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-card border border-border rounded-xl p-4 animate-pulse">
-                <div className="h-4 w-20 bg-muted rounded mb-2" />
-                <div className="h-8 w-16 bg-muted rounded" />
+              <div key={i} className="bg-card border border-border rounded-xl p-4">
+                <Skeleton className="h-4 w-20 mb-2" />
+                <Skeleton className="h-8 w-16" />
               </div>
             ))}
           </div>

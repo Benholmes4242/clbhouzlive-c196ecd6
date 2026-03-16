@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface SettingsSkeletonProps {
   /** Number of sections to show */
@@ -27,8 +27,8 @@ export function SettingsSkeleton({
         <div key={sectionIdx}>
           {/* Section title skeleton */}
           <div className="mb-3 ml-1">
-            <div 
-              className="h-2.5 rounded animate-pulse bg-muted"
+            <Skeleton 
+              className="h-2.5"
               style={{ width: `${section.title.length * 7}px` }}
             />
           </div>
@@ -59,22 +59,22 @@ function SkeletonRow({ isLast, index }: { isLast: boolean; index?: number }) {
   return (
     <div className="relative min-h-[60px] px-4 py-3 flex items-center gap-3">
       {/* Icon container skeleton */}
-      <div className="w-10 h-10 rounded-xl animate-pulse bg-muted" />
+      <Skeleton className="w-10 h-10 rounded-xl" />
 
       {/* Text content */}
       <div className="flex-1 space-y-2">
-        <div 
-          className="h-3.5 rounded-md animate-pulse bg-muted"
+        <Skeleton 
+          className="h-3.5 rounded-md"
           style={{ width: `${titleWidth}%` }}
         />
-        <div 
-          className="h-3 rounded-md animate-pulse bg-muted/60"
+        <Skeleton 
+          className="h-3 rounded-md"
           style={{ width: `${subtitleWidth}%` }}
         />
       </div>
 
       {/* Right control skeleton */}
-      <div className="w-5 h-5 rounded animate-pulse bg-muted/60" />
+      <Skeleton className="w-5 h-5 rounded" />
 
       {/* Divider */}
       {!isLast && (

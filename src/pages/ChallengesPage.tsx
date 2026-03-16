@@ -4,6 +4,7 @@ import { useActiveChallenges } from '@/hooks/useActiveChallenges';
 import { useChallengeProgress } from '@/hooks/useChallengeProgress';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Trophy, Clock, Zap } from 'lucide-react';
 
@@ -16,13 +17,13 @@ const ChallengesPage: React.FC = () => {
       <div className="min-h-screen bg-background py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
-            <div className="h-10 w-48 bg-surface-alt animate-pulse rounded mb-2"></div>
-            <div className="h-5 w-96 bg-surface-alt animate-pulse rounded"></div>
+            <Skeleton className="h-10 w-48 rounded mb-2" />
+            <Skeleton className="h-5 w-96 rounded" />
           </div>
           
           <div className="grid gap-4 md:grid-cols-2">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-48 bg-surface-alt animate-pulse rounded-sq-md"></div>
+              <Skeleton key={i} className="h-48 rounded-sq-md" />
             ))}
           </div>
         </div>

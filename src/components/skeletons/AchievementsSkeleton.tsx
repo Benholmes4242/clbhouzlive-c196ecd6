@@ -24,7 +24,7 @@ export function AchievementsSkeleton() {
       <div className="flex-1 overflow-y-auto">
         {/* Hero banner skeleton */}
         <section className="px-2.5 md:px-5 mt-5 mb-6">
-          <div className="rounded-sq-lg p-5 md:p-6 bg-muted/50 animate-pulse">
+          <div className="rounded-sq-lg p-5 md:p-6 bg-muted/50">
             <div className="flex flex-col gap-2.5">
               {/* Label */}
               <Skeleton className="h-3 w-40" />
@@ -46,7 +46,7 @@ export function AchievementsSkeleton() {
           <Skeleton className="h-4 w-40 mb-3" />
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="rounded-sq-md p-4 bg-muted/40 animate-pulse">
+              <div key={i} className="rounded-sq-md p-4 bg-muted/40">
                 <Skeleton className="h-10 w-10 rounded-full mb-3 mx-auto" />
                 <Skeleton className="h-4 w-20 mx-auto mb-1" />
                 <Skeleton className="h-3 w-24 mx-auto" />
@@ -60,7 +60,7 @@ export function AchievementsSkeleton() {
           <Skeleton className="h-4 w-48 mb-3" />
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="rounded-sq-md p-4 bg-muted/40 animate-pulse">
+              <div key={i} className="rounded-sq-md p-4 bg-muted/40">
                 <Skeleton className="h-10 w-10 rounded-full mb-3 mx-auto" />
                 <Skeleton className="h-4 w-20 mx-auto mb-1" />
                 <Skeleton className="h-3 w-24 mx-auto" />
