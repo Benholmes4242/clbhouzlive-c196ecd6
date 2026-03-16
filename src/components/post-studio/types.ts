@@ -1,6 +1,8 @@
 // Post Studio — Complete Type System
 // Single source of truth for all Post Studio types
 
+import type { StudioEdits } from '@/types/studio';
+
 // ============================================================================
 // ENUMS & LITERALS
 // ============================================================================
@@ -66,6 +68,9 @@ export interface StudioMediaItem {
 
   // Validation
   validationError: string | null;
+
+  // Studio edits (crop, filter, text, music)
+  edits?: StudioEdits;
 }
 
 /** Mention token representing an @mention in the caption */
@@ -180,7 +185,8 @@ export type PostStudioAction =
   | { type: 'SET_DISCARDING'; payload: boolean }
   | { type: 'OPEN_PANEL'; payload: PanelId }
   | { type: 'CLOSE_PANEL' }
-  | { type: 'RESET' };
+  | { type: 'RESET' }
+  | { type: 'UPDATE_MEDIA_EDITS'; payload: { id: string; edits: StudioEdits } };
 
 // ============================================================================
 // PROPS

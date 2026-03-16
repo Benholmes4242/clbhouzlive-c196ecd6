@@ -1,8 +1,8 @@
 // ComposerScreen — Step 2: The creative canvas
 // Dark immersive studio. Media front and centre. Tools feel pro, not form-like.
 
-import React, { useCallback, useRef } from 'react';
-import { AtSign, Scissors, Image as ImageIcon, Star, Plus, ChevronRight } from 'lucide-react';
+import React, { useState, useCallback, useRef } from 'react';
+import { AtSign, Scissors, Image as ImageIcon, Star, Plus, ChevronRight, Wand2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StudioHeader } from '../components/StudioHeader';
 import { MediaPreview } from '../components/MediaPreview';
@@ -13,12 +13,15 @@ import { usePostStudioContext } from '../usePostStudio';
 import { ALLOWED_VIDEO_TYPES, ALLOWED_IMAGE_TYPES, POST_LIMITS } from '../constants';
 import { BG_BASE, BG_CARD, AMBER, AMBER_DEEP, AMBER_DIM, AMBER_GHOST, AMBER_GRADIENT, BORDER_CARD, TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY } from '../tokens';
 import type { StudioMediaItem } from '../types';
+import type { StudioEdits, StudioTool } from '@/types/studio';
+import StudioShelf from '@/components/studio/StudioShelf';
 import { toast } from 'sonner';
 
 export function ComposerScreen() {
   const {
     state, setStep, setActiveMedia, removeMedia, addMedia,
     setCaption, openPanel, setPostType, setReviewRating,
+    updateMediaEdits,
   } = usePostStudioContext();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -26,6 +29,24 @@ export function ComposerScreen() {
 
   const activeItem = state.mediaItems[state.activeMediaIndex] ?? null;
   const activeIsVideo = activeItem?.mediaType === 'video';
+
+  const [shelfOpen, setShelfOpen] = useState(false);
+  const [activeTool, setActiveTool] = useState<StudioTool>(null);
+  const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
+
+  const handleUpdateEdits = useCallback(
+    (patch: Partial<StudioEdits>) => {
+      if (!activeItem) return;
+      const merged = { ...(activeItem.edits ?? {}), ...patch };
+      updateMediaEdits(activeItem.id, merged);
+    },
+    [activeItem, updateMediaEdits]
+  );
+
+  const handleClearEdits = useCallback(() => {
+    if (!activeItem) return;
+    updateMediaEdits(activeItem.id, {});
+  }, [activeItem, updateMediaEdits]);
 
   const charCount = (() => {
     try {
@@ -91,6 +112,23 @@ export function ComposerScreen() {
             <MediaPreview item={activeItem} onSwipeLeft={handleSwipeLeft} onSwipeRight={handleSwipeRight} />
             {/* Bottom scrim gradient */}
             <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: 60, background: `linear-gradient(to top, rgba(8,8,8,0.8), transparent)` }} />
+            {/* Edit button — all media types */}
+            <div className="absolute bottom-3 left-3 z-10">
+              <motion.button whileTap={{ scale: 0.93 }} onClick={() => { setActiveTool(null); setShelfOpen(true); }}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium"
+                style={{
+                  background: 'rgba(0,0,0,0.65)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: 12,
+                  color: 'rgba(255,255,255,0.85)',
+                }}
+              >
+                <Wand2 className="w-4 h-4" strokeWidth={1.75} />
+                Edit
+              </motion.button>
+            </div>
+
             {/* Floating trim/cover buttons for video */}
             {activeIsVideo && (
               <div className="absolute bottom-3 right-3 flex gap-2 z-10">
@@ -206,6 +244,25 @@ export function ComposerScreen() {
         </AnimatePresence>
         <div className="h-6" />
       </div>
+
+      {/* Studio Shelf — crop, filter, text, music */}
+      {activeItem && (
+        <StudioShelf
+          open={shelfOpen}
+          onClose={() => setShelfOpen(false)}
+          activeTool={activeTool}
+          setActiveTool={setActiveTool}
+          activeMediaId={activeItem.id}
+          activeMediaType={activeItem.mediaType}
+          activeMediaPreviewUrl={activeItem.previewUrl}
+          activeMediaThumbnailUrl={activeItem.thumbnailUrl ?? null}
+          edits={activeItem.edits ?? {}}
+          updateEdits={handleUpdateEdits}
+          clearEdits={handleClearEdits}
+          activeOverlayId={activeOverlayId}
+          onSelectOverlay={setActiveOverlayId}
+        />
+      )}
     </div>
   );
 }

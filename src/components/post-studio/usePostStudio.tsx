@@ -2,6 +2,7 @@
 // Single useReducer + React Context for the entire studio
 
 import React, { createContext, useContext, useReducer, useCallback, useMemo } from 'react';
+import type { StudioEdits } from '@/types/studio';
 import type {
   PostStudioState,
   PostStudioAction,
@@ -101,6 +102,17 @@ function postStudioReducer(state: PostStudioState, action: PostStudioAction): Po
         isDirty: true,
       };
 
+    case 'UPDATE_MEDIA_EDITS':
+      return {
+        ...state,
+        mediaItems: state.mediaItems.map((m) =>
+          m.id === action.payload.id
+            ? { ...m, edits: action.payload.edits }
+            : m
+        ),
+        isDirty: true,
+      };
+
     case 'SET_CAPTION':
       return { ...state, caption: action.payload, isDirty: true };
 
@@ -175,6 +187,7 @@ interface PostStudioContextValue {
   setActiveMedia: (index: number) => void;
   updateTrim: (id: string, trimStart: number, trimEnd: number) => void;
   updatePoster: (id: string, posterTimestamp: number, posterPreviewUrl: string | null) => void;
+  updateMediaEdits: (id: string, edits: StudioEdits) => void;
   setCaption: (text: string) => void;
   setMentions: (mentions: MentionToken[]) => void;
   setTaggedCourses: (courses: TaggedCourse[]) => void;
@@ -225,6 +238,11 @@ export function PostStudioProvider({
   const setActiveMedia = useCallback((index: number) => dispatch({ type: 'SET_ACTIVE_MEDIA', payload: index }), []);
   const updateTrim = useCallback((id: string, trimStart: number, trimEnd: number) => dispatch({ type: 'UPDATE_MEDIA_TRIM', payload: { id, trimStart, trimEnd } }), []);
   const updatePoster = useCallback((id: string, posterTimestamp: number, posterPreviewUrl: string | null) => dispatch({ type: 'UPDATE_MEDIA_POSTER', payload: { id, posterTimestamp, posterPreviewUrl } }), []);
+  const updateMediaEdits = useCallback(
+    (id: string, edits: StudioEdits) =>
+      dispatch({ type: 'UPDATE_MEDIA_EDITS', payload: { id, edits } }),
+    []
+  );
   const setCaption = useCallback((text: string) => dispatch({ type: 'SET_CAPTION', payload: text }), []);
   const setMentions = useCallback((mentions: MentionToken[]) => dispatch({ type: 'SET_MENTIONS', payload: mentions }), []);
   const setTaggedCourses = useCallback((courses: TaggedCourse[]) => dispatch({ type: 'SET_TAGGED_COURSES', payload: courses }), []);
@@ -249,6 +267,7 @@ export function PostStudioProvider({
       setActiveMedia,
       updateTrim,
       updatePoster,
+      updateMediaEdits,
       setCaption,
       setMentions,
       setTaggedCourses,
@@ -273,6 +292,7 @@ export function PostStudioProvider({
       setActiveMedia,
       updateTrim,
       updatePoster,
+      updateMediaEdits,
       setCaption,
       setMentions,
       setTaggedCourses,

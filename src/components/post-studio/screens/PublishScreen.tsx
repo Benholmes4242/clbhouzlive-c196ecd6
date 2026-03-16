@@ -43,6 +43,11 @@ export function PublishScreen() {
           trimStart: item.trimStart || null, trimEnd: item.trimEnd || null,
           posterTimestamp: item.posterTimestamp || null,
         })),
+        studioEditsByMediaId: Object.fromEntries(
+          state.mediaItems
+            .filter((item) => item.edits && Object.keys(item.edits).length > 0)
+            .map((item) => [item.id, item.edits!])
+        ),
         courseIds: state.taggedCourses.map((c) => c.courseId),
         courseInfo: state.taggedCourses[0]
           ? { id: state.taggedCourses[0].courseId, name: state.taggedCourses[0].courseName, country: state.taggedCourses[0].country ?? '' }
