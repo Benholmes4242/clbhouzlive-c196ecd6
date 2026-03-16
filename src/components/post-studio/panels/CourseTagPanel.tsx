@@ -188,7 +188,7 @@ export function CourseTagPanel() {
                 className="w-full flex items-center gap-3 py-3 min-h-[56px] disabled:opacity-40"
                 style={{ borderBottom: i < results.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}
               >
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: AMBER_GHOST, border: '1px solid rgba(232,152,10,0.20)' }}>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)' }}>
                   <span className="text-base">⛳</span>
                 </div>
                 <div className="flex-1 text-left min-w-0">
