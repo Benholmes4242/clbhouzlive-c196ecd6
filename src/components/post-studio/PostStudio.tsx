@@ -50,7 +50,7 @@ function StudioScreenRouter({ onClose }: { onClose: () => void }) {
         transition={{ duration: DURATION.screenTransition, ease: [0.22, 1, 0.36, 1] }}
         className="absolute inset-0 flex flex-col"
       >
-        {renderScreen(state.step, handleSuccessDone)}
+        {renderScreen(state.step, handleSuccessDone, onClose)}
       </motion.div>
     </AnimatePresence>
   );
