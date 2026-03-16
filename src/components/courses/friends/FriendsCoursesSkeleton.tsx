@@ -27,7 +27,7 @@ const FriendsCoursesSkeleton: React.FC = () => {
           <div className="text-center relative">
             <Skeleton className="h-3 w-20 mx-auto mb-2" />
             <Skeleton className="h-6 w-8 mx-auto" />
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-slate-200/60" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-border/60" />
           </div>
           <div className="text-center">
             <Skeleton className="h-3 w-14 mx-auto mb-2" />
@@ -35,13 +35,13 @@ const FriendsCoursesSkeleton: React.FC = () => {
           </div>
 
           {/* Horizontal divider */}
-          <div className="col-span-2 h-px bg-slate-200/60 my-1" />
+          <div className="col-span-2 h-px bg-border/60 my-1" />
 
           {/* Row 2 */}
           <div className="text-center relative">
             <Skeleton className="h-3 w-16 mx-auto mb-2" />
             <Skeleton className="h-6 w-10 mx-auto" />
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-slate-200/60" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-border/60" />
           </div>
           <div className="text-center">
             <Skeleton className="h-3 w-20 mx-auto mb-2" />
@@ -152,7 +152,7 @@ const FriendsCoursesSkeleton: React.FC = () => {
             <Skeleton className="h-5 w-8 mx-auto mb-1" />
             <Skeleton className="h-2 w-12 mx-auto" />
           </div>
-          <div className="h-6 w-px bg-slate-200/60" />
+          <div className="h-6 w-px bg-border/60" />
           <div className="text-center">
             <Skeleton className="h-5 w-6 mx-auto mb-1" />
             <Skeleton className="h-2 w-14 mx-auto" />

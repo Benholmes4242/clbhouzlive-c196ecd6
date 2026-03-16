@@ -13,6 +13,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { getProfilePathById } from '@/lib/profileRoutes';
@@ -309,23 +310,18 @@ const GolfersToFollowPage = () => {
 
           {/* Loading skeletons */}
           {loading && !error ? (
-            <div className="divide-y divide-[#e2e8f0]">
+            <div className="divide-y divide-border/30">
               {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="flex items-center gap-3 px-6 py-4 animate-pulse">
-                  {/* Avatar skeleton */}
-                  <div className="w-14 h-14 rounded-2xl bg-[#e2e8f0] flex-shrink-0" />
-                  
-                  {/* Content skeleton */}
+                <div key={i} className="flex items-center gap-3 px-6 py-4">
+                  <Skeleton className="w-14 h-14 rounded-2xl flex-shrink-0" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-[#e2e8f0] rounded w-32" />
-                    <div className="h-3 bg-[#e2e8f0] rounded w-24" />
-                    <div className="h-3 bg-[#e2e8f0] rounded w-28" />
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-24" />
+                    <Skeleton className="h-3 w-28" />
                   </div>
-                  
-                  {/* Button skeletons */}
                   <div className="flex gap-2">
-                    <div className="h-8 w-20 bg-[#e2e8f0] rounded-full" />
-                    <div className="h-8 w-24 bg-[#e2e8f0] rounded-full" />
+                    <Skeleton className="h-8 w-20 rounded-full" />
+                    <Skeleton className="h-8 w-24 rounded-full" />
                   </div>
                 </div>
               ))}
