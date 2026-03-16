@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Plus, Users, MoreHorizontal, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
