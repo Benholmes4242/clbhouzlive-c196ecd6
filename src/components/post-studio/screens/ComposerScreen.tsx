@@ -2,7 +2,7 @@
 // Dark immersive studio. Media front and centre. Tools feel pro, not form-like.
 
 import React, { useState, useCallback, useRef, useMemo } from 'react';
-import { AtSign, Scissors, Image as ImageIcon, Plus, ChevronRight, Wand2 } from 'lucide-react';
+import { AtSign, Scissors, Image as ImageIcon, Plus, ChevronRight, Wand2, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StudioHeader } from '../components/StudioHeader';
 import { MediaPreview } from '../components/MediaPreview';
@@ -23,6 +23,7 @@ export function ComposerScreen() {
     setCaption, openPanel,
     updateMediaEdits,
     setMentions,
+    setTaggedCourses,
   } = usePostStudioContext();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -235,8 +236,15 @@ export function ComposerScreen() {
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                 <div className="flex flex-wrap gap-1.5 px-4 py-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                   {state.taggedCourses.map((course) => (
-                    <span key={course.courseId} className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: AMBER_GHOST, color: 'rgba(245,158,11,0.90)', border: '1px solid rgba(245,158,11,0.25)' }}>
+                    <span key={course.courseId} className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: AMBER_GHOST, color: 'rgba(245,158,11,0.90)', border: '1px solid rgba(245,158,11,0.25)' }}>
                       ⛳ {course.courseName}
+                      <button
+                        onClick={() => setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId))}
+                        className="flex items-center justify-center w-3.5 h-3.5 rounded-full"
+                        style={{ background: 'rgba(245,158,11,0.25)', marginLeft: 1 }}
+                      >
+                        <X className="w-2 h-2" style={{ color: 'rgba(245,158,11,0.90)' }} strokeWidth={2.5} />
+                      </button>
                     </span>
                   ))}
                 </div>
