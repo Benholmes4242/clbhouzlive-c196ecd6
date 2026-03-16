@@ -1,5 +1,5 @@
-// MediaPickerScreen — Step 1: Cinematic entry into the studio
-// Dark immersive stage. Golf energy. Not a file picker — a creative launchpad.
+// MediaPickerScreen — Step 1: The invitation
+// Pure. Minimal. One line of text, one button. Apple-grade restraint.
 
 import React, { useCallback, useRef, useState } from 'react';
 import { Camera, Layers, BookOpen } from 'lucide-react';
@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { StudioHeader } from '../components/StudioHeader';
 import { usePostStudioContext } from '../usePostStudio';
 import { validateMediaFile, POST_LIMITS, ALLOWED_VIDEO_TYPES, ALLOWED_IMAGE_TYPES } from '../constants';
-import { BG_BASE, AMBER, AMBER_DEEP, AMBER_DIM, AMBER_GHOST, AMBER_GRADIENT, BG_CARD, TEXT_PRIMARY, TEXT_SECONDARY } from '../tokens';
+import { BG_BASE, BG_CARD, AMBER_GRADIENT, AMBER_DIM, TEXT_PRIMARY } from '../tokens';
 import type { StudioMediaItem } from '../types';
 
 async function generatePoster(file: File): Promise<string> {
@@ -80,9 +80,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
   const { state, addMedia, setStep, openPanel } = usePostStudioContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-
   const hasMedia = state.mediaItems.length > 0;
-  const mediaCount = state.mediaItems.length;
   const acceptTypes = [...ALLOWED_VIDEO_TYPES, ...ALLOWED_IMAGE_TYPES].join(',');
 
   const handleFileSelect = useCallback(
@@ -134,65 +132,38 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
       <input ref={fileInputRef} type="file" accept={acceptTypes} multiple onChange={handleFileSelect} className="hidden" />
 
       <div className="flex-1 flex flex-col">
+        {/* ── Empty state — minimal ── */}
         {!hasMedia && (
           <div className="flex-1 flex flex-col items-center justify-center px-8">
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="relative mb-8"
-            >
-              {/* Dramatic spotlight glow */}
-              <div
-                className="absolute inset-0 rounded-full"
-                style={{
-                  background: 'radial-gradient(circle, rgba(200,135,10,0.13) 0%, transparent 70%)',
-                  transform: 'scale(3.5)',
-                }}
-              />
-              {/* Pulsing ring animation */}
-              <motion.div
-                animate={{ scale: [1, 1.08, 1], opacity: [0.3, 0.1, 0.3] }}
-                transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
-                className="absolute inset-0 rounded-full"
-                style={{ border: '1px solid rgba(200,135,10,0.22)' }}
-              />
-              <div
-                className="w-32 h-32 rounded-full flex items-center justify-center relative"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(200,135,10,0.20) 0%, rgba(200,135,10,0.07) 100%)',
-                  border: '1px solid rgba(200,135,10,0.22)',
-                  boxShadow: '0 0 24px rgba(200,135,10,0.08), inset 0 1px 0 rgba(255,255,255,0.07)',
-                }}
-              >
-                <Camera className="w-11 h-11" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={1.5} />
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
+            <motion.h2
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-center space-y-2 mb-10"
+              transition={{ delay: 0.08, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                fontSize: 36,
+                fontWeight: 700,
+                color: TEXT_PRIMARY,
+                letterSpacing: '-0.04em',
+                lineHeight: 1.1,
+                textAlign: 'center',
+              }}
             >
-              <p className="text-[26px] font-bold" style={{ color: TEXT_PRIMARY, letterSpacing: '-0.03em' }}>Share a moment</p>
-              <p className="text-sm max-w-[220px] mx-auto leading-relaxed" style={{ color: 'rgba(255,255,255,0.48)' }}>
-                Photos, videos, course reviews — your story on the fairway.
-              </p>
-            </motion.div>
+              Share a moment.
+            </motion.h2>
 
+            {/* Processing indicator — only appears when a file is being processed */}
             <AnimatePresence>
               {isProcessing && (
                 <motion.div
-                  initial={{ opacity: 0, y: 8 }}
+                  initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className="flex items-center gap-2.5 text-sm mb-6"
-                  style={{ color: 'rgba(255,255,255,0.45)' }}
+                  className="flex items-center gap-2 mt-8 text-sm"
+                  style={{ color: 'rgba(255,255,255,0.35)' }}
                 >
                   <div
-                    className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin"
-                    style={{ borderColor: 'rgba(255,255,255,0.25)', borderTopColor: 'transparent' }}
+                    className="w-3.5 h-3.5 rounded-full border-2 border-t-transparent animate-spin"
+                    style={{ borderColor: 'rgba(255,255,255,0.20)', borderTopColor: 'transparent' }}
                   />
                   Preparing…
                 </motion.div>
@@ -201,6 +172,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
           </div>
         )}
 
+        {/* ── Media grid — shown once user has selected items ── */}
         {hasMedia && (
           <div className="flex-1 flex flex-col px-5 pt-5 pb-4">
             <div className="grid grid-cols-3 gap-2 mb-4">
@@ -216,27 +188,46 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
                     style={{ background: BG_CARD }}
                   >
                     <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
+                    {/* Order badge */}
                     <div
                       className="absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center"
                       style={{ background: AMBER_GRADIENT, boxShadow: '0 2px 8px rgba(200,135,10,0.30)' }}
                     >
                       <span className="text-[11px] font-bold text-black">{index + 1}</span>
                     </div>
+                    {/* Video duration badge */}
                     {item.mediaType === 'video' && (
-                      <div className="absolute bottom-1.5 right-1.5 flex items-center rounded-md" style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.10)', padding: '2px 5px' }}>
-                        <span className="text-[9px] font-semibold leading-none block" style={{ color: 'rgba(255,255,255,0.90)', letterSpacing: '0.02em' }}>{item.duration ? formatTime(item.duration) : 'Video'}</span>
+                      <div
+                        className="absolute bottom-1.5 right-1.5 flex items-center rounded-md"
+                        style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.10)', padding: '2px 5px' }}
+                      >
+                        <span className="text-[9px] font-semibold leading-none block" style={{ color: 'rgba(255,255,255,0.90)', letterSpacing: '0.02em' }}>
+                          {item.duration ? formatTime(item.duration) : 'Video'}
+                        </span>
                       </div>
                     )}
-                    <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: index === 0 ? 'inset 0 0 0 2px rgba(232,152,10,0.55)' : 'none' }} />
+                    {/* First-item amber border */}
+                    <div
+                      className="absolute inset-0 rounded-2xl pointer-events-none"
+                      style={{ boxShadow: index === 0 ? 'inset 0 0 0 2px rgba(232,152,10,0.55)' : 'none' }}
+                    />
                   </motion.div>
                 ))}
               </AnimatePresence>
             </div>
-
             <AnimatePresence>
               {isProcessing && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center justify-center gap-2.5 py-3 text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>
-                  <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(255,255,255,0.25)', borderTopColor: 'transparent' }} />
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-center justify-center gap-2 py-3 text-sm"
+                  style={{ color: 'rgba(255,255,255,0.35)' }}
+                >
+                  <div
+                    className="w-3.5 h-3.5 rounded-full border-2 border-t-transparent animate-spin"
+                    style={{ borderColor: 'rgba(255,255,255,0.20)', borderTopColor: 'transparent' }}
+                  />
                   Processing…
                 </motion.div>
               )}
@@ -245,36 +236,63 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
         )}
       </div>
 
-      {/* Bottom bar */}
+      {/* ── Bottom action bar ── */}
       <div className="shrink-0 relative">
-        {/* Fade gradient above bar */}
-        <div className="absolute left-0 right-0" style={{ top: -32, height: 32, background: `linear-gradient(to top, ${BG_BASE}, transparent)`, pointerEvents: 'none' }} />
+        {/* Fade vignette */}
         <div
-          className="px-6 py-5 flex items-center justify-around"
+          className="absolute left-0 right-0 pointer-events-none"
+          style={{ top: -40, height: 40, background: `linear-gradient(to top, ${BG_BASE}, transparent)` }}
+        />
+        <div
+          className="px-8 flex items-center justify-between"
           style={{
-            background: `linear-gradient(to bottom, rgba(8,8,8,0) 0%, rgba(8,8,8,0.97) 20%)`,
+            paddingTop: 16,
+            paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
             borderTop: '1px solid rgba(255,255,255,0.05)',
-            paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
           }}
         >
-          <motion.button whileTap={{ scale: 0.92 }} onClick={() => fileInputRef.current?.click()} disabled={isProcessing} className="flex flex-col items-center gap-1.5 min-w-[60px] min-h-[44px] justify-center disabled:opacity-40">
-            <Layers className="w-6 h-6" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={1.75} />
-            <span className="text-[11px] font-semibold" style={{ color: 'rgba(255,255,255,0.45)', letterSpacing: '0.02em' }}>Gallery</span>
+          {/* Gallery */}
+          <motion.button
+            whileTap={{ scale: 0.92 }}
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isProcessing}
+            className="flex flex-col items-center gap-1.5 disabled:opacity-30"
+            style={{ minWidth: 64, minHeight: 44, justifyContent: 'center' }}
+          >
+            <Layers className="w-6 h-6" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={1.5} />
+            <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.35)', letterSpacing: '0.03em' }}>
+              Gallery
+            </span>
           </motion.button>
 
+          {/* Primary camera CTA — the only amber element on screen */}
           <motion.button
-            whileTap={{ scale: 0.91 }}
+            whileTap={{ scale: 0.93 }}
             onClick={() => fileInputRef.current?.click()}
             disabled={isProcessing}
             className="relative flex items-center justify-center disabled:opacity-40"
-            style={{ width: 72, height: 72, borderRadius: '50%', background: AMBER_GRADIENT, boxShadow: '0 4px 16px rgba(200,135,10,0.30)' }}
+            style={{
+              width: 76,
+              height: 76,
+              borderRadius: '50%',
+              background: AMBER_GRADIENT,
+              boxShadow: '0 4px 20px rgba(200,135,10,0.35), 0 1px 0 rgba(255,255,255,0.15) inset',
+            }}
           >
             <Camera className="w-7 h-7 text-black" strokeWidth={1.75} />
           </motion.button>
 
-          <motion.button whileTap={{ scale: 0.92 }} onClick={() => openPanel('drafts')} className="flex flex-col items-center gap-1.5 min-w-[60px] min-h-[44px] justify-center">
-            <BookOpen className="w-6 h-6" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={1.75} />
-            <span className="text-[11px] font-semibold" style={{ color: 'rgba(255,255,255,0.45)', letterSpacing: '0.02em' }}>Drafts</span>
+          {/* Drafts */}
+          <motion.button
+            whileTap={{ scale: 0.92 }}
+            onClick={() => openPanel('drafts')}
+            className="flex flex-col items-center gap-1.5"
+            style={{ minWidth: 64, minHeight: 44, justifyContent: 'center' }}
+          >
+            <BookOpen className="w-6 h-6" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={1.5} />
+            <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.35)', letterSpacing: '0.03em' }}>
+              Drafts
+            </span>
           </motion.button>
         </div>
       </div>
