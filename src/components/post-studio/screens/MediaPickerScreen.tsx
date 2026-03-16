@@ -160,9 +160,9 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
               <div
                 className="w-32 h-32 rounded-full flex items-center justify-center relative"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(232,152,10,0.14) 0%, rgba(232,152,10,0.05) 100%)',
-                  border: '1px solid rgba(232,152,10,0.18)',
-                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
+                  background: 'linear-gradient(135deg, rgba(200,135,10,0.20) 0%, rgba(200,135,10,0.07) 100%)',
+                  border: '1px solid rgba(200,135,10,0.22)',
+                  boxShadow: '0 0 24px rgba(200,135,10,0.08), inset 0 1px 0 rgba(255,255,255,0.07)',
                 }}
               >
                 <Camera className="w-11 h-11" style={{ color: 'rgba(245,158,11,0.90)' }} strokeWidth={1.5} />
