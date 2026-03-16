@@ -152,7 +152,7 @@ interface PlayerSeasonStatsProps {
 }
 
 export function PlayerSeasonStats({ playerStats }: PlayerSeasonStatsProps) {
-  const [activeTab, setActiveTab] = useState('Overview');
+  const [activeTab, setActiveTab] = useState('Player Overview');
 
   const top10Ratio = (playerStats.top_10s && playerStats.events_played && playerStats.events_played > 0)
     ? (playerStats.top_10s / playerStats.events_played) * 100 : undefined;

@@ -1,4 +1,5 @@
 import { createPortal } from 'react-dom';
+import { useLocation } from 'react-router-dom';
 import { useFullscreenFeed } from './hooks/useFullscreenFeed';
 import { FullscreenFeedContent } from './FullscreenFeedContent';
 
@@ -9,8 +10,12 @@ export function FullscreenFeedOverlay() {
   const fetchNextPage = useFullscreenFeed((s) => s.fetchNextPage);
   const hasNextPage = useFullscreenFeed((s) => s.hasNextPage);
   const isFetchingNextPage = useFullscreenFeed((s) => s.isFetchingNextPage);
+  const { pathname } = useLocation();
 
-  if (!isOpen || posts.length === 0) return null;
+  // Never render over the Clubhouse feed — it has its own action rail
+  const isClubhouse = pathname === '/' || pathname === '/clubhouse';
+
+  if (!isOpen || posts.length === 0 || isClubhouse) return null;
 
   return createPortal(
     <div

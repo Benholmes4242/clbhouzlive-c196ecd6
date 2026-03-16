@@ -156,6 +156,11 @@ const ClubhouseContent = () => {
     clubhouseDebug.pageMount();
     return () => { clubhouseDebug.pageUnmount(); };
   }, []);
+
+  // Close fullscreen feed overlay when Clubhouse mounts — prevents duplicate action rail
+  useEffect(() => {
+    useFullscreenFeed.getState().close();
+  }, []);
   
   useHeaderVariant('glass-dark');
   useMedianStatusBar("dark", "transparent", true, false);
