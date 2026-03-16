@@ -48,7 +48,12 @@ export function PosterPicker({ item, onPosterChange, darkMode }: PosterPickerPro
     };
     video.onloadeddata = () => captureNext();
     video.onerror = () => setIsGenerating(false);
-    return () => { video.src = ''; };
+    return () => {
+      video.onloadeddata = null;
+      video.onseeked = null;
+      video.onerror = null;
+      video.src = '';
+    };
   }, [item.previewUrl, duration]);
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
