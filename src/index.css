@@ -359,6 +359,12 @@ html.lightbox-open {
   100% { background-position: 200% center; }
 }
 
+/* ============================================================
+   CANONICAL SHIMMER — use these classes on all new skeletons
+   clb-shimmer-light  → light surfaces (most pages)
+   clb-shimmer-dark   → dark/glass surfaces (Clubhouse, sheets)
+   ============================================================ */
+
 /* Dark shimmer — for dark/glass contexts (Clubhouse, sheets, overlays) */
 .clb-shimmer-dark {
   background: linear-gradient(90deg,
