@@ -96,7 +96,8 @@ export function PosterPicker({ item, onPosterChange, darkMode }: PosterPickerPro
 
       <div
         ref={containerRef}
-        className="relative h-[42px] rounded-lg overflow-hidden bg-muted touch-none select-none cursor-pointer"
+        className="relative h-[56px] rounded-xl overflow-hidden touch-none select-none cursor-pointer"
+        style={{ background: 'rgba(255,255,255,0.04)' }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
