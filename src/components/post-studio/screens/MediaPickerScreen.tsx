@@ -76,7 +76,7 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-export function MediaPickerScreen() {
+export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
   const { state, addMedia, setStep, openPanel } = usePostStudioContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -119,9 +119,14 @@ export function MediaPickerScreen() {
       <StudioHeader
         title="New Post"
         step="MEDIA_PICKER"
+        leftAction={
+          onClose
+            ? { label: '', onClick: onClose, icon: 'close' as const }
+            : undefined
+        }
         rightAction={
           hasMedia
-            ? { label: `Next (${mediaCount})`, onClick: () => setStep('COMPOSER'), variant: 'primary' }
+            ? { label: `Next (${mediaCount})`, onClick: () => setStep('COMPOSER'), variant: 'primary' as const }
             : undefined
         }
       />

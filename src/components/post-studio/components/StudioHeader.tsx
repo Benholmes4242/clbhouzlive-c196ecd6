@@ -2,7 +2,7 @@
 // Safe-area aware, 44px tap targets, amber accent for primary actions
 
 import React from 'react';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { MIN_TAP_TARGET } from '../constants';
 import { BG_GLASS, AMBER, AMBER_DEEP, AMBER_GRADIENT, TEXT_PRIMARY } from '../tokens';
@@ -13,6 +13,7 @@ interface HeaderAction {
   onClick: () => void;
   disabled?: boolean;
   variant?: 'default' | 'primary';
+  icon?: 'close' | 'back';
 }
 
 interface StudioHeaderProps {
@@ -57,15 +58,26 @@ export function StudioHeader({
         {/* Left */}
         <div className="w-20 flex justify-start">
           {leftAction ? (
-            <button
-              onClick={leftAction.onClick}
-              disabled={leftAction.disabled}
-              className="flex items-center gap-0.5 disabled:opacity-30 transition-opacity"
-              style={{ minWidth: MIN_TAP_TARGET, minHeight: MIN_TAP_TARGET, color: 'rgba(255,255,255,0.65)' }}
-            >
-              <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
-              <span className="text-sm font-medium">{leftAction.label}</span>
-            </button>
+            leftAction.icon === 'close' ? (
+              <motion.button
+                whileTap={{ scale: 0.90 }}
+                onClick={leftAction.onClick}
+                className="flex items-center justify-center"
+                style={{ minWidth: 44, minHeight: 44, color: 'rgba(255,255,255,0.65)' }}
+              >
+                <X className="w-5 h-5" strokeWidth={2} />
+              </motion.button>
+            ) : (
+              <button
+                onClick={leftAction.onClick}
+                disabled={leftAction.disabled}
+                className="flex items-center gap-0.5 disabled:opacity-30 transition-opacity"
+                style={{ minWidth: 44, minHeight: 44, color: 'rgba(255,255,255,0.65)' }}
+              >
+                <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
+                <span className="text-sm font-medium">{leftAction.label}</span>
+              </button>
+            )
           ) : <div />}
         </div>
 
