@@ -24,7 +24,7 @@ export function AchievementsSkeleton() {
       <div className="flex-1 overflow-y-auto">
         {/* Hero banner skeleton */}
         <section className="px-2.5 md:px-5 mt-5 mb-6">
-          <div className="rounded-sq-lg p-5 md:p-6 bg-muted/50 animate-pulse">
+          <div className="rounded-sq-lg p-5 md:p-6 bg-muted/50">
             <div className="flex flex-col gap-2.5">
               {/* Label */}
               <Skeleton className="h-3 w-40" />
