@@ -21,6 +21,7 @@ export function ComposerScreen() {
   const {
     state, setStep, setActiveMedia, removeMedia, addMedia,
     setCaption, openPanel, setPostType, setReviewRating,
+    updateMediaEdits,
   } = usePostStudioContext();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
