@@ -1,5 +1,5 @@
-// StudioHeader — Glass dark nav bar, consistent across every screen
-// Safe-area aware, 44px tap targets, amber accent for primary actions
+// StudioHeader — Apple-minimal nav bar, consistent across every screen
+// Heavy title weight. Thicker progress bar. Clean tap targets.
 
 import React from 'react';
 import { ChevronLeft, X } from 'lucide-react';
@@ -55,7 +55,7 @@ export function StudioHeader({
       }}
     >
       <div className="flex items-center justify-between px-4" style={{ minHeight: '52px' }}>
-        {/* Left */}
+        {/* Left action */}
         <div className="w-20 flex justify-start">
           {leftAction ? (
             leftAction.icon === 'close' ? (
@@ -63,33 +63,40 @@ export function StudioHeader({
                 whileTap={{ scale: 0.90 }}
                 onClick={leftAction.onClick}
                 className="flex items-center justify-center"
-                style={{ minWidth: 44, minHeight: 44, color: 'rgba(255,255,255,0.65)' }}
+                style={{ minWidth: 44, minHeight: 44, color: 'rgba(255,255,255,0.70)' }}
               >
-                <X className="w-5 h-5" strokeWidth={2} />
+                {/* Thicker X — strokeWidth 2.5 */}
+                <X className="w-5 h-5" strokeWidth={2.5} />
               </motion.button>
             ) : (
               <button
                 onClick={leftAction.onClick}
                 disabled={leftAction.disabled}
                 className="flex items-center gap-0.5 disabled:opacity-30 transition-opacity"
-                style={{ minWidth: 44, minHeight: 44, color: 'rgba(255,255,255,0.65)' }}
+                style={{ minWidth: 44, minHeight: 44, color: 'rgba(255,255,255,0.70)' }}
               >
-                <ChevronLeft className="w-5 h-5" strokeWidth={2.5} />
-                <span className="text-sm font-medium">{leftAction.label}</span>
+                {/* Thicker chevron — strokeWidth 3 */}
+                <ChevronLeft className="w-5 h-5" strokeWidth={3} />
+                <span className="text-[15px] font-semibold">{leftAction.label}</span>
               </button>
             )
           ) : <div />}
         </div>
 
-        {/* Centre title */}
+        {/* Centre title — heavier weight, tighter tracking */}
         <h1
-          className="text-[15px] font-semibold flex-1 text-center"
-          style={{ color: TEXT_PRIMARY, letterSpacing: '-0.02em' }}
+          className="flex-1 text-center"
+          style={{
+            fontSize: 17,
+            fontWeight: 700,
+            color: TEXT_PRIMARY,
+            letterSpacing: '-0.03em',
+          }}
         >
           {title}
         </h1>
 
-        {/* Right */}
+        {/* Right action */}
         <div className="w-20 flex justify-end">
           {rightAction && (
             rightAction.variant === 'primary' ? (
@@ -97,14 +104,17 @@ export function StudioHeader({
                 whileTap={{ scale: 0.94 }}
                 onClick={rightAction.onClick}
                 disabled={rightAction.disabled}
-                className="font-bold px-4 disabled:opacity-30 transition-opacity"
+                className="disabled:opacity-30 transition-opacity"
                 style={{
                   minHeight: '36px',
                   borderRadius: 20,
                   fontSize: 14,
+                  fontWeight: 700,
                   letterSpacing: '-0.01em',
+                  paddingLeft: 16,
+                  paddingRight: 16,
                   background: rightAction.disabled
-                    ? 'rgba(255,255,255,0.15)'
+                    ? 'rgba(232,152,10,0.25)'
                     : AMBER_GRADIENT,
                   color: '#0D0D0D',
                   boxShadow: rightAction.disabled ? 'none' : '0 2px 8px rgba(200,135,10,0.20)',
@@ -116,8 +126,8 @@ export function StudioHeader({
               <button
                 onClick={rightAction.onClick}
                 disabled={rightAction.disabled}
-                className="text-sm font-medium disabled:opacity-30"
-                style={{ minHeight: MIN_TAP_TARGET, color: 'rgba(255,255,255,0.65)' }}
+                className="text-[15px] font-semibold disabled:opacity-30"
+                style={{ minHeight: MIN_TAP_TARGET, color: 'rgba(255,255,255,0.70)' }}
               >
                 {rightAction.label}
               </button>
@@ -126,15 +136,18 @@ export function StudioHeader({
         </div>
       </div>
 
-      {/* Amber progress bar */}
+      {/* Progress bar — thicker, more visible */}
       {showProgress && (
-        <div style={{ height: '2px', background: 'rgba(255,255,255,0.06)' }}>
+        <div style={{ height: '3px', background: 'rgba(255,255,255,0.08)' }}>
           <motion.div
             className="h-full"
             initial={false}
             animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            style={{ background: `linear-gradient(90deg, ${AMBER}, ${AMBER_DEEP})` }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              background: `linear-gradient(90deg, ${AMBER}, ${AMBER_DEEP})`,
+              borderRadius: '0 2px 2px 0',
+            }}
           />
         </div>
       )}
