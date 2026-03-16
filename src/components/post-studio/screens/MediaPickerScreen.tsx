@@ -275,11 +275,11 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
               width: 76,
               height: 76,
               borderRadius: '50%',
-              background: AMBER_GRADIENT,
-              boxShadow: '0 4px 20px rgba(200,135,10,0.35), 0 1px 0 rgba(255,255,255,0.15) inset',
+              background: 'rgba(255,255,255,0.96)',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.40), 0 1px 0 rgba(255,255,255,1) inset',
             }}
           >
-            <Camera className="w-7 h-7 text-black" strokeWidth={1.75} />
+            <Camera className="w-7 h-7" style={{ color: '#0D0D0D' }} strokeWidth={2} />
           </motion.button>
 
           {/* Drafts */}
