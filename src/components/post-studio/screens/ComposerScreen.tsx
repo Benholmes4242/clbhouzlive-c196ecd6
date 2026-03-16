@@ -129,7 +129,7 @@ export function ComposerScreen() {
       last = m.end;
     }
     if (last < state.caption.length) {
-      parts.push(<span key={`t-${partIndex++}`}>{state.caption.slice(last)}</span>);
+      parts.push(<span key={`t-${partIndex++}`} style={{ color: 'rgba(255,255,255,0.85)' }}>{state.caption.slice(last)}</span>);
     }
     return parts;
   }, [state.caption, state.mentions]);
