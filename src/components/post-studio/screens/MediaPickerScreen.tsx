@@ -218,7 +218,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
                     <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
                     <div
                       className="absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center"
-                      style={{ background: AMBER_GRADIENT, boxShadow: '0 2px 8px rgba(245,158,11,0.5)' }}
+                      style={{ background: AMBER_GRADIENT, boxShadow: '0 2px 8px rgba(200,135,10,0.30)' }}
                     >
                       <span className="text-[11px] font-bold text-black">{index + 1}</span>
                     </div>
