@@ -18,7 +18,7 @@ interface MediaReelProps {
 
 export function MediaReel({ items, activeIndex, onSelect, onRemove, onAddMore }: MediaReelProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  if (items.length <= 1) return null;
+  
 
   return (
     <div ref={scrollRef} className="flex items-center gap-2 overflow-x-auto py-3 px-4" style={{ scrollbarWidth: 'none' }}>
