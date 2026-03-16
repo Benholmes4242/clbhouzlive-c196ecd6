@@ -145,7 +145,7 @@ export function StudioHeader({
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             style={{
-              background: `linear-gradient(90deg, ${AMBER}, ${AMBER_DEEP})`,
+              background: 'rgba(255,255,255,0.90)',
               borderRadius: '0 2px 2px 0',
             }}
           />
