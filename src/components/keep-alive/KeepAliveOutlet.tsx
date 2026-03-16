@@ -46,7 +46,9 @@ export function KeepAliveOutlet({ keepAliveRoutes, maxCached = 3 }: KeepAliveOut
   const [cachedPaths, setCachedPaths] = useState<Set<string>>(new Set());
   const mountedRef = useRef<Map<string, HTMLDivElement>>(new Map());
 
-  const currentPath = location.pathname;
+  // Normalise Clubhouse alias — '/clubhouse' and '/' are the same keep-alive slot
+  const rawPath = location.pathname;
+  const currentPath = rawPath === '/clubhouse' ? '/' : rawPath;
   
   // Check if current path matches any keep-alive route (exact or prefix match)
   const matchedRoute = keepAliveRoutes.find(r => {
