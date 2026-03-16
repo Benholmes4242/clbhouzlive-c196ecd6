@@ -2,7 +2,7 @@
 // Dark-mode explicit styling for Post Studio context
 
 import React, { useEffect, useState } from 'react';
-import { Check } from 'lucide-react';
+
 import { supabase } from '@/integrations/supabase/client';
 import { usePostStudioContext } from '../usePostStudio';
 import { AMBER, AMBER_GHOST } from '../tokens';
