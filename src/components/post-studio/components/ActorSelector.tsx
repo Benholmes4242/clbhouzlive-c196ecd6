@@ -127,7 +127,7 @@ export function ActorSelector({ compact = false }: ActorSelectorProps) {
                 animate={{ y: 0 }}
                 exit={{ y: '100%' }}
                 transition={{ type: 'spring', damping: 32, stiffness: 380 }}
-                className="fixed inset-x-0 bottom-0 z-50 rounded-t-[24px] flex flex-col"
+                className="fixed bottom-0 z-50 w-full max-w-[480px] left-1/2 -translate-x-1/2 rounded-t-[24px] flex flex-col"
                 style={{
                   background: 'rgba(13,13,13,0.99)',
                   backdropFilter: 'blur(24px)',
