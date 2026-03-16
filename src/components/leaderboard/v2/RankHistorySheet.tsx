@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { Trophy, Target, Zap, ArrowUp, Plus } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
 import {
   Drawer,
