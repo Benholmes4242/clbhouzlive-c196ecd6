@@ -194,7 +194,7 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
           posterTimestamp: 0, posterPreviewUrl: null, width: null, height: null, validationError: null,
         });
       }
-      if (items.length > 0) { addMedia(items); setStep('COMPOSER'); }
+      if (items.length > 0) { addMedia(items); setStep('COMPOSE'); }
     })();
   }, [initialMedia, addMedia, setStep]);
 

@@ -138,7 +138,7 @@ export interface PostStudioState {
 /** Initial state factory */
 export function createInitialState(overrides?: Partial<PostStudioState>): PostStudioState {
   return {
-    step: 'MEDIA_PICKER',
+    step: 'COMPOSE',
     previousStep: null,
     actorType: 'personal',
     actorId: null,
