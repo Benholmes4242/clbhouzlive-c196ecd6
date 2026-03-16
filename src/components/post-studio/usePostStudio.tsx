@@ -267,6 +267,7 @@ export function PostStudioProvider({
       setActiveMedia,
       updateTrim,
       updatePoster,
+      updateMediaEdits,
       setCaption,
       setMentions,
       setTaggedCourses,
