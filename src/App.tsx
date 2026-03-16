@@ -254,7 +254,6 @@ function AppRoutes() {
   // Keep-alive routes configuration - these routes stay mounted when navigating away
   const keepAliveRoutes = useMemo(() => [
     { path: '/', element: <ClubhouseWrapped /> },
-    { path: '/clubhouse', element: <ClubhouseWrapped /> },
   ], []);
 
   return (
