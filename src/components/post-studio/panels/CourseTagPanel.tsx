@@ -100,18 +100,14 @@ export function CourseTagPanel() {
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 pb-3 pt-1">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: AMBER_DIM }}>
-              Tag a Course
-            </p>
-            <h3 className="text-sm font-semibold mt-0.5" style={{ color: TEXT_PRIMARY }}>
-              Where did you play?
-            </h3>
-          </div>
-          <button onClick={closePanel} className="w-9 h-9 flex items-center justify-center rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }}>
-            <X className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.60)' }} />
-          </button>
+        <div className="px-5 pb-3 shrink-0">
+          <p className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-0.5" style={{ color: AMBER_DIM }}>
+            Tag a Course
+          </p>
+          <h3 className="text-[17px] font-semibold tracking-tight" style={{ color: TEXT_PRIMARY }}>
+            Where did you play?
+          </h3>
+        </div>
         </div>
 
         {/* Tagged courses pills */}
