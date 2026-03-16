@@ -164,15 +164,14 @@ interface MediaGridProps {
   onSelect: (index: number) => void;
   onRemove: (id: string) => void;
   onEdit: (index: number) => void;
-  onTrim: (index: number) => void;
-  onCover: (index: number) => void;
   onSetCover: (index: number) => void;
+  onOverflow: () => void;
   onAddMore: () => void;
 }
 
 function MediaGrid({
   items, activeIndex, coverIndex,
-  onSelect, onRemove, onEdit, onTrim, onCover, onSetCover, onAddMore,
+  onSelect, onRemove, onEdit, onSetCover, onOverflow, onAddMore,
 }: MediaGridProps) {
   if (items.length === 0) return null;
 
