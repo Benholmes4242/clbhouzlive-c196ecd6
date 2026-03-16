@@ -29,7 +29,7 @@ export function MediaReel({ items, activeIndex, onSelect, onRemove, onAddMore }:
             <motion.div key={item.id} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ type: 'spring', damping: 22, stiffness: 380 }}
               onClick={() => onSelect(index)}
               className="relative shrink-0 rounded-xl overflow-hidden cursor-pointer"
-              style={{ width: THUMB, height: THUMB, border: isActive ? '2px solid rgba(245,158,11,0.90)' : '1px solid rgba(255,255,255,0.10)', boxShadow: isActive ? '0 0 8px rgba(200,135,10,0.20)' : 'none', transform: isActive ? 'scale(1.06)' : 'scale(1)', transition: 'transform 0.2s, border 0.2s, box-shadow 0.2s', background: 'rgba(255,255,255,0.05)' }}>
+              style={{ width: THUMB, height: THUMB, border: isActive ? '2px solid rgba(232,152,10,0.85)' : '1px solid rgba(255,255,255,0.10)', boxShadow: isActive ? '0 0 8px rgba(200,135,10,0.18)' : 'none', transform: isActive ? 'scale(1.06)' : 'scale(1)', transition: 'transform 0.2s, border 0.2s, box-shadow 0.2s', background: 'rgba(255,255,255,0.05)' }}>
               <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
               {item.mediaType === 'video' && (
                 <div className="absolute bottom-1 left-1 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.70)' }}>
