@@ -18,7 +18,7 @@ export function GenericPageSkeleton({ layout = 'list', count = 4 }: GenericPageS
   return (
     <div className="min-h-screen bg-background page-with-header">
       {/* Header skeleton */}
-      <div className="px-4 pt-[72px] pb-4">
+      <div className="px-4 pb-4" style={{ paddingTop: "calc(var(--header-h-mobile, 60px) + env(safe-area-inset-top, 0px) + 12px)" }}>
         <Skeleton className="h-8 w-48 mb-2" />
         <Skeleton className="h-4 w-64" />
       </div>

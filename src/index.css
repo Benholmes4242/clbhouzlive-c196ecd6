@@ -359,6 +359,12 @@ html.lightbox-open {
   100% { background-position: 200% center; }
 }
 
+/* ============================================================
+   CANONICAL SHIMMER — use these classes on all new skeletons
+   clb-shimmer-light  → light surfaces (most pages)
+   clb-shimmer-dark   → dark/glass surfaces (Clubhouse, sheets)
+   ============================================================ */
+
 /* Dark shimmer — for dark/glass contexts (Clubhouse, sheets, overlays) */
 .clb-shimmer-dark {
   background: linear-gradient(90deg,
@@ -387,6 +393,15 @@ html.lightbox-open {
   }
 }
 
+/* Neutral base fill for skeletons on light surfaces */
+.clb-skeleton-base {
+  background-color: hsl(var(--muted));
+}
+
+/* DEPRECATED — do not use on new components: */
+/* clb-skeleton, clb-skeleton::before (opacity sweep variant) */
+/* skeleton-shimmer, skeleton-shimmer::after (legacy sweep) */
+
 /* Generic skeleton shimmer - use on any placeholder block */
 .clb-skeleton {
   position: relative;
@@ -413,6 +428,18 @@ html.lightbox-open {
     animation: none;
   }
 }
+
+/* Reduced-motion: disable all shimmer/pulse animations */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse {
+    animation: none;
+  }
+  .animate-shimmer,
+  .animate-shimmer-slide {
+    animation: none;
+  }
+}
+
 .rating-slider {
   touch-action: pan-y;
 }
@@ -680,6 +707,18 @@ html.lightbox-open {
   
   /* Ensure background extends behind safe areas */
   background-color: var(--bg-page);
+
+  /* Desktop centering — constrains to mobile width on large screens */
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Desktop backdrop behind the app column */
+@media (min-width: 480px) {
+  body {
+    background-color: #0A0A0A;
+  }
 }
 
 /* Fade mask utility for horizontal scroll rails */

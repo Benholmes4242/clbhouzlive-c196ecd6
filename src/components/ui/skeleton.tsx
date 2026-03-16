@@ -2,14 +2,20 @@ import { cn } from "@/lib/utils"
 
 function Skeleton({
   className,
+  variant = "light",
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: React.HTMLAttributes<HTMLDivElement> & { variant?: "light" | "dark" }) {
   return (
     <div
-      className={cn("animate-pulse rounded-sq-sm bg-surface-alt", className)}
+      className={cn(
+        "rounded-sq-sm bg-surface-alt",
+        variant === "dark" ? "clb-shimmer-dark" : "clb-shimmer-light",
+        className
+      )}
       {...props}
     />
   )
 }
 
 export { Skeleton }
+export type { } // ensure isolatedModules
