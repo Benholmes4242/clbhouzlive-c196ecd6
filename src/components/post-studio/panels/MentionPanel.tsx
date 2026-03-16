@@ -19,7 +19,7 @@ function isEmail(str: string): boolean {
 }
 
 export function MentionPanel() {
-  const { state, closePanel, setMentions, setCaption } = usePostStudioContext();
+  const { state, closePanel, setMentions, setCaption, setMentionTriggerIndex } = usePostStudioContext();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<TaggableResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
