@@ -981,7 +981,7 @@ const ProfilePageV2Content: React.FC = () => {
         {/* Segmented control tabs - matches schedule page exactly */}
         {/* Explicit touch-action and z-index to ensure tappability on mobile */}
         <section 
-          className="px-4 py-2 relative flex justify-center"
+          className="px-4 py-2 relative"
           style={{ 
             touchAction: 'auto',
             pointerEvents: 'auto',
@@ -989,11 +989,7 @@ const ProfilePageV2Content: React.FC = () => {
           }}
         >
           <div 
-            className="inline-flex items-center gap-1"
-            style={{ 
-              touchAction: 'auto',
-              pointerEvents: 'auto'
-            }}
+            className="flex items-center gap-1 w-full"
           >
             {tabs.map((tab) => {
               const isActive = activeSection === tab.id;
@@ -1002,7 +998,7 @@ const ProfilePageV2Content: React.FC = () => {
                   key={tab.id}
                   onClick={() => handleTabChange(tab.id)}
                   className={cn(
-                    "relative py-1.5 px-4 text-sm transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] rounded-lg",
+                    "relative py-1.5 px-2 text-sm transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] rounded-lg flex-1",
                     isActive 
                       ? "bg-[#f59e0b] text-white font-semibold shadow-sm" 
                       : "text-muted-foreground font-medium hover:text-foreground"

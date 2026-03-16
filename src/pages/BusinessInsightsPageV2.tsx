@@ -220,9 +220,9 @@ const BusinessInsightsPageV2 = () => {
     return (
       <PageRoot className="min-h-screen bg-background">
         <div className="space-y-4 px-4 pt-4">
-          <div className="h-32 bg-muted animate-pulse rounded-2xl" />
-          <div className="h-24 bg-muted animate-pulse rounded-2xl" />
-          <div className="h-24 bg-muted animate-pulse rounded-2xl" />
+          <Skeleton className="h-32 rounded-2xl" />
+          <Skeleton className="h-24 rounded-2xl" />
+          <Skeleton className="h-24 rounded-2xl" />
         </div>
       </PageRoot>
     );
