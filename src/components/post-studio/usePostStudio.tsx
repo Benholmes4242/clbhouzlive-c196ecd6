@@ -309,6 +309,7 @@ export function PostStudioProvider({
       openPanel,
       closePanel,
       setDiscarding,
+      setMentionTriggerIndex,
       reset,
       onSuccess,
     ]
