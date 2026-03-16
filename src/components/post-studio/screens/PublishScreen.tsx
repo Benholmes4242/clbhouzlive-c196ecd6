@@ -94,15 +94,27 @@ export function PublishScreen() {
                 className="absolute inset-0"
                 style={{ background: 'linear-gradient(to top, rgba(8,8,8,0.95) 0%, rgba(8,8,8,0.40) 50%, transparent 100%)' }}
               />
-              {itemCount > 1 && (
-                <div
-                  className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[11px] font-semibold"
-                  style={{ background: 'rgba(0,0,0,0.60)', backdropFilter: 'blur(8px)', color: 'rgba(255,255,255,0.85)', border: '1px solid rgba(255,255,255,0.15)' }}
-                >
-                  {itemCount} items
-                </div>
-              )}
             </div>
+
+            {/* Media dots */}
+            {itemCount > 1 && (
+              <div className="flex justify-center gap-1.5 py-2">
+                {state.mediaItems.map((_, i) => (
+                  <div
+                    key={i}
+                    className="rounded-full"
+                    style={{
+                      width: i === 0 ? 16 : 6,
+                      height: 6,
+                      background: i === 0
+                        ? 'linear-gradient(135deg, #F59E0B 0%, #C7870A 100%)'
+                        : 'rgba(255,255,255,0.25)',
+                      transition: 'all 0.2s',
+                    }}
+                  />
+                ))}
+              </div>
+            )}
 
             <div className="absolute bottom-0 left-0 right-0 px-4 pb-4">
               {hasCaption && (
