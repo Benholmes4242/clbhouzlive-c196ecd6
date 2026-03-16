@@ -128,13 +128,13 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
       />
       
       {/* Content container */}
-      <div className="relative flex-1 flex flex-col px-6 pt-safe">
+      <div className="relative flex-1 flex flex-col px-6 pt-safe overflow-y-auto">
         {/* Logo section - enhanced with larger size and glow */}
         <div 
           className="flex flex-col justify-center items-center gap-3 auth-logo-animate"
           style={{ 
-            paddingTop: '16vh',
-            paddingBottom: '2.5rem',
+            paddingTop: 'clamp(32px, 12vh, 100px)',
+            paddingBottom: '2rem',
           }}
         >
           {/* Subtle radial glow behind logo */}
@@ -385,6 +385,20 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         .auth-button-3 { animation: auth-button-in 0.4s ease-out 0.55s both; }
         .auth-button-4 { animation: auth-button-in 0.4s ease-out 0.65s both; }
         .auth-button-5 { animation: auth-button-in 0.4s ease-out 0.75s both; }
+        
+        @media (prefers-reduced-motion: reduce) {
+          .auth-logo-animate,
+          .auth-tagline-animate,
+          .auth-button-1,
+          .auth-button-2,
+          .auth-button-3,
+          .auth-button-4,
+          .auth-button-5 {
+            animation: none;
+            opacity: 1;
+            transform: none;
+          }
+        }
       `}</style>
     </div>
   );

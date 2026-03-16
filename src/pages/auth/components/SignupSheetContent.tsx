@@ -179,7 +179,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 overflow-y-auto" style={{ maxHeight: '60vh' }}>
       {/* Back button and email display - breadcrumb style */}
       <div 
         className="flex items-center gap-2.5 py-2 px-3 rounded-xl -mx-1"
@@ -210,7 +210,10 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
             value={username}
             onChange={(e) => handleUsernameChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            onFocus={() => setUsernameFocused(true)}
+            onFocus={(e) => {
+              setUsernameFocused(true);
+              setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+            }}
             onBlur={() => setUsernameFocused(false)}
             placeholder="Username"
             disabled={submitting}
@@ -287,7 +290,10 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onKeyDown={handleKeyDown}
-            onFocus={() => setPasswordFocused(true)}
+            onFocus={(e) => {
+              setPasswordFocused(true);
+              setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+            }}
             onBlur={() => setPasswordFocused(false)}
             placeholder="Create password"
             disabled={isPasswordDisabled}
@@ -354,7 +360,10 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
               if (!confirmPasswordTouched) setConfirmPasswordTouched(true);
             }}
             onKeyDown={handleKeyDown}
-            onFocus={() => setConfirmPasswordFocused(true)}
+            onFocus={(e) => {
+              setConfirmPasswordFocused(true);
+              setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+            }}
             onBlur={() => setConfirmPasswordFocused(false)}
             placeholder="Confirm password"
             disabled={isConfirmPasswordDisabled}
