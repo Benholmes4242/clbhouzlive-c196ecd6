@@ -9,8 +9,7 @@ import type { StudioEdits } from '@/types/studio';
 
 /** Wizard step identifiers */
 export type StudioStep =
-  | 'MEDIA_PICKER'
-  | 'COMPOSER'
+  | 'COMPOSE'
   | 'TRIM'
   | 'POSTER'
   | 'PUBLISH'
