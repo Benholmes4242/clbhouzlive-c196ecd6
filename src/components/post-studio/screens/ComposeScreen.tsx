@@ -155,6 +155,188 @@ async function filesToMediaItems(
   return items;
 }
 
+// ─── VideoToolSheet — intermediate tool picker for videos ────────────────────
+
+interface VideoToolSheetProps {
+  item: StudioMediaItem;
+  onEdit: () => void;
+  onTrim: () => void;
+  onCover: () => void;
+  onClose: () => void;
+}
+
+function VideoToolSheet({ item, onEdit, onTrim, onCover, onClose }: VideoToolSheetProps) {
+  return (
+    <AnimatePresence>
+      <motion.div
+        key="video-tool-backdrop"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-40"
+        style={{ background: 'rgba(0,0,0,0.70)' }}
+        onClick={onClose}
+      />
+      <motion.div
+        key="video-tool-sheet"
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+        className="fixed inset-x-0 bottom-0 z-50 rounded-t-[24px]"
+        style={{
+          background: 'rgba(10,10,10,0.99)',
+          backdropFilter: 'blur(24px)',
+          borderTop: '1px solid rgba(255,255,255,0.08)',
+          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
+        }}
+      >
+        {/* Handle */}
+        <div className="flex justify-center pt-3 pb-4">
+          <div className="w-9 h-[3px] rounded-full" style={{ background: 'rgba(255,255,255,0.18)' }} />
+        </div>
+
+        {/* Video thumbnail preview */}
+        <div className="mx-4 mb-5 overflow-hidden" style={{ borderRadius: 14, aspectRatio: '16/9' }}>
+          <img
+            src={item.thumbnailUrl || item.previewUrl}
+            alt=""
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        {/* Three tool buttons */}
+        <div className="flex gap-3 px-4 pb-2">
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={onEdit}
+            className="flex-1 flex flex-col items-center gap-2 py-4 rounded-2xl"
+            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}
+          >
+            <Pencil className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.80)' }} strokeWidth={2} />
+            <span className="text-[13px] font-semibold" style={{ color: 'rgba(255,255,255,0.80)' }}>Edit</span>
+            <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>Music, filters, text</span>
+          </motion.button>
+
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={onTrim}
+            className="flex-1 flex flex-col items-center gap-2 py-4 rounded-2xl"
+            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}
+          >
+            <Scissors className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.80)' }} strokeWidth={2} />
+            <span className="text-[13px] font-semibold" style={{ color: 'rgba(255,255,255,0.80)' }}>Trim</span>
+            <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>Cut start & end</span>
+          </motion.button>
+
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={onCover}
+            className="flex-1 flex flex-col items-center gap-2 py-4 rounded-2xl"
+            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}
+          >
+            <ImageIcon className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.80)' }} strokeWidth={2} />
+            <span className="text-[13px] font-semibold" style={{ color: 'rgba(255,255,255,0.80)' }}>Cover</span>
+            <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>Choose thumbnail</span>
+          </motion.button>
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+// ─── OverflowSheet — access hidden items beyond the 4-tile grid ──────────────
+
+interface OverflowSheetProps {
+  items: StudioMediaItem[];
+  startIndex: number;
+  onEdit: (index: number) => void;
+  onClose: () => void;
+}
+
+function OverflowSheet({ items, startIndex, onEdit, onClose }: OverflowSheetProps) {
+  return (
+    <AnimatePresence>
+      <motion.div
+        key="overflow-backdrop"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-40"
+        style={{ background: 'rgba(0,0,0,0.70)' }}
+        onClick={onClose}
+      />
+      <motion.div
+        key="overflow-sheet"
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+        className="fixed inset-x-0 bottom-0 z-50 rounded-t-[24px]"
+        style={{
+          background: 'rgba(10,10,10,0.99)',
+          backdropFilter: 'blur(24px)',
+          borderTop: '1px solid rgba(255,255,255,0.08)',
+          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
+        }}
+      >
+        {/* Handle */}
+        <div className="flex justify-center pt-3 pb-2">
+          <div className="w-9 h-[3px] rounded-full" style={{ background: 'rgba(255,255,255,0.18)' }} />
+        </div>
+
+        {/* Header */}
+        <div className="px-5 pb-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: 'rgba(255,255,255,0.30)' }}>
+            More media
+          </p>
+        </div>
+
+        {/* Scrollable row of hidden items */}
+        <div className="flex gap-3 overflow-x-auto px-5 pb-2" style={{ scrollbarWidth: 'none' }}>
+          {items.map((item, i) => {
+            const actualIndex = startIndex + i;
+            return (
+              <div key={item.id} className="relative shrink-0" style={{ width: 100 }}>
+                <div className="overflow-hidden" style={{ borderRadius: 12, aspectRatio: '1/1' }}>
+                  <img
+                    src={item.thumbnailUrl || item.previewUrl}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
+                  {item.mediaType === 'video' && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.50)' }}>
+                        <Play className="w-3.5 h-3.5 text-white ml-0.5" fill="white" strokeWidth={0} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {/* Pencil button */}
+                <motion.button
+                  whileTap={{ scale: 0.88 }}
+                  onClick={() => { onEdit(actualIndex); onClose(); }}
+                  className="absolute bottom-1.5 right-1.5 w-7 h-7 flex items-center justify-center rounded-full"
+                  style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.20)' }}
+                >
+                  <Pencil className="w-3 h-3 text-white" strokeWidth={2} />
+                </motion.button>
+                {/* Item number */}
+                <div
+                  className="absolute top-1.5 left-1.5 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold"
+                  style={{ background: 'rgba(0,0,0,0.55)', color: 'rgba(255,255,255,0.80)' }}
+                >
+                  {actualIndex + 1}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
 // ─── Adaptive media grid with per-tile edit + cover selection ─────────────────
 
 interface MediaGridProps {
@@ -164,15 +346,14 @@ interface MediaGridProps {
   onSelect: (index: number) => void;
   onRemove: (id: string) => void;
   onEdit: (index: number) => void;
-  onTrim: (index: number) => void;
-  onCover: (index: number) => void;
   onSetCover: (index: number) => void;
+  onOverflow: () => void;
   onAddMore: () => void;
 }
 
 function MediaGrid({
   items, activeIndex, coverIndex,
-  onSelect, onRemove, onEdit, onTrim, onCover, onSetCover, onAddMore,
+  onSelect, onRemove, onEdit, onSetCover, onOverflow, onAddMore,
 }: MediaGridProps) {
   if (items.length === 0) return null;
 
@@ -216,9 +397,15 @@ function MediaGrid({
 
         {/* Overflow count */}
         {isOverflowTile && (
-          <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}>
+          <motion.div
+            whileTap={{ scale: 0.97 }}
+            className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer"
+            style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
+            onClick={(e) => { e.stopPropagation(); onOverflow(); }}
+          >
             <span className="text-[22px] font-bold text-white">+{overflow + 1}</span>
-          </div>
+            <span className="text-[10px] mt-1" style={{ color: 'rgba(255,255,255,0.55)' }}>tap to edit</span>
+          </motion.div>
         )}
 
         {!isOverflowTile && (
@@ -252,52 +439,15 @@ function MediaGrid({
               <X className="w-3 h-3 text-white" strokeWidth={2.5} />
             </motion.button>
 
-            {/* Edit / tool badges — bottom, depends on media type */}
-            {item.mediaType === 'image' ? (
-              /* Images: single edit pencil bottom-right */
-              <motion.button
-                whileTap={{ scale: 0.85 }}
-                onClick={(e) => { e.stopPropagation(); onEdit(index); }}
-                className="absolute bottom-2 right-2 w-7 h-7 flex items-center justify-center rounded-full z-10"
-                style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}
-              >
-                <Pencil className="w-3 h-3 text-white" strokeWidth={2} />
-              </motion.button>
-            ) : (
-              /* Videos: Edit · Trim · Cover row bottom */
-              <>
-                <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: 44, background: 'linear-gradient(to top, rgba(0,0,0,0.65), transparent)' }} />
-                <div className="absolute bottom-2 left-2 flex gap-1 z-10">
-                  <motion.button
-                    whileTap={{ scale: 0.93 }}
-                    onClick={(e) => { e.stopPropagation(); onEdit(index); }}
-                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-lg"
-                    style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.18)', color: 'rgba(255,255,255,0.90)' }}
-                  >
-                    <Pencil className="w-2.5 h-2.5" strokeWidth={2} />
-                    Edit
-                  </motion.button>
-                  <motion.button
-                    whileTap={{ scale: 0.93 }}
-                    onClick={(e) => { e.stopPropagation(); onTrim(index); }}
-                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-lg"
-                    style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.18)', color: 'rgba(255,255,255,0.90)' }}
-                  >
-                    <Scissors className="w-2.5 h-2.5" strokeWidth={2} />
-                    Trim
-                  </motion.button>
-                  <motion.button
-                    whileTap={{ scale: 0.93 }}
-                    onClick={(e) => { e.stopPropagation(); onCover(index); }}
-                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-lg"
-                    style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.18)', color: 'rgba(255,255,255,0.90)' }}
-                  >
-                    <ImageIcon className="w-2.5 h-2.5" strokeWidth={2} />
-                    Cover
-                  </motion.button>
-                </div>
-              </>
-            )}
+            {/* Pencil — single edit entry point for all media types */}
+            <motion.button
+              whileTap={{ scale: 0.85 }}
+              onClick={(e) => { e.stopPropagation(); onEdit(index); }}
+              className="absolute bottom-2 right-2 w-7 h-7 flex items-center justify-center rounded-full z-10"
+              style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}
+            >
+              <Pencil className="w-3 h-3 text-white" strokeWidth={2} />
+            </motion.button>
           </>
         )}
       </div>
@@ -368,6 +518,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const [activeTool, setActiveTool] = useState<StudioTool>(null);
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
   const [coverIndex, setCoverIndex] = useState(0);
+
+  // Video tool picker sheet — shown when pencil tapped on a video
+  const [videoToolSheetIndex, setVideoToolSheetIndex] = useState<number | null>(null);
+
+  // Overflow sheet — shown when +N tile tapped
+  const [overflowSheetOpen, setOverflowSheetOpen] = useState(false);
 
   const hasMedia = state.mediaItems.length > 0;
   const activeItem = state.mediaItems[state.activeMediaIndex] ?? null;
@@ -461,20 +617,21 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   }, [activeItem, updateMediaEdits]);
 
   const handleEdit = useCallback((index: number) => {
+    const item = state.mediaItems[index];
+    if (!item) return;
     setActiveMedia(index);
-    setActiveTool(null);
-    setShelfOpen(true);
-  }, [setActiveMedia]);
+    if (item.mediaType === 'video') {
+      // Video: open intermediate tool picker
+      setVideoToolSheetIndex(index);
+    } else {
+      // Image: go straight into StudioShelf
+      setActiveTool(null);
+      setShelfOpen(true);
+    }
+  }, [state.mediaItems, setActiveMedia]);
 
-  const handleTrim = useCallback((index: number) => {
-    setActiveMedia(index);
-    setStep('TRIM');
-  }, [setActiveMedia, setStep]);
 
-  const handleCover = useCallback((index: number) => {
-    setActiveMedia(index);
-    setStep('POSTER');
-  }, [setActiveMedia, setStep]);
+
 
   return (
     <div className="flex-1 flex flex-col" style={{ background: BG_BASE }}>
@@ -624,9 +781,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             onSelect={setActiveMedia}
             onRemove={removeMedia}
             onEdit={handleEdit}
-            onTrim={handleTrim}
-            onCover={handleCover}
             onSetCover={setCoverIndex}
+            onOverflow={() => setOverflowSheetOpen(true)}
             onAddMore={() => fileInputRef.current?.click()}
           />
         )}
@@ -744,6 +900,47 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           <CharacterRing count={charCount} />
         </div>
       </div>
+
+      {/* Video tool picker sheet */}
+      {videoToolSheetIndex !== null && state.mediaItems[videoToolSheetIndex] && (
+        <VideoToolSheet
+          item={state.mediaItems[videoToolSheetIndex]}
+          onEdit={() => {
+            setVideoToolSheetIndex(null);
+            setActiveTool(null);
+            setShelfOpen(true);
+          }}
+          onTrim={() => {
+            setVideoToolSheetIndex(null);
+            setStep('TRIM');
+          }}
+          onCover={() => {
+            setVideoToolSheetIndex(null);
+            setStep('POSTER');
+          }}
+          onClose={() => setVideoToolSheetIndex(null)}
+        />
+      )}
+
+      {/* Overflow sheet — hidden items beyond tile 4 */}
+      {overflowSheetOpen && (
+        <OverflowSheet
+          items={state.mediaItems.slice(3)}
+          startIndex={3}
+          onEdit={(index) => {
+            setActiveMedia(index);
+            const item = state.mediaItems[index];
+            if (!item) return;
+            if (item.mediaType === 'video') {
+              setVideoToolSheetIndex(index);
+            } else {
+              setActiveTool(null);
+              setShelfOpen(true);
+            }
+          }}
+          onClose={() => setOverflowSheetOpen(false)}
+        />
+      )}
 
       {/* Studio Shelf */}
       {activeItem && (
