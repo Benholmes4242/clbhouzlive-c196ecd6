@@ -59,7 +59,7 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
       {/* Sheet - premium glass surface */}
       <div 
         className={cn(
-          "fixed bottom-0 left-0 right-0 z-50",
+          "fixed bottom-0 z-50 w-full max-w-[480px] left-1/2 -translate-x-1/2",
           "rounded-t-[32px]", // Softer, more premium corners
           "transition-all duration-[380ms] ease-out",
           "pb-safe",

@@ -360,7 +360,10 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
               if (!confirmPasswordTouched) setConfirmPasswordTouched(true);
             }}
             onKeyDown={handleKeyDown}
-            onFocus={() => setConfirmPasswordFocused(true)}
+            onFocus={(e) => {
+              setConfirmPasswordFocused(true);
+              setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+            }}
             onBlur={() => setConfirmPasswordFocused(false)}
             placeholder="Confirm password"
             disabled={isConfirmPasswordDisabled}
