@@ -79,7 +79,7 @@ export function ComposerScreen() {
         title="Compose"
         step="COMPOSER"
         leftAction={{ label: 'Back', onClick: () => setStep('MEDIA_PICKER') }}
-        rightAction={{ label: 'Next', onClick: () => setStep('PUBLISH'), variant: 'primary', disabled: !isValid }}
+        rightAction={{ label: 'Review', onClick: () => setStep('PUBLISH'), variant: 'primary', disabled: !isValid }}
       />
 
       <input ref={fileInputRef} type="file" accept={acceptTypes} multiple onChange={handleFileSelect} className="hidden" />
