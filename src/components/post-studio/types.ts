@@ -1,6 +1,8 @@
 // Post Studio — Complete Type System
 // Single source of truth for all Post Studio types
 
+import type { StudioEdits } from '@/types/studio';
+
 // ============================================================================
 // ENUMS & LITERALS
 // ============================================================================
