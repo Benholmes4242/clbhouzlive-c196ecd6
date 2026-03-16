@@ -78,13 +78,13 @@ export function MediaPreview({ item, onSwipeLeft, onSwipeRight }: MediaPreviewPr
             )}
           </AnimatePresence>
           {item.posterPreviewUrl && (
-            <div className="absolute top-2.5 left-2.5 px-2 py-1 rounded-lg text-[11px] font-semibold" style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', color: 'rgba(255,255,255,0.70)' }}>Cover set</div>
+            <div className="absolute top-2.5 left-2.5 px-2 py-1 rounded-lg text-[11px] font-semibold" style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.70)' }}>Cover set</div>
           )}
           {item.edits && Object.keys(item.edits).some(() => {
             const e = item.edits!;
             return (e.filter && e.filter !== 'normal') || e.textOverlays?.length || e.music || e.crop || e.rotate || e.flipH || e.flipV;
           }) && (
-            <div className={`absolute ${item.posterPreviewUrl ? 'top-9' : 'top-2.5'} left-2.5 px-2 py-1 rounded-lg text-[11px] font-semibold`} style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', color: 'rgba(245,158,11,0.9)' }}>Edited</div>
+            <div className={`absolute ${item.posterPreviewUrl ? 'top-9' : 'top-2.5'} left-2.5 px-2 py-1 rounded-lg text-[11px] font-semibold`} style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(245,158,11,0.9)' }}>Edited</div>
           )}
         </>
       ) : (
@@ -94,7 +94,7 @@ export function MediaPreview({ item, onSwipeLeft, onSwipeRight }: MediaPreviewPr
             const e = item.edits!;
             return (e.filter && e.filter !== 'normal') || e.textOverlays?.length || e.music || e.crop || e.rotate || e.flipH || e.flipV;
           }) && (
-            <div className="absolute top-2.5 left-2.5 px-2 py-1 rounded-lg text-[11px] font-semibold" style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', color: 'rgba(245,158,11,0.9)' }}>Edited</div>
+            <div className="absolute top-2.5 left-2.5 px-2 py-1 rounded-lg text-[11px] font-semibold" style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(245,158,11,0.9)' }}>Edited</div>
           )}
         </>
       )}
