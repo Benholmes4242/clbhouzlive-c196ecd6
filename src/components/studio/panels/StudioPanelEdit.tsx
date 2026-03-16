@@ -91,7 +91,7 @@ export default function StudioPanelEdit({ edits, updateEdits, mediaType, mediaUr
       <div className="flex-1 overflow-y-auto p-3 space-y-4">
         {/* Crop ratios */}
         <div>
-          <label className="block text-[11px] font-semibold uppercase tracking-[1.5px] mb-2" style={{ color: '#AEAEB2' }}>Crop Ratio</label>
+          <label className="block text-[11px] font-semibold uppercase tracking-[1.5px] mb-2" style={{ color: 'rgba(255,255,255,0.45)' }}>Crop Ratio</label>
           <div className="grid grid-cols-5 gap-1.5">
             {CROP_RATIOS.map(ratio => (
               <button
@@ -99,11 +99,11 @@ export default function StudioPanelEdit({ edits, updateEdits, mediaType, mediaUr
                 onClick={() => handleCropRatio(ratio)}
                 className="py-1.5 px-2 rounded-md text-xs font-medium transition-colors"
                 style={cropRatio === ratio ? {
-                  background: '#f59e0b',
+                  background: '#E8980A',
                   color: '#FFFFFF',
                 } : {
                   background: 'rgba(255,255,255,0.08)',
-                  color: '#AEAEB2',
+                  color: 'rgba(255,255,255,0.45)',
                 }}
               >
                 {ratio === 'original' ? 'Free' : ratio}
@@ -128,7 +128,7 @@ export default function StudioPanelEdit({ edits, updateEdits, mediaType, mediaUr
         {/* Hint for videos */}
         {mediaType === 'video' && (
           <div className="rounded-lg p-3" style={{ background: 'rgba(255,255,255,0.04)' }}>
-            <p className="text-xs text-center" style={{ color: '#AEAEB2' }}>
+            <p className="text-xs text-center" style={{ color: 'rgba(255,255,255,0.45)' }}>
               Video cropping applies the selected ratio. 
               Drag-to-position is available for images.
             </p>
@@ -140,13 +140,13 @@ export default function StudioPanelEdit({ edits, updateEdits, mediaType, mediaUr
 
         {/* Transform controls */}
         <div>
-          <label className="block text-[11px] font-semibold uppercase tracking-[1.5px] mb-2" style={{ color: '#AEAEB2' }}>Transform</label>
+          <label className="block text-[11px] font-semibold uppercase tracking-[1.5px] mb-2" style={{ color: 'rgba(255,255,255,0.45)' }}>Transform</label>
           <div className="flex gap-2">
             <button
               onClick={handleRotate}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors"
               style={rotation > 0 ? {
-                background: '#f59e0b',
+                background: '#E8980A',
                 color: '#FFFFFF',
                 border: '1px solid transparent',
               } : {
@@ -165,7 +165,7 @@ export default function StudioPanelEdit({ edits, updateEdits, mediaType, mediaUr
               onClick={handleFlipH}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors"
               style={flipH ? {
-                background: '#f59e0b',
+                background: '#E8980A',
                 color: '#FFFFFF',
                 border: '1px solid transparent',
               } : {
@@ -181,7 +181,7 @@ export default function StudioPanelEdit({ edits, updateEdits, mediaType, mediaUr
               onClick={handleFlipV}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors"
               style={flipV ? {
-                background: '#f59e0b',
+                background: '#E8980A',
                 color: '#FFFFFF',
                 border: '1px solid transparent',
               } : {

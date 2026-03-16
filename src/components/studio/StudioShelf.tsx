@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 import { StudioEdits, StudioTool } from '@/types/studio';
 import StudioToolRail from './StudioToolRail';
 import StudioPanelMusic from './panels/StudioPanelMusic';
@@ -215,7 +215,8 @@ export default function StudioShelf({
                   )}
                   <button
                     onClick={() => onClose()}
-                    className="px-4 rounded-full text-sm font-semibold text-white bg-primary min-h-[44px] flex items-center"
+                    className="px-5 rounded-full text-sm font-semibold min-h-[36px] flex items-center"
+                    style={{ background: 'linear-gradient(135deg, #F59E0B 0%, #C7870A 100%)', color: '#0D0D0D', boxShadow: '0 2px 8px rgba(200,135,10,0.25)' }}
                   >
                     Done
                   </button>
@@ -317,7 +318,7 @@ export default function StudioShelf({
             {/* Panel Area */}
             <div
               className="overflow-y-auto flex-shrink-0"
-              style={{ height: '35vh', background: '#1A1A1A' }}
+              style={{ height: '35vh', background: 'rgba(10,10,10,0.98)' }}
             >
               <AnimatePresence mode="wait">
                 {activeTool === 'music' && (
@@ -407,18 +408,23 @@ export default function StudioShelf({
                     exit={{ opacity: 0 }}
                   >
                     <div className="text-center px-6 py-8">
-                      <motion.div 
-                        className="text-3xl mb-2"
+                      <motion.div
+                        className="flex items-center justify-center mb-3"
                         animate={{ opacity: [0.7, 1, 0.7] }}
                         transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
                       >
-                        ✨
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center"
+                          style={{ background: 'rgba(232,152,10,0.15)' }}
+                        >
+                          <Sparkles className="w-5 h-5" style={{ color: '#E8980A' }} />
+                        </div>
                       </motion.div>
                       <p className="text-sm font-semibold text-white">
-                        Choose a tool to enhance your moment
+                        Enhance your moment
                       </p>
-                      <p className="text-xs mt-1" style={{ color: '#AEAEB2' }}>
-                        Add music, text, filters, or fine-tune your clip
+                      <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                        Add music, text, filters or crop
                       </p>
                     </div>
                   </motion.div>

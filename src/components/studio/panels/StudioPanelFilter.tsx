@@ -67,8 +67,8 @@ const FilterCard = memo(function FilterCard({
       onPointerCancel={handlePointerUp}
       className="rounded-xl overflow-hidden transition-all duration-150 active:scale-[0.98] snap-start"
       style={{
-        border: isSelected ? '2.5px solid #f59e0b' : '1px solid rgba(255,255,255,0.1)',
-        boxShadow: isSelected ? '0 0 0 1px rgba(245,158,11,0.3)' : undefined,
+        border: isSelected ? '2.5px solid #E8980A' : '1px solid rgba(255,255,255,0.1)',
+        boxShadow: isSelected ? '0 0 0 1px rgba(232,152,10,0.3)' : undefined,
       }}
     >
       <div className="aspect-square relative" style={{ background: '#2A2A2A' }}>
@@ -89,7 +89,7 @@ const FilterCard = memo(function FilterCard({
         <div
           className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full flex items-center justify-center shadow-sm transition-all duration-150"
           style={{
-            background: '#f59e0b',
+            background: '#E8980A',
             opacity: isSelected ? 1 : 0,
             transform: isSelected ? 'scale(1)' : 'scale(0.75)',
           }}
@@ -106,10 +106,10 @@ const FilterCard = memo(function FilterCard({
         )}
       </div>
       
-      <div className="py-1.5 px-1 text-center" style={{ background: '#1A1A1A' }}>
+      <div className="py-1.5 px-1 text-center" style={{ background: 'rgba(10,10,10,0.98)' }}>
         <span
           className="text-[11px] font-medium block truncate"
-          style={{ color: isSelected ? '#f59e0b' : '#AEAEB2' }}
+          style={{ color: isSelected ? '#E8980A' : 'rgba(255,255,255,0.45)' }}
         >
           {filter.label}
         </span>
@@ -150,10 +150,10 @@ export default function StudioPanelFilter({
       <div className="flex items-center justify-between px-4 pt-3 pb-2 flex-shrink-0">
         <span className="text-sm font-semibold text-white">Filters</span>
         <div className="flex items-center gap-2">
-          <span className="text-[11px]" style={{ color: '#AEAEB2' }}>
-            Selected: <span style={{ color: '#f59e0b' }}>{selectedLabel}</span>
+          <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
+            Selected: <span style={{ color: '#E8980A' }}>{selectedLabel}</span>
           </span>
-          <span className="text-[9px]" style={{ color: '#AEAEB2' }}>Hold to compare</span>
+          <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.45)' }}>Hold to compare</span>
         </div>
       </div>
       
@@ -179,9 +179,9 @@ export default function StudioPanelFilter({
 
       {/* Intensity slider */}
       {showIntensity && (
-        <div className="px-4 py-3 flex-shrink-0" style={{ borderTop: '1px solid rgba(255,255,255,0.08)', background: '#1A1A1A' }}>
+        <div className="px-4 py-3 flex-shrink-0" style={{ borderTop: '1px solid rgba(255,255,255,0.08)', background: 'rgba(10,10,10,0.98)' }}>
           <div className="flex items-center gap-3">
-            <label className="text-[11px] font-medium shrink-0" style={{ color: '#AEAEB2' }}>Intensity</label>
+            <label className="text-[11px] font-medium shrink-0" style={{ color: 'rgba(255,255,255,0.45)' }}>Intensity</label>
             <input
               type="range"
               min={0}
@@ -204,7 +204,7 @@ export default function StudioPanelFilter({
                 [&::-moz-range-thumb]:shadow-md"
               style={{ background: 'rgba(255,255,255,0.1)' }}
             />
-            <span className="text-[11px] font-mono w-8 text-right" style={{ color: '#AEAEB2' }}>{intensity}%</span>
+            <span className="text-[11px] font-mono w-8 text-right" style={{ color: 'rgba(255,255,255,0.45)' }}>{intensity}%</span>
           </div>
         </div>
       )}
