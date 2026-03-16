@@ -2,7 +2,7 @@
 // Dark immersive studio. Media front and centre. Tools feel pro, not form-like.
 
 import React, { useState, useCallback, useRef } from 'react';
-import { AtSign, Scissors, Image as ImageIcon, Star, Plus, ChevronRight, Wand2 } from 'lucide-react';
+import { AtSign, Scissors, Image as ImageIcon, Plus, ChevronRight, Wand2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StudioHeader } from '../components/StudioHeader';
 import { MediaPreview } from '../components/MediaPreview';
@@ -20,7 +20,7 @@ import { toast } from 'sonner';
 export function ComposerScreen() {
   const {
     state, setStep, setActiveMedia, removeMedia, addMedia,
-    setCaption, openPanel, setPostType, setReviewRating,
+    setCaption, openPanel,
     updateMediaEdits,
   } = usePostStudioContext();
 
@@ -105,7 +105,7 @@ export function ComposerScreen() {
 
       <input ref={fileInputRef} type="file" accept={acceptTypes} multiple onChange={handleFileSelect} className="hidden" />
 
-      <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+      <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain' }}>
         {/* Full-bleed media preview */}
         {activeItem && (
           <div className="relative overflow-hidden" style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
@@ -162,9 +162,6 @@ export function ComposerScreen() {
               style={{ background: 'transparent', color: 'rgba(255,255,255,0.85)', caretColor: AMBER }}
               maxLength={POST_LIMITS.MAX_CAPTION_LENGTH + 100}
             />
-            <div className="absolute bottom-3 right-4">
-              <CharacterRing count={charCount} />
-            </div>
           </div>
 
           <AnimatePresence>
@@ -191,58 +188,14 @@ export function ComposerScreen() {
             <motion.button whileTap={{ scale: 0.93 }} onClick={() => openPanel('course')} className="flex items-center justify-center rounded-xl" style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
               <span className="text-base leading-none">⛳</span>
             </motion.button>
-            {/* Review toggle pushed right */}
-            <motion.button layout whileTap={{ scale: 0.93 }} onClick={() => setPostType(state.postType === 'standard' ? 'review' : 'standard')}
-              className="ml-auto flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold min-h-[40px]"
-              style={
-                state.postType === 'review'
-                  ? { background: AMBER_GHOST, color: AMBER, border: '1px solid rgba(245,158,11,0.35)' }
-                  : { background: 'rgba(245,158,11,0.08)', color: 'rgba(245,158,11,0.60)', border: '1px solid rgba(245,158,11,0.18)' }
-              }
-            >
-              <Star className="w-3.5 h-3.5" strokeWidth={2} fill={state.postType === 'review' ? AMBER : 'none'} />
-              {state.postType === 'review' ? 'Review on' : 'Add review'}
-            </motion.button>
+            {/* Character ring pushed right */}
+            <div className="ml-auto flex items-center justify-center" style={{ width: 40, height: 40 }}>
+              <CharacterRing count={charCount} />
+            </div>
           </div>
         </div>
 
-        {/* Review rating card */}
-        <AnimatePresence>
-          {state.postType === 'review' && (
-            <motion.div initial={{ height: 0, opacity: 0, y: -8 }} animate={{ height: 'auto', opacity: 1, y: 0 }} exit={{ height: 0, opacity: 0, y: -8 }} transition={{ type: 'spring', damping: 28, stiffness: 360 }} className="overflow-hidden mx-4 mt-2">
-              <div className="p-4 rounded-[24px]" style={{ background: `linear-gradient(135deg, ${AMBER_GHOST} 0%, rgba(245,158,11,0.04) 100%)`, border: '1px solid rgba(245,158,11,0.20)' }}>
-                <p className="text-[13px] font-medium mb-3 text-center" style={{ color: AMBER_DIM }}>Course Rating</p>
-                <div className="flex items-center justify-center gap-1">
-                  {[1, 2, 3, 4, 5].map((star) => {
-                    const isActive = (state.reviewRating ?? 0) >= star;
-                    return (
-                      <motion.button key={star} whileTap={{ scale: 0.85 }} onClick={() => setReviewRating(star === state.reviewRating ? null : star)} className="flex items-center justify-center" style={{ minWidth: 44, minHeight: 44 }}>
-                        <motion.div animate={{ scale: isActive ? 1.15 : 1 }} transition={{ type: 'spring', damping: 20, stiffness: 400 }}>
-                          <Star className="w-9 h-9" strokeWidth={1.5} style={{ fill: isActive ? AMBER : 'transparent', color: isActive ? AMBER : 'rgba(255,255,255,0.20)', filter: isActive ? 'drop-shadow(0 0 8px rgba(245,158,11,0.7))' : 'none' }} />
-                        </motion.div>
-                      </motion.button>
-                    );
-                  })}
-                </div>
-                {/* Animated rating label */}
-                <AnimatePresence>
-                  {state.reviewRating && (
-                    <motion.p
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 6 }}
-                      className="text-3xl font-bold text-center mt-3"
-                      style={{ color: AMBER }}
-                    >
-                      {state.reviewRating}.0 ★
-                    </motion.p>
-                  )}
-                </AnimatePresence>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <div className="h-6" />
+        <div className="h-10" />
       </div>
 
       {/* Studio Shelf — crop, filter, text, music */}

@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { StudioMediaItem } from '../types';
 
 const VIDEO_ASPECT = 16 / 9;
-const IMAGE_MAX_ASPECT = 1.3;
+const MAX_ASPECT = 4 / 5; // cap at 4:5 — no taller than this for any media
 
 interface MediaPreviewProps {
   item: StudioMediaItem;
@@ -24,7 +24,8 @@ export function MediaPreview({ item, onSwipeLeft, onSwipeRight }: MediaPreviewPr
   const touchStartY = useRef(0);
 
   const isVideo = item.mediaType === 'video';
-  const aspect = isVideo ? VIDEO_ASPECT : Math.min((item.width ?? 1) / (item.height ?? 1), IMAGE_MAX_ASPECT);
+  const rawAspect = isVideo ? VIDEO_ASPECT : (item.width ?? 1) / (item.height ?? 1);
+  const aspect = Math.max(rawAspect, MAX_ASPECT); // max() because higher ratio = wider/shorter
 
   const fadeOutControls = useCallback(() => {
     clearTimeout(controlsTimerRef.current);
@@ -76,9 +77,6 @@ export function MediaPreview({ item, onSwipeLeft, onSwipeRight }: MediaPreviewPr
               </motion.div>
             )}
           </AnimatePresence>
-          {(item.trimStart > 0 || (item.trimEnd !== null && item.trimEnd !== item.duration)) && (
-            <div className="absolute top-2.5 right-2.5 px-2 py-1 rounded-lg text-[11px] font-semibold" style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', color: 'rgba(245,158,11,0.9)' }}>Trimmed</div>
-          )}
           {item.posterPreviewUrl && (
             <div className="absolute top-2.5 left-2.5 px-2 py-1 rounded-lg text-[11px] font-semibold" style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)', color: 'rgba(255,255,255,0.70)' }}>Cover set</div>
           )}
