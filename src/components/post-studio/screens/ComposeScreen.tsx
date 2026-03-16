@@ -44,18 +44,67 @@ function getRandomPlaceholder(): string {
 async function generatePoster(file: File): Promise<string> {
   return new Promise((resolve) => {
     const video = document.createElement('video');
-    video.preload = 'metadata'; video.muted = true; video.playsInline = true;
+    video.preload = 'metadata';
+    video.muted = true;
+    video.playsInline = true;
+    video.crossOrigin = 'anonymous';
+
     const url = URL.createObjectURL(file);
-    video.src = url;
-    video.onloadeddata = () => { video.currentTime = 0.1; };
-    video.onseeked = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-      canvas.getContext('2d')?.drawImage(video, 0, 0);
-      URL.revokeObjectURL(url);
-      resolve(canvas.toDataURL('image/jpeg', 0.7));
+    let settled = false;
+
+    const capture = () => {
+      if (settled) return;
+      settled = true;
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth || 320;
+        canvas.height = video.videoHeight || 240;
+        canvas.getContext('2d')?.drawImage(video, 0, 0, canvas.width, canvas.height);
+        URL.revokeObjectURL(url);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      } catch {
+        URL.revokeObjectURL(url);
+        resolve('');
+      }
     };
-    video.onerror = () => { URL.revokeObjectURL(url); resolve(''); };
+
+    // Safety timeout — if nothing fires within 8 seconds, give up gracefully
+    const timeout = setTimeout(() => {
+      if (!settled) {
+        settled = true;
+        URL.revokeObjectURL(url);
+        resolve('');
+      }
+    }, 8000);
+
+    video.onloadedmetadata = () => {
+      video.currentTime = 0.1;
+    };
+
+    video.onseeked = () => {
+      clearTimeout(timeout);
+      capture();
+    };
+
+    // iOS fallback: if onseeked never fires after seek, capture on timeupdate
+    video.ontimeupdate = () => {
+      if (video.currentTime > 0) {
+        clearTimeout(timeout);
+        capture();
+      }
+    };
+
+    video.onerror = () => {
+      clearTimeout(timeout);
+      if (!settled) {
+        settled = true;
+        URL.revokeObjectURL(url);
+        resolve('');
+      }
+    };
+
+    video.src = url;
+    video.load();
   });
 }
 
