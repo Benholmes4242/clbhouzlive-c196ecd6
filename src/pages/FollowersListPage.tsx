@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useParams } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePaginatedFollowers, usePaginatedFollowing } from '@/hooks/useSocialLists';
