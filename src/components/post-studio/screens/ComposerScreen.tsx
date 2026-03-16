@@ -154,10 +154,16 @@ export function ComposerScreen() {
               <span className="text-base leading-none">⛳</span>
             </motion.button>
             {/* Review toggle pushed right */}
-            <motion.button layout whileTap={{ scale: 0.93 }} onClick={() => setPostType(state.postType === 'standard' ? 'review' : 'standard')} className="ml-auto flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold min-h-[40px]"
-              style={state.postType === 'review' ? { background: AMBER_GHOST, color: AMBER, border: '1px solid rgba(245,158,11,0.35)' } : { background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.45)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <motion.button layout whileTap={{ scale: 0.93 }} onClick={() => setPostType(state.postType === 'standard' ? 'review' : 'standard')}
+              className="ml-auto flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold min-h-[40px]"
+              style={
+                state.postType === 'review'
+                  ? { background: AMBER_GHOST, color: AMBER, border: '1px solid rgba(245,158,11,0.35)' }
+                  : { background: 'rgba(245,158,11,0.08)', color: 'rgba(245,158,11,0.60)', border: '1px solid rgba(245,158,11,0.18)' }
+              }
+            >
               <Star className="w-3.5 h-3.5" strokeWidth={2} fill={state.postType === 'review' ? AMBER : 'none'} />
-              {state.postType === 'review' ? 'Review' : 'Post'}
+              {state.postType === 'review' ? 'Review on' : 'Add review'}
             </motion.button>
           </div>
         </div>
