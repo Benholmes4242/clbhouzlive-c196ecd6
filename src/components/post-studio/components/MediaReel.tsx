@@ -1,9 +1,7 @@
-// MediaReel — Dark horizontal thumbnail strip with amber active state
-
+// MediaReel — Minimal horizontal thumbnail strip
 import React, { useRef } from 'react';
 import { Plus, X, Play } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AMBER, AMBER_DIM, AMBER_GHOST } from '../tokens';
 import type { StudioMediaItem } from '../types';
 
 const THUMB = 72;
@@ -18,7 +16,6 @@ interface MediaReelProps {
 
 export function MediaReel({ items, activeIndex, onSelect, onRemove, onAddMore }: MediaReelProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  
 
   return (
     <div ref={scrollRef} className="flex items-center gap-2 overflow-x-auto py-3 px-4" style={{ scrollbarWidth: 'none' }}>
@@ -29,14 +26,25 @@ export function MediaReel({ items, activeIndex, onSelect, onRemove, onAddMore }:
             <motion.div key={item.id} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ type: 'spring', damping: 22, stiffness: 380 }}
               onClick={() => onSelect(index)}
               className="relative shrink-0 rounded-xl overflow-hidden cursor-pointer"
-              style={{ width: THUMB, height: THUMB, border: isActive ? '2px solid rgba(255,255,255,0.70)' : '1px solid rgba(255,255,255,0.10)', boxShadow: isActive ? '0 0 8px rgba(255,255,255,0.12)' : 'none', transform: isActive ? 'scale(1.06)' : 'scale(1)', transition: 'transform 0.2s, border 0.2s, box-shadow 0.2s', background: 'rgba(255,255,255,0.05)' }}>
+              style={{
+                width: THUMB, height: THUMB,
+                border: isActive ? '2px solid rgba(255,255,255,0.80)' : '1px solid rgba(255,255,255,0.10)',
+                boxShadow: isActive ? '0 0 0 1px rgba(255,255,255,0.10)' : 'none',
+                transform: isActive ? 'scale(1.06)' : 'scale(1)',
+                transition: 'transform 0.2s, border 0.2s, box-shadow 0.2s',
+                background: 'rgba(255,255,255,0.05)',
+              }}
+            >
               <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
               {item.mediaType === 'video' && (
                 <div className="absolute bottom-1 left-1 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.70)' }}>
                   <Play className="w-2.5 h-2.5 text-white ml-0.5" fill="white" strokeWidth={0} />
                 </div>
               )}
-              <button onClick={(e) => { e.stopPropagation(); onRemove(item.id); }} className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.75)', border: '1px solid rgba(255,255,255,0.15)' }}>
+              <button onClick={(e) => { e.stopPropagation(); onRemove(item.id); }}
+                className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center"
+                style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.15)' }}
+              >
                 <X className="w-3 h-3 text-white" strokeWidth={2.5} />
               </button>
             </motion.div>
