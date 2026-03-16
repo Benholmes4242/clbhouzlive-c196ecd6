@@ -97,7 +97,7 @@ export function ComposerScreen() {
   return (
     <div className="flex-1 flex flex-col" style={{ background: BG_BASE }}>
       <StudioHeader
-        title="Compose"
+        title="Moment"
         step="COMPOSER"
         leftAction={{ label: 'Back', onClick: () => setStep('MEDIA_PICKER') }}
         rightAction={{ label: 'Review', onClick: () => setStep('PUBLISH'), variant: 'primary', disabled: !isValid }}
@@ -176,7 +176,7 @@ export function ComposerScreen() {
               placeholder="Tell the story…"
               rows={4}
               className="w-full text-sm resize-none outline-none min-h-[120px] leading-relaxed"
-              style={{ background: 'transparent', color: 'rgba(255,255,255,0.85)', caretColor: AMBER }}
+              style={{ background: 'transparent', color: 'rgba(255,255,255,0.85)', caretColor: 'rgba(255,255,255,0.70)' }}
               maxLength={POST_LIMITS.MAX_CAPTION_LENGTH + 100}
             />
           </div>
