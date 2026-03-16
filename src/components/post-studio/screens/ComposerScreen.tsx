@@ -13,6 +13,8 @@ import { usePostStudioContext } from '../usePostStudio';
 import { ALLOWED_VIDEO_TYPES, ALLOWED_IMAGE_TYPES, POST_LIMITS } from '../constants';
 import { BG_BASE, BG_CARD, AMBER, AMBER_DEEP, AMBER_DIM, AMBER_GHOST, AMBER_GRADIENT, BORDER_CARD, TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY } from '../tokens';
 import type { StudioMediaItem } from '../types';
+import type { StudioEdits, StudioTool } from '@/types/studio';
+import StudioShelf from '@/components/studio/StudioShelf';
 import { toast } from 'sonner';
 
 export function ComposerScreen() {
