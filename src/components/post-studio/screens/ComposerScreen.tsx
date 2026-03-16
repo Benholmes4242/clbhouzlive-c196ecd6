@@ -110,17 +110,22 @@ export function ComposerScreen() {
     if (!state.mentions.length) return null;
     const parts: React.ReactNode[] = [];
     let last = 0;
+    let partIndex = 0;
     const sorted = [...state.mentions].sort((a, b) => a.start - b.start);
     for (const m of sorted) {
-      if (m.start > last) parts.push(<span key={`t-${last}`}>{state.caption.slice(last, m.start)}</span>);
+      if (m.start > last) {
+        parts.push(<span key={`t-${partIndex++}`}>{state.caption.slice(last, m.start)}</span>);
+      }
       parts.push(
-        <span key={`m-${m.start}`} style={{ color: 'rgba(232,152,10,0.90)' }}>
+        <span key={`m-${partIndex++}`} style={{ color: 'rgba(232,152,10,0.90)', fontWeight: 500 }}>
           {state.caption.slice(m.start, m.end)}
         </span>
       );
       last = m.end;
     }
-    if (last < state.caption.length) parts.push(<span key={`t-${last}`}>{state.caption.slice(last)}</span>);
+    if (last < state.caption.length) {
+      parts.push(<span key={`t-${partIndex++}`}>{state.caption.slice(last)}</span>);
+    }
     return parts;
   }, [state.caption, state.mentions]);
 
