@@ -215,9 +215,15 @@ function MediaGrid({
 
         {/* Overflow count */}
         {isOverflowTile && (
-          <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}>
+          <motion.div
+            whileTap={{ scale: 0.97 }}
+            className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer"
+            style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
+            onClick={(e) => { e.stopPropagation(); onOverflow(); }}
+          >
             <span className="text-[22px] font-bold text-white">+{overflow + 1}</span>
-          </div>
+            <span className="text-[10px] mt-1" style={{ color: 'rgba(255,255,255,0.55)' }}>tap to edit</span>
+          </motion.div>
         )}
 
         {!isOverflowTile && (
