@@ -20,7 +20,7 @@ import { toast } from 'sonner';
 export function ComposerScreen() {
   const {
     state, setStep, setActiveMedia, removeMedia, addMedia,
-    setCaption, openPanel, setPostType, setReviewRating,
+    setCaption, openPanel,
     updateMediaEdits,
   } = usePostStudioContext();
 
