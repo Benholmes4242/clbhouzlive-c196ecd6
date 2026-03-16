@@ -108,7 +108,6 @@ export function CourseTagPanel() {
             Where did you play?
           </h3>
         </div>
-        </div>
 
         {/* Tagged courses pills */}
         {state.taggedCourses.length > 0 && (

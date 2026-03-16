@@ -137,7 +137,6 @@ export function MentionPanel() {
             Tag a golfer
           </h3>
         </div>
-        </div>
 
         {/* Search input */}
         <div className="px-5 pb-3">
