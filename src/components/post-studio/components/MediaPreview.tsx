@@ -24,7 +24,8 @@ export function MediaPreview({ item, onSwipeLeft, onSwipeRight }: MediaPreviewPr
   const touchStartY = useRef(0);
 
   const isVideo = item.mediaType === 'video';
-  const aspect = isVideo ? VIDEO_ASPECT : Math.min((item.width ?? 1) / (item.height ?? 1), IMAGE_MAX_ASPECT);
+  const rawAspect = isVideo ? VIDEO_ASPECT : (item.width ?? 1) / (item.height ?? 1);
+  const aspect = Math.max(rawAspect, MAX_ASPECT); // max() because higher ratio = wider/shorter
 
   const fadeOutControls = useCallback(() => {
     clearTimeout(controlsTimerRef.current);
