@@ -107,7 +107,7 @@ export function StudioHeader({
                     ? 'rgba(245,158,11,0.3)'
                     : AMBER_GRADIENT,
                   color: '#0D0D0D',
-                  boxShadow: rightAction.disabled ? 'none' : '0 2px 12px rgba(245,158,11,0.40)',
+                  boxShadow: rightAction.disabled ? 'none' : '0 2px 8px rgba(200,135,10,0.20)',
                 }}
               >
                 {rightAction.label}

@@ -146,7 +146,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
               <div
                 className="absolute inset-0 rounded-full"
                 style={{
-                  background: 'radial-gradient(circle, rgba(245,158,11,0.18) 0%, transparent 70%)',
+                  background: 'radial-gradient(circle, rgba(232,152,10,0.08) 0%, transparent 70%)',
                   transform: 'scale(3.5)',
                 }}
               />
@@ -155,14 +155,14 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
                 animate={{ scale: [1, 1.08, 1], opacity: [0.3, 0.1, 0.3] }}
                 transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
                 className="absolute inset-0 rounded-full"
-                style={{ border: '1px solid rgba(245,158,11,0.30)' }}
+                style={{ border: '1px solid rgba(232,152,10,0.15)' }}
               />
               <div
                 className="w-32 h-32 rounded-full flex items-center justify-center relative"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(245,158,11,0.25) 0%, rgba(245,158,11,0.08) 100%)',
-                  border: '1px solid rgba(245,158,11,0.30)',
-                  boxShadow: '0 0 40px rgba(245,158,11,0.12), inset 0 1px 0 rgba(255,255,255,0.08)',
+                  background: 'linear-gradient(135deg, rgba(232,152,10,0.14) 0%, rgba(232,152,10,0.05) 100%)',
+                  border: '1px solid rgba(232,152,10,0.18)',
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
                 }}
               >
                 <Camera className="w-11 h-11" style={{ color: 'rgba(245,158,11,0.90)' }} strokeWidth={1.5} />
@@ -267,7 +267,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
             onClick={() => fileInputRef.current?.click()}
             disabled={isProcessing}
             className="relative flex items-center justify-center disabled:opacity-40"
-            style={{ width: 72, height: 72, borderRadius: '50%', background: AMBER_GRADIENT, boxShadow: '0 0 0 6px rgba(245,158,11,0.10), 0 0 0 12px rgba(245,158,11,0.05), 0 8px 28px rgba(245,158,11,0.50)' }}
+            style={{ width: 72, height: 72, borderRadius: '50%', background: AMBER_GRADIENT, boxShadow: '0 4px 16px rgba(200,135,10,0.30)' }}
           >
             <Camera className="w-7 h-7 text-black" strokeWidth={1.75} />
           </motion.button>
