@@ -4,7 +4,7 @@
 
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import {
-  Camera, Layers, BookOpen, AtSign, X, Pencil, Star, Play, Plus,
+  Camera, Layers, BookOpen, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
