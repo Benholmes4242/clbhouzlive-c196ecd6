@@ -209,7 +209,7 @@ export function ComposerScreen() {
         <MediaReel items={state.mediaItems} activeIndex={state.activeMediaIndex} onSelect={setActiveMedia} onRemove={removeMedia} onAddMore={() => fileInputRef.current?.click()} />
 
         {/* Caption card */}
-        <div className="mx-4 mt-2" style={{ background: 'rgba(255,255,255,0.055)', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 24 }}>
+        <div className="mx-4 mt-2" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 24 }}>
           <div className="px-4 pt-4 pb-3 relative">
             {/* Highlight layer — sits behind textarea, mirrors its text */}
             {state.mentions.length > 0 && (
