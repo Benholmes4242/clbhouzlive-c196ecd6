@@ -162,9 +162,6 @@ export function ComposerScreen() {
               style={{ background: 'transparent', color: 'rgba(255,255,255,0.85)', caretColor: AMBER }}
               maxLength={POST_LIMITS.MAX_CAPTION_LENGTH + 100}
             />
-            <div className="absolute bottom-3 right-4">
-              <CharacterRing count={charCount} />
-            </div>
           </div>
 
           <AnimatePresence>
