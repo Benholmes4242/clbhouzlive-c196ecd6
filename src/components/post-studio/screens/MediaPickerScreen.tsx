@@ -192,7 +192,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
                 >
                   <div
                     className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin"
-                    style={{ borderColor: 'rgba(245,158,11,0.4)', borderTopColor: 'transparent' }}
+                    style={{ borderColor: 'rgba(232,152,10,0.35)', borderTopColor: 'transparent' }}
                   />
                   Preparing…
                 </motion.div>
