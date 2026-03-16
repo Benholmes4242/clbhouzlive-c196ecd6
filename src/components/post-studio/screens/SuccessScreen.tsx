@@ -64,7 +64,7 @@ export function SuccessScreen({ onDone }: SuccessScreenProps) {
         <UploadBanner />
       </motion.div>
 
-      <motion.button initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75, duration: 0.4 }} whileTap={{ scale: 0.96 }} onClick={onDone} className="w-full max-w-sm flex items-center justify-center gap-2 rounded-2xl font-semibold text-sm min-h-[52px] relative z-10" style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(245,158,11,0.80)' }}>
+      <motion.button initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75, duration: 0.4 }} whileTap={{ scale: 0.96 }} onClick={onDone} className="w-full max-w-sm flex items-center justify-center gap-2 rounded-2xl font-semibold text-sm min-h-[52px] relative z-10" style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(232,152,10,0.85)' }}>
         Back to clbhouz
         <ArrowRight className="w-4 h-4" strokeWidth={2} />
       </motion.button>
