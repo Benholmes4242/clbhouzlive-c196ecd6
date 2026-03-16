@@ -445,8 +445,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         className="flex-1 overflow-y-auto"
         style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain' }}
       >
-        {/* Actor selector — who is posting */}
-        <ActorSelector />
+        {/* Actor selector moved to bottom toolbar */}
 
         {/* ── Text input ── */}
         <div className="px-4 pt-3 pb-2 relative">
@@ -610,6 +609,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         }}
       >
+        {/* Actor avatar — compact profile switcher */}
+        <ActorSelector compact />
+
+        {/* Spacer between avatar and camera */}
+        <div className="w-2" />
+
         {/* Camera — primary action, white circle */}
         <motion.button
           whileTap={{ scale: 0.92 }}
