@@ -2,7 +2,7 @@
 // Dark-mode explicit styling for Post Studio context
 
 import React, { useEffect, useState } from 'react';
-import { Check } from 'lucide-react';
+
 import { supabase } from '@/integrations/supabase/client';
 import { usePostStudioContext } from '../usePostStudio';
 import { AMBER, AMBER_GHOST } from '../tokens';
@@ -53,15 +53,15 @@ export function ActorSelector() {
   if (businesses.length === 0) return null;
 
   const activeStyle: React.CSSProperties = {
-    background: AMBER_GHOST,
-    border: '1px solid rgba(245,158,11,0.35)',
-    color: AMBER,
+    background: 'rgba(255,255,255,0.06)',
+    border: `1.5px solid ${AMBER}`,
+    color: 'rgba(255,255,255,0.92)',
   };
 
   const inactiveStyle: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(255,255,255,0.08)',
-    color: 'rgba(255,255,255,0.70)',
+    background: 'rgba(255,255,255,0.04)',
+    border: '1px solid rgba(255,255,255,0.09)',
+    color: 'rgba(255,255,255,0.55)',
   };
 
   return (
@@ -69,24 +69,19 @@ export function ActorSelector() {
       {/* Personal */}
       <button
         onClick={() => setActor('personal', null)}
-        className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-full transition-all min-h-[44px]"
+        className="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-full transition-all min-h-[44px]"
         style={state.actorType === 'personal' ? activeStyle : inactiveStyle}
       >
-        <div className="w-7 h-7 rounded-full overflow-hidden shrink-0 relative" style={{ background: 'rgba(255,255,255,0.08)', outline: state.actorType === 'personal' ? '2px solid rgba(245,158,11,0.80)' : 'none', outlineOffset: 1 }}>
+        <div className="w-6 h-6 rounded-full overflow-hidden shrink-0" style={{ background: 'rgba(255,255,255,0.08)' }}>
           {userAvatar ? (
             <img src={userAvatar} alt="" className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-xs font-bold" style={{ color: 'rgba(255,255,255,0.50)' }}>
+            <div className="w-full h-full flex items-center justify-center text-[10px] font-bold" style={{ color: 'rgba(255,255,255,0.50)' }}>
               {userName.charAt(0)}
             </div>
           )}
-          {state.actorType === 'personal' && (
-            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full flex items-center justify-center" style={{ background: AMBER }}>
-              <Check className="w-2 h-2 text-black" />
-            </div>
-          )}
         </div>
-        <span className="text-xs font-medium">{userName}</span>
+        <span className="text-[13px] font-medium">{userName}</span>
       </button>
 
       {/* Business accounts */}
@@ -96,24 +91,19 @@ export function ActorSelector() {
           <button
             key={biz.id}
             onClick={() => setActor('business', biz.id)}
-            className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-full transition-all min-h-[44px]"
+            className="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-full transition-all min-h-[44px]"
             style={isActive ? activeStyle : inactiveStyle}
           >
-            <div className="w-7 h-7 rounded-xl overflow-hidden shrink-0 relative" style={{ background: 'rgba(255,255,255,0.08)', outline: isActive ? '2px solid rgba(245,158,11,0.80)' : 'none', outlineOffset: 1 }}>
+            <div className="w-6 h-6 rounded-lg overflow-hidden shrink-0" style={{ background: 'rgba(255,255,255,0.08)' }}>
               {biz.logo_url ? (
                 <img src={biz.logo_url} alt="" className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-xs font-bold" style={{ color: 'rgba(255,255,255,0.50)' }}>
+                <div className="w-full h-full flex items-center justify-center text-[10px] font-bold" style={{ color: 'rgba(255,255,255,0.50)' }}>
                   {biz.name.charAt(0)}
                 </div>
               )}
-              {isActive && (
-                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full flex items-center justify-center" style={{ background: AMBER }}>
-                  <Check className="w-2 h-2 text-black" />
-                </div>
-              )}
             </div>
-            <span className="text-xs font-medium truncate max-w-[80px]">{biz.name}</span>
+            <span className="text-[13px] font-medium truncate max-w-[80px]">{biz.name}</span>
           </button>
         );
       })}
