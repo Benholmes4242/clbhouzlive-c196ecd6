@@ -124,9 +124,9 @@ export function PublishScreen() {
               )}
               <div className="flex items-center gap-2 flex-wrap">
                 {state.taggedCourses.length > 0 && (
-                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: 'rgba(232,152,10,0.18)', border: '1px solid rgba(232,152,10,0.30)' }}>
-                    <MapPin className="w-3 h-3" style={{ color: AMBER_DIM }} strokeWidth={1.75} />
-                    <span className="text-[11px] font-medium" style={{ color: AMBER_DIM }}>
+                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                    <MapPin className="w-3.5 h-3.5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
+                    <span className="text-[12px] font-medium" style={{ color: 'rgba(255,255,255,0.45)' }}>
                       {state.taggedCourses[0].courseName}
                       {state.taggedCourses.length > 1 && ` +${state.taggedCourses.length - 1}`}
                     </span>
