@@ -114,10 +114,10 @@ export function StudioHeader({
                   paddingLeft: 16,
                   paddingRight: 16,
                   background: rightAction.disabled
-                    ? 'rgba(232,152,10,0.25)'
-                    : AMBER_GRADIENT,
+                    ? 'rgba(255,255,255,0.15)'
+                    : 'rgba(255,255,255,0.96)',
                   color: '#0D0D0D',
-                  boxShadow: rightAction.disabled ? 'none' : '0 2px 8px rgba(200,135,10,0.20)',
+                  boxShadow: rightAction.disabled ? 'none' : '0 2px 12px rgba(0,0,0,0.30)',
                 }}
               >
                 {rightAction.label}
