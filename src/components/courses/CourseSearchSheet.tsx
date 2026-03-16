@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { X, MapPin, Search, Check } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCourseSearch, getSuggestions } from '@/hooks/useCourseSearch';
 import { getFlagCode } from '@/utils/countryFlags';
