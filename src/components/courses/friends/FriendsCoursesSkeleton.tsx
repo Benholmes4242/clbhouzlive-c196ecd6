@@ -35,7 +35,7 @@ const FriendsCoursesSkeleton: React.FC = () => {
           </div>
 
           {/* Horizontal divider */}
-          <div className="col-span-2 h-px bg-slate-200/60 my-1" />
+          <div className="col-span-2 h-px bg-border/60 my-1" />
 
           {/* Row 2 */}
           <div className="text-center relative">
