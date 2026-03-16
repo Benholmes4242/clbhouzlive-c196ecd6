@@ -199,7 +199,7 @@ export function ComposerScreen() {
         <MediaReel items={state.mediaItems} activeIndex={state.activeMediaIndex} onSelect={setActiveMedia} onRemove={removeMedia} onAddMore={() => fileInputRef.current?.click()} />
 
         {/* Caption card */}
-        <div className="mx-4 mt-3" style={{ background: BG_CARD, border: BORDER_CARD, borderRadius: 24 }}>
+        <div className="mx-4 mt-2" style={{ background: 'rgba(255,255,255,0.055)', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 24 }}>
           <div className="px-4 pt-4 pb-3 relative">
             {/* Highlight layer — sits behind textarea, mirrors its text */}
             {state.mentions.length > 0 && (
@@ -233,14 +233,14 @@ export function ComposerScreen() {
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                 <div className="flex flex-wrap gap-1.5 px-4 py-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                   {state.taggedCourses.map((course) => (
-                    <span key={course.courseId} className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: AMBER_GHOST, color: 'rgba(245,158,11,0.90)', border: '1px solid rgba(245,158,11,0.25)' }}>
+                    <span key={course.courseId} className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium" style={{ background: AMBER_GHOST, color: 'rgba(232,152,10,0.90)', border: '1px solid rgba(232,152,10,0.25)' }}>
                       ⛳ {course.courseName}
                       <button
                         onClick={() => setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId))}
                         className="flex items-center justify-center w-3.5 h-3.5 rounded-full"
-                        style={{ background: 'rgba(245,158,11,0.25)', marginLeft: 1 }}
+                        style={{ background: 'rgba(232,152,10,0.20)', marginLeft: 1 }}
                       >
-                        <X className="w-2 h-2" style={{ color: 'rgba(245,158,11,0.90)' }} strokeWidth={2.5} />
+                        <X className="w-2 h-2" style={{ color: 'rgba(232,152,10,0.85)' }} strokeWidth={2.5} />
                       </button>
                     </span>
                   ))}
@@ -252,11 +252,10 @@ export function ComposerScreen() {
           {/* Toolbar — hairline separator */}
           <div className="flex items-center gap-2 px-3 py-3 flex-wrap" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
             {/* Icon-only Mention */}
-            <motion.button whileTap={{ scale: 0.93 }} onClick={() => openPanel('mention')} className="flex items-center justify-center rounded-xl" style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <AtSign className="w-[18px] h-[18px]" strokeWidth={2} style={{ color: 'rgba(255,255,255,0.60)' }} />
+            <motion.button whileTap={{ scale: 0.93 }} onClick={() => openPanel('mention')} className="flex items-center justify-center rounded-xl" style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
+              <AtSign className="w-[18px] h-[18px]" strokeWidth={2} style={{ color: 'rgba(255,255,255,0.75)' }} />
             </motion.button>
-            {/* Icon-only Course with golf flag */}
-            <motion.button whileTap={{ scale: 0.93 }} onClick={() => openPanel('course')} className="flex items-center justify-center rounded-xl" style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <motion.button whileTap={{ scale: 0.93 }} onClick={() => openPanel('course')} className="flex items-center justify-center rounded-xl" style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
               <span className="text-base leading-none">⛳</span>
             </motion.button>
             {/* Character ring pushed right */}
