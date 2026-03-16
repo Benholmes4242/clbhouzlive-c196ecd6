@@ -81,8 +81,8 @@ export function ActorSelector({ compact = false }: ActorSelectorProps) {
         >
           {/* Avatar */}
           <div
-            className="w-8 h-8 rounded-full overflow-hidden shrink-0"
-            style={{ background: 'rgba(255,255,255,0.10)', border: '1.5px solid rgba(255,255,255,0.18)' }}
+            className="w-8 h-8 overflow-hidden shrink-0"
+            style={{ background: 'rgba(255,255,255,0.10)', border: '1.5px solid rgba(255,255,255,0.18)', borderRadius: '34%' }}
           >
             {activeAvatar ? (
               <img src={activeAvatar} alt="" className="w-full h-full object-cover" />
