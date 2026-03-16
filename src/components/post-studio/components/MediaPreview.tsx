@@ -71,32 +71,15 @@ export function MediaPreview({ item, onSwipeLeft, onSwipeRight }: MediaPreviewPr
           <AnimatePresence>
             {showControls && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.50)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}>
-                  {isPlaying ? <Pause className="w-6 h-6 text-white" strokeWidth={2} /> : <Play className="w-6 h-6 text-white ml-0.5" strokeWidth={2} />}
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                  {isPlaying ? <Pause className="w-4 h-4 text-white" strokeWidth={2} /> : <Play className="w-4 h-4 text-white ml-0.5" strokeWidth={2} />}
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-          {item.posterPreviewUrl && (
-            <div className="absolute top-2.5 left-2.5 px-2 py-1 rounded-lg text-[11px] font-semibold" style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.70)' }}>Cover set</div>
-          )}
-          {item.edits && Object.keys(item.edits).some(() => {
-            const e = item.edits!;
-            return (e.filter && e.filter !== 'normal') || e.textOverlays?.length || e.music || e.crop || e.rotate || e.flipH || e.flipV;
-          }) && (
-            <div className={`absolute ${item.posterPreviewUrl ? 'top-9' : 'top-2.5'} left-2.5 px-2 py-1 rounded-lg text-[11px] font-semibold`} style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(245,158,11,0.9)' }}>Edited</div>
-          )}
         </>
       ) : (
-        <>
-          <img src={item.previewUrl} alt="" className="w-full h-full object-cover" loading="lazy" onError={() => setHasError(true)} />
-          {item.edits && Object.keys(item.edits).some(() => {
-            const e = item.edits!;
-            return (e.filter && e.filter !== 'normal') || e.textOverlays?.length || e.music || e.crop || e.rotate || e.flipH || e.flipV;
-          }) && (
-            <div className="absolute top-2.5 left-2.5 px-2 py-1 rounded-lg text-[11px] font-semibold" style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(245,158,11,0.9)' }}>Edited</div>
-          )}
-        </>
+        <img src={item.previewUrl} alt="" className="w-full h-full object-cover" loading="lazy" onError={() => setHasError(true)} />
       )}
     </div>
   );
