@@ -85,8 +85,8 @@ export function CollegeComparePage() {
                   <span className="text-white/30" style={{ fontSize: 16, fontWeight: 800 }}>VS</span>
                 </div>
                 <div className="flex-1 flex flex-col items-center gap-2">
-                  <div className="w-20 h-20 rounded-xl bg-white/10 animate-pulse" />
-                  <div className="h-4 w-24 rounded bg-white/10 animate-pulse" />
+                  <Skeleton className="w-20 h-20 rounded-xl bg-white/10" />
+                  <Skeleton className="h-4 w-24 bg-white/10" />
                 </div>
               </div>
             ) : data ? (
