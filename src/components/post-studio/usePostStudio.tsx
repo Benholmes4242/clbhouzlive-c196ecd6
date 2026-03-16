@@ -165,6 +165,9 @@ function postStudioReducer(state: PostStudioState, action: PostStudioAction): Po
     case 'RESET':
       return createInitialState();
 
+    case 'SET_MENTION_TRIGGER':
+      return { ...state, mentionTriggerIndex: action.payload };
+
     default:
       return state;
   }
