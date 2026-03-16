@@ -184,16 +184,16 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.85, opacity: 0 }}
                     transition={{ type: 'spring', damping: 22, stiffness: 380 }}
-                    className="relative aspect-square rounded-2xl overflow-hidden"
+                    className="relative aspect-square rounded-xl overflow-hidden"
                     style={{ background: BG_CARD }}
                   >
                     <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
                     {/* Order badge */}
                     <div
-                      className="absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center"
-                      style={{ background: AMBER_GRADIENT, boxShadow: '0 2px 8px rgba(200,135,10,0.30)' }}
+                      className="absolute top-2 left-2 w-5 h-5 rounded-full flex items-center justify-center"
+                      style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.25)' }}
                     >
-                      <span className="text-[11px] font-bold text-black">{index + 1}</span>
+                      <span className="text-[10px] font-semibold" style={{ color: 'rgba(255,255,255,0.90)' }}>{index + 1}</span>
                     </div>
                     {/* Video duration badge */}
                     {item.mediaType === 'video' && (
@@ -208,8 +208,8 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
                     )}
                     {/* First-item amber border */}
                     <div
-                      className="absolute inset-0 rounded-2xl pointer-events-none"
-                      style={{ boxShadow: index === 0 ? 'inset 0 0 0 2px rgba(232,152,10,0.55)' : 'none' }}
+                      className="absolute inset-0 rounded-xl pointer-events-none"
+                      style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.08)' }}
                     />
                   </motion.div>
                 ))}
