@@ -23,6 +23,7 @@ export function ComposerScreen() {
     setCaption, openPanel,
     updateMediaEdits,
     setMentions,
+    setTaggedCourses,
   } = usePostStudioContext();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
