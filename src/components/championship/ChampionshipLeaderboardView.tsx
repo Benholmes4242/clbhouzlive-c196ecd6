@@ -65,7 +65,7 @@ function readSavedFilters(): SavedFilters | null {
 const LeaderboardLoadingSkeleton = () => (
   <div className="space-y-2">
     {[1, 2, 3].map((i) => (
-      <div key={i} className="flex items-center gap-3 p-3 rounded-xl animate-pulse">
+      <div key={i} className="flex items-center gap-3 p-3 rounded-xl">
         <Skeleton className="w-7 h-7 rounded" />
         <Skeleton className="w-10 h-10 rounded-lg" />
         <div className="flex-1 space-y-1.5">
