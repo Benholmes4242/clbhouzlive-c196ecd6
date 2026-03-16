@@ -54,7 +54,7 @@ export function ActorSelector() {
 
   const activeStyle: React.CSSProperties = {
     background: 'rgba(255,255,255,0.06)',
-    border: `1.5px solid ${AMBER}`,
+    border: '1.5px solid rgba(255,255,255,0.60)',
     color: 'rgba(255,255,255,0.92)',
   };
 

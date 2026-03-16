@@ -130,7 +130,7 @@ export function MentionPanel() {
 
         {/* Header */}
         <div className="px-5 pb-3 shrink-0">
-          <p className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-0.5" style={{ color: AMBER_DIM }}>
+          <p className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
             Mention
           </p>
           <h3 className="text-[17px] font-semibold tracking-tight" style={{ color: TEXT_PRIMARY }}>
@@ -151,7 +151,7 @@ export function MentionPanel() {
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search golfers & clubs…"
               className="flex-1 bg-transparent text-sm outline-none"
-              style={{ color: 'rgba(255,255,255,0.85)', caretColor: 'rgba(232,152,10,0.90)' }}
+              style={{ color: 'rgba(255,255,255,0.85)', caretColor: 'rgba(255,255,255,0.70)' }}
             />
             {query.length > 0 && (
               <button onClick={() => setQuery('')} className="shrink-0">
@@ -165,7 +165,7 @@ export function MentionPanel() {
         <div className="flex-1 overflow-y-auto px-5 pb-6" style={{ scrollbarWidth: 'none' }}>
           {isSearching && (
             <div className="flex items-center justify-center py-8">
-              <div className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(232,152,10,0.30)', borderTopColor: 'transparent' }} />
+              <div className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(255,255,255,0.20)', borderTopColor: 'transparent' }} />
             </div>
           )}
 
@@ -210,7 +210,7 @@ export function MentionPanel() {
                   </p>
                 )}
               </div>
-              <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ background: AMBER_GHOST, color: AMBER_DIM }}>
+              <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full" style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.45)' }}>
                 {entity.entity_type === 'business' ? 'Club' : 'Golfer'}
               </span>
             </motion.button>

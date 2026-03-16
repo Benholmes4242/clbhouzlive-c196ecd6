@@ -77,7 +77,7 @@ export function SchedulePanel() {
 
         {/* Header — no X button */}
         <div className="px-5 pb-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-0.5" style={{ color: AMBER_DIM }}>
+          <p className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
             Schedule
           </p>
           <h3 className="text-[17px] font-semibold tracking-tight" style={{ color: TEXT_PRIMARY }}>
@@ -133,11 +133,11 @@ export function SchedulePanel() {
               >
                 <div
                   className="rounded-2xl overflow-hidden"
-                  style={{ border: '1px solid rgba(232,152,10,0.20)', background: AMBER_GHOST }}
+                  style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' }}
                 >
                   <div className="flex items-center gap-2.5 px-4 pt-3 pb-1">
-                    <Calendar className="w-4 h-4 shrink-0" style={{ color: AMBER_DIM }} strokeWidth={1.75} />
-                    <span className="text-[11px] font-semibold uppercase tracking-[1.2px]" style={{ color: AMBER_DIM }}>
+                    <Calendar className="w-4 h-4 shrink-0" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={1.75} />
+                    <span className="text-[11px] font-semibold uppercase tracking-[1.2px]" style={{ color: 'rgba(255,255,255,0.40)' }}>
                       Select date & time
                     </span>
                   </div>
@@ -155,7 +155,7 @@ export function SchedulePanel() {
                     }}
                   />
                   {state.scheduledAt && (
-                    <p className="px-4 pb-3 text-xs" style={{ color: 'rgba(232,152,10,0.70)' }}>
+                    <p className="px-4 pb-3 text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
                       Will post {state.scheduledAt.toLocaleDateString('en-GB', {
                         weekday: 'long', day: 'numeric', month: 'long',
                         hour: 'numeric', minute: '2-digit',

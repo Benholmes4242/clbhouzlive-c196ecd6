@@ -104,7 +104,7 @@ export function StudioHeader({
                   fontSize: 14,
                   letterSpacing: '-0.01em',
                   background: rightAction.disabled
-                    ? 'rgba(232,152,10,0.25)'
+                    ? 'rgba(255,255,255,0.15)'
                     : AMBER_GRADIENT,
                   color: '#0D0D0D',
                   boxShadow: rightAction.disabled ? 'none' : '0 2px 8px rgba(200,135,10,0.20)',

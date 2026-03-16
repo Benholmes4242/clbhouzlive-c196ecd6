@@ -165,7 +165,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
                   boxShadow: '0 0 24px rgba(200,135,10,0.08), inset 0 1px 0 rgba(255,255,255,0.07)',
                 }}
               >
-                <Camera className="w-11 h-11" style={{ color: 'rgba(232,152,10,0.85)' }} strokeWidth={1.5} />
+                <Camera className="w-11 h-11" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={1.5} />
               </div>
             </motion.div>
 
@@ -188,11 +188,11 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
                   className="flex items-center gap-2.5 text-sm mb-6"
-                  style={{ color: AMBER_DIM }}
+                  style={{ color: 'rgba(255,255,255,0.45)' }}
                 >
                   <div
                     className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin"
-                    style={{ borderColor: 'rgba(232,152,10,0.35)', borderTopColor: 'transparent' }}
+                    style={{ borderColor: 'rgba(255,255,255,0.25)', borderTopColor: 'transparent' }}
                   />
                   Preparing…
                 </motion.div>
@@ -235,8 +235,8 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
 
             <AnimatePresence>
               {isProcessing && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center justify-center gap-2.5 py-3 text-sm" style={{ color: AMBER_DIM }}>
-                  <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(232,152,10,0.35)', borderTopColor: 'transparent' }} />
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center justify-center gap-2.5 py-3 text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                  <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(255,255,255,0.25)', borderTopColor: 'transparent' }} />
                   Processing…
                 </motion.div>
               )}
@@ -258,8 +258,8 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
           }}
         >
           <motion.button whileTap={{ scale: 0.92 }} onClick={() => fileInputRef.current?.click()} disabled={isProcessing} className="flex flex-col items-center gap-1.5 min-w-[60px] min-h-[44px] justify-center disabled:opacity-40">
-            <Layers className="w-6 h-6" style={{ color: 'rgba(232,152,10,0.85)' }} strokeWidth={1.75} />
-            <span className="text-[11px] font-semibold" style={{ color: AMBER_DIM, letterSpacing: '0.02em' }}>Gallery</span>
+            <Layers className="w-6 h-6" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={1.75} />
+            <span className="text-[11px] font-semibold" style={{ color: 'rgba(255,255,255,0.45)', letterSpacing: '0.02em' }}>Gallery</span>
           </motion.button>
 
           <motion.button
@@ -273,8 +273,8 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
           </motion.button>
 
           <motion.button whileTap={{ scale: 0.92 }} onClick={() => openPanel('drafts')} className="flex flex-col items-center gap-1.5 min-w-[60px] min-h-[44px] justify-center">
-            <BookOpen className="w-6 h-6" style={{ color: 'rgba(232,152,10,0.85)' }} strokeWidth={1.75} />
-            <span className="text-[11px] font-semibold" style={{ color: AMBER_DIM, letterSpacing: '0.02em' }}>Drafts</span>
+            <BookOpen className="w-6 h-6" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={1.75} />
+            <span className="text-[11px] font-semibold" style={{ color: 'rgba(255,255,255,0.45)', letterSpacing: '0.02em' }}>Drafts</span>
           </motion.button>
         </div>
       </div>

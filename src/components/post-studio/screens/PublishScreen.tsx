@@ -170,7 +170,7 @@ export function PublishScreen() {
               <p className="text-[11px] mt-0.5" style={{ color: TEXT_TERTIARY }}>{visibilityConfig.desc}</p>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-[13px] font-semibold" style={{ color: AMBER }}>{visibilityConfig.label}</span>
+              <span className="text-[13px] font-semibold" style={{ color: 'rgba(255,255,255,0.70)' }}>{visibilityConfig.label}</span>
               <ChevronRight className="w-3.5 h-3.5" style={{ color: 'rgba(255,255,255,0.25)' }} />
             </div>
           </motion.button>
@@ -191,7 +191,7 @@ export function PublishScreen() {
               </p>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-[12px] font-medium" style={{ color: state.scheduledAt ? AMBER : TEXT_TERTIARY }}>
+              <span className="text-[12px] font-medium" style={{ color: 'rgba(255,255,255,0.55)' }}>
                 {state.scheduledAt
                   ? state.scheduledAt.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
                   : 'Now'}
