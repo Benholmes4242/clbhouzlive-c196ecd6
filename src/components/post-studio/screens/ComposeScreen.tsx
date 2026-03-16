@@ -115,6 +115,8 @@ interface MediaGridProps {
   onSelect: (index: number) => void;
   onRemove: (id: string) => void;
   onEdit: (index: number) => void;
+  onTrim: (index: number) => void;
+  onCover: (index: number) => void;
   onSetCover: (index: number) => void;
   onAddMore: () => void;
 }
