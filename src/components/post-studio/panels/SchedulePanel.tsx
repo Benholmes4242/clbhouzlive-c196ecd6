@@ -4,7 +4,7 @@ import { Clock, Calendar } from 'lucide-react';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { usePostStudioContext } from '../usePostStudio';
 import { SPRING } from '../constants';
-import { AMBER, AMBER_DIM, AMBER_GHOST, AMBER_GRADIENT, TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY } from '../tokens';
+import { AMBER, AMBER_DIM, AMBER_GHOST, AMBER_GRADIENT, TEXT_PRIMARY, TEXT_TERTIARY } from '../tokens';
 
 export function SchedulePanel() {
   const { state, setScheduledAt, closePanel } = usePostStudioContext();
@@ -19,7 +19,7 @@ export function SchedulePanel() {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
   };
 
-  const [dateValue, setDateValue] = useState(
+  const [dateValue, setDateValue] = useState<string>(
     state.scheduledAt ? toDateTimeLocal(state.scheduledAt) : toDateTimeLocal(minDate)
   );
 
@@ -41,9 +41,9 @@ export function SchedulePanel() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        onClick={closePanel}
         className="absolute inset-0 z-30"
-        style={{ background: 'rgba(0,0,0,0.45)' }}
+        style={{ background: 'rgba(0,0,0,0.50)' }}
+        onClick={closePanel}
       />
 
       <motion.div
@@ -53,9 +53,10 @@ export function SchedulePanel() {
         transition={{ type: 'spring', ...SPRING.panel }}
         drag="y"
         dragControls={dragControls}
-        dragConstraints={{ top: 0 }}
-        dragElastic={0.15}
-        onDragEnd={(_, info) => {
+        dragListener={false}
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={{ top: 0, bottom: 0.4 }}
+        onDragEnd={(_e, info) => {
           if (info.offset.y > 80 || info.velocity.y > 400) closePanel();
         }}
         className="absolute inset-x-0 bottom-0 z-40 rounded-t-[24px]"
@@ -68,60 +69,54 @@ export function SchedulePanel() {
       >
         {/* Drag handle */}
         <div
-          className="flex justify-center pt-3 pb-1 cursor-grab active:cursor-grabbing"
+          className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing"
           onPointerDown={(e) => dragControls.start(e)}
         >
-          <div className="w-10 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.20)' }} />
+          <div className="w-9 h-[3px] rounded-full" style={{ background: 'rgba(255,255,255,0.18)' }} />
         </div>
 
-        {/* Header — no X */}
-        <div className="px-5 pb-4 pt-1">
-          <p
-            className="text-[11px] font-semibold uppercase tracking-[1.5px]"
-            style={{ color: AMBER_DIM }}
-          >
+        {/* Header — no X button */}
+        <div className="px-5 pb-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-0.5" style={{ color: AMBER_DIM }}>
             Schedule
           </p>
-          <h3 className="text-base font-semibold mt-0.5" style={{ color: TEXT_PRIMARY }}>
+          <h3 className="text-[17px] font-semibold tracking-tight" style={{ color: TEXT_PRIMARY }}>
             When to post?
           </h3>
         </div>
 
-        <div className="px-5 pb-8 space-y-4">
+        <div className="px-5 pb-8 space-y-3">
           {/* Toggle row */}
-          <div className="flex items-center justify-between">
+          <div
+            className="flex items-center justify-between px-4 py-4 rounded-2xl"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+          >
             <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                style={{ background: isScheduling ? 'rgba(232,152,10,0.12)' : 'rgba(255,255,255,0.06)' }}
-              >
-                <Clock
-                  className="w-5 h-5"
-                  style={{ color: isScheduling ? AMBER : 'rgba(255,255,255,0.50)' }}
-                  strokeWidth={1.75}
-                />
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.07)' }}>
+                <Clock className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={1.75} />
               </div>
               <div>
-                <p className="text-sm font-medium" style={{ color: TEXT_PRIMARY }}>
+                <p className="text-[13px] font-semibold" style={{ color: TEXT_PRIMARY }}>
                   {isScheduling ? 'Schedule for later' : 'Post now'}
                 </p>
-                <p className="text-xs mt-0.5" style={{ color: TEXT_TERTIARY }}>
+                <p className="text-[11px] mt-0.5" style={{ color: TEXT_TERTIARY }}>
                   {isScheduling ? 'Choose a date and time' : 'Goes live immediately'}
                 </p>
               </div>
             </div>
-            {/* Toggle switch */}
             <button
               onClick={handleToggle}
-              className="w-12 h-7 rounded-full flex items-center px-0.5 transition-colors"
-              style={{ background: isScheduling ? AMBER : 'rgba(255,255,255,0.12)' }}
+              className="flex items-center px-0.5 transition-all"
+              style={{
+                width: 48, height: 28, borderRadius: 99,
+                background: isScheduling ? AMBER_GRADIENT : 'rgba(255,255,255,0.12)',
+              }}
             >
-              <div
-                className="w-6 h-6 rounded-full shadow transition-transform"
-                style={{
-                  background: '#FFFFFF',
-                  transform: isScheduling ? 'translateX(20px)' : 'translateX(0px)',
-                }}
+              <motion.div
+                animate={{ x: isScheduling ? 20 : 0 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                className="w-6 h-6 rounded-full"
+                style={{ background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.30)' }}
               />
             </button>
           </div>
@@ -133,15 +128,16 @@ export function SchedulePanel() {
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                style={{ overflow: 'hidden' }}
+                transition={{ type: 'spring', damping: 28, stiffness: 360 }}
+                className="overflow-hidden"
               >
                 <div
                   className="rounded-2xl overflow-hidden"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+                  style={{ border: '1px solid rgba(232,152,10,0.20)', background: AMBER_GHOST }}
                 >
-                  <div className="flex items-center gap-2 px-4 pt-3 pb-1">
-                    <Calendar className="w-3.5 h-3.5" style={{ color: TEXT_TERTIARY }} strokeWidth={2} />
-                    <span className="text-[11px] font-medium uppercase tracking-wide" style={{ color: TEXT_TERTIARY }}>
+                  <div className="flex items-center gap-2.5 px-4 pt-3 pb-1">
+                    <Calendar className="w-4 h-4 shrink-0" style={{ color: AMBER_DIM }} strokeWidth={1.75} />
+                    <span className="text-[11px] font-semibold uppercase tracking-[1.2px]" style={{ color: AMBER_DIM }}>
                       Select date & time
                     </span>
                   </div>
@@ -159,7 +155,7 @@ export function SchedulePanel() {
                     }}
                   />
                   {state.scheduledAt && (
-                    <p className="px-4 pb-3 text-xs" style={{ color: AMBER_DIM }}>
+                    <p className="px-4 pb-3 text-xs" style={{ color: 'rgba(232,152,10,0.70)' }}>
                       Will post {state.scheduledAt.toLocaleDateString('en-GB', {
                         weekday: 'long', day: 'numeric', month: 'long',
                         hour: 'numeric', minute: '2-digit',

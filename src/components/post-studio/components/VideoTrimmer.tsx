@@ -1,6 +1,4 @@
-// VideoTrimmer — Canvas-based waveform trim handles
-// Two amber drag handles for start/end, selected region overlay
-
+// VideoTrimmer — Waveform trim handles, dark spec
 import React, { useRef, useState, useCallback } from 'react';
 import type { StudioMediaItem } from '../types';
 
@@ -13,7 +11,10 @@ interface VideoTrimmerProps {
 const HANDLE_WIDTH = 16;
 const MIN_TRIM_DURATION = 1;
 
-export function VideoTrimmer({ item, onTrimChange, darkMode }: VideoTrimmerProps) {
+const AMBER_GRADIENT = 'linear-gradient(135deg, #F59E0B 0%, #C7870A 100%)';
+const AMBER_GLOW = '0 0 8px rgba(200,135,10,0.50)';
+
+export function VideoTrimmer({ item, onTrimChange }: VideoTrimmerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState<'start' | 'end' | null>(null);
   const duration = item.duration ?? 0;
@@ -41,63 +42,84 @@ export function VideoTrimmer({ item, onTrimChange, darkMode }: VideoTrimmerProps
       const rect = containerRef.current.getBoundingClientRect();
       const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
       const percent = (x / rect.width) * 100;
-      let time = percentToTime(percent);
-      time = Math.round(time * 10) / 10;
+      let time = Math.round(percentToTime(percent) * 10) / 10;
 
       if (isDragging === 'start') {
-        const maxStart = trimEnd - MIN_TRIM_DURATION;
-        time = Math.max(0, Math.min(time, maxStart));
+        time = Math.max(0, Math.min(time, trimEnd - MIN_TRIM_DURATION));
         onTrimChange(time, trimEnd);
       } else {
-        const minEnd = trimStart + MIN_TRIM_DURATION;
-        time = Math.max(minEnd, Math.min(time, duration));
+        time = Math.max(trimStart + MIN_TRIM_DURATION, Math.min(time, duration));
         onTrimChange(trimStart, time);
       }
     },
     [isDragging, trimStart, trimEnd, duration, onTrimChange]
   );
 
-  const handlePointerUp = useCallback(() => { setIsDragging(null); }, []);
+  const handlePointerUp = useCallback(() => setIsDragging(null), []);
 
-  const formatTimestamp = (secs: number) => {
+  const fmt = (secs: number) => {
     const m = Math.floor(secs / 60);
     const s = Math.floor(secs % 60);
     return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
   const trimDuration = trimEnd - trimStart;
-  const textColor = darkMode ? 'text-white/70' : 'text-muted-foreground';
-  const boldColor = darkMode ? 'text-white font-semibold' : 'text-foreground font-medium';
 
   return (
-    <div className="w-full space-y-2">
+    <div className="w-full space-y-2.5">
       <div className="text-center">
-        <span className={`text-xs ${textColor}`}>
-          {formatTimestamp(trimStart)} — {formatTimestamp(trimEnd)}{' '}
-          <span className={boldColor}>({Math.round(trimDuration)}s)</span>
+        <span className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
+          {fmt(trimStart)} — {fmt(trimEnd)}{' '}
+          <span style={{ color: 'rgba(255,255,255,0.80)', fontWeight: 600 }}>
+            ({Math.round(trimDuration)}s)
+          </span>
         </span>
       </div>
 
       <div
         ref={containerRef}
-        className="relative h-14 rounded-lg overflow-hidden bg-muted touch-none select-none"
+        className="relative rounded-xl overflow-hidden touch-none select-none"
+        style={{ height: 56, background: 'rgba(255,255,255,0.05)' }}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
       >
-        {/* Unselected before */}
-        <div className="absolute inset-y-0 left-0 bg-black/50 z-10" style={{ width: `${startPercent}%` }} />
+        {/* Waveform bars — deterministic heights, no random flicker */}
+        <div className="absolute inset-0 flex items-center justify-evenly px-2" style={{ opacity: 0.25 }}>
+          {Array.from({ length: 44 }).map((_, i) => {
+            const height = 20 + Math.sin(i * 0.8) * 15 + ((i * 37 + 11) % 13);
+            return (
+              <div
+                key={i}
+                className="rounded-full"
+                style={{ width: 2, height: `${height}%`, background: 'rgba(255,255,255,0.90)' }}
+              />
+            );
+          })}
+        </div>
 
-        {/* Selected region */}
+        {/* Dimmed region — before trim start */}
+        <div
+          className="absolute inset-y-0 left-0 z-10"
+          style={{ width: `${startPercent}%`, background: 'rgba(0,0,0,0.58)' }}
+        />
+
+        {/* Selected region highlight */}
         <div
           className="absolute inset-y-0 z-10"
           style={{
-            left: `${startPercent}%`, width: `${endPercent - startPercent}%`,
-            backgroundColor: 'hsl(var(--primary) / 0.2)', borderTop: '2px solid hsl(var(--primary))', borderBottom: '2px solid hsl(var(--primary))',
+            left: `${startPercent}%`,
+            width: `${endPercent - startPercent}%`,
+            background: 'rgba(232,152,10,0.12)',
+            borderTop: '2px solid rgba(232,152,10,0.70)',
+            borderBottom: '2px solid rgba(232,152,10,0.70)',
           }}
         />
 
-        {/* Unselected after */}
-        <div className="absolute inset-y-0 right-0 bg-black/50 z-10" style={{ width: `${100 - endPercent}%` }} />
+        {/* Dimmed region — after trim end */}
+        <div
+          className="absolute inset-y-0 right-0 z-10"
+          style={{ width: `${100 - endPercent}%`, background: 'rgba(0,0,0,0.58)' }}
+        />
 
         {/* Start handle */}
         <div
@@ -105,8 +127,17 @@ export function VideoTrimmer({ item, onTrimChange, darkMode }: VideoTrimmerProps
           className="absolute inset-y-0 z-20 flex items-center cursor-ew-resize"
           style={{ left: `calc(${startPercent}% - ${HANDLE_WIDTH / 2}px)` }}
         >
-          <div className="w-4 h-full bg-primary rounded-l-md flex items-center justify-center shadow-[0_0_8px_rgba(245,158,11,0.6)]">
-            <div className="w-0.5 h-5 bg-primary-foreground rounded-full" />
+          <div
+            className="flex items-center justify-center"
+            style={{
+              width: HANDLE_WIDTH,
+              height: '100%',
+              background: AMBER_GRADIENT,
+              borderRadius: '6px 0 0 6px',
+              boxShadow: AMBER_GLOW,
+            }}
+          >
+            <div className="rounded-full" style={{ width: 2, height: 20, background: 'rgba(0,0,0,0.40)' }} />
           </div>
         </div>
 
@@ -116,17 +147,18 @@ export function VideoTrimmer({ item, onTrimChange, darkMode }: VideoTrimmerProps
           className="absolute inset-y-0 z-20 flex items-center cursor-ew-resize"
           style={{ left: `calc(${endPercent}% - ${HANDLE_WIDTH / 2}px)` }}
         >
-          <div className="w-4 h-full bg-primary rounded-r-md flex items-center justify-center shadow-[0_0_8px_rgba(245,158,11,0.6)]">
-            <div className="w-0.5 h-5 bg-primary-foreground rounded-full" />
+          <div
+            className="flex items-center justify-center"
+            style={{
+              width: HANDLE_WIDTH,
+              height: '100%',
+              background: AMBER_GRADIENT,
+              borderRadius: '0 6px 6px 0',
+              boxShadow: AMBER_GLOW,
+            }}
+          >
+            <div className="rounded-full" style={{ width: 2, height: 20, background: 'rgba(0,0,0,0.40)' }} />
           </div>
-        </div>
-
-        {/* Waveform placeholder */}
-        <div className="absolute inset-0 flex items-center justify-evenly px-2 opacity-30">
-          {Array.from({ length: 40 }).map((_, i) => {
-            const height = 20 + Math.sin(i * 0.8) * 15 + Math.random() * 10;
-            return <div key={i} className="w-0.5 bg-foreground rounded-full" style={{ height: `${height}%` }} />;
-          })}
         </div>
       </div>
     </div>

@@ -8,8 +8,8 @@ import { enqueuePostUpload } from '@/uploads/uploadPipeline';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
-  BG_BASE, BG_CARD, BORDER_CARD, AMBER, AMBER_DEEP,
-  AMBER_GRADIENT, AMBER_DIM, AMBER_GHOST, TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY,
+  BG_BASE, AMBER, AMBER_GRADIENT, AMBER_DIM, AMBER_GHOST,
+  TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY,
 } from '../tokens';
 import type { UploadJobInput } from '@/uploads/types';
 
@@ -74,155 +74,146 @@ export function PublishScreen() {
   return (
     <div className="flex-1 flex flex-col" style={{ background: BG_BASE }}>
       <StudioHeader
-        title="Review"
+        title="Review Moment"
         step="PUBLISH"
         leftAction={{ label: 'Back', onClick: () => setStep('COMPOSER') }}
       />
 
       <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
 
-        {/* ── Cinematic media preview ── */}
+        {/* Cinematic media preview */}
         {firstItem && (
-          <div className="mx-4 mt-4" style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.50)' }}>
-            {/* Full-bleed thumbnail */}
-            <div className="relative" style={{ aspectRatio: '4/5', maxHeight: '44vh' }}>
+          <div className="relative mx-4 mt-4 overflow-hidden" style={{ borderRadius: 20, boxShadow: '0 8px 40px rgba(0,0,0,0.60)' }}>
+            <div className="relative" style={{ aspectRatio: '4/3' }}>
               <img
                 src={firstItem.thumbnailUrl || firstItem.previewUrl}
                 alt=""
                 className="w-full h-full object-cover"
               />
-              {/* Gradient scrim */}
               <div
                 className="absolute inset-0"
-                style={{ background: 'linear-gradient(to top, rgba(8,8,8,0.90) 0%, rgba(8,8,8,0.20) 40%, transparent 65%)' }}
+                style={{ background: 'linear-gradient(to top, rgba(8,8,8,0.95) 0%, rgba(8,8,8,0.40) 50%, transparent 100%)' }}
               />
-              {/* Multi-item indicator */}
               {itemCount > 1 && (
                 <div
                   className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[11px] font-semibold"
-                  style={{ background: 'rgba(0,0,0,0.55)', color: 'rgba(255,255,255,0.80)', backdropFilter: 'blur(12px)' }}
+                  style={{ background: 'rgba(0,0,0,0.60)', backdropFilter: 'blur(8px)', color: 'rgba(255,255,255,0.85)', border: '1px solid rgba(255,255,255,0.15)' }}
                 >
                   {itemCount} items
                 </div>
               )}
             </div>
 
-            {/* Caption + metadata overlay */}
-            <div className="relative px-4 pt-0 pb-4 -mt-14" style={{ zIndex: 2 }}>
+            <div className="absolute bottom-0 left-0 right-0 px-4 pb-4">
               {hasCaption && (
-                <p
-                  className="text-sm leading-relaxed line-clamp-3 mb-2"
-                  style={{ color: 'rgba(255,255,255,0.80)' }}
-                >
+                <p className="text-sm font-medium leading-relaxed mb-2 line-clamp-2" style={{ color: 'rgba(255,255,255,0.90)' }}>
                   {state.caption}
                 </p>
               )}
-              <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap">
                 {state.taggedCourses.length > 0 && (
-                  <div className="flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5" style={{ color: AMBER_DIM }} strokeWidth={2} />
-                    <span className="text-[12px] font-medium" style={{ color: AMBER_DIM }}>
+                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: 'rgba(232,152,10,0.18)', border: '1px solid rgba(232,152,10,0.30)' }}>
+                    <MapPin className="w-3 h-3" style={{ color: AMBER_DIM }} strokeWidth={1.75} />
+                    <span className="text-[11px] font-medium" style={{ color: AMBER_DIM }}>
                       {state.taggedCourses[0].courseName}
                       {state.taggedCourses.length > 1 && ` +${state.taggedCourses.length - 1}`}
                     </span>
                   </div>
                 )}
                 {state.mentions.length > 0 && (
-                  <div className="flex items-center gap-1.5">
-                    <AtSign className="w-3.5 h-3.5" style={{ color: TEXT_SECONDARY }} strokeWidth={2} />
-                    <span className="text-[12px] font-medium" style={{ color: TEXT_SECONDARY }}>
+                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                    <AtSign className="w-3 h-3" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={1.75} />
+                    <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.55)' }}>
                       {state.mentions.length} tagged
                     </span>
                   </div>
                 )}
                 {!hasCaption && state.taggedCourses.length === 0 && (
-                  <span className="text-[12px]" style={{ color: TEXT_TERTIARY }}>No caption</span>
+                  <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.30)' }}>No caption</span>
                 )}
               </div>
             </div>
           </div>
         )}
 
-        {/* ── Settings card ── */}
-        <div className="mx-4 mt-3" style={{ background: BG_CARD, border: BORDER_CARD, borderRadius: 20 }}>
-
-          {/* Section label */}
-          <div className="px-4 pt-4 pb-2">
-            <p className="text-[13px] font-medium" style={{ color: TEXT_SECONDARY }}>
+        {/* Settings card */}
+        <div className="mx-4 mt-3 mb-2" style={{ borderRadius: 20, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.07)' }}>
+          <div className="px-4 pt-4 pb-2" style={{ background: 'rgba(255,255,255,0.03)' }}>
+            <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: 'rgba(255,255,255,0.30)' }}>
               Before you post
             </p>
           </div>
 
-          {/* Audience row */}
           <motion.button
-            whileTap={{ scale: 0.98 }}
+            whileTap={{ backgroundColor: 'rgba(255,255,255,0.04)' }}
             onClick={() => openPanel('audience')}
             className="w-full flex items-center gap-3.5 px-4 py-4 min-h-[60px]"
             style={{ background: 'rgba(255,255,255,0.025)', borderTop: '1px solid rgba(255,255,255,0.06)' }}
           >
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }}>
-              <visibilityConfig.Icon className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={1.75} />
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(255,255,255,0.07)' }}>
+              <visibilityConfig.Icon className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.60)' }} strokeWidth={1.75} />
             </div>
             <div className="flex-1 text-left">
-              <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.80)' }}>Audience</p>
-              <p className="text-xs mt-0.5" style={{ color: TEXT_TERTIARY }}>{visibilityConfig.desc}</p>
+              <p className="text-[13px] font-semibold" style={{ color: TEXT_PRIMARY }}>Audience</p>
+              <p className="text-[11px] mt-0.5" style={{ color: TEXT_TERTIARY }}>{visibilityConfig.desc}</p>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-sm font-semibold" style={{ color: AMBER }}>{visibilityConfig.label}</span>
-              <ChevronRight className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.25)' }} />
+              <span className="text-[13px] font-semibold" style={{ color: AMBER }}>{visibilityConfig.label}</span>
+              <ChevronRight className="w-3.5 h-3.5" style={{ color: 'rgba(255,255,255,0.25)' }} />
             </div>
           </motion.button>
 
-          {/* Schedule row */}
           <motion.button
-            whileTap={{ scale: 0.98 }}
+            whileTap={{ backgroundColor: 'rgba(255,255,255,0.04)' }}
             onClick={() => openPanel('schedule')}
             className="w-full flex items-center gap-3.5 px-4 py-4 min-h-[60px]"
             style={{ background: 'rgba(255,255,255,0.025)', borderTop: '1px solid rgba(255,255,255,0.06)' }}
           >
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }}>
-              <Clock className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={1.75} />
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(255,255,255,0.07)' }}>
+              <Clock className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.60)' }} strokeWidth={1.75} />
             </div>
             <div className="flex-1 text-left">
-              <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.80)' }}>Schedule</p>
-              <p className="text-xs mt-0.5" style={{ color: TEXT_TERTIARY }}>
+              <p className="text-[13px] font-semibold" style={{ color: TEXT_PRIMARY }}>Schedule</p>
+              <p className="text-[11px] mt-0.5" style={{ color: TEXT_TERTIARY }}>
                 {state.scheduledAt ? 'Scheduled for later' : 'Post immediately'}
               </p>
             </div>
             <div className="flex items-center gap-1.5">
-              <span
-                className="text-xs font-medium"
-                style={{ color: state.scheduledAt ? AMBER : TEXT_TERTIARY }}
-              >
+              <span className="text-[12px] font-medium" style={{ color: state.scheduledAt ? AMBER : TEXT_TERTIARY }}>
                 {state.scheduledAt
                   ? state.scheduledAt.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
                   : 'Now'}
               </span>
-              <ChevronRight className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.25)' }} />
+              <ChevronRight className="w-3.5 h-3.5" style={{ color: 'rgba(255,255,255,0.25)' }} />
             </div>
           </motion.button>
         </div>
 
-        <div className="h-6" />
+        <div className="h-4" />
       </div>
 
-      {/* ── Post Now CTA ── */}
+      {/* Post Now CTA */}
       <div
-        className="shrink-0 px-4 pt-3 pb-4"
+        className="shrink-0 px-4 pt-3"
         style={{
+          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
+          background: 'rgba(8,8,8,0.98)',
           borderTop: '1px solid rgba(255,255,255,0.06)',
-          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
-          background: 'rgba(8,8,8,0.97)',
         }}
       >
-        {/* Scheduled label above button */}
-        <div className="mb-2 text-center" style={{ minHeight: 16 }}>
+        <AnimatePresence>
           {state.scheduledAt && (
-            <span className="text-[11px]" style={{ color: TEXT_TERTIARY }}>
+            <motion.p
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              className="text-center text-xs mb-2.5"
+              style={{ color: AMBER_DIM }}
+            >
               Will post {state.scheduledAt.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })}
-            </span>
+            </motion.p>
           )}
-        </div>
+        </AnimatePresence>
 
         <motion.button
           whileTap={{ scale: 0.97 }}
@@ -230,28 +221,22 @@ export function PublishScreen() {
           disabled={isPublishing}
           className="w-full rounded-2xl font-bold flex items-center justify-center gap-2.5 disabled:opacity-60"
           style={{
-            minHeight: 62,
-            fontSize: 17,
-            background: isPublishing ? 'rgba(232,152,10,0.50)' : AMBER_GRADIENT,
+            minHeight: 58,
+            fontSize: 16,
+            letterSpacing: '-0.01em',
+            background: isPublishing ? 'rgba(232,152,10,0.45)' : AMBER_GRADIENT,
             color: '#0D0D0D',
-            boxShadow: isPublishing
-              ? 'none'
-              : '0 8px 32px rgba(232,152,10,0.45), 0 2px 8px rgba(232,152,10,0.30), inset 0 1px 0 rgba(255,255,255,0.20)',
+            boxShadow: isPublishing ? 'none' : '0 4px 24px rgba(200,135,10,0.40), inset 0 1px 0 rgba(255,255,255,0.15)',
           }}
         >
           {isPublishing ? (
             <>
-              <div
-                className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin"
-                style={{ borderColor: 'rgba(0,0,0,0.4)', borderTopColor: 'transparent' }}
-              />
+              <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(0,0,0,0.35)', borderTopColor: 'transparent' }} />
               Starting upload…
             </>
           ) : (
             <>
-              {state.scheduledAt
-                ? <Clock className="w-5 h-5" strokeWidth={2.5} />
-                : <Zap className="w-5 h-5" strokeWidth={2.5} fill="currentColor" />}
+              {state.scheduledAt ? <Clock className="w-5 h-5" strokeWidth={2.5} /> : <Zap className="w-5 h-5" strokeWidth={2.5} fill="currentColor" />}
               {state.scheduledAt ? 'Schedule Moment' : 'Post Moment'}
             </>
           )}
