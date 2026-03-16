@@ -231,19 +231,19 @@ export function PublishScreen() {
           whileTap={{ scale: 0.97 }}
           onClick={handlePublish}
           disabled={isPublishing}
-          className="w-full rounded-2xl font-bold flex items-center justify-center gap-2.5 disabled:opacity-60"
+          className="w-full rounded-2xl font-bold flex items-center justify-center gap-2.5 disabled:opacity-40"
           style={{
-            minHeight: 58,
-            fontSize: 16,
+            minHeight: 62,
+            fontSize: 17,
             letterSpacing: '-0.01em',
-            background: isPublishing ? 'rgba(232,152,10,0.45)' : AMBER_GRADIENT,
+            background: isPublishing ? 'rgba(255,255,255,0.50)' : 'rgba(255,255,255,0.96)',
             color: '#0D0D0D',
-            boxShadow: isPublishing ? 'none' : '0 4px 24px rgba(200,135,10,0.40), inset 0 1px 0 rgba(255,255,255,0.15)',
+            boxShadow: isPublishing ? 'none' : '0 4px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,1)',
           }}
         >
           {isPublishing ? (
             <>
-              <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(0,0,0,0.35)', borderTopColor: 'transparent' }} />
+              <div className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(0,0,0,0.25)', borderTopColor: 'transparent' }} />
               Starting upload…
             </>
           ) : (
