@@ -104,7 +104,18 @@ export default function SeasonShop() {
         {/* Items Grid */}
         <div className="px-4 py-6 max-w-4xl mx-auto">
           {isLoadingShop ? (
-            <div className="text-center py-12 text-muted-foreground">Loading shop...</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="rounded-xl border border-border overflow-hidden">
+                  <Skeleton className="h-48 rounded-none" />
+                  <div className="p-4 space-y-2">
+                    <Skeleton className="h-5 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                    <Skeleton className="h-9 w-full rounded-lg mt-3" />
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : filteredItems && filteredItems.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredItems.map(item => {
