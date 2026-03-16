@@ -4,7 +4,7 @@ import { Clock, Calendar } from 'lucide-react';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { usePostStudioContext } from '../usePostStudio';
 import { SPRING } from '../constants';
-import { AMBER, AMBER_DIM, AMBER_GHOST, AMBER_GRADIENT, TEXT_PRIMARY, TEXT_TERTIARY } from '../tokens';
+import { TEXT_PRIMARY, TEXT_TERTIARY } from '../tokens';
 
 export function SchedulePanel() {
   const { state, setScheduledAt, closePanel } = usePostStudioContext();
@@ -89,11 +89,11 @@ export function SchedulePanel() {
           {/* Toggle row */}
           <div
             className="flex items-center justify-between px-4 py-4 rounded-2xl"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+            style={{ background: isScheduling ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.07)' }}
           >
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.07)' }}>
-                <Clock className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={1.75} />
+                <Clock className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.50)' }} strokeWidth={1.75} />
               </div>
               <div>
                 <p className="text-[13px] font-semibold" style={{ color: TEXT_PRIMARY }}>
@@ -109,14 +109,14 @@ export function SchedulePanel() {
               className="flex items-center px-0.5 transition-all"
               style={{
                 width: 48, height: 28, borderRadius: 99,
-                background: isScheduling ? AMBER_GRADIENT : 'rgba(255,255,255,0.12)',
+                background: isScheduling ? 'rgba(255,255,255,0.90)' : 'rgba(255,255,255,0.12)',
               }}
             >
               <motion.div
                 animate={{ x: isScheduling ? 20 : 0 }}
                 transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                 className="w-6 h-6 rounded-full"
-                style={{ background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.30)' }}
+                style={{ background: isScheduling ? '#0D0D0D' : '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.30)' }}
               />
             </button>
           </div>
@@ -136,8 +136,8 @@ export function SchedulePanel() {
                   style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' }}
                 >
                   <div className="flex items-center gap-2.5 px-4 pt-3 pb-1">
-                    <Calendar className="w-4 h-4 shrink-0" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={1.75} />
-                    <span className="text-[11px] font-semibold uppercase tracking-[1.2px]" style={{ color: 'rgba(255,255,255,0.40)' }}>
+                    <Calendar className="w-4 h-4 shrink-0" style={{ color: 'rgba(255,255,255,0.35)' }} strokeWidth={1.75} />
+                    <span className="text-[11px] font-semibold uppercase tracking-[1.2px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
                       Select date & time
                     </span>
                   </div>
@@ -150,12 +150,12 @@ export function SchedulePanel() {
                     className="w-full bg-transparent px-4 py-3 text-sm outline-none"
                     style={{
                       color: TEXT_PRIMARY,
-                      caretColor: AMBER,
+                      caretColor: 'rgba(255,255,255,0.70)',
                       colorScheme: 'dark',
                     }}
                   />
                   {state.scheduledAt && (
-                    <p className="px-4 pb-3 text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                    <p className="px-4 pb-3 text-xs" style={{ color: 'rgba(255,255,255,0.40)' }}>
                       Will post {state.scheduledAt.toLocaleDateString('en-GB', {
                         weekday: 'long', day: 'numeric', month: 'long',
                         hour: 'numeric', minute: '2-digit',
