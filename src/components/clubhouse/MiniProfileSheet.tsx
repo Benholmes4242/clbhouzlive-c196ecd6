@@ -6,6 +6,7 @@ import { useFollow } from '@/hooks/useFollow';
 import { useUserProfilePosts } from '@/hooks/useUserProfilePosts';
 // REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ImageWithFallback } from '@/components/common/ImageWithFallback';
 import { SheetPlaybackProvider, useSheetPlayback } from './SheetPlaybackContext';
 import { VideoThumbPlayer } from './VideoThumbPlayer';
@@ -404,9 +405,9 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
               {postsLoading && (
                 <div className="grid grid-cols-2 gap-3 pb-2">
                   {Array.from({ length: 6 }).map((_, i) => (
-                    <div
+                    <Skeleton
                       key={i}
-                      className="aspect-square rounded-[18px] animate-pulse" style={{ background: 'rgba(0,0,0,0.06)' }}
+                      className="aspect-square rounded-[18px]"
                     />
                   ))}
                 </div>

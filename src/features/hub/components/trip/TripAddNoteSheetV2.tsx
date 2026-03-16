@@ -136,7 +136,7 @@ export function TripAddNoteSheetV2({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
-            className="fixed inset-x-0 bottom-0 z-[10004] flex flex-col rounded-t-[24px] overflow-hidden"
+            className="fixed bottom-0 z-[10004] w-full max-w-[480px] left-1/2 -translate-x-1/2 flex flex-col rounded-t-[24px] overflow-hidden"
             style={{
               maxHeight: '70svh',
               backgroundColor: '#F9FAFB',

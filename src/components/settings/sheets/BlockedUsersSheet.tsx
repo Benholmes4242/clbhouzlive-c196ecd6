@@ -1,4 +1,5 @@
 import { X, UserX } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -62,11 +63,11 @@ export function BlockedUsersSheet({ open, onClose, userId }: Props) {
         {isLoading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="flex items-center gap-3 animate-pulse">
-                <div className="w-10 h-10 rounded-full bg-muted" />
+              <div key={i} className="flex items-center gap-3">
+                <Skeleton className="w-10 h-10 rounded-full" />
                 <div className="flex-1 space-y-1.5">
-                  <div className="h-3.5 w-32 rounded bg-muted" />
-                  <div className="h-3 w-20 rounded bg-muted" />
+                  <Skeleton className="h-3.5 w-32" />
+                  <Skeleton className="h-3 w-20" />
                 </div>
               </div>
             ))}

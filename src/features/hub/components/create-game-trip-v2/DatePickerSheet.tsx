@@ -105,7 +105,7 @@ export function DatePickerSheet({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-            className="fixed inset-x-0 bottom-0 z-[10201] rounded-t-[24px] overflow-hidden"
+            className="fixed bottom-0 z-[10201] w-full max-w-[480px] left-1/2 -translate-x-1/2 rounded-t-[24px] overflow-hidden"
             style={{
               background: '#FFFFFF',
               boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.12)',

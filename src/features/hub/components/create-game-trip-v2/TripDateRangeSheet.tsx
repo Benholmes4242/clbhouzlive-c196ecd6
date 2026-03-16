@@ -88,7 +88,7 @@ export function TripDateRangeSheet({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
-            className="fixed inset-x-0 bottom-0 z-[10008] rounded-t-[28px] overflow-hidden"
+            className="fixed bottom-0 z-[10008] w-full max-w-[480px] left-1/2 -translate-x-1/2 rounded-t-[28px] overflow-hidden"
             style={{
               background: '#F8FAFC',
               boxShadow: '0 -4px 24px rgba(0, 0, 0, 0.08)',

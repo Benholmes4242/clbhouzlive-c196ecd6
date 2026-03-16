@@ -5,6 +5,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence, useMotionValue, animate, PanInfo } from 'framer-motion';
 import { Clock, ChevronRight, Trash2 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEchoConversations } from '../../hooks/useEchoHistory';
 import { supabase } from '@/integrations/supabase/client';
@@ -77,12 +78,12 @@ function HistorySkeleton() {
     <div className="px-4">
       {[...Array(5)].map((_, i) => (
         <div key={i} className="flex items-center gap-3 px-0 py-3.5 border-b border-border/40">
-          <div className="w-10 h-10 rounded-full bg-muted/60 animate-pulse flex-shrink-0" />
+          <Skeleton className="w-10 h-10 rounded-full flex-shrink-0" />
           <div className="flex-1 space-y-2">
-            <div className="h-4 bg-muted/40 animate-pulse rounded-full w-3/4" />
-            <div className="h-3 bg-muted/30 animate-pulse rounded-full w-1/2" />
+            <Skeleton className="h-4 rounded-full w-3/4" />
+            <Skeleton className="h-3 rounded-full w-1/2" />
           </div>
-          <div className="h-3 bg-muted/30 animate-pulse rounded-full w-12" />
+          <Skeleton className="h-3 rounded-full w-12" />
         </div>
       ))}
     </div>
@@ -243,7 +244,7 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
             dragElastic={{ top: 0, bottom: 0.5 }}
             onDragEnd={handleSheetDragEnd}
             style={{ y: sheetY }}
-            className="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl h-[75vh] flex flex-col bg-background"
+            className="fixed bottom-0 z-50 w-full max-w-[480px] left-1/2 -translate-x-1/2 rounded-t-3xl h-[75vh] flex flex-col bg-background"
             initial={sheetAnimProps.initial}
             animate={{ y: 0 }}
             exit={sheetAnimProps.exit}
