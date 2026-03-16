@@ -16,6 +16,7 @@ import { SegmentedTabOption } from '@/components/ui/SegmentedTabs';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Search, X, Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
 
 import { 
   SHOW_MOCK_REVIEWS, 
