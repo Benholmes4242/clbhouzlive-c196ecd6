@@ -126,7 +126,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
         }
         rightAction={
           hasMedia
-            ? { label: `Next (${mediaCount})`, onClick: () => setStep('COMPOSER'), variant: 'primary' as const }
+            ? { label: 'Next', onClick: () => setStep('COMPOSER'), variant: 'primary' as const }
             : undefined
         }
       />
