@@ -289,7 +289,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
             className="flex flex-col items-center gap-1.5"
             style={{ minWidth: 64, minHeight: 44, justifyContent: 'center' }}
           >
-            <BookOpen className="w-6 h-6" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={1.5} />
+            <BookOpen className="w-6 h-6" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={2} />
             <span className="text-[11px] font-medium" style={{ color: 'rgba(255,255,255,0.35)', letterSpacing: '0.03em' }}>
               Drafts
             </span>
