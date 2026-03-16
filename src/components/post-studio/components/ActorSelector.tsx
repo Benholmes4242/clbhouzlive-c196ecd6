@@ -94,7 +94,7 @@ export function ActorSelector() {
             className="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-full transition-all min-h-[44px]"
             style={isActive ? activeStyle : inactiveStyle}
           >
-            <div className="w-6 h-6 rounded-lg overflow-hidden shrink-0" style={{ background: 'rgba(255,255,255,0.08)' }}>
+            <div className="w-6 h-6 overflow-hidden shrink-0" style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '34%' }}>
               {biz.logo_url ? (
                 <img src={biz.logo_url} alt="" className="w-full h-full object-cover" />
               ) : (
