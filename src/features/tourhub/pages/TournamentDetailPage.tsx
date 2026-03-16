@@ -3,6 +3,7 @@
  */
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { Trophy, Clock, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
