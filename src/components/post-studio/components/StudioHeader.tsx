@@ -2,7 +2,7 @@
 // Safe-area aware, 44px tap targets, amber accent for primary actions
 
 import React from 'react';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { MIN_TAP_TARGET } from '../constants';
 import { BG_GLASS, AMBER, AMBER_DEEP, AMBER_GRADIENT, TEXT_PRIMARY } from '../tokens';
