@@ -227,7 +227,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
                         <span className="text-[9px] font-semibold leading-none block" style={{ color: 'rgba(255,255,255,0.90)', letterSpacing: '0.02em' }}>{item.duration ? formatTime(item.duration) : 'Video'}</span>
                       </div>
                     )}
-                    <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: index === 0 ? 'inset 0 0 0 2px rgba(245,158,11,0.60)' : 'none' }} />
+                    <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: index === 0 ? 'inset 0 0 0 2px rgba(232,152,10,0.55)' : 'none' }} />
                   </motion.div>
                 ))}
               </AnimatePresence>
