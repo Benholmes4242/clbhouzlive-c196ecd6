@@ -337,6 +337,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
   const [coverIndex, setCoverIndex] = useState(0);
 
+  // Video tool picker sheet — shown when pencil tapped on a video
+  const [videoToolSheetIndex, setVideoToolSheetIndex] = useState<number | null>(null);
+
+  // Overflow sheet — shown when +N tile tapped
+  const [overflowSheetOpen, setOverflowSheetOpen] = useState(false);
+
   const hasMedia = state.mediaItems.length > 0;
   const activeItem = state.mediaItems[state.activeMediaIndex] ?? null;
   const activeIsVideo = activeItem?.mediaType === 'video';
