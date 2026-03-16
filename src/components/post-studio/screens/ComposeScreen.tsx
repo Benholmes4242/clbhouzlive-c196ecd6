@@ -10,15 +10,35 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { StudioHeader } from '../components/StudioHeader';
-import { MediaPreview } from '../components/MediaPreview';
 import { CharacterRing } from '../components/CharacterRing';
 import { ActorSelector } from '../components/ActorSelector';
 import { usePostStudioContext } from '../usePostStudio';
 import { validateMediaFile, POST_LIMITS, ALLOWED_VIDEO_TYPES, ALLOWED_IMAGE_TYPES } from '../constants';
-import { BG_BASE, TEXT_PRIMARY, TEXT_TERTIARY, AMBER_GRADIENT } from '../tokens';
+import { BG_BASE } from '../tokens';
 import type { StudioMediaItem } from '../types';
 import type { StudioEdits, StudioTool } from '@/types/studio';
 import StudioShelf from '@/components/studio/StudioShelf';
+
+// ─── Golf-native rotating placeholders ────────────────────────────────────────
+
+const GOLF_PLACEHOLDERS = [
+  "Which hole broke you today?",
+  "The fairway never lies.",
+  "Name the course. Tell the story.",
+  "Best shot of the round?",
+  "What did the back nine teach you?",
+  "Pin high. Did it count?",
+  "The 19th hole starts here.",
+  "Which course deserves more credit?",
+  "Birdied it. Bogied it. Either way, share it.",
+  "Golf is 90% mental. Vent here.",
+  "Which green was the fastest you've ever played?",
+  "Links, parkland, heathland — where were you?",
+];
+
+function getRandomPlaceholder(): string {
+  return GOLF_PLACEHOLDERS[Math.floor(Math.random() * GOLF_PLACEHOLDERS.length)];
+}
 
 // ─── Media processing helpers ─────────────────────────────────────────────────
 
@@ -87,10 +107,214 @@ async function filesToMediaItems(
   return items;
 }
 
-function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
+// ─── Adaptive media grid ─────────────────────────────────────────────────────
+
+interface MediaGridProps {
+  items: StudioMediaItem[];
+  activeIndex: number;
+  onSelect: (index: number) => void;
+  onRemove: (id: string) => void;
+  onAddMore: () => void;
+  onEdit: () => void;
+  onTrim: () => void;
+  onCover: () => void;
+  activeIsVideo: boolean;
+  activeItem: StudioMediaItem | null;
+}
+
+function MediaGrid({
+  items, activeIndex, onSelect, onRemove, onAddMore,
+  onEdit, onTrim, onCover, activeIsVideo, activeItem,
+}: MediaGridProps) {
+  if (items.length === 0) return null;
+
+  const GAP = 2;
+
+  // Single item — full width, native ratio
+  if (items.length === 1) {
+    const item = items[0];
+    const ratio = item.width && item.height
+      ? Math.min(Math.max(item.width / item.height, 4 / 5), 16 / 9)
+      : 4 / 3;
+    return (
+      <div className="mx-4 mb-2 relative overflow-hidden" style={{ borderRadius: 14, aspectRatio: String(ratio) }}>
+        <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
+        {item.mediaType === 'video' && <VideoOverlay />}
+        <RemoveButton onRemove={() => onRemove(item.id)} />
+        <ToolBar item={item} onEdit={onEdit} onTrim={onTrim} onCover={onCover} activeIsVideo={activeIsVideo} />
+      </div>
+    );
+  }
+
+  // 2 items — side by side
+  if (items.length === 2) {
+    return (
+      <div className="mx-4 mb-2 flex overflow-hidden" style={{ borderRadius: 14, gap: GAP, aspectRatio: '16/9' }}>
+        {items.map((item, i) => (
+          <div
+            key={item.id}
+            className="relative flex-1 overflow-hidden cursor-pointer"
+            style={{ borderRadius: i === 0 ? '14px 0 0 14px' : '0 14px 14px 0' }}
+            onClick={() => onSelect(i)}
+          >
+            <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
+            {item.mediaType === 'video' && <VideoOverlay />}
+            <RemoveButton onRemove={() => onRemove(item.id)} />
+            {i === activeIndex && <ToolBar item={item} onEdit={onEdit} onTrim={onTrim} onCover={onCover} activeIsVideo={activeIsVideo} />}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // 3 items — large left, 2 stacked right
+  if (items.length === 3) {
+    return (
+      <div className="mx-4 mb-2 flex overflow-hidden" style={{ borderRadius: 14, gap: GAP, aspectRatio: '4/3' }}>
+        {/* Left — large */}
+        <div
+          className="relative flex-1 overflow-hidden cursor-pointer"
+          style={{ borderRadius: '14px 0 0 14px' }}
+          onClick={() => onSelect(0)}
+        >
+          <img src={items[0].thumbnailUrl || items[0].previewUrl} alt="" className="w-full h-full object-cover" />
+          {items[0].mediaType === 'video' && <VideoOverlay />}
+          <RemoveButton onRemove={() => onRemove(items[0].id)} />
+          {activeIndex === 0 && <ToolBar item={items[0]} onEdit={onEdit} onTrim={onTrim} onCover={onCover} activeIsVideo={activeIsVideo} />}
+        </div>
+        {/* Right — 2 stacked */}
+        <div className="flex flex-col flex-1 overflow-hidden" style={{ gap: GAP }}>
+          {items.slice(1).map((item, i) => (
+            <div
+              key={item.id}
+              className="relative flex-1 overflow-hidden cursor-pointer"
+              style={{ borderRadius: i === 0 ? '0 14px 0 0' : '0 0 14px 0' }}
+              onClick={() => onSelect(i + 1)}
+            >
+              <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
+              {item.mediaType === 'video' && <VideoOverlay />}
+              <RemoveButton onRemove={() => onRemove(item.id)} />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // 4+ items — 2×2 grid with overflow count on last tile
+  const visible = items.slice(0, 4);
+  const overflow = items.length - 4;
+  return (
+    <div className="mx-4 mb-2 grid grid-cols-2 overflow-hidden" style={{ borderRadius: 14, gap: GAP, aspectRatio: '1/1' }}>
+      {visible.map((item, i) => {
+        const isLast = i === 3;
+        const corners = [
+          '14px 0 0 0',
+          '0 14px 0 0',
+          '0 0 0 14px',
+          '0 0 14px 0',
+        ];
+        return (
+          <div
+            key={item.id}
+            className="relative overflow-hidden cursor-pointer"
+            style={{ borderRadius: corners[i] }}
+            onClick={() => onSelect(i)}
+          >
+            <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
+            {item.mediaType === 'video' && <VideoOverlay />}
+            {!isLast && <RemoveButton onRemove={() => onRemove(item.id)} />}
+            {/* Overflow count overlay on last tile */}
+            {isLast && overflow > 0 && (
+              <div
+                className="absolute inset-0 flex items-center justify-center"
+                style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
+              >
+                <span className="text-[22px] font-bold text-white">+{overflow + 1}</span>
+              </div>
+            )}
+            {i === activeIndex && !isLast && <ToolBar item={item} onEdit={onEdit} onTrim={onTrim} onCover={onCover} activeIsVideo={activeIsVideo} />}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// Sub-components for the grid
+
+function VideoOverlay() {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+      <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(8px)' }}>
+        <Play className="w-4 h-4 text-white ml-0.5" fill="white" strokeWidth={0} />
+      </div>
+    </div>
+  );
+}
+
+function RemoveButton({ onRemove }: { onRemove: () => void }) {
+  return (
+    <button
+      onClick={(e) => { e.stopPropagation(); onRemove(); }}
+      className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center z-10"
+      style={{ background: 'rgba(0,0,0,0.60)', border: '1px solid rgba(255,255,255,0.20)' }}
+    >
+      <X className="w-3 h-3 text-white" strokeWidth={2.5} />
+    </button>
+  );
+}
+
+function ToolBar({
+  item, onEdit, onTrim, onCover, activeIsVideo,
+}: {
+  item: StudioMediaItem;
+  onEdit: () => void;
+  onTrim: () => void;
+  onCover: () => void;
+  activeIsVideo: boolean;
+}) {
+  return (
+    <>
+      <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: 48, background: 'linear-gradient(to top, rgba(0,0,0,0.70), transparent)' }} />
+      <div className="absolute bottom-2 left-2 flex gap-1 z-10">
+        <motion.button
+          whileTap={{ scale: 0.93 }}
+          onClick={(e) => { e.stopPropagation(); onEdit(); }}
+          className="flex items-center gap-1 px-2 py-1 text-[11px] font-medium"
+          style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8, color: 'rgba(255,255,255,0.90)' }}
+        >
+          <Wand2 className="w-3 h-3" strokeWidth={2} />
+          Edit
+          {item.edits && Object.values(item.edits).some(Boolean) && (
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.80)' }} />
+          )}
+        </motion.button>
+        {activeIsVideo && (
+          <motion.button
+            whileTap={{ scale: 0.93 }}
+            onClick={(e) => { e.stopPropagation(); onTrim(); }}
+            className="flex items-center gap-1 px-2 py-1 text-[11px] font-medium"
+            style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8, color: 'rgba(255,255,255,0.90)' }}
+          >
+            <Scissors className="w-3 h-3" strokeWidth={2} />
+            Trim
+          </motion.button>
+        )}
+        {activeIsVideo && (
+          <motion.button
+            whileTap={{ scale: 0.93 }}
+            onClick={(e) => { e.stopPropagation(); onCover(); }}
+            className="flex items-center gap-1 px-2 py-1 text-[11px] font-medium"
+            style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8, color: 'rgba(255,255,255,0.90)' }}
+          >
+            <ImageIcon className="w-3 h-3" strokeWidth={2} />
+            Cover
+          </motion.button>
+        )}
+      </div>
+    </>
+  );
 }
 
 // ─── ComposeScreen ────────────────────────────────────────────────────────────
@@ -104,6 +328,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const placeholderRef = useRef(getRandomPlaceholder());
   const [isProcessing, setIsProcessing] = useState(false);
   const [shelfOpen, setShelfOpen] = useState(false);
   const [activeTool, setActiveTool] = useState<StudioTool>(null);
@@ -200,14 +425,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     updateMediaEdits(activeItem.id, {});
   }, [activeItem, updateMediaEdits]);
 
-  const handleSwipeLeft = useCallback(() => {
-    if (state.activeMediaIndex < state.mediaItems.length - 1) setActiveMedia(state.activeMediaIndex + 1);
-  }, [state.activeMediaIndex, state.mediaItems.length, setActiveMedia]);
-
-  const handleSwipeRight = useCallback(() => {
-    if (state.activeMediaIndex > 0) setActiveMedia(state.activeMediaIndex - 1);
-  }, [state.activeMediaIndex, setActiveMedia]);
-
   return (
     <div className="flex-1 flex flex-col" style={{ background: BG_BASE }}>
       <StudioHeader
@@ -247,7 +464,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             ref={textareaRef}
             value={state.caption}
             onChange={handleCaptionChange}
-            placeholder="What happened on the course?"
+            placeholder={placeholderRef.current}
             className="w-full resize-none outline-none leading-relaxed"
             style={{
               background: 'transparent',
@@ -261,140 +478,108 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             }}
             maxLength={POST_LIMITS.MAX_CAPTION_LENGTH + 100}
           />
+        </div>
 
-          {/* Tagged course pills */}
-          <AnimatePresence>
-            {state.taggedCourses.length > 0 && (
+        {/* ── Course tag — elevated, first-class ── */}
+        <div className="px-4 mb-1">
+          <AnimatePresence mode="wait">
+            {state.taggedCourses.length === 0 ? (
+              <motion.button
+                key="prompt"
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.18 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => openPanel('course')}
+                className="flex items-center gap-2.5 w-full py-2"
+              >
+                <div
+                  className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.10)' }}
+                >
+                  <span className="text-sm">⛳</span>
+                </div>
+                <span className="text-[14px]" style={{ color: 'rgba(255,255,255,0.30)' }}>
+                  Where did you play?
+                </span>
+              </motion.button>
+            ) : (
               <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="flex flex-wrap gap-1.5 mt-1"
+                key="tagged"
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.18 }}
+                className="flex flex-wrap gap-1.5 py-1"
               >
                 {state.taggedCourses.map((course) => (
-                  <span
+                  <motion.button
                     key={course.courseId}
-                    className="inline-flex items-center gap-1.5 text-sm px-3 py-1 rounded-full"
-                    style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.70)', border: '1px solid rgba(255,255,255,0.12)' }}
+                    layout
+                    initial={{ scale: 0.85, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.85, opacity: 0 }}
+                    onClick={() => openPanel('course')}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
+                    style={{
+                      background: 'rgba(255,255,255,0.08)',
+                      border: '1px solid rgba(255,255,255,0.14)',
+                    }}
                   >
-                    ⛳ {course.courseName}
+                    <span className="text-sm">⛳</span>
+                    <div className="text-left">
+                      <p className="text-[13px] font-semibold leading-none" style={{ color: 'rgba(255,255,255,0.90)' }}>
+                        {course.courseName}
+                      </p>
+                      {course.country && (
+                        <p className="text-[10px] mt-0.5 leading-none" style={{ color: 'rgba(255,255,255,0.40)' }}>
+                          {course.region ? `${course.region}, ${course.country}` : course.country}
+                        </p>
+                      )}
+                    </div>
                     <button
-                      onClick={() => setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId))}
-                      className="flex items-center justify-center w-4 h-4 rounded-full"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId));
+                      }}
+                      className="ml-1 w-4 h-4 rounded-full flex items-center justify-center"
                       style={{ background: 'rgba(255,255,255,0.12)' }}
                     >
-                      <X className="w-2.5 h-2.5" style={{ color: 'rgba(255,255,255,0.60)' }} strokeWidth={2.5} />
+                      <X className="w-2.5 h-2.5" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={2.5} />
                     </button>
-                  </span>
+                  </motion.button>
                 ))}
+                {state.taggedCourses.length < 5 && (
+                  <motion.button
+                    layout
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => openPanel('course')}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
+                    style={{ border: '1.5px dashed rgba(255,255,255,0.15)', background: 'transparent' }}
+                  >
+                    <span className="text-sm">⛳</span>
+                    <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.30)' }}>Add course</span>
+                  </motion.button>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
         </div>
 
-        {/* ── Media: full-bleed active preview ── */}
-        {activeItem && (
-          <div className="relative mx-4 mb-2 overflow-hidden" style={{ borderRadius: 16, boxShadow: '0 4px 20px rgba(0,0,0,0.40)' }}>
-            <MediaPreview item={activeItem} onSwipeLeft={handleSwipeLeft} onSwipeRight={handleSwipeRight} />
-            {/* Bottom scrim */}
-            <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: 56, background: 'linear-gradient(to top, rgba(8,8,8,0.75), transparent)' }} />
-            {/* Tool buttons */}
-            <div className="absolute bottom-2.5 left-3 flex gap-1.5 z-10">
-              <motion.button
-                whileTap={{ scale: 0.93 }}
-                onClick={() => { setActiveTool(null); setShelfOpen(true); }}
-                className="flex items-center gap-1 px-2.5 py-1.5 text-[12px] font-medium"
-                style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.13)', borderRadius: 10, color: 'rgba(255,255,255,0.85)' }}
-              >
-                <Wand2 className="w-3.5 h-3.5" strokeWidth={2} />
-                Edit
-                {activeItem.edits && Object.values(activeItem.edits).some(Boolean) && (
-                  <span className="w-1.5 h-1.5 rounded-full ml-0.5" style={{ background: 'rgba(255,255,255,0.80)', flexShrink: 0 }} />
-                )}
-              </motion.button>
-              {activeIsVideo && (
-                <motion.button
-                  whileTap={{ scale: 0.93 }}
-                  onClick={() => setStep('TRIM')}
-                  className="flex items-center gap-1 px-2.5 py-1.5 text-[12px] font-medium"
-                  style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.13)', borderRadius: 10, color: 'rgba(255,255,255,0.85)' }}
-                >
-                  <Scissors className="w-3.5 h-3.5" strokeWidth={2} />
-                  Trim
-                  {(activeItem.trimStart > 0 || (activeItem.trimEnd !== null && activeItem.trimEnd !== activeItem.duration)) && (
-                    <span className="w-1.5 h-1.5 rounded-full ml-0.5" style={{ background: 'rgba(255,255,255,0.80)', flexShrink: 0 }} />
-                  )}
-                </motion.button>
-              )}
-              {activeIsVideo && (
-                <motion.button
-                  whileTap={{ scale: 0.93 }}
-                  onClick={() => setStep('POSTER')}
-                  className="flex items-center gap-1 px-2.5 py-1.5 text-[12px] font-medium"
-                  style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.13)', borderRadius: 10, color: 'rgba(255,255,255,0.85)' }}
-                >
-                  <ImageIcon className="w-3.5 h-3.5" strokeWidth={2} />
-                  Cover
-                  {activeItem.posterPreviewUrl && (
-                    <span className="w-1.5 h-1.5 rounded-full ml-0.5" style={{ background: 'rgba(255,255,255,0.80)', flexShrink: 0 }} />
-                  )}
-                </motion.button>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* ── Media thumbnail strip — shows when 2+ items ── */}
-        {state.mediaItems.length > 1 && (
-          <div className="flex items-center gap-2 overflow-x-auto px-4 pb-2" style={{ scrollbarWidth: 'none' }}>
-            <AnimatePresence>
-              {state.mediaItems.map((item, index) => {
-                const isActive = index === state.activeMediaIndex;
-                return (
-                  <motion.div
-                    key={item.id}
-                    initial={{ scale: 0.85, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.85, opacity: 0 }}
-                    transition={{ type: 'spring', damping: 22, stiffness: 380 }}
-                    onClick={() => setActiveMedia(index)}
-                    className="relative shrink-0 rounded-lg overflow-hidden cursor-pointer"
-                    style={{
-                      width: 56, height: 56,
-                      border: isActive ? '2px solid rgba(255,255,255,0.80)' : '1px solid rgba(255,255,255,0.10)',
-                      transform: isActive ? 'scale(1.06)' : 'scale(1)',
-                      transition: 'transform 0.2s, border 0.2s',
-                    }}
-                  >
-                    <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
-                    {item.mediaType === 'video' && (
-                      <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.25)' }}>
-                        <Play className="w-3 h-3 text-white" fill="white" strokeWidth={0} />
-                      </div>
-                    )}
-                    <button
-                      onClick={(e) => { e.stopPropagation(); removeMedia(item.id); }}
-                      className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full flex items-center justify-center"
-                      style={{ background: 'rgba(0,0,0,0.70)' }}
-                    >
-                      <X className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />
-                    </button>
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-            {state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
-              <motion.button
-                whileTap={{ scale: 0.93 }}
-                onClick={() => fileInputRef.current?.click()}
-                className="shrink-0 rounded-lg flex items-center justify-center"
-                style={{ width: 56, height: 56, border: '1.5px dashed rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.04)' }}
-              >
-                <ImageIcon className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={2} />
-              </motion.button>
-            )}
-          </div>
-        )}
+        {/* ── Adaptive media grid ── */}
+        <MediaGrid
+          items={state.mediaItems}
+          activeIndex={state.activeMediaIndex}
+          onSelect={setActiveMedia}
+          onRemove={removeMedia}
+          onAddMore={() => fileInputRef.current?.click()}
+          onEdit={() => { setActiveTool(null); setShelfOpen(true); }}
+          onTrim={() => setStep('TRIM')}
+          onCover={() => setStep('POSTER')}
+          activeIsVideo={activeIsVideo}
+          activeItem={activeItem}
+        />
 
         {/* Processing indicator */}
         <AnimatePresence>
@@ -462,16 +647,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           style={{ width: 40, height: 40 }}
         >
           <AtSign className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
-        </motion.button>
-
-        {/* Course tag */}
-        <motion.button
-          whileTap={{ scale: 0.92 }}
-          onClick={() => openPanel('course')}
-          className="flex items-center justify-center mr-3"
-          style={{ width: 40, height: 40 }}
-        >
-          <span className="text-xl" style={{ opacity: 0.50 }}>⛳</span>
         </motion.button>
 
         {/* Drafts */}
