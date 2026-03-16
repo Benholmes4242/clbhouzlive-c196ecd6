@@ -1,26 +1,13 @@
 // CourseTagPanel — Golf course search, dark glass bottom sheet
-
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
-import { Search, X, MapPin } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Search, X, MapPin, Flag } from 'lucide-react';
+import { motion, useDragControls } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { usePostStudioContext } from '../usePostStudio';
 import { SPRING } from '../constants';
+import { AMBER_DIM, AMBER_GHOST, TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY } from '../tokens';
 import type { TaggedCourse } from '../types';
-
-const PANEL_STYLE: React.CSSProperties = {
-  background: 'rgba(18,18,18,0.98)',
-  borderTop: '1px solid rgba(255,255,255,0.08)',
-  backdropFilter: 'blur(24px)',
-  WebkitBackdropFilter: 'blur(24px)',
-};
-
-const SEARCH_STYLE: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.07)',
-  border: '1px solid rgba(255,255,255,0.08)',
-  borderRadius: 14,
-};
 
 interface CourseResult { id: string; name: string; country: string; region: string | null; }
 
@@ -31,6 +18,7 @@ export function CourseTagPanel() {
   const [isSearching, setIsSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const dragControls = useDragControls();
 
   useEffect(() => { setTimeout(() => inputRef.current?.focus(), 100); }, []);
 
@@ -40,7 +28,11 @@ export function CourseTagPanel() {
     debounceRef.current = setTimeout(async () => {
       setIsSearching(true);
       try {
-        const { data, error } = await supabase.from('golf_courses').select('id, name, country, region').ilike('name', `%${query}%`).limit(20);
+        const { data, error } = await supabase
+          .from('golf_courses')
+          .select('id, name, country, region')
+          .ilike('name', `%${query}%`)
+          .limit(20);
         if (!error && data) setResults(data as CourseResult[]);
       } catch (err) { console.error('[CourseTagPanel]', err); }
       finally { setIsSearching(false); }
@@ -51,77 +43,180 @@ export function CourseTagPanel() {
   const handleSelect = useCallback((course: CourseResult) => {
     if (state.taggedCourses.some((c) => c.courseId === course.id)) return;
     if (state.taggedCourses.length >= 5) { toast.error('Maximum 5 courses per post'); return; }
-    const newCourse: TaggedCourse = { courseId: course.id, courseName: course.name, country: course.country, region: course.region ?? undefined };
+    const newCourse: TaggedCourse = {
+      courseId: course.id, courseName: course.name,
+      country: course.country, region: course.region ?? undefined,
+    };
     setTaggedCourses([...state.taggedCourses, newCourse]);
-    closePanel();
-  }, [state.taggedCourses, setTaggedCourses, closePanel]);
+    // Stay open so user can add more courses (up to 5)
+  }, [state.taggedCourses, setTaggedCourses]);
 
   const handleRemove = useCallback((courseId: string) => {
     setTaggedCourses(state.taggedCourses.filter((c) => c.courseId !== courseId));
   }, [state.taggedCourses, setTaggedCourses]);
 
   return (
-    <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', ...SPRING.panel }} className="absolute inset-x-0 bottom-0 z-40 rounded-t-[24px] max-h-[70vh] flex flex-col" style={PANEL_STYLE}>
-      <div className="flex justify-center pt-3 pb-1"><div className="w-10 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.20)' }} /></div>
+    <>
+      {/* Tap-outside backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 z-30"
+        style={{ background: 'rgba(0,0,0,0.45)' }}
+        onClick={closePanel}
+      />
 
-      <div className="flex items-center justify-between px-5 pb-3 pt-1">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: 'rgba(245,158,11,0.70)' }}>Tag a Course</p>
-          <h3 className="text-base font-semibold text-white mt-0.5">Where did you play?</h3>
+      <motion.div
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', ...SPRING.panel }}
+        drag="y"
+        dragControls={dragControls}
+        dragListener={false}
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={{ top: 0, bottom: 0.4 }}
+        onDragEnd={(_e, info) => {
+          if (info.offset.y > 80 || info.velocity.y > 400) closePanel();
+        }}
+        className="absolute inset-x-0 bottom-0 z-40 rounded-t-[24px] max-h-[75vh] flex flex-col"
+        style={{
+          background: 'rgba(13,13,13,0.99)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          borderTop: '1px solid rgba(255,255,255,0.08)',
+        }}
+      >
+        {/* Drag handle */}
+        <div
+          className="flex justify-center pt-2.5 pb-1 cursor-grab active:cursor-grabbing"
+          onPointerDown={(e) => dragControls.start(e)}
+        >
+          <div
+            className="w-10 h-1 rounded-full"
+            style={{ background: 'rgba(255,255,255,0.20)' }}
+          />
         </div>
-        <button onClick={closePanel} className="w-11 h-11 flex items-center justify-center rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }}>
-          <X className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.60)' }} />
-        </button>
-      </div>
 
-      {state.taggedCourses.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 px-5 pb-3">
-          {state.taggedCourses.map((course) => (
-            <span key={course.courseId} className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-semibold" style={{ background: 'rgba(245,158,11,0.15)', color: 'rgba(245,158,11,0.90)', border: '1px solid rgba(245,158,11,0.25)' }}>
-              ⛳ {course.courseName}
-              <button onClick={() => handleRemove(course.courseId)} className="w-4 h-4 flex items-center justify-center rounded-full" style={{ background: 'rgba(245,158,11,0.25)' }}>
-                <X className="w-2.5 h-2.5" style={{ color: 'rgba(245,158,11,0.90)' }} strokeWidth={2.5} />
-              </button>
-            </span>
-          ))}
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 pb-3 pt-1">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: AMBER_DIM }}>
+              Tag a Course
+            </p>
+            <h3 className="text-sm font-semibold mt-0.5" style={{ color: TEXT_PRIMARY }}>
+              Where did you play?
+            </h3>
+          </div>
+          <button onClick={closePanel} className="w-9 h-9 flex items-center justify-center rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }}>
+            <X className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.60)' }} />
+          </button>
         </div>
-      )}
 
-      <div className="px-5 pb-3">
-        <div className="flex items-center gap-2.5 px-3.5 py-3" style={SEARCH_STYLE}>
-          <Search className="w-4 h-4 shrink-0" style={{ color: 'rgba(255,255,255,0.35)' }} />
-          <input ref={inputRef} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search golf courses…" className="flex-1 bg-transparent text-sm outline-none" style={{ color: 'rgba(255,255,255,0.85)', caretColor: '#f59e0b' }} />
-        </div>
-      </div>
-
-      <div className="flex-1 overflow-y-auto px-5 pb-6" style={{ scrollbarWidth: 'none' }}>
-        {isSearching && (
-          <div className="flex items-center justify-center py-8">
-            <div className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(245,158,11,0.30)', borderTopColor: 'transparent' }} />
+        {/* Tagged courses pills */}
+        {state.taggedCourses.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 px-5 pb-3">
+            {state.taggedCourses.map((course) => (
+              <span key={course.courseId} className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-semibold" style={{ background: AMBER_GHOST, color: 'rgba(232,152,10,0.90)', border: '1px solid rgba(232,152,10,0.25)' }}>
+                ⛳ {course.courseName}
+                <button
+                  onClick={() => handleRemove(course.courseId)}
+                  className="w-4 h-4 flex items-center justify-center rounded-full"
+                  style={{ background: 'rgba(232,152,10,0.20)' }}
+                >
+                  <X className="w-2.5 h-2.5" style={{ color: 'rgba(232,152,10,0.90)' }} strokeWidth={2.5} />
+                </button>
+              </span>
+            ))}
           </div>
         )}
-        {!isSearching && results.length === 0 && query.length >= 2 && (
-          <p className="text-center py-8 text-sm" style={{ color: 'rgba(255,255,255,0.30)' }}>No courses found for "{query}"</p>
-        )}
-        {results.map((course, i) => {
-          const isTagged = state.taggedCourses.some((c) => c.courseId === course.id);
-          return (
-            <motion.button key={course.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }} onClick={() => handleSelect(course)} disabled={isTagged} className="w-full flex items-center gap-3 py-3.5 min-h-[56px] disabled:opacity-40" style={{ borderBottom: i < results.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.20)' }}>
-                <span className="text-base">⛳</span>
-              </div>
-              <div className="flex-1 text-left min-w-0">
-                <p className="text-sm font-medium text-white truncate">{course.name}</p>
-                <div className="flex items-center gap-1 mt-0.5">
-                  <MapPin className="w-3 h-3 shrink-0" style={{ color: 'rgba(255,255,255,0.30)' }} strokeWidth={1.5} />
-                  <p className="text-xs truncate" style={{ color: 'rgba(255,255,255,0.40)' }}>{[course.region, course.country].filter(Boolean).join(', ')}</p>
+
+        {/* Search input */}
+        <div className="px-5 pb-3">
+          <div
+            className="flex items-center gap-2.5 px-3.5 py-3"
+            style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14 }}
+          >
+            <Search className="w-4 h-4 shrink-0" style={{ color: 'rgba(255,255,255,0.35)' }} />
+            <input
+              ref={inputRef}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search golf courses…"
+              className="flex-1 bg-transparent text-sm outline-none"
+              style={{ color: 'rgba(255,255,255,0.85)', caretColor: 'rgba(232,152,10,0.90)' }}
+            />
+            {query.length > 0 && (
+              <button onClick={() => setQuery('')} className="shrink-0">
+                <X className="w-3.5 h-3.5" style={{ color: 'rgba(255,255,255,0.40)' }} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Results */}
+        <div className="flex-1 overflow-y-auto px-5 pb-6" style={{ scrollbarWidth: 'none' }}>
+
+          {/* Empty prompt */}
+          {!isSearching && query.length < 2 && state.taggedCourses.length === 0 && (
+            <div className="flex flex-col items-center text-center py-10">
+              <Flag className="w-6 h-6 mb-2" style={{ color: 'rgba(255,255,255,0.20)' }} strokeWidth={1.5} />
+              <p className="text-xs" style={{ color: TEXT_SECONDARY }}>
+                Search for the course you played
+              </p>
+            </div>
+          )}
+
+          {isSearching && (
+            <div className="flex items-center justify-center py-8">
+              <div className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(232,152,10,0.30)', borderTopColor: 'transparent' }} />
+            </div>
+          )}
+
+          {!isSearching && results.length === 0 && query.length >= 2 && (
+            <p className="text-center py-8 text-sm" style={{ color: 'rgba(255,255,255,0.30)' }}>
+              No courses found for &ldquo;{query}&rdquo;
+            </p>
+          )}
+
+          {results.map((course, i) => {
+            const isTagged = state.taggedCourses.some((c) => c.courseId === course.id);
+            return (
+              <motion.button
+                key={course.id}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.04 }}
+                onClick={() => handleSelect(course)}
+                disabled={isTagged}
+                className="w-full flex items-center gap-3 py-3 min-h-[56px] disabled:opacity-40"
+                style={{ borderBottom: i < results.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}
+              >
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: AMBER_GHOST, border: '1px solid rgba(232,152,10,0.20)' }}>
+                  <span className="text-base">⛳</span>
                 </div>
-              </div>
-              {isTagged && <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full shrink-0" style={{ background: 'rgba(245,158,11,0.15)', color: 'rgba(245,158,11,0.80)' }}>Added</span>}
-            </motion.button>
-          );
-        })}
-      </div>
-    </motion.div>
+                <div className="flex-1 text-left min-w-0">
+                  <p className="text-sm font-medium truncate" style={{ color: TEXT_PRIMARY }}>
+                    {course.name}
+                  </p>
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <MapPin className="w-3 h-3 shrink-0" style={{ color: 'rgba(255,255,255,0.30)' }} strokeWidth={1.5} />
+                    <p className="text-xs truncate" style={{ color: TEXT_SECONDARY }}>
+                      {[course.region, course.country].filter(Boolean).join(', ')}
+                    </p>
+                  </div>
+                </div>
+                {isTagged && (
+                  <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full shrink-0" style={{ background: AMBER_GHOST, color: AMBER_DIM }}>
+                    Added
+                  </span>
+                )}
+              </motion.button>
+            );
+          })}
+        </div>
+      </motion.div>
+    </>
   );
 }
