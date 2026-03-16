@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, BarChart3, Star, MessageCircle } from 'lucide-react';
 import { useBusinessProfile } from '@/hooks/useBusinessProfile';
