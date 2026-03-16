@@ -6,6 +6,7 @@
  */
 
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, ChevronLeft } from 'lucide-react';
