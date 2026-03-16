@@ -267,7 +267,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
             onClick={() => fileInputRef.current?.click()}
             disabled={isProcessing}
             className="relative flex items-center justify-center disabled:opacity-40"
-            style={{ width: 72, height: 72, borderRadius: '50%', background: AMBER_GRADIENT, boxShadow: '0 0 0 6px rgba(245,158,11,0.10), 0 0 0 12px rgba(245,158,11,0.05), 0 8px 28px rgba(245,158,11,0.50)' }}
+            style={{ width: 72, height: 72, borderRadius: '50%', background: AMBER_GRADIENT, boxShadow: '0 4px 16px rgba(200,135,10,0.30)' }}
           >
             <Camera className="w-7 h-7 text-black" strokeWidth={1.75} />
           </motion.button>
