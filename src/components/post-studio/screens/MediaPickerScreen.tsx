@@ -258,8 +258,8 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
           }}
         >
           <motion.button whileTap={{ scale: 0.92 }} onClick={() => fileInputRef.current?.click()} disabled={isProcessing} className="flex flex-col items-center gap-1.5 min-w-[60px] min-h-[44px] justify-center disabled:opacity-40">
-            <Layers className="w-6 h-6" style={{ color: 'rgba(232,152,10,0.85)' }} strokeWidth={1.75} />
-            <span className="text-[11px] font-semibold" style={{ color: AMBER_DIM, letterSpacing: '0.02em' }}>Gallery</span>
+            <Layers className="w-6 h-6" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={1.75} />
+            <span className="text-[11px] font-semibold" style={{ color: 'rgba(255,255,255,0.45)', letterSpacing: '0.02em' }}>Gallery</span>
           </motion.button>
 
           <motion.button
