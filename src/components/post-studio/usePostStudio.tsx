@@ -201,6 +201,7 @@ interface PostStudioContextValue {
   openPanel: (panelId: PanelId) => void;
   closePanel: () => void;
   setDiscarding: (value: boolean) => void;
+  setMentionTriggerIndex: (index: number) => void;
   reset: () => void;
   onSuccess?: (postId: string) => void;
 }
