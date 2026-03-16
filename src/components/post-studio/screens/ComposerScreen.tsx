@@ -262,7 +262,7 @@ export function ComposerScreen() {
           {/* Toolbar — hairline separator */}
           <div className="flex items-center gap-2 px-3 py-3 flex-wrap" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
             {/* Icon-only Mention */}
-            <motion.button whileTap={{ scale: 0.93 }} onClick={() => openPanel('mention')} className="flex items-center justify-center rounded-xl" style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
+            <motion.button whileTap={{ scale: 0.93 }} onClick={() => { setMentionTriggerIndex(state.caption.length); openPanel('mention'); }} className="flex items-center justify-center rounded-xl" style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
               <AtSign className="w-[18px] h-[18px]" strokeWidth={2} style={{ color: 'rgba(255,255,255,0.75)' }} />
             </motion.button>
             <motion.button whileTap={{ scale: 0.93 }} onClick={() => openPanel('course')} className="flex items-center justify-center rounded-xl" style={{ width: 40, height: 40, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
