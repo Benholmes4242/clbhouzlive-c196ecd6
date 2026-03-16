@@ -57,12 +57,15 @@ export function MentionPanel() {
 
   const handleSelect = useCallback((entity: TaggableResult) => {
     const displayName = `@${entity.name}`;
-    const triggerIndex = state.mentionTriggerIndex >= 0 ? state.mentionTriggerIndex : state.caption.length;
+    const triggerIndex = state.mentionTriggerIndex >= 0
+      ? state.mentionTriggerIndex
+      : state.caption.length;
 
-    // Replace from trigger index to end of any partial text the user typed after @
-    const afterTrigger = state.caption.slice(triggerIndex);
-    const partialLength = afterTrigger.search(/\s|$/);
-    const replaceEnd = triggerIndex + (partialLength >= 0 ? partialLength : afterTrigger.length);
+    // afterTrigger starts with '@' (the inserted trigger character)
+    // find the end of any partial name the user typed after '@'
+    const afterTrigger = state.caption.slice(triggerIndex + 1); // skip the '@' itself
+    const spaceOrEnd = afterTrigger.search(/\s|$/);
+    const replaceEnd = triggerIndex + 1 + (spaceOrEnd >= 0 ? spaceOrEnd : afterTrigger.length);
 
     const newCaption =
       state.caption.slice(0, triggerIndex) +
