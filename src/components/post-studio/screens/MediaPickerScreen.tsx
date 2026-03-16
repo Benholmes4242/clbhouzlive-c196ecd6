@@ -165,7 +165,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
                   boxShadow: '0 0 24px rgba(200,135,10,0.08), inset 0 1px 0 rgba(255,255,255,0.07)',
                 }}
               >
-                <Camera className="w-11 h-11" style={{ color: 'rgba(232,152,10,0.85)' }} strokeWidth={1.5} />
+                <Camera className="w-11 h-11" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={1.5} />
               </div>
             </motion.div>
 
