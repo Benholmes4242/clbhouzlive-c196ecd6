@@ -1,8 +1,8 @@
 // ComposerScreen — Step 2: The creative canvas
 // Dark immersive studio. Media front and centre. Tools feel pro, not form-like.
 
-import React, { useCallback, useRef } from 'react';
-import { AtSign, Scissors, Image as ImageIcon, Star, Plus, ChevronRight } from 'lucide-react';
+import React, { useState, useCallback, useRef } from 'react';
+import { AtSign, Scissors, Image as ImageIcon, Star, Plus, ChevronRight, Wand2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StudioHeader } from '../components/StudioHeader';
 import { MediaPreview } from '../components/MediaPreview';
