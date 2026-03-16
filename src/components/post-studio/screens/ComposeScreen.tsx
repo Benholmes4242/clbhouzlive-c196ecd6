@@ -140,6 +140,7 @@ function MediaGrid({
     style?: React.CSSProperties;
     borderRadius?: string;
   }) {
+    // Note: onTrim and onCover are captured from MediaGrid closure
     const isCover = index === coverIndex;
     const isOverflowTile = index === MAX_VISIBLE - 1 && overflow > 0;
 
