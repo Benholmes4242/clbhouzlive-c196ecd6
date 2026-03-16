@@ -10,6 +10,7 @@ import {
 } from '@/lib/achievementDefinitions';
 import { getTop100Club, getNextTop100Club } from '@/lib/top100Club';
 import { EliteGameCard, EliteCardTier } from '@/components/achievements/EliteGameCard';
+import { AchievementsSkeleton } from '@/components/skeletons/AchievementsSkeleton';
 import NudgeBanner from '@/components/achievements/NudgeBanner';
 import { getNextBadgeNudge } from '@/lib/achievements/nextBadgeNudge';
 import { DEBUG_UNLOCK_ALL_ACHIEVEMENTS, DEBUG_ACHIEVEMENTS_USER_EMAIL } from '@/utils/featureFlags';
