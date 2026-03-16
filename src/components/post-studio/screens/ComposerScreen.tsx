@@ -30,6 +30,24 @@ export function ComposerScreen() {
   const activeItem = state.mediaItems[state.activeMediaIndex] ?? null;
   const activeIsVideo = activeItem?.mediaType === 'video';
 
+  const [shelfOpen, setShelfOpen] = useState(false);
+  const [activeTool, setActiveTool] = useState<StudioTool>(null);
+  const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
+
+  const handleUpdateEdits = useCallback(
+    (patch: Partial<StudioEdits>) => {
+      if (!activeItem) return;
+      const merged = { ...(activeItem.edits ?? {}), ...patch };
+      updateMediaEdits(activeItem.id, merged);
+    },
+    [activeItem, updateMediaEdits]
+  );
+
+  const handleClearEdits = useCallback(() => {
+    if (!activeItem) return;
+    updateMediaEdits(activeItem.id, {});
+  }, [activeItem, updateMediaEdits]);
+
   const charCount = (() => {
     try {
       const S = (Intl as Record<string, unknown>).Segmenter as
