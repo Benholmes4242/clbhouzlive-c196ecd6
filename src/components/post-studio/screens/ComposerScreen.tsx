@@ -119,7 +119,7 @@ export function ComposerScreen() {
     const sorted = [...state.mentions].sort((a, b) => a.start - b.start);
     for (const m of sorted) {
       if (m.start > last) {
-        parts.push(<span key={`t-${partIndex++}`}>{state.caption.slice(last, m.start)}</span>);
+        parts.push(<span key={`t-${partIndex++}`} style={{ color: 'rgba(255,255,255,0.85)' }}>{state.caption.slice(last, m.start)}</span>);
       }
       parts.push(
         <span key={`m-${partIndex++}`} style={{ color: 'rgba(232,152,10,0.90)', fontWeight: 500 }}>
