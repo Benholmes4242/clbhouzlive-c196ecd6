@@ -1,4 +1,4 @@
-// VideoTrimmer — Waveform trim handles, dark spec
+// VideoTrimmer — Waveform trim handles, white system
 import React, { useRef, useState, useCallback } from 'react';
 import type { StudioMediaItem } from '../types';
 
@@ -10,9 +10,6 @@ interface VideoTrimmerProps {
 
 const HANDLE_WIDTH = 16;
 const MIN_TRIM_DURATION = 1;
-
-const AMBER_GRADIENT = 'linear-gradient(135deg, #F59E0B 0%, #C7870A 100%)';
-const AMBER_GLOW = '0 0 8px rgba(200,135,10,0.50)';
 
 export function VideoTrimmer({ item, onTrimChange }: VideoTrimmerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -109,9 +106,9 @@ export function VideoTrimmer({ item, onTrimChange }: VideoTrimmerProps) {
           style={{
             left: `${startPercent}%`,
             width: `${endPercent - startPercent}%`,
-            background: 'rgba(232,152,10,0.12)',
-            borderTop: '2px solid rgba(232,152,10,0.70)',
-            borderBottom: '2px solid rgba(232,152,10,0.70)',
+            background: 'rgba(255,255,255,0.06)',
+            borderTop: '2px solid rgba(255,255,255,0.50)',
+            borderBottom: '2px solid rgba(255,255,255,0.50)',
           }}
         />
 
@@ -132,12 +129,12 @@ export function VideoTrimmer({ item, onTrimChange }: VideoTrimmerProps) {
             style={{
               width: HANDLE_WIDTH,
               height: '100%',
-              background: AMBER_GRADIENT,
+              background: 'rgba(255,255,255,0.90)',
               borderRadius: '6px 0 0 6px',
-              boxShadow: AMBER_GLOW,
+              boxShadow: '0 0 8px rgba(255,255,255,0.25)',
             }}
           >
-            <div className="rounded-full" style={{ width: 2, height: 20, background: 'rgba(0,0,0,0.40)' }} />
+            <div className="rounded-full" style={{ width: 2, height: 20, background: 'rgba(0,0,0,0.35)' }} />
           </div>
         </div>
 
@@ -152,12 +149,12 @@ export function VideoTrimmer({ item, onTrimChange }: VideoTrimmerProps) {
             style={{
               width: HANDLE_WIDTH,
               height: '100%',
-              background: AMBER_GRADIENT,
+              background: 'rgba(255,255,255,0.90)',
               borderRadius: '0 6px 6px 0',
-              boxShadow: AMBER_GLOW,
+              boxShadow: '0 0 8px rgba(255,255,255,0.25)',
             }}
           >
-            <div className="rounded-full" style={{ width: 2, height: 20, background: 'rgba(0,0,0,0.40)' }} />
+            <div className="rounded-full" style={{ width: 2, height: 20, background: 'rgba(0,0,0,0.35)' }} />
           </div>
         </div>
       </div>
