@@ -108,9 +108,9 @@ export function DraftsPanel() {
             <div className="flex flex-col items-center text-center py-10">
               <div
                 className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3"
-                style={{ background: AMBER_GHOST }}
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
               >
-                <FileText className="w-5 h-5" style={{ color: 'rgba(232,152,10,0.80)' }} strokeWidth={1.75} />
+                <FileText className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.35)' }} strokeWidth={1.75} />
               </div>
               <p className="font-semibold text-sm" style={{ color: TEXT_PRIMARY }}>
                 No drafts yet
