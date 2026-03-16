@@ -123,7 +123,7 @@ interface MediaGridProps {
 
 function MediaGrid({
   items, activeIndex, coverIndex,
-  onSelect, onRemove, onEdit, onSetCover, onAddMore,
+  onSelect, onRemove, onEdit, onTrim, onCover, onSetCover, onAddMore,
 }: MediaGridProps) {
   if (items.length === 0) return null;
 
