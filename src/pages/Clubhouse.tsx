@@ -20,7 +20,7 @@ import { logRouteClubhouse } from '@/utils/bootTimeline';
 import { ClubhouseSkeletonShimmer } from '@/components/clubhouse/ClubhouseSkeletonShimmer';
 import { useClubhouseSkeletonTiming } from '@/hooks/useClubhouseSkeletonTiming';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
-import { ClubhouseSkeleton } from '@/components/skeletons/ClubhouseSkeleton';
+// ClubhouseSkeleton import removed — rehydration now uses ClubhouseSkeletonShimmer
 import { ClubhouseTabProvider, useClubhouseTab } from '@/contexts/ClubhouseTabContext';
 import { clubhouseDebug } from '@/debug/clubhouseDebug';
 import MobileVideoDebugPanel from '@/components/debug/MobileVideoDebugPanel';
