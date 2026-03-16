@@ -76,7 +76,7 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-export function MediaPickerScreen() {
+export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
   const { state, addMedia, setStep, openPanel } = usePostStudioContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isProcessing, setIsProcessing] = useState(false);
