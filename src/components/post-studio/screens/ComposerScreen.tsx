@@ -105,7 +105,7 @@ export function ComposerScreen() {
 
       <input ref={fileInputRef} type="file" accept={acceptTypes} multiple onChange={handleFileSelect} className="hidden" />
 
-      <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+      <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain' }}>
         {/* Full-bleed media preview */}
         {activeItem && (
           <div className="relative overflow-hidden" style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
