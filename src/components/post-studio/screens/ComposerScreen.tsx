@@ -1,7 +1,7 @@
 // ComposerScreen — Step 2: The creative canvas
 // Dark immersive studio. Media front and centre. Tools feel pro, not form-like.
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useMemo } from 'react';
 import { AtSign, Scissors, Image as ImageIcon, Plus, ChevronRight, Wand2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StudioHeader } from '../components/StudioHeader';
@@ -22,6 +22,7 @@ export function ComposerScreen() {
     state, setStep, setActiveMedia, removeMedia, addMedia,
     setCaption, openPanel,
     updateMediaEdits,
+    setMentions,
   } = usePostStudioContext();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -91,6 +92,36 @@ export function ComposerScreen() {
     },
     [state.mediaItems.length, addMedia]
   );
+
+  // Detect @ typed in textarea → open mention panel
+  const handleCaptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = e.target.value;
+    setCaption(val);
+    const prev = state.caption;
+    if (val.length === prev.length + 1) {
+      const newChar = val[e.target.selectionStart! - 1];
+      if (newChar === '@') openPanel('mention');
+    }
+  }, [state.caption, setCaption, openPanel]);
+
+  // Render caption with amber @mention highlights
+  const highlightedCaption = useMemo(() => {
+    if (!state.mentions.length) return null;
+    const parts: React.ReactNode[] = [];
+    let last = 0;
+    const sorted = [...state.mentions].sort((a, b) => a.start - b.start);
+    for (const m of sorted) {
+      if (m.start > last) parts.push(<span key={`t-${last}`}>{state.caption.slice(last, m.start)}</span>);
+      parts.push(
+        <span key={`m-${m.start}`} style={{ color: 'rgba(232,152,10,0.90)' }}>
+          {state.caption.slice(m.start, m.end)}
+        </span>
+      );
+      last = m.end;
+    }
+    if (last < state.caption.length) parts.push(<span key={`t-${last}`}>{state.caption.slice(last)}</span>);
+    return parts;
+  }, [state.caption, state.mentions]);
 
   const acceptTypes = [...ALLOWED_VIDEO_TYPES, ...ALLOWED_IMAGE_TYPES].join(',');
 
@@ -169,16 +200,34 @@ export function ComposerScreen() {
         {/* Caption card */}
         <div className="mx-4 mt-3" style={{ background: BG_CARD, border: BORDER_CARD, borderRadius: 24 }}>
           <div className="px-4 pt-4 pb-3 relative">
+            {/* Highlight layer — sits behind textarea, mirrors its text */}
+            {state.mentions.length > 0 && (
+              <div
+                aria-hidden="true"
+                className="absolute inset-x-4 top-4 text-sm leading-relaxed min-h-[120px] pointer-events-none whitespace-pre-wrap break-words"
+                style={{ color: 'transparent', wordBreak: 'break-word' }}
+              >
+                {highlightedCaption}
+              </div>
+            )}
             <textarea
               ref={textareaRef}
               value={state.caption}
-              onChange={(e) => setCaption(e.target.value)}
+              onChange={handleCaptionChange}
               placeholder="Tell the story…"
               rows={4}
-              className="w-full text-sm resize-none outline-none min-h-[120px] leading-relaxed"
-              style={{ background: 'transparent', color: 'rgba(255,255,255,0.85)', caretColor: 'rgba(255,255,255,0.70)' }}
+              className="w-full text-sm resize-none outline-none min-h-[120px] leading-relaxed relative"
+              style={{
+                background: 'transparent',
+                color: state.mentions.length > 0 ? 'transparent' : 'rgba(255,255,255,0.85)',
+                caretColor: 'rgba(255,255,255,0.70)',
+                WebkitTextFillColor: state.mentions.length > 0 ? 'transparent' : undefined,
+              }}
               maxLength={POST_LIMITS.MAX_CAPTION_LENGTH + 100}
             />
+            <div className="absolute bottom-3 right-4">
+              <CharacterRing count={charCount} />
+            </div>
           </div>
 
           <AnimatePresence>

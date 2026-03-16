@@ -34,7 +34,15 @@ export function MentionPanel() {
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
-  useEffect(() => { setTimeout(() => inputRef.current?.focus(), 100); }, []);
+  // Pre-populate query from what user typed after @ in caption
+  useEffect(() => {
+    const atIndex = state.caption.lastIndexOf('@');
+    if (atIndex >= 0) {
+      const typed = state.caption.slice(atIndex + 1).trim();
+      if (typed.length > 0 && typed.length < 20) setQuery(typed);
+    }
+    setTimeout(() => inputRef.current?.focus(), 100);
+  }, []);
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -56,8 +64,12 @@ export function MentionPanel() {
   }, [query]);
 
   const handleSelect = useCallback((entity: TaggableResult) => {
-    const displayName = entity.username ? `@${entity.username}` : `@${entity.name}`;
-    const newCaption = state.caption ? `${state.caption} ${displayName} ` : `${displayName} `;
+    const displayName = `@${entity.name}`;
+    // Replace the @trigger text in the caption if user typed @ directly
+    const atIndex = state.caption.lastIndexOf('@');
+    const newCaption = atIndex >= 0
+      ? `${state.caption.slice(0, atIndex)}${displayName} `
+      : `${state.caption} ${displayName} `;
     const start = newCaption.indexOf(displayName);
     const newMention: MentionToken = {
       start, end: start + displayName.length, entityId: entity.id,
