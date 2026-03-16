@@ -569,11 +569,9 @@ export default function TextOverlayRenderer({
     document.removeEventListener('mouseup', handleDragEnd as any);
   }, [handleDragMove]);
   
-  // Handle pinch start (two finger touch)
-  const handleTouchStart = useCallback((
-    e: React.TouchEvent,
-    overlay: TextOverlay
-  ) => {
+  // Handle pinch start (two finger touch) — stored as ref for native listener
+  const handleTouchStartRef = useRef<(e: TouchEvent, overlay: TextOverlay) => void>(() => {});
+  handleTouchStartRef.current = (e: TouchEvent, overlay: TextOverlay) => {
     if (!isEditable) return;
     
     handleSelectOverlay(overlay.id);
@@ -582,7 +580,7 @@ export default function TextOverlayRenderer({
       e.preventDefault();
       e.stopPropagation();
       
-      const dist = touchDistance(e.touches[0], e.touches[1]);
+      const dist = touchDistance(e.touches[0] as unknown as React.Touch, e.touches[1] as unknown as React.Touch);
       pinchRef.current = {
         id: overlay.id,
         startDistance: dist,
@@ -592,9 +590,51 @@ export default function TextOverlayRenderer({
       document.addEventListener('touchmove', handleDragMove as any, { passive: false });
       document.addEventListener('touchend', handleDragEnd as any);
     } else {
-      handleDragStart(e, overlay);
+      // Synthesise enough of a React-like event for handleDragStart
+      e.preventDefault();
+      e.stopPropagation();
+      handleSelectOverlay(overlay.id);
+
+      const clientX = e.touches[0].clientX;
+      const clientY = e.touches[0].clientY;
+
+      dragRef.current = {
+        id: overlay.id,
+        startX: clientX,
+        startY: clientY,
+        originalX: overlay.x,
+        originalY: overlay.y,
+      };
+      
+      snappedXRef.current = null;
+      snappedYRef.current = null;
+
+      document.addEventListener('touchmove', handleDragMove as any, { passive: false });
+      document.addEventListener('touchend', handleDragEnd as any);
     }
-  }, [isEditable, handleDragStart, handleDragMove, handleDragEnd, handleSelectOverlay]);
+  };
+
+  // Ref-callback map for attaching native touchstart with { passive: false }
+  const overlayElsRef = useRef<Map<string, HTMLDivElement>>(new Map());
+  const overlayListenersRef = useRef<Map<string, (e: TouchEvent) => void>>(new Map());
+
+  const getOverlayRefCallback = useCallback((overlay: TextOverlay) => (el: HTMLDivElement | null) => {
+    const prev = overlayElsRef.current.get(overlay.id);
+    const prevListener = overlayListenersRef.current.get(overlay.id);
+    // Clean up old listener
+    if (prev && prevListener) {
+      prev.removeEventListener('touchstart', prevListener);
+    }
+    if (el && isEditable) {
+      const listener = (e: TouchEvent) => handleTouchStartRef.current(e, overlay);
+      el.addEventListener('touchstart', listener, { passive: false });
+      overlayElsRef.current.set(overlay.id, el);
+      overlayListenersRef.current.set(overlay.id, listener);
+    } else {
+      overlayElsRef.current.delete(overlay.id);
+      overlayListenersRef.current.delete(overlay.id);
+    }
+  }, [isEditable]);
   
   // Rotation handle drag - using pointer events with refs to avoid stale closures
   const rotatePointerIdRef = useRef<number | null>(null);
