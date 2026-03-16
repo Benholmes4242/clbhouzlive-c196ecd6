@@ -14,11 +14,8 @@ export function UploadToastsBridge() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const offEnqueued = uploadEventBus.on('upload:enqueued', (evt) => {
-      toast("Uploading...", {
-        description: "Your post will appear soon.",
-        duration: TOAST_DURATION_MS,
-      });
+    const offEnqueued = uploadEventBus.on('upload:enqueued', (_evt) => {
+      // No toast on enqueue — user is already on SuccessScreen which confirms queued state
     });
 
     const offComplete = uploadEventBus.on('upload:complete', (evt) => {
