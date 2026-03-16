@@ -378,7 +378,6 @@ const Top100List = () => {
             {[...Array(4)].map((_, i) => (
               <Skeleton key={i} className="aspect-[16/9] rounded-none mx-0" />
             ))}
-            ))}
           </div>
         </main>
       </PageRoot>
