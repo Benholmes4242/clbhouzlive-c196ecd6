@@ -77,7 +77,7 @@ export function SchedulePanel() {
 
         {/* Header — no X button */}
         <div className="px-5 pb-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-0.5" style={{ color: AMBER_DIM }}>
+          <p className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
             Schedule
           </p>
           <h3 className="text-[17px] font-semibold tracking-tight" style={{ color: TEXT_PRIMARY }}>
