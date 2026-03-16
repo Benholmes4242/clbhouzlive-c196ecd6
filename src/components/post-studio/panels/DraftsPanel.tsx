@@ -1,11 +1,11 @@
-// DraftsPanel — Saved drafts list bottom sheet (dark mode override)
+// DraftsPanel — Saved drafts list bottom sheet
 import React, { useCallback } from 'react';
-import { Trash2 } from 'lucide-react';
+import { Trash2, FileText } from 'lucide-react';
 import { motion, useDragControls } from 'framer-motion';
 import { useDrafts } from '@/hooks/useDrafts';
 import { usePostStudioContext } from '../usePostStudio';
 import { SPRING } from '../constants';
-import { AMBER_DIM, TEXT_PRIMARY, TEXT_SECONDARY } from '../tokens';
+import { AMBER_DIM, AMBER_GHOST, AMBER_GRADIENT, TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY } from '../tokens';
 import type { PostStudioState } from '../types';
 
 export function DraftsPanel() {
@@ -63,14 +63,14 @@ export function DraftsPanel() {
         onDragEnd={(_e, info) => {
           if (info.offset.y > 80 || info.velocity.y > 400) closePanel();
         }}
-        className="absolute inset-x-0 bottom-0 z-40 rounded-t-[20px] max-h-[70vh] flex flex-col"
+        className="absolute inset-x-0 bottom-0 z-40 rounded-t-[24px] max-h-[75vh] flex flex-col"
         style={{
-          background: 'rgba(14,14,14,0.98)',
+          background: 'rgba(13,13,13,0.99)',
           backdropFilter: 'blur(24px)',
-          borderTop: '1px solid rgba(255,255,255,0.07)',
+          borderTop: '1px solid rgba(255,255,255,0.08)',
         }}
       >
-        {/* Drag handle — touch here to swipe down */}
+        {/* Drag handle */}
         <div
           className="flex justify-center pt-2.5 pb-1 cursor-grab active:cursor-grabbing"
           onPointerDown={(e) => dragControls.start(e)}
@@ -81,75 +81,94 @@ export function DraftsPanel() {
           />
         </div>
 
-        {/* Header — no close button */}
+        {/* Header */}
         <div className="px-4 pb-2">
           <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: AMBER_DIM }}>
-            YOUR DRAFTS
+            Saved
           </p>
           <h3 className="text-sm font-semibold" style={{ color: TEXT_PRIMARY }}>
-            Drafts
+            Your Drafts
           </h3>
         </div>
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-4 pb-4">
+
+          {/* Loading skeletons */}
           {isLoading && (
             <div className="grid grid-cols-2 gap-3">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="aspect-square rounded-xl clb-shimmer-dark" style={{ background: 'rgba(255,255,255,0.05)' }} />
+                <div key={i} className="aspect-square rounded-[18px] clb-shimmer-dark" style={{ background: 'rgba(255,255,255,0.05)' }} />
               ))}
             </div>
           )}
 
+          {/* Empty state */}
           {!isLoading && drafts.length === 0 && (
-            <div className="text-center py-10">
-              <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: AMBER_DIM }}>
-                YOUR DRAFTS
-              </p>
-              <p className="font-semibold mt-1" style={{ color: TEXT_PRIMARY }}>
+            <div className="flex flex-col items-center text-center py-10">
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3"
+                style={{ background: AMBER_GHOST }}
+              >
+                <FileText className="w-5 h-5" style={{ color: 'rgba(232,152,10,0.80)' }} strokeWidth={1.75} />
+              </div>
+              <p className="font-semibold text-sm" style={{ color: TEXT_PRIMARY }}>
                 No drafts yet
               </p>
-              <p className="text-xs mt-1" style={{ color: TEXT_SECONDARY }}>
-                Start a post and save it to come back later
+              <p className="text-xs mt-1 max-w-[200px]" style={{ color: TEXT_SECONDARY }}>
+                Start a post and save it to pick up where you left off
               </p>
             </div>
           )}
 
+          {/* Draft grid */}
           {!isLoading && drafts.length > 0 && (
             <div className="grid grid-cols-2 gap-3">
               {drafts.map((draft) => {
                 const firstMedia = draft.media?.[0];
                 const thumbnailUrl = firstMedia?.posterUrl || firstMedia?.mediaUrl;
+                const date = new Date(draft.updatedAt).toLocaleDateString('en-GB', {
+                  day: 'numeric', month: 'short',
+                });
                 return (
                   <button
                     key={draft.id}
                     onClick={() => handleLoadDraft(draft)}
-                    className="relative aspect-square overflow-hidden group"
+                    className="relative aspect-square overflow-hidden text-left"
                     style={{
-                      borderRadius: 16,
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      borderRadius: 18,
+                      border: '1px solid rgba(255,255,255,0.07)',
                       background: 'rgba(255,255,255,0.04)',
                     }}
                   >
+                    {/* Thumbnail or placeholder */}
                     {thumbnailUrl ? (
                       <img src={thumbnailUrl} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-3xl">📝</span>
+                      <div className="w-full h-full flex items-center justify-center" style={{ background: AMBER_GHOST }}>
+                        <FileText className="w-8 h-8" style={{ color: 'rgba(232,152,10,0.50)' }} strokeWidth={1.5} />
                       </div>
                     )}
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2">
-                      <p className="text-white text-[10px] line-clamp-2">{draft.content || 'No caption'}</p>
-                      <p className="text-[9px] mt-0.5" style={{ color: 'rgba(255,255,255,0.50)' }}>
-                        {new Date(draft.updatedAt).toLocaleDateString()}
+
+                    {/* Bottom scrim + caption */}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 to-transparent p-2">
+                      {draft.content ? (
+                        <p className="text-[10px] line-clamp-2" style={{ color: 'rgba(255,255,255,0.90)' }}>
+                          {draft.content}
+                        </p>
+                      ) : null}
+                      <p className="text-[9px] mt-0.5" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                        {date}
                       </p>
                     </div>
+
+                    {/* Delete button — always visible on mobile */}
                     <button
                       onClick={(e) => handleDelete(e, draft.id)}
-                      className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                      style={{ background: 'rgba(0,0,0,0.60)' }}
+                      className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center"
+                      style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.12)' }}
                     >
-                      <Trash2 className="w-3.5 h-3.5 text-white" />
+                      <Trash2 className="w-3 h-3 text-white" />
                     </button>
                   </button>
                 );
