@@ -18,10 +18,10 @@ export const CoursesListSkeleton = () => {
             </div>
 
             {/* Tabs skeleton */}
-            <div className="flex justify-center gap-2 px-4 pb-2">
-              <Skeleton className="h-10 w-28 rounded-lg" />
-              <Skeleton className="h-10 w-28 rounded-lg" />
-              <Skeleton className="h-10 w-36 rounded-lg" />
+            <div className="flex gap-1 px-1 pb-2">
+              <Skeleton className="h-10 flex-1 rounded-lg" />
+              <Skeleton className="h-10 flex-1 rounded-lg" />
+              <Skeleton className="h-10 flex-1 rounded-lg" />
             </div>
 
             {/* Search bar skeleton */}

@@ -88,8 +88,8 @@ const Top100Hub = () => {
       <PageRoot className="min-h-screen bg-background">
         <main className="px-4 md:container md:mx-auto md:px-0 py-6 pb-20">
           <div className="space-y-4">
-            <div className="aspect-[16/10] bg-card/60 border border-border/40 rounded-2xl clb-skeleton" />
-            <div className="aspect-[16/10] bg-card/60 border border-border/40 rounded-2xl clb-skeleton" />
+            <Skeleton className="aspect-[16/10] rounded-2xl" />
+            <Skeleton className="aspect-[16/10] rounded-2xl" />
           </div>
         </main>
       </PageRoot>
