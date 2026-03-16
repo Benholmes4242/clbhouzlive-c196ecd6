@@ -81,8 +81,8 @@ export function ActorSelector({ compact = false }: ActorSelectorProps) {
         >
           {/* Avatar */}
           <div
-            className="w-8 h-8 rounded-full overflow-hidden shrink-0"
-            style={{ background: 'rgba(255,255,255,0.10)', border: '1.5px solid rgba(255,255,255,0.18)' }}
+            className="w-8 h-8 overflow-hidden shrink-0"
+            style={{ background: 'rgba(255,255,255,0.10)', border: '1.5px solid rgba(255,255,255,0.18)', borderRadius: '34%' }}
           >
             {activeAvatar ? (
               <img src={activeAvatar} alt="" className="w-full h-full object-cover" />
@@ -166,12 +166,12 @@ export function ActorSelector({ compact = false }: ActorSelectorProps) {
                     }}
                   >
                     <div
-                      className="w-10 h-10 rounded-full overflow-hidden shrink-0"
-                      style={{ background: 'rgba(255,255,255,0.08)' }}
+                      className="w-10 h-10 overflow-hidden shrink-0"
+                      style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '34%' }}
                     >
                       {userAvatar
                         ? <img src={userAvatar} alt="" className="w-full h-full object-cover" />
-                        : <div className="w-full h-full flex items-center justify-center text-sm font-bold" style={{ color: 'rgba(255,255,255,0.50)' }}>{userName.charAt(0)}</div>
+                        : <div className="w-full h-full flex items-center justify-center text-[10px] font-bold" style={{ color: 'rgba(255,255,255,0.50)' }}>{userName}</div>
                       }
                     </div>
                     <div className="flex-1 text-left">
@@ -197,12 +197,12 @@ export function ActorSelector({ compact = false }: ActorSelectorProps) {
                         }}
                       >
                         <div
-                          className="w-10 h-10 rounded-full overflow-hidden shrink-0"
-                          style={{ background: 'rgba(255,255,255,0.08)' }}
+                          className="w-10 h-10 overflow-hidden shrink-0"
+                          style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '34%' }}
                         >
                           {biz.logo_url
                             ? <img src={biz.logo_url} alt="" className="w-full h-full object-cover" />
-                            : <div className="w-full h-full flex items-center justify-center text-sm font-bold" style={{ color: 'rgba(255,255,255,0.50)' }}>{biz.name.charAt(0)}</div>
+                            : <div className="w-full h-full flex items-center justify-center text-[10px] font-bold" style={{ color: 'rgba(255,255,255,0.50)' }}>{biz.name}</div>
                           }
                         </div>
                         <div className="flex-1 text-left">
