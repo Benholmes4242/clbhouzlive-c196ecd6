@@ -216,7 +216,7 @@ export default function StudioShelf({
                   <button
                     onClick={() => onClose()}
                     className="px-5 rounded-full text-sm font-semibold min-h-[36px] flex items-center"
-                    style={{ background: 'linear-gradient(135deg, #F59E0B 0%, #C7870A 100%)', color: '#0D0D0D', boxShadow: '0 2px 8px rgba(200,135,10,0.25)' }}
+                    style={{ background: 'rgba(255,255,255,0.92)', color: '#0D0D0D', boxShadow: '0 2px 8px rgba(255,255,255,0.15)' }}
                   >
                     Done
                   </button>
