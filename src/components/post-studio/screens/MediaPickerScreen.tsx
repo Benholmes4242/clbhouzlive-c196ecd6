@@ -155,7 +155,7 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
                 animate={{ scale: [1, 1.08, 1], opacity: [0.3, 0.1, 0.3] }}
                 transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
                 className="absolute inset-0 rounded-full"
-                style={{ border: '1px solid rgba(245,158,11,0.30)' }}
+                style={{ border: '1px solid rgba(232,152,10,0.15)' }}
               />
               <div
                 className="w-32 h-32 rounded-full flex items-center justify-center relative"
