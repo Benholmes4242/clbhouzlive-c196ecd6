@@ -216,7 +216,7 @@ export function ComposerScreen() {
               <div
                 aria-hidden="true"
                 className="absolute inset-x-4 top-4 text-sm leading-relaxed min-h-[120px] pointer-events-none whitespace-pre-wrap break-words"
-                style={{ color: 'transparent', wordBreak: 'break-word' }}
+                style={{ wordBreak: 'break-word' }}
               >
                 {highlightedCaption}
               </div>
