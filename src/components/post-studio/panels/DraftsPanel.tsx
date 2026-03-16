@@ -83,7 +83,7 @@ export function DraftsPanel() {
 
         {/* Header */}
         <div className="px-4 pb-2">
-          <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: AMBER_DIM }}>
+          <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
             Saved
           </p>
           <h3 className="text-sm font-semibold" style={{ color: TEXT_PRIMARY }}>
