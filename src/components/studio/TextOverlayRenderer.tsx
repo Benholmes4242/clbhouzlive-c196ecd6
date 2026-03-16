@@ -801,6 +801,7 @@ export default function TextOverlayRenderer({
         return (
           <div
             key={overlay.id}
+            ref={getOverlayRefCallback(overlay)}
             className={cn(
               "absolute",
               isEditable && "cursor-move touch-none select-none"
@@ -815,7 +816,6 @@ export default function TextOverlayRenderer({
               pointerEvents: isEditable ? 'auto' : 'none',
             }}
             onPointerDown={isEditable ? (e) => handlePointerDown(e, overlay) : undefined}
-            onTouchStart={isEditable ? (e) => handleTouchStart(e, overlay) : undefined}
           >
             <span
               className={cn(
