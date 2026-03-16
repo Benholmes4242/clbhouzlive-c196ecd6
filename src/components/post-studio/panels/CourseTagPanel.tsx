@@ -165,7 +165,7 @@ export function CourseTagPanel() {
 
           {isSearching && (
             <div className="flex items-center justify-center py-8">
-              <div className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(232,152,10,0.30)', borderTopColor: 'transparent' }} />
+              <div className="w-5 h-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(255,255,255,0.20)', borderTopColor: 'transparent' }} />
             </div>
           )}
 
