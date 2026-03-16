@@ -19,7 +19,9 @@ export function UploadToastsBridge() {
     });
 
     const offComplete = uploadEventBus.on('upload:complete', (evt) => {
-      // PostSuccessScreen handles all post-success feedback — no toast here
+      toast.success("Your moment is live.", {
+        duration: 4000,
+      });
 
       // Still invalidate queries so content appears
       if (evt.isScheduled) {
