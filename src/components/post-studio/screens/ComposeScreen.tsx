@@ -609,6 +609,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         }}
       >
+        {/* Actor avatar — compact profile switcher */}
+        <ActorSelector compact />
+
+        {/* Spacer between avatar and camera */}
+        <div className="w-2" />
+
         {/* Camera — primary action, white circle */}
         <motion.button
           whileTap={{ scale: 0.92 }}
