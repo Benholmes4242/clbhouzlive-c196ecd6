@@ -136,9 +136,9 @@ export function StudioHeader({
         </div>
       </div>
 
-      {/* Progress bar — thicker, more visible */}
+      {/* Progress bar */}
       {showProgress && (
-        <div style={{ height: '3px', background: 'rgba(255,255,255,0.08)' }}>
+        <div style={{ height: '4px', background: 'rgba(255,255,255,0.08)' }}>
           <motion.div
             className="h-full"
             initial={false}
