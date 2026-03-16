@@ -290,7 +290,10 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onKeyDown={handleKeyDown}
-            onFocus={() => setPasswordFocused(true)}
+            onFocus={(e) => {
+              setPasswordFocused(true);
+              setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+            }}
             onBlur={() => setPasswordFocused(false)}
             placeholder="Create password"
             disabled={isPasswordDisabled}
