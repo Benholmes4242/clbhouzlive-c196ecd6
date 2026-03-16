@@ -303,11 +303,11 @@ function AppRoutes() {
         <Route path="/news" element={<Suspense fallback={<GenericPageSkeleton />}><News /></Suspense>} />
         
         {/* Post deep link for notifications */}
-        <Route path="/post/:postId" element={<Suspense fallback={null}><PostDeepLinkPage /></Suspense>} />
-        <Route path="/post/:postId/comment/:commentId" element={<Suspense fallback={null}><CommentDeepLinkPage /></Suspense>} />
+        <Route path="/post/:postId" element={<Suspense fallback={<GenericPageSkeleton />}><PostDeepLinkPage /></Suspense>} />
+        <Route path="/post/:postId/comment/:commentId" element={<Suspense fallback={<GenericPageSkeleton />}><CommentDeepLinkPage /></Suspense>} />
         
         
-        <Route path="/video/:videoId" element={<Suspense fallback={null}><VideoPlayerModal /></Suspense>} />
+        <Route path="/video/:videoId" element={<Suspense fallback={<GenericPageSkeleton />}><VideoPlayerModal /></Suspense>} />
         
         {/* Legacy creator routes - redirect to home (creators now handled via Business profiles or Personal Creator Mode) */}
         <Route path="/creator/*" element={<Navigate to="/" replace />} />

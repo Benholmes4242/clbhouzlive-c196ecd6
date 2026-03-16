@@ -428,6 +428,18 @@ html.lightbox-open {
     animation: none;
   }
 }
+
+/* Reduced-motion: disable all shimmer/pulse animations */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse {
+    animation: none;
+  }
+  .animate-shimmer,
+  .animate-shimmer-slide {
+    animation: none;
+  }
+}
+
 .rating-slider {
   touch-action: pan-y;
 }
