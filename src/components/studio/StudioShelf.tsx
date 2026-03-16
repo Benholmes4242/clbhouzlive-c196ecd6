@@ -415,7 +415,7 @@ export default function StudioShelf({
                       >
                         <div
                           className="w-10 h-10 rounded-full flex items-center justify-center"
-                          style={{ background: 'rgba(232,152,10,0.15)' }}
+                          style={{ background: 'rgba(255,255,255,0.07)' }}
                         >
                           <Sparkles className="w-5 h-5" style={{ color: '#E8980A' }} />
                         </div>

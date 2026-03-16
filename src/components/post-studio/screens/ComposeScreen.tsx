@@ -4,8 +4,7 @@
 
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import {
-  Camera, Layers, BookOpen, AtSign, Wand2, Scissors,
-  Image as ImageIcon, X, Play,
+  Camera, Layers, BookOpen, AtSign, X, Pencil, Star, Play, Plus,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -107,41 +106,134 @@ async function filesToMediaItems(
   return items;
 }
 
-// ─── Adaptive media grid ─────────────────────────────────────────────────────
+// ─── Adaptive media grid with per-tile edit + cover selection ─────────────────
 
 interface MediaGridProps {
   items: StudioMediaItem[];
   activeIndex: number;
+  coverIndex: number;
   onSelect: (index: number) => void;
   onRemove: (id: string) => void;
+  onEdit: (index: number) => void;
+  onSetCover: (index: number) => void;
   onAddMore: () => void;
-  onEdit: () => void;
-  onTrim: () => void;
-  onCover: () => void;
-  activeIsVideo: boolean;
-  activeItem: StudioMediaItem | null;
 }
 
 function MediaGrid({
-  items, activeIndex, onSelect, onRemove, onAddMore,
-  onEdit, onTrim, onCover, activeIsVideo, activeItem,
+  items, activeIndex, coverIndex,
+  onSelect, onRemove, onEdit, onSetCover, onAddMore,
 }: MediaGridProps) {
   if (items.length === 0) return null;
 
   const GAP = 2;
+  const MAX_VISIBLE = 4;
+  const visible = items.slice(0, MAX_VISIBLE);
+  const overflow = items.length - MAX_VISIBLE;
 
-  // Single item — full width, native ratio
+  function Tile({
+    item, index, style, borderRadius,
+  }: {
+    item: StudioMediaItem;
+    index: number;
+    style?: React.CSSProperties;
+    borderRadius?: string;
+  }) {
+    const isCover = index === coverIndex;
+    const isOverflowTile = index === MAX_VISIBLE - 1 && overflow > 0;
+
+    return (
+      <div
+        className="relative overflow-hidden cursor-pointer"
+        style={{ borderRadius: borderRadius ?? 14, ...style }}
+        onClick={() => onSelect(index)}
+      >
+        <img
+          src={item.thumbnailUrl || item.previewUrl}
+          alt=""
+          className="w-full h-full object-cover"
+        />
+
+        {/* Video play indicator */}
+        {item.mediaType === 'video' && !isOverflowTile && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(8px)' }}>
+              <Play className="w-4 h-4 text-white ml-0.5" fill="white" strokeWidth={0} />
+            </div>
+          </div>
+        )}
+
+        {/* Overflow count */}
+        {isOverflowTile && (
+          <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}>
+            <span className="text-[22px] font-bold text-white">+{overflow + 1}</span>
+          </div>
+        )}
+
+        {!isOverflowTile && (
+          <>
+            {/* Cover star — top left */}
+            <motion.button
+              whileTap={{ scale: 0.85 }}
+              onClick={(e) => { e.stopPropagation(); onSetCover(index); }}
+              className="absolute top-2 left-2 w-7 h-7 flex items-center justify-center rounded-full z-10"
+              style={{
+                background: isCover ? 'rgba(255,255,255,0.90)' : 'rgba(0,0,0,0.45)',
+                backdropFilter: 'blur(8px)',
+                border: isCover ? 'none' : '1px solid rgba(255,255,255,0.20)',
+              }}
+            >
+              <Star
+                className="w-3.5 h-3.5"
+                style={{ color: isCover ? '#0D0D0D' : 'rgba(255,255,255,0.70)' }}
+                strokeWidth={isCover ? 0 : 1.75}
+                fill={isCover ? '#0D0D0D' : 'none'}
+              />
+            </motion.button>
+
+            {/* Remove — top right */}
+            <motion.button
+              whileTap={{ scale: 0.85 }}
+              onClick={(e) => { e.stopPropagation(); onRemove(item.id); }}
+              className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center rounded-full z-10"
+              style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}
+            >
+              <X className="w-3 h-3 text-white" strokeWidth={2.5} />
+            </motion.button>
+
+            {/* Edit pencil — bottom right */}
+            <motion.button
+              whileTap={{ scale: 0.85 }}
+              onClick={(e) => { e.stopPropagation(); onEdit(index); }}
+              className="absolute bottom-2 right-2 w-7 h-7 flex items-center justify-center rounded-full z-10"
+              style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}
+            >
+              <Pencil className="w-3 h-3 text-white" strokeWidth={2} />
+            </motion.button>
+
+            {/* Cover label — bottom left, only on cover item */}
+            {isCover && (
+              <div
+                className="absolute bottom-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-semibold"
+                style={{ background: 'rgba(255,255,255,0.90)', color: '#0D0D0D' }}
+              >
+                Cover
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    );
+  }
+
+  // 1 item — full width, native ratio
   if (items.length === 1) {
     const item = items[0];
     const ratio = item.width && item.height
       ? Math.min(Math.max(item.width / item.height, 4 / 5), 16 / 9)
       : 4 / 3;
     return (
-      <div className="mx-4 mb-2 relative overflow-hidden" style={{ borderRadius: 14, aspectRatio: String(ratio) }}>
-        <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
-        {item.mediaType === 'video' && <VideoOverlay />}
-        <RemoveButton onRemove={() => onRemove(item.id)} />
-        <ToolBar item={item} onEdit={onEdit} onTrim={onTrim} onCover={onCover} activeIsVideo={activeIsVideo} />
+      <div className="mx-4 mb-2" style={{ borderRadius: 14, overflow: 'hidden', aspectRatio: String(ratio) }}>
+        <Tile item={item} index={0} style={{ width: '100%', height: '100%' }} borderRadius="14px" />
       </div>
     );
   }
@@ -149,20 +241,9 @@ function MediaGrid({
   // 2 items — side by side
   if (items.length === 2) {
     return (
-      <div className="mx-4 mb-2 flex overflow-hidden" style={{ borderRadius: 14, gap: GAP, aspectRatio: '16/9' }}>
-        {items.map((item, i) => (
-          <div
-            key={item.id}
-            className="relative flex-1 overflow-hidden cursor-pointer"
-            style={{ borderRadius: i === 0 ? '14px 0 0 14px' : '0 14px 14px 0' }}
-            onClick={() => onSelect(i)}
-          >
-            <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
-            {item.mediaType === 'video' && <VideoOverlay />}
-            <RemoveButton onRemove={() => onRemove(item.id)} />
-            {i === activeIndex && <ToolBar item={item} onEdit={onEdit} onTrim={onTrim} onCover={onCover} activeIsVideo={activeIsVideo} />}
-          </div>
-        ))}
+      <div className="mx-4 mb-2 flex" style={{ borderRadius: 14, overflow: 'hidden', gap: GAP, aspectRatio: '16/9' }}>
+        <Tile item={items[0]} index={0} style={{ flex: 1, height: '100%' }} borderRadius="14px 0 0 14px" />
+        <Tile item={items[1]} index={1} style={{ flex: 1, height: '100%' }} borderRadius="0 14px 14px 0" />
       </div>
     );
   }
@@ -170,150 +251,24 @@ function MediaGrid({
   // 3 items — large left, 2 stacked right
   if (items.length === 3) {
     return (
-      <div className="mx-4 mb-2 flex overflow-hidden" style={{ borderRadius: 14, gap: GAP, aspectRatio: '4/3' }}>
-        {/* Left — large */}
-        <div
-          className="relative flex-1 overflow-hidden cursor-pointer"
-          style={{ borderRadius: '14px 0 0 14px' }}
-          onClick={() => onSelect(0)}
-        >
-          <img src={items[0].thumbnailUrl || items[0].previewUrl} alt="" className="w-full h-full object-cover" />
-          {items[0].mediaType === 'video' && <VideoOverlay />}
-          <RemoveButton onRemove={() => onRemove(items[0].id)} />
-          {activeIndex === 0 && <ToolBar item={items[0]} onEdit={onEdit} onTrim={onTrim} onCover={onCover} activeIsVideo={activeIsVideo} />}
-        </div>
-        {/* Right — 2 stacked */}
-        <div className="flex flex-col flex-1 overflow-hidden" style={{ gap: GAP }}>
-          {items.slice(1).map((item, i) => (
-            <div
-              key={item.id}
-              className="relative flex-1 overflow-hidden cursor-pointer"
-              style={{ borderRadius: i === 0 ? '0 14px 0 0' : '0 0 14px 0' }}
-              onClick={() => onSelect(i + 1)}
-            >
-              <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
-              {item.mediaType === 'video' && <VideoOverlay />}
-              <RemoveButton onRemove={() => onRemove(item.id)} />
-            </div>
-          ))}
+      <div className="mx-4 mb-2 flex" style={{ borderRadius: 14, overflow: 'hidden', gap: GAP, aspectRatio: '4/3' }}>
+        <Tile item={items[0]} index={0} style={{ flex: 1, height: '100%' }} borderRadius="14px 0 0 14px" />
+        <div className="flex flex-col flex-1" style={{ gap: GAP }}>
+          <Tile item={items[1]} index={1} style={{ flex: 1 }} borderRadius="0 14px 0 0" />
+          <Tile item={items[2]} index={2} style={{ flex: 1 }} borderRadius="0 0 14px 0" />
         </div>
       </div>
     );
   }
 
-  // 4+ items — 2×2 grid with overflow count on last tile
-  const visible = items.slice(0, 4);
-  const overflow = items.length - 4;
+  // 4+ items — 2×2 grid
+  const cornerRadii = ['14px 0 0 0', '0 14px 0 0', '0 0 0 14px', '0 0 14px 0'];
   return (
-    <div className="mx-4 mb-2 grid grid-cols-2 overflow-hidden" style={{ borderRadius: 14, gap: GAP, aspectRatio: '1/1' }}>
-      {visible.map((item, i) => {
-        const isLast = i === 3;
-        const corners = [
-          '14px 0 0 0',
-          '0 14px 0 0',
-          '0 0 0 14px',
-          '0 0 14px 0',
-        ];
-        return (
-          <div
-            key={item.id}
-            className="relative overflow-hidden cursor-pointer"
-            style={{ borderRadius: corners[i] }}
-            onClick={() => onSelect(i)}
-          >
-            <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
-            {item.mediaType === 'video' && <VideoOverlay />}
-            {!isLast && <RemoveButton onRemove={() => onRemove(item.id)} />}
-            {/* Overflow count overlay on last tile */}
-            {isLast && overflow > 0 && (
-              <div
-                className="absolute inset-0 flex items-center justify-center"
-                style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
-              >
-                <span className="text-[22px] font-bold text-white">+{overflow + 1}</span>
-              </div>
-            )}
-            {i === activeIndex && !isLast && <ToolBar item={item} onEdit={onEdit} onTrim={onTrim} onCover={onCover} activeIsVideo={activeIsVideo} />}
-          </div>
-        );
-      })}
+    <div className="mx-4 mb-2 grid grid-cols-2" style={{ borderRadius: 14, overflow: 'hidden', gap: GAP, aspectRatio: '1/1' }}>
+      {visible.map((item, i) => (
+        <Tile key={item.id} item={item} index={i} style={{ aspectRatio: '1/1' }} borderRadius={cornerRadii[i]} />
+      ))}
     </div>
-  );
-}
-
-// Sub-components for the grid
-
-function VideoOverlay() {
-  return (
-    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-      <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(8px)' }}>
-        <Play className="w-4 h-4 text-white ml-0.5" fill="white" strokeWidth={0} />
-      </div>
-    </div>
-  );
-}
-
-function RemoveButton({ onRemove }: { onRemove: () => void }) {
-  return (
-    <button
-      onClick={(e) => { e.stopPropagation(); onRemove(); }}
-      className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center z-10"
-      style={{ background: 'rgba(0,0,0,0.60)', border: '1px solid rgba(255,255,255,0.20)' }}
-    >
-      <X className="w-3 h-3 text-white" strokeWidth={2.5} />
-    </button>
-  );
-}
-
-function ToolBar({
-  item, onEdit, onTrim, onCover, activeIsVideo,
-}: {
-  item: StudioMediaItem;
-  onEdit: () => void;
-  onTrim: () => void;
-  onCover: () => void;
-  activeIsVideo: boolean;
-}) {
-  return (
-    <>
-      <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: 48, background: 'linear-gradient(to top, rgba(0,0,0,0.70), transparent)' }} />
-      <div className="absolute bottom-2 left-2 flex gap-1 z-10">
-        <motion.button
-          whileTap={{ scale: 0.93 }}
-          onClick={(e) => { e.stopPropagation(); onEdit(); }}
-          className="flex items-center gap-1 px-2 py-1 text-[11px] font-medium"
-          style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8, color: 'rgba(255,255,255,0.90)' }}
-        >
-          <Wand2 className="w-3 h-3" strokeWidth={2} />
-          Edit
-          {item.edits && Object.values(item.edits).some(Boolean) && (
-            <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.80)' }} />
-          )}
-        </motion.button>
-        {activeIsVideo && (
-          <motion.button
-            whileTap={{ scale: 0.93 }}
-            onClick={(e) => { e.stopPropagation(); onTrim(); }}
-            className="flex items-center gap-1 px-2 py-1 text-[11px] font-medium"
-            style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8, color: 'rgba(255,255,255,0.90)' }}
-          >
-            <Scissors className="w-3 h-3" strokeWidth={2} />
-            Trim
-          </motion.button>
-        )}
-        {activeIsVideo && (
-          <motion.button
-            whileTap={{ scale: 0.93 }}
-            onClick={(e) => { e.stopPropagation(); onCover(); }}
-            className="flex items-center gap-1 px-2 py-1 text-[11px] font-medium"
-            style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8, color: 'rgba(255,255,255,0.90)' }}
-          >
-            <ImageIcon className="w-3 h-3" strokeWidth={2} />
-            Cover
-          </motion.button>
-        )}
-      </div>
-    </>
   );
 }
 
@@ -333,6 +288,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const [shelfOpen, setShelfOpen] = useState(false);
   const [activeTool, setActiveTool] = useState<StudioTool>(null);
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
+  const [coverIndex, setCoverIndex] = useState(0);
 
   const hasMedia = state.mediaItems.length > 0;
   const activeItem = state.mediaItems[state.activeMediaIndex] ?? null;
@@ -425,6 +381,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     updateMediaEdits(activeItem.id, {});
   }, [activeItem, updateMediaEdits]);
 
+  const handleEdit = useCallback((index: number) => {
+    setActiveMedia(index);
+    setActiveTool(null);
+    setShelfOpen(true);
+  }, [setActiveMedia]);
+
   return (
     <div className="flex-1 flex flex-col" style={{ background: BG_BASE }}>
       <StudioHeader
@@ -445,8 +407,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         className="flex-1 overflow-y-auto"
         style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain' }}
       >
-        {/* Actor selector moved to bottom toolbar */}
-
         {/* ── Text input ── */}
         <div className="px-4 pt-3 pb-2 relative">
           {/* Mention highlight layer */}
@@ -566,19 +526,34 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           </AnimatePresence>
         </div>
 
-        {/* ── Adaptive media grid ── */}
-        <MediaGrid
-          items={state.mediaItems}
-          activeIndex={state.activeMediaIndex}
-          onSelect={setActiveMedia}
-          onRemove={removeMedia}
-          onAddMore={() => fileInputRef.current?.click()}
-          onEdit={() => { setActiveTool(null); setShelfOpen(true); }}
-          onTrim={() => setStep('TRIM')}
-          onCover={() => setStep('POSTER')}
-          activeIsVideo={activeIsVideo}
-          activeItem={activeItem}
-        />
+        {/* ── Adaptive media grid with per-tile edit + cover ── */}
+        {state.mediaItems.length > 0 && (
+          <MediaGrid
+            items={state.mediaItems}
+            activeIndex={state.activeMediaIndex}
+            coverIndex={coverIndex}
+            onSelect={setActiveMedia}
+            onRemove={removeMedia}
+            onEdit={handleEdit}
+            onSetCover={setCoverIndex}
+            onAddMore={() => fileInputRef.current?.click()}
+          />
+        )}
+
+        {/* Add more button — shown below grid when < 10 items */}
+        {state.mediaItems.length > 0 && state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
+          <div className="px-4 mb-2">
+            <motion.button
+              whileTap={{ scale: 0.96 }}
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-2 px-3 py-2 rounded-xl"
+              style={{ border: '1.5px dashed rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.03)' }}
+            >
+              <Plus className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={2} />
+              <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.35)' }}>Add more</span>
+            </motion.button>
+          </div>
+        )}
 
         {/* Processing indicator */}
         <AnimatePresence>

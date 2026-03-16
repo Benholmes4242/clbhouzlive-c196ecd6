@@ -124,9 +124,9 @@ export function PosterPicker({ item, onPosterChange, darkMode }: PosterPickerPro
           <div
             className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full"
             style={{
-              background: 'linear-gradient(135deg, #F59E0B 0%, #C7870A 100%)',
-              boxShadow: '0 2px 8px rgba(200,135,10,0.60)',
-              border: '2px solid rgba(0,0,0,0.40)',
+              background: 'rgba(255,255,255,0.92)',
+              boxShadow: '0 2px 8px rgba(255,255,255,0.20)',
+              border: '2px solid rgba(0,0,0,0.25)',
             }}
           />
         </div>

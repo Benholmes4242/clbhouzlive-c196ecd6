@@ -15,9 +15,9 @@ const ToolButton = ({ icon, label, active, onClick }: ToolButtonProps) => (
     whileTap={{ scale: 0.97 }}
     className="flex flex-col items-center justify-center gap-1 py-2.5 px-4 rounded-xl transition-all duration-150"
     style={active ? {
-      background: 'linear-gradient(135deg, #F59E0B 0%, #C7870A 100%)',
+      background: 'rgba(255,255,255,0.90)',
       color: '#0D0D0D',
-      boxShadow: '0 2px 10px rgba(200,135,10,0.28)',
+      boxShadow: '0 2px 10px rgba(255,255,255,0.15)',
     } : {
       background: 'transparent',
       color: 'rgba(255,255,255,0.45)',
