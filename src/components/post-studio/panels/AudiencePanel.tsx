@@ -4,7 +4,7 @@ import { Globe, Users, Lock, Check } from 'lucide-react';
 import { motion, useDragControls } from 'framer-motion';
 import { usePostStudioContext } from '../usePostStudio';
 import { SPRING } from '../constants';
-import { AMBER, AMBER_DIM, AMBER_GHOST, TEXT_PRIMARY } from '../tokens';
+import { TEXT_PRIMARY } from '../tokens';
 import type { StudioVisibility } from '../types';
 
 const OPTIONS: { value: StudioVisibility; label: string; description: string; icon: React.ElementType }[] = [
@@ -87,18 +87,18 @@ export function AudiencePanel() {
                 onClick={() => handleSelect(opt.value)}
                 className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl min-h-[64px]"
                 style={{
-                  background: isActive ? AMBER_GHOST : 'rgba(255,255,255,0.04)',
-                  border: isActive ? '1px solid rgba(232,152,10,0.30)' : '1px solid rgba(255,255,255,0.07)',
+                  background: isActive ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
+                  border: isActive ? '1px solid rgba(255,255,255,0.25)' : '1px solid rgba(255,255,255,0.07)',
                 }}
               >
                 <div
                   className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: isActive ? 'rgba(232,152,10,0.15)' : 'rgba(255,255,255,0.07)' }}
+                  style={{ background: isActive ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.07)' }}
                 >
-                  <Icon className="w-5 h-5" style={{ color: isActive ? AMBER : 'rgba(255,255,255,0.45)' }} strokeWidth={1.75} />
+                  <Icon className="w-5 h-5" style={{ color: isActive ? 'rgba(255,255,255,0.90)' : 'rgba(255,255,255,0.45)' }} strokeWidth={1.75} />
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="text-[14px] font-semibold" style={{ color: isActive ? AMBER : 'rgba(255,255,255,0.85)' }}>
+                  <p className="text-[14px] font-semibold" style={{ color: isActive ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.70)' }}>
                     {opt.label}
                   </p>
                   <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
@@ -110,9 +110,9 @@ export function AudiencePanel() {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
-                    style={{ background: 'linear-gradient(135deg, #F59E0B 0%, #C7870A 100%)' }}
+                    style={{ background: 'rgba(255,255,255,0.90)' }}
                   >
-                    <Check className="w-3.5 h-3.5 text-black" strokeWidth={3} />
+                    <Check className="w-3.5 h-3.5" style={{ color: '#0D0D0D' }} strokeWidth={3} />
                   </motion.div>
                 )}
               </motion.button>
