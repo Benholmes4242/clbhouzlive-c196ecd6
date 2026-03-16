@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTop100Lists } from '@/hooks/useTop100Lists';
 import { useTop100ProgressForUser } from '@/hooks/useTop100ProgressForUser';
@@ -370,12 +371,12 @@ const Top100List = () => {
     return (
       <PageRoot className="min-h-screen bg-background" immersive immersiveStatusBar>
         <main className="pb-20">
-          <div className="animate-pulse space-y-4 pt-0">
-            <div className="h-[260px] bg-muted" />
-            <div className="h-20 bg-card/60 border border-border/40 rounded-2xl mx-4" />
-            <div className="h-32 bg-card/60 border border-border/40 rounded-2xl mx-4" />
+          <div className="space-y-4 pt-0">
+            <Skeleton className="h-[260px] rounded-none" />
+            <Skeleton className="h-20 rounded-2xl mx-4" />
+            <Skeleton className="h-32 rounded-2xl mx-4" />
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="aspect-[16/9] bg-card/60 border border-border/40 rounded-none mx-0" />
+              <Skeleton key={i} className="aspect-[16/9] rounded-none mx-0" />
             ))}
           </div>
         </main>
