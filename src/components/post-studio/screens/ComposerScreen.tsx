@@ -244,6 +244,25 @@ export function ComposerScreen() {
         </AnimatePresence>
         <div className="h-6" />
       </div>
+
+      {/* Studio Shelf — crop, filter, text, music */}
+      {activeItem && (
+        <StudioShelf
+          open={shelfOpen}
+          onClose={() => setShelfOpen(false)}
+          activeTool={activeTool}
+          setActiveTool={setActiveTool}
+          activeMediaId={activeItem.id}
+          activeMediaType={activeItem.mediaType}
+          activeMediaPreviewUrl={activeItem.previewUrl}
+          activeMediaThumbnailUrl={activeItem.thumbnailUrl ?? null}
+          edits={activeItem.edits ?? {}}
+          updateEdits={handleUpdateEdits}
+          clearEdits={handleClearEdits}
+          activeOverlayId={activeOverlayId}
+          onSelectOverlay={setActiveOverlayId}
+        />
+      )}
     </div>
   );
 }
