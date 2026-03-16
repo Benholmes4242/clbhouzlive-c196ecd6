@@ -117,8 +117,8 @@ export function PosterPicker({ item, onPosterChange, darkMode }: PosterPickerPro
           style={{
             left: `${scrubPercent}%`,
             transform: 'translateX(-50%)',
-            background: 'linear-gradient(135deg, #F59E0B 0%, #C7870A 100%)',
-            boxShadow: '0 0 6px rgba(200,135,10,0.50)',
+            background: 'rgba(255,255,255,0.90)',
+            boxShadow: '0 0 6px rgba(255,255,255,0.30)',
           }}
         >
           <div
