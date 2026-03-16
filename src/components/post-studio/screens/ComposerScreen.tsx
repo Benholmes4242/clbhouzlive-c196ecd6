@@ -112,6 +112,23 @@ export function ComposerScreen() {
             <MediaPreview item={activeItem} onSwipeLeft={handleSwipeLeft} onSwipeRight={handleSwipeRight} />
             {/* Bottom scrim gradient */}
             <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: 60, background: `linear-gradient(to top, rgba(8,8,8,0.8), transparent)` }} />
+            {/* Edit button — all media types */}
+            <div className="absolute bottom-3 left-3 z-10">
+              <motion.button whileTap={{ scale: 0.93 }} onClick={() => { setActiveTool(null); setShelfOpen(true); }}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium"
+                style={{
+                  background: 'rgba(0,0,0,0.65)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: 12,
+                  color: 'rgba(255,255,255,0.85)',
+                }}
+              >
+                <Wand2 className="w-4 h-4" strokeWidth={1.75} />
+                Edit
+              </motion.button>
+            </div>
+
             {/* Floating trim/cover buttons for video */}
             {activeIsVideo && (
               <div className="absolute bottom-3 right-3 flex gap-2 z-10">
