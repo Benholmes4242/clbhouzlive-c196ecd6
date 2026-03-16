@@ -194,11 +194,11 @@ export function MentionPanel() {
               className="w-full flex items-center gap-3 py-3 min-h-[56px]"
               style={{ borderBottom: i < results.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}
             >
-              <div className="w-10 h-10 rounded-full overflow-hidden shrink-0" style={{ background: 'rgba(255,255,255,0.08)' }}>
+              <div className="w-10 h-10 overflow-hidden shrink-0" style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '34%' }}>
                 {entity.profile_image_url
                   ? <img src={entity.profile_image_url} alt="" className="w-full h-full object-cover" />
-                  : <div className="w-full h-full flex items-center justify-center text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.50)' }}>
-                      {entity.name.charAt(0).toUpperCase()}
+                  : <div className="w-full h-full flex items-center justify-center text-[10px] font-bold" style={{ color: 'rgba(255,255,255,0.50)' }}>
+                      {entity.name}
                     </div>
                 }
               </div>
