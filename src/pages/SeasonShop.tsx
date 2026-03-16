@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Lock, Sparkles, Coins } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { PageRoot } from '@/components/layout/PageRoot';
 
 const rarityColors = {
