@@ -1,10 +1,9 @@
-// UploadBanner — Live upload progress, dark glass spec
+// UploadBanner — Live upload progress bar
+// Card surface with amber icon + green flash on completion
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Upload } from 'lucide-react';
 import { useUploadProgress } from '@/hooks/useUploadProgress';
-
-const AMBER = '#F59E0B';
-const AMBER_DEEP = '#D97706';
 
 export function UploadBanner() {
   const { isUploading, uploadedCount, totalCount } = useUploadProgress();
@@ -14,6 +13,7 @@ export function UploadBanner() {
   const progress = totalCount > 0 ? (uploadedCount / totalCount) * 100 : 0;
   const isComplete = uploadedCount >= totalCount && totalCount > 0;
 
+  // Green flash on completion
   useEffect(() => {
     if (isComplete && !prevComplete.current) {
       setShowGreen(true);
@@ -23,54 +23,35 @@ export function UploadBanner() {
     prevComplete.current = isComplete;
   }, [isComplete]);
 
-  const cardStyle: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.07)',
-    border: '1px solid rgba(255,255,255,0.10)',
-    borderRadius: 20,
-    padding: 16,
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-    width: '100%',
-  };
-
-  const iconWrapStyle: React.CSSProperties = {
-    width: 40, height: 40, borderRadius: 12, flexShrink: 0,
-    background: 'rgba(245,158,11,0.15)',
-    border: '1px solid rgba(245,158,11,0.25)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-  };
-
   if (!isUploading && totalCount === 0) {
     return (
-      <div style={cardStyle}>
-        <div style={iconWrapStyle}>
-          <Upload className="w-5 h-5" style={{ color: AMBER }} />
+      <div className="w-full bg-background rounded-2xl p-4 border border-border/40 shadow-sm flex items-center gap-3">
+        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+          <Upload className="w-5 h-5 text-primary" />
         </div>
-        <div style={{ flex: 1 }}>
-          <p style={{ color: 'rgba(255,255,255,0.92)', fontSize: 14, fontWeight: 500 }}>Queued</p>
-          <p style={{ color: 'rgba(255,255,255,0.50)', fontSize: 12 }}>Upload will start shortly…</p>
+        <div className="flex-1">
+          <p className="text-foreground text-sm font-medium">Queued</p>
+          <p className="text-muted-foreground text-xs">Upload will start shortly…</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={cardStyle}>
-      <div style={iconWrapStyle}>
-        {isComplete
-          ? <span className="text-lg">✓</span>
-          : <Upload className="w-5 h-5" style={{ color: AMBER }} />}
+    <div className="w-full bg-background rounded-2xl p-4 border border-border/40 shadow-sm flex items-center gap-3">
+      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+        {isComplete ? <span className="text-lg">✅</span> : <Upload className="w-5 h-5 text-primary" />}
       </div>
-      <div style={{ flex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-          <p style={{ color: 'rgba(255,255,255,0.92)', fontSize: 14, fontWeight: 500 }}>
-            {isComplete ? 'Uploaded' : 'Uploading…'}
-          </p>
-          <p style={{ color: 'rgba(255,255,255,0.50)', fontSize: 12 }}>{uploadedCount}/{totalCount}</p>
+      <div className="flex-1 space-y-1.5">
+        <div className="flex items-center justify-between">
+          <p className="text-foreground text-sm font-medium">{isComplete ? 'Uploaded' : 'Uploading…'}</p>
+          <p className="text-muted-foreground text-xs">{uploadedCount}/{totalCount}</p>
         </div>
-        <div style={{ width: '100%', height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.10)', overflow: 'hidden' }}>
-          <div style={{ height: '100%', borderRadius: 3, width: `${progress}%`, transition: 'width 0.5s ease', background: showGreen ? '#22c55e' : `linear-gradient(90deg, ${AMBER}, ${AMBER_DEEP})` }} />
+        <div className="w-full h-1.5 rounded-full bg-muted-foreground/20 overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${showGreen ? 'bg-green-500' : 'bg-primary'}`}
+            style={{ width: `${progress}%` }}
+          />
         </div>
       </div>
     </div>

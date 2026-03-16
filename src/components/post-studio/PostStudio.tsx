@@ -244,6 +244,14 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
           background: BG_BASE,
         }}
       >
+        {/* Ambient amber top line — brand identity */}
+        <motion.div
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={{ scaleX: 1, opacity: 1 }}
+          transition={{ delay: 0.3, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute left-0 right-0 h-px origin-left"
+          style={{ top: 'max(env(safe-area-inset-top, 0px), 47px)', background: AMBER_LINE }}
+        />
 
         {/* Drag handle */}
         <div className="flex justify-center shrink-0" style={{ paddingTop: 8 }}>

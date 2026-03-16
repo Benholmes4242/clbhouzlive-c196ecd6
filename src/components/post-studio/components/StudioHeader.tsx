@@ -126,6 +126,18 @@ export function StudioHeader({
         </div>
       </div>
 
+      {/* Amber progress bar */}
+      {showProgress && (
+        <div style={{ height: '1.5px', background: 'transparent' }}>
+          <motion.div
+            className="h-full"
+            initial={false}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            style={{ background: `linear-gradient(90deg, ${AMBER}, ${AMBER_DEEP})` }}
+          />
+        </div>
+      )}
     </header>
   );
 }
