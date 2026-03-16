@@ -112,37 +112,54 @@ export function ComposerScreen() {
             <MediaPreview item={activeItem} onSwipeLeft={handleSwipeLeft} onSwipeRight={handleSwipeRight} />
             {/* Bottom scrim gradient */}
             <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: 60, background: `linear-gradient(to top, rgba(8,8,8,0.8), transparent)` }} />
-            {/* Edit button — all media types */}
-            <div className="absolute bottom-3 left-3 z-10">
-              <motion.button whileTap={{ scale: 0.93 }} onClick={() => { setActiveTool(null); setShelfOpen(true); }}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium"
-                style={{
-                  background: 'rgba(0,0,0,0.65)',
-                  backdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                  borderRadius: 12,
-                  color: 'rgba(255,255,255,0.85)',
-                }}
+            {/* Video tool bar — Edit / Trim / Cover with inline status dots */}
+            <div className="absolute bottom-3 left-3 right-3 flex gap-1.5 z-10">
+              {/* Edit — all media */}
+              <motion.button
+                whileTap={{ scale: 0.93 }}
+                onClick={() => { setActiveTool(null); setShelfOpen(true); }}
+                className="flex items-center gap-1 px-2.5 py-1.5 text-[12px] font-medium"
+                style={{ background: 'rgba(0,0,0,0.60)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.13)', borderRadius: 10, color: 'rgba(255,255,255,0.85)' }}
               >
-                <Wand2 className="w-4 h-4" strokeWidth={1.75} />
+                <Wand2 className="w-3.5 h-3.5" strokeWidth={1.75} />
                 Edit
-              </motion.button>
-            </div>
-
-            {/* Floating trim/cover buttons for video */}
-            {activeIsVideo && (
-              <div className="absolute bottom-3 right-3 flex gap-2 z-10">
-                <motion.button whileTap={{ scale: 0.93 }} onClick={() => setStep('TRIM')} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium" style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 12, color: 'rgba(255,255,255,0.85)' }}>
-                  <Scissors className="w-4 h-4" strokeWidth={1.75} /> Trim
-                </motion.button>
-                <motion.button whileTap={{ scale: 0.93 }} onClick={() => setStep('POSTER')} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium" style={{ background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 12, color: 'rgba(255,255,255,0.85)' }}>
-                  <ImageIcon className="w-4 h-4" strokeWidth={1.75} /> Cover
-                </motion.button>
-                {(activeItem.trimStart > 0 || (activeItem.trimEnd !== null && activeItem.trimEnd !== activeItem.duration)) && (
-                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full self-center" style={{ background: 'rgba(245,158,11,0.20)', color: 'rgba(245,158,11,0.90)' }}>Trimmed</span>
+                {activeItem.edits && Object.values(activeItem.edits).some(Boolean) && (
+                  <span className="w-1.5 h-1.5 rounded-full ml-0.5" style={{ background: 'rgba(232,152,10,0.90)', flexShrink: 0 }} />
                 )}
-              </div>
-            )}
+              </motion.button>
+
+              {/* Trim — video only */}
+              {activeIsVideo && (
+                <motion.button
+                  whileTap={{ scale: 0.93 }}
+                  onClick={() => setStep('TRIM')}
+                  className="flex items-center gap-1 px-2.5 py-1.5 text-[12px] font-medium"
+                  style={{ background: 'rgba(0,0,0,0.60)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.13)', borderRadius: 10, color: 'rgba(255,255,255,0.85)' }}
+                >
+                  <Scissors className="w-3.5 h-3.5" strokeWidth={1.75} />
+                  Trim
+                  {(activeItem.trimStart > 0 || (activeItem.trimEnd !== null && activeItem.trimEnd !== activeItem.duration)) && (
+                    <span className="w-1.5 h-1.5 rounded-full ml-0.5" style={{ background: 'rgba(232,152,10,0.90)', flexShrink: 0 }} />
+                  )}
+                </motion.button>
+              )}
+
+              {/* Cover — video only */}
+              {activeIsVideo && (
+                <motion.button
+                  whileTap={{ scale: 0.93 }}
+                  onClick={() => setStep('POSTER')}
+                  className="flex items-center gap-1 px-2.5 py-1.5 text-[12px] font-medium"
+                  style={{ background: 'rgba(0,0,0,0.60)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.13)', borderRadius: 10, color: 'rgba(255,255,255,0.85)' }}
+                >
+                  <ImageIcon className="w-3.5 h-3.5" strokeWidth={1.75} />
+                  Cover
+                  {activeItem.posterPreviewUrl && (
+                    <span className="w-1.5 h-1.5 rounded-full ml-0.5" style={{ background: 'rgba(232,152,10,0.90)', flexShrink: 0 }} />
+                  )}
+                </motion.button>
+              )}
+            </div>
           </div>
         )}
 
