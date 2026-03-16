@@ -152,7 +152,7 @@ const FriendsCoursesSkeleton: React.FC = () => {
             <Skeleton className="h-5 w-8 mx-auto mb-1" />
             <Skeleton className="h-2 w-12 mx-auto" />
           </div>
-          <div className="h-6 w-px bg-slate-200/60" />
+          <div className="h-6 w-px bg-border/60" />
           <div className="text-center">
             <Skeleton className="h-5 w-6 mx-auto mb-1" />
             <Skeleton className="h-2 w-14 mx-auto" />
