@@ -202,8 +202,8 @@ export function MediaPickerScreen({ onClose }: { onClose?: () => void }) {
         )}
 
         {hasMedia && (
-          <div className="flex-1 flex flex-col justify-center px-5 py-4">
-            <div className="grid grid-cols-3 gap-1.5 mb-4">
+          <div className="flex-1 flex flex-col px-5 pt-5 pb-4">
+            <div className="grid grid-cols-3 gap-2 mb-4">
               <AnimatePresence>
                 {state.mediaItems.map((item, index) => (
                   <motion.div
