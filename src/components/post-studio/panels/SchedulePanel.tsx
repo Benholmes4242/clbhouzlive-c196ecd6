@@ -133,7 +133,7 @@ export function SchedulePanel() {
               >
                 <div
                   className="rounded-2xl overflow-hidden"
-                  style={{ border: '1px solid rgba(232,152,10,0.20)', background: AMBER_GHOST }}
+                  style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' }}
                 >
                   <div className="flex items-center gap-2.5 px-4 pt-3 pb-1">
                     <Calendar className="w-4 h-4 shrink-0" style={{ color: AMBER_DIM }} strokeWidth={1.75} />
