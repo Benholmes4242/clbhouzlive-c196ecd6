@@ -174,23 +174,23 @@ function MediaGrid({
 
         {!isOverflowTile && (
           <>
-            {/* Cover star — top left */}
+            {/* Cover pill — top left */}
             <motion.button
-              whileTap={{ scale: 0.85 }}
-              onClick={(e) => { e.stopPropagation(); onSetCover(index); }}
-              className="absolute top-2 left-2 w-7 h-7 flex items-center justify-center rounded-full z-10"
-              style={{
-                background: isCover ? 'rgba(255,255,255,0.90)' : 'rgba(0,0,0,0.45)',
+              whileTap={{ scale: 0.92 }}
+              onClick={(e) => { e.stopPropagation(); if (!isCover) onSetCover(index); }}
+              className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full text-[10px] font-semibold"
+              style={isCover ? {
+                background: 'rgba(255,255,255,0.92)',
+                color: '#0D0D0D',
+                border: 'none',
+              } : {
+                background: 'rgba(0,0,0,0.45)',
+                color: 'rgba(255,255,255,0.65)',
+                border: '1px solid rgba(255,255,255,0.30)',
                 backdropFilter: 'blur(8px)',
-                border: isCover ? 'none' : '1px solid rgba(255,255,255,0.20)',
               }}
             >
-              <Star
-                className="w-3.5 h-3.5"
-                style={{ color: isCover ? '#0D0D0D' : 'rgba(255,255,255,0.70)' }}
-                strokeWidth={isCover ? 0 : 1.75}
-                fill={isCover ? '#0D0D0D' : 'none'}
-              />
+              Cover
             </motion.button>
 
             {/* Remove — top right */}
@@ -203,24 +203,51 @@ function MediaGrid({
               <X className="w-3 h-3 text-white" strokeWidth={2.5} />
             </motion.button>
 
-            {/* Edit pencil — bottom right */}
-            <motion.button
-              whileTap={{ scale: 0.85 }}
-              onClick={(e) => { e.stopPropagation(); onEdit(index); }}
-              className="absolute bottom-2 right-2 w-7 h-7 flex items-center justify-center rounded-full z-10"
-              style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}
-            >
-              <Pencil className="w-3 h-3 text-white" strokeWidth={2} />
-            </motion.button>
-
-            {/* Cover label — bottom left, only on cover item */}
-            {isCover && (
-              <div
-                className="absolute bottom-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-semibold"
-                style={{ background: 'rgba(255,255,255,0.90)', color: '#0D0D0D' }}
+            {/* Edit / tool badges — bottom, depends on media type */}
+            {item.mediaType === 'image' ? (
+              /* Images: single edit pencil bottom-right */
+              <motion.button
+                whileTap={{ scale: 0.85 }}
+                onClick={(e) => { e.stopPropagation(); onEdit(index); }}
+                className="absolute bottom-2 right-2 w-7 h-7 flex items-center justify-center rounded-full z-10"
+                style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}
               >
-                Cover
-              </div>
+                <Pencil className="w-3 h-3 text-white" strokeWidth={2} />
+              </motion.button>
+            ) : (
+              /* Videos: Edit · Trim · Cover row bottom */
+              <>
+                <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: 44, background: 'linear-gradient(to top, rgba(0,0,0,0.65), transparent)' }} />
+                <div className="absolute bottom-2 left-2 flex gap-1 z-10">
+                  <motion.button
+                    whileTap={{ scale: 0.93 }}
+                    onClick={(e) => { e.stopPropagation(); onEdit(index); }}
+                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-lg"
+                    style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.18)', color: 'rgba(255,255,255,0.90)' }}
+                  >
+                    <Pencil className="w-2.5 h-2.5" strokeWidth={2} />
+                    Edit
+                  </motion.button>
+                  <motion.button
+                    whileTap={{ scale: 0.93 }}
+                    onClick={(e) => { e.stopPropagation(); onTrim(index); }}
+                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-lg"
+                    style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.18)', color: 'rgba(255,255,255,0.90)' }}
+                  >
+                    <Scissors className="w-2.5 h-2.5" strokeWidth={2} />
+                    Trim
+                  </motion.button>
+                  <motion.button
+                    whileTap={{ scale: 0.93 }}
+                    onClick={(e) => { e.stopPropagation(); onCover(index); }}
+                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-lg"
+                    style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.18)', color: 'rgba(255,255,255,0.90)' }}
+                  >
+                    <ImageIcon className="w-2.5 h-2.5" strokeWidth={2} />
+                    Cover
+                  </motion.button>
+                </div>
+              </>
             )}
           </>
         )}
