@@ -36,7 +36,7 @@ export function PosterPicker({ item, onPosterChange, darkMode }: PosterPickerPro
     const generatedFrames: string[] = [];
     let frameIndex = 0;
     const captureNext = () => {
-      if (frameIndex >= timestamps.length || !ctx) { setFrames(generatedFrames); setIsGenerating(false); URL.revokeObjectURL(video.src); return; }
+      if (frameIndex >= timestamps.length || !ctx) { setFrames(generatedFrames); setIsGenerating(false); return; }
       video.currentTime = timestamps[frameIndex];
     };
     video.onseeked = () => {
@@ -48,7 +48,12 @@ export function PosterPicker({ item, onPosterChange, darkMode }: PosterPickerPro
     };
     video.onloadeddata = () => captureNext();
     video.onerror = () => setIsGenerating(false);
-    return () => { video.src = ''; };
+    return () => {
+      video.onloadeddata = null;
+      video.onseeked = null;
+      video.onerror = null;
+      video.src = '';
+    };
   }, [item.previewUrl, duration]);
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
