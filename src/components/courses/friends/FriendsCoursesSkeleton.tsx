@@ -41,7 +41,7 @@ const FriendsCoursesSkeleton: React.FC = () => {
           <div className="text-center relative">
             <Skeleton className="h-3 w-16 mx-auto mb-2" />
             <Skeleton className="h-6 w-10 mx-auto" />
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-slate-200/60" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-px bg-border/60" />
           </div>
           <div className="text-center">
             <Skeleton className="h-3 w-20 mx-auto mb-2" />
