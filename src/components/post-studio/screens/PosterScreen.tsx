@@ -38,8 +38,8 @@ export function PosterScreen() {
         title="Cover"
         step="POSTER"
         darkMode
-        leftAction={{ label: 'Cancel', onClick: () => setStep('COMPOSER') }}
-        rightAction={{ label: 'Done', onClick: () => setStep('COMPOSER'), variant: 'primary' }}
+        leftAction={{ label: 'Cancel', onClick: () => setStep('COMPOSE') }}
+        rightAction={{ label: 'Done', onClick: () => setStep('COMPOSE'), variant: 'primary' }}
       />
 
       {/* Video preview */}

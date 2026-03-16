@@ -19,7 +19,7 @@ export function DraftsPanel() {
       actorType: (draft.actorType as 'personal' | 'business') ?? 'personal',
       actorId: draft.actorId ?? null,
       visibility: (draft.visibility as PostStudioState['visibility']) ?? 'anyone',
-      step: 'COMPOSER',
+      step: 'COMPOSE',
     };
     if (draft.courseId) {
       partialState.taggedCourses = [{
