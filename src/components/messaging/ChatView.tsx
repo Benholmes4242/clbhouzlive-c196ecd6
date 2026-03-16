@@ -631,8 +631,8 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           {showScrollToBottom && (
             <button
               onClick={scrollToBottom}
-              className="fixed bottom-28 right-4 w-9 h-9 rounded-full flex items-center justify-center z-20 active:scale-[0.97] transition-transform border border-border"
-              style={{ background: 'hsl(var(--background) / 0.9)' }}
+              className="fixed bottom-28 w-9 h-9 rounded-full flex items-center justify-center z-20 active:scale-[0.97] transition-transform border border-border"
+              style={{ right: 'calc(max(16px, (100vw - 480px) / 2 + 16px))', background: 'hsl(var(--background) / 0.9)' }}
             >
               <ChevronDown className="w-[18px] h-[18px] text-foreground/60" />
               {unreadBelowCount > 0 && (
