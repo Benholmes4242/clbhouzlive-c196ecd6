@@ -23,10 +23,7 @@ export function LeaderboardHeroSkeleton() {
 
 export function LeaderboardStatusSkeleton() {
   return (
-    <div className={cn(
-      "mx-4 p-4 rounded-xl border border-border/60 bg-card shadow-sm",
-      shimmerClass
-    )}>
+    <div className="mx-4 p-4 rounded-xl border border-border/60 bg-card shadow-sm">
       <div className="flex items-center gap-4">
         {/* Avatar */}
         <Skeleton className="h-16 w-16 rounded-full" />
