@@ -6,6 +6,7 @@ import { useFollow } from '@/hooks/useFollow';
 import { useUserProfilePosts } from '@/hooks/useUserProfilePosts';
 // REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ImageWithFallback } from '@/components/common/ImageWithFallback';
 import { SheetPlaybackProvider, useSheetPlayback } from './SheetPlaybackContext';
 import { VideoThumbPlayer } from './VideoThumbPlayer';
