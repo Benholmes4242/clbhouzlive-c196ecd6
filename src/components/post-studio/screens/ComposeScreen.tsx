@@ -435,10 +435,18 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   }, [activeItem, updateMediaEdits]);
 
   const handleEdit = useCallback((index: number) => {
+    const item = state.mediaItems[index];
+    if (!item) return;
     setActiveMedia(index);
-    setActiveTool(null);
-    setShelfOpen(true);
-  }, [setActiveMedia]);
+    if (item.mediaType === 'video') {
+      // Video: open intermediate tool picker
+      setVideoToolSheetIndex(index);
+    } else {
+      // Image: go straight into StudioShelf
+      setActiveTool(null);
+      setShelfOpen(true);
+    }
+  }, [state.mediaItems, setActiveMedia]);
 
   const handleTrim = useCallback((index: number) => {
     setActiveMedia(index);
