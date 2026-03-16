@@ -113,10 +113,22 @@ export function PosterPicker({ item, onPosterChange, darkMode }: PosterPickerPro
         </div>
 
         <div
-          className="absolute top-0 bottom-0 w-[3px] bg-primary z-10 pointer-events-none shadow-[0_0_8px_rgba(245,158,11,0.6)]"
-          style={{ left: `${scrubPercent}%`, transform: 'translateX(-50%)' }}
+          className="absolute top-0 bottom-0 w-[2px] z-10 pointer-events-none"
+          style={{
+            left: `${scrubPercent}%`,
+            transform: 'translateX(-50%)',
+            background: 'linear-gradient(135deg, #F59E0B 0%, #C7870A 100%)',
+            boxShadow: '0 0 6px rgba(200,135,10,0.50)',
+          }}
         >
-          <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-primary border-2 border-primary-foreground shadow" />
+          <div
+            className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full"
+            style={{
+              background: 'linear-gradient(135deg, #F59E0B 0%, #C7870A 100%)',
+              boxShadow: '0 2px 8px rgba(200,135,10,0.60)',
+              border: '2px solid rgba(0,0,0,0.40)',
+            }}
+          />
         </div>
       </div>
 
