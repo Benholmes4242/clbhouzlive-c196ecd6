@@ -156,6 +156,7 @@ export function createInitialState(overrides?: Partial<PostStudioState>): PostSt
     isDirty: false,
     isDiscarding: false,
     activePanelId: null,
+    mentionTriggerIndex: -1,
     ...overrides,
   };
 }
