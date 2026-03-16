@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { StudioMediaItem } from '../types';
 
 const VIDEO_ASPECT = 16 / 9;
-const IMAGE_MAX_ASPECT = 1.3;
+const MAX_ASPECT = 4 / 5; // cap at 4:5 — no taller than this for any media
 
 interface MediaPreviewProps {
   item: StudioMediaItem;
