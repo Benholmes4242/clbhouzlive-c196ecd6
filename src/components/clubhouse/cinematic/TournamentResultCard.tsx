@@ -441,7 +441,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
                         border: '2px solid rgba(0,0,0,0.95)',
                         overflow: 'hidden',
                       }}>
-                        <RowAvatar src={resolvePhoto(p.name, p.photoUrl)} name={p.name} size={30} />
+                        <RowAvatar src={resolvePhoto(p.name, p.photoUrl)} name={p.name} size={34} />
                       </div>
                     ))}
                     {row.players.length > 4 && (
