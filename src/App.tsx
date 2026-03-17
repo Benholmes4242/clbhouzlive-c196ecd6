@@ -95,6 +95,7 @@ import { useModalContext } from '@/contexts/ModalContext';
 const Auth = lazy(() => import("./pages/Auth"));
 const AuthCallback = lazy(() => import("./pages/auth/AuthCallback"));
 const VerifiedPage = lazy(() => import("./pages/auth/VerifiedPage"));
+const ResetPasswordPage = lazy(() => import("./pages/auth/ResetPasswordPage"));
 const Signup = lazy(() => import("./pages/Signup"));
 const Clubhouse = lazy(() => import("./pages/Clubhouse"));
 const WatchPage = lazy(() => import("./pages/WatchPage"));
