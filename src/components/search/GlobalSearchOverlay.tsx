@@ -407,7 +407,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                             onClick={() => selectPerson(person)}
                             className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-muted/50"
                           >
-                            <div className="w-10 h-10 rounded-full bg-muted overflow-hidden shrink-0">
+                            <div className="w-10 h-10 clbhouz-squircle bg-muted overflow-hidden shrink-0 relative">
                               {person.avatar_url && (
                                 <img src={person.avatar_url} alt="" className="w-full h-full object-cover" />
                               )}
