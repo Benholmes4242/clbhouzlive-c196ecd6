@@ -123,7 +123,7 @@ export default function StudioPanelText({
       <div className="px-3 pt-2 pb-1.5 flex items-center gap-2">
         <Layers className="w-3.5 h-3.5" style={{ color: 'rgba(255,255,255,0.45)' }} />
         <span className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: 'rgba(255,255,255,0.45)' }}>Layers</span>
-        <span className="text-[11px] ml-auto" style={{ color: '#E8980A' }}>{textBoxes.length}</span>
+        <span className="text-[11px] ml-auto" style={{ color: 'rgba(255,255,255,0.70)' }}>{textBoxes.length}</span>
       </div>
       
       {/* Text boxes list OR empty state */}
@@ -134,8 +134,8 @@ export default function StudioPanelText({
             className="w-full py-6 rounded-xl transition-colors flex flex-col items-center justify-center gap-2"
             style={{ background: 'rgba(255,255,255,0.04)' }}
           >
-            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(232,152,10,0.15)' }}>
-              <Type className="w-5 h-5" style={{ color: '#E8980A' }} />
+            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.10)' }}>
+              <Type className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.80)' }} />
             </div>
             <span className="text-sm font-medium text-white">Tap to add text overlay</span>
             <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.45)' }}>Add captions, titles, or labels</span>
@@ -160,8 +160,8 @@ export default function StudioPanelText({
                     }}
                     className="w-full px-2 py-1.5 rounded-md text-left transition-colors cursor-pointer"
                     style={{
-                      border: isSelected ? '1px solid rgba(232,152,10,0.4)' : '1px solid rgba(255,255,255,0.08)',
-                      background: isSelected ? 'rgba(232,152,10,0.08)' : 'transparent',
+                      border: isSelected ? '1px solid rgba(255,255,255,0.30)' : '1px solid rgba(255,255,255,0.08)',
+                      background: isSelected ? 'rgba(255,255,255,0.06)' : 'transparent',
                     }}
                   >
                     <div className="flex items-center justify-between gap-1.5">
@@ -205,7 +205,7 @@ export default function StudioPanelText({
                         style={{
                           background: 'rgba(255,255,255,0.06)',
                           border: '1px solid rgba(255,255,255,0.12)',
-                          caretColor: '#E8980A',
+                          caretColor: '#FFFFFF',
                         }}
                       />
 
@@ -224,7 +224,7 @@ export default function StudioPanelText({
                               onClick={() => updateBox(selected.id, { style: preset.id })}
                               className="flex-shrink-0 flex flex-col items-center gap-0.5 px-2.5 py-2 rounded-xl transition-all min-w-[52px]"
                               style={selected.style === preset.id ? {
-                                background: '#E8980A',
+                                background: 'rgba(255,255,255,0.90)',
                                 color: '#FFFFFF',
                               } : {
                                 background: 'rgba(255,255,255,0.08)',
@@ -300,7 +300,7 @@ export default function StudioPanelText({
             <button
               onClick={addTextBox}
               className="w-full py-1.5 mt-0.5 rounded-md transition-colors flex items-center justify-center gap-1 text-[11px]"
-              style={{ color: '#E8980A' }}
+              style={{ color: '#FFFFFF' }}
             >
               <Plus className="w-3 h-3" />
               <span className="font-medium">Add another</span>

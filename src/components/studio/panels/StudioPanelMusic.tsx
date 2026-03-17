@@ -98,8 +98,8 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
         <div className="flex items-center gap-1.5 min-w-0">
           {selectedTrack ? (
             <>
-              <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#E8980A' }} />
-              <span className="text-[11px] font-medium truncate" style={{ color: '#E8980A' }}>
+              <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: 'rgba(255,255,255,0.70)' }} />
+              <span className="text-[11px] font-medium truncate" style={{ color: 'rgba(255,255,255,0.70)' }}>
                 {MUSIC_LIBRARY.find(t => t.id === selectedTrack)?.title || 'Music enabled'}
               </span>
             </>
@@ -129,7 +129,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
         <div className="relative">
           <Search
             className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 transition-colors"
-            style={{ color: searchFocused ? '#E8980A' : 'rgba(255,255,255,0.45)' }}
+            style={{ color: searchFocused ? 'rgba(255,255,255,0.90)' : 'rgba(255,255,255,0.45)' }}
           />
           <input
             type="text"
@@ -141,9 +141,9 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
             className="w-full pl-8 pr-3 py-1.5 rounded-lg text-sm focus:outline-none text-white"
             style={{
               background: 'rgba(255,255,255,0.06)',
-              border: searchFocused ? '1.5px solid #E8980A' : '1.5px solid rgba(255,255,255,0.08)',
-              caretColor: '#E8980A',
-              boxShadow: searchFocused ? '0 0 0 3px rgba(232,152,10,0.1)' : undefined,
+              border: searchFocused ? '1.5px solid rgba(255,255,255,0.40)' : '1.5px solid rgba(255,255,255,0.08)',
+              caretColor: '#FFFFFF',
+              boxShadow: searchFocused ? '0 0 0 3px rgba(255,255,255,0.06)' : undefined,
               // @ts-ignore
               '--placeholder-color': 'rgba(255,255,255,0.45)',
             }}
@@ -159,7 +159,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
             onClick={() => setActiveMood(mood.key)}
             className="px-2.5 py-1 rounded-md text-[12px] font-medium whitespace-nowrap transition-colors"
             style={activeMood === mood.key ? {
-              background: '#E8980A',
+               background: 'rgba(255,255,255,0.90)',
               color: '#FFFFFF',
             } : {
               background: 'rgba(255,255,255,0.08)',
@@ -192,8 +192,8 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
                   className="px-3 py-2 flex items-center gap-2.5 transition-colors cursor-pointer"
                   style={{
                     borderBottom: '1px solid rgba(255,255,255,0.06)',
-                    background: isSelected ? 'rgba(232,152,10,0.08)' : undefined,
-                    borderLeft: isSelected ? '2px solid #E8980A' : '2px solid transparent',
+                    background: isSelected ? 'rgba(255,255,255,0.06)' : undefined,
+                    borderLeft: isSelected ? '2px solid rgba(255,255,255,0.90)' : '2px solid transparent',
                   }}
                   onClick={() => handleSelectTrack(track)}
                 >
@@ -205,7 +205,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
                     }}
                     className="w-10 h-10 rounded-full flex items-center justify-center transition-all flex-shrink-0 active:scale-90"
                     style={isPlaying ? {
-                      background: '#E8980A',
+                      background: 'rgba(255,255,255,0.90)',
                       color: '#FFFFFF',
                     } : {
                       background: 'rgba(255,255,255,0.08)',
@@ -215,7 +215,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
                     {isPlaying ? (
                       <Pause className="w-3.5 h-3.5" />
                     ) : (
-                      <Play className="w-3.5 h-3.5 ml-0.5" style={{ color: '#E8980A' }} />
+                      <Play className="w-3.5 h-3.5 ml-0.5" style={{ color: 'rgba(255,255,255,0.90)' }} />
                     )}
                   </button>
 
@@ -236,7 +236,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
 
                   {/* Selected indicator */}
                   {isSelected && (
-                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#E8980A' }} />
+                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: 'rgba(255,255,255,0.90)' }} />
                   )}
                 </div>
               );

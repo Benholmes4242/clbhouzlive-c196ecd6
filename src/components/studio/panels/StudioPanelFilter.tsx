@@ -67,8 +67,8 @@ const FilterCard = memo(function FilterCard({
       onPointerCancel={handlePointerUp}
       className="rounded-xl overflow-hidden transition-all duration-150 active:scale-[0.98] snap-start"
       style={{
-        border: isSelected ? '2.5px solid #E8980A' : '1px solid rgba(255,255,255,0.1)',
-        boxShadow: isSelected ? '0 0 0 1px rgba(232,152,10,0.3)' : undefined,
+        border: isSelected ? '2.5px solid rgba(255,255,255,0.90)' : '1px solid rgba(255,255,255,0.1)',
+        boxShadow: isSelected ? '0 0 0 1px rgba(255,255,255,0.2)' : undefined,
       }}
     >
       <div className="aspect-square relative" style={{ background: '#2A2A2A' }}>
@@ -89,7 +89,7 @@ const FilterCard = memo(function FilterCard({
         <div
           className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full flex items-center justify-center shadow-sm transition-all duration-150"
           style={{
-            background: '#E8980A',
+            background: 'rgba(255,255,255,0.90)',
             opacity: isSelected ? 1 : 0,
             transform: isSelected ? 'scale(1)' : 'scale(0.75)',
           }}
@@ -109,7 +109,7 @@ const FilterCard = memo(function FilterCard({
       <div className="py-1.5 px-1 text-center" style={{ background: 'rgba(10,10,10,0.98)' }}>
         <span
           className="text-[11px] font-medium block truncate"
-          style={{ color: isSelected ? '#E8980A' : 'rgba(255,255,255,0.45)' }}
+          style={{ color: isSelected ? '#FFFFFF' : 'rgba(255,255,255,0.45)' }}
         >
           {filter.label}
         </span>
@@ -151,7 +151,7 @@ export default function StudioPanelFilter({
         <span className="text-sm font-semibold text-white">Filters</span>
         <div className="flex items-center gap-2">
           <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
-            Selected: <span style={{ color: '#E8980A' }}>{selectedLabel}</span>
+            Selected: <span style={{ color: '#FFFFFF' }}>{selectedLabel}</span>
           </span>
           <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.45)' }}>Hold to compare</span>
         </div>

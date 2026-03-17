@@ -417,7 +417,7 @@ export default function StudioShelf({
                           className="w-10 h-10 rounded-full flex items-center justify-center"
                           style={{ background: 'rgba(255,255,255,0.07)' }}
                         >
-                          <Sparkles className="w-5 h-5" style={{ color: '#E8980A' }} />
+                          <Sparkles className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.80)' }} />
                         </div>
                       </motion.div>
                       <p className="text-sm font-semibold text-white">

@@ -99,7 +99,7 @@ export default function StudioPanelEdit({ edits, updateEdits, mediaType, mediaUr
                 onClick={() => handleCropRatio(ratio)}
                 className="py-1.5 px-2 rounded-md text-xs font-medium transition-colors"
                 style={cropRatio === ratio ? {
-                  background: '#E8980A',
+                  background: 'rgba(255,255,255,0.90)',
                   color: '#FFFFFF',
                 } : {
                   background: 'rgba(255,255,255,0.08)',
@@ -146,7 +146,7 @@ export default function StudioPanelEdit({ edits, updateEdits, mediaType, mediaUr
               onClick={handleRotate}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors"
               style={rotation > 0 ? {
-                background: '#E8980A',
+                background: 'rgba(255,255,255,0.90)',
                 color: '#FFFFFF',
                 border: '1px solid transparent',
               } : {
@@ -165,7 +165,7 @@ export default function StudioPanelEdit({ edits, updateEdits, mediaType, mediaUr
               onClick={handleFlipH}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors"
               style={flipH ? {
-                background: '#E8980A',
+                background: 'rgba(255,255,255,0.90)',
                 color: '#FFFFFF',
                 border: '1px solid transparent',
               } : {
@@ -181,7 +181,7 @@ export default function StudioPanelEdit({ edits, updateEdits, mediaType, mediaUr
               onClick={handleFlipV}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors"
               style={flipV ? {
-                background: '#E8980A',
+                background: 'rgba(255,255,255,0.90)',
                 color: '#FFFFFF',
                 border: '1px solid transparent',
               } : {
