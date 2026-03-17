@@ -525,7 +525,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
 
                     {/* Name or tie label */}
                     {isTie ? (
-                      <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.35)', flex: 1 }}>
+                      <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.35)', flex: 1 }}>
                         {tiedEntries.length}-way tie
                       </span>
                     ) : (
