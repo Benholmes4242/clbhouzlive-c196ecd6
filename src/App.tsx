@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect, useMemo } from "react";
+import React, { Suspense, lazy, useEffect, useLayoutEffect, useMemo } from "react";
 import { MessagingProvider } from '@/contexts/MessagingContext';
 
 import { Toaster as Sonner } from "@/components/ui/sonner";
