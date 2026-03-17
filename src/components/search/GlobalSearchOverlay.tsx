@@ -451,7 +451,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                             onClick={() => selectBusiness(business)}
                             className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-muted/50"
                           >
-                            <div className="w-10 h-10 rounded-xl bg-muted overflow-hidden shrink-0 flex items-center justify-center">
+                            <div className="w-10 h-10 clbhouz-squircle bg-muted overflow-hidden shrink-0 relative flex items-center justify-center">
                               {business.logo_url
                                 ? <img src={business.logo_url} alt="" className="w-full h-full object-cover" />
                                 : <Briefcase className="w-5 h-5 text-muted-foreground" />
