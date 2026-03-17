@@ -98,8 +98,8 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
         <div className="flex items-center gap-1.5 min-w-0">
           {selectedTrack ? (
             <>
-              <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#E8980A' }} />
-              <span className="text-[11px] font-medium truncate" style={{ color: '#E8980A' }}>
+              <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: 'rgba(255,255,255,0.70)' }} />
+              <span className="text-[11px] font-medium truncate" style={{ color: 'rgba(255,255,255,0.70)' }}>
                 {MUSIC_LIBRARY.find(t => t.id === selectedTrack)?.title || 'Music enabled'}
               </span>
             </>
