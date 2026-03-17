@@ -75,7 +75,7 @@ export function PublishScreen() {
     }
   }, [state, setStep, onSuccess, isPublishing]);
 
-  const firstItem = state.mediaItems[0];
+  const firstItem = state.mediaItems[state.activeMediaIndex] ?? state.mediaItems[0];
   const itemCount = state.mediaItems.length;
   const hasCaption = state.caption.trim().length > 0;
 
