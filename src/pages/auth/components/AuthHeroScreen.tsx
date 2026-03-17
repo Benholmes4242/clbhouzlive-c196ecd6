@@ -152,7 +152,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
           
           {/* Logo - larger for more presence */}
           <img
-            src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
+            src="/images/clbhouz-logo.png"
             alt="clbhouz"
             className="h-[90px] md:h-[100px] w-auto relative z-10"
           />
