@@ -371,19 +371,23 @@ function MediaGrid({
         style={{ borderRadius: borderRadius ?? 14, ...style }}
         onClick={() => onSelect(index)}
       >
-        <img
-          src={item.thumbnailUrl || item.previewUrl}
-          alt=""
-          className="w-full h-full object-cover"
-        />
-
-        {/* Video play indicator */}
-        {item.mediaType === 'video' && !isOverflowTile && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(8px)' }}>
-              <Play className="w-4 h-4 text-white ml-0.5" fill="white" strokeWidth={0} />
-            </div>
-          </div>
+        {item.mediaType === 'video' ? (
+          <video
+            src={item.previewUrl}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            className="w-full h-full object-cover"
+            style={{ pointerEvents: 'none' }}
+          />
+        ) : (
+          <img
+            src={item.thumbnailUrl || item.previewUrl}
+            alt=""
+            className="w-full h-full object-cover"
+          />
         )}
 
         {/* Overflow count */}
