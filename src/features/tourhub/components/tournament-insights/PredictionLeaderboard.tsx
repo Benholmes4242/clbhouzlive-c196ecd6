@@ -64,7 +64,7 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
               className="text-muted-foreground uppercase"
               style={{ fontSize: 13, fontWeight: 600, letterSpacing: '0.05em' }}
             >
-              OUR PICKS · LIVE POSITIONS
+              TOURNAMENT PICKS · LIVE POSITIONS
             </span>
             <span
               className="text-muted-foreground uppercase"
