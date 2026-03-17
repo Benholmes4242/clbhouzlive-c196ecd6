@@ -48,19 +48,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
       exit={{ opacity: 0 }}
       transition={{ duration: 0.4 }}
     >
-      {/* Burger menu */}
-      <button 
-        className="fixed z-20 flex items-center justify-center"
-        style={{ top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: '16px', width: '44px', height: '44px' }}
-        onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
-        aria-label="Open tour menu"
-      >
-        <Menu 
-          className="w-[24px] h-[24px]" 
-          strokeWidth={1.5}
-          style={{ color: 'hsl(var(--foreground))', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.15))' }}
-        />
-      </button>
+      {/* Burger menu moved to TourHubShell */}
 
       <Link
         to={`/tourhub/player/${player.id}`}

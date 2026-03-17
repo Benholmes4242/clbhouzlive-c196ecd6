@@ -138,18 +138,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
           }}
         />
 
-        {/* Burger menu — standard Tour Hub position */}
-        <button
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
-          aria-label="Open tour menu"
-          className="fixed z-30 flex items-center justify-center"
-          style={{ width: 44, height: 44, top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)', left: 16 }}
-        >
-          <Menu
-            className="w-[24px] h-[24px] text-white"
-            style={{ strokeWidth: 1.5, filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.7)) drop-shadow(0 0px 8px rgba(0,0,0,0.3))' }}
-          />
-        </button>
+        {/* Burger menu moved to TourHubShell */}
 
         {/* Content overlay - bottom aligned */}
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">

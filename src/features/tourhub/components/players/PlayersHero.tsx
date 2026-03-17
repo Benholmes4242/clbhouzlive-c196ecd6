@@ -339,24 +339,7 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
 
   return (
     <div className="relative">
-      {/* Burger menu */}
-      <button 
-        className="fixed z-20 flex items-center justify-center"
-        style={{
-          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
-          left: '16px',
-          width: '44px',
-          height: '44px',
-        }}
-        onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
-        aria-label="Open tour menu"
-      >
-        <Menu 
-          className="w-6 h-6" 
-          strokeWidth={1.5}
-          style={{ color: 'hsl(var(--foreground))', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.15))' }}
-        />
-      </button>
+      {/* Burger menu moved to TourHubShell */}
       <AnimatePresence mode="wait">
         <motion.div
           key={champion.playerId}

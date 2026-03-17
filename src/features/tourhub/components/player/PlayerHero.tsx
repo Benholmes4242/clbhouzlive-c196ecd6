@@ -58,19 +58,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
         }}
       />
 
-      {/* Burger menu — standard Tour Hub position */}
-      <button
-        onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
-        aria-label="Open tour menu"
-        className="fixed z-30 flex items-center justify-center"
-        style={{ width: 44, height: 44, top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)', left: 16 }}
-      >
-        <Menu
-          className="w-[24px] h-[24px]"
-          strokeWidth={1.5}
-          style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }}
-        />
-      </button>
+      {/* Burger menu moved to TourHubShell */}
 
       {/* Overlay Content — bottom of hero */}
       <motion.div

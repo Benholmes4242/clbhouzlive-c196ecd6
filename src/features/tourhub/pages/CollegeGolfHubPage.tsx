@@ -129,19 +129,7 @@ export function CollegeGolfHubPage() {
           />
         ) : null}
 
-        {/* Burger menu — AFTER hero in DOM so it paints on top of hero's stacking context */}
-        <button
-          className="fixed z-20 flex items-center justify-center"
-          style={{ top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: '16px', width: '44px', height: '44px' }}
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
-          aria-label="Open tour menu"
-        >
-          <Menu
-            className="w-6 h-6"
-            strokeWidth={1.5}
-            style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5))' }}
-          />
-        </button>
+        {/* Burger menu moved to TourHubShell */}
 
         {/* Alumni Face Strip — overlaps hero */}
         {heroAlumni && heroAlumni.length > 0 && topCollege && (
