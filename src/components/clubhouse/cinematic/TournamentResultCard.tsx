@@ -425,7 +425,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
                 animationDelay: `${0.65 + idx * 0.08}s`,
               }}>
                 <span style={{
-                  width: 26, textAlign: 'center' as const, fontSize: 13, fontWeight: 600,
+                  width: 28, textAlign: 'center' as const, fontSize: 14, fontWeight: 600,
                   color: 'rgba(255,255,255,0.45)',
                 }}>
                   {row.isTied ? `T${row.position}` : row.position}
