@@ -44,63 +44,47 @@ function getRandomPlaceholder(): string {
 async function generatePoster(file: File): Promise<string> {
   return new Promise((resolve) => {
     const video = document.createElement('video');
-    video.preload = 'metadata';
+    video.preload = 'auto';
     video.muted = true;
     video.playsInline = true;
-    video.crossOrigin = 'anonymous';
+    // DO NOT set crossOrigin — on iOS WKWebView, crossOrigin on blob URLs
+    // causes silent failure or zero-dimension decode → black thumbnail
 
     const url = URL.createObjectURL(file);
     let settled = false;
 
     const capture = () => {
       if (settled) return;
+      // Guard: if dimensions are zero, the frame hasn't decoded yet — don't capture
+      if (video.videoWidth === 0 || video.videoHeight === 0) return;
       settled = true;
+      clearTimeout(timeout);
       try {
         const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth || 320;
-        canvas.height = video.videoHeight || 240;
-        canvas.getContext('2d')?.drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        if (ctx) ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         URL.revokeObjectURL(url);
-        resolve(canvas.toDataURL('image/jpeg', 0.7));
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        resolve(dataUrl.length > 100 ? dataUrl : '');
       } catch {
         URL.revokeObjectURL(url);
         resolve('');
       }
     };
 
-    // Safety timeout — if nothing fires within 8 seconds, give up gracefully
     const timeout = setTimeout(() => {
-      if (!settled) {
-        settled = true;
-        URL.revokeObjectURL(url);
-        resolve('');
-      }
-    }, 8000);
+      if (!settled) { settled = true; URL.revokeObjectURL(url); resolve(''); }
+    }, 10000);
 
-    video.onloadedmetadata = () => {
-      video.currentTime = 0.1;
-    };
-
-    video.onseeked = () => {
-      clearTimeout(timeout);
-      capture();
-    };
-
-    // iOS fallback: if onseeked never fires after seek, capture on timeupdate
-    video.ontimeupdate = () => {
-      if (video.currentTime > 0) {
-        clearTimeout(timeout);
-        capture();
-      }
-    };
-
+    video.onloadedmetadata = () => { video.currentTime = 0.5; };
+    video.onseeked = () => { capture(); };
+    video.ontimeupdate = () => { if (video.currentTime > 0) capture(); };
+    video.onloadeddata = () => { if (video.readyState >= 2) capture(); };
     video.onerror = () => {
       clearTimeout(timeout);
-      if (!settled) {
-        settled = true;
-        URL.revokeObjectURL(url);
-        resolve('');
-      }
+      if (!settled) { settled = true; URL.revokeObjectURL(url); resolve(''); }
     };
 
     video.src = url;
