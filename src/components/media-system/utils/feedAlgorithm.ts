@@ -81,13 +81,15 @@ export function injectLiveTournamentCards(
     return !liveTourSlugs.includes(meta.tour_slug);
   });
 
-  // Step 2 — don't re-inject if already present
-  const existingLiveIds = new Set(
-    filtered.filter(p => p.postType === 'tournament_live').map(p => p.id)
-  );
-  const newLivePosts = livePosts.filter(p => !existingLiveIds.has(p.id));
+  // Step 2 — evict from the RPC feed any post whose ID matches a live card,
+  // so the tournament_live version (correct postType + liveMeta) always wins.
+  // The old guard only checked postType === 'tournament_live' which missed the
+  // plain-post version returned by get_suggested_feed for the same UUID.
+  const livePostIds = new Set(livePosts.map(p => p.id));
+  const filteredForMerge = filtered.filter(p => !livePostIds.has(p.id));
+  const newLivePosts = livePosts;
 
-  if (!newLivePosts.length) return filtered;
+  if (!newLivePosts.length) return filteredForMerge;
 
   // Step 3 — build regular and tournament arrays from filtered posts
   const BLOCK_SIZE        = 10;
@@ -96,7 +98,7 @@ export function injectLiveTournamentCards(
   const regular: FeedPost[]    = [];
   const tournament: FeedPost[] = [];
 
-  for (const post of filtered) {
+  for (const post of filteredForMerge) {
     if (post.postType === 'tournament_result' || post.postType === 'tournament_live') {
       tournament.push(post);
     } else {
