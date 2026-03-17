@@ -148,7 +148,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         data-chrome="header"
         className={cn(
           "compact-header clubhouse-header",
-          "fixed left-1/2 -translate-x-1/2 w-full max-w-[480px] z-header",
+          "fixed inset-x-0 mx-auto w-full max-w-[480px] z-header",
           className
         )}
         style={{
