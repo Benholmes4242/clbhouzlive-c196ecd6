@@ -142,7 +142,7 @@ export function TournamentHero({ tournament, imageUrl }: TournamentHeroProps) {
         <button
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
           aria-label="Open tour menu"
-          className="fixed z-30 flex items-center justify-center"
+          className="absolute z-30 flex items-center justify-center"
           style={{ width: 44, height: 44, top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)', left: 16 }}
         >
           <Menu

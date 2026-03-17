@@ -90,7 +90,7 @@ function AllToursShowcase({ players }: { players: ElitePlayer[] }) {
     <div className="relative">
       {/* Burger menu */}
       <button
-        className="fixed z-20 flex items-center justify-center"
+        className="absolute z-20 flex items-center justify-center"
         style={{ top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: '16px', width: '44px', height: '44px' }}
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
         aria-label="Open tour menu"
@@ -353,7 +353,7 @@ export function PlayersHero({ players, activeTour, statsMap, sort = 'world-rank-
     <div className="relative">
       {/* Burger menu */}
       <button 
-        className="fixed z-20 flex items-center justify-center"
+        className="absolute z-20 flex items-center justify-center"
         style={{
           top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
           left: '16px',
