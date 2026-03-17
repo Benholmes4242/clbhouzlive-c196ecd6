@@ -589,19 +589,55 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     [state.mediaItems.length, addMedia]
   );
 
-  // Caption change — detect @ for mention trigger
+  // Caption change — detect @ for mention trigger + reindex mentions
   const handleCaptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
-    setCaption(val);
     const prev = state.caption;
+    const cursorPos = e.target.selectionStart ?? val.length;
+
+    // Detect @ trigger for mention panel
     if (val.length === prev.length + 1) {
-      const cursorPos = e.target.selectionStart! - 1;
-      if (val[cursorPos] === '@') {
-        setMentionTriggerIndex(cursorPos);
+      if (val[cursorPos - 1] === '@') {
+        setMentionTriggerIndex(cursorPos - 1);
         openPanel('mention');
       }
     }
-  }, [state.caption, setCaption, openPanel, setMentionTriggerIndex]);
+
+    // Update mention indices if text was inserted or deleted before any mention
+    if (state.mentions.length > 0 && val !== prev) {
+      let changeStart = 0;
+      while (
+        changeStart < prev.length &&
+        changeStart < val.length &&
+        prev[changeStart] === val[changeStart]
+      ) {
+        changeStart++;
+      }
+      const delta = val.length - prev.length;
+
+      const updatedMentions = state.mentions
+        .map(m => {
+          if (changeStart <= m.start) {
+            return { ...m, start: m.start + delta, end: m.end + delta };
+          }
+          if (changeStart < m.end) {
+            return null;
+          }
+          return m;
+        })
+        .filter((m): m is NonNullable<typeof m> => {
+          if (!m) return false;
+          if (m.start < 0 || m.end > val.length) return false;
+          const textAtPosition = val.slice(m.start, m.end);
+          const expectedText = `@${m.displayName}`;
+          return textAtPosition === expectedText;
+        });
+
+      setMentions(updatedMentions);
+    }
+
+    setCaption(val);
+  }, [state.caption, state.mentions, setCaption, setMentions, openPanel, setMentionTriggerIndex]);
 
   // Mention highlight layer
   const highlightedCaption = useMemo(() => {

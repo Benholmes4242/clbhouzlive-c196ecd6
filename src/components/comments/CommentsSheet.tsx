@@ -76,6 +76,7 @@ function CommentsSheet({
   initialCommentId,
   initialParentCommentId,
   caddiePickCommentId,
+  caption,
   isReview,
   onCommentPosted,
   onCommentDeleted,
@@ -568,6 +569,25 @@ function CommentsSheet({
                 </button>
               </div>
             </div>
+
+            {/* Post caption — shown above comments when present */}
+            {caption && caption.trim().length > 0 && (
+              <div className={cn(
+                'px-4 py-3 shrink-0 border-b',
+                isDark ? 'border-white/[0.06]' : 'border-border/50'
+              )}>
+                <MentionText
+                  text={caption}
+                  className={cn(
+                    'text-[14px] leading-[20px]',
+                    isDark ? 'text-white/70' : 'text-foreground/70'
+                  )}
+                  mentionClassName={cn(
+                    isDark ? 'text-white/90' : 'text-foreground'
+                  )}
+                />
+              </div>
+            )}
 
             {/* Scroll area */}
             <div
