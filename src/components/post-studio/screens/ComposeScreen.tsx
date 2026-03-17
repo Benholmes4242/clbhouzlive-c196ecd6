@@ -5,7 +5,7 @@
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  Camera, Layers, BookOpen, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon,
+  Camera, SwitchCamera, Layers, BookOpen, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -524,7 +524,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   } = usePostStudioContext();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const rearCameraInputRef = useRef<HTMLInputElement>(null);
+  const frontCameraInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const placeholderRef = useRef(getRandomPlaceholder());
   const [isProcessing, setIsProcessing] = useState(false);
@@ -585,7 +586,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       } finally {
         setIsProcessing(false);
         if (fileInputRef.current) fileInputRef.current.value = '';
-        if (cameraInputRef.current) cameraInputRef.current.value = '';
+        if (rearCameraInputRef.current) rearCameraInputRef.current.value = '';
+        if (frontCameraInputRef.current) frontCameraInputRef.current.value = '';
       }
     },
     [state.mediaItems.length, addMedia]
@@ -698,7 +700,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       />
 
       <input ref={fileInputRef} type="file" accept={acceptTypes} multiple onChange={handleFileSelect} className="hidden" />
-      <input ref={cameraInputRef} type="file" accept="image/*,video/*" capture="environment" onChange={handleFileSelect} className="hidden" />
+      <input ref={rearCameraInputRef} type="file" accept="image/*,video/*" capture="environment" onChange={handleFileSelect} className="hidden" />
+      <input ref={frontCameraInputRef} type="file" accept="image/*,video/*" capture="user" onChange={handleFileSelect} className="hidden" />
 
       {/* ── Scrollable compose area ── */}
       <div
@@ -890,22 +893,51 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           paddingBottom: '30px',
         }}
       >
-        {/* Camera — primary action, white circle */}
+        {/* Rear Camera */}
         <motion.button
           whileTap={{ scale: 0.92 }}
-          onClick={() => cameraInputRef.current?.click()}
+          onClick={() => rearCameraInputRef.current?.click()}
           disabled={isProcessing}
-          className="flex items-center justify-center disabled:opacity-40 mr-4 shrink-0"
-          style={{
-            width: 34, height: 34, borderRadius: '50%',
-            background: 'rgba(255,255,255,0.96)',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.30)',
-          }}
+          className="flex flex-col items-center justify-center disabled:opacity-40 shrink-0"
+          style={{ width: 34, height: 42 }}
         >
-          <Camera className="w-4 h-4 shrink-0" style={{ color: '#0D0D0D' }} strokeWidth={2} />
+          <div
+            className="flex items-center justify-center"
+            style={{
+              width: 34, height: 34, borderRadius: '50%',
+              background: 'rgba(255,255,255,0.96)',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.30)',
+            }}
+          >
+            <Camera className="w-4 h-4 shrink-0" style={{ color: '#0D0D0D' }} strokeWidth={2} />
+          </div>
+          <span className="text-[9px] mt-0.5 leading-none" style={{ color: 'rgba(255,255,255,0.40)' }}>Rear</span>
         </motion.button>
 
-        {/* Spacer between camera and gallery */}
+        <div className="w-2" />
+
+        {/* Front Camera */}
+        <motion.button
+          whileTap={{ scale: 0.92 }}
+          onClick={() => frontCameraInputRef.current?.click()}
+          disabled={isProcessing}
+          className="flex flex-col items-center justify-center disabled:opacity-40 shrink-0"
+          style={{ width: 34, height: 42 }}
+        >
+          <div
+            className="flex items-center justify-center"
+            style={{
+              width: 34, height: 34, borderRadius: '50%',
+              background: 'rgba(255,255,255,0.96)',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.30)',
+            }}
+          >
+            <SwitchCamera className="w-4 h-4 shrink-0" style={{ color: '#0D0D0D' }} strokeWidth={2} />
+          </div>
+          <span className="text-[9px] mt-0.5 leading-none" style={{ color: 'rgba(255,255,255,0.40)' }}>Front</span>
+        </motion.button>
+
+        {/* Spacer between cameras and gallery */}
         <div className="w-2" />
 
         {/* Gallery */}
