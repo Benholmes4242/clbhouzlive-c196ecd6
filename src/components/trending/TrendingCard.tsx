@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTrendingCard } from '@/hooks/useTrendingCard';
 import { useFullscreenVideoModal } from '@/hooks/useFullscreenVideoModal';
 import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
+import PostContentWithTags from '@/components/posts/PostContentWithTags';
 
 const TrendingCard = () => {
   const { trendingPosts, loading, nextSlide, prevSlide, currentIndex, totalPosts } = useTrendingCard();
