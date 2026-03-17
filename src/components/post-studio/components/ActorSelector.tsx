@@ -19,7 +19,7 @@ interface ActorSelectorProps {
   header?: boolean;
 }
 
-export function ActorSelector({ compact = false }: ActorSelectorProps) {
+export function ActorSelector({ compact = false, header = false }: ActorSelectorProps) {
   const { state, setActor } = usePostStudioContext();
   const [businesses, setBusinesses] = useState<BusinessAccount[]>([]);
   const [userAvatar, setUserAvatar] = useState<string | null>(null);
