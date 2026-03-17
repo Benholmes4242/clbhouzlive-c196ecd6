@@ -598,7 +598,7 @@ function CommentsSheet({
                     cleanCaption ? 'mt-1' : '',
                     isDark ? 'text-white' : 'text-foreground'
                   )}>
-                    {displayCourseName}
+                    📍 {displayCourseName}
                   </p>
                 )}
               </div>
