@@ -1146,12 +1146,12 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
       </button>
 
       <AnimatePresence mode="sync">
-        {slides.map((slide, index) => (
+        {safeSlides.map((slide, index) => (
           <HeroSlide
             key={slide.tournament.id}
             slide={slide}
             isActive={index === currentIndex}
-            totalSlides={slides.length}
+            totalSlides={safeSlides.length}
             currentIndex={currentIndex}
             onDotClick={setCurrentIndex}
             leadersWinnersMap={leadersWinnersMap}
