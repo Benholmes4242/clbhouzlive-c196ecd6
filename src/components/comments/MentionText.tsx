@@ -1,6 +1,7 @@
 /**
  * MentionText - Renders text with @mentions highlighted in amber.
- * Mentions are stored as slug-safe \w-only usernames (e.g. @danny_holmes).
+ * Supports both new PascalCase mentions (e.g. @AndrewYetzes) and
+ * legacy space-separated mentions (e.g. @Andrew Yetzes).
  * On tap: resolves entity_id via taggable_entities, navigates by entity_id (not raw username).
  */
 
@@ -24,11 +25,11 @@ interface TextPart {
 
 /**
  * Parse text into regular text and mention parts.
- * Regex matches slug-safe \w-only usernames (e.g. @danny_holmes).
+ * Matches @PascalCase (new) and @First Last (legacy space-separated) mentions.
  */
 function parseTextWithMentions(text: string): TextPart[] {
   const parts: TextPart[] = [];
-  const mentionRegex = /@(\w+)/g;
+  const mentionRegex = /@([\w]+(?:\s[\w]+)*)/g;
   let lastIndex = 0;
   let match;
 
