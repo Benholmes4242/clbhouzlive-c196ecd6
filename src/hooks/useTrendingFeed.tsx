@@ -54,8 +54,21 @@ export const useTrendingFeed = () => {
           user_id,
           actor_type,
           badges,
-          post_media!inner(id, media_type, media_url, filter_id, studio_edits)
-        `)
+          post_media!inner(id, media_type, media_url, filter_id, studio_edits),
+          post_tags(
+            id,
+            post_id,
+            tagged_entity_id,
+            start_index,
+            end_index,
+            taggable_entities(
+              id,
+              entity_type,
+              entity_id,
+              name,
+              username
+            )
+          )
         .in('user_id', allConnectedUserIds)
         .or('actor_type.eq.personal,actor_type.is.null') // Exclude business posts
         .or(visibilityFilter) // Apply visibility filter
