@@ -42,7 +42,7 @@ function ExploreHeaderInner({
       </div>
 
       {/* Region chips */}
-      <div role="tablist" aria-label="Filter by region" className="flex gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide">
+      <div role="tablist" aria-label="Filter by region" className="flex justify-center gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide">
         {regions.map((region) => {
           const isActive = activeRegion === region.slug;
           return (
