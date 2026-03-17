@@ -2,6 +2,7 @@
 // Single profile: avatar only. Multiple profiles: avatar + chevron, taps to switch.
 
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronUp, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
