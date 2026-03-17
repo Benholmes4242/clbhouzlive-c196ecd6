@@ -225,7 +225,7 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
             {isOwnProfile && (
               <button
                 onClick={() => navigate('/courses')}
-                className="px-5 py-2.5 bg-[#f59e0b] text-white text-sm font-semibold rounded-full hover:bg-[#e8920f] transition-colors min-h-[44px] active:scale-[0.97]"
+                className="px-5 py-2.5 bg-card text-foreground border border-border/60 text-sm font-semibold rounded-full hover:bg-muted transition-colors min-h-[44px] active:scale-[0.97]"
               >
                 Explore Courses
               </button>
@@ -328,8 +328,8 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
                 className={cn(
                   'h-1.5 rounded-full transition-all duration-200',
                     idx === batchIndex
-                    ? 'w-5 bg-[#f59e0b]'
-                    : 'w-1.5 bg-[#f59e0b]/25 hover:bg-[#f59e0b]/50'
+                    ? 'w-5 bg-foreground'
+                    : 'w-1.5 bg-foreground/25 hover:bg-foreground/50'
                 )}
               />
             ))}
