@@ -68,7 +68,16 @@ export function PhotosIdentityStep({
             <div className="flex justify-between items-baseline mb-1.5">
               <label className="text-[13px] font-medium text-muted-foreground">Username</label>
               {usernameIsLocked && (
-                <span className="text-[11px] text-muted-foreground">Cannot be changed</span>
+                <span className="text-[11px] text-muted-foreground">
+                  Contact{' '}
+                  <a
+                    href="mailto:support@clbhouz.co.uk"
+                    className="underline text-muted-foreground"
+                  >
+                    support@clbhouz.co.uk
+                  </a>
+                  {' '}to change
+                </span>
               )}
             </div>
             <div className="relative">
