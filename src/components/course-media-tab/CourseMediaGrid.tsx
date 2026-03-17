@@ -134,7 +134,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
       })}
 
       {/* Infinite scroll sentinel */}
-      <div ref={sentinelRef} className="col-span-3 h-1" />
+      <div ref={sentinelRef} className="col-span-2 h-1" />
 
       {/* Loading indicator */}
       {isFetchingNextPage && (
