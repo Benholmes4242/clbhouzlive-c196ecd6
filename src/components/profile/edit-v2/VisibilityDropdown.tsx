@@ -57,8 +57,8 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
         >
           <Icon className="w-3 h-3 text-muted-foreground" />
           <SelectValue>
-            <span className="text-muted-foreground">{label}:</span>
-            <span className="ml-1 font-medium">{selectedOption.label}</span>
+            <span className="text-foreground/60">{label}:</span>
+            <span className="ml-1 font-semibold text-foreground">{selectedOption.label}</span>
           </SelectValue>
         </SelectTrigger>
         <SelectContent align="end" className="min-w-[200px] bg-white border-slate-200 z-50 rounded-sq-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
