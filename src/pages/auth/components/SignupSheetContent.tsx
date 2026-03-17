@@ -255,7 +255,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
         {/* Username taken suggestions */}
         {usernameAvailable === false && suggestedUsernames.length > 0 && (
           <div className="mt-3">
-            <p className="text-[#E03131] text-[13px] mb-2">
+            <p role="alert" className="text-[#E03131] text-[13px] mb-2">
               That username's taken. Try one of these:
             </p>
             <div className="flex flex-wrap gap-2">
