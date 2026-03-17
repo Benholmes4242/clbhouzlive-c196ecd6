@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -7,6 +7,7 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileForm } from '@/hooks/useProfileForm';
 import { useProfileSave } from '@/hooks/useProfileSave';
+import { supabase } from '@/integrations/supabase/client';
 import { WizardHeader } from './WizardHeader';
 import { WizardProgress } from './WizardProgress';
 import { WizardNavigation } from './WizardNavigation';
@@ -59,6 +60,9 @@ export function PersonalProfileWizard() {
   const { save, isSaving } = useProfileSave(user?.id ?? '');
 
   const usernameIsLocked = !!(profile as any)?.username;
+  
+  // Fix 2: Detect new user at mount time (before wizard changes onboarding status)
+  const isNewUser = useRef(!(profile as any)?.has_completed_onboarding);
 
   const goNext = useCallback(() => {
     if (step < 3) {
@@ -82,6 +86,16 @@ export function PersonalProfileWizard() {
     }
   }, [isDirty, navigate]);
 
+  // Fix 3: Skip button handler
+  const handleSkip = useCallback(async () => {
+    if (!user?.id) return;
+    await supabase
+      .from('user_profiles')
+      .update({ has_completed_onboarding: true })
+      .eq('id', user.id);
+    navigate('/', { replace: true });
+  }, [user, navigate]);
+
   const handleSave = useCallback(async () => {
     if (step < 3) { goNext(); return; }
     const ok = await save(form);
@@ -100,6 +114,7 @@ export function PersonalProfileWizard() {
           isFirstStep={step === 1}
           onBack={goBack}
           onClose={handleClose}
+          onSkip={isNewUser.current ? handleSkip : undefined}
         />
         <WizardProgress step={step} />
 
@@ -176,7 +191,7 @@ export function PersonalProfileWizard() {
       </AlertDialog>
 
       {showSuccess && (
-        <WizardSuccessScreen username={(profile as any)?.username ?? ''} />
+        <WizardSuccessScreen username={(profile as any)?.username ?? ''} isNewUser={isNewUser.current} />
       )}
     </>,
     document.body

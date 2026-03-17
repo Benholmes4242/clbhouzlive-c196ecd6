@@ -4,17 +4,23 @@ import { CheckCircle2 } from 'lucide-react';
 
 interface Props {
   username: string;
+  isNewUser?: boolean;
 }
 
-export function WizardSuccessScreen({ username }: Props) {
+export function WizardSuccessScreen({ username, isNewUser = false }: Props) {
   const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigate(`/profile/${username}`);
+      if (isNewUser) {
+        // Fix 2: New users go to Clubhouse feed, not their empty profile
+        navigate('/', { replace: true });
+      } else {
+        navigate(`/profile/${username}`, { replace: true });
+      }
     }, 1800);
     return () => clearTimeout(timer);
-  }, [username, navigate]);
+  }, [username, navigate, isNewUser]);
 
   return (
     <div className="fixed inset-0 z-[101] flex flex-col items-center justify-center bg-background">
@@ -27,7 +33,7 @@ export function WizardSuccessScreen({ username }: Props) {
             Profile saved
           </p>
           <p className="text-[14px] text-muted-foreground mt-1">
-            Taking you to your profile…
+            {isNewUser ? 'Taking you to the feed…' : 'Taking you to your profile…'}
           </p>
         </div>
       </div>

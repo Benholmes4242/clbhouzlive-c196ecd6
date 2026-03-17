@@ -250,7 +250,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             <button
               onClick={onEmailSignUp}
               disabled={submitting}
-              aria-label="Continue with Email"
+              aria-label="Create account with Email"
               className="auth-button-3 w-full h-[56px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50 hover:bg-white/[0.06]"
               style={{
                 fontFamily: 'SF Pro Text, system-ui, sans-serif',
@@ -259,7 +259,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 color: 'rgba(255, 255, 255, 0.88)',
               }}
             >
-              Continue with Email
+              Create account with Email
             </button>
             
             {/* OR Divider */}
@@ -274,8 +274,23 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               <div className="flex-1 h-px bg-neutral-700" />
             </div>
             
+            {/* Sign-in eyebrow label */}
+            <p
+              className="auth-button-5 text-center"
+              style={{
+                fontFamily: 'SF Pro Text, system-ui, sans-serif',
+                fontSize: '11px',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '1.5px',
+                color: 'rgba(255, 255, 255, 0.4)',
+              }}
+            >
+              Already have an account? Sign in below
+            </p>
+            
             {/* Email input for login */}
-            <div className="auth-button-5 space-y-3">
+            <div className="auth-button-6 space-y-3">
               <div className="relative">
                 <input
                   ref={emailInputRef}
@@ -385,6 +400,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         .auth-button-3 { animation: auth-button-in 0.4s ease-out 0.55s both; }
         .auth-button-4 { animation: auth-button-in 0.4s ease-out 0.65s both; }
         .auth-button-5 { animation: auth-button-in 0.4s ease-out 0.75s both; }
+        .auth-button-6 { animation: auth-button-in 0.4s ease-out 0.85s both; }
         
         @media (prefers-reduced-motion: reduce) {
           .auth-logo-animate,
@@ -393,7 +409,8 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
           .auth-button-2,
           .auth-button-3,
           .auth-button-4,
-          .auth-button-5 {
+          .auth-button-5,
+          .auth-button-6 {
             animation: none;
             opacity: 1;
             transform: none;

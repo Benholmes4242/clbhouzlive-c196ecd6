@@ -70,7 +70,7 @@ export function trackAuthCallbackStarted() {
   track('auth_callback_started');
 }
 
-export function trackAuthRedirect(destination: 'onboarding' | 'home' | 'verified' | 'auth') {
+export function trackAuthRedirect(destination: 'onboarding' | 'home' | 'verified' | 'auth' | 'reset-password') {
   track('auth_redirect', { destination });
 }
 
