@@ -917,24 +917,27 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       }
 
       {/* Overflow sheet — hidden items beyond tile 4 */}
-      {overflowSheetOpen && (
-        <OverflowSheet
-          items={state.mediaItems.slice(3)}
-          startIndex={3}
-          onEdit={(index) => {
-            setActiveMedia(index);
-            const item = state.mediaItems[index];
-            if (!item) return;
-            if (item.mediaType === 'video') {
-              setVideoToolSheetIndex(index);
-            } else {
-              setActiveTool(null);
-              setShelfOpen(true);
-            }
-          }}
-          onClose={() => setOverflowSheetOpen(false)}
-        />
-      )}
+      {overflowSheetOpen &&
+        createPortal(
+          <OverflowSheet
+            items={state.mediaItems.slice(3)}
+            startIndex={3}
+            onEdit={(index) => {
+              setActiveMedia(index);
+              const item = state.mediaItems[index];
+              if (!item) return;
+              if (item.mediaType === 'video') {
+                setVideoToolSheetIndex(index);
+              } else {
+                setActiveTool(null);
+                setShelfOpen(true);
+              }
+            }}
+            onClose={() => setOverflowSheetOpen(false)}
+          />,
+          document.body
+        )
+      }
 
       {/* Studio Shelf */}
       {activeItem && (
