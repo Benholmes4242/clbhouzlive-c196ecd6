@@ -252,6 +252,7 @@ export interface FeedRpcRow {
   engagement_score: number;
   post_type?: string | null;
   tournament_meta?: TournamentResultMeta | null;
+  post_tags?: FeedPostTag[] | null;
 }
 
 /** Timing constants */

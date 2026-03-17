@@ -540,6 +540,7 @@ const ClubhouseContent = () => {
               avatar: activePost.avatarUrl,
             }}
             caption={activePost.caption}
+            tags={activePost.tags || []}
             golfCourse={golfCourse}
             isFollowing={isActivePostFollowed}
             isOwnPost={isOwnPost}

@@ -62,6 +62,8 @@ export interface UserPostWithType {
     entity_id: string;
     name: string;
     username: string | null;
+    start_index?: number;
+    end_index?: number;
   }[];
   type: 'user_post';
 }
