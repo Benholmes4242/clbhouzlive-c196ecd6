@@ -383,7 +383,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             <button
               onClick={handleViewResults}
               style={{
-                fontSize: 11, fontWeight: 600, color: tour.accentColor,
+                fontSize: 12, fontWeight: 600, color: tour.accentColor,
                 background: 'none', border: 'none', cursor: 'pointer', padding: 0,
               }}
             >
