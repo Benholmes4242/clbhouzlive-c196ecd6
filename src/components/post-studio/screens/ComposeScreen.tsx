@@ -823,7 +823,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           minHeight: 52,
           borderTop: '1px solid rgba(255,255,255,0.07)',
           background: 'rgba(8,8,8,0.98)',
-          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)',
+          paddingBottom: '30px',
         }}
       >
         {/* Camera — primary action, white circle */}
