@@ -962,7 +962,7 @@ interface HeroCarouselProps {
 
 export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
-  
+  const safeSlides = Array.isArray(slides) ? slides : [];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
