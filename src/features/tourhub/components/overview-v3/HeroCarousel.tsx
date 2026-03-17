@@ -1093,7 +1093,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
 
     const threshold = 50;
     if (Math.abs(deltaX) > threshold && Math.abs(deltaX) > deltaY) {
-      if (deltaX < -threshold && currentIndex < slides.length - 1) {
+      if (deltaX < -threshold && currentIndex < safeSlides.length - 1) {
         setCurrentIndex(prev => prev + 1);
         if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
         setIsPaused(false);
@@ -1107,7 +1107,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     scheduleResume();
   };
 
-  if (isLoading || slides.length === 0) {
+  if (isLoading || safeSlides.length === 0) {
     return (
       <div className="relative w-full h-full bg-slate-900 animate-pulse">
         <div 
