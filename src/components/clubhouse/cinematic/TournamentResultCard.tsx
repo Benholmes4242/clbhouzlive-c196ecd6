@@ -462,7 +462,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
                 )}
 
                 <span style={{
-                  flex: 1, fontSize: 'clamp(11px, 3vw, 13px)', fontWeight: 500,
+                  flex: 1, fontSize: 'clamp(13px, 3.5vw, 15px)', fontWeight: 500,
                   color: 'rgba(255,255,255,0.8)',
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
                 }}>
