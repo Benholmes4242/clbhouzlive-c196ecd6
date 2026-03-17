@@ -71,10 +71,15 @@ export const usePostDeletion = () => {
         });
       }
       
-      // If we know the actor type/id, invalidate those specifically
+      // If we know the actor type/id, optimistically decrement count and invalidate
       if (actorType && actorId) {
+        // Instant count decrement — no refetch needed for immediate UI feedback
+        const countKey = postKeys.actorPostsCount(actorType, actorId);
+        queryClient.setQueryData(countKey, (old: number | undefined) =>
+          Math.max((old ?? 1) - 1, 0)
+        );
         queryClient.invalidateQueries({ queryKey: postKeys.actorPosts(actorType, actorId) });
-        queryClient.invalidateQueries({ queryKey: postKeys.actorPostsCount(actorType, actorId) });
+        queryClient.invalidateQueries({ queryKey: countKey });
       }
       
       // Invalidate other feed caches (but NOT profile-posts or actor-posts broadly)
