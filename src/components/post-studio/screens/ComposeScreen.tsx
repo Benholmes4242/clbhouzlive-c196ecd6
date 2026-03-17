@@ -3,6 +3,7 @@
 // Dark. Minimal. Golf-native.
 
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Camera, Layers, BookOpen, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon,
 } from 'lucide-react';
