@@ -74,7 +74,7 @@ export const useUserPosts = () => {
         return;
       }
 
-      console.log('Raw posts data:', postsData);
+      
 
       if (!postsData || postsData.length === 0) {
         console.log('No posts found');
