@@ -78,6 +78,7 @@ function CommentsSheet({
   initialParentCommentId,
   caddiePickCommentId,
   caption,
+  courseName,
   isReview,
   onCommentPosted,
   onCommentDeleted,
