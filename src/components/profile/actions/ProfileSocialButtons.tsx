@@ -4,7 +4,7 @@ import { UserPlus, UserCheck, UserMinus, MoreVertical } from 'lucide-react';
 import { useRelationshipStatus } from '@/hooks/useRelationshipStatus';
 import { useFriendActions } from '@/hooks/useFriendActions';
 import { useBlockActions } from '@/hooks/useBlockActions';
-import { useProfileActions } from './useProfileActions';
+import { useUserFollow } from '@/hooks/useUserFollow';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 import {
   DropdownMenu,
@@ -36,10 +36,11 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
   isMobile = false
 }) => {
   const { data: relationship, isLoading } = useRelationshipStatus(profileUserId);
-  const { loading: followLoading, handleFollow } = useProfileActions({
-    targetUserId: profileUserId,
-    currentUserId
-  });
+  const {
+    isFollowing,
+    toggleFollow,
+    isFollowingPending,
+  } = useUserFollow(profileUserId);
   const {
     loading: friendLoading,
     sendFriendRequest,
@@ -215,22 +216,24 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
     );
   })();
 
+  // Use relationship.isFollowing as source of truth (from RPC),
+  // but useUserFollow provides optimistic state
   const followButton = (
     <Button
-      variant={relationship.isFollowing ? 'secondary' : 'destructive'}
+      variant={isFollowing ? 'secondary' : 'default'}
       size="sm"
       onClick={() => {
         analyticsEvents.social.followToggled({
           targetUserId: profileUserId,
           from: "profile",
-          isFollowing: !relationship.isFollowing,
+          isFollowing: !isFollowing,
         });
-        handleFollow(relationship.isFollowing);
+        toggleFollow();
       }}
-      disabled={followLoading}
+      disabled={isFollowingPending}
       className={isMobile ? 'flex-1' : ''}
     >
-      {relationship.isFollowing ? (
+      {isFollowing ? (
         <>
           <UserCheck className="w-4 h-4 mr-1" />
           Following

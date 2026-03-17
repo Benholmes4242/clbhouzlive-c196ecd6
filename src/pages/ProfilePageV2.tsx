@@ -369,6 +369,13 @@ const ProfilePageV2Content: React.FC = () => {
     // For 'friends' and 'request_received', we might want different actions
   };
 
+  // Redirect to auth if not logged in (must be before early returns but after all hooks)
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/auth', { replace: true });
+    }
+  }, [user, authLoading, navigate]);
+
   if (authLoading || profileLoading) {
     return <ProfileSkeleton />;
   }
@@ -398,10 +405,7 @@ const ProfilePageV2Content: React.FC = () => {
     );
   }
 
-  if (!user) {
-    navigate('/auth', { replace: true });
-    return null;
-  }
+  if (!user) return null;
 
   const displayName = profile?.display_name || 'Golfer';
   const username = profile?.username || 'user';
