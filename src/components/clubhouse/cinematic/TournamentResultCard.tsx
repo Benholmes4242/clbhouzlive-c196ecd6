@@ -405,7 +405,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
               {meta.winner_name}
             </span>
-            <span style={{ fontSize: 14, fontWeight: 700, color: tour.accentColor, fontVariantNumeric: 'tabular-nums' as const }}>
+            <span style={{ fontSize: 15, fontWeight: 700, color: tour.accentColor, fontVariantNumeric: 'tabular-nums' as const }}>
               {meta.winner_score_display || 'E'}
             </span>
           </div>
