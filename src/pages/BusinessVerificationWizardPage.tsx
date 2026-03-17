@@ -326,7 +326,7 @@ export default function BusinessVerificationWizardPage() {
       {/* Header */}
       <header
         className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border/40"
-        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)' }}
       >
         <div className="flex items-center px-4 h-14">
           <button
