@@ -41,6 +41,11 @@ export function useProfileForm(profile: any, loading?: boolean) {
   const [initialData, setInitialData] = useState<ProfileFormData>(() => makeInitial(null));
   const hydrated = useRef(false);
 
+  // Reset hydration guard when profile identity changes (e.g. navigating back to wizard)
+  useEffect(() => {
+    hydrated.current = false;
+  }, [profile?.id]);
+
   useEffect(() => {
     if (!loading && profile && !hydrated.current) {
       hydrated.current = true;

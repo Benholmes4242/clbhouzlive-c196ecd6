@@ -115,9 +115,11 @@ export function useProfileSave(userId: string) {
           );
       }
 
-      // 6. Invalidate all relevant query keys
-      INVALIDATE_KEYS.forEach(key =>
-        queryClient.invalidateQueries({ queryKey: [key] })
+      // 6. Invalidate all relevant query keys — await to prevent stale data
+      await Promise.all(
+        INVALIDATE_KEYS.map(key =>
+          queryClient.invalidateQueries({ queryKey: [key] })
+        )
       );
       // FIX I5: Invalidate onboarding cache so AuthWrapper doesn't re-route
       queryClient.invalidateQueries({ queryKey: ['onboarding-status', userId] });
