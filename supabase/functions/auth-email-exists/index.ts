@@ -36,22 +36,37 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Query auth.users directly via PostgREST REST API with service role
-    // getUserByEmail was removed from the Supabase Admin SDK
+    // Use GoTrue Admin API directly to check if user exists by email
     const fetchRes = await fetch(
-      `${supabaseUrl}/rest/v1/users?email=eq.${encodeURIComponent(normalizedEmail)}&select=id`,
+      `${supabaseUrl}/auth/v1/admin/users?page=1&per_page=1`,
       {
+        method: "GET",
         headers: {
           "apikey": serviceRoleKey,
           "Authorization": `Bearer ${serviceRoleKey}`,
-          "Accept": "application/json",
-          "Accept-Profile": "auth",
         },
       }
     );
 
-    if (!fetchRes.ok) {
-      const errText = await fetchRes.text();
+    // Alternative: use the signIn with wrong password trick won't work.
+    // Use admin listUsers and filter — but that's expensive.
+    // Best approach: call GoTrue's admin user lookup endpoint
+    const lookupRes = await fetch(
+      `${supabaseUrl}/auth/v1/admin/users`,
+      {
+        method: "GET",
+        headers: {
+          "apikey": serviceRoleKey,
+          "Authorization": `Bearer ${serviceRoleKey}`,
+        },
+      }
+    );
+
+    // Consume the first fetch
+    await fetchRes.text();
+
+    if (!lookupRes.ok) {
+      const errText = await lookupRes.text();
       console.error("[auth-email-exists] Error checking user:", errText);
       return new Response(
         JSON.stringify({ error: "Failed to check email" }),
@@ -59,8 +74,9 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const users = await fetchRes.json();
-    const exists = Array.isArray(users) && users.length > 0;
+    const data = await lookupRes.json();
+    const users = data?.users ?? [];
+    const exists = users.some((u: any) => u.email?.toLowerCase() === normalizedEmail);
     console.log(`[auth-email-exists] Email exists: ${exists}`);
 
     return new Response(
