@@ -56,9 +56,10 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
             className={cn(
               'min-h-[44px] px-4 rounded-full text-sm font-semibold transition-colors',
               activeFilter === key
-                ? 'bg-[#f59e0b] text-white shadow-sm'
+                ? 'text-white shadow-sm'
                 : 'bg-muted text-muted-foreground hover:bg-muted/80'
             )}
+            style={activeFilter === key ? { backgroundColor: 'hsl(var(--tab-sub-active))', color: 'hsl(var(--tab-sub-active-foreground))' } : undefined}
           >
             {label}
           </button>
