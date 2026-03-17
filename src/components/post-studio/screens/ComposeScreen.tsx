@@ -5,7 +5,7 @@
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  Camera, Layers, BookOpen, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon,
+  Camera, BookOpen, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -690,19 +690,26 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.18 }}
-                whileTap={{ scale: 0.97 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => openPanel('course')}
-                className="flex items-center gap-2.5 w-full py-2"
+                className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl"
+                style={{
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.09)',
+                }}
               >
                 <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.10)' }}
+                  className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ background: 'rgba(255,255,255,0.08)' }}
                 >
-                  <span className="text-sm">⛳</span>
+                  <span className="text-base">⛳</span>
                 </div>
-                <span className="text-[14px]" style={{ color: 'rgba(255,255,255,0.30)' }}>
+                <span className="flex-1 text-left text-[14px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
                   Where did you play?
                 </span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'rgba(255,255,255,0.20)', flexShrink: 0 }}>
+                  <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </motion.button>
             ) : (
               <motion.div
@@ -826,32 +833,24 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           paddingBottom: '30px',
         }}
       >
-        {/* Camera — primary action, white circle */}
-
-        {/* Camera — primary action, white circle */}
+        {/* Camera — FAB shutter button, breaks toolbar top edge */}
         <motion.button
-          whileTap={{ scale: 0.92 }}
+          whileTap={{ scale: 0.90 }}
           onClick={() => fileInputRef.current?.click()}
           disabled={isProcessing}
-          className="flex items-center justify-center disabled:opacity-40 mr-4"
+          className="flex items-center justify-center disabled:opacity-40 mr-4 shrink-0"
           style={{
-            width: 40, height: 40, borderRadius: '50%',
+            width: 60,
+            height: 60,
+            borderRadius: '50%',
             background: 'rgba(255,255,255,0.96)',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.30)',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.12)',
+            marginTop: -20,
+            position: 'relative',
+            zIndex: 10,
           }}
         >
-          <Camera className="w-5 h-5" style={{ color: '#0D0D0D' }} strokeWidth={2} />
-        </motion.button>
-
-        {/* Gallery */}
-        <motion.button
-          whileTap={{ scale: 0.92 }}
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isProcessing}
-          className="flex items-center justify-center disabled:opacity-40 mr-4"
-          style={{ width: 40, height: 40 }}
-        >
-          <Layers className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
+          <Camera className="w-6 h-6" style={{ color: '#0D0D0D' }} strokeWidth={2} />
         </motion.button>
 
         {/* Divider */}
