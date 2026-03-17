@@ -43,6 +43,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
 
   return (
     <motion.div
+      className="relative"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
