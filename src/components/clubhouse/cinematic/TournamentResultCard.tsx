@@ -335,7 +335,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
       {/* ZONE 2 — AI INTELLIGENCE STRIP */}
       <div style={{
-        flex: '0 0 auto', padding: '10px 20px',
+        flex: '0 0 auto', padding: '12px 20px',
         background: 'rgba(255,255,255,0.03)',
         borderTop: `1px solid ${tour.accentColor}22`,
         borderBottom: '1px solid rgba(255,255,255,0.04)',
