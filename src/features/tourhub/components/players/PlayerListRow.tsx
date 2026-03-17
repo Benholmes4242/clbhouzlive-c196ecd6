@@ -53,6 +53,7 @@ interface PlayerListRowProps {
     countryCode: string | null;
     photoUrl: string | null;
     pgaTourId: string | null;
+    tourCode?: string | null;
   };
   rank?: number;
   rankChange?: number | null;
