@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileForm } from '@/hooks/useProfileForm';
