@@ -135,7 +135,7 @@ export function PublishScreen() {
                   className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[11px] font-semibold"
                   style={{ background: 'rgba(0,0,0,0.50)', backdropFilter: 'blur(12px)', color: 'rgba(255,255,255,0.80)', border: '1px solid rgba(255,255,255,0.12)' }}
                 >
-                  {itemCount} items
+                  {itemCount} Media
                 </div>
               )}
               {/* Caption overlay */}
