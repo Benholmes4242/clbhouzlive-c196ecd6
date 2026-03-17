@@ -10,6 +10,7 @@ import CommentsSheet from '@/components/comments/CommentsSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VideoCardMenu } from './VideoCardMenu';
 import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
+import PostContentWithTags from '@/components/posts/PostContentWithTags';
 
 interface VideoCardProps {
   post: FeedPost;
@@ -151,9 +152,11 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
         {/* Caption */}
         {cleanedCaption && (
           <div className="px-3 pb-2">
-            <p className={`text-sm text-foreground ${expanded ? '' : 'line-clamp-2'}`}>
-              {cleanedCaption}
-            </p>
+            <PostContentWithTags
+              content={cleanedCaption}
+              tags={post.tags || []}
+              className={`text-sm text-foreground ${expanded ? '' : 'line-clamp-2'}`}
+            />
             {!expanded && cleanedCaption.length > 100 && (
               <button
                 onClick={() => setExpanded(true)}

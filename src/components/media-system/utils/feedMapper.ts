@@ -1,5 +1,5 @@
 import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/media/constants';
-import type { FeedPost, FeedRpcRow, MediaItem, ReviewData, CreatorRelation, TournamentResultFeedPost } from '../types/media';
+import type { FeedPost, FeedRpcRow, MediaItem, ReviewData, CreatorRelation, TournamentResultFeedPost, FeedPostTag } from '../types/media';
 
 const UID_RE = /([0-9a-f]{32})/i;
 
@@ -86,6 +86,18 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
     };
   }
 
+  const tags: FeedPostTag[] = Array.isArray(row.post_tags)
+    ? row.post_tags.map((tag) => ({
+        id: tag.id,
+        entity_type: tag.entity_type,
+        entity_id: tag.entity_id,
+        name: tag.name,
+        username: tag.username,
+        start_index: tag.start_index ?? 0,
+        end_index: tag.end_index ?? 0,
+      }))
+    : [];
+
   return {
     id: row.post_id,
     userId: row.post_user_id,
@@ -110,6 +122,7 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
     likeCount: Number(row.like_count) || 0,
     commentCount: Number(row.comment_count) || 0,
     shareCount: Number(row.share_count) || 0,
+    tags,
     courseName: row.review_course_name || undefined,
     courseId: row.review_course_id || undefined,
     review,

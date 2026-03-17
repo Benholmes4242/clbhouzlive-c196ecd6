@@ -11,7 +11,7 @@ interface TaggableEntity {
   creator_only?: boolean | null;
 }
 
-interface PostTag {
+interface NestedPostTag {
   id: string;
   tagged_entity_id: string;
   start_index: number;
@@ -19,19 +19,67 @@ interface PostTag {
   taggable_entities: TaggableEntity;
 }
 
+interface FlatPostTag {
+  id: string;
+  entity_type: 'user' | 'golf_club' | 'business';
+  entity_id: string;
+  name: string;
+  username: string | null;
+  start_index?: number;
+  end_index?: number;
+  creator_only?: boolean | null;
+}
+
+interface NormalizedPostTag {
+  id: string;
+  start_index: number;
+  end_index: number;
+  taggable_entities: TaggableEntity;
+}
+
 interface PostContentWithTagsProps {
   content: string;
-  tags: PostTag[];
+  tags: Array<NestedPostTag | FlatPostTag>;
   className?: string;
 }
 
-// Only these entity types render as orange @mentions
 const MENTIONABLE_TYPES = new Set(['user', 'business']);
+
+const isNestedTag = (tag: NestedPostTag | FlatPostTag): tag is NestedPostTag => {
+  return 'taggable_entities' in tag;
+};
+
+const normalizeTags = (tags: Array<NestedPostTag | FlatPostTag>): NormalizedPostTag[] => {
+  return tags.map((tag) => {
+    if (isNestedTag(tag)) {
+      return {
+        id: tag.id,
+        start_index: tag.start_index ?? 0,
+        end_index: tag.end_index ?? 0,
+        taggable_entities: tag.taggable_entities,
+      };
+    }
+
+    return {
+      id: tag.id,
+      start_index: tag.start_index ?? 0,
+      end_index: tag.end_index ?? 0,
+      taggable_entities: {
+        id: tag.id,
+        entity_type: tag.entity_type,
+        entity_id: tag.entity_id,
+        name: tag.name,
+        username: tag.username,
+        creator_only: tag.creator_only,
+      },
+    };
+  });
+};
 
 const PostContentWithTags: React.FC<PostContentWithTagsProps> = ({
   content,
   tags,
-  className = ''
+  className = '',
 }) => {
   const navigate = useNavigate();
 
@@ -42,81 +90,53 @@ const PostContentWithTags: React.FC<PostContentWithTagsProps> = ({
     } else if (entity.entity_type === 'business') {
       navigate(`/business/${entity.entity_id}`);
     }
-    // golf_club navigation is handled via "Played at" CTA, not @mentions
   };
 
-  const renderContentWithTags = () => {
-    if (!content) {
-      return <span>{content}</span>;
+  if (!content) return <span className={className}>{content}</span>;
+
+  const mentionableTags = normalizeTags(tags)
+    .filter((tag) => tag.taggable_entities && MENTIONABLE_TYPES.has(tag.taggable_entities.entity_type))
+    .sort((a, b) => a.start_index - b.start_index);
+
+  if (mentionableTags.length === 0) {
+    return <span className={className}>{content}</span>;
+  }
+
+  let lastIndex = 0;
+  const elements: React.ReactNode[] = [];
+
+  mentionableTags.forEach((tag, index) => {
+    const { start_index, end_index, taggable_entities } = tag;
+
+    if (start_index > lastIndex) {
+      elements.push(<span key={`text-${index}`}>{content.slice(lastIndex, start_index)}</span>);
     }
 
-    // Filter to only mentionable types (user, business) - golf_club uses "Played at" CTA instead
-    const mentionableTags = tags.filter(tag => 
-      tag.taggable_entities && MENTIONABLE_TYPES.has(tag.taggable_entities.entity_type)
+    const fallbackLabel = `@${taggable_entities.username || taggable_entities.name}`;
+    const tagText = content.slice(start_index, end_index) || fallbackLabel;
+
+    elements.push(
+      <button
+        key={`tag-${tag.id}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleTagClick(taggable_entities);
+        }}
+        className="text-primary font-medium hover:underline cursor-pointer bg-transparent border-none p-0 m-0 inline"
+        style={{ fontSize: 'inherit', lineHeight: 'inherit' }}
+      >
+        {tagText}
+      </button>
     );
 
-    if (mentionableTags.length === 0) {
-      return <span>{content}</span>;
-    }
+    lastIndex = end_index;
+  });
 
-    // Sort tags by start_index to process them in order
-    const sortedTags = [...mentionableTags].sort((a, b) => a.start_index - b.start_index);
-    
-    let lastIndex = 0;
-    const elements: React.ReactNode[] = [];
+  if (lastIndex < content.length) {
+    elements.push(<span key="text-end">{content.slice(lastIndex)}</span>);
+  }
 
-    sortedTags.forEach((tag, index) => {
-      const { start_index, end_index, taggable_entities } = tag;
-      
-      // Add text before the tag
-      if (start_index > lastIndex) {
-        elements.push(
-          <span key={`text-${index}`}>
-            {content.slice(lastIndex, start_index)}
-          </span>
-        );
-      }
-
-      // Add the clickable tag with orange accent styling
-      const tagText = content.slice(start_index, end_index);
-      const displayName = taggable_entities.username 
-        ? `@${taggable_entities.username}` 
-        : `@${taggable_entities.name}`;
-
-      elements.push(
-        <button
-          key={`tag-${tag.id}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            handleTagClick(taggable_entities);
-          }}
-          className="text-primary font-medium hover:underline cursor-pointer bg-transparent border-none p-0 m-0 inline"
-          style={{ fontSize: 'inherit', lineHeight: 'inherit' }}
-        >
-          {tagText || displayName}
-        </button>
-      );
-
-      lastIndex = end_index;
-    });
-
-    // Add remaining text after the last tag
-    if (lastIndex < content.length) {
-      elements.push(
-        <span key="text-end">
-          {content.slice(lastIndex)}
-        </span>
-      );
-    }
-
-    return <>{elements}</>;
-  };
-
-  return (
-    <div className={className}>
-      {renderContentWithTags()}
-    </div>
-  );
+  return <div className={className}>{elements}</div>;
 };
 
 export default PostContentWithTags;

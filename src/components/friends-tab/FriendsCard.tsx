@@ -10,6 +10,7 @@ import CommentsSheet from '@/components/comments/CommentsSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { FriendsCardMenu } from './FriendsCardMenu';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
+import PostContentWithTags from '@/components/posts/PostContentWithTags';
 
 interface FriendsCardProps {
   post: FeedPost;
@@ -148,9 +149,11 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
         {/* Caption */}
         {cleanCaption && (
           <div className="px-3 pb-2">
-            <p className={`text-sm text-foreground ${expanded ? '' : 'line-clamp-2'}`}>
-              {cleanCaption}
-            </p>
+            <PostContentWithTags
+              content={cleanCaption}
+              tags={post.tags || []}
+              className={`text-sm text-foreground ${expanded ? '' : 'line-clamp-2'}`}
+            />
             {!expanded && cleanCaption.length > 100 && (
               <button
                 onClick={() => setExpanded(true)}

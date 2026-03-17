@@ -30,6 +30,16 @@ export interface ReviewData {
 /** Creator relationship to current user */
 export type CreatorRelation = 'friend' | 'following' | 'none' | 'system';
 
+export interface FeedPostTag {
+  id: string;
+  entity_type: 'user' | 'golf_club' | 'business';
+  entity_id: string;
+  name: string;
+  username: string | null;
+  start_index: number;
+  end_index: number;
+}
+
 export interface FeedPost {
   id: string;
   userId: string;
@@ -50,6 +60,7 @@ export interface FeedPost {
   isReview: boolean;
   isLikedByMe: boolean;
   isFollowedByMe: boolean;
+  tags?: FeedPostTag[];
   courseName?: string;
   courseId?: string;
   postType?: string;
@@ -241,6 +252,7 @@ export interface FeedRpcRow {
   engagement_score: number;
   post_type?: string | null;
   tournament_meta?: TournamentResultMeta | null;
+  post_tags?: FeedPostTag[] | null;
 }
 
 /** Timing constants */

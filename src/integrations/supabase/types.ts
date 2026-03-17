@@ -6832,6 +6832,7 @@ export type Database = {
           id: string
           post_id: string
           start_index: number
+          tagged_by_user_id: string
           tagged_entity_id: string
         }
         Insert: {
@@ -6840,6 +6841,7 @@ export type Database = {
           id?: string
           post_id: string
           start_index: number
+          tagged_by_user_id: string
           tagged_entity_id: string
         }
         Update: {
@@ -6848,6 +6850,7 @@ export type Database = {
           id?: string
           post_id?: string
           start_index?: number
+          tagged_by_user_id?: string
           tagged_entity_id?: string
         }
         Relationships: [

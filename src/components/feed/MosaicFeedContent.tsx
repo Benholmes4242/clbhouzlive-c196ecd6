@@ -23,6 +23,7 @@ import Masonry from 'react-masonry-css';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { cn } from '@/lib/utils';
+import PostContentWithTags from '@/components/posts/PostContentWithTags';
 
 interface MosaicFeedContentProps {
   optimisticPosts: any[];
@@ -368,35 +369,19 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                     </p>
                   </div>
                    {caption && (() => {
-                    // Filter out golf club references from caption
-                    let filteredCaption = caption;
-                    
-                    // Remove common golf course patterns
-                    filteredCaption = filteredCaption
+                    const filteredCaption = caption
                       .replace(/\s*Played at[^.]*\.?\s*/gi, '')
-                      .replace(/\s*@\s*[^#\s]*\s*/g, '')
                       .replace(/\s+/g, ' ')
                       .trim();
-                    
+
+                    const surfaceTags = isUserPost ? ((item as UserPostWithType).post_tags || []) : [];
+
                     return filteredCaption ? (
-                      <div className="text-white/90 text-sm mt-1">
-                        {(() => {
-                          const hadIndex = filteredCaption.toLowerCase().indexOf(' had ');
-                          if (hadIndex !== -1) {
-                            const firstLine = filteredCaption.substring(0, hadIndex + 4); // Include " had"
-                            const secondLine = filteredCaption.substring(hadIndex + 4).trim();
-                            return (
-                              <div>
-                                <div className="truncate">{firstLine}</div>
-                                {secondLine && (
-                                  <div className="truncate">{secondLine}</div>
-                                )}
-                              </div>
-                            );
-                          }
-                          return <div className="line-clamp-2">{filteredCaption}</div>;
-                        })()}
-                      </div>
+                      <PostContentWithTags
+                        content={filteredCaption}
+                        tags={surfaceTags}
+                        className="text-white/90 text-sm mt-1 line-clamp-2"
+                      />
                     ) : null;
                    })()}
                 </div>

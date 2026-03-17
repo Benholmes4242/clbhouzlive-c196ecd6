@@ -21,6 +21,7 @@ import { getProfilePathById } from '@/lib/profileRoutes';
 
 import { getOverlayRatingColors, type ExtractedReviewData } from '@/lib/postHelpers';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
+import PostContentWithTags from '@/components/posts/PostContentWithTags';
 
 /** Animated soundwave bars for music playback indicator */
 const SoundwaveAnimation: React.FC = () => (
@@ -58,6 +59,16 @@ interface MusicTrackInfo {
   artist?: string;
 }
 
+interface PostTag {
+  id: string;
+  entity_type: 'user' | 'golf_club' | 'business';
+  entity_id: string;
+  name: string;
+  username: string | null;
+  start_index?: number;
+  end_index?: number;
+}
+
 interface CreatorCapsuleProps {
   // Regular mode props
   user: {
@@ -67,6 +78,7 @@ interface CreatorCapsuleProps {
     avatar?: string;
   };
   caption?: string;
+  tags?: PostTag[];
   golfCourse?: GolfCourseInfo | null;
   /** Music track info - only shown when audioMode === 'music_only' */
   musicTrack?: MusicTrackInfo | null;
@@ -101,6 +113,7 @@ interface CreatorCapsuleProps {
 export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   user,
   caption,
+  tags = [],
   golfCourse,
   musicTrack,
   isMusicPlaying = false,
@@ -197,13 +210,19 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     <div className="px-3 pb-3 space-y-3">
       {/* Caption (scrollable) */}
       {cleanCaption && (
-        <div 
+        <div
           className="max-h-[100px] overflow-y-auto scrollbar-hide"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          <p className="text-[13px] leading-relaxed text-white/90">
-            {cleanCaption}
-          </p>
+          {tags.length > 0 ? (
+            <PostContentWithTags
+              content={cleanCaption}
+              tags={tags}
+              className="text-[13px] leading-relaxed text-white/90"
+            />
+          ) : (
+            <p className="text-[13px] leading-relaxed text-white/90">{cleanCaption}</p>
+          )}
         </div>
       )}
 

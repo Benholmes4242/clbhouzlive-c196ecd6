@@ -16,12 +16,23 @@ interface PostTag {
 }
 
 export const usePostTags = () => {
-  const savePostTags = useCallback(async (postId: string, tags: PostTag[]) => {
+  const savePostTags = useCallback(async (postId: string, tags: PostTag[], taggedByUserId?: string) => {
     if (tags.length === 0) return;
 
     try {
+      let userId = taggedByUserId;
+      if (!userId) {
+        const { data: { user } } = await supabase.auth.getUser();
+        userId = user?.id;
+      }
+
+      if (!userId) {
+        throw new Error('User must be authenticated to save post tags');
+      }
+
       const tagsWithPostId = tags.map(tag => ({
         post_id: postId,
+        tagged_by_user_id: userId,
         ...tag
       }));
 
