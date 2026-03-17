@@ -24,6 +24,8 @@ export interface TournamentFinisher {
   position: number;
   photoUrl: string | null;
   pgaTourId: string | null;
+  /** Primary tour code for R2 headshot folder lookup */
+  tourCode: string | null;
   /** Formatted display: "S. Scheffler" */
   displayName: string;
   /** Formatted score: "-12" or "E" or "+3" */
