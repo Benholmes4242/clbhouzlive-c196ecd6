@@ -815,10 +815,10 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       <div
         className="shrink-0 flex items-center px-4"
         style={{
-          height: 52,
+          minHeight: 52,
           borderTop: '1px solid rgba(255,255,255,0.07)',
           background: 'rgba(8,8,8,0.98)',
-          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)',
         }}
       >
         {/* Actor avatar — compact profile switcher */}
