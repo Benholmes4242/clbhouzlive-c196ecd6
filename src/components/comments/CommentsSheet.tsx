@@ -122,6 +122,10 @@ function CommentsSheet({
 
   const isDark = theme === 'dark';
 
+  const cleanCaption = useMemo(() => removeGolfCourseFromContent(caption ?? null), [caption]);
+  const extractedCourse = useMemo(() => extractGolfCourseFromContent(caption ?? null), [caption]);
+  const displayCourseName = courseName || extractedCourse?.name || null;
+
   // ── Sorted comments ──
   const sortedComments = useMemo(() => {
     const sorted = [...comments];
