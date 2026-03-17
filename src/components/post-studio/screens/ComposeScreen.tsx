@@ -893,25 +893,28 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       </div>
 
       {/* Video tool picker sheet */}
-      {videoToolSheetIndex !== null && state.mediaItems[videoToolSheetIndex] && (
-        <VideoToolSheet
-          item={state.mediaItems[videoToolSheetIndex]}
-          onEdit={() => {
-            setVideoToolSheetIndex(null);
-            setActiveTool(null);
-            setShelfOpen(true);
-          }}
-          onTrim={() => {
-            setVideoToolSheetIndex(null);
-            setStep('TRIM');
-          }}
-          onCover={() => {
-            setVideoToolSheetIndex(null);
-            setStep('POSTER');
-          }}
-          onClose={() => setVideoToolSheetIndex(null)}
-        />
-      )}
+      {videoToolSheetIndex !== null && state.mediaItems[videoToolSheetIndex] &&
+        createPortal(
+          <VideoToolSheet
+            item={state.mediaItems[videoToolSheetIndex]}
+            onEdit={() => {
+              setVideoToolSheetIndex(null);
+              setActiveTool(null);
+              setShelfOpen(true);
+            }}
+            onTrim={() => {
+              setVideoToolSheetIndex(null);
+              setStep('TRIM');
+            }}
+            onCover={() => {
+              setVideoToolSheetIndex(null);
+              setStep('POSTER');
+            }}
+            onClose={() => setVideoToolSheetIndex(null)}
+          />,
+          document.body
+        )
+      }
 
       {/* Overflow sheet — hidden items beyond tile 4 */}
       {overflowSheetOpen && (
