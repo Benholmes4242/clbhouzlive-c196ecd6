@@ -351,6 +351,10 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
       
       {/* Enhanced animation styles */}
       <style>{`
+        html, body {
+          background-color: #0d0d0d !important;
+        }
+
         @keyframes auth-logo-in {
           0% {
             opacity: 0;
