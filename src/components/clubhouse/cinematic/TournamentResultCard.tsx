@@ -497,11 +497,11 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
               { v: meta.stat_bogeys,  label: 'Bogeys',  color: '#EF4444', show: meta.stat_bogeys != null },
             ].filter(s => s.show).map(stat => (
               <div key={stat.label} style={{
-                flex: 1, textAlign: 'center' as const, padding: '4px 0',
+                flex: 1, textAlign: 'center' as const, padding: '6px 0',
                 borderRadius: 8, background: `${stat.color}0A`,
               }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: stat.color }}>{stat.v}</div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: 0.5, marginTop: 1 }}>{stat.label}</div>
+                <div style={{ fontSize: 17, fontWeight: 700, color: stat.color }}>{stat.v}</div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: 0.5, marginTop: 1 }}>{stat.label}</div>
               </div>
             ))}
             {meta.stat_driving_distance != null && (
