@@ -35,6 +35,7 @@ const STEP_PROGRESS: Partial<Record<StudioStep, number>> = {
 
 export function StudioHeader({
   title,
+  centerContent,
   leftAction,
   rightAction,
   step,
