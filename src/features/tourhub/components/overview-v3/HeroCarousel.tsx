@@ -1122,12 +1122,16 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     );
   }
 
-  if (slides.length === 0) {
+  if (!slides || slides.length === 0) {
     return (
-      <div className="relative w-full h-full bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center">
-        <div className="text-center text-white/60">
-          <p className="text-lg mb-2">No active tournaments</p>
-          <p className="text-sm">Check back soon for upcoming events</p>
+      <div className="relative w-full h-full bg-slate-900 animate-pulse">
+        <div 
+          className="absolute left-4 right-4 sm:right-auto sm:w-[360px] p-5 glass-card"
+          style={{ bottom: 'calc(60px + env(safe-area-inset-bottom, 0px))' }}
+        >
+          <div className="h-4 w-20 bg-white/10 rounded mb-4" />
+          <div className="h-8 w-56 bg-white/10 rounded mb-2" />
+          <div className="h-4 w-40 bg-white/10 rounded" />
         </div>
       </div>
     );
