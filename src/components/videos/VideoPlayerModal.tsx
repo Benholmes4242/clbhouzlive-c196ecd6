@@ -230,6 +230,20 @@ export const VideoPlayerModal: React.FC = () => {
           category: categoryTag?.tagged_entity?.slug,
           studioEdits: media.studio_edits,
           filterId: media.filter_id ?? (media.studio_edits as any)?.filter ?? null,
+          tags: postTags
+            ?.filter((tag: any) => {
+              const et = tag.tagged_entity?.entity_type;
+              return et === 'user' || et === 'business';
+            })
+            .map((tag: any) => ({
+              id: tag.id,
+              entity_type: tag.tagged_entity?.entity_type,
+              entity_id: tag.tagged_entity?.entity_id,
+              name: tag.tagged_entity?.name || 'Unknown',
+              username: tag.tagged_entity?.username || null,
+              start_index: tag.start_index ?? 0,
+              end_index: tag.end_index ?? 0,
+            })) || [],
         });
       } catch (err) {
         console.error('Error loading video:', err);
