@@ -9,7 +9,6 @@ import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeads
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
-import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 
 interface PlayerHeroProps {
   player: TourPlayer;
