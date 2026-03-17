@@ -86,6 +86,16 @@ export function PersonalProfileWizard() {
     }
   }, [isDirty, navigate]);
 
+  // Fix 3: Skip button handler
+  const handleSkip = useCallback(async () => {
+    if (!user?.id) return;
+    await supabase
+      .from('user_profiles')
+      .update({ has_completed_onboarding: true })
+      .eq('id', user.id);
+    navigate('/', { replace: true });
+  }, [user, navigate]);
+
   const handleSave = useCallback(async () => {
     if (step < 3) { goNext(); return; }
     const ok = await save(form);
