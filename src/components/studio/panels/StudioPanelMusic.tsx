@@ -205,7 +205,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
                     }}
                     className="w-10 h-10 rounded-full flex items-center justify-center transition-all flex-shrink-0 active:scale-90"
                     style={isPlaying ? {
-                      background: '#E8980A',
+                      background: 'rgba(255,255,255,0.90)',
                       color: '#FFFFFF',
                     } : {
                       background: 'rgba(255,255,255,0.08)',
