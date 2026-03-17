@@ -286,7 +286,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         }}>
           {(meta.venue_name || meta.venue_city) && (
             <div style={{
-              fontSize: 12, color: 'rgba(255,255,255,0.5)',
+              fontSize: 13, color: 'rgba(255,255,255,0.5)',
               letterSpacing: 0.5, marginBottom: 4,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
             }}>
