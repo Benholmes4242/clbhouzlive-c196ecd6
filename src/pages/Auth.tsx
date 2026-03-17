@@ -87,7 +87,6 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
     <AuthForm
       isSignUp={isSignUp}
       setIsSignUp={setIsSignUp}
-      setShowConfirmNotice={setShowConfirmNotice}
       setErrorMsg={setErrorMsg}
       setSubmitting={setSubmitting}
       setResendMsg={setResendMsg}
@@ -97,7 +96,6 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
       email={email}
       password={password}
       submitting={submitting}
-      showConfirmNotice={showConfirmNotice}
       authNotice={authNotice}
       setAuthNotice={setAuthNotice}
     />

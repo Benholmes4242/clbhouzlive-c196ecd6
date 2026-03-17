@@ -11695,6 +11695,7 @@ export type Database = {
           updated_at: string | null
           user_type: Database["public"]["Enums"]["user_type"] | null
           username: string | null
+          username_is_custom: boolean
           verification_notes: string | null
           verification_requested_at: string | null
           verification_reviewed_at: string | null
@@ -11804,6 +11805,7 @@ export type Database = {
           updated_at?: string | null
           user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
+          username_is_custom?: boolean
           verification_notes?: string | null
           verification_requested_at?: string | null
           verification_reviewed_at?: string | null
@@ -11913,6 +11915,7 @@ export type Database = {
           updated_at?: string | null
           user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
+          username_is_custom?: boolean
           verification_notes?: string | null
           verification_requested_at?: string | null
           verification_reviewed_at?: string | null
