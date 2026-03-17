@@ -38,7 +38,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Query auth.users directly via PostgREST REST API with service role
     // getUserByEmail was removed from the Supabase Admin SDK
-    const response = await fetch(
+    const fetchRes = await fetch(
       `${supabaseUrl}/rest/v1/users?email=eq.${encodeURIComponent(normalizedEmail)}&select=id`,
       {
         headers: {
@@ -50,8 +50,8 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
 
-    if (!response.ok) {
-      const errText = await response.text();
+    if (!fetchRes.ok) {
+      const errText = await fetchRes.text();
       console.error("[auth-email-exists] Error checking user:", errText);
       return new Response(
         JSON.stringify({ error: "Failed to check email" }),
@@ -59,13 +59,12 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const users = await response.json();
+    const users = await fetchRes.json();
     const exists = Array.isArray(users) && users.length > 0;
     console.log(`[auth-email-exists] Email exists: ${exists}`);
 
-    const response: EmailExistsResponse = { exists };
     return new Response(
-      JSON.stringify(response),
+      JSON.stringify({ exists } as EmailExistsResponse),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   } catch (error) {
