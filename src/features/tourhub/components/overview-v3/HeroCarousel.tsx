@@ -1005,7 +1005,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     }, 8000);
 
     return () => clearInterval(interval);
-  }, [slides.length, isPaused, isExpanded]);
+  }, [slides?.length, isPaused, isExpanded]);
 
   // Pause auto-advance when app is backgrounded
   useEffect(() => {
