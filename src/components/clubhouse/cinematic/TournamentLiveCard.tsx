@@ -506,7 +506,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                     padding: 'clamp(12px, 2.8vh, 24px) 20px',
                   }}>
                     {/* Position */}
-                    <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.35)', width: 22, flexShrink: 0, textAlign: 'center' }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.35)', width: 24, flexShrink: 0, textAlign: 'center' }}>
                       {entry.positionTied ? `T${entry.position}` : entry.position}
                     </span>
 
