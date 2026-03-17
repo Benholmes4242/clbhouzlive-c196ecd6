@@ -159,7 +159,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
             onClick={() => setActiveMood(mood.key)}
             className="px-2.5 py-1 rounded-md text-[12px] font-medium whitespace-nowrap transition-colors"
             style={activeMood === mood.key ? {
-              background: '#E8980A',
+               background: 'rgba(255,255,255,0.90)',
               color: '#FFFFFF',
             } : {
               background: 'rgba(255,255,255,0.08)',
