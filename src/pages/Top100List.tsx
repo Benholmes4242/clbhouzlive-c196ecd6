@@ -13,7 +13,6 @@ import GolfClubView from '@/components/golf-club/GolfClubView';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import {
   Top100ListLeaderboard,
-  Top100ListMilestoneRail,
   Top100ListFilterChips,
   Top100ListCourseCard,
   Top100ListProgressCard,
