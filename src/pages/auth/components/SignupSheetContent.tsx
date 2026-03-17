@@ -133,7 +133,8 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
   };
 
   const handleUsernameChange = (value: string) => {
-    const cleanValue = value.replace('@', '');
+    // H5: Only allow alphanumeric and underscores (matches DB trigger for OAuth)
+    const cleanValue = value.replace(/[^a-zA-Z0-9_]/g, '');
     setUsername(cleanValue);
     
     // Clear previous timeout
@@ -216,6 +217,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
             }}
             onBlur={() => setUsernameFocused(false)}
             placeholder="Username"
+            maxLength={20}
             disabled={submitting}
             className="w-full h-[54px] px-4 pr-10 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
             style={{
@@ -253,7 +255,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
         {/* Username taken suggestions */}
         {usernameAvailable === false && suggestedUsernames.length > 0 && (
           <div className="mt-3">
-            <p className="text-[#E03131] text-[13px] mb-2">
+            <p role="alert" className="text-[#E03131] text-[13px] mb-2">
               That username's taken. Try one of these:
             </p>
             <div className="flex flex-wrap gap-2">
@@ -275,7 +277,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
         )}
         
         {username.length > 0 && username.length < 3 && (
-          <p className="text-[#E03131] text-[13px] mt-2">
+          <p role="alert" className="text-[#E03131] text-[13px] mt-2">
             Username must be at least 3 characters
           </p>
         )}
@@ -323,6 +325,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
           {!isPasswordDisabled && (
             <button
               type="button"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-full transition-opacity"
               style={{ opacity: password.length > 0 ? 1 : 0.5 }}
@@ -344,7 +347,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
         />
         
         {passwordError && (
-          <p className="text-[#E03131] text-[13px] mt-2">{passwordError}</p>
+          <p role="alert" className="text-[#E03131] text-[13px] mt-2">{passwordError}</p>
         )}
       </div>
       
@@ -395,6 +398,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
           {!isConfirmPasswordDisabled && (
             <button
               type="button"
+              aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-full transition-opacity"
               style={{ opacity: confirmPassword.length > 0 ? 1 : 0.5 }}
@@ -410,7 +414,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
         </div>
         
         {showMismatchError && (
-          <p className="text-[#E03131] text-[13px] mt-2">Passwords don't match.</p>
+          <p role="alert" className="text-[#E03131] text-[13px] mt-2">Passwords don't match.</p>
         )}
         
         {isConfirmPasswordValid && (

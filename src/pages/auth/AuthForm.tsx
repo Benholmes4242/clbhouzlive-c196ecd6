@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import {
   trackAuthMethodSelected,
   trackAuthInitiated,
@@ -30,10 +31,21 @@ type AuthNotice = {
 // UI view states - maps to existing isSignUp/showForgotPassword logic
 type AuthView = 'entry' | 'email' | 'password' | 'signup' | 'forgot';
 
+// Helper to sanitise error messages before sending to analytics
+const sanitiseErrorForAnalytics = (message?: string): string => {
+  if (!message) return 'auth_error';
+  if (message.includes('Invalid login')) return 'invalid_credentials';
+  if (message.includes('Email not confirmed')) return 'email_not_confirmed';
+  if (message.includes('popup_closed')) return 'popup_closed';
+  if (message.includes('network') || message.includes('fetch')) return 'network_error';
+  if (message.includes('unauthorized') || message.includes('invalid')) return 'invalid_provider';
+  if (message.includes('already registered')) return 'already_registered';
+  return 'auth_error';
+};
+
 interface AuthFormProps {
   isSignUp: boolean;
   setIsSignUp: (b: boolean) => void;
-  setShowConfirmNotice: (b: boolean) => void;
   setErrorMsg: (msg: string | null) => void;
   setSubmitting: (b: boolean) => void;
   setResendMsg: (msg: string | null) => void;
@@ -43,7 +55,6 @@ interface AuthFormProps {
   email: string;
   password: string;
   submitting: boolean;
-  showConfirmNotice: boolean;
   authNotice: AuthNotice;
   setAuthNotice: (notice: AuthNotice) => void;
 }
@@ -51,7 +62,6 @@ interface AuthFormProps {
 const AuthForm: React.FC<AuthFormProps> = ({
   isSignUp,
   setIsSignUp,
-  setShowConfirmNotice,
   setErrorMsg,
   setSubmitting,
   setResendMsg,
@@ -61,7 +71,6 @@ const AuthForm: React.FC<AuthFormProps> = ({
   email,
   password,
   submitting,
-  showConfirmNotice,
   authNotice,
   setAuthNotice,
 }) => {
@@ -147,7 +156,6 @@ const AuthForm: React.FC<AuthFormProps> = ({
       });
       
       if (error) {
-        // FIX 3: Enhanced error messaging
         let errorMessage = 'Google sign-in failed.';
         
         if (error.message?.includes('popup_closed')) {
@@ -156,11 +164,10 @@ const AuthForm: React.FC<AuthFormProps> = ({
           errorMessage = 'Connection issue. Please check your internet and try again.';
         } else if (error.message?.includes('unauthorized') || error.message?.includes('invalid')) {
           errorMessage = 'Unable to verify with Google. Please try again.';
-        } else {
-          errorMessage += ` ${error.message}`;
         }
+        // D2: No longer appending raw error.message
         
-        trackAuthFailed('google', error.message, Date.now() - startTime);
+        trackAuthFailed('google', sanitiseErrorForAnalytics(error.message), Date.now() - startTime);
         setErrorMsg(errorMessage);
         setSubmitting(false);
       } else {
@@ -190,7 +197,6 @@ const AuthForm: React.FC<AuthFormProps> = ({
       });
       
       if (error) {
-        // FIX 3: Enhanced error messaging
         let errorMessage = 'Apple sign-in failed.';
         
         if (error.message?.includes('popup_closed')) {
@@ -199,11 +205,10 @@ const AuthForm: React.FC<AuthFormProps> = ({
           errorMessage = 'Connection issue. Please check your internet and try again.';
         } else if (error.message?.includes('unauthorized') || error.message?.includes('invalid')) {
           errorMessage = 'Unable to verify with Apple. Please try again.';
-        } else {
-          errorMessage += ` ${error.message}`;
         }
+        // D2: No longer appending raw error.message
         
-        trackAuthFailed('apple', error.message, Date.now() - startTime);
+        trackAuthFailed('apple', sanitiseErrorForAnalytics(error.message), Date.now() - startTime);
         setErrorMsg(errorMessage);
         setSubmitting(false);
       } else {
@@ -240,7 +245,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     
     if (error) {
-      trackLoginFailed('email', error.message, Date.now() - startTime);
+      trackLoginFailed('email', sanitiseErrorForAnalytics(error.message), Date.now() - startTime);
       setPasswordError("Email or password is incorrect");
       setSubmitting(false);
     } else if (data?.user) {
@@ -265,13 +270,12 @@ const AuthForm: React.FC<AuthFormProps> = ({
     });
     
     if (error) {
-      trackLoginFailed('email', error.message, Date.now() - startTime);
-      // Show error via toast or notice
+      trackLoginFailed('email', sanitiseErrorForAnalytics(error.message), Date.now() - startTime);
       setAuthNotice({
         type: 'error',
         message: error.message.includes('Invalid login') 
           ? 'Email or password is incorrect' 
-          : error.message,
+          : 'Something went wrong. Please try again.',
       });
       setSubmitting(false);
     } else if (data?.user) {
@@ -314,7 +318,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
 
     trackSignupInitiated('email');
     setSubmitting(true);
-    console.log('[Auth] Starting signup for:', email);
+    // B1/D1: Removed console.log that exposed user email
     
     const startTime = Date.now();
 
@@ -350,12 +354,12 @@ const AuthForm: React.FC<AuthFormProps> = ({
           setEmailError("This email is already registered");
           setView('email');
         } else {
-          setErrorMsg(error.message);
+          setErrorMsg('Something went wrong. Please try again.');
         }
         setSubmitting(false);
       } else if (data?.user?.identities?.length === 0) {
         // Email already registered but not confirmed
-        localStorage.setItem('pending_signup_email', email);
+        safeLocalStorage.set('pending_signup_email', email);
         setIsSignUp(false);
         setPassword('');
         setConfirmPassword('');
@@ -369,7 +373,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
       } else if (data?.user) {
         // Fix 1: Let users in immediately — no verification gate
         // Store pending email for later nudge system
-        localStorage.setItem('pending_verification_email', email);
+        safeLocalStorage.set('pending_verification_email', email);
         trackSignupSuccess('email', Date.now() - startTime);
         
         // Show success animation and navigate to callback
@@ -377,7 +381,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
         setShowSuccessAnimation(true);
       } else if (data && !data.user) {
         // Supabase returned success but no user — edge case fallback
-        localStorage.setItem('pending_verification_email', email);
+        safeLocalStorage.set('pending_verification_email', email);
         setErrorMsg('Something went wrong. Please try again.');
         setSubmitting(false);
       } else {
@@ -476,6 +480,9 @@ const AuthForm: React.FC<AuthFormProps> = ({
     setPasswordError(null);
     setForgotPasswordMsg(null);
     setForgotPasswordSuccess(false);
+    // D5: Clear password state when sheet closes
+    setPassword('');
+    setConfirmPassword('');
   };
 
   const handleBackToEmail = () => {

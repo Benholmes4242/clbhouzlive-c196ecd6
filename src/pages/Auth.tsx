@@ -21,8 +21,6 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [showConfirmNotice, setShowConfirmNotice] = useState(false);
-  const [resending, setResending] = useState(false);
   const [resendMsg, setResendMsg] = useState<string | null>(null);
   const [authNotice, setAuthNotice] = useState<AuthNotice>(null);
   const { user } = useSupabaseSession();
@@ -79,7 +77,6 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
 
   // Clear all auth messages helper
   const clearAuthMessages = () => {
-    setShowConfirmNotice(false);
     setErrorMsg(null);
     setResendMsg(null);
     setAuthNotice(null);
@@ -89,7 +86,6 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
     <AuthForm
       isSignUp={isSignUp}
       setIsSignUp={setIsSignUp}
-      setShowConfirmNotice={setShowConfirmNotice}
       setErrorMsg={setErrorMsg}
       setSubmitting={setSubmitting}
       setResendMsg={setResendMsg}
@@ -99,7 +95,6 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
       email={email}
       password={password}
       submitting={submitting}
-      showConfirmNotice={showConfirmNotice}
       authNotice={authNotice}
       setAuthNotice={setAuthNotice}
     />
