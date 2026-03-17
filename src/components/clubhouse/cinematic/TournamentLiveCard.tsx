@@ -417,7 +417,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           </div>
 
           {/* Birdies / Eagles / Pars / Bogeys row */}
-          <div style={{ display: 'flex', gap: 4 }}>
+          <div style={{ display: 'flex', gap: 5 }}>
             {meta.leaderStats.totalEagles > 0 && (
               <LiveStatChip
                 value={meta.leaderStats.totalEagles}
