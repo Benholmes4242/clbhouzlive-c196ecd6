@@ -838,14 +838,14 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           whileTap={{ scale: 0.92 }}
           onClick={() => fileInputRef.current?.click()}
           disabled={isProcessing}
-          className="flex items-center justify-center disabled:opacity-40 mr-4"
-           style={{
-             width: 34, height: 34, borderRadius: '50%',
-             background: 'rgba(255,255,255,0.96)',
-             boxShadow: '0 2px 12px rgba(0,0,0,0.30)',
-           }}
-         >
-           <Camera className="w-4 h-4" style={{ color: '#0D0D0D' }} strokeWidth={2} />
+          className="flex items-center justify-center disabled:opacity-40 mr-4 shrink-0"
+          style={{
+            width: 34, height: 34, borderRadius: '50%',
+            background: 'rgba(255,255,255,0.96)',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.30)',
+          }}
+        >
+          <Camera className="w-4 h-4 shrink-0" style={{ color: '#0D0D0D' }} strokeWidth={2} />
         </motion.button>
 
         {/* Spacer between camera and gallery */}
