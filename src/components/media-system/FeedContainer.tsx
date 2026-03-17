@@ -399,7 +399,7 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
           willChange: 'transform',
         }}
       >
-        {posts.map((post, index) => {
+        {deduplicatePosts(posts).map((post, index) => {
           const distance = Math.abs(index - storeActiveIndex);
           
           // DOM virtualization: only render FeedItems within ±5 of active
