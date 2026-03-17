@@ -192,8 +192,8 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
                   className="px-3 py-2 flex items-center gap-2.5 transition-colors cursor-pointer"
                   style={{
                     borderBottom: '1px solid rgba(255,255,255,0.06)',
-                    background: isSelected ? 'rgba(232,152,10,0.08)' : undefined,
-                    borderLeft: isSelected ? '2px solid #E8980A' : '2px solid transparent',
+                    background: isSelected ? 'rgba(255,255,255,0.06)' : undefined,
+                    borderLeft: isSelected ? '2px solid rgba(255,255,255,0.90)' : '2px solid transparent',
                   }}
                   onClick={() => handleSelectTrack(track)}
                 >
