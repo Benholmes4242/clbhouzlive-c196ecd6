@@ -506,8 +506,8 @@ const ClubhouseContent = () => {
           */}
 
           {/* DEBUG DISABLED — CinematicActionRail
-          <CinematicActionRail
-            key={activePost.id}
+           <CinematicActionRail
+              key={activePost.id}
             postId={activePost.id}
             likesCount={activeLikeState ? activeLikeState.count : null}
             commentsCount={activePost ? activeCommentCount : null}
@@ -532,8 +532,8 @@ const ClubhouseContent = () => {
           */}
 
           {/* DEBUG DISABLED — CreatorCapsule
-          <CreatorCapsule
-            key={activePost.id}
+           <CreatorCapsule
+              key={activePost.id}
             postId={activePost.id}
             user={{
               id: activePost.userId,
