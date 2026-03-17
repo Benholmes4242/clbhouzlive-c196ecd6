@@ -469,7 +469,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
                   {isTied ? `${row.players.length}-Way Tie` : primary.name}
                 </span>
                 <span style={{
-                  fontSize: 'clamp(12px, 3.2vw, 14px)', fontWeight: 600,
+                  fontSize: 'clamp(13px, 3.5vw, 15px)', fontWeight: 600,
                   color: 'rgba(255,255,255,0.6)',
                   fontVariantNumeric: 'tabular-nums' as const,
                 }}>
