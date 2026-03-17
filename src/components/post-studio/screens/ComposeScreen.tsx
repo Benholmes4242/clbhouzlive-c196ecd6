@@ -893,7 +893,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         {/* Camera — primary action, white circle */}
         <motion.button
           whileTap={{ scale: 0.92 }}
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => cameraInputRef.current?.click()}
           disabled={isProcessing}
           className="flex items-center justify-center disabled:opacity-40 mr-4 shrink-0"
           style={{
