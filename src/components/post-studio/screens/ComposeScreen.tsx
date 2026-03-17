@@ -524,7 +524,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   } = usePostStudioContext();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const rearCameraInputRef = useRef<HTMLInputElement>(null);
+  const frontCameraInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const placeholderRef = useRef(getRandomPlaceholder());
   const [isProcessing, setIsProcessing] = useState(false);
