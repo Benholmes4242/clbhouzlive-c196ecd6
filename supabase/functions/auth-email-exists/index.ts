@@ -34,38 +34,34 @@ const handler = async (req: Request): Promise<Response> => {
     const normalizedEmail = email.toLowerCase().trim();
     console.log("[auth-email-exists] Checking email...");
 
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    // Query auth.users directly via PostgREST REST API with service role
+    // getUserByEmail was removed from the Supabase Admin SDK
+    const response = await fetch(
+      `${supabaseUrl}/rest/v1/users?email=eq.${encodeURIComponent(normalizedEmail)}&select=id`,
       {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
+        headers: {
+          "apikey": serviceRoleKey,
+          "Authorization": `Bearer ${serviceRoleKey}`,
+          "Accept": "application/json",
+          "Accept-Profile": "auth",
         },
       }
     );
 
-    // Query auth.users directly — getUserByEmail was removed from Admin SDK
-    const { data, error } = await supabaseAdmin
-      .rpc('', { }).catch(() => null) as any; // unused, see below
-
-    // Use raw PostgREST query against auth.users via service role
-    const { data: user, error: queryError } = await supabaseAdmin
-      .schema('auth' as any)
-      .from('users')
-      .select('id')
-      .eq('email', normalizedEmail)
-      .maybeSingle();
-
-    if (queryError) {
-      console.error("[auth-email-exists] Error checking user:", queryError.message);
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error("[auth-email-exists] Error checking user:", errText);
       return new Response(
         JSON.stringify({ error: "Failed to check email" }),
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    const exists = !!user;
+    const users = await response.json();
+    const exists = Array.isArray(users) && users.length > 0;
     console.log(`[auth-email-exists] Email exists: ${exists}`);
 
     const response: EmailExistsResponse = { exists };
