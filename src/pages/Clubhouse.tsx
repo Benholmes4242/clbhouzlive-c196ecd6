@@ -506,7 +506,6 @@ const ClubhouseContent = () => {
 
           {/* CinematicActionRail — z-40, right side */}
            <CinematicActionRail
-              key={activePost.id}
             postId={activePost.id}
             likesCount={activeLikeState ? activeLikeState.count : null}
             commentsCount={activePost ? activeCommentCount : null}
