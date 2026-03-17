@@ -301,8 +301,8 @@ export function ScheduleTab() {
         t.tour_full_name?.toLowerCase().includes(searchLower)
       );
     }
-    // Remove hero items from the list on all tabs (they're shown in the carousel above)
-    if (!search && heroItems.length > 0 && filter !== 'all' && filter !== 'live') {
+    // Remove hero items from list — but never on the completed tab so all finished events remain visible
+    if (!search && heroItems.length > 0 && filter !== 'all' && filter !== 'live' && filter !== 'completed') {
       const heroIds = new Set(heroItems.map(h => h.tournament.id));
       filtered = filtered.filter(t => !heroIds.has(t.id));
     }
