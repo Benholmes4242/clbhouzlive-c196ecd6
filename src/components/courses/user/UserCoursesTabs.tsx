@@ -35,7 +35,7 @@ const UserCoursesTabs: React.FC<UserCoursesTabsProps> = ({
           <span className="text-sm font-medium">Top 100</span>
           {activeTab === 'top100' && (
             <div 
-              className="w-1.5 h-1.5 rounded-full bg-[#b66b41] mt-1 animate-fade-in"
+             className="w-1.5 h-1.5 rounded-full bg-foreground mt-1 animate-fade-in"
               style={{ marginTop: '4px' }}
             />
           )}
