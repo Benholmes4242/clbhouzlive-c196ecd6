@@ -28,9 +28,9 @@ const UpdateUsernameDialog: React.FC<UpdateUsernameDialogProps> = ({
   const [username, setUsername] = useState(currentUsername || "");
   const [saving, setSaving] = useState(false);
 
-  // Function to clean username - remove spaces and @ symbol, preserve case
+  // Function to clean username - only allow alphanumeric and underscores (matches signup flow)
   const cleanUsername = (value: string) => {
-    return value.replace(/\s+/g, '').replace('@', '');
+    return value.replace(/[^a-zA-Z0-9_]/g, '');
   };
 
   // Handle username input change with automatic space removal
