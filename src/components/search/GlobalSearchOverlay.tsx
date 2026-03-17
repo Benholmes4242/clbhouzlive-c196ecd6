@@ -59,8 +59,8 @@ function SkeletonDivider() {
 function SearchSkeleton() {
   const sections = [
     { label: 'Courses', count: 2, shape: 'rounded-xl', eyebrowW: 'w-14' },
-    { label: 'People', count: 2, shape: 'rounded-full', eyebrowW: 'w-12' },
-    { label: 'Businesses', count: 2, shape: 'rounded-xl', eyebrowW: 'w-16' },
+    { label: 'People', count: 2, shape: 'clbhouz-squircle', eyebrowW: 'w-12' },
+    { label: 'Businesses', count: 2, shape: 'clbhouz-squircle', eyebrowW: 'w-16' },
   ];
   return (
     <>
@@ -407,7 +407,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                             onClick={() => selectPerson(person)}
                             className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-muted/50"
                           >
-                            <div className="w-10 h-10 rounded-full bg-muted overflow-hidden shrink-0">
+                            <div className="w-10 h-10 clbhouz-squircle bg-muted overflow-hidden shrink-0 relative">
                               {person.avatar_url && (
                                 <img src={person.avatar_url} alt="" className="w-full h-full object-cover" />
                               )}
@@ -451,7 +451,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                             onClick={() => selectBusiness(business)}
                             className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-muted/50"
                           >
-                            <div className="w-10 h-10 rounded-xl bg-muted overflow-hidden shrink-0 flex items-center justify-center">
+                            <div className="w-10 h-10 clbhouz-squircle bg-muted overflow-hidden shrink-0 relative flex items-center justify-center">
                               {business.logo_url
                                 ? <img src={business.logo_url} alt="" className="w-full h-full object-cover" />
                                 : <Briefcase className="w-5 h-5 text-muted-foreground" />
