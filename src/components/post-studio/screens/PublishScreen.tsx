@@ -95,16 +95,24 @@ export function PublishScreen() {
             {/* Thumbnail */}
             <div className="relative" style={{ aspectRatio: '4/3' }}>
               {firstItem.mediaType === 'video' ? (
-                <video
-                  src={firstItem.previewUrl}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  preload="auto"
-                  className="w-full h-full object-cover"
-                  style={{ pointerEvents: 'none' }}
-                />
+                firstItem.posterPreviewUrl ? (
+                  <img
+                    src={firstItem.posterPreviewUrl}
+                    alt="Cover"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <video
+                    src={firstItem.previewUrl}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="auto"
+                    className="w-full h-full object-cover"
+                    style={{ pointerEvents: 'none' }}
+                  />
+                )
               ) : (
                 <img
                   src={firstItem.thumbnailUrl || firstItem.previewUrl}
@@ -112,7 +120,16 @@ export function PublishScreen() {
                   className="w-full h-full object-cover"
                 />
               )}
-              {/* Multi-item count badge */}
+              {/* Cover pill — top left */}
+              {firstItem.posterPreviewUrl && (
+                <div
+                  className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-semibold"
+                  style={{ background: 'rgba(0,0,0,0.50)', backdropFilter: 'blur(12px)', color: 'rgba(255,255,255,0.80)', border: '1px solid rgba(255,255,255,0.12)' }}
+                >
+                  Cover
+                </div>
+              )}
+              {/* Media count — top right */}
               {itemCount > 1 && (
                 <div
                   className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[11px] font-semibold"
