@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPinned, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import { FiMapPin } from 'react-icons/fi';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 
