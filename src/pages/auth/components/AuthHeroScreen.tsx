@@ -400,6 +400,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
         .auth-button-3 { animation: auth-button-in 0.4s ease-out 0.55s both; }
         .auth-button-4 { animation: auth-button-in 0.4s ease-out 0.65s both; }
         .auth-button-5 { animation: auth-button-in 0.4s ease-out 0.75s both; }
+        .auth-button-6 { animation: auth-button-in 0.4s ease-out 0.85s both; }
         
         @media (prefers-reduced-motion: reduce) {
           .auth-logo-animate,
@@ -408,7 +409,8 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
           .auth-button-2,
           .auth-button-3,
           .auth-button-4,
-          .auth-button-5 {
+          .auth-button-5,
+          .auth-button-6 {
             animation: none;
             opacity: 1;
             transform: none;
