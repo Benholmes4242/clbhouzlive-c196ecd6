@@ -476,13 +476,6 @@ export function TourHubNavOverlay({
                       );
                     })}
                   </div>
-                  {/* Right-fade overlay — indicates more cards to scroll */}
-                  <div
-                    className="absolute inset-y-0 right-0 w-12 pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(to left, hsl(var(--background) / 0.9), transparent)',
-                    }}
-                  />
                 </div>
               </motion.div>
             )}
