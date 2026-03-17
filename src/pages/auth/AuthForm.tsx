@@ -334,7 +334,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
         email,
         password,
         options: {
-          emailRedirectTo: `${import.meta.env.VITE_APP_URL ?? window.location.origin}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
             username: username.trim(),  // Preserve case, just trim whitespace
           }
@@ -350,9 +350,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
       });
       
       if (error) {
-        if ((error as any)?.status === 429) {
-          setErrorMsg('Too many attempts. Please wait a moment before trying again.');
-        } else if (error.message.includes('already registered')) {
+        if (error.message.includes('already registered')) {
           setEmailError("This email is already registered");
           setView('email');
         } else {

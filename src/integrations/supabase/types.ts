@@ -13907,7 +13907,6 @@ export type Database = {
           newly_awarded_badges: Json
         }[]
       }
-      check_email_exists: { Args: { lookup_email: string }; Returns: boolean }
       check_expiring_admin_access: { Args: never; Returns: undefined }
       cleanup_echo_data: { Args: never; Returns: undefined }
       cleanup_expired_dismissals: { Args: never; Returns: undefined }

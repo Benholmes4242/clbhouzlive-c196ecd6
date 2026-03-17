@@ -7,13 +7,21 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+interface EmailExistsRequest {
+  email: string;
+}
+
+interface EmailExistsResponse {
+  exists: boolean;
+}
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { email } = await req.json();
+    const { email }: EmailExistsRequest = await req.json();
 
     if (!email || typeof email !== "string") {
       console.error("[auth-email-exists] Missing or invalid email");
@@ -24,32 +32,51 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
+    console.log("[auth-email-exists] Checking email...");
 
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-      { auth: { autoRefreshToken: false, persistSession: false } }
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      }
     );
 
-    // Use a security-definer RPC that queries auth.users directly
-    const { data: exists, error } = await supabaseAdmin.rpc("check_email_exists", {
-      lookup_email: normalizedEmail,
-    });
+    // Use getUserByEmail — O(1) lookup, no pagination, scales to any user count
+    const { data: { user }, error } = await supabaseAdmin.auth.admin
+      .getUserByEmail(normalizedEmail);
 
     if (error) {
-      console.error("[auth-email-exists] RPC error:", error.message);
+      // "User not found" is expected when email doesn't exist
+      if (error.message?.includes("User not found")) {
+        console.log("[auth-email-exists] Email does not exist");
+        const response: EmailExistsResponse = { exists: false };
+        return new Response(
+          JSON.stringify(response),
+          { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+
+      console.error("[auth-email-exists] Error checking user:", error.message);
       return new Response(
         JSON.stringify({ error: "Failed to check email" }),
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
+    const exists = !!user;
+    console.log(`[auth-email-exists] Email exists: ${exists}`);
+
+    const response: EmailExistsResponse = { exists };
     return new Response(
-      JSON.stringify({ exists: !!exists }),
+      JSON.stringify(response),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
-  } catch (err) {
-    console.error("[auth-email-exists] Unexpected error:", err);
+  } catch (error) {
+    console.error("[auth-email-exists] Unexpected error:", error);
     return new Response(
       JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
