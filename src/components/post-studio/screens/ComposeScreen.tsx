@@ -97,12 +97,18 @@ async function getVideoDuration(file: File): Promise<number | null> {
     const video = document.createElement('video');
     video.preload = 'metadata';
     const url = URL.createObjectURL(file);
-    video.src = url;
+
+    const timeout = setTimeout(() => { URL.revokeObjectURL(url); resolve(null); }, 8000);
+
     video.onloadedmetadata = () => {
-      resolve(isFinite(video.duration) ? video.duration : null);
+      clearTimeout(timeout);
       URL.revokeObjectURL(url);
+      resolve(isFinite(video.duration) && video.duration > 0 ? video.duration : null);
     };
-    video.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+    video.onerror = () => { clearTimeout(timeout); URL.revokeObjectURL(url); resolve(null); };
+
+    video.src = url;
+    video.load();
   });
 }
 
