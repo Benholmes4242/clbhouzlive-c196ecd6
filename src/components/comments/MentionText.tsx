@@ -137,10 +137,11 @@ export function MentionText({
               type="button"
               onClick={(e) => handleMentionClick(part.username!, e)}
               className={cn(
-                'text-amber-500 font-medium hover:underline cursor-pointer',
+                'font-medium hover:underline cursor-pointer',
                 'inline bg-transparent border-none p-0',
                 mentionClassName
               )}
+              style={{ color: '#E8980A' }}
             >
               {part.content}
             </button>

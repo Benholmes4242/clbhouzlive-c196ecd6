@@ -122,8 +122,8 @@ const PostContentWithTags: React.FC<PostContentWithTagsProps> = ({
           e.stopPropagation();
           handleTagClick(taggable_entities);
         }}
-        className="text-primary font-medium hover:underline cursor-pointer bg-transparent border-none p-0 m-0 inline"
-        style={{ fontSize: 'inherit', lineHeight: 'inherit' }}
+        className="font-medium hover:underline cursor-pointer bg-transparent border-none p-0 m-0 inline"
+        style={{ color: 'var(--mention-color, #E8980A)', fontSize: 'inherit', lineHeight: 'inherit' }}
       >
         {tagText}
       </button>

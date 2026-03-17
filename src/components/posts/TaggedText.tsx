@@ -60,7 +60,8 @@ const TaggedText: React.FC<TaggedTextProps> = ({ text, tags, className = '' }) =
       <Link
         key={`tag-${index}`}
         to={getEntityLink(tag)}
-        className="text-primary hover:text-primary/80 hover:underline font-medium cursor-pointer"
+        className="font-medium hover:underline cursor-pointer"
+        style={{ color: '#E8980A' }}
         onClick={(e) => {
           e.stopPropagation();
         }}
