@@ -892,46 +892,52 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         </div>
       </div>
 
-      {/* Video tool picker sheet */}
-      {videoToolSheetIndex !== null && state.mediaItems[videoToolSheetIndex] && (
-        <VideoToolSheet
-          item={state.mediaItems[videoToolSheetIndex]}
-          onEdit={() => {
-            setVideoToolSheetIndex(null);
-            setActiveTool(null);
-            setShelfOpen(true);
-          }}
-          onTrim={() => {
-            setVideoToolSheetIndex(null);
-            setStep('TRIM');
-          }}
-          onCover={() => {
-            setVideoToolSheetIndex(null);
-            setStep('POSTER');
-          }}
-          onClose={() => setVideoToolSheetIndex(null)}
-        />
-      )}
-
-      {/* Overflow sheet — hidden items beyond tile 4 */}
-      {overflowSheetOpen && (
-        <OverflowSheet
-          items={state.mediaItems.slice(3)}
-          startIndex={3}
-          onEdit={(index) => {
-            setActiveMedia(index);
-            const item = state.mediaItems[index];
-            if (!item) return;
-            if (item.mediaType === 'video') {
-              setVideoToolSheetIndex(index);
-            } else {
+      {/* Video tool picker sheet — rendered via portal to escape parent transform */}
+      {videoToolSheetIndex !== null && state.mediaItems[videoToolSheetIndex] &&
+        createPortal(
+          <VideoToolSheet
+            item={state.mediaItems[videoToolSheetIndex]}
+            onEdit={() => {
+              setVideoToolSheetIndex(null);
               setActiveTool(null);
               setShelfOpen(true);
-            }
-          }}
-          onClose={() => setOverflowSheetOpen(false)}
-        />
-      )}
+            }}
+            onTrim={() => {
+              setVideoToolSheetIndex(null);
+              setStep('TRIM');
+            }}
+            onCover={() => {
+              setVideoToolSheetIndex(null);
+              setStep('POSTER');
+            }}
+            onClose={() => setVideoToolSheetIndex(null)}
+          />,
+          document.body
+        )
+      }
+
+      {/* Overflow sheet — rendered via portal to escape parent transform */}
+      {overflowSheetOpen &&
+        createPortal(
+          <OverflowSheet
+            items={state.mediaItems.slice(3)}
+            startIndex={3}
+            onEdit={(index) => {
+              setActiveMedia(index);
+              const item = state.mediaItems[index];
+              if (!item) return;
+              if (item.mediaType === 'video') {
+                setVideoToolSheetIndex(index);
+              } else {
+                setActiveTool(null);
+                setShelfOpen(true);
+              }
+            }}
+            onClose={() => setOverflowSheetOpen(false)}
+          />,
+          document.body
+        )
+      }
 
       {/* Studio Shelf */}
       {activeItem && (
