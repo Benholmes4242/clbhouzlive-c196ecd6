@@ -67,8 +67,8 @@ const FilterCard = memo(function FilterCard({
       onPointerCancel={handlePointerUp}
       className="rounded-xl overflow-hidden transition-all duration-150 active:scale-[0.98] snap-start"
       style={{
-        border: isSelected ? '2.5px solid #E8980A' : '1px solid rgba(255,255,255,0.1)',
-        boxShadow: isSelected ? '0 0 0 1px rgba(232,152,10,0.3)' : undefined,
+        border: isSelected ? '2.5px solid rgba(255,255,255,0.90)' : '1px solid rgba(255,255,255,0.1)',
+        boxShadow: isSelected ? '0 0 0 1px rgba(255,255,255,0.2)' : undefined,
       }}
     >
       <div className="aspect-square relative" style={{ background: '#2A2A2A' }}>
