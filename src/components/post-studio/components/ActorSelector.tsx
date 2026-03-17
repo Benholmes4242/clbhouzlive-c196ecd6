@@ -2,6 +2,7 @@
 // Single profile: avatar only. Multiple profiles: avatar + chevron, taps to switch.
 
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronUp, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
@@ -107,119 +108,122 @@ export function ActorSelector({ compact = false }: ActorSelectorProps) {
           )}
         </button>
 
-        {/* Profile switcher sheet */}
-        <AnimatePresence>
-          {sheetOpen && (
-            <>
-              {/* Backdrop */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50"
-                style={{ background: 'rgba(0,0,0,0.50)' }}
-                onClick={() => setSheetOpen(false)}
-              />
+        {/* Profile switcher sheet — portalled to body to escape parent transforms */}
+        {createPortal(
+          <AnimatePresence>
+            {sheetOpen && (
+              <>
+                {/* Backdrop */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-[10000]"
+                  style={{ background: 'rgba(0,0,0,0.50)' }}
+                  onClick={() => setSheetOpen(false)}
+                />
 
-              {/* Sheet */}
-              <motion.div
-                initial={{ y: '100%' }}
-                animate={{ y: 0 }}
-                exit={{ y: '100%' }}
-                transition={{ type: 'spring', damping: 32, stiffness: 380 }}
-                className="fixed bottom-0 z-50 w-full max-w-[480px] left-1/2 -translate-x-1/2 rounded-t-[24px] flex flex-col"
-                style={{
-                  background: 'rgba(13,13,13,0.99)',
-                  backdropFilter: 'blur(24px)',
-                  WebkitBackdropFilter: 'blur(24px)',
-                  borderTop: '1px solid rgba(255,255,255,0.08)',
-                  paddingBottom: 'env(safe-area-inset-bottom, 16px)',
-                }}
-              >
-                {/* Drag handle */}
-                <div className="flex justify-center pt-2.5 pb-1">
-                  <div
-                    className="w-10 h-1 rounded-full"
-                    style={{ background: 'rgba(255,255,255,0.20)' }}
-                  />
-                </div>
-
-                {/* Header */}
-                <div className="px-5 pb-3">
-                  <p
-                    className="text-[11px] font-semibold uppercase tracking-[1.5px]"
-                    style={{ color: 'rgba(255,255,255,0.35)' }}
-                  >
-                    Posting as
-                  </p>
-                </div>
-
-                {/* Options */}
-                <div className="px-5 pb-5 flex flex-col gap-2">
-                  {/* Personal */}
-                  <button
-                    onClick={() => { setActor('personal', null); setSheetOpen(false); }}
-                    className="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl active:scale-[0.97] transition-transform"
-                    style={{
-                      background: state.actorType === 'personal' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
-                      border: state.actorType === 'personal' ? '1px solid rgba(255,255,255,0.20)' : '1px solid rgba(255,255,255,0.07)',
-                    }}
-                  >
+                {/* Sheet */}
+                <motion.div
+                  initial={{ y: '100%' }}
+                  animate={{ y: 0 }}
+                  exit={{ y: '100%' }}
+                  transition={{ type: 'spring', damping: 32, stiffness: 380 }}
+                  className="fixed bottom-0 inset-x-0 z-[10001] w-full max-w-[480px] mx-auto rounded-t-[24px] flex flex-col"
+                  style={{
+                    background: 'rgba(13,13,13,0.99)',
+                    backdropFilter: 'blur(24px)',
+                    WebkitBackdropFilter: 'blur(24px)',
+                    borderTop: '1px solid rgba(255,255,255,0.08)',
+                    paddingBottom: 'env(safe-area-inset-bottom, 16px)',
+                  }}
+                >
+                  {/* Drag handle */}
+                  <div className="flex justify-center pt-2.5 pb-1">
                     <div
-                      className="w-10 h-10 overflow-hidden shrink-0"
-                      style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '34%' }}
-                    >
-                      {userAvatar
-                        ? <img src={userAvatar} alt="" className="w-full h-full object-cover" />
-                        : <div className="w-full h-full flex items-center justify-center text-[10px] font-bold" style={{ color: 'rgba(255,255,255,0.50)' }}>{userName}</div>
-                      }
-                    </div>
-                    <div className="flex-1 text-left">
-                      <p className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.90)' }}>{userName}</p>
-                      <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.40)' }}>Personal profile</p>
-                    </div>
-                    {state.actorType === 'personal' && (
-                      <Check className="w-5 h-5 shrink-0" style={{ color: 'rgba(255,255,255,0.70)' }} strokeWidth={2.5} />
-                    )}
-                  </button>
+                      className="w-10 h-1 rounded-full"
+                      style={{ background: 'rgba(255,255,255,0.20)' }}
+                    />
+                  </div>
 
-                  {/* Business accounts */}
-                  {businesses.map((biz) => {
-                    const isActive = state.actorType === 'business' && state.actorId === biz.id;
-                    return (
-                      <button
-                        key={biz.id}
-                        onClick={() => { setActor('business', biz.id); setSheetOpen(false); }}
-                        className="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl active:scale-[0.97] transition-transform"
-                        style={{
-                          background: isActive ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
-                          border: isActive ? '1px solid rgba(255,255,255,0.20)' : '1px solid rgba(255,255,255,0.07)',
-                        }}
+                  {/* Header */}
+                  <div className="px-5 pb-3">
+                    <p
+                      className="text-[11px] font-semibold uppercase tracking-[1.5px]"
+                      style={{ color: 'rgba(255,255,255,0.35)' }}
+                    >
+                      Posting as
+                    </p>
+                  </div>
+
+                  {/* Options */}
+                  <div className="px-5 pb-5 flex flex-col gap-2">
+                    {/* Personal */}
+                    <button
+                      onClick={() => { setActor('personal', null); setSheetOpen(false); }}
+                      className="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl active:scale-[0.97] transition-transform"
+                      style={{
+                        background: state.actorType === 'personal' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
+                        border: state.actorType === 'personal' ? '1px solid rgba(255,255,255,0.20)' : '1px solid rgba(255,255,255,0.07)',
+                      }}
+                    >
+                      <div
+                        className="w-10 h-10 overflow-hidden shrink-0"
+                        style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '34%' }}
                       >
-                        <div
-                          className="w-10 h-10 overflow-hidden shrink-0"
-                          style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '34%' }}
+                        {userAvatar
+                          ? <img src={userAvatar} alt="" className="w-full h-full object-cover" />
+                          : <div className="w-full h-full flex items-center justify-center text-[10px] font-bold" style={{ color: 'rgba(255,255,255,0.50)' }}>{userName}</div>
+                        }
+                      </div>
+                      <div className="flex-1 text-left">
+                        <p className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.90)' }}>{userName}</p>
+                        <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.40)' }}>Personal profile</p>
+                      </div>
+                      {state.actorType === 'personal' && (
+                        <Check className="w-5 h-5 shrink-0" style={{ color: 'rgba(255,255,255,0.70)' }} strokeWidth={2.5} />
+                      )}
+                    </button>
+
+                    {/* Business accounts */}
+                    {businesses.map((biz) => {
+                      const isActive = state.actorType === 'business' && state.actorId === biz.id;
+                      return (
+                        <button
+                          key={biz.id}
+                          onClick={() => { setActor('business', biz.id); setSheetOpen(false); }}
+                          className="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl active:scale-[0.97] transition-transform"
+                          style={{
+                            background: isActive ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)',
+                            border: isActive ? '1px solid rgba(255,255,255,0.20)' : '1px solid rgba(255,255,255,0.07)',
+                          }}
                         >
-                          {biz.logo_url
-                            ? <img src={biz.logo_url} alt="" className="w-full h-full object-cover" />
-                            : <div className="w-full h-full flex items-center justify-center text-[10px] font-bold" style={{ color: 'rgba(255,255,255,0.50)' }}>{biz.name}</div>
-                          }
-                        </div>
-                        <div className="flex-1 text-left">
-                          <p className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.90)' }}>{biz.name}</p>
-                          <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.40)' }}>Business profile</p>
-                        </div>
-                        {isActive && (
-                          <Check className="w-5 h-5 shrink-0" style={{ color: 'rgba(255,255,255,0.70)' }} strokeWidth={2.5} />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
+                          <div
+                            className="w-10 h-10 overflow-hidden shrink-0"
+                            style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '34%' }}
+                          >
+                            {biz.logo_url
+                              ? <img src={biz.logo_url} alt="" className="w-full h-full object-cover" />
+                              : <div className="w-full h-full flex items-center justify-center text-[10px] font-bold" style={{ color: 'rgba(255,255,255,0.50)' }}>{biz.name}</div>
+                            }
+                          </div>
+                          <div className="flex-1 text-left">
+                            <p className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.90)' }}>{biz.name}</p>
+                            <p className="text-[11px] mt-0.5" style={{ color: 'rgba(255,255,255,0.40)' }}>Business profile</p>
+                          </div>
+                          {isActive && (
+                            <Check className="w-5 h-5 shrink-0" style={{ color: 'rgba(255,255,255,0.70)' }} strokeWidth={2.5} />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>,
+          document.body
+        )}
       </>
     );
   }
