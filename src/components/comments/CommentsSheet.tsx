@@ -4,6 +4,7 @@
  */
 
 import { memo, useRef, useState, useEffect, useCallback, useMemo } from 'react';
+import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Heart, MoreHorizontal, SendHorizontal, ChevronRight } from 'lucide-react';
@@ -77,6 +78,7 @@ function CommentsSheet({
   initialParentCommentId,
   caddiePickCommentId,
   caption,
+  courseName,
   isReview,
   onCommentPosted,
   onCommentDeleted,
@@ -119,6 +121,10 @@ function CommentsSheet({
   const commentElsRef = useRef<Map<string, HTMLDivElement>>(new Map());
 
   const isDark = theme === 'dark';
+
+  const cleanCaption = useMemo(() => removeGolfCourseFromContent(caption ?? null), [caption]);
+  const extractedCourse = useMemo(() => extractGolfCourseFromContent(caption ?? null), [caption]);
+  const displayCourseName = courseName || extractedCourse?.name || null;
 
   // ── Sorted comments ──
   const sortedComments = useMemo(() => {
@@ -571,19 +577,30 @@ function CommentsSheet({
             </div>
 
             {/* Post caption — shown above comments when present */}
-            {caption && caption.trim().length > 0 && (
+            {(cleanCaption || displayCourseName) && (
               <div className={cn(
                 'px-4 py-3 shrink-0 border-b',
                 isDark ? 'border-white/[0.06]' : 'border-border/50'
               )}>
-                <MentionText
-                  text={caption}
-                  className={cn(
-                    'text-[14px] leading-[20px]',
-                    isDark ? 'text-white/70' : 'text-foreground/70'
-                  )}
-                  mentionClassName="font-semibold [color:#E8980A]"
-                />
+                {cleanCaption && (
+                  <MentionText
+                    text={cleanCaption}
+                    className={cn(
+                      'text-[14px] leading-[20px] line-clamp-2',
+                      isDark ? 'text-white/70' : 'text-foreground/70'
+                    )}
+                    mentionClassName="font-semibold [color:#E8980A]"
+                  />
+                )}
+                {displayCourseName && (
+                  <p className={cn(
+                    'text-[13px] leading-[18px] font-semibold truncate',
+                    cleanCaption ? 'mt-1' : '',
+                    isDark ? 'text-white' : 'text-foreground'
+                  )}>
+                    {displayCourseName}
+                  </p>
+                )}
               </div>
             )}
 
