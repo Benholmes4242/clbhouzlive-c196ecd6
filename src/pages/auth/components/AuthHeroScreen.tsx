@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import PasswordBottomSheet from './PasswordBottomSheet';
 
 // Toggle wordmark visibility
