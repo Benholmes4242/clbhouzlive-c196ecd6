@@ -181,7 +181,7 @@ export default function StudioPanelEdit({ edits, updateEdits, mediaType, mediaUr
               onClick={handleFlipV}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors"
               style={flipV ? {
-                background: '#E8980A',
+                background: 'rgba(255,255,255,0.90)',
                 color: '#FFFFFF',
                 border: '1px solid transparent',
               } : {

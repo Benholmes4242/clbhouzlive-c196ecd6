@@ -300,7 +300,7 @@ export default function StudioPanelText({
             <button
               onClick={addTextBox}
               className="w-full py-1.5 mt-0.5 rounded-md transition-colors flex items-center justify-center gap-1 text-[11px]"
-              style={{ color: '#E8980A' }}
+              style={{ color: '#FFFFFF' }}
             >
               <Plus className="w-3 h-3" />
               <span className="font-medium">Add another</span>

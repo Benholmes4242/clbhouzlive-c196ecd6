@@ -236,7 +236,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
 
                   {/* Selected indicator */}
                   {isSelected && (
-                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#E8980A' }} />
+                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: 'rgba(255,255,255,0.90)' }} />
                   )}
                 </div>
               );

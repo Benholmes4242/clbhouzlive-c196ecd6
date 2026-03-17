@@ -151,7 +151,7 @@ export default function StudioPanelFilter({
         <span className="text-sm font-semibold text-white">Filters</span>
         <div className="flex items-center gap-2">
           <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
-            Selected: <span style={{ color: '#E8980A' }}>{selectedLabel}</span>
+            Selected: <span style={{ color: '#FFFFFF' }}>{selectedLabel}</span>
           </span>
           <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.45)' }}>Hold to compare</span>
         </div>
