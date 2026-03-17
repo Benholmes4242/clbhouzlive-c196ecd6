@@ -59,6 +59,16 @@ interface MusicTrackInfo {
   artist?: string;
 }
 
+interface PostTag {
+  id: string;
+  entity_type: 'user' | 'golf_club' | 'business';
+  entity_id: string;
+  name: string;
+  username: string | null;
+  start_index?: number;
+  end_index?: number;
+}
+
 interface CreatorCapsuleProps {
   // Regular mode props
   user: {
@@ -68,6 +78,7 @@ interface CreatorCapsuleProps {
     avatar?: string;
   };
   caption?: string;
+  tags?: PostTag[];
   golfCourse?: GolfCourseInfo | null;
   /** Music track info - only shown when audioMode === 'music_only' */
   musicTrack?: MusicTrackInfo | null;
