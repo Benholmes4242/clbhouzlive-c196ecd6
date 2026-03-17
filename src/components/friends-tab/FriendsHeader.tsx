@@ -21,10 +21,8 @@ export function FriendsHeader({
 }: FriendsHeaderProps) {
   return (
     <div
-      className="sticky top-[55px] z-30 bg-background/95 backdrop-blur-xl border-b border-border/50"
-      style={{
-        paddingTop: embedded ? '24px' : 'max(env(safe-area-inset-top, 0px), 47px)',
-      }}
+      className="sticky top-0 z-10 bg-background pb-0 pt-2 px-0"
+      style={{ borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
     >
       <div className="px-4 pb-2">
         <button
