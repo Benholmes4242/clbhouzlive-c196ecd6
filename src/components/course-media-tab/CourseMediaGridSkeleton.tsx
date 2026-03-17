@@ -19,11 +19,11 @@ export const CourseMediaGridSkeleton: React.FC = () => (
       </div>
     </div>
     {/* Grid skeleton */}
-    <div className="grid grid-cols-3 gap-[2px]">
-      {Array.from({ length: 9 }).map((_, i) => (
+    <div className="grid grid-cols-2 gap-[2px]">
+      {Array.from({ length: 6 }).map((_, i) => (
         <Skeleton key={`tile-${i}`} className="aspect-[4/5] rounded-[4px]" />
       ))}
-      <Skeleton className="col-span-3 aspect-video rounded-[4px]" />
+      <Skeleton className="col-span-2 aspect-video rounded-[4px]" />
     </div>
   </div>
 );
