@@ -204,7 +204,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
           </div>
 
           {/* Center section: Clubhouse tabs (mobile) or Desktop nav (lg+) */}
-          <div className="flex-1 flex justify-center">
+          <div className="hidden lg:flex flex-1 justify-center">
             {/* Desktop: main nav links */}
             <nav className="hidden lg:flex items-center gap-1">
               {[
