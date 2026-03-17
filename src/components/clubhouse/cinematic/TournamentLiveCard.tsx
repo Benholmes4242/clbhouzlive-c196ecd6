@@ -299,15 +299,15 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
         }}>
           {/* Venue */}
           {(meta.venueName || meta.venueCity) && (
-            <div style={{ fontSize: 'clamp(9px, 2.5vw, 11px)', color: 'rgba(255,255,255,0.4)', marginBottom: 3, letterSpacing: '0.02em' }}>
+            <div style={{ fontSize: 'clamp(11px, 3vw, 13px)', color: 'rgba(255,255,255,0.4)', marginBottom: 4, letterSpacing: '0.02em' }}>
               {[meta.venueName, meta.venueCity].filter(Boolean).join(' · ')}
             </div>
           )}
 
           {/* Tournament name */}
           <div style={{
-            fontSize: 'clamp(11px, 3vw, 13px)', fontWeight: 700, color: 'rgba(255,255,255,0.95)',
-            letterSpacing: '-0.01em', marginBottom: 8, lineHeight: 1.2,
+            fontSize: 'clamp(14px, 4vw, 16px)', fontWeight: 700, color: 'rgba(255,255,255,0.95)',
+            letterSpacing: '-0.01em', marginBottom: 10, lineHeight: 1.2,
           }}>
             {meta.tournamentName}
           </div>
@@ -317,12 +317,12 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
               <div>
                 <div style={{
-                  fontSize: 28, fontWeight: 800, color: '#fff',
+                  fontSize: 'clamp(26px, 7vw, 32px)', fontWeight: 800, color: '#fff',
                   letterSpacing: '-0.02em', lineHeight: 1.1,
                 }}>
                   {leader.playerName}
                 </div>
-                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
+                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginTop: 3 }}>
                   {isTiedFirst ? `Tied for the lead (${coLeaders.length}-way)` : 'Leads the field'}
                 </div>
                 {isTiedFirst && (
@@ -363,14 +363,14 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
 
               <div style={{ textAlign: 'right' }}>
                 <span style={{
-                  fontSize: 32, fontWeight: 800,
+                  fontSize: 'clamp(30px, 8vw, 36px)', fontWeight: 800,
                   color: scoreColor(leader.scoreDisplay),
                   fontVariantNumeric: 'tabular-nums',
                 }}>
                   {leader.scoreDisplay}
                 </span>
                 {leader.thru && (
-                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 1 }}>
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
                     Thru {leader.thru}
                   </div>
                 )}
@@ -383,13 +383,13 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
       {/* ══ ZONE 2: VOLATILITY BANNER (conditional) ══ */}
       {volatilityBanner && (
         <div style={{
-          padding: '8px max(10px, 3vw)',
+          padding: '10px max(12px, 3vw)',
           borderTop: '1px solid hsl(var(--accent-amber) / 0.12)',
           borderBottom: '1px solid hsl(var(--accent-amber) / 0.12)',
           background: 'hsl(var(--accent-amber) / 0.05)',
         }}>
           <div style={{
-            fontSize: 12, fontWeight: 600, color: 'hsl(var(--accent-amber))',
+            fontSize: 13, fontWeight: 600, color: 'hsl(var(--accent-amber))',
             textAlign: 'center', letterSpacing: '0.01em',
           }}>
             {volatilityBanner}
@@ -404,20 +404,20 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
       ) && (
         <div style={{
           flexShrink: 0,
-          margin: '6px max(10px, 3vw) 0',
+          margin: '8px max(12px, 3vw) 0',
           animation: 'trlive-fadeUp 0.5s ease-out both',
           animationDelay: '180ms',
           touchAction: 'none',
         }}>
           {/* Round scores row */}
-          <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
+          <div style={{ display: 'flex', gap: 5, marginBottom: 5 }}>
             {meta.leaderStats.rounds.map((score, i) => (
               <RoundChip key={i} round={i + 1} score={score} />
             ))}
           </div>
 
           {/* Birdies / Eagles / Pars / Bogeys row */}
-          <div style={{ display: 'flex', gap: 4 }}>
+          <div style={{ display: 'flex', gap: 5 }}>
             {meta.leaderStats.totalEagles > 0 && (
               <LiveStatChip
                 value={meta.leaderStats.totalEagles}
@@ -494,7 +494,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           ).filter(e => e.position > 1).slice(0, 2);
 
           return (
-            <div style={{ marginTop: 4, borderTop: '1px solid rgba(255,255,255,0.06)', padding: '4px 0 10px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ marginTop: 4, borderTop: '1px solid rgba(255,255,255,0.06)', padding: '6px 0 12px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               {distinctByPos.map((entry, i) => {
                 const tiedEntries = meta.leaderboard.filter(e => e.position === entry.position);
                 const isTie = tiedEntries.length > 1;
@@ -502,11 +502,11 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
 
                 return (
                   <div key={i} style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    padding: 'clamp(11px, 2.5vh, 22px) 20px',
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: 'clamp(12px, 2.8vh, 24px) 20px',
                   }}>
                     {/* Position */}
-                    <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.35)', width: 22, flexShrink: 0, textAlign: 'center' }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.35)', width: 24, flexShrink: 0, textAlign: 'center' }}>
                       {entry.positionTied ? `T${entry.position}` : entry.position}
                     </span>
 
@@ -515,32 +515,32 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                       <div style={{ display: 'flex', flexShrink: 0 }}>
                         {shown.map((p, idx) => (
                           <div key={idx} style={{ marginLeft: idx === 0 ? 0 : -14, position: 'relative', zIndex: shown.length - idx }}>
-                            <RowAvatar name={p.playerName} photoUrl={p.photoUrl} tourSlug={meta.tourSlug} size={52} />
+                            <RowAvatar name={p.playerName} photoUrl={p.photoUrl} tourSlug={meta.tourSlug} size={56} />
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <RowAvatar name={entry.playerName} photoUrl={entry.photoUrl} tourSlug={meta.tourSlug} size={52} />
+                      <RowAvatar name={entry.playerName} photoUrl={entry.photoUrl} tourSlug={meta.tourSlug} size={56} />
                     )}
 
                     {/* Name or tie label */}
                     {isTie ? (
-                      <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.35)', flex: 1 }}>
+                      <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.35)', flex: 1 }}>
                         {tiedEntries.length}-way tie
                       </span>
                     ) : (
-                      <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.8)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <span style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.8)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {entry.playerName}
                       </span>
                     )}
 
                     {/* Thru */}
-                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', flexShrink: 0, marginRight: 8 }}>
+                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', flexShrink: 0, marginRight: 8 }}>
                       {entry.thru}
                     </span>
 
                     {/* Score */}
-                    <span style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.9)', flexShrink: 0, minWidth: 36, textAlign: 'right' }}>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.9)', flexShrink: 0, minWidth: 36, textAlign: 'right' }}>
                       {entry.scoreDisplay}
                     </span>
                   </div>
@@ -560,14 +560,14 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
         }}>
           {/* Like */}
           <button onClick={handleLike} style={{
-            display: 'flex', alignItems: 'center', gap: 4,
-            background: isLiked ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.07)',
-            border: `1px solid ${isLiked ? 'rgba(245,158,11,0.45)' : 'rgba(255,255,255,0.12)'}`,
-            cursor: 'pointer', borderRadius: 20, padding: '8px 14px',
-            fontSize: 14, color: isLiked ? '#F59E0B' : 'rgba(255,255,255,0.7)',
+            display: 'flex', alignItems: 'center', gap: 5,
+            background: isLiked ? 'rgba(239,68,68,0.12)' : 'rgba(255,255,255,0.07)',
+            border: `1px solid ${isLiked ? 'rgba(239,68,68,0.35)' : 'rgba(255,255,255,0.12)'}`,
+            cursor: 'pointer', borderRadius: 20, padding: '10px 16px',
+            fontSize: 15, fontWeight: 600, color: isLiked ? '#EF4444' : 'rgba(255,255,255,0.6)',
             animation: heartPopping ? 'trlive-heartPop 0.4s ease-out' : undefined,
           }}>
-            <span style={{ fontSize: 16 }}>
+            <span style={{ fontSize: 18 }}>
               {isLiked ? '♥' : '♡'}
             </span>
             {likeCount}
@@ -576,24 +576,28 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           {/* Centre CTA — shorter */}
           <button onClick={onComment} style={{
             flex: 1,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            background: 'linear-gradient(135deg, rgba(249,115,22,0.22), rgba(234,88,12,0.15))',
-            border: '1px solid rgba(249,115,22,0.35)', borderRadius: 22, padding: '8px 10px',
-            color: '#FB923C', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            background: 'linear-gradient(180deg, rgba(232,152,10,0.60) 0%, rgba(199,135,10,0.45) 50%, rgba(180,120,8,0.50) 100%)',
+            border: '1px solid rgba(232,152,10,0.50)',
+            borderTop: '1px solid rgba(255,210,130,0.30)',
+            borderRadius: 22, padding: '10px 10px',
+            color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer',
             minWidth: 0,
+            boxShadow: '0 2px 12px rgba(232,152,10,0.3), inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -1px 0 rgba(0,0,0,0.15)',
+            textShadow: '0 1px 2px rgba(0,0,0,0.3)',
           }}>
-            <span style={{ fontSize: 14, flexShrink: 0 }}>💬</span>
+            <span style={{ fontSize: 15, flexShrink: 0 }}>💬</span>
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Who wins?</span>
             {commentCount > 0 && (
-              <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(251,146,60,0.6)', flexShrink: 0 }}>{commentCount}</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.7)', flexShrink: 0 }}>{commentCount}</span>
             )}
           </button>
 
           {/* Leaderboard link */}
           <button onClick={handleWatchLive} style={{
             background: 'transparent', border: 'none',
-            color: '#F59E0B', fontSize: 12, fontWeight: 700,
-            whiteSpace: 'nowrap', cursor: 'pointer', padding: '8px 4px',
+            color: '#F59E0B', fontSize: 13, fontWeight: 700,
+            whiteSpace: 'nowrap', cursor: 'pointer', padding: '10px 4px',
             flexShrink: 0,
           }}>
             Leaderboard →
