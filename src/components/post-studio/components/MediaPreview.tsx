@@ -67,7 +67,7 @@ export function MediaPreview({ item, onSwipeLeft, onSwipeRight }: MediaPreviewPr
     <div className="w-full relative" style={{ aspectRatio: aspect, background: '#000', cursor: isVideo ? 'pointer' : 'default' }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} onClick={isVideo ? togglePlay : undefined}>
       {isVideo ? (
         <>
-          <video ref={videoRef} src={item.previewUrl} muted playsInline loop className="w-full h-full object-contain" onError={() => setHasError(true)} />
+          <video ref={videoRef} src={item.previewUrl} preload="auto" muted playsInline loop className="w-full h-full object-contain" onError={() => setHasError(true)} />
           <AnimatePresence>
             {showControls && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="absolute inset-0 flex items-center justify-center pointer-events-none">
