@@ -21,6 +21,7 @@ interface PredictionScorecardRowProps {
   isLast?: boolean;
   isBestCall?: boolean;
   leaderScore?: number | null;
+  tourSlug?: string;
 }
 
 function getAccuracyBorderColor() {
