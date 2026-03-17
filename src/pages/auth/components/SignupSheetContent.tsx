@@ -347,7 +347,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
         />
         
         {passwordError && (
-          <p className="text-[#E03131] text-[13px] mt-2">{passwordError}</p>
+          <p role="alert" className="text-[#E03131] text-[13px] mt-2">{passwordError}</p>
         )}
       </div>
       
