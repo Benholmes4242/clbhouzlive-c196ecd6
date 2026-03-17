@@ -1001,7 +1001,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     if (!slides || slides.length <= 1 || isPaused || isExpanded) return;
     
     const interval = setInterval(() => {
-      setCurrentIndex(prev => (prev + 1) % slides.length);
+      setCurrentIndex(prev => (prev + 1) % (slides?.length ?? 1));
     }, 8000);
 
     return () => clearInterval(interval);
