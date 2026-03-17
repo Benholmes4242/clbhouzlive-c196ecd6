@@ -414,7 +414,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
         </div>
         
         {showMismatchError && (
-          <p className="text-[#E03131] text-[13px] mt-2">Passwords don't match.</p>
+          <p role="alert" className="text-[#E03131] text-[13px] mt-2">Passwords don't match.</p>
         )}
         
         {isConfirmPasswordValid && (
