@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Swords, GitCompare, Crown, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
+import { Menu, Swords, GitCompare, Crown, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
+import { openTourNav } from '../contexts/TourNavContext';
 import { motion } from 'framer-motion';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { useQueryClient } from '@tanstack/react-query';
@@ -175,7 +176,15 @@ export function CollegeProfilePage() {
           }}
         />
 
-        {/* Burger menu moved to TourHubShell */}
+        {/* Burger menu — matches Players/Leaders pages */}
+        <button
+          className="fixed z-20 flex items-center justify-center"
+          style={{ top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: '16px', width: '44px', height: '44px' }}
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
+          aria-label="Open tour menu"
+        >
+          <Menu className="w-6 h-6" strokeWidth={1.5} style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }} />
+        </button>
 
         {/* Content — centered */}
         {isLoading ? (

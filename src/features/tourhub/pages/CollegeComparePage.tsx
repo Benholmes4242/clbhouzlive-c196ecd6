@@ -1,9 +1,10 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ChevronLeft } from 'lucide-react';
+import { Menu, ChevronLeft } from 'lucide-react';
 import { TourHubShell } from '../components';
 import { CollegeCompareHero } from '../components/college/CollegeCompareHero';
 import { useCollegeCompare } from '../hooks/useCollegeCompare';
+import { openTourNav } from '../contexts/TourNavContext';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { getCollegeGradientCSS } from '../config/collegeBrandColors';
 
@@ -54,7 +55,15 @@ export function CollegeComparePage() {
             }}
           />
 
-          {/* Burger menu moved to TourHubShell */}
+          {/* Burger menu — absolute inside hero, white with drop shadow */}
+          <button
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
+            aria-label="Open tour menu"
+            className="absolute z-30 flex items-center justify-center"
+            style={{ width: 44, height: 44, top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 12px)', left: 16 }}
+          >
+            <Menu className="w-[24px] h-[24px]" strokeWidth={1.5} style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }} />
+          </button>
 
           {/* Hero content — VS logos centered */}
           <div
