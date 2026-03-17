@@ -48,7 +48,7 @@ const CLBHOUZ_ORANGE = '#F59E0B';
 
 const NAV_ITEMS: NavItem[] = [
   { value: 'overview', label: 'Overview', subtitle: 'The global golf season at a glance.', icon: <LayoutGrid className="w-5 h-5" /> },
-  { value: 'schedule', label: 'Schedule', subtitle: 'What\'s happening — past, present, and upcoming.', icon: <Calendar className="w-5 h-5" /> },
+  { value: 'schedule', label: 'Schedule', subtitle: 'What\'s happening - past, present, and upcoming.', icon: <Calendar className="w-5 h-5" /> },
   { value: 'players', label: 'Players', subtitle: 'The names shaping the season across every tour.', icon: <Users className="w-5 h-5" /> },
   { value: 'leaderboards', label: 'Performance Rankings', subtitle: 'Statistical leaders across every category.', icon: <Trophy className="w-5 h-5" /> },
 ];
