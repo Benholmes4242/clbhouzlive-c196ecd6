@@ -86,6 +86,8 @@ export interface MentionToken {
   entityType: 'user' | 'business';
   /** Avatar URL for display */
   avatarUrl?: string;
+  /** Slug username (e.g. "benholmes42") */
+  username?: string | null;
 }
 
 /** Tagged course reference */
