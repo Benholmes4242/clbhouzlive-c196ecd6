@@ -133,7 +133,8 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
   };
 
   const handleUsernameChange = (value: string) => {
-    const cleanValue = value.replace('@', '');
+    // H5: Only allow alphanumeric and underscores (matches DB trigger for OAuth)
+    const cleanValue = value.replace(/[^a-zA-Z0-9_]/g, '');
     setUsername(cleanValue);
     
     // Clear previous timeout
