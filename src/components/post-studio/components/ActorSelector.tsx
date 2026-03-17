@@ -15,11 +15,11 @@ interface BusinessAccount {
 }
 
 interface ActorSelectorProps {
-  /** When true renders the compact toolbar avatar button */
   compact?: boolean;
+  header?: boolean;
 }
 
-export function ActorSelector({ compact = false }: ActorSelectorProps) {
+export function ActorSelector({ compact = false, header = false }: ActorSelectorProps) {
   const { state, setActor } = usePostStudioContext();
   const [businesses, setBusinesses] = useState<BusinessAccount[]>([]);
   const [userAvatar, setUserAvatar] = useState<string | null>(null);
@@ -75,15 +75,20 @@ export function ActorSelector({ compact = false }: ActorSelectorProps) {
     return (
       <>
         <button
-          onClick={() => hasMultiple && setSheetOpen(true)}
-          disabled={!hasMultiple}
+          onClick={() => setSheetOpen(true)}
           className="relative flex items-center justify-center"
           style={{ width: 40, height: 40 }}
         >
           {/* Avatar */}
           <div
-            className="w-8 h-8 overflow-hidden shrink-0"
-            style={{ background: 'rgba(255,255,255,0.10)', border: '1.5px solid rgba(255,255,255,0.18)', borderRadius: '34%' }}
+            className="overflow-hidden shrink-0"
+            style={{
+              width: header ? 34 : 32,
+              height: header ? 34 : 32,
+              background: 'rgba(255,255,255,0.10)',
+              border: '1.5px solid rgba(255,255,255,0.18)',
+              borderRadius: '34%',
+            }}
           >
             {activeAvatar ? (
               <img src={activeAvatar} alt="" className="w-full h-full object-cover" />
@@ -98,7 +103,7 @@ export function ActorSelector({ compact = false }: ActorSelectorProps) {
           </div>
 
           {/* Chevron badge — only when multiple profiles exist */}
-          {hasMultiple && (
+          {(hasMultiple || header) && (
             <div
               className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center"
               style={{ background: 'rgba(255,255,255,0.90)', boxShadow: '0 1px 4px rgba(0,0,0,0.40)' }}

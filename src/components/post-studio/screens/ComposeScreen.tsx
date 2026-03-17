@@ -631,7 +631,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   return (
     <div className="flex-1 flex flex-col" style={{ background: BG_BASE }}>
       <StudioHeader
-        title="New Moment"
+        centerContent={<ActorSelector compact header />}
         step="COMPOSE"
         leftAction={onClose ? { label: '', onClick: onClose, icon: 'close' as const } : undefined}
         rightAction={
@@ -826,11 +826,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)',
         }}
       >
-        {/* Actor avatar — compact profile switcher */}
-        <ActorSelector compact />
-
-        {/* Spacer between avatar and camera */}
-        <div className="w-2" />
+        {/* Camera — primary action, white circle */}
 
         {/* Camera — primary action, white circle */}
         <motion.button
