@@ -33,7 +33,7 @@ export function PublishScreen() {
         entity_id: m.entityId,
         entity_type: m.entityType,
         name: m.displayName,
-        username: m.displayName,
+        username: m.username ?? null,
         start_index: m.start,
         end_index: m.end,
       }));
