@@ -233,6 +233,14 @@ function AppRoutes() {
   const state = location.state as { backgroundLocation?: Location; fromHub?: boolean; fromVideo?: boolean } | null;
   const { shouldHideHeader } = useModalContext();
   
+  // BUG-1 FIX: Reset shield to transparent on every route change as a baseline.
+  // Individual page hooks then opt-in to their own color (e.g. PageRoot → #F8FAFC).
+  // This prevents stale shield colors when navigating back to immersive/KeepAlive pages.
+  useLayoutEffect(() => {
+    const shield = document.getElementById('safe-area-shield');
+    if (shield) shield.style.backgroundColor = 'transparent';
+  }, [location.pathname]);
+  
   // Render origin page when we have a background location
   const routesLocation = state?.backgroundLocation || location;
   
