@@ -494,7 +494,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           ).filter(e => e.position > 1).slice(0, 2);
 
           return (
-            <div style={{ marginTop: 4, borderTop: '1px solid rgba(255,255,255,0.06)', padding: '4px 0 10px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ marginTop: 4, borderTop: '1px solid rgba(255,255,255,0.06)', padding: '6px 0 12px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               {distinctByPos.map((entry, i) => {
                 const tiedEntries = meta.leaderboard.filter(e => e.position === entry.position);
                 const isTie = tiedEntries.length > 1;
