@@ -495,7 +495,6 @@ const ClubhouseContent = () => {
             )}
           </AnimatePresence>
 
-          {/* DEBUG DISABLED — MediaNavigationDots
           {activeMediaCount > 1 && (
             <MediaNavigationDots
               mediaCount={activeMediaCount}
@@ -503,9 +502,7 @@ const ClubhouseContent = () => {
               onJump={(idx) => setCarouselPosition(activeIndex, idx)}
             />
           )}
-          */}
 
-          {/* DEBUG DISABLED — CinematicActionRail
            <CinematicActionRail
               key={activePost.id}
             postId={activePost.id}
@@ -529,9 +526,7 @@ const ClubhouseContent = () => {
               ? () => setCarouselPosition(activeIndex, currentMediaIndex - 1) 
               : undefined}
           />
-          */}
 
-          {/* DEBUG DISABLED — CreatorCapsule
            <CreatorCapsule
               key={activePost.id}
             postId={activePost.id}
@@ -559,7 +554,6 @@ const ClubhouseContent = () => {
             } : undefined}
             onReviewTap={handleReviewTap}
           />
-          */}
 
           <MoreOptionsDrawer
             open={moreOptionsOpen}
