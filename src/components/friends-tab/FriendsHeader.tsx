@@ -35,7 +35,7 @@ export function FriendsHeader({
         </button>
       </div>
 
-      <div role="tablist" aria-label="Friends feed filter" className="flex gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide">
+      <div role="tablist" aria-label="Friends feed filter" className="flex justify-center gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide">
         {MODES.map(({ id, label }) => {
           const isActive = activeMode === id;
           return (
