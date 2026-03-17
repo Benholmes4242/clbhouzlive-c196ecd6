@@ -14,6 +14,10 @@ import { appNavigate } from '@/utils/navigation';
 
 // Notification types that should show a toast
 const IMPORTANT_NOTIFICATION_TYPES = new Set([
+  // Social notifications
+  'follow',
+  'friend_request',
+  'friend_accept',
   // Game notifications
   'game_request',
   'game_request_accepted',
