@@ -258,10 +258,17 @@ const ProfilePageV2Content: React.FC = () => {
       const fileName = `${user.id}/profile-${Date.now()}.${fileExt}`;
       const result = await uploadToR2Only(croppedFile, 'clbhouz-profile-images', fileName);
       if (!result.success) throw new Error(result.error || 'Upload failed');
-      await supabase.from('user_profiles').update({ profile_photo_url: result.publicUrl }).eq('id', user.id);
+      const { error: updateError } = await supabase.from('user_profiles').update({ profile_photo_url: result.publicUrl }).eq('id', user.id);
+      if (updateError) {
+        console.error('[ProfilePage] Avatar DB update failed:', updateError);
+        toast.error('Failed to save avatar. Please try again.');
+        return;
+      }
       queryClient.invalidateQueries({ queryKey: ['user-profile', profileUserId] });
+      queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
       toast.success('Profile photo updated');
-    } catch {
+    } catch (err) {
+      console.error('[ProfilePage] Avatar upload error:', err);
       toast.error('Failed to update profile photo');
     } finally {
       setIsUploadingAvatar(false);
@@ -276,10 +283,17 @@ const ProfilePageV2Content: React.FC = () => {
       const fileName = `${user.id}/header-${Date.now()}.${fileExt}`;
       const result = await uploadToR2Only(croppedFile, 'clbhouz-profile-images', fileName);
       if (!result.success) throw new Error(result.error || 'Upload failed');
-      await supabase.from('user_profiles').update({ header_photo_url: result.publicUrl }).eq('id', user.id);
+      const { error: updateError } = await supabase.from('user_profiles').update({ header_photo_url: result.publicUrl }).eq('id', user.id);
+      if (updateError) {
+        console.error('[ProfilePage] Cover DB update failed:', updateError);
+        toast.error('Failed to save cover photo. Please try again.');
+        return;
+      }
       queryClient.invalidateQueries({ queryKey: ['user-profile', profileUserId] });
+      queryClient.invalidateQueries({ queryKey: ['profile', user.id] });
       toast.success('Cover photo updated');
-    } catch {
+    } catch (err) {
+      console.error('[ProfilePage] Cover upload error:', err);
       toast.error('Failed to update cover photo');
     } finally {
       setIsUploadingHero(false);
