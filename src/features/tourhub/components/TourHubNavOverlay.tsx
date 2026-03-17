@@ -48,7 +48,7 @@ const CLBHOUZ_ORANGE = '#F59E0B';
 
 const NAV_ITEMS: NavItem[] = [
   { value: 'overview', label: 'Overview', subtitle: 'The global golf season at a glance.', icon: <LayoutGrid className="w-5 h-5" /> },
-  { value: 'schedule', label: 'Schedule', subtitle: 'What\'s happening — past, present, and upcoming.', icon: <Calendar className="w-5 h-5" /> },
+  { value: 'schedule', label: 'Schedule', subtitle: 'What\'s happening - past, present, and upcoming.', icon: <Calendar className="w-5 h-5" /> },
   { value: 'players', label: 'Players', subtitle: 'The names shaping the season across every tour.', icon: <Users className="w-5 h-5" /> },
   { value: 'leaderboards', label: 'Performance Rankings', subtitle: 'Statistical leaders across every category.', icon: <Trophy className="w-5 h-5" /> },
 ];
@@ -182,13 +182,13 @@ export function TourHubNavOverlay({
   // Generate dynamic subtitle for Schedule
   const scheduleSubtitle = hasLive
     ? `${liveCount} tournament${(liveCount ?? 0) > 1 ? 's' : ''} live right now.`
-    : "What's happening — past, present, and upcoming.";
+    : "What's happening - past, present, and upcoming.";
 
   // TM-08: aria-labels for each card
   const getAriaLabel = (item: NavItem) => {
     switch (item.value) {
       case 'overview': return 'Overview — The global golf season at a glance';
-      case 'schedule': return hasLive ? `Schedule — ${liveCount} tournament${(liveCount ?? 0) > 1 ? 's' : ''} live right now` : 'Schedule — What\'s happening past, present, and upcoming';
+      case 'schedule': return hasLive ? `Schedule — ${liveCount} tournament${(liveCount ?? 0) > 1 ? 's' : ''} live right now` : 'Schedule - What\'s happening past, present, and upcoming';
       case 'players': return 'Players — The names shaping the season';
       case 'leaderboards': return 'Performance Rankings — Statistical leaders across every category';
       default: return item.label;
@@ -476,13 +476,6 @@ export function TourHubNavOverlay({
                       );
                     })}
                   </div>
-                  {/* Right-fade overlay — indicates more cards to scroll */}
-                  <div
-                    className="absolute inset-y-0 right-0 w-12 pointer-events-none"
-                    style={{
-                      background: 'linear-gradient(to left, hsl(var(--background) / 0.9), transparent)',
-                    }}
-                  />
                 </div>
               </motion.div>
             )}
