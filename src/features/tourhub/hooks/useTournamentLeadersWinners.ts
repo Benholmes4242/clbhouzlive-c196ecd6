@@ -125,6 +125,7 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
           position: entry.position,
           photoUrl: player?.photo_url || null,
           pgaTourId: player?.pga_tour_id || null,
+          tourCode: player?.tour_codes?.[0] ?? null,
           displayName: formatDisplayName(firstName, lastName),
           displayScore: formatScore(entry.score),
           // B44 FIX 4B: populate round scores
