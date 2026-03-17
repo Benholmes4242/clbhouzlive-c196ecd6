@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -34,45 +33,54 @@ const handler = async (req: Request): Promise<Response> => {
     const normalizedEmail = email.toLowerCase().trim();
     console.log("[auth-email-exists] Checking email...");
 
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    // Use GoTrue Admin API directly to check if user exists by email
+    const fetchRes = await fetch(
+      `${supabaseUrl}/auth/v1/admin/users?page=1&per_page=1`,
       {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
+        method: "GET",
+        headers: {
+          "apikey": serviceRoleKey,
+          "Authorization": `Bearer ${serviceRoleKey}`,
         },
       }
     );
 
-    // Use getUserByEmail — O(1) lookup, no pagination, scales to any user count
-    const { data: { user }, error } = await supabaseAdmin.auth.admin
-      .getUserByEmail(normalizedEmail);
-
-    if (error) {
-      // "User not found" is expected when email doesn't exist
-      if (error.message?.includes("User not found")) {
-        console.log("[auth-email-exists] Email does not exist");
-        const response: EmailExistsResponse = { exists: false };
-        return new Response(
-          JSON.stringify(response),
-          { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
-        );
+    // Alternative: use the signIn with wrong password trick won't work.
+    // Use admin listUsers and filter — but that's expensive.
+    // Best approach: call GoTrue's admin user lookup endpoint
+    const lookupRes = await fetch(
+      `${supabaseUrl}/auth/v1/admin/users`,
+      {
+        method: "GET",
+        headers: {
+          "apikey": serviceRoleKey,
+          "Authorization": `Bearer ${serviceRoleKey}`,
+        },
       }
+    );
 
-      console.error("[auth-email-exists] Error checking user:", error.message);
+    // Consume the first fetch
+    await fetchRes.text();
+
+    if (!lookupRes.ok) {
+      const errText = await lookupRes.text();
+      console.error("[auth-email-exists] Error checking user:", errText);
       return new Response(
         JSON.stringify({ error: "Failed to check email" }),
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    const exists = !!user;
+    const data = await lookupRes.json();
+    const users = data?.users ?? [];
+    const exists = users.some((u: any) => u.email?.toLowerCase() === normalizedEmail);
     console.log(`[auth-email-exists] Email exists: ${exists}`);
 
-    const response: EmailExistsResponse = { exists };
     return new Response(
-      JSON.stringify(response),
+      JSON.stringify({ exists } as EmailExistsResponse),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   } catch (error) {
