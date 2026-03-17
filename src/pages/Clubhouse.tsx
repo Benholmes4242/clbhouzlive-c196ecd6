@@ -495,6 +495,7 @@ const ClubhouseContent = () => {
             )}
           </AnimatePresence>
 
+          {/* Media navigation dots for multi-media posts */}
           {activeMediaCount > 1 && (
             <MediaNavigationDots
               mediaCount={activeMediaCount}
@@ -503,6 +504,7 @@ const ClubhouseContent = () => {
             />
           )}
 
+          {/* CinematicActionRail — z-40, right side */}
            <CinematicActionRail
               key={activePost.id}
             postId={activePost.id}
@@ -527,6 +529,7 @@ const ClubhouseContent = () => {
               : undefined}
           />
 
+          {/* CreatorCapsule — z-50, bottom-left */}
            <CreatorCapsule
               key={activePost.id}
             postId={activePost.id}
