@@ -13,6 +13,7 @@ interface PredictionLeaderboardProps {
   isCompleted?: boolean;
   bestCallPlayerId?: string;
   tournamentLeaderScore?: number | null;
+  tourSlug?: string;
 }
 
 export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
