@@ -129,7 +129,7 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
         <div className="relative">
           <Search
             className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 transition-colors"
-            style={{ color: searchFocused ? '#E8980A' : 'rgba(255,255,255,0.45)' }}
+            style={{ color: searchFocused ? 'rgba(255,255,255,0.90)' : 'rgba(255,255,255,0.45)' }}
           />
           <input
             type="text"
