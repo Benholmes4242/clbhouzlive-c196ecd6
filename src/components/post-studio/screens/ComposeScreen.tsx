@@ -189,10 +189,15 @@ function VideoToolSheet({ item, onEdit, onTrim, onCover, onClose }: VideoToolShe
 
         {/* Video thumbnail preview */}
         <div className="mx-4 mb-5 overflow-hidden" style={{ borderRadius: 14, aspectRatio: '16/9' }}>
-          <img
-            src={item.thumbnailUrl || item.previewUrl}
-            alt=""
+          <video
+            src={item.previewUrl}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
             className="w-full h-full object-cover"
+            style={{ pointerEvents: 'none' }}
           />
         </div>
 
