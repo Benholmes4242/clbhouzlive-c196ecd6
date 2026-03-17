@@ -3,8 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Upload } from 'lucide-react';
 import { useUploadProgress } from '@/hooks/useUploadProgress';
 
-const AMBER = '#F59E0B';
-const AMBER_DEEP = '#D97706';
+const WHITE_90 = 'rgba(255,255,255,0.90)';
+const WHITE_70 = 'rgba(255,255,255,0.70)';
 
 export function UploadBanner() {
   const { isUploading, uploadedCount, totalCount } = useUploadProgress();
