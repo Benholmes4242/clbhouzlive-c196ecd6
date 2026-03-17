@@ -16,7 +16,8 @@ export const usePostDeletion = () => {
   const deletePost = async (
     postId: string,
     actorType?: 'personal' | 'business',
-    actorId?: string
+    actorId?: string,
+    userId?: string
   ) => {
     try {
       // First delete associated media
@@ -54,8 +55,21 @@ export const usePostDeletion = () => {
       // Show delete toast
       showToast("Post deleted");
 
-      // Invalidate all relevant React Query caches
-      // This ensures the deleted post disappears from all feeds immediately
+      // Optimistically remove the deleted post from the infinite query cache
+      // instead of invalidating (which causes seenPostIds ref issues)
+      if (actorType && actorId && userId) {
+        const profilePostsKey = ['profile-posts', actorType, actorId, userId];
+        queryClient.setQueryData(profilePostsKey, (old: any) => {
+          if (!old?.pages) return old;
+          return {
+            ...old,
+            pages: old.pages.map((page: any) => ({
+              ...page,
+              posts: (page.posts ?? []).filter((p: any) => p.id !== postId),
+            })),
+          };
+        });
+      }
       
       // If we know the actor type/id, invalidate those specifically
       if (actorType && actorId) {
@@ -63,15 +77,13 @@ export const usePostDeletion = () => {
         queryClient.invalidateQueries({ queryKey: postKeys.actorPostsCount(actorType, actorId) });
       }
       
-      // Invalidate common feed caches (broader invalidation for safety)
+      // Invalidate other feed caches (but NOT profile-posts or actor-posts broadly)
       queryClient.invalidateQueries({ queryKey: postKeys.trending() });
       queryClient.invalidateQueries({ queryKey: ['infinite-followed-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['actor-posts'] });
       queryClient.invalidateQueries({ queryKey: ['activity-posts'] });
       queryClient.invalidateQueries({ queryKey: ['userPosts'] });
       queryClient.invalidateQueries({ queryKey: ['followedUsersPosts'] });
       queryClient.invalidateQueries({ queryKey: ['explore-content'] });
-      queryClient.invalidateQueries({ queryKey: ['profile-posts'] });
       queryClient.invalidateQueries({ queryKey: ['pinned-posts'] });
       queryClient.invalidateQueries({ queryKey: ['featured-post'] });
       queryClient.invalidateQueries({ queryKey: ['creator-features'] });

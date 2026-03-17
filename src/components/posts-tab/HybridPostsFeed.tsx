@@ -111,7 +111,7 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
   }, [posts]);
 
   const handleDelete = (postId: string, postUserId?: string) => {
-    deletePost(postId, 'personal', postUserId || userId);
+    deletePost(postId, 'personal', postUserId || userId, userId);
   };
 
   if (isLoading) {
