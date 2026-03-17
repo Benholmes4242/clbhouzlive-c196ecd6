@@ -76,7 +76,25 @@ export function PosterPicker({ item, onPosterChange, darkMode }: PosterPickerPro
     if (!isDragging) return;
     setIsDragging(false);
     const video = videoRef.current;
-    if (!video) { onPosterChange(currentTimestamp, null); return; }
+    if (!video) {
+      setTimeout(() => {
+        const retryVideo = document.querySelector('video') as HTMLVideoElement | null;
+        if (retryVideo) {
+          retryVideo.currentTime = currentTimestamp;
+          retryVideo.onseeked = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = retryVideo.videoWidth;
+            canvas.height = retryVideo.videoHeight;
+            canvas.getContext('2d')?.drawImage(retryVideo, 0, 0);
+            onPosterChange(currentTimestamp, canvas.toDataURL('image/jpeg', 0.85));
+            retryVideo.onseeked = null;
+          };
+        } else {
+          onPosterChange(currentTimestamp, null);
+        }
+      }, 150);
+      return;
+    }
     video.currentTime = currentTimestamp;
     video.onseeked = () => {
       const canvas = document.createElement('canvas');
