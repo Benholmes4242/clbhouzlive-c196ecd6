@@ -22,7 +22,7 @@ export function VideosHeader({
 }: VideosHeaderProps) {
   return (
     <div
-      className="sticky top-0 z-10 bg-background pb-0 pt-2 px-0"
+      className="sticky top-0 z-30 bg-background pb-0 pt-2 px-0"
       style={{ borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
     >
       <div className="px-4 pb-2">
