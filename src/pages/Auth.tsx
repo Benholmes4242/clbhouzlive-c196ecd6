@@ -34,6 +34,12 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
   useHideBottomNav();
   useHideHeader();
 
+  // Bleed behind notch/safe-area like Clubhouse & Tour Hub
+  useLayoutEffect(() => {
+    document.body.classList.add('route-auth');
+    return () => { document.body.classList.remove('route-auth'); };
+  }, []);
+
   // Helper to check profile and onboarding status
   async function checkProfileAndOnboarding(userId: string): Promise<{
     hasProfile: boolean;
