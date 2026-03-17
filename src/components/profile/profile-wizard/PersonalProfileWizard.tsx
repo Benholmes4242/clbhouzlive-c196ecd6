@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileForm } from '@/hooks/useProfileForm';
@@ -43,6 +44,7 @@ const transition = { type: 'tween' as const, duration: 0.22, ease: 'easeInOut' a
 
 export function PersonalProfileWizard() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
   const { profile, loading } = useProfileData();
 
@@ -93,8 +95,10 @@ export function PersonalProfileWizard() {
       .from('user_profiles')
       .update({ has_completed_onboarding: true })
       .eq('id', user.id);
+    // FIX I5: Invalidate onboarding cache so AuthWrapper doesn't re-route
+    queryClient.invalidateQueries({ queryKey: ['onboarding-status', user.id] });
     navigate('/', { replace: true });
-  }, [user, navigate]);
+  }, [user, navigate, queryClient]);
 
   const handleSave = useCallback(async () => {
     if (step < 3) { goNext(); return; }

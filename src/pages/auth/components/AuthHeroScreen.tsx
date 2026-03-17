@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { safeLocalStorage } from '@/utils/safeLocalStorage';
 import PasswordBottomSheet from './PasswordBottomSheet';
 
 // Toggle wordmark visibility
@@ -38,10 +39,10 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
 
   // FIX 6: Check for session expiry message on mount
   useEffect(() => {
-    const logoutReason = localStorage.getItem('logout_reason');
+    const logoutReason = safeLocalStorage.get('logout_reason');
     if (logoutReason === 'session_expired') {
       toast.info('For your security, please sign in again.', { duration: 5000 });
-      localStorage.removeItem('logout_reason');
+      safeLocalStorage.remove('logout_reason');
     }
   }, []);
 

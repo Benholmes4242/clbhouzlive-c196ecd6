@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
 import { 
   trackAuthCallbackStarted, 
   trackAuthRedirect, 
@@ -24,15 +25,11 @@ const AuthCallback: React.FC = () => {
         const accessToken = hashParams.get('access_token');
         
         // PRIORITY 1: Email verification flow - always route to verified page
-        // Supabase uses type=signup for email confirmation, type=magiclink for magic links
-        // type=recovery for password reset, type=invite for invites
         const isEmailVerification = type === 'signup' || type === 'email' || type === 'email_confirmation';
         
         if (isEmailVerification) {
-          // Clear any pending signup email
-          localStorage.removeItem('pending_signup_email');
+          safeLocalStorage.remove('pending_signup_email');
           
-          // Sign out any session so user must enter password on next login
           if (accessToken) {
             await supabase.auth.signOut();
           }
@@ -51,10 +48,9 @@ const AuthCallback: React.FC = () => {
         }
 
         // PRIORITY 2: Check for pending signup email (same-browser verification)
-        const pendingEmail = localStorage.getItem('pending_signup_email');
+        const pendingEmail = safeLocalStorage.get('pending_signup_email');
         if (pendingEmail && accessToken) {
-          // This is email verification in same browser - go to verified page
-          localStorage.removeItem('pending_signup_email');
+          safeLocalStorage.remove('pending_signup_email');
           await supabase.auth.signOut();
           trackAuthRedirect('verified');
           navigate('/auth/verified', { replace: true });
@@ -65,28 +61,36 @@ const AuthCallback: React.FC = () => {
         const { data: { user }, error: userError } = await supabase.auth.getUser();
         
         if (userError || !user) {
-          // No user found after callback - something went wrong or verification link
+          // FIX J5: Detect expired PKCE state
+          const errMsg = userError?.message ?? '';
+          const isPkceError =
+            errMsg.includes('code verifier') ||
+            errMsg.includes('invalid request') ||
+            errMsg.includes('code challenge');
+
           if (pendingEmail) {
-            localStorage.removeItem('pending_signup_email');
+            safeLocalStorage.remove('pending_signup_email');
             trackAuthRedirect('verified');
             navigate('/auth/verified', { replace: true });
             return;
           }
           
-          setStatus("No authenticated user found. Redirecting to login...");
+          setStatus(
+            isPkceError
+              ? "Sign-in session expired. Redirecting..."
+              : "No authenticated user found. Redirecting to login..."
+          );
           trackAuthRedirect('auth');
           setTimeout(() => navigate('/auth', { replace: true }), 1000);
           return;
         }
 
-        // PRIORITY 4: Check if OAuth user (Google/Apple) - these don't need verification page
-        // OAuth users have email_confirmed_at set immediately
+        // PRIORITY 4: Check if OAuth user (Google/Apple)
         const isOAuthUser = user.app_metadata?.provider && user.app_metadata.provider !== 'email';
         
         setStatus("Checking profile...");
 
-        // FIX: Add small delay to give the database trigger time to create profile
-        // This reduces reliance on the client-side fallback for race conditions
+        // Small delay to give the database trigger time to create profile
         await new Promise(resolve => setTimeout(resolve, 500));
 
         // Check if user has a profile
@@ -101,7 +105,6 @@ const AuthCallback: React.FC = () => {
         }
 
         // FIX 2e: Client-side fallback for missing profiles
-        // Username is NOT auto-generated from email - user must set it during onboarding
         if (!profile) {
           console.warn('[Auth] No profile found for user, attempting client-side creation');
           
@@ -113,7 +116,7 @@ const AuthCallback: React.FC = () => {
             .from('user_profiles')
             .insert({
               id: user.id,
-              username: null,  // User will set username during onboarding - no email fallback
+              username: null,
               display_name: fallbackDisplayName,
               user_type: 'individual',
               is_public: true,
@@ -124,7 +127,6 @@ const AuthCallback: React.FC = () => {
             console.error('[Auth] Failed to create fallback profile:', createError);
             trackProfileFallbackCreated(false, createError.message);
             
-            // Log error to console - profile_creation_errors table may not exist yet
             console.warn('[Auth] Profile creation error details:', {
               user_id: user.id,
               error_message: `Client-side fallback failed: ${createError.message}`,
@@ -133,7 +135,6 @@ const AuthCallback: React.FC = () => {
           } else {
             trackProfileFallbackCreated(true);
             
-            // Retry the profile fetch
             const { data: retryProfile } = await supabase
               .from('user_profiles')
               .select('id, has_completed_onboarding')
@@ -162,8 +163,19 @@ const AuthCallback: React.FC = () => {
           navigate('/', { replace: true });
         }
       } catch (error) {
+        // FIX J5: Detect expired PKCE state in catch block
+        const errMsg = (error as Error)?.message ?? '';
+        const isPkceError =
+          errMsg.includes('code verifier') ||
+          errMsg.includes('invalid request') ||
+          errMsg.includes('code challenge');
+
         console.error('Auth callback error:', error);
-        setStatus("Something went wrong. Redirecting to login...");
+        setStatus(
+          isPkceError
+            ? "Sign-in session expired. Redirecting..."
+            : "Something went wrong. Redirecting to login..."
+        );
         trackAuthRedirect('auth');
         setTimeout(() => navigate('/auth', { replace: true }), 1500);
       }

@@ -118,6 +118,8 @@ export function useProfileSave(userId: string) {
       INVALIDATE_KEYS.forEach(key =>
         queryClient.invalidateQueries({ queryKey: [key] })
       );
+      // FIX I5: Invalidate onboarding cache so AuthWrapper doesn't re-route
+      queryClient.invalidateQueries({ queryKey: ['onboarding-status', userId] });
 
       return true;
     } catch (err: any) {
