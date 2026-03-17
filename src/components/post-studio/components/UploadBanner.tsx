@@ -36,8 +36,8 @@ export function UploadBanner() {
 
   const iconWrapStyle: React.CSSProperties = {
     width: 40, height: 40, borderRadius: 12, flexShrink: 0,
-    background: 'rgba(245,158,11,0.15)',
-    border: '1px solid rgba(245,158,11,0.25)',
+    background: 'rgba(255,255,255,0.08)',
+    border: '1px solid rgba(255,255,255,0.12)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
   };
 
