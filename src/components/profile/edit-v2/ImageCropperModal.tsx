@@ -240,7 +240,8 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
             </div>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
   );
 };

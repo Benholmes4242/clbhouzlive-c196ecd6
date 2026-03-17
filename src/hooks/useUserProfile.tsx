@@ -86,7 +86,7 @@ export const useUserProfile = (userId: string | undefined | null) => {
       return data as UserProfile;
     },
     enabled: !!userId,
-    staleTime: 5 * 60 * 1000, // 5 min - profile changes are rare
+    staleTime: 0, // Always refetch after invalidation
     gcTime: 10 * 60 * 1000,
   });
 };
