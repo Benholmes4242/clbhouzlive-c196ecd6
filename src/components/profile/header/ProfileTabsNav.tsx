@@ -42,8 +42,7 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
     >
       {/* Hub-style pill toggle bar */}
       <div 
-        className="inline-flex items-center gap-1 p-1 rounded-full"
-        style={{ background: '#e2e8f0' }}
+        className="inline-flex items-center gap-1 p-1 rounded-full bg-muted"
       >
         {tabs.map((tab) => {
           const isActive = activeSection === tab.id;
@@ -58,8 +57,8 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
               className={cn(
                 "px-4 py-2 text-sm font-medium rounded-full transition-all duration-150 whitespace-nowrap",
                 isActive 
-                  ? "bg-white text-[#1e293b] shadow-sm border border-[#e2e8f0]" 
-                  : "text-[#64748b] hover:text-[#1e293b] hover:bg-white/50",
+                  ? "bg-foreground text-background shadow-sm" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-background/50",
                 disabled && "pointer-events-none opacity-50"
               )}
             >
