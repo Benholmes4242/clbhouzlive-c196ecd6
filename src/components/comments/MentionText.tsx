@@ -1,6 +1,7 @@
 /**
  * MentionText - Renders text with @mentions highlighted in amber.
- * Mentions are stored as slug-safe \w-only usernames (e.g. @danny_holmes).
+ * Supports both new PascalCase mentions (e.g. @AndrewYetzes) and
+ * legacy space-separated mentions (e.g. @Andrew Yetzes).
  * On tap: resolves entity_id via taggable_entities, navigates by entity_id (not raw username).
  */
 
