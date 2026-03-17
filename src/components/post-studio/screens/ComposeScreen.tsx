@@ -805,16 +805,19 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                         </p>
                       )}
                     </div>
-                    <button
+                    <div
+                      role="button"
+                      tabIndex={0}
                       onClick={(e) => {
                         e.stopPropagation();
                         setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId));
                       }}
-                      className="ml-1 w-4 h-4 rounded-full flex items-center justify-center"
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId)); } }}
+                      className="ml-1 w-4 h-4 rounded-full flex items-center justify-center cursor-pointer"
                       style={{ background: 'rgba(255,255,255,0.12)' }}
                     >
                       <X className="w-2.5 h-2.5" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={2.5} />
-                    </button>
+                    </div>
                   </motion.button>
                 ))}
                 {state.taggedCourses.length < 5 && (
