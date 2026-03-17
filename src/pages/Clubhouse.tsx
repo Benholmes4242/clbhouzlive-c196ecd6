@@ -504,8 +504,7 @@ const ClubhouseContent = () => {
             />
           )}
 
-          {/* CinematicActionRail — z-40, right side (hidden for tournament cards) */}
-          {!isTournamentCardActive && (
+          {/* CinematicActionRail — z-40, right side */}
            <CinematicActionRail
               key={activePost.id}
             postId={activePost.id}
@@ -529,7 +528,6 @@ const ClubhouseContent = () => {
               ? () => setCarouselPosition(activeIndex, currentMediaIndex - 1) 
               : undefined}
           />
-          )}
 
           {/* CreatorCapsule — z-50, bottom-left */}
            <CreatorCapsule
