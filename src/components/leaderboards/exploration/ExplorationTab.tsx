@@ -2,8 +2,6 @@ import { useState, useEffect, useRef, useMemo, useLayoutEffect, useCallback } fr
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExplorationLeaderboard, useUserExplorationStatus } from '@/hooks/leaderboards';
-import { useSeasonCalendar } from '@/hooks/championship';
-import { getSeasonConfig, type SeasonId } from '@/lib/seasonConfig';
 import { supabase } from '@/integrations/supabase/client';
 
 import { cn } from '@/lib/utils';
