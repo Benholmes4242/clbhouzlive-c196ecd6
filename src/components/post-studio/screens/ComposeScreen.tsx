@@ -632,7 +632,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         leftAction={onClose ? { label: '', onClick: onClose, icon: 'close' as const } : undefined}
         rightAction={
           isValid
-            ? { label: 'Review', onClick: () => setStep('PUBLISH'), variant: 'primary' as const }
+            ? { label: 'Next', onClick: () => setStep('PUBLISH'), variant: 'primary' as const }
             : undefined
         }
       />
