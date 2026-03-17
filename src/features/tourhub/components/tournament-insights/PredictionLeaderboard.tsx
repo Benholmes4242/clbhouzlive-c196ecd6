@@ -54,7 +54,7 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
               className="text-foreground"
               style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.01em' }}
             >
-              Our Picks
+              Tournament Picks
             </span>
             <div style={{ height: 1, background: 'hsl(var(--border) / 0.15)', marginTop: 8 }} />
           </div>
