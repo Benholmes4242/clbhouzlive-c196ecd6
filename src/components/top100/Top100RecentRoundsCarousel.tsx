@@ -159,10 +159,10 @@ export function Top100RecentRoundsCarousel({
                   className={cn(
                     'h-1.5 rounded-full transition-all duration-200',
                     idx === current
-                      ? 'w-5'
-                      : 'w-2 bg-[hsl(var(--accent-amber))]/25'
+                      ? 'w-5 bg-foreground/70'
+                      : 'w-2 bg-foreground/20'
                   )}
-                  style={idx === current ? { background: 'hsl(var(--accent-amber))' } : undefined}
+                />
                 />
               ))}
             </div>
