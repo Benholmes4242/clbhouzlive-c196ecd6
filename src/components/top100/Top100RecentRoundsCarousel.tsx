@@ -163,7 +163,6 @@ export function Top100RecentRoundsCarousel({
                       : 'w-2 bg-foreground/20'
                   )}
                 />
-                />
               ))}
             </div>
 
