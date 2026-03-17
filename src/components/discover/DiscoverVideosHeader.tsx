@@ -63,20 +63,20 @@ const DiscoverVideosHeader: React.FC<DiscoverVideosHeaderProps> = ({
     <div 
       className="sticky top-[var(--header-height,0px)] z-40 bg-transparent"
     >
-      <div className="py-2 px-3 space-y-2">
-        {/* Search icon row */}
-        <div className="flex items-center">
-          <button
-            onClick={handleSearchOpen}
-            aria-label="Search videos"
-            className="grid h-8 w-8 place-items-center rounded-full transition-all flex-shrink-0 text-slate-500 hover:text-slate-700 hover:bg-slate-100"
-          >
-            <Search size={18} />
-          </button>
-        </div>
+      <div 
+        className="flex items-center gap-2 py-2 px-3"
+      >
+        {/* Search icon on the left - light theme */}
+        <button
+          onClick={handleSearchOpen}
+          aria-label="Search videos"
+          className="grid h-8 w-8 place-items-center rounded-full transition-all flex-shrink-0 text-slate-500 hover:text-slate-700 hover:bg-slate-100"
+        >
+          <Search size={18} />
+        </button>
 
-        {/* Centered filter chips */}
-        <div className="no-scrollbar flex gap-1.5 overflow-x-auto justify-center">
+        {/* Scrollable filter chips - light theme */}
+        <div className="no-scrollbar flex gap-1.5 overflow-x-auto flex-1">
           {allPills.map((pill) => {
             const isActive = 
               (pill.type === 'duration' && activeDuration === pill.key) ||
