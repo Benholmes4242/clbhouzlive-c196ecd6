@@ -6,32 +6,29 @@ import { usePostStudioContext } from '../usePostStudio';
 import { SPRING } from '../constants';
 import { TEXT_PRIMARY, TEXT_TERTIARY } from '../tokens';
 
+const pad = (n: number) => n.toString().padStart(2, '0');
+const toDateStr = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const toTimeStr = (d: Date) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
 export function SchedulePanel() {
   const { state, setScheduledAt, closePanel } = usePostStudioContext();
   const dragControls = useDragControls();
   const [isScheduling, setIsScheduling] = useState(state.scheduledAt !== null);
 
   const minDate = useMemo(() => { const d = new Date(); d.setMinutes(d.getMinutes() + 5); return d; }, []);
-  const maxDate = useMemo(() => { const d = new Date(); d.setMonth(d.getMonth() + 6); return d; }, []);
 
-  const toDateTimeLocal = (date: Date): string => {
-    const pad = (n: number) => n.toString().padStart(2, '0');
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  const initDate = state.scheduledAt ?? minDate;
+  const [dateValue, setDateValue] = useState(toDateStr(initDate));
+  const [timeValue, setTimeValue] = useState(toTimeStr(initDate));
+
+  const combineAndSet = (d: string, t: string) => {
+    const combined = new Date(`${d}T${t}`);
+    if (!isNaN(combined.getTime()) && combined >= minDate) setScheduledAt(combined);
   };
-
-  const [dateValue, setDateValue] = useState<string>(
-    state.scheduledAt ? toDateTimeLocal(state.scheduledAt) : toDateTimeLocal(minDate)
-  );
 
   const handleToggle = () => {
     if (isScheduling) { setIsScheduling(false); setScheduledAt(null); }
-    else { setIsScheduling(true); const selected = new Date(dateValue); if (selected > minDate) setScheduledAt(selected); }
-  };
-
-  const handleDateChange = (value: string) => {
-    setDateValue(value);
-    const selected = new Date(value);
-    if (selected >= minDate && selected <= maxDate) setScheduledAt(selected);
+    else { setIsScheduling(true); combineAndSet(dateValue, timeValue); }
   };
 
   return (
@@ -75,7 +72,7 @@ export function SchedulePanel() {
           <div className="w-9 h-[3px] rounded-full" style={{ background: 'rgba(255,255,255,0.18)' }} />
         </div>
 
-        {/* Header — no X button */}
+        {/* Header */}
         <div className="px-5 pb-4">
           <p className="text-[11px] font-semibold uppercase tracking-[1.5px] mb-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
             Schedule
@@ -121,7 +118,7 @@ export function SchedulePanel() {
             </button>
           </div>
 
-          {/* Date picker */}
+          {/* Date & time pickers */}
           <AnimatePresence>
             {isScheduling && (
               <motion.div
@@ -131,31 +128,43 @@ export function SchedulePanel() {
                 transition={{ type: 'spring', damping: 28, stiffness: 360 }}
                 className="overflow-hidden"
               >
-                <div
-                  className="rounded-2xl overflow-hidden"
-                  style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.04)' }}
-                >
-                  <div className="flex items-center gap-2.5 px-4 pt-3 pb-1">
+                <div className="space-y-3 pt-1">
+                  <div className="flex items-center gap-2.5 px-1">
                     <Calendar className="w-4 h-4 shrink-0" style={{ color: 'rgba(255,255,255,0.35)' }} strokeWidth={1.75} />
                     <span className="text-[11px] font-semibold uppercase tracking-[1.2px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
                       Select date & time
                     </span>
                   </div>
+
+                  {/* Date picker */}
                   <input
-                    type="datetime-local"
+                    type="date"
                     value={dateValue}
-                    min={toDateTimeLocal(minDate)}
-                    max={toDateTimeLocal(maxDate)}
-                    onChange={(e) => handleDateChange(e.target.value)}
-                    className="w-full bg-transparent px-4 py-3 text-sm outline-none"
+                    min={toDateStr(new Date())}
+                    onChange={(e) => { setDateValue(e.target.value); combineAndSet(e.target.value, timeValue); }}
+                    className="w-full px-4 py-3 rounded-xl text-white text-[15px] font-medium outline-none"
                     style={{
-                      color: TEXT_PRIMARY,
-                      caretColor: 'rgba(255,255,255,0.70)',
+                      background: 'rgba(255,255,255,0.07)',
+                      border: '1px solid rgba(255,255,255,0.12)',
                       colorScheme: 'dark',
                     }}
                   />
+
+                  {/* Time picker */}
+                  <input
+                    type="time"
+                    value={timeValue}
+                    onChange={(e) => { setTimeValue(e.target.value); combineAndSet(dateValue, e.target.value); }}
+                    className="w-full px-4 py-3 rounded-xl text-white text-[15px] font-medium outline-none"
+                    style={{
+                      background: 'rgba(255,255,255,0.07)',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                      colorScheme: 'dark',
+                    }}
+                  />
+
                   {state.scheduledAt && (
-                    <p className="px-4 pb-3 text-xs" style={{ color: 'rgba(255,255,255,0.40)' }}>
+                    <p className="px-1 text-xs" style={{ color: 'rgba(255,255,255,0.40)' }}>
                       Will post {state.scheduledAt.toLocaleDateString('en-GB', {
                         weekday: 'long', day: 'numeric', month: 'long',
                         hour: 'numeric', minute: '2-digit',
