@@ -102,7 +102,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
   let tileIndex = 0;
 
   return (
-    <div ref={ref} className="grid grid-cols-3 gap-[2px]">
+    <div ref={ref} className="grid grid-cols-2 gap-[2px]">
       {posts.map((post) => {
         const mediaKey = post.mediaItems[0]?.id || post.id;
         if (isLandscape(post)) {
@@ -134,11 +134,11 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
       })}
 
       {/* Infinite scroll sentinel */}
-      <div ref={sentinelRef} className="col-span-3 h-1" />
+      <div ref={sentinelRef} className="col-span-2 h-1" />
 
       {/* Loading indicator */}
       {isFetchingNextPage && (
-        <div className="col-span-3 flex items-center justify-center py-4">
+        <div className="col-span-2 flex items-center justify-center py-4">
           <Loader2 className="w-5 h-5 animate-spin text-[#f59e0b]" />
         </div>
       )}
