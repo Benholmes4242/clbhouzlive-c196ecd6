@@ -527,9 +527,9 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         }}>
           <button onClick={handleLike} style={{
             display: 'flex', alignItems: 'center', gap: 5,
-            background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 10,
-            padding: '8px 14px', cursor: 'pointer', color: isLiked ? '#EF4444' : 'rgba(255,255,255,0.6)',
-            fontSize: 14, fontWeight: 600, transition: 'color 0.2s',
+            background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 12,
+            padding: '10px 16px', cursor: 'pointer', color: isLiked ? '#EF4444' : 'rgba(255,255,255,0.6)',
+            fontSize: 15, fontWeight: 600, transition: 'color 0.2s',
             animation: heartPopping ? 'trc-heartPop 0.5s ease-out' : 'none',
           }}>
             <span style={{ fontSize: 18 }}>
