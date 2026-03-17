@@ -1022,7 +1022,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
 
   // Preload current slide's winner avatar into browser cache
   useEffect(() => {
-    const slide = slides[currentIndex];
+    const slide = safeSlides[currentIndex];
     if (slide?.type === 'completed') {
       const winners = leadersWinnersMap?.get(slide.tournament.id);
       const winner = winners?.topFinishers?.find(w => w.position === 1);
@@ -1037,14 +1037,14 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
         }
       }
     }
-  }, [currentIndex, slides, leadersWinnersMap]);
+  }, [currentIndex, safeSlides, leadersWinnersMap]);
 
   // Reset index when slides change
   useEffect(() => {
-    if (currentIndex >= slides.length) {
+    if (currentIndex >= safeSlides.length) {
       setCurrentIndex(0);
     }
-  }, [slides.length, currentIndex]);
+  }, [safeSlides.length, currentIndex]);
 
   // Auto-collapse if slide index changes
   const prevIndexRef = React.useRef(currentIndex);
