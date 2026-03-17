@@ -577,19 +577,30 @@ function CommentsSheet({
             </div>
 
             {/* Post caption — shown above comments when present */}
-            {caption && caption.trim().length > 0 && (
+            {(cleanCaption || displayCourseName) && (
               <div className={cn(
                 'px-4 py-3 shrink-0 border-b',
                 isDark ? 'border-white/[0.06]' : 'border-border/50'
               )}>
-                <MentionText
-                  text={caption}
-                  className={cn(
-                    'text-[14px] leading-[20px]',
-                    isDark ? 'text-white/70' : 'text-foreground/70'
-                  )}
-                  mentionClassName="font-semibold [color:#E8980A]"
-                />
+                {cleanCaption && (
+                  <MentionText
+                    text={cleanCaption}
+                    className={cn(
+                      'text-[14px] leading-[20px] line-clamp-2',
+                      isDark ? 'text-white/70' : 'text-foreground/70'
+                    )}
+                    mentionClassName="font-semibold [color:#E8980A]"
+                  />
+                )}
+                {displayCourseName && (
+                  <p className={cn(
+                    'text-[13px] leading-[18px] font-semibold truncate',
+                    cleanCaption ? 'mt-1' : '',
+                    isDark ? 'text-white' : 'text-foreground'
+                  )}>
+                    {displayCourseName}
+                  </p>
+                )}
               </div>
             )}
 
