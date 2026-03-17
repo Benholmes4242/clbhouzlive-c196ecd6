@@ -75,15 +75,20 @@ export function ActorSelector({ compact = false, header = false }: ActorSelector
     return (
       <>
         <button
-          onClick={() => hasMultiple && setSheetOpen(true)}
-          disabled={!hasMultiple}
+          onClick={() => setSheetOpen(true)}
           className="relative flex items-center justify-center"
           style={{ width: 40, height: 40 }}
         >
           {/* Avatar */}
           <div
-            className="w-8 h-8 overflow-hidden shrink-0"
-            style={{ background: 'rgba(255,255,255,0.10)', border: '1.5px solid rgba(255,255,255,0.18)', borderRadius: '34%' }}
+            className="overflow-hidden shrink-0"
+            style={{
+              width: header ? 34 : 32,
+              height: header ? 34 : 32,
+              background: 'rgba(255,255,255,0.10)',
+              border: '1.5px solid rgba(255,255,255,0.18)',
+              borderRadius: '34%',
+            }}
           >
             {activeAvatar ? (
               <img src={activeAvatar} alt="" className="w-full h-full object-cover" />
