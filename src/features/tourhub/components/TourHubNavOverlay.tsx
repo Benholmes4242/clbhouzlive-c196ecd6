@@ -188,7 +188,7 @@ export function TourHubNavOverlay({
   const getAriaLabel = (item: NavItem) => {
     switch (item.value) {
       case 'overview': return 'Overview — The global golf season at a glance';
-      case 'schedule': return hasLive ? `Schedule — ${liveCount} tournament${(liveCount ?? 0) > 1 ? 's' : ''} live right now` : 'Schedule — What\'s happening past, present, and upcoming';
+      case 'schedule': return hasLive ? `Schedule — ${liveCount} tournament${(liveCount ?? 0) > 1 ? 's' : ''} live right now` : 'Schedule - What\'s happening past, present, and upcoming';
       case 'players': return 'Players — The names shaping the season';
       case 'leaderboards': return 'Performance Rankings — Statistical leaders across every category';
       default: return item.label;
