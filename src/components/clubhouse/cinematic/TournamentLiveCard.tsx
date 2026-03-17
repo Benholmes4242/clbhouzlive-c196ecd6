@@ -529,7 +529,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                         {tiedEntries.length}-way tie
                       </span>
                     ) : (
-                      <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.8)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <span style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.8)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {entry.playerName}
                       </span>
                     )}
