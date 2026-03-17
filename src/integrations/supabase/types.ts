@@ -14756,6 +14756,7 @@ export type Database = {
           sub_region_name: string
         }[]
       }
+      get_current_username: { Args: { _user_id: string }; Returns: string }
       get_division_config: {
         Args: never
         Returns: {
