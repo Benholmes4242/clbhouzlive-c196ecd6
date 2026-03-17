@@ -134,8 +134,8 @@ export default function StudioPanelText({
             className="w-full py-6 rounded-xl transition-colors flex flex-col items-center justify-center gap-2"
             style={{ background: 'rgba(255,255,255,0.04)' }}
           >
-            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(232,152,10,0.15)' }}>
-              <Type className="w-5 h-5" style={{ color: '#E8980A' }} />
+            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.10)' }}>
+              <Type className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.80)' }} />
             </div>
             <span className="text-sm font-medium text-white">Tap to add text overlay</span>
             <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.45)' }}>Add captions, titles, or labels</span>
