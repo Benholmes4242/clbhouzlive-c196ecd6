@@ -38,7 +38,7 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className, tourna
   const visibleTabs = isCompleted ? COMPLETED_TABS : DEFAULT_TABS;
 
   return (
-    <div className={cn("sticky top-0 z-20 bg-background/95 backdrop-blur-md py-3", className)}>
+    <div className={cn("sticky top-0 z-20 bg-background/95 backdrop-blur-md border-b border-border/50 py-3 -mx-4 px-4", className)}>
       <div 
         className="flex gap-1.5"
         role="tablist"
