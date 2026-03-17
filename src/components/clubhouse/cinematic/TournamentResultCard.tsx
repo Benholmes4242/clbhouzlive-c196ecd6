@@ -401,7 +401,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             animationDelay: '0.6s',
           }}>
             <span style={{ width: 28, textAlign: 'center' as const, fontSize: 15, fontWeight: 700, color: tour.accentColor }}>1</span>
-            <RowAvatar src={winnerPhotoSrc} name={meta.winner_name} />
+            <RowAvatar src={winnerPhotoSrc} name={meta.winner_name} size={38} />
             <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
               {meta.winner_name}
             </span>
