@@ -210,13 +210,19 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     <div className="px-3 pb-3 space-y-3">
       {/* Caption (scrollable) */}
       {cleanCaption && (
-        <div 
+        <div
           className="max-h-[100px] overflow-y-auto scrollbar-hide"
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          <p className="text-[13px] leading-relaxed text-white/90">
-            {cleanCaption}
-          </p>
+          {tags.length > 0 ? (
+            <PostContentWithTags
+              content={cleanCaption}
+              tags={tags}
+              className="text-[13px] leading-relaxed text-white/90"
+            />
+          ) : (
+            <p className="text-[13px] leading-relaxed text-white/90">{cleanCaption}</p>
+          )}
         </div>
       )}
 

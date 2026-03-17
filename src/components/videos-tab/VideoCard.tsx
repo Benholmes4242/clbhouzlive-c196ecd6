@@ -152,9 +152,11 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
         {/* Caption */}
         {cleanedCaption && (
           <div className="px-3 pb-2">
-            <p className={`text-sm text-foreground ${expanded ? '' : 'line-clamp-2'}`}>
-              {cleanedCaption}
-            </p>
+            <PostContentWithTags
+              content={cleanedCaption}
+              tags={post.tags || []}
+              className={`text-sm text-foreground ${expanded ? '' : 'line-clamp-2'}`}
+            />
             {!expanded && cleanedCaption.length > 100 && (
               <button
                 onClick={() => setExpanded(true)}

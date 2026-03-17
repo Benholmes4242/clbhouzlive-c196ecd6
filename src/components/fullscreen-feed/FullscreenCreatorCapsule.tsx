@@ -103,6 +103,7 @@ export function FullscreenCreatorCapsule({ posts, store }: FullscreenCreatorCaps
         avatar: activePost.avatarUrl,
       }}
       caption={activePost.caption}
+      tags={activePost.tags || []}
       golfCourse={golfCourse}
       isFollowing={isFollowed}
       isOwnPost={isOwnPost}
