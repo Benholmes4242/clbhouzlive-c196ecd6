@@ -21,6 +21,7 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
   isCompleted,
   bestCallPlayerId,
   tournamentLeaderScore,
+  tourSlug,
 }) => {
   if (allPicks.length === 0) return null;
 
