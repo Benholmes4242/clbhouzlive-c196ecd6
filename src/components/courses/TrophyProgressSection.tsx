@@ -390,7 +390,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                                          <p className="text-xs text-green-600 font-medium">Unlocked: {trophy.unlockedDate}</p>
                                        )}
                                      </div>
-                                     <Tooltip.Arrow className="fill-border" />
+                                      <Tooltip.Arrow style={{ fill: 'hsl(var(--border))' }} />
                                    </Tooltip.Content>
                                  </Tooltip.Portal>
                                </Tooltip.Root>
@@ -513,7 +513,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                                       <p className="text-xs text-green-600 font-medium">Unlocked: {trophy.unlockedDate}</p>
                                     )}
                                   </div>
-                                  <Tooltip.Arrow className="fill-border" />
+                                  <Tooltip.Arrow style={{ fill: 'hsl(var(--border))' }} />
                                 </Tooltip.Content>
                               </Tooltip.Portal>
                             </Tooltip.Root>
