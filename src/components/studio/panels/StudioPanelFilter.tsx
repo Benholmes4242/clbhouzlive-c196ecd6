@@ -89,7 +89,7 @@ const FilterCard = memo(function FilterCard({
         <div
           className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full flex items-center justify-center shadow-sm transition-all duration-150"
           style={{
-            background: '#E8980A',
+            background: 'rgba(255,255,255,0.90)',
             opacity: isSelected ? 1 : 0,
             transform: isSelected ? 'scale(1)' : 'scale(0.75)',
           }}
