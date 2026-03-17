@@ -367,33 +367,18 @@ const AuthForm: React.FC<AuthFormProps> = ({
         });
         setSubmitting(false);
       } else if (data?.user) {
-        // Store email for callback to use
-        localStorage.setItem('pending_signup_email', email);
+        // Fix 1: Let users in immediately — no verification gate
+        // Store pending email for later nudge system
+        localStorage.setItem('pending_verification_email', email);
+        trackSignupSuccess('email', Date.now() - startTime);
         
-        // Switch back to sign-in and show success notice
-        setIsSignUp(false);
-        setPassword('');
-        setConfirmPassword('');
-        setUsername('');
-        setView('entry');
-        setAuthNotice({
-          type: 'success',
-          message: `Your account is almost ready. Check ${email} for a verification link, then sign in here.`,
-        });
-        setSubmitting(false);
+        // Show success animation and navigate to callback
+        setSuccessMessage('Welcome to clbhouz!');
+        setShowSuccessAnimation(true);
       } else if (data && !data.user) {
-        // Supabase returned success but no user - email confirmation required
-        localStorage.setItem('pending_signup_email', email);
-        
-        setIsSignUp(false);
-        setPassword('');
-        setConfirmPassword('');
-        setUsername('');
-        setView('entry');
-        setAuthNotice({
-          type: 'success',
-          message: `Check ${email} for a verification link to complete signup.`,
-        });
+        // Supabase returned success but no user — edge case fallback
+        localStorage.setItem('pending_verification_email', email);
+        setErrorMsg('Something went wrong. Please try again.');
         setSubmitting(false);
       } else {
         // Unexpected state - fail gracefully

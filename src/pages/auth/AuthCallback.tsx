@@ -42,6 +42,14 @@ const AuthCallback: React.FC = () => {
           return;
         }
 
+        // Fix 4: Password recovery flow
+        const isPasswordReset = type === 'recovery';
+        if (isPasswordReset) {
+          trackAuthRedirect('reset-password');
+          navigate('/auth/reset-password', { replace: true });
+          return;
+        }
+
         // PRIORITY 2: Check for pending signup email (same-browser verification)
         const pendingEmail = localStorage.getItem('pending_signup_email');
         if (pendingEmail && accessToken) {

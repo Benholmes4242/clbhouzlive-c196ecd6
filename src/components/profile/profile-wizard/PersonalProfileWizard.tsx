@@ -191,7 +191,7 @@ export function PersonalProfileWizard() {
       </AlertDialog>
 
       {showSuccess && (
-        <WizardSuccessScreen username={(profile as any)?.username ?? ''} />
+        <WizardSuccessScreen username={(profile as any)?.username ?? ''} isNewUser={isNewUser.current} />
       )}
     </>,
     document.body

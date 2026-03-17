@@ -274,8 +274,23 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               <div className="flex-1 h-px bg-neutral-700" />
             </div>
             
+            {/* Sign-in eyebrow label */}
+            <p
+              className="auth-button-5 text-center"
+              style={{
+                fontFamily: 'SF Pro Text, system-ui, sans-serif',
+                fontSize: '11px',
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '1.5px',
+                color: 'rgba(255, 255, 255, 0.4)',
+              }}
+            >
+              Already have an account? Sign in below
+            </p>
+            
             {/* Email input for login */}
-            <div className="auth-button-5 space-y-3">
+            <div className="auth-button-6 space-y-3">
               <div className="relative">
                 <input
                   ref={emailInputRef}
