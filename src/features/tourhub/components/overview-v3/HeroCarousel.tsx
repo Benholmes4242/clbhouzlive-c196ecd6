@@ -962,7 +962,7 @@ interface HeroCarouselProps {
 
 export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   const { data: slides = [], isLoading } = useHeroCarouselData();
-  
+  const safeSlides = Array.isArray(slides) ? slides : [];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -972,7 +972,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   }, []);
 
   // Wire up top-3 podium data for completed slides
-  const completedIds = (slides ?? [])
+  const completedIds = safeSlides
     .filter(s => s.type === 'completed')
     .map(s => s.tournament.id);
   const { data: leadersWinnersMap } = useTournamentLeadersWinners(completedIds);
@@ -998,14 +998,14 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
 
   // Auto-advance every 8 seconds (spec: 8s idle, 5s resume after touch)
   useEffect(() => {
-    if (!slides || slides.length <= 1 || isPaused || isExpanded) return;
+    if (safeSlides.length <= 1 || isPaused || isExpanded) return;
     
     const interval = setInterval(() => {
-      setCurrentIndex(prev => (prev + 1) % (slides?.length ?? 1));
+      setCurrentIndex(prev => (prev + 1) % safeSlides.length);
     }, 8000);
 
     return () => clearInterval(interval);
-  }, [slides?.length, isPaused, isExpanded]);
+  }, [safeSlides.length, isPaused, isExpanded]);
 
   // Pause auto-advance when app is backgrounded
   useEffect(() => {
@@ -1022,7 +1022,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
 
   // Preload current slide's winner avatar into browser cache
   useEffect(() => {
-    const slide = slides[currentIndex];
+    const slide = safeSlides[currentIndex];
     if (slide?.type === 'completed') {
       const winners = leadersWinnersMap?.get(slide.tournament.id);
       const winner = winners?.topFinishers?.find(w => w.position === 1);
@@ -1037,14 +1037,14 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
         }
       }
     }
-  }, [currentIndex, slides, leadersWinnersMap]);
+  }, [currentIndex, safeSlides, leadersWinnersMap]);
 
   // Reset index when slides change
   useEffect(() => {
-    if (currentIndex >= slides.length) {
+    if (currentIndex >= safeSlides.length) {
       setCurrentIndex(0);
     }
-  }, [slides.length, currentIndex]);
+  }, [safeSlides.length, currentIndex]);
 
   // Auto-collapse if slide index changes
   const prevIndexRef = React.useRef(currentIndex);
@@ -1093,7 +1093,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
 
     const threshold = 50;
     if (Math.abs(deltaX) > threshold && Math.abs(deltaX) > deltaY) {
-      if (deltaX < -threshold && currentIndex < slides.length - 1) {
+      if (deltaX < -threshold && currentIndex < safeSlides.length - 1) {
         setCurrentIndex(prev => prev + 1);
         if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
         setIsPaused(false);
@@ -1107,7 +1107,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     scheduleResume();
   };
 
-  if (isLoading || slides.length === 0) {
+  if (isLoading || safeSlides.length === 0) {
     return (
       <div className="relative w-full h-full bg-slate-900 animate-pulse">
         <div 
@@ -1146,12 +1146,12 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
       </button>
 
       <AnimatePresence mode="sync">
-        {slides.map((slide, index) => (
+        {safeSlides.map((slide, index) => (
           <HeroSlide
             key={slide.tournament.id}
             slide={slide}
             isActive={index === currentIndex}
-            totalSlides={slides.length}
+            totalSlides={safeSlides.length}
             currentIndex={currentIndex}
             onDotClick={setCurrentIndex}
             leadersWinnersMap={leadersWinnersMap}
