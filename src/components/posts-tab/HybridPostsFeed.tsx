@@ -94,7 +94,7 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
       }
 
       if (compactIndex < compactPosts.length) {
-        const chunk = compactPosts.slice(compactIndex, compactIndex + 3);
+        const chunk = compactPosts.slice(compactIndex, compactIndex + 2);
         result.push({
           kind: 'compact-group',
           posts: chunk.map((c) => c.post),
