@@ -87,7 +87,7 @@ export const useUserPosts = () => {
       const userIds = [...new Set(postsData.map(post => post.user_id))];
       const postIds = postsData.map(p => p.id);
       
-      const [profilesResponse, mediaResponse] = await Promise.all([
+      const [profilesResponse, mediaResponse, tagsResponse] = await Promise.all([
         supabase
           .from('user_profiles')
           .select('id, display_name, username, profile_photo_url')
@@ -95,6 +95,23 @@ export const useUserPosts = () => {
         supabase
           .from('post_media')
           .select('id, media_type, media_url, post_id, filter_id, studio_edits')
+          .in('post_id', postIds),
+        supabase
+          .from('post_tags')
+          .select(`
+            id,
+            post_id,
+            tagged_entity_id,
+            start_index,
+            end_index,
+            taggable_entities (
+              id,
+              entity_type,
+              entity_id,
+              name,
+              username
+            )
+          `)
           .in('post_id', postIds)
       ]);
 
