@@ -22,6 +22,7 @@ interface BestPickSpotlightProps {
   tournamentId: string;
   courseName: string;
   tournamentName: string;
+  tourSlug?: string;
 }
 
 /* ── Helpers ────────────────────────────────────────────────────────── */
