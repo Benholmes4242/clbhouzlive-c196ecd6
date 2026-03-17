@@ -523,26 +523,22 @@ function CommentsSheet({
 
             {/* Header */}
             <div className={cn(
-              'flex items-center px-4 pt-3 pb-3 shrink-0 border-b',
-              isDark ? 'border-white/[0.06]' : 'border-border/50'
+              'flex items-center justify-between px-4 pt-3 pb-3 shrink-0'
             )}>
-              {/* Left spacer — matches close button width */}
+              {/* Left spacer */}
               <div className="w-11" />
 
               {/* Title — centred */}
               <div className="flex-1 min-w-0 flex items-center justify-center gap-2">
-                <span className={cn('text-[16px] font-semibold truncate', isDark ? 'text-white' : 'text-foreground')}>
-                  Comments
-                </span>
                 {totalCount > 0 && (
                   <span className={cn('text-[16px] font-semibold shrink-0', isDark ? 'text-white/40' : 'text-muted-foreground')}>
-                    {totalCount}
+                    {totalCount} {totalCount === 1 ? 'Comment' : 'Comments'}
                   </span>
                 )}
               </div>
 
-              {/* Right — sort toggle + close */}
-              <div className="flex items-center gap-3 shrink-0">
+              {/* Right — sort toggle only */}
+              <div className="flex items-center shrink-0">
                 {totalCount > 1 && (
                   <div className={cn('flex items-center gap-1 rounded-lg p-0.5', isDark ? 'bg-white/8' : 'bg-muted/60')}>
                     {(['best', 'newest'] as const).map(s => (
@@ -562,17 +558,6 @@ function CommentsSheet({
                     ))}
                   </div>
                 )}
-
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className={cn(
-                    'w-11 h-11 rounded-full flex items-center justify-center',
-                    isDark ? 'bg-white/8' : 'bg-muted'
-                  )}
-                >
-                  <X className={cn('w-5 h-5', isDark ? 'text-white/70' : 'text-muted-foreground')} />
-                </button>
               </div>
             </div>
 
