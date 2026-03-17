@@ -143,7 +143,7 @@ export function PlayersFeed({ players, maxEvents, maxCuts }: PlayersFeedProps) {
                 {/* Player photo */}
                 <div className="relative w-11 h-11 rounded-full overflow-hidden flex-shrink-0 bg-muted">
                   <img 
-                    src={getPlayerHeadshotUrl(stat.player?.full_name ?? '', 'pga')}
+                    src={getPlayerHeadshotUrl(stat.player?.full_name ?? '', stat.player?.tour_codes?.[0] ?? 'pga')}
                     alt={stat.player?.full_name ?? ''}
                     className="w-full h-full object-cover object-top"
                     onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}

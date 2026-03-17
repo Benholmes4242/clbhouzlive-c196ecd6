@@ -13,6 +13,7 @@ interface PredictionLeaderboardProps {
   isCompleted?: boolean;
   bestCallPlayerId?: string;
   tournamentLeaderScore?: number | null;
+  tourSlug?: string;
 }
 
 export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
@@ -20,6 +21,7 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
   isCompleted,
   bestCallPlayerId,
   tournamentLeaderScore,
+  tourSlug,
 }) => {
   if (allPicks.length === 0) return null;
 
@@ -81,6 +83,7 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
               isLast={i === sorted.length - 1}
               isBestCall={isCompleted && prediction.playerId === bestCallPlayerId}
               leaderScore={leaderScore}
+              tourSlug={tourSlug}
             />
           </motion.div>
         ))}

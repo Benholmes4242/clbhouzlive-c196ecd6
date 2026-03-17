@@ -22,6 +22,7 @@ interface BestPickSpotlightProps {
   tournamentId: string;
   courseName: string;
   tournamentName: string;
+  tourSlug?: string;
 }
 
 /* ── Helpers ────────────────────────────────────────────────────────── */
@@ -126,6 +127,7 @@ export const BestPickSpotlight: React.FC<BestPickSpotlightProps> = ({
   tournamentId,
   courseName,
   tournamentName,
+  tourSlug,
 }) => {
   // Resolve the Sportradar player ID for stats lookup
   const playerId = bestPick.playerId;
@@ -142,7 +144,7 @@ export const BestPickSpotlight: React.FC<BestPickSpotlightProps> = ({
     venueImageQuery.data?.imageUrl || getFallbackCourseImage(tournamentName);
 
   // Player headshot
-  const avatarUrl = getPlayerHeadshotUrl(bestPick.playerName, 'pga') || PLAYER_SILHOUETTE_URL;
+  const avatarUrl = getPlayerHeadshotUrl(bestPick.playerName, tourSlug ?? 'pga') || PLAYER_SILHOUETTE_URL;
 
   // Finish text
   const isWinner = bestPick.actualPosition === 1;

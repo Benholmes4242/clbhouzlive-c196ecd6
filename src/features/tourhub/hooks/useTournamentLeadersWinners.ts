@@ -24,6 +24,8 @@ export interface TournamentFinisher {
   position: number;
   photoUrl: string | null;
   pgaTourId: string | null;
+  /** Primary tour code for R2 headshot folder lookup */
+  tourCode: string | null;
   /** Formatted display: "S. Scheffler" */
   displayName: string;
   /** Formatted score: "-12" or "E" or "+3" */
@@ -81,7 +83,8 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
             full_name,
             headshot_override,
             photo_url,
-            pga_tour_id
+            pga_tour_id,
+            tour_codes
           )
         `)
         // NOTE: photo_url is NOT used for display. All player headshots are served from R2
@@ -122,6 +125,7 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
           position: entry.position,
           photoUrl: player?.photo_url || null,
           pgaTourId: player?.pga_tour_id || null,
+          tourCode: player?.tour_codes?.[0] ?? null,
           displayName: formatDisplayName(firstName, lastName),
           displayScore: formatScore(entry.score),
           // B44 FIX 4B: populate round scores

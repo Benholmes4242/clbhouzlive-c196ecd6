@@ -53,6 +53,7 @@ interface PlayerListRowProps {
     countryCode: string | null;
     photoUrl: string | null;
     pgaTourId: string | null;
+    tourCode?: string | null;
   };
   rank?: number;
   rankChange?: number | null;
@@ -76,7 +77,7 @@ export function PlayerListRow({
   index = 0,
 }: PlayerListRowProps) {
   // Use R2 headshot as primary source
-  const photoUrl = batchHeadshotUrl ?? getPlayerHeadshotUrl(player.fullName, 'pga');
+  const photoUrl = batchHeadshotUrl ?? getPlayerHeadshotUrl(player.fullName, player.tourCode ?? 'pga');
   const flag = countryCodeToFlag(player.countryCode);
   const countryName = titleCaseCountry(player.country);
 
