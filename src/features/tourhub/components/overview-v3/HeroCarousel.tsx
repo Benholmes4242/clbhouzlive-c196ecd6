@@ -15,8 +15,7 @@ import React, { useState, useEffect, useRef, useCallback, type ReactNode } from 
 import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronRight, Trophy, Menu } from 'lucide-react';
-import { openTourNav } from '../../contexts/TourNavContext';
+import { ChevronDown, ChevronRight, Trophy } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { 
@@ -1147,18 +1146,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <button 
-        className="fixed z-20 flex items-center justify-center"
-        style={{ top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: '16px', width: '44px', height: '44px' }}
-        onClick={() => { openTourNav(); }}
-        aria-label="Open tour menu"
-      >
-        <Menu 
-          className="w-[22px] h-[22px]" 
-          strokeWidth={2}
-          style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5))' }}
-        />
-      </button>
+      {/* Burger menu moved to TourHubShell */}
 
       <AnimatePresence mode="sync">
         {slides.map((slide, index) => (
