@@ -458,7 +458,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
                     )}
                   </div>
                 ) : (
-                  <RowAvatar src={resolvePhoto(primary.name, primary.photoUrl)} name={primary.name} />
+                  <RowAvatar src={resolvePhoto(primary.name, primary.photoUrl)} name={primary.name} size={38} />
                 )}
 
                 <span style={{
