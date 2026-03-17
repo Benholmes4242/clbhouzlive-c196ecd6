@@ -524,6 +524,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   } = usePostStudioContext();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const placeholderRef = useRef(getRandomPlaceholder());
   const [isProcessing, setIsProcessing] = useState(false);
@@ -584,6 +585,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       } finally {
         setIsProcessing(false);
         if (fileInputRef.current) fileInputRef.current.value = '';
+        if (cameraInputRef.current) cameraInputRef.current.value = '';
       }
     },
     [state.mediaItems.length, addMedia]
@@ -696,6 +698,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       />
 
       <input ref={fileInputRef} type="file" accept={acceptTypes} multiple onChange={handleFileSelect} className="hidden" />
+      <input ref={cameraInputRef} type="file" accept="image/*,video/*" capture="environment" onChange={handleFileSelect} className="hidden" />
 
       {/* ── Scrollable compose area ── */}
       <div
@@ -890,7 +893,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         {/* Camera — primary action, white circle */}
         <motion.button
           whileTap={{ scale: 0.92 }}
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => cameraInputRef.current?.click()}
           disabled={isProcessing}
           className="flex items-center justify-center disabled:opacity-40 mr-4 shrink-0"
           style={{
