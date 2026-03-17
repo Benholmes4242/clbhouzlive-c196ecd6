@@ -152,7 +152,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
           
           {/* Logo - larger for more presence */}
           <img
-            src="/images/clbhouz-logo.png"
+            src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
             alt="clbhouz"
             className="h-[90px] md:h-[100px] w-auto relative z-10"
           />
@@ -351,6 +351,10 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
       
       {/* Enhanced animation styles */}
       <style>{`
+        html, body {
+          background-color: #0d0d0d !important;
+        }
+
         @keyframes auth-logo-in {
           0% {
             opacity: 0;
