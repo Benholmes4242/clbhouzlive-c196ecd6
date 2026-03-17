@@ -1606,7 +1606,7 @@ async function processReviewJob(jobId: string, job: any): Promise<void> {
         
         const tagRecords = reviewData.selectedTags.map((tag: any) => ({
           review_id: ratingId,
-          tagged_entity_id: tag.id || tag.entity_id,
+          tagged_entity_id: tag.id,
           start_index: tag.start_index ?? null,
           end_index: tag.end_index ?? null,
         }));
