@@ -44,6 +44,7 @@ const transition = { type: 'tween' as const, duration: 0.22, ease: 'easeInOut' a
 
 export function PersonalProfileWizard() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user } = useSupabaseSession();
   const { profile, loading } = useProfileData();
 
