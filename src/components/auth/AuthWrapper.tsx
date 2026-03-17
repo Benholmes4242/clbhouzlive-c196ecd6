@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useLocation, Navigate } from 'react-router-dom';
 import { logOrangeLoaderShow, logOrangeLoaderHide } from '@/utils/bootTimeline';
-import { EmailVerificationGate } from './EmailVerificationGate';
 import { useSessionTimeout } from '@/hooks/useSessionTimeout';
 interface AuthWrapperProps {
   children: React.ReactNode;
@@ -15,9 +14,6 @@ interface AuthWrapperProps {
  * Session resolves in the background while the app renders immediately.
  * 
  * Protected routes should handle their own loading states if needed.
- * 
- * EMAIL VERIFICATION GATE:
- * If user is authenticated but email_confirmed_at is null, show verification screen.
  */
 const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   const { user, loading } = useSupabaseSession();
@@ -43,7 +39,10 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   // Only redirect after session is fully resolved
   if (!loading) {
     // If user is not authenticated and not on an auth page, redirect to auth
-    const isAuthPage = location.pathname === '/auth' || location.pathname === '/auth/verified' || location.pathname === '/auth/callback';
+    const isAuthPage = location.pathname === '/auth' 
+      || location.pathname === '/auth/verified' 
+      || location.pathname === '/auth/callback'
+      || location.pathname === '/auth/reset-password';
     if (!user && !isAuthPage) {
       return <Navigate to="/auth" replace />;
     }
@@ -53,12 +52,7 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
       return <Navigate to="/" replace />;
     }
 
-    // EMAIL VERIFICATION GATE
-    // If user is authenticated but email not confirmed, show verification screen
-    // Allow /auth/callback through so email verification links work
-    if (user && !user.email_confirmed_at && location.pathname !== '/auth/callback') {
-      return <EmailVerificationGate email={user.email || ''} />;
-    }
+    // No verification gate — users enter immediately
   }
 
   // Always render children - no blocking loader
