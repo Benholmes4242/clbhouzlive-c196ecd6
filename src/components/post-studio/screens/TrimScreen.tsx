@@ -53,10 +53,10 @@ export function TrimScreen() {
           style={{
             borderRadius: 20,
             boxShadow: '0 16px 48px rgba(0,0,0,0.60)',
-            width: '100%',
-            maxWidth: isPortrait ? 260 : '100%',
-            maxHeight: '52vh',
-            aspectRatio: String(aspectRatio),
+            aspectRatio: isPortrait ? '4/5' : String(aspectRatio),
+            width: isPortrait ? 'auto' : '100%',
+            height: isPortrait ? '48vh' : 'auto',
+            maxWidth: '100%',
           }}
         >
           <video
