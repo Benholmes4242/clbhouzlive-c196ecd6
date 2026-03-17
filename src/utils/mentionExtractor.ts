@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
  * Extract @mentions from text and return unique usernames (without the @ symbol)
  */
 export function extractMentions(text: string): string[] {
-  const mentions = text.match(/@(\w+)/g) || [];
+  const mentions = text.match(/@([\w]+(?:\s[\w]+)*)/g) || [];
   // Remove @ and dedupe
   const usernames = [...new Set(mentions.map(m => m.slice(1).toLowerCase()))];
   return usernames;
