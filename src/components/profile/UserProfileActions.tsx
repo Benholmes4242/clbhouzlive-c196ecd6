@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { useProfileActions } from './actions/useProfileActions';
 import { Button } from '@/components/ui/button';
 import { Check, UserPlus, Clock, UserCheck, X, MessageCircle, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';

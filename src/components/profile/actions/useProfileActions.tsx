@@ -1,3 +1,8 @@
+/**
+ * @deprecated Use `useUserFollow` for ProfileSocialButtons.
+ * This hook is retained only for BusinessProfileActions and legacy consumers.
+ * All Supabase calls now properly check for errors.
+ */
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -17,13 +22,15 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
   const { data: relationship } = useRelationshipStatus(targetUserId);
 
   const invalidateAllRelatedQueries = () => {
-    queryClient.invalidateQueries({ queryKey: ['relationshipStatus'] });
+    queryClient.invalidateQueries({ queryKey: ['relationship-status'] });
     queryClient.invalidateQueries({ queryKey: ['followerCount'] });
     queryClient.invalidateQueries({ queryKey: ['followingCount'] });
     queryClient.invalidateQueries({ queryKey: ['followers'] });
     queryClient.invalidateQueries({ queryKey: ['following'] });
     queryClient.invalidateQueries({ queryKey: ['notifications'] });
     queryClient.invalidateQueries({ queryKey: ['discovery-exclusions'] });
+    queryClient.invalidateQueries({ queryKey: ['user-follows'] });
+    queryClient.invalidateQueries({ queryKey: ['social-counts'] });
   };
 
   const handleFollow = async (isFollowing: boolean) => {
@@ -37,15 +44,16 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
     setLoading(true);
     try {
       if (isFollowing) {
-        await supabase
+        const { error } = await supabase
           .from('user_follows')
           .delete()
           .eq('follower_id', currentUserId)
           .eq('following_id', targetUserId);
         
+        if (error) throw error;
         toast.success("Unfollowed");
       } else {
-        await supabase
+        const { error } = await supabase
           .from('user_follows')
           .upsert({
             follower_id: currentUserId,
@@ -55,13 +63,14 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
             ignoreDuplicates: true 
           });
         
+        if (error) throw error;
         toast.success("Following");
       }
       
       invalidateAllRelatedQueries();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error toggling follow:', error);
-      toast.error("Couldn't update follow");
+      toast.error(error?.message || "Couldn't update follow");
     } finally {
       setLoading(false);
     }

@@ -398,10 +398,13 @@ const ProfilePageV2Content: React.FC = () => {
     );
   }
 
-  if (!user) {
-    navigate('/auth', { replace: true });
-    return null;
-  }
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth', { replace: true });
+    }
+  }, [user, navigate]);
+
+  if (!user) return null;
 
   const displayName = profile?.display_name || 'Golfer';
   const username = profile?.username || 'user';
