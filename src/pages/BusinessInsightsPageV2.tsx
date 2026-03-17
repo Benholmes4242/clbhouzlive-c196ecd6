@@ -261,7 +261,7 @@ const BusinessInsightsPageV2 = () => {
   return (
     <PageRoot className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}>
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-xl border-b border-border" style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)' }}>
         <div className="flex items-center px-4 h-14">
           <button
             onClick={() => navigate(-1)}

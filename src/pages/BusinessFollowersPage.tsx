@@ -223,7 +223,7 @@ export default function BusinessFollowersPage() {
       {/* Header */}
       <div
         className="sticky top-0 z-30 bg-background/95 backdrop-blur-xl border-b border-border"
-        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)' }}
       >
         <div className="flex items-center px-4 h-14">
           <button

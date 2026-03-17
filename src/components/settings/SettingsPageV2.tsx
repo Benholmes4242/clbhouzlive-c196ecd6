@@ -84,7 +84,7 @@ export function SettingsPageV2() {
   return (
     <div
       className="min-h-screen bg-background"
-      style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+      style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)' }}
     >
       {/* Header */}
       <div className="flex items-center gap-2 px-4 pt-4 pb-2">
