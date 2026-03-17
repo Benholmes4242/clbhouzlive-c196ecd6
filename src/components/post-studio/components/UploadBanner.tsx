@@ -45,7 +45,7 @@ export function UploadBanner() {
     return (
       <div style={cardStyle}>
         <div style={iconWrapStyle}>
-          <Upload className="w-5 h-5" style={{ color: AMBER }} />
+          <Upload className="w-5 h-5" style={{ color: WHITE_90 }} />
         </div>
         <div style={{ flex: 1 }}>
           <p style={{ color: 'rgba(255,255,255,0.92)', fontSize: 14, fontWeight: 500 }}>Queued</p>
