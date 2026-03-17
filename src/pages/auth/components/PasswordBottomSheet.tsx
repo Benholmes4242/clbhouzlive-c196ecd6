@@ -62,7 +62,7 @@ export const PasswordBottomSheet: React.FC<PasswordBottomSheetProps> = ({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed bottom-0 z-50 w-full max-w-[480px] left-1/2 -translate-x-1/2"
+            className="fixed bottom-0 inset-x-0 mx-auto z-50 w-full max-w-[480px]"
           >
             <div
               className="rounded-t-[20px] pb-safe"
