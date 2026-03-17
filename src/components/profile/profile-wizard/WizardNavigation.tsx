@@ -27,7 +27,7 @@ export function WizardNavigation({
             variant="outline"
             onClick={onBack}
             disabled={isSaving}
-            className="flex-1 min-h-[50px] rounded-xl text-[15px] font-semibold"
+            className="flex-1 min-h-[50px] rounded-xl text-[15px] font-semibold border-0"
           >
             Back
           </Button>
