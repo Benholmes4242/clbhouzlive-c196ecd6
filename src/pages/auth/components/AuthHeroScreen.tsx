@@ -250,7 +250,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             <button
               onClick={onEmailSignUp}
               disabled={submitting}
-              aria-label="Continue with Email"
+              aria-label="Create account with Email"
               className="auth-button-3 w-full h-[56px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50 hover:bg-white/[0.06]"
               style={{
                 fontFamily: 'SF Pro Text, system-ui, sans-serif',
@@ -259,7 +259,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                 color: 'rgba(255, 255, 255, 0.88)',
               }}
             >
-              Continue with Email
+              Create account with Email
             </button>
             
             {/* OR Divider */}
