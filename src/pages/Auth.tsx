@@ -77,7 +77,6 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
 
   // Clear all auth messages helper
   const clearAuthMessages = () => {
-    setShowConfirmNotice(false);
     setErrorMsg(null);
     setResendMsg(null);
     setAuthNotice(null);

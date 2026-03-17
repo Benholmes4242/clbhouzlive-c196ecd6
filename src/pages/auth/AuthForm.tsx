@@ -561,7 +561,6 @@ const AuthForm: React.FC<AuthFormProps> = ({
         onEmailLogin={handleInlineEmailLogin}
         onForgotPassword={handleInlineForgotPassword}
         submitting={submitting}
-        inert={isSheetOpen ? true : undefined}
       />
 
       {/* Bottom sheet for email/password flows */}
