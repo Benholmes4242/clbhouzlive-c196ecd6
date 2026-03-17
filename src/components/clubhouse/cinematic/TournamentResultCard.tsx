@@ -25,7 +25,7 @@ function ensureKeyframes() {
     @keyframes trc-fadeIn   { from { opacity: 0; } to { opacity: 1; } }
     @keyframes trc-slideIn  { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: translateX(0); } }
     @keyframes trc-heartPop { 0% { transform: scale(1); } 30% { transform: scale(1.6); } 70% { transform: scale(0.9); } 100% { transform: scale(1); } }
-    @keyframes trc-ctaPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(249,115,22,0); } 60% { box-shadow: 0 0 0 8px rgba(249,115,22,0.12); } }
+    @keyframes trc-ctaPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(232,152,10,0); } 60% { box-shadow: 0 0 0 8px rgba(232,152,10,0.12); } }
     @keyframes trc-shimmer  { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
   `;
   document.head.appendChild(s);
