@@ -561,15 +561,16 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           {/* Like */}
           <button onClick={handleLike} style={{
             display: 'flex', alignItems: 'center', gap: 5,
-            background: isLiked ? 'rgba(239,68,68,0.12)' : 'rgba(255,255,255,0.07)',
-            border: `1px solid ${isLiked ? 'rgba(239,68,68,0.35)' : 'rgba(255,255,255,0.12)'}`,
+            background: isLiked ? 'rgba(245,158,11,0.12)' : 'rgba(255,255,255,0.07)',
+            border: `1px solid ${isLiked ? 'rgba(245,158,11,0.35)' : 'rgba(255,255,255,0.12)'}`,
             cursor: 'pointer', borderRadius: 20, padding: '10px 16px',
-            fontSize: 15, fontWeight: 600, color: isLiked ? '#EF4444' : 'rgba(255,255,255,0.6)',
+            fontSize: 15, fontWeight: 600, color: isLiked ? '#f59e0b' : 'rgba(255,255,255,0.6)',
             animation: heartPopping ? 'trlive-heartPop 0.4s ease-out' : undefined,
+            transition: 'all 0.2s',
           }}>
-            <span style={{ fontSize: 18 }}>
-              {isLiked ? '♥' : '♡'}
-            </span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill={isLiked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={isLiked ? 0 : 2} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
             {likeCount}
           </button>
 
