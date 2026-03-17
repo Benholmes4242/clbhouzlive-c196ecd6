@@ -30,6 +30,7 @@ import { formatDistanceToNow } from 'date-fns';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
+import PostContentWithTags from '@/components/posts/PostContentWithTags';
 
 interface VideoDataTag {
   id: string;
