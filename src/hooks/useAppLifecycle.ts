@@ -41,6 +41,12 @@ export function useAppLifecycle() {
 
       const backgroundDuration = Date.now() - backgroundTimeRef.current;
 
+      // Step 0: Re-apply current shield color so the repaint uses the correct value
+      const color = currentShieldColor ?? 'transparent';
+      applyShieldColor(color);
+      document.documentElement.style.backgroundColor = color;
+      document.body.style.backgroundColor = color;
+
       // Step 1: Immediately ensure shield is painted (no gap)
       const shield = document.getElementById('safe-area-shield');
       if (shield) {
