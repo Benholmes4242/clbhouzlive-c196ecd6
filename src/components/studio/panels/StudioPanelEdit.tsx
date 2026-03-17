@@ -99,7 +99,7 @@ export default function StudioPanelEdit({ edits, updateEdits, mediaType, mediaUr
                 onClick={() => handleCropRatio(ratio)}
                 className="py-1.5 px-2 rounded-md text-xs font-medium transition-colors"
                 style={cropRatio === ratio ? {
-                  background: '#E8980A',
+                  background: 'rgba(255,255,255,0.90)',
                   color: '#FFFFFF',
                 } : {
                   background: 'rgba(255,255,255,0.08)',
