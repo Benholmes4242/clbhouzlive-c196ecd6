@@ -893,22 +893,51 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           paddingBottom: '30px',
         }}
       >
-        {/* Camera — primary action, white circle */}
+        {/* Rear Camera */}
         <motion.button
           whileTap={{ scale: 0.92 }}
-          onClick={() => cameraInputRef.current?.click()}
+          onClick={() => rearCameraInputRef.current?.click()}
           disabled={isProcessing}
-          className="flex items-center justify-center disabled:opacity-40 mr-4 shrink-0"
-          style={{
-            width: 34, height: 34, borderRadius: '50%',
-            background: 'rgba(255,255,255,0.96)',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.30)',
-          }}
+          className="flex flex-col items-center justify-center disabled:opacity-40 shrink-0"
+          style={{ width: 34, height: 42 }}
         >
-          <Camera className="w-4 h-4 shrink-0" style={{ color: '#0D0D0D' }} strokeWidth={2} />
+          <div
+            className="flex items-center justify-center"
+            style={{
+              width: 34, height: 34, borderRadius: '50%',
+              background: 'rgba(255,255,255,0.96)',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.30)',
+            }}
+          >
+            <Camera className="w-4 h-4 shrink-0" style={{ color: '#0D0D0D' }} strokeWidth={2} />
+          </div>
+          <span className="text-[9px] mt-0.5 leading-none" style={{ color: 'rgba(255,255,255,0.40)' }}>Rear</span>
         </motion.button>
 
-        {/* Spacer between camera and gallery */}
+        <div className="w-2" />
+
+        {/* Front Camera */}
+        <motion.button
+          whileTap={{ scale: 0.92 }}
+          onClick={() => frontCameraInputRef.current?.click()}
+          disabled={isProcessing}
+          className="flex flex-col items-center justify-center disabled:opacity-40 shrink-0"
+          style={{ width: 34, height: 42 }}
+        >
+          <div
+            className="flex items-center justify-center"
+            style={{
+              width: 34, height: 34, borderRadius: '50%',
+              background: 'rgba(255,255,255,0.96)',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.30)',
+            }}
+          >
+            <SwitchCamera className="w-4 h-4 shrink-0" style={{ color: '#0D0D0D' }} strokeWidth={2} />
+          </div>
+          <span className="text-[9px] mt-0.5 leading-none" style={{ color: 'rgba(255,255,255,0.40)' }}>Front</span>
+        </motion.button>
+
+        {/* Spacer between cameras and gallery */}
         <div className="w-2" />
 
         {/* Gallery */}
