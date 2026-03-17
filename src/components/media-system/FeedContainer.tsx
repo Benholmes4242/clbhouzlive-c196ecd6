@@ -9,6 +9,7 @@
  */
 import { useState, useCallback, useEffect, useRef, useMemo, useContext } from 'react';
 import { FeedItem } from './FeedItem';
+import { deduplicatePosts } from './utils/feedAlgorithm';
 import { PullToRefresh } from './PullToRefresh';
 import { useMediaStore } from './store/mediaStore';
 import { useMediaStoreCompat } from './store/useMediaStoreCompat';
