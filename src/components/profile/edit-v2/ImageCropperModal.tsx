@@ -159,11 +159,15 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg sm:max-w-xl p-0 gap-0 overflow-hidden bg-white">
-        <DialogHeader className="px-4 py-3 border-b border-[#e2e8f0]">
-          <DialogTitle className="text-[#1e293b]">{title}</DialogTitle>
-        </DialogHeader>
+    <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+      <DialogPrimitive.Portal>
+        {/* Overlay at z-[199] to sit above wizard's z-[100] */}
+        <DialogPrimitive.Overlay className="fixed inset-0 z-[199] bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+        {/* Content at z-[200] */}
+        <DialogPrimitive.Content className="fixed left-[50%] top-[50%] z-[200] grid w-full max-w-lg sm:max-w-xl translate-x-[-50%] translate-y-[-50%] p-0 gap-0 overflow-hidden bg-white border border-border shadow-lg rounded-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95">
+          <div className="px-4 py-3 border-b border-[#e2e8f0]">
+            <DialogPrimitive.Title className="text-lg font-semibold leading-none tracking-tight text-[#1e293b]">{title}</DialogPrimitive.Title>
+          </div>
 
         {/* Cropper area - dark background for contrast */}
         <div className="relative h-[300px] sm:h-[350px] bg-[#1e293b]">
