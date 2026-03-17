@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import HighQualityImage from '@/components/ui/high-quality-image';
+import PostContentWithTags from '@/components/posts/PostContentWithTags';
 import { Card } from '@/components/ui/card';
 import { Squircle } from '@/components/ui/squircle';
 import { Progress } from '@/components/ui/progress';
