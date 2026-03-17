@@ -17,6 +17,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/comments/MentionText';
 import { relativeTime } from '@/utils/relativeTime';
+import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
+import CourseLocationRow from '@/components/posts/CourseLocationRow';
 import {
   AlertDialog,
   AlertDialogAction,
