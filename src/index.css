@@ -4463,8 +4463,10 @@ em-emoji-picker input:focus {
   left: 0;
   right: 0;
   height: env(safe-area-inset-top, 47px);
-  z-index: 9999;
+  /* z-index below z-header (60) so CompactHeader content is visible above the shield.
+     Still above most page content (z-base:1, z-overlay:50) to catch transition gaps. */
+  z-index: 55;
   pointer-events: none;
-  background-color: #000000;
+  background-color: transparent;
   transition: none !important;
 }

@@ -14,10 +14,18 @@ const getShield = (): HTMLElement | null =>
 // Single source of truth for current status bar color
 let currentShieldColor = '#000000';
 
-function applyShieldColor(color: string) {
+export function applyShieldColor(color: string) {
   currentShieldColor = color;
   const shield = getShield();
   if (shield) shield.style.backgroundColor = color;
+}
+
+/**
+ * Reset shield to transparent — called on every route change as a baseline.
+ * Individual page hooks then opt-in to their own color on top.
+ */
+export function resetShieldToTransparent() {
+  applyShieldColor('transparent');
 }
 
 function toAARRGGBB(hex: string) {
