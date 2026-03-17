@@ -31,6 +31,16 @@ import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 
+interface VideoDataTag {
+  id: string;
+  entity_type: string;
+  entity_id: string;
+  name: string;
+  username: string | null;
+  start_index: number;
+  end_index: number;
+}
+
 interface VideoData {
   id: string;
   title: string;
@@ -46,8 +56,9 @@ interface VideoData {
   golfCourseId?: string;
   durationSeconds?: number;
   category?: string;
-  studioEdits?: any; // Text overlays, filters, etc.
-  filterId?: string | null; // Filter applied to the video
+  studioEdits?: any;
+  filterId?: string | null;
+  tags?: VideoDataTag[];
 }
 
 /**
