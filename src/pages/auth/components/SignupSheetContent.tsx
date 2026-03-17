@@ -217,6 +217,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
             }}
             onBlur={() => setUsernameFocused(false)}
             placeholder="Username"
+            maxLength={20}
             disabled={submitting}
             className="w-full h-[54px] px-4 pr-10 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
             style={{
