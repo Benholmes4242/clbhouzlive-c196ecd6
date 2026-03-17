@@ -50,11 +50,14 @@ export const useExploreContent = () => {
           post_tags (
             id,
             tagged_entity_id,
+            start_index,
+            end_index,
             taggable_entities!inner (
               id,
               entity_type,
               entity_id,
-              name
+              name,
+              username
             )
           )
         `)

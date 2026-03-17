@@ -43,11 +43,14 @@ export interface RawMediaData {
 export interface RawPostTag {
   id: string;
   tagged_entity_id?: string;
+  start_index?: number;
+  end_index?: number;
   taggable_entities?: {
     id: string;
     entity_type: string;
     entity_id: string;
     name: string;
+    username?: string | null;
   } | null;
 }
 

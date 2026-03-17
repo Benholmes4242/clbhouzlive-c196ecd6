@@ -87,11 +87,14 @@ export async function fetchFriendsPosts(
         post_tags (
           id,
           tagged_entity_id,
+          start_index,
+          end_index,
           taggable_entities (
             id,
             entity_type,
             entity_id,
-            name
+            name,
+            username
           )
         )
       `);
