@@ -21,6 +21,7 @@ import { getProfilePathById } from '@/lib/profileRoutes';
 
 import { getOverlayRatingColors, type ExtractedReviewData } from '@/lib/postHelpers';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
+import PostContentWithTags from '@/components/posts/PostContentWithTags';
 
 /** Animated soundwave bars for music playback indicator */
 const SoundwaveAnimation: React.FC = () => (

@@ -10,6 +10,7 @@ import CommentsSheet from '@/components/comments/CommentsSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VideoCardMenu } from './VideoCardMenu';
 import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
+import PostContentWithTags from '@/components/posts/PostContentWithTags';
 
 interface VideoCardProps {
   post: FeedPost;
