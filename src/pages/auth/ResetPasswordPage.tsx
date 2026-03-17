@@ -90,6 +90,7 @@ const ResetPasswordPage: React.FC = () => {
                   onChange={(e) => { setPassword(e.target.value); setError(null); }}
                   placeholder="New password"
                   autoFocus
+                  autoComplete="new-password"
                   className="w-full h-[52px] px-4 pr-12 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 text-[15px] focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/20 transition-all"
                   style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
                 />
