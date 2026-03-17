@@ -15,8 +15,8 @@ interface BusinessAccount {
 }
 
 interface ActorSelectorProps {
-  /** When true renders the compact toolbar avatar button */
   compact?: boolean;
+  header?: boolean;
 }
 
 export function ActorSelector({ compact = false }: ActorSelectorProps) {
