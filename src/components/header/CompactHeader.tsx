@@ -148,7 +148,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
         data-chrome="header"
         className={cn(
           "compact-header clubhouse-header",
-          "fixed left-1/2 -translate-x-1/2 w-full max-w-[480px] z-header",
+          "fixed inset-x-0 mx-auto w-full max-w-[480px] z-header",
           className
         )}
         style={{
@@ -194,7 +194,11 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   )}
                 </span>
               ) : (
-                <span className="text-foreground font-bold text-sm">LOGO TEST</span>
+                <img
+                  src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
+                  alt="clbhouz"
+                  className="object-contain h-9 w-9"
+                />
               )}
             </button>
           </div>
