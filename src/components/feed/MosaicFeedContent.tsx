@@ -23,6 +23,7 @@ import Masonry from 'react-masonry-css';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
 import { cn } from '@/lib/utils';
+import PostContentWithTags from '@/components/posts/PostContentWithTags';
 
 interface MosaicFeedContentProps {
   optimisticPosts: any[];
