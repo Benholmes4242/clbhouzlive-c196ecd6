@@ -141,9 +141,9 @@ export default function StudioPanelMusic({ edits, updateEdits, onApply, onReset 
             className="w-full pl-8 pr-3 py-1.5 rounded-lg text-sm focus:outline-none text-white"
             style={{
               background: 'rgba(255,255,255,0.06)',
-              border: searchFocused ? '1.5px solid #E8980A' : '1.5px solid rgba(255,255,255,0.08)',
-              caretColor: '#E8980A',
-              boxShadow: searchFocused ? '0 0 0 3px rgba(232,152,10,0.1)' : undefined,
+              border: searchFocused ? '1.5px solid rgba(255,255,255,0.40)' : '1.5px solid rgba(255,255,255,0.08)',
+              caretColor: '#FFFFFF',
+              boxShadow: searchFocused ? '0 0 0 3px rgba(255,255,255,0.06)' : undefined,
               // @ts-ignore
               '--placeholder-color': 'rgba(255,255,255,0.45)',
             }}
