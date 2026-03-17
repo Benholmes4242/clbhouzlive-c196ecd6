@@ -74,21 +74,58 @@ const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
   open, onOpenChange, onReport, onNotInterested, onCopyLink
 }) => (
   <Drawer open={open} onOpenChange={onOpenChange}>
-    <DrawerContent className="bg-black/95 border-white/10">
-      <div className="p-4 space-y-2">
-        <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={onReport}>
-          <Flag className="w-5 h-5 text-white/60" />
-          <span className="text-sm text-white">Report this post</span>
+    <DrawerContent
+      className="border-white/[0.08] rounded-t-[20px]"
+      style={{
+        background: 'rgba(13, 13, 13, 0.98)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+      }}
+    >
+      {/* Drag handle */}
+      <div className="flex justify-center pt-3 pb-1">
+        <div className="w-9 h-1 rounded-full bg-white/20" />
+      </div>
+
+      {/* Title */}
+      <div className="px-4 pt-2 pb-3 border-b border-white/[0.06]">
+        <h2 className="text-[16px] font-semibold text-white text-center">Post Options</h2>
+      </div>
+
+      {/* Content moderation notice */}
+      <div className="mx-4 mt-4 mb-2 px-4 py-3 rounded-xl bg-white/[0.06] border border-white/[0.08]">
+        <p className="text-[12px] text-white/40 text-center leading-relaxed">
+          Content moderation coming soon
+        </p>
+      </div>
+
+      {/* Actions */}
+      <div className="p-4 space-y-1">
+        <button
+          className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-white/[0.06] active:bg-white/10 transition-colors"
+          onClick={onReport}
+        >
+          <Flag className="w-5 h-5 text-white/50" />
+          <span className="text-[15px] text-white/80">Report this post</span>
         </button>
-        <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={onNotInterested}>
-          <EyeOff className="w-5 h-5 text-white/60" />
-          <span className="text-sm text-white">Not interested</span>
+        <button
+          className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-white/[0.06] active:bg-white/10 transition-colors"
+          onClick={onNotInterested}
+        >
+          <EyeOff className="w-5 h-5 text-white/50" />
+          <span className="text-[15px] text-white/80">Not interested</span>
         </button>
-        <button className="flex items-center gap-3 w-full p-3 rounded-lg hover:bg-white/5" onClick={onCopyLink}>
-          <LinkIcon className="w-5 h-5 text-white/60" />
-          <span className="text-sm text-white">Copy link</span>
+        <button
+          className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-white/[0.06] active:bg-white/10 transition-colors"
+          onClick={onCopyLink}
+        >
+          <LinkIcon className="w-5 h-5 text-white/50" />
+          <span className="text-[15px] text-white/80">Copy link</span>
         </button>
       </div>
+
+      {/* Safe area spacer */}
+      <div className="h-[env(safe-area-inset-bottom,0px)]" />
     </DrawerContent>
   </Drawer>
 );
