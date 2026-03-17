@@ -25,7 +25,7 @@ function ensureKeyframes() {
     @keyframes trc-fadeIn   { from { opacity: 0; } to { opacity: 1; } }
     @keyframes trc-slideIn  { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: translateX(0); } }
     @keyframes trc-heartPop { 0% { transform: scale(1); } 30% { transform: scale(1.6); } 70% { transform: scale(0.9); } 100% { transform: scale(1); } }
-    @keyframes trc-ctaPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(249,115,22,0); } 60% { box-shadow: 0 0 0 8px rgba(249,115,22,0.12); } }
+    @keyframes trc-ctaPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(232,152,10,0); } 60% { box-shadow: 0 0 0 8px rgba(232,152,10,0.12); } }
     @keyframes trc-shimmer  { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
   `;
   document.head.appendChild(s);
@@ -280,13 +280,13 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         {/* Winner name + score */}
         <div style={{
           position: 'absolute', bottom: 0, left: 0, right: 0,
-          padding: '0 20px 16px',
+          padding: '0 20px 20px',
           animation: 'trc-fadeUp 0.7s ease-out both',
           animationDelay: '0.3s',
         }}>
           {(meta.venue_name || meta.venue_city) && (
             <div style={{
-              fontSize: 12, color: 'rgba(255,255,255,0.5)',
+              fontSize: 13, color: 'rgba(255,255,255,0.5)',
               letterSpacing: 0.5, marginBottom: 4,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
             }}>
@@ -295,7 +295,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
           )}
 
           <div style={{
-            fontSize: 'clamp(16px, 4.5vw, 20px)', fontWeight: 600,
+            fontSize: 'clamp(18px, 5vw, 22px)', fontWeight: 600,
             color: 'rgba(255,255,255,0.85)', lineHeight: 1.25,
             marginBottom: 10, maxWidth: '90%',
             display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const,
@@ -306,7 +306,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' as const }}>
             <div style={{
-              fontSize: 'clamp(20px, 5.5vw, 26px)', fontWeight: 800,
+              fontSize: 'clamp(22px, 6vw, 28px)', fontWeight: 800,
               color: '#fff', lineHeight: 1.1, letterSpacing: -0.5,
             }}>
               {meta.winner_name}
@@ -314,7 +314,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{
-                fontSize: 'clamp(18px, 5vw, 22px)', fontWeight: 700,
+                fontSize: 'clamp(20px, 5.5vw, 24px)', fontWeight: 700,
                 color: tour.accentColor, lineHeight: 1,
               }}>
                 {meta.winner_score_display || 'E'}
@@ -335,7 +335,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
       {/* ZONE 2 — AI INTELLIGENCE STRIP */}
       <div style={{
-        flex: '0 0 auto', padding: '10px 20px',
+        flex: '0 0 auto', padding: '12px 20px',
         background: 'rgba(255,255,255,0.03)',
         borderTop: `1px solid ${tour.accentColor}22`,
         borderBottom: '1px solid rgba(255,255,255,0.04)',
@@ -351,7 +351,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
           ⚡
         </div>
         <div style={{
-          fontSize: 13, lineHeight: 1.45, color: 'rgba(255,255,255,0.72)',
+          fontSize: 14, lineHeight: 1.45, color: 'rgba(255,255,255,0.72)',
           fontStyle: 'italic' as const,
         }}>
           {insight}
@@ -368,14 +368,14 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         <div style={{
           flex: '1 1 auto', overflow: 'auto',
           WebkitOverflowScrolling: 'touch' as const,
-          padding: '8px max(12px, 3vw) 0',
+          padding: '10px max(14px, 3vw) 0',
         }}>
           <div style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             marginBottom: 8,
           }}>
             <span style={{
-              fontSize: 11, fontWeight: 700, letterSpacing: 1.5,
+              fontSize: 12, fontWeight: 700, letterSpacing: 1.5,
               color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const,
             }}>
               Final Leaderboard
@@ -383,7 +383,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             <button
               onClick={handleViewResults}
               style={{
-                fontSize: 11, fontWeight: 600, color: tour.accentColor,
+                fontSize: 12, fontWeight: 600, color: tour.accentColor,
                 background: 'none', border: 'none', cursor: 'pointer', padding: 0,
               }}
             >
@@ -393,19 +393,19 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
           {/* Winner row */}
           <div style={{
-            display: 'flex', alignItems: 'center', gap: 10,
-            padding: '8px 0',
+            display: 'flex', alignItems: 'center', gap: 12,
+            padding: '10px 0',
             borderBottom: podiumRows.length > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none',
             background: `${tour.accentColor}08`,
             animation: 'trc-slideIn 0.5s ease-out both',
             animationDelay: '0.6s',
           }}>
-            <span style={{ width: 26, textAlign: 'center' as const, fontSize: 13, fontWeight: 700, color: tour.accentColor }}>1</span>
-            <RowAvatar src={winnerPhotoSrc} name={meta.winner_name} />
-            <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+            <span style={{ width: 28, textAlign: 'center' as const, fontSize: 15, fontWeight: 700, color: tour.accentColor }}>1</span>
+            <RowAvatar src={winnerPhotoSrc} name={meta.winner_name} size={38} />
+            <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
               {meta.winner_name}
             </span>
-            <span style={{ fontSize: 14, fontWeight: 700, color: tour.accentColor, fontVariantNumeric: 'tabular-nums' as const }}>
+            <span style={{ fontSize: 15, fontWeight: 700, color: tour.accentColor, fontVariantNumeric: 'tabular-nums' as const }}>
               {meta.winner_score_display || 'E'}
             </span>
           </div>
@@ -418,14 +418,14 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
             return (
               <div key={`${row.position}-${idx}`} style={{
-                display: 'flex', alignItems: 'center', gap: 10,
-                padding: '7px 0',
+                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '9px 0',
                 borderBottom: '1px solid rgba(255,255,255,0.03)',
                 animation: 'trc-slideIn 0.5s ease-out both',
                 animationDelay: `${0.65 + idx * 0.08}s`,
               }}>
                 <span style={{
-                  width: 26, textAlign: 'center' as const, fontSize: 13, fontWeight: 600,
+                  width: 28, textAlign: 'center' as const, fontSize: 14, fontWeight: 600,
                   color: 'rgba(255,255,255,0.45)',
                 }}>
                   {row.isTied ? `T${row.position}` : row.position}
@@ -441,7 +441,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
                         border: '2px solid rgba(0,0,0,0.95)',
                         overflow: 'hidden',
                       }}>
-                        <RowAvatar src={resolvePhoto(p.name, p.photoUrl)} name={p.name} size={30} />
+                        <RowAvatar src={resolvePhoto(p.name, p.photoUrl)} name={p.name} size={34} />
                       </div>
                     ))}
                     {row.players.length > 4 && (
@@ -458,18 +458,18 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
                     )}
                   </div>
                 ) : (
-                  <RowAvatar src={resolvePhoto(primary.name, primary.photoUrl)} name={primary.name} />
+                  <RowAvatar src={resolvePhoto(primary.name, primary.photoUrl)} name={primary.name} size={38} />
                 )}
 
                 <span style={{
-                  flex: 1, fontSize: 'clamp(11px, 3vw, 13px)', fontWeight: 500,
+                  flex: 1, fontSize: 'clamp(13px, 3.5vw, 15px)', fontWeight: 500,
                   color: 'rgba(255,255,255,0.8)',
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
                 }}>
                   {isTied ? `${row.players.length}-Way Tie` : primary.name}
                 </span>
                 <span style={{
-                  fontSize: 'clamp(12px, 3.2vw, 14px)', fontWeight: 600,
+                  fontSize: 'clamp(13px, 3.5vw, 15px)', fontWeight: 600,
                   color: 'rgba(255,255,255,0.6)',
                   fontVariantNumeric: 'tabular-nums' as const,
                 }}>
@@ -483,8 +483,8 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         {/* Stats strip */}
         {(meta.stat_birdies != null || meta.stat_eagles != null) && (
           <div style={{
-            flex: '0 0 auto', display: 'flex', gap: 2,
-            padding: '8px 16px',
+            flex: '0 0 auto', display: 'flex', gap: 3,
+            padding: '10px 16px',
             borderTop: '1px solid rgba(255,255,255,0.04)',
             overflowX: 'auto' as const,
             animation: 'trc-fadeIn 0.5s ease-out both',
@@ -497,22 +497,22 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
               { v: meta.stat_bogeys,  label: 'Bogeys',  color: '#EF4444', show: meta.stat_bogeys != null },
             ].filter(s => s.show).map(stat => (
               <div key={stat.label} style={{
-                flex: 1, textAlign: 'center' as const, padding: '4px 0',
+                flex: 1, textAlign: 'center' as const, padding: '6px 0',
                 borderRadius: 8, background: `${stat.color}0A`,
               }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: stat.color }}>{stat.v}</div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: 0.5, marginTop: 1 }}>{stat.label}</div>
+                <div style={{ fontSize: 17, fontWeight: 700, color: stat.color }}>{stat.v}</div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: 0.5, marginTop: 1 }}>{stat.label}</div>
               </div>
             ))}
             {meta.stat_driving_distance != null && (
               <div style={{
-                flex: 1, textAlign: 'center' as const, padding: '4px 0',
+                flex: 1, textAlign: 'center' as const, padding: '6px 0',
                 borderRadius: 8, background: 'rgba(255,255,255,0.03)',
               }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>
-                  {meta.stat_driving_distance}<span style={{ fontSize: 10, fontWeight: 500 }}>yds</span>
+                <div style={{ fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>
+                  {meta.stat_driving_distance}<span style={{ fontSize: 11, fontWeight: 500 }}>yds</span>
                 </div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: 0.5, marginTop: 1 }}>Driver</div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: 0.5, marginTop: 1 }}>Driver</div>
               </div>
             )}
           </div>
@@ -520,16 +520,16 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
         {/* CTA bar */}
         <div style={{
-          flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: 6,
-          padding: '10px 16px',
+          flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: 8,
+          padding: '12px 16px',
           paddingBottom: 'max(env(safe-area-inset-bottom, 10px), 10px)',
           borderTop: '1px solid rgba(255,255,255,0.06)',
         }}>
           <button onClick={handleLike} style={{
             display: 'flex', alignItems: 'center', gap: 5,
-            background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 10,
-            padding: '8px 14px', cursor: 'pointer', color: isLiked ? '#EF4444' : 'rgba(255,255,255,0.6)',
-            fontSize: 14, fontWeight: 600, transition: 'color 0.2s',
+            background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 12,
+            padding: '10px 16px', cursor: 'pointer', color: isLiked ? '#EF4444' : 'rgba(255,255,255,0.6)',
+            fontSize: 15, fontWeight: 600, transition: 'color 0.2s',
             animation: heartPopping ? 'trc-heartPop 0.5s ease-out' : 'none',
           }}>
             <span style={{ fontSize: 18 }}>
@@ -540,14 +540,14 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
           <button onClick={onComment} style={{
             flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            background: 'linear-gradient(180deg, rgba(251,146,60,0.55) 0%, rgba(234,88,12,0.38) 50%, rgba(194,65,12,0.45) 100%)',
-            border: '1px solid rgba(251,146,60,0.5)',
-            borderTop: '1px solid rgba(255,200,150,0.35)',
-            borderRadius: 22, padding: '8px 8px', cursor: 'pointer', color: '#fff',
-            fontSize: 'clamp(11px, 3vw, 13px)', fontWeight: 700, letterSpacing: 0.3,
+            background: 'linear-gradient(180deg, rgba(232,152,10,0.60) 0%, rgba(199,135,10,0.45) 50%, rgba(180,120,8,0.50) 100%)',
+            border: '1px solid rgba(232,152,10,0.50)',
+            borderTop: '1px solid rgba(255,210,130,0.30)',
+            borderRadius: 22, padding: '10px 10px', cursor: 'pointer', color: '#fff',
+            fontSize: 'clamp(12px, 3.2vw, 14px)', fontWeight: 700, letterSpacing: 0.3,
             animation: 'trc-ctaPulse 2.5s ease-in-out infinite',
             animationDelay: '1.5s',
-            boxShadow: '0 2px 12px rgba(249,115,22,0.3), inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -1px 0 rgba(0,0,0,0.15)',
+            boxShadow: '0 2px 12px rgba(232,152,10,0.3), inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -1px 0 rgba(0,0,0,0.15)',
             textShadow: '0 1px 2px rgba(0,0,0,0.3)',
           }}>
             <span>💬</span>
