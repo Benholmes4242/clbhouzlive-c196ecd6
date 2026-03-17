@@ -54,7 +54,7 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
               className={cn(
                 "relative flex-1 py-1.5 px-4 text-sm transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] rounded-lg",
                 isActive
-                  ? "bg-[#f59e0b] text-white font-semibold shadow-sm"
+                  ? "bg-foreground text-background font-semibold shadow-sm"
                   : "text-muted-foreground font-medium hover:text-foreground"
               )}
             >

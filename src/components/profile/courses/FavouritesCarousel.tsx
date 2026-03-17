@@ -304,7 +304,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
                 key={i}
                 className={cn(
                   "rounded-full transition-all duration-300",
-                  isActive ? "w-5 h-1.5 bg-[#f59e0b]" : "w-1.5 h-1.5 bg-[#f59e0b]/30"
+                  isActive ? "w-5 h-1.5 bg-foreground" : "w-1.5 h-1.5 bg-foreground/30"
                 )}
               />
             );

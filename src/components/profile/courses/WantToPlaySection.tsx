@@ -328,8 +328,8 @@ export const WantToPlaySection: React.FC<WantToPlaySectionProps> = ({
                 className={cn(
                   'h-1.5 rounded-full transition-all duration-200',
                     idx === batchIndex
-                    ? 'w-5 bg-[#f59e0b]'
-                    : 'w-1.5 bg-[#f59e0b]/25 hover:bg-[#f59e0b]/50'
+                    ? 'w-5 bg-foreground'
+                    : 'w-1.5 bg-foreground/25 hover:bg-foreground/50'
                 )}
               />
             ))}
