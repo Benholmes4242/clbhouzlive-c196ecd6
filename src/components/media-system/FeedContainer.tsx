@@ -9,7 +9,6 @@
  */
 import { useState, useCallback, useEffect, useRef, useMemo, useContext } from 'react';
 import { FeedItem } from './FeedItem';
-import { deduplicatePosts } from './utils/feedAlgorithm';
 import { PullToRefresh } from './PullToRefresh';
 import { useMediaStore } from './store/mediaStore';
 import { useMediaStoreCompat } from './store/useMediaStoreCompat';
@@ -399,7 +398,7 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
           willChange: 'transform',
         }}
       >
-        {deduplicatePosts(posts).map((post, index) => {
+        {posts.map((post, index) => {
           const distance = Math.abs(index - storeActiveIndex);
           
           // DOM virtualization: only render FeedItems within ±5 of active
