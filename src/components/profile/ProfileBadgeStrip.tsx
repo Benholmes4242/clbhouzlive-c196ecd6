@@ -160,7 +160,7 @@ const ProfileBadgeStrip: React.FC<ProfileBadgeStripProps> = ({
                 sideOffset={4}
               >
                 {badge.tooltip}
-                <Tooltip.Arrow className="fill-black/90" />
+                <Tooltip.Arrow style={{ fill: 'rgba(0,0,0,0.9)' }} />
               </Tooltip.Content>
             </Tooltip.Portal>
           </Tooltip.Root>
