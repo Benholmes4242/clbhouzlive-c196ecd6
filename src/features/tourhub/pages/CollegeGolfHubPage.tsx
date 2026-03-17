@@ -1,7 +1,6 @@
 import { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Menu, RefreshCw, ChevronLeft } from 'lucide-react';
-import { openTourNav } from '../contexts/TourNavContext';
+import { RefreshCw, ChevronLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import { TourHubShell } from '../components';

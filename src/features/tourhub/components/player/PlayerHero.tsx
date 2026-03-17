@@ -4,12 +4,11 @@
  */
 
 import { motion } from 'framer-motion';
-import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
-import { openTourNav } from '../../contexts/TourNavContext';
+import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 import type { TourPlayer, TourPlayerStatistics } from '../../hooks/useTourHubData';
 
 interface PlayerHeroProps {

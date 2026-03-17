@@ -15,11 +15,10 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu } from 'lucide-react';
 import type { TourTournament } from '../../hooks/useTourHubData';
 import type { TournamentLeaderWinner } from '../../hooks/useTournamentLeadersWinners';
 import { ScheduleHeroCard } from './ScheduleHeroCard';
-import { openTourNav } from '../../contexts/TourNavContext';
+import '@/styles/hero-glass.css';
 import '@/styles/hero-glass.css';
 
 type HeroItemType = 'live' | 'upcoming' | 'recent';

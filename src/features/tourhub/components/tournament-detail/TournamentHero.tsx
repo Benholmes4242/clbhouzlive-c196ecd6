@@ -3,10 +3,9 @@
  */
 
 import { format, isSameMonth } from 'date-fns';
-import { MapPin, Calendar, DollarSign, Flag, Ruler, Clock, CheckCircle2, Menu, Target } from 'lucide-react';
+import { MapPin, Calendar, DollarSign, Flag, Ruler, Clock, CheckCircle2, Target } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { openTourNav } from '../../contexts/TourNavContext';
 import type { TourTournament } from '../../hooks/useTourHubData';
 
 interface TournamentHeroProps {

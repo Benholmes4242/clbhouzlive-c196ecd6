@@ -1,10 +1,9 @@
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Menu, ChevronLeft } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { TourHubShell } from '../components';
 import { CollegeCompareHero } from '../components/college/CollegeCompareHero';
 import { useCollegeCompare } from '../hooks/useCollegeCompare';
-import { openTourNav } from '../contexts/TourNavContext';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { getCollegeGradientCSS } from '../config/collegeBrandColors';
 
