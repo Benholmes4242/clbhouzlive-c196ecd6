@@ -128,6 +128,7 @@ export const PasswordBottomSheet: React.FC<PasswordBottomSheetProps> = ({
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Password"
                       disabled={submitting}
+                      autoComplete="current-password"
                       className="w-full h-[56px] px-5 pr-12 rounded-full bg-neutral-900 border border-neutral-700 text-white placeholder:text-neutral-500 text-[15px] focus:outline-none focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500 transition-all disabled:opacity-50"
                       style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
                     />

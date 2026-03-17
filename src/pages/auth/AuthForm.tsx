@@ -553,15 +553,17 @@ const AuthForm: React.FC<AuthFormProps> = ({
         />
       )}
 
-      {/* Hero entry screen */}
-      <AuthHeroScreen
-        onAppleSignIn={handleAppleSignIn}
-        onGoogleSignIn={handleGoogleSignIn}
-        onEmailSignUp={handleEmailSignUp}
-        onEmailLogin={handleInlineEmailLogin}
-        onForgotPassword={handleInlineForgotPassword}
-        submitting={submitting}
-      />
+      {/* Hero entry screen — inert when a sheet is open (A40 focus trap) */}
+      <div inert={isSheetOpen ? true : undefined}>
+        <AuthHeroScreen
+          onAppleSignIn={handleAppleSignIn}
+          onGoogleSignIn={handleGoogleSignIn}
+          onEmailSignUp={handleEmailSignUp}
+          onEmailLogin={handleInlineEmailLogin}
+          onForgotPassword={handleInlineForgotPassword}
+          submitting={submitting}
+        />
+      </div>
 
       {/* Bottom sheet for email/password flows */}
       <AuthBottomSheet
