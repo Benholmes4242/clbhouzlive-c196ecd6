@@ -109,7 +109,7 @@ const FilterCard = memo(function FilterCard({
       <div className="py-1.5 px-1 text-center" style={{ background: 'rgba(10,10,10,0.98)' }}>
         <span
           className="text-[11px] font-medium block truncate"
-          style={{ color: isSelected ? '#E8980A' : 'rgba(255,255,255,0.45)' }}
+          style={{ color: isSelected ? '#FFFFFF' : 'rgba(255,255,255,0.45)' }}
         >
           {filter.label}
         </span>
