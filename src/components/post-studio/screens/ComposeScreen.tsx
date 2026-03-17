@@ -846,7 +846,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             onSelect={setActiveMedia}
             onRemove={removeMedia}
             onEdit={handleEdit}
-            onSetCover={setCoverIndex}
+            onSetCover={(index) => { setCoverIndex(index); setActiveMedia(index); }}
             onOverflow={() => setOverflowSheetOpen(true)}
             onAddMore={() => fileInputRef.current?.click()}
           />
@@ -1007,6 +1007,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               setStep('TRIM');
             }}
             onCover={() => {
+              if (videoToolSheetIndex !== null) setActiveMedia(videoToolSheetIndex);
               setVideoToolSheetIndex(null);
               setStep('POSTER');
             }}
