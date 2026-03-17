@@ -375,7 +375,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             marginBottom: 8,
           }}>
             <span style={{
-              fontSize: 11, fontWeight: 700, letterSpacing: 1.5,
+              fontSize: 12, fontWeight: 700, letterSpacing: 1.5,
               color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const,
             }}>
               Final Leaderboard
