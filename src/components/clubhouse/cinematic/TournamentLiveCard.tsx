@@ -370,7 +370,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                   {leader.scoreDisplay}
                 </span>
                 {leader.thru && (
-                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 1 }}>
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
                     Thru {leader.thru}
                   </div>
                 )}
