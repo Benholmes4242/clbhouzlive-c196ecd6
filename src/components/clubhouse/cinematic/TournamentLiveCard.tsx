@@ -389,7 +389,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           background: 'hsl(var(--accent-amber) / 0.05)',
         }}>
           <div style={{
-            fontSize: 12, fontWeight: 600, color: 'hsl(var(--accent-amber))',
+            fontSize: 13, fontWeight: 600, color: 'hsl(var(--accent-amber))',
             textAlign: 'center', letterSpacing: '0.01em',
           }}>
             {volatilityBanner}
