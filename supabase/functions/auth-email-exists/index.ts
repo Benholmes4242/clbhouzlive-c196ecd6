@@ -45,22 +45,20 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
 
-    // Use getUserByEmail — O(1) lookup, no pagination, scales to any user count
-    const { data: { user }, error } = await supabaseAdmin.auth.admin
-      .getUserByEmail(normalizedEmail);
+    // Query auth.users directly — getUserByEmail was removed from Admin SDK
+    const { data, error } = await supabaseAdmin
+      .rpc('', { }).catch(() => null) as any; // unused, see below
 
-    if (error) {
-      // "User not found" is expected when email doesn't exist
-      if (error.message?.includes("User not found")) {
-        console.log("[auth-email-exists] Email does not exist");
-        const response: EmailExistsResponse = { exists: false };
-        return new Response(
-          JSON.stringify(response),
-          { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
-        );
-      }
+    // Use raw PostgREST query against auth.users via service role
+    const { data: user, error: queryError } = await supabaseAdmin
+      .schema('auth' as any)
+      .from('users')
+      .select('id')
+      .eq('email', normalizedEmail)
+      .maybeSingle();
 
-      console.error("[auth-email-exists] Error checking user:", error.message);
+    if (queryError) {
+      console.error("[auth-email-exists] Error checking user:", queryError.message);
       return new Response(
         JSON.stringify({ error: "Failed to check email" }),
         { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
