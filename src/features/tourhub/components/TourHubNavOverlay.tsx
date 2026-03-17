@@ -182,7 +182,7 @@ export function TourHubNavOverlay({
   // Generate dynamic subtitle for Schedule
   const scheduleSubtitle = hasLive
     ? `${liveCount} tournament${(liveCount ?? 0) > 1 ? 's' : ''} live right now.`
-    : "What's happening — past, present, and upcoming.";
+    : "What's happening - past, present, and upcoming.";
 
   // TM-08: aria-labels for each card
   const getAriaLabel = (item: NavItem) => {
