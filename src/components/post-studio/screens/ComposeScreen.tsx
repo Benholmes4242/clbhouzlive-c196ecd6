@@ -263,7 +263,7 @@ function OverflowSheet({ items, startIndex, onEdit, onClose }: OverflowSheetProp
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        className="fixed bottom-0 z-[10001] w-full max-w-[480px] left-1/2 -translate-x-1/2 rounded-t-[24px]"
+        className="fixed bottom-0 inset-x-0 z-[10001] w-full max-w-[480px] mx-auto rounded-t-[24px]"
         style={{
           background: 'rgba(10,10,10,0.99)',
           backdropFilter: 'blur(24px)',
