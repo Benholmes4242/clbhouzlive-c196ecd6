@@ -51,14 +51,14 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
       <Select value={value} onValueChange={onChange} disabled={disabled}>
         <SelectTrigger 
           className={cn(
-            "gap-1.5 border-none bg-[#F8FAFC] hover:bg-slate-100 transition-colors rounded-full",
+            "gap-1.5 border border-border/60 bg-muted/60 hover:bg-muted transition-colors rounded-full",
             size === 'sm' ? "h-7 px-2.5 text-[11px]" : "h-9 px-4 text-sm"
           )}
         >
           <Icon className="w-3 h-3 text-muted-foreground" />
           <SelectValue>
-            <span className="text-muted-foreground">{label}:</span>
-            <span className="ml-1 font-medium">{selectedOption.label}</span>
+            <span className="text-foreground/60">{label}:</span>
+            <span className="ml-1 font-semibold text-foreground">{selectedOption.label}</span>
           </SelectValue>
         </SelectTrigger>
         <SelectContent align="end" className="min-w-[200px] bg-white border-slate-200 z-50 rounded-sq-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
