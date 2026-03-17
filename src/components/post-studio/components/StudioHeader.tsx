@@ -17,7 +17,8 @@ interface HeaderAction {
 }
 
 interface StudioHeaderProps {
-  title: string;
+  title?: string;
+  centerContent?: React.ReactNode;
   leftAction?: HeaderAction;
   rightAction?: HeaderAction;
   step?: StudioStep;
