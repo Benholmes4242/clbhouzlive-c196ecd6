@@ -5,7 +5,7 @@
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
-  Camera, BookOpen, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon,
+  Camera, Layers, BookOpen, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -833,24 +833,33 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           paddingBottom: '30px',
         }}
       >
-        {/* Camera — FAB shutter button, breaks toolbar top edge */}
+        {/* Camera — primary action, white circle */}
         <motion.button
-          whileTap={{ scale: 0.90 }}
+          whileTap={{ scale: 0.92 }}
           onClick={() => fileInputRef.current?.click()}
           disabled={isProcessing}
-          className="flex items-center justify-center disabled:opacity-40 mr-4 shrink-0"
+          className="flex items-center justify-center disabled:opacity-40 mr-4"
           style={{
-            width: 60,
-            height: 60,
-            borderRadius: '50%',
+            width: 40, height: 40, borderRadius: '50%',
             background: 'rgba(255,255,255,0.96)',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.12)',
-            marginTop: -20,
-            position: 'relative',
-            zIndex: 10,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.30)',
           }}
         >
-          <Camera className="w-6 h-6" style={{ color: '#0D0D0D' }} strokeWidth={2} />
+          <Camera className="w-5 h-5" style={{ color: '#0D0D0D' }} strokeWidth={2} />
+        </motion.button>
+
+        {/* Spacer between camera and gallery */}
+        <div className="w-2" />
+
+        {/* Gallery */}
+        <motion.button
+          whileTap={{ scale: 0.92 }}
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isProcessing}
+          className="flex items-center justify-center disabled:opacity-40 mr-4"
+          style={{ width: 40, height: 40 }}
+        >
+          <Layers className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
         </motion.button>
 
         {/* Divider */}
