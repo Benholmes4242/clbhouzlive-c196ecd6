@@ -70,7 +70,7 @@ export function useMedianStatusBar(
       const c = configRef.current;
       if (!c.enabled) return;
 
-      const color = c.hexColor === 'transparent' ? '#000000' : (c.hexColor || '#000000');
+      const color = c.hexColor === 'transparent' ? 'transparent' : (c.hexColor || '#000000');
 
       // 1. Update the persistent shield — this NEVER gets cleaned up
       applyShieldColor(color);
