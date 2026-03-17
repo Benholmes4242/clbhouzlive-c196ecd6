@@ -17,8 +17,6 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/comments/MentionText';
 import { relativeTime } from '@/utils/relativeTime';
-import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
-import CourseLocationRow from '@/components/posts/CourseLocationRow';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -79,9 +77,6 @@ function CommentsSheet({
   initialParentCommentId,
   caddiePickCommentId,
   caption,
-  courseId,
-  courseName,
-  courseCountry,
   isReview,
   onCommentPosted,
   onCommentDeleted,
@@ -576,43 +571,21 @@ function CommentsSheet({
             </div>
 
             {/* Post caption — shown above comments when present */}
-            {(() => {
-              const cleanCaption = caption && caption.trim().length > 0
-                ? removeGolfCourseFromContent(caption).trim()
-                : '';
-              const hasCourse = !!(courseName);
-              if (!cleanCaption && !hasCourse) return null;
-              return (
-                <div className={cn(
-                  'px-4 py-3 shrink-0 border-b',
-                  isDark ? 'border-white/[0.06]' : 'border-border/50'
-                )}>
-                  {cleanCaption && (
-                    <MentionText
-                      text={cleanCaption}
-                      className={cn(
-                        'text-[14px] leading-[20px]',
-                        isDark ? 'text-white/70' : 'text-foreground/70'
-                      )}
-                      mentionClassName="font-semibold [color:#E8980A]"
-                    />
+            {caption && caption.trim().length > 0 && (
+              <div className={cn(
+                'px-4 py-3 shrink-0 border-b',
+                isDark ? 'border-white/[0.06]' : 'border-border/50'
+              )}>
+                <MentionText
+                  text={caption}
+                  className={cn(
+                    'text-[14px] leading-[20px]',
+                    isDark ? 'text-white/70' : 'text-foreground/70'
                   )}
-                  {hasCourse && (
-                    <div className={cleanCaption ? 'mt-2' : ''}>
-                      <CourseLocationRow
-                        course={{
-                          id: courseId,
-                          name: courseName,
-                          country: courseCountry,
-                        }}
-                        isDark={isDark}
-                        showChevron={false}
-                      />
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
+                  mentionClassName="font-semibold [color:#E8980A]"
+                />
+              </div>
+            )}
 
             {/* Scroll area */}
             <div
