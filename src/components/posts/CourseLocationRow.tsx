@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPinned, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import { FiMapPin } from 'react-icons/fi';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -125,9 +126,10 @@ const CourseLocationRow: React.FC<CourseLocationRowProps> = ({
         className
       )}
     >
-      <MapPinned 
+      <FiMapPin 
+        size={16}
         className={cn(
-          "h-4 w-4 flex-shrink-0 mt-0.5",
+          "flex-shrink-0 mt-0.5",
           isDark ? "text-white/60" : "text-muted-foreground"
         )} 
       />
