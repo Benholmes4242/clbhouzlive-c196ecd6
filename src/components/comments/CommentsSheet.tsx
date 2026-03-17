@@ -582,9 +582,7 @@ function CommentsSheet({
                     'text-[14px] leading-[20px]',
                     isDark ? 'text-white/70' : 'text-foreground/70'
                   )}
-                  mentionClassName={cn(
-                    isDark ? 'text-white/90' : 'text-foreground'
-                  )}
+                  mentionClassName="font-semibold [color:#E8980A]"
                 />
               </div>
             )}
