@@ -59,7 +59,7 @@ function SkeletonDivider() {
 function SearchSkeleton() {
   const sections = [
     { label: 'Courses', count: 2, shape: 'rounded-xl', eyebrowW: 'w-14' },
-    { label: 'People', count: 2, shape: 'rounded-full', eyebrowW: 'w-12' },
+    { label: 'People', count: 2, shape: 'clbhouz-squircle', eyebrowW: 'w-12' },
     { label: 'Businesses', count: 2, shape: 'rounded-xl', eyebrowW: 'w-16' },
   ];
   return (
