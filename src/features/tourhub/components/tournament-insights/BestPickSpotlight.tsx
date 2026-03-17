@@ -127,6 +127,7 @@ export const BestPickSpotlight: React.FC<BestPickSpotlightProps> = ({
   tournamentId,
   courseName,
   tournamentName,
+  tourSlug,
 }) => {
   // Resolve the Sportradar player ID for stats lookup
   const playerId = bestPick.playerId;
