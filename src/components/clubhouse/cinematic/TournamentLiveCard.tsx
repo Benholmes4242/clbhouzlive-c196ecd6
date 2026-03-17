@@ -317,7 +317,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
               <div>
                 <div style={{
-                  fontSize: 28, fontWeight: 800, color: '#fff',
+                  fontSize: 'clamp(26px, 7vw, 32px)', fontWeight: 800, color: '#fff',
                   letterSpacing: '-0.02em', lineHeight: 1.1,
                 }}>
                   {leader.playerName}
