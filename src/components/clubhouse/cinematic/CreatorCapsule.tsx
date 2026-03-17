@@ -113,6 +113,7 @@ interface CreatorCapsuleProps {
 export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   user,
   caption,
+  tags = [],
   golfCourse,
   musicTrack,
   isMusicPlaying = false,
