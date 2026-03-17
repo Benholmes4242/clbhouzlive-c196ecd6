@@ -18,7 +18,7 @@ import type { CourseWithFriends, FriendCourseHit } from '@/hooks/useFriendsCours
 
 const FriendsCoursesPanel: React.FC = () => {
   const { user } = useSupabaseSession();
-  const [timeframe, setTimeframe] = useState<Timeframe>('30d');
+  const [timeframe, setTimeframe] = useState<Timeframe>('90d');
 
   const { data: realData, isLoading: isRealLoading, isError, error } = useFriendsCourses(user?.id, timeframe);
   const sourceData = realData;
