@@ -13,7 +13,6 @@ import GolfClubView from '@/components/golf-club/GolfClubView';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import {
   Top100ListLeaderboard,
-  Top100ListMilestoneRail,
   Top100ListFilterChips,
   Top100ListCourseCard,
   Top100ListProgressCard,
@@ -428,13 +427,6 @@ const Top100List = () => {
           </div>
         )}
 
-        {/* 4. Milestones - horizontal rail with regional theming */}
-        {/* Spacing: Leaderboard → Milestones = 32px (XL) */}
-        {session && (
-          <div className="mt-8">
-            <Top100ListMilestoneRail playedCount={playedCount} listSlug={slug} />
-          </div>
-        )}
 
         {/* Ref target for scroll-to-top after pagination */}
         <div ref={listTopRef} />
