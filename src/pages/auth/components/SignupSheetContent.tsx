@@ -325,6 +325,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
           {!isPasswordDisabled && (
             <button
               type="button"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-full transition-opacity"
               style={{ opacity: password.length > 0 ? 1 : 0.5 }}
