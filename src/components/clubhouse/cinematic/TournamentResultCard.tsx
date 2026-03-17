@@ -276,34 +276,6 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
           pointerEvents: 'none',
         }} />
 
-        {/* Tour badge */}
-        <div style={{
-          position: 'absolute',
-          top: 'max(env(safe-area-inset-top, 0px), 12px)',
-          left: 16,
-          animation: 'trc-fadeIn 0.6s ease-out both',
-          animationDelay: '0.2s',
-        }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            background: tour.badgeBg,
-            backdropFilter: 'blur(12px)',
-            borderRadius: 20, padding: '5px 12px',
-            border: `1px solid ${tour.accentColor}33`,
-          }}>
-            <div style={{
-              width: 7, height: 7, borderRadius: '50%',
-              background: tour.accentColor,
-              boxShadow: `0 0 6px ${tour.accentColor}`,
-            }} />
-            <span style={{
-              fontSize: 11, fontWeight: 700, letterSpacing: 1.2,
-              color: 'rgba(255,255,255,0.9)', textTransform: 'uppercase' as const,
-            }}>
-              {meta.tour_name || tour.label}
-            </span>
-          </div>
-        </div>
 
         {/* Winner name + score */}
         <div style={{
