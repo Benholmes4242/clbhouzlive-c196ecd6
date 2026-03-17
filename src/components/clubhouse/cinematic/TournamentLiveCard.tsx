@@ -540,7 +540,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                     </span>
 
                     {/* Score */}
-                    <span style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.9)', flexShrink: 0, minWidth: 36, textAlign: 'right' }}>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.9)', flexShrink: 0, minWidth: 36, textAlign: 'right' }}>
                       {entry.scoreDisplay}
                     </span>
                   </div>
