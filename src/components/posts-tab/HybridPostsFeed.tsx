@@ -4,7 +4,8 @@ import { LongFormCard } from './LongFormCard';
 import { ReviewCard } from './ReviewCard';
 import { CompactGridRow } from './CompactGridRow';
 import { PostsFeedSkeleton } from './PostsFeedSkeleton';
-import { Loader2, RefreshCw, Film } from 'lucide-react';
+import { Loader2, Film } from 'lucide-react';
+import { usePostDeletion } from '@/hooks/usePostDeletion';
 
 type PostKind = 'longform' | 'review' | 'compact';
 
@@ -48,6 +49,7 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
   gridRef,
 }) => {
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const { deletePost } = usePostDeletion();
 
   // Infinite scroll sentinel
   useEffect(() => {
@@ -108,6 +110,10 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
     return result;
   }, [posts]);
 
+  const handleDelete = (postId: string, postUserId?: string) => {
+    deletePost(postId, 'personal', postUserId || userId);
+  };
+
   if (isLoading) {
     return <PostsFeedSkeleton />;
   }
@@ -123,7 +129,7 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
         </p>
         <button
           onClick={() => refetch()}
-          className="h-11 px-5 rounded-full text-sm font-semibold bg-[#f59e0b] text-white hover:bg-[#e8920f] active:scale-[0.97] transition-all"
+          className="h-11 px-5 rounded-full text-sm font-semibold bg-foreground text-background hover:bg-foreground/90 active:scale-[0.97] transition-all"
         >
           Try again
         </button>
@@ -150,11 +156,29 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
       {segments.map((segment, i) => {
         if (segment.kind === 'longform') {
           const idx = posts.indexOf(segment.post);
-          return <LongFormCard key={segment.post.id} post={segment.post} allPosts={posts} postIndex={idx >= 0 ? idx : undefined} />;
+          return (
+            <LongFormCard
+              key={segment.post.id}
+              post={segment.post}
+              allPosts={posts}
+              postIndex={idx >= 0 ? idx : undefined}
+              isOwnPost={isOwnProfile}
+              onDelete={() => handleDelete(segment.post.id, segment.post.userId)}
+            />
+          );
         }
         if (segment.kind === 'review') {
           const idx = posts.indexOf(segment.post);
-          return <ReviewCard key={segment.post.id} post={segment.post} allPosts={posts} postIndex={idx >= 0 ? idx : undefined} />;
+          return (
+            <ReviewCard
+              key={segment.post.id}
+              post={segment.post}
+              allPosts={posts}
+              postIndex={idx >= 0 ? idx : undefined}
+              isOwnPost={isOwnProfile}
+              onDelete={() => handleDelete(segment.post.id, segment.post.userId)}
+            />
+          );
         }
         return (
           <CompactGridRow
@@ -163,6 +187,8 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
             startIndex={segment.startIndex}
             globalIndices={segment.globalIndices}
             allPosts={posts}
+            isOwnProfile={isOwnProfile}
+            onDeletePost={(postId) => handleDelete(postId)}
           />
         );
       })}
@@ -172,7 +198,7 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
 
       {isFetchingNextPage && (
         <div className="flex justify-center py-4">
-          <Loader2 className="w-5 h-5 animate-spin text-[#f59e0b]" />
+          <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
         </div>
       )}
     </div>

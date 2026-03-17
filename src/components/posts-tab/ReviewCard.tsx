@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { Star, Play, Heart, MessageCircle } from 'lucide-react';
+import { Star, Play, Heart, MessageCircle, MoreHorizontal } from 'lucide-react';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 import { formatDistanceToNow } from 'date-fns';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -10,9 +10,11 @@ interface ReviewCardProps {
   post: FeedPost;
   allPosts?: FeedPost[];
   postIndex?: number;
+  isOwnPost?: boolean;
+  onDelete?: () => void;
 }
 
-export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postIndex }) => {
+export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postIndex, isOwnPost, onDelete }) => {
   const [expanded, setExpanded] = useState(false);
   const review = post.review;
   if (!review) return null;
@@ -51,16 +53,30 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
             <p className="text-xs text-muted-foreground truncate">{location}</p>
           )}
         </div>
-        <div
-          className="flex items-center gap-1 ml-2 shrink-0 rounded-full px-2 py-0.5"
-          style={{
-            backgroundColor: `${accentColor}1A`,
-          }}
-        >
-          <Star className="w-3 h-3" style={{ color: accentColor, fill: accentColor }} />
-          <span className="text-xs font-semibold" style={{ color: accentColor }}>
-            {review.rating.toFixed(1)}
-          </span>
+        <div className="flex items-center gap-1.5 ml-2 shrink-0">
+          <div
+            className="flex items-center gap-1 rounded-full px-2 py-0.5"
+            style={{
+              backgroundColor: `${accentColor}1A`,
+            }}
+          >
+            <Star className="w-3 h-3" style={{ color: accentColor, fill: accentColor }} />
+            <span className="text-xs font-semibold" style={{ color: accentColor }}>
+              {review.rating.toFixed(1)}
+            </span>
+          </div>
+          {/* Three dots — own post delete */}
+          {isOwnPost && onDelete && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (window.confirm('Delete this post?')) onDelete();
+              }}
+              className="p-1.5 -mr-1 text-muted-foreground hover:text-foreground"
+            >
+              <MoreHorizontal className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
 

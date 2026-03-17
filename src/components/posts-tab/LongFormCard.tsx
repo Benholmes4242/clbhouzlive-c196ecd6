@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { Play, Heart, MessageCircle, Share2 } from 'lucide-react';
+import { Play, Heart, MessageCircle, Share2, MoreHorizontal } from 'lucide-react';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 import { formatDistanceToNow } from 'date-fns';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -10,9 +10,11 @@ interface LongFormCardProps {
   post: FeedPost;
   allPosts?: FeedPost[];
   postIndex?: number;
+  isOwnPost?: boolean;
+  onDelete?: () => void;
 }
 
-export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, postIndex }) => {
+export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, postIndex, isOwnPost, onDelete }) => {
   const [expanded, setExpanded] = useState(false);
   const firstMedia = post.mediaItems[0];
   const thumbnailUrl = firstMedia?.thumbnailUrl || firstMedia?.imageUrl;
@@ -111,6 +113,19 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
         </span>
         <span className="text-xs text-muted-foreground">·</span>
         <span className="text-xs text-muted-foreground">{timeAgo}</span>
+
+        {/* Three dots — own post delete */}
+        {isOwnPost && onDelete && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (window.confirm('Delete this post?')) onDelete();
+            }}
+            className="ml-auto p-2 -mr-1 text-muted-foreground hover:text-foreground"
+          >
+            <MoreHorizontal className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Engagement */}

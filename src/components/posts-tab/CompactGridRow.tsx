@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { Play, Star, Heart } from 'lucide-react';
+import { Play, Star, Heart, MoreHorizontal } from 'lucide-react';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 import { formatDuration, formatCompact } from './utils';
 
@@ -9,9 +9,18 @@ interface CompactGridRowProps {
   startIndex: number;
   globalIndices?: number[];
   allPosts?: FeedPost[];
+  isOwnProfile?: boolean;
+  onDeletePost?: (postId: string) => void;
 }
 
-const CompactTile: React.FC<{ post: FeedPost; globalIndex: number; allPosts?: FeedPost[] }> = ({ post, globalIndex, allPosts }) => {
+const CompactTile: React.FC<{
+  post: FeedPost;
+  globalIndex: number;
+  allPosts?: FeedPost[];
+  isOwnProfile?: boolean;
+  onDeletePost?: (postId: string) => void;
+}> = ({ post, globalIndex, allPosts, isOwnProfile, onDeletePost }) => {
+  const [showMenu, setShowMenu] = useState(false);
   const firstMedia = post.mediaItems[0];
   const isVideo = firstMedia?.type === 'video';
   const thumbnailUrl = firstMedia?.thumbnailUrl || firstMedia?.imageUrl;
@@ -24,6 +33,7 @@ const CompactTile: React.FC<{ post: FeedPost; globalIndex: number; allPosts?: Fe
       data-posts-tile-index={globalIndex}
       data-hls-url={firstMedia?.hlsUrl || ''}
       onClick={() => {
+        if (showMenu) return;
         if (allPosts) {
           useFullscreenFeed.getState().open({
             posts: allPosts,
@@ -52,6 +62,45 @@ const CompactTile: React.FC<{ post: FeedPost; globalIndex: number; allPosts?: Fe
           >
             <Play className="w-3.5 h-3.5 text-white fill-white ml-0.5" />
           </div>
+        </div>
+      )}
+
+      {/* Three dots — own post delete */}
+      {isOwnProfile && onDeletePost && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowMenu(true);
+          }}
+          className="absolute top-1.5 right-1.5 z-10 p-1 rounded-full"
+          style={{ background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(8px)' }}
+        >
+          <MoreHorizontal className="w-3.5 h-3.5 text-white" />
+        </button>
+      )}
+
+      {/* Delete confirmation overlay */}
+      {showMenu && (
+        <div
+          className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2"
+          style={{ background: 'rgba(0,0,0,0.7)' }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={() => {
+              onDeletePost(post.id);
+              setShowMenu(false);
+            }}
+            className="px-4 py-2 text-xs font-semibold text-white bg-red-500 rounded-full active:scale-[0.97]"
+          >
+            Delete
+          </button>
+          <button
+            onClick={() => setShowMenu(false)}
+            className="px-4 py-2 text-xs font-medium text-white/80 active:scale-[0.97]"
+          >
+            Cancel
+          </button>
         </div>
       )}
 
@@ -113,7 +162,7 @@ const CompactTile: React.FC<{ post: FeedPost; globalIndex: number; allPosts?: Fe
   );
 };
 
-export const CompactGridRow: React.FC<CompactGridRowProps> = ({ posts, startIndex, globalIndices, allPosts }) => {
+export const CompactGridRow: React.FC<CompactGridRowProps> = ({ posts, startIndex, globalIndices, allPosts, isOwnProfile, onDeletePost }) => {
   return (
     <div className="grid grid-cols-2 gap-[2px]">
       {posts.map((post, i) => (
@@ -122,6 +171,8 @@ export const CompactGridRow: React.FC<CompactGridRowProps> = ({ posts, startInde
           post={post}
           globalIndex={globalIndices ? globalIndices[i] : startIndex + i}
           allPosts={allPosts}
+          isOwnProfile={isOwnProfile}
+          onDeletePost={onDeletePost}
         />
       ))}
     </div>
