@@ -56,8 +56,7 @@ const DrawerContent = React.forwardRef<
       {/* Handle - matches Visibility sheet */}
       <div className="pt-3 pb-2 flex justify-center">
         <div 
-          className="w-10 h-1 rounded-full"
-          style={{ background: 'var(--cm-border)' }}
+          className="w-9 h-1 rounded-full bg-muted-foreground/30"
         />
       </div>
       {children}
