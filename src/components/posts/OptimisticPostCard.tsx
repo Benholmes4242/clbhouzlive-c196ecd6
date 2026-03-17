@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import HighQualityImage from '@/components/ui/high-quality-image';
+import PostContentWithTags from '@/components/posts/PostContentWithTags';
 import { Card } from '@/components/ui/card';
 import { Squircle } from '@/components/ui/squircle';
 import { Progress } from '@/components/ui/progress';
@@ -68,7 +69,12 @@ const OptimisticPostCard = ({ post, onRetry }: OptimisticPostCardProps) => {
 
         {/* Content */}
         {post.content && (
-          <p className="text-sm mb-3">{post.content}</p>
+          <div className="text-sm mb-3">
+            <PostContentWithTags
+              content={post.content}
+              tags={post.post_tags || []}
+            />
+          </div>
         )}
 
         {/* Media Preview */}

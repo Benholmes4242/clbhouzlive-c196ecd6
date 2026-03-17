@@ -36,6 +36,8 @@ export const usePostData = () => {
             id,
             tagged_entity_id,
             tagged_by_user_id,
+            start_index,
+            end_index,
             tagged_entity:taggable_entities(
               id,
               entity_type,
@@ -95,6 +97,8 @@ export const usePostData = () => {
             id,
             tagged_entity_id,
             tagged_by_user_id,
+            start_index,
+            end_index,
             tagged_entity:taggable_entities(
               id,
               entity_type,

@@ -54,7 +54,21 @@ export const useTrendingFeed = () => {
           user_id,
           actor_type,
           badges,
-          post_media!inner(id, media_type, media_url, filter_id, studio_edits)
+          post_media!inner(id, media_type, media_url, filter_id, studio_edits),
+          post_tags(
+            id,
+            post_id,
+            tagged_entity_id,
+            start_index,
+            end_index,
+            taggable_entities(
+              id,
+              entity_type,
+              entity_id,
+              name,
+              username
+            )
+          )
         `)
         .in('user_id', allConnectedUserIds)
         .or('actor_type.eq.personal,actor_type.is.null') // Exclude business posts
@@ -100,7 +114,15 @@ export const useTrendingFeed = () => {
             filter_id: m.filter_id,
             studio_edits: m.studio_edits
           })) || [],
-          post_tags: [] // Disabled for performance
+          post_tags: (post as any).post_tags?.map((tag: any) => ({
+            id: tag.taggable_entities?.id || tag.tagged_entity_id,
+            entity_type: tag.taggable_entities?.entity_type || 'user',
+            entity_id: tag.taggable_entities?.entity_id || tag.tagged_entity_id,
+            name: tag.taggable_entities?.name || 'Unknown',
+            username: tag.taggable_entities?.username || null,
+            start_index: tag.start_index ?? 0,
+            end_index: tag.end_index ?? 0,
+          })) || []
         };
       });
     },

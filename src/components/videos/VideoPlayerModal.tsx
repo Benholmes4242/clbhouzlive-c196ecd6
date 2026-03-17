@@ -30,6 +30,17 @@ import { formatDistanceToNow } from 'date-fns';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { getFilterClass } from '@/utils/studioFilters';
 import { getCropWrapperClass, getPixelLayerStyle } from '@/utils/studioEdit';
+import PostContentWithTags from '@/components/posts/PostContentWithTags';
+
+interface VideoDataTag {
+  id: string;
+  entity_type: 'user' | 'golf_club' | 'business';
+  entity_id: string;
+  name: string;
+  username: string | null;
+  start_index: number;
+  end_index: number;
+}
 
 interface VideoData {
   id: string;
@@ -46,8 +57,9 @@ interface VideoData {
   golfCourseId?: string;
   durationSeconds?: number;
   category?: string;
-  studioEdits?: any; // Text overlays, filters, etc.
-  filterId?: string | null; // Filter applied to the video
+  studioEdits?: any;
+  filterId?: string | null;
+  tags?: VideoDataTag[];
 }
 
 /**
@@ -219,6 +231,20 @@ export const VideoPlayerModal: React.FC = () => {
           category: categoryTag?.tagged_entity?.slug,
           studioEdits: media.studio_edits,
           filterId: media.filter_id ?? (media.studio_edits as any)?.filter ?? null,
+          tags: postTags
+            ?.filter((tag: any) => {
+              const et = tag.tagged_entity?.entity_type;
+              return et === 'user' || et === 'business';
+            })
+            .map((tag: any) => ({
+              id: tag.id,
+              entity_type: tag.tagged_entity?.entity_type,
+              entity_id: tag.tagged_entity?.entity_id,
+              name: tag.tagged_entity?.name || 'Unknown',
+              username: tag.tagged_entity?.username || null,
+              start_index: tag.start_index ?? 0,
+              end_index: tag.end_index ?? 0,
+            })) || [],
         });
       } catch (err) {
         console.error('Error loading video:', err);
@@ -859,7 +885,10 @@ export const VideoPlayerModal: React.FC = () => {
                           !showFullDescription && "line-clamp-2"
                         )}
                       >
-                        {videoData.description}
+                        <PostContentWithTags
+                          content={videoData.description}
+                          tags={videoData.tags || []}
+                        />
                       </div>
                       {videoData.description.length > 100 && (
                         <button
