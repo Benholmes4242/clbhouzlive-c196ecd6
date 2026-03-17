@@ -12,7 +12,7 @@ const getShield = (): HTMLElement | null =>
   document.getElementById('safe-area-shield');
 
 // Single source of truth for current status bar color
-let currentShieldColor = '#000000';
+export let currentShieldColor = '#000000';
 
 export function applyShieldColor(color: string) {
   currentShieldColor = color;

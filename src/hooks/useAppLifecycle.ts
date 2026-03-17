@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { currentShieldColor, applyShieldColor } from './useMedianStatusBar';
 
 // Thresholds for rehydration behavior
 const REHYDRATION_THRESHOLDS = {
