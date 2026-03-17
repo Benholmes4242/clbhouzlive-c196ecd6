@@ -103,7 +103,7 @@ export function ActorSelector({ compact = false, header = false }: ActorSelector
           </div>
 
           {/* Chevron badge — only when multiple profiles exist */}
-          {hasMultiple && (
+          {(hasMultiple || header) && (
             <div
               className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center"
               style={{ background: 'rgba(255,255,255,0.90)', boxShadow: '0 1px 4px rgba(0,0,0,0.40)' }}

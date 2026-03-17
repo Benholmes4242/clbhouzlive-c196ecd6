@@ -84,18 +84,21 @@ export function StudioHeader({
           ) : <div />}
         </div>
 
-        {/* Centre title — heavier weight, tighter tracking */}
-        <h1
-          className="flex-1 text-center"
-          style={{
-            fontSize: 17,
-            fontWeight: 700,
-            color: TEXT_PRIMARY,
-            letterSpacing: '-0.03em',
-          }}
-        >
-          {title}
-        </h1>
+        {/* Centre — title or custom content */}
+        <div className="flex-1 flex items-center justify-center">
+          {centerContent ?? (
+            <h1
+              style={{
+                fontSize: 17,
+                fontWeight: 700,
+                color: TEXT_PRIMARY,
+                letterSpacing: '-0.03em',
+              }}
+            >
+              {title}
+            </h1>
+          )}
+        </div>
 
         {/* Right action */}
         <div className="w-20 flex justify-end">
