@@ -280,7 +280,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         {/* Winner name + score */}
         <div style={{
           position: 'absolute', bottom: 0, left: 0, right: 0,
-          padding: '0 20px 16px',
+          padding: '0 20px 20px',
           animation: 'trc-fadeUp 0.7s ease-out both',
           animationDelay: '0.3s',
         }}>
