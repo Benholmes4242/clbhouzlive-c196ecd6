@@ -224,7 +224,7 @@ export default function StudioPanelText({
                               onClick={() => updateBox(selected.id, { style: preset.id })}
                               className="flex-shrink-0 flex flex-col items-center gap-0.5 px-2.5 py-2 rounded-xl transition-all min-w-[52px]"
                               style={selected.style === preset.id ? {
-                                background: '#E8980A',
+                                background: 'rgba(255,255,255,0.90)',
                                 color: '#FFFFFF',
                               } : {
                                 background: 'rgba(255,255,255,0.08)',
