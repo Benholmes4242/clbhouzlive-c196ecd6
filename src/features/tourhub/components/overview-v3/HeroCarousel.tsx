@@ -961,7 +961,7 @@ interface HeroCarouselProps {
 }
 
 export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
-  const { data: slides = [], isLoading } = useHeroCarouselData();
+  const { data: slides, isLoading } = useHeroCarouselData();
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -972,7 +972,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   }, []);
 
   // Wire up top-3 podium data for completed slides
-  const completedIds = slides
+  const completedIds = (slides ?? [])
     .filter(s => s.type === 'completed')
     .map(s => s.tournament.id);
   const { data: leadersWinnersMap } = useTournamentLeadersWinners(completedIds);
@@ -998,14 +998,14 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
 
   // Auto-advance every 8 seconds (spec: 8s idle, 5s resume after touch)
   useEffect(() => {
-    if (slides.length <= 1 || isPaused || isExpanded) return;
+    if (!slides || slides.length <= 1 || isPaused || isExpanded) return;
     
     const interval = setInterval(() => {
-      setCurrentIndex(prev => (prev + 1) % slides.length);
+      setCurrentIndex(prev => (prev + 1) % (slides?.length ?? 1));
     }, 8000);
 
     return () => clearInterval(interval);
-  }, [slides.length, isPaused, isExpanded]);
+  }, [slides?.length, isPaused, isExpanded]);
 
   // Pause auto-advance when app is backgrounded
   useEffect(() => {
@@ -1122,12 +1122,16 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     );
   }
 
-  if (slides.length === 0) {
+  if (!slides || slides.length === 0) {
     return (
-      <div className="relative w-full h-full bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center">
-        <div className="text-center text-white/60">
-          <p className="text-lg mb-2">No active tournaments</p>
-          <p className="text-sm">Check back soon for upcoming events</p>
+      <div className="relative w-full h-full bg-slate-900 animate-pulse">
+        <div 
+          className="absolute left-4 right-4 sm:right-auto sm:w-[360px] p-5 glass-card"
+          style={{ bottom: 'calc(60px + env(safe-area-inset-bottom, 0px))' }}
+        >
+          <div className="h-4 w-20 bg-white/10 rounded mb-4" />
+          <div className="h-8 w-56 bg-white/10 rounded mb-2" />
+          <div className="h-4 w-40 bg-white/10 rounded" />
         </div>
       </div>
     );
