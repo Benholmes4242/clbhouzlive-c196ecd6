@@ -351,7 +351,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
           ⚡
         </div>
         <div style={{
-          fontSize: 13, lineHeight: 1.45, color: 'rgba(255,255,255,0.72)',
+          fontSize: 14, lineHeight: 1.45, color: 'rgba(255,255,255,0.72)',
           fontStyle: 'italic' as const,
         }}>
           {insight}
