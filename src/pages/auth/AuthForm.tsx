@@ -554,7 +554,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
       )}
 
       {/* Hero entry screen — inert when a sheet is open (A40 focus trap) */}
-      <div inert={isSheetOpen ? true : undefined}>
+      <div {...(isSheetOpen ? { inert: '' } : {})} style={isSheetOpen ? { pointerEvents: 'none' as const } : undefined}>
         <AuthHeroScreen
           onAppleSignIn={handleAppleSignIn}
           onGoogleSignIn={handleGoogleSignIn}
