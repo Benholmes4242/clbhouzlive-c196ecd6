@@ -194,11 +194,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   )}
                 </span>
               ) : (
-                <img
-                  src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
-                  alt="clbhouz"
-                  className="object-contain h-9 w-9"
-                />
+                <span className="text-foreground font-bold text-sm">LOGO TEST</span>
               )}
             </button>
           </div>
