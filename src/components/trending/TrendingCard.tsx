@@ -163,23 +163,42 @@ const TrendingCard = () => {
                       });
                     }
                     
-                    // Also remove common golf course patterns
+                    // Remove golf course patterns but keep @mentions
                     filteredContent = filteredContent
                       .replace(/\s*Played at[^.]*\.?\s*/gi, '')
-                      .replace(/\s*@\s*[^#\s]*\s*/g, '')
                       .replace(/\s+/g, ' ')
                       .trim();
+
+                    // Build mentionable tags for PostContentWithTags
+                    const mentionTags = (post.post_tags || [])
+                      .filter((tag: any) => {
+                        const entityType = tag.taggable_entities?.entity_type || tag.entity_type;
+                        return entityType === 'user' || entityType === 'business';
+                      })
+                      .map((tag: any) => ({
+                        id: tag.id,
+                        entity_type: tag.taggable_entities?.entity_type || tag.entity_type,
+                        entity_id: tag.taggable_entities?.entity_id || tag.entity_id,
+                        name: tag.taggable_entities?.name || tag.name || 'Unknown',
+                        username: tag.taggable_entities?.username || tag.username || null,
+                        start_index: tag.start_index ?? 0,
+                        end_index: tag.end_index ?? 0,
+                      }));
                     
                     return filteredContent ? (
                       <>
                         {/* Default truncated text */}
-                        <p className="text-white/90 text-sm mt-1 line-clamp-2 group-hover:hidden">
-                          {filteredContent}
-                        </p>
+                        <PostContentWithTags
+                          content={filteredContent}
+                          tags={mentionTags}
+                          className="text-white/90 text-sm mt-1 line-clamp-2 group-hover:hidden"
+                        />
                         {/* Full text on hover (desktop only) */}
-                        <p className="text-white/90 text-sm mt-1 hidden group-hover:block md:group-hover:block">
-                          {filteredContent}
-                        </p>
+                        <PostContentWithTags
+                          content={filteredContent}
+                          tags={mentionTags}
+                          className="text-white/90 text-sm mt-1 hidden group-hover:block md:group-hover:block"
+                        />
                       </>
                     ) : null;
                   })()}
