@@ -363,7 +363,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
 
               <div style={{ textAlign: 'right' }}>
                 <span style={{
-                  fontSize: 32, fontWeight: 800,
+                  fontSize: 'clamp(30px, 8vw, 36px)', fontWeight: 800,
                   color: scoreColor(leader.scoreDisplay),
                   fontVariantNumeric: 'tabular-nums',
                 }}>
