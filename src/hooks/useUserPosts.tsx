@@ -133,7 +133,9 @@ export const useUserPosts = () => {
           entity_type: tag.taggable_entities?.entity_type || 'user',
           entity_id: tag.taggable_entities?.entity_id || tag.tagged_entity_id,
           name: tag.taggable_entities?.name || 'Unknown',
-          username: tag.taggable_entities?.username || null
+          username: tag.taggable_entities?.username || null,
+          start_index: tag.start_index ?? 0,
+          end_index: tag.end_index ?? 0,
         })) || [];
         
         return {
