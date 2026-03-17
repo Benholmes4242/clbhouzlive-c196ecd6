@@ -2,8 +2,6 @@ import { useState, useEffect, useRef, useMemo, useLayoutEffect, useCallback } fr
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useExplorationLeaderboard, useUserExplorationStatus } from '@/hooks/leaderboards';
-import { useSeasonCalendar } from '@/hooks/championship';
-import { getSeasonConfig, type SeasonId } from '@/lib/seasonConfig';
 import { supabase } from '@/integrations/supabase/client';
 
 import { cn } from '@/lib/utils';
@@ -90,18 +88,9 @@ export function ExplorationTab() {
   const navigate = useNavigate();
   const savedFilters = useRef(loadSavedFilters()).current;
 
-  // Season color derivation
-  const { data: seasonCalendar } = useSeasonCalendar();
-  const seasonThemeColor = useMemo(() => {
-    const currentSeason = seasonCalendar?.find(s => s.is_current);
-    if (!currentSeason) return 'hsl(var(--accent-amber))';
-    const lower = currentSeason.name.toLowerCase();
-    let id: SeasonId = 'major';
-    if (lower.includes('pre-season') || lower.includes('preseason') || lower.includes('training')) id = 'preseason';
-    else if (lower.includes('summer')) id = 'summer';
-    else if (lower.includes('off-season') || lower.includes('offseason')) id = 'offseason';
-    return getSeasonConfig(id).themeColor;
-  }, [seasonCalendar]);
+  // Globe played dots always use amber per design system (not season-themed)
+  // Globe played dots always use amber per design system (not season-themed)
+  const seasonThemeColor = '#f59e0b';
 
   const [scope, setScope] = useState<LeaderboardScope>(() => savedFilters?.scope ?? 'global');
   const [metric, setMetric] = useState<ExplorationMetric>(() => savedFilters?.metric ?? 'countries');

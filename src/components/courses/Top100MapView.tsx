@@ -15,8 +15,6 @@ import { cn } from '@/lib/utils';
 import { MapCourseSheet, MapProgressOrb } from './map';
 import { MAP_CONFIG, applyClbhouzMapStyle } from '@/config/maps';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
-import { useSeasonCalendar } from '@/hooks/championship';
-import { getSeasonConfig, type SeasonId } from '@/lib/seasonConfig';
 
 type StatusFilter = 'all' | 'played' | 'want_to_play' | 'not_played';
 
@@ -85,18 +83,8 @@ const Top100MapView: React.FC<Top100MapViewProps> = ({
   const [hasInitialFit, setHasInitialFit] = useState(false);
   const [mapLoaded, setMapLoaded] = useState(false);
 
-  // Dynamic season color
-  const { data: seasonCalendar } = useSeasonCalendar();
-  const seasonColor = useMemo(() => {
-    const activeSeason = seasonCalendar?.find(s => s.is_current);
-    if (!activeSeason?.name) return '#f59e0b'; // amber-400 hex — Mapbox compatible
-    const lower = activeSeason.name.toLowerCase();
-    let id: SeasonId = 'preseason';
-    if (lower.includes('major')) id = 'major';
-    else if (lower.includes('summer')) id = 'summer';
-    else if (lower.includes('off-season') || lower.includes('offseason')) id = 'offseason';
-    return getSeasonConfig(id).themeColor;
-  }, [seasonCalendar]);
+  // Played markers always use amber per design system (not season-themed)
+  const seasonColor = '#f59e0b';
 
   const {
     data: courses = [],
