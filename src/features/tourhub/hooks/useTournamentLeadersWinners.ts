@@ -83,7 +83,8 @@ export function useTournamentLeadersWinners(tournamentIds: string[]) {
             full_name,
             headshot_override,
             photo_url,
-            pga_tour_id
+            pga_tour_id,
+            tour_codes
           )
         `)
         // NOTE: photo_url is NOT used for display. All player headshots are served from R2
