@@ -4,6 +4,7 @@
  */
 
 import { memo, useRef, useState, useEffect, useCallback, useMemo } from 'react';
+import { removeGolfCourseFromContent, extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Heart, MoreHorizontal, SendHorizontal, ChevronRight } from 'lucide-react';
