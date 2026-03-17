@@ -188,7 +188,7 @@ function VideoToolSheet({ item, onEdit, onTrim, onCover, onClose }: VideoToolShe
         </div>
 
         {/* Video thumbnail preview */}
-        <div className="mx-4 mb-5 overflow-hidden" style={{ borderRadius: 14, aspectRatio: '16/9' }}>
+        <div className="mx-4 mb-5 overflow-hidden" style={{ borderRadius: 14, aspectRatio: item.height && item.width && item.height > item.width ? '4/5' : '16/9' }}>
           <video
             src={item.previewUrl}
             autoPlay
