@@ -998,7 +998,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
 
   // Auto-advance every 8 seconds (spec: 8s idle, 5s resume after touch)
   useEffect(() => {
-    if (slides.length <= 1 || isPaused || isExpanded) return;
+    if (!slides || slides.length <= 1 || isPaused || isExpanded) return;
     
     const interval = setInterval(() => {
       setCurrentIndex(prev => (prev + 1) % slides.length);
