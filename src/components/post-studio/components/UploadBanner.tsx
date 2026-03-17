@@ -59,8 +59,8 @@ export function UploadBanner() {
     <div style={cardStyle}>
       <div style={iconWrapStyle}>
         {isComplete
-          ? <span style={{ fontSize: 18, color: '#22c55e' }}>✓</span>
-          : <Upload className="w-5 h-5" style={{ color: AMBER }} />}
+          ? <span style={{ fontSize: 18, color: WHITE_90 }}>✓</span>
+          : <Upload className="w-5 h-5" style={{ color: WHITE_90 }} />}
       </div>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
