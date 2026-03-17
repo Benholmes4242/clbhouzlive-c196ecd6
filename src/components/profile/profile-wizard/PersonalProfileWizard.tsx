@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -7,6 +7,7 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileForm } from '@/hooks/useProfileForm';
 import { useProfileSave } from '@/hooks/useProfileSave';
+import { supabase } from '@/integrations/supabase/client';
 import { WizardHeader } from './WizardHeader';
 import { WizardProgress } from './WizardProgress';
 import { WizardNavigation } from './WizardNavigation';
