@@ -884,7 +884,10 @@ export const VideoPlayerModal: React.FC = () => {
                           !showFullDescription && "line-clamp-2"
                         )}
                       >
-                        {videoData.description}
+                        <PostContentWithTags
+                          content={videoData.description}
+                          tags={videoData.tags || []}
+                        />
                       </div>
                       {videoData.description.length > 100 && (
                         <button
