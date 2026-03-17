@@ -35,7 +35,7 @@ const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange,
       <div
         role="tablist"
         aria-label="Watch filters"
-        className="flex gap-2 overflow-x-auto px-4 pb-3 scrollbar-hide"
+        className="flex justify-center gap-2 overflow-x-auto px-4 pb-3 scrollbar-hide"
       >
         {FILTERS.map(({ key, label, icon }) => {
           const isActive = activeFilter === key;
