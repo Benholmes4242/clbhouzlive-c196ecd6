@@ -506,13 +506,13 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
             ))}
             {meta.stat_driving_distance != null && (
               <div style={{
-                flex: 1, textAlign: 'center' as const, padding: '4px 0',
+                flex: 1, textAlign: 'center' as const, padding: '6px 0',
                 borderRadius: 8, background: 'rgba(255,255,255,0.03)',
               }}>
-                <div style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>
-                  {meta.stat_driving_distance}<span style={{ fontSize: 10, fontWeight: 500 }}>yds</span>
+                <div style={{ fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>
+                  {meta.stat_driving_distance}<span style={{ fontSize: 11, fontWeight: 500 }}>yds</span>
                 </div>
-                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: 0.5, marginTop: 1 }}>Driver</div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: 0.5, marginTop: 1 }}>Driver</div>
               </div>
             )}
           </div>
