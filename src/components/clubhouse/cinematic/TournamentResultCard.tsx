@@ -418,8 +418,8 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
             return (
               <div key={`${row.position}-${idx}`} style={{
-                display: 'flex', alignItems: 'center', gap: 10,
-                padding: '7px 0',
+                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '9px 0',
                 borderBottom: '1px solid rgba(255,255,255,0.03)',
                 animation: 'trc-slideIn 0.5s ease-out both',
                 animationDelay: `${0.65 + idx * 0.08}s`,
