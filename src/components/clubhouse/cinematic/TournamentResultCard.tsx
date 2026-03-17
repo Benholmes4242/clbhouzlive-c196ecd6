@@ -306,7 +306,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' as const }}>
             <div style={{
-              fontSize: 'clamp(20px, 5.5vw, 26px)', fontWeight: 800,
+              fontSize: 'clamp(22px, 6vw, 28px)', fontWeight: 800,
               color: '#fff', lineHeight: 1.1, letterSpacing: -0.5,
             }}>
               {meta.winner_name}
