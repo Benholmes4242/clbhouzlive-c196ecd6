@@ -56,7 +56,10 @@ export function MentionPanel() {
   }, [query]);
 
   const handleSelect = useCallback((entity: TaggableResult) => {
-    const displayName = `@${entity.name}`;
+    const displayName = '@' + entity.name
+      .split(' ')
+      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join('');
     const triggerIndex = state.mentionTriggerIndex >= 0
       ? state.mentionTriggerIndex
       : state.caption.length;

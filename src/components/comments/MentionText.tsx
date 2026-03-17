@@ -28,7 +28,7 @@ interface TextPart {
  */
 function parseTextWithMentions(text: string): TextPart[] {
   const parts: TextPart[] = [];
-  const mentionRegex = /@(\w+)/g;
+  const mentionRegex = /@([\w]+(?:\s[\w]+)*)/g;
   let lastIndex = 0;
   let match;
 
