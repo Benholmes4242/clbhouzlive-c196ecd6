@@ -176,20 +176,34 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
         {/* Course tag */}
         {courseName && (
           <div className="px-3 pb-2">
-            {courseId ? (
-              <button
-                onClick={() => navigate(`/courses/${courseId}`)}
-                className="flex items-center gap-1 hover:underline"
-              >
-                <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground truncate">{courseName}</span>
-              </button>
-            ) : (
-              <div className="flex items-center gap-1">
-                <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground truncate">{courseName}</span>
-              </div>
-            )}
+            <button
+              onClick={async (e) => {
+                e.stopPropagation();
+                if (courseId) {
+                  navigate(`/courses/${courseId}`);
+                } else if (courseName) {
+                  try {
+                    const { data } = await supabase
+                      .from('golf_courses')
+                      .select('id')
+                      .ilike('name', courseName.trim())
+                      .limit(1)
+                      .single();
+                    if (data?.id) {
+                      navigate(`/courses/${data.id}`);
+                    } else {
+                      navigate(`/courses?search=${encodeURIComponent(courseName)}`);
+                    }
+                  } catch {
+                    navigate(`/courses?search=${encodeURIComponent(courseName)}`);
+                  }
+                }
+              }}
+              className="flex items-center gap-1 hover:underline"
+            >
+              <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground truncate">{courseName}</span>
+            </button>
           </div>
         )}
 
