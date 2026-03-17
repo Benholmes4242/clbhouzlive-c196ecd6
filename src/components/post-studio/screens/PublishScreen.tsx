@@ -28,6 +28,16 @@ export function PublishScreen() {
       if (!user) { toast.error('You need to be logged in'); setIsPublishing(false); return; }
 
       const files = state.mediaItems.map((m) => m.file).filter((f): f is File => !!f);
+      const selectedTags = state.mentions.map((m) => ({
+        id: m.entityId,
+        entity_id: m.entityId,
+        entity_type: m.entityType,
+        name: m.displayName,
+        username: m.displayName,
+        start_index: m.start,
+        end_index: m.end,
+      }));
+
       const input: UploadJobInput = {
         actorType: state.actorType,
         actorId: state.actorId ?? user.id,
@@ -50,6 +60,7 @@ export function PublishScreen() {
         courseInfo: state.taggedCourses[0]
           ? { id: state.taggedCourses[0].courseId, name: state.taggedCourses[0].courseName, country: state.taggedCourses[0].country ?? '' }
           : null,
+        selectedTags,
         visibility: state.visibility,
         scheduledAt: state.scheduledAt,
       };
