@@ -393,8 +393,8 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
           {/* Winner row */}
           <div style={{
-            display: 'flex', alignItems: 'center', gap: 10,
-            padding: '8px 0',
+            display: 'flex', alignItems: 'center', gap: 12,
+            padding: '10px 0',
             borderBottom: podiumRows.length > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none',
             background: `${tour.accentColor}08`,
             animation: 'trc-slideIn 0.5s ease-out both',
