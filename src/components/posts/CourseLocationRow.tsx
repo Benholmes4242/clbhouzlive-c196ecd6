@@ -126,9 +126,10 @@ const CourseLocationRow: React.FC<CourseLocationRowProps> = ({
         className
       )}
     >
-      <MapPinned 
+      <FiMapPin 
+        size={16}
         className={cn(
-          "h-4 w-4 flex-shrink-0 mt-0.5",
+          "flex-shrink-0 mt-0.5",
           isDark ? "text-white/60" : "text-muted-foreground"
         )} 
       />
