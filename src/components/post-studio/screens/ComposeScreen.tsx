@@ -631,7 +631,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   return (
     <div className="flex-1 flex flex-col" style={{ background: BG_BASE }}>
       <StudioHeader
-        title="New Moment"
+        centerContent={<ActorSelector compact header />}
         step="COMPOSE"
         leftAction={onClose ? { label: '', onClick: onClose, icon: 'close' as const } : undefined}
         rightAction={
