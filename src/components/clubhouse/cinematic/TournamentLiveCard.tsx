@@ -322,7 +322,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                 }}>
                   {leader.playerName}
                 </div>
-                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
+                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginTop: 3 }}>
                   {isTiedFirst ? `Tied for the lead (${coLeaders.length}-way)` : 'Leads the field'}
                 </div>
                 {isTiedFirst && (
