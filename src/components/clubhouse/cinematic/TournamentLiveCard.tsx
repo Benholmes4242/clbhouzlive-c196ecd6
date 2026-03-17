@@ -576,16 +576,20 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           {/* Centre CTA — shorter */}
           <button onClick={onComment} style={{
             flex: 1,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-            background: 'linear-gradient(135deg, rgba(249,115,22,0.22), rgba(234,88,12,0.15))',
-            border: '1px solid rgba(249,115,22,0.35)', borderRadius: 22, padding: '8px 10px',
-            color: '#FB923C', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            background: 'linear-gradient(180deg, rgba(232,152,10,0.60) 0%, rgba(199,135,10,0.45) 50%, rgba(180,120,8,0.50) 100%)',
+            border: '1px solid rgba(232,152,10,0.50)',
+            borderTop: '1px solid rgba(255,210,130,0.30)',
+            borderRadius: 22, padding: '10px 10px',
+            color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer',
             minWidth: 0,
+            boxShadow: '0 2px 12px rgba(232,152,10,0.3), inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -1px 0 rgba(0,0,0,0.15)',
+            textShadow: '0 1px 2px rgba(0,0,0,0.3)',
           }}>
-            <span style={{ fontSize: 14, flexShrink: 0 }}>💬</span>
+            <span style={{ fontSize: 15, flexShrink: 0 }}>💬</span>
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Who wins?</span>
             {commentCount > 0 && (
-              <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(251,146,60,0.6)', flexShrink: 0 }}>{commentCount}</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.7)', flexShrink: 0 }}>{commentCount}</span>
             )}
           </button>
 
