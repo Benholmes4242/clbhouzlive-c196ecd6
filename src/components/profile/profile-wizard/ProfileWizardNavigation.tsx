@@ -40,7 +40,7 @@ export function ProfileWizardNavigation({
         <Button
           onClick={isFinalStep ? onSubmit : onNext}
           disabled={!canProceed || isSubmitting}
-          className="flex-1 min-h-[50px] rounded-xl text-[15px] font-semibold bg-[#f59e0b] hover:bg-[#e8920f] text-white border-0"
+          className="flex-1 min-h-[50px] rounded-xl text-[15px] font-semibold bg-foreground hover:bg-foreground/90 text-background border-0"
         >
           {isSubmitting ? (
             <><Loader2 size={18} className="animate-spin mr-2" /> Saving…</>
