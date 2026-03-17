@@ -41,6 +41,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
   isLast = false,
   isBestCall = false,
   leaderScore,
+  tourSlug,
 }) => {
   const isCut = prediction.performanceStatus === 'cut';
   const isWD = prediction.performanceStatus === 'withdrawn';
