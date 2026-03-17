@@ -596,8 +596,8 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           {/* Leaderboard link */}
           <button onClick={handleWatchLive} style={{
             background: 'transparent', border: 'none',
-            color: '#F59E0B', fontSize: 12, fontWeight: 700,
-            whiteSpace: 'nowrap', cursor: 'pointer', padding: '8px 4px',
+            color: '#F59E0B', fontSize: 13, fontWeight: 700,
+            whiteSpace: 'nowrap', cursor: 'pointer', padding: '10px 4px',
             flexShrink: 0,
           }}>
             Leaderboard →
