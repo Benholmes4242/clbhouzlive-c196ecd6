@@ -114,6 +114,7 @@ export function PersonalProfileWizard() {
           isFirstStep={step === 1}
           onBack={goBack}
           onClose={handleClose}
+          onSkip={isNewUser.current ? handleSkip : undefined}
         />
         <WizardProgress step={step} />
 
