@@ -146,7 +146,7 @@ export default function StudioPanelEdit({ edits, updateEdits, mediaType, mediaUr
               onClick={handleRotate}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors"
               style={rotation > 0 ? {
-                background: '#E8980A',
+                background: 'rgba(255,255,255,0.90)',
                 color: '#FFFFFF',
                 border: '1px solid transparent',
               } : {
