@@ -3,6 +3,7 @@
 // Dark. Minimal. Golf-native.
 
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Camera, Layers, BookOpen, AtSign, X, Pencil, Play, Plus, Scissors, Image as ImageIcon,
 } from 'lucide-react';
@@ -815,10 +816,10 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       <div
         className="shrink-0 flex items-center px-4"
         style={{
-          height: 52,
+          minHeight: 52,
           borderTop: '1px solid rgba(255,255,255,0.07)',
           background: 'rgba(8,8,8,0.98)',
-          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)',
         }}
       >
         {/* Actor avatar — compact profile switcher */}
@@ -891,46 +892,52 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         </div>
       </div>
 
-      {/* Video tool picker sheet */}
-      {videoToolSheetIndex !== null && state.mediaItems[videoToolSheetIndex] && (
-        <VideoToolSheet
-          item={state.mediaItems[videoToolSheetIndex]}
-          onEdit={() => {
-            setVideoToolSheetIndex(null);
-            setActiveTool(null);
-            setShelfOpen(true);
-          }}
-          onTrim={() => {
-            setVideoToolSheetIndex(null);
-            setStep('TRIM');
-          }}
-          onCover={() => {
-            setVideoToolSheetIndex(null);
-            setStep('POSTER');
-          }}
-          onClose={() => setVideoToolSheetIndex(null)}
-        />
-      )}
-
-      {/* Overflow sheet — hidden items beyond tile 4 */}
-      {overflowSheetOpen && (
-        <OverflowSheet
-          items={state.mediaItems.slice(3)}
-          startIndex={3}
-          onEdit={(index) => {
-            setActiveMedia(index);
-            const item = state.mediaItems[index];
-            if (!item) return;
-            if (item.mediaType === 'video') {
-              setVideoToolSheetIndex(index);
-            } else {
+      {/* Video tool picker sheet — rendered via portal to escape parent transform */}
+      {videoToolSheetIndex !== null && state.mediaItems[videoToolSheetIndex] &&
+        createPortal(
+          <VideoToolSheet
+            item={state.mediaItems[videoToolSheetIndex]}
+            onEdit={() => {
+              setVideoToolSheetIndex(null);
               setActiveTool(null);
               setShelfOpen(true);
-            }
-          }}
-          onClose={() => setOverflowSheetOpen(false)}
-        />
-      )}
+            }}
+            onTrim={() => {
+              setVideoToolSheetIndex(null);
+              setStep('TRIM');
+            }}
+            onCover={() => {
+              setVideoToolSheetIndex(null);
+              setStep('POSTER');
+            }}
+            onClose={() => setVideoToolSheetIndex(null)}
+          />,
+          document.body
+        )
+      }
+
+      {/* Overflow sheet — rendered via portal to escape parent transform */}
+      {overflowSheetOpen &&
+        createPortal(
+          <OverflowSheet
+            items={state.mediaItems.slice(3)}
+            startIndex={3}
+            onEdit={(index) => {
+              setActiveMedia(index);
+              const item = state.mediaItems[index];
+              if (!item) return;
+              if (item.mediaType === 'video') {
+                setVideoToolSheetIndex(index);
+              } else {
+                setActiveTool(null);
+                setShelfOpen(true);
+              }
+            }}
+            onClose={() => setOverflowSheetOpen(false)}
+          />,
+          document.body
+        )
+      }
 
       {/* Studio Shelf */}
       {activeItem && (
