@@ -1,6 +1,7 @@
 import { useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { safeLocalStorage } from '@/utils/safeLocalStorage';
 
 const MAX_SESSION_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 const SESSION_CHECK_INTERVAL = 60 * 60 * 1000; // Check every hour
@@ -17,17 +18,16 @@ export function useSessionTimeout() {
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
-      localStorage.removeItem(SESSION_START_KEY);
+      safeLocalStorage.remove(SESSION_START_KEY);
       return;
     }
 
     // Get or set session start time
-    let sessionStartTime = localStorage.getItem(SESSION_START_KEY);
+    let sessionStartTime = safeLocalStorage.get(SESSION_START_KEY);
     
     if (!sessionStartTime) {
-      // First time seeing this session - record start time
       sessionStartTime = Date.now().toString();
-      localStorage.setItem(SESSION_START_KEY, sessionStartTime);
+      safeLocalStorage.set(SESSION_START_KEY, sessionStartTime);
     }
 
     const sessionAge = Date.now() - parseInt(sessionStartTime, 10);
@@ -35,10 +35,10 @@ export function useSessionTimeout() {
     // If session is older than 30 days, force re-authentication
     if (sessionAge > MAX_SESSION_AGE_MS) {
       console.log('[Auth] Session expired after 30 days, signing out');
-      localStorage.removeItem(SESSION_START_KEY);
+      safeLocalStorage.remove(SESSION_START_KEY);
       
       // Store reason for logout
-      localStorage.setItem('logout_reason', 'session_expired');
+      safeLocalStorage.set('logout_reason', 'session_expired');
       
       await supabase.auth.signOut();
       navigate('/auth');
@@ -55,10 +55,9 @@ export function useSessionTimeout() {
     // Listen for sign out to clean up
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_OUT') {
-        localStorage.removeItem(SESSION_START_KEY);
+        safeLocalStorage.remove(SESSION_START_KEY);
       } else if (event === 'SIGNED_IN') {
-        // New sign in - reset session start time
-        localStorage.setItem(SESSION_START_KEY, Date.now().toString());
+        safeLocalStorage.set(SESSION_START_KEY, Date.now().toString());
       }
     });
 

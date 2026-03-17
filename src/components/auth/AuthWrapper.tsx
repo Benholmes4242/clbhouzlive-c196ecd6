@@ -3,6 +3,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useLocation, Navigate } from 'react-router-dom';
 import { logOrangeLoaderShow, logOrangeLoaderHide } from '@/utils/bootTimeline';
 import { useSessionTimeout } from '@/hooks/useSessionTimeout';
+import { useOnboardingStatus } from '@/hooks/useOnboardingStatus';
+
 interface AuthWrapperProps {
   children: React.ReactNode;
 }
@@ -13,7 +15,9 @@ interface AuthWrapperProps {
  * IMPORTANT: This component NEVER blocks UI with a loading screen.
  * Session resolves in the background while the app renders immediately.
  * 
- * Protected routes should handle their own loading states if needed.
+ * Enforces:
+ * 1. Authentication — unauthenticated users redirected to /auth
+ * 2. Onboarding — users who haven't completed profile setup redirected to /edit-profile
  */
 const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   const { user, loading } = useSupabaseSession();
@@ -22,6 +26,9 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
 
   // FIX 6: Enforce 30-day session timeout
   useSessionTimeout();
+
+  // FIX I2: Check onboarding status for authenticated users
+  const { data: onboardingData } = useOnboardingStatus(user?.id);
 
   // Track orange loader show/hide for boot timeline (audit only, no UI shown)
   useEffect(() => {
@@ -38,11 +45,13 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
 
   // Only redirect after session is fully resolved
   if (!loading) {
-    // If user is not authenticated and not on an auth page, redirect to auth
+    // Auth pages and onboarding-exempt routes
     const isAuthPage = location.pathname === '/auth' 
       || location.pathname === '/auth/verified' 
       || location.pathname === '/auth/callback'
       || location.pathname === '/auth/reset-password';
+
+    // If user is not authenticated and not on an auth page, redirect to auth
     if (!user && !isAuthPage) {
       return <Navigate to="/auth" replace />;
     }
@@ -52,7 +61,21 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
       return <Navigate to="/" replace />;
     }
 
-    // No verification gate — users enter immediately
+    // FIX I2: Onboarding gate — must come AFTER auth check
+    // Skip for auth pages and edit-profile itself (avoid redirect loop)
+    const isOnboardingExempt =
+      isAuthPage ||
+      location.pathname === '/edit-profile' ||
+      location.pathname === '/onboarding/account-type';
+
+    if (
+      user &&
+      !isOnboardingExempt &&
+      onboardingData !== undefined &&
+      !onboardingData.hasCompletedOnboarding
+    ) {
+      return <Navigate to="/edit-profile" replace />;
+    }
   }
 
   // Always render children - no blocking loader

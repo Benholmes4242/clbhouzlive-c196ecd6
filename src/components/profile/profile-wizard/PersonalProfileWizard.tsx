@@ -95,8 +95,10 @@ export function PersonalProfileWizard() {
       .from('user_profiles')
       .update({ has_completed_onboarding: true })
       .eq('id', user.id);
+    // FIX I5: Invalidate onboarding cache so AuthWrapper doesn't re-route
+    queryClient.invalidateQueries({ queryKey: ['onboarding-status', user.id] });
     navigate('/', { replace: true });
-  }, [user, navigate]);
+  }, [user, navigate, queryClient]);
 
   const handleSave = useCallback(async () => {
     if (step < 3) { goNext(); return; }
