@@ -82,22 +82,6 @@ const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
         WebkitBackdropFilter: 'blur(24px)',
       }}
     >
-      {/* Drag handle */}
-      <div className="flex justify-center pt-3 pb-1">
-        <div className="w-9 h-1 rounded-full bg-white/20" />
-      </div>
-
-      {/* Title */}
-      <div className="px-4 pt-2 pb-3 border-b border-white/[0.06]">
-        <h2 className="text-[16px] font-semibold text-white text-center">Post Options</h2>
-      </div>
-
-      {/* Content moderation notice */}
-      <div className="mx-4 mt-4 mb-2 px-4 py-3 rounded-xl bg-white/[0.06] border border-white/[0.08]">
-        <p className="text-[12px] text-white/40 text-center leading-relaxed">
-          Content moderation coming soon
-        </p>
-      </div>
 
       {/* Actions */}
       <div className="p-4 space-y-1">
