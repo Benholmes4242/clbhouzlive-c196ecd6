@@ -25,7 +25,7 @@ interface TextPart {
 
 /**
  * Parse text into regular text and mention parts.
- * Regex matches slug-safe \w-only usernames (e.g. @danny_holmes).
+ * Matches @PascalCase (new) and @First Last (legacy space-separated) mentions.
  */
 function parseTextWithMentions(text: string): TextPart[] {
   const parts: TextPart[] = [];
