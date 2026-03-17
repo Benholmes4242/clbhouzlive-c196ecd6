@@ -21,8 +21,6 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [showConfirmNotice, setShowConfirmNotice] = useState(false);
-  const [resending, setResending] = useState(false);
   const [resendMsg, setResendMsg] = useState<string | null>(null);
   const [authNotice, setAuthNotice] = useState<AuthNotice>(null);
   const { user } = useSupabaseSession();
