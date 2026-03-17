@@ -237,8 +237,12 @@ function AppRoutes() {
   // Individual page hooks then opt-in to their own color (e.g. PageRoot → #F8FAFC).
   // This prevents stale shield colors when navigating back to immersive/KeepAlive pages.
   useLayoutEffect(() => {
+    // Reset shield
     const shield = document.getElementById('safe-area-shield');
     if (shield) shield.style.backgroundColor = 'transparent';
+    // Reset html/body to prevent stale grey bleeding through WebView compositing
+    document.documentElement.style.backgroundColor = 'transparent';
+    document.body.style.backgroundColor = 'transparent';
   }, [location.pathname]);
   
   // Render origin page when we have a background location
