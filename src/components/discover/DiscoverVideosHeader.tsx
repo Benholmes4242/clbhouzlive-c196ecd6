@@ -76,7 +76,7 @@ const DiscoverVideosHeader: React.FC<DiscoverVideosHeaderProps> = ({
         </button>
 
         {/* Scrollable filter chips - light theme */}
-        <div className="no-scrollbar flex gap-1.5 overflow-x-auto flex-1">
+        <div className="no-scrollbar flex gap-1.5 overflow-x-auto flex-1 justify-center">
           {allPills.map((pill) => {
             const isActive = 
               (pill.type === 'duration' && activeDuration === pill.key) ||
