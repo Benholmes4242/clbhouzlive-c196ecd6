@@ -410,7 +410,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           touchAction: 'none',
         }}>
           {/* Round scores row */}
-          <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
+          <div style={{ display: 'flex', gap: 5, marginBottom: 5 }}>
             {meta.leaderStats.rounds.map((score, i) => (
               <RoundChip key={i} round={i + 1} score={score} />
             ))}
