@@ -690,19 +690,26 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.18 }}
-                whileTap={{ scale: 0.97 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => openPanel('course')}
-                className="flex items-center gap-2.5 w-full py-2"
+                className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl"
+                style={{
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.09)',
+                }}
               >
                 <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.10)' }}
+                  className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                  style={{ background: 'rgba(255,255,255,0.08)' }}
                 >
-                  <span className="text-sm">⛳</span>
+                  <span className="text-base">⛳</span>
                 </div>
-                <span className="text-[14px]" style={{ color: 'rgba(255,255,255,0.30)' }}>
+                <span className="flex-1 text-left text-[14px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
                   Where did you play?
                 </span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'rgba(255,255,255,0.20)', flexShrink: 0 }}>
+                  <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </motion.button>
             ) : (
               <motion.div
