@@ -3,8 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Upload } from 'lucide-react';
 import { useUploadProgress } from '@/hooks/useUploadProgress';
 
-const AMBER = '#F59E0B';
-const AMBER_DEEP = '#D97706';
+const WHITE_90 = 'rgba(255,255,255,0.90)';
+const WHITE_70 = 'rgba(255,255,255,0.70)';
 
 export function UploadBanner() {
   const { isUploading, uploadedCount, totalCount } = useUploadProgress();
@@ -36,8 +36,8 @@ export function UploadBanner() {
 
   const iconWrapStyle: React.CSSProperties = {
     width: 40, height: 40, borderRadius: 12, flexShrink: 0,
-    background: 'rgba(245,158,11,0.15)',
-    border: '1px solid rgba(245,158,11,0.25)',
+    background: 'rgba(255,255,255,0.08)',
+    border: '1px solid rgba(255,255,255,0.12)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
   };
 
@@ -45,7 +45,7 @@ export function UploadBanner() {
     return (
       <div style={cardStyle}>
         <div style={iconWrapStyle}>
-          <Upload className="w-5 h-5" style={{ color: AMBER }} />
+          <Upload className="w-5 h-5" style={{ color: WHITE_90 }} />
         </div>
         <div style={{ flex: 1 }}>
           <p style={{ color: 'rgba(255,255,255,0.92)', fontSize: 14, fontWeight: 500 }}>Queued</p>
@@ -59,8 +59,8 @@ export function UploadBanner() {
     <div style={cardStyle}>
       <div style={iconWrapStyle}>
         {isComplete
-          ? <span style={{ fontSize: 18, color: '#22c55e' }}>✓</span>
-          : <Upload className="w-5 h-5" style={{ color: AMBER }} />}
+          ? <span style={{ fontSize: 18, color: WHITE_90 }}>✓</span>
+          : <Upload className="w-5 h-5" style={{ color: WHITE_90 }} />}
       </div>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -74,7 +74,7 @@ export function UploadBanner() {
             height: '100%', borderRadius: 999,
             transition: 'all 500ms',
             width: `${progress}%`,
-            background: showGreen ? '#22c55e' : `linear-gradient(90deg, ${AMBER}, ${AMBER_DEEP})`,
+            background: showGreen ? 'rgba(255,255,255,0.90)' : `linear-gradient(90deg, ${WHITE_90}, ${WHITE_70})`,
           }} />
         </div>
       </div>
