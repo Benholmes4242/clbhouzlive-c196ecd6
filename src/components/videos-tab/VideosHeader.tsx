@@ -36,7 +36,7 @@ export function VideosHeader({
         </button>
       </div>
 
-      <div role="tablist" aria-label="Video filters" className="flex gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide">
+      <div role="tablist" aria-label="Video filters" className="flex justify-center gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide">
         {FILTERS.map(({ id, label }) => {
           const isActive = activeFilter === id;
           return (
