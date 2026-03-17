@@ -69,7 +69,12 @@ const OptimisticPostCard = ({ post, onRetry }: OptimisticPostCardProps) => {
 
         {/* Content */}
         {post.content && (
-          <p className="text-sm mb-3">{post.content}</p>
+          <div className="text-sm mb-3">
+            <PostContentWithTags
+              content={post.content}
+              tags={post.post_tags || []}
+            />
+          </div>
         )}
 
         {/* Media Preview */}
