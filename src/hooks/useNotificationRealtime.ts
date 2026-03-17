@@ -99,6 +99,29 @@ export function useNotificationRealtime() {
 function getToastAction(notification: RealtimeNotification) {
   const { entity_type, entity_id, data, type } = notification;
 
+  // Social notifications — navigate to the actor's profile
+  if ((type === 'follow' || type === 'friend_request' || type === 'friend_accept') && data?.follower_id) {
+    return {
+      label: 'View',
+      onClick: () => { appNavigate(`/profile/${data.follower_id}`); },
+    };
+  }
+
+  if ((type === 'friend_request' || type === 'friend_accept') && data?.requester_id) {
+    return {
+      label: 'View',
+      onClick: () => { appNavigate(`/profile/${data.requester_id}`); },
+    };
+  }
+
+  // Navigate to activity page for social notifications without specific actor data
+  if (type === 'follow' || type === 'friend_request' || type === 'friend_accept') {
+    return {
+      label: 'View',
+      onClick: () => { appNavigate('/activity'); },
+    };
+  }
+
   if (entity_type === 'post' && entity_id) {
     return {
       label: 'View',
