@@ -520,8 +520,8 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
         {/* CTA bar */}
         <div style={{
-          flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: 6,
-          padding: '10px 16px',
+          flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: 8,
+          padding: '12px 16px',
           paddingBottom: 'max(env(safe-area-inset-bottom, 10px), 10px)',
           borderTop: '1px solid rgba(255,255,255,0.06)',
         }}>
