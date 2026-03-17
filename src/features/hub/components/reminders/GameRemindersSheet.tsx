@@ -94,7 +94,7 @@ export function GameRemindersSheet({ isOpen, onClose, gameId }: GameRemindersShe
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
-            className="fixed bottom-0 z-[10000] w-full max-w-[480px] left-1/2 -translate-x-1/2 rounded-t-[20px] overflow-hidden"
+            className="fixed bottom-0 inset-x-0 mx-auto z-[10000] w-full max-w-[480px] rounded-t-[20px] overflow-hidden"
             style={{
               backgroundColor: 'hsl(var(--background))',
               boxShadow: '0 -4px 24px rgba(0, 0, 0, 0.12)',
