@@ -277,7 +277,7 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
         )}
         
         {username.length > 0 && username.length < 3 && (
-          <p className="text-[#E03131] text-[13px] mt-2">
+          <p role="alert" className="text-[#E03131] text-[13px] mt-2">
             Username must be at least 3 characters
           </p>
         )}
