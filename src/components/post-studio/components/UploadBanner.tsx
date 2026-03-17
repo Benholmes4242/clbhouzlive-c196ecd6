@@ -74,7 +74,7 @@ export function UploadBanner() {
             height: '100%', borderRadius: 999,
             transition: 'all 500ms',
             width: `${progress}%`,
-            background: showGreen ? '#22c55e' : `linear-gradient(90deg, ${AMBER}, ${AMBER_DEEP})`,
+            background: showGreen ? 'rgba(255,255,255,0.90)' : `linear-gradient(90deg, ${WHITE_90}, ${WHITE_70})`,
           }} />
         </div>
       </div>

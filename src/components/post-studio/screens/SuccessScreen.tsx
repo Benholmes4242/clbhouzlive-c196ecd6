@@ -61,7 +61,7 @@ export function SuccessScreen({ onDone }: SuccessScreenProps) {
 
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.5, ease: [0.22, 1, 0.36, 1] }} className="text-center space-y-2 relative z-10">
         <p className="text-[11px] font-semibold uppercase tracking-[2px]" style={{ color: 'rgba(255,255,255,0.40)' }}>Post queued</p>
-        <h2 className="text-[28px] font-bold text-white" style={{ letterSpacing: '-0.03em' }}>You're live on the fairway</h2>
+        <h2 className="text-[28px] font-bold text-white" style={{ letterSpacing: '-0.03em' }}>You're in play</h2>
         <p className="text-sm leading-relaxed max-w-[260px] mx-auto" style={{ color: 'rgba(255,255,255,0.45)' }}>Uploading in the background. Keep playing – clbhouz has it from here.</p>
       </motion.div>
 
