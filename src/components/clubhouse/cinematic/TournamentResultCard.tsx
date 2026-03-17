@@ -483,8 +483,8 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
         {/* Stats strip */}
         {(meta.stat_birdies != null || meta.stat_eagles != null) && (
           <div style={{
-            flex: '0 0 auto', display: 'flex', gap: 2,
-            padding: '8px 16px',
+            flex: '0 0 auto', display: 'flex', gap: 3,
+            padding: '10px 16px',
             borderTop: '1px solid rgba(255,255,255,0.04)',
             overflowX: 'auto' as const,
             animation: 'trc-fadeIn 0.5s ease-out both',
