@@ -3,7 +3,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronUp, Check } from 'lucide-react';
+import { ChevronUp, ChevronDown, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { usePostStudioContext } from '../usePostStudio';
@@ -105,10 +105,13 @@ export function ActorSelector({ compact = false, header = false }: ActorSelector
           {/* Chevron badge — only when multiple profiles exist */}
           {(hasMultiple || header) && (
             <div
-              className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center"
+              className={`absolute w-4 h-4 rounded-full flex items-center justify-center ${header ? '-bottom-0.5 -right-0.5' : '-top-0.5 -right-0.5'}`}
               style={{ background: 'rgba(255,255,255,0.90)', boxShadow: '0 1px 4px rgba(0,0,0,0.40)' }}
             >
-              <ChevronUp className="w-2.5 h-2.5" style={{ color: '#0D0D0D' }} strokeWidth={3} />
+              {header
+                ? <ChevronDown className="w-2.5 h-2.5" style={{ color: '#0D0D0D' }} strokeWidth={3} />
+                : <ChevronUp className="w-2.5 h-2.5" style={{ color: '#0D0D0D' }} strokeWidth={3} />
+              }
             </div>
           )}
         </button>
