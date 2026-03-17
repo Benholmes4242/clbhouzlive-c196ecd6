@@ -123,8 +123,7 @@ export const useUserPosts = () => {
       const profiles = profilesResponse.data;
       const postMedia = mediaResponse.data;
 
-      // Tags temporarily disabled due to missing database tables
-      const postTags = [];
+      const postTags = tagsResponse.data || [];
 
       const formattedPosts = postsData.map(post => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);
