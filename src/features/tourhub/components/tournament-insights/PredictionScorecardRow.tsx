@@ -47,7 +47,7 @@ export const PredictionScorecardRow: React.FC<PredictionScorecardRowProps> = ({
   const isWD = prediction.performanceStatus === 'withdrawn';
   const isWinner = prediction.actualPosition === 1;
   const isLeader = !isCompleted && prediction.actualPosition === 1;
-  const avatarUrl = getPlayerHeadshotUrl(prediction.playerName, 'pga');
+  const avatarUrl = getPlayerHeadshotUrl(prediction.playerName, tourSlug ?? 'pga');
   const borderColor = getAccuracyBorderColor();
 
   const offLead = (prediction.score !== null && leaderScore !== null && leaderScore !== undefined)
