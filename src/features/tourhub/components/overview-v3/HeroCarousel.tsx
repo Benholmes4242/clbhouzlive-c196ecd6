@@ -972,7 +972,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   }, []);
 
   // Wire up top-3 podium data for completed slides
-  const completedIds = slides
+  const completedIds = (slides ?? [])
     .filter(s => s.type === 'completed')
     .map(s => s.tournament.id);
   const { data: leadersWinnersMap } = useTournamentLeadersWinners(completedIds);
