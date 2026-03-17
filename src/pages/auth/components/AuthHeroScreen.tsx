@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -31,6 +32,9 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
   onForgotPassword,
   submitting,
 }) => {
+  // Dark status bar + safe-area shield for Median.co wrapper
+  useMedianStatusBar('dark', '#0d0d0d', true, false);
+
   const [lastOAuthAttempt, setLastOAuthAttempt] = useState<number>(0);
   const [loginEmail, setLoginEmail] = useState('');
   const [emailError, setEmailError] = useState<string | null>(null);
