@@ -83,7 +83,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
       {reviewRating != null && reviewRating > 0 && (
         <div
           className="absolute top-1.5 right-1.5 z-10 rounded-full flex items-center gap-[3px]"
-          style={{ padding: '2px 6px', background: 'rgba(245,158,11,0.75)', backdropFilter: 'blur(8px)' }}
+          style={{ padding: '2px 6px', background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.1)' }}
         >
           <img
             src="/images/brand/clubhouz-mark-white.svg"
