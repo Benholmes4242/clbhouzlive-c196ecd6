@@ -88,8 +88,7 @@ export function ExplorationTab() {
   const navigate = useNavigate();
   const savedFilters = useRef(loadSavedFilters()).current;
 
-  // Season color derivation
-  const { data: seasonCalendar } = useSeasonCalendar();
+  // Globe played dots always use amber per design system (not season-themed)
   // Globe played dots always use amber per design system (not season-themed)
   const seasonThemeColor = '#f59e0b';
 
