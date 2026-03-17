@@ -3,7 +3,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronUp, Check } from 'lucide-react';
+import { ChevronUp, ChevronDown, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { usePostStudioContext } from '../usePostStudio';
