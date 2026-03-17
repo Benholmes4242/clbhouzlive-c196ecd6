@@ -189,10 +189,15 @@ function VideoToolSheet({ item, onEdit, onTrim, onCover, onClose }: VideoToolShe
 
         {/* Video thumbnail preview */}
         <div className="mx-4 mb-5 overflow-hidden" style={{ borderRadius: 14, aspectRatio: '16/9' }}>
-          <img
-            src={item.thumbnailUrl || item.previewUrl}
-            alt=""
+          <video
+            src={item.previewUrl}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
             className="w-full h-full object-cover"
+            style={{ pointerEvents: 'none' }}
           />
         </div>
 
@@ -290,11 +295,24 @@ function OverflowSheet({ items, startIndex, onEdit, onClose }: OverflowSheetProp
             return (
               <div key={item.id} className="relative shrink-0" style={{ width: 100 }}>
                 <div className="overflow-hidden" style={{ borderRadius: 12, aspectRatio: '1/1' }}>
-                  <img
-                    src={item.thumbnailUrl || item.previewUrl}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
+                  {item.mediaType === 'video' ? (
+                    <video
+                      src={item.previewUrl}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      preload="auto"
+                      className="w-full h-full object-cover"
+                      style={{ pointerEvents: 'none' }}
+                    />
+                  ) : (
+                    <img
+                      src={item.thumbnailUrl || item.previewUrl}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
+                  )}
                   {item.mediaType === 'video' && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.50)' }}>

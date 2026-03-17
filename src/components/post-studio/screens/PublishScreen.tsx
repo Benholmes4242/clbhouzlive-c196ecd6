@@ -83,16 +83,24 @@ export function PublishScreen() {
           <div className="mx-4 mt-4 overflow-hidden" style={{ borderRadius: 16, boxShadow: '0 4px 24px rgba(0,0,0,0.40)' }}>
             {/* Thumbnail */}
             <div className="relative" style={{ aspectRatio: '4/3' }}>
-              <img
-                src={firstItem.thumbnailUrl || firstItem.previewUrl}
-                alt=""
-                className="w-full h-full object-cover"
-              />
-              {/* Subtle bottom scrim — just enough for text legibility */}
-              <div
-                className="absolute inset-0"
-                style={{ background: 'linear-gradient(to top, rgba(8,8,8,0.70) 0%, transparent 50%)' }}
-              />
+              {firstItem.mediaType === 'video' ? (
+                <video
+                  src={firstItem.previewUrl}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="auto"
+                  className="w-full h-full object-cover"
+                  style={{ pointerEvents: 'none' }}
+                />
+              ) : (
+                <img
+                  src={firstItem.thumbnailUrl || firstItem.previewUrl}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
+              )}
               {/* Multi-item count badge */}
               {itemCount > 1 && (
                 <div
