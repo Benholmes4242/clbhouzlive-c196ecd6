@@ -160,8 +160,8 @@ export default function StudioPanelText({
                     }}
                     className="w-full px-2 py-1.5 rounded-md text-left transition-colors cursor-pointer"
                     style={{
-                      border: isSelected ? '1px solid rgba(232,152,10,0.4)' : '1px solid rgba(255,255,255,0.08)',
-                      background: isSelected ? 'rgba(232,152,10,0.08)' : 'transparent',
+                      border: isSelected ? '1px solid rgba(255,255,255,0.30)' : '1px solid rgba(255,255,255,0.08)',
+                      background: isSelected ? 'rgba(255,255,255,0.06)' : 'transparent',
                     }}
                   >
                     <div className="flex items-center justify-between gap-1.5">
