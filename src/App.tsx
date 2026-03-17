@@ -273,6 +273,7 @@ function AppRoutes() {
         <Route path="/auth" element={<AuthWrapped />} />
         <Route path="/auth/callback" element={<Suspense fallback={<GenericPageSkeleton />}><AuthCallback /></Suspense>} />
         <Route path="/auth/verified" element={<Suspense fallback={<GenericPageSkeleton />}><VerifiedPage /></Suspense>} />
+        <Route path="/auth/reset-password" element={<Suspense fallback={<GenericPageSkeleton />}><ResetPasswordPage /></Suspense>} />
         <Route path="/signup" element={<Suspense fallback={<GenericPageSkeleton />}><Signup /></Suspense>} />
         <Route path="/onboarding/account-type" element={<Suspense fallback={<GenericPageSkeleton />}><AccountTypeOnboarding /></Suspense>} />
         <Route path="/create-profile" element={<CreateProfileRedirect />} />
