@@ -338,7 +338,7 @@ export function TournamentResultsCard({
 
       {/* ── AI NARRATIVE ────────────────────────────────────────────── */}
       {narrative && (
-        <div style={{ padding: '4px 16px 14px' }}>
+        <div style={{ padding: '4px 16px 14px', textAlign: 'center' }}>
           <p style={{
             fontSize: 13, lineHeight: 1.6,
             fontStyle: 'normal',
