@@ -444,7 +444,7 @@ export default function ClubhouseVideoDebugPanel() {
     };
 
     tick();
-    const interval = setInterval(tick, 500);
+    const interval = setInterval(tick, 2000);
     return () => clearInterval(interval);
   }, [visible, attachListeners, selectedId]);
 

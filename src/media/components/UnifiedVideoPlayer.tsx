@@ -878,7 +878,6 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         DecoderLimitManager.releaseSlot(uniqueMediaId);
         
         if (hlsRef.current) {
-          unregisterHlsForDebug(cloudflareUid || uniqueMediaId);
           try {
             hlsRef.current.stopLoad();
             hlsRef.current.detachMedia();
@@ -888,6 +887,17 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         }
       };
     }, [hlsUrl, startTime, autoplay, managedByMediaRuntime, mp4Fallback, onError, updatePlaybackState, cloudflareUid, hasFirstFrame]);
+
+    // ============ Debug registry: unregister only on true unmount ============
+    // Separate from the main setup effect (which has many deps and re-runs often)
+    // so that HLS_REGISTRY entries persist across dep-change re-renders.
+    useEffect(() => {
+      const debugId = cloudflareUid || uniqueMediaId;
+      return () => {
+        unregisterHlsForDebug(debugId);
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // ============ MediaRuntime Registration ============
     useEffect(() => {
