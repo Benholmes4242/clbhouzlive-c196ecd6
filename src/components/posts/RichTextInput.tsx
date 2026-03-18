@@ -125,7 +125,6 @@ const RichTextInput: React.FC<RichTextInputProps> = ({
         className="absolute inset-0 p-3 pointer-events-none z-0 whitespace-pre-wrap break-words overflow-hidden"
         style={{
           fontSize: 'inherit',
-          fontFamily: 'inherit',
           lineHeight: 'inherit',
           border: '1px solid transparent', // Match textarea border
         }}

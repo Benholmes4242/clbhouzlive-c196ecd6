@@ -239,7 +239,7 @@ export function AdminCommandPalette({ open, onClose }: AdminCommandPaletteProps)
             <button
               onClick={onClose}
               className="px-1.5 py-0.5 rounded flex-shrink-0 mr-2"
-              style={{ background: '#F1F5F9', border: '1px solid #E2E8F0', borderRadius: 6, fontSize: 10, fontFamily: 'monospace', color: '#64748B' }}
+              style={{ background: '#F1F5F9', border: '1px solid #E2E8F0', borderRadius: 6, fontSize: 10, color: '#64748B' }}
             >
               esc
             </button>
@@ -308,15 +308,15 @@ export function AdminCommandPalette({ open, onClose }: AdminCommandPaletteProps)
           {/* Footer */}
           <div className="flex items-center gap-4 px-4 py-2" style={{ borderTop: '1px solid #E2E8F0', fontSize: 11, color: '#94A3B8' }}>
             <span className="flex items-center gap-1">
-              <kbd className="px-1 py-0.5 rounded text-[10px]" style={{ fontFamily: 'monospace', background: '#F1F5F9', border: '1px solid #E2E8F0', color: '#64748B' }}>↑↓</kbd>
+              <kbd className="px-1 py-0.5 rounded text-[10px]" style={{ background: '#F1F5F9', border: '1px solid #E2E8F0', color: '#64748B' }}>↑↓</kbd>
               Navigate
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1 py-0.5 rounded text-[10px]" style={{ fontFamily: 'monospace', background: '#F1F5F9', border: '1px solid #E2E8F0', color: '#64748B' }}>↵</kbd>
+              <kbd className="px-1 py-0.5 rounded text-[10px]" style={{ background: '#F1F5F9', border: '1px solid #E2E8F0', color: '#64748B' }}>↵</kbd>
               Open
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1 py-0.5 rounded text-[10px]" style={{ fontFamily: 'monospace', background: '#F1F5F9', border: '1px solid #E2E8F0', color: '#64748B' }}>esc</kbd>
+              <kbd className="px-1 py-0.5 rounded text-[10px]" style={{ background: '#F1F5F9', border: '1px solid #E2E8F0', color: '#64748B' }}>esc</kbd>
               Close
             </span>
           </div>

@@ -92,7 +92,6 @@ const ResetPasswordPage: React.FC = () => {
                   autoFocus
                   autoComplete="new-password"
                   className="w-full h-[52px] px-4 pr-12 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 text-[15px] focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/20 transition-all"
-                  style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
                 />
                 <button
                   type="button"
@@ -114,7 +113,6 @@ const ResetPasswordPage: React.FC = () => {
                   placeholder="Confirm new password"
                   autoComplete="new-password"
                   className="w-full h-[52px] px-4 pr-12 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 text-[15px] focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/20 transition-all"
-                  style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
                 />
                 <button
                   type="button"
@@ -134,7 +132,6 @@ const ResetPasswordPage: React.FC = () => {
                 disabled={submitting || !password || !confirmPassword}
                 className="w-full h-[52px] rounded-xl bg-white text-[#0D0F11] font-semibold text-[15px] transition-all active:scale-[0.98] disabled:opacity-40"
                 style={{
-                  fontFamily: 'SF Pro Text, system-ui, sans-serif',
                   boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.5), 0 4px 12px rgba(0,0,0,0.2)',
                 }}
               >

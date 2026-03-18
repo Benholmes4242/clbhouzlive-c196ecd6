@@ -72,7 +72,6 @@ function SpotlightStatChip({
           fontSize: 15,
           fontWeight: 700,
           color: color ?? '#FFFFFF',
-          fontFamily: "'JetBrains Mono', 'SF Mono', monospace",
           lineHeight: 1,
           whiteSpace: 'nowrap',
         }}
@@ -310,7 +309,6 @@ export const BestPickSpotlight: React.FC<BestPickSpotlightProps> = ({
               fontSize: 22,
               fontWeight: 700,
               color: '#FFFFFF',
-              fontFamily: "'JetBrains Mono', 'SF Mono', monospace",
               flexShrink: 0,
               letterSpacing: '-0.02em',
             }}

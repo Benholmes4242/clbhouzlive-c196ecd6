@@ -91,7 +91,6 @@ const VerifiedPage: React.FC = () => {
             {/* Headline */}
             <h1 
               className="text-center text-2xl font-semibold tracking-tight text-white sm:text-3xl"
-              style={{ fontFamily: 'SF Pro Display, system-ui, sans-serif' }}
             >
               Welcome to clbhouz
             </h1>
@@ -99,7 +98,6 @@ const VerifiedPage: React.FC = () => {
             {/* Body */}
             <p 
               className="mx-auto mt-3 max-w-xl text-center text-sm leading-6 text-white/70 sm:text-base"
-              style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
             >
               Your email address has been verified. You can now sign in to finish setting up your profile.
             </p>

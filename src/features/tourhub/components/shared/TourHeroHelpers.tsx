@@ -322,7 +322,6 @@ export function PodiumRunnerRow({
       {/* Score — shared for this position */}
       <span
         style={{
-          fontFamily: "'JetBrains Mono', 'SF Mono', monospace",
           fontSize: isSingle ? 14 : 13,
           fontWeight: isSingle ? 700 : 600,
           color: getFinishedScoreColor(row.sharedScore),
@@ -382,7 +381,6 @@ export function StatChip({
         fontSize: 15,
         fontWeight: 700,
         color: color ?? '#FFFFFF',
-        fontFamily: "'JetBrains Mono','SF Mono',monospace",
         lineHeight: 1,
         whiteSpace: 'nowrap',
       }}>

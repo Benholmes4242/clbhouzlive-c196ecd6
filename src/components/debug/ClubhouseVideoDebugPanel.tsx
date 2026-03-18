@@ -540,7 +540,6 @@ export default function ClubhouseVideoDebugPanel() {
             position: 'fixed', inset: 0, zIndex: 99998,
             background: 'rgba(0,0,0,0.92)',
             display: 'flex', flexDirection: 'column',
-            fontFamily: '"SF Mono", "Fira Code", "Cascadia Code", monospace',
             fontSize: 11, color: '#e2e8f0',
             backdropFilter: 'blur(8px)',
           }}>
@@ -879,6 +878,6 @@ function btnStyle(bg: string, color: string): React.CSSProperties {
   return {
     background: bg, color, border: 'none', borderRadius: 3,
     padding: '3px 8px', fontSize: 10, fontWeight: 600,
-    cursor: 'pointer', fontFamily: 'inherit', letterSpacing: 0.5,
+    cursor: 'pointer', letterSpacing: 0.5,
   };
 }

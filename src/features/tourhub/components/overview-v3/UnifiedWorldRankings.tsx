@@ -484,7 +484,7 @@ export function UnifiedWorldRankings() {
             </button>
           </div>
 
-          <p className="text-center text-[10px] font-medium text-muted-foreground/50 mt-1.5" style={{ fontFamily: 'system-ui, -apple-system, sans-serif', fontVariantNumeric: 'normal' }}>
+          <p className="text-center text-[10px] font-medium text-muted-foreground/50 mt-1.5" style={{ fontVariantNumeric: 'normal' }}>
             {startIndex + 1}–{endIndex} of {totalPlayers}
           </p>
         </div>
