@@ -30,7 +30,7 @@ export function PublishScreen() {
       const files = state.mediaItems.map((m) => m.file).filter((f): f is File => !!f);
       const selectedTags = state.mentions.map((m) => ({
         id: m.entityId,
-        entity_id: m.entityId,
+        entity_id: m.profileId,
         entity_type: m.entityType,
         name: m.displayName,
         username: m.username ?? null,
