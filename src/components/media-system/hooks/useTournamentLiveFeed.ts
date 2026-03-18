@@ -131,7 +131,8 @@ export function useTournamentLiveFeed(userId?: string): {
   const livePosts = useMemo((): TournamentLiveFeedPost[] => {
     if (!arenaData?.length) return [];
 
-    return arenaData.map((tournament): TournamentLiveFeedPost => {
+    return arenaData
+      .map((tournament): TournamentLiveFeedPost | null => {
       const allPlayers = [
         ...(tournament.leader ? [tournament.leader] : []),
         ...tournament.chasePack,
