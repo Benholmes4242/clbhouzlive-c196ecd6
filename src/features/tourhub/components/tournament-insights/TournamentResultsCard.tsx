@@ -324,7 +324,7 @@ export function TournamentResultsCard({
                 </div>
               )}
               {sStats.puttingAverage && (
-                <div style={{ textAlign: 'center' as const, padding: '9px 4px 7px', borderRadius: 10, background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.05)' }}>
+                <div style={{ textAlign: 'center' as const, padding: '9px 4px 7px', borderRadius: 12, background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(16px) saturate(180%)', WebkitBackdropFilter: 'blur(16px) saturate(180%)', border: '1px solid rgba(255,255,255,0.75)', boxShadow: '0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
                   <div style={{ fontSize: 16, fontWeight: 800, color: 'hsl(var(--foreground))', lineHeight: 1 }}>
                     {sStats.puttingAverage.toFixed(2)}
                   </div>
