@@ -53,7 +53,7 @@ export function OverviewPageV3() {
       <button
         className="fixed z-30 flex items-center justify-center"
         style={{
-          top: 'calc(env(safe-area-inset-top, 47px) + 12px)',
+          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
           left: '16px',
           width: '44px',
           height: '44px',
