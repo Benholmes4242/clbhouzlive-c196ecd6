@@ -351,11 +351,7 @@ export function TournamentResultsCard({
 
       {/* ── AI NARRATIVE ────────────────────────────────────────────── */}
       {narrative && (
-        <div style={{
-          display: 'flex', alignItems: 'flex-start', gap: 8,
-          padding: '4px 16px 14px',
-        }}>
-          <span style={{ fontSize: 13, flexShrink: 0, marginTop: 1, opacity: 0.7 }}>⚡</span>
+        <div style={{ padding: '4px 16px 14px' }}>
           <p style={{
             fontSize: 13, lineHeight: 1.6,
             fontStyle: 'italic',
