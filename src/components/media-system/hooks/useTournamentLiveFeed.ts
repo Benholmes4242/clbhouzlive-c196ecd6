@@ -56,7 +56,7 @@ async function getOrCreateLivePost(tournamentId: string, tournamentName: string)
   }
 }
 
-export function useTournamentLiveFeed(): {
+export function useTournamentLiveFeed(userId?: string): {
   livePosts:     TournamentLiveFeedPost[];
   liveTourSlugs: string[];
   isLoading:     boolean;
