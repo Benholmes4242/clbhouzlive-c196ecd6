@@ -749,11 +749,14 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
         {/* ── Today's Prompt — visible when canvas is blank ── */}
         {state.caption.length === 0 && !hasMedia && (
-          <div style={{
+           <div
+            onClick={() => textareaRef.current?.focus()}
+            style={{
             padding: '28px 24px 16px',
             textAlign: 'center' as const,
             position: 'relative',
             zIndex: 1,
+            cursor: 'text',
           }}>
             {/* Eyebrow label */}
             <p style={{
@@ -764,7 +767,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               color: 'rgba(255,255,255,0.28)',
               marginBottom: 12,
             }}>
-              Today's Prompt
+              What's on your mind?
             </p>
             {/* Prompt text — large, editorial */}
             <p style={{
