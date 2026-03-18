@@ -1,5 +1,5 @@
 // PublishScreen — Step 2: Clean review before posting
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { Globe, Users, Lock, Clock, ChevronRight, Zap, MapPin, AtSign } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StudioHeader } from '../components/StudioHeader';
@@ -8,11 +8,33 @@ import { enqueuePostUpload } from '@/uploads/uploadPipeline';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { BG_BASE, BG_CARD, BORDER_CARD, TEXT_PRIMARY, TEXT_TERTIARY } from '../tokens';
+import { useSocialCounts } from '@/hooks/useSocialCounts';
 import type { UploadJobInput } from '@/uploads/types';
 
 export function PublishScreen() {
   const { state, setStep, openPanel, onSuccess } = usePostStudioContext();
   const [isPublishing, setIsPublishing] = useState(false);
+
+  // Fetch follower count for social context line
+  const [currentUserId, setCurrentUserId] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setCurrentUserId(data?.user?.id ?? undefined);
+    });
+  }, []);
+  const { data: socialCounts } = useSocialCounts(currentUserId);
+  const contextLine = (() => {
+    const n = socialCounts?.followers ?? 0;
+    if (state.visibility === 'private') return 'Only visible to you';
+    if (state.visibility === 'followers') {
+      if (n === 0) return 'Visible to your followers';
+      if (n === 1) return 'Visible to 1 follower';
+      return `Visible to ${n.toLocaleString()} followers`;
+    }
+    // public
+    if (n === 0) return 'Visible to everyone on clbhouz';
+    return `Visible to your ${n.toLocaleString()} followers and beyond`;
+  })();
 
   const visibilityConfig = {
     anyone:    { label: 'Public',  Icon: Globe,  desc: 'Everyone can see' },
@@ -87,7 +109,7 @@ export function PublishScreen() {
         leftAction={{ label: 'Back', onClick: () => setStep('COMPOSE') }}
       />
 
-      <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+      <div className="flex-1 overflow-y-auto flex flex-col" style={{ scrollbarWidth: 'none' }}>
 
         {/* ── Media preview — clean, minimal scrim ── */}
         {firstItem && (
@@ -247,7 +269,7 @@ export function PublishScreen() {
           </motion.button>
         </div>
 
-        <div className="h-4" />
+        <div className="flex-1" />
       </div>
 
       {/* ── Post Moment CTA ── */}
@@ -259,6 +281,33 @@ export function PublishScreen() {
           borderTop: '1px solid rgba(255,255,255,0.06)',
         }}
       >
+        {/* Social context line */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 6,
+          paddingBottom: 10,
+        }}>
+          <div style={{
+            width: 5, height: 5, borderRadius: '50%',
+            background: state.visibility === 'private'
+              ? 'rgba(255,255,255,0.20)'
+              : 'rgba(255,255,255,0.55)',
+            flexShrink: 0,
+          }} />
+          <span style={{
+            fontSize: 12,
+            fontWeight: 500,
+            letterSpacing: 0.1,
+            color: state.visibility === 'private'
+              ? 'rgba(255,255,255,0.30)'
+              : 'rgba(255,255,255,0.45)',
+          }}>
+            {contextLine}
+          </span>
+        </div>
+
         <AnimatePresence>
           {state.scheduledAt && (
             <motion.p
@@ -277,14 +326,18 @@ export function PublishScreen() {
           whileTap={{ scale: 0.97 }}
           onClick={handlePublish}
           disabled={isPublishing}
-          className="w-full rounded-2xl font-bold flex items-center justify-center gap-2.5 disabled:opacity-40"
+          className="w-full rounded-[18px] font-bold flex items-center justify-center gap-2.5 disabled:opacity-40"
           style={{
-            minHeight: 56,
+            minHeight: 58,
             fontSize: 16,
-            letterSpacing: '-0.01em',
-            background: isPublishing ? 'rgba(255,255,255,0.40)' : 'rgba(255,255,255,0.96)',
+            fontWeight: 700,
+            letterSpacing: '-0.015em',
+            borderRadius: 18,
+            background: isPublishing ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.97)',
             color: '#0D0D0D',
-            boxShadow: isPublishing ? 'none' : '0 4px 20px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,1)',
+            boxShadow: isPublishing
+              ? 'none'
+              : '0 6px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.20), inset 0 1px 0 rgba(255,255,255,1)',
           }}
         >
           {isPublishing ? (
