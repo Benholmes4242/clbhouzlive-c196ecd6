@@ -183,13 +183,12 @@ export function TournamentResultsCard({
       style={{ paddingBottom: 8, marginTop: -36 }}
     >
       {/* ── WINNER HERO — split layout ─────────────────────────────── */}
-      <div style={{ position: 'relative', overflow: 'hidden', minHeight: 280 }}>
+      <div style={{ position: 'relative', overflow: 'visible', minHeight: 280 }}>
 
-        {/* Player portrait — right side, full bleed */}
+        {/* Player portrait — right side, full bleed, hangs off edge */}
         <div style={{
-          position: 'absolute', top: 0, right: 0,
-          width: '55%', height: '100%',
-          display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
+          position: 'absolute', top: 0, right: -16,
+          width: '60%', height: '100%',
           maskImage: 'linear-gradient(to left, black 55%, transparent 100%)',
           WebkitMaskImage: 'linear-gradient(to left, black 55%, transparent 100%)',
         }}>
@@ -198,10 +197,9 @@ export function TournamentResultsCard({
             alt={winnerName}
             onError={e => { (e.target as HTMLImageElement).src = heroFallback; }}
             style={{
-              width: '100%', height: 'auto',
-              objectFit: 'contain', objectPosition: 'center top',
+              width: '100%', height: '100%',
+              objectFit: 'cover', objectPosition: '50% 8%',
               display: 'block',
-              marginTop: 8,
             }}
           />
         </div>
