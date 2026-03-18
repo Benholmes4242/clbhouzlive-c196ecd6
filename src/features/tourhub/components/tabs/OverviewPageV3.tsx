@@ -75,6 +75,27 @@ export function OverviewPageV3() {
         )}
       </AnimatePresence>
 
+      {/* Burger menu — fixed to viewport so it is immune to the hero carousel's
+           negative marginTop compositing context. Sits at SAT + 12px from top,
+           matching the Players page pattern exactly. */}
+      <button
+        className="fixed z-30 flex items-center justify-center"
+        style={{
+          top: 'calc(env(safe-area-inset-top, 47px) + 12px)',
+          left: '16px',
+          width: '44px',
+          height: '44px',
+        }}
+        onClick={() => openTourNav()}
+        aria-label="Open tour menu"
+      >
+        <Menu
+          className="w-[22px] h-[22px]"
+          strokeWidth={2}
+          style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }}
+        />
+      </button>
+
       {/* 1. Hero Carousel - using containerNoHeader since Overview has no header */}
       <motion.div 
         className="relative w-full z-0"
