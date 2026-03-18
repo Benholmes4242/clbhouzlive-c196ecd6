@@ -341,8 +341,9 @@ export function TournamentResultsCard({
         <div style={{ padding: '4px 16px 14px' }}>
           <p style={{
             fontSize: 13, lineHeight: 1.6,
-            fontStyle: 'italic',
-            color: 'hsl(var(--muted-foreground))',
+            fontStyle: 'normal',
+            fontWeight: 500,
+            color: 'hsl(var(--foreground))',
             margin: 0,
           }}>
             {narrative}
