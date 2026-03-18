@@ -551,7 +551,12 @@ export default function ClubhouseVideoDebugPanel() {
           {/* ── Header ── */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: 8,
-            padding: '8px 12px', borderBottom: '1px solid #1e293b',
+            // Safe area: push content below the iOS notch/Dynamic Island
+            paddingTop: 'calc(env(safe-area-inset-top, 47px) + 8px)',
+            paddingBottom: '8px',
+            paddingLeft: '12px',
+            paddingRight: '12px',
+            borderBottom: '1px solid #1e293b',
             background: '#0f172a', flexShrink: 0,
           }}>
             <span style={{ color: '#38bdf8', fontWeight: 700, fontSize: 12 }}>
