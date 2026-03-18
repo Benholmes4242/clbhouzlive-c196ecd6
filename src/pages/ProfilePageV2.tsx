@@ -834,6 +834,16 @@ const ProfilePageV2Content: React.FC = () => {
                   Copy link
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                {/* Unfriend — only show when already friends */}
+                {friendshipStatus === 'friends' && (
+                  <DropdownMenuItem
+                    onClick={() => unfriend()}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <UserMinus className="w-4 h-4 mr-2" />
+                    Remove friend
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={() => setShowReportDialog(true)}>
                   <Flag className="w-4 h-4 mr-2" />
                   Report
@@ -848,6 +858,7 @@ const ProfilePageV2Content: React.FC = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </>
+          )}
         )}
       </div>
 
