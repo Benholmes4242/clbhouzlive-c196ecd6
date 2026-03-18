@@ -183,7 +183,7 @@ export function TournamentResultsCard({
       style={{ paddingBottom: 8, marginTop: -36 }}
     >
       {/* ── WINNER HERO — split layout ─────────────────────────────── */}
-      <div style={{ position: 'relative', overflow: 'visible', minHeight: 280 }}>
+      <div style={{ position: 'relative', overflow: 'visible', minHeight: 280, zIndex: 1 }}>
 
         {/* Player portrait — right side, full bleed, behind everything */}
         <div style={{
