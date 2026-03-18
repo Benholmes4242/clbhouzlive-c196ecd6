@@ -303,7 +303,7 @@ export default function ClubhouseVideoDebugPanel() {
       video.addEventListener(evt, fn, { passive: true });
     });
 
-    // ── HLS.js events ──
+    // ── HLS.js events (only when hls instance exists — not on native iOS path) ──
     const onManifestParsed = (_: string, data: any) => {
       const levels = (hls.levels ?? []).map((l: any, i: number) => ({
         idx: i, height: l.height ?? 0, bitrateKbps: Math.round((l.bitrate ?? 0) / 1000),
@@ -381,22 +381,26 @@ export default function ClubhouseVideoDebugPanel() {
       });
     };
 
-    hls.on('hlsManifestParsed', onManifestParsed);
-    hls.on('hlsLevelSwitched', onLevelSwitched);
-    hls.on('hlsFragLoaded', onFragLoaded);
-    hls.on('hlsError', onError);
-    hls.on('hlsBufferAppended', onBufferAppended);
+    if (hls) {
+      hls.on('hlsManifestParsed', onManifestParsed);
+      hls.on('hlsLevelSwitched', onLevelSwitched);
+      hls.on('hlsFragLoaded', onFragLoaded);
+      hls.on('hlsError', onError);
+      hls.on('hlsBufferAppended', onBufferAppended);
+    }
 
     // Cleanup fn
     const cleanup = () => {
       Object.entries(videoHandlers).forEach(([evt, fn]) => {
         video.removeEventListener(evt, fn);
       });
-      hls.off('hlsManifestParsed', onManifestParsed);
-      hls.off('hlsLevelSwitched', onLevelSwitched);
-      hls.off('hlsFragLoaded', onFragLoaded);
-      hls.off('hlsError', onError);
-      hls.off('hlsBufferAppended', onBufferAppended);
+      if (hls) {
+        hls.off('hlsManifestParsed', onManifestParsed);
+        hls.off('hlsLevelSwitched', onLevelSwitched);
+        hls.off('hlsFragLoaded', onFragLoaded);
+        hls.off('hlsError', onError);
+        hls.off('hlsBufferAppended', onBufferAppended);
+      }
     };
 
     hlsListeners.current.set(videoId, cleanup);
