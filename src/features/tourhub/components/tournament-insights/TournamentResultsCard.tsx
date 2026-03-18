@@ -276,11 +276,7 @@ export function TournamentResultsCard({
       {narrative && (
         <div style={{
           display: 'flex', alignItems: 'flex-start', gap: 10,
-          padding: '12px 16px',
-          background: 'hsl(var(--muted) / 0.6)',
-          borderBottom: '1px solid hsl(var(--border))',
-          animation: 'tric-fadeIn 0.5s ease-out both',
-          animationDelay: '0.35s',
+          padding: '8px 16px',
         }}>
           <span style={{ fontSize: 14, flexShrink: 0, marginTop: 1 }}>⚡</span>
           <p className="text-muted-foreground" style={{
