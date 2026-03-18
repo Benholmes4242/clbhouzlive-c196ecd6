@@ -215,12 +215,10 @@ export const TournamentInsights = memo(function TournamentInsights() {
           >
             {isStale && <StaleBadge />}
             {insightsData.winners.length > 0 && (
-              <LikelyWinnersCarousel
+              <NextUpPickCard
                 featured={insightsData.winners[0]}
                 cards={insightsData.contenderCards}
                 withdrawnPlayerIds={withdrawnPlayerIds}
-                courseName={insightsData.tournament.courseName}
-                tournamentName={insightsData.tournament.name}
               />
             )}
           </motion.div>
