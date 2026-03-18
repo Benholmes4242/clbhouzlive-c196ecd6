@@ -22,7 +22,7 @@ import { useMyBusinesses } from '@/hooks/useMyBusinesses';
 import { useBlockActions } from '@/hooks/useBlockActions';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Trophy, ChevronRight, ChevronDown, MoreHorizontal, Send, UserPlus, Check, ExternalLink, Loader2, ArrowLeft, Pencil, Camera, Share2, Link2, Flag, Ban, Settings, Building2 } from 'lucide-react';
+import { Trophy, ChevronRight, ChevronDown, MoreHorizontal, Send, UserPlus, UserCheck, UserMinus, Check, ExternalLink, Loader2, ArrowLeft, Pencil, Camera, Share2, Link2, Flag, Ban, Settings, Building2 } from 'lucide-react';
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
