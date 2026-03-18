@@ -152,13 +152,13 @@ function buildSession(
 ): VideoSession {
   const { hls, video } = entry;
 
-  const levels = (hls.levels ?? []).map((l: any, i: number) => ({
+  const levels = hls ? (hls.levels ?? []).map((l: any, i: number) => ({
     idx: i,
     height: l.height ?? 0,
     bitrateKbps: Math.round((l.bitrate ?? 0) / 1000),
-  }));
+  })) : [];
 
-  const currentLevelIdx = hls.currentLevel ?? -1;
+  const currentLevelIdx = hls ? (hls.currentLevel ?? -1) : -1;
   const currentLevel = levels[currentLevelIdx] ?? { height: 0, bitrateKbps: 0 };
 
   // Buffer ahead
@@ -174,8 +174,8 @@ function buildSession(
     }
   } catch { /* ignore */ }
 
-  // Bandwidth from HLS.js EWMA
-  const bandwidthKbps = Math.round((hls.bandwidthEstimate ?? 0) / 1000);
+  // Bandwidth from HLS.js EWMA (unavailable on native path)
+  const bandwidthKbps = hls ? Math.round((hls.bandwidthEstimate ?? 0) / 1000) : 0;
 
   const base: VideoSession = {
     videoId,
