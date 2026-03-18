@@ -16,7 +16,7 @@ export function ImageViewer({ imageUrl, thumbnailUrl, width, height, onFirstFram
   const firstFrameFiredRef = useState(() => ({ current: false }))[0];
   const [loaded, setLoaded] = useState(false);
   const aspectRatio = width && height ? width / height : 1;
-  const fit = aspectRatio > 1.2 ? 'contain' : 'cover';
+  const fit = 'contain';
 
   // Preload full image
   useEffect(() => {
