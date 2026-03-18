@@ -87,21 +87,45 @@ export function TournamentResultsCard({
 
   // ── Data fetches ──────────────────────────────────────────────────────────
   const { data: winner, isLoading: winnerLoading } = useEventWinner(tournamentId);
-  const { data: tStats } = useWinnerScorecardStats(
-    tournamentId, winner?.player_id
-  );
-  const { data: sStats } = useWinnerSeasonStats(winner?.player_id);
   const { data: top5 = [] } = useTop5Leaderboard(tournamentId);
+
+  // If event_winners is empty, synthesise a winner object from sr_leaderboards position 1
+  const effectiveWinner = useMemo(() => {
+    if (winner) return winner;
+    const pos1 = top5[0];
+    if (!pos1) return null;
+    return {
+      player_id: pos1.playerId,
+      score_to_par: null as number | null,
+      margin: null as number | null,
+      is_playoff: false,
+      headline: null as string | null,
+      narrative: null as string | null,
+      player: {
+        id: pos1.playerId,
+        full_name: pos1.playerName,
+        country: null,
+        photo_url: pos1.photoUrl,
+      },
+      _scoreDisplayOverride: pos1.scoreDisplay,
+    };
+  }, [winner, top5]);
+
+  const { data: tStats } = useWinnerScorecardStats(
+    tournamentId, effectiveWinner?.player_id
+  );
+  const { data: sStats } = useWinnerSeasonStats(effectiveWinner?.player_id);
   const venueQuery = useVenueImage(courseName, null);
   const venueImageUrl = venueQuery.data?.imageUrl;
 
   // ── Derived values ────────────────────────────────────────────────────────
-  const winnerName = winner?.player?.full_name ?? '';
-  const scoreDisplay = formatScoreDisplay(winner?.score_to_par ?? null);
-  const marginText = winner?.is_playoff
+  const winnerName = effectiveWinner?.player?.full_name ?? '';
+  const scoreDisplay = (effectiveWinner as any)?._scoreDisplayOverride
+    ?? formatScoreDisplay(effectiveWinner?.score_to_par ?? null);
+  const marginText = effectiveWinner?.is_playoff
     ? 'Playoff'
-    : winner?.margin === 1 ? 'Won by 1 stroke'
-    : winner?.margin ? `Won by ${winner.margin} strokes`
+    : effectiveWinner?.margin === 1 ? 'Won by 1 stroke'
+    : effectiveWinner?.margin ? `Won by ${effectiveWinner.margin} strokes`
     : '';
 
   // Player headshot — always use R2 via getPlayerHeadshotUrl, fallback to silhouette
@@ -113,9 +137,9 @@ export function TournamentResultsCard({
 
   // AI Narrative — DB narrative first, then DB headline, then generated
   const narrative = useMemo(() => {
-    if (winner?.narrative) return winner.narrative;
-    if (winner?.headline && !winner.headline.includes('Champion crowned'))
-      return winner.headline;
+    if (effectiveWinner?.narrative) return effectiveWinner.narrative;
+    if (effectiveWinner?.headline && !effectiveWinner.headline.includes('Champion crowned'))
+      return effectiveWinner.headline;
     // Client-side fallback from available stats
     return generateFallbackNarrative(
       winnerName,
@@ -126,14 +150,14 @@ export function TournamentResultsCard({
       sStats?.drivingDistance,
       marginText,
     );
-  }, [winner, winnerName, scoreDisplay, tStats, sStats, marginText]);
+  }, [effectiveWinner, winnerName, scoreDisplay, tStats, sStats, marginText]);
 
   // Leaderboard: winner row (from event_winners) + rows 2–5 (from sr_leaderboards)
   // top5[0] is position 1 (confirmed winner), top5[1..4] are positions 2–5
   const podiumRows = top5.slice(1, 5); // positions 2–5 max
 
   // ── Loading skeleton ──────────────────────────────────────────────────────
-  if (winnerLoading) {
+  if (winnerLoading && top5.length === 0) {
     return (
       <div className="rounded-2xl overflow-hidden border border-border bg-card animate-pulse">
         {[1, 2, 3].map(i => (
@@ -143,7 +167,13 @@ export function TournamentResultsCard({
     );
   }
 
-  if (!winner) return null;
+  if (!effectiveWinner) {
+    return (
+      <div className="rounded-2xl overflow-hidden border border-border bg-card p-6 text-center">
+        <p className="text-sm text-muted-foreground">Results not yet available.</p>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -295,7 +325,7 @@ export function TournamentResultsCard({
         </div>
 
         {/* Winner row — amber accent */}
-        {winner.player && (
+        {effectiveWinner.player && (
           <div style={{
             display: 'flex', alignItems: 'center', gap: 12, padding: '9px 0',
             borderBottom: '1px solid hsl(var(--border))',
