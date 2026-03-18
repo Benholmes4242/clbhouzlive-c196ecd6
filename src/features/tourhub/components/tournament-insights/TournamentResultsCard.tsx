@@ -254,19 +254,6 @@ export function TournamentResultsCard({
             {scoreDisplay}
           </div>
 
-          {/* Margin pill */}
-          {marginText && (
-            <div style={{
-              display: 'inline-flex', alignSelf: 'flex-start',
-              fontSize: 11, fontWeight: 700,
-              color: 'hsl(var(--foreground))',
-              background: 'hsl(var(--accent-amber) / 0.12)',
-              border: '1px solid hsl(var(--accent-amber) / 0.30)',
-              borderRadius: 20, padding: '4px 12px',
-            }}>
-              {marginText}
-            </div>
-          )}
         </div>
       </div>
 
