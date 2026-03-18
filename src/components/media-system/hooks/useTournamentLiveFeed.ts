@@ -56,7 +56,7 @@ async function getOrCreateLivePost(tournamentId: string, tournamentName: string)
   }
 }
 
-export function useTournamentLiveFeed(userId?: string): {
+export function useTournamentLiveFeed(): {
   livePosts:     TournamentLiveFeedPost[];
   liveTourSlugs: string[];
   isLoading:     boolean;
@@ -88,51 +88,10 @@ export function useTournamentLiveFeed(userId?: string): {
 
   const postIdMap = postIdsQuery.data ?? {};
 
-  // Fetch live like/comment counts for all real post IDs.
-  const realPostIds = Object.values(postIdMap).filter(Boolean);
-
-  const liveCountsQuery = useQuery({
-    queryKey: ['live-tournament-counts', realPostIds.join(','), userId],
-    queryFn: async (): Promise<Record<string, { likeCount: number; commentCount: number; isLikedByMe: boolean }>> => {
-      if (!realPostIds.length) return {};
-
-      const [likesResult, commentsResult] = await Promise.all([
-        supabase
-          .from('post_likes')
-          .select('post_id, user_id')
-          .in('post_id', realPostIds),
-        supabase
-          .from('post_comments')
-          .select('post_id')
-          .in('post_id', realPostIds),
-      ]);
-
-      const likes = likesResult.data ?? [];
-      const comments = commentsResult.data ?? [];
-
-      const counts: Record<string, { likeCount: number; commentCount: number; isLikedByMe: boolean }> = {};
-
-      for (const postId of realPostIds) {
-        counts[postId] = {
-          likeCount: likes.filter(l => l.post_id === postId).length,
-          commentCount: comments.filter(c => c.post_id === postId).length,
-          isLikedByMe: userId ? likes.some(l => l.post_id === postId && l.user_id === userId) : false,
-        };
-      }
-
-      return counts;
-    },
-    enabled: realPostIds.length > 0,
-    staleTime: 30_000,
-  });
-
-  const liveCountsMap = liveCountsQuery.data ?? {};
-
   const livePosts = useMemo((): TournamentLiveFeedPost[] => {
     if (!arenaData?.length) return [];
 
-    return arenaData
-      .map((tournament): TournamentLiveFeedPost | null => {
+    return arenaData.map((tournament): TournamentLiveFeedPost => {
       const allPlayers = [
         ...(tournament.leader ? [tournament.leader] : []),
         ...tournament.chasePack,
@@ -183,15 +142,7 @@ export function useTournamentLiveFeed(userId?: string): {
         leaderStats:     tournament.leaderStats ?? null,
       };
 
-      // Only use the post ID if it came from the DB — never use a random UUID
-      const realPostId = postIdMap[tournament.id];
-      if (!realPostId) return null;
-
-      const counts = liveCountsMap[realPostId] ?? {
-        likeCount: 0,
-        commentCount: 0,
-        isLikedByMe: false,
-      };
+      const realPostId = postIdMap[tournament.id] ?? crypto.randomUUID();
 
       return {
         id:              realPostId,
@@ -206,19 +157,18 @@ export function useTournamentLiveFeed(userId?: string): {
         caption:         '',
         mediaItems:      [],
         createdAt:       new Date().toISOString(),
-        likeCount:       counts.likeCount,
-        commentCount:    counts.commentCount,
+        likeCount:       0,
+        commentCount:    0,
         shareCount:      0,
         review:          null,
         isReview:        false,
-        isLikedByMe:     counts.isLikedByMe,
+        isLikedByMe:     false,
         isFollowedByMe:  false,
         postType:        'tournament_live',
         liveMeta:        meta,
       };
-    })
-      .filter((p): p is TournamentLiveFeedPost => p !== null);
-  }, [arenaData, postIdMap, liveCountsMap]);
+    });
+  }, [arenaData, postIdMap]);
 
   const liveTourSlugs = useMemo(
     () => (arenaData ?? []).map(t => t.tourSlug),
@@ -228,6 +178,6 @@ export function useTournamentLiveFeed(userId?: string): {
   return {
     livePosts,
     liveTourSlugs,
-    isLoading: arenaLoading || postIdsQuery.isLoading || liveCountsQuery.isLoading,
+    isLoading: arenaLoading || postIdsQuery.isLoading,
   };
 }
