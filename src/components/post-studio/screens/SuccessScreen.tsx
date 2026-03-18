@@ -60,18 +60,40 @@ export function SuccessScreen({ onDone }: SuccessScreenProps) {
       </div>
 
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.5, ease: [0.22, 1, 0.36, 1] }} className="text-center space-y-2 relative z-10">
-        <p className="text-[11px] font-semibold uppercase tracking-[2px]" style={{ color: 'rgba(255,255,255,0.40)' }}>Post queued</p>
-        <h2 className="text-[28px] font-bold text-white" style={{ letterSpacing: '-0.03em' }}>You're in play</h2>
-        <p className="text-sm leading-relaxed max-w-[260px] mx-auto" style={{ color: 'rgba(255,255,255,0.45)' }}>Uploading in the background. Keep playing – clbhouz has it from here.</p>
+        <p className="text-[10px] font-bold uppercase tracking-[2.5px]"
+          style={{ color: 'rgba(255,255,255,0.35)' }}>
+          Moment posted
+        </p>
+        <h2 className="text-[30px] font-bold text-white"
+          style={{ letterSpacing: '-0.04em', lineHeight: 1.1 }}>
+          On the board.
+        </h2>
+        <p className="text-[13px] leading-relaxed max-w-[240px] mx-auto"
+          style={{ color: 'rgba(255,255,255,0.42)', letterSpacing: '-0.01em' }}>
+          Uploading while you play. The feed awaits.
+        </p>
       </motion.div>
 
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6, duration: 0.4 }} className="w-full max-w-sm relative z-10">
         <UploadBanner />
       </motion.div>
 
-      <motion.button initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75, duration: 0.4 }} whileTap={{ scale: 0.96 }} onClick={onDone} className="w-full max-w-sm flex items-center justify-center gap-2 rounded-2xl font-semibold text-sm min-h-[52px] relative z-10" style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.70)' }}>
+      <motion.button
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.75, duration: 0.4 }}
+        whileTap={{ scale: 0.96 }}
+        onClick={onDone}
+        className="w-full max-w-sm flex items-center justify-center gap-2 rounded-[18px] font-bold text-[15px] min-h-[58px] relative z-10"
+        style={{
+          background: 'rgba(255,255,255,0.97)',
+          color: '#0D0D0D',
+          letterSpacing: '-0.015em',
+          boxShadow: '0 6px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.20), inset 0 1px 0 rgba(255,255,255,1)',
+        }}
+      >
         Back to clbhouz
-        <ArrowRight className="w-4 h-4" strokeWidth={2} />
+        <ArrowRight className="w-4 h-4" strokeWidth={2.5} style={{ color: 'rgba(0,0,0,0.45)' }} />
       </motion.button>
     </div>
   );
