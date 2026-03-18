@@ -1,0 +1,442 @@
+/**
+ * NextUpPickCard — Editorial full-width pick cards for Next Up predictions.
+ * Matches TournamentResultsCard visual language: player portrait right side
+ * masked left, dark semantic text on light surface, stats grid, AI tips.
+ * Swipeable via pagination dots. Stats from useWinnerSeasonStats per-pick.
+ */
+
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useWinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import CountryFlag from '@/components/ui/country-flag';
+import type { WinnerProfile, ContenderCard } from './types';
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+interface NextUpPickCardProps {
+  featured: WinnerProfile;
+  cards: ContenderCard[];
+  withdrawnPlayerIds?: Set<string>;
+}
+
+interface PickItem {
+  id: string;
+  name: string;
+  countryCode?: string;
+  avatarUrl: string;
+  confidenceTier: 'elite' | 'high' | 'medium';
+  matchPct: number;
+  bullets: string[];
+  isWithdrawn?: boolean;
+  promoted?: boolean;
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function tierToPct(tier: 'elite' | 'high' | 'medium'): number {
+  return tier === 'elite' ? 95 : tier === 'high' ? 88 : 78;
+}
+
+function tierDotColor(tier: 'elite' | 'high' | 'medium'): string {
+  return tier === 'elite' ? '#16A34A' : tier === 'high' ? '#2563EB' : '#9CA3AF';
+}
+
+// ─── Stat chip ───────────────────────────────────────────────────────────────
+
+function StatChip({
+  value,
+  label,
+  unit,
+}: {
+  value: number | null | undefined;
+  label: string;
+  unit?: string;
+}) {
+  if (!value) return null;
+  const display =
+    unit === 'yds' ? Math.round(value).toString()
+    : unit === '%' ? Math.round(value).toString()
+    : value.toFixed(2);
+  return (
+    <div
+      style={{
+        flex: 1,
+        textAlign: 'center' as const,
+        padding: '8px 4px 6px',
+        borderRadius: 10,
+        background: 'rgba(255,255,255,0.55)',
+        backdropFilter: 'blur(16px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+        border: '1px solid rgba(255,255,255,0.75)',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)',
+      }}
+    >
+      <div
+        style={{
+          fontSize: 15,
+          fontWeight: 800,
+          color: 'hsl(var(--foreground))',
+          lineHeight: 1,
+        }}
+      >
+        {display}
+        {unit && (
+          <span style={{ color: 'hsl(var(--muted-foreground))' }}>
+            {unit}
+          </span>
+        )}
+      </div>
+      <div
+        style={{
+          fontSize: 9,
+          fontWeight: 700,
+          letterSpacing: 0.8,
+          textTransform: 'uppercase' as const,
+          color: 'hsl(var(--muted-foreground))',
+          marginTop: 3,
+        }}
+      >
+        {label}
+      </div>
+    </div>
+  );
+}
+
+// ─── Single pick slide ────────────────────────────────────────────────────────
+
+function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
+  const { data: stats } = useWinnerSeasonStats(pick.id);
+
+  const photo =
+    getPlayerHeadshotUrl(pick.name, 'pga') ||
+    pick.avatarUrl ||
+    PLAYER_SILHOUETTE_URL;
+
+  const hasStats = stats && (
+    stats.drivingDistance || stats.drivingAccuracy ||
+    stats.greensInReg || stats.puttingAverage
+  );
+
+  return (
+    <div>
+      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* ZONE 1 — PLAYER HERO */}
+      {/* ═══════════════════════════════════════════════════════════════════ */}
+      <div style={{ position: 'relative', overflow: 'hidden' }}>
+        {/* Player portrait — right side, masked to fade left */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            width: '62%',
+            height: '100%',
+            maskImage: 'linear-gradient(to left, black 50%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to left, black 50%, transparent 100%)',
+          }}
+        >
+          <img
+            src={photo}
+            alt={pick.name}
+            onError={e => {
+              (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL;
+            }}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: '50% 8%',
+              display: 'block',
+              opacity: pick.isWithdrawn ? 0.30 : 1,
+            }}
+          />
+        </div>
+
+        {/* Left column — pick info */}
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 2,
+            padding: '20px 12px 20px 16px',
+            width: '65%',
+            minHeight: 280,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
+            gap: 4,
+          }}
+        >
+          {/* Eyebrow — pick number */}
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: 1.8,
+              textTransform: 'uppercase' as const,
+              color: 'hsl(var(--muted-foreground))',
+              marginBottom: 2,
+              lineHeight: 1,
+            }}
+          >
+            {index === 0 ? 'Top Pick' : `Pick ${index + 1}`}
+          </div>
+
+          {/* Player name */}
+          <div
+            style={{
+              fontSize: 26,
+              fontWeight: 900,
+              color: 'hsl(var(--foreground))',
+              letterSpacing: -0.8,
+              lineHeight: 1.05,
+              marginBottom: 2,
+            }}
+          >
+            {pick.name}
+          </div>
+
+          {/* Flag */}
+          {pick.countryCode && (
+            <CountryFlag
+              country={pick.countryCode}
+              size="sm"
+              className="rounded-sm"
+            />
+          )}
+
+          {/* Match % pill */}
+          <div
+            style={{
+              display: 'inline-flex',
+              alignSelf: 'flex-start',
+              alignItems: 'center',
+              gap: 6,
+              fontSize: 12,
+              fontWeight: 700,
+              color: 'hsl(var(--foreground))',
+              background: 'rgba(0,0,0,0.06)',
+              border: '1px solid rgba(0,0,0,0.10)',
+              borderRadius: 20,
+              padding: '4px 12px',
+            }}
+          >
+            <div
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: tierDotColor(pick.confidenceTier),
+                flexShrink: 0,
+              }}
+            />
+            {pick.matchPct}% Match
+          </div>
+
+          {/* Promoted badge */}
+          {pick.promoted && (
+            <div
+              style={{
+                display: 'inline-flex',
+                alignSelf: 'flex-start',
+                marginTop: 4,
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: 0.5,
+                color: '#16A34A',
+                background: 'rgba(22,163,74,0.08)',
+                border: '1px solid rgba(22,163,74,0.20)',
+                borderRadius: 6,
+                padding: '3px 8px',
+                textTransform: 'uppercase' as const,
+              }}
+            >
+              Promoted
+            </div>
+          )}
+
+          {/* Withdrawn badge */}
+          {pick.isWithdrawn && (
+            <div
+              style={{
+                display: 'inline-flex',
+                alignSelf: 'flex-start',
+                marginTop: 4,
+                fontSize: 10,
+                fontWeight: 700,
+                letterSpacing: 0.5,
+                color: '#EF4444',
+                background: 'rgba(239,68,68,0.08)',
+                border: '1px solid rgba(239,68,68,0.20)',
+                borderRadius: 6,
+                padding: '3px 8px',
+                textTransform: 'uppercase' as const,
+              }}
+            >
+              Withdrawn
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* ZONE 2 — STATS GRID (overlaps hero by 28px) */}
+      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {hasStats && (
+        <div
+          style={{
+            padding: '0 16px 8px',
+            marginTop: -28,
+            position: 'relative',
+            zIndex: 4,
+          }}
+        >
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: 5,
+            }}
+          >
+            <StatChip value={stats.drivingDistance} label="Driver" unit="yds" />
+            <StatChip value={stats.drivingAccuracy} label="Accuracy" unit="%" />
+            <StatChip value={stats.greensInReg} label="GIR" unit="%" />
+            <StatChip value={stats.puttingAverage} label="Putts" />
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* ZONE 3 — AI TIPS */}
+      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {pick.bullets.length > 0 && (
+        <div style={{ padding: '0 16px 16px' }}>
+          <div
+            style={{
+              height: 1,
+              background: 'hsl(var(--border))',
+              marginBottom: 12,
+            }}
+          />
+          {pick.bullets.slice(0, 3).map((b, j) => (
+            <div key={j}>
+              {j > 0 && (
+                <div
+                  style={{
+                    height: 1,
+                    background: 'hsl(var(--border))',
+                    margin: '10px 0',
+                  }}
+                />
+              )}
+              <p
+                style={{
+                  fontSize: 13,
+                  lineHeight: 1.55,
+                  margin: 0,
+                  fontWeight: 500,
+                  color: 'hsl(var(--foreground))',
+                }}
+              >
+                {b}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Main component ──────────────────────────────────────────────────────────
+
+export function NextUpPickCard({
+  featured,
+  cards,
+  withdrawnPlayerIds,
+}: NextUpPickCardProps) {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  // Build unified picks list: featured first, then contenders only (max 4)
+  const allPicks: PickItem[] = [
+    {
+      id: featured.id,
+      name: featured.name,
+      countryCode: featured.countryCode,
+      avatarUrl: featured.avatarUrl,
+      confidenceTier: featured.confidenceTier,
+      matchPct: tierToPct(featured.confidenceTier),
+      bullets: featured.fitBullets.slice(0, 3),
+      isWithdrawn: withdrawnPlayerIds?.has(featured.id) ?? false,
+      promoted: featured.promoted,
+    },
+    ...cards
+      .filter(c => c.type === 'contender')
+      .slice(0, 4)
+      .map(c => ({
+        id: c.id,
+        name: c.name,
+        countryCode: c.countryCode,
+        avatarUrl: c.avatarUrl,
+        confidenceTier: c.confidenceTier ?? ('medium' as const),
+        matchPct: tierToPct(c.confidenceTier ?? 'medium'),
+        bullets: c.fitBullets?.slice(0, 3) ||
+          (c.description ? [c.description] : []),
+        isWithdrawn: withdrawnPlayerIds?.has(c.id) ?? false,
+        promoted: c.promoted,
+      })),
+  ];
+
+  const current = allPicks[activeIndex];
+  if (!current) return null;
+
+  return (
+    <div>
+      {/* Active pick */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={`${current.id}-${activeIndex}`}
+          initial={{ opacity: 0, x: 10 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -10 }}
+          transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <PickSlide pick={current} index={activeIndex} />
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Pagination dots */}
+      {allPicks.length > 1 && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            padding: '14px 16px 4px',
+          }}
+        >
+          {allPicks.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setActiveIndex(i)}
+              style={{
+                width: i === activeIndex ? 20 : 6,
+                height: 6,
+                borderRadius: 3,
+                background: i === activeIndex
+                  ? 'hsl(var(--foreground))'
+                  : 'hsl(var(--border))',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+                transition: 'all 0.25s ease',
+                flexShrink: 0,
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
