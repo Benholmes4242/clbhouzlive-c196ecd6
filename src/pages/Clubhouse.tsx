@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
 // SnapToast removed — PostStudio handles its own toasts
 
@@ -172,6 +172,7 @@ const ClubhouseContent = () => {
   // ============================================================================
   
   const { isRehydrating } = useRehydrationSafe();
+  const { pathname } = useLocation();
   
   useEffect(() => {
     logRouteClubhouse();
@@ -185,7 +186,11 @@ const ClubhouseContent = () => {
   }, []);
   
   useHeaderVariant('glass-dark');
-  useMedianStatusBar("dark", "transparent", true, false);
+  // Pass pathname as reapplyKey — since Clubhouse is keep-alive it never remounts,
+  // so the effect only fires once without this. With pathname as the key, it
+  // re-fires every time the user navigates back to /, re-applying the transparent
+  // status bar over whatever the previous page left behind.
+  useMedianStatusBar("dark", "transparent", true, false, true, pathname);
   
   useLayoutEffect(() => {
     document.body.classList.add('route-clubhouse');

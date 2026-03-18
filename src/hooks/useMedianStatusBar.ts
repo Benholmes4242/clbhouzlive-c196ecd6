@@ -67,6 +67,10 @@ export function useMedianStatusBar(
   overlay = false,
   blur = false,
   enabled = true,
+  /** Optional key — when this changes, the effect re-fires.
+   * Pass location.pathname for keep-alive pages (e.g. Clubhouse)
+   * so the status bar is re-applied on every navigation back. */
+  reapplyKey?: string | number,
 ) {
   const configRef = useRef({ style, hexColor, overlay, blur, enabled });
   configRef.current = { style, hexColor, overlay, blur, enabled };
@@ -138,5 +142,6 @@ export function useMedianStatusBar(
       // The next page's useMedianStatusBar will overwrite them when it mounts.
       // Resetting to '' causes the grey flash — we never do this.
     };
-  }, [enabled]); // config changes handled via ref — only re-run if enabled toggles
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled, reapplyKey]); // reapplyKey allows keep-alive pages to force re-apply on nav
 }
