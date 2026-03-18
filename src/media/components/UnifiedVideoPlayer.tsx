@@ -28,6 +28,7 @@ import type { MediaSurface } from '@/media/runtime/MediaRuntime';
 import { CLOUDFLARE_STREAM_PATTERNS } from '@/media/constants';
 import type { PlaybackState, MediaError, AspectRatio } from '@/media/types';
 import { VideoOverlay } from './VideoOverlay';
+import { registerHlsForDebug, unregisterHlsForDebug } from '@/components/debug/ClubhouseVideoDebugPanel';
 import { NetworkPriorityManager } from '@/utils/video/NetworkPriorityManager';
 import { DecoderLimitManager } from '@/utils/video/DecoderLimitManager';
 import { useGaplessLoop } from '@/utils/video/GaplessLoop';
