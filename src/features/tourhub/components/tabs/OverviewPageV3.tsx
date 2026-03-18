@@ -47,37 +47,9 @@ export function OverviewPageV3() {
   useMedianStatusBar("dark", "transparent", true, false);
 
   return (
-    <motion.div
-      className="min-h-screen bg-background"
-      style={{ 
-        marginTop: 0,
-        paddingTop: 0,
-      }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-    >
-      {/* FIX 09: Offline banner */}
-      <AnimatePresence>
-        {!isOnline && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center gap-2 py-2 px-4 bg-muted/95 backdrop-blur-sm border-b border-border"
-            style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
-          >
-            <WifiOff className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="text-xs font-medium text-muted-foreground">
-              You're offline. Some data may be outdated.
-            </span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Burger menu — fixed to viewport so it is immune to the hero carousel's
-           negative marginTop compositing context. Sits at SAT + 12px from top,
-           matching the Players page pattern exactly. */}
+    <>
+      {/* Burger menu — portaled outside motion.div so fixed positioning
+           is relative to the viewport, not a transform-containing parent. */}
       <button
         className="fixed z-30 flex items-center justify-center"
         style={{
@@ -96,8 +68,36 @@ export function OverviewPageV3() {
         />
       </button>
 
-      {/* 1. Hero Carousel - using containerNoHeader since Overview has no header */}
-      <motion.div 
+      <motion.div
+        className="min-h-screen bg-background"
+        style={{ 
+          marginTop: 0,
+          paddingTop: 0,
+        }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        {/* FIX 09: Offline banner */}
+        <AnimatePresence>
+          {!isOnline && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center gap-2 py-2 px-4 bg-muted/95 backdrop-blur-sm border-b border-border"
+              style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 8px)' }}
+            >
+              <WifiOff className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-xs font-medium text-muted-foreground">
+                You're offline. Some data may be outdated.
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* 1. Hero Carousel - using containerNoHeader since Overview has no header */}
+        <motion.div 
         className="relative w-full z-0"
         style={{ ...HERO_STYLES.containerNoHeader, opacity: heroOpacity, scale: heroScale }}
       >
@@ -139,5 +139,6 @@ export function OverviewPageV3() {
         </div>
       </div>
     </motion.div>
+    </>
   );
 }
