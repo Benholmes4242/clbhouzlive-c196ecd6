@@ -188,7 +188,7 @@ export function TournamentResultsCard({
         {/* Player portrait — right side, full bleed */}
         <div style={{
           position: 'absolute', top: 0, right: 0,
-          width: '58%', height: '100%',
+          width: '55%', height: '100%',
           maskImage: 'linear-gradient(to left, black 55%, transparent 100%)',
           WebkitMaskImage: 'linear-gradient(to left, black 55%, transparent 100%)',
         }}>
