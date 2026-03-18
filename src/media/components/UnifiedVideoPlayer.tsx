@@ -22,7 +22,7 @@ import React, {
 } from 'react';
 import { cn } from '@/lib/utils';
 import { loadHlsJs } from '@/utils/hlsLoader';
-import { safePlay, isIOS } from '@/utils/safePlay';
+import { safePlay } from '@/utils/safePlay';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import type { MediaSurface } from '@/media/runtime/MediaRuntime';
 import { CLOUDFLARE_STREAM_PATTERNS } from '@/media/constants';
