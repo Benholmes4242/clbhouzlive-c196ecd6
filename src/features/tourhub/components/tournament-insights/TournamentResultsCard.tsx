@@ -185,10 +185,11 @@ export function TournamentResultsCard({
       {/* ── WINNER HERO — split layout ─────────────────────────────── */}
       <div style={{ position: 'relative', overflow: 'visible', minHeight: 280 }}>
 
-        {/* Player portrait — right side, full bleed, hangs off edge */}
+        {/* Player portrait — right side, full bleed, behind everything */}
         <div style={{
           position: 'absolute', top: 0, right: -16,
           width: '60%', height: '100%',
+          zIndex: 0,
         }}>
           <img
             src={winnerPhoto}
@@ -202,19 +203,13 @@ export function TournamentResultsCard({
           />
         </div>
 
-        {/* Winner info — anchored top left, level with player's head */}
+        {/* Winner info — anchored top left */}
         <div style={{
           position: 'absolute', top: 0, left: 0,
           width: '58%',
-          padding: '20px 12px 0 16px',
+          padding: '28px 12px 0 16px',
           zIndex: 2,
         }}>
-          {/* Gradient scrim behind text only — top-left quadrant */}
-          <div style={{
-            position: 'absolute', inset: 0, pointerEvents: 'none',
-            background: 'linear-gradient(to right, rgba(0,0,0,0.45) 0%, transparent 100%)',
-            zIndex: -1,
-          }} />
 
           {/* Eyebrow — course name in amber */}
           <div style={{
