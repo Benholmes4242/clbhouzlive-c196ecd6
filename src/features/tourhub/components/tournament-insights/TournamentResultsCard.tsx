@@ -276,7 +276,12 @@ export function TournamentResultsCard({
 
       {/* ── STATS GRID ──────────────────────────────────────────────── */}
       {(tStats || sStats) && (
-        <div style={{ padding: '14px 16px 6px' }}>
+        <div style={{
+          padding: '14px 16px 6px',
+          marginTop: -28,
+          position: 'relative',
+          zIndex: 3,
+        }}>
 
           {/* Row 1 — Scorecard stats */}
           {tStats && (
