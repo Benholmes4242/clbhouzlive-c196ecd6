@@ -18,6 +18,7 @@ import { LiveUpcomingToggle } from './LiveUpcomingToggle';
 import { BestPickSpotlight } from './BestPickSpotlight';
 import { StaleBadge } from './StaleBadge';
 import IntelligenceTabSwitcher from './components/IntelligenceTabSwitcher';
+import { TournamentResultsCard } from './TournamentResultsCard';
 
 type IntelligenceTab = 'courseDNA' | 'predictions';
 
