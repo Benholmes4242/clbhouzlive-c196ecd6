@@ -181,71 +181,42 @@ export function TournamentResultsCard({
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {/* ZONE 1 — WINNER HERO                                              */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
-      <div style={{ position: 'relative', height: 260, overflow: 'hidden' }}>
-        {/* Player headshot background */}
+      <div className="relative overflow-hidden" style={{ height: 320, marginTop: -8 }}>
         <img
           src={winnerPhoto}
           alt={winnerName}
           onError={e => { (e.target as HTMLImageElement).src = heroFallback; }}
           className="absolute inset-0 w-full h-full"
-          style={{ objectFit: 'cover', objectPosition: 'top center' }}
+          style={{ objectFit: 'cover', objectPosition: '50% 15%' }}
         />
 
-        {/* Winner info overlay — bottom */}
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0,
-          padding: '0 16px 16px',
-          animation: 'tric-fadeUp 0.6s ease-out both',
-          animationDelay: '0.15s',
+        {/* Winner info overlay — frosted glass at bottom */}
+        <div className="absolute bottom-0 left-0 right-0" style={{
+          padding: '12px 16px 16px',
+          background: 'rgba(248,250,252,0.82)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
         }}>
-          {/* Venue eyebrow */}
           {(courseName || location) && (
-            <div style={{
-              fontSize: 12, color: 'rgba(255,255,255,0.5)',
-              marginBottom: 4, letterSpacing: 0.3,
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
-            }}>
+            <div style={{ fontSize: 11, color: 'hsl(var(--muted-foreground))', marginBottom: 3, letterSpacing: 0.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
               {[courseName, location].filter(Boolean).join(' · ')}
             </div>
           )}
-
-          {/* Tournament name */}
-          <div style={{
-            fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.80)',
-            marginBottom: 8, lineHeight: 1.3,
-            overflow: 'hidden', display: '-webkit-box',
-            WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const,
-          }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: 'hsl(var(--foreground))', marginBottom: 6, lineHeight: 1.3 }}>
             {tournamentName}
           </div>
-
-          {/* Winner name + score + margin */}
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' as const }}>
-            <span style={{
-              fontSize: 22, fontWeight: 800, color: '#fff',
-              lineHeight: 1.1, letterSpacing: -0.5,
-            }}>
+            <span style={{ fontSize: 22, fontWeight: 800, color: 'hsl(var(--foreground))', letterSpacing: -0.5 }}>
               {winnerName}
             </span>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{
-                fontSize: 20, fontWeight: 700,
-                color: 'hsl(var(--accent-amber))', lineHeight: 1,
-              }}>
-                {scoreDisplay}
+            <span style={{ fontSize: 20, fontWeight: 700, color: 'hsl(var(--accent-amber))' }}>
+              {scoreDisplay}
+            </span>
+            {marginText && (
+              <span style={{ fontSize: 11, fontWeight: 600, color: 'hsl(var(--foreground))', background: 'hsl(var(--accent-amber) / 0.15)', border: '1px solid hsl(var(--accent-amber) / 0.35)', borderRadius: 6, padding: '2px 8px' }}>
+                {marginText}
               </span>
-              {marginText && (
-                <span style={{
-                  fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.75)',
-                  background: 'rgba(232,152,10,0.18)',
-                  border: '1px solid rgba(232,152,10,0.35)',
-                  borderRadius: 6, padding: '2px 8px',
-                }}>
-                  {marginText}
-                </span>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </div>
