@@ -203,6 +203,9 @@ function buildSession(
 const STORAGE_KEY = 'CLBHOUZ_VIDEO_DEBUG';
 
 export default function ClubhouseVideoDebugPanel() {
+  // Short-circuited — panel disabled. Remove this line to re-enable.
+  return null;
+
   const [visible, setVisible] = useState<boolean>(() => {
     try { return localStorage.getItem(STORAGE_KEY) === 'true'; } catch { return false; }
   });
