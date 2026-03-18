@@ -224,7 +224,7 @@ export function TournamentResultsCard({
           {/* Tournament name */}
           <div style={{
             fontSize: 12, fontWeight: 600,
-            color: 'rgba(255,255,255,0.80)',
+            color: 'hsl(var(--muted-foreground))',
             lineHeight: 1.3, marginBottom: 5,
           }}>
             {tournamentName}
@@ -233,10 +233,9 @@ export function TournamentResultsCard({
           {/* Winner name */}
           <div style={{
             fontSize: 26, fontWeight: 900,
-            color: '#ffffff',
+            color: 'hsl(var(--foreground))',
             letterSpacing: -0.8, lineHeight: 1.05,
             marginBottom: 6,
-            textShadow: '0 1px 8px rgba(0,0,0,0.4)',
           }}>
             {winnerName}
           </div>
