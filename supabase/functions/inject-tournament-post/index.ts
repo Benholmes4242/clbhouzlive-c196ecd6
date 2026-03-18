@@ -157,7 +157,7 @@ Deno.serve(async (req) => {
     const { data: winnerEntries } = await supabase
       .from('sr_leaderboards')
       .select(`
-        player_id, position, position_tied, score, strokes,
+        player_id, position, position_tied, score, strokes, raw_data,
         player:sr_players!inner(id, first_name, last_name, full_name, photo_url, pga_tour_id, headshot_override)
       `)
       .eq('tournament_id', tournamentId)
