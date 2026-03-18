@@ -181,71 +181,42 @@ export function TournamentResultsCard({
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {/* ZONE 1 — WINNER HERO                                              */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
-      <div style={{ position: 'relative', height: 260, overflow: 'hidden' }}>
-        {/* Player headshot background */}
+      <div className="relative overflow-hidden" style={{ height: 320, marginTop: -8 }}>
         <img
           src={winnerPhoto}
           alt={winnerName}
           onError={e => { (e.target as HTMLImageElement).src = heroFallback; }}
           className="absolute inset-0 w-full h-full"
-          style={{ objectFit: 'cover', objectPosition: 'top center' }}
+          style={{ objectFit: 'cover', objectPosition: '50% 15%' }}
         />
 
-        {/* Winner info overlay — bottom */}
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0,
-          padding: '0 16px 16px',
-          animation: 'tric-fadeUp 0.6s ease-out both',
-          animationDelay: '0.15s',
+        {/* Winner info overlay — frosted glass at bottom */}
+        <div className="absolute bottom-0 left-0 right-0" style={{
+          padding: '12px 16px 16px',
+          background: 'rgba(248,250,252,0.82)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
         }}>
-          {/* Venue eyebrow */}
           {(courseName || location) && (
-            <div style={{
-              fontSize: 12, color: 'rgba(255,255,255,0.5)',
-              marginBottom: 4, letterSpacing: 0.3,
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
-            }}>
+            <div style={{ fontSize: 11, color: 'hsl(var(--muted-foreground))', marginBottom: 3, letterSpacing: 0.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
               {[courseName, location].filter(Boolean).join(' · ')}
             </div>
           )}
-
-          {/* Tournament name */}
-          <div style={{
-            fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.80)',
-            marginBottom: 8, lineHeight: 1.3,
-            overflow: 'hidden', display: '-webkit-box',
-            WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const,
-          }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: 'hsl(var(--foreground))', marginBottom: 6, lineHeight: 1.3 }}>
             {tournamentName}
           </div>
-
-          {/* Winner name + score + margin */}
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' as const }}>
-            <span style={{
-              fontSize: 22, fontWeight: 800, color: '#fff',
-              lineHeight: 1.1, letterSpacing: -0.5,
-            }}>
+            <span style={{ fontSize: 22, fontWeight: 800, color: 'hsl(var(--foreground))', letterSpacing: -0.5 }}>
               {winnerName}
             </span>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{
-                fontSize: 20, fontWeight: 700,
-                color: 'hsl(var(--accent-amber))', lineHeight: 1,
-              }}>
-                {scoreDisplay}
+            <span style={{ fontSize: 20, fontWeight: 700, color: 'hsl(var(--accent-amber))' }}>
+              {scoreDisplay}
+            </span>
+            {marginText && (
+              <span style={{ fontSize: 11, fontWeight: 600, color: 'hsl(var(--foreground))', background: 'hsl(var(--accent-amber) / 0.15)', border: '1px solid hsl(var(--accent-amber) / 0.35)', borderRadius: 6, padding: '2px 8px' }}>
+                {marginText}
               </span>
-              {marginText && (
-                <span style={{
-                  fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.75)',
-                  background: 'rgba(232,152,10,0.18)',
-                  border: '1px solid rgba(232,152,10,0.35)',
-                  borderRadius: 6, padding: '2px 8px',
-                }}>
-                  {marginText}
-                </span>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -260,12 +231,12 @@ export function TournamentResultsCard({
           {tStats && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginBottom: 6 }}>
               {[
-                { v: tStats.birdies, label: 'Birdies', color: '#16A34A', bg: 'rgba(22,163,74,0.08)', show: !!tStats.birdies },
-                { v: tStats.pars, label: 'Pars', color: 'hsl(var(--muted-foreground))', bg: 'hsl(var(--muted))', show: !!tStats.pars },
-                { v: tStats.bogeys, label: 'Bogeys', color: '#DC2626', bg: 'rgba(220,38,38,0.08)', show: !!(tStats.bogeys && tStats.bogeys > 0) },
-                { v: tStats.eagles, label: 'Eagles', color: '#F59E0B', bg: 'rgba(245,158,11,0.08)', show: !!(tStats.eagles && tStats.eagles > 0) },
+                { v: tStats.birdies, label: 'Birdies', color: '#16A34A', bg: 'rgba(22,163,74,0.12)', show: !!tStats.birdies },
+                { v: tStats.pars, label: 'Pars', color: 'hsl(var(--muted-foreground))', bg: 'rgba(255,255,255,0.6)', show: !!tStats.pars },
+                { v: tStats.bogeys, label: 'Bogeys', color: '#DC2626', bg: 'rgba(220,38,38,0.10)', show: !!(tStats.bogeys && tStats.bogeys > 0) },
+                { v: tStats.eagles, label: 'Eagles', color: '#F59E0B', bg: 'rgba(245,158,11,0.12)', show: !!(tStats.eagles && tStats.eagles > 0) },
               ].map(stat => (
-                <div key={stat.label} style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 8, background: stat.bg, opacity: stat.show ? 1 : 0.3 }}>
+                <div key={stat.label} style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 10, background: stat.bg, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', opacity: stat.show ? 1 : 0.3 }}>
                   <div style={{ fontSize: 17, fontWeight: 700, color: stat.color }}>{stat.v ?? '—'}</div>
                   <div className="text-muted-foreground" style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.5, marginTop: 2 }}>{stat.label}</div>
                 </div>
@@ -277,19 +248,19 @@ export function TournamentResultsCard({
           {sStats && (sStats.drivingDistance || sStats.greensInReg || sStats.puttingAverage) && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
               {sStats.drivingDistance && (
-                <div style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 8, background: 'rgba(232,152,10,0.07)' }}>
+                <div style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 10, background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
                   <div className="text-foreground" style={{ fontSize: 15, fontWeight: 700 }}>{Math.round(sStats.drivingDistance)}<span className="text-muted-foreground" style={{ fontSize: 9 }}>yds</span></div>
                   <div className="text-muted-foreground" style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.5, marginTop: 2 }}>Driver</div>
                 </div>
               )}
               {sStats.greensInReg && (
-                <div style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 8, background: 'rgba(22,163,74,0.07)' }}>
+                <div style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 10, background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
                   <div className="text-foreground" style={{ fontSize: 15, fontWeight: 700 }}>{Math.round(sStats.greensInReg)}<span className="text-muted-foreground" style={{ fontSize: 9 }}>%</span></div>
                   <div className="text-muted-foreground" style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.5, marginTop: 2 }}>GIR</div>
                 </div>
               )}
               {sStats.puttingAverage && (
-                <div style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 8, background: 'hsl(var(--muted))' }}>
+                <div style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 10, background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
                   <div className="text-foreground" style={{ fontSize: 15, fontWeight: 700 }}>{sStats.puttingAverage.toFixed(2)}</div>
                   <div className="text-muted-foreground" style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.5, marginTop: 2 }}>Putts</div>
                 </div>
@@ -305,11 +276,7 @@ export function TournamentResultsCard({
       {narrative && (
         <div style={{
           display: 'flex', alignItems: 'flex-start', gap: 10,
-          padding: '12px 16px',
-          background: 'hsl(var(--muted) / 0.6)',
-          borderBottom: '1px solid hsl(var(--border))',
-          animation: 'tric-fadeIn 0.5s ease-out both',
-          animationDelay: '0.35s',
+          padding: '8px 16px',
         }}>
           <span style={{ fontSize: 14, flexShrink: 0, marginTop: 1 }}>⚡</span>
           <p className="text-muted-foreground" style={{
