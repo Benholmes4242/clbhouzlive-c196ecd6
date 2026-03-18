@@ -444,7 +444,7 @@ export default function ClubhouseVideoDebugPanel() {
   // ── Cleanup listeners when sessions disappear ──
   useEffect(() => {
     hlsListeners.current.forEach((cleanup, id) => {
-      if (!HLS_REGISTRY.has(id)) {
+      if (!getHlsRegistry().has(id)) {
         cleanup();
         hlsListeners.current.delete(id);
       }
