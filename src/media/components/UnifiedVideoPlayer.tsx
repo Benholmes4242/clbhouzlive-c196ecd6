@@ -28,6 +28,7 @@ import type { MediaSurface } from '@/media/runtime/MediaRuntime';
 import { CLOUDFLARE_STREAM_PATTERNS } from '@/media/constants';
 import type { PlaybackState, MediaError, AspectRatio } from '@/media/types';
 import { VideoOverlay } from './VideoOverlay';
+import { registerHlsForDebug, unregisterHlsForDebug } from '@/components/debug/ClubhouseVideoDebugPanel';
 import { NetworkPriorityManager } from '@/utils/video/NetworkPriorityManager';
 import { DecoderLimitManager } from '@/utils/video/DecoderLimitManager';
 import { useGaplessLoop } from '@/utils/video/GaplessLoop';
@@ -704,6 +705,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           if (pooledHls) {
             // Use promoted instance - already attached to video
             hlsRef.current = pooledHls;
+            registerHlsForDebug(cloudflareUid || uniqueMediaId, pooledHls, video);
             
             // Re-wire event handlers for the promoted instance
             pooledHls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -852,6 +854,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           hls.loadSource(hlsUrl);
           hls.attachMedia(video);
           hlsRef.current = hls;
+          registerHlsForDebug(cloudflareUid || uniqueMediaId, hls, video);
         } catch (err) {
           // Fall back to native
           video.src = hlsUrl;
@@ -873,6 +876,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         DecoderLimitManager.releaseSlot(uniqueMediaId);
         
         if (hlsRef.current) {
+          unregisterHlsForDebug(cloudflareUid || uniqueMediaId);
           try {
             hlsRef.current.stopLoad();
             hlsRef.current.detachMedia();
