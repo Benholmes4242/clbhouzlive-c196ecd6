@@ -22,7 +22,7 @@ import { useMyBusinesses } from '@/hooks/useMyBusinesses';
 import { useBlockActions } from '@/hooks/useBlockActions';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Trophy, ChevronRight, ChevronDown, MoreHorizontal, Send, UserPlus, Check, ExternalLink, Loader2, ArrowLeft, Pencil, Camera, Share2, Link2, Flag, Ban, Settings, Building2 } from 'lucide-react';
+import { Trophy, ChevronRight, ChevronDown, MoreHorizontal, Send, UserPlus, UserCheck, UserMinus, Check, ExternalLink, Loader2, ArrowLeft, Pencil, Camera, Share2, Link2, Flag, Ban, Settings, Building2 } from 'lucide-react';
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
@@ -161,7 +161,15 @@ const ProfilePageV2Content: React.FC = () => {
 
   // Follow and friendship hooks for other users
   const { isFollowing, busy: followBusy, toggle: toggleFollow, ensureInitial } = useFollow(isSelf ? undefined : profileUserId);
-  const { status: friendshipStatus, isUpdating: friendshipUpdating, sendRequest, cancelRequest } = useFriendship(isSelf ? undefined : profileUserId);
+  const {
+    status: friendshipStatus,
+    isUpdating: friendshipUpdating,
+    sendRequest,
+    cancelRequest,
+    acceptRequest,
+    declineRequest,
+    unfriend,
+  } = useFriendship(isSelf ? undefined : profileUserId);
   
   // Initialize follow state
   useEffect(() => {
@@ -169,6 +177,15 @@ const ProfilePageV2Content: React.FC = () => {
       ensureInitial();
     }
   }, [isSelf, profileUserId, ensureInitial]);
+
+  // Fallback: if follow state never resolves from 'unknown' after 5s,
+  // treat as not-following so buttons don't stay disabled forever.
+  const [followResolved, setFollowResolved] = useState(false);
+  useEffect(() => {
+    if (isFollowing !== 'unknown') { setFollowResolved(true); return; }
+    const t = setTimeout(() => setFollowResolved(true), 5000);
+    return () => clearTimeout(t);
+  }, [isFollowing]);
   
   // Fix 4: Read initial tab from URL search params
   const [searchParams, setSearchParams] = useSearchParams();
@@ -361,12 +378,22 @@ const ProfilePageV2Content: React.FC = () => {
   
   // Handle friend button click
   const handleFriendAction = async () => {
-    if (friendshipStatus === 'none') {
-      await sendRequest();
-    } else if (friendshipStatus === 'request_sent') {
-      await cancelRequest();
+    switch (friendshipStatus) {
+      case 'none':
+        await sendRequest();
+        break;
+      case 'request_sent':
+        await cancelRequest();
+        break;
+      case 'request_received':
+        await acceptRequest();
+        break;
+      case 'friends':
+        await unfriend();
+        break;
+      default:
+        break;
     }
-    // For 'friends' and 'request_received', we might want different actions
   };
 
   // Redirect to auth if not logged in (must be before early returns but after all hooks)
@@ -705,11 +732,17 @@ const ProfilePageV2Content: React.FC = () => {
           </div>
         ) : (
           /* ── Other user: Follow + Add Friend + Overflow menu ── */
+          /* If blocked (either direction), show only a muted status label */
+          friendshipStatus === 'blocked' ? (
+            <div className="h-11 flex-1 rounded-full text-sm font-medium flex items-center justify-center text-muted-foreground bg-muted border border-border">
+              Unavailable
+            </div>
+          ) : (
           <>
             <button 
               className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 disabled:opacity-60 active:scale-[0.98] transition-transform border border-border bg-card text-foreground"
               onClick={toggleFollow}
-              disabled={followBusy || isFollowing === 'unknown'}
+              disabled={followBusy || (isFollowing === 'unknown' && !followResolved)}
             >
               {followBusy ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -724,24 +757,44 @@ const ProfilePageV2Content: React.FC = () => {
             </button>
             
             <button 
-              className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 disabled:opacity-60 active:scale-[0.98] transition-transform border border-border"
-              style={{
-                background: friendshipStatus === 'friends' ? 'rgba(245, 158, 11, 0.10)' : undefined,
-                color: friendshipStatus === 'friends' ? '#d97706' : undefined,
-                borderColor: friendshipStatus === 'friends' ? 'rgba(245, 158, 11, 0.3)' : undefined,
-              }}
+              className={cn(
+                'h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5',
+                'whitespace-nowrap disabled:opacity-60 active:scale-[0.98] transition-transform border',
+                // State-specific colour tokens — no hardcoded hex
+                friendshipStatus === 'friends'
+                  ? 'bg-amber-500/10 text-amber-600 border-amber-500/30'
+                  : friendshipStatus === 'request_received'
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-card text-foreground border-border',
+              )}
               onClick={handleFriendAction}
-              disabled={friendshipUpdating || friendshipStatus === 'friends'}
+              // Only disable during an in-flight mutation — never permanently
+              disabled={friendshipUpdating}
             >
               {friendshipUpdating ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  {/* Keep a text label so button width doesn't collapse */}
+                  {friendshipStatus === 'friends' ? 'Unfriending…'
+                    : friendshipStatus === 'request_sent' ? 'Cancelling…'
+                    : friendshipStatus === 'request_received' ? 'Accepting…'
+                    : 'Sending…'}
+                </>
               ) : friendshipStatus === 'friends' ? (
                 <>
-                  <Check className="w-3.5 h-3.5" />
+                  <UserCheck className="w-3.5 h-3.5" />
                   Friends
                 </>
               ) : friendshipStatus === 'request_sent' ? (
-                'Requested'
+                <>
+                  <UserMinus className="w-3.5 h-3.5" />
+                  Requested
+                </>
+              ) : friendshipStatus === 'request_received' ? (
+                <>
+                  <UserCheck className="w-3.5 h-3.5" />
+                  Accept
+                </>
               ) : (
                 <>
                   <UserPlus className="w-3.5 h-3.5" />
@@ -781,6 +834,16 @@ const ProfilePageV2Content: React.FC = () => {
                   Copy link
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                {/* Unfriend — only show when already friends */}
+                {friendshipStatus === 'friends' && (
+                  <DropdownMenuItem
+                    onClick={() => unfriend()}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <UserMinus className="w-4 h-4 mr-2" />
+                    Remove friend
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={() => setShowReportDialog(true)}>
                   <Flag className="w-4 h-4 mr-2" />
                   Report
@@ -795,6 +858,7 @@ const ProfilePageV2Content: React.FC = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </>
+          )
         )}
       </div>
 
