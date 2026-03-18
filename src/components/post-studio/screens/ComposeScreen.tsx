@@ -820,7 +820,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             ref={textareaRef}
             value={state.caption}
             onChange={handleCaptionChange}
-            placeholder={placeholderRef.current}
+            placeholder=""
             className="w-full resize-none outline-none leading-relaxed"
             style={{
               background: 'transparent',
