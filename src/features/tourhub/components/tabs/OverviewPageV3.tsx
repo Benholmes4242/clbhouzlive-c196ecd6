@@ -29,7 +29,8 @@ import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { HERO_STYLES } from '../../constants/heroStyles';
-import { WifiOff } from 'lucide-react';
+import { WifiOff, Menu } from 'lucide-react';
+import { openTourNav } from '../../contexts/TourNavContext';
 
 export function OverviewPageV3() {
   const { isOnline } = useNetworkStatus();
