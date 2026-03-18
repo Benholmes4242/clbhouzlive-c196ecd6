@@ -285,10 +285,10 @@ export function TournamentResultsCard({
               marginBottom: 6,
             }}>
               {([
+                { v: tStats.eagles,   label: 'Eagles',  num: '#F59E0B', bg: 'rgba(245,158,11,0.10)'  },
                 { v: tStats.birdies,  label: 'Birdies', num: '#16A34A', bg: 'rgba(22,163,74,0.09)'   },
                 { v: tStats.pars,     label: 'Pars',    num: 'hsl(var(--foreground))', bg: 'rgba(0,0,0,0.04)'  },
                 { v: tStats.bogeys,   label: 'Bogeys',  num: '#DC2626', bg: 'rgba(220,38,38,0.08)'   },
-                { v: tStats.eagles,   label: 'Eagles',  num: '#F59E0B', bg: 'rgba(245,158,11,0.10)'  },
               ] as const).map(s => (
                 <div key={s.label} style={{
                   textAlign: 'center' as const,
@@ -351,11 +351,7 @@ export function TournamentResultsCard({
 
       {/* ── AI NARRATIVE ────────────────────────────────────────────── */}
       {narrative && (
-        <div style={{
-          display: 'flex', alignItems: 'flex-start', gap: 8,
-          padding: '4px 16px 14px',
-        }}>
-          <span style={{ fontSize: 13, flexShrink: 0, marginTop: 1, opacity: 0.7 }}>⚡</span>
+        <div style={{ padding: '4px 16px 14px' }}>
           <p style={{
             fontSize: 13, lineHeight: 1.6,
             fontStyle: 'italic',
