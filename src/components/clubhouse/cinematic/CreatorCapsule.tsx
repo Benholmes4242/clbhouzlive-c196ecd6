@@ -423,9 +423,17 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         
         {/* Caption preview (collapsed) */}
         {!isExpanded && truncatedCaption && (
-          <p className="text-[11px] text-white/60 line-clamp-1 mt-0.5">
-            {truncatedCaption}
-          </p>
+          <div className="text-[11px] text-white/60 line-clamp-1 mt-0.5" style={{ ['--mention-color' as any]: 'rgba(255,255,255,0.75)' }}>
+            {tags.length > 0 ? (
+              <PostContentWithTags
+                content={truncatedCaption}
+                tags={tags}
+                className="text-[11px] text-white/60 line-clamp-1"
+              />
+            ) : (
+              truncatedCaption
+            )}
+          </div>
         )}
 
         {/* Course location (collapsed) — separate line */}
