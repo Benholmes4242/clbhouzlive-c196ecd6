@@ -152,13 +152,13 @@ function buildSession(
 ): VideoSession {
   const { hls, video } = entry;
 
-  const levels = (hls.levels ?? []).map((l: any, i: number) => ({
+  const levels = hls ? (hls.levels ?? []).map((l: any, i: number) => ({
     idx: i,
     height: l.height ?? 0,
     bitrateKbps: Math.round((l.bitrate ?? 0) / 1000),
-  }));
+  })) : [];
 
-  const currentLevelIdx = hls.currentLevel ?? -1;
+  const currentLevelIdx = hls ? (hls.currentLevel ?? -1) : -1;
   const currentLevel = levels[currentLevelIdx] ?? { height: 0, bitrateKbps: 0 };
 
   // Buffer ahead
@@ -174,8 +174,8 @@ function buildSession(
     }
   } catch { /* ignore */ }
 
-  // Bandwidth from HLS.js EWMA
-  const bandwidthKbps = Math.round((hls.bandwidthEstimate ?? 0) / 1000);
+  // Bandwidth from HLS.js EWMA (unavailable on native path)
+  const bandwidthKbps = hls ? Math.round((hls.bandwidthEstimate ?? 0) / 1000) : 0;
 
   const base: VideoSession = {
     videoId,
@@ -303,7 +303,7 @@ export default function ClubhouseVideoDebugPanel() {
       video.addEventListener(evt, fn, { passive: true });
     });
 
-    // ── HLS.js events ──
+    // ── HLS.js events (only when hls instance exists — not on native iOS path) ──
     const onManifestParsed = (_: string, data: any) => {
       const levels = (hls.levels ?? []).map((l: any, i: number) => ({
         idx: i, height: l.height ?? 0, bitrateKbps: Math.round((l.bitrate ?? 0) / 1000),
@@ -381,22 +381,26 @@ export default function ClubhouseVideoDebugPanel() {
       });
     };
 
-    hls.on('hlsManifestParsed', onManifestParsed);
-    hls.on('hlsLevelSwitched', onLevelSwitched);
-    hls.on('hlsFragLoaded', onFragLoaded);
-    hls.on('hlsError', onError);
-    hls.on('hlsBufferAppended', onBufferAppended);
+    if (hls) {
+      hls.on('hlsManifestParsed', onManifestParsed);
+      hls.on('hlsLevelSwitched', onLevelSwitched);
+      hls.on('hlsFragLoaded', onFragLoaded);
+      hls.on('hlsError', onError);
+      hls.on('hlsBufferAppended', onBufferAppended);
+    }
 
     // Cleanup fn
     const cleanup = () => {
       Object.entries(videoHandlers).forEach(([evt, fn]) => {
         video.removeEventListener(evt, fn);
       });
-      hls.off('hlsManifestParsed', onManifestParsed);
-      hls.off('hlsLevelSwitched', onLevelSwitched);
-      hls.off('hlsFragLoaded', onFragLoaded);
-      hls.off('hlsError', onError);
-      hls.off('hlsBufferAppended', onBufferAppended);
+      if (hls) {
+        hls.off('hlsManifestParsed', onManifestParsed);
+        hls.off('hlsLevelSwitched', onLevelSwitched);
+        hls.off('hlsFragLoaded', onFragLoaded);
+        hls.off('hlsError', onError);
+        hls.off('hlsBufferAppended', onBufferAppended);
+      }
     };
 
     hlsListeners.current.set(videoId, cleanup);
@@ -520,14 +524,19 @@ export default function ClubhouseVideoDebugPanel() {
       />
 
       {visible && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 99998,
-          background: 'rgba(0,0,0,0.92)',
-          display: 'flex', flexDirection: 'column',
-          fontFamily: '"SF Mono", "Fira Code", "Cascadia Code", monospace',
-          fontSize: 11, color: '#e2e8f0',
-          backdropFilter: 'blur(8px)',
-        }}>
+        <div
+          onTouchStart={e => e.stopPropagation()}
+          onTouchMove={e => e.stopPropagation()}
+          onTouchEnd={e => e.stopPropagation()}
+          onMouseDown={e => e.stopPropagation()}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 99998,
+            background: 'rgba(0,0,0,0.92)',
+            display: 'flex', flexDirection: 'column',
+            fontFamily: '"SF Mono", "Fira Code", "Cascadia Code", monospace',
+            fontSize: 11, color: '#e2e8f0',
+            backdropFilter: 'blur(8px)',
+          }}>
 
           {/* ── Header ── */}
           <div style={{

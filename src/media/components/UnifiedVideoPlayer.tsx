@@ -687,6 +687,8 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           if (startTime && startTime > 0) {
             video.currentTime = startTime;
           }
+          // Register with debug panel — null hls since native path has no HLS.js instance
+          registerHlsForDebug(cloudflareUid || uniqueMediaId, null, video);
           return;
         }
 
