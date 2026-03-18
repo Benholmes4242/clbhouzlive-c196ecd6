@@ -94,19 +94,12 @@ interface VideoSession {
   hlsInstance: any | null;
 }
 
-// ─── Global registry so the panel can reach into active HLS instances ────────
+// ─── Global registry — imported from dedicated singleton module ──────────────
 
-// We register HLS instances by videoId when they are created in UnifiedVideoPlayer.
-// The panel polls this registry.
-const HLS_REGISTRY = new Map<string, { hls: any; video: HTMLVideoElement }>();
+import { getHlsRegistry, registerHlsForDebug, unregisterHlsForDebug } from './hlsDebugRegistry';
 
-export function registerHlsForDebug(videoId: string, hls: any, video: HTMLVideoElement) {
-  HLS_REGISTRY.set(videoId, { hls, video });
-}
-
-export function unregisterHlsForDebug(videoId: string) {
-  HLS_REGISTRY.delete(videoId);
-}
+// Re-export so existing imports from other files don't break
+export { registerHlsForDebug, unregisterHlsForDebug } from './hlsDebugRegistry';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -421,11 +414,11 @@ export default function ClubhouseVideoDebugPanel() {
     if (!visible) return;
 
     const tick = () => {
-      console.log('[DEBUG] HLS_REGISTRY size:', HLS_REGISTRY.size);
+      console.log('[DEBUG] HLS_REGISTRY size:', getHlsRegistry().size);
       setSessions(prev => {
         const next = new Map<string, VideoSession>();
 
-        HLS_REGISTRY.forEach((entry, videoId) => {
+        getHlsRegistry().forEach((entry, videoId) => {
           // Attach listeners if not already done
           attachListeners(videoId, entry);
 
@@ -451,7 +444,7 @@ export default function ClubhouseVideoDebugPanel() {
   // ── Cleanup listeners when sessions disappear ──
   useEffect(() => {
     hlsListeners.current.forEach((cleanup, id) => {
-      if (!HLS_REGISTRY.has(id)) {
+      if (!getHlsRegistry().has(id)) {
         cleanup();
         hlsListeners.current.delete(id);
       }
