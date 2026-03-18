@@ -180,7 +180,7 @@ export function TournamentResultsCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      style={{ paddingBottom: 8 }}
+      style={{ paddingBottom: 8, marginTop: -8 }}
     >
       {/* ── WINNER HERO — split layout ─────────────────────────────── */}
       <div style={{ position: 'relative', overflow: 'hidden', minHeight: 280 }}>
@@ -188,7 +188,7 @@ export function TournamentResultsCard({
         {/* Player portrait — right side, full bleed */}
         <div style={{
           position: 'absolute', top: 0, right: 0,
-          width: '58%', height: '100%',
+          width: '55%', height: '100%',
           maskImage: 'linear-gradient(to left, black 55%, transparent 100%)',
           WebkitMaskImage: 'linear-gradient(to left, black 55%, transparent 100%)',
         }}>
@@ -208,7 +208,7 @@ export function TournamentResultsCard({
         <div style={{
           position: 'relative', zIndex: 2,
           padding: '20px 16px 20px 16px',
-          width: '62%',
+          width: '65%',
           minHeight: 280,
           display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
           gap: 4,
@@ -364,10 +364,10 @@ export function TournamentResultsCard({
       )}
 
       {/* ── DIVIDER ─────────────────────────────────────────────────── */}
-      <div style={{ height: 1, background: 'hsl(var(--border))', margin: '0 16px' }} />
+      <div style={{ height: 1, background: 'hsl(var(--border))', margin: '0' }} />
 
       {/* ── FINAL LEADERBOARD ───────────────────────────────────────── */}
-      <div style={{ padding: '12px 16px 0' }}>
+      <div style={{ padding: '12px 16px 8px' }}>
         <div style={{
           display: 'flex', justifyContent: 'space-between',
           alignItems: 'center', marginBottom: 8,
