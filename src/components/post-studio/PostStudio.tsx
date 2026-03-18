@@ -2,6 +2,10 @@
 // Full-screen immersive studio. Dark-first. Golf-native. Better than Instagram.
 
 import React, { useCallback, useEffect, useRef } from 'react';
+import {
+  applyShieldColor,
+  currentShieldColor,
+} from '@/hooks/useMedianStatusBar';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PostStudioProvider, usePostStudioContext } from './usePostStudio';
