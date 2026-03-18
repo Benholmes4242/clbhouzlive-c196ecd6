@@ -1,5 +1,4 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
 
 interface Tab {
   id: string;
@@ -24,13 +23,13 @@ export function SegmentedTabs({ tabs, activeTab, onTabChange }: SegmentedTabsPro
               key={tab.id}
               type="button"
               onClick={() => onTabChange(tab.id)}
-              className={cn(
-                "px-4 min-h-[36px] rounded-full text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold",
-                isActive
-                  ? "text-white"
-                  : "text-muted-foreground bg-muted"
-              )}
-              style={isActive ? { backgroundColor: '#f59e0b' } : undefined}
+              className="px-4 min-h-[36px] text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold"
+              style={{
+                borderRadius: 8,
+                background: isActive ? 'hsl(var(--foreground))' : 'transparent',
+                color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
+                border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
+              }}
             >
               {tab.label}
               {tab.count !== undefined && tab.count > 0 && (

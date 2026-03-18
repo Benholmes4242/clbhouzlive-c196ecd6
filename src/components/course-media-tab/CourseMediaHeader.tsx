@@ -40,30 +40,35 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
         </div>
         <button
           onClick={() => navigate(`/courses/${courseId}/rate`)}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold border border-[#f59e0b] text-[#d97706] hover:bg-amber-50 active:scale-[0.97] transition-all min-h-[36px]"
+          className="flex items-center gap-1 px-3 py-1.5 text-xs font-semibold active:scale-[0.97] transition-all min-h-[36px]"
+          style={{ borderRadius: 8, background: 'hsl(var(--muted))', color: 'hsl(var(--foreground))', border: 'none' }}
         >
           <Plus className="w-3.5 h-3.5" />
           Add media
         </button>
       </div>
 
-      {/* Filter chips */}
+      {/* Filter chips — orange gradient */}
       <div className="flex items-center justify-center gap-2">
-        {FILTERS.map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => onFilterChange(key)}
-            className={cn(
-              'min-h-[44px] px-4 rounded-full text-sm font-semibold transition-colors',
-              activeFilter === key
-                ? 'text-white shadow-sm'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80'
-            )}
-            style={activeFilter === key ? { backgroundColor: 'hsl(var(--tab-sub-active))', color: 'hsl(var(--tab-sub-active-foreground))' } : undefined}
-          >
-            {label}
-          </button>
-        ))}
+        {FILTERS.map(({ key, label }) => {
+          const isActive = activeFilter === key;
+          return (
+            <button
+              key={key}
+              onClick={() => onFilterChange(key)}
+              className="min-h-[34px] px-4 text-sm font-semibold transition-colors"
+              style={{
+                borderRadius: 8,
+                background: isActive ? 'linear-gradient(90deg, #F59E0B, #F7931E)' : 'transparent',
+                color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
+                border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
+                boxShadow: isActive ? '0 2px 8px rgba(247,147,30,0.20)' : 'none',
+              }}
+            >
+              {label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

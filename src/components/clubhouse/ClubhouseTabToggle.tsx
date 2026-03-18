@@ -10,9 +10,7 @@ interface ClubhouseTabToggleProps {
 }
 
 /**
- * Tab toggle for Clubhouse feed - now rendered inside CompactHeader
- * Uses flex layout for automatic centering, no JS measurements needed
- * Hides Friends tab when in business actor mode
+ * ClubhouseTabToggle — Pinpoint dark-surface main tab (white text, amber gradient underline)
  */
 export const ClubhouseTabToggle = ({
   activeTab,
@@ -20,10 +18,9 @@ export const ClubhouseTabToggle = ({
   className,
   isBusinessActor = false,
 }: ClubhouseTabToggleProps) => {
-  // When in business mode, only show Suggested (no toggle needed)
   if (isBusinessActor) {
     return (
-      <div className={cn("flex items-center gap-2 relative z-[45]", className)} role="tablist" aria-label="Feed filter">
+      <div className={cn("flex items-center gap-6 relative z-[45]", className)} role="tablist" aria-label="Feed filter">
         <span className="text-sm font-semibold text-white opacity-100 whitespace-nowrap py-3 px-1">
           Suggested
         </span>
@@ -32,34 +29,53 @@ export const ClubhouseTabToggle = ({
   }
 
   return (
-    <div className={cn("flex items-center gap-2 relative z-[45]", className)} role="tablist" aria-label="Feed filter">
-      <button
-        role="tab"
-        aria-selected={activeTab === 'foryou'}
-        onClick={() => onTabChange('foryou')}
-        className={cn(
-          "text-sm transition-all duration-200 whitespace-nowrap px-1 min-h-[44px] flex items-center active:scale-[0.97]",
-          activeTab === 'foryou' 
-            ? "text-white opacity-100 font-semibold" 
-            : "text-white opacity-50 font-medium"
-        )}
-      >
-        Suggested
-      </button>
-      <span className="text-white opacity-40 text-sm font-light" aria-hidden="true">|</span>
-      <button
-        role="tab"
-        aria-selected={activeTab === 'friends'}
-        onClick={() => onTabChange('friends')}
-        className={cn(
-          "text-sm transition-all duration-200 whitespace-nowrap px-1 min-h-[44px] flex items-center active:scale-[0.97]",
-          activeTab === 'friends' 
-            ? "text-white opacity-100 font-semibold" 
-            : "text-white opacity-50 font-medium"
-        )}
-      >
-        Friends
-      </button>
+    <div
+      className={cn("flex items-center gap-6 relative z-[45]", className)}
+      role="tablist"
+      aria-label="Feed filter"
+      style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}
+    >
+      {(['foryou', 'friends'] as const).map((id) => {
+        const label = id === 'foryou' ? 'Suggested' : 'Friends';
+        const isActive = activeTab === id;
+        return (
+          <button
+            key={id}
+            role="tab"
+            aria-selected={isActive}
+            onClick={() => onTabChange(id)}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '10px 2px 8px',
+              fontSize: 14,
+              whiteSpace: 'nowrap' as const,
+              fontWeight: isActive ? 700 : 500,
+              color: isActive ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.40)',
+              letterSpacing: isActive ? '-0.025em' : '0',
+              position: 'relative' as const,
+              minHeight: 44,
+              display: 'flex',
+              alignItems: 'center',
+              transition: 'color 0.18s',
+            }}
+          >
+            {label}
+            {isActive && (
+              <div style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: 2.5,
+                borderRadius: 2,
+                background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
+              }} />
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 };

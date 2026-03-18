@@ -1,9 +1,8 @@
 /**
- * IntelligenceTabSwitcher - Tier 2 sub-tab pills
+ * IntelligenceTabSwitcher - Pinpoint sub-tab pills (8px, foreground active)
  */
 
 import React from 'react';
-import { cn } from '@/lib/utils';
 
 type IntelligenceTab = 'courseDNA' | 'predictions';
 
@@ -36,13 +35,13 @@ const IntelligenceTabSwitcher: React.FC<IntelligenceTabSwitcherProps> = ({
           <button
             key={opt.value}
             onClick={() => onTabChange(opt.value)}
-            className={cn(
-              "px-4 min-h-[36px] rounded-full text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold",
-              isActive
-                ? "text-white"
-                : "text-muted-foreground bg-muted"
-            )}
-            style={isActive ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
+            className="px-4 min-h-[36px] text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold"
+            style={{
+              borderRadius: 8,
+              background: isActive ? 'hsl(var(--foreground))' : 'transparent',
+              color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
+              border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
+            }}
           >
             {opt.label}
           </button>

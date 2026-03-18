@@ -35,13 +35,15 @@ export function LeaderboardSegmentedControl({
               disabled={isDisabled}
               onClick={() => !isDisabled && onChange(seg.value)}
               className={cn(
-                'px-4 min-h-[36px] rounded-full text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold',
-                isActive
-                  ? 'text-white'
-                  : 'text-muted-foreground bg-muted',
+                'px-4 min-h-[36px] text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold',
                 isDisabled && 'opacity-40 cursor-not-allowed'
               )}
-              style={isActive ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
+              style={{
+                borderRadius: 8,
+                background: isActive ? 'hsl(var(--foreground))' : 'transparent',
+                color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
+                border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
+              }}
             >
               {seg.label}
             </button>

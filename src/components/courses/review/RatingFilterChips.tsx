@@ -18,23 +18,6 @@ const FILTER_OPTIONS: { key: ScoreTier; label: string; sampleScore: number }[] =
   { key: 'fair', label: 'Fair', sampleScore: 5.0 },
 ];
 
-const amberConfig = {
-  bg: 'bg-[#f59e0b]/10',
-  text: 'text-[#d97706]',
-  activeBg: 'bg-[#f59e0b]',
-  activeText: 'text-white',
-  border: 'border-[#f59e0b]/30',
-  activeBorder: 'border-[#f59e0b]',
-};
-
-const tierConfig: Record<ScoreTier, typeof amberConfig> = {
-  outstanding: amberConfig,
-  excellent:   amberConfig,
-  veryGood:    amberConfig,
-  good:        amberConfig,
-  fair:        amberConfig,
-};
-
 export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
   value,
   onChange,
@@ -46,36 +29,40 @@ export const RatingFilterChips: React.FC<RatingFilterChipsProps> = ({
       aria-label="Filter reviews by rating"
     >
       {FILTER_OPTIONS.map((option) => {
-        const isSelected = value === option.key;
-        const config = tierConfig[option.key];
-        
+        const isActive = value === option.key;
         return (
           <button
             key={option.key}
             type="button"
-            onClick={() => onChange(isSelected ? null : option.key)}
-            className={cn(
-              "inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium",
-              "whitespace-nowrap min-h-[32px] transition-all duration-150 border",
-              "active:scale-[0.97]",
-              isSelected 
-                ? `${config.activeBg} ${config.activeText} ${config.activeBorder}` 
-                : `${config.bg} ${config.text} ${config.border} hover:opacity-80`
-            )}
+            onClick={() => onChange(isActive ? null : option.key)}
+            style={{
+              borderRadius: 8,
+              height: 32,
+              paddingLeft: 12,
+              paddingRight: 12,
+              fontSize: 12,
+              fontWeight: isActive ? 700 : 500,
+              cursor: 'pointer',
+              background: isActive ? 'linear-gradient(90deg, #F59E0B, #F7931E)' : 'transparent',
+              color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
+              border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
+              boxShadow: isActive ? '0 2px 8px rgba(247,147,30,0.20)' : 'none',
+              transition: 'all 0.18s ease',
+            }}
           >
             {option.label}
           </button>
         );
       })}
       
-      {/* Clear button - only visible when filter is active */}
       {value && (
         <button
           type="button"
           onClick={() => onChange(null)}
-          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium
-            whitespace-nowrap min-h-[32px] bg-gray-100 text-gray-600 
-            border border-gray-200 hover:bg-gray-200 active:scale-[0.97] transition-all"
+          className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium
+            whitespace-nowrap min-h-[32px] bg-muted text-muted-foreground 
+            border border-border hover:bg-muted/80 active:scale-[0.97] transition-all"
+          style={{ borderRadius: 8 }}
         >
           <X className="w-3 h-3" />
           Clear

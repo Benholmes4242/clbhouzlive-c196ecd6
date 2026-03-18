@@ -44,10 +44,12 @@ export function FriendsHeader({
               role="tab"
               aria-selected={isActive}
               onClick={() => onModeChange(id)}
-              className="shrink-0 min-h-[36px] px-4 rounded-full text-sm font-semibold transition-colors"
+              className="shrink-0 min-h-[36px] px-4 text-sm font-semibold transition-colors"
               style={{
-                backgroundColor: isActive ? 'hsl(var(--tab-sub-active))' : 'hsl(var(--muted))',
-                color: isActive ? 'hsl(var(--tab-sub-active-foreground))' : 'hsl(var(--muted-foreground))',
+                borderRadius: 8,
+                background: isActive ? 'hsl(var(--foreground))' : 'transparent',
+                color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
+                border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
               }}
             >
               {label}

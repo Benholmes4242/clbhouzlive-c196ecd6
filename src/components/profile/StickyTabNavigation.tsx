@@ -89,13 +89,14 @@ const StickyTabNavigation: React.FC<StickyTabNavigationProps> = ({
 
           {/* Animated Underline */}
           <div 
-            className="absolute bottom-0 h-0.5 bg-muted-foreground/40 transition-all duration-300 ease-out rounded-full"
+            className="absolute bottom-0 h-[2.5px] transition-all duration-300 ease-out rounded-full"
             style={{
               left: underlineStyle.left,
               width: underlineStyle.width,
-              transform: 'translateX(8px)', // Offset for padding
+              transform: 'translateX(8px)',
               marginLeft: '-8px',
-              marginRight: '-8px'
+              marginRight: '-8px',
+              background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
             }}
           />
         </div>

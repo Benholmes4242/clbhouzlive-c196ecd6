@@ -39,28 +39,22 @@ const MyCoursesTabs = ({
   const { user: currentUser } = useSupabaseSession();
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="flex items-center gap-2 w-full bg-transparent border-0 p-0 h-auto justify-center">
+      <TabsList className="flex items-center gap-4 w-full bg-transparent border-b border-border p-0 h-auto justify-center rounded-none">
         <TabsTrigger 
           value="all"
-          className="min-h-[36px] px-4 rounded-full text-sm font-semibold transition-all active:scale-[0.97] border-0 shadow-none
-            data-[state=active]:text-white data-[state=active]:shadow-none data-[state=active]:bg-[hsl(215,16%,35%)]
-            data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground"
+          className="min-h-[36px] px-1 text-sm font-semibold transition-all border-0 shadow-none rounded-none"
         >
           All Courses
         </TabsTrigger>
         <TabsTrigger 
           value="top100"
-          className="min-h-[36px] px-4 rounded-full text-sm font-semibold transition-all active:scale-[0.97] border-0 shadow-none
-            data-[state=active]:text-white data-[state=active]:shadow-none data-[state=active]:bg-[hsl(215,16%,35%)]
-            data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground"
+          className="min-h-[36px] px-1 text-sm font-semibold transition-all border-0 shadow-none rounded-none"
         >
           Top 100
         </TabsTrigger>
         <TabsTrigger 
           value="recent"
-          className="min-h-[36px] px-4 rounded-full text-sm font-semibold transition-all active:scale-[0.97] border-0 shadow-none
-            data-[state=active]:text-white data-[state=active]:shadow-none data-[state=active]:bg-[hsl(215,16%,35%)]
-            data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground"
+          className="min-h-[36px] px-1 text-sm font-semibold transition-all border-0 shadow-none rounded-none"
         >
           Recent
         </TabsTrigger>

@@ -34,7 +34,8 @@ const ClaimCourseCTA: React.FC<ClaimCourseCTAProps> = ({ clubId, clubName }) => 
         </p>
         <Button
           onClick={handleClaim}
-          className="border border-[#f59e0b] text-[#d97706] min-h-[44px] rounded-full px-6 font-semibold active:scale-[0.97] transition-all hover:bg-[#fff7ed]"
+          className="min-h-[44px] px-6 font-semibold active:scale-[0.97] transition-all"
+          style={{ borderRadius: 10, background: 'transparent', color: '#F7931E', border: '1.5px solid #F59E0B' }}
         >
           Claim this course →
         </Button>

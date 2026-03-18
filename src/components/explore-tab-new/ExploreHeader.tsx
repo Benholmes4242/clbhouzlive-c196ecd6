@@ -28,7 +28,6 @@ function ExploreHeaderInner({
       className="sticky top-0 z-30 bg-background pb-0 pt-2 px-0"
       style={{ borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
     >
-      {/* Search bar */}
       <div className="px-4 pb-2">
         <button
           type="button"
@@ -41,7 +40,6 @@ function ExploreHeaderInner({
         </button>
       </div>
 
-      {/* Region chips */}
       <div role="tablist" aria-label="Filter by region" className="flex justify-center gap-2 px-4 pb-3 overflow-x-auto scrollbar-hide">
         {regions.map((region) => {
           const isActive = activeRegion === region.slug;
@@ -52,10 +50,12 @@ function ExploreHeaderInner({
               role="tab"
               aria-selected={isActive}
               onClick={() => onRegionChange(region.slug)}
-              className="shrink-0 min-h-[36px] px-4 rounded-full text-sm font-semibold transition-colors"
+              className="shrink-0 min-h-[36px] px-4 text-sm font-semibold transition-colors"
               style={{
-                backgroundColor: isActive ? 'hsl(var(--tab-sub-active))' : 'hsl(var(--muted))',
-                color: isActive ? 'hsl(var(--tab-sub-active-foreground))' : 'hsl(var(--muted-foreground))',
+                borderRadius: 8,
+                background: isActive ? 'hsl(var(--foreground))' : 'transparent',
+                color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
+                border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
               }}
             >
               {region.title}
@@ -68,7 +68,7 @@ function ExploreHeaderInner({
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="shrink-0 min-h-[36px] w-20 rounded-full bg-muted animate-pulse"
+                className="shrink-0 min-h-[36px] w-20 rounded-[8px] bg-muted animate-pulse"
               />
             ))}
           </>
