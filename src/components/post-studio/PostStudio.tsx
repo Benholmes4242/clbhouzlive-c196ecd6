@@ -221,6 +221,39 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
     return () => { document.body.style.overflow = prev; };
   }, []);
 
+  // Status bar — PostStudio is a portal, not a route, so App.tsx's
+  // route-change useLayoutEffect never fires when it opens.
+  // We manually apply transparent on open and restore on close.
+  useEffect(() => {
+    // Save whatever the underlying page set before we opened
+    const prevShieldColor = currentShieldColor;
+
+    // Apply dark transparent status bar for the dark studio surface
+    applyShieldColor('transparent');
+    document.documentElement.style.backgroundColor = 'transparent';
+    document.body.style.backgroundColor = 'transparent';
+
+    // Also update Median native status bar if available
+    try {
+      if (typeof window !== 'undefined' && window.median?.statusbar?.set) {
+        window.median.statusbar.set({
+          style: 'dark',
+          color: '00000000',
+          overlay: true,
+          blur: false,
+        });
+      }
+    } catch { /* Median bridge not ready — fail silently */ }
+
+    return () => {
+      // Restore the underlying page's shield color when PostStudio closes.
+      // This covers both Clubhouse (keep-alive) and standard route pages.
+      applyShieldColor(prevShieldColor);
+      document.documentElement.style.backgroundColor = prevShieldColor === 'transparent' ? 'transparent' : prevShieldColor;
+      document.body.style.backgroundColor = prevShieldColor === 'transparent' ? 'transparent' : prevShieldColor;
+    };
+  }, []); // intentionally empty — run once on mount, cleanup on unmount
+
   return (
     <>
       {/* Backdrop */}
