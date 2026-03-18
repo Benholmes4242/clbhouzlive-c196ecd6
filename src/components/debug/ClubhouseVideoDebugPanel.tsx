@@ -418,7 +418,7 @@ export default function ClubhouseVideoDebugPanel() {
       setSessions(prev => {
         const next = new Map<string, VideoSession>();
 
-        HLS_REGISTRY.forEach((entry, videoId) => {
+        getHlsRegistry().forEach((entry, videoId) => {
           // Attach listeners if not already done
           attachListeners(videoId, entry);
 
