@@ -414,7 +414,7 @@ export default function ClubhouseVideoDebugPanel() {
     if (!visible) return;
 
     const tick = () => {
-      console.log('[DEBUG] HLS_REGISTRY size:', HLS_REGISTRY.size);
+      console.log('[DEBUG] HLS_REGISTRY size:', getHlsRegistry().size);
       setSessions(prev => {
         const next = new Map<string, VideoSession>();
 
