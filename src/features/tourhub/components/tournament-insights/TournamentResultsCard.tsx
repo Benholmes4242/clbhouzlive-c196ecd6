@@ -180,7 +180,7 @@ export function TournamentResultsCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      style={{ paddingBottom: 8, marginTop: -36 }}
+      style={{ paddingBottom: 8, marginTop: -20 }}
     >
       {/* ── WINNER HERO — split layout ─────────────────────────────── */}
       <div style={{ position: 'relative', overflow: 'visible', minHeight: 280, zIndex: 1 }}>
@@ -338,7 +338,7 @@ export function TournamentResultsCard({
 
       {/* ── AI NARRATIVE ────────────────────────────────────────────── */}
       {narrative && (
-        <div style={{ padding: '4px 16px 14px' }}>
+        <div style={{ padding: '4px 16px 14px', textAlign: 'center' }}>
           <p style={{
             fontSize: 13, lineHeight: 1.6,
             fontStyle: 'normal',
