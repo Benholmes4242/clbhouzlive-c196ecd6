@@ -250,21 +250,6 @@ export function TournamentResultsCard({
             {scoreDisplay}
           </div>
 
-          {/* Margin pill */}
-          {marginText && (
-            <div style={{
-              display: 'inline-flex',
-              fontSize: 11, fontWeight: 700,
-              color: 'rgba(255,255,255,0.9)',
-              background: 'rgba(0,0,0,0.35)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: 20, padding: '4px 12px',
-            }}>
-              {marginText}
-            </div>
-          )}
         </div>
       </div>
 
