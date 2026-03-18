@@ -182,40 +182,44 @@ export function TournamentResultsCard({
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       style={{ paddingBottom: 8, marginTop: -36 }}
     >
-      {/* ── WINNER HERO — full bleed immersive ──────────────────── */}
-      <div style={{ position: 'relative', overflow: 'hidden', height: 320 }}>
+      {/* ── WINNER HERO — split layout ─────────────────────────────── */}
+      <div style={{ position: 'relative', overflow: 'hidden', minHeight: 280 }}>
 
-        {/* Player portrait — full bleed edge to edge */}
-        <img
-          src={winnerPhoto}
-          alt={winnerName}
-          onError={e => { (e.target as HTMLImageElement).src = heroFallback; }}
-          style={{
-            position: 'absolute', inset: 0,
-            width: '100%', height: '100%',
-            objectFit: 'cover', objectPosition: '50% 8%',
-            display: 'block',
-          }}
-        />
-
-        {/* Gradient scrim — bottom-to-top for text legibility only */}
+        {/* Player portrait — right side, full bleed */}
         <div style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none',
-          background: 'linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.55) 35%, rgba(0,0,0,0.15) 60%, transparent 100%)',
-        }} />
+          position: 'absolute', top: 0, right: 0,
+          width: '55%', height: '100%',
+          maskImage: 'linear-gradient(to left, black 55%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to left, black 55%, transparent 100%)',
+        }}>
+          <img
+            src={winnerPhoto}
+            alt={winnerName}
+            onError={e => { (e.target as HTMLImageElement).src = heroFallback; }}
+            style={{
+              width: '100%', height: '100%',
+              objectFit: 'cover', objectPosition: '50% 8%',
+              display: 'block',
+            }}
+          />
+        </div>
 
-        {/* Winner info — anchored bottom left */}
+        {/* Left column — winner info */}
         <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0,
-          padding: '0 16px 18px',
-          zIndex: 2,
+          position: 'relative', zIndex: 2,
+          padding: '20px 16px 20px 16px',
+          width: '65%',
+          minHeight: 280,
+          display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+          gap: 4,
         }}>
           {/* Eyebrow — course name in amber */}
           <div style={{
             fontSize: 10, fontWeight: 700, letterSpacing: 1.8,
             textTransform: 'uppercase' as const,
             color: 'hsl(var(--accent-amber))',
-            marginBottom: 3, lineHeight: 1,
+            marginBottom: 2,
+            lineHeight: 1,
           }}>
             {courseName}
           </div>
@@ -223,46 +227,46 @@ export function TournamentResultsCard({
           {/* Tournament name */}
           <div style={{
             fontSize: 12, fontWeight: 600,
-            color: 'rgba(255,255,255,0.75)',
-            lineHeight: 1.3, marginBottom: 5,
+            color: 'hsl(var(--muted-foreground))',
+            lineHeight: 1.3,
+            marginBottom: 4,
           }}>
             {tournamentName}
           </div>
 
-          {/* Winner name */}
+          {/* Winner name — big */}
           <div style={{
-            fontSize: 26, fontWeight: 900,
-            color: '#ffffff',
-            letterSpacing: -0.8, lineHeight: 1.05,
+            fontSize: 28, fontWeight: 900,
+            color: 'hsl(var(--foreground))',
+            letterSpacing: -1, lineHeight: 1.05,
             marginBottom: 2,
-            textShadow: '0 1px 8px rgba(0,0,0,0.3)',
           }}>
             {winnerName}
           </div>
 
-          {/* Score + margin on same line */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4, flexWrap: 'wrap' as const }}>
-            <span style={{
-              fontSize: 40, fontWeight: 900,
-              color: 'hsl(var(--accent-amber))',
-              letterSpacing: -2, lineHeight: 1,
-            }}>
-              {scoreDisplay}
-            </span>
-            {marginText && (
-              <span style={{
-                fontSize: 11, fontWeight: 700,
-                color: 'rgba(255,255,255,0.9)',
-                background: 'rgba(0,0,0,0.35)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255,255,255,0.2)',
-                borderRadius: 20, padding: '4px 12px',
-              }}>
-                {marginText}
-              </span>
-            )}
+          {/* Score — amber, very large */}
+          <div style={{
+            fontSize: 48, fontWeight: 900,
+            color: 'hsl(var(--accent-amber))',
+            letterSpacing: -2, lineHeight: 1,
+            marginBottom: 6,
+          }}>
+            {scoreDisplay}
           </div>
+
+          {/* Margin pill */}
+          {marginText && (
+            <div style={{
+              display: 'inline-flex', alignSelf: 'flex-start',
+              fontSize: 11, fontWeight: 700,
+              color: 'hsl(var(--foreground))',
+              background: 'hsl(var(--accent-amber) / 0.12)',
+              border: '1px solid hsl(var(--accent-amber) / 0.30)',
+              borderRadius: 20, padding: '4px 12px',
+            }}>
+              {marginText}
+            </div>
+          )}
         </div>
       </div>
 
