@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
 // SnapToast removed — PostStudio handles its own toasts
 
