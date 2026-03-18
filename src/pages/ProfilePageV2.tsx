@@ -742,7 +742,7 @@ const ProfilePageV2Content: React.FC = () => {
             <button 
               className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 disabled:opacity-60 active:scale-[0.98] transition-transform border border-border bg-card text-foreground"
               onClick={toggleFollow}
-              disabled={followBusy || isFollowing === 'unknown'}
+              disabled={followBusy || (isFollowing === 'unknown' && !followResolved)}
             >
               {followBusy ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
