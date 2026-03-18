@@ -228,6 +228,6 @@ export function useTournamentLiveFeed(userId?: string): {
   return {
     livePosts,
     liveTourSlugs,
-    isLoading: arenaLoading || postIdsQuery.isLoading,
+    isLoading: arenaLoading || postIdsQuery.isLoading || liveCountsQuery.isLoading,
   };
 }
