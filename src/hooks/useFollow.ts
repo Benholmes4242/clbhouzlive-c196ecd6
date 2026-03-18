@@ -1,9 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 type FollowState = 'following' | 'not_following' | 'unknown';
 
 export function useFollow(targetUserId: string | undefined) {
+  const queryClient = useQueryClient();
   const [busy, setBusy] = useState(false);
   const [isFollowing, setIsFollowing] = useState<FollowState>('unknown');
 
@@ -49,7 +51,8 @@ export function useFollow(targetUserId: string | undefined) {
     }
     // Notification is created by database trigger - no frontend insert needed
     setBusy(false);
-  }, [busy, isFollowing, targetUserId]);
+    queryClient.invalidateQueries({ queryKey: ['social-counts', targetUserId] });
+  }, [busy, isFollowing, targetUserId, queryClient]);
 
   const unfollow = useCallback(async () => {
     if (!targetUserId || busy) return;
@@ -71,7 +74,8 @@ export function useFollow(targetUserId: string | undefined) {
       setIsFollowing(prev);
     }
     setBusy(false);
-  }, [busy, isFollowing, targetUserId]);
+    queryClient.invalidateQueries({ queryKey: ['social-counts', targetUserId] });
+  }, [busy, isFollowing, targetUserId, queryClient]);
 
   const toggle = useCallback(async () => {
     if (isFollowing === 'following') return unfollow();
