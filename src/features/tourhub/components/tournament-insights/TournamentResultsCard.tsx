@@ -189,8 +189,6 @@ export function TournamentResultsCard({
         <div style={{
           position: 'absolute', top: 0, right: -16,
           width: '60%', height: '100%',
-          maskImage: 'linear-gradient(to left, black 55%, transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to left, black 55%, transparent 100%)',
         }}>
           <img
             src={winnerPhoto}
