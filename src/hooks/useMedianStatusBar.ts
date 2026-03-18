@@ -142,5 +142,6 @@ export function useMedianStatusBar(
       // The next page's useMedianStatusBar will overwrite them when it mounts.
       // Resetting to '' causes the grey flash — we never do this.
     };
-  }, [enabled]); // config changes handled via ref — only re-run if enabled toggles
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled, reapplyKey]); // reapplyKey allows keep-alive pages to force re-apply on nav
 }
