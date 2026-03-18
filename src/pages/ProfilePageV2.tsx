@@ -732,6 +732,12 @@ const ProfilePageV2Content: React.FC = () => {
           </div>
         ) : (
           /* ── Other user: Follow + Add Friend + Overflow menu ── */
+          /* If blocked (either direction), show only a muted status label */
+          friendshipStatus === 'blocked' ? (
+            <div className="h-11 flex-1 rounded-full text-sm font-medium flex items-center justify-center text-muted-foreground bg-muted border border-border">
+              Unavailable
+            </div>
+          ) : (
           <>
             <button 
               className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 disabled:opacity-60 active:scale-[0.98] transition-transform border border-border bg-card text-foreground"
