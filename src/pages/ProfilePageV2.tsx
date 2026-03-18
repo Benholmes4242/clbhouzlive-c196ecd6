@@ -757,24 +757,44 @@ const ProfilePageV2Content: React.FC = () => {
             </button>
             
             <button 
-              className="h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 disabled:opacity-60 active:scale-[0.98] transition-transform border border-border"
-              style={{
-                background: friendshipStatus === 'friends' ? 'rgba(245, 158, 11, 0.10)' : undefined,
-                color: friendshipStatus === 'friends' ? '#d97706' : undefined,
-                borderColor: friendshipStatus === 'friends' ? 'rgba(245, 158, 11, 0.3)' : undefined,
-              }}
+              className={cn(
+                'h-11 flex-1 rounded-full text-sm font-semibold flex items-center justify-center gap-1.5',
+                'whitespace-nowrap disabled:opacity-60 active:scale-[0.98] transition-transform border',
+                // State-specific colour tokens — no hardcoded hex
+                friendshipStatus === 'friends'
+                  ? 'bg-amber-500/10 text-amber-600 border-amber-500/30'
+                  : friendshipStatus === 'request_received'
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-card text-foreground border-border',
+              )}
               onClick={handleFriendAction}
-              disabled={friendshipUpdating || friendshipStatus === 'friends'}
+              // Only disable during an in-flight mutation — never permanently
+              disabled={friendshipUpdating}
             >
               {friendshipUpdating ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  {/* Keep a text label so button width doesn't collapse */}
+                  {friendshipStatus === 'friends' ? 'Unfriending…'
+                    : friendshipStatus === 'request_sent' ? 'Cancelling…'
+                    : friendshipStatus === 'request_received' ? 'Accepting…'
+                    : 'Sending…'}
+                </>
               ) : friendshipStatus === 'friends' ? (
                 <>
-                  <Check className="w-3.5 h-3.5" />
+                  <UserCheck className="w-3.5 h-3.5" />
                   Friends
                 </>
               ) : friendshipStatus === 'request_sent' ? (
-                'Requested'
+                <>
+                  <UserMinus className="w-3.5 h-3.5" />
+                  Requested
+                </>
+              ) : friendshipStatus === 'request_received' ? (
+                <>
+                  <UserCheck className="w-3.5 h-3.5" />
+                  Accept
+                </>
               ) : (
                 <>
                   <UserPlus className="w-3.5 h-3.5" />
