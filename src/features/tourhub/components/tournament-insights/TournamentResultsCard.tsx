@@ -189,6 +189,7 @@ export function TournamentResultsCard({
         <div style={{
           position: 'absolute', top: 0, right: 0,
           width: '55%', height: '100%',
+          display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
           maskImage: 'linear-gradient(to left, black 55%, transparent 100%)',
           WebkitMaskImage: 'linear-gradient(to left, black 55%, transparent 100%)',
         }}>
@@ -197,9 +198,10 @@ export function TournamentResultsCard({
             alt={winnerName}
             onError={e => { (e.target as HTMLImageElement).src = heroFallback; }}
             style={{
-              width: '100%', height: '100%',
-              objectFit: 'cover', objectPosition: '50% 8%',
+              width: '100%', height: 'auto',
+              objectFit: 'contain', objectPosition: 'center top',
               display: 'block',
+              marginTop: 8,
             }}
           />
         </div>
@@ -254,19 +256,6 @@ export function TournamentResultsCard({
             {scoreDisplay}
           </div>
 
-          {/* Margin pill */}
-          {marginText && (
-            <div style={{
-              display: 'inline-flex', alignSelf: 'flex-start',
-              fontSize: 11, fontWeight: 700,
-              color: 'hsl(var(--foreground))',
-              background: 'hsl(var(--accent-amber) / 0.12)',
-              border: '1px solid hsl(var(--accent-amber) / 0.30)',
-              borderRadius: 20, padding: '4px 12px',
-            }}>
-              {marginText}
-            </div>
-          )}
         </div>
       </div>
 
