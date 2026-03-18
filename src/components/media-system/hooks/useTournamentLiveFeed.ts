@@ -88,6 +88,46 @@ export function useTournamentLiveFeed(userId?: string): {
 
   const postIdMap = postIdsQuery.data ?? {};
 
+  // Fetch live like/comment counts for all real post IDs.
+  const realPostIds = Object.values(postIdMap).filter(Boolean);
+
+  const liveCountsQuery = useQuery({
+    queryKey: ['live-tournament-counts', realPostIds.join(','), userId],
+    queryFn: async (): Promise<Record<string, { likeCount: number; commentCount: number; isLikedByMe: boolean }>> => {
+      if (!realPostIds.length) return {};
+
+      const [likesResult, commentsResult] = await Promise.all([
+        supabase
+          .from('post_likes')
+          .select('post_id, user_id')
+          .in('post_id', realPostIds),
+        supabase
+          .from('post_comments')
+          .select('post_id')
+          .in('post_id', realPostIds),
+      ]);
+
+      const likes = likesResult.data ?? [];
+      const comments = commentsResult.data ?? [];
+
+      const counts: Record<string, { likeCount: number; commentCount: number; isLikedByMe: boolean }> = {};
+
+      for (const postId of realPostIds) {
+        counts[postId] = {
+          likeCount: likes.filter(l => l.post_id === postId).length,
+          commentCount: comments.filter(c => c.post_id === postId).length,
+          isLikedByMe: userId ? likes.some(l => l.post_id === postId && l.user_id === userId) : false,
+        };
+      }
+
+      return counts;
+    },
+    enabled: realPostIds.length > 0,
+    staleTime: 30_000,
+  });
+
+  const liveCountsMap = liveCountsQuery.data ?? {};
+
   const livePosts = useMemo((): TournamentLiveFeedPost[] => {
     if (!arenaData?.length) return [];
 
