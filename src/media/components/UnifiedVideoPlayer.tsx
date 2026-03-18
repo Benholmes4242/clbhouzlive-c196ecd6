@@ -854,6 +854,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           hls.loadSource(hlsUrl);
           hls.attachMedia(video);
           hlsRef.current = hls;
+          registerHlsForDebug(cloudflareUid || uniqueMediaId, hls, video);
         } catch (err) {
           // Fall back to native
           video.src = hlsUrl;
