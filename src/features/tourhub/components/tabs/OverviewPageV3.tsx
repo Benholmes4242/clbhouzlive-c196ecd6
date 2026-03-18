@@ -66,24 +66,6 @@ export function OverviewPageV3() {
         )}
       </AnimatePresence>
 
-      <button
-        className="fixed z-50 flex items-center justify-center"
-        style={{
-          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
-          left: '16px',
-          width: '44px',
-          height: '44px',
-        }}
-        onClick={() => openTourNav()}
-        aria-label="Open tour menu"
-      >
-        <Menu
-          className="w-[22px] h-[22px]"
-          strokeWidth={2}
-          style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }}
-        />
-      </button>
-
       {/* ── PAGE CONTENT — motion.div for fade-in only ── */}
       <motion.div
         className="min-h-screen bg-background"
@@ -98,6 +80,24 @@ export function OverviewPageV3() {
           style={{ ...HERO_STYLES.containerNoHeader, opacity: heroOpacity, scale: heroScale }}
         >
           <HeroCarousel hasHeader={false} />
+          {/* Burger menu — absolute inside hero, scrolls away with hero naturally */}
+          <button
+            className="absolute z-20 flex items-center justify-center"
+            style={{
+              top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
+              left: '16px',
+              width: '44px',
+              height: '44px',
+            }}
+            onClick={() => openTourNav()}
+            aria-label="Open tour menu"
+          >
+            <Menu
+              className="w-[22px] h-[22px]"
+              strokeWidth={2}
+              style={{ color: '#FFFFFF', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))' }}
+            />
+          </button>
         </motion.div>
 
         {/* Content sections */}
