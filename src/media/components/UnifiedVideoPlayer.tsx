@@ -666,10 +666,14 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           return; // Don't attach if no slot available
         }
 
-        // Check for native HLS support (iOS Safari)
-        const canPlayNatively = isIOS ||
-          video.canPlayType('application/vnd.apple.mpegurl') !== '' ||
-          video.canPlayType('application/vnd.apple.mpegURL') !== '';
+        // Check for native HLS support — do NOT short-circuit on isIOS.
+        // Modern iOS Safari (15.1+) supports MediaSource Extensions, so HLS.js
+        // works correctly and gives us full ABR quality control.
+        // Falling back to native Safari HLS surrenders all quality configuration.
+        const Hls = await loadHlsJs();
+        const canPlayNatively = (!Hls || !Hls.isSupported()) &&
+          (video.canPlayType('application/vnd.apple.mpegurl') !== '' ||
+          video.canPlayType('application/vnd.apple.mpegURL') !== '');
 
         const isHlsUrl = hlsUrl.includes('.m3u8');
 
