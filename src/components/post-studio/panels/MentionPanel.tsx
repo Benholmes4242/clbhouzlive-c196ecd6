@@ -79,6 +79,7 @@ export function MentionPanel() {
       start: triggerIndex,
       end: triggerIndex + displayName.length,
       entityId: entity.id,
+      profileId: entity.entity_id,
       displayName: entity.name,
       entityType: entity.entity_type,
       avatarUrl: entity.profile_image_url ?? undefined,

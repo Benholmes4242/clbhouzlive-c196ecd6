@@ -78,8 +78,10 @@ export interface MentionToken {
   start: number;
   /** Character end index in raw caption */
   end: number;
-  /** Entity ID from taggable_entities */
+  /** taggable_entities.id — used for post_tags FK */
   entityId: string;
+  /** taggable_entities.entity_id — actual user/business UUID for notifications */
+  profileId: string;
   /** Display name shown in the pill */
   displayName: string;
   /** Entity type */
