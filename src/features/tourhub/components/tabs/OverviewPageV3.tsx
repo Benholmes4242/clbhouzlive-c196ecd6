@@ -47,17 +47,8 @@ export function OverviewPageV3() {
   useMedianStatusBar("dark", "transparent", true, false);
 
   return (
-    <motion.div
-      className="min-h-screen bg-background"
-      style={{ 
-        marginTop: 0,
-        paddingTop: 0,
-      }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-    >
-      {/* FIX 09: Offline banner */}
+    <>
+      {/* ── FIXED OVERLAYS — outside motion.div so CSS transforms don't break position:fixed ── */}
       <AnimatePresence>
         {!isOnline && (
           <motion.div
@@ -75,13 +66,10 @@ export function OverviewPageV3() {
         )}
       </AnimatePresence>
 
-      {/* Burger menu — fixed to viewport so it is immune to the hero carousel's
-           negative marginTop compositing context. Sits at SAT + 12px from top,
-           matching the Players page pattern exactly. */}
       <button
-        className="fixed z-30 flex items-center justify-center"
+        className="fixed z-50 flex items-center justify-center"
         style={{
-          top: 'calc(env(safe-area-inset-top, 47px) + 12px)',
+          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
           left: '16px',
           width: '44px',
           height: '44px',
@@ -96,48 +84,45 @@ export function OverviewPageV3() {
         />
       </button>
 
-      {/* 1. Hero Carousel - using containerNoHeader since Overview has no header */}
-      <motion.div 
-        className="relative w-full z-0"
-        style={{ ...HERO_STYLES.containerNoHeader, opacity: heroOpacity, scale: heroScale }}
+      {/* ── PAGE CONTENT — motion.div for fade-in only ── */}
+      <motion.div
+        className="min-h-screen bg-background"
+        style={{ marginTop: 0, paddingTop: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
       >
-        <HeroCarousel hasHeader={false} />
-      </motion.div>
+        {/* 1. Hero Carousel */}
+        <motion.div 
+          className="relative w-full z-0"
+          style={{ ...HERO_STYLES.containerNoHeader, opacity: heroOpacity, scale: heroScale }}
+        >
+          <HeroCarousel hasHeader={false} />
+        </motion.div>
 
-      {/* Content sections — consistent 40px vertical rhythm between major sections */}
-      <div 
-        id="content-below-hero"
-        className="relative z-10"
-      >
-        <div className="bg-background pt-4 space-y-section" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
-          {/* 2. Live Right Now (conditional - hides if no live) */}
-          <LiveRightNow />
-
-          {/* 3. What's Coming - upcoming tournaments across all tours */}
-          <WhatsComing />
-
-          {/* 4. Tournament Insights - AI Predictions (Tournament Intelligence) */}
-          <LazySection minHeight={250}>
-            <TournamentInsights />
-          </LazySection>
-
-          {/* 5. Unified World Rankings (Movers + OWGR Table) */}
-          <LazySection minHeight={400}>
-            <UnifiedWorldRankings />
-          </LazySection>
-
-          {/* 6. Season Leaderboards */}
-          <LazySection minHeight={300}>
-            <SeasonLeaderboards />
-          </LazySection>
-
-          {/* 7. College Golf Rankings */}
-          <LazySection minHeight={350}>
-            <CollegeRankingsPreview />
-          </LazySection>
-
+        {/* Content sections */}
+        <div 
+          id="content-below-hero"
+          className="relative z-10"
+        >
+          <div className="bg-background pt-4 space-y-section" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
+            <LiveRightNow />
+            <WhatsComing />
+            <LazySection minHeight={250}>
+              <TournamentInsights />
+            </LazySection>
+            <LazySection minHeight={400}>
+              <UnifiedWorldRankings />
+            </LazySection>
+            <LazySection minHeight={300}>
+              <SeasonLeaderboards />
+            </LazySection>
+            <LazySection minHeight={350}>
+              <CollegeRankingsPreview />
+            </LazySection>
+          </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </>
   );
 }
