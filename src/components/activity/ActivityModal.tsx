@@ -189,13 +189,13 @@ const ActivityModal: React.FC<ActivityModalProps> = ({ open, onOpenChange }) => 
                     role="tab"
                     aria-selected={activeTab === tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={cn(
-                      "px-4 min-h-[36px] rounded-full text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold",
-                      activeTab === tab.id
-                        ? "text-white"
-                        : "text-muted-foreground bg-muted"
-                    )}
-                    style={activeTab === tab.id ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
+                    className="px-4 min-h-[36px] text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold"
+                    style={{
+                      borderRadius: 8,
+                      background: activeTab === tab.id ? 'hsl(var(--foreground))' : 'transparent',
+                      color: activeTab === tab.id ? '#fff' : 'hsl(var(--muted-foreground))',
+                      border: activeTab === tab.id ? 'none' : '1.5px solid hsl(var(--border))',
+                    }}
                   >
                     {tab.label}
                   </button>

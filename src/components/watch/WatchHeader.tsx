@@ -46,10 +46,12 @@ const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange,
               aria-selected={isActive}
               aria-label={label}
               onClick={() => onFilterChange(key)}
-              className="shrink-0 min-h-[36px] px-4 rounded-full text-sm font-semibold transition-colors flex items-center gap-1.5"
+              className="shrink-0 min-h-[36px] px-4 text-sm font-semibold transition-colors flex items-center gap-1.5"
               style={{
-                backgroundColor: isActive ? 'hsl(var(--tab-sub-active))' : 'hsl(var(--muted))',
-                color: isActive ? 'hsl(var(--tab-sub-active-foreground))' : 'hsl(var(--muted-foreground))',
+                borderRadius: 8,
+                background: isActive ? 'hsl(var(--foreground))' : 'transparent',
+                color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
+                border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
               }}
             >
               {icon}
