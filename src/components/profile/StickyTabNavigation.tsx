@@ -98,13 +98,6 @@ const StickyTabNavigation: React.FC<StickyTabNavigationProps> = ({
               marginRight: '-8px',
               background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
             }}
-            style={{
-              left: underlineStyle.left,
-              width: underlineStyle.width,
-              transform: 'translateX(8px)', // Offset for padding
-              marginLeft: '-8px',
-              marginRight: '-8px'
-            }}
           />
         </div>
       </div>
