@@ -384,33 +384,16 @@ export const TournamentInsights = memo(function TournamentInsights() {
   };
 
   const renderResultsContent = () => {
-    if (!tracker) return null;
-    const bestCall = getBestCall(tracker);
-    const bestCallPick = bestCall
-      ? tracker.allPicks.find((p) => p.playerId === bestCall.playerId) ?? null
-      : null;
-    // Remaining picks exclude the best pick (it's in the spotlight card)
-    const remainingPicks = bestCallPick
-      ? tracker.allPicks.filter((p) => p.playerId !== bestCallPick.playerId)
-      : tracker.allPicks;
+    // data is guaranteed non-null here (outer guard at line 138 returns null if !data)
+    if (!data?.tournament) return null;
 
     return (
-      <>
-        {bestCallPick && data?.tournament && (
-          <BestPickSpotlight
-            bestPick={bestCallPick}
-            tournamentId={data.tournament.id}
-            courseName={data.tournament.courseName}
-            tournamentName={data.tournament.name}
-          />
-        )}
-        <PredictionLeaderboard
-          allPicks={remainingPicks}
-          isCompleted={true}
-          bestCallPlayerId={bestCall?.playerId}
-          tournamentLeaderScore={tracker?.tournamentLeaderScore}
-        />
-      </>
+      <TournamentResultsCard
+        tournamentId={data.tournament.id}
+        tournamentName={data.tournament.name}
+        courseName={data.tournament.courseName}
+        location={data.tournament.location}
+      />
     );
   };
 
