@@ -791,6 +791,21 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
         {/* ── Text input ── */}
         <div className="px-4 pt-3 pb-2 relative">
+          {/* Flashing cursor — shows when canvas is blank, replaces placeholder */}
+          {state.caption.length === 0 && !hasMedia && (
+            <div style={{
+              position: 'absolute',
+              top: 12,
+              left: 16,
+              width: 2,
+              height: 22,
+              background: 'rgba(255,255,255,0.80)',
+              borderRadius: 1,
+              animation: 'studio-cursor-blink 1s step-end infinite',
+              zIndex: 2,
+              pointerEvents: 'none',
+            }} />
+          )}
           {/* Mention highlight layer */}
           {state.mentions.length > 0 && (
             <div
