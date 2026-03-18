@@ -213,6 +213,16 @@ export default function ClubhouseVideoDebugPanel() {
   const [visible, setVisible] = useState<boolean>(() => {
     try { return localStorage.getItem(STORAGE_KEY) === 'true'; } catch { return false; }
   });
+
+  // Listen for toggle event from the Test nav button
+  useEffect(() => {
+    const handler = () => {
+      setVisible(localStorage.getItem(STORAGE_KEY) === 'true');
+    };
+    window.addEventListener('clbhouz-debug-toggle', handler);
+    return () => window.removeEventListener('clbhouz-debug-toggle', handler);
+  }, []);
+
   const [tab, setTab] = useState<'live' | 'quality' | 'frags' | 'stalls' | 'timeline' | 'system'>('live');
   const [sessions, setSessions] = useState<Map<string, VideoSession>>(new Map());
   const [selectedId, setSelectedId] = useState<string | null>(null);
