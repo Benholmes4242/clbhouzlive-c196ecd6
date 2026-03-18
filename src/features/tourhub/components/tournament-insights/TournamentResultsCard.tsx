@@ -183,7 +183,7 @@ export function TournamentResultsCard({
       style={{ paddingBottom: 8, marginTop: -36 }}
     >
       {/* ── WINNER HERO — split layout ─────────────────────────────── */}
-      <div style={{ position: 'relative', overflow: 'visible', minHeight: 280 }}>
+      <div style={{ position: 'relative', overflow: 'visible', minHeight: 280, zIndex: 1 }}>
 
         {/* Player portrait — right side, full bleed, behind everything */}
         <div style={{
@@ -224,7 +224,7 @@ export function TournamentResultsCard({
           {/* Tournament name */}
           <div style={{
             fontSize: 12, fontWeight: 600,
-            color: 'rgba(255,255,255,0.80)',
+            color: 'hsl(var(--muted-foreground))',
             lineHeight: 1.3, marginBottom: 5,
           }}>
             {tournamentName}
@@ -233,10 +233,9 @@ export function TournamentResultsCard({
           {/* Winner name */}
           <div style={{
             fontSize: 26, fontWeight: 900,
-            color: '#ffffff',
+            color: 'hsl(var(--foreground))',
             letterSpacing: -0.8, lineHeight: 1.05,
             marginBottom: 6,
-            textShadow: '0 1px 8px rgba(0,0,0,0.4)',
           }}>
             {winnerName}
           </div>
@@ -251,21 +250,6 @@ export function TournamentResultsCard({
             {scoreDisplay}
           </div>
 
-          {/* Margin pill */}
-          {marginText && (
-            <div style={{
-              display: 'inline-flex',
-              fontSize: 11, fontWeight: 700,
-              color: 'rgba(255,255,255,0.9)',
-              background: 'rgba(0,0,0,0.35)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: 20, padding: '4px 12px',
-            }}>
-              {marginText}
-            </div>
-          )}
         </div>
       </div>
 
@@ -275,7 +259,7 @@ export function TournamentResultsCard({
           padding: '14px 16px 6px',
           marginTop: -28,
           position: 'relative',
-          zIndex: 3,
+          zIndex: 4,
         }}>
 
           {/* Row 1 — Scorecard stats */}
@@ -293,9 +277,12 @@ export function TournamentResultsCard({
                 <div key={s.label} style={{
                   textAlign: 'center' as const,
                   padding: '9px 4px 7px',
-                  borderRadius: 10,
-                  background: s.bg,
-                  border: '1px solid rgba(0,0,0,0.05)',
+                  borderRadius: 12,
+                  background: 'rgba(255,255,255,0.55)',
+                  backdropFilter: 'blur(16px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+                  border: '1px solid rgba(255,255,255,0.75)',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)',
                 }}>
                   <div style={{ fontSize: 18, fontWeight: 800, color: s.num, lineHeight: 1 }}>
                     {s.v ?? 0}
@@ -321,7 +308,7 @@ export function TournamentResultsCard({
               gap: 6, marginBottom: 8,
             }}>
               {sStats.drivingDistance && (
-                <div style={{ textAlign: 'center' as const, padding: '9px 4px 7px', borderRadius: 10, background: 'rgba(232,152,10,0.07)', border: '1px solid rgba(0,0,0,0.05)' }}>
+                <div style={{ textAlign: 'center' as const, padding: '9px 4px 7px', borderRadius: 12, background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(16px) saturate(180%)', WebkitBackdropFilter: 'blur(16px) saturate(180%)', border: '1px solid rgba(255,255,255,0.75)', boxShadow: '0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
                   <div style={{ fontSize: 16, fontWeight: 800, color: 'hsl(var(--foreground))', lineHeight: 1 }}>
                     {Math.round(sStats.drivingDistance)}<span style={{ fontSize: 9, fontWeight: 600, color: 'hsl(var(--muted-foreground))' }}>yds</span>
                   </div>
@@ -329,7 +316,7 @@ export function TournamentResultsCard({
                 </div>
               )}
               {sStats.greensInReg && (
-                <div style={{ textAlign: 'center' as const, padding: '9px 4px 7px', borderRadius: 10, background: 'rgba(22,163,74,0.07)', border: '1px solid rgba(0,0,0,0.05)' }}>
+                <div style={{ textAlign: 'center' as const, padding: '9px 4px 7px', borderRadius: 12, background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(16px) saturate(180%)', WebkitBackdropFilter: 'blur(16px) saturate(180%)', border: '1px solid rgba(255,255,255,0.75)', boxShadow: '0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
                   <div style={{ fontSize: 16, fontWeight: 800, color: 'hsl(var(--foreground))', lineHeight: 1 }}>
                     {Math.round(sStats.greensInReg)}<span style={{ fontSize: 9, fontWeight: 600, color: 'hsl(var(--muted-foreground))' }}>%</span>
                   </div>
@@ -337,7 +324,7 @@ export function TournamentResultsCard({
                 </div>
               )}
               {sStats.puttingAverage && (
-                <div style={{ textAlign: 'center' as const, padding: '9px 4px 7px', borderRadius: 10, background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.05)' }}>
+                <div style={{ textAlign: 'center' as const, padding: '9px 4px 7px', borderRadius: 12, background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(16px) saturate(180%)', WebkitBackdropFilter: 'blur(16px) saturate(180%)', border: '1px solid rgba(255,255,255,0.75)', boxShadow: '0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
                   <div style={{ fontSize: 16, fontWeight: 800, color: 'hsl(var(--foreground))', lineHeight: 1 }}>
                     {sStats.puttingAverage.toFixed(2)}
                   </div>
@@ -354,8 +341,9 @@ export function TournamentResultsCard({
         <div style={{ padding: '4px 16px 14px' }}>
           <p style={{
             fontSize: 13, lineHeight: 1.6,
-            fontStyle: 'italic',
-            color: 'hsl(var(--muted-foreground))',
+            fontStyle: 'normal',
+            fontWeight: 500,
+            color: 'hsl(var(--foreground))',
             margin: 0,
           }}>
             {narrative}
