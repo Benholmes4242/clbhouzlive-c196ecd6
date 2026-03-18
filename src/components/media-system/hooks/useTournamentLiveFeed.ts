@@ -183,7 +183,15 @@ export function useTournamentLiveFeed(userId?: string): {
         leaderStats:     tournament.leaderStats ?? null,
       };
 
-      const realPostId = postIdMap[tournament.id] ?? crypto.randomUUID();
+      // Only use the post ID if it came from the DB — never use a random UUID
+      const realPostId = postIdMap[tournament.id];
+      if (!realPostId) return null;
+
+      const counts = liveCountsMap[realPostId] ?? {
+        likeCount: 0,
+        commentCount: 0,
+        isLikedByMe: false,
+      };
 
       return {
         id:              realPostId,
@@ -198,18 +206,19 @@ export function useTournamentLiveFeed(userId?: string): {
         caption:         '',
         mediaItems:      [],
         createdAt:       new Date().toISOString(),
-        likeCount:       0,
-        commentCount:    0,
+        likeCount:       counts.likeCount,
+        commentCount:    counts.commentCount,
         shareCount:      0,
         review:          null,
         isReview:        false,
-        isLikedByMe:     false,
+        isLikedByMe:     counts.isLikedByMe,
         isFollowedByMe:  false,
         postType:        'tournament_live',
         liveMeta:        meta,
       };
-    });
-  }, [arenaData, postIdMap]);
+    })
+      .filter((p): p is TournamentLiveFeedPost => p !== null);
+  }, [arenaData, postIdMap, liveCountsMap]);
 
   const liveTourSlugs = useMemo(
     () => (arenaData ?? []).map(t => t.tourSlug),
