@@ -15,8 +15,7 @@ interface SegmentedControlProps {
 }
 
 /**
- * SegmentedControl — Main tab component (Tier 1).
- * Active: #1e293b rounded rectangle pill, no track.
+ * SegmentedControl — Pinpoint main tab (typographic underline, keeps icon support)
  */
 const SegmentedControl: React.FC<SegmentedControlProps> = ({
   tabs,
@@ -25,27 +24,49 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
   className,
 }) => {
   return (
-    <section className={cn('py-3 -mx-4 px-4 bg-background', className)}>
-      <div role="tablist" className="flex gap-1">
+    <section className={cn('py-0 px-4 bg-background', className)}>
+      <div
+        role="tablist"
+        style={{ borderBottom: '1px solid hsl(var(--border))', display: 'flex', gap: 20 }}
+      >
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
-
           return (
             <button
               key={tab.id}
               role="tab"
               aria-selected={isActive}
               onClick={() => onTabChange(tab.id)}
-              className={cn(
-                'flex-1 py-2.5 px-4 text-sm font-medium rounded-lg transition-all duration-150 active:scale-[0.97] flex items-center justify-center',
-                isActive
-                  ? 'text-white font-semibold'
-                  : 'text-muted-foreground hover:text-foreground',
-              )}
-              style={isActive ? { backgroundColor: 'hsl(var(--tab-main-active))' } : undefined}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '11px 2px 9px',
+                fontSize: 14,
+                fontWeight: isActive ? 700 : 500,
+                color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
+                letterSpacing: isActive ? '-0.025em' : '0',
+                position: 'relative',
+                minHeight: 44,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                transition: 'color 0.18s',
+              }}
             >
-              {tab.icon && <span className="mr-1.5">{tab.icon}</span>}
+              {tab.icon && <span>{tab.icon}</span>}
               {tab.label}
+              {isActive && (
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 2.5,
+                  borderRadius: 2,
+                  background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
+                }} />
+              )}
             </button>
           );
         })}

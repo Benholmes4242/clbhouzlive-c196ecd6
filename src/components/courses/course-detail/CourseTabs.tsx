@@ -17,38 +17,52 @@ const tabs: { id: CourseTabId; label: string }[] = [
 ];
 
 /**
- * Course detail tabs — Tier 1 main tabs
- * Active: bg-foreground text-background, no track
+ * CourseTabs — Pinpoint main tab (typographic underline)
  */
 export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: CourseTabsProps) {
   const getLabel = (tab: { id: CourseTabId; label: string }) => {
-    if (tab.id === 'reviews' && reviewCount !== undefined && reviewCount > 0) {
-      return `${tab.label} (${reviewCount})`;
-    }
-    if (tab.id === 'media' && mediaCount !== undefined && mediaCount > 0) {
-      return `${tab.label} (${mediaCount})`;
-    }
+    if (tab.id === 'reviews' && reviewCount) return `${tab.label} (${reviewCount})`;
+    if (tab.id === 'media' && mediaCount) return `${tab.label} (${mediaCount})`;
     return tab.label;
   };
 
   return (
-    <section className="px-4 pt-1 pb-3">
-      <div className="flex gap-1">
+    <section className="px-4 pt-1 pb-0">
+      <div style={{ borderBottom: '1px solid hsl(var(--border))', display: 'flex', gap: 24 }}>
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => onChange(tab.id)}
-              className={cn(
-                "relative flex-1 py-2.5 text-[13px] font-semibold transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] rounded-lg",
-                isActive 
-                  ? "text-background" 
-                  : "text-muted-foreground"
-              )}
-              style={isActive ? { backgroundColor: 'hsl(var(--foreground, 0 0% 9%))' } : undefined}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '11px 2px 9px',
+                fontSize: 15,
+                fontWeight: isActive ? 700 : 500,
+                color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
+                letterSpacing: isActive ? '-0.025em' : '0',
+                position: 'relative',
+                minHeight: 44,
+                display: 'flex',
+                alignItems: 'center',
+                transition: 'color 0.18s',
+              }}
             >
               {getLabel(tab)}
+              {isActive && (
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 2.5,
+                  borderRadius: 2,
+                  background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
+                }} />
+              )}
             </button>
           );
         })}

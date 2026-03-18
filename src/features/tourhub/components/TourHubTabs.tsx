@@ -1,4 +1,3 @@
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 
 export type TourHubTab = 
@@ -20,26 +19,53 @@ const tabs: { value: TourHubTab; label: string; shortLabel: string }[] = [
   { value: 'leaderboards', label: 'Rankings', shortLabel: 'Rankings' },
 ];
 
+/**
+ * TourHubTabs — Pinpoint main tab (typographic underline)
+ */
 export function TourHubTabs({ activeTab, onTabChange, className }: TourHubTabsProps) {
   return (
-    <Tabs value={activeTab} onValueChange={(v) => onTabChange(v as TourHubTab)}>
-      <div className={cn("w-full max-w-full", className)}>
-        {/* Pill toggle style - matching design system */}
-        <TabsList 
-          className="flex flex-wrap h-auto items-center justify-start gap-0 p-1 rounded-xl overflow-hidden border-0 bg-muted"
-        >
-          {tabs.map((tab) => (
-            <TabsTrigger
+    <div className={cn('w-full px-4', className)}>
+      <div style={{ borderBottom: '1px solid hsl(var(--border))', display: 'flex', gap: 16 }}>
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.value;
+          return (
+            <button
               key={tab.value}
-              value={tab.value}
-              className="px-3 py-2 text-sm font-medium whitespace-nowrap min-h-[40px] rounded-none border-0 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm data-[state=active]:m-1 data-[state=active]:rounded-lg data-[state=active]:border data-[state=active]:border-border data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground data-[state=inactive]:hover:bg-card/50 data-[state=inactive]:bg-transparent transition-all duration-200"
+              onClick={() => onTabChange(tab.value)}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '11px 2px 9px',
+                fontSize: 14,
+                whiteSpace: 'nowrap',
+                fontWeight: isActive ? 700 : 500,
+                color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
+                letterSpacing: isActive ? '-0.025em' : '0',
+                position: 'relative',
+                minHeight: 44,
+                display: 'flex',
+                alignItems: 'center',
+                transition: 'color 0.18s',
+              }}
             >
               {tab.shortLabel}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+              {isActive && (
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 2.5,
+                  borderRadius: 2,
+                  background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
+                }} />
+              )}
+            </button>
+          );
+        })}
       </div>
-    </Tabs>
+    </div>
   );
 }
 
@@ -62,24 +88,47 @@ const tournamentTabs: { value: TournamentDetailTab; label: string; icon: string 
 
 export function TournamentDetailTabs({ activeTab, onTabChange, className }: TournamentDetailTabsProps) {
   return (
-    <Tabs value={activeTab} onValueChange={(v) => onTabChange(v as TournamentDetailTab)}>
-      <div className={cn("w-full max-w-full", className)}>
-        {/* Segmented control - matching design system */}
-        <TabsList 
-          className="flex items-stretch h-auto gap-0 p-1 rounded-xl overflow-hidden border-0 bg-muted w-full"
-        >
-          {tournamentTabs.map((tab) => (
-            <TabsTrigger
+    <div className={cn('w-full px-4', className)}>
+      <div style={{ borderBottom: '1px solid hsl(var(--border))', display: 'flex', gap: 16 }}>
+        {tournamentTabs.map((tab) => {
+          const isActive = activeTab === tab.value;
+          return (
+            <button
               key={tab.value}
-              value={tab.value}
-              className="flex-1 py-2.5 text-[13px] font-semibold whitespace-nowrap min-h-[44px] rounded-none border-0 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm data-[state=active]:m-1 data-[state=active]:rounded-lg data-[state=active]:border data-[state=active]:border-border data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground data-[state=inactive]:hover:bg-card/50 data-[state=inactive]:bg-transparent transition-all duration-200"
+              onClick={() => onTabChange(tab.value)}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '11px 2px 9px',
+                fontSize: 14,
+                whiteSpace: 'nowrap',
+                fontWeight: isActive ? 700 : 500,
+                color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
+                letterSpacing: isActive ? '-0.025em' : '0',
+                position: 'relative',
+                minHeight: 44,
+                display: 'flex',
+                alignItems: 'center',
+                transition: 'color 0.18s',
+              }}
             >
-              <span className="text-sm hidden sm:inline mr-1">{tab.icon}</span>
               {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+              {isActive && (
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 2.5,
+                  borderRadius: 2,
+                  background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
+                }} />
+              )}
+            </button>
+          );
+        })}
       </div>
-    </Tabs>
+    </div>
   );
 }

@@ -11,8 +11,7 @@ interface ProfileTabsNavProps {
 }
 
 /**
- * ProfileTabsNav - Hub-style toggle bar
- * Captures scroll position at click time before any state changes
+ * ProfileTabsNav — Pinpoint main tab (typographic underline)
  */
 const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   userType,
@@ -24,29 +23,20 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   const tabs = getProfileTabs(userType);
   const scrollSnapshotRef = useRef<number>(0);
 
-  // Capture scroll position on mousedown/touchstart (before click completes)
   const handlePointerDown = () => {
     scrollSnapshotRef.current = window.scrollY;
   };
 
-  // Pass captured scroll snapshot when tab changes
   const handleTabClick = (tabId: string) => {
     if (disabled) return;
     onTabChange(tabId, scrollSnapshotRef.current);
   };
 
   return (
-    <section 
-      className="flex justify-center py-3 bg-[#F8FAFC]"
-      onPointerDown={handlePointerDown}
-    >
-      {/* Hub-style pill toggle bar */}
-      <div 
-        className="inline-flex items-center gap-1 p-1 rounded-full bg-muted"
-      >
+    <section className="px-4 bg-[#F8FAFC]" onPointerDown={handlePointerDown}>
+      <div style={{ borderBottom: '1px solid hsl(var(--border))', display: 'flex', gap: 20 }}>
         {tabs.map((tab) => {
           const isActive = activeSection === tab.id;
-          
           return (
             <button
               key={tab.id}
@@ -54,15 +44,35 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
               aria-selected={isActive}
               onClick={() => handleTabClick(tab.id)}
               disabled={disabled}
-              className={cn(
-                "px-4 py-2 text-sm font-medium rounded-full transition-all duration-150 whitespace-nowrap",
-                isActive 
-                  ? "bg-foreground text-background shadow-sm" 
-                  : "text-muted-foreground hover:text-foreground hover:bg-background/50",
-                disabled && "pointer-events-none opacity-50"
-              )}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: disabled ? 'default' : 'pointer',
+                padding: '11px 2px 9px',
+                fontSize: 14,
+                fontWeight: isActive ? 700 : 500,
+                color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
+                letterSpacing: isActive ? '-0.025em' : '0',
+                position: 'relative',
+                minHeight: 44,
+                display: 'flex',
+                alignItems: 'center',
+                opacity: disabled ? 0.5 : 1,
+                transition: 'color 0.18s',
+              }}
             >
               {tab.label}
+              {isActive && (
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 2.5,
+                  borderRadius: 2,
+                  background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
+                }} />
+              )}
             </button>
           );
         })}
