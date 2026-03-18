@@ -714,6 +714,18 @@ html.lightbox-open {
   margin-right: auto;
 }
 
+/* ============================================================
+   IMMERSIVE ROUTE — hero media bleeds into safe area
+   When data-immersive-route is set (by App.tsx useLayoutEffect
+   on every route change), suppress .app-shell's page background
+   so no grey shows through the safe area zone while the hero
+   mounts. Individual page useMedianStatusBar calls handle the
+   Median native status bar separately.
+   ============================================================ */
+html[data-immersive-route='true'] .app-shell {
+  background-color: transparent !important;
+}
+
 /* Desktop backdrop behind the app column */
 @media (min-width: 480px) {
   body {

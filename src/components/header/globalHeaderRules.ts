@@ -60,3 +60,34 @@ export function isGlobalHeaderExcluded(pathname: string) {
 
   return isExcludedExact || isExcludedPrefix || isBusinessProfilePage(pathname);
 }
+
+/**
+ * Routes whose hero media bleeds into the safe area.
+ * On these routes, .app-shell background must be transparent
+ * so no grey shows through while the hero mounts.
+ */
+export const IMMERSIVE_ROUTE_PREFIXES = [
+  '/courses/',        // Course Detail pages
+  '/profile',         // Own profile + /profile/:username
+  '/profile/',
+  '/tourhub',         // All Tour Hub pages
+  '/tour',            // Tour alias
+  '/top100/',         // Region Top 100 pages
+  '/business/',       // Business profile pages (immersive hero)
+  '/discover/explore/region/', // Region pages
+] as const;
+
+export const IMMERSIVE_EXACT_ROUTES = [
+  '/',
+  '/clubhouse',
+] as const;
+
+export function isImmersiveRoute(pathname: string): boolean {
+  const exactMatch = (IMMERSIVE_EXACT_ROUTES as readonly string[]).some(
+    (r) => pathname === r
+  );
+  const prefixMatch = (IMMERSIVE_ROUTE_PREFIXES as readonly string[]).some(
+    (p) => pathname.startsWith(p)
+  );
+  return exactMatch || prefixMatch;
+}
