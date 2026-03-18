@@ -325,7 +325,7 @@ export function TournamentResultsCard({
         </div>
 
         {/* Winner row — amber accent */}
-        {winner.player && (
+        {effectiveWinner.player && (
           <div style={{
             display: 'flex', alignItems: 'center', gap: 12, padding: '9px 0',
             borderBottom: '1px solid hsl(var(--border))',
