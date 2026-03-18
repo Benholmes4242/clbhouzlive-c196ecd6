@@ -13,32 +13,34 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // Primary CTA pill – use for 1 main action per screen
-        primary: "rounded-sq-pill border border-slate-300/70 bg-slate-100 text-sm text-slate-900 shadow-[0_6px_16px_rgba(15,23,42,0.15)] hover:bg-slate-50",
-        // Secondary – default for everything else
-        secondary: "rounded-sq-sm border border-border/60 bg-card text-sm text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-slate-50",
-        // Tertiary - micro buttons for filters, sort controls, small utilities
-        tertiary: "rounded-sq-sm border border-border/60 bg-card text-xs font-medium text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:bg-slate-100 active:bg-slate-100 active:scale-[0.98]",
-        // Legacy variants - preserved for backward compatibility
-        default: "rounded-sq-sm bg-white border border-slate-600 text-slate-600 hover:bg-slate-50 active:bg-slate-100",
-        destructive: "rounded-sq-sm bg-red-500 text-white border border-red-500/80 shadow-sm hover:bg-red-600 active:bg-red-700",
-        outline: "rounded-sq-sm bg-white border border-slate-600 text-slate-600 hover:bg-slate-50 active:bg-slate-100",
-        ghost: "rounded-sq-sm bg-transparent text-slate-600 hover:bg-slate-50",
-        link: "text-slate-600 underline-offset-4 hover:underline",
-        gradient: "rounded-sq-sm bg-white border border-slate-600 text-slate-600 hover:bg-slate-50 active:bg-slate-100",
-        "gradient-primary": "rounded-sq-sm bg-white border border-slate-600 text-slate-600 hover:bg-slate-50 active:bg-slate-100",
-        chip: "bg-surface-alt border border-border text-secondary rounded-sq-pill hover:bg-surface-alt/80",
-        "chip-active": "bg-surface-slate text-white rounded-sq-pill hover:opacity-90",
-        glass: "rounded-sq-md bg-white/90 backdrop-blur-md border border-black/10 shadow-sm text-gray-900 font-medium hover:bg-white hover:scale-[1.02] active:translate-y-[1px] disabled:opacity-60 disabled:cursor-not-allowed",
-        "glass-outline": "rounded-sq-md bg-white/70 backdrop-blur-md border border-black/15 shadow text-gray-900 font-medium hover:bg-white/80 hover:scale-[1.02] active:translate-y-[1px]",
+        // —— PINPOINT SYSTEM ——
+        'orange':          'font-bold text-white border-none active:scale-[0.97]',
+        'dark':            'font-bold text-white border-none active:scale-[0.97]',
+        'outline':         'font-semibold bg-transparent border border-border text-foreground active:scale-[0.97]',
+        'outlineOrange':   'font-semibold bg-transparent text-[#F7931E] active:scale-[0.97]',
+        'muted':           'font-semibold bg-muted text-foreground border-none active:scale-[0.97]',
+        'ghost':           'bg-transparent text-muted-foreground border-none active:scale-[0.97]',
+        // —— LEGACY ALIASES (unchanged behaviour) ——
+        primary:           'font-bold text-white border-none active:scale-[0.97]',
+        secondary:         'font-semibold bg-transparent border border-border text-foreground active:scale-[0.97]',
+        default:           'font-semibold bg-transparent border border-border text-foreground',
+        destructive:       'bg-red-500 text-white border border-red-500/80 shadow-sm',
+        link:              'text-foreground underline-offset-4 hover:underline',
+        chip:              'bg-muted border border-border text-muted-foreground',
+        'chip-active':     'bg-foreground text-white',
+        glass:             'bg-white/90 backdrop-blur-md border border-black/10 shadow-sm text-gray-900 font-medium',
+        'glass-outline':   'bg-white/70 backdrop-blur-md border border-black/15 shadow text-gray-900 font-medium',
+        gradient:          'font-bold text-white border-none',
+        'gradient-primary': 'font-bold text-white border-none',
+        tertiary:          'border border-border/60 bg-card text-foreground shadow-sm',
       },
       size: {
-        default: "h-11 px-5 py-2.5",
-        sm: "h-9 px-3",
-        lg: "h-12 px-6",
-        icon: "h-10 w-10",
-        chip: "h-8 px-3 py-1.5",
-        tertiary: "px-3 py-1.5",
+        default: 'h-11 px-5 py-2.5 rounded-[10px]',
+        sm:      'h-9 px-3 rounded-[10px]',
+        lg:      'h-12 px-6 rounded-[10px]',
+        icon:    'h-10 w-10 rounded-[10px]',
+        chip:    'h-8 px-3 py-1.5 rounded-[8px]',
+        tertiary: 'px-3 py-1.5 rounded-[8px]',
       },
     },
     defaultVariants: {
@@ -56,10 +58,24 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, fullWidth = false, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, fullWidth = false, asChild = false, style, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
+    
+    // Compute inline styles for gradient/dark/outlineOrange variants
+    const gradientStyle =
+      (variant === 'orange' || variant === 'primary' || variant === 'gradient' || variant === 'gradient-primary')
+        ? { background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
+            boxShadow: '0 4px 16px rgba(247,147,30,0.28)' }
+      : variant === 'dark'
+        ? { background: 'hsl(var(--foreground))',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.22)' }
+      : variant === 'outlineOrange'
+        ? { border: '1.5px solid #F59E0B' }
+      : {};
+
     return (
       <Comp
+        style={{ ...gradientStyle, ...style }}
         className={cn(
           buttonVariants({ variant, size, className }),
           fullWidth && "w-full"
