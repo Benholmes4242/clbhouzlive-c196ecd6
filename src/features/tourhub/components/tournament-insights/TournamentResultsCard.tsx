@@ -202,22 +202,26 @@ export function TournamentResultsCard({
           />
         </div>
 
-        {/* Left column — winner info */}
+        {/* Winner info — anchored top left, level with player's head */}
         <div style={{
-          position: 'relative', zIndex: 2,
-          padding: '20px 16px 20px 16px',
-          width: '65%',
-          minHeight: 280,
-          display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
-          gap: 4,
+          position: 'absolute', top: 0, left: 0,
+          width: '58%',
+          padding: '20px 12px 0 16px',
+          zIndex: 2,
         }}>
+          {/* Gradient scrim behind text only — top-left quadrant */}
+          <div style={{
+            position: 'absolute', inset: 0, pointerEvents: 'none',
+            background: 'linear-gradient(to right, rgba(0,0,0,0.45) 0%, transparent 100%)',
+            zIndex: -1,
+          }} />
+
           {/* Eyebrow — course name in amber */}
           <div style={{
             fontSize: 10, fontWeight: 700, letterSpacing: 1.8,
             textTransform: 'uppercase' as const,
             color: 'hsl(var(--accent-amber))',
-            marginBottom: 2,
-            lineHeight: 1,
+            marginBottom: 3, lineHeight: 1,
           }}>
             {courseName}
           </div>
@@ -225,39 +229,59 @@ export function TournamentResultsCard({
           {/* Tournament name */}
           <div style={{
             fontSize: 12, fontWeight: 600,
-            color: 'hsl(var(--muted-foreground))',
-            lineHeight: 1.3,
-            marginBottom: 4,
+            color: 'rgba(255,255,255,0.80)',
+            lineHeight: 1.3, marginBottom: 5,
           }}>
             {tournamentName}
           </div>
 
-          {/* Winner name — big */}
+          {/* Winner name */}
           <div style={{
-            fontSize: 28, fontWeight: 900,
-            color: 'hsl(var(--foreground))',
-            letterSpacing: -1, lineHeight: 1.05,
-            marginBottom: 2,
+            fontSize: 26, fontWeight: 900,
+            color: '#ffffff',
+            letterSpacing: -0.8, lineHeight: 1.05,
+            marginBottom: 6,
+            textShadow: '0 1px 8px rgba(0,0,0,0.4)',
           }}>
             {winnerName}
           </div>
 
-          {/* Score — amber, very large */}
+          {/* Score */}
           <div style={{
-            fontSize: 48, fontWeight: 900,
+            fontSize: 40, fontWeight: 900,
             color: 'hsl(var(--accent-amber))',
             letterSpacing: -2, lineHeight: 1,
-            marginBottom: 6,
+            marginBottom: 8,
           }}>
             {scoreDisplay}
           </div>
 
+          {/* Margin pill */}
+          {marginText && (
+            <div style={{
+              display: 'inline-flex',
+              fontSize: 11, fontWeight: 700,
+              color: 'rgba(255,255,255,0.9)',
+              background: 'rgba(0,0,0,0.35)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: 20, padding: '4px 12px',
+            }}>
+              {marginText}
+            </div>
+          )}
         </div>
       </div>
 
       {/* ── STATS GRID ──────────────────────────────────────────────── */}
       {(tStats || sStats) && (
-        <div style={{ padding: '14px 16px 6px' }}>
+        <div style={{
+          padding: '14px 16px 6px',
+          marginTop: -28,
+          position: 'relative',
+          zIndex: 3,
+        }}>
 
           {/* Row 1 — Scorecard stats */}
           {tStats && (
