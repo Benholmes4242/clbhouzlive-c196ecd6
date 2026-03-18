@@ -28,45 +28,15 @@ export default {
 			}
 		},
 		extend: {
-		fontFamily: {
-			// SF Pro Text - For body text, buttons, labels, forms
-			'sans': [
-				'-apple-system',
-				'BlinkMacSystemFont',
-				'"SF Pro Text"',
-				'"Segoe UI"',
-				'Roboto',
-				'"Helvetica Neue"',
-				'Arial',
-				'sans-serif',
-			],
-			// SF Pro Display - For headings and large text (text-xl and above)
-			'display': [
-				'-apple-system',
-				'BlinkMacSystemFont',
-				'"SF Pro Display"',
-				'"Segoe UI"',
-				'Roboto',
-				'"Helvetica Neue"',
-				'Arial',
-				'sans-serif',
-			],
-		// League Spartan - Bold display font for special headings
-			'league-spartan': [
-				'"League Spartan"',
-				'sans-serif',
-			],
-			// DM Sans — Hub warm redesign body font
-			'dm-sans': [
-				'"DM Sans"',
-				'sans-serif',
-			],
-			// Playfair Display — Hub warm redesign display font
-			'playfair': [
-				'"Playfair Display"',
-				'serif',
-			],
-		},
+	fontFamily: {
+		// Geist — Single variable font for all typography
+		'sans': ['"Geist"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+		'display': ['"Geist"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+		// Legacy class names → all resolve to Geist
+		'league-spartan': ['"Geist"', 'sans-serif'],
+		'dm-sans': ['"Geist"', 'sans-serif'],
+		'playfair': ['"Geist"', 'sans-serif'],
+	},
 			fontSize: {
 				// CLBHOUZ SEMANTIC TYPE SCALE - 8 Roles
 				'display-xl': ['2.125rem', { lineHeight: '1.15' }],   // 34px

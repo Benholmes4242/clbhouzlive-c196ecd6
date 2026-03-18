@@ -196,7 +196,6 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
         </button>
         <span 
           className="text-[13px] text-white/50 truncate"
-          style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
         >
           {email}
         </span>
@@ -221,7 +220,6 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
             disabled={submitting}
             className="w-full h-[54px] px-4 pr-10 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
             style={{
-              fontFamily: 'SF Pro Text, system-ui, sans-serif',
               background: getInputBackground(usernameFocused),
               border: getInputBorderColor(usernameAvailable, true),
               boxShadow: usernameFocused 
@@ -301,7 +299,6 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
             disabled={isPasswordDisabled}
             className="w-full h-[54px] px-4 pr-12 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
             style={{
-              fontFamily: 'SF Pro Text, system-ui, sans-serif',
               background: getInputBackground(passwordFocused, isPasswordDisabled),
               border: passwordError 
                 ? '1px solid #E03131' 
@@ -372,7 +369,6 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
             disabled={isConfirmPasswordDisabled}
             className="w-full h-[54px] px-4 pr-12 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
             style={{
-              fontFamily: 'SF Pro Text, system-ui, sans-serif',
               background: getInputBackground(confirmPasswordFocused, isConfirmPasswordDisabled),
               border: showMismatchError 
                 ? '1px solid #E03131' 
@@ -430,7 +426,6 @@ const SignupSheetContent: React.FC<SignupSheetContentProps> = ({
         disabled={isSubmitDisabled}
         className="w-full h-[54px] flex items-center justify-center rounded-full text-[15px] transition-all duration-200 active:scale-[0.98]"
         style={{
-          fontFamily: 'SF Pro Text, system-ui, sans-serif',
           fontWeight: 500,
           background: isSubmitDisabled ? 'rgba(255, 255, 255, 0.5)' : 'white',
           color: '#0D0F11',

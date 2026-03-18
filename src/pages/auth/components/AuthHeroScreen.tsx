@@ -164,7 +164,6 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
           {SHOW_WORDMARK && (
             <span 
               className="text-white/90 text-[24px] font-medium tracking-tight"
-              style={{ fontFamily: 'SF Pro Display, system-ui, sans-serif' }}
             >
               clbhouz
             </span>
@@ -176,7 +175,6 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
           <h1 
             className="text-[38px] md:text-[44px] font-semibold text-white leading-tight auth-tagline-animate"
             style={{ 
-              fontFamily: 'SF Pro Display, system-ui, sans-serif',
               letterSpacing: '-0.02em',
             }}
           >
@@ -204,7 +202,6 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               aria-busy={submitting}
               className="auth-button-1 w-full h-[56px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50 hover:bg-white/[0.08]"
               style={{
-                fontFamily: 'SF Pro Text, system-ui, sans-serif',
                 background: 'rgba(255, 255, 255, 0.05)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 color: 'rgba(255, 255, 255, 0.92)',
@@ -228,7 +225,6 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               aria-label="Continue with Google — Coming soon"
               className="auth-button-2 w-full h-[56px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all duration-150 cursor-not-allowed"
               style={{
-                fontFamily: 'SF Pro Text, system-ui, sans-serif',
                 background: 'rgba(255, 255, 255, 0.05)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 color: 'rgba(255, 255, 255, 0.92)',
@@ -254,7 +250,6 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               aria-label="Create account with Email"
               className="auth-button-3 w-full h-[56px] flex items-center justify-center gap-2.5 rounded-full font-medium text-[15px] transition-all duration-150 active:scale-[0.98] disabled:opacity-50 hover:bg-white/[0.06]"
               style={{
-                fontFamily: 'SF Pro Text, system-ui, sans-serif',
                 background: 'rgba(255, 255, 255, 0.03)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
                 color: 'rgba(255, 255, 255, 0.88)',
@@ -268,7 +263,6 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               <div className="flex-1 h-px bg-neutral-700" />
               <span 
                 className="text-sm font-medium text-neutral-500"
-                style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
               >
                 OR
               </span>
@@ -279,7 +273,6 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
             <p
               className="auth-button-5 text-center"
               style={{
-                fontFamily: 'SF Pro Text, system-ui, sans-serif',
                 fontSize: '11px',
                 fontWeight: 600,
                 textTransform: 'uppercase',
@@ -305,7 +298,6 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                   placeholder="Email address"
                   disabled={submitting}
                   className="w-full h-[56px] px-5 rounded-full bg-neutral-900 border border-neutral-700 text-white placeholder:text-neutral-500 text-[15px] focus:outline-none focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500 transition-all disabled:opacity-50"
-                  style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
                   autoComplete="email"
                   inputMode="email"
                 />
@@ -313,7 +305,7 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
               
               {/* Email error message */}
               {emailError && (
-                <p className="text-red-400 text-[13px] text-center" style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}>
+                <p className="text-red-400 text-[13px] text-center">
                   {emailError}
                 </p>
               )}
@@ -329,7 +321,6 @@ const AuthHeroScreen: React.FC<AuthHeroScreenProps> = ({
                     : 'hover:bg-white/[0.08]'
                 }`}
                 style={{
-                  fontFamily: 'SF Pro Text, system-ui, sans-serif',
                   ...(loginEmail.trim() 
                     ? { boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 4px 12px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255, 255, 255, 0.08)' }
                     : { background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', color: 'rgba(255, 255, 255, 0.92)' }

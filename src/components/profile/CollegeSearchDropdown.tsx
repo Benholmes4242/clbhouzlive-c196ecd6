@@ -154,7 +154,6 @@ export const CollegeSearchDropdown: React.FC<CollegeSearchDropdownProps> = ({
           disabled={disabled}
           className="w-full h-[54px] px-4 pr-10 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
           style={{
-            fontFamily: 'SF Pro Text, system-ui, sans-serif',
             background: getInputBackground(),
             border: '1px solid rgba(255, 255, 255, 0.07)',
             opacity: disabled ? 0.5 : 1,

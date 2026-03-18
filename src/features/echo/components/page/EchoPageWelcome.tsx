@@ -115,7 +115,6 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
             key={index}
             onClick={() => handleChipClick(prompt)}
             className="px-4 py-3 rounded-2xl text-[13px] font-medium text-left active:bg-[hsl(38,92%,50%)]/5 active:scale-[0.98] transition-all duration-150 flex items-center justify-between gap-2 bg-background border border-border"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
             aria-label={`Ask Echo: ${prompt}`}
           >
             <span className="text-foreground">{prompt}</span>

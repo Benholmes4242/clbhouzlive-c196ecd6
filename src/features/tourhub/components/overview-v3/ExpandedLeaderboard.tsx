@@ -225,7 +225,6 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
         width: 56,
         textAlign: 'right',
         flexShrink: 0,
-        fontFamily: "'JetBrains Mono','SF Mono','Courier New',monospace",
         fontSize: 16,
         fontWeight: 700,
         color: '#FFFFFF',

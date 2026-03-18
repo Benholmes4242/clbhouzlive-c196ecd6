@@ -287,7 +287,6 @@ const EnhancedRichTextInput: React.FC<EnhancedRichTextInputProps> = ({
           className={`w-full px-3.5 py-3.5 pr-12 text-[15px] leading-6 border-0 rounded-xl bg-transparent resize-none placeholder:text-gray-400 focus:outline-none ${className}`}
           style={{ 
             minHeight: '72px', // 3 lines * 24px line height
-            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
           }}
         />
         

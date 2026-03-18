@@ -60,7 +60,6 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
         </button>
         <span 
           className="text-[13px] text-white/50 truncate"
-          style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
         >
           {email}
         </span>
@@ -79,7 +78,6 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
           disabled={submitting}
           className="w-full h-[54px] px-4 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
           style={{
-            fontFamily: 'SF Pro Text, system-ui, sans-serif',
             background: getInputBackground(),
             border: passwordError 
               ? '1px solid #E03131' 
@@ -114,7 +112,6 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
         disabled={isDisabled}
         className="w-full h-[54px] flex items-center justify-center rounded-full text-[15px] transition-all duration-200 active:scale-[0.98]"
         style={{
-          fontFamily: 'SF Pro Text, system-ui, sans-serif',
           fontWeight: 500,
           background: isDisabled ? 'rgba(255, 255, 255, 0.5)' : 'white',
           color: '#0D0F11',
@@ -135,7 +132,6 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
         disabled={submitting}
         className="w-full text-center text-[13px] transition-colors pt-2 group"
         style={{ 
-          fontFamily: 'SF Pro Text, system-ui, sans-serif',
           color: 'rgba(255, 255, 255, 0.4)',
         }}
       >

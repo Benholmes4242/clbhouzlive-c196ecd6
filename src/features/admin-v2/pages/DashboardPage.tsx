@@ -383,7 +383,7 @@ export default function DashboardPage() {
                       {entry.action.replace(/_/g, ' ')}
                     </span>
                     {entry.targetEmail && (
-                      <span className="ml-2" style={{ fontSize: 12, fontFamily: 'monospace', color: '#64748B' }}>
+                      <span className="ml-2" style={{ fontSize: 12, color: '#64748B' }}>
                         {entry.targetEmail}
                       </span>
                     )}

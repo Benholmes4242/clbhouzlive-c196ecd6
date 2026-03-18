@@ -97,7 +97,6 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
               <h2 
                 className="text-[18px] text-white mb-1"
                 style={{ 
-                  fontFamily: 'SF Pro Display, system-ui, sans-serif',
                   fontWeight: 500,
                   letterSpacing: '-0.01em',
                 }}
@@ -109,7 +108,6 @@ const AuthBottomSheet: React.FC<AuthBottomSheetProps> = ({
               <p 
                 className="text-[14px] text-white/65"
                 style={{ 
-                  fontFamily: 'SF Pro Text, system-ui, sans-serif',
                   lineHeight: '1.45',
                 }}
               >

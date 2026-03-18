@@ -90,13 +90,11 @@ export const PasswordBottomSheet: React.FC<PasswordBottomSheetProps> = ({
                 {/* Header */}
                 <h2
                   className="text-[22px] font-semibold text-white"
-                  style={{ fontFamily: 'SF Pro Display, system-ui, sans-serif' }}
                 >
                   Enter password
                 </h2>
                 <p
                   className="text-[15px] text-neutral-400 mt-1"
-                  style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
                 >
                   Welcome back.
                 </p>
@@ -111,7 +109,6 @@ export const PasswordBottomSheet: React.FC<PasswordBottomSheetProps> = ({
                   </div>
                   <span
                     className="text-[15px] text-neutral-300"
-                    style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
                   >
                     {email}
                   </span>
@@ -130,7 +127,6 @@ export const PasswordBottomSheet: React.FC<PasswordBottomSheetProps> = ({
                       disabled={submitting}
                       autoComplete="current-password"
                       className="w-full h-[56px] px-5 pr-12 rounded-full bg-neutral-900 border border-neutral-700 text-white placeholder:text-neutral-500 text-[15px] focus:outline-none focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500 transition-all disabled:opacity-50"
-                      style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
                     />
                     <button
                       type="button"
@@ -156,7 +152,6 @@ export const PasswordBottomSheet: React.FC<PasswordBottomSheetProps> = ({
                         : 'hover:bg-white/[0.08]'
                     }`}
                     style={{
-                      fontFamily: 'SF Pro Text, system-ui, sans-serif',
                       ...(password.trim() 
                         ? { boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 4px 12px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255, 255, 255, 0.08)' }
                         : { background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', color: 'rgba(255, 255, 255, 0.92)' }
@@ -176,7 +171,6 @@ export const PasswordBottomSheet: React.FC<PasswordBottomSheetProps> = ({
                   type="button"
                   onClick={onForgotPassword}
                   className="w-full text-center mt-4 text-[14px] text-neutral-500 hover:text-neutral-300 transition-colors"
-                  style={{ fontFamily: 'SF Pro Text, system-ui, sans-serif' }}
                 >
                   Forgot your password?
                 </button>

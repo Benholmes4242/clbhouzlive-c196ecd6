@@ -120,7 +120,6 @@ const EmailSheetContent: React.FC<EmailSheetContentProps> = ({
           disabled={submitting || checkingEmail}
           className="w-full h-[54px] px-4 rounded-2xl text-white text-[15px] focus:outline-none transition-all duration-200"
           style={{
-            fontFamily: 'SF Pro Text, system-ui, sans-serif',
             background: getInputBackground(),
             border: (emailError || showEmailExistsError)
               ? '1px solid #E03131' 
@@ -189,7 +188,6 @@ const EmailSheetContent: React.FC<EmailSheetContentProps> = ({
           disabled={isDisabled}
           className="w-full h-[54px] flex items-center justify-center rounded-full text-[15px] transition-all duration-200 active:scale-[0.98]"
           style={{
-            fontFamily: 'SF Pro Text, system-ui, sans-serif',
             fontWeight: 500,
             background: isDisabled ? 'rgba(255, 255, 255, 0.5)' : 'white',
             color: '#0D0F11',
