@@ -1,11 +1,5 @@
-/* SF Pro fonts are used via system font stack - native on Apple devices, fallbacks on others */
-/* No external font loading needed - improves performance */
-
-/* League Spartan - Bold display font for special headings */
-@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800&display=swap');
-
-/* DM Sans + Playfair Display — Hub warm redesign typography */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Playfair+Display:wght@400;500;600;700;800&display=swap');
+/* Geist — Single variable font for all typography (weights 100–900) */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
 
 @import './components/ai-chat/ai-chat-fixes.css';
 @import './styles/hub-warm.css';
