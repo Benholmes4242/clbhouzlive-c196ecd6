@@ -231,12 +231,12 @@ export function TournamentResultsCard({
           {tStats && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginBottom: 6 }}>
               {[
-                { v: tStats.birdies, label: 'Birdies', color: '#16A34A', bg: 'rgba(22,163,74,0.08)', show: !!tStats.birdies },
-                { v: tStats.pars, label: 'Pars', color: 'hsl(var(--muted-foreground))', bg: 'hsl(var(--muted))', show: !!tStats.pars },
-                { v: tStats.bogeys, label: 'Bogeys', color: '#DC2626', bg: 'rgba(220,38,38,0.08)', show: !!(tStats.bogeys && tStats.bogeys > 0) },
-                { v: tStats.eagles, label: 'Eagles', color: '#F59E0B', bg: 'rgba(245,158,11,0.08)', show: !!(tStats.eagles && tStats.eagles > 0) },
+                { v: tStats.birdies, label: 'Birdies', color: '#16A34A', bg: 'rgba(22,163,74,0.12)', show: !!tStats.birdies },
+                { v: tStats.pars, label: 'Pars', color: 'hsl(var(--muted-foreground))', bg: 'rgba(255,255,255,0.6)', show: !!tStats.pars },
+                { v: tStats.bogeys, label: 'Bogeys', color: '#DC2626', bg: 'rgba(220,38,38,0.10)', show: !!(tStats.bogeys && tStats.bogeys > 0) },
+                { v: tStats.eagles, label: 'Eagles', color: '#F59E0B', bg: 'rgba(245,158,11,0.12)', show: !!(tStats.eagles && tStats.eagles > 0) },
               ].map(stat => (
-                <div key={stat.label} style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 8, background: stat.bg, opacity: stat.show ? 1 : 0.3 }}>
+                <div key={stat.label} style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 10, background: stat.bg, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', opacity: stat.show ? 1 : 0.3 }}>
                   <div style={{ fontSize: 17, fontWeight: 700, color: stat.color }}>{stat.v ?? '—'}</div>
                   <div className="text-muted-foreground" style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.5, marginTop: 2 }}>{stat.label}</div>
                 </div>
@@ -248,19 +248,19 @@ export function TournamentResultsCard({
           {sStats && (sStats.drivingDistance || sStats.greensInReg || sStats.puttingAverage) && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
               {sStats.drivingDistance && (
-                <div style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 8, background: 'rgba(232,152,10,0.07)' }}>
+                <div style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 10, background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
                   <div className="text-foreground" style={{ fontSize: 15, fontWeight: 700 }}>{Math.round(sStats.drivingDistance)}<span className="text-muted-foreground" style={{ fontSize: 9 }}>yds</span></div>
                   <div className="text-muted-foreground" style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.5, marginTop: 2 }}>Driver</div>
                 </div>
               )}
               {sStats.greensInReg && (
-                <div style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 8, background: 'rgba(22,163,74,0.07)' }}>
+                <div style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 10, background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
                   <div className="text-foreground" style={{ fontSize: 15, fontWeight: 700 }}>{Math.round(sStats.greensInReg)}<span className="text-muted-foreground" style={{ fontSize: 9 }}>%</span></div>
                   <div className="text-muted-foreground" style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.5, marginTop: 2 }}>GIR</div>
                 </div>
               )}
               {sStats.puttingAverage && (
-                <div style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 8, background: 'hsl(var(--muted))' }}>
+                <div style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 10, background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
                   <div className="text-foreground" style={{ fontSize: 15, fontWeight: 700 }}>{sStats.puttingAverage.toFixed(2)}</div>
                   <div className="text-muted-foreground" style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.5, marginTop: 2 }}>Putts</div>
                 </div>
