@@ -1,16 +1,16 @@
 /**
- * CourseStatusToggle - Personal status toggle (Played / Want to Play)
- * Played button matches user's rating color (Gray/Amber)
+ * CourseStatusToggle - Pinpoint CTA buttons
+ * Mark Played: Primary Dark (orange gradient when played)
+ * Want to Play: Secondary Outline (orange tint when active)
  */
 import React from 'react';
-import { Check, Bookmark, Loader2, Sparkles, Map } from 'lucide-react';
+import { Check, Bookmark, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
 import { useNavigate, Link } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
-
 
 interface CourseStatusToggleProps {
   courseId: string;
@@ -27,21 +27,13 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
 }) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
-  
   const { status, isLoading, setWantToPlay, isUpdating } = useCoursePersonalStatus(courseId);
 
   if (!user) {
     return (
       <div className={cn("space-y-3", className)}>
-        <p className="text-sm text-muted-foreground">
-          Sign in to track this course
-        </p>
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={() => navigate('/auth')}
-          className="w-full"
-        >
+        <p className="text-sm text-muted-foreground">Sign in to track this course</p>
+        <Button variant="outline" size="sm" onClick={() => navigate('/auth')} className="w-full">
           Sign in
         </Button>
       </div>
@@ -56,13 +48,10 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
     );
   }
 
-  const handlePlayedClick = () => {
-    navigate(`/courses/${courseId}/rate`);
-  };
+  const handlePlayedClick = () => navigate(`/courses/${courseId}/rate`);
 
   const handleWantToPlayClick = async () => {
     if (status.status === 'played') return;
-    
     if (status.status === 'want_to_play') {
       await setWantToPlay(false);
       toast("Removed from Want to Play", { duration: 2000 });
@@ -75,50 +64,69 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
   const isPlayed = status.status === 'played';
   const isWantToPlay = status.status === 'want_to_play';
   const hasNoSelection = status.status === 'none';
-  
-  const playedBgColor = 'bg-[#f59e0b]';
-  const playedShadowColor = 'shadow-[#f59e0b]/25';
 
   return (
     <div className={cn("space-y-3", className)}>
       <div className="flex flex-wrap gap-2">
-        {/* Played button */}
+        {/* Mark Played — Primary Dark; orange gradient when already played */}
         <button
           onClick={handlePlayedClick}
           disabled={isUpdating}
-          className={cn(
-            "flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all active:scale-95",
-            isPlayed
-              ? `${playedBgColor} text-white ${playedShadowColor}`
-              : "bg-muted text-muted-foreground hover:bg-secondary"
-          )}
+          style={{
+            height: 42,
+            paddingLeft: 20,
+            paddingRight: 20,
+            borderRadius: 10,
+            fontSize: 14,
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            background: isPlayed
+              ? 'linear-gradient(90deg, #F59E0B, #F7931E)'
+              : 'hsl(var(--foreground))',
+            color: '#fff',
+            border: 'none',
+            boxShadow: isPlayed
+              ? '0 3px 12px rgba(247,147,30,0.28)'
+              : '0 2px 10px rgba(0,0,0,0.20)',
+            transition: 'all 0.18s ease',
+          }}
         >
           {isPlayed && <Check className="h-4 w-4" />}
-          <span>{isPlayed ? 'Played' : 'Mark Played'}</span>
+          {isPlayed ? 'Played' : 'Mark Played'}
         </button>
 
-        {/* Want to Play */}
+        {/* Want to Play — Outline with orange tint when active */}
         <button
           onClick={handleWantToPlayClick}
           disabled={isUpdating || isPlayed}
-          className={cn(
-            "flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all active:scale-95",
-            isPlayed && "opacity-40 cursor-not-allowed",
-            isWantToPlay
-              ? "bg-amber-100 text-amber-700 border-2 border-amber-300 shadow-sm"
-              : "bg-muted text-muted-foreground hover:bg-secondary"
-          )}
+          style={{
+            height: 42,
+            paddingLeft: 20,
+            paddingRight: 20,
+            borderRadius: 10,
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: isPlayed ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            background: isWantToPlay ? 'rgba(245,158,11,0.06)' : 'transparent',
+            color: isWantToPlay ? '#F7931E' : 'hsl(var(--foreground))',
+            border: isWantToPlay ? '1.5px solid #F59E0B' : '1.5px solid hsl(var(--border))',
+            opacity: isPlayed ? 0.35 : 1,
+            transition: 'all 0.18s ease',
+          }}
         >
-          {isUpdating ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Bookmark className={cn("h-4 w-4", isWantToPlay && "fill-amber-500")} />
-          )}
-          <span>Want to Play</span>
+          {isUpdating
+            ? <Loader2 className="h-4 w-4 animate-spin" />
+            : <Bookmark className={cn('h-4 w-4', isWantToPlay && 'fill-[#F7931E]')} />}
+          Want to Play
         </button>
       </div>
 
-      {/* Journey tooltip */}
       {hasNoSelection && (
         <div className="flex items-start gap-2 text-xs text-muted-foreground">
           <Sparkles className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
