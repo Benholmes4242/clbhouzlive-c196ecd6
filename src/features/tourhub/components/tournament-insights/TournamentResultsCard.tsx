@@ -277,9 +277,12 @@ export function TournamentResultsCard({
                 <div key={s.label} style={{
                   textAlign: 'center' as const,
                   padding: '9px 4px 7px',
-                  borderRadius: 10,
-                  background: s.bg,
-                  border: '1px solid rgba(0,0,0,0.05)',
+                  borderRadius: 12,
+                  background: 'rgba(255,255,255,0.55)',
+                  backdropFilter: 'blur(16px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+                  border: '1px solid rgba(255,255,255,0.75)',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)',
                 }}>
                   <div style={{ fontSize: 18, fontWeight: 800, color: s.num, lineHeight: 1 }}>
                     {s.v ?? 0}
