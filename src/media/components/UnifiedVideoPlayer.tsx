@@ -705,6 +705,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           if (pooledHls) {
             // Use promoted instance - already attached to video
             hlsRef.current = pooledHls;
+            registerHlsForDebug(cloudflareUid || uniqueMediaId, pooledHls, video);
             
             // Re-wire event handlers for the promoted instance
             pooledHls.on(Hls.Events.MANIFEST_PARSED, () => {
