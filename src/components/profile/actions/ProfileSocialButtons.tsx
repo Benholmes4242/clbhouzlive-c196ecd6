@@ -274,7 +274,7 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
 
   return (
     <>
-      <div className={`flex gap-2 ${isMobile ? 'flex-col' : 'items-center'}`}>
+      <div className="flex gap-2 items-center flex-wrap">
         {followButton}
         {friendButton}
         {moreMenu}
