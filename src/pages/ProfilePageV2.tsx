@@ -369,12 +369,22 @@ const ProfilePageV2Content: React.FC = () => {
   
   // Handle friend button click
   const handleFriendAction = async () => {
-    if (friendshipStatus === 'none') {
-      await sendRequest();
-    } else if (friendshipStatus === 'request_sent') {
-      await cancelRequest();
+    switch (friendshipStatus) {
+      case 'none':
+        await sendRequest();
+        break;
+      case 'request_sent':
+        await cancelRequest();
+        break;
+      case 'request_received':
+        await acceptRequest();
+        break;
+      case 'friends':
+        await unfriend();
+        break;
+      default:
+        break;
     }
-    // For 'friends' and 'request_received', we might want different actions
   };
 
   // Redirect to auth if not logged in (must be before early returns but after all hooks)
