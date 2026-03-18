@@ -421,6 +421,7 @@ export default function ClubhouseVideoDebugPanel() {
     if (!visible) return;
 
     const tick = () => {
+      console.log('[DEBUG] HLS_REGISTRY size:', HLS_REGISTRY.size);
       setSessions(prev => {
         const next = new Map<string, VideoSession>();
 
@@ -443,7 +444,7 @@ export default function ClubhouseVideoDebugPanel() {
     };
 
     tick();
-    const interval = setInterval(tick, 500);
+    const interval = setInterval(tick, 2000);
     return () => clearInterval(interval);
   }, [visible, attachListeners, selectedId]);
 
