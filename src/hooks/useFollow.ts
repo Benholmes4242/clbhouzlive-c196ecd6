@@ -1,9 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 type FollowState = 'following' | 'not_following' | 'unknown';
 
 export function useFollow(targetUserId: string | undefined) {
+  const queryClient = useQueryClient();
   const [busy, setBusy] = useState(false);
   const [isFollowing, setIsFollowing] = useState<FollowState>('unknown');
 
