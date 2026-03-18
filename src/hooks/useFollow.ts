@@ -51,7 +51,7 @@ export function useFollow(targetUserId: string | undefined) {
     }
     // Notification is created by database trigger - no frontend insert needed
     setBusy(false);
-  }, [busy, isFollowing, targetUserId]);
+    queryClient.invalidateQueries({ queryKey: ['social-counts', targetUserId] });
 
   const unfollow = useCallback(async () => {
     if (!targetUserId || busy) return;
