@@ -284,7 +284,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
           <ChevronLeft size={22} className="text-foreground/60" />
         </button>
         <div className="flex-1 text-center">
-          <span className="text-[16px] font-semibold" style={{ color: 'hsl(var(--foreground))', fontFamily: "'DM Sans', sans-serif" }}>
+          <span className="text-[16px] font-semibold" style={{ color: 'hsl(var(--foreground))' }}>
             Group Info
           </span>
         </div>
