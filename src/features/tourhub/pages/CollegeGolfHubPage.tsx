@@ -132,7 +132,7 @@ export function CollegeGolfHubPage() {
         {/* Burger menu — AFTER hero in DOM so it paints on top of hero's stacking context */}
         <button
           className="fixed z-20 flex items-center justify-center"
-          style={{ top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: '16px', width: '44px', height: '44px' }}
+          style={{ top: 'calc(var(--sat, env(safe-area-inset-top, 0px)) + 52px)', left: '16px', width: '44px', height: '44px' }}
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); openTourNav(); }}
           aria-label="Open tour menu"
         >
