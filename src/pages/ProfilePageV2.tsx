@@ -177,6 +177,15 @@ const ProfilePageV2Content: React.FC = () => {
       ensureInitial();
     }
   }, [isSelf, profileUserId, ensureInitial]);
+
+  // Fallback: if follow state never resolves from 'unknown' after 5s,
+  // treat as not-following so buttons don't stay disabled forever.
+  const [followResolved, setFollowResolved] = useState(false);
+  useEffect(() => {
+    if (isFollowing !== 'unknown') { setFollowResolved(true); return; }
+    const t = setTimeout(() => setFollowResolved(true), 5000);
+    return () => clearTimeout(t);
+  }, [isFollowing]);
   
   // Fix 4: Read initial tab from URL search params
   const [searchParams, setSearchParams] = useSearchParams();
