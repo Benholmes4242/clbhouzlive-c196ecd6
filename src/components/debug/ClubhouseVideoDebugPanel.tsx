@@ -94,19 +94,12 @@ interface VideoSession {
   hlsInstance: any | null;
 }
 
-// ─── Global registry so the panel can reach into active HLS instances ────────
+// ─── Global registry — imported from dedicated singleton module ──────────────
 
-// We register HLS instances by videoId when they are created in UnifiedVideoPlayer.
-// The panel polls this registry.
-const HLS_REGISTRY = new Map<string, { hls: any; video: HTMLVideoElement }>();
+import { getHlsRegistry, registerHlsForDebug, unregisterHlsForDebug } from './hlsDebugRegistry';
 
-export function registerHlsForDebug(videoId: string, hls: any, video: HTMLVideoElement) {
-  HLS_REGISTRY.set(videoId, { hls, video });
-}
-
-export function unregisterHlsForDebug(videoId: string) {
-  HLS_REGISTRY.delete(videoId);
-}
+// Re-export so existing imports from other files don't break
+export { registerHlsForDebug, unregisterHlsForDebug } from './hlsDebugRegistry';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
