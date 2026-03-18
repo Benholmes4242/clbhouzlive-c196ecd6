@@ -160,14 +160,17 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
 
   // C) Normal state - Follow + Friend buttons
   const friendButton = (() => {
+    // Shared defensive classes: prevent text from ever being clipped/hidden
+    const btnGuard = 'whitespace-nowrap overflow-visible';
+
     if (relationship.isFriend) {
       return (
-        <div className={isMobile ? 'flex-1' : ''}>
+        <div className={isMobile ? 'flex-1 min-w-0' : ''}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="sm" className="w-full">
-                <UserCheck className="w-4 h-4 mr-1" />
-                Friends
+              <Button variant="secondary" size="sm" className={`w-full ${btnGuard}`}>
+                <UserCheck className="w-4 h-4 mr-1 shrink-0" />
+                <span>Friends</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -182,12 +185,12 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
 
     if (relationship.hasPendingFriendRequestToThem) {
       return (
-        <div className={isMobile ? 'flex-1' : ''}>
+        <div className={isMobile ? 'flex-1 min-w-0' : ''}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="sm" disabled={friendLoading} className="w-full">
-                <UserMinus className="w-4 h-4 mr-1" />
-                Pending
+              <Button variant="secondary" size="sm" disabled={friendLoading} className={`w-full ${btnGuard}`}>
+                <UserMinus className="w-4 h-4 mr-1 shrink-0" />
+                <span>Pending</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -212,16 +215,17 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
           sendFriendRequest(profileUserId);
         }}
         disabled={friendLoading}
-        className={isMobile ? 'flex-1' : ''}
+        className={`${isMobile ? 'flex-1 min-w-0' : ''} ${btnGuard}`}
       >
-        <UserPlus className="w-4 h-4 mr-1" />
-        Add Friend
+        <UserPlus className="w-4 h-4 mr-1 shrink-0" />
+        <span>Add Friend</span>
       </Button>
     );
   })();
 
   // Use relationship.isFollowing as source of truth (from RPC),
   // but useUserFollow provides optimistic state
+  const btnGuard = 'whitespace-nowrap overflow-visible';
   const followButton = (
     <Button
       variant={isFollowing ? 'secondary' : 'default'}
@@ -235,17 +239,17 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
         toggleFollow();
       }}
       disabled={isFollowingPending}
-      className={isMobile ? 'flex-1' : ''}
+      className={`${isMobile ? 'flex-1 min-w-0' : ''} ${btnGuard}`}
     >
       {isFollowing ? (
         <>
-          <UserCheck className="w-4 h-4 mr-1" />
-          Following
+          <UserCheck className="w-4 h-4 mr-1 shrink-0" />
+          <span>Following</span>
         </>
       ) : (
         <>
-          <UserPlus className="w-4 h-4 mr-1" />
-          Follow
+          <UserPlus className="w-4 h-4 mr-1 shrink-0" />
+          <span>Follow</span>
         </>
       )}
     </Button>
