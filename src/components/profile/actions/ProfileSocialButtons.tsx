@@ -162,37 +162,41 @@ export const ProfileSocialButtons: React.FC<ProfileSocialButtonsProps> = ({
   const friendButton = (() => {
     if (relationship.isFriend) {
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="secondary" size="sm" className={isMobile ? 'flex-1' : ''}>
-              <UserCheck className="w-4 h-4 mr-1" />
-              Friends
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => setShowUnfriendDialog(true)}>
-              Unfriend
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className={isMobile ? 'flex-1' : ''}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="secondary" size="sm" className="w-full">
+                <UserCheck className="w-4 h-4 mr-1" />
+                Friends
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setShowUnfriendDialog(true)}>
+                Unfriend
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       );
     }
 
     if (relationship.hasPendingFriendRequestToThem) {
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="secondary" size="sm" disabled={friendLoading} className={isMobile ? 'flex-1' : ''}>
-              <UserMinus className="w-4 h-4 mr-1" />
-              Pending
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => cancelFriendRequest(profileUserId)}>
-              Cancel request
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className={isMobile ? 'flex-1' : ''}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="secondary" size="sm" disabled={friendLoading} className="w-full">
+                <UserMinus className="w-4 h-4 mr-1" />
+                Pending
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => cancelFriendRequest(profileUserId)}>
+                Cancel request
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       );
     }
 
