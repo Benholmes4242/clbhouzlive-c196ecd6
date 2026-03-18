@@ -345,7 +345,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
               </div>
             ) : (
               <>
-                <h2 className="text-xl font-semibold" style={{ color: 'hsl(var(--foreground))', fontFamily: "'DM Sans', sans-serif" }}>
+                <h2 className="text-xl font-semibold" style={{ color: 'hsl(var(--foreground))' }}>
                   {conversation.name}
                 </h2>
                 {isAdmin && (
