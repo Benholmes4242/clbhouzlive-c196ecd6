@@ -73,7 +73,7 @@ export function useFollow(targetUserId: string | undefined) {
       setIsFollowing(prev);
     }
     setBusy(false);
-  }, [busy, isFollowing, targetUserId]);
+    queryClient.invalidateQueries({ queryKey: ['social-counts', targetUserId] });
 
   const toggle = useCallback(async () => {
     if (isFollowing === 'following') return unfollow();
