@@ -243,6 +243,15 @@ function AppRoutes() {
     // Reset html/body to prevent stale grey bleeding through WebView compositing
     document.documentElement.style.backgroundColor = 'transparent';
     document.body.style.backgroundColor = 'transparent';
+
+    // FIX: Mark immersive routes so CSS can suppress .app-shell's
+    // #F8FAFC background-color before the hero page mounts.
+    // This eliminates the grey safe-area flash on return navigation.
+    if (isImmersiveRoute(location.pathname)) {
+      document.documentElement.setAttribute('data-immersive-route', 'true');
+    } else {
+      document.documentElement.removeAttribute('data-immersive-route');
+    }
   }, [location.pathname]);
   
   // Render origin page when we have a background location
