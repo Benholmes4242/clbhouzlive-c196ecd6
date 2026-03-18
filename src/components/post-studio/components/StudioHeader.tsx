@@ -142,15 +142,16 @@ export function StudioHeader({
 
       {/* Progress bar */}
       {showProgress && (
-        <div style={{ height: '2.5px', background: 'rgba(255,255,255,0.08)' }}>
+        <div style={{ height: '2.5px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)' }}>
           <motion.div
             className="h-full"
             initial={false}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             style={{
-              background: 'rgba(255,255,255,0.90)',
+              background: 'rgba(255,255,255,0.95)',
               borderRadius: '0 2px 2px 0',
+              boxShadow: '0 0 6px rgba(255,255,255,0.30)',
             }}
           />
         </div>

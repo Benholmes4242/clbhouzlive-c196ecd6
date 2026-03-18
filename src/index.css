@@ -933,6 +933,12 @@ html, body, #root {
   --composer-height: 380px;
 }
 
+/* Post Studio — ambient orb breathing */
+@keyframes studio-orb-breathe {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: 1; }
+  50% { transform: translateX(-50%) scale(1.15); opacity: 0.6; }
+}
+
 /* Sheet animations */
 @keyframes sheet-in {
   from { transform: translateY(16px); opacity: 0; }

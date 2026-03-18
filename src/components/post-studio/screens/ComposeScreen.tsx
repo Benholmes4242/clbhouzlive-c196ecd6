@@ -705,9 +705,87 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
       {/* ── Scrollable compose area ── */}
       <div
-        className="flex-1 overflow-y-auto"
+        className="flex-1 overflow-y-auto relative"
         style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain' }}
       >
+        {/* ── Ambient empty state — visible only when canvas is blank ── */}
+        {!hasMedia && state.caption.length === 0 && (
+          <div
+            className="absolute inset-0 pointer-events-none overflow-hidden"
+            style={{ zIndex: 0 }}
+          >
+            {/* Soft white radial orb, centred upper-third, slowly breathing */}
+            <div style={{
+              position: 'absolute',
+              top: '22%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: 320,
+              height: 320,
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.02) 50%, transparent 75%)',
+              animation: 'studio-orb-breathe 5s ease-in-out infinite',
+            }} />
+            {/* Second smaller orb — offset, slower, creates depth */}
+            <div style={{
+              position: 'absolute',
+              top: '35%',
+              left: '60%',
+              width: 180,
+              height: 180,
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(255,255,255,0.025) 0%, transparent 70%)',
+              animation: 'studio-orb-breathe 7s ease-in-out infinite reverse',
+            }} />
+            {/* Fine noise grain */}
+            <div style={{
+              position: 'absolute', inset: 0,
+              opacity: 0.35,
+              backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'0.05\'/%3E%3C/svg%3E")',
+              backgroundSize: '120px 120px',
+            }} />
+          </div>
+        )}
+
+        {/* ── Today's Prompt — visible when canvas is blank ── */}
+        {state.caption.length === 0 && !hasMedia && (
+          <div style={{
+            padding: '28px 24px 16px',
+            textAlign: 'center' as const,
+            position: 'relative',
+            zIndex: 1,
+          }}>
+            {/* Eyebrow label */}
+            <p style={{
+              fontSize: 9,
+              fontWeight: 700,
+              letterSpacing: 2.5,
+              textTransform: 'uppercase' as const,
+              color: 'rgba(255,255,255,0.28)',
+              marginBottom: 12,
+            }}>
+              Today's Prompt
+            </p>
+            {/* Prompt text — large, editorial */}
+            <p style={{
+              fontSize: 22,
+              fontWeight: 600,
+              color: 'rgba(255,255,255,0.70)',
+              lineHeight: 1.4,
+              letterSpacing: '-0.025em',
+            }}>
+              {placeholderRef.current}
+            </p>
+            {/* White hairline divider below */}
+            <div style={{
+              width: 28,
+              height: 1,
+              background: 'rgba(255,255,255,0.15)',
+              margin: '18px auto 0',
+            }} />
+          </div>
+        )}
+
         {/* ── Text input ── */}
         <div className="px-4 pt-3 pb-2 relative">
           {/* Mention highlight layer */}
@@ -755,19 +833,19 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl"
                 style={{
                   background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.09)',
+                  border: '1px solid rgba(255,255,255,0.14)',
                 }}
               >
                 <div
                   className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: 'rgba(255,255,255,0.08)' }}
+                  style={{ background: 'rgba(255,255,255,0.14)' }}
                 >
                   <span className="text-base">⛳</span>
                 </div>
-                <span className="flex-1 text-left text-[14px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                <span className="flex-1 text-left text-[14px]" style={{ color: 'rgba(255,255,255,0.55)' }}>
                   Where did you play?
                 </span>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'rgba(255,255,255,0.20)', flexShrink: 0 }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'rgba(255,255,255,0.35)', flexShrink: 0 }}>
                   <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </motion.button>
@@ -886,109 +964,124 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         <div className="h-4" />
       </div>
 
-      {/* ── Bottom toolbar — always visible above keyboard ── */}
+      {/* ── Bottom action rail ── */}
       <div
-        className="shrink-0 flex items-center px-4"
+        className="shrink-0"
         style={{
-          minHeight: 52,
-          borderTop: '1px solid rgba(255,255,255,0.07)',
           background: 'rgba(8,8,8,0.98)',
-          paddingBottom: '30px',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
         }}
       >
-        {/* Rear Camera */}
-        <motion.button
-          whileTap={{ scale: 0.92 }}
-          onClick={() => rearCameraInputRef.current?.click()}
-          disabled={isProcessing}
-          className="flex flex-col items-center justify-center disabled:opacity-40 shrink-0"
-          style={{ width: 34, height: 42 }}
-        >
-          <div
-            className="flex items-center justify-center"
-            style={{
-              width: 34, height: 34, borderRadius: '50%',
-              background: 'rgba(255,255,255,0.96)',
-              boxShadow: '0 2px 12px rgba(0,0,0,0.30)',
-            }}
+        {/* White hairline at top of rail */}
+        <div style={{
+          height: 1,
+          background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.10) 20%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.10) 80%, transparent 100%)',
+        }} />
+
+        <div className="flex items-center px-4" style={{ minHeight: 52 }}>
+          {/* ── Zone A: Capture ── */}
+          {/* Rear camera — slightly elevated as primary capture */}
+          <motion.button
+            whileTap={{ scale: 0.88 }}
+            onClick={() => rearCameraInputRef.current?.click()}
+            disabled={isProcessing}
+            className="flex flex-col items-center justify-center disabled:opacity-40"
+            style={{ width: 52, height: 54, gap: 3 }}
           >
-            <Camera className="w-4 h-4 shrink-0" style={{ color: '#0D0D0D' }} strokeWidth={2} />
-          </div>
-          <span className="text-[9px] mt-0.5 leading-none" style={{ color: 'rgba(255,255,255,0.40)' }}>Rear</span>
-        </motion.button>
-
-        <div className="w-2" />
-
-        {/* Front Camera */}
-        <motion.button
-          whileTap={{ scale: 0.92 }}
-          onClick={() => frontCameraInputRef.current?.click()}
-          disabled={isProcessing}
-          className="flex flex-col items-center justify-center disabled:opacity-40 shrink-0"
-          style={{ width: 34, height: 42 }}
-        >
-          <div
-            className="flex items-center justify-center"
-            style={{
-              width: 34, height: 34, borderRadius: '50%',
+            <div style={{
+              width: 40, height: 40, borderRadius: 13,
               background: 'rgba(255,255,255,0.96)',
-              boxShadow: '0 2px 12px rgba(0,0,0,0.30)',
-            }}
+              boxShadow: '0 2px 14px rgba(0,0,0,0.35)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Camera className="w-[18px] h-[18px]" style={{ color: '#0D0D0D' }} strokeWidth={2} />
+            </div>
+            <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: 0.8, color: 'rgba(255,255,255,0.50)', textTransform: 'uppercase' as const }}>
+              Rear
+            </span>
+          </motion.button>
+
+          {/* Front camera */}
+          <motion.button
+            whileTap={{ scale: 0.88 }}
+            onClick={() => frontCameraInputRef.current?.click()}
+            disabled={isProcessing}
+            className="flex flex-col items-center justify-center disabled:opacity-40"
+            style={{ width: 52, height: 54, gap: 3 }}
           >
-            <SwitchCamera className="w-4 h-4 shrink-0" style={{ color: '#0D0D0D' }} strokeWidth={2} />
+            <div style={{
+              width: 40, height: 40, borderRadius: 13,
+              background: 'rgba(255,255,255,0.07)',
+              border: '1px solid rgba(255,255,255,0.10)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <SwitchCamera className="w-[18px] h-[18px]" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={2} />
+            </div>
+            <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: 0.8, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' as const }}>
+              Front
+            </span>
+          </motion.button>
+
+          {/* Library */}
+          <motion.button
+            whileTap={{ scale: 0.88 }}
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isProcessing}
+            className="flex flex-col items-center justify-center disabled:opacity-40"
+            style={{ width: 52, height: 54, gap: 3 }}
+          >
+            <div style={{
+              width: 40, height: 40, borderRadius: 13,
+              background: 'rgba(255,255,255,0.07)',
+              border: '1px solid rgba(255,255,255,0.10)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Layers className="w-[18px] h-[18px]" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={2} />
+            </div>
+            <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: 0.8, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' as const }}>
+              Library
+            </span>
+          </motion.button>
+
+          {/* ── Divider ── */}
+          <div style={{
+            width: 1, height: 26,
+            background: 'rgba(255,255,255,0.08)',
+            margin: '0 10px',
+          }} />
+
+          {/* ── Zone B: Text tools ── */}
+          <motion.button
+            whileTap={{ scale: 0.88 }}
+            onClick={() => {
+              const pos = textareaRef.current?.selectionStart ?? state.caption.length;
+              const newCaption = state.caption.slice(0, pos) + '@' + state.caption.slice(pos);
+              setCaption(newCaption);
+              setMentionTriggerIndex(pos);
+              openPanel('mention');
+            }}
+            style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <AtSign className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
+          </motion.button>
+
+          <motion.button
+            whileTap={{ scale: 0.88 }}
+            onClick={() => openPanel('drafts')}
+            style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <BookOpen className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
+          </motion.button>
+
+          {/* ── Spacer ── */}
+          <div className="flex-1" />
+
+          {/* ── Zone C: Character count ── */}
+          <div className="flex items-center justify-center" style={{ width: 36, height: 36 }}>
+            <CharacterRing count={charCount} />
           </div>
-          <span className="text-[9px] mt-0.5 leading-none" style={{ color: 'rgba(255,255,255,0.40)' }}>Front</span>
-        </motion.button>
-
-        {/* Spacer between cameras and gallery */}
-        <div className="w-2" />
-
-        {/* Gallery */}
-        <motion.button
-          whileTap={{ scale: 0.92 }}
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isProcessing}
-          className="flex items-center justify-center disabled:opacity-40 mr-4"
-          style={{ width: 40, height: 40 }}
-        >
-          <Layers className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
-        </motion.button>
-
-        {/* Divider */}
-        <div className="w-px h-5 mr-4" style={{ background: 'rgba(255,255,255,0.10)' }} />
-
-        {/* Mention */}
-        <motion.button
-          whileTap={{ scale: 0.92 }}
-          onClick={() => {
-            const pos = textareaRef.current?.selectionStart ?? state.caption.length;
-            const newCaption = state.caption.slice(0, pos) + '@' + state.caption.slice(pos);
-            setCaption(newCaption);
-            setMentionTriggerIndex(pos);
-            openPanel('mention');
-          }}
-          className="flex items-center justify-center mr-3"
-          style={{ width: 40, height: 40 }}
-        >
-          <AtSign className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
-        </motion.button>
-
-        {/* Drafts */}
-        <motion.button
-          whileTap={{ scale: 0.92 }}
-          onClick={() => openPanel('drafts')}
-          className="flex items-center justify-center"
-          style={{ width: 40, height: 40 }}
-        >
-          <BookOpen className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
-        </motion.button>
-
-        {/* Spacer */}
-        <div className="flex-1" />
-
-        {/* Character ring */}
-        <div className="flex items-center justify-center" style={{ width: 36, height: 36 }}>
-          <CharacterRing count={charCount} />
         </div>
       </div>
 
