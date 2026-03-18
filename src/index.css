@@ -939,6 +939,13 @@ html, body, #root {
   50% { transform: translateX(-50%) scale(1.15); opacity: 0.6; }
 }
 
+/* Post Studio — flashing cursor blink */
+@keyframes studio-cursor-blink {
+  0%, 100% { opacity: 1; }
+  45%       { opacity: 1; }
+  55%       { opacity: 0; }
+}
+
 /* Sheet animations */
 @keyframes sheet-in {
   from { transform: translateY(16px); opacity: 0; }
