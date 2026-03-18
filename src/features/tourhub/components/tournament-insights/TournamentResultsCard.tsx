@@ -208,7 +208,7 @@ export function TournamentResultsCard({
         <div style={{
           position: 'relative', zIndex: 2,
           padding: '20px 16px 20px 16px',
-          width: '62%',
+          width: '65%',
           minHeight: 280,
           display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
           gap: 4,
