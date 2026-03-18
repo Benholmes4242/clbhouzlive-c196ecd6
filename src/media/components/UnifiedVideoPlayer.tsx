@@ -876,6 +876,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         DecoderLimitManager.releaseSlot(uniqueMediaId);
         
         if (hlsRef.current) {
+          unregisterHlsForDebug(cloudflareUid || uniqueMediaId);
           try {
             hlsRef.current.stopLoad();
             hlsRef.current.detachMedia();

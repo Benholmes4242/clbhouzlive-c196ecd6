@@ -637,6 +637,7 @@ const ClubhouseContent = () => {
 
       {/* Mobile Video Debug Panel */}
       <MobileVideoDebugPanel />
+      <ClubhouseVideoDebugPanel />
     </PageRoot>
   );
 };
