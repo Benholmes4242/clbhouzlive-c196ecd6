@@ -367,7 +367,7 @@ export function TournamentResultsCard({
       <div style={{ height: 1, background: 'hsl(var(--border))', margin: '0' }} />
 
       {/* ── FINAL LEADERBOARD ───────────────────────────────────────── */}
-      <div style={{ padding: '12px 16px 0' }}>
+      <div style={{ padding: '12px 16px 8px' }}>
         <div style={{
           display: 'flex', justifyContent: 'space-between',
           alignItems: 'center', marginBottom: 8,
