@@ -78,15 +78,17 @@ export function useVideoPreloader(
         }
 
         const hls = new Hls({
-          // Match UnifiedVideoPlayer optimized config for consistency
-          startLevel: 0,                    // Force lowest quality for fast first segment
-          maxBufferLength: 4,               // Modest buffer for preload
-          maxMaxBufferLength: 10,           // Cap preload buffer
+          // Match UnifiedVideoPlayer quality config exactly
+          startLevel: -1,                         // ABR auto-select (not forced to lowest)
+          capLevelToPlayerSize: false,             // No pixel-dimension quality cap
+          maxBufferLength: 4,                     // Modest buffer for preload
+          maxMaxBufferLength: 10,                 // Cap preload buffer
           backBufferLength: 2,
           lowLatencyMode: false,
-          abrEwmaDefaultEstimate: 1000000,  // 1Mbps conservative estimate
+          abrEwmaDefaultEstimate: 5_000_000,      // 5 Mbps — matches player config
           abrBandWidthFactor: 0.95,
-          abrBandWidthUpFactor: 0.7,
+          abrBandWidthUpFactor: 0.85,
+          abrMaxWithRealBitrate: true,
           startFragPrefetch: true,
           testBandwidth: false,
         });

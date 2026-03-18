@@ -22,7 +22,7 @@ import React, {
 } from 'react';
 import { cn } from '@/lib/utils';
 import { loadHlsJs } from '@/utils/hlsLoader';
-import { safePlay, isIOS } from '@/utils/safePlay';
+import { safePlay } from '@/utils/safePlay';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import type { MediaSurface } from '@/media/runtime/MediaRuntime';
 import { CLOUDFLARE_STREAM_PATTERNS } from '@/media/constants';
@@ -666,10 +666,14 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           return; // Don't attach if no slot available
         }
 
-        // Check for native HLS support (iOS Safari)
-        const canPlayNatively = isIOS ||
-          video.canPlayType('application/vnd.apple.mpegurl') !== '' ||
-          video.canPlayType('application/vnd.apple.mpegURL') !== '';
+        // Check for native HLS support — do NOT short-circuit on isIOS.
+        // Modern iOS Safari (15.1+) supports MediaSource Extensions, so HLS.js
+        // works correctly and gives us full ABR quality control.
+        // Falling back to native Safari HLS surrenders all quality configuration.
+        const Hls = await loadHlsJs();
+        const canPlayNatively = (!Hls || !Hls.isSupported()) &&
+          (video.canPlayType('application/vnd.apple.mpegurl') !== '' ||
+          video.canPlayType('application/vnd.apple.mpegURL') !== '');
 
         const isHlsUrl = hlsUrl.includes('.m3u8');
 
@@ -685,9 +689,8 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           return;
         }
 
-        // HLS.js playback
+        // HLS.js playback — Hls is already loaded above
         try {
-          const Hls = await loadHlsJs();
           if (!Hls || !Hls.isSupported() || !mountedRef.current) {
             // Fall back to native
             video.src = hlsUrl;
@@ -746,30 +749,36 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
 
           // No pooled instance available - create new one
           const hls = new Hls({
-            // PRIORITY FIX: Force lowest quality for first segment, then let ABR take over
-            startLevel: 0,
-            
-            // Buffer optimisations for fast start
-            maxBufferLength: 30,           // Don't over-buffer (wastes bandwidth)
-            maxMaxBufferLength: 60,        // Hard cap on buffer
-            maxBufferSize: 60 * 1000000,   // 60MB buffer size cap
-            maxBufferHole: 0.5,            // Tolerate small gaps without stalling
-            lowLatencyMode: false,         // We're not live streaming, disable LL-HLS overhead
-            backBufferLength: 30,          // Keep 30s of back buffer for seeking
-            
-            // Fast ABR ramping after first segment
-            abrEwmaDefaultEstimate: 1000000,  // Start with 1Mbps estimate (conservative)
+            // Quality: let ABR auto-select start level based on measured bandwidth.
+            // startLevel: 0 was forcing lowest quality (blurry) — removed.
+            startLevel: -1,
+
+            // Quality: do NOT cap quality to player pixel dimensions.
+            // capLevelToPlayerSize: true was capping at ~360-540p on phones — removed.
+            capLevelToPlayerSize: false,
+
+            // Quality: start with a realistic bandwidth estimate for mobile (5 Mbps).
+            // 1 Mbps was too conservative — caused ABR to start at lowest rendition.
+            abrEwmaDefaultEstimate: 5_000_000,
+
+            // Quality: ramp up to higher quality more aggressively.
             abrBandWidthFactor: 0.95,         // Use 95% of measured bandwidth
-            abrBandWidthUpFactor: 0.7,        // Be aggressive ramping UP quality
+            abrBandWidthUpFactor: 0.85,       // Ramp UP faster (was 0.7)
             abrMaxWithRealBitrate: true,      // Use real bitrate for ABR decisions
-            
-            // Startup optimisation
-            startFragPrefetch: true,          // Prefetch next fragment during current decode
-            testBandwidth: false,             // Don't waste time on bandwidth test, just start
-            
-            // Existing config
-            capLevelToPlayerSize: true,
+
+            // Buffer: balanced for mobile
+            maxBufferLength: 30,
+            maxMaxBufferLength: 60,
+            maxBufferSize: 60 * 1000000,
+            maxBufferHole: 0.5,
+            lowLatencyMode: false,
+            backBufferLength: 30,
+
+            // Startup
+            startFragPrefetch: true,
+            testBandwidth: false,
             enableWorker: true,
+
             // Wire up cached loader for prefetched segments
             loader: cloudflareUid ? createCachedHlsLoader(cloudflareUid) : undefined,
           });
