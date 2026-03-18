@@ -161,7 +161,15 @@ const ProfilePageV2Content: React.FC = () => {
 
   // Follow and friendship hooks for other users
   const { isFollowing, busy: followBusy, toggle: toggleFollow, ensureInitial } = useFollow(isSelf ? undefined : profileUserId);
-  const { status: friendshipStatus, isUpdating: friendshipUpdating, sendRequest, cancelRequest } = useFriendship(isSelf ? undefined : profileUserId);
+  const {
+    status: friendshipStatus,
+    isUpdating: friendshipUpdating,
+    sendRequest,
+    cancelRequest,
+    acceptRequest,
+    declineRequest,
+    unfriend,
+  } = useFriendship(isSelf ? undefined : profileUserId);
   
   // Initialize follow state
   useEffect(() => {
