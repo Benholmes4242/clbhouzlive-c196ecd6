@@ -232,8 +232,7 @@ export const UserListPage: React.FC<UserListPageProps> = ({
                   selected={activeTab}
                   onSelect={handleTabChange}
                   size="small"
-                  className="w-full"
-                  activeColor="#f59e0b"
+                  className="justify-center"
                 />
               </div>
             )}
