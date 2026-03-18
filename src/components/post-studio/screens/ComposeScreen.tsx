@@ -933,6 +933,112 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           </AnimatePresence>
         </div>
 
+        {/* ── Inline media zone — primary discovery path for adding photos/video ── */}
+        <AnimatePresence>
+          {state.mediaItems.length === 0 && (
+            <motion.div
+              key="media-zone"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4, scale: 0.98 }}
+              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+              className="px-4 mb-3"
+            >
+              <div
+                style={{
+                  borderRadius: 18,
+                  border: '1.5px dashed rgba(255,255,255,0.13)',
+                  background: 'rgba(255,255,255,0.025)',
+                  overflow: 'hidden',
+                }}
+              >
+                <div style={{ display: 'flex' }}>
+                  {/* Gallery — primary */}
+                  <motion.button
+                    whileTap={{ scale: 0.97, backgroundColor: 'rgba(255,255,255,0.05)' }}
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isProcessing}
+                    style={{
+                      flex: 1,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      padding: '20px 12px',
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      borderRight: '1px solid rgba(255,255,255,0.07)',
+                    }}
+                  >
+                    <div style={{
+                      width: 44, height: 44, borderRadius: 14,
+                      background: 'rgba(255,255,255,0.08)',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <ImageIcon className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.75)' }} strokeWidth={1.75} />
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.80)', marginBottom: 2 }}>
+                        Add from Library
+                      </div>
+                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+                        Photos & videos
+                      </div>
+                    </div>
+                  </motion.button>
+                  {/* Camera — secondary */}
+                  <motion.button
+                    whileTap={{ scale: 0.97, backgroundColor: 'rgba(255,255,255,0.05)' }}
+                    onClick={() => rearCameraInputRef.current?.click()}
+                    disabled={isProcessing}
+                    style={{
+                      flex: 1,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      padding: '20px 12px',
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <div style={{
+                      width: 44, height: 44, borderRadius: 14,
+                      background: 'rgba(255,255,255,0.08)',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <Camera className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.75)' }} strokeWidth={1.75} />
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.80)', marginBottom: 2 }}>
+                        Take a Photo
+                      </div>
+                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+                        Camera
+                      </div>
+                    </div>
+                  </motion.button>
+                </div>
+                <div style={{
+                  borderTop: '1px solid rgba(255,255,255,0.06)',
+                  padding: '8px 16px',
+                  textAlign: 'center',
+                }}>
+                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.22)', letterSpacing: 0.2 }}>
+                    Or write a text-only post above
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* ── Adaptive media grid with per-tile edit + cover ── */}
         {state.mediaItems.length > 0 && (
           <MediaGrid
