@@ -176,13 +176,7 @@ export function TournamentResultsCard({
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className="rounded-2xl overflow-hidden border border-border bg-card"
-      style={{ boxShadow: '0 2px 20px rgba(0,0,0,0.07)' }}
-    >
+    <div>
 
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {/* ZONE 1 — WINNER HERO                                              */}
@@ -196,33 +190,6 @@ export function TournamentResultsCard({
           className="absolute inset-0 w-full h-full"
           style={{ objectFit: 'cover', objectPosition: 'top center' }}
         />
-
-        {/* Bottom-to-top gradient for text legibility */}
-        <div className="absolute inset-0 pointer-events-none" style={{
-          background: 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.45) 45%, rgba(0,0,0,0.05) 100%)',
-        }} />
-
-        {/* Top vignette */}
-        <div className="absolute inset-0 pointer-events-none" style={{
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.30) 0%, transparent 30%)',
-        }} />
-
-        {/* LATEST RESULTS pill — top-left */}
-        <div style={{
-          position: 'absolute', top: 14, left: 14,
-          background: 'rgba(0,0,0,0.35)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255,255,255,0.15)',
-          borderRadius: 8,
-          padding: '4px 10px',
-          fontSize: 10, fontWeight: 700,
-          color: 'rgba(255,255,255,0.85)',
-          letterSpacing: 1.5,
-          textTransform: 'uppercase' as const,
-        }}>
-          LATEST RESULTS
-        </div>
 
         {/* Winner info overlay — bottom */}
         <div style={{
@@ -284,7 +251,56 @@ export function TournamentResultsCard({
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* ZONE 2 — AI NARRATIVE STRIP                                       */}
+      {/* ZONE 2 — STATS GRID                                               */}
+      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {(tStats || sStats) && (
+        <div style={{ padding: '12px 16px', borderBottom: '1px solid hsl(var(--border))' }}>
+
+          {/* Row 1 — Tournament scorecard stats */}
+          {tStats && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginBottom: 6 }}>
+              {[
+                { v: tStats.birdies, label: 'Birdies', color: '#16A34A', bg: 'rgba(22,163,74,0.08)', show: !!tStats.birdies },
+                { v: tStats.pars, label: 'Pars', color: 'hsl(var(--muted-foreground))', bg: 'hsl(var(--muted))', show: !!tStats.pars },
+                { v: tStats.bogeys, label: 'Bogeys', color: '#DC2626', bg: 'rgba(220,38,38,0.08)', show: !!(tStats.bogeys && tStats.bogeys > 0) },
+                { v: tStats.eagles, label: 'Eagles', color: '#F59E0B', bg: 'rgba(245,158,11,0.08)', show: !!(tStats.eagles && tStats.eagles > 0) },
+              ].map(stat => (
+                <div key={stat.label} style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 8, background: stat.bg, opacity: stat.show ? 1 : 0.3 }}>
+                  <div style={{ fontSize: 17, fontWeight: 700, color: stat.color }}>{stat.v ?? '—'}</div>
+                  <div className="text-muted-foreground" style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.5, marginTop: 2 }}>{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Row 2 — Season performance stats */}
+          {sStats && (sStats.drivingDistance || sStats.greensInReg || sStats.puttingAverage) && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+              {sStats.drivingDistance && (
+                <div style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 8, background: 'rgba(232,152,10,0.07)' }}>
+                  <div className="text-foreground" style={{ fontSize: 15, fontWeight: 700 }}>{Math.round(sStats.drivingDistance)}<span className="text-muted-foreground" style={{ fontSize: 9 }}>yds</span></div>
+                  <div className="text-muted-foreground" style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.5, marginTop: 2 }}>Driver</div>
+                </div>
+              )}
+              {sStats.greensInReg && (
+                <div style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 8, background: 'rgba(22,163,74,0.07)' }}>
+                  <div className="text-foreground" style={{ fontSize: 15, fontWeight: 700 }}>{Math.round(sStats.greensInReg)}<span className="text-muted-foreground" style={{ fontSize: 9 }}>%</span></div>
+                  <div className="text-muted-foreground" style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.5, marginTop: 2 }}>GIR</div>
+                </div>
+              )}
+              {sStats.puttingAverage && (
+                <div style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 8, background: 'hsl(var(--muted))' }}>
+                  <div className="text-foreground" style={{ fontSize: 15, fontWeight: 700 }}>{sStats.puttingAverage.toFixed(2)}</div>
+                  <div className="text-muted-foreground" style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.5, marginTop: 2 }}>Putts</div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* ZONE 3 — AI NARRATIVE STRIP                                       */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {narrative && (
         <div style={{
@@ -305,7 +321,7 @@ export function TournamentResultsCard({
       )}
 
       {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* ZONE 3 — FINAL LEADERBOARD                                        */}
+      {/* ZONE 4 — FINAL LEADERBOARD                                        */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
       <div style={{ padding: '12px 16px 0' }}>
         {/* Section header */}
@@ -317,8 +333,7 @@ export function TournamentResultsCard({
           </span>
           <button
             onClick={() => navigate(`/tourhub/tournament/${tournamentId}`)}
-            className="text-primary"
-            style={{ fontSize: 12, fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            style={{ fontSize: 12, fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'hsl(var(--accent-amber))' }}
           >
             Full results →
           </button>
@@ -386,81 +401,6 @@ export function TournamentResultsCard({
           </div>
         ))}
       </div>
-
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* ZONE 4 — STATS STRIP                                              */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {(tStats || sStats) && (
-        <div style={{
-          display: 'flex', gap: 4, padding: '12px 16px',
-          borderTop: '1px solid hsl(var(--border))',
-          overflowX: 'auto' as const,
-          animation: 'tric-fadeIn 0.5s ease-out both', animationDelay: '0.75s',
-        }}>
-          {[
-            { v: tStats?.eagles, label: 'Eagles', color: '#F59E0B', bg: 'rgba(245,158,11,0.08)',
-              show: !!(tStats?.eagles && tStats.eagles > 0) },
-            { v: tStats?.birdies, label: 'Birdies', color: '#16A34A', bg: 'rgba(22,163,74,0.08)',
-              show: !!tStats?.birdies },
-            { v: tStats?.pars, label: 'Pars',
-              color: 'hsl(var(--muted-foreground))', bg: 'hsl(var(--muted))',
-              show: !!tStats?.pars },
-            { v: tStats?.bogeys, label: 'Bogeys', color: '#DC2626', bg: 'rgba(220,38,38,0.08)',
-              show: !!(tStats?.bogeys && tStats.bogeys > 0) },
-          ].filter(s => s.show).map(stat => (
-            <div key={stat.label} style={{
-              flex: 1, textAlign: 'center' as const,
-              padding: '7px 4px', borderRadius: 8, background: stat.bg, minWidth: 52,
-            }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: stat.color }}>{stat.v}</div>
-              <div style={{ fontSize: 10, fontWeight: 600, color: stat.color, opacity: 0.7, letterSpacing: 0.5, marginTop: 2 }}>{stat.label}</div>
-            </div>
-          ))}
-
-          {/* Performance averages */}
-          {sStats?.drivingDistance && (
-            <div style={{ flex: 1, textAlign: 'center' as const, padding: '7px 4px', borderRadius: 8, background: 'rgba(232,152,10,0.07)', minWidth: 62 }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#E8980A' }}>{Math.round(sStats.drivingDistance)}<span style={{ fontSize: 10, fontWeight: 500, opacity: 0.7 }}> yds</span></div>
-              <div style={{ fontSize: 10, fontWeight: 600, color: '#E8980A', opacity: 0.7, letterSpacing: 0.5, marginTop: 2 }}>Driver</div>
-            </div>
-          )}
-          {sStats?.greensInReg && (
-            <div style={{ flex: 1, textAlign: 'center' as const, padding: '7px 4px', borderRadius: 8, background: 'rgba(22,163,74,0.07)', minWidth: 52 }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#16A34A' }}>{Math.round(sStats.greensInReg)}<span style={{ fontSize: 10, fontWeight: 500, opacity: 0.7 }}>%</span></div>
-              <div style={{ fontSize: 10, fontWeight: 600, color: '#16A34A', opacity: 0.7, letterSpacing: 0.5, marginTop: 2 }}>GIR</div>
-            </div>
-          )}
-          {sStats?.puttingAverage && (
-            <div style={{ flex: 1, textAlign: 'center' as const, padding: '7px 4px', borderRadius: 8, background: 'hsl(var(--muted))', minWidth: 52 }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: 'hsl(var(--muted-foreground))' }}>{sStats.puttingAverage.toFixed(2)}</div>
-              <div style={{ fontSize: 10, fontWeight: 600, color: 'hsl(var(--muted-foreground))', opacity: 0.7, letterSpacing: 0.5, marginTop: 2 }}>Putts</div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* ZONE 5 — CTA BAR                                                  */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      <div style={{ padding: '12px 16px 16px' }}>
-        <button
-          onClick={() => navigate(`/tourhub/tournament/${tournamentId}`)}
-          style={{
-            width: '100%', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', gap: 8,
-            background: 'linear-gradient(180deg, rgba(232,152,10,0.55) 0%, rgba(180,120,8,0.42) 100%)',
-            border: '1px solid rgba(232,152,10,0.42)',
-            borderTop: '1px solid rgba(255,210,130,0.22)',
-            borderRadius: 20, padding: '11px 20px',
-            cursor: 'pointer', color: '#fff',
-            fontSize: 14, fontWeight: 700, letterSpacing: 0.2,
-            boxShadow: '0 2px 10px rgba(232,152,10,0.18)',
-            textShadow: '0 1px 2px rgba(0,0,0,0.25)',
-          }}
-        >
-          View Full Results →
-        </button>
-      </div>
-    </motion.div>
+    </div>
   );
 }
