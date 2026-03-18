@@ -705,9 +705,87 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
       {/* ── Scrollable compose area ── */}
       <div
-        className="flex-1 overflow-y-auto"
+        className="flex-1 overflow-y-auto relative"
         style={{ scrollbarWidth: 'none', overscrollBehavior: 'contain' }}
       >
+        {/* ── Ambient empty state — visible only when canvas is blank ── */}
+        {!hasMedia && state.caption.length === 0 && (
+          <div
+            className="absolute inset-0 pointer-events-none overflow-hidden"
+            style={{ zIndex: 0 }}
+          >
+            {/* Soft white radial orb, centred upper-third, slowly breathing */}
+            <div style={{
+              position: 'absolute',
+              top: '22%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: 320,
+              height: 320,
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.02) 50%, transparent 75%)',
+              animation: 'studio-orb-breathe 5s ease-in-out infinite',
+            }} />
+            {/* Second smaller orb — offset, slower, creates depth */}
+            <div style={{
+              position: 'absolute',
+              top: '35%',
+              left: '60%',
+              width: 180,
+              height: 180,
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(255,255,255,0.025) 0%, transparent 70%)',
+              animation: 'studio-orb-breathe 7s ease-in-out infinite reverse',
+            }} />
+            {/* Fine noise grain */}
+            <div style={{
+              position: 'absolute', inset: 0,
+              opacity: 0.35,
+              backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'0.05\'/%3E%3C/svg%3E")',
+              backgroundSize: '120px 120px',
+            }} />
+          </div>
+        )}
+
+        {/* ── Today's Prompt — visible when canvas is blank ── */}
+        {state.caption.length === 0 && !hasMedia && (
+          <div style={{
+            padding: '28px 24px 16px',
+            textAlign: 'center' as const,
+            position: 'relative',
+            zIndex: 1,
+          }}>
+            {/* Eyebrow label */}
+            <p style={{
+              fontSize: 9,
+              fontWeight: 700,
+              letterSpacing: 2.5,
+              textTransform: 'uppercase' as const,
+              color: 'rgba(255,255,255,0.28)',
+              marginBottom: 12,
+            }}>
+              Today's Prompt
+            </p>
+            {/* Prompt text — large, editorial */}
+            <p style={{
+              fontSize: 22,
+              fontWeight: 600,
+              color: 'rgba(255,255,255,0.70)',
+              lineHeight: 1.4,
+              letterSpacing: '-0.025em',
+            }}>
+              {placeholderRef.current}
+            </p>
+            {/* White hairline divider below */}
+            <div style={{
+              width: 28,
+              height: 1,
+              background: 'rgba(255,255,255,0.15)',
+              margin: '18px auto 0',
+            }} />
+          </div>
+        )}
+
         {/* ── Text input ── */}
         <div className="px-4 pt-3 pb-2 relative">
           {/* Mention highlight layer */}
