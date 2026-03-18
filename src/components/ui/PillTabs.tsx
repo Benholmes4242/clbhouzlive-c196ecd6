@@ -14,9 +14,7 @@ interface PillTabsProps {
 }
 
 /**
- * PillTabs — Tier 2 sub-tab pill
- * Active: filled pill, no underline
- * Inactive: plain text, no track/background
+ * PillTabs — Pinpoint sub-tab pill (8px radius, foreground active)
  */
 export const PillTabs: React.FC<PillTabsProps> = ({
   options,
@@ -28,19 +26,18 @@ export const PillTabs: React.FC<PillTabsProps> = ({
     <div className={cn('flex items-center gap-2', className)}>
       {options.map((option) => {
         const isActive = activeId === option.id;
-        
         return (
           <button
             key={option.id}
             onClick={() => onChange(option.id)}
-            className={cn(
-              'px-4 min-h-[36px] rounded-full text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold',
-              isActive
-                ? 'text-white'
-                : 'text-muted-foreground'
-            )}
-            style={isActive ? { backgroundColor: 'hsl(var(--tab-sub-active))' } : undefined}
             type="button"
+            className="px-4 min-h-[36px] text-sm whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold"
+            style={{
+              borderRadius: 8,
+              background: isActive ? 'hsl(var(--foreground))' : 'transparent',
+              color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
+              border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
+            }}
           >
             {option.label}
           </button>

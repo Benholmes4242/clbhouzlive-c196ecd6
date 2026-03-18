@@ -12,39 +12,53 @@ interface PillToggleProps {
   onSelect: (id: string) => void;
   size?: 'default' | 'small';
   className?: string;
-  activeColor?: string;
+  activeColor?: string; // legacy — ignored, use variant
+  variant?: 'default' | 'filter';
 }
 
 /**
- * PillToggle - Tier 2 sub-tab pill
- * Active: #475569 filled pill, no track, no underline
+ * PillToggle — Pinpoint sub-tab pill
+ * variant='default': 8px foreground active
+ * variant='filter': 8px orange gradient active
  */
-export const PillToggle: React.FC<PillToggleProps> = ({ 
-  options, 
-  selected, 
-  onSelect, 
+export const PillToggle: React.FC<PillToggleProps> = ({
+  options,
+  selected,
+  onSelect,
   size = 'default',
   className,
-  activeColor,
+  variant = 'default',
 }) => {
-  const textClass = size === 'small' ? 'text-xs' : 'text-sm';
-  
+  const h = size === 'small' ? '30px' : '36px';
+  const px = size === 'small' ? '11px' : '14px';
+  const fs = size === 'small' ? 12 : 13;
+
   return (
     <div className={cn('flex items-center gap-2', className)}>
       {options.map((option) => {
         const isActive = selected === option.id;
+        const activeBg = variant === 'filter'
+          ? 'linear-gradient(90deg, #F59E0B, #F7931E)'
+          : 'hsl(var(--foreground))';
         return (
           <button
             key={option.id}
             onClick={() => onSelect(option.id)}
-            className={cn(
-              textClass,
-              'px-4 min-h-[36px] rounded-full whitespace-nowrap transition-all duration-200 active:scale-[0.97] font-semibold',
-              isActive
-                ? 'text-white'
-                : 'text-muted-foreground bg-muted'
-            )}
-            style={isActive ? { backgroundColor: activeColor || 'hsl(var(--tab-sub-active))' } : undefined}
+            style={{
+              height: h,
+              paddingLeft: px,
+              paddingRight: px,
+              borderRadius: 8,
+              fontSize: fs,
+              fontWeight: 600,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap' as const,
+              transition: 'all 0.18s ease',
+              background: isActive ? activeBg : 'transparent',
+              color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
+              border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
+              boxShadow: isActive && variant === 'filter' ? '0 2px 8px rgba(247,147,30,0.22)' : 'none',
+            }}
           >
             {option.label}
           </button>

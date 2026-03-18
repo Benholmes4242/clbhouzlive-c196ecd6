@@ -217,10 +217,12 @@ html.lightbox-open {
   /* Tab underline orange - exact #f79e1b */
   --tab-orange: 38 93% 54%;
   
-  /* Tab system — main & sub */
-  --tab-main-active: 215 26% 17%;     /* #1e293b — slate-800 */
-  --tab-sub-active: 215 16% 35%;      /* #475569 — slate-600 */
-  --tab-sub-active-foreground: 0 0% 100%; /* white text on active sub pills */
+  /* — PINPOINT SYSTEM — */
+  --tab-main-active: 215 26% 17%;     /* preserved for legacy */
+  --tab-sub-active: 215 13% 18%;      /* #1F2428 — foreground for sub-tab active */
+  --tab-sub-active-foreground: 0 0% 100%; /* white on active pill */
+  --tab-underline-start: #F59E0B;     /* amber */
+  --tab-underline-end:   #F7931E;     /* orange */
 
   /* Accent amber — rank badges, college #1 highlights */
   --accent-amber: 38 92% 50%;            /* #F59E0B - amber-500 */
