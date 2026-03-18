@@ -689,9 +689,8 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           return;
         }
 
-        // HLS.js playback
+        // HLS.js playback — Hls is already loaded above
         try {
-          const Hls = await loadHlsJs();
           if (!Hls || !Hls.isSupported() || !mountedRef.current) {
             // Fall back to native
             video.src = hlsUrl;
