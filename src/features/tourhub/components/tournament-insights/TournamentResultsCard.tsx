@@ -176,69 +176,134 @@ export function TournamentResultsCard({
   }
 
   return (
-    <div>
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      style={{ paddingBottom: 8 }}
+    >
+      {/* ── WINNER HERO — split layout ─────────────────────────────── */}
+      <div style={{ position: 'relative', overflow: 'hidden', minHeight: 280 }}>
 
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* ZONE 1 — WINNER HERO                                              */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      <div className="relative overflow-hidden" style={{ height: 320, marginTop: -8 }}>
-        <img
-          src={winnerPhoto}
-          alt={winnerName}
-          onError={e => { (e.target as HTMLImageElement).src = heroFallback; }}
-          className="absolute inset-0 w-full h-full"
-          style={{ objectFit: 'cover', objectPosition: '50% 15%' }}
-        />
-
-        {/* Winner info overlay — frosted glass at bottom */}
-        <div className="absolute bottom-0 left-0 right-0" style={{
-          padding: '12px 16px 16px',
-          background: 'rgba(248,250,252,0.82)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
+        {/* Player portrait — right side, full bleed */}
+        <div style={{
+          position: 'absolute', top: 0, right: 0,
+          width: '58%', height: '100%',
+          maskImage: 'linear-gradient(to left, black 55%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to left, black 55%, transparent 100%)',
         }}>
-          {(courseName || location) && (
-            <div style={{ fontSize: 11, color: 'hsl(var(--muted-foreground))', marginBottom: 3, letterSpacing: 0.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
-              {[courseName, location].filter(Boolean).join(' · ')}
-            </div>
-          )}
-          <div style={{ fontSize: 14, fontWeight: 600, color: 'hsl(var(--foreground))', marginBottom: 6, lineHeight: 1.3 }}>
+          <img
+            src={winnerPhoto}
+            alt={winnerName}
+            onError={e => { (e.target as HTMLImageElement).src = heroFallback; }}
+            style={{
+              width: '100%', height: '100%',
+              objectFit: 'cover', objectPosition: '50% 8%',
+              display: 'block',
+            }}
+          />
+        </div>
+
+        {/* Left column — winner info */}
+        <div style={{
+          position: 'relative', zIndex: 2,
+          padding: '20px 16px 20px 16px',
+          width: '62%',
+          minHeight: 280,
+          display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+          gap: 4,
+        }}>
+          {/* Eyebrow — course name in amber */}
+          <div style={{
+            fontSize: 10, fontWeight: 700, letterSpacing: 1.8,
+            textTransform: 'uppercase' as const,
+            color: 'hsl(var(--accent-amber))',
+            marginBottom: 2,
+            lineHeight: 1,
+          }}>
+            {courseName}
+          </div>
+
+          {/* Tournament name */}
+          <div style={{
+            fontSize: 12, fontWeight: 600,
+            color: 'hsl(var(--muted-foreground))',
+            lineHeight: 1.3,
+            marginBottom: 4,
+          }}>
             {tournamentName}
           </div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' as const }}>
-            <span style={{ fontSize: 22, fontWeight: 800, color: 'hsl(var(--foreground))', letterSpacing: -0.5 }}>
-              {winnerName}
-            </span>
-            <span style={{ fontSize: 20, fontWeight: 700, color: 'hsl(var(--accent-amber))' }}>
-              {scoreDisplay}
-            </span>
-            {marginText && (
-              <span style={{ fontSize: 11, fontWeight: 600, color: 'hsl(var(--foreground))', background: 'hsl(var(--accent-amber) / 0.15)', border: '1px solid hsl(var(--accent-amber) / 0.35)', borderRadius: 6, padding: '2px 8px' }}>
-                {marginText}
-              </span>
-            )}
+
+          {/* Winner name — big */}
+          <div style={{
+            fontSize: 28, fontWeight: 900,
+            color: 'hsl(var(--foreground))',
+            letterSpacing: -1, lineHeight: 1.05,
+            marginBottom: 2,
+          }}>
+            {winnerName}
           </div>
+
+          {/* Score — amber, very large */}
+          <div style={{
+            fontSize: 48, fontWeight: 900,
+            color: 'hsl(var(--accent-amber))',
+            letterSpacing: -2, lineHeight: 1,
+            marginBottom: 6,
+          }}>
+            {scoreDisplay}
+          </div>
+
+          {/* Margin pill */}
+          {marginText && (
+            <div style={{
+              display: 'inline-flex', alignSelf: 'flex-start',
+              fontSize: 11, fontWeight: 700,
+              color: 'hsl(var(--foreground))',
+              background: 'hsl(var(--accent-amber) / 0.12)',
+              border: '1px solid hsl(var(--accent-amber) / 0.30)',
+              borderRadius: 20, padding: '4px 12px',
+            }}>
+              {marginText}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* ZONE 2 — STATS GRID                                               */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* ── STATS GRID ──────────────────────────────────────────────── */}
       {(tStats || sStats) && (
-        <div style={{ padding: '12px 16px', borderBottom: '1px solid hsl(var(--border))' }}>
+        <div style={{ padding: '14px 16px 6px' }}>
 
-          {/* Row 1 — Tournament scorecard stats */}
+          {/* Row 1 — Scorecard stats */}
           {tStats && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginBottom: 6 }}>
-              {[
-                { v: tStats.birdies, label: 'Birdies', color: '#16A34A', bg: 'rgba(22,163,74,0.12)', show: !!tStats.birdies },
-                { v: tStats.pars, label: 'Pars', color: 'hsl(var(--muted-foreground))', bg: 'rgba(255,255,255,0.6)', show: !!tStats.pars },
-                { v: tStats.bogeys, label: 'Bogeys', color: '#DC2626', bg: 'rgba(220,38,38,0.10)', show: !!(tStats.bogeys && tStats.bogeys > 0) },
-                { v: tStats.eagles, label: 'Eagles', color: '#F59E0B', bg: 'rgba(245,158,11,0.12)', show: !!(tStats.eagles && tStats.eagles > 0) },
-              ].map(stat => (
-                <div key={stat.label} style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 10, background: stat.bg, backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', opacity: stat.show ? 1 : 0.3 }}>
-                  <div style={{ fontSize: 17, fontWeight: 700, color: stat.color }}>{stat.v ?? '—'}</div>
-                  <div className="text-muted-foreground" style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.5, marginTop: 2 }}>{stat.label}</div>
+            <div style={{
+              display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6,
+              marginBottom: 6,
+            }}>
+              {([
+                { v: tStats.birdies,  label: 'Birdies', num: '#16A34A', bg: 'rgba(22,163,74,0.09)'   },
+                { v: tStats.pars,     label: 'Pars',    num: 'hsl(var(--foreground))', bg: 'rgba(0,0,0,0.04)'  },
+                { v: tStats.bogeys,   label: 'Bogeys',  num: '#DC2626', bg: 'rgba(220,38,38,0.08)'   },
+                { v: tStats.eagles,   label: 'Eagles',  num: '#F59E0B', bg: 'rgba(245,158,11,0.10)'  },
+              ] as const).map(s => (
+                <div key={s.label} style={{
+                  textAlign: 'center' as const,
+                  padding: '9px 4px 7px',
+                  borderRadius: 10,
+                  background: s.bg,
+                  border: '1px solid rgba(0,0,0,0.05)',
+                }}>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: s.num, lineHeight: 1 }}>
+                    {s.v ?? 0}
+                  </div>
+                  <div style={{
+                    fontSize: 9, fontWeight: 700, letterSpacing: 0.8,
+                    textTransform: 'uppercase' as const,
+                    color: 'hsl(var(--muted-foreground))',
+                    marginTop: 3,
+                  }}>
+                    {s.label}
+                  </div>
                 </div>
               ))}
             </div>
@@ -246,23 +311,33 @@ export function TournamentResultsCard({
 
           {/* Row 2 — Season performance stats */}
           {sStats && (sStats.drivingDistance || sStats.greensInReg || sStats.puttingAverage) && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: `repeat(${[sStats.drivingDistance, sStats.greensInReg, sStats.puttingAverage].filter(Boolean).length}, 1fr)`,
+              gap: 6, marginBottom: 8,
+            }}>
               {sStats.drivingDistance && (
-                <div style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 10, background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                  <div className="text-foreground" style={{ fontSize: 15, fontWeight: 700 }}>{Math.round(sStats.drivingDistance)}<span className="text-muted-foreground" style={{ fontSize: 9 }}>yds</span></div>
-                  <div className="text-muted-foreground" style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.5, marginTop: 2 }}>Driver</div>
+                <div style={{ textAlign: 'center' as const, padding: '9px 4px 7px', borderRadius: 10, background: 'rgba(232,152,10,0.07)', border: '1px solid rgba(0,0,0,0.05)' }}>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: 'hsl(var(--foreground))', lineHeight: 1 }}>
+                    {Math.round(sStats.drivingDistance)}<span style={{ fontSize: 9, fontWeight: 600, color: 'hsl(var(--muted-foreground))' }}>yds</span>
+                  </div>
+                  <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase' as const, color: 'hsl(var(--muted-foreground))', marginTop: 3 }}>Driver</div>
                 </div>
               )}
               {sStats.greensInReg && (
-                <div style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 10, background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                  <div className="text-foreground" style={{ fontSize: 15, fontWeight: 700 }}>{Math.round(sStats.greensInReg)}<span className="text-muted-foreground" style={{ fontSize: 9 }}>%</span></div>
-                  <div className="text-muted-foreground" style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.5, marginTop: 2 }}>GIR</div>
+                <div style={{ textAlign: 'center' as const, padding: '9px 4px 7px', borderRadius: 10, background: 'rgba(22,163,74,0.07)', border: '1px solid rgba(0,0,0,0.05)' }}>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: 'hsl(var(--foreground))', lineHeight: 1 }}>
+                    {Math.round(sStats.greensInReg)}<span style={{ fontSize: 9, fontWeight: 600, color: 'hsl(var(--muted-foreground))' }}>%</span>
+                  </div>
+                  <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase' as const, color: 'hsl(var(--muted-foreground))', marginTop: 3 }}>GIR</div>
                 </div>
               )}
               {sStats.puttingAverage && (
-                <div style={{ textAlign: 'center', padding: '8px 4px', borderRadius: 10, background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                  <div className="text-foreground" style={{ fontSize: 15, fontWeight: 700 }}>{sStats.puttingAverage.toFixed(2)}</div>
-                  <div className="text-muted-foreground" style={{ fontSize: 10, fontWeight: 600, letterSpacing: 0.5, marginTop: 2 }}>Putts</div>
+                <div style={{ textAlign: 'center' as const, padding: '9px 4px 7px', borderRadius: 10, background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.05)' }}>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: 'hsl(var(--foreground))', lineHeight: 1 }}>
+                    {sStats.puttingAverage.toFixed(2)}
+                  </div>
+                  <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase' as const, color: 'hsl(var(--muted-foreground))', marginTop: 3 }}>Putts/hole</div>
                 </div>
               )}
             </div>
@@ -270,65 +345,84 @@ export function TournamentResultsCard({
         </div>
       )}
 
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* ZONE 3 — AI NARRATIVE STRIP                                       */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* ── AI NARRATIVE ────────────────────────────────────────────── */}
       {narrative && (
         <div style={{
-          display: 'flex', alignItems: 'flex-start', gap: 10,
-          padding: '8px 16px',
+          display: 'flex', alignItems: 'flex-start', gap: 8,
+          padding: '4px 16px 14px',
         }}>
-          <span style={{ fontSize: 14, flexShrink: 0, marginTop: 1 }}>⚡</span>
-          <p className="text-muted-foreground" style={{
-            fontSize: 13, lineHeight: 1.55, fontStyle: 'italic', margin: 0,
+          <span style={{ fontSize: 13, flexShrink: 0, marginTop: 1, opacity: 0.7 }}>⚡</span>
+          <p style={{
+            fontSize: 13, lineHeight: 1.6,
+            fontStyle: 'italic',
+            color: 'hsl(var(--muted-foreground))',
+            margin: 0,
           }}>
             {narrative}
           </p>
         </div>
       )}
 
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* ZONE 4 — FINAL LEADERBOARD                                        */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* ── DIVIDER ─────────────────────────────────────────────────── */}
+      <div style={{ height: 1, background: 'hsl(var(--border))', margin: '0 16px' }} />
+
+      {/* ── FINAL LEADERBOARD ───────────────────────────────────────── */}
       <div style={{ padding: '12px 16px 0' }}>
-        {/* Section header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <span className="text-muted-foreground" style={{
-            fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase' as const,
+        <div style={{
+          display: 'flex', justifyContent: 'space-between',
+          alignItems: 'center', marginBottom: 8,
+        }}>
+          <span style={{
+            fontSize: 11, fontWeight: 700, letterSpacing: 1.8,
+            textTransform: 'uppercase' as const,
+            color: 'hsl(var(--muted-foreground))',
           }}>
             Final Leaderboard
           </span>
           <button
             onClick={() => navigate(`/tourhub/tournament/${tournamentId}`)}
-            style={{ fontSize: 12, fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'hsl(var(--accent-amber))' }}
+            style={{
+              fontSize: 12, fontWeight: 700,
+              color: 'hsl(var(--accent-amber))',
+              background: 'none', border: 'none',
+              cursor: 'pointer', padding: 0,
+              letterSpacing: 0.2,
+            }}
           >
             Full results →
           </button>
         </div>
 
-        {/* Winner row — amber accent */}
-        {effectiveWinner.player && (
+        {/* Winner row */}
+        {effectiveWinner?.player && (
           <div style={{
-            display: 'flex', alignItems: 'center', gap: 12, padding: '9px 0',
+            display: 'flex', alignItems: 'center', gap: 12,
+            padding: '10px 16px',
             borderBottom: '1px solid hsl(var(--border))',
-            background: 'hsl(var(--accent-amber) / 0.05)',
-            animation: 'tric-slideIn 0.4s ease-out both', animationDelay: '0.45s',
+            background: 'hsl(var(--accent-amber) / 0.04)',
+            margin: '0 -16px',
           }}>
-            <span style={{ width: 28, textAlign: 'center' as const, fontSize: 15, fontWeight: 700, color: 'hsl(var(--accent-amber))' }}>1</span>
+            <span style={{
+              width: 24, textAlign: 'center' as const,
+              fontSize: 13, fontWeight: 800,
+              color: 'hsl(var(--accent-amber))',
+            }}>1</span>
             <SquircleAvatar
-              src={winnerPhoto}
-              alt={winnerName}
-              size={36}
+              src={winnerPhoto} alt={winnerName} size={36}
               fallback={winnerName.split(' ').map((w: string) => w[0]).join('')}
               hideRing
             />
-            <span className="text-foreground" style={{
-              flex: 1, fontSize: 14, fontWeight: 600,
+            <span style={{
+              flex: 1, fontSize: 14, fontWeight: 700,
+              color: 'hsl(var(--foreground))',
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
             }}>
               {winnerName}
             </span>
-            <span style={{ fontSize: 15, fontWeight: 700, color: 'hsl(var(--accent-amber))', fontVariantNumeric: 'tabular-nums' as const }}>
+            <span style={{
+              fontSize: 15, fontWeight: 800,
+              color: 'hsl(var(--accent-amber))',
+            }}>
               {scoreDisplay}
             </span>
           </div>
@@ -337,37 +431,38 @@ export function TournamentResultsCard({
         {/* Positions 2–5 */}
         {podiumRows.map((row, idx) => (
           <div key={`${row.position}-${idx}`} style={{
-            display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0',
+            display: 'flex', alignItems: 'center', gap: 12,
+            padding: '9px 0',
             borderBottom: idx < podiumRows.length - 1 ? '1px solid hsl(var(--border))' : 'none',
-            animation: 'tric-slideIn 0.4s ease-out both',
-            animationDelay: `${0.5 + idx * 0.07}s`,
           }}>
-            <span className="text-muted-foreground" style={{
-              width: 28, textAlign: 'center' as const, fontSize: 13, fontWeight: 600,
+            <span style={{
+              width: 24, textAlign: 'center' as const,
+              fontSize: 12, fontWeight: 600,
+              color: 'hsl(var(--muted-foreground))',
             }}>
               {row.isTied ? `T${row.position}` : row.position}
             </span>
             <SquircleAvatar
-              src={row.photoUrl}
-              alt={row.playerName}
-              size={34}
+              src={row.photoUrl} alt={row.playerName} size={34}
               fallback={row.playerName.split(' ').map((w: string) => w[0]).join('')}
               hideRing
             />
-            <span className="text-foreground" style={{
+            <span style={{
               flex: 1, fontSize: 13, fontWeight: 500,
+              color: 'hsl(var(--foreground))',
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
             }}>
               {row.playerName}
             </span>
-            <span className="text-foreground" style={{
-              fontSize: 13, fontWeight: 600, fontVariantNumeric: 'tabular-nums' as const,
+            <span style={{
+              fontSize: 13, fontWeight: 600,
+              color: 'hsl(var(--muted-foreground))',
             }}>
               {row.scoreDisplay}
             </span>
           </div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }
