@@ -209,29 +209,35 @@ Deno.serve(async (req) => {
       winnerBy = 'Winner';
     }
 
-    // ── STEP 6: Fetch scorecard stats for winner (soft failure) ─────────
+    // ── STEP 6: Extract scorecard stats from sr_leaderboards.raw_data ────
+    // Uses raw_data.rounds array (all 4 rounds guaranteed complete) instead
+    // of sr_scorecards which is unreliable — rounds 3/4 often missing or NULL.
+    // This mirrors the exact approach used by useWinnerScorecardStats.ts.
     let statEagles = 0;
     let statBirdies = 0;
     let statPars = 0;
     let statBogeys = 0;
 
     try {
-      const { data: scorecardStats } = await supabase
-        .from('sr_scorecards')
-        .select('eagles, birdies, pars, bogeys')
-        .eq('tournament_id', tournamentId)
-        .eq('player_id', winnerPlayer.id);
+      // deno-lint-ignore no-explicit-any
+      const rawData = (winnerEntry as any).raw_data as any;
+      const rounds: any[] = rawData?.rounds ?? [];
 
-      if (scorecardStats && scorecardStats.length > 0) {
-        for (const row of scorecardStats) {
-          statEagles += row.eagles ?? 0;
-          statBirdies += row.birdies ?? 0;
-          statPars += row.pars ?? 0;
-          statBogeys += row.bogeys ?? 0;
+      if (rounds.length > 0) {
+        for (const round of rounds) {
+          statEagles += round.eagles ?? 0;
+          statBirdies += round.birdies ?? 0;
+          statPars += round.pars ?? 0;
+          statBogeys += round.bogeys ?? 0;
         }
+        console.log(`[InjectPost] Stats from raw_data: ${rounds.length} rounds,`,
+          `${statBirdies}B / ${statPars}P / ${statBogeys}Bo`);
+      } else {
+        console.warn('[InjectPost] raw_data.rounds empty — stats will be 0');
       }
     } catch (err) {
-      console.error('[InjectPost] Scorecard stats fetch failed (non-blocking):', (err as Error).message);
+      console.error('[InjectPost] raw_data stats extraction failed (non-blocking):',
+        (err as Error).message);
     }
 
     // ── STEP 7: Season stats for winner (soft failure) ──────────────────
