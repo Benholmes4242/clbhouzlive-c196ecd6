@@ -520,14 +520,19 @@ export default function ClubhouseVideoDebugPanel() {
       />
 
       {visible && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 99998,
-          background: 'rgba(0,0,0,0.92)',
-          display: 'flex', flexDirection: 'column',
-          fontFamily: '"SF Mono", "Fira Code", "Cascadia Code", monospace',
-          fontSize: 11, color: '#e2e8f0',
-          backdropFilter: 'blur(8px)',
-        }}>
+        <div
+          onTouchStart={e => e.stopPropagation()}
+          onTouchMove={e => e.stopPropagation()}
+          onTouchEnd={e => e.stopPropagation()}
+          onMouseDown={e => e.stopPropagation()}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 99998,
+            background: 'rgba(0,0,0,0.92)',
+            display: 'flex', flexDirection: 'column',
+            fontFamily: '"SF Mono", "Fira Code", "Cascadia Code", monospace',
+            fontSize: 11, color: '#e2e8f0',
+            backdropFilter: 'blur(8px)',
+          }}>
 
           {/* ── Header ── */}
           <div style={{
