@@ -159,7 +159,7 @@ function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
             zIndex: 2,
             padding: '16px 12px 20px 16px',
             width: '65%',
-            minHeight: 280,
+            minHeight: 260,
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-start',
