@@ -174,12 +174,30 @@ export function VideoPlayer({
     }
   }, [isActive]);
 
-  // Sync mute state
+  // Sync mute state — fade in on unmute to avoid audio pop
   useEffect(() => {
-    if (videoRef.current && isActive) {
-      videoRef.current.muted = isMuted;
+    const video = videoRef.current;
+    if (!video || !isActive) return;
+
+    if (isMuted) {
+      // Muting is instant — no pop risk when going silent
+      video.muted = true;
+    } else {
+      // Unmuting — fade in to avoid audio pop
+      video.muted = false;
+      video.volume = 0;
+      const targetVolume = getStore().volume ?? 1;
+      const FADE_MS = 120;
+      const start = performance.now();
+      const step = (now: number) => {
+        const progress = Math.min(1, (now - start) / FADE_MS);
+        video.volume = targetVolume * progress;
+        if (progress < 1) requestAnimationFrame(step);
+        else video.volume = targetVolume;
+      };
+      requestAnimationFrame(step);
     }
-  }, [isMuted, isActive]);
+  }, [isMuted, isActive, getStore]);
 
   // Retry handler
   const handleRetry = useCallback(() => {

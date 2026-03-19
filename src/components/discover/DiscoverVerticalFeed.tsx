@@ -800,15 +800,28 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
               >
                 <div className={cn("w-full h-full", mediaFilterClass)} style={mediaPixelStyle}>
                 {currentMedia.media_type === 'video' ? (
-                  <VideoWithAutoplay
-                    src={currentMedia.media_url}
-                    muted={isGloballyMuted}
-                    className="w-full h-full"
-                    objectFit="contain"
-                    shouldAttach={!!shouldAttach[item.id]}
-                    autoplay={!!autoplay[item.id]}
-                    isActive={index === currentIndex}
-                  />
+                  Math.abs(index - currentIndex) <= VIDEO_WINDOW_RADIUS ? (
+                    <VideoWithAutoplay
+                      src={currentMedia.media_url}
+                      muted={isGloballyMuted}
+                      className="w-full h-full"
+                      objectFit="contain"
+                      shouldAttach={!!shouldAttach[item.id]}
+                      autoplay={!!autoplay[item.id]}
+                      isActive={index === currentIndex}
+                    />
+                  ) : (
+                    /* Placeholder keeps layout stable without mounting the player */
+                    <div className="w-full h-full bg-black flex items-center justify-center">
+                      {(() => {
+                        const uid = uidFromNode({ src: currentMedia.media_url });
+                        const thumbUrl = uid ? generateStreamThumbnailUrl(uid, { height: 600 }) : undefined;
+                        return thumbUrl ? (
+                          <img src={thumbUrl} alt="" className="w-full h-full object-cover opacity-70" loading="lazy" />
+                        ) : null;
+                      })()}
+                    </div>
+                  )
                 ) : (
                   <ImageWithPinchZoom
                     src={currentMedia.media_url}
