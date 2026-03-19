@@ -69,6 +69,7 @@ function mapTourSlug(tourName: string): TourId {
 
 export function useHeroCarouselData() {
   const { data: cache, isLoading: cacheLoading } = useTournamentsCache();
+  const { data: lbCache } = useLeaderboardCache();
 
   return useQuery({
     queryKey: ['hero-carousel-data', cache ? 'ready' : 'waiting'],
