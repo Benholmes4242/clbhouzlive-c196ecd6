@@ -211,15 +211,20 @@ function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
       </div>
 
       {/* Match % pill — above stats row */}
-      <div style={{ padding: '0 16px', marginTop: -56, position: 'relative', zIndex: 4, display: 'flex', alignItems: 'flex-start', marginBottom: 8 }}>
+      <div style={{ padding: '0 16px', marginTop: -56, position: 'relative', zIndex: 4, display: 'flex', alignItems: 'flex-start', marginBottom: 12 }}>
         <div style={{
           display: 'inline-flex',
           alignItems: 'center', gap: 6,
           fontSize: 12, fontWeight: 700,
           color: 'hsl(var(--foreground))',
-          background: 'rgba(0,0,0,0.06)',
-          border: '1px solid rgba(0,0,0,0.10)',
-          borderRadius: 20, padding: '4px 12px',
+          textAlign: 'center' as const,
+          padding: '8px 12px 6px',
+          borderRadius: 10,
+          background: 'rgba(255,255,255,0.55)',
+          backdropFilter: 'blur(16px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(16px) saturate(180%)',
+          border: '1px solid rgba(255,255,255,0.75)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)',
         }}>
           <div style={{
             width: 6, height: 6, borderRadius: '50%',
