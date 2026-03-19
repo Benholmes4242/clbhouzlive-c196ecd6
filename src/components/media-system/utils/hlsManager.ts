@@ -11,7 +11,9 @@ export const HLS_CONFIG: Record<string, unknown> = {
   startFragPrefetch: true,
   progressive: true,
   abrBandWidthFactor: 0.95,
-  abrBandWidthUpFactor: 0.7,
+  abrBandWidthUpFactor: 0.5,
+  highBufferWatchdogPeriod: 1,
+  nudgeOffset: 0.1,
   fragLoadingMaxRetry: 4,
 };
 

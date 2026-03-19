@@ -87,7 +87,9 @@ export function useVideoPreloader(
           lowLatencyMode: false,
           abrEwmaDefaultEstimate: 5_000_000,      // 5 Mbps — matches player config
           abrBandWidthFactor: 0.95,
-          abrBandWidthUpFactor: 0.85,
+          abrBandWidthUpFactor: 0.5,
+          highBufferWatchdogPeriod: 1,
+          nudgeOffset: 0.1,
           abrMaxWithRealBitrate: true,
           startFragPrefetch: true,
           testBandwidth: false,

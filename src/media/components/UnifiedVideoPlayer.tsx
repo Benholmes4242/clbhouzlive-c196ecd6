@@ -767,7 +767,9 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
 
             // Quality: ramp up to higher quality more aggressively.
             abrBandWidthFactor: 0.95,         // Use 95% of measured bandwidth
-            abrBandWidthUpFactor: 0.85,       // Ramp UP faster (was 0.7)
+            abrBandWidthUpFactor: 0.5,        // Step up quality much more aggressively
+            highBufferWatchdogPeriod: 1,      // Check for quality step-up every 1s (default 3s)
+            nudgeOffset: 0.1,                 // Smaller nudge for stall recovery
             abrMaxWithRealBitrate: true,      // Use real bitrate for ABR decisions
 
             // Buffer: balanced for mobile
