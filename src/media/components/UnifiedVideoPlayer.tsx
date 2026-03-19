@@ -678,7 +678,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         const canPlayNatively = (!Hls || !Hls.isSupported()) &&
           (video.canPlayType('application/vnd.apple.mpegurl') !== '' ||
           video.canPlayType('application/vnd.apple.mpegURL') !== '');
-        console.log('[UVP DEBUG] canPlayNatively:', canPlayNatively, '| hlsUrl:', hlsUrl?.slice(-30));
+        
 
         const isHlsUrl = hlsUrl.includes('.m3u8');
 
