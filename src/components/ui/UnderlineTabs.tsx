@@ -65,7 +65,7 @@ export function UnderlineTabs({ options, value, onChange, className = '' }: Unde
     <div 
       ref={containerRef}
       className={cn(
-        "relative flex gap-4 overflow-x-auto scrollbar-hide",
+        "relative flex justify-center gap-4 overflow-x-auto scrollbar-hide",
         className
       )}
     >
