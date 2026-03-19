@@ -905,8 +905,8 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           // Verification logging for first fragment optimization
           hls.on(Hls.Events.FRAG_LOADED, (_, data) => {
             // Save real measured download bandwidth for next HLS.js instance
-            if (data.stats?.bwEstimate && data.stats.bwEstimate > 0) {
-              saveSharedBandwidth(data.stats.bwEstimate);
+            if (data.frag?.stats?.bwEstimate && data.frag.stats.bwEstimate > 0) {
+              saveSharedBandwidth(data.frag.stats.bwEstimate);
             }
             if (data.frag.sn === 0 || data.frag.sn === 1) {
               videoDebug('hlsEvents', `Fragment ${data.frag.sn} loaded`, { 
