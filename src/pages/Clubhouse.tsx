@@ -24,6 +24,7 @@ import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import { ClubhouseTabProvider, useClubhouseTab } from '@/contexts/ClubhouseTabContext';
 import { clubhouseDebug } from '@/debug/clubhouseDebug';
 import FeedVideoDebugOverlay from '@/components/debug/FeedVideoDebugOverlay';
+import ClubhouseVideoDebugPanel from '@/components/debug/ClubhouseVideoDebugPanel';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
@@ -638,6 +639,9 @@ const ClubhouseContent = () => {
           userId={user.id}
         />
       )}
+
+      {/* Full HLS diagnostics panel — toggled via Test tab */}
+      <ClubhouseVideoDebugPanel />
 
       {/* Feed Video Debug — reads directly from mediaStore */}
       <FeedVideoDebugOverlay />
