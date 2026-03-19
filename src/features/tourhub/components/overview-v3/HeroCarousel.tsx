@@ -25,8 +25,8 @@ import {
 } from '../../hooks/useHeroCarouselData';
 import { useTournamentTopLeaders, type LeaderEntry } from '../../hooks/useOverviewData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
-import { useTourLeaderboard } from '../../hooks/useTourHubData';
-import { useLeaderboardRealtime } from '../../hooks/useLeaderboardRealtime';
+import { useLeaderboardCache, type LiveLeaderboardEntry } from '../../hooks/useLeaderboardCache';
+import { useMultiLeaderboardRealtime } from '../../hooks/useLeaderboardRealtime';
 import { ExpandedLeaderboardList, ExpandedLeaderboardSkeleton, ExpandedLeaderboardError, ExpandedLeaderboardEmpty } from './ExpandedLeaderboard';
 import { PlayerScorecardCard } from '@/components/tourhub/PlayerScorecardCard';
 
