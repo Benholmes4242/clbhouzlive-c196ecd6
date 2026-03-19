@@ -57,8 +57,8 @@ export function useAppLifecycle() {
         });
       }
 
-      // Step 2: Force GPU compositing on #root to prevent iOS grey artifact
-      // Double-nested rAF gives shield and status bar time to repaint first
+      // Step 2: Force GPU compositing to prevent iOS grey artifact
+      // Covers #root, document.body (for portals), and the fullscreen portal specifically
       const root = document.getElementById('root');
       if (root) {
         root.style.transform = 'translateZ(0)';
@@ -66,6 +66,22 @@ export function useAppLifecycle() {
           requestAnimationFrame(() => {
             root.style.transform = '';
           });
+        });
+      }
+
+      // Also force repaint on document.body to cover portals (fullscreen overlay, modals)
+      // that are mounted outside #root and would otherwise miss the repaint trigger
+      document.body.style.transform = 'translateZ(0)';
+      requestAnimationFrame(() => {
+        document.body.style.transform = '';
+      });
+
+      // Force repaint on the fullscreen portal specifically if present
+      const fullscreenPortal = document.querySelector('[data-fullscreen-portal]');
+      if (fullscreenPortal instanceof HTMLElement) {
+        fullscreenPortal.style.transform = 'translateZ(0)';
+        requestAnimationFrame(() => {
+          fullscreenPortal.style.transform = '';
         });
       }
 

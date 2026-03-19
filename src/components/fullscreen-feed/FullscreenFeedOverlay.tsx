@@ -23,6 +23,7 @@ export function FullscreenFeedOverlay() {
 
   return createPortal(
     <div
+      data-fullscreen-portal=""
       aria-hidden={!isOpen}
       className="fixed inset-0 z-[9999] bg-black"
       style={{
