@@ -307,8 +307,9 @@ export function NextUpPickCard({
   withdrawnPlayerIds,
 }: NextUpPickCardProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const dragStartX = useRef<number>(0);
+  const isDragging = useRef(false);
 
-  // Build unified picks list: featured first, then contenders only (max 4)
   const allPicks: PickItem[] = [
     {
       id: featured.id,
@@ -341,8 +342,32 @@ export function NextUpPickCard({
   const current = allPicks[activeIndex];
   if (!current) return null;
 
+  const goTo = (index: number) => {
+    const clamped = Math.max(0, Math.min(allPicks.length - 1, index));
+    setActiveIndex(clamped);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    dragStartX.current = e.touches[0].clientX;
+    isDragging.current = true;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+    const delta = e.changedTouches[0].clientX - dragStartX.current;
+    if (Math.abs(delta) > 40) {
+      if (delta < 0) goTo(activeIndex + 1);
+      else goTo(activeIndex - 1);
+    }
+  };
+
   return (
-    <div>
+    <div
+      style={{ paddingBottom: 8, userSelect: 'none' }}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* Active pick */}
       <AnimatePresence mode="wait">
         <motion.div
