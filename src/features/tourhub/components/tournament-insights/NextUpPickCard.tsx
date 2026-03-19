@@ -291,6 +291,7 @@ function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
                   margin: 0,
                   fontWeight: 500,
                   color: 'hsl(var(--foreground))',
+                  textAlign: 'center',
                 }}
               >
                 {b}
