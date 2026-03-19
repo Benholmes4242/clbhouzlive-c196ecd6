@@ -123,17 +123,16 @@ function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {/* ZONE 1 — PLAYER HERO */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
-      <div style={{ position: 'relative', overflow: 'hidden' }}>
-        {/* Player portrait — right side, masked to fade left */}
+      <div style={{ position: 'relative', overflow: 'visible' }}>
+        {/* Player portrait — right side, full bleed, no fade (matches Results hero) */}
         <div
           style={{
             position: 'absolute',
             top: 0,
-            right: 0,
-            width: '62%',
+            right: -16,
+            width: '60%',
             height: '100%',
-            maskImage: 'linear-gradient(to left, black 50%, transparent 100%)',
-            WebkitMaskImage: 'linear-gradient(to left, black 50%, transparent 100%)',
+            zIndex: 0,
           }}
         >
           <img
