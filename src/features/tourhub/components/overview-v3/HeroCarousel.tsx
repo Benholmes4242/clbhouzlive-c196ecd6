@@ -267,6 +267,7 @@ interface HeroSlideProps {
   currentIndex: number;
   onDotClick: (index: number) => void;
   leadersWinnersMap?: Map<string, import('../../hooks/useTournamentLeadersWinners').TournamentLeaderWinner>;
+  liveLeaderboardRows: LiveLeaderboardEntry[];
   isExpanded: boolean;
   onToggleExpand: () => void;
   onInteraction: () => void;
