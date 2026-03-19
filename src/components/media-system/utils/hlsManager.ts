@@ -1,11 +1,12 @@
 import type HlsType from 'hls.js';
 import { createCachedLoader } from './cachedHlsLoader';
+import { getSharedBandwidth, saveSharedBandwidth, setNativeHlsSource } from './sharedBandwidth';
 
 export const HLS_CONFIG: Record<string, unknown> = {
   enableWorker: true,
   lowLatencyMode: false,
   startLevel: -1,
-  capLevelToPlayerSize: true,
+  capLevelToPlayerSize: false,
   maxBufferLength: 15,
   maxMaxBufferLength: 30,
   startFragPrefetch: true,
@@ -55,7 +56,10 @@ export function getHlsInstance(video: HTMLVideoElement): InstanceType<typeof Hls
 
 /** Build HLS config with cached loader if available. */
 function getHlsConfig(): Record<string, unknown> {
-  const config = { ...HLS_CONFIG };
+  const config: Record<string, unknown> = {
+    ...HLS_CONFIG,
+    abrEwmaDefaultEstimate: getSharedBandwidth() > 0 ? getSharedBandwidth() : 8_000_000,
+  };
   if (HlsConstructor) {
     const loader = createCachedLoader(HlsConstructor as any);
     config.fLoader = loader;
@@ -105,15 +109,25 @@ export async function attachMedia(
 
       hls.loadSource(hlsUrl);
       hls.attachMedia(video);
+
+      hls.on((Hls as any).Events.LEVEL_SWITCHED, (_: unknown, data: any) => {
+        const level = hls.levels[data.level];
+        if (level?.bitrate > 0) {
+          saveSharedBandwidth(level.bitrate);
+        }
+      });
+
+      hls.on((Hls as any).Events.FRAG_LOADED, (_: unknown, data: any) => {
+        const bw = data.frag?.stats?.bwEstimate;
+        if (bw && bw > 0) {
+          saveSharedBandwidth(bw);
+        }
+      });
     });
   }
 
   if (supportsNativeHls()) {
-    // Do NOT set video.src here on native HLS.
-    // UnifiedVideoPlayer calls setNativeHlsSource() which fetches the manifest,
-    // parses the rendition ladder, and sets the highest quality rendition URL directly.
-    // Setting video.src here causes iOS to start loading the master manifest at 360p
-    // before setNativeHlsSource can override it.
+    await setNativeHlsSource(video, hlsUrl);
     return;
   }
 
