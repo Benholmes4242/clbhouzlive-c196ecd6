@@ -829,8 +829,10 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               color: state.mentions.length > 0 ? 'transparent' : 'rgba(255,255,255,0.90)',
               caretColor: 'rgba(255,255,255,0.80)',
               WebkitTextFillColor: state.mentions.length > 0 ? 'transparent' : undefined,
-              minHeight: hasMedia ? 80 : 160,
-              maxHeight: hasMedia ? 160 : 400,
+              height: hasMedia ? 80 : 120,
+              overflowY: 'auto',
+              resize: 'none',
+              WebkitOverflowScrolling: 'touch',
             }}
             maxLength={POST_LIMITS.MAX_CAPTION_LENGTH + 100}
           />
