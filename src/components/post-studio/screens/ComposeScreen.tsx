@@ -48,15 +48,12 @@ async function generatePoster(file: File): Promise<string> {
     video.preload = 'auto';
     video.muted = true;
     video.playsInline = true;
-    // DO NOT set crossOrigin — on iOS WKWebView, crossOrigin on blob URLs
-    // causes silent failure or zero-dimension decode → black thumbnail
 
     const url = URL.createObjectURL(file);
     let settled = false;
 
     const capture = () => {
       if (settled) return;
-      // Guard: if dimensions are zero, the frame hasn't decoded yet — don't capture
       if (video.videoWidth === 0 || video.videoHeight === 0) return;
       settled = true;
       clearTimeout(timeout);
@@ -182,12 +179,10 @@ function VideoToolSheet({ item, onEdit, onTrim, onCover, onClose }: VideoToolShe
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
         }}
       >
-        {/* Handle */}
         <div className="flex justify-center pt-3 pb-4">
           <div className="w-9 h-[3px] rounded-full" style={{ background: 'rgba(255,255,255,0.18)' }} />
         </div>
 
-        {/* Video thumbnail preview */}
         <div className="mx-4 mb-5 overflow-hidden" style={{ borderRadius: 14, aspectRatio: item.height && item.width && item.height > item.width ? '4/5' : '16/9' }}>
           <video
             src={item.previewUrl}
@@ -201,7 +196,6 @@ function VideoToolSheet({ item, onEdit, onTrim, onCover, onClose }: VideoToolShe
           />
         </div>
 
-        {/* Three tool buttons */}
         <div className="flex gap-3 px-4 pb-2">
           <motion.button
             whileTap={{ scale: 0.95 }}
@@ -276,19 +270,16 @@ function OverflowSheet({ items, startIndex, onEdit, onClose }: OverflowSheetProp
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
         }}
       >
-        {/* Handle */}
         <div className="flex justify-center pt-3 pb-2">
           <div className="w-9 h-[3px] rounded-full" style={{ background: 'rgba(255,255,255,0.18)' }} />
         </div>
 
-        {/* Header */}
         <div className="px-5 pb-3">
           <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: 'rgba(255,255,255,0.30)' }}>
             More media
           </p>
         </div>
 
-        {/* Scrollable row of hidden items */}
         <div className="flex gap-3 overflow-x-auto px-5 pb-2" style={{ scrollbarWidth: 'none' }}>
           {items.map((item, i) => {
             const actualIndex = startIndex + i;
@@ -321,7 +312,6 @@ function OverflowSheet({ items, startIndex, onEdit, onClose }: OverflowSheetProp
                     </div>
                   )}
                 </div>
-                {/* Pencil button */}
                 <motion.button
                   whileTap={{ scale: 0.88 }}
                   onClick={() => { onEdit(actualIndex); onClose(); }}
@@ -330,7 +320,6 @@ function OverflowSheet({ items, startIndex, onEdit, onClose }: OverflowSheetProp
                 >
                   <Pencil className="w-3 h-3 text-white" strokeWidth={2} />
                 </motion.button>
-                {/* Item number */}
                 <div
                   className="absolute top-1.5 left-1.5 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold"
                   style={{ background: 'rgba(0,0,0,0.55)', color: 'rgba(255,255,255,0.80)' }}
@@ -379,7 +368,6 @@ function MediaGrid({
     style?: React.CSSProperties;
     borderRadius?: string;
   }) {
-    // Note: onTrim and onCover are captured from MediaGrid closure
     const isCover = index === coverIndex;
     const isOverflowTile = index === MAX_VISIBLE - 1 && overflow > 0;
 
@@ -408,7 +396,6 @@ function MediaGrid({
           />
         )}
 
-        {/* Overflow count */}
         {isOverflowTile && (
           <motion.div
             whileTap={{ scale: 0.97 }}
@@ -423,7 +410,6 @@ function MediaGrid({
 
         {!isOverflowTile && (
           <>
-            {/* Cover pill — top left */}
             <motion.button
               whileTap={{ scale: 0.92 }}
               onClick={(e) => { e.stopPropagation(); if (!isCover) onSetCover(index); }}
@@ -442,7 +428,6 @@ function MediaGrid({
               Cover
             </motion.button>
 
-            {/* Remove — top right */}
             <motion.button
               whileTap={{ scale: 0.85 }}
               onClick={(e) => { e.stopPropagation(); onRemove(item.id); }}
@@ -452,7 +437,6 @@ function MediaGrid({
               <X className="w-3 h-3 text-white" strokeWidth={2.5} />
             </motion.button>
 
-            {/* Pencil — single edit entry point for all media types */}
             <motion.button
               whileTap={{ scale: 0.85 }}
               onClick={(e) => { e.stopPropagation(); onEdit(index); }}
@@ -467,7 +451,6 @@ function MediaGrid({
     );
   }
 
-  // 1 item — full width, native ratio
   if (items.length === 1) {
     const item = items[0];
     const ratio = item.width && item.height
@@ -480,7 +463,6 @@ function MediaGrid({
     );
   }
 
-  // 2 items — side by side
   if (items.length === 2) {
     return (
       <div className="mx-4 mb-2 flex" style={{ borderRadius: 14, overflow: 'hidden', gap: GAP, aspectRatio: '16/9' }}>
@@ -490,7 +472,6 @@ function MediaGrid({
     );
   }
 
-  // 3 items — large left, 2 stacked right
   if (items.length === 3) {
     return (
       <div className="mx-4 mb-2 flex" style={{ borderRadius: 14, overflow: 'hidden', gap: GAP, aspectRatio: '4/3' }}>
@@ -503,7 +484,6 @@ function MediaGrid({
     );
   }
 
-  // 4+ items — 2×2 grid
   const cornerRadii = ['14px 0 0 0', '0 14px 0 0', '0 0 0 14px', '0 0 14px 0'];
   return (
     <div className="mx-4 mb-2 grid grid-cols-2" style={{ borderRadius: 14, overflow: 'hidden', gap: GAP, aspectRatio: '1/1' }}>
@@ -534,10 +514,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
   const [coverIndex, setCoverIndex] = useState(0);
 
-  // Video tool picker sheet — shown when pencil tapped on a video
   const [videoToolSheetIndex, setVideoToolSheetIndex] = useState<number | null>(null);
-
-  // Overflow sheet — shown when +N tile tapped
   const [overflowSheetOpen, setOverflowSheetOpen] = useState(false);
 
   const hasMedia = state.mediaItems.length > 0;
@@ -545,7 +522,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const activeIsVideo = activeItem?.mediaType === 'video';
   const acceptTypes = [...ALLOWED_VIDEO_TYPES, ...ALLOWED_IMAGE_TYPES].join(',');
 
-  // Open keyboard immediately on mount
   useEffect(() => {
     const timer = setTimeout(() => {
       textareaRef.current?.focus();
@@ -553,7 +529,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     return () => clearTimeout(timer);
   }, []);
 
-  // Character count with grapheme support
   const charCount = useMemo(() => {
     try {
       const S = (Intl as Record<string, unknown>).Segmenter as
@@ -566,7 +541,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
 
   const isValid = charCount <= POST_LIMITS.MAX_CAPTION_LENGTH && (hasMedia || state.caption.trim().length > 0);
 
-  // File selection and processing
   const handleFileSelect = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const fileList = e.target.files;
@@ -593,13 +567,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     [state.mediaItems.length, addMedia]
   );
 
-  // Caption change — detect @ for mention trigger + reindex mentions
   const handleCaptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
     const prev = state.caption;
     const cursorPos = e.target.selectionStart ?? val.length;
 
-    // Detect @ trigger for mention panel
     if (val.length === prev.length + 1) {
       if (val[cursorPos - 1] === '@') {
         setMentionTriggerIndex(cursorPos - 1);
@@ -607,7 +579,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       }
     }
 
-    // Update mention indices if text was inserted or deleted before any mention
     if (state.mentions.length > 0 && val !== prev) {
       let changeStart = 0;
       while (
@@ -643,7 +614,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     setCaption(val);
   }, [state.caption, state.mentions, setCaption, setMentions, openPanel, setMentionTriggerIndex]);
 
-  // Mention highlight layer
   const highlightedCaption = useMemo(() => {
     if (!state.mentions.length) return null;
     const parts: React.ReactNode[] = [];
@@ -674,15 +644,12 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     if (!item) return;
     setActiveMedia(index);
     if (item.mediaType === 'video') {
-      // Video: open intermediate tool picker
       setVideoToolSheetIndex(index);
     } else {
-      // Image: go straight into StudioShelf
       setActiveTool(null);
       setShelfOpen(true);
     }
   }, [state.mediaItems, setActiveMedia]);
-
 
 
 
@@ -714,7 +681,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             className="absolute inset-0 pointer-events-none overflow-hidden"
             style={{ zIndex: 0 }}
           >
-            {/* Soft white radial orb, centred upper-third, slowly breathing */}
             <div style={{
               position: 'absolute',
               top: '22%',
@@ -726,7 +692,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               background: 'radial-gradient(circle, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.02) 50%, transparent 75%)',
               animation: 'studio-orb-breathe 5s ease-in-out infinite',
             }} />
-            {/* Second smaller orb — offset, slower, creates depth */}
             <div style={{
               position: 'absolute',
               top: '35%',
@@ -737,7 +702,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               background: 'radial-gradient(circle, rgba(255,255,255,0.025) 0%, transparent 70%)',
               animation: 'studio-orb-breathe 7s ease-in-out infinite reverse',
             }} />
-            {/* Fine noise grain */}
             <div style={{
               position: 'absolute', inset: 0,
               opacity: 0.35,
@@ -758,7 +722,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             zIndex: 1,
             cursor: 'text',
           }}>
-            {/* Eyebrow label */}
             <p style={{
               fontSize: 9,
               fontWeight: 700,
@@ -769,7 +732,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             }}>
               What's on your mind?
             </p>
-            {/* Prompt text — large, editorial */}
             <p style={{
               fontSize: 22,
               fontWeight: 600,
@@ -779,7 +741,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             }}>
               {placeholderRef.current}
             </p>
-            {/* White hairline divider below */}
             <div style={{
               width: 28,
               height: 1,
@@ -789,7 +750,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           </div>
         )}
 
-        {/* ── Text input ── */}
+        {/* ── Text input — fixed height, scrolls internally ── */}
         <div className="px-4 pt-3 pb-2 relative">
           {/* Flashing cursor — shows when canvas is blank, replaces placeholder */}
           {state.caption.length === 0 && !hasMedia && (
@@ -838,8 +799,139 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           />
         </div>
 
-        {/* ── Course tag — elevated, first-class ── */}
-        <div className="px-4 mb-1">
+        {/* ── Inline media zone — visible only when no media added ── */}
+        <AnimatePresence>
+          {state.mediaItems.length === 0 && (
+            <motion.div
+              key="media-zone"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4, scale: 0.98 }}
+              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+              className="px-4 mb-0"
+            >
+              <div
+                style={{
+                  borderRadius: 18,
+                  border: '1.5px dashed rgba(255,255,255,0.13)',
+                  background: 'rgba(255,255,255,0.025)',
+                  overflow: 'hidden',
+                }}
+              >
+                <div style={{ display: 'flex' }}>
+                  {/* Library — primary, left */}
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isProcessing}
+                    style={{
+                      flex: 1,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      padding: '20px 12px',
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      borderRight: '1px solid rgba(255,255,255,0.07)',
+                    }}
+                  >
+                    <div style={{
+                      width: 44, height: 44, borderRadius: 14,
+                      background: 'rgba(255,255,255,0.08)',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <ImageIcon className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.75)' }} strokeWidth={1.75} />
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.80)', marginBottom: 2 }}>
+                        Add from Library
+                      </div>
+                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+                        Photos & videos
+                      </div>
+                    </div>
+                  </motion.button>
+
+                  {/* Camera — secondary, right */}
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => rearCameraInputRef.current?.click()}
+                    disabled={isProcessing}
+                    style={{
+                      flex: 1,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      padding: '20px 12px',
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <div style={{
+                      width: 44, height: 44, borderRadius: 14,
+                      background: 'rgba(255,255,255,0.08)',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <Camera className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.75)' }} strokeWidth={1.75} />
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.80)', marginBottom: 2 }}>
+                        Take a Photo
+                      </div>
+                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+                        Camera
+                      </div>
+                    </div>
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ── Media grid — visible when media added ── */}
+        {state.mediaItems.length > 0 && (
+          <MediaGrid
+            items={state.mediaItems}
+            activeIndex={state.activeMediaIndex}
+            coverIndex={coverIndex}
+            onSelect={setActiveMedia}
+            onRemove={removeMedia}
+            onEdit={handleEdit}
+            onSetCover={(index) => { setCoverIndex(index); setActiveMedia(index); }}
+            onOverflow={() => setOverflowSheetOpen(true)}
+            onAddMore={() => fileInputRef.current?.click()}
+          />
+        )}
+
+        {/* Add more — below grid when < 10 items */}
+        {state.mediaItems.length > 0 && state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
+          <div className="px-4 mb-2">
+            <motion.button
+              whileTap={{ scale: 0.96 }}
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-2 px-3 py-2 rounded-xl"
+              style={{ border: '1.5px dashed rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.03)' }}
+            >
+              <Plus className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={2} />
+              <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.35)' }}>Add more</span>
+            </motion.button>
+          </div>
+        )}
+
+        {/* 12px spacer between media zone / grid and course tag */}
+        <div className="h-3" />
+
+        {/* ── Course tag ── */}
+        <div className="px-4 mb-3">
           <AnimatePresence mode="wait">
             {state.taggedCourses.length === 0 ? (
               <motion.button
@@ -853,19 +945,19 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl"
                 style={{
                   background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.14)',
+                  border: '1px solid rgba(255,255,255,0.09)',
                 }}
               >
                 <div
                   className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: 'rgba(255,255,255,0.14)' }}
+                  style={{ background: 'rgba(255,255,255,0.08)' }}
                 >
                   <span className="text-base">⛳</span>
                 </div>
-                <span className="flex-1 text-left text-[14px]" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                <span className="flex-1 text-left text-[14px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
                   Where did you play?
                 </span>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'rgba(255,255,255,0.35)', flexShrink: 0 }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'rgba(255,255,255,0.20)', flexShrink: 0 }}>
                   <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </motion.button>
@@ -935,142 +1027,6 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           </AnimatePresence>
         </div>
 
-        {/* ── Inline media zone — primary discovery path for adding photos/video ── */}
-        <AnimatePresence>
-          {state.mediaItems.length === 0 && (
-            <motion.div
-              key="media-zone"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4, scale: 0.98 }}
-              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-              className="px-4 mb-3"
-            >
-              <div
-                style={{
-                  borderRadius: 18,
-                  border: '1.5px dashed rgba(255,255,255,0.13)',
-                  background: 'rgba(255,255,255,0.025)',
-                  overflow: 'hidden',
-                }}
-              >
-                <div style={{ display: 'flex' }}>
-                  {/* Gallery — primary */}
-                  <motion.button
-                    whileTap={{ scale: 0.97, backgroundColor: 'rgba(255,255,255,0.05)' }}
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isProcessing}
-                    style={{
-                      flex: 1,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 8,
-                      padding: '20px 12px',
-                      background: 'transparent',
-                      border: 'none',
-                      cursor: 'pointer',
-                      borderRight: '1px solid rgba(255,255,255,0.07)',
-                    }}
-                  >
-                    <div style={{
-                      width: 44, height: 44, borderRadius: 14,
-                      background: 'rgba(255,255,255,0.08)',
-                      border: '1px solid rgba(255,255,255,0.12)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <ImageIcon className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.75)' }} strokeWidth={1.75} />
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.80)', marginBottom: 2 }}>
-                        Add from Library
-                      </div>
-                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
-                        Photos & videos
-                      </div>
-                    </div>
-                  </motion.button>
-                  {/* Camera — secondary */}
-                  <motion.button
-                    whileTap={{ scale: 0.97, backgroundColor: 'rgba(255,255,255,0.05)' }}
-                    onClick={() => rearCameraInputRef.current?.click()}
-                    disabled={isProcessing}
-                    style={{
-                      flex: 1,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 8,
-                      padding: '20px 12px',
-                      background: 'transparent',
-                      border: 'none',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <div style={{
-                      width: 44, height: 44, borderRadius: 14,
-                      background: 'rgba(255,255,255,0.08)',
-                      border: '1px solid rgba(255,255,255,0.12)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <Camera className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.75)' }} strokeWidth={1.75} />
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.80)', marginBottom: 2 }}>
-                        Take a Photo
-                      </div>
-                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
-                        Camera
-                      </div>
-                    </div>
-                  </motion.button>
-                </div>
-                <div style={{
-                  borderTop: '1px solid rgba(255,255,255,0.06)',
-                  padding: '8px 16px',
-                  textAlign: 'center',
-                }}>
-                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.22)', letterSpacing: 0.2 }}>
-                    Or write a text-only post above
-                  </span>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* ── Adaptive media grid with per-tile edit + cover ── */}
-        {state.mediaItems.length > 0 && (
-          <MediaGrid
-            items={state.mediaItems}
-            activeIndex={state.activeMediaIndex}
-            coverIndex={coverIndex}
-            onSelect={setActiveMedia}
-            onRemove={removeMedia}
-            onEdit={handleEdit}
-            onSetCover={(index) => { setCoverIndex(index); setActiveMedia(index); }}
-            onOverflow={() => setOverflowSheetOpen(true)}
-            onAddMore={() => fileInputRef.current?.click()}
-          />
-        )}
-
-        {/* Add more button — shown below grid when < 10 items */}
-        {state.mediaItems.length > 0 && state.mediaItems.length < POST_LIMITS.MAX_MEDIA_COUNT && (
-          <div className="px-4 mb-2">
-            <motion.button
-              whileTap={{ scale: 0.96 }}
-              onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl"
-              style={{ border: '1.5px dashed rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.03)' }}
-            >
-              <Plus className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={2} />
-              <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.35)' }}>Add more</span>
-            </motion.button>
-          </div>
-        )}
-
         {/* Processing indicator */}
         <AnimatePresence>
           {isProcessing && (
@@ -1100,111 +1056,106 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
         }}
       >
-        {/* White hairline at top of rail */}
+        {/* White hairline at top */}
         <div style={{
           height: 1,
           background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.10) 20%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.10) 80%, transparent 100%)',
         }} />
 
-        <div className="flex items-center px-4" style={{ minHeight: 52 }}>
-          {/* ── Zone A: Capture ── */}
-          {/* Rear camera — slightly elevated as primary capture */}
-          <motion.button
-            whileTap={{ scale: 0.88 }}
-            onClick={() => rearCameraInputRef.current?.click()}
-            disabled={isProcessing}
-            className="flex flex-col items-center justify-center disabled:opacity-40"
-            style={{ width: 52, height: 54, gap: 3 }}
-          >
-            <div style={{
-              width: 40, height: 40, borderRadius: 13,
-              background: 'rgba(255,255,255,0.96)',
-              boxShadow: '0 2px 14px rgba(0,0,0,0.35)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <Camera className="w-[18px] h-[18px]" style={{ color: '#0D0D0D' }} strokeWidth={2} />
-            </div>
-            <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: 0.8, color: 'rgba(255,255,255,0.50)', textTransform: 'uppercase' as const }}>
-              Rear
-            </span>
-          </motion.button>
+        <div className="flex items-center px-4" style={{ minHeight: 60, gap: 0 }}>
 
-          {/* Front camera */}
-          <motion.button
-            whileTap={{ scale: 0.88 }}
-            onClick={() => frontCameraInputRef.current?.click()}
-            disabled={isProcessing}
-            className="flex flex-col items-center justify-center disabled:opacity-40"
-            style={{ width: 52, height: 54, gap: 3 }}
-          >
-            <div style={{
-              width: 40, height: 40, borderRadius: 13,
-              background: 'rgba(255,255,255,0.07)',
-              border: '1px solid rgba(255,255,255,0.10)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <SwitchCamera className="w-[18px] h-[18px]" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={2} />
-            </div>
-            <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: 0.8, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' as const }}>
-              Front
-            </span>
-          </motion.button>
+          {/* Zone A — Capture */}
+          <div className="flex items-center" style={{ gap: 4 }}>
+            {/* Rear — solid white, primary */}
+            <motion.button
+              whileTap={{ scale: 0.88 }}
+              onClick={() => rearCameraInputRef.current?.click()}
+              disabled={isProcessing}
+              className="flex flex-col items-center justify-center disabled:opacity-40"
+              style={{ width: 52, height: 54, gap: 3 }}
+            >
+              <div style={{
+                width: 40, height: 40, borderRadius: 13,
+                background: 'rgba(255,255,255,0.96)',
+                boxShadow: '0 2px 14px rgba(0,0,0,0.35)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Camera className="w-[18px] h-[18px]" style={{ color: '#0D0D0D' }} strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: 'rgba(255,255,255,0.50)', textTransform: 'uppercase' }}>Rear</span>
+            </motion.button>
 
-          {/* Library */}
-          <motion.button
-            whileTap={{ scale: 0.88 }}
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isProcessing}
-            className="flex flex-col items-center justify-center disabled:opacity-40"
-            style={{ width: 52, height: 54, gap: 3 }}
-          >
-            <div style={{
-              width: 40, height: 40, borderRadius: 13,
-              background: 'rgba(255,255,255,0.07)',
-              border: '1px solid rgba(255,255,255,0.10)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <Layers className="w-[18px] h-[18px]" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={2} />
-            </div>
-            <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: 0.8, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' as const }}>
-              Library
-            </span>
-          </motion.button>
+            {/* Front */}
+            <motion.button
+              whileTap={{ scale: 0.88 }}
+              onClick={() => frontCameraInputRef.current?.click()}
+              disabled={isProcessing}
+              className="flex flex-col items-center justify-center disabled:opacity-40"
+              style={{ width: 52, height: 54, gap: 3 }}
+            >
+              <div style={{
+                width: 40, height: 40, borderRadius: 13,
+                background: 'rgba(255,255,255,0.07)',
+                border: '1px solid rgba(255,255,255,0.10)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <SwitchCamera className="w-[18px] h-[18px]" style={{ color: 'rgba(255,255,255,0.60)' }} strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' }}>Front</span>
+            </motion.button>
 
-          {/* ── Divider ── */}
-          <div style={{
-            width: 1, height: 26,
-            background: 'rgba(255,255,255,0.08)',
-            margin: '0 10px',
-          }} />
+            {/* Library */}
+            <motion.button
+              whileTap={{ scale: 0.88 }}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isProcessing}
+              className="flex flex-col items-center justify-center disabled:opacity-40"
+              style={{ width: 52, height: 54, gap: 3 }}
+            >
+              <div style={{
+                width: 40, height: 40, borderRadius: 13,
+                background: 'rgba(255,255,255,0.07)',
+                border: '1px solid rgba(255,255,255,0.10)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Layers className="w-[18px] h-[18px]" style={{ color: 'rgba(255,255,255,0.60)' }} strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' }}>Library</span>
+            </motion.button>
+          </div>
 
-          {/* ── Zone B: Text tools ── */}
-          <motion.button
-            whileTap={{ scale: 0.88 }}
-            onClick={() => {
-              const pos = textareaRef.current?.selectionStart ?? state.caption.length;
-              const newCaption = state.caption.slice(0, pos) + '@' + state.caption.slice(pos);
-              setCaption(newCaption);
-              setMentionTriggerIndex(pos);
-              openPanel('mention');
-            }}
-            style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          >
-            <AtSign className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
-          </motion.button>
+          {/* Divider */}
+          <div style={{ width: 1, height: 28, background: 'rgba(255,255,255,0.08)', margin: '0 10px' }} />
 
-          <motion.button
-            whileTap={{ scale: 0.88 }}
-            onClick={() => openPanel('drafts')}
-            style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          >
-            <BookOpen className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
-          </motion.button>
+          {/* Zone B — Text tools */}
+          <div className="flex items-center" style={{ gap: 0 }}>
+            <motion.button
+              whileTap={{ scale: 0.88 }}
+              onClick={() => {
+                const pos = textareaRef.current?.selectionStart ?? state.caption.length;
+                const newCaption = state.caption.slice(0, pos) + '@' + state.caption.slice(pos);
+                setCaption(newCaption);
+                setMentionTriggerIndex(pos);
+                openPanel('mention');
+              }}
+              style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              <AtSign className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
+            </motion.button>
 
-          {/* ── Spacer ── */}
+            <motion.button
+              whileTap={{ scale: 0.88 }}
+              onClick={() => openPanel('drafts')}
+              style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              <BookOpen className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
+            </motion.button>
+          </div>
+
+          {/* Spacer */}
           <div className="flex-1" />
 
-          {/* ── Zone C: Character count ── */}
+          {/* Zone C — Character count */}
           <div className="flex items-center justify-center" style={{ width: 36, height: 36 }}>
             <CharacterRing count={charCount} />
           </div>
