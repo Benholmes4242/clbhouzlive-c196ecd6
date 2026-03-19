@@ -20,6 +20,7 @@ import { useTournamentsCache } from '@/hooks/useTournamentsCache';
 // ---------------------------------------------------------------------------
 
 export interface LiveLeaderboardEntry {
+  id: string;
   tournament_id: string;
   position: number;
   score: number | null;
