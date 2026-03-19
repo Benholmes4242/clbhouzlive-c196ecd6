@@ -211,6 +211,8 @@ export function VideoPlayer({
     ).then((video) => {
       if (video) {
         videoRef.current = video;
+        video.style.objectFit = isLandscape ? 'contain' : 'cover';
+        video.style.zIndex = '1';
         video.muted = getStore().isMuted;
       }
     });
