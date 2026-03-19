@@ -1,6 +1,7 @@
 import React, { PropsWithChildren, useEffect } from "react";
 import { warmHlsJs } from "@/hooks/useHlsUrlCache";
 import { initMobileVideoDebug } from "@/media/mobileVideoDebug";
+import { runBandwidthProbe } from "@/components/media-system/utils/bandwidthProbe";
 
 /**
  * Wrap the entire app in <AppShell> so content respects iOS safe areas,
