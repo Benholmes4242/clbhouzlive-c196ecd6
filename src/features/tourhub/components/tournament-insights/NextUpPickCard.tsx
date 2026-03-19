@@ -5,7 +5,7 @@
  * Swipeable via pagination dots. Stats from useWinnerSeasonStats per-pick.
  */
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
