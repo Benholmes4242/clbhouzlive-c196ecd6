@@ -268,6 +268,7 @@ interface HeroSlideProps {
   onDotClick: (index: number) => void;
   leadersWinnersMap?: Map<string, import('../../hooks/useTournamentLeadersWinners').TournamentLeaderWinner>;
   liveLeaderboardRows: LiveLeaderboardEntry[];
+  lbCacheLoading: boolean;
   isExpanded: boolean;
   onToggleExpand: () => void;
   onInteraction: () => void;
@@ -277,7 +278,7 @@ interface HeroSlideProps {
 }
 
 
-function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, liveLeaderboardRows, isExpanded, onToggleExpand, onInteraction, onCardTouchStart, onCardTouchMove, onCardTouchEnd }: HeroSlideProps) {
+function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, liveLeaderboardRows, lbCacheLoading, isExpanded, onToggleExpand, onInteraction, onCardTouchStart, onCardTouchMove, onCardTouchEnd }: HeroSlideProps) {
   const { tournament, type } = slide;
   const navigate = useNavigate();
   
@@ -354,7 +355,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
 
   // Full leaderboard from cache (top 10 for overview; full field on tournament detail page)
   const fullLeaderboard = isLive ? liveLeaderboardRows as any[] : [];
-  const isLoadingFull = isLive && liveLeaderboardRows.length === 0;
+  const isLoadingFull = isLive && lbCacheLoading;
   const isFullError = false;
   const refetchFull = () => Promise.resolve({} as any);
 
@@ -1000,7 +1001,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   }, []);
 
   // Shared leaderboard cache — one fetch for all tournaments
-  const { data: lbCache } = useLeaderboardCache();
+  const { data: lbCache, isLoading: lbCacheLoading } = useLeaderboardCache();
 
   // Wire up top-3 podium data for completed slides
   const completedIds = safeSlides
@@ -1181,6 +1182,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
             onDotClick={setCurrentIndex}
             leadersWinnersMap={leadersWinnersMap}
             liveLeaderboardRows={lbCache?.live.get(slide.tournament.id) ?? []}
+            lbCacheLoading={lbCacheLoading}
             isExpanded={index === currentIndex && (slide.type === 'live' ? true : isExpanded)}
             onToggleExpand={handleToggleExpand}
             onInteraction={() => {
