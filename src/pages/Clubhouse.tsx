@@ -23,8 +23,7 @@ import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 // ClubhouseSkeleton import removed — rehydration now uses ClubhouseSkeletonShimmer
 import { ClubhouseTabProvider, useClubhouseTab } from '@/contexts/ClubhouseTabContext';
 import { clubhouseDebug } from '@/debug/clubhouseDebug';
-import MobileVideoDebugPanel from '@/components/debug/MobileVideoDebugPanel';
-import ClubhouseVideoDebugPanel from '@/components/debug/ClubhouseVideoDebugPanel';
+import FeedVideoDebugOverlay from '@/components/debug/FeedVideoDebugOverlay';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
@@ -640,9 +639,8 @@ const ClubhouseContent = () => {
         />
       )}
 
-      {/* Mobile Video Debug Panel */}
-      <MobileVideoDebugPanel />
-      <ClubhouseVideoDebugPanel />
+      {/* Feed Video Debug — reads directly from mediaStore */}
+      <FeedVideoDebugOverlay />
     </PageRoot>
   );
 };
