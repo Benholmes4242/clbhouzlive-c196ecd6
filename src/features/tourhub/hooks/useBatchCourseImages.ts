@@ -42,6 +42,16 @@ export function useBatchCourseImages(tournaments: TourTournament[] | undefined) 
 
       const result = new Map<string, string | null>();
 
+      // Apply static overrides first
+      for (const name of venueNames) {
+        if (VENUE_IMAGE_OVERRIDES[name]) {
+          result.set(name, VENUE_IMAGE_OVERRIDES[name]);
+        }
+      }
+
+      const uncachedNames = venueNames.filter(n => !result.has(n));
+      if (uncachedNames.length === 0) return result;
+
       // Step 1: Check sr_course_map cache (bulk lookup)
       const { data: cached, error } = await supabase
         .from('sr_course_map')
