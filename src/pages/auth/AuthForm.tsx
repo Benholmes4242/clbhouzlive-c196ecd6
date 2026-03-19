@@ -373,14 +373,8 @@ const AuthForm: React.FC<AuthFormProps> = ({
         });
         setSubmitting(false);
       } else if (data?.user) {
-        // Fix 1: Let users in immediately — no verification gate
-        // Store pending email for later nudge system
-        safeLocalStorage.set('pending_verification_email', email);
         trackSignupSuccess('email', Date.now() - startTime);
-        
-        // Show success animation and navigate to callback
-        setSuccessMessage('Welcome to clbhouz!');
-        setShowSuccessAnimation(true);
+        navigate('/auth/check-email', { state: { email }, replace: true });
       } else if (data && !data.user) {
         // Supabase returned success but no user — edge case fallback
         safeLocalStorage.set('pending_verification_email', email);
