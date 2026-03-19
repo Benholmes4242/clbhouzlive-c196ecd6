@@ -158,7 +158,17 @@ export function SeasonLeaderboards() {
       >
         <div>
           <div className="flex items-center gap-2">
-            <p className="m-0 text-muted-foreground" style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <p
+              className="m-0 flex items-center gap-1.5"
+              style={{
+                fontSize: '11px',
+                fontWeight: 700,
+                letterSpacing: '0.8px',
+                textTransform: 'uppercase',
+                color: 'hsl(var(--accent-amber))',
+              }}
+            >
+              <Trophy className="w-3.5 h-3.5" />
               {displayYear} Season
             </p>
             {data?.availableSeasons && (
