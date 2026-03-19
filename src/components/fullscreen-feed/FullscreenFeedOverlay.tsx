@@ -2,8 +2,6 @@ import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
 import { useFullscreenFeed } from './hooks/useFullscreenFeed';
 import { FullscreenFeedContent } from './FullscreenFeedContent';
-import FeedVideoDebugOverlay from '@/components/debug/FeedVideoDebugOverlay';
-import ConsoleLogCapture from '@/components/debug/ConsoleLogCapture';
 
 export function FullscreenFeedOverlay() {
   const isOpen = useFullscreenFeed((s) => s.isOpen);
@@ -31,8 +29,6 @@ export function FullscreenFeedOverlay() {
         hasNextPage={hasNextPage}
         isFetchingNextPage={isFetchingNextPage}
       />
-      <FeedVideoDebugOverlay />
-      <ConsoleLogCapture />
     </div>,
     document.body
   );
