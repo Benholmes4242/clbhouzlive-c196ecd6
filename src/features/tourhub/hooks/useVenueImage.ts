@@ -10,6 +10,15 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import innisbrookCopperhead from '@/assets/courses/innisbrook-copperhead.jpeg';
+
+/**
+ * Static venue image overrides for courses not yet in the database.
+ * Maps sr_tournament venue_name → local asset import.
+ */
+const VENUE_IMAGE_OVERRIDES: Record<string, string> = {
+  'Innisbrook Resort - Copperhead': innisbrookCopperhead,
+};
 
 interface VenueImageResult {
   imageUrl: string | null;
