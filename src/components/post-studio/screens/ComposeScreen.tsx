@@ -811,7 +811,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             <div
               aria-hidden="true"
               className="absolute inset-x-4 top-3 text-[17px] leading-relaxed pointer-events-none whitespace-pre-wrap break-words"
-              style={{ wordBreak: 'break-word', minHeight: 120 }}
+              style={{ wordBreak: 'break-word', height: hasMedia ? 80 : 120, overflowY: 'auto' }}
             >
               {highlightedCaption}
             </div>
