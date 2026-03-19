@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { getSharedBandwidth } from '@/components/media-system/utils/sharedBandwidth';
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSheetPlayback } from './SheetPlaybackContext';
@@ -89,6 +90,9 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
 
         if (Hls.isSupported()) {
           const hls = new Hls({
+            startLevel: -1,
+            capLevelToPlayerSize: false,
+            abrEwmaDefaultEstimate: getSharedBandwidth() > 0 ? getSharedBandwidth() : 8_000_000,
             maxBufferLength: 10,
             maxMaxBufferLength: 20,
           });

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
+import { getSharedBandwidth } from '@/components/media-system/utils/sharedBandwidth';
 import type { RefObject } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 
@@ -127,6 +128,8 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
 
       const hls = new Hls({
         startLevel: -1,
+        capLevelToPlayerSize: false,
+        abrEwmaDefaultEstimate: getSharedBandwidth() > 0 ? getSharedBandwidth() : 8_000_000,
         maxBufferLength: 8,
         maxMaxBufferLength: 16,
         enableWorker: true,

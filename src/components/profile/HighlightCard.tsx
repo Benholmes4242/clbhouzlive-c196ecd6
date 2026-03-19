@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import { getSharedBandwidth } from '@/components/media-system/utils/sharedBandwidth';
 import { Top100Highlight } from '@/hooks/useTop100Highlights';
 import { Volume2, VolumeX } from 'lucide-react';
 import { uidFromNode, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
@@ -56,7 +57,9 @@ const HighlightCard: React.FC<HighlightCardProps> = ({ highlight, muted, setMute
             if (Hls.isSupported() && !cancelled) {
               hls = new Hls({
                 autoStartLoad: true,
-                capLevelToPlayerSize: true,
+                startLevel: -1,
+                capLevelToPlayerSize: false,
+                abrEwmaDefaultEstimate: getSharedBandwidth() > 0 ? getSharedBandwidth() : 8_000_000,
               });
               hls.attachMedia(video);
               hls.on(Hls.Events.MEDIA_ATTACHED, () => {

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
+import { getSharedBandwidth } from '@/components/media-system/utils/sharedBandwidth';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 const ATTACH_THRESHOLD = 0.6;
@@ -105,6 +106,8 @@ export const CourseMediaAutoplay: React.FC<CourseMediaAutoplayProps> = ({ posts,
 
     const hls = new Hls({
       startLevel: -1,
+      capLevelToPlayerSize: false,
+      abrEwmaDefaultEstimate: getSharedBandwidth() > 0 ? getSharedBandwidth() : 8_000_000,
       maxBufferLength: 8,
       maxMaxBufferLength: 16,
       enableWorker: true,
