@@ -1,5 +1,6 @@
 import type HlsType from 'hls.js';
 import { createCachedLoader } from './cachedHlsLoader';
+import { getSharedBandwidth, saveSharedBandwidth, setNativeHlsSource } from './sharedBandwidth';
 
 export const HLS_CONFIG: Record<string, unknown> = {
   enableWorker: true,
