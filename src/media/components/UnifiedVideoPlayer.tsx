@@ -53,6 +53,50 @@ import {
   logVideoElementUnmount,
 } from '@/media/mobileVideoDebug';
 
+// ============ Native HLS Quality Fix ============
+// iOS Safari ignores all query-string quality hints on HLS manifests.
+// This helper fetches the master manifest, parses the rendition ladder,
+// and sets video.src to the highest-bandwidth single-rendition URL directly.
+const setNativeHlsSource = async (video: HTMLVideoElement, manifestUrl: string): Promise<void> => {
+  try {
+    const res = await fetch(manifestUrl);
+    if (!res.ok) throw new Error(`Manifest fetch failed: ${res.status}`);
+    const text = await res.text();
+
+    // Parse EXT-X-STREAM-INF entries to find highest bandwidth rendition
+    const lines = text.split('\n');
+    let bestUrl = '';
+    let bestBandwidth = 0;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (line.startsWith('#EXT-X-STREAM-INF:')) {
+        const bwMatch = line.match(/BANDWIDTH=(\d+)/);
+        const bandwidth = bwMatch ? parseInt(bwMatch[1], 10) : 0;
+        const nextLine = lines[i + 1]?.trim();
+        if (nextLine && !nextLine.startsWith('#') && bandwidth > bestBandwidth) {
+          bestBandwidth = bandwidth;
+          bestUrl = nextLine;
+        }
+      }
+    }
+
+    if (bestUrl) {
+      const absoluteUrl = bestUrl.startsWith('http')
+        ? bestUrl
+        : new URL(bestUrl, manifestUrl).href;
+      console.log(`[UnifiedVideoPlayer] Native HLS — selected rendition: ${Math.round(bestBandwidth / 1000)}kbps — ${absoluteUrl.slice(-60)}`);
+      video.src = absoluteUrl;
+    } else {
+      console.log('[UnifiedVideoPlayer] Native HLS — manifest parse failed, using master');
+      video.src = manifestUrl;
+    }
+  } catch (err) {
+    console.log('[UnifiedVideoPlayer] Native HLS — fetch error, using master:', err);
+    video.src = manifestUrl;
+  }
+};
+
 // ============ Types ============
 
 export interface UnifiedVideoPlayerProps {
@@ -679,15 +723,9 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         const isHlsUrl = hlsUrl.includes('.m3u8');
 
         if (canPlayNatively || !isHlsUrl) {
-          // Native playback - CachedHlsLoader NOT used (Safari/iOS uses native HLS)
-          // No additional guard needed - currentSrcRef check above prevents spam
-          // Append clientBandwidthHint=4.5 to Cloudflare Stream manifests so native HLS
-          // starts at ~720p instead of the lowest rendition
-          const nativeSrc = hlsUrl.includes('.m3u8') && hlsUrl.includes('cloudflarestream.com')
-            ? `${hlsUrl}${hlsUrl.includes('?') ? '&' : '?'}clientBandwidthHint=4.5`
-            : hlsUrl;
-          console.log('[UnifiedVideoPlayer] Native HLS path — manifest URL:', nativeSrc);
-          video.src = nativeSrc;
+          // Native playback - fetch manifest and select highest quality rendition
+          // iOS native HLS ignores all query hints, so we parse the manifest ourselves
+          await setNativeHlsSource(video, hlsUrl);
           video.load();
           
           if (startTime && startTime > 0) {
@@ -701,12 +739,8 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         // HLS.js playback — Hls is already loaded above
         try {
           if (!Hls || !Hls.isSupported() || !mountedRef.current) {
-            // Fall back to native — apply 720p quality hint for Cloudflare Stream
-            const fallbackSrc = hlsUrl.includes('.m3u8') && hlsUrl.includes('cloudflarestream.com')
-              ? `${hlsUrl}${hlsUrl.includes('?') ? '&' : '?'}clientBandwidthHint=4.5`
-              : hlsUrl;
-            console.log('[UnifiedVideoPlayer] Native fallback — manifest URL:', fallbackSrc);
-            video.src = fallbackSrc;
+            // Fall back to native — fetch manifest and select highest quality rendition
+            await setNativeHlsSource(video, hlsUrl);
             return;
           }
 
@@ -870,12 +904,8 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           hlsRef.current = hls;
           registerHlsForDebug(cloudflareUid || uniqueMediaId, hls, video);
         } catch (err) {
-          // Fall back to native — apply 720p quality hint for Cloudflare Stream
-          const catchSrc = hlsUrl.includes('.m3u8') && hlsUrl.includes('cloudflarestream.com')
-            ? `${hlsUrl}${hlsUrl.includes('?') ? '&' : '?'}clientBandwidthHint=4.5`
-            : hlsUrl;
-          console.log('[UnifiedVideoPlayer] Catch fallback — manifest URL:', catchSrc);
-          video.src = catchSrc;
+          // Fall back to native — fetch manifest and select highest quality rendition
+          await setNativeHlsSource(video, hlsUrl);
         }
       };
 
