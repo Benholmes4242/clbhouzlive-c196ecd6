@@ -53,6 +53,28 @@ import {
   logVideoElementUnmount,
 } from '@/media/mobileVideoDebug';
 
+// ─── Shared HLS bandwidth memory ─────────────────────────────────────────────
+// Persists the last measured bandwidth within a browser session so each new
+// HLS.js instance starts knowing the connection speed instead of defaulting
+// to the lowest quality rendition.
+// Uses in-memory (fast) + sessionStorage (survives app backgrounding).
+// Resets on every new browser session — prevents stale cross-network measurements.
+let _sharedBandwidth = 0; // bits per second, in-memory
+
+function getSharedBandwidth(): number {
+  if (_sharedBandwidth > 0) return _sharedBandwidth;
+  try {
+    const v = sessionStorage.getItem('clbhouz-hls-bw');
+    return v ? parseInt(v, 10) : 0;
+  } catch { return 0; }
+}
+
+function saveSharedBandwidth(bps: number): void {
+  if (bps <= 0) return;
+  _sharedBandwidth = bps;
+  try { sessionStorage.setItem('clbhouz-hls-bw', String(Math.round(bps))); } catch {}
+}
+
 // ============ Native HLS Quality Fix ============
 // iOS Safari ignores all query-string quality hints on HLS manifests.
 // This helper fetches the master manifest, parses the rendition ladder,
