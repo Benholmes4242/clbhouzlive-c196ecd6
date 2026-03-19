@@ -15,6 +15,8 @@ interface LogEntry {
 let _logId = 0;
 const _subscribers = new Set<(entry: LogEntry) => void>();
 let _intercepting = false;
+const _buffer: LogEntry[] = []; // Buffer logs before any subscriber exists
+const MAX_BUFFER = 200;
 
 function startIntercepting() {
   if (_intercepting) return;
@@ -30,6 +32,8 @@ function startIntercepting() {
       const now = new Date();
       const time = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}.${now.getMilliseconds().toString().padStart(3,'0')}`;
       const entry: LogEntry = { id: _logId++, level, message, time };
+      _buffer.push(entry);
+      if (_buffer.length > MAX_BUFFER) _buffer.shift();
       _subscribers.forEach(fn => fn(entry));
     };
   });
@@ -41,7 +45,7 @@ startIntercepting();
 export function ConsoleLogCapture() {
   const [isOpen, setIsOpen] = useState(false);
   const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [filter, setFilter] = useState('UVP DEBUG');
+  const [filter, setFilter] = useState('');
   const [copied, setCopied] = useState(false);
   const logsRef = useRef<LogEntry[]>([]);
 
@@ -50,6 +54,11 @@ export function ConsoleLogCapture() {
       logsRef.current = [entry, ...logsRef.current].slice(0, 200);
       setLogs([...logsRef.current]);
     };
+    // Replay any logs that fired before this component subscribed
+    _buffer.forEach(entry => {
+      logsRef.current = [entry, ...logsRef.current].slice(0, 200);
+    });
+    setLogs([...logsRef.current]);
     _subscribers.add(handler);
     return () => { _subscribers.delete(handler); };
   }, []);
