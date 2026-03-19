@@ -44,6 +44,22 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
   const firstVideo = post.mediaItems.find(m => m.type === 'video');
   const thumbnailUrl = firstVideo?.thumbnailUrl || '';
   const hlsUrl = firstVideo?.hlsUrl || '';
+  const tileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = tileRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          onViewPreload(hlsUrl);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hlsUrl]);
   const duration = firstVideo?.duration || 0;
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
 
