@@ -644,6 +644,7 @@ const ClubhouseContent = () => {
 
       {/* Feed Video Debug — reads directly from mediaStore */}
       <FeedVideoDebugOverlay />
+      <ConsoleLogCapture />
     </PageRoot>
   );
 };
