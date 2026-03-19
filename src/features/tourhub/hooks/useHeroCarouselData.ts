@@ -17,6 +17,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TOUR_CONFIG, type TourId } from './useOverviewData';
 import { useTournamentsCache, type CachedTournament } from '@/hooks/useTournamentsCache';
+import { useLeaderboardCache } from './useLeaderboardCache';
 import { getContextLabel } from '../utils/tournamentClassification';
 
 // Tour priority order for sorting live tournaments
@@ -68,6 +69,7 @@ function mapTourSlug(tourName: string): TourId {
 
 export function useHeroCarouselData() {
   const { data: cache, isLoading: cacheLoading } = useTournamentsCache();
+  const { data: lbCache } = useLeaderboardCache();
 
   return useQuery({
     queryKey: ['hero-carousel-data', cache ? 'ready' : 'waiting'],
@@ -93,25 +95,14 @@ export function useHeroCarouselData() {
         .map(t => t.defending_champion)
         .filter((name): name is string => !!name);
 
-      // Fetch winner details, leaderboard data, and defending champion photos in parallel
-      const [winnersResult, leaderboardResult, defendingChampionResult] = await Promise.all([
+      // Fetch winner details and defending champion photos in parallel
+      // (Leaderboard data now comes from lbCache instead of a separate query)
+      const [winnersResult, defendingChampionResult] = await Promise.all([
         winnerSrIds.length > 0
           ? supabase
               .from('sr_players')
               .select('sr_id, first_name, last_name, photo_url, pga_tour_id')
               .in('sr_id', winnerSrIds)
-          : Promise.resolve({ data: [] }),
-        allTournamentIds.length > 0
-          ? supabase
-              .from('sr_leaderboards')
-              .select(`
-                tournament_id, position, score,
-                player:sr_players!inner(sr_id, first_name, last_name, photo_url, pga_tour_id)
-              `)
-              .in('tournament_id', allTournamentIds)
-              .gt('strokes', 0)
-              .not('position', 'is', null)
-              .eq('position', 1)
           : Promise.resolve({ data: [] }),
         defendingChampionNames.length > 0
           ? supabase
@@ -141,16 +132,17 @@ export function useHeroCarouselData() {
         }
       });
 
-      // Build leaderboard map
+      // Build leaderboard map from cache instead of a separate query
       const leaderboardMap: Record<string, { score: number | null; player: any }> = {};
-      (leaderboardResult.data || []).forEach((entry: any) => {
-        if (entry.player) {
-          leaderboardMap[entry.tournament_id] = {
-            score: entry.score,
-            player: entry.player,
-          };
-        }
-      });
+      for (const [tid, rows] of lbCache?.live ?? []) {
+        const pos1 = rows.find(r => r.position === 1);
+        if (pos1) leaderboardMap[tid] = { score: pos1.score, player: pos1.player };
+      }
+      for (const [tid, rows] of lbCache?.completed ?? []) {
+        const pos1 = rows.find(r => r.position === 1);
+        if (pos1 && !leaderboardMap[tid])
+          leaderboardMap[tid] = { score: pos1.score, player: pos1.player };
+      }
 
       // Build defending champion map
       const defendingChampionMap: Record<string, { photo_url: string | null; pga_tour_id: string | null }> = {};

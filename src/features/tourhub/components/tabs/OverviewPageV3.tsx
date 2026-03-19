@@ -108,16 +108,16 @@ export function OverviewPageV3() {
           <div className="bg-background pt-4 space-y-section" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
             <LiveRightNow />
             <WhatsComing />
-            <LazySection minHeight={250}>
+            <LazySection minHeight={250} rootMargin="50px">
               <TournamentInsights />
             </LazySection>
-            <LazySection minHeight={400}>
+            <LazySection minHeight={400} rootMargin="50px">
               <UnifiedWorldRankings />
             </LazySection>
-            <LazySection minHeight={300}>
+            <LazySection minHeight={300} rootMargin="50px">
               <SeasonLeaderboards />
             </LazySection>
-            <LazySection minHeight={350}>
+            <LazySection minHeight={350} rootMargin="50px">
               <CollegeRankingsPreview />
             </LazySection>
           </div>

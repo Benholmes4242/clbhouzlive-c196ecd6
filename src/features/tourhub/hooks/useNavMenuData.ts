@@ -10,6 +10,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { getCollegeLogoUrl } from '@/utils/collegeLogo';
 import { getContextLabel } from '../utils/tournamentClassification';
+import { useLeaderboardCache } from './useLeaderboardCache';
 
 /**
  * Count of currently in-progress tournaments
@@ -48,6 +49,8 @@ function getTourSlug(tourName: string): string {
 }
 
 export function useLiveLeaderTeaser() {
+  const { data: lbCache } = useLeaderboardCache();
+
   return useQuery({
     queryKey: ['live-leader-teaser'],
     queryFn: async () => {
@@ -84,14 +87,11 @@ export function useLiveLeaderTeaser() {
 
       const tournament = scored[0];
 
-      // Get all players at position 1 from the selected tournament
-      const { data: leaders } = await supabase
-        .from('sr_leaderboards')
-        .select('score, position, player_id, sr_players!sr_leaderboards_player_id_fkey(full_name)')
-        .eq('tournament_id', tournament.id)
-        .eq('position', 1);
+      // Read leaders from shared leaderboard cache instead of a separate query
+      const rows = lbCache?.live.get(tournament.id) ?? [];
+      const leaders = rows.filter(r => r.position === 1);
 
-      if (!leaders || leaders.length === 0) return null;
+      if (leaders.length === 0) return null;
 
       const first = leaders[0];
       const tiedCount = leaders.length;
@@ -107,8 +107,7 @@ export function useLiveLeaderTeaser() {
         };
       }
 
-      const playerData = first.sr_players as unknown as { full_name: string } | null;
-      const fullName = playerData?.full_name || 'Unknown';
+      const fullName = first.player?.full_name || `${first.player?.first_name || ''} ${first.player?.last_name || ''}`.trim() || 'Unknown';
       const nameParts = fullName.split(' ');
       const displayName = nameParts.length >= 2
         ? `${nameParts[0][0]}. ${nameParts.slice(1).join(' ')}`
@@ -116,7 +115,7 @@ export function useLiveLeaderTeaser() {
 
       return {
         playerName: displayName,
-        playerId: first.player_id,
+        playerId: first.player?.id || null,
         score: first.score,
         tournamentId: tournament.id,
         tournamentName: tournament.name,

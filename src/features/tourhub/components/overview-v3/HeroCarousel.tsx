@@ -25,8 +25,8 @@ import {
 } from '../../hooks/useHeroCarouselData';
 import { useTournamentTopLeaders, type LeaderEntry } from '../../hooks/useOverviewData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
-import { useTourLeaderboard } from '../../hooks/useTourHubData';
-import { useLeaderboardRealtime } from '../../hooks/useLeaderboardRealtime';
+import { useLeaderboardCache, type LiveLeaderboardEntry } from '../../hooks/useLeaderboardCache';
+import { useMultiLeaderboardRealtime } from '../../hooks/useLeaderboardRealtime';
 import { ExpandedLeaderboardList, ExpandedLeaderboardSkeleton, ExpandedLeaderboardError, ExpandedLeaderboardEmpty } from './ExpandedLeaderboard';
 import { PlayerScorecardCard } from '@/components/tourhub/PlayerScorecardCard';
 
@@ -267,6 +267,7 @@ interface HeroSlideProps {
   currentIndex: number;
   onDotClick: (index: number) => void;
   leadersWinnersMap?: Map<string, import('../../hooks/useTournamentLeadersWinners').TournamentLeaderWinner>;
+  liveLeaderboardRows: LiveLeaderboardEntry[];
   isExpanded: boolean;
   onToggleExpand: () => void;
   onInteraction: () => void;
@@ -276,7 +277,7 @@ interface HeroSlideProps {
 }
 
 
-function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction, onCardTouchStart, onCardTouchMove, onCardTouchEnd }: HeroSlideProps) {
+function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, liveLeaderboardRows, isExpanded, onToggleExpand, onInteraction, onCardTouchStart, onCardTouchMove, onCardTouchEnd }: HeroSlideProps) {
   const { tournament, type } = slide;
   const navigate = useNavigate();
   
@@ -316,18 +317,46 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
   const handleScorecardTap = useCallback((player: PlayerInfo) => setSelectedPlayer(player), []);
   const handleBackToLeaderboard = useCallback(() => setSelectedPlayer(null), []);
 
-  // Fetch top 5 leaders for live tournaments only
-  const { data: leaders = [], isLoading: leadersLoading } = useTournamentTopLeaders(
-    isLive ? tournament.id : null
-  );
+  // Derive leaders from shared cache data (replaces useTournamentTopLeaders)
+  const leaders: LeaderEntry[] = isLive
+    ? liveLeaderboardRows.slice(0, 10).map((row): LeaderEntry => {
+        const scoreToPar = row.score ?? 0;
+        const scoreDisplay = scoreToPar === 0 ? 'E' : scoreToPar > 0 ? `+${scoreToPar}` : `${scoreToPar}`;
+        return {
+          position: row.position,
+          score: row.score ?? 0,
+          scoreToPar,
+          scoreDisplay,
+          thru: row.thru,
+          status: row.status ?? null,
+          updatedAt: row.updated_at ?? null,
+          thruUpdatedAt: row.thru_updated_at ?? null,
+          tournamentTimezone: null,
+          round_1: row.round_1 ?? null,
+          round_2: row.round_2 ?? null,
+          round_3: row.round_3 ?? null,
+          round_4: row.round_4 ?? null,
+          player: {
+            id: row.player.id,
+            firstName: row.player.first_name,
+            lastName: row.player.last_name,
+            fullName: row.player.full_name || `${row.player.first_name} ${row.player.last_name}`,
+            headshotOverride: row.player.headshot_override ?? null,
+            country: row.player.country,
+            photoUrl: row.player.photo_url,
+            pgaTourId: row.player.pga_tour_id ?? null,
+            tourCode: row.player.tour_codes?.[0] ?? null,
+          },
+        };
+      })
+    : [];
+  const leadersLoading = false;
 
-  // Full leaderboard — only fetched when expanded
-  const { data: fullLeaderboard = [], isLoading: isLoadingFull, isError: isFullError, refetch: refetchFull } = useTourLeaderboard(
-    isLive ? tournament.id : ''
-  );
-  
-  // Realtime updates — always subscribe when live so collapsed hero stays fresh
-  useLeaderboardRealtime(isLive ? tournament.id : null);
+  // Full leaderboard from cache (top 10 for overview; full field on tournament detail page)
+  const fullLeaderboard = isLive ? liveLeaderboardRows as any[] : [];
+  const isLoadingFull = false;
+  const isFullError = false;
+  const refetchFull = () => Promise.resolve({} as any);
 
   // Body scroll lock when expanded
   useEffect(() => {
@@ -970,11 +999,20 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     setIsExpanded(prev => !prev);
   }, []);
 
+  // Shared leaderboard cache — one fetch for all tournaments
+  const { data: lbCache } = useLeaderboardCache();
+
   // Wire up top-3 podium data for completed slides
   const completedIds = safeSlides
     .filter(s => s.type === 'completed')
     .map(s => s.tournament.id);
   const { data: leadersWinnersMap } = useTournamentLeadersWinners(completedIds);
+
+  // Shared realtime channel — replaces per-slide useLeaderboardRealtime calls
+  const liveTournamentIds = safeSlides
+    .filter(s => s.type === 'live')
+    .map(s => s.tournament.id);
+  useMultiLeaderboardRealtime(liveTournamentIds);
   
   // Touch swipe state
   const touchStartRef = React.useRef<{ x: number; y: number; time: number } | null>(null);
@@ -1142,6 +1180,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
             currentIndex={currentIndex}
             onDotClick={setCurrentIndex}
             leadersWinnersMap={leadersWinnersMap}
+            liveLeaderboardRows={lbCache?.live.get(slide.tournament.id) ?? []}
             isExpanded={index === currentIndex && (slide.type === 'live' ? true : isExpanded)}
             onToggleExpand={handleToggleExpand}
             onInteraction={() => {
