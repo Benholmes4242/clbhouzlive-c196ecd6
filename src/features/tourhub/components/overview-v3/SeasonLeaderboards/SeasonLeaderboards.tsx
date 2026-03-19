@@ -6,7 +6,7 @@
  */
 
 import { useState, memo, useEffect } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Trophy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSeasonLeaderboards, CATEGORY_CONFIG as CATEGORY_DATA_CONFIG } from '@/features/tourhub/hooks/useSeasonLeaderboards';
@@ -75,8 +75,19 @@ const SeasonLeaderboardsEmpty = memo(function SeasonLeaderboardsEmpty() {
   return (
     <section>
       <div className="px-4">
-        <p className="m-0 text-muted-foreground/50" style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1.2px' }}>
-          Season
+        <p
+          className="m-0 flex items-center gap-1.5"
+          style={{
+            fontSize: '11px',
+            fontWeight: 700,
+            letterSpacing: '0.8px',
+            textTransform: 'uppercase',
+            color: 'hsl(var(--accent-amber))',
+            marginBottom: '6px',
+          }}
+        >
+          <Trophy className="w-3.5 h-3.5" />
+          2026 Season
         </p>
         <h2 className="m-0 mt-1 text-foreground" style={{ fontSize: '22px', fontWeight: 700, letterSpacing: '-0.3px' }}>
           Performance Rankings
@@ -147,7 +158,17 @@ export function SeasonLeaderboards() {
       >
         <div>
           <div className="flex items-center gap-2">
-            <p className="m-0 text-muted-foreground" style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            <p
+              className="m-0 flex items-center gap-1.5"
+              style={{
+                fontSize: '11px',
+                fontWeight: 700,
+                letterSpacing: '0.8px',
+                textTransform: 'uppercase',
+                color: 'hsl(var(--accent-amber))',
+              }}
+            >
+              <Trophy className="w-3.5 h-3.5" />
               {displayYear} Season
             </p>
             {data?.availableSeasons && (
