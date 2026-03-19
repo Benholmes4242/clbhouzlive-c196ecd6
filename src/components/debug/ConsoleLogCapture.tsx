@@ -15,6 +15,8 @@ interface LogEntry {
 let _logId = 0;
 const _subscribers = new Set<(entry: LogEntry) => void>();
 let _intercepting = false;
+const _buffer: LogEntry[] = []; // Buffer logs before any subscriber exists
+const MAX_BUFFER = 200;
 
 function startIntercepting() {
   if (_intercepting) return;
