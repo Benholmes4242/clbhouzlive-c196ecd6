@@ -355,7 +355,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
 
   // Full leaderboard from cache (top 10 for overview; full field on tournament detail page)
   const fullLeaderboard = isLive ? liveLeaderboardRows as any[] : [];
-  const isLoadingFull = isLive && liveLeaderboardRows.length === 0;
+  const isLoadingFull = isLive && lbCacheLoading;
   const isFullError = false;
   const refetchFull = () => Promise.resolve({} as any);
 
