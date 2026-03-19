@@ -230,7 +230,7 @@ export default function NewAuthPage() {
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
-                {password.length > 0 && <PasswordStrengthIndicator password={password} />}
+                {password.length > 0 && <PasswordStrengthIndicator password={password} show={password.length > 0} />}
                 <input type={showPassword ? 'text' : 'password'} placeholder="Confirm password" value={confirmPassword} onChange={e => { setConfirmPassword(e.target.value); clearErrors(); }} className={inputClass} autoComplete="new-password" />
                 {error && <p className="text-red-400 text-[13px]">{error}</p>}
                 <button onClick={handleSignUp} disabled={loading} className="w-full rounded-2xl py-3.5 text-[15px] font-semibold text-white flex items-center justify-center gap-2 transition-all active:scale-[0.98]" style={{ background: 'rgba(232,97,10,0.9)', border: '1px solid rgba(232,97,10,0.5)' }}>
