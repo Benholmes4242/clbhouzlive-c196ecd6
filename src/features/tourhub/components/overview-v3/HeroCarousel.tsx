@@ -1001,7 +1001,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   }, []);
 
   // Shared leaderboard cache — one fetch for all tournaments
-  const { data: lbCache } = useLeaderboardCache();
+  const { data: lbCache, isLoading: lbCacheLoading } = useLeaderboardCache();
 
   // Wire up top-3 podium data for completed slides
   const completedIds = safeSlides
