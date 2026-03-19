@@ -13,7 +13,7 @@
  */
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { useMediaStore } from '@/components/media-system/store/mediaStore';
+import { useMediaStoreCompat } from '@/components/media-system/store/useMediaStoreCompat';
 import { subscribeToDebugLogs, clearDebugLogs, type DebugLogEntry } from '@/media/mobileVideoDebug';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
