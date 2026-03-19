@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useCallback } from 'react';
+import { useMemo, useEffect, useCallback, lazy, Suspense } from 'react';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { createMediaStore } from '@/components/media-system/store/createMediaStore';
 import { MediaStoreProvider } from '@/components/media-system/store/MediaStoreContext';
