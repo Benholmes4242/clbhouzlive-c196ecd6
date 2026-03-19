@@ -57,7 +57,7 @@ export async function attachHlsIfNeeded(video: HTMLVideoElement, url: string) {
 
   const hls = existing ?? new HlsClass({
     autoStartLoad: true,
-    capLevelToPlayerSize: true,
+    capLevelToPlayerSize: false,
     startLevel: -1,
     backBufferLength: 30,
     lowLatencyMode: false,
