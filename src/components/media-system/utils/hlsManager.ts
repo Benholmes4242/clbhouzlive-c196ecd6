@@ -56,7 +56,7 @@ export function getHlsInstance(video: HTMLVideoElement): InstanceType<typeof Hls
 
 /** Build HLS config with cached loader if available. */
 function getHlsConfig(): Record<string, unknown> {
-  const config = {
+  const config: Record<string, unknown> = {
     ...HLS_CONFIG,
     abrEwmaDefaultEstimate: getSharedBandwidth() > 0 ? getSharedBandwidth() : 8_000_000,
   };
