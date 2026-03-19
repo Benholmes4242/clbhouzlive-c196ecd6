@@ -20,6 +20,7 @@ interface FullscreenFeedState {
   }) => void;
   appendPosts: (newPosts: FeedPost[]) => void;
   close: () => void;
+  reset: () => void;
 }
 
 export const useFullscreenFeed = create<FullscreenFeedState>((set) => ({
