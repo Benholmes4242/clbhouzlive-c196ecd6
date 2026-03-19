@@ -54,6 +54,11 @@ export function ConsoleLogCapture() {
       logsRef.current = [entry, ...logsRef.current].slice(0, 200);
       setLogs([...logsRef.current]);
     };
+    // Replay any logs that fired before this component subscribed
+    _buffer.forEach(entry => {
+      logsRef.current = [entry, ...logsRef.current].slice(0, 200);
+    });
+    setLogs([...logsRef.current]);
     _subscribers.add(handler);
     return () => { _subscribers.delete(handler); };
   }, []);
