@@ -696,7 +696,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           registerHlsForDebug(cloudflareUid || uniqueMediaId, null, video);
           return;
         }
-        console.log('[UVP DEBUG] Taking HLS.JS path for:', hlsUrl?.slice(-30));
+        // HLS.js playback — Hls is already loaded above
 
         // HLS.js playback — Hls is already loaded above
         try {
