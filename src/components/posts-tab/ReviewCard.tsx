@@ -19,20 +19,8 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
   const [expanded, setExpanded] = useState(false);
   const review = post.review;
   const tileRef = useRef<HTMLDivElement>(null);
-  if (!review) return null;
+  const hlsUrl = post.mediaItems[0]?.hlsUrl;
 
-  const userMedia = post.mediaItems[0];
-  const thumbnailUrl = userMedia?.thumbnailUrl || userMedia?.imageUrl || review.courseImageUrl;
-  const isVideo = userMedia?.type === 'video';
-  const duration = userMedia?.duration;
-  const hlsUrl = userMedia?.hlsUrl;
-  const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
-  const location = [review.courseRegion, review.courseCountry].filter(Boolean).join(', ');
-
-  // Unified amber accent for all rating tiers
-  const accentColor = '#f59e0b';
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     const el = tileRef.current;
     if (!el) return;
@@ -47,6 +35,18 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
     observer.observe(el);
     return () => observer.disconnect();
   }, [hlsUrl]);
+
+  if (!review) return null;
+
+  const userMedia = post.mediaItems[0];
+  const thumbnailUrl = userMedia?.thumbnailUrl || userMedia?.imageUrl || review.courseImageUrl;
+  const isVideo = userMedia?.type === 'video';
+  const duration = userMedia?.duration;
+  const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
+  const location = [review.courseRegion, review.courseCountry].filter(Boolean).join(', ');
+
+  // Unified amber accent for all rating tiers
+  const accentColor = '#f59e0b';
 
   return (
     <div
