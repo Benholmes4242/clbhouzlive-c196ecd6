@@ -5,6 +5,7 @@
  * for instant promotion — no cold attachMedia needed.
  */
 import { preCreateHlsInstance } from '@/components/media-system/utils/hlsManager';
+import { devLog } from '@/components/debug/ConsoleLogCapture';
 
 let _lastPreloadedUrl = '';
 
@@ -24,6 +25,6 @@ export function recordPlayStart(hlsUrl: string): void {
   if (entry && !entry.playStart) {
     entry.playStart = performance.now();
     const tapToPlay = Math.round(entry.playStart - entry.touchStart);
-    console.log(`[TapToPlay] ${tapToPlay}ms from touch to first frame — ${hlsUrl.slice(-30)}`);
+    devLog(`[TapToPlay] ${tapToPlay}ms from touch to first frame — ${hlsUrl.slice(-30)}`);
   }
 }

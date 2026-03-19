@@ -1,46 +1,40 @@
 /**
- * ConsoleLogCapture — intercepts console.log/warn/error and displays them
- * in a copyable in-app panel. No Mac/desktop needed for debugging.
- * Toggle via floating button. Auto-captures from mount.
+ * ConsoleLogCapture — direct instrumentation log store.
+ * Any module can import devLog/devWarn/devError to write directly
+ * to the in-memory buffer. No console interception needed.
+ * Works in all environments including WKWebView native bridges.
  */
 import { useEffect, useState, useRef } from 'react';
 
 interface LogEntry {
   id: number;
-  level: 'log' | 'warn' | 'error';
+  level: 'log' | 'warn' | 'error' | 'info';
   message: string;
   time: string;
 }
 
 let _logId = 0;
-const _subscribers = new Set<(entry: LogEntry) => void>();
-let _intercepting = false;
-const _buffer: LogEntry[] = []; // Buffer logs before any subscriber exists
-const MAX_BUFFER = 200;
+const _buffer: LogEntry[] = [];
+const _subscribers = new Set<(logs: LogEntry[]) => void>();
+const MAX_BUFFER = 300;
 
-function startIntercepting() {
-  if (_intercepting) return;
-  _intercepting = true;
-  const orig = { log: console.log, warn: console.warn, error: console.error };
-  (['log', 'warn', 'error'] as const).forEach((level) => {
-    (console as any)[level] = (...args: any[]) => {
-      orig[level](...args);
-      const message = args.map(a => {
-        try { return typeof a === 'object' ? JSON.stringify(a) : String(a); }
-        catch { return String(a); }
-      }).join(' ');
-      const now = new Date();
-      const time = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}.${now.getMilliseconds().toString().padStart(3,'0')}`;
-      const entry: LogEntry = { id: _logId++, level, message, time };
-      _buffer.push(entry);
-      if (_buffer.length > MAX_BUFFER) _buffer.shift();
-      _subscribers.forEach(fn => fn(entry));
-    };
-  });
+export function captureLog(level: LogEntry['level'], ...args: any[]): void {
+  const message = args.map(a => {
+    try { return typeof a === 'object' ? JSON.stringify(a) : String(a); }
+    catch { return String(a); }
+  }).join(' ');
+  const now = new Date();
+  const time = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}.${now.getMilliseconds().toString().padStart(3,'0')}`;
+  const entry: LogEntry = { id: _logId++, level, message, time };
+  _buffer.push(entry);
+  if (_buffer.length > MAX_BUFFER) _buffer.shift();
+  _subscribers.forEach(fn => fn([..._buffer]));
 }
 
-// Start intercepting immediately on module load
-startIntercepting();
+// Convenience exports for direct instrumentation
+export const devLog = (...args: any[]) => captureLog('log', ...args);
+export const devWarn = (...args: any[]) => captureLog('warn', ...args);
+export const devError = (...args: any[]) => captureLog('error', ...args);
 
 export function ConsoleLogCapture() {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,15 +44,15 @@ export function ConsoleLogCapture() {
   const logsRef = useRef<LogEntry[]>([]);
 
   useEffect(() => {
-    const handler = (entry: LogEntry) => {
-      logsRef.current = [entry, ...logsRef.current].slice(0, 200);
+    const handler = (allLogs: LogEntry[]) => {
+      logsRef.current = [...allLogs].reverse().slice(0, 300);
       setLogs([...logsRef.current]);
     };
     // Replay any logs that fired before this component subscribed
-    _buffer.forEach(entry => {
-      logsRef.current = [entry, ...logsRef.current].slice(0, 200);
-    });
-    setLogs([...logsRef.current]);
+    if (_buffer.length > 0) {
+      logsRef.current = [..._buffer].reverse().slice(0, 300);
+      setLogs([...logsRef.current]);
+    }
     _subscribers.add(handler);
     return () => { _subscribers.delete(handler); };
   }, []);
