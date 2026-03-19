@@ -364,6 +364,23 @@ export function promotePreCreated(
   }
 
   hls.attachMedia(video);
+  // Reset to ABR auto-selection — pre-creation forces currentLevel=0 for fast
+  // buffering, but we must re-enable ABR when promoting to actual playback.
+  // Without this, every promoted video stays locked at 360p permanently.
+  hls.currentLevel = -1;
+
+  const HlsClass = HlsConstructor;
+  if (HlsClass) {
+    hls.on((HlsClass as any).Events.LEVEL_SWITCHED, (_: unknown, data: any) => {
+      const level = hls.levels[data.level];
+      if (level?.bitrate > 0) saveSharedBandwidth(level.bitrate);
+    });
+    hls.on((HlsClass as any).Events.FRAG_LOADED, (_: unknown, data: any) => {
+      const bw = data.frag?.stats?.bwEstimate;
+      if (bw && bw > 0) saveSharedBandwidth(bw);
+    });
+  }
+
   return hls;
 }
 

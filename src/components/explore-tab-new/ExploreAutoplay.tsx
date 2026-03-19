@@ -126,7 +126,7 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
       if (activeMapRef.current.get(slot) !== tileIdx) return;
 
       const hls = new Hls({
-        startLevel: 0,
+        startLevel: -1,
         maxBufferLength: 8,
         maxMaxBufferLength: 16,
         enableWorker: true,

@@ -104,7 +104,7 @@ export const CourseMediaAutoplay: React.FC<CourseMediaAutoplayProps> = ({ posts,
     }
 
     const hls = new Hls({
-      startLevel: 0,
+      startLevel: -1,
       maxBufferLength: 8,
       maxMaxBufferLength: 16,
       enableWorker: true,
