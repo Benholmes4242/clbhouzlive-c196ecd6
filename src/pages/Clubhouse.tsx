@@ -640,6 +640,9 @@ const ClubhouseContent = () => {
         />
       )}
 
+      {/* Full HLS diagnostics panel — toggled via Test tab */}
+      <ClubhouseVideoDebugPanel />
+
       {/* Feed Video Debug — reads directly from mediaStore */}
       <FeedVideoDebugOverlay />
     </PageRoot>

@@ -119,7 +119,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const handleTabClickWithCamera = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     if (tab.isAction && tab.id === 'post') {
       openPostStudio();
-    } else if (tab.isAction && tab.id === 'debug') {
+    } else if ((tab as any).isDebug && tab.id === 'debug') {
       const current = localStorage.getItem('CLBHOUZ_VIDEO_DEBUG') === 'true';
       localStorage.setItem('CLBHOUZ_VIDEO_DEBUG', current ? 'false' : 'true');
       window.dispatchEvent(new CustomEvent('clbhouz-debug-toggle'));
