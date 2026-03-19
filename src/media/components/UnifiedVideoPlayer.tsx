@@ -681,7 +681,13 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         if (canPlayNatively || !isHlsUrl) {
           // Native playback - CachedHlsLoader NOT used (Safari/iOS uses native HLS)
           // No additional guard needed - currentSrcRef check above prevents spam
-          video.src = hlsUrl;
+          // Append defaultQuality=720 to Cloudflare Stream manifests so native HLS
+          // starts at 720p instead of the lowest rendition
+          const nativeSrc = hlsUrl.includes('.m3u8') && hlsUrl.includes('cloudflarestream.com')
+            ? `${hlsUrl}${hlsUrl.includes('?') ? '&' : '?'}defaultQuality=720`
+            : hlsUrl;
+          console.log('[UnifiedVideoPlayer] Native HLS path — manifest URL:', nativeSrc);
+          video.src = nativeSrc;
           video.load();
           
           if (startTime && startTime > 0) {
