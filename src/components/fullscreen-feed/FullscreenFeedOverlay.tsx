@@ -16,10 +16,14 @@ export function FullscreenFeedOverlay() {
   const isClubhouse = pathname === '/' || pathname === '/clubhouse';
 
   if (isClubhouse) return null;
+
+  // Never unmount when posts exist — keeps pool and pre-created instances alive
+  // Only hide visually when closed
   if (posts.length === 0) return null;
 
   return createPortal(
     <div
+      aria-hidden={!isOpen}
       className="fixed inset-0 z-[9999] bg-black"
       style={{
         isolation: 'isolate',

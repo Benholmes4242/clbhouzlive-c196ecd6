@@ -20,6 +20,7 @@ interface FullscreenFeedState {
   }) => void;
   appendPosts: (newPosts: FeedPost[]) => void;
   close: () => void;
+  reset: () => void;
 }
 
 export const useFullscreenFeed = create<FullscreenFeedState>((set) => ({
@@ -43,7 +44,8 @@ export const useFullscreenFeed = create<FullscreenFeedState>((set) => ({
     }),
   appendPosts: (newPosts) =>
     set((state) => ({ posts: [...state.posts, ...newPosts] })),
-  close: () =>
+  close: () => set({ isOpen: false }),
+  reset: () =>
     set({
       isOpen: false,
       posts: [],
