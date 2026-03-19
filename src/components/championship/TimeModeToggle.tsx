@@ -25,25 +25,38 @@ export const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
 
   return (
     <div className="w-full px-1">
-      <div className="flex gap-2 justify-center">
+      <div className="flex gap-4 justify-center" style={{ borderBottom: '1px solid hsl(var(--border))' }}>
         {options.map((option) => {
           const isActive = value === option.id;
           return (
             <button
               key={option.id}
               onClick={() => onChange(option.id)}
-              className={cn(
-                'px-5 py-1.5 text-[14px] font-medium transition-all duration-200 active:scale-[0.97]',
-                isActive
-                  ? 'text-white font-semibold'
-                  : 'text-muted-foreground'
-              )}
+              className="relative px-4 py-2 transition-all duration-200 active:scale-[0.97] whitespace-nowrap"
               style={{
-                borderRadius: 20,
-                backgroundColor: isActive ? '#475569' : 'transparent',
+                fontSize: 16,
+                fontWeight: isActive ? 700 : 500,
+                letterSpacing: isActive ? '-0.025em' : '0',
+                color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
+                background: 'transparent',
+                border: 'none',
+                minHeight: 44,
               }}
             >
               {option.label}
+              {isActive && (
+                <span
+                  style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: 2.5,
+                    borderRadius: 2,
+                    background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
+                  }}
+                />
+              )}
             </button>
           );
         })}

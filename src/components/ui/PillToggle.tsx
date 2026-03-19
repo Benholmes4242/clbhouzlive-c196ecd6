@@ -27,40 +27,43 @@ export const PillToggle: React.FC<PillToggleProps> = ({
   onSelect,
   size = 'default',
   className,
+  activeColor,
   variant = 'default',
 }) => {
-  const h = size === 'small' ? '30px' : '36px';
-  const px = size === 'small' ? '11px' : '14px';
-  const fs = size === 'small' ? 12 : 13;
-
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <div className={cn('flex items-center gap-4', className)} style={{ borderBottom: '1px solid hsl(var(--border))' }}>
       {options.map((option) => {
         const isActive = selected === option.id;
-        const activeBg = variant === 'filter'
-          ? 'linear-gradient(90deg, #F59E0B, #F7931E)'
-          : 'hsl(var(--foreground))';
         return (
           <button
             key={option.id}
             onClick={() => onSelect(option.id)}
+            className="relative px-4 py-2 transition-all duration-200 active:scale-[0.97] whitespace-nowrap"
             style={{
-              height: h,
-              paddingLeft: px,
-              paddingRight: px,
-              borderRadius: 8,
-              fontSize: fs,
-              fontWeight: 600,
+              fontSize: 16,
+              fontWeight: isActive ? 700 : 500,
+              letterSpacing: isActive ? '-0.025em' : '0',
+              color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
+              background: 'transparent',
+              border: 'none',
+              minHeight: 44,
               cursor: 'pointer',
-              whiteSpace: 'nowrap' as const,
-              transition: 'all 0.18s ease',
-              background: isActive ? activeBg : 'transparent',
-              color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
-              border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
-              boxShadow: isActive && variant === 'filter' ? '0 2px 8px rgba(247,147,30,0.22)' : 'none',
             }}
           >
             {option.label}
+            {isActive && (
+              <span
+                style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 2.5,
+                  borderRadius: 2,
+                  background: activeColor || 'linear-gradient(90deg, #F59E0B, #F7931E)',
+                }}
+              />
+            )}
           </button>
         );
       })}
