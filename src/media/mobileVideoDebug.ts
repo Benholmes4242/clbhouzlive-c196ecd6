@@ -9,7 +9,7 @@
 
 // ENABLE THIS FOR DEBUGGING - set to false for production
 // Controlled by CLUBHOUSE_DEBUG flag in config/flags.ts for unified control
-export const MOBILE_VIDEO_DEBUG = false;
+export const MOBILE_VIDEO_DEBUG = true;
 
 // ============ In-Memory Log Store for On-Screen Debug Panel ============
 
