@@ -89,6 +89,7 @@ function bufferColor(pct: number): string {
 export function FeedVideoDebugOverlay() {
   const [isOpen, setIsOpen]         = useState(false);
   const [activeTab, setActiveTab]   = useState<Tab>('live');
+  const [copyState, setCopyState]   = useState<'idle' | 'copied' | 'failed'>('idle');
   const activeVideoElement          = useMediaStore(s => s.activeVideoElement);
   const activeIndex                 = useMediaStore(s => s.activeIndex);
   const isMuted                     = useMediaStore(s => s.isMuted);
@@ -103,6 +104,7 @@ export function FeedVideoDebugOverlay() {
   const firstFrameRef    = useRef(false);
   const stallStartRef    = useRef<number | null>(null);
   const currentIdxRef    = useRef(-1);
+  const copyTimerRef     = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Enable MOBILE_VIDEO_DEBUG in localStorage when panel opens
   const handleOpen = useCallback(() => {
