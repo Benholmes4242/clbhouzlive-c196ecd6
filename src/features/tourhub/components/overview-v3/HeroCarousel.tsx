@@ -1002,16 +1002,60 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   // Shared leaderboard cache — one fetch for all tournaments
   const { data: lbCache, isLoading: lbCacheLoading } = useLeaderboardCache();
 
-  // Wire up top-3 podium data for completed slides
-  const completedIds = safeSlides
-    .filter(s => s.type === 'completed')
-    .map(s => s.tournament.id);
-  const { data: leadersWinnersMap } = useTournamentLeadersWinners(completedIds);
+  const completedIds = useMemo(
+    () => safeSlides.filter(s => s.type === 'completed').map(s => s.tournament.id),
+    [safeSlides]
+  );
+
+  const leadersWinnersMap = useMemo<Map<string, import('../../hooks/useTournamentLeadersWinners').TournamentLeaderWinner>>(() => {
+    if (!lbCache?.completed || completedIds.length === 0) return new Map();
+
+    const result = new Map<string, import('../../hooks/useTournamentLeadersWinners').TournamentLeaderWinner>();
+
+    for (const tid of completedIds) {
+      const rows = lbCache.completed.get(tid) ?? [];
+      const sorted = [...rows].sort((a, b) => a.position - b.position);
+      const leader = sorted[0];
+      if (!leader) continue;
+
+      const makeFinisher = (row: (typeof sorted)[number]) => ({
+        playerId: row.player_id ?? null,
+        firstName: row.player?.first_name ?? '',
+        lastName: row.player?.last_name ?? '',
+        fullName: row.player?.full_name ?? '',
+        headshotOverride: row.player?.headshot_override ?? null,
+        score: row.score,
+        money: row.money ?? null,
+        position: row.position,
+        photoUrl: row.player?.photo_url ?? null,
+        pgaTourId: row.player?.pga_tour_id ?? null,
+        tourCode: row.player?.tour_codes?.[0] ?? null,
+        displayName: row.player?.first_name ? `${row.player.first_name[0]}. ${row.player.last_name}` : '',
+        displayScore: row.score === 0 ? 'E' : row.score && row.score > 0 ? `+${row.score}` : `${row.score ?? ''}`,
+        round1: row.round_1 ?? null,
+        round2: row.round_2 ?? null,
+        round3: row.round_3 ?? null,
+        round4: row.round_4 ?? null,
+        thru: row.thru ?? null,
+      });
+
+      const finishers = sorted.map(makeFinisher);
+      result.set(tid, {
+        ...makeFinisher(leader),
+        topFinishers: finishers.slice(0, 3),
+        allFetched: finishers,
+      });
+    }
+
+    return result;
+  }, [lbCache?.completed, completedIds]);
+
+  const liveTournamentIds = useMemo(
+    () => safeSlides.filter(s => s.type === 'live').map(s => s.tournament.id),
+    [safeSlides]
+  );
 
   // Shared realtime channel — replaces per-slide useLeaderboardRealtime calls
-  const liveTournamentIds = safeSlides
-    .filter(s => s.type === 'live')
-    .map(s => s.tournament.id);
   useMultiLeaderboardRealtime(liveTournamentIds);
   
   // Touch swipe state
