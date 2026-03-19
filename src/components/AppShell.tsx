@@ -1,8 +1,6 @@
 import React, { PropsWithChildren, useEffect } from "react";
 import { warmHlsJs } from "@/hooks/useHlsUrlCache";
 import { initMobileVideoDebug } from "@/media/mobileVideoDebug";
-import FeedVideoDebugOverlay from "@/components/debug/FeedVideoDebugOverlay";
-import ConsoleLogCapture from "@/components/debug/ConsoleLogCapture";
 import { runBandwidthProbe } from "@/components/media-system/utils/bandwidthProbe";
 
 /**
