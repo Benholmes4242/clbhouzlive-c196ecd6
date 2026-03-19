@@ -86,7 +86,7 @@ export function useVideoPreloader(
           maxMaxBufferLength: 10,                 // Cap preload buffer
           backBufferLength: 2,
           lowLatencyMode: false,
-          abrEwmaDefaultEstimate: 5_000_000,      // 5 Mbps — matches player config
+          abrEwmaDefaultEstimate: getSharedBandwidth() > 0 ? getSharedBandwidth() : 1_000_000,
           abrBandWidthFactor: 0.95,
           abrBandWidthUpFactor: 0.5,
           highBufferWatchdogPeriod: 1,
