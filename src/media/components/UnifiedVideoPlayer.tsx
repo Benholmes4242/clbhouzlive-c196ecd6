@@ -872,7 +872,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         } catch (err) {
           // Fall back to native — apply 720p quality hint for Cloudflare Stream
           const catchSrc = hlsUrl.includes('.m3u8') && hlsUrl.includes('cloudflarestream.com')
-            ? `${hlsUrl}${hlsUrl.includes('?') ? '&' : '?'}defaultQuality=720`
+            ? `${hlsUrl}${hlsUrl.includes('?') ? '&' : '?'}clientBandwidthHint=4.5`
             : hlsUrl;
           console.log('[UnifiedVideoPlayer] Catch fallback — manifest URL:', catchSrc);
           video.src = catchSrc;
