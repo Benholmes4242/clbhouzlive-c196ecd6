@@ -40,7 +40,7 @@ export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: Cou
                 border: 'none',
                 cursor: 'pointer',
                 padding: '11px 2px 9px',
-                fontSize: 15,
+                fontSize: 16,
                 fontWeight: isActive ? 700 : 500,
                 color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
                 letterSpacing: isActive ? '-0.025em' : '0',

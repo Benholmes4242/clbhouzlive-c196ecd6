@@ -71,11 +71,13 @@ const StickyTabNavigation: React.FC<StickyTabNavigationProps> = ({
                   key={tab.id}
                   ref={(el) => tabsRef.current[index] = el}
                   onClick={() => onTabChange(tab.id)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-sq-sm font-medium transition-all duration-300 ${
-                    isActive
-                      ? 'text-primary bg-primary/10'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                  } ${isMobile ? 'text-base' : 'text-lg'}`}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-sq-sm transition-all duration-300"
+                  style={{
+                    fontSize: 16,
+                    fontWeight: isActive ? 700 : 500,
+                    color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
+                    letterSpacing: isActive ? '-0.025em' : '0',
+                  }}
                 >
                   <Icon className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
                   {!isMobile && <span>{tab.label}</span>}
