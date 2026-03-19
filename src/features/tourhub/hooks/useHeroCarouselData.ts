@@ -72,7 +72,7 @@ export function useHeroCarouselData() {
   const { data: lbCache } = useLeaderboardCache();
 
   return useQuery({
-    queryKey: ['hero-carousel-data', cache ? 'ready' : 'waiting'],
+    queryKey: ['hero-carousel-data', cache ? 'ready' : 'waiting', lbCache ? 'lb-ready' : 'lb-waiting'],
     queryFn: async (): Promise<HeroSlide[]> => {
       if (!cache) return [];
 

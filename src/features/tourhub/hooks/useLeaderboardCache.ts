@@ -102,7 +102,7 @@ export function useLeaderboardCache() {
           ? supabase
               .from('sr_leaderboards')
               .select(`
-                tournament_id, position, score, strokes, thru, status,
+                id, tournament_id, position, score, strokes, thru, status,
                 updated_at, thru_updated_at,
                 round_1, round_2, round_3, round_4,
                 player:sr_players!inner(

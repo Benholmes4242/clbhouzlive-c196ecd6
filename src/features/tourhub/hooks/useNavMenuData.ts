@@ -52,7 +52,7 @@ export function useLiveLeaderTeaser() {
   const { data: lbCache } = useLeaderboardCache();
 
   return useQuery({
-    queryKey: ['live-leader-teaser'],
+    queryKey: ['live-leader-teaser', lbCache ? 'lb-ready' : 'lb-waiting'],
     queryFn: async () => {
       // Fetch ALL live tournaments with enough data to prioritise
       const { data: liveTournaments } = await supabase

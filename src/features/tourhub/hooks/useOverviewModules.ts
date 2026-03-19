@@ -136,7 +136,7 @@ export function useLiveRightNow() {
   const { data: lbCache } = useLeaderboardCache();
 
   return useQuery({
-    queryKey: ['overview-live-right-now', cache ? 'ready' : 'waiting'],
+    queryKey: ['overview-live-right-now', cache ? 'ready' : 'waiting', lbCache ? 'lb-ready' : 'lb-waiting'],
     queryFn: async () => {
       if (!cache?.live.length) return [];
 
