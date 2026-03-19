@@ -11,7 +11,6 @@ export * from './useCollegeCompare';
 export * from './useLiveTournamentSync';
 export * from './useLeaderboardRealtime';
 export * from './useTournamentStatusRealtime';
-export * from './useLeaderboardCache';
 export { useUpcomingEvents, useLiveEvents } from './useTourEvents';
 
 // Gamification Hooks - Power Ladder, Skill Trees, Live Arena, Predictions

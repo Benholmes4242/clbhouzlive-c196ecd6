@@ -27,9 +27,8 @@ export function useTournamentStatusRealtime() {
             queryClient.invalidateQueries({ queryKey: ['tournament-top-leaders'] });
             queryClient.invalidateQueries({ queryKey: ['tourhub'] });
             queryClient.invalidateQueries({ queryKey: ['prediction-tracker'] });
-            queryClient.invalidateQueries({ queryKey: ['tourhub', 'tournament-leaders-winners-v2'] });
-            queryClient.invalidateQueries({ queryKey: ['leaderboard-cache'] });
-            
+            queryClient.invalidateQueries({ queryKey: ['tournament-leaders-winners'] });
+            queryClient.invalidateQueries({ queryKey: ['live-arena'] });
             queryClient.invalidateQueries({ queryKey: ['hero-carousel-data'] });
             queryClient.invalidateQueries({ queryKey: ['live-tournaments'] });
             queryClient.invalidateQueries({ queryKey: ['overview-live-tournaments'] });
