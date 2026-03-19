@@ -313,9 +313,26 @@ export function VideoPlayer({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full"
+      className="relative w-full h-full bg-black overflow-hidden flex items-center justify-center"
       onClick={handleTap}
     >
+      {/* Blurred backdrop for landscape videos */}
+      {isLandscape && thumbnailUrl && (
+        <img
+          src={thumbnailUrl}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{
+            objectFit: 'cover',
+            filter: 'blur(28px) brightness(0.45) saturate(1.4)',
+            WebkitFilter: 'blur(28px) brightness(0.45) saturate(1.4)',
+            transform: 'scale(1.12)',
+            zIndex: 0,
+          }}
+        />
+      )}
       <LoadingSkeleton visible={isLoading && !hasError} posterUrl={thumbnailUrl} />
 
       {hasError && <ErrorState onRetry={handleRetry} canRetry={canRetry} />}
