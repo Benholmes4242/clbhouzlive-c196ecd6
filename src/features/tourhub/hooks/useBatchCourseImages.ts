@@ -6,6 +6,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { TourTournament } from './useTourHubData';
+import innisbrookCopperhead from '@/assets/courses/innisbrook-copperhead.jpeg';
+
+/**
+ * Static venue image overrides for courses not yet in the database.
+ */
+const VENUE_IMAGE_OVERRIDES: Record<string, string> = {
+  'Innisbrook Resort - Copperhead': innisbrookCopperhead,
+};
 
 export interface BatchImageMap {
   /** Maps venue_name → thumbnail_image URL */
@@ -34,11 +42,21 @@ export function useBatchCourseImages(tournaments: TourTournament[] | undefined) 
 
       const result = new Map<string, string | null>();
 
+      // Apply static overrides first
+      for (const name of venueNames) {
+        if (VENUE_IMAGE_OVERRIDES[name]) {
+          result.set(name, VENUE_IMAGE_OVERRIDES[name]);
+        }
+      }
+
+      const uncachedNames = venueNames.filter(n => !result.has(n));
+      if (uncachedNames.length === 0) return result;
+
       // Step 1: Check sr_course_map cache (bulk lookup)
       const { data: cached, error } = await supabase
         .from('sr_course_map')
         .select('sr_venue_name, golf_courses:golf_course_id(thumbnail_image)')
-        .in('sr_venue_name', venueNames);
+        .in('sr_venue_name', uncachedNames);
 
       if (!error && cached) {
         for (const row of cached as any[]) {
