@@ -31,39 +31,22 @@ export const PillToggle: React.FC<PillToggleProps> = ({
   variant = 'default',
 }) => {
   return (
-    <div className={cn('flex items-center gap-4', className)} style={{ borderBottom: '1px solid hsl(var(--border))' }}>
+    <div className={cn('flex items-center gap-2', className)}>
       {options.map((option) => {
         const isActive = selected === option.id;
         return (
           <button
             key={option.id}
             onClick={() => onSelect(option.id)}
-            className="relative px-4 py-2 transition-all duration-200 active:scale-[0.97] whitespace-nowrap"
+            className="shrink-0 min-h-[36px] px-4 text-sm font-semibold transition-colors flex items-center active:scale-[0.97]"
             style={{
-              fontSize: 16,
-              fontWeight: isActive ? 700 : 500,
-              letterSpacing: isActive ? '-0.025em' : '0',
-              color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
-              background: 'transparent',
-              border: 'none',
-              minHeight: 44,
-              cursor: 'pointer',
+              borderRadius: 8,
+              background: isActive ? 'hsl(var(--foreground))' : 'transparent',
+              color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
+              border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
             }}
           >
             {option.label}
-            {isActive && (
-              <span
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: 2.5,
-                  borderRadius: 2,
-                  background: activeColor || 'linear-gradient(90deg, #F59E0B, #F7931E)',
-                }}
-              />
-            )}
           </button>
         );
       })}
