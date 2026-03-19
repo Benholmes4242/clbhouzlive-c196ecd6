@@ -42,16 +42,18 @@ const Top100LeaderboardPanel = () => {
       <Tabs value={view} onValueChange={handleViewChange} className="w-full">
         <div
           className="sticky top-0 z-10 bg-background pb-2 pt-1 px-3"
-          style={{ borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
         >
           <TabsList className="bg-transparent border-0 px-0 py-0 gap-2 w-full flex justify-center">
             {tabs.map((tab) => (
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}
-                className="min-h-[36px] px-4 rounded-full text-sm font-semibold transition-all active:scale-[0.97] border-0 shadow-none
-                  data-[state=active]:text-white data-[state=active]:shadow-none data-[state=active]:bg-[hsl(var(--tab-sub-active))]
-                  data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground"
+                className="min-h-[36px] px-4 text-sm font-semibold transition-all active:scale-[0.97] shadow-none border-0
+                  data-[state=active]:text-white data-[state=active]:shadow-none
+                  data-[state=inactive]:text-muted-foreground data-[state=inactive]:bg-transparent"
+                style={{
+                  borderRadius: 8,
+                }}
               >
                 {tab.label}
               </TabsTrigger>
