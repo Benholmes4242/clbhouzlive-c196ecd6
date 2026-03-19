@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { Play, Star, Heart, MoreHorizontal } from 'lucide-react';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
-import { preTouchPreload } from '@/components/media-system/utils/preTouchPreload';
+import { preTouchPreload, onViewPreload } from '@/components/media-system/utils/preTouchPreload';
 import { formatDuration, formatCompact } from './utils';
 
 interface CompactGridRowProps {
@@ -27,9 +27,27 @@ const CompactTile: React.FC<{
   const thumbnailUrl = firstMedia?.thumbnailUrl || firstMedia?.imageUrl;
   const duration = firstMedia?.duration;
   const hasReview = post.isReview && post.review;
+  const hlsUrl = firstMedia?.hlsUrl;
+  const tileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = tileRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          onViewPreload(hlsUrl);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hlsUrl]);
 
   return (
     <div
+      ref={tileRef}
       className="relative aspect-[4/5] rounded-[4px] overflow-hidden bg-muted cursor-pointer"
       data-posts-tile-index={globalIndex}
       data-hls-url={firstMedia?.hlsUrl || ''}

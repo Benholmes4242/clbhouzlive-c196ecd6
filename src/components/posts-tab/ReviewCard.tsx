@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { Star, Play, Heart, MessageCircle, MoreHorizontal } from 'lucide-react';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
-import { preTouchPreload } from '@/components/media-system/utils/preTouchPreload';
+import { preTouchPreload, onViewPreload } from '@/components/media-system/utils/preTouchPreload';
 import { formatDistanceToNow } from 'date-fns';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatCompact } from './utils';
@@ -18,6 +18,24 @@ interface ReviewCardProps {
 export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postIndex, isOwnPost, onDelete }) => {
   const [expanded, setExpanded] = useState(false);
   const review = post.review;
+  const tileRef = useRef<HTMLDivElement>(null);
+  const hlsUrl = post.mediaItems[0]?.hlsUrl;
+
+  useEffect(() => {
+    const el = tileRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          onViewPreload(hlsUrl);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hlsUrl]);
+
   if (!review) return null;
 
   const userMedia = post.mediaItems[0];
@@ -32,6 +50,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
 
   return (
     <div
+      ref={tileRef}
       className="bg-card overflow-hidden cursor-pointer active:scale-[0.99] transition-transform"
       onTouchStart={() => preTouchPreload(userMedia?.hlsUrl)}
       onClick={() => {

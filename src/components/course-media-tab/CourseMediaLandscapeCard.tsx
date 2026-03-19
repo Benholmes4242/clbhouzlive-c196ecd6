@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
-import { preTouchPreload } from '@/components/media-system/utils/preTouchPreload';
+import { preTouchPreload, onViewPreload } from '@/components/media-system/utils/preTouchPreload';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
@@ -26,9 +26,27 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
   const isVideo = media?.type === 'video';
   const thumbnailUrl = isVideo ? media?.thumbnailUrl : (media?.imageUrl || media?.thumbnailUrl);
   const duration = media?.duration;
+  const hlsUrl = media?.hlsUrl;
+  const tileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = tileRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          onViewPreload(hlsUrl);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hlsUrl]);
 
   return (
     <div
+      ref={tileRef}
       style={{ gridColumn: '1 / -1' }}
       className="relative aspect-video overflow-hidden cursor-pointer rounded-[4px] active:scale-[0.99] transition-transform"
       onTouchStart={() => preTouchPreload(media?.hlsUrl)}

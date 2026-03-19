@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { Play, Heart, MessageCircle, Share2, MoreHorizontal } from 'lucide-react';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
-import { preTouchPreload } from '@/components/media-system/utils/preTouchPreload';
+import { preTouchPreload, onViewPreload } from '@/components/media-system/utils/preTouchPreload';
 import { formatDistanceToNow } from 'date-fns';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatCompact, formatDuration } from './utils';
@@ -20,10 +20,28 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
   const firstMedia = post.mediaItems[0];
   const thumbnailUrl = firstMedia?.thumbnailUrl || firstMedia?.imageUrl;
   const duration = firstMedia?.duration;
+  const hlsUrl = firstMedia?.hlsUrl;
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
+  const tileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = tileRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          onViewPreload(hlsUrl);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hlsUrl]);
 
   return (
     <div
+      ref={tileRef}
       className="bg-card overflow-hidden border-b border-border/50 cursor-pointer active:scale-[0.99] transition-transform"
       onTouchStart={() => preTouchPreload(firstMedia?.hlsUrl)}
       onClick={() => {

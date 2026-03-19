@@ -1,10 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, MessageCircle, Share2, MapPin } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
-import { preTouchPreload } from '@/components/media-system/utils/preTouchPreload';
+import { preTouchPreload, onViewPreload } from '@/components/media-system/utils/preTouchPreload';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import CommentsSheet from '@/components/comments/CommentsSheet';
@@ -44,6 +44,22 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
   const firstVideo = post.mediaItems.find(m => m.type === 'video');
   const thumbnailUrl = firstVideo?.thumbnailUrl || '';
   const hlsUrl = firstVideo?.hlsUrl || '';
+  const tileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = tileRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          onViewPreload(hlsUrl);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hlsUrl]);
   const duration = firstVideo?.duration || 0;
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
 
@@ -117,7 +133,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
 
   return (
     <>
-      <article className="bg-card overflow-hidden border-b border-border/50">
+      <article ref={tileRef} className="bg-card overflow-hidden border-b border-border/50">
         {/* Creator header */}
         <div className="flex items-center gap-3 px-3 pt-3 pb-2">
           <button

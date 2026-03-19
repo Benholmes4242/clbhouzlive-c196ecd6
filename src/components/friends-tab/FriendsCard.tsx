@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, MessageCircle, Share2, MapPin, Star } from 'lucide-react';
@@ -10,7 +10,7 @@ import CommentsSheet from '@/components/comments/CommentsSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { FriendsCardMenu } from './FriendsCardMenu';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
-import { preTouchPreload } from '@/components/media-system/utils/preTouchPreload';
+import { preTouchPreload, onViewPreload } from '@/components/media-system/utils/preTouchPreload';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
 
 interface FriendsCardProps {
@@ -53,8 +53,25 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
   const isVideo = firstMedia?.type === 'video';
   const thumbnailUrl = firstMedia?.thumbnailUrl || firstMedia?.imageUrl || '';
   const duration = firstMedia?.duration || 0;
+  const hlsUrl = firstMedia?.hlsUrl;
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
   const aspectClass = getMediaAspectClass(post);
+  const tileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = tileRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          onViewPreload(hlsUrl);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hlsUrl]);
 
   const [expanded, setExpanded] = useState(false);
   const [isLiked, setIsLiked] = useState(post.isLikedByMe);
@@ -114,7 +131,7 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
 
   return (
     <>
-      <article className="bg-card overflow-hidden border-b border-border/50">
+      <article ref={tileRef} className="bg-card overflow-hidden border-b border-border/50">
         {/* Creator header */}
         <div className="flex items-center gap-3 px-3 pt-3 pb-2">
           <button
