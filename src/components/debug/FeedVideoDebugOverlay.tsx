@@ -239,6 +239,88 @@ export function FeedVideoDebugOverlay() {
   const currentSession = sessions[sessions.length - 1] ?? null;
   const displayQuality = snap?.videoHeight || currentSession?.currentQuality || 0;
 
+  // ─── Build full text report ──────────────────────────────────────────────
+  const buildReport = useCallback((): string => {
+    const cs = currentSession;
+    const withTTFF = sessions.filter(s => s.ttff != null);
+    const avgTTFF = withTTFF.length > 0 ? Math.round(withTTFF.reduce((a, s) => a + s.ttff!, 0) / withTTFF.length) : null;
+    const sortedTTFF = [...withTTFF].sort((a, b) => a.ttff! - b.ttff!);
+    const p95TTFF = sortedTTFF[Math.floor(sortedTTFF.length * 0.95)]?.ttff ?? null;
+    const prefetchPct = sessions.length > 0 ? Math.round((sessions.filter(s => s.prefetched).length / sessions.length) * 100) : 0;
+    const totalStalls = sessions.reduce((a, s) => a + s.stallCount, 0);
+    const qualities = sessions.filter(s => s.currentQuality > 0).map(s => s.currentQuality).sort((a, b) => b - a);
+    const medianQ = qualities[Math.floor(qualities.length / 2)] ?? 0;
+
+    const lines: string[] = [
+      'CLBHOUZ VIDEO DIAGNOSTICS REPORT',
+      '',
+      `Generated: ${new Date().toISOString()}`,
+      `Feed index: ${activeIndex}`,
+      '',
+      '=== LIVE ===',
+      `Ready state: ${snap ? (READY_LABELS[snap.readyState] || snap.readyState) : 'NO ELEMENT'}`,
+      `Network state: ${snap ? (NETWORK_LABELS[snap.networkState] || snap.networkState) : 'NO ELEMENT'}`,
+      `Playing: ${snap ? (snap.paused ? 'NO' : 'YES') : 'NO ELEMENT'}`,
+      `Position: ${snap ? `${snap.currentTime}s / ${snap.duration}s` : '—'}`,
+      `Dimensions: ${snap?.videoWidth ? `${snap.videoWidth}×${snap.videoHeight}` : '—'}`,
+      `Quality: ${qualityLabel(displayQuality)}`,
+      `Buffer ahead: ${snap ? `${snap.bufferedEnd}s` : '—'}`,
+      `Buffer %: ${snap ? `${Math.round(snap.bufferedPct * 100)}%` : '—'}`,
+      `Muted: ${isMuted ? 'YES' : 'NO'}`,
+      `DOM videos: ${domVideoCount}`,
+      `Feed errors: ${errorItems.size}`,
+      '',
+      `=== QUALITY — VIDEO #${activeIndex} ===`,
+      `Current quality: ${qualityLabel(displayQuality)}`,
+      `TTFF: ${cs?.ttff != null ? `${cs.ttff}ms` : '—'}`,
+      `Prefetched: ${cs?.prefetched ? 'YES' : 'NO (cold start)'}`,
+      `ABR switches: ${cs?.qualityHistory.length ?? 0}`,
+      `Stalls: ${cs?.stallCount ?? 0}`,
+      `Quality ladder: [${(cs?.qualityHistory ?? []).map(h => qualityLabel(h)).join(', ')}]`,
+      '',
+      'Previous videos:',
+      ...sessions.slice().reverse().slice(0, 14).map(s =>
+        `  #${s.index}  ${qualityLabel(s.currentQuality)}  ${s.ttff != null ? `${s.ttff}ms` : '—'}  ${s.stallCount}×stall  ${s.prefetched ? '⚡' : '❄️'}`
+      ),
+      '',
+      '=== BUFFER ===',
+      `Buffer ahead: ${snap ? `${snap.bufferedEnd}s` : '—'}`,
+      `Buffer %: ${snap ? `${Math.round(snap.bufferedPct * 100)}%` : '—'}`,
+      `Duration: ${snap ? `${snap.duration}s` : '—'}`,
+      `Position: ${snap ? `${snap.currentTime}s` : '—'}`,
+      `Stalls: ${cs?.stallCount ?? 0}`,
+      '',
+      '=== EVENTS (last 80) ===',
+      ...logs.slice(0, 80).map(l => `[${l.formattedTime?.slice(-12) || '—'}] [${l.category}] ${l.message}`),
+      '',
+      '=== SESSION SUMMARY ===',
+      `Videos sampled: ${sessions.length}`,
+      `Avg TTFF: ${avgTTFF != null ? `${avgTTFF}ms` : '—'}`,
+      `P95 TTFF: ${p95TTFF != null ? `${p95TTFF}ms` : '—'}`,
+      `Prefetch hit rate: ${prefetchPct}%`,
+      `Total stalls: ${totalStalls}`,
+      `Median quality: ${qualityLabel(medianQ)}`,
+      '',
+      'TTFF distribution:',
+      `  < 500ms (excellent): ${withTTFF.filter(s => s.ttff! < 500).length} / ${withTTFF.length}`,
+      `  500ms–1.5s (ok): ${withTTFF.filter(s => s.ttff! >= 500 && s.ttff! < 1500).length} / ${withTTFF.length}`,
+      `  > 1.5s (needs fix): ${withTTFF.filter(s => s.ttff! >= 1500).length} / ${withTTFF.length}`,
+    ];
+
+    return lines.join('\n');
+  }, [snap, currentSession, sessions, logs, activeIndex, isMuted, domVideoCount, errorItems, displayQuality]);
+
+  const handleCopyReport = useCallback(async () => {
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    try {
+      await navigator.clipboard.writeText(buildReport());
+      setCopyState('copied');
+    } catch {
+      setCopyState('failed');
+    }
+    copyTimerRef.current = setTimeout(() => setCopyState('idle'), 2000);
+  }, [buildReport]);
+
   // ─── Colour palette ──────────────────────────────────────────────────────
   const C = {
     bg:      '#09090F',
