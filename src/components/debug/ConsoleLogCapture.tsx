@@ -75,6 +75,10 @@ export function ConsoleLogCapture() {
     }
   };
 
+  // Production gate — only render when debug mode is enabled
+  const debugEnabled = (() => { try { return localStorage.getItem('clbhouz-video-debug') === 'true'; } catch { return false; } })();
+  if (!debugEnabled) return null;
+
   if (!isOpen) {
     return (
       <button

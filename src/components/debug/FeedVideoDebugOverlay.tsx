@@ -331,6 +331,10 @@ export function FeedVideoDebugOverlay() {
     accent:  '#60A5FA',
   };
 
+  // ─── Production gate — only render when debug mode is enabled ───────────
+  const debugEnabled = (() => { try { return localStorage.getItem('clbhouz-video-debug') === 'true'; } catch { return false; } })();
+  if (!debugEnabled) return null;
+
   // ─── Floating button (closed) ────────────────────────────────────────────
   if (!isOpen) {
     const btnColor = displayQuality >= 1080 ? '#34D399'

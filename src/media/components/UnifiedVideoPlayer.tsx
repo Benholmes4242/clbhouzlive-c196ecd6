@@ -674,16 +674,16 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         // works correctly and gives us full ABR quality control.
         // Falling back to native Safari HLS surrenders all quality configuration.
         const Hls = await loadHlsJs();
-        console.log('[UVP DEBUG] Hls exists:', !!Hls, '| Hls.isSupported():', Hls ? Hls.isSupported() : 'N/A', '| canPlayNatively will be:', (!Hls || !Hls.isSupported()));
+        
         const canPlayNatively = (!Hls || !Hls.isSupported()) &&
           (video.canPlayType('application/vnd.apple.mpegurl') !== '' ||
           video.canPlayType('application/vnd.apple.mpegURL') !== '');
-        console.log('[UVP DEBUG] canPlayNatively:', canPlayNatively, '| hlsUrl:', hlsUrl?.slice(-30));
+        
 
         const isHlsUrl = hlsUrl.includes('.m3u8');
 
         if (canPlayNatively || !isHlsUrl) {
-          console.log('[UVP DEBUG] Taking NATIVE path for:', hlsUrl?.slice(-30));
+          // Native playback - fetch manifest and select highest quality rendition
           // Native playback - fetch manifest and select highest quality rendition
           // iOS native HLS ignores all query hints, so we parse the manifest ourselves
           await setNativeHlsSource(video, hlsUrl);
@@ -696,7 +696,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           registerHlsForDebug(cloudflareUid || uniqueMediaId, null, video);
           return;
         }
-        console.log('[UVP DEBUG] Taking HLS.JS path for:', hlsUrl?.slice(-30));
+        // HLS.js playback — Hls is already loaded above
 
         // HLS.js playback — Hls is already loaded above
         try {
