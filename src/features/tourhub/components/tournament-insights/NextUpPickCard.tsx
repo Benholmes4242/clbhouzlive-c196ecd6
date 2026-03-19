@@ -263,6 +263,9 @@ function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
             style={{
               height: 1,
               background: 'hsl(var(--border))',
+              width: '33%',
+              marginLeft: 'auto',
+              marginRight: 'auto',
               marginBottom: 12,
             }}
           />
