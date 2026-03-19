@@ -32,6 +32,8 @@ function startIntercepting() {
       const now = new Date();
       const time = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}.${now.getMilliseconds().toString().padStart(3,'0')}`;
       const entry: LogEntry = { id: _logId++, level, message, time };
+      _buffer.push(entry);
+      if (_buffer.length > MAX_BUFFER) _buffer.shift();
       _subscribers.forEach(fn => fn(entry));
     };
   });
