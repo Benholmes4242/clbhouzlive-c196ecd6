@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { Play, Star, Heart, MoreHorizontal } from 'lucide-react';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
+import { preTouchPreload } from '@/components/media-system/utils/preTouchPreload';
 import { formatDuration, formatCompact } from './utils';
 
 interface CompactGridRowProps {
