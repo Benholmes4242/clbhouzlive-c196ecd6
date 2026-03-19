@@ -162,10 +162,35 @@ function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
             minHeight: 280,
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-start',
+            gap: 10,
           }}
         >
-          {/* TOP — Match % pill sits here, top-left */}
+          {/* Eyebrow */}
+          <div style={{
+            fontSize: 10, fontWeight: 700, letterSpacing: 1.8,
+            textTransform: 'uppercase' as const,
+            color: 'hsl(var(--muted-foreground))',
+            lineHeight: 1,
+          }}>
+            {index === 0 ? 'Top Pick' : `Pick ${index + 1}`}
+          </div>
+
+          {/* Player name */}
+          <div style={{
+            fontSize: 26, fontWeight: 900,
+            color: 'hsl(var(--foreground))',
+            letterSpacing: -0.8, lineHeight: 1.05,
+          }}>
+            {pick.name}
+          </div>
+
+          {/* Flag */}
+          {pick.countryCode && (
+            <CountryFlag country={pick.countryCode} size="sm" className="rounded-sm" />
+          )}
+
+          {/* Match % pill */}
           <div style={{ display: 'flex', alignItems: 'flex-start' }}>
             <div style={{
               display: 'inline-flex',
@@ -185,47 +210,20 @@ function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
             </div>
           </div>
 
-          {/* BOTTOM — Eyebrow, name, flag stacked */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {/* Eyebrow */}
+          {/* Withdrawn badge if applicable */}
+          {pick.isWithdrawn && (
             <div style={{
-              fontSize: 10, fontWeight: 700, letterSpacing: 1.8,
+              display: 'inline-flex', alignSelf: 'flex-start',
+              fontSize: 10, fontWeight: 700, letterSpacing: 0.5,
+              color: '#EF4444',
+              background: 'rgba(239,68,68,0.08)',
+              border: '1px solid rgba(239,68,68,0.20)',
+              borderRadius: 6, padding: '3px 8px',
               textTransform: 'uppercase' as const,
-              color: 'hsl(var(--muted-foreground))',
-              lineHeight: 1,
             }}>
-              {index === 0 ? 'Top Pick' : `Pick ${index + 1}`}
+              Withdrawn
             </div>
-
-            {/* Player name */}
-            <div style={{
-              fontSize: 26, fontWeight: 900,
-              color: 'hsl(var(--foreground))',
-              letterSpacing: -0.8, lineHeight: 1.05,
-            }}>
-              {pick.name}
-            </div>
-
-            {/* Flag */}
-            {pick.countryCode && (
-              <CountryFlag country={pick.countryCode} size="sm" className="rounded-sm" />
-            )}
-
-            {/* Withdrawn badge if applicable */}
-            {pick.isWithdrawn && (
-              <div style={{
-                display: 'inline-flex', alignSelf: 'flex-start',
-                fontSize: 10, fontWeight: 700, letterSpacing: 0.5,
-                color: '#EF4444',
-                background: 'rgba(239,68,68,0.08)',
-                border: '1px solid rgba(239,68,68,0.20)',
-                borderRadius: 6, padding: '3px 8px',
-                textTransform: 'uppercase' as const,
-              }}>
-                Withdrawn
-              </div>
-            )}
-          </div>
+          )}
         </div>
       </div>
 
