@@ -681,7 +681,13 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         if (canPlayNatively || !isHlsUrl) {
           // Native playback - CachedHlsLoader NOT used (Safari/iOS uses native HLS)
           // No additional guard needed - currentSrcRef check above prevents spam
-          video.src = hlsUrl;
+          // Append defaultQuality=720 to Cloudflare Stream manifests so native HLS
+          // starts at 720p instead of the lowest rendition
+          const nativeSrc = hlsUrl.includes('.m3u8') && hlsUrl.includes('cloudflarestream.com')
+            ? `${hlsUrl}${hlsUrl.includes('?') ? '&' : '?'}defaultQuality=720`
+            : hlsUrl;
+          console.log('[UnifiedVideoPlayer] Native HLS path — manifest URL:', nativeSrc);
+          video.src = nativeSrc;
           video.load();
           
           if (startTime && startTime > 0) {
@@ -695,8 +701,12 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         // HLS.js playback — Hls is already loaded above
         try {
           if (!Hls || !Hls.isSupported() || !mountedRef.current) {
-            // Fall back to native
-            video.src = hlsUrl;
+            // Fall back to native — apply 720p quality hint for Cloudflare Stream
+            const fallbackSrc = hlsUrl.includes('.m3u8') && hlsUrl.includes('cloudflarestream.com')
+              ? `${hlsUrl}${hlsUrl.includes('?') ? '&' : '?'}defaultQuality=720`
+              : hlsUrl;
+            console.log('[UnifiedVideoPlayer] Native fallback — manifest URL:', fallbackSrc);
+            video.src = fallbackSrc;
             return;
           }
 
@@ -860,8 +870,12 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           hlsRef.current = hls;
           registerHlsForDebug(cloudflareUid || uniqueMediaId, hls, video);
         } catch (err) {
-          // Fall back to native
-          video.src = hlsUrl;
+          // Fall back to native — apply 720p quality hint for Cloudflare Stream
+          const catchSrc = hlsUrl.includes('.m3u8') && hlsUrl.includes('cloudflarestream.com')
+            ? `${hlsUrl}${hlsUrl.includes('?') ? '&' : '?'}defaultQuality=720`
+            : hlsUrl;
+          console.log('[UnifiedVideoPlayer] Catch fallback — manifest URL:', catchSrc);
+          video.src = catchSrc;
         }
       };
 
