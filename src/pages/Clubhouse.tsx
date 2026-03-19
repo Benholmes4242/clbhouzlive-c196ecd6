@@ -640,9 +640,8 @@ const ClubhouseContent = () => {
         />
       )}
 
-      {/* Mobile Video Debug Panel */}
-      <MobileVideoDebugPanel />
-      <ClubhouseVideoDebugPanel />
+      {/* Feed Video Debug — reads directly from mediaStore */}
+      <FeedVideoDebugOverlay />
     </PageRoot>
   );
 };
