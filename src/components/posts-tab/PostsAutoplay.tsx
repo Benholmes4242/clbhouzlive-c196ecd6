@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
+import { getSharedBandwidth } from '@/components/media-system/utils/sharedBandwidth';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 const ATTACH_THRESHOLD = 0.6;
