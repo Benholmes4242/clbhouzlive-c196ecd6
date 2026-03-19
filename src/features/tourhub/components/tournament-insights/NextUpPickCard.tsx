@@ -125,6 +125,49 @@ function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
       {/* ZONE 1 — PLAYER HERO */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
       <div style={{ position: 'relative', overflow: 'visible' }}>
+        {/* Navigation chevrons */}
+        {totalPicks > 1 && (
+          <>
+            {index > 0 && (
+              <button
+                onClick={() => onNav?.(-1)}
+                style={{
+                  position: 'absolute',
+                  left: 4,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  zIndex: 5,
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 4,
+                  opacity: 0.5,
+                }}
+              >
+                <ChevronLeft size={22} color="hsl(var(--foreground))" />
+              </button>
+            )}
+            {index < totalPicks - 1 && (
+              <button
+                onClick={() => onNav?.(1)}
+                style={{
+                  position: 'absolute',
+                  right: 4,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  zIndex: 5,
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: 4,
+                  opacity: 0.5,
+                }}
+              >
+                <ChevronRight size={22} color="hsl(var(--foreground))" />
+              </button>
+            )}
+          </>
+        )}
         {/* Player portrait — right side, full bleed, no fade (matches Results hero) */}
         <div
           style={{
