@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { TourTournament } from './useTourHubData';
 import innisbrookCopperhead from '@/assets/courses/innisbrook-copperhead.jpeg';
 import steynCityJackNicklaus from '@/assets/courses/steyn-city-jack-nicklaus.jpg';
+import sharonHeightsGCC from '@/assets/courses/sharon-heights-gcc.jpg';
 
 /**
  * Static venue image overrides for courses not yet in the database.
@@ -15,6 +16,7 @@ import steynCityJackNicklaus from '@/assets/courses/steyn-city-jack-nicklaus.jpg
 const VENUE_IMAGE_OVERRIDES: Record<string, string> = {
   'Innisbrook Resort - Copperhead': innisbrookCopperhead,
   'The Club at Steyn City': steynCityJackNicklaus,
+  'Sharon Heights Golf & Country Club': sharonHeightsGCC,
 };
 
 export interface BatchImageMap {
