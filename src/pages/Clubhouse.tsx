@@ -24,6 +24,7 @@ import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import { ClubhouseTabProvider, useClubhouseTab } from '@/contexts/ClubhouseTabContext';
 import { clubhouseDebug } from '@/debug/clubhouseDebug';
 import FeedVideoDebugOverlay from '@/components/debug/FeedVideoDebugOverlay';
+import ConsoleLogCapture from '@/components/debug/ConsoleLogCapture';
 
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
