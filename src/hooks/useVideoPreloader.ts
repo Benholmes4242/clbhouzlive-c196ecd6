@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { getSharedBandwidth } from '@/components/media-system/utils/sharedBandwidth';
 import Hls from 'hls.js';
 import { logVideoTelemetry } from '@/utils/videoTelemetry';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
