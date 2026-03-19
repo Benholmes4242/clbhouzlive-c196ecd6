@@ -98,7 +98,14 @@ export function useVideoPreloader(
 
         hls.attachMedia(video);
         hls.loadSource(item.media_url);
-        
+
+        // After first fragment loads at low quality, re-enable ABR for promotion
+        hls.on(Hls.Events.FRAG_LOADED, (_, data) => {
+          if (data.frag.sn === 0) {
+            hls.currentLevel = -1;
+          }
+        });
+
         // FIX #2: Register with global HLS Pool for promotion
         HLSPoolManager.register(item.media_url, hls, video);
       } else {
