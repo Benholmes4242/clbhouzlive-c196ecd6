@@ -6,7 +6,7 @@
  */
 
 import { useState, memo, useEffect } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Trophy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSeasonLeaderboards, CATEGORY_CONFIG as CATEGORY_DATA_CONFIG } from '@/features/tourhub/hooks/useSeasonLeaderboards';
