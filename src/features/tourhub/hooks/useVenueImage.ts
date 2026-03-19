@@ -47,6 +47,15 @@ export function useVenueImage(venueName: string | null, venueCity: string | null
     queryFn: async (): Promise<VenueImageResult> => {
       if (!venueName) return { imageUrl: null, courseName: null, courseId: null };
 
+      // TIER 0: Static overrides for courses not in the database
+      if (VENUE_IMAGE_OVERRIDES[venueName]) {
+        return {
+          imageUrl: VENUE_IMAGE_OVERRIDES[venueName],
+          courseName: venueName,
+          courseId: null,
+        };
+      }
+
       // ============================================================
       // TIER 1: Exact match via sr_course_map (canonical authority)
       // ============================================================
