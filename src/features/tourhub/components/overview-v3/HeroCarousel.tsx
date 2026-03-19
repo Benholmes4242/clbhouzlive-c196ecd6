@@ -1180,6 +1180,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
             currentIndex={currentIndex}
             onDotClick={setCurrentIndex}
             leadersWinnersMap={leadersWinnersMap}
+            liveLeaderboardRows={lbCache?.live.get(slide.tournament.id) ?? []}
             isExpanded={index === currentIndex && (slide.type === 'live' ? true : isExpanded)}
             onToggleExpand={handleToggleExpand}
             onInteraction={() => {
