@@ -132,37 +132,20 @@ function formatScore(score: number): string {
 
 export function useLiveRightNow() {
   const { data: cache, isLoading: cacheLoading } = useTournamentsCache();
+  const { data: lbCache } = useLeaderboardCache();
 
   return useQuery({
     queryKey: ['overview-live-right-now', cache ? 'ready' : 'waiting'],
     queryFn: async () => {
       if (!cache?.live.length) return [];
 
-      const tournamentIds = cache.live.map(t => t.id);
-
-      // Batch fetch leaders for ALL live tournaments in a single query
-      const { data: allLeaders } = await supabase
-        .from('sr_leaderboards')
-        .select(`
-          tournament_id,
-          position,
-          score,
-          player_id,
-          player:sr_players!inner(id, first_name, last_name)
-        `)
-        .in('tournament_id', tournamentIds)
-        .eq('position', 1)
-        .gt('strokes', 0)
-        .not('position', 'is', null);
-
-      // Build leader map and count ties at position 1
+      // Build leader map from leaderboard cache instead of a separate DB call
       const leaderMap: Record<string, any> = {};
       const leaderCountMap: Record<string, number> = {};
-      for (const entry of allLeaders || []) {
-        leaderCountMap[entry.tournament_id] = (leaderCountMap[entry.tournament_id] ?? 0) + 1;
-        if (!leaderMap[entry.tournament_id]) {
-          leaderMap[entry.tournament_id] = entry;
-        }
+      for (const [tid, rows] of lbCache?.live ?? []) {
+        const pos1Rows = rows.filter(r => r.position === 1);
+        leaderCountMap[tid] = pos1Rows.length;
+        if (pos1Rows[0]) leaderMap[tid] = pos1Rows[0];
       }
 
       return cache.live.map((t): LiveTournamentWithLeader => {
@@ -183,14 +166,14 @@ export function useLiveRightNow() {
           leader: leader
             ? leaderCountMap[t.id] > 1
               ? {
-                  id: (leader.player as any).id,
+                  id: leader.player?.id || '',
                   name: `${leaderCountMap[t.id]} tied`,
                   score: leader.score,
                   scoreDisplay: formatScore(leader.score),
                 }
               : {
-                  id: (leader.player as any).id,
-                  name: `${(leader.player as any).first_name} ${(leader.player as any).last_name}`,
+                  id: leader.player?.id || '',
+                  name: `${leader.player?.first_name || ''} ${leader.player?.last_name || ''}`.trim(),
                   score: leader.score,
                   scoreDisplay: formatScore(leader.score),
                 }
@@ -198,7 +181,7 @@ export function useLiveRightNow() {
         };
       });
     },
-    enabled: !!cache,
+    enabled: !!cache && !!lbCache,
     staleTime: 30_000,
     refetchInterval: 60_000,
     refetchOnWindowFocus: true,
