@@ -45,7 +45,7 @@ startIntercepting();
 export function ConsoleLogCapture() {
   const [isOpen, setIsOpen] = useState(false);
   const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [filter, setFilter] = useState('UVP DEBUG');
+  const [filter, setFilter] = useState('');
   const [copied, setCopied] = useState(false);
   const logsRef = useRef<LogEntry[]>([]);
 
