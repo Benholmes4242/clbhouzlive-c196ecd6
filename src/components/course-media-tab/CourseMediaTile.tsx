@@ -35,6 +35,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
       data-course-media-index={index}
       className="relative aspect-[4/5] overflow-hidden rounded-[4px] cursor-pointer active:scale-[0.97]"
       style={{ transition: 'transform 100ms ease' }}
+      onTouchStart={() => preTouchPreload(media?.hlsUrl)}
       onClick={() => {
         if (allPosts) {
           useFullscreenFeed.getState().open({

@@ -25,6 +25,7 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
   return (
     <div
       className="bg-card overflow-hidden border-b border-border/50 cursor-pointer active:scale-[0.99] transition-transform"
+      onTouchStart={() => preTouchPreload(firstMedia?.hlsUrl)}
       onClick={() => {
         if (allPosts && postIndex != null) {
           useFullscreenFeed.getState().open({

@@ -214,6 +214,7 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
           data-media-wrapper
           aria-label={`Play post by ${post.displayName}`}
           className={`relative w-full ${aspectClass} bg-muted`}
+          onTouchStart={() => preTouchPreload(firstMedia?.hlsUrl)}
           onClick={() => {
             if (allPosts && cardIndex != null) {
               useFullscreenFeed.getState().open({

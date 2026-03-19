@@ -33,6 +33,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
   return (
     <div
       className="bg-card overflow-hidden cursor-pointer active:scale-[0.99] transition-transform"
+      onTouchStart={() => preTouchPreload(userMedia?.hlsUrl)}
       onClick={() => {
         if (allPosts && postIndex != null) {
           useFullscreenFeed.getState().open({

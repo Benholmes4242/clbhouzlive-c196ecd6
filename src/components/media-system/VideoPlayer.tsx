@@ -121,6 +121,7 @@ export function VideoPlayer({
           if (videoEl && videoEl.duration && isFinite(videoEl.duration)) {
             setVideoDuration(videoEl.duration);
           }
+          recordPlayStart(hlsUrl);
           if (!firstFrameFiredRef.current && onFirstFrameReady) {
             firstFrameFiredRef.current = true;
             onFirstFrameReady();

@@ -216,6 +216,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
           data-media-wrapper
           className="relative w-full aspect-[16/9.5] bg-muted cursor-pointer"
           onClick={handleTap}
+          onTouchStart={() => preTouchPreload(firstVideo?.hlsUrl)}
           aria-label={`Play video by ${post.displayName}`}
         >
           {thumbnailUrl && (

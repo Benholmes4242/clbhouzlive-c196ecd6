@@ -31,6 +31,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
     <div
       style={{ gridColumn: '1 / -1' }}
       className="relative aspect-video overflow-hidden cursor-pointer rounded-[4px] active:scale-[0.99] transition-transform"
+      onTouchStart={() => preTouchPreload(media?.hlsUrl)}
       onClick={() => {
         if (allPosts) {
           useFullscreenFeed.getState().open({

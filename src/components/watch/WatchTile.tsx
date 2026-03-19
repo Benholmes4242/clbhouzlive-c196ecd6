@@ -37,6 +37,7 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, fetchNextP
       data-watch-index={index}
       className="relative aspect-[4/5] overflow-hidden rounded-[4px] cursor-pointer active:scale-[0.97]"
       style={{ transition: 'transform 100ms ease' }}
+      onTouchStart={() => preTouchPreload(post.mediaItems?.[0]?.hlsUrl)}
       onClick={() => {
         if (allPosts) {
           useFullscreenFeed.getState().open({

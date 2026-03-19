@@ -33,6 +33,7 @@ const CompactTile: React.FC<{
       className="relative aspect-[4/5] rounded-[4px] overflow-hidden bg-muted cursor-pointer"
       data-posts-tile-index={globalIndex}
       data-hls-url={firstMedia?.hlsUrl || ''}
+      onTouchStart={() => preTouchPreload(firstMedia?.hlsUrl)}
       onClick={() => {
         if (showMenu) return;
         if (allPosts) {
