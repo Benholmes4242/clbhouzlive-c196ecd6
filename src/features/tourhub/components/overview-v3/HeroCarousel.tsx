@@ -317,18 +317,46 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
   const handleScorecardTap = useCallback((player: PlayerInfo) => setSelectedPlayer(player), []);
   const handleBackToLeaderboard = useCallback(() => setSelectedPlayer(null), []);
 
-  // Fetch top 5 leaders for live tournaments only
-  const { data: leaders = [], isLoading: leadersLoading } = useTournamentTopLeaders(
-    isLive ? tournament.id : null
-  );
+  // Derive leaders from shared cache data (replaces useTournamentTopLeaders)
+  const leaders: LeaderEntry[] = isLive
+    ? liveLeaderboardRows.slice(0, 10).map((row): LeaderEntry => {
+        const scoreToPar = row.score ?? 0;
+        const scoreDisplay = scoreToPar === 0 ? 'E' : scoreToPar > 0 ? `+${scoreToPar}` : `${scoreToPar}`;
+        return {
+          position: row.position,
+          score: row.score ?? 0,
+          scoreToPar,
+          scoreDisplay,
+          thru: row.thru,
+          status: row.status ?? null,
+          updatedAt: row.updated_at ?? null,
+          thruUpdatedAt: row.thru_updated_at ?? null,
+          tournamentTimezone: null,
+          round_1: row.round_1 ?? null,
+          round_2: row.round_2 ?? null,
+          round_3: row.round_3 ?? null,
+          round_4: row.round_4 ?? null,
+          player: {
+            id: row.player.id,
+            firstName: row.player.first_name,
+            lastName: row.player.last_name,
+            fullName: row.player.full_name || `${row.player.first_name} ${row.player.last_name}`,
+            headshotOverride: row.player.headshot_override ?? null,
+            country: row.player.country,
+            photoUrl: row.player.photo_url,
+            pgaTourId: row.player.pga_tour_id ?? null,
+            tourCode: row.player.tour_codes?.[0] ?? null,
+          },
+        };
+      })
+    : [];
+  const leadersLoading = false;
 
-  // Full leaderboard — only fetched when expanded
-  const { data: fullLeaderboard = [], isLoading: isLoadingFull, isError: isFullError, refetch: refetchFull } = useTourLeaderboard(
-    isLive ? tournament.id : ''
-  );
-  
-  // Realtime updates — always subscribe when live so collapsed hero stays fresh
-  useLeaderboardRealtime(isLive ? tournament.id : null);
+  // Full leaderboard from cache (top 10 for overview; full field on tournament detail page)
+  const fullLeaderboard = isLive ? liveLeaderboardRows as any[] : [];
+  const isLoadingFull = false;
+  const isFullError = false;
+  const refetchFull = () => Promise.resolve({} as any);
 
   // Body scroll lock when expanded
   useEffect(() => {
