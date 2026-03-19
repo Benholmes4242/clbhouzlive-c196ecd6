@@ -890,6 +890,10 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
             const level = hls.levels[data.level];
             if (level) {
               setQuality(level.height);
+              // Save real bitrate measurement for next video instance
+              if (level.bitrate > 0) {
+                saveSharedBandwidth(level.bitrate);
+              }
               // Log level switch for debugging ABR behavior
               videoDebug('hlsEvents', `Quality switched to level ${data.level}`, { height: level.height });
               if (MOBILE_VIDEO_DEBUG) {
