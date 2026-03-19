@@ -410,6 +410,7 @@ export function FeedVideoDebugOverlay() {
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <span style={{ fontSize: 10, color: C.muted }}>DOM:{domVideoCount}</span>
+          <button onClick={handleCopyReport} style={{ fontSize: 9, color: copyState === 'copied' ? '#34D399' : copyState === 'failed' ? '#F87171' : C.muted, background: 'none', border: `1px solid ${copyState === 'copied' ? '#34D39955' : copyState === 'failed' ? '#F8717155' : C.border}`, borderRadius: 3, padding: '2px 5px', cursor: 'pointer', minWidth: 56, textAlign: 'center', fontWeight: 700, fontFamily: 'monospace', transition: 'color 0.2s, border-color 0.2s' }}>{copyState === 'copied' ? 'COPIED ✓' : copyState === 'failed' ? 'FAILED ✗' : 'COPY'}</button>
           <button onClick={() => clearDebugLogs()} style={{ fontSize: 9, color: C.muted, background: 'none', border: `1px solid ${C.border}`, borderRadius: 3, padding: '2px 5px', cursor: 'pointer' }}>CLR</button>
           <button onClick={() => setIsOpen(false)} style={{ fontSize: 16, color: C.muted, background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1, padding: 0 }}>✕</button>
         </div>
