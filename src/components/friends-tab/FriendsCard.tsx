@@ -53,8 +53,25 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
   const isVideo = firstMedia?.type === 'video';
   const thumbnailUrl = firstMedia?.thumbnailUrl || firstMedia?.imageUrl || '';
   const duration = firstMedia?.duration || 0;
+  const hlsUrl = firstMedia?.hlsUrl;
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
   const aspectClass = getMediaAspectClass(post);
+  const tileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = tileRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          onViewPreload(hlsUrl);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hlsUrl]);
 
   const [expanded, setExpanded] = useState(false);
   const [isLiked, setIsLiked] = useState(post.isLikedByMe);
