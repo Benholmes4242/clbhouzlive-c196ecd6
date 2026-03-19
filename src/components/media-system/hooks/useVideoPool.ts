@@ -359,6 +359,9 @@ export function useVideoPool() {
 
       // Try promote pre-created instance first
       const promoted = promotePreCreated(hlsUrl, video, handleHlsError);
+      if (promoted) {
+        devLog(`[Pool] Prefetch promotion succeeded — ${hlsUrl.slice(-30)}`);
+      }
 
       if (!promoted) {
         // Cold load path
