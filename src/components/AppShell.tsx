@@ -37,8 +37,6 @@ export default function AppShell({ children }: PropsWithChildren) {
       </div>
       {/* Global A11y live region for screen reader announcements */}
       <div id="a11y-live" className="sr-live" aria-live="polite" aria-atomic="true" />
-      <FeedVideoDebugOverlay />
-      <ConsoleLogCapture />
     </>
   );
 }
