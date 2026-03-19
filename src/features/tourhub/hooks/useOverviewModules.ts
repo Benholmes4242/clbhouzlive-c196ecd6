@@ -4,6 +4,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { TourId, TOUR_CONFIG } from './useOverviewData';
 import { useTournamentsCache, type CachedTournament, type TournamentsCache } from '@/hooks/useTournamentsCache';
 import { useLeaderboardCache } from './useLeaderboardCache';
