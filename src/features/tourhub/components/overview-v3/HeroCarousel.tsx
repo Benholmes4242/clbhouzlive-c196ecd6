@@ -999,11 +999,20 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     setIsExpanded(prev => !prev);
   }, []);
 
+  // Shared leaderboard cache — one fetch for all tournaments
+  const { data: lbCache } = useLeaderboardCache();
+
   // Wire up top-3 podium data for completed slides
   const completedIds = safeSlides
     .filter(s => s.type === 'completed')
     .map(s => s.tournament.id);
   const { data: leadersWinnersMap } = useTournamentLeadersWinners(completedIds);
+
+  // Shared realtime channel — replaces per-slide useLeaderboardRealtime calls
+  const liveTournamentIds = safeSlides
+    .filter(s => s.type === 'live')
+    .map(s => s.tournament.id);
+  useMultiLeaderboardRealtime(liveTournamentIds);
   
   // Touch swipe state
   const touchStartRef = React.useRef<{ x: number; y: number; time: number } | null>(null);
