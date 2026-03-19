@@ -53,6 +53,28 @@ import {
   logVideoElementUnmount,
 } from '@/media/mobileVideoDebug';
 
+// ─── Shared HLS bandwidth memory ─────────────────────────────────────────────
+// Persists the last measured bandwidth within a browser session so each new
+// HLS.js instance starts knowing the connection speed instead of defaulting
+// to the lowest quality rendition.
+// Uses in-memory (fast) + sessionStorage (survives app backgrounding).
+// Resets on every new browser session — prevents stale cross-network measurements.
+let _sharedBandwidth = 0; // bits per second, in-memory
+
+function getSharedBandwidth(): number {
+  if (_sharedBandwidth > 0) return _sharedBandwidth;
+  try {
+    const v = sessionStorage.getItem('clbhouz-hls-bw');
+    return v ? parseInt(v, 10) : 0;
+  } catch { return 0; }
+}
+
+function saveSharedBandwidth(bps: number): void {
+  if (bps <= 0) return;
+  _sharedBandwidth = bps;
+  try { sessionStorage.setItem('clbhouz-hls-bw', String(Math.round(bps))); } catch {}
+}
+
 // ============ Native HLS Quality Fix ============
 // iOS Safari ignores all query-string quality hints on HLS manifests.
 // This helper fetches the master manifest, parses the rendition ladder,
@@ -772,6 +794,17 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
               const level = pooledHls.levels[data.level];
               if (level) {
                 setQuality(level.height);
+                // Save real bitrate measurement for next video instance
+                if (level.bitrate > 0) {
+                  saveSharedBandwidth(level.bitrate);
+                }
+              }
+            });
+
+            pooledHls.on(Hls.Events.FRAG_LOADED, (_, data) => {
+              // Save real measured download bandwidth for next HLS.js instance
+              if (data.frag?.stats?.bwEstimate && data.frag.stats.bwEstimate > 0) {
+                saveSharedBandwidth(data.frag.stats.bwEstimate);
               }
             });
 
@@ -805,9 +838,11 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
             // capLevelToPlayerSize: true was capping at ~360-540p on phones — removed.
             capLevelToPlayerSize: false,
 
-            // Quality: start with a realistic bandwidth estimate for mobile (5 Mbps).
-            // 1 Mbps was too conservative — caused ABR to start at lowest rendition.
-            abrEwmaDefaultEstimate: 5_000_000,
+            // Quality: seed with shared bandwidth from previous video, or 8 Mbps default.
+            // Shared estimate ensures video #2+ starts at the quality video #1 measured.
+            abrEwmaDefaultEstimate: getSharedBandwidth() > 0
+              ? getSharedBandwidth()
+              : 8_000_000,   // 8 Mbps default on first video — aggressive but safe given observed 100% buffer health
 
             // Quality: ramp up to higher quality more aggressively.
             abrBandWidthFactor: 0.95,         // Use 95% of measured bandwidth
@@ -855,6 +890,10 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
             const level = hls.levels[data.level];
             if (level) {
               setQuality(level.height);
+              // Save real bitrate measurement for next video instance
+              if (level.bitrate > 0) {
+                saveSharedBandwidth(level.bitrate);
+              }
               // Log level switch for debugging ABR behavior
               videoDebug('hlsEvents', `Quality switched to level ${data.level}`, { height: level.height });
               if (MOBILE_VIDEO_DEBUG) {
@@ -865,6 +904,10 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
 
           // Verification logging for first fragment optimization
           hls.on(Hls.Events.FRAG_LOADED, (_, data) => {
+            // Save real measured download bandwidth for next HLS.js instance
+            if (data.frag?.stats?.bwEstimate && data.frag.stats.bwEstimate > 0) {
+              saveSharedBandwidth(data.frag.stats.bwEstimate);
+            }
             if (data.frag.sn === 0 || data.frag.sn === 1) {
               videoDebug('hlsEvents', `Fragment ${data.frag.sn} loaded`, { 
                 level: data.frag.level, 
