@@ -215,7 +215,7 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
                 >
                   {getShortName(id)}
                 </p>
-                {isLocked && daysUntil && (
+                {isLocked && daysUntil && daysUntil <= 60 && (
                   <p className="text-[11px] text-muted-foreground/50 mt-0.5">
                     In {daysUntil}d
                   </p>
