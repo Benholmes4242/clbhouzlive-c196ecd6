@@ -674,7 +674,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         // works correctly and gives us full ABR quality control.
         // Falling back to native Safari HLS surrenders all quality configuration.
         const Hls = await loadHlsJs();
-        console.log('[UVP DEBUG] Hls exists:', !!Hls, '| Hls.isSupported():', Hls ? Hls.isSupported() : 'N/A', '| canPlayNatively will be:', (!Hls || !Hls.isSupported()));
+        
         const canPlayNatively = (!Hls || !Hls.isSupported()) &&
           (video.canPlayType('application/vnd.apple.mpegurl') !== '' ||
           video.canPlayType('application/vnd.apple.mpegURL') !== '');

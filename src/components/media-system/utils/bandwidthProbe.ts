@@ -78,10 +78,7 @@ export async function runBandwidthProbe(): Promise<void> {
 
     saveSharedBandwidth(conservativeBps);
 
-    devLog(
-      `[BandwidthProbe] ${Math.round(bytes / 1024)}KB in ${Math.round(durationMs)}ms` +
-      ` = ${Math.round(conservativeBps / 1_000_000 * 10) / 10} Mbps`
-    );
+    // Probe result logged silently — enable clbhouz-video-debug for visibility
 
   } catch (err) {
     // Probe failed — try fallback URL silently
