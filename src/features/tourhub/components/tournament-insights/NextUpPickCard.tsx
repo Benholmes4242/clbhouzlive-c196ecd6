@@ -434,7 +434,7 @@ export function NextUpPickCard({
           exit={{ opacity: 0, x: -10 }}
           transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
         >
-          <PickSlide pick={current} index={activeIndex} />
+          <PickSlide pick={current} index={activeIndex} totalPicks={allPicks.length} onNav={(dir) => goTo(activeIndex + dir)} />
         </motion.div>
       </AnimatePresence>
 
