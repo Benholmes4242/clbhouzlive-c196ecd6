@@ -56,7 +56,7 @@ export function useBatchCourseImages(tournaments: TourTournament[] | undefined) 
       const { data: cached, error } = await supabase
         .from('sr_course_map')
         .select('sr_venue_name, golf_courses:golf_course_id(thumbnail_image)')
-        .in('sr_venue_name', venueNames);
+        .in('sr_venue_name', uncachedNames);
 
       if (!error && cached) {
         for (const row of cached as any[]) {
