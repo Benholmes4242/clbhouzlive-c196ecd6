@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
+import { getSharedBandwidth } from '@/components/media-system/utils/sharedBandwidth';
 import type { RefObject } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 
