@@ -134,9 +134,6 @@ export function FullscreenFeedContent({ posts, startIndex, fetchNextPage, hasNex
         style={{ height: 0 }}
       />
 
-      {/* Debug overlays — inside MediaStoreProvider so they read the scoped store */}
-      <FeedVideoDebugOverlay />
-      <ConsoleLogCapture />
     </MediaStoreProvider>
   );
 }
