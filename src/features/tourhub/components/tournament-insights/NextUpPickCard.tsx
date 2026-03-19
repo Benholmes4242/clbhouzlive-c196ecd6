@@ -82,7 +82,7 @@ function StatChip({
       >
         {display}
         {unit && (
-          <span style={{ color: 'hsl(var(--muted-foreground))' }}>
+          <span style={{ color: 'hsl(var(--foreground))' }}>
             {unit}
           </span>
         )}
