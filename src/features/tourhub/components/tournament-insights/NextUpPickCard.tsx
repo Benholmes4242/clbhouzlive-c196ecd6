@@ -158,124 +158,75 @@ function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
           style={{
             position: 'relative',
             zIndex: 2,
-            padding: '20px 12px 20px 16px',
+            padding: '16px 12px 20px 16px',
             width: '65%',
             minHeight: 280,
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'flex-end',
-            gap: 4,
+            justifyContent: 'space-between',
           }}
         >
-          {/* Eyebrow — pick number */}
-          <div
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: 1.8,
-              textTransform: 'uppercase' as const,
-              color: 'hsl(var(--muted-foreground))',
-              marginBottom: 2,
-              lineHeight: 1,
-            }}
-          >
-            {index === 0 ? 'Top Pick' : `Pick ${index + 1}`}
-          </div>
-
-          {/* Player name */}
-          <div
-            style={{
-              fontSize: 26,
-              fontWeight: 900,
-              color: 'hsl(var(--foreground))',
-              letterSpacing: -0.8,
-              lineHeight: 1.05,
-              marginBottom: 2,
-            }}
-          >
-            {pick.name}
-          </div>
-
-          {/* Flag */}
-          {pick.countryCode && (
-            <CountryFlag
-              country={pick.countryCode}
-              size="sm"
-              className="rounded-sm"
-            />
-          )}
-
-          {/* Match % pill */}
-          <div
-            style={{
+          {/* TOP — Match % pill sits here, top-left */}
+          <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+            <div style={{
               display: 'inline-flex',
-              alignSelf: 'flex-start',
-              alignItems: 'center',
-              gap: 6,
-              fontSize: 12,
-              fontWeight: 700,
+              alignItems: 'center', gap: 6,
+              fontSize: 12, fontWeight: 700,
               color: 'hsl(var(--foreground))',
               background: 'rgba(0,0,0,0.06)',
               border: '1px solid rgba(0,0,0,0.10)',
-              borderRadius: 20,
-              padding: '4px 12px',
-            }}
-          >
-            <div
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: '50%',
+              borderRadius: 20, padding: '4px 12px',
+            }}>
+              <div style={{
+                width: 6, height: 6, borderRadius: '50%',
                 background: tierDotColor(pick.confidenceTier),
                 flexShrink: 0,
-              }}
-            />
-            {pick.matchPct}% Match
+              }} />
+              {pick.matchPct}% Match
+            </div>
           </div>
 
-          {/* Promoted badge */}
-          {pick.promoted && (
-            <div
-              style={{
-                display: 'inline-flex',
-                alignSelf: 'flex-start',
-                marginTop: 4,
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: 0.5,
-                color: '#16A34A',
-                background: 'rgba(22,163,74,0.08)',
-                border: '1px solid rgba(22,163,74,0.20)',
-                borderRadius: 6,
-                padding: '3px 8px',
-                textTransform: 'uppercase' as const,
-              }}
-            >
-              Promoted
+          {/* BOTTOM — Eyebrow, name, flag stacked */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {/* Eyebrow */}
+            <div style={{
+              fontSize: 10, fontWeight: 700, letterSpacing: 1.8,
+              textTransform: 'uppercase' as const,
+              color: 'hsl(var(--muted-foreground))',
+              lineHeight: 1,
+            }}>
+              {index === 0 ? 'Top Pick' : `Pick ${index + 1}`}
             </div>
-          )}
 
-          {/* Withdrawn badge */}
-          {pick.isWithdrawn && (
-            <div
-              style={{
-                display: 'inline-flex',
-                alignSelf: 'flex-start',
-                marginTop: 4,
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: 0.5,
+            {/* Player name */}
+            <div style={{
+              fontSize: 26, fontWeight: 900,
+              color: 'hsl(var(--foreground))',
+              letterSpacing: -0.8, lineHeight: 1.05,
+            }}>
+              {pick.name}
+            </div>
+
+            {/* Flag */}
+            {pick.countryCode && (
+              <CountryFlag country={pick.countryCode} size="sm" className="rounded-sm" />
+            )}
+
+            {/* Withdrawn badge if applicable */}
+            {pick.isWithdrawn && (
+              <div style={{
+                display: 'inline-flex', alignSelf: 'flex-start',
+                fontSize: 10, fontWeight: 700, letterSpacing: 0.5,
                 color: '#EF4444',
                 background: 'rgba(239,68,68,0.08)',
                 border: '1px solid rgba(239,68,68,0.20)',
-                borderRadius: 6,
-                padding: '3px 8px',
+                borderRadius: 6, padding: '3px 8px',
                 textTransform: 'uppercase' as const,
-              }}
-            >
-              Withdrawn
-            </div>
-          )}
+              }}>
+                Withdrawn
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
