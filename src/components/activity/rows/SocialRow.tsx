@@ -60,26 +60,6 @@ export const SocialRow: React.FC<RowProps> = ({
         <>
           <span className={cn(showOrange ? "font-semibold" : "font-medium")}>{actorName}</span>{' '}
           <span className="font-normal text-muted-foreground">{renderNotificationText(notification)}</span>
-          {(notification.type === 'tag' || 
-            notification.type === 'mention' || 
-            notification.type === 'mention_post' || 
-            notification.type === 'comment_mention') && 
-            notification.data?.post_id && (
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 3,
-                marginTop: 4,
-                fontSize: 11,
-                fontWeight: 600,
-                color: 'rgba(249,115,22,0.85)',
-                letterSpacing: 0.1,
-              }}
-            >
-              View post →
-            </span>
-          )}
         </>
       }
       meta={notification.time_ago}

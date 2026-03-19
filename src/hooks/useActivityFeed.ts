@@ -249,14 +249,6 @@ function getContextUrl(notification: any): string {
     if (businessSlug) return `/business/${businessSlug}`;
   }
   
-  // Tag and mention notifications — post_id lives in the data JSONB
-  if (
-    (type === 'tag' || type === 'mention' || type === 'mention_post' || type === 'comment_mention') &&
-    data?.post_id
-  ) {
-    return `/post/${data.post_id}`;
-  }
-
   return '/';
 }
 
