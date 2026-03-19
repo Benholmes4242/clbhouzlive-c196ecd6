@@ -268,6 +268,7 @@ interface HeroSlideProps {
   onDotClick: (index: number) => void;
   leadersWinnersMap?: Map<string, import('../../hooks/useTournamentLeadersWinners').TournamentLeaderWinner>;
   liveLeaderboardRows: LiveLeaderboardEntry[];
+  lbCacheLoading: boolean;
   isExpanded: boolean;
   onToggleExpand: () => void;
   onInteraction: () => void;
