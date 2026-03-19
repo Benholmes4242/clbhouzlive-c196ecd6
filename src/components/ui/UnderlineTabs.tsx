@@ -76,12 +76,13 @@ export function UnderlineTabs({ options, value, onChange, className = '' }: Unde
             key={option.value}
             ref={(el) => { tabsRef.current[index] = el; }}
             onClick={() => onChange(option.value)}
-            className={cn(
-              "px-1 py-2 text-sm font-medium whitespace-nowrap transition-colors duration-200",
-              isActive
-                ? "text-slate-900"
-                : "text-slate-500 hover:text-slate-700"
-            )}
+            className="px-1 py-2 whitespace-nowrap transition-colors duration-200"
+            style={{
+              fontSize: 16,
+              fontWeight: isActive ? 700 : 500,
+              color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
+              letterSpacing: isActive ? '-0.025em' : '0',
+            }}
           >
             {option.label}
           </button>
