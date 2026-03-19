@@ -97,6 +97,23 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
     prevPostsRef.current = posts;
   }, [posts, initialIndex, itemHeight, setActiveIndex]);
 
+  // Jump to new index when initialIndex changes while already mounted
+  // (handles pool-persistent fullscreen reopens with different startIndex)
+  const prevInitialIndexRef = useRef(initialIndex);
+  useEffect(() => {
+    if (initialIndex === prevInitialIndexRef.current) return;
+    prevInitialIndexRef.current = initialIndex;
+
+    const newOffset = -initialIndex * itemHeight;
+    offsetRef.current = newOffset;
+    activeIndexRef.current = initialIndex;
+    setOffsetY(newOffset);
+    if (trackRef.current) {
+      trackRef.current.style.transform = `translateY(${newOffset}px)`;
+    }
+    setActiveIndex(initialIndex);
+  }, [initialIndex, itemHeight, setActiveIndex]);
+
   // Resize handling
   useEffect(() => {
     const onResize = () => setItemHeight(window.innerHeight);

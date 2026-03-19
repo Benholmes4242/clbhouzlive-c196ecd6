@@ -37,6 +37,11 @@ export function FullscreenFeedContent({ posts, startIndex, fetchNextPage, hasNex
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const store = useMemo(() => createMediaStore(startIndex), []);
 
+  // Sync active index when fullscreen reopens with a different video
+  useEffect(() => {
+    store.getState().setActiveIndex(startIndex);
+  }, [store, startIndex]);
+
   const activeIndex = useStore(store, (s) => s.activeIndex);
   const activeVideoElement = useStore(store, (s) => s.activeVideoElement);
   const activeVideoRef = useStore(store, (s) => s.activeVideoRef);
