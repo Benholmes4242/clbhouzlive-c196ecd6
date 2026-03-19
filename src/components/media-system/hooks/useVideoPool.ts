@@ -12,7 +12,7 @@ import {
 } from '../utils/hlsManager';
 import { fadeOut, fadeIn } from '../utils/audioFade';
 import { segmentCache } from '../utils/segmentCache';
-import { devLog } from '@/components/debug/ConsoleLogCapture';
+
 import { useSessionCache } from './useSessionCache';
 import { useMediaStore } from '../store/mediaStore';
 import { MediaStoreContext } from '../store/MediaStoreContext';

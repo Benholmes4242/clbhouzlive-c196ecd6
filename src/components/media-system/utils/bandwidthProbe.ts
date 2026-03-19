@@ -10,7 +10,7 @@
  */
 
 import { saveSharedBandwidth, getSharedBandwidth } from './sharedBandwidth';
-import { devLog } from '@/components/debug/ConsoleLogCapture';
+
 
 // A small thumbnail image hosted on Cloudflare R2 — same CDN as all videos.
 // This URL must be a publicly accessible image that is always available.

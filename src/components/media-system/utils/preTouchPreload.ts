@@ -5,7 +5,7 @@
  * for instant promotion — no cold attachMedia needed.
  */
 import { preCreateHlsInstance } from '@/components/media-system/utils/hlsManager';
-import { devLog } from '@/components/debug/ConsoleLogCapture';
+
 
 let _lastPreloadedUrl = '';
 
