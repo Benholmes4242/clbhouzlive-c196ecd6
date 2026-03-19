@@ -47,8 +47,8 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   if (!loading) {
     // Auth pages and onboarding-exempt routes
     const isAuthPage = location.pathname === '/auth' 
-      || location.pathname === '/auth/verified' 
       || location.pathname === '/auth/callback'
+      || location.pathname === '/auth/check-email'
       || location.pathname === '/auth/reset-password';
 
     // If user is not authenticated and not on an auth page, redirect to auth
