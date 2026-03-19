@@ -91,11 +91,11 @@ export function UnderlineTabs({ options, value, onChange, className = '' }: Unde
 
       {/* Animated orange underline - matches text width */}
       <div 
-        className="absolute bottom-0 h-[2px] transition-all duration-200 ease-out rounded-full"
+        className="absolute bottom-0 h-[2.5px] transition-all duration-200 ease-out rounded-full"
         style={{
           left: underlineStyle.left,
           width: underlineStyle.width,
-          backgroundColor: '#F79E1B',
+          background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
         }}
       />
     </div>

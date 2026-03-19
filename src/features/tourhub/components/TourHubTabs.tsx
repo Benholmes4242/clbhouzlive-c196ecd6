@@ -101,7 +101,7 @@ export function TournamentDetailTabs({ activeTab, onTabChange, className }: Tour
                 border: 'none',
                 cursor: 'pointer',
                 padding: '11px 2px 9px',
-                fontSize: 14,
+                fontSize: 16,
                 whiteSpace: 'nowrap',
                 fontWeight: isActive ? 700 : 500,
                 color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',

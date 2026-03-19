@@ -42,7 +42,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
                 border: 'none',
                 cursor: 'pointer',
                 padding: '11px 2px 9px',
-                fontSize: 14,
+                fontSize: 16,
                 fontWeight: isActive ? 700 : 500,
                 color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
                 letterSpacing: isActive ? '-0.025em' : '0',
