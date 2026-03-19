@@ -14,6 +14,8 @@ import { useStore } from 'zustand';
 import { ChevronLeft } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { Scrubber } from '@/components/media-system/Scrubber';
+import FeedVideoDebugOverlay from '@/components/debug/FeedVideoDebugOverlay';
+import ConsoleLogCapture from '@/components/debug/ConsoleLogCapture';
 
 interface FullscreenFeedContentProps {
   posts: FeedPost[];
