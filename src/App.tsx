@@ -95,8 +95,9 @@ import { useModalContext } from '@/contexts/ModalContext';
 // Lazy load other pages for better code splitting and loading screen experience
 const Auth = lazy(() => import("./pages/Auth"));
 const AuthCallback = lazy(() => import("./pages/auth/AuthCallback"));
-const CheckEmailPage = lazy(() => import("./pages/auth/CheckEmailPage"));
+const VerifiedPage = lazy(() => import("./pages/auth/VerifiedPage"));
 const ResetPasswordPage = lazy(() => import("./pages/auth/ResetPasswordPage"));
+const Signup = lazy(() => import("./pages/Signup"));
 const Clubhouse = lazy(() => import("./pages/Clubhouse"));
 const WatchPage = lazy(() => import("./pages/WatchPage"));
 const AccountTypeOnboarding = lazy(() => import("./pages/onboarding/AccountTypeOnboarding"));
@@ -293,8 +294,9 @@ function AppRoutes() {
         
         <Route path="/auth" element={<AuthWrapped />} />
         <Route path="/auth/callback" element={<Suspense fallback={<GenericPageSkeleton />}><AuthCallback /></Suspense>} />
-        <Route path="/auth/check-email" element={<Suspense fallback={<GenericPageSkeleton />}><CheckEmailPage /></Suspense>} />
+        <Route path="/auth/verified" element={<Suspense fallback={<GenericPageSkeleton />}><VerifiedPage /></Suspense>} />
         <Route path="/auth/reset-password" element={<Suspense fallback={<GenericPageSkeleton />}><ResetPasswordPage /></Suspense>} />
+        <Route path="/signup" element={<Suspense fallback={<GenericPageSkeleton />}><Signup /></Suspense>} />
         <Route path="/onboarding/account-type" element={<Suspense fallback={<GenericPageSkeleton />}><AccountTypeOnboarding /></Suspense>} />
         <Route path="/create-profile" element={<CreateProfileRedirect />} />
         <Route path="/profile" element={<ProfileWrapped />} />

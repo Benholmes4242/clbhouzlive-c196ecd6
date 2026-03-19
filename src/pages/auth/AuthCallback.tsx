@@ -1,71 +1,216 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
-import { useHideHeader } from '@/hooks/useHeaderVisibility';
-import { Loader2 } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { safeLocalStorage } from "@/utils/safeLocalStorage";
+import { 
+  trackAuthCallbackStarted, 
+  trackAuthRedirect, 
+  trackAuthComplete,
+  trackProfileFallbackCreated 
+} from "@/lib/authAnalytics";
 
-export default function AuthCallback() {
-  useHideBottomNav();
-  useHideHeader();
-
+const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
-  const [message, setMessage] = useState('Signing you in…');
+  const [searchParams] = useSearchParams();
+  const [status, setStatus] = useState("Checking authentication...");
 
   useEffect(() => {
-    const run = async () => {
+    const handleCallback = async () => {
+      trackAuthCallbackStarted();
+      
       try {
-        // Wait one tick for Supabase client to process URL hash tokens
-        await new Promise(r => setTimeout(r, 150));
-
-        const { data: { session } } = await supabase.auth.getSession();
-
-        if (!session) {
-          setMessage('Session not found. Redirecting…');
-          setTimeout(() => navigate('/auth', { replace: true }), 1500);
+        // Check URL hash for Supabase auth tokens (email verification comes with tokens in hash)
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const type = hashParams.get('type') || searchParams.get('type');
+        const accessToken = hashParams.get('access_token');
+        
+        // PRIORITY 1: Email verification flow - always route to verified page
+        const isEmailVerification = type === 'signup' || type === 'email' || type === 'email_confirmation';
+        
+        if (isEmailVerification) {
+          safeLocalStorage.remove('pending_signup_email');
+          
+          if (accessToken) {
+            await supabase.auth.signOut();
+          }
+          
+          trackAuthRedirect('verified');
+          navigate('/auth/verified', { replace: true });
           return;
         }
 
-        // Check for password recovery flow
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        if (hashParams.get('type') === 'recovery') {
+        // Fix 4: Password recovery flow
+        const isPasswordReset = type === 'recovery';
+        if (isPasswordReset) {
+          trackAuthRedirect('reset-password');
           navigate('/auth/reset-password', { replace: true });
           return;
         }
 
-        setMessage('Setting up your profile…');
-
-        // Give the DB trigger time to create the profile row
-        await new Promise(r => setTimeout(r, 700));
-
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('id, has_completed_onboarding')
-          .eq('id', session.user.id)
-          .maybeSingle();
-
-        if (!profile || !profile.has_completed_onboarding) {
-          navigate('/edit-profile', { replace: true });
-        } else {
-          navigate('/', { replace: true });
+        // PRIORITY 2: Check for pending signup email (same-browser verification)
+        const pendingEmail = safeLocalStorage.get('pending_signup_email');
+        if (pendingEmail && accessToken) {
+          safeLocalStorage.remove('pending_signup_email');
+          await supabase.auth.signOut();
+          trackAuthRedirect('verified');
+          navigate('/auth/verified', { replace: true });
+          return;
         }
 
-      } catch (err) {
-        console.error('[AuthCallback]', err);
-        setMessage('Something went wrong. Redirecting…');
+        // PRIORITY 3: OAuth and other auth flows - get the user
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError || !user) {
+          // FIX J5: Detect expired PKCE state
+          const errMsg = userError?.message ?? '';
+          const isPkceError =
+            errMsg.includes('code verifier') ||
+            errMsg.includes('invalid request') ||
+            errMsg.includes('code challenge');
+
+          if (pendingEmail) {
+            safeLocalStorage.remove('pending_signup_email');
+            trackAuthRedirect('verified');
+            navigate('/auth/verified', { replace: true });
+            return;
+          }
+          
+          setStatus(
+            isPkceError
+              ? "Sign-in session expired. Redirecting..."
+              : "No authenticated user found. Redirecting to login..."
+          );
+          trackAuthRedirect('auth');
+          setTimeout(() => navigate('/auth', { replace: true }), 1000);
+          return;
+        }
+
+        // PRIORITY 4: Check if OAuth user (Google/Apple)
+        const isOAuthUser = user.app_metadata?.provider && user.app_metadata.provider !== 'email';
+        
+        setStatus("Checking profile...");
+
+        // Small delay to give the database trigger time to create profile
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Check if user has a profile
+        let { data: profile, error: profileError } = await supabase
+          .from('user_profiles')
+          .select('id, has_completed_onboarding')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.error('Error checking profile:', profileError);
+        }
+
+        // FIX 2e: Client-side fallback for missing profiles
+        if (!profile) {
+          console.warn('[Auth] No profile found for user, attempting client-side creation');
+          
+          const fallbackDisplayName = user.user_metadata?.name || 
+                                       user.user_metadata?.full_name || 
+                                       null;
+          
+          const { error: createError } = await supabase
+            .from('user_profiles')
+            .insert({
+              id: user.id,
+              username: null,
+              display_name: fallbackDisplayName,
+              user_type: 'individual',
+              is_public: true,
+              has_completed_onboarding: false
+            });
+          
+          if (createError) {
+            console.error('[Auth] Failed to create fallback profile:', createError);
+            trackProfileFallbackCreated(false, createError.message);
+            
+            console.warn('[Auth] Profile creation error details:', {
+              user_id: user.id,
+              error_message: `Client-side fallback failed: ${createError.message}`,
+              error_code: createError.code
+            });
+          } else {
+            trackProfileFallbackCreated(true);
+            
+            const { data: retryProfile } = await supabase
+              .from('user_profiles')
+              .select('id, has_completed_onboarding')
+              .eq('id', user.id)
+              .maybeSingle();
+            
+            if (retryProfile) {
+              console.log('[Auth] Fallback profile created successfully');
+              profile = retryProfile;
+            }
+          }
+        }
+
+        if (!profile) {
+          setStatus("Setting up your profile...");
+          trackAuthRedirect('onboarding');
+          navigate('/edit-profile', { replace: true });
+        } else if (!profile.has_completed_onboarding) {
+          setStatus("Completing onboarding...");
+          trackAuthRedirect('onboarding');
+          navigate('/edit-profile', { replace: true });
+        } else {
+          setStatus("Welcome back!");
+          trackAuthComplete(isOAuthUser ? (user.app_metadata.provider as 'google' | 'apple') : 'email');
+          trackAuthRedirect('home');
+          navigate('/', { replace: true });
+        }
+      } catch (error) {
+        // FIX J5: Detect expired PKCE state in catch block
+        const errMsg = (error as Error)?.message ?? '';
+        const isPkceError =
+          errMsg.includes('code verifier') ||
+          errMsg.includes('invalid request') ||
+          errMsg.includes('code challenge');
+
+        console.error('Auth callback error:', error);
+        setStatus(
+          isPkceError
+            ? "Sign-in session expired. Redirecting..."
+            : "Something went wrong. Redirecting to login..."
+        );
+        trackAuthRedirect('auth');
         setTimeout(() => navigate('/auth', { replace: true }), 1500);
       }
     };
 
-    run();
-  }, [navigate]);
+    handleCallback();
+  }, [navigate, searchParams]);
 
   return (
-    <div className="min-h-[100dvh] bg-black flex items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <Loader2 size={32} className="animate-spin text-[#e8610a]" />
-        <p className="text-[15px] text-white/60">{message}</p>
+    <div 
+      className="fixed inset-0 flex flex-col items-center justify-center"
+      style={{
+        background: 'radial-gradient(ellipse 120% 80% at 50% 20%, rgba(20, 20, 22, 1) 0%, #0a0a0a 100%)',
+      }}
+    >
+      {/* Glass container */}
+      <div 
+        className="flex flex-col items-center gap-4 p-8 rounded-3xl"
+        style={{
+          background: 'rgba(10, 10, 10, 0.78)',
+          backdropFilter: 'blur(22px)',
+          border: '1px solid rgba(255, 255, 255, 0.05)',
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.55)',
+        }}
+      >
+        <img
+          src="/images/clbhouz-logo.png"
+          alt="clbhouz"
+          className="h-10 w-auto opacity-80"
+        />
+        <div className="w-6 h-6 border-2 border-white/20 border-t-white/70 rounded-full animate-spin" aria-label="Loading" />
+        <p className="text-white/50 text-sm" aria-live="polite">{status}</p>
       </div>
     </div>
   );
-}
+};
+
+export default AuthCallback;
