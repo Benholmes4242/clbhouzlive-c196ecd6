@@ -125,6 +125,8 @@ export function FriendsAutoplay({ posts, feedRef }: FriendsAutoplayProps) {
 
       const hls = new Hls({
         startLevel: -1,
+        capLevelToPlayerSize: false,
+        abrEwmaDefaultEstimate: getSharedBandwidth() > 0 ? getSharedBandwidth() : 8_000_000,
         maxBufferLength: 8,
         maxMaxBufferLength: 16,
         enableWorker: true,

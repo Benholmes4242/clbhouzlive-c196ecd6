@@ -85,6 +85,8 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
 
     const hls = new Hls({
       startLevel: -1,
+      capLevelToPlayerSize: false,
+      abrEwmaDefaultEstimate: getSharedBandwidth() > 0 ? getSharedBandwidth() : 8_000_000,
       maxBufferLength: 5,
       maxMaxBufferLength: 10,
       enableWorker: true,

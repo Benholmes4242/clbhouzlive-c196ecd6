@@ -90,6 +90,9 @@ export const VideoThumbPlayer: React.FC<VideoThumbPlayerProps> = ({
 
         if (Hls.isSupported()) {
           const hls = new Hls({
+            startLevel: -1,
+            capLevelToPlayerSize: false,
+            abrEwmaDefaultEstimate: getSharedBandwidth() > 0 ? getSharedBandwidth() : 8_000_000,
             maxBufferLength: 10,
             maxMaxBufferLength: 20,
           });
