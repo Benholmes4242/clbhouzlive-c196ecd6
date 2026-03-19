@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import { getSharedBandwidth } from '@/components/media-system/utils/sharedBandwidth';
 import { Top100Highlight } from '@/hooks/useTop100Highlights';
 import { Volume2, VolumeX } from 'lucide-react';
 import { uidFromNode, generateThumbnailUrl } from '@/utils/cloudflareStreamTransform';
