@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { getSharedBandwidth } from '@/components/media-system/utils/sharedBandwidth';
 import Hls from 'hls.js';
 import { logVideoTelemetry } from '@/utils/videoTelemetry';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
@@ -85,7 +86,7 @@ export function useVideoPreloader(
           maxMaxBufferLength: 10,                 // Cap preload buffer
           backBufferLength: 2,
           lowLatencyMode: false,
-          abrEwmaDefaultEstimate: 5_000_000,      // 5 Mbps — matches player config
+          abrEwmaDefaultEstimate: getSharedBandwidth() > 0 ? getSharedBandwidth() : 1_000_000,
           abrBandWidthFactor: 0.95,
           abrBandWidthUpFactor: 0.5,
           highBufferWatchdogPeriod: 1,
@@ -97,7 +98,14 @@ export function useVideoPreloader(
 
         hls.attachMedia(video);
         hls.loadSource(item.media_url);
-        
+
+        // After first fragment loads at low quality, re-enable ABR for promotion
+        hls.on(Hls.Events.FRAG_LOADED, (_, data) => {
+          if (data.frag.sn === 0) {
+            hls.currentLevel = -1;
+          }
+        });
+
         // FIX #2: Register with global HLS Pool for promotion
         HLSPoolManager.register(item.media_url, hls, video);
       } else {
