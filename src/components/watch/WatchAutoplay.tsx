@@ -83,7 +83,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     }
 
     const hls = new Hls({
-      startLevel: 0,
+      startLevel: -1,
       maxBufferLength: 5,
       maxMaxBufferLength: 10,
       enableWorker: true,
