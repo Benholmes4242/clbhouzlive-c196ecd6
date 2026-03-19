@@ -638,11 +638,6 @@ const ClubhouseContent = () => {
           userId={user.id}
         />
       )}
-
-
-      {/* Feed Video Debug — reads directly from mediaStore */}
-      <FeedVideoDebugOverlay />
-      <ConsoleLogCapture />
     </PageRoot>
   );
 };
