@@ -1,6 +1,7 @@
 import React, { PropsWithChildren, useEffect } from "react";
 import { warmHlsJs } from "@/hooks/useHlsUrlCache";
 import { initMobileVideoDebug } from "@/media/mobileVideoDebug";
+import { runBandwidthProbe } from "@/components/media-system/utils/bandwidthProbe";
 
 /**
  * Wrap the entire app in <AppShell> so content respects iOS safe areas,
@@ -19,8 +20,11 @@ export default function AppShell({ children }: PropsWithChildren) {
   // Warm hls.js chunk on app start to avoid delay on first video
   useEffect(() => {
     warmHlsJs();
-    // Initialize mobile video debugging
     initMobileVideoDebug();
+    // Pre-measure bandwidth before any video loads so the first video
+    // starts at full quality — no ramp-up, no soft first frame.
+    // Runs in parallel with feed data fetch, adds zero perceived latency.
+    runBandwidthProbe();
   }, []);
 
   // DEBUG PANEL DISABLED - Re-enable when needed
