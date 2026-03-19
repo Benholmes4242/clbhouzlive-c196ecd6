@@ -203,6 +203,7 @@ function buildSession(
 const STORAGE_KEY = 'CLBHOUZ_VIDEO_DEBUG';
 
 export default function ClubhouseVideoDebugPanel() {
+  return null;
   const [visible, setVisible] = useState<boolean>(() => {
     try { return localStorage.getItem(STORAGE_KEY) === 'true'; } catch { return false; }
   });
