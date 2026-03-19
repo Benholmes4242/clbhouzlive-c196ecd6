@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
+import { preTouchPreload } from '@/components/media-system/utils/preTouchPreload';
 
 interface ExploreTileProps {
   post: FeedPost;
