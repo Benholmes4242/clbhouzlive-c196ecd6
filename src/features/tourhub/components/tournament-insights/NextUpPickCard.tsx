@@ -128,7 +128,7 @@ function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
         <div
           style={{
             position: 'absolute',
-            top: 0,
+            top: -16,
             right: -16,
             width: '60%',
             height: '100%',
