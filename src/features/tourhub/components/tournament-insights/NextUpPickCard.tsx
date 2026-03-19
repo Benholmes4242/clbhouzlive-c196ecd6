@@ -190,25 +190,8 @@ function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
             <CountryFlag country={pick.countryCode} size="sm" className="rounded-sm" />
           )}
 
-          {/* Match % pill */}
-          <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center', gap: 6,
-              fontSize: 12, fontWeight: 700,
-              color: 'hsl(var(--foreground))',
-              background: 'rgba(0,0,0,0.06)',
-              border: '1px solid rgba(0,0,0,0.10)',
-              borderRadius: 20, padding: '4px 12px',
-            }}>
-              <div style={{
-                width: 6, height: 6, borderRadius: '50%',
-                background: tierDotColor(pick.confidenceTier),
-                flexShrink: 0,
-              }} />
-              {pick.matchPct}% Match
-            </div>
-          </div>
+
+
 
           {/* Withdrawn badge if applicable */}
           {pick.isWithdrawn && (
