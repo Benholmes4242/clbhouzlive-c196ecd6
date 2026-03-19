@@ -109,20 +109,12 @@ export async function attachMedia(
   }
 
   if (supportsNativeHls()) {
-    return new Promise<void>((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        video.removeEventListener('loadedmetadata', onMeta);
-        reject(new Error('Native HLS attach timeout'));
-      }, ATTACH_TIMEOUT);
-
-      const onMeta = () => {
-        clearTimeout(timeout);
-        video.removeEventListener('loadedmetadata', onMeta);
-        resolve();
-      };
-      video.addEventListener('loadedmetadata', onMeta);
-      video.src = hlsUrl;
-    });
+    // Do NOT set video.src here on native HLS.
+    // UnifiedVideoPlayer calls setNativeHlsSource() which fetches the manifest,
+    // parses the rendition ladder, and sets the highest quality rendition URL directly.
+    // Setting video.src here causes iOS to start loading the master manifest at 360p
+    // before setNativeHlsSource can override it.
+    return;
   }
 
   video.src = hlsUrl;
