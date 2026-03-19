@@ -264,6 +264,9 @@ function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
           <div
             style={{
               height: 1,
+              width: '33%',
+              marginLeft: 'auto',
+              marginRight: 'auto',
               background: 'hsl(var(--border))',
               marginBottom: 12,
             }}
@@ -274,8 +277,11 @@ function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
                 <div
                   style={{
                     height: 1,
+                    width: '33%',
+                    marginLeft: 'auto',
+                    marginRight: 'auto',
                     background: 'hsl(var(--border))',
-                    margin: '10px 0',
+                    margin: '10px auto',
                   }}
                 />
               )}
@@ -286,6 +292,7 @@ function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
                   margin: 0,
                   fontWeight: 500,
                   color: 'hsl(var(--foreground))',
+                  textAlign: 'center',
                 }}
               >
                 {b}
