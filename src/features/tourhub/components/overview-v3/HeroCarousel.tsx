@@ -11,7 +11,7 @@
  * Slide order: LIVE (by tour priority) > COMPLETED (by end_date DESC) > UPCOMING (by start_date ASC)
  */
 
-import React, { useState, useEffect, useRef, useCallback, type ReactNode } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo, type ReactNode } from 'react';
 import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,7 +24,6 @@ import {
   type HeroTournament,
 } from '../../hooks/useHeroCarouselData';
 import { useTournamentTopLeaders, type LeaderEntry } from '../../hooks/useOverviewData';
-import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
 import { useLeaderboardCache, type LiveLeaderboardEntry } from '../../hooks/useLeaderboardCache';
 import { useMultiLeaderboardRealtime } from '../../hooks/useLeaderboardRealtime';
 import { ExpandedLeaderboardList, ExpandedLeaderboardSkeleton, ExpandedLeaderboardError, ExpandedLeaderboardEmpty } from './ExpandedLeaderboard';
