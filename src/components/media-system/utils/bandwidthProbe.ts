@@ -78,7 +78,7 @@ export async function runBandwidthProbe(): Promise<void> {
 
     saveSharedBandwidth(conservativeBps);
 
-    console.log(
+    devLog(
       `[BandwidthProbe] ${Math.round(bytes / 1024)}KB in ${Math.round(durationMs)}ms` +
       ` = ${Math.round(conservativeBps / 1_000_000 * 10) / 10} Mbps`
     );
