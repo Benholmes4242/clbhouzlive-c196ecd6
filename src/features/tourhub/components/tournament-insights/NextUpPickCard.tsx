@@ -237,7 +237,7 @@ function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
         <div
           style={{
             padding: '0 16px 8px',
-            marginTop: 0,
+            marginTop: -4,
             position: 'relative',
             zIndex: 4,
           }}
