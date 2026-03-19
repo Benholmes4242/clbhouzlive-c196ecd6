@@ -109,6 +109,20 @@ export async function attachMedia(
 
       hls.loadSource(hlsUrl);
       hls.attachMedia(video);
+
+      hls.on((Hls as any).Events.LEVEL_SWITCHED, (_: unknown, data: any) => {
+        const level = hls.levels[data.level];
+        if (level?.bitrate > 0) {
+          saveSharedBandwidth(level.bitrate);
+        }
+      });
+
+      hls.on((Hls as any).Events.FRAG_LOADED, (_: unknown, data: any) => {
+        const bw = data.frag?.stats?.bwEstimate;
+        if (bw && bw > 0) {
+          saveSharedBandwidth(bw);
+        }
+      });
     });
   }
 
