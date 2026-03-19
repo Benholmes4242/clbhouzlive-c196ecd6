@@ -138,10 +138,6 @@ export function FullscreenFeedContent({ posts, startIndex, fetchNextPage, hasNex
         className="fullscreen-feed-bottom-anchor fixed bottom-0 left-0 right-0"
         style={{ height: 0 }}
       />
-
-      {/* Debug overlays — inside scoped store so they read fullscreen state */}
-      <FeedVideoDebugOverlay />
-      <ConsoleLogCapture />
     </MediaStoreProvider>
   );
 }
