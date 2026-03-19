@@ -14,6 +14,24 @@ interface ExploreTileProps {
 
 function ExploreTileInner({ post, index, allPosts, fetchNextPage, hasNextPage, isFetchingNextPage }: ExploreTileProps) {
   const media = post.mediaItems[0];
+  const tileRef = useRef<HTMLButtonElement>(null);
+  const hlsUrl = post.mediaItems?.[0]?.hlsUrl;
+
+  useEffect(() => {
+    const el = tileRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          onViewPreload(hlsUrl);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hlsUrl]);
+
   if (!media) return null;
 
   const posterSrc = media.thumbnailUrl || media.imageUrl || '';
@@ -35,6 +53,7 @@ function ExploreTileInner({ post, index, allPosts, fetchNextPage, hasNextPage, i
 
   return (
     <button
+      ref={tileRef}
       type="button"
       onClick={handleTap}
       onTouchStart={() => preTouchPreload(post.mediaItems?.[0]?.hlsUrl)}

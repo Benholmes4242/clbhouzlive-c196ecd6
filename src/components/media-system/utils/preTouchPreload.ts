@@ -28,3 +28,18 @@ export function recordPlayStart(hlsUrl: string): void {
     devLog(`[TapToPlay] ${tapToPlay}ms from touch to first frame — ${hlsUrl.slice(-30)}`);
   }
 }
+
+/**
+ * onViewPreload — call this when a video tile scrolls into view.
+ * Starts HLS pre-creation ~500ms-2s before the user taps,
+ * so the instance is ready for instant promotion when fullscreen opens.
+ */
+export function onViewPreload(hlsUrl: string | undefined): void {
+  if (!hlsUrl) return;
+  // Don't re-create if already preloaded recently
+  if (hlsUrl === _lastPreloadedUrl) return;
+  // Don't overwrite an existing timing entry (touchStart takes priority)
+  if (_preloadTimings.has(hlsUrl)) return;
+  _lastPreloadedUrl = hlsUrl;
+  preCreateHlsInstance(hlsUrl).catch(() => {});
+}
