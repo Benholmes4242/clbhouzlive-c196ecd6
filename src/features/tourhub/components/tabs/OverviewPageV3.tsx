@@ -111,13 +111,13 @@ export function OverviewPageV3() {
             <LazySection minHeight={250} rootMargin="50px">
               <TournamentInsights />
             </LazySection>
-            <LazySection minHeight={400} rootMargin="50px">
+            <LazySection minHeight={400} rootMargin="0px">
               <UnifiedWorldRankings />
             </LazySection>
-            <LazySection minHeight={300} rootMargin="50px">
+            <LazySection minHeight={300} rootMargin="0px">
               <SeasonLeaderboards />
             </LazySection>
-            <LazySection minHeight={350} rootMargin="50px">
+            <LazySection minHeight={350} rootMargin="0px">
               <CollegeRankingsPreview />
             </LazySection>
           </div>
