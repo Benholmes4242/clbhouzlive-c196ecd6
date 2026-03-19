@@ -10,6 +10,9 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Allow requests from Supabase Auth Hook (no user JWT present)
+  // The hook sends its own authorization via the hook secret header
+
   try {
     const payload = await req.json();
     const { user, email_data } = payload;
