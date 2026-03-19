@@ -27,6 +27,8 @@ interface VideoPlayerProps {
   thumbnailUrl?: string;
   duration?: number;
   mp4Url?: string;
+  width?: number;
+  height?: number;
   onDoubleTapLike?: () => void;
   onScrubStart?: () => void;
   onScrubEnd?: () => void;
@@ -35,8 +37,10 @@ interface VideoPlayerProps {
 
 export function VideoPlayer({
   hlsUrl, feedIndex, isActive, thumbnailUrl, duration: mediaDuration,
-  mp4Url, onDoubleTapLike, onScrubStart, onScrubEnd, onFirstFrameReady,
+  mp4Url, width, height, onDoubleTapLike, onScrubStart, onScrubEnd, onFirstFrameReady,
 }: VideoPlayerProps) {
+  const aspectRatio = width && height ? width / height : 0;
+  const isLandscape = aspectRatio > 1.0;
   const firstFrameFiredRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);

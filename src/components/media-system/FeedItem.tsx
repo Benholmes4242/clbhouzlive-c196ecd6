@@ -138,6 +138,8 @@ export function FeedItem({
           isActive={isActive}
           thumbnailUrl={media.thumbnailUrl}
           duration={media.duration}
+          width={media.width}
+          height={media.height}
           onFirstFrameReady={onFirstFrameReady}
         />
       ) : media.imageUrl ? (
