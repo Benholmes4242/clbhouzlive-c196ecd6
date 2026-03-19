@@ -6,7 +6,7 @@ export const HLS_CONFIG: Record<string, unknown> = {
   enableWorker: true,
   lowLatencyMode: false,
   startLevel: -1,
-  capLevelToPlayerSize: true,
+  capLevelToPlayerSize: false,
   maxBufferLength: 15,
   maxMaxBufferLength: 30,
   startFragPrefetch: true,
