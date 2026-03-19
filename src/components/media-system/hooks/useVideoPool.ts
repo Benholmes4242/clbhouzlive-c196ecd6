@@ -12,6 +12,7 @@ import {
 } from '../utils/hlsManager';
 import { fadeOut, fadeIn } from '../utils/audioFade';
 import { segmentCache } from '../utils/segmentCache';
+import { devLog } from '@/components/debug/ConsoleLogCapture';
 import { useSessionCache } from './useSessionCache';
 import { useMediaStore } from '../store/mediaStore';
 import { MediaStoreContext } from '../store/MediaStoreContext';
@@ -358,6 +359,9 @@ export function useVideoPool() {
 
       // Try promote pre-created instance first
       const promoted = promotePreCreated(hlsUrl, video, handleHlsError);
+      if (promoted) {
+        devLog(`[Pool] Prefetch promotion succeeded — ${hlsUrl.slice(-30)}`);
+      }
 
       if (!promoted) {
         // Cold load path

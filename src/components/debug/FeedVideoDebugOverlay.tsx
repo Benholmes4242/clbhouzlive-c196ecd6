@@ -217,7 +217,7 @@ export function FeedVideoDebugOverlay() {
         return next;
       });
     }
-    if (latest.message.toLowerCase().includes('prefetch')) {
+    if (latest.message.includes('Prefetch promotion succeeded') || latest.message.toLowerCase().includes('prefetch')) {
       setSessions(prev => {
         if (!prev.length) return prev;
         const next = [...prev];
