@@ -33,13 +33,21 @@ export async function setNativeHlsSource(
   manifestUrl: string
 ): Promise<void> {
   try {
+    console.log('[NativeHLS] Fetching manifest:', manifestUrl.slice(-60));
     const res = await fetch(manifestUrl);
-    if (!res.ok) throw new Error(`Manifest fetch failed: ${res.status}`);
+    if (!res.ok) {
+      console.log('[NativeHLS] Manifest fetch failed:', res.status, '— falling back to master');
+      video.src = manifestUrl;
+      return;
+    }
     const text = await res.text();
+    console.log('[NativeHLS] Manifest received, length:', text.length, 'chars');
+    console.log('[NativeHLS] Manifest preview:', text.slice(0, 300));
 
     const lines = text.split('\n');
     let bestUrl = '';
     let bestBandwidth = 0;
+    let renditionCount = 0;
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
@@ -47,22 +55,31 @@ export async function setNativeHlsSource(
         const bwMatch = line.match(/BANDWIDTH=(\d+)/);
         const bandwidth = bwMatch ? parseInt(bwMatch[1], 10) : 0;
         const nextLine = lines[i + 1]?.trim();
-        if (nextLine && !nextLine.startsWith('#') && bandwidth > bestBandwidth) {
-          bestBandwidth = bandwidth;
-          bestUrl = nextLine;
+        if (nextLine && !nextLine.startsWith('#')) {
+          renditionCount++;
+          console.log(`[NativeHLS] Rendition ${renditionCount}: ${Math.round(bandwidth/1000)}kbps — ${nextLine.slice(-50)}`);
+          if (bandwidth > bestBandwidth) {
+            bestBandwidth = bandwidth;
+            bestUrl = nextLine;
+          }
         }
       }
     }
+
+    console.log('[NativeHLS] Renditions found:', renditionCount, '| Best bandwidth:', Math.round(bestBandwidth/1000), 'kbps');
 
     if (bestUrl) {
       const absoluteUrl = bestUrl.startsWith('http')
         ? bestUrl
         : new URL(bestUrl, manifestUrl).href;
+      console.log('[NativeHLS] Setting src to highest rendition:', absoluteUrl.slice(-80));
       video.src = absoluteUrl;
     } else {
+      console.log('[NativeHLS] No renditions parsed — falling back to master manifest');
       video.src = manifestUrl;
     }
-  } catch {
+  } catch (err) {
+    console.log('[NativeHLS] Exception:', String(err), '— falling back to master manifest');
     video.src = manifestUrl;
   }
 }
