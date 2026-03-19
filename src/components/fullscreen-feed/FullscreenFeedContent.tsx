@@ -14,8 +14,6 @@ import { useStore } from 'zustand';
 import { ChevronLeft } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { Scrubber } from '@/components/media-system/Scrubber';
-import FeedVideoDebugOverlay from '@/components/debug/FeedVideoDebugOverlay';
-import ConsoleLogCapture from '@/components/debug/ConsoleLogCapture';
 
 interface FullscreenFeedContentProps {
   posts: FeedPost[];
@@ -140,10 +138,6 @@ export function FullscreenFeedContent({ posts, startIndex, fetchNextPage, hasNex
         className="fullscreen-feed-bottom-anchor fixed bottom-0 left-0 right-0"
         style={{ height: 0 }}
       />
-
-      {/* Debug overlays — inside scoped store so they read fullscreen state */}
-      <FeedVideoDebugOverlay />
-      <ConsoleLogCapture />
     </MediaStoreProvider>
   );
 }
