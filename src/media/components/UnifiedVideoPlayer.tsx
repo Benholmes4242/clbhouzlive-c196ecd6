@@ -53,71 +53,7 @@ import {
   logVideoElementUnmount,
 } from '@/media/mobileVideoDebug';
 
-// ─── Shared HLS bandwidth memory ─────────────────────────────────────────────
-// Persists the last measured bandwidth within a browser session so each new
-// HLS.js instance starts knowing the connection speed instead of defaulting
-// to the lowest quality rendition.
-// Uses in-memory (fast) + sessionStorage (survives app backgrounding).
-// Resets on every new browser session — prevents stale cross-network measurements.
-let _sharedBandwidth = 0; // bits per second, in-memory
-
-function getSharedBandwidth(): number {
-  if (_sharedBandwidth > 0) return _sharedBandwidth;
-  try {
-    const v = sessionStorage.getItem('clbhouz-hls-bw');
-    return v ? parseInt(v, 10) : 0;
-  } catch { return 0; }
-}
-
-function saveSharedBandwidth(bps: number): void {
-  if (bps <= 0) return;
-  _sharedBandwidth = bps;
-  try { sessionStorage.setItem('clbhouz-hls-bw', String(Math.round(bps))); } catch {}
-}
-
-// ============ Native HLS Quality Fix ============
-// iOS Safari ignores all query-string quality hints on HLS manifests.
-// This helper fetches the master manifest, parses the rendition ladder,
-// and sets video.src to the highest-bandwidth single-rendition URL directly.
-const setNativeHlsSource = async (video: HTMLVideoElement, manifestUrl: string): Promise<void> => {
-  try {
-    const res = await fetch(manifestUrl);
-    if (!res.ok) throw new Error(`Manifest fetch failed: ${res.status}`);
-    const text = await res.text();
-
-    // Parse EXT-X-STREAM-INF entries to find highest bandwidth rendition
-    const lines = text.split('\n');
-    let bestUrl = '';
-    let bestBandwidth = 0;
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (line.startsWith('#EXT-X-STREAM-INF:')) {
-        const bwMatch = line.match(/BANDWIDTH=(\d+)/);
-        const bandwidth = bwMatch ? parseInt(bwMatch[1], 10) : 0;
-        const nextLine = lines[i + 1]?.trim();
-        if (nextLine && !nextLine.startsWith('#') && bandwidth > bestBandwidth) {
-          bestBandwidth = bandwidth;
-          bestUrl = nextLine;
-        }
-      }
-    }
-
-    if (bestUrl) {
-      const absoluteUrl = bestUrl.startsWith('http')
-        ? bestUrl
-        : new URL(bestUrl, manifestUrl).href;
-      console.log(`[UnifiedVideoPlayer] Native HLS — selected rendition: ${Math.round(bestBandwidth / 1000)}kbps — ${absoluteUrl.slice(-60)}`);
-      video.src = absoluteUrl;
-    } else {
-      console.log('[UnifiedVideoPlayer] Native HLS — manifest parse failed, using master');
-      video.src = manifestUrl;
-    }
-  } catch (err) {
-    console.log('[UnifiedVideoPlayer] Native HLS — fetch error, using master:', err);
-    video.src = manifestUrl;
-  }
-};
+import { getSharedBandwidth, saveSharedBandwidth, setNativeHlsSource } from '@/components/media-system/utils/sharedBandwidth';
 
 // ============ Types ============
 

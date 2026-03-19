@@ -127,11 +127,7 @@ export async function attachMedia(
   }
 
   if (supportsNativeHls()) {
-    // Do NOT set video.src here on native HLS.
-    // UnifiedVideoPlayer calls setNativeHlsSource() which fetches the manifest,
-    // parses the rendition ladder, and sets the highest quality rendition URL directly.
-    // Setting video.src here causes iOS to start loading the master manifest at 360p
-    // before setNativeHlsSource can override it.
+    await setNativeHlsSource(video, hlsUrl);
     return;
   }
 
