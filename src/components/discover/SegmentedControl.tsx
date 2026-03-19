@@ -27,7 +27,7 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
     <section className={cn('py-0 px-4 bg-background', className)}>
       <div
         role="tablist"
-        style={{ borderBottom: '1px solid hsl(var(--border))', display: 'flex', gap: 20 }}
+        style={{ borderBottom: '1px solid hsl(var(--border))', display: 'flex', gap: 20, justifyContent: 'center' }}
       >
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
