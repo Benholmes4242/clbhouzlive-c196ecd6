@@ -89,7 +89,7 @@ export function useMultiLeaderboardRealtime(tournamentIds: (string | null | unde
             queryClient.invalidateQueries({ queryKey: ['prediction-tracker', tid] });
             queryClient.invalidateQueries({ queryKey: ['tourhub', 'tournament-leaders-winners-v2'] });
             queryClient.invalidateQueries({ queryKey: ['leaderboard-cache'] });
-            queryClient.invalidateQueries({ queryKey: ['live-arena'] });
+            
             queryClient.invalidateQueries({ queryKey: ['hero-carousel-data'] });
             queryClient.invalidateQueries({ queryKey: ['overview-live-right-now'] });
             queryClient.invalidateQueries({ queryKey: ['live-leader-teaser'] });

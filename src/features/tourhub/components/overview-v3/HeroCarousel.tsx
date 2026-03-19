@@ -1182,6 +1182,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
             onDotClick={setCurrentIndex}
             leadersWinnersMap={leadersWinnersMap}
             liveLeaderboardRows={lbCache?.live.get(slide.tournament.id) ?? []}
+            lbCacheLoading={lbCacheLoading}
             isExpanded={index === currentIndex && (slide.type === 'live' ? true : isExpanded)}
             onToggleExpand={handleToggleExpand}
             onInteraction={() => {
