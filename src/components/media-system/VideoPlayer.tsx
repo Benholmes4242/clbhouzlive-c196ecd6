@@ -143,6 +143,9 @@ export function VideoPlayer({
 
       videoEl = video;
       videoRef.current = video;
+      // Override object-fit based on media aspect ratio
+      video.style.objectFit = isLandscape ? 'contain' : 'cover';
+      video.style.zIndex = '1';
       setVideoElement(video);
       getStore().setActiveVideoElement(video, videoRef);
       video.muted = isMuted;
