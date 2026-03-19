@@ -794,6 +794,17 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
               const level = pooledHls.levels[data.level];
               if (level) {
                 setQuality(level.height);
+                // Save real bitrate measurement for next video instance
+                if (level.bitrate > 0) {
+                  saveSharedBandwidth(level.bitrate);
+                }
+              }
+            });
+
+            pooledHls.on(Hls.Events.FRAG_LOADED, (_, data) => {
+              // Save real measured download bandwidth for next HLS.js instance
+              if (data.stats?.bwEstimate && data.stats.bwEstimate > 0) {
+                saveSharedBandwidth(data.stats.bwEstimate);
               }
             });
 
