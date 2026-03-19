@@ -210,8 +210,28 @@ function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
         </div>
       </div>
 
+      {/* Match % pill — above stats row */}
+      <div style={{ padding: '0 16px', marginTop: -28, position: 'relative', zIndex: 4, display: 'flex', alignItems: 'flex-start', marginBottom: 8 }}>
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center', gap: 6,
+          fontSize: 12, fontWeight: 700,
+          color: 'hsl(var(--foreground))',
+          background: 'rgba(0,0,0,0.06)',
+          border: '1px solid rgba(0,0,0,0.10)',
+          borderRadius: 20, padding: '4px 12px',
+        }}>
+          <div style={{
+            width: 6, height: 6, borderRadius: '50%',
+            background: tierDotColor(pick.confidenceTier),
+            flexShrink: 0,
+          }} />
+          {pick.matchPct}% Match
+        </div>
+      </div>
+
       {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* ZONE 2 — STATS GRID (overlaps hero by 28px) */}
+      {/* ZONE 2 — STATS GRID */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {hasStats && (
         <div
