@@ -208,39 +208,38 @@ function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* Match % pill — sits above stats row */}
+      {/* ZONE 2 — MATCH PILL + STATS GRID (overlaps hero by 28px) */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
-      <div style={{ padding: '0 16px', marginBottom: 8 }}>
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center', gap: 6,
-          fontSize: 12, fontWeight: 700,
-          color: 'hsl(var(--foreground))',
-          background: 'rgba(0,0,0,0.06)',
-          border: '1px solid rgba(0,0,0,0.10)',
-          borderRadius: 20, padding: '4px 12px',
-        }}>
+      <div
+        style={{
+          padding: '0 16px 8px',
+          marginTop: -28,
+          position: 'relative',
+          zIndex: 4,
+        }}
+      >
+        {/* Match % pill */}
+        <div style={{ marginBottom: 8 }}>
           <div style={{
-            width: 6, height: 6, borderRadius: '50%',
-            background: tierDotColor(pick.confidenceTier),
-            flexShrink: 0,
-          }} />
-          {pick.matchPct}% Match
+            display: 'inline-flex',
+            alignItems: 'center', gap: 6,
+            fontSize: 12, fontWeight: 700,
+            color: 'hsl(var(--foreground))',
+            background: 'rgba(0,0,0,0.06)',
+            border: '1px solid rgba(0,0,0,0.10)',
+            borderRadius: 20, padding: '4px 12px',
+          }}>
+            <div style={{
+              width: 6, height: 6, borderRadius: '50%',
+              background: tierDotColor(pick.confidenceTier),
+              flexShrink: 0,
+            }} />
+            {pick.matchPct}% Match
+          </div>
         </div>
-      </div>
 
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* ZONE 2 — STATS GRID (overlaps hero by 28px) */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {hasStats && (
-        <div
-          style={{
-            padding: '0 16px 8px',
-            marginTop: -28,
-            position: 'relative',
-            zIndex: 4,
-          }}
-        >
+        {/* Stats grid */}
+        {hasStats && (
           <div
             style={{
               display: 'grid',
@@ -253,8 +252,8 @@ function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
             <StatChip value={stats.greensInReg} label="GIR" unit="%" />
             <StatChip value={stats.puttingAverage} label="Putts" />
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {/* ZONE 3 — AI TIPS */}
