@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
-import { preTouchPreload } from '@/components/media-system/utils/preTouchPreload';
+import { preTouchPreload, onViewPreload } from '@/components/media-system/utils/preTouchPreload';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
@@ -29,9 +29,27 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
   const duration = media?.duration;
   const reviewRating = post.review?.rating;
   const avatarUrl = post.avatarUrl;
+  const tileRef = useRef<HTMLDivElement>(null);
+  const hlsUrl = media?.hlsUrl;
+
+  useEffect(() => {
+    const el = tileRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          onViewPreload(hlsUrl);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hlsUrl]);
 
   return (
     <div
+      ref={tileRef}
       data-course-media-index={index}
       className="relative aspect-[4/5] overflow-hidden rounded-[4px] cursor-pointer active:scale-[0.97]"
       style={{ transition: 'transform 100ms ease' }}

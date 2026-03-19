@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Heart, Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
-import { preTouchPreload } from '@/components/media-system/utils/preTouchPreload';
+import { preTouchPreload, onViewPreload } from '@/components/media-system/utils/preTouchPreload';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
@@ -31,9 +31,27 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, fetchNextP
   const thumbnailUrl = media?.thumbnailUrl;
   const duration = media?.duration;
   const engagement = post.likeCount + post.commentCount + post.shareCount;
+  const tileRef = useRef<HTMLDivElement>(null);
+  const hlsUrl = post.mediaItems?.[0]?.hlsUrl;
+
+  useEffect(() => {
+    const el = tileRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          onViewPreload(hlsUrl);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hlsUrl]);
 
   return (
     <div
+      ref={tileRef}
       data-watch-index={index}
       className="relative aspect-[4/5] overflow-hidden rounded-[4px] cursor-pointer active:scale-[0.97]"
       style={{ transition: 'transform 100ms ease' }}
