@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { Star, Play, Heart, MessageCircle, MoreHorizontal } from 'lucide-react';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
+import { preTouchPreload } from '@/components/media-system/utils/preTouchPreload';
 import { formatDistanceToNow } from 'date-fns';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatCompact } from './utils';
@@ -32,6 +33,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
   return (
     <div
       className="bg-card overflow-hidden cursor-pointer active:scale-[0.99] transition-transform"
+      onTouchStart={() => preTouchPreload(userMedia?.hlsUrl)}
       onClick={() => {
         if (allPosts && postIndex != null) {
           useFullscreenFeed.getState().open({

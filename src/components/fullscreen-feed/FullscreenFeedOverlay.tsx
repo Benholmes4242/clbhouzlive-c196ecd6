@@ -15,12 +15,17 @@ export function FullscreenFeedOverlay() {
   // Never render over the Clubhouse feed — it has its own action rail
   const isClubhouse = pathname === '/' || pathname === '/clubhouse';
 
-  if (!isOpen || posts.length === 0 || isClubhouse) return null;
+  if (isClubhouse) return null;
+  if (posts.length === 0) return null;
 
   return createPortal(
     <div
       className="fixed inset-0 z-[9999] bg-black"
-      style={{ isolation: 'isolate' }}
+      style={{
+        isolation: 'isolate',
+        visibility: isOpen ? 'visible' : 'hidden',
+        pointerEvents: isOpen ? 'auto' : 'none',
+      }}
     >
       <FullscreenFeedContent
         posts={posts}

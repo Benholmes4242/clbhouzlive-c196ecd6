@@ -10,6 +10,7 @@ import CommentsSheet from '@/components/comments/CommentsSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { FriendsCardMenu } from './FriendsCardMenu';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
+import { preTouchPreload } from '@/components/media-system/utils/preTouchPreload';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
 
 interface FriendsCardProps {
@@ -213,6 +214,7 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
           data-media-wrapper
           aria-label={`Play post by ${post.displayName}`}
           className={`relative w-full ${aspectClass} bg-muted`}
+          onTouchStart={() => preTouchPreload(firstMedia?.hlsUrl)}
           onClick={() => {
             if (allPosts && cardIndex != null) {
               useFullscreenFeed.getState().open({

@@ -4,6 +4,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { Heart, MessageCircle, Share2, MapPin } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
+import { preTouchPreload } from '@/components/media-system/utils/preTouchPreload';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import CommentsSheet from '@/components/comments/CommentsSheet';
@@ -215,6 +216,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
           data-media-wrapper
           className="relative w-full aspect-[16/9.5] bg-muted cursor-pointer"
           onClick={handleTap}
+          onTouchStart={() => preTouchPreload(firstVideo?.hlsUrl)}
           aria-label={`Play video by ${post.displayName}`}
         >
           {thumbnailUrl && (

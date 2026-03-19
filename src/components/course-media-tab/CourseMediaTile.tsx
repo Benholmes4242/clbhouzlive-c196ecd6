@@ -3,6 +3,7 @@ import { Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
+import { preTouchPreload } from '@/components/media-system/utils/preTouchPreload';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
@@ -34,6 +35,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
       data-course-media-index={index}
       className="relative aspect-[4/5] overflow-hidden rounded-[4px] cursor-pointer active:scale-[0.97]"
       style={{ transition: 'transform 100ms ease' }}
+      onTouchStart={() => preTouchPreload(media?.hlsUrl)}
       onClick={() => {
         if (allPosts) {
           useFullscreenFeed.getState().open({

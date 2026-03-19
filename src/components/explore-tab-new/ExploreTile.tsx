@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
+import { preTouchPreload } from '@/components/media-system/utils/preTouchPreload';
 
 interface ExploreTileProps {
   post: FeedPost;
@@ -36,6 +37,7 @@ function ExploreTileInner({ post, index, allPosts, fetchNextPage, hasNextPage, i
     <button
       type="button"
       onClick={handleTap}
+      onTouchStart={() => preTouchPreload(post.mediaItems?.[0]?.hlsUrl)}
       aria-label={courseName ? `View ${courseName}` : 'View post'}
       className="relative aspect-[4/5] rounded-[4px] overflow-hidden bg-muted focus:outline-none"
       data-explore-index={index}

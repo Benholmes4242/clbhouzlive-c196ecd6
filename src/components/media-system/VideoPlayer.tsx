@@ -13,6 +13,7 @@ import { useGaplessLoop } from './hooks/useGaplessLoop';
 import { getHlsInstance } from './utils/hlsManager';
 import { LoadingSkeleton } from './LoadingSkeleton';
 import { ErrorState } from './ErrorState';
+import { recordPlayStart } from './utils/preTouchPreload';
 // Scrubber moved to page level (Clubhouse.tsx)
 import { Play, Pause, Heart } from 'lucide-react';
 import { haptic } from '@/utils/haptics';
@@ -120,6 +121,7 @@ export function VideoPlayer({
           if (videoEl && videoEl.duration && isFinite(videoEl.duration)) {
             setVideoDuration(videoEl.duration);
           }
+          recordPlayStart(hlsUrl);
           if (!firstFrameFiredRef.current && onFirstFrameReady) {
             firstFrameFiredRef.current = true;
             onFirstFrameReady();
