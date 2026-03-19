@@ -43,7 +43,8 @@ export const useFullscreenFeed = create<FullscreenFeedState>((set) => ({
     }),
   appendPosts: (newPosts) =>
     set((state) => ({ posts: [...state.posts, ...newPosts] })),
-  close: () =>
+  close: () => set({ isOpen: false }),
+  reset: () =>
     set({
       isOpen: false,
       posts: [],
