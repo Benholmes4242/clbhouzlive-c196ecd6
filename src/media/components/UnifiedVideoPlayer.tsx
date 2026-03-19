@@ -701,8 +701,12 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         // HLS.js playback — Hls is already loaded above
         try {
           if (!Hls || !Hls.isSupported() || !mountedRef.current) {
-            // Fall back to native
-            video.src = hlsUrl;
+            // Fall back to native — apply 720p quality hint for Cloudflare Stream
+            const fallbackSrc = hlsUrl.includes('.m3u8') && hlsUrl.includes('cloudflarestream.com')
+              ? `${hlsUrl}${hlsUrl.includes('?') ? '&' : '?'}defaultQuality=720`
+              : hlsUrl;
+            console.log('[UnifiedVideoPlayer] Native fallback — manifest URL:', fallbackSrc);
+            video.src = fallbackSrc;
             return;
           }
 
