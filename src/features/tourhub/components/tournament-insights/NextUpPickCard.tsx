@@ -210,67 +210,47 @@ function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {/* ZONE 2 — STATS GRID (overlaps hero by 28px) */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
-      {hasStats ? (
+      {/* Match % pill — sits between hero and stats, no negative margin */}
+      <div style={{ padding: '0 16px', marginTop: 8, marginBottom: 4 }}>
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center', gap: 6,
+          fontSize: 12, fontWeight: 700,
+          color: 'hsl(var(--foreground))',
+          background: 'rgba(0,0,0,0.06)',
+          border: '1px solid rgba(0,0,0,0.10)',
+          borderRadius: 20, padding: '4px 12px',
+        }}>
+          <div style={{
+            width: 6, height: 6, borderRadius: '50%',
+            background: tierDotColor(pick.confidenceTier),
+            flexShrink: 0,
+          }} />
+          {pick.matchPct}% Match
+        </div>
+      </div>
+
+      {/* Stats chips — overlap hero with negative margin */}
+      {hasStats && (
         <div
           style={{
-            marginTop: -28,
+            marginTop: -20,
             position: 'relative',
             zIndex: 4,
+            padding: '0 16px 8px',
           }}
         >
-          {/* Match % pill — left-aligned, sitting just above stats chips */}
-          <div style={{ padding: '0 16px', marginBottom: 6 }}>
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center', gap: 6,
-              fontSize: 12, fontWeight: 700,
-              color: 'hsl(var(--foreground))',
-              background: 'rgba(0,0,0,0.06)',
-              border: '1px solid rgba(0,0,0,0.10)',
-              borderRadius: 20, padding: '4px 12px',
-            }}>
-              <div style={{
-                width: 6, height: 6, borderRadius: '50%',
-                background: tierDotColor(pick.confidenceTier),
-                flexShrink: 0,
-              }} />
-              {pick.matchPct}% Match
-            </div>
-          </div>
-
-          {/* Stats chips */}
-          <div style={{ padding: '0 16px 8px' }}>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(4, 1fr)',
-                gap: 5,
-              }}
-            >
-              <StatChip value={stats.drivingDistance} label="Driver" unit="yds" />
-              <StatChip value={stats.drivingAccuracy} label="Accuracy" unit="%" />
-              <StatChip value={stats.greensInReg} label="GIR" unit="%" />
-              <StatChip value={stats.puttingAverage} label="Putts" />
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div style={{ padding: '0 16px', marginBottom: 8 }}>
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center', gap: 6,
-            fontSize: 12, fontWeight: 700,
-            color: 'hsl(var(--foreground))',
-            background: 'rgba(0,0,0,0.06)',
-            border: '1px solid rgba(0,0,0,0.10)',
-            borderRadius: 20, padding: '4px 12px',
-          }}>
-            <div style={{
-              width: 6, height: 6, borderRadius: '50%',
-              background: tierDotColor(pick.confidenceTier),
-              flexShrink: 0,
-            }} />
-            {pick.matchPct}% Match
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: 5,
+            }}
+          >
+            <StatChip value={stats.drivingDistance} label="Driver" unit="yds" />
+            <StatChip value={stats.drivingAccuracy} label="Accuracy" unit="%" />
+            <StatChip value={stats.greensInReg} label="GIR" unit="%" />
+            <StatChip value={stats.puttingAverage} label="Putts" />
           </div>
         </div>
       )}
