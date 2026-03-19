@@ -211,7 +211,7 @@ function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
       </div>
 
       {/* Match % pill — above stats row */}
-      <div style={{ padding: '0 16px', marginTop: -28, position: 'relative', zIndex: 4, display: 'flex', alignItems: 'flex-start', marginBottom: 8 }}>
+      <div style={{ padding: '0 16px', marginTop: -36, position: 'relative', zIndex: 4, display: 'flex', alignItems: 'flex-start', marginBottom: 8 }}>
         <div style={{
           display: 'inline-flex',
           alignItems: 'center', gap: 6,
