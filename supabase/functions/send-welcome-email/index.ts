@@ -83,7 +83,7 @@ serve(async (req) => {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${resendApiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: 'Clbhouz <noreply@clbhouz.com>',
+        from: 'Clbhouz <notifications@clbhouz.com>',
         to: [userEmail],
         subject: `Verify your Clbhouz account`,
         html,
