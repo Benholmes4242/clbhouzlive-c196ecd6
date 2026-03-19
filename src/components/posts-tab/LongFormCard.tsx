@@ -20,10 +20,28 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
   const firstMedia = post.mediaItems[0];
   const thumbnailUrl = firstMedia?.thumbnailUrl || firstMedia?.imageUrl;
   const duration = firstMedia?.duration;
+  const hlsUrl = firstMedia?.hlsUrl;
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
+  const tileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = tileRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          onViewPreload(hlsUrl);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hlsUrl]);
 
   return (
     <div
+      ref={tileRef}
       className="bg-card overflow-hidden border-b border-border/50 cursor-pointer active:scale-[0.99] transition-transform"
       onTouchStart={() => preTouchPreload(firstMedia?.hlsUrl)}
       onClick={() => {

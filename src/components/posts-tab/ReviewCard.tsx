@@ -18,20 +18,39 @@ interface ReviewCardProps {
 export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postIndex, isOwnPost, onDelete }) => {
   const [expanded, setExpanded] = useState(false);
   const review = post.review;
+  const tileRef = useRef<HTMLDivElement>(null);
   if (!review) return null;
 
   const userMedia = post.mediaItems[0];
   const thumbnailUrl = userMedia?.thumbnailUrl || userMedia?.imageUrl || review.courseImageUrl;
   const isVideo = userMedia?.type === 'video';
   const duration = userMedia?.duration;
+  const hlsUrl = userMedia?.hlsUrl;
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
   const location = [review.courseRegion, review.courseCountry].filter(Boolean).join(', ');
 
   // Unified amber accent for all rating tiers
   const accentColor = '#f59e0b';
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    const el = tileRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          onViewPreload(hlsUrl);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hlsUrl]);
+
   return (
     <div
+      ref={tileRef}
       className="bg-card overflow-hidden cursor-pointer active:scale-[0.99] transition-transform"
       onTouchStart={() => preTouchPreload(userMedia?.hlsUrl)}
       onClick={() => {

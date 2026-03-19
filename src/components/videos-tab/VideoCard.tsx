@@ -133,7 +133,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
 
   return (
     <>
-      <article className="bg-card overflow-hidden border-b border-border/50">
+      <article ref={tileRef} className="bg-card overflow-hidden border-b border-border/50">
         {/* Creator header */}
         <div className="flex items-center gap-3 px-3 pt-3 pb-2">
           <button
