@@ -683,7 +683,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
         const isHlsUrl = hlsUrl.includes('.m3u8');
 
         if (canPlayNatively || !isHlsUrl) {
-          console.log('[UVP DEBUG] Taking NATIVE path for:', hlsUrl?.slice(-30));
+          // Native playback - fetch manifest and select highest quality rendition
           // Native playback - fetch manifest and select highest quality rendition
           // iOS native HLS ignores all query hints, so we parse the manifest ourselves
           await setNativeHlsSource(video, hlsUrl);
