@@ -93,7 +93,7 @@ function StatChip({
           fontWeight: 700,
           letterSpacing: 0.8,
           textTransform: 'uppercase' as const,
-          color: 'hsl(var(--muted-foreground))',
+          color: 'hsl(var(--foreground))',
           marginTop: 3,
         }}
       >
