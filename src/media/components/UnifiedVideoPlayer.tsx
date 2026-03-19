@@ -827,9 +827,11 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
             // capLevelToPlayerSize: true was capping at ~360-540p on phones — removed.
             capLevelToPlayerSize: false,
 
-            // Quality: start with a realistic bandwidth estimate for mobile (5 Mbps).
-            // 1 Mbps was too conservative — caused ABR to start at lowest rendition.
-            abrEwmaDefaultEstimate: 5_000_000,
+            // Quality: seed with shared bandwidth from previous video, or 8 Mbps default.
+            // Shared estimate ensures video #2+ starts at the quality video #1 measured.
+            abrEwmaDefaultEstimate: getSharedBandwidth() > 0
+              ? getSharedBandwidth()
+              : 8_000_000,   // 8 Mbps default on first video — aggressive but safe given observed 100% buffer health
 
             // Quality: ramp up to higher quality more aggressively.
             abrBandWidthFactor: 0.95,         // Use 95% of measured bandwidth
