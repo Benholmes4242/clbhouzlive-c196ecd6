@@ -106,7 +106,7 @@ function StatChip({
 
 // ─── Single pick slide ────────────────────────────────────────────────────────
 
-function PickSlide({ pick, index }: { pick: PickItem; index: number }) {
+function PickSlide({ pick, index, totalPicks, onNav }: { pick: PickItem; index: number; totalPicks: number; onNav: (dir: number) => void }) {
   const { data: stats } = useWinnerSeasonStats(pick.id);
 
   const photo =
