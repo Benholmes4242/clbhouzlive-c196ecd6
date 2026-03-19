@@ -13,7 +13,7 @@
  */
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { useMediaStore } from '@/components/media-system/store/mediaStore';
+import { useMediaStoreCompat } from '@/components/media-system/store/useMediaStoreCompat';
 import { subscribeToDebugLogs, clearDebugLogs, type DebugLogEntry } from '@/media/mobileVideoDebug';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -90,10 +90,10 @@ export function FeedVideoDebugOverlay() {
   const [isOpen, setIsOpen]         = useState(false);
   const [activeTab, setActiveTab]   = useState<Tab>('live');
   const [copyState, setCopyState]   = useState<'idle' | 'copied' | 'failed'>('idle');
-  const activeVideoElement          = useMediaStore(s => s.activeVideoElement);
-  const activeIndex                 = useMediaStore(s => s.activeIndex);
-  const isMuted                     = useMediaStore(s => s.isMuted);
-  const errorItems                  = useMediaStore(s => s.errorItems);
+  const activeVideoElement          = useMediaStoreCompat(s => s.activeVideoElement);
+  const activeIndex                 = useMediaStoreCompat(s => s.activeIndex);
+  const isMuted                     = useMediaStoreCompat(s => s.isMuted);
+  const errorItems                  = useMediaStoreCompat(s => s.errorItems);
 
   const [snap, setSnap]             = useState<VideoSnapshot | null>(null);
   const [domVideoCount, setDomVideoCount] = useState(0);
