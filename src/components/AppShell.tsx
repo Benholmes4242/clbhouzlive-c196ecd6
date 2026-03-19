@@ -2,6 +2,8 @@ import React, { PropsWithChildren, useEffect } from "react";
 import { warmHlsJs } from "@/hooks/useHlsUrlCache";
 import { initMobileVideoDebug } from "@/media/mobileVideoDebug";
 import { runBandwidthProbe } from "@/components/media-system/utils/bandwidthProbe";
+import FeedVideoDebugOverlay from '@/components/debug/FeedVideoDebugOverlay';
+import ConsoleLogCapture from '@/components/debug/ConsoleLogCapture';
 
 /**
  * Wrap the entire app in <AppShell> so content respects iOS safe areas,
@@ -37,6 +39,8 @@ export default function AppShell({ children }: PropsWithChildren) {
       </div>
       {/* Global A11y live region for screen reader announcements */}
       <div id="a11y-live" className="sr-live" aria-live="polite" aria-atomic="true" />
+      <FeedVideoDebugOverlay />
+      <ConsoleLogCapture />
     </>
   );
 }
