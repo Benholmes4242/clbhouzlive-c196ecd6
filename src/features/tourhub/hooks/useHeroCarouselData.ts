@@ -17,6 +17,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TOUR_CONFIG, type TourId } from './useOverviewData';
 import { useTournamentsCache, type CachedTournament } from '@/hooks/useTournamentsCache';
+import { useLeaderboardCache } from './useLeaderboardCache';
 import { getContextLabel } from '../utils/tournamentClassification';
 
 // Tour priority order for sorting live tournaments
