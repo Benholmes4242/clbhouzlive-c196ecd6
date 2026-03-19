@@ -48,7 +48,7 @@ const Top100LeaderboardPanel = () => {
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}
-                className="min-h-[36px] px-4 text-sm font-semibold transition-all active:scale-[0.97] shadow-none
+                className="min-h-[36px] px-4 text-sm font-semibold transition-all active:scale-[0.97] shadow-none after:hidden
                   data-[state=active]:text-white data-[state=active]:shadow-none data-[state=active]:bg-foreground data-[state=active]:border-0
                   data-[state=inactive]:text-muted-foreground data-[state=inactive]:bg-transparent data-[state=inactive]:border-[1.5px] data-[state=inactive]:border-border"
                 style={{
