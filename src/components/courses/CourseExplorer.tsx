@@ -432,7 +432,7 @@ const CourseExplorer = () => {
       <YourNetworkSection className="mt-2 px-4" />
 
       <div
-        className="sticky top-0 z-10 bg-background pb-3 px-4 space-y-5"
+        className="sticky top-0 z-10 bg-background pb-3 space-y-5 -mx-4 px-4"
         style={{ borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
       >
       {/* Search */}
