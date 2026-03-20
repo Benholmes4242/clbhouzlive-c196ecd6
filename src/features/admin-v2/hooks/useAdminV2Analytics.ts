@@ -280,3 +280,316 @@ export function useAuthAnalytics(period: AnalyticsPeriod) {
     staleTime: 5 * 60_000,
   });
 }
+
+// ─── Engagement analytics ─────────────────────────────────────────────────────
+
+export interface EngagementAnalyticsData {
+  totalEvents: number;
+  avgEventsPerUserDay: number;
+  mostActiveUser: string;
+  busiestHour: number;
+  dailyVolume: DailyBucket[];
+  topEvents: { name: string; count: number; uniqueUsers: number }[];
+}
+
+async function fetchEngagementAnalytics(period: AnalyticsPeriod): Promise<EngagementAnalyticsData> {
+  const days = periodToDays(period);
+  const since = startOf(period).toISOString();
+
+  const { data: events } = await supabase
+    .from('analytics_events')
+    .select('name, user_id, created_at')
+    .gte('created_at', since);
+
+  const rows = events ?? [];
+  const totalEvents = rows.length;
+
+  // Avg events per user per day
+  const userDays = new Map<string, Set<string>>();
+  const hourCounts: Record<number, number> = {};
+  const userCounts = new Map<string, number>();
+  const eventCounts = new Map<string, { count: number; users: Set<string> }>();
+
+  for (const r of rows) {
+    const day = r.created_at.slice(0, 10);
+    const hour = new Date(r.created_at).getHours();
+    hourCounts[hour] = (hourCounts[hour] ?? 0) + 1;
+
+    if (r.user_id) {
+      if (!userDays.has(r.user_id)) userDays.set(r.user_id, new Set());
+      userDays.get(r.user_id)!.add(day);
+      userCounts.set(r.user_id, (userCounts.get(r.user_id) ?? 0) + 1);
+    }
+
+    if (!eventCounts.has(r.name)) eventCounts.set(r.name, { count: 0, users: new Set() });
+    const ec = eventCounts.get(r.name)!;
+    ec.count++;
+    if (r.user_id) ec.users.add(r.user_id);
+  }
+
+  const uniqueUserCount = userDays.size || 1;
+  const avgEventsPerUserDay = Math.round(totalEvents / uniqueUserCount / Math.max(days, 1));
+
+  let mostActiveUserId = '—';
+  let maxCount = 0;
+  for (const [uid, cnt] of userCounts) {
+    if (cnt > maxCount) { maxCount = cnt; mostActiveUserId = uid; }
+  }
+
+  // Resolve username
+  let mostActiveUser = mostActiveUserId;
+  if (mostActiveUserId !== '—') {
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('username')
+      .eq('id', mostActiveUserId)
+      .single();
+    if (profile?.username) mostActiveUser = `@${profile.username} (${maxCount})`;
+  }
+
+  const busiestHour = Object.entries(hourCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? 0;
+
+  const topEvents = Array.from(eventCounts.entries())
+    .map(([name, { count, users }]) => ({ name, count, uniqueUsers: users.size }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 20);
+
+  return {
+    totalEvents,
+    avgEventsPerUserDay,
+    mostActiveUser,
+    busiestHour: Number(busiestHour),
+    dailyVolume: fillBuckets(rows, days),
+    topEvents,
+  };
+}
+
+export function useEngagementAnalytics(period: AnalyticsPeriod) {
+  return useQuery({
+    queryKey: ['admin-v2', 'analytics', 'engagement', period],
+    queryFn: () => fetchEngagementAnalytics(period),
+    staleTime: 5 * 60_000,
+  });
+}
+
+// ─── Navigation analytics ─────────────────────────────────────────────────────
+
+export interface NavigationAnalyticsData {
+  totalPageViews: number;
+  mostVisitedPage: string;
+  avgSessionDuration: number;
+  mostTappedTab: string;
+  dailyPageViews: DailyBucket[];
+  pageTable: { path: string; views: number; uniqueUsers: number; avgTimeSec: number }[];
+  navTabs: { tab: string; count: number }[];
+}
+
+async function fetchNavigationAnalytics(period: AnalyticsPeriod): Promise<NavigationAnalyticsData> {
+  const days = periodToDays(period);
+  const since = startOf(period).toISOString();
+
+  const [pvRes, peRes, navRes] = await Promise.all([
+    supabase.from('analytics_events').select('created_at, user_id, props').eq('name', 'page_view').gte('created_at', since),
+    supabase.from('analytics_events').select('created_at, user_id, props').eq('name', 'page_exit').gte('created_at', since),
+    supabase.from('analytics_events').select('created_at, props').eq('name', 'nav_tab_tap').gte('created_at', since),
+  ]);
+
+  const pvRows = pvRes.data ?? [];
+  const peRows = peRes.data ?? [];
+  const navRows = navRes.data ?? [];
+
+  // Page views by path
+  const pathStats = new Map<string, { views: number; users: Set<string>; totalSec: number; exitCount: number }>();
+  for (const r of pvRows) {
+    const path = (r.props as any)?.path ?? '/';
+    if (!pathStats.has(path)) pathStats.set(path, { views: 0, users: new Set(), totalSec: 0, exitCount: 0 });
+    const s = pathStats.get(path)!;
+    s.views++;
+    if (r.user_id) s.users.add(r.user_id);
+  }
+  for (const r of peRows) {
+    const path = (r.props as any)?.path ?? '/';
+    const dur = Number((r.props as any)?.duration_sec) || 0;
+    if (pathStats.has(path)) {
+      pathStats.get(path)!.totalSec += dur;
+      pathStats.get(path)!.exitCount++;
+    }
+  }
+
+  const pageTable = Array.from(pathStats.entries())
+    .map(([path, s]) => ({
+      path,
+      views: s.views,
+      uniqueUsers: s.users.size,
+      avgTimeSec: s.exitCount > 0 ? Math.round(s.totalSec / s.exitCount) : 0,
+    }))
+    .sort((a, b) => b.views - a.views)
+    .slice(0, 30);
+
+  // Nav tabs
+  const tabCounts = new Map<string, number>();
+  for (const r of navRows) {
+    const tab = (r.props as any)?.tab ?? 'unknown';
+    tabCounts.set(tab, (tabCounts.get(tab) ?? 0) + 1);
+  }
+  const navTabs = Array.from(tabCounts.entries())
+    .map(([tab, count]) => ({ tab, count }))
+    .sort((a, b) => b.count - a.count);
+
+  // Avg session duration from page_exit
+  const totalDuration = peRows.reduce((sum, r) => sum + (Number((r.props as any)?.duration_sec) || 0), 0);
+  const avgSessionDuration = peRows.length > 0 ? Math.round(totalDuration / peRows.length) : 0;
+
+  return {
+    totalPageViews: pvRows.length,
+    mostVisitedPage: pageTable[0]?.path ?? '—',
+    avgSessionDuration,
+    mostTappedTab: navTabs[0]?.tab ?? '—',
+    dailyPageViews: fillBuckets(pvRows, days),
+    pageTable,
+    navTabs,
+  };
+}
+
+export function useNavigationAnalytics(period: AnalyticsPeriod) {
+  return useQuery({
+    queryKey: ['admin-v2', 'analytics', 'navigation', period],
+    queryFn: () => fetchNavigationAnalytics(period),
+    staleTime: 5 * 60_000,
+  });
+}
+
+// ─── Echo AI analytics ────────────────────────────────────────────────────────
+
+export interface EchoAnalyticsData {
+  totalQueries: number;
+  uniqueUsers: number;
+  avgPerUser: number;
+  dailyVolume: DailyBucket[];
+  recentQueries: { queryText: string; username: string; createdAt: string }[];
+}
+
+async function fetchEchoAnalytics(period: AnalyticsPeriod): Promise<EchoAnalyticsData> {
+  const days = periodToDays(period);
+  const since = startOf(period).toISOString();
+
+  const { data: echoEvents } = await supabase
+    .from('analytics_events')
+    .select('created_at, user_id, props')
+    .eq('name', 'echo_query')
+    .gte('created_at', since)
+    .order('created_at', { ascending: false })
+    .limit(200);
+
+  const rows = echoEvents ?? [];
+  const uniqueUserIds = new Set(rows.map(r => r.user_id).filter(Boolean));
+
+  // Resolve usernames
+  const userIds = Array.from(uniqueUserIds) as string[];
+  let usernameMap = new Map<string, string>();
+  if (userIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('user_profiles')
+      .select('id, username')
+      .in('id', userIds.slice(0, 50));
+    for (const p of profiles ?? []) {
+      if (p.username) usernameMap.set(p.id, p.username);
+    }
+  }
+
+  const recentQueries = rows.map(r => ({
+    queryText: (r.props as any)?.query_text ?? '(no text)',
+    username: r.user_id ? usernameMap.get(r.user_id) ?? '' : '',
+    createdAt: r.created_at,
+  }));
+
+  return {
+    totalQueries: rows.length,
+    uniqueUsers: uniqueUserIds.size,
+    avgPerUser: uniqueUserIds.size > 0 ? Math.round(rows.length / uniqueUserIds.size) : 0,
+    dailyVolume: fillBuckets(rows, days),
+    recentQueries,
+  };
+}
+
+export function useEchoAnalytics(period: AnalyticsPeriod) {
+  return useQuery({
+    queryKey: ['admin-v2', 'analytics', 'echo', period],
+    queryFn: () => fetchEchoAnalytics(period),
+    staleTime: 5 * 60_000,
+  });
+}
+
+// ─── Social & Messaging analytics ────────────────────────────────────────────
+
+export interface SocialAnalyticsData {
+  messagesSent: number;
+  newConversations: number;
+  followActions: number;
+  totalFollows: number;
+  messagesTrend: DailyBucket[];
+  conversationsTrend: DailyBucket[];
+  mostFollowed: { username: string; displayName: string; followerCount: number }[];
+}
+
+async function fetchSocialAnalytics(period: AnalyticsPeriod): Promise<SocialAnalyticsData> {
+  const days = periodToDays(period);
+  const since = startOf(period).toISOString();
+
+  const [messagesRes, convsRes, followsRes, totalFollowsRes, topFollowedRes] = await Promise.all([
+    supabase.from('messages' as any).select('created_at').gte('created_at', since),
+    supabase.from('conversations' as any).select('created_at').gte('created_at', since),
+    supabase.from('analytics_events').select('created_at').eq('name', 'social_follow_toggled').gte('created_at', since),
+    supabase.from('user_follows' as any).select('id', { count: 'exact', head: true }),
+    supabase.from('user_follows' as any).select('followed_id').limit(1000),
+  ]);
+
+  const messages = messagesRes.data ?? [];
+  const convs = convsRes.data ?? [];
+  const follows = followsRes.data ?? [];
+
+  // Most followed users
+  const followCounts = new Map<string, number>();
+  for (const f of (topFollowedRes.data ?? []) as any[]) {
+    followCounts.set(f.followed_id, (followCounts.get(f.followed_id) ?? 0) + 1);
+  }
+  const topFollowedIds = Array.from(followCounts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
+
+  let mostFollowed: SocialAnalyticsData['mostFollowed'] = [];
+  if (topFollowedIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('user_profiles')
+      .select('id, username, display_name')
+      .in('id', topFollowedIds.map(t => t[0]));
+
+    const profileMap = new Map((profiles ?? []).map(p => [p.id, p]));
+    mostFollowed = topFollowedIds.map(([id, count]) => {
+      const p = profileMap.get(id);
+      return {
+        username: p?.username ?? id.slice(0, 8),
+        displayName: p?.display_name ?? '',
+        followerCount: count,
+      };
+    });
+  }
+
+  return {
+    messagesSent: messages.length,
+    newConversations: convs.length,
+    followActions: follows.length,
+    totalFollows: totalFollowsRes.count ?? 0,
+    messagesTrend: fillBuckets(messages, days),
+    conversationsTrend: fillBuckets(convs, days),
+    mostFollowed,
+  };
+}
+
+export function useSocialAnalytics(period: AnalyticsPeriod) {
+  return useQuery({
+    queryKey: ['admin-v2', 'analytics', 'social', period],
+    queryFn: () => fetchSocialAnalytics(period),
+    staleTime: 5 * 60_000,
+  });
+}
