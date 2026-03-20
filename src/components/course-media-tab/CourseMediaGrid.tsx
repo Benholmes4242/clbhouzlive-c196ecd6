@@ -102,7 +102,7 @@ export const CourseMediaGrid = forwardRef<HTMLDivElement, CourseMediaGridProps>(
   let tileIndex = 0;
 
   return (
-    <div ref={ref} className="grid grid-cols-2 gap-[2px]">
+    <div ref={ref} className="grid grid-cols-2 gap-[2px] grid-flow-dense">
       {posts.map((post) => {
         const mediaKey = post.mediaItems[0]?.id || post.id;
         if (isLandscape(post)) {
