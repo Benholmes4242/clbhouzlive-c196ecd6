@@ -107,29 +107,10 @@ const handler = async (req: Request): Promise<Response> => {
     // TEMPORARY: Plaintext fallback for debugging
     const plaintextFallback = ["CLBHOUZ2025*"];
 
-    // Accept internal bypass code (used by AuthCallback for verified users)
-    const INTERNAL_CODE = Deno.env.get('INTERNAL_ACCESS_CODE');
-    let isValid = false;
-
-    if (INTERNAL_CODE && accessCode === INTERNAL_CODE) {
-      // Verify the caller actually has a confirmed email before granting
-      const authHeader = req.headers.get('Authorization');
-      if (authHeader?.startsWith('Bearer ')) {
-        const serviceClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
-        const { data: { user } } = await serviceClient.auth.getUser(authHeader.replace('Bearer ', ''));
-        if (user?.email_confirmed_at) {
-          console.log(`✅ Internal access code matched — email confirmed (${user.id})`);
-          isValid = true;
-        } else {
-          console.warn(`⛔ Internal code used but email NOT confirmed (user: ${user?.id ?? 'unknown'})`);
-        }
-      } else {
-        console.warn('⛔ Internal code used without Authorization header — denied');
-      }
-    }
-
     // Verify access code against plaintext first (for debugging)
-    if (!isValid && accessCode && plaintextFallback.some(code => code === String(accessCode).toUpperCase())) {
+    let isValid = false;
+    
+    if (accessCode && plaintextFallback.some(code => code === String(accessCode).toUpperCase())) {
       console.log("✅ Valid plaintext code matched");
       isValid = true;
     }
