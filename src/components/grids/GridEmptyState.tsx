@@ -32,7 +32,7 @@ const DEFAULT_CONFIG: Record<ContentFilter, { icon: typeof ImageIcon; title: str
   shorts: {
     icon: Video,
     title: 'No shorts yet',
-    description: 'Short videos under 4 minutes will appear here.',
+    description: 'Short videos under 3 minutes will appear here.',
     ctaLabel: 'Create a short',
   },
   images: {

@@ -90,7 +90,7 @@ export function VideosFeed({
         ) : (
           <>
             <p className="text-base font-medium text-foreground mb-1">No long-form videos yet</p>
-            <p className="text-sm text-muted-foreground">Videos over 4 minutes will appear here.</p>
+            <p className="text-sm text-muted-foreground">Videos over 3 minutes will appear here.</p>
           </>
         )}
       </div>
