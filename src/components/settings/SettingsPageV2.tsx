@@ -197,8 +197,8 @@ export function SettingsPageV2() {
           />
           <SettingsToggleRow
             icon={<Map size={18} />}
-            title="Show in Course Leaderboards"
-            subtitle="Appear in courses played and exploration rankings"
+            title="Course Leaderboards"
+            subtitle="Show in courses played and exploration rankings"
             iconTheme="privacy"
             checked={privacy.showInExplorationLeaderboards}
             disabled={privacy.isUpdatingExplorationLb}
