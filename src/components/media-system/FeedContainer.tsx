@@ -75,8 +75,11 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
   useEffect(() => {
     if (prevPostsRef.current !== posts && posts.length > 0) {
       const prevPosts = prevPostsRef.current;
+      // An "append" is any update where the first post ID is unchanged.
+      // This covers: new pages loaded (length grows) AND live feed refetches
+      // (same length, new array reference). Only treat as a full feed switch
+      // when the first post ID actually changes (genuine tab switch).
       const isAppend = prevPosts && prevPosts.length > 0 &&
-        posts.length > prevPosts.length &&
         posts[0]?.id === prevPosts[0]?.id;
       
       if (!isAppend) {
@@ -85,7 +88,6 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
         const newOffset = -startAt * itemHeight;
         offsetRef.current = newOffset;
         activeIndexRef.current = startAt;
-        setOffsetY(newOffset);
         if (trackRef.current) {
           trackRef.current.style.transform = `translateY(${newOffset}px)`;
         }
