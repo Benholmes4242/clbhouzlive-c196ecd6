@@ -25,6 +25,11 @@ export function usePrivacySettings(
     queryClient.invalidateQueries({ queryKey: ['profile'] });
     queryClient.invalidateQueries({ queryKey: ['user-profile'] });
     queryClient.invalidateQueries({ queryKey: ['liveClubhouseBase'] });
+    queryClient.invalidateQueries({ queryKey: ['lowest-handicap-leaderboard'] });
+    queryClient.invalidateQueries({ queryKey: ['handicap-improvement-leaderboard'] });
+    queryClient.invalidateQueries({ queryKey: ['season-improvement-leaderboard'] });
+    queryClient.invalidateQueries({ queryKey: ['exploration-leaderboard'] });
+    queryClient.invalidateQueries({ queryKey: ['countries-leaderboard'] });
   };
 
   const togglePublic = async (value: boolean) => {
