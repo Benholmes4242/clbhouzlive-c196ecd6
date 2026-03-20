@@ -28,6 +28,20 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
+    // Guard: verify system user exists before attempting insert
+    const { data: systemUser } = await supabase
+      .from('user_profiles')
+      .select('id')
+      .eq('id', SYSTEM_USER_ID)
+      .maybeSingle();
+
+    if (!systemUser) {
+      console.error('[upsert-live-tournament-post] System user not found — aborting');
+      return new Response(JSON.stringify({ error: 'System user not found', postId: null }), {
+        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Check if post already exists
     const { data: existing } = await supabase
       .from('posts')

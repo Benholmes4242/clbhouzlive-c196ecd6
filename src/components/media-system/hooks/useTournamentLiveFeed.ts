@@ -84,6 +84,7 @@ export function useTournamentLiveFeed(userId?: string): {
     },
     enabled:   !!arenaData?.length,
     staleTime: 5 * 60_000,
+    retry:     false,
   });
 
   const postIdMap = postIdsQuery.data ?? {};
