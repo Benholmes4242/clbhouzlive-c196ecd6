@@ -56,47 +56,22 @@ export interface ReviewOverlayTheme extends RatingTheme {
 // Per-tier overlay themes for dark backgrounds
 // Maps course-detail tier palette to overlay-safe colors (light-on-dark)
 // Outstanding: Amber (#f59e0b), then graduated slate scale for visibility on glass
+// All tiers now use the same amber overlay theme (unified rating system)
+const amberOverlay: Omit<ReviewOverlayTheme, keyof RatingTheme> = {
+  pillBg: 'rgba(245, 158, 11, 0.15)',
+  pillBorder: 'rgba(245, 158, 11, 0.5)',
+  pillText: '#f59e0b',
+  containerBg: 'rgba(245, 158, 11, 0.08)',
+  containerBorder: 'rgba(245, 158, 11, 0.3)',
+  overlayText: '#FFFFFF',
+};
+
 const tierOverlayThemes: Record<string, Omit<ReviewOverlayTheme, keyof RatingTheme>> = {
-  outstanding: {
-    pillBg: 'rgba(245, 158, 11, 0.15)',
-    pillBorder: 'rgba(245, 158, 11, 0.5)',
-    pillText: '#f59e0b',
-    containerBg: 'rgba(245, 158, 11, 0.08)',
-    containerBorder: 'rgba(245, 158, 11, 0.3)',
-    overlayText: '#FFFFFF',
-  },
-  excellent: {
-    pillBg: 'rgba(226, 232, 240, 0.15)',
-    pillBorder: 'rgba(226, 232, 240, 0.45)',
-    pillText: '#e2e8f0',                          // slate-200
-    containerBg: 'rgba(0, 0, 0, 0.5)',
-    containerBorder: 'rgba(255, 255, 255, 0.08)',
-    overlayText: '#FFFFFF',
-  },
-  veryGood: {
-    pillBg: 'rgba(203, 213, 225, 0.15)',
-    pillBorder: 'rgba(203, 213, 225, 0.45)',
-    pillText: '#cbd5e1',                          // slate-300
-    containerBg: 'rgba(0, 0, 0, 0.5)',
-    containerBorder: 'rgba(255, 255, 255, 0.08)',
-    overlayText: '#FFFFFF',
-  },
-  good: {
-    pillBg: 'rgba(148, 163, 184, 0.15)',
-    pillBorder: 'rgba(148, 163, 184, 0.45)',
-    pillText: '#94a3b8',                          // slate-400
-    containerBg: 'rgba(0, 0, 0, 0.5)',
-    containerBorder: 'rgba(255, 255, 255, 0.08)',
-    overlayText: '#FFFFFF',
-  },
-  fair: {
-    pillBg: 'rgba(100, 116, 139, 0.15)',
-    pillBorder: 'rgba(100, 116, 139, 0.45)',
-    pillText: '#64748b',                          // slate-500
-    containerBg: 'rgba(0, 0, 0, 0.5)',
-    containerBorder: 'rgba(255, 255, 255, 0.08)',
-    overlayText: '#FFFFFF',
-  },
+  outstanding: amberOverlay,
+  excellent: amberOverlay,
+  veryGood: amberOverlay,
+  good: amberOverlay,
+  fair: amberOverlay,
 };
 
 function getTierKey(score: number): string {

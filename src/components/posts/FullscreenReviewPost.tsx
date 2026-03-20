@@ -128,7 +128,7 @@ export function FullscreenReviewPost({
     }
   }, [courseId, reviewId, navigate, handleCloseReviewSheet]);
   
-  const isOutstanding = rating >= 9.0;
+  // All ratings now use amber/gold styling (unified system)
   
   // User initials for avatar fallback
   const initials = (user?.name || 'G')
@@ -343,25 +343,22 @@ export function FullscreenReviewPost({
             )}
           </div>
           
-          {/* Right: Rating Number (elegant, confident) — tier-aware: amber 9.0+, light slate below */}
+          {/* Right: Rating Number — all tiers use amber */}
           <div className="flex flex-col items-center gap-0 flex-shrink-0">
             <span 
               className="font-bold tracking-tight leading-none"
               style={{ 
                 fontSize: 'clamp(1.5rem, 7vw, 2.25rem)',
                 fontVariantNumeric: 'tabular-nums',
-                color: isOutstanding ? '#f59e0b' : '#cbd5e1',
-                textShadow: isOutstanding
-                  ? '0 0 16px rgba(245, 158, 11, 0.4)' 
-                  : 'none',
+                color: '#f59e0b',
+                textShadow: '0 0 16px rgba(245, 158, 11, 0.4)',
               }}
             >
               {rating === 10 ? '10' : rating.toFixed(1)}
             </span>
-            {/* Smaller, secondary tier label */}
             <span 
               className="text-[9px] font-medium uppercase tracking-wider mt-0.5"
-              style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.7)' : 'rgba(203, 213, 225, 0.9)' }}
+              style={{ color: 'rgba(245, 158, 11, 0.7)' }}
             >
               {tierData.label}
             </span>
@@ -398,13 +395,13 @@ export function FullscreenReviewPost({
           <div className="flex flex-col items-center justify-center mb-4">
             <span 
               className="text-5xl font-bold"
-              style={{ color: isOutstanding ? '#f59e0b' : '#9ca3af' }}
+              style={{ color: '#f59e0b' }}
             >
               {rating === 10 ? '10' : rating.toFixed(1)}
             </span>
             <span 
               className="text-sm font-semibold uppercase tracking-wider mt-1"
-              style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.8)' : 'rgba(156, 163, 175, 0.8)' }}
+              style={{ color: 'rgba(245, 158, 11, 0.8)' }}
             >
               {tierData.label}
             </span>
@@ -460,13 +457,9 @@ export function FullscreenReviewPost({
               onClick={handleReadFullReview}
               className="flex-1 py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1 transition-all active:scale-[0.98]"
               style={{
-                background: isOutstanding 
-                  ? 'linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)' 
-                  : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
-                boxShadow: isOutstanding 
-                  ? '0 4px 14px rgba(251,191,36,0.25)' 
-                  : '0 4px 14px rgba(107,114,128,0.25)',
-                color: isOutstanding ? '#000' : '#fff',
+                background: 'linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)',
+                boxShadow: '0 4px 14px rgba(251,191,36,0.25)',
+                color: '#000',
               }}
             >
               Read Full Review
@@ -534,13 +527,7 @@ export function FullscreenReviewPost({
                 <div className="text-[13px] font-semibold text-white truncate">
                   {user.name || 'Golfer'}
                 </div>
-                <div className={cn(
-                  "flex items-center gap-0.5 mt-0.5",
-                  "text-[11px] font-medium",
-                  isOutstanding 
-                    ? "text-amber-400/90"
-                    : "text-white/60"
-                )}>
+                <div className="flex items-center gap-0.5 mt-0.5 text-[11px] font-medium text-amber-400/90">
                   <span>Read review</span>
                   <ChevronRight className="w-3 h-3" />
                 </div>

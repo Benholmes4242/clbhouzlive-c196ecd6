@@ -35,11 +35,8 @@ export function RatingBar({
   const pct = Math.max(0, Math.min(100, (value / max) * 100));
   const tierData = getScoreTier(value);
   
-  // Use tier-specific bar fill from the central color system
-  const isOutstanding = showOutstandingGold && tierData.isOutstanding;
-  const barFillClass = isOutstanding
-    ? 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]'
-    : tierData.barFill;
+  // All tiers now use amber gradient fill (unified rating system)
+  const barFillClass = 'bg-gradient-to-r from-[#f59e0b] to-[#fbbf24]';
 
   return (
     <div
