@@ -521,6 +521,18 @@ const AchievementToastWrapper: React.FC = () => {
 const AppInner: React.FC = () => {
   // Global focus re-auth hook
   useReauthOnFocus();
+
+  // ── Analytics: session start + page tracking ──
+  useEffect(() => {
+    const sessionId = crypto.randomUUID();
+    sessionStorage.setItem('session_id', sessionId);
+    import('@/utils/analyticsEvents').then(({ analyticsEvents }) => {
+      analyticsEvents.track('session_start', {
+        session_id: sessionId,
+        referrer: document.referrer || 'direct',
+      });
+    });
+  }, []);
   
   // Enforce R2-only policy globally
   useImageUploadSafeguard();
