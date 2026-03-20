@@ -33,7 +33,6 @@ export const ClubhouseTabToggle = ({
       className={cn("flex items-center gap-4 sm:gap-7 relative z-[45]", className)}
       role="tablist"
       aria-label="Feed filter"
-      style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}
     >
       {(['foryou', 'friends'] as const).map((id) => {
         const label = id === 'foryou' ? 'Suggested' : 'Friends';
