@@ -425,12 +425,8 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
   }, [pathname]);
   
   // If we should bypass, skip the gate entirely (no Router needed)
-  if (shouldBypassEarly) {
-    return <>{children}</>;
-  }
-  
-  // Otherwise render the inner gate which uses useLocation
-  return <AccessGateInner>{children}</AccessGateInner>;
+  // Gate disabled — all users pass through unconditionally
+  return <>{children}</>;
 };
 
 export default AccessGateV2;

@@ -677,7 +677,7 @@ const App: React.FC = () => {
   const AppPrefetchProvider = React.lazy(() => import('@/providers/AppPrefetchProvider'));
   
   return (
-    <BetaAccessGate>
+    <>
       <AppShell>
         <ReviewIslandLoader />
         <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
@@ -698,7 +698,7 @@ const App: React.FC = () => {
           </Top100DebugProvider>
         </ThemeProvider>
       </AppShell>
-    </BetaAccessGate>
+    </>
   );
 };
 
