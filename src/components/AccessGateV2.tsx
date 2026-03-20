@@ -10,7 +10,7 @@ interface AccessGateV2Props {
 
 // Auth route prefixes that should bypass the access gate
 // Using prefixes so any new /auth/* routes are automatically bypassed
-const AUTH_BYPASS_PREFIXES = ['/auth', '/onboarding'];
+const AUTH_BYPASS_PREFIXES = ['/auth', '/onboarding', '/edit-profile'];
 
 // ===== Session Storage Utils =====
 const KEY = 'clubhouz_gate_session';
