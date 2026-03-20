@@ -91,7 +91,7 @@ serve(async (req) => {
         </td></tr>
         <!-- Footer -->
         <tr><td style="padding:0 32px 28px;text-align:center;">
-          <p style="color:rgba(255,255,255,0.2);font-size:11px;margin:0;">&copy; 2026 Clbhouz &middot; clbhouz.co.uk</p>
+          <p style="color:rgba(255,255,255,0.2);font-size:11px;margin:0;">&copy; 2026 clbhouz &middot; clbhouz.co.uk</p>
         </td></tr>
       </table>
     </td></tr>
