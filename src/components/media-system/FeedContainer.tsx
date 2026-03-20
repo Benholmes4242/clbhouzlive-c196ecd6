@@ -47,7 +47,6 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
     typeof window !== 'undefined' ? window.innerHeight : 800
   );
   const startOffset = -(initialIndex) * (typeof window !== 'undefined' ? window.innerHeight : 800);
-  const [offsetY, setOffsetY] = useState(startOffset);
 
   const offsetRef = useRef(startOffset);
   const trackRef = useRef<HTMLDivElement>(null);
