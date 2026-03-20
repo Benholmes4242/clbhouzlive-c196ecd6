@@ -80,7 +80,7 @@ function groupMessagesByDate(messages: MessageWithSender[]): Map<string, Message
 
 function ChatSkeleton() {
   return (
-    <div className="flex-1 p-4 space-y-4">
+    <div className="flex-1 p-4">
       {[1, 2, 3, 4].map(i => (
         <div key={i} className={`flex ${i % 2 === 0 ? 'justify-end' : 'justify-start'}`}>
           <div className="flex gap-2 max-w-[70%]">
