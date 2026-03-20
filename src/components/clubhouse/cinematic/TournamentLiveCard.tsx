@@ -486,7 +486,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                         border: '2px solid rgba(0,0,0,0.95)',
                         overflow: 'hidden',
                       }}>
-                        <RowAvatar name={p.playerName} photoUrl={p.photoUrl} tourSlug={meta.tourSlug} size={34} />
+                        <RowAvatar name={p.playerName} photoUrl={p.photoUrl} tourSlug={meta.tourSlug} size={42} />
                       </div>
                     ))}
                     {row.players.length > 4 && (
