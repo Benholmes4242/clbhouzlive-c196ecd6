@@ -394,7 +394,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           {leader && (
             <div style={{
               display: 'flex', alignItems: 'center', gap: 12,
-              padding: '10px 0',
+              padding: '12px 0',
               borderBottom: chaserRows.length > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none',
               background: `${tour.accentColor}08`,
               animation: 'trlive-slideIn 0.5s ease-out both',
@@ -403,7 +403,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
               <span style={{ width: 28, textAlign: 'center' as const, fontSize: 15, fontWeight: 700, color: tour.accentColor }}>
                 {isTiedFirst ? 'T1' : '1'}
               </span>
-              <RowAvatar name={leader.playerName} photoUrl={leader.photoUrl} tourSlug={meta.tourSlug} size={38} />
+              <RowAvatar name={leader.playerName} photoUrl={leader.photoUrl} tourSlug={meta.tourSlug} size={46} />
               <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                 {leader.playerName}
               </span>
@@ -425,7 +425,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
             .map((co, idx) => (
               <div key={`co-${idx}`} style={{
                 display: 'flex', alignItems: 'center', gap: 12,
-                padding: '9px 0',
+                padding: '11px 0',
                 borderBottom: '1px solid rgba(255,255,255,0.03)',
                 background: `${tour.accentColor}05`,
                 animation: 'trlive-slideIn 0.5s ease-out both',
@@ -434,7 +434,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                 <span style={{ width: 28, textAlign: 'center' as const, fontSize: 14, fontWeight: 600, color: tour.accentColor }}>
                   T1
                 </span>
-                <RowAvatar name={co.playerName} photoUrl={co.photoUrl} tourSlug={meta.tourSlug} size={34} />
+                <RowAvatar name={co.playerName} photoUrl={co.photoUrl} tourSlug={meta.tourSlug} size={42} />
                 <span style={{
                   flex: 1, fontSize: 'clamp(13px, 3.5vw, 15px)', fontWeight: 500,
                   color: 'rgba(255,255,255,0.8)',
@@ -464,7 +464,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
             return (
               <div key={`${row.position}-${idx}`} style={{
                 display: 'flex', alignItems: 'center', gap: 12,
-                padding: '9px 0',
+                padding: '11px 0',
                 borderBottom: '1px solid rgba(255,255,255,0.03)',
                 animation: 'trlive-slideIn 0.5s ease-out both',
                 animationDelay: `${0.65 + (isTiedFirst ? Math.min(coLeaders.length - 1, 2) : 0) * 0.08 + idx * 0.08}s`,
@@ -480,22 +480,22 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                   <div style={{ display: 'flex', alignItems: 'center', marginLeft: 0 }}>
                     {stackedAvatars.map((p, i) => (
                       <div key={i} style={{
-                        marginLeft: i === 0 ? 0 : -10,
+                        marginLeft: i === 0 ? 0 : -12,
                         zIndex: stackedAvatars.length - i,
                         borderRadius: '34%',
                         border: '2px solid rgba(0,0,0,0.95)',
                         overflow: 'hidden',
                       }}>
-                        <RowAvatar name={p.playerName} photoUrl={p.photoUrl} tourSlug={meta.tourSlug} size={34} />
+                        <RowAvatar name={p.playerName} photoUrl={p.photoUrl} tourSlug={meta.tourSlug} size={42} />
                       </div>
                     ))}
                     {row.players.length > 4 && (
                       <div style={{
-                        marginLeft: -8, zIndex: 0,
-                        width: 30, height: 30, borderRadius: '34%',
+                        marginLeft: -10, zIndex: 0,
+                        width: 38, height: 38, borderRadius: '34%',
                         background: 'rgba(255,255,255,0.08)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)',
+                        fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.5)',
                         border: '2px solid rgba(0,0,0,0.95)',
                       }}>
                         +{row.players.length - 4}
@@ -503,7 +503,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                     )}
                   </div>
                 ) : (
-                  <RowAvatar name={primary.playerName} photoUrl={primary.photoUrl} tourSlug={meta.tourSlug} size={38} />
+                  <RowAvatar name={primary.playerName} photoUrl={primary.photoUrl} tourSlug={meta.tourSlug} size={46} />
                 )}
 
                 <span style={{
