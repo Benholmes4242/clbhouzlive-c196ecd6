@@ -20,10 +20,14 @@ serve(async (req) => {
 
     const { user, email_data } = payload;
 
-    // Try alternative field paths that Supabase Auth Hook may use
-    const confirmationUrl = email_data?.confirmation_url
-      ?? email_data?.token_hash
-      ?? email_data?.redirect_to;
+    // Build the confirmation URL from token_hash and redirect_to
+    const tokenHash = email_data?.token_hash;
+    const redirectTo = email_data?.redirect_to ?? 'https://clbhouz.co.uk/auth/callback';
+    const siteUrl = email_data?.site_url ?? 'https://ybxkehyomcakqjvuhnna.supabase.co/auth/v1';
+
+    const confirmationUrl = tokenHash
+      ? `${siteUrl}/verify?token=${tokenHash}&type=signup&redirect_to=${encodeURIComponent(redirectTo)}`
+      : null;
     const userEmail = user?.email ?? user?.new_email;
     const username = user?.user_metadata?.username
       ?? user?.raw_user_meta_data?.username
