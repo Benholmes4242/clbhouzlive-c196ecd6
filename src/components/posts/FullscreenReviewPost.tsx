@@ -128,7 +128,7 @@ export function FullscreenReviewPost({
     }
   }, [courseId, reviewId, navigate, handleCloseReviewSheet]);
   
-  const isOutstanding = rating >= 9.0;
+  // All ratings now use amber/gold styling (unified system)
   
   // User initials for avatar fallback
   const initials = (user?.name || 'G')
