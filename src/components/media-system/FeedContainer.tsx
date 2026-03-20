@@ -108,7 +108,6 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
     const newOffset = -initialIndex * itemHeight;
     offsetRef.current = newOffset;
     activeIndexRef.current = initialIndex;
-    setOffsetY(newOffset);
     if (trackRef.current) {
       trackRef.current.style.transform = `translateY(${newOffset}px)`;
     }
