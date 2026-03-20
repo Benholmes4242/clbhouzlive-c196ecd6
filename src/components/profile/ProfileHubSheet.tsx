@@ -281,15 +281,24 @@ function ProfileHubSheet({
 
               {/* ── Quick actions ── */}
               <div className="grid grid-cols-2 gap-2 py-4">
-                {quickActions.map(({ icon: Icon, label, route, badge, badgeColor }) => (
+                {quickActions.map(({ icon: Icon, label, route, badge, badgeColor, isEcho }) => (
                   <button
                     key={label}
                     type="button"
                     onClick={() => handleNav(route)}
-                    className="relative flex items-center gap-3 bg-muted rounded-2xl px-4 min-h-[56px] hover:bg-muted/40 active:bg-muted/70 transition-colors duration-150"
+                    className={cn(
+                      "relative flex items-center gap-3 rounded-2xl px-4 min-h-[56px] transition-colors duration-150",
+                      isEcho
+                        ? "hover:opacity-90 active:opacity-70"
+                        : "bg-muted hover:bg-muted/40 active:bg-muted/70"
+                    )}
+                    style={isEcho ? {
+                      background: 'rgba(245, 158, 11, 0.10)',
+                      border: '1px solid rgba(245, 158, 11, 0.22)',
+                    } : undefined}
                   >
                     <div className="relative">
-                      <Icon className="w-[18px] h-[18px] text-muted-foreground" />
+                      <Icon className={isEcho ? "" : "w-[18px] h-[18px] text-muted-foreground"} />
                       {badge > 0 && (
                         <span className={cn(
                           'absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold text-white flex items-center justify-center',
