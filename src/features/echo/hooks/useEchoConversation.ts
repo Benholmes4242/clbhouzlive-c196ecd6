@@ -186,6 +186,12 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
       return;
     }
 
+    // Track echo query text for analytics
+    analyticsEvents.track('echo_query', {
+      query_text: content.slice(0, 500),
+      query_length: content.length,
+    });
+
     const userMessage: EchoMessage = {
       id: nanoid(),
       role: 'user',
