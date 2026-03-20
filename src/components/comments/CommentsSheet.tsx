@@ -18,6 +18,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/comments/MentionText';
 import { relativeTime } from '@/utils/relativeTime';
+import { usePostLikes } from '@/hooks/usePostLikes';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,6 +31,8 @@ import {
 } from '@/components/ui/alert-dialog';
 
 // ── Types ──
+
+type SheetTab = 'comments' | 'likes';
 
 interface CommentsSheetProps {
   isOpen: boolean;
@@ -56,6 +59,7 @@ interface CommentsSheetProps {
   isReview?: boolean;
   reviewRating?: number | null;
   caddiePickCommentId?: string | null;
+  likesCount?: number | null;
   onCommentPosted?: () => void;
   onCommentDeleted?: () => void;
 }
@@ -80,6 +84,7 @@ function CommentsSheet({
   caption,
   courseName,
   isReview,
+  likesCount,
   onCommentPosted,
   onCommentDeleted,
 }: CommentsSheetProps) {
@@ -107,6 +112,7 @@ function CommentsSheet({
   useCommentsRealtime(postId, isOpen);
 
   // ── State ──
+  const [activeTab, setActiveTab] = useState<SheetTab>('comments');
   const [sort, setSort] = useState<'best' | 'newest'>('newest');
   const [replyingTo, setReplyingTo] = useState<ReplyTarget | null>(null);
   const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
@@ -125,6 +131,10 @@ function CommentsSheet({
   const cleanCaption = useMemo(() => removeGolfCourseFromContent(caption ?? null), [caption]);
   const extractedCourse = useMemo(() => extractGolfCourseFromContent(caption ?? null), [caption]);
   const displayCourseName = courseName || extractedCourse?.name || null;
+
+  // ── Likes hook ──
+  const { data: likers, isLoading: likersLoading } =
+    usePostLikes(postId, isOpen && activeTab === 'likes');
 
   // ── Sorted comments ──
   const sortedComments = useMemo(() => {
@@ -148,6 +158,9 @@ function CommentsSheet({
 
   const totalCount = comments.length;
 
+  // Hide toggle if 0 comments AND 0 likes
+  const showToggle = totalCount > 0 || (likesCount ?? 0) > 0;
+
   // ── Effects ──
 
   // Auto-focus input
@@ -159,6 +172,7 @@ function CommentsSheet({
       setInputText('');
       setReplyingTo(null);
       setExpandedReplies(new Set());
+      setActiveTab('comments');
     }
   }, [isOpen]);
 
@@ -528,41 +542,92 @@ function CommentsSheet({
               {/* Left spacer */}
               <div className="w-11" />
 
-              {/* Title — centred */}
-              <div className="flex-1 min-w-0 flex items-center justify-center gap-2">
-                {totalCount > 0 && (
-                  <span className={cn('text-[16px] font-semibold shrink-0', isDark ? 'text-white/40' : 'text-muted-foreground')}>
-                    {totalCount} {totalCount === 1 ? 'Comment' : 'Comments'}
+              {/* Centre: Comments | Likes pill toggle */}
+              <div className="flex-1 min-w-0 flex items-center justify-center">
+                {showToggle ? (
+                  <div className={cn(
+                    'flex items-center gap-1 rounded-lg p-0.5',
+                    isDark ? 'bg-white/[0.08]' : 'bg-muted/60'
+                  )}>
+                    {(['comments', 'likes'] as const).map((tab) => {
+                      const isActive = activeTab === tab;
+                      const label = tab === 'comments'
+                        ? (totalCount > 0 ? `${totalCount} ` : '') + 'Comments'
+                        : ((likesCount ?? 0) > 0 ? `${likesCount} ` : '') + 'Likes';
+                      return (
+                        <button
+                          key={tab}
+                          type="button"
+                          onClick={() => {
+                            setActiveTab(tab);
+                            scrollRef.current?.scrollTo({ top: 0 });
+                          }}
+                          className={cn(
+                            'px-3 py-1 rounded-md text-[13px] font-semibold transition-colors min-h-[32px]',
+                            isActive
+                              ? isDark ? 'bg-white/15 text-white' : 'bg-background text-foreground shadow-sm'
+                              : isDark ? 'text-white/40' : 'text-muted-foreground'
+                          )}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <span className={cn('text-[16px] font-semibold', isDark ? 'text-white/40' : 'text-muted-foreground')}>
+                    Comments
                   </span>
                 )}
               </div>
 
-              {/* Right — sort toggle only */}
+              {/* Right: sort toggle (comments tab only) + close button */}
               <div className="flex items-center shrink-0">
-                {totalCount > 1 && (
-                  <div className={cn('flex items-center gap-1 rounded-lg p-0.5', isDark ? 'bg-white/8' : 'bg-muted/60')}>
-                    {(['best', 'newest'] as const).map(s => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => setSort(s)}
-                        className={cn(
-                          'px-3 py-1 rounded-md text-[12px] font-semibold transition-colors capitalize min-h-[32px]',
-                          sort === s
-                            ? isDark ? 'bg-white/15 text-white' : 'bg-background text-foreground shadow-sm'
-                            : isDark ? 'text-white/40' : 'text-muted-foreground'
-                        )}
-                      >
-                        {s === 'best' ? 'Best' : 'Newest'}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                <AnimatePresence>
+                  {activeTab === 'comments' && totalCount > 1 && (
+                    <motion.div
+                      initial={{ opacity: 0, width: 0 }}
+                      animate={{ opacity: 1, width: 'auto' }}
+                      exit={{ opacity: 0, width: 0 }}
+                      transition={{ duration: 0.15 }}
+                      className={cn(
+                        'flex items-center gap-0.5 rounded-lg p-0.5 overflow-hidden',
+                        isDark ? 'bg-white/[0.08]' : 'bg-muted/60'
+                      )}
+                    >
+                      {(['best', 'newest'] as const).map(s => (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => setSort(s)}
+                          className={cn(
+                            'px-2 py-1 rounded-md text-[11px] font-semibold transition-colors min-h-[32px]',
+                            sort === s
+                              ? isDark ? 'bg-white/15 text-white' : 'bg-background text-foreground shadow-sm'
+                              : isDark ? 'text-white/40' : 'text-muted-foreground'
+                          )}
+                        >
+                          {s === 'best' ? 'Best' : 'Newest'}
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className={cn(
+                    'w-11 h-11 flex items-center justify-center rounded-full',
+                    isDark ? 'text-white/50 hover:text-white' : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
             </div>
 
             {/* Post caption — shown above comments when present */}
-            {(cleanCaption || displayCourseName) && (
+            {activeTab === 'comments' && (cleanCaption || displayCourseName) && (
               <div className={cn(
                 'px-4 py-3 shrink-0 border-b',
                 isDark ? 'border-white/[0.06]' : 'border-border/50'
@@ -595,156 +660,219 @@ function CommentsSheet({
               className="flex-1 overflow-y-auto overscroll-contain"
               style={{ WebkitOverflowScrolling: 'touch' }}
             >
-              <AnimatePresence mode="wait">
-              {commentsLoading ? (
-                /* Loading skeletons with crossfade */
-                <motion.div
-                  key="comments-skeleton"
-                  initial={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.15, ease: 'easeOut' }}
-                  className="px-4"
-                >
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i}>
-                      <div className="flex gap-3 py-3">
-                        <div className={cn('w-[34px] h-[34px] rounded-[34%] shrink-0', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
-                        <div className="flex-1 space-y-2 py-0.5">
-                          <div className={cn('h-[18px] w-24 rounded', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
-                          <div className={cn('h-[18px] w-[85%] rounded', isDark ? 'bg-white/6 clb-shimmer-dark' : 'bg-muted/80 clb-shimmer-light')} />
-                          <div className={cn('h-[18px] w-[55%] rounded', isDark ? 'bg-white/5 clb-shimmer-dark' : 'bg-muted/60 clb-shimmer-light')} />
+              {activeTab === 'likes' ? (
+                /* ── LIKES TAB ── */
+                <div>
+                  {likersLoading ? (
+                    <div className="px-4">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <div key={i} className="flex items-center gap-3 py-3">
+                          <div className={cn('w-[40px] h-[40px] rounded-[34%] shrink-0', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
+                          <div className="flex-1 space-y-2">
+                            <div className={cn('h-[16px] w-28 rounded', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
+                            <div className={cn('h-[14px] w-20 rounded', isDark ? 'bg-white/6 clb-shimmer-dark' : 'bg-muted/80 clb-shimmer-light')} />
+                          </div>
                         </div>
-                      </div>
-                      {i < 4 && (
-                        <div className={cn('ml-[56px] sm:ml-[64px] h-px', isDark ? 'bg-white/5' : 'bg-border/20')} />
-                      )}
+                      ))}
                     </div>
-                  ))}
-                </motion.div>
-              ) : comments.length === 0 ? (
-                /* Empty state */
-                <motion.div
-                  key="comments-empty"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.15 }}
-                  className="flex-1 flex flex-col items-center justify-center px-8 gap-4 min-h-[220px]"
-                >
-                  {/* Staggered bounce emoji cluster */}
-                  <div className="flex gap-3 text-4xl">
-                    <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>⛳</span>
-                    <span className="inline-block animate-bounce" style={{ animationDelay: '180ms' }}>🏌️</span>
-                    <span className="inline-block animate-bounce" style={{ animationDelay: '360ms' }}>💬</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1.5">
-                    <p className={cn('text-[16px] font-semibold', isDark ? 'text-white' : 'text-foreground')}>
-                      No comments yet
-                    </p>
-                    <p className={cn('text-[13px] text-center leading-relaxed', isDark ? 'text-white/50' : 'text-muted-foreground')}>
-                      {isReview
-                        ? 'Be the first to review this course'
-                        : 'Be the first to drop your thoughts'}
-                    </p>
-                  </div>
-                </motion.div>
-              ) : (
-                /* Comment list */
-                <motion.div
-                  key="comments-content"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.15 }}
-                >
-                  {sortedComments.map((comment, idx) => renderTopLevelComment(comment, idx))}
-                  <div ref={sentinelRef} className="h-px" />
-                  {isFetchingNextPage && (
-                    <div className="flex items-center justify-center py-4">
-                      <div className={cn('w-5 h-5 border-2 rounded-full animate-spin', isDark ? 'border-white/20 border-t-white/60' : 'border-muted border-t-muted-foreground')} />
+                  ) : !likers || likers.length === 0 ? (
+                    <div className="flex-1 flex flex-col items-center justify-center px-8 gap-4 min-h-[220px]">
+                      <span className="text-4xl">🤍</span>
+                      <div className="flex flex-col items-center gap-1.5">
+                        <p className={cn('text-[16px] font-semibold', isDark ? 'text-white' : 'text-foreground')}>
+                          No likes yet
+                        </p>
+                        <p className={cn('text-[13px] text-center leading-relaxed', isDark ? 'text-white/50' : 'text-muted-foreground')}>
+                          Be the first to like this post
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      {likers.map((liker) => (
+                        <button
+                          key={liker.userId}
+                          type="button"
+                          onClick={() => { navigate(`/profile/${liker.userId}`); onClose(); }}
+                          className="flex items-center gap-3 w-full px-4 py-3 min-h-[64px] text-left"
+                        >
+                          <SquircleAvatar
+                            size={40}
+                            src={liker.avatarUrl}
+                            alt={liker.displayName}
+                            fallback={liker.displayName.charAt(0)}
+                            hideRing
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className={cn('text-[14px] font-semibold truncate', isDark ? 'text-white' : 'text-foreground')}>
+                              {liker.displayName}
+                            </p>
+                            {liker.username && (
+                              <p className={cn('text-[12px] truncate', isDark ? 'text-white/50' : 'text-muted-foreground')}>
+                                @{liker.username}
+                              </p>
+                            )}
+                          </div>
+                        </button>
+                      ))}
                     </div>
                   )}
-                </motion.div>
-              )}
-              </AnimatePresence>
-            </div>
-
-            {/* Input bar */}
-            <div
-              className="shrink-0 px-4 py-3"
-              style={{
-                paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 20px)',
-                borderTop: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid hsl(var(--border) / 0.5)',
-                background: isDark ? '#0d0d0d' : undefined,
-              }}
-            >
-              {/* Reply indicator */}
-              <AnimatePresence>
-                {replyingTo && (
+                </div>
+              ) : (
+                /* ── COMMENTS TAB ── */
+                <AnimatePresence mode="wait">
+                {commentsLoading ? (
+                  /* Loading skeletons with crossfade */
                   <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 28 }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="flex items-center justify-between mb-2 overflow-hidden"
+                    key="comments-skeleton"
+                    initial={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.15, ease: 'easeOut' }}
+                    className="px-4"
                   >
-                    <span className={cn('text-[13px]', isDark ? 'text-white/60' : 'text-muted-foreground')}>
-                      Replying to <span className="font-medium">{replyingTo.displayName}</span>
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setReplyingTo(null)}
-                      className="min-h-[44px] min-w-[44px] flex items-center justify-center"
-                    >
-                      <X className={cn('w-4 h-4', isDark ? 'text-white/50' : 'text-muted-foreground')} />
-                    </button>
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <div key={i}>
+                        <div className="flex gap-3 py-3">
+                          <div className={cn('w-[34px] h-[34px] rounded-[34%] shrink-0', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
+                          <div className="flex-1 space-y-2 py-0.5">
+                            <div className={cn('h-[18px] w-24 rounded', isDark ? 'bg-white/8 clb-shimmer-dark' : 'bg-muted clb-shimmer-light')} />
+                            <div className={cn('h-[18px] w-[85%] rounded', isDark ? 'bg-white/6 clb-shimmer-dark' : 'bg-muted/80 clb-shimmer-light')} />
+                            <div className={cn('h-[18px] w-[55%] rounded', isDark ? 'bg-white/5 clb-shimmer-dark' : 'bg-muted/60 clb-shimmer-light')} />
+                          </div>
+                        </div>
+                        {i < 4 && (
+                          <div className={cn('ml-[56px] sm:ml-[64px] h-px', isDark ? 'bg-white/5' : 'bg-border/20')} />
+                        )}
+                      </div>
+                    ))}
+                  </motion.div>
+                ) : comments.length === 0 ? (
+                  /* Empty state */
+                  <motion.div
+                    key="comments-empty"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.15 }}
+                    className="flex-1 flex flex-col items-center justify-center px-8 gap-4 min-h-[220px]"
+                  >
+                    {/* Staggered bounce emoji cluster */}
+                    <div className="flex gap-3 text-4xl">
+                      <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>⛳</span>
+                      <span className="inline-block animate-bounce" style={{ animationDelay: '180ms' }}>🏌️</span>
+                      <span className="inline-block animate-bounce" style={{ animationDelay: '360ms' }}>💬</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1.5">
+                      <p className={cn('text-[16px] font-semibold', isDark ? 'text-white' : 'text-foreground')}>
+                        No comments yet
+                      </p>
+                      <p className={cn('text-[13px] text-center leading-relaxed', isDark ? 'text-white/50' : 'text-muted-foreground')}>
+                        {isReview
+                          ? 'Be the first to review this course'
+                          : 'Be the first to drop your thoughts'}
+                      </p>
+                    </div>
+                  </motion.div>
+                ) : (
+                  /* Comment list */
+                  <motion.div
+                    key="comments-content"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    {sortedComments.map((comment, idx) => renderTopLevelComment(comment, idx))}
+                    <div ref={sentinelRef} className="h-px" />
+                    {isFetchingNextPage && (
+                      <div className="flex items-center justify-center py-4">
+                        <div className={cn('w-5 h-5 border-2 rounded-full animate-spin', isDark ? 'border-white/20 border-t-white/60' : 'border-muted border-t-muted-foreground')} />
+                      </div>
+                    )}
                   </motion.div>
                 )}
-              </AnimatePresence>
-
-              {/* Input row */}
-              <div className="flex items-end gap-2">
-                <SquircleAvatar
-                  size={32}
-                  src={activeActor?.avatarUrl}
-                  alt={activeActor?.name || 'You'}
-                  fallback={activeActor?.name?.charAt(0) || '?'}
-                  hideRing
-                />
-                <div className={cn(
-                  'flex-1 min-w-0 flex items-end rounded-[22px] px-4 py-2',
-                  isDark
-                    ? 'bg-white/10 border border-white/15'
-                    : 'bg-muted border border-border/50'
-                )}>
-                  <textarea
-                    ref={textareaRef}
-                    value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
-                    onKeyDown={handleInputKeyDown}
-                    placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : 'Add a comment...'}
-                    rows={1}
-                    className={cn(
-                      'flex-1 min-w-0 bg-transparent text-sm outline-none resize-none leading-snug',
-                      isDark
-                        ? 'text-white placeholder:text-white/40'
-                        : 'text-foreground placeholder:text-muted-foreground'
-                    )}
-                    style={{ maxHeight: '120px' }}
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={handleSend}
-                  disabled={!inputText.trim() || isAddingComment}
-                  className={cn(
-                    'w-11 h-11 rounded-full flex items-center justify-center transition-colors shrink-0',
-                    inputText.trim()
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-white/10 text-white/30'
-                  )}
-                >
-                  <SendHorizontal className="w-[18px] h-[18px]" />
-                </button>
-              </div>
+                </AnimatePresence>
+              )}
             </div>
+
+            {/* Input bar — only on Comments tab */}
+            {activeTab === 'comments' && (
+              <div
+                className="shrink-0 px-4 py-3"
+                style={{
+                  paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 20px)',
+                  borderTop: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid hsl(var(--border) / 0.5)',
+                  background: isDark ? '#0d0d0d' : undefined,
+                }}
+              >
+                {/* Reply indicator */}
+                <AnimatePresence>
+                  {replyingTo && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 28 }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="flex items-center justify-between mb-2 overflow-hidden"
+                    >
+                      <span className={cn('text-[13px]', isDark ? 'text-white/60' : 'text-muted-foreground')}>
+                        Replying to <span className="font-medium">{replyingTo.displayName}</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setReplyingTo(null)}
+                        className="min-h-[44px] min-w-[44px] flex items-center justify-center"
+                      >
+                        <X className={cn('w-4 h-4', isDark ? 'text-white/50' : 'text-muted-foreground')} />
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Input row */}
+                <div className="flex items-end gap-2">
+                  <SquircleAvatar
+                    size={32}
+                    src={activeActor?.avatarUrl}
+                    alt={activeActor?.name || 'You'}
+                    fallback={activeActor?.name?.charAt(0) || '?'}
+                    hideRing
+                  />
+                  <div className={cn(
+                    'flex-1 min-w-0 flex items-end rounded-[22px] px-4 py-2',
+                    isDark
+                      ? 'bg-white/10 border border-white/15'
+                      : 'bg-muted border border-border/50'
+                  )}>
+                    <textarea
+                      ref={textareaRef}
+                      value={inputText}
+                      onChange={(e) => setInputText(e.target.value)}
+                      onKeyDown={handleInputKeyDown}
+                      placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : 'Add a comment...'}
+                      rows={1}
+                      className={cn(
+                        'flex-1 min-w-0 bg-transparent text-sm outline-none resize-none leading-snug',
+                        isDark
+                          ? 'text-white placeholder:text-white/40'
+                          : 'text-foreground placeholder:text-muted-foreground'
+                      )}
+                      style={{ maxHeight: '120px' }}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleSend}
+                    disabled={!inputText.trim() || isAddingComment}
+                    className={cn(
+                      'w-11 h-11 rounded-full flex items-center justify-center transition-colors shrink-0',
+                      inputText.trim()
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-white/10 text-white/30'
+                    )}
+                  >
+                    <SendHorizontal className="w-[18px] h-[18px]" />
+                  </button>
+                </div>
+              </div>
+            )}
           </motion.div>
 
           {/* Delete confirmation */}
