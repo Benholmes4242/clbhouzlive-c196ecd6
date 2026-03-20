@@ -313,6 +313,7 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
         caption={post.caption}
         videoThumbnail={thumbnailUrl}
         theme="light"
+        likesCount={likeCount}
         courseId={post.review?.courseId}
         courseName={post.review?.courseName}
         isReview={post.isReview}

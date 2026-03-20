@@ -295,6 +295,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
         caption={post.caption}
         videoThumbnail={thumbnailUrl}
         theme="light"
+        likesCount={likeCount}
         courseId={post.review?.courseId}
         courseName={post.review?.courseName}
         isReview={post.isReview}

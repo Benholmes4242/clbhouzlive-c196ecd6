@@ -930,6 +930,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
           }}
           postId={selectedPostId}
           theme="dark"
+          likesCount={null}
         />
       )}
 
