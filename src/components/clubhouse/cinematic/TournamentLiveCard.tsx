@@ -260,7 +260,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           {/* Tour + Round badge */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: 6,
-            background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(10px)',
+            background: 'rgba(0,0,0,0.55)',
             padding: '5px 12px', borderRadius: 20,
           }}>
             <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: '0.04em' }}>
