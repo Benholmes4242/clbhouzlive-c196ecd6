@@ -116,17 +116,25 @@ const PostContentWithTags: React.FC<PostContentWithTagsProps> = ({
     const tagText = content.slice(start_index, end_index) || fallbackLabel;
 
     elements.push(
-      <button
+      <span
         key={`tag-${tag.id}`}
+        role="button"
+        tabIndex={0}
         onClick={(e) => {
           e.stopPropagation();
           handleTagClick(taggable_entities);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.stopPropagation();
+            handleTagClick(taggable_entities);
+          }
         }}
         className="font-medium hover:underline cursor-pointer bg-transparent border-none p-0 m-0 inline"
         style={{ color: 'var(--mention-color, #E8980A)', fontSize: 'inherit', lineHeight: 'inherit' }}
       >
         {tagText}
-      </button>
+      </span>
     );
 
     lastIndex = end_index;
