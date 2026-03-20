@@ -237,6 +237,9 @@ function AppRoutes() {
   const state = location.state as { backgroundLocation?: Location; fromHub?: boolean; fromVideo?: boolean } | null;
   const { shouldHideHeader } = useModalContext();
   
+  // Page view + time-on-page tracking
+  usePageTracking();
+  
   // BUG-1 FIX: Reset shield to transparent on every route change as a baseline.
   // Individual page hooks then opt-in to their own color (e.g. PageRoot → #F8FAFC).
   // This prevents stale shield colors when navigating back to immersive/KeepAlive pages.
