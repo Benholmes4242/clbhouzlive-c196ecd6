@@ -644,6 +644,7 @@ const TaggedPostCard = React.memo(function TaggedPostCard({
         creatorName={authorName}
         creatorAvatar={authorAvatar || undefined}
         theme="grey"
+        likesCount={likesCount}
       />
     </>
   );
