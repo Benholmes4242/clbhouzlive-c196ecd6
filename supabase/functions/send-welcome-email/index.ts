@@ -70,8 +70,8 @@ serve(async (req) => {
         <!-- Header -->
         <tr><td style="padding:36px 32px 20px;text-align:center;">
           <img src="https://clbhouzlive.lovable.app/images/clbhouz-logo.png" alt="Clbhouz" height="32" style="height:32px;" />
-          <h1 style="color:#ffffff;font-size:22px;font-weight:600;margin:24px 0 4px;">Welcome to Clbhouz, ${username}.</h1>
-          <p style="color:rgba(255,255,255,0.45);font-size:14px;margin:0;">The home of golf.</p>
+          <h1 style="color:#ffffff;font-size:22px;font-weight:600;margin:24px 0 4px;">Welcome to clbhouz, ${username}.</h1>
+          <p style="color:rgba(255,255,255,0.45);font-size:14px;margin:0;">stay in play.</p>
         </td></tr>
         <!-- Body -->
         <tr><td style="padding:0 32px 32px;">
@@ -85,13 +85,13 @@ serve(async (req) => {
               </a>
             </div>
             <p style="color:rgba(255,255,255,0.3);font-size:12px;line-height:1.5;margin:24px 0 0;text-align:center;">
-              This link expires in 24 hours. If you didn't create a Clbhouz account, you can safely ignore this email.
+              This link expires in 24 hours. If you didn't create a clbhouz account, you can safely ignore this email.
             </p>
           </div>
         </td></tr>
         <!-- Footer -->
         <tr><td style="padding:0 32px 28px;text-align:center;">
-          <p style="color:rgba(255,255,255,0.2);font-size:11px;margin:0;">&copy; 2026 Clbhouz &middot; clbhouz.co.uk</p>
+          <p style="color:rgba(255,255,255,0.2);font-size:11px;margin:0;">&copy; 2026 clbhouz &middot; clbhouz.co.uk</p>
         </td></tr>
       </table>
     </td></tr>
@@ -106,9 +106,9 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Clbhouz <notifications@clbhouz.co.uk>',
+        from: 'clbhouz <notifications@clbhouz.co.uk>',
         to: [userEmail],
-        subject: 'Verify your Clbhouz account',
+        subject: 'Verify your clbhouz account',
         html,
       }),
     });
