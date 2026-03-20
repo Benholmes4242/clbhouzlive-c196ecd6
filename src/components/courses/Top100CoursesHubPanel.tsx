@@ -189,7 +189,7 @@ const Top100CoursesHubPanel = () => {
 
       {/* Controls Section - sticky search + filters */}
       <div
-        className="sticky top-0 z-10 bg-background pb-3 px-4 space-y-3"
+        className="sticky top-0 z-10 bg-background pb-3 space-y-3 -mx-4 px-4"
         style={{ borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
       >
         {/* Search */}
