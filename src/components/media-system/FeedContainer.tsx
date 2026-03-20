@@ -47,6 +47,7 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
     typeof window !== 'undefined' ? window.innerHeight : 800
   );
   const startOffset = -(initialIndex) * (typeof window !== 'undefined' ? window.innerHeight : 800);
+  const [offsetY, setOffsetY] = useState(startOffset);
 
   const offsetRef = useRef(startOffset);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -75,11 +76,8 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
   useEffect(() => {
     if (prevPostsRef.current !== posts && posts.length > 0) {
       const prevPosts = prevPostsRef.current;
-      // An "append" is any update where the first post ID is unchanged.
-      // This covers: new pages loaded (length grows) AND live feed refetches
-      // (same length, new array reference). Only treat as a full feed switch
-      // when the first post ID actually changes (genuine tab switch).
       const isAppend = prevPosts && prevPosts.length > 0 &&
+        posts.length > prevPosts.length &&
         posts[0]?.id === prevPosts[0]?.id;
       
       if (!isAppend) {
@@ -88,6 +86,7 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
         const newOffset = -startAt * itemHeight;
         offsetRef.current = newOffset;
         activeIndexRef.current = startAt;
+        setOffsetY(newOffset);
         if (trackRef.current) {
           trackRef.current.style.transform = `translateY(${newOffset}px)`;
         }
@@ -108,6 +107,7 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
     const newOffset = -initialIndex * itemHeight;
     offsetRef.current = newOffset;
     activeIndexRef.current = initialIndex;
+    setOffsetY(newOffset);
     if (trackRef.current) {
       trackRef.current.style.transform = `translateY(${newOffset}px)`;
     }
@@ -125,6 +125,7 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
   useEffect(() => {
     const newOffset = -activeIndexRef.current * itemHeight;
     offsetRef.current = newOffset;
+    setOffsetY(newOffset);
     if (trackRef.current) {
       trackRef.current.style.transform = `translateY(${newOffset}px)`;
     }
@@ -188,7 +189,7 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
       if (trackRef.current) {
         trackRef.current.style.transform = `translateY(${targetY}px)`;
       }
-      // offsetY state removed — transform is DOM-only via trackRef
+      setOffsetY(targetY);
       activeIndexRef.current = clamped;
       setActiveIndex(clamped);
       const gs = scopedStore ? scopedStore.getState() : useMediaStore.getState();
@@ -216,6 +217,7 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
       },
       () => {
         offsetRef.current = targetY;
+        setOffsetY(targetY);
         const prevIdx = activeIndexRef.current;
         activeIndexRef.current = clamped;
         setActiveIndex(clamped);
@@ -409,7 +411,7 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
       <div
         ref={trackRef}
         style={{
-          transform: `translateY(${startOffset}px)`,
+          transform: `translateY(${offsetY}px)`,
           willChange: 'transform',
         }}
       >
