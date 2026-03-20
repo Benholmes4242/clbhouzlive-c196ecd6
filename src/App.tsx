@@ -1,4 +1,5 @@
 import React, { Suspense, lazy, useEffect, useLayoutEffect, useMemo } from "react";
+import { usePageTracking } from '@/hooks/usePageTracking';
 import { MessagingProvider } from '@/contexts/MessagingContext';
 
 import { Toaster as Sonner } from "@/components/ui/sonner";

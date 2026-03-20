@@ -28,6 +28,9 @@ export const useNavigationHandlers = () => {
   }, [location.pathname]);
 
   const handleTabClick = (tab: { id: string; path: string | null; isAction?: boolean }) => {
+    // Track nav tab tap
+    analyticsEvents.track('nav_tab_tap', { tab: tab.id });
+
     if (tab.isAction) {
       // Action tabs are handled by the parent component (BottomNavigation)
       return;

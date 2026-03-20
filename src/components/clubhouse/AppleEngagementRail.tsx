@@ -12,6 +12,7 @@
 import React, { useState, useEffect } from 'react';
 import { Heart, MessageCircle, Share2, Volume2, VolumeX, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 interface AppleEngagementRailProps {
   stats: {
