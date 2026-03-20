@@ -6,6 +6,7 @@ export const GLOBAL_HEADER_EXCLUDED_ROUTES = [
   '/clubhouse',
   '/auth',
   '/auth/callback',
+  '/auth/check-email',
   '/auth/verified',
   '/signup',
   '/onboarding',
