@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useLayoutEffect } from 'react';
 import { Mail } from 'lucide-react';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
@@ -6,6 +7,11 @@ import { useHideHeader } from '@/hooks/useHeaderVisibility';
 export default function CheckEmailPage() {
   useHideBottomNav();
   useHideHeader();
+
+  useLayoutEffect(() => {
+    document.body.classList.add('route-auth');
+    return () => document.body.classList.remove('route-auth');
+  }, []);
 
   const location = useLocation();
   const navigate = useNavigate();
