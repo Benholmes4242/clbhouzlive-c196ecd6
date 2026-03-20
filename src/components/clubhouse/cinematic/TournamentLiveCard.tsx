@@ -480,7 +480,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                   <div style={{ display: 'flex', alignItems: 'center', marginLeft: 0 }}>
                     {stackedAvatars.map((p, i) => (
                       <div key={i} style={{
-                        marginLeft: i === 0 ? 0 : -10,
+                        marginLeft: i === 0 ? 0 : -12,
                         zIndex: stackedAvatars.length - i,
                         borderRadius: '34%',
                         border: '2px solid rgba(0,0,0,0.95)',
