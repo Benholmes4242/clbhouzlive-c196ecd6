@@ -216,7 +216,6 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
       },
       () => {
         offsetRef.current = targetY;
-        setOffsetY(targetY);
         const prevIdx = activeIndexRef.current;
         activeIndexRef.current = clamped;
         setActiveIndex(clamped);
