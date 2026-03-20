@@ -16,15 +16,28 @@ serve(async (req) => {
     console.log('[send-welcome-email] invoked');
 
     const payload = await req.json();
-    console.log('[send-welcome-email] payload keys:', Object.keys(payload));
+    console.log('[send-welcome-email] full payload:', JSON.stringify(payload));
 
     const { user, email_data } = payload;
-    const confirmationUrl = email_data?.confirmation_url;
-    const userEmail = user?.email;
-    const username = user?.user_metadata?.username || userEmail?.split('@')[0] || 'golfer';
+
+    // Try alternative field paths that Supabase Auth Hook may use
+    const confirmationUrl = email_data?.confirmation_url
+      ?? email_data?.token_hash
+      ?? email_data?.redirect_to;
+    const userEmail = user?.email ?? user?.new_email;
+    const username = user?.user_metadata?.username
+      ?? user?.raw_user_meta_data?.username
+      ?? userEmail?.split('@')[0]
+      ?? 'golfer';
+
+    console.log('[send-welcome-email] confirmationUrl:', confirmationUrl);
+    console.log('[send-welcome-email] userEmail:', userEmail);
+    console.log('[send-welcome-email] username:', username);
 
     if (!confirmationUrl || !userEmail) {
-      console.log('[send-welcome-email] missing fields');
+      console.log('[send-welcome-email] missing fields — confirmationUrl:', confirmationUrl, 'userEmail:', userEmail);
+      console.log('[send-welcome-email] email_data keys:', email_data ? Object.keys(email_data) : 'null');
+      console.log('[send-welcome-email] user keys:', user ? Object.keys(user) : 'null');
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
