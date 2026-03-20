@@ -85,7 +85,7 @@ serve(async (req) => {
               </a>
             </div>
             <p style="color:rgba(255,255,255,0.3);font-size:12px;line-height:1.5;margin:24px 0 0;text-align:center;">
-              This link expires in 24 hours. If you didn't create a Clbhouz account, you can safely ignore this email.
+              This link expires in 24 hours. If you didn't create a clbhouz account, you can safely ignore this email.
             </p>
           </div>
         </td></tr>
