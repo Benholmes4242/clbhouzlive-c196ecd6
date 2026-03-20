@@ -697,7 +697,7 @@ const App: React.FC = () => {
           </Top100DebugProvider>
         </ThemeProvider>
       </AppShell>
-    </BetaAccessGate>
+    </>
   );
 };
 

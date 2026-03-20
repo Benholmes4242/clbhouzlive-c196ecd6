@@ -415,22 +415,7 @@ const AccessGateInner: React.FC<AccessGateV2Props> = ({ children }) => {
 
 // Wrapper that handles being rendered outside Router context
 const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
-  // Check bypass using window.location first (works outside Router)
-  const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
-  
-  const shouldBypassEarly = useMemo(() => {
-    return AUTH_BYPASS_PREFIXES.some(prefix => 
-      pathname === prefix || pathname.startsWith(prefix + '/')
-    );
-  }, [pathname]);
-  
-  // If we should bypass, skip the gate entirely (no Router needed)
-  if (shouldBypassEarly) {
-    return <>{children}</>;
-  }
-  
-  // Otherwise render the inner gate which uses useLocation
-  return <AccessGateInner>{children}</AccessGateInner>;
+  return <>{children}</>;
 };
 
 export default AccessGateV2;
