@@ -7,7 +7,7 @@ import { memo, useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  User, Sparkles, MessageCircle, Bell, Pencil,
+  User, MessageCircle, Bell, Pencil,
   Building2, Settings, ChevronRight, LogOut,
   Shield, Plus, Check, X,
 } from 'lucide-react';
