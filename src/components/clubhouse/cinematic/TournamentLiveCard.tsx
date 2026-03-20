@@ -394,7 +394,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           {leader && (
             <div style={{
               display: 'flex', alignItems: 'center', gap: 12,
-              padding: '10px 0',
+              padding: '12px 0',
               borderBottom: chaserRows.length > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none',
               background: `${tour.accentColor}08`,
               animation: 'trlive-slideIn 0.5s ease-out both',
@@ -403,7 +403,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
               <span style={{ width: 28, textAlign: 'center' as const, fontSize: 15, fontWeight: 700, color: tour.accentColor }}>
                 {isTiedFirst ? 'T1' : '1'}
               </span>
-              <RowAvatar name={leader.playerName} photoUrl={leader.photoUrl} tourSlug={meta.tourSlug} size={38} />
+              <RowAvatar name={leader.playerName} photoUrl={leader.photoUrl} tourSlug={meta.tourSlug} size={46} />
               <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                 {leader.playerName}
               </span>
