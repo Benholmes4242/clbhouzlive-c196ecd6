@@ -43,15 +43,15 @@ export const LiveUpcomingToggle: React.FC<LiveUpcomingToggleProps> = ({
             className="flex-1 flex items-center justify-center gap-1.5 transition-all duration-200 whitespace-nowrap"
             style={{
               padding: '10px 16px',
-              borderRadius: 10,
+              borderRadius: 8,
               fontSize: 13,
               fontWeight: 600,
               color: isActive
                 ? 'hsl(var(--background))'
                 : 'hsl(var(--muted-foreground))',
               background: isActive ? 'hsl(var(--foreground))' : 'transparent',
+              border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
               boxShadow: 'none',
-              border: 'none',
               cursor: 'pointer',
             }}
           >
