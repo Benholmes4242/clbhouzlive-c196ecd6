@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 export type ClubhouseTab = 'foryou' | 'friends';
 
@@ -43,7 +44,10 @@ export const ClubhouseTabToggle = ({
             key={id}
             role="tab"
             aria-selected={isActive}
-            onClick={() => onTabChange(id)}
+            onClick={() => {
+              onTabChange(id);
+              analyticsEvents.track('feed_tab_switch', { tab: id === 'foryou' ? 'suggested' : 'friends' });
+            }}
             className="min-w-0"
             style={{
               background: 'none',

@@ -162,8 +162,17 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && inputValue.trim()) {
       handleSaveRecent(inputValue.trim());
+      // Track search query
+      const totalResults = (people?.length ?? 0) + (clubs?.length ?? 0) + (businesses?.length ?? 0);
+      import('@/utils/analyticsEvents').then(({ analyticsEvents }) => {
+        analyticsEvents.track('search_query', {
+          query: inputValue.trim(),
+          result_count: totalResults,
+          query_length: inputValue.trim().length,
+        });
+      });
     }
-  }, [inputValue, handleSaveRecent]);
+  }, [inputValue, handleSaveRecent, people, clubs, businesses]);
 
   const handleClear = useCallback(() => {
     setInputValue('');

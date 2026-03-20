@@ -6,6 +6,7 @@ import { FadeInContent } from '@/components/ui/FadeInContent';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 const CourseDetailPage = () => {
   const params = useParams();
@@ -20,6 +21,13 @@ const CourseDetailPage = () => {
     const rootElement = document.getElementById('root');
     if (rootElement) {
       rootElement.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }
+
+    // Track course detail view
+    if (courseId) {
+      analyticsEvents.track('course_view', {
+        course_id: courseId,
+      });
     }
   }, [courseId]);
 

@@ -5,6 +5,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { nanoid } from 'nanoid';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -185,6 +186,12 @@ export function useEchoConversation(opts?: UseEchoConversationOptions) {
     if (isStreaming || !userId || rateLimitCooldown) {
       return;
     }
+
+    // Track echo query text for analytics
+    analyticsEvents.track('echo_query', {
+      query_text: content.slice(0, 500),
+      query_length: content.length,
+    });
 
     const userMessage: EchoMessage = {
       id: nanoid(),

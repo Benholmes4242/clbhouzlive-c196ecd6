@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useMediaStore } from '@/components/media-system/store/mediaStore';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 /**
  * Manages comments sheet state and optimistic comment counts.
@@ -23,7 +24,10 @@ export function useClubhouseComments() {
     }
   }, [commentsOpen]);
 
-  const openComments = useCallback(() => setCommentsOpen(true), []);
+  const openComments = useCallback(() => {
+    setCommentsOpen(true);
+    analyticsEvents.track('post_comment_open', {});
+  }, []);
   const closeComments = useCallback(() => setCommentsOpen(false), []);
 
   const handleCommentPosted = useCallback((post: FeedPost | null) => {
