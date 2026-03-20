@@ -107,10 +107,17 @@ const handler = async (req: Request): Promise<Response> => {
     // TEMPORARY: Plaintext fallback for debugging
     const plaintextFallback = ["CLBHOUZ2025*"];
 
-    // Verify access code against plaintext first (for debugging)
+    // Accept internal bypass code (used by AuthCallback for verified users)
+    const INTERNAL_CODE = Deno.env.get('INTERNAL_ACCESS_CODE');
     let isValid = false;
-    
-    if (accessCode && plaintextFallback.some(code => code === String(accessCode).toUpperCase())) {
+
+    if (INTERNAL_CODE && accessCode === INTERNAL_CODE) {
+      console.log("✅ Internal access code matched (auth callback grant)");
+      isValid = true;
+    }
+
+    // Verify access code against plaintext first (for debugging)
+    if (!isValid && accessCode && plaintextFallback.some(code => code === String(accessCode).toUpperCase())) {
       console.log("✅ Valid plaintext code matched");
       isValid = true;
     }

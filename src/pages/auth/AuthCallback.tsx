@@ -32,6 +32,37 @@ export default function AuthCallback() {
           return;
         }
 
+        // ── Grant gate access for verified user ──────────────────────────
+        // A freshly-verified user has a valid Supabase session but no gate
+        // token. Auto-grant so they aren't blocked by the beta access screen.
+        setMessage('Almost there…');
+        try {
+          const gateRes = await fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/secure-site-access`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                accessCode: import.meta.env.VITE_INTERNAL_ACCESS_CODE,
+                domain: window.location.hostname,
+              }),
+            }
+          );
+          const gateData = await gateRes.json();
+          if (gateRes.ok && gateData?.success) {
+            localStorage.setItem(
+              'clubhouz_gate_session',
+              JSON.stringify({
+                token: gateData.sessionToken,
+                expiresAt: gateData.expiresAt,
+              })
+            );
+          }
+        } catch {
+          // Non-fatal — gate will re-check on next load
+        }
+        // ─────────────────────────────────────────────────────────────────
+
         setMessage('Setting up your profile…');
 
         // Give the DB trigger time to create the profile row
