@@ -43,8 +43,8 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
           top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
         }}
       >
-        {/* Left: Tab Toggle — flex-1 + overflow-hidden prevents tabs pushing into search */}
-        <div className="flex-1 min-w-0 overflow-hidden">
+        {/* Left: Tab Toggle — flex-1 lets it take available space and shrink */}
+        <div className="flex-1 min-w-0">
           <ClubhouseTabToggle
             activeTab={activeTab}
             onTabChange={onTabChange}

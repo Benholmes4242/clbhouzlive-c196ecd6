@@ -44,13 +44,13 @@ export const ClubhouseTabToggle = ({
             role="tab"
             aria-selected={isActive}
             onClick={() => onTabChange(id)}
+            className="min-w-0"
             style={{
               background: 'none',
               border: 'none',
               cursor: 'pointer',
               padding: '10px 2px 8px',
               fontSize: 16,
-              whiteSpace: 'nowrap' as const,
               fontWeight: isActive ? 700 : 500,
               color: isActive ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.40)',
               letterSpacing: isActive ? '-0.025em' : '0',
