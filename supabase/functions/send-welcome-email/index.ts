@@ -69,7 +69,7 @@ serve(async (req) => {
       <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="background:#0a0a0a;border-radius:16px;overflow:hidden;">
         <!-- Header -->
         <tr><td style="padding:36px 32px 20px;text-align:center;">
-          <img src="https://clbhouzlive.lovable.app/images/clbhouz-logo.png" alt="Clbhouz" height="32" style="height:32px;" />
+          <img src="https://clbhouz.co.uk/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png" alt="clbhouz" width="72" style="display:block;margin:0 auto 24px;" />
           <h1 style="color:#ffffff;font-size:22px;font-weight:600;margin:24px 0 4px;">Welcome to clbhouz, ${username}.</h1>
           <p style="color:rgba(255,255,255,0.45);font-size:14px;margin:0;">stay in play.</p>
         </td></tr>
