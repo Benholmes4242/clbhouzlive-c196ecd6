@@ -188,7 +188,7 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
       if (trackRef.current) {
         trackRef.current.style.transform = `translateY(${targetY}px)`;
       }
-      setOffsetY(targetY);
+      // offsetY state removed — transform is DOM-only via trackRef
       activeIndexRef.current = clamped;
       setActiveIndex(clamped);
       const gs = scopedStore ? scopedStore.getState() : useMediaStore.getState();
