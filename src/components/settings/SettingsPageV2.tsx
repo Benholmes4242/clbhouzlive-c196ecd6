@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, User, Mail, Lock, Bell, Shield, EyeOff, UserX, HelpCircle, Flag, MessageSquare, FileText, Trash2, LogOut, Eye } from 'lucide-react';
+import { ChevronLeft, User, Mail, Lock, Bell, Shield, EyeOff, UserX, HelpCircle, Flag, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Map } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useCreatorSettings } from '@/hooks/useCreatorSettings';
@@ -69,6 +69,8 @@ export function SettingsPageV2() {
     user?.id,
     !!(profile as any)?.is_public,
     !!(profile as any)?.show_handicap,
+    (profile as any)?.show_in_handicap_leaderboards ?? true,
+    (profile as any)?.show_in_exploration_leaderboards ?? true,
   );
 
   const deleteAccount = useDeleteAccount(user?.id);
@@ -183,6 +185,24 @@ export function SettingsPageV2() {
             checked={privacy.showHandicap}
             disabled={privacy.isUpdatingHandicap}
             onCheckedChange={privacy.toggleHandicap}
+          />
+          <SettingsToggleRow
+            icon={<BarChart2 size={18} />}
+            title="Show in Handicap Leaderboards"
+            subtitle="Appear in lowest handicap and improvement rankings"
+            iconTheme="privacy"
+            checked={privacy.showInHandicapLeaderboards}
+            disabled={privacy.isUpdatingHandicapLb}
+            onCheckedChange={privacy.toggleHandicapLeaderboards}
+          />
+          <SettingsToggleRow
+            icon={<Map size={18} />}
+            title="Show in Course Leaderboards"
+            subtitle="Appear in courses played and exploration rankings"
+            iconTheme="privacy"
+            checked={privacy.showInExplorationLeaderboards}
+            disabled={privacy.isUpdatingExplorationLb}
+            onCheckedChange={privacy.toggleExplorationLeaderboards}
           />
           <SettingsChevronRow
             icon={<UserX size={18} />}
