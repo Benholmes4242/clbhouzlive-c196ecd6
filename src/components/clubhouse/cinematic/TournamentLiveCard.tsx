@@ -421,7 +421,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           {/* Co-leaders (if tied at 1st, show other co-leaders) */}
           {isTiedFirst && coLeaders
             .filter(e => e.playerName !== leader?.playerName)
-            .slice(0, 3)
+            .slice(0, 2)
             .map((co, idx) => (
               <div key={`co-${idx}`} style={{
                 display: 'flex', alignItems: 'center', gap: 12,
@@ -454,10 +454,9 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                   {co.scoreDisplay}
                 </span>
               </div>
-            ))
-          }
+            ))}
 
-          {/* Chaser rows (positions 2+) */}
+          {/* Chaser rows (positions 2-3 only) */}
           {chaserRows.map((row, idx) => {
             const primary = row.players[0];
             const stackedAvatars = row.players.slice(0, 4);
@@ -468,7 +467,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                 padding: '9px 0',
                 borderBottom: '1px solid rgba(255,255,255,0.03)',
                 animation: 'trlive-slideIn 0.5s ease-out both',
-                animationDelay: `${0.65 + (isTiedFirst ? coLeaders.length - 1 : 0) * 0.08 + idx * 0.08}s`,
+                animationDelay: `${0.65 + (isTiedFirst ? Math.min(coLeaders.length - 1, 2) : 0) * 0.08 + idx * 0.08}s`,
               }}>
                 <span style={{
                   width: 28, textAlign: 'center' as const, fontSize: 14, fontWeight: 600,
