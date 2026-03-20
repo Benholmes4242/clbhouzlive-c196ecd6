@@ -369,7 +369,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
         <div style={{
           flex: '1 1 auto', overflow: 'auto',
           WebkitOverflowScrolling: 'touch' as const,
-          padding: '10px max(14px, 3vw) 0',
+          padding: '10px max(14px, 3vw) 16px',
         }}>
           <div style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
