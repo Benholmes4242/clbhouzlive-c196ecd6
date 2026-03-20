@@ -28,6 +28,10 @@ const SettingsPage         = lazy(() => import('./pages/SettingsPage'));
 const PlatformAnalytics    = lazy(() => import('./pages/analytics/PlatformAnalyticsPage'));
 const ContentAnalytics     = lazy(() => import('./pages/analytics/ContentAnalyticsPage'));
 const AuthAnalytics        = lazy(() => import('./pages/analytics/AuthAnalyticsPage'));
+const EngagementAnalytics  = lazy(() => import('./pages/analytics/EngagementAnalyticsPage'));
+const NavigationAnalytics  = lazy(() => import('./pages/analytics/NavigationAnalyticsPage'));
+const EchoAnalytics        = lazy(() => import('./pages/analytics/EchoAnalyticsPage'));
+const SocialAnalytics      = lazy(() => import('./pages/analytics/SocialAnalyticsPage'));
 const GeocodingPage        = lazy(() => import('./pages/tools/GeocodingPage'));
 const TestLabPage          = lazy(() => import('./pages/tools/TestLabPage'));
 
