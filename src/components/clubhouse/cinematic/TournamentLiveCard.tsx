@@ -90,7 +90,7 @@ function HeroPhoto({ src, name }: { src: string | null; name: string }) {
         }}
         style={{
           position: 'absolute', inset: 0, width: '100%', height: '100%',
-          objectFit: 'cover', objectPosition: 'center -40%',
+          objectFit: 'cover', objectPosition: 'center 20%',
         }}
       />
     );
@@ -208,7 +208,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
 
       {/* ══ ZONE 1: HERO — leader portrait (50%, matching Result card) ══ */}
       <div style={{
-        position: 'relative', flex: '0 0 50%', overflow: 'hidden',
+        position: 'relative', flex: '0 0 45%', overflow: 'hidden',
       }}>
         <div ref={heroRef} style={{
           position: 'absolute', inset: '-10px',
@@ -236,13 +236,13 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
         {/* Top bar — LIVE badge + tour/round */}
         <div style={{
           position: 'absolute', top: 0, left: 0, right: 0,
-          padding: '52px 16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          padding: 'calc(max(env(safe-area-inset-top, 44px), 44px) + 8px) 16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           animation: 'trlive-fadeIn 0.4s ease-out',
         }}>
           {/* LIVE pill */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: 6,
-            background: 'rgba(34,197,94,0.15)', backdropFilter: 'blur(8px)',
+            background: 'rgba(0,0,0,0.55)',
             border: '1px solid rgba(34,197,94,0.40)',
             padding: '5px 12px', borderRadius: 20,
             fontSize: 11, fontWeight: 800, color: '#22C55E',
@@ -260,7 +260,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           {/* Tour + Round badge */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: 6,
-            background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(10px)',
+            background: 'rgba(0,0,0,0.55)',
             padding: '5px 12px', borderRadius: 20,
           }}>
             <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: '0.04em' }}>
@@ -369,7 +369,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
         <div style={{
           flex: '1 1 auto', overflow: 'auto',
           WebkitOverflowScrolling: 'touch' as const,
-          padding: '10px max(14px, 3vw) 0',
+          padding: '10px max(14px, 3vw) 16px',
         }}>
           <div style={{
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
