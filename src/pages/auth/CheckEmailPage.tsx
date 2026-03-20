@@ -3,10 +3,12 @@ import { useLayoutEffect } from 'react';
 import { Mail } from 'lucide-react';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
+import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 
 export default function CheckEmailPage() {
   useHideBottomNav();
   useHideHeader();
+  useMedianStatusBar('dark', '#0d0d0d', true, false);
 
   useLayoutEffect(() => {
     document.body.classList.add('route-auth');
