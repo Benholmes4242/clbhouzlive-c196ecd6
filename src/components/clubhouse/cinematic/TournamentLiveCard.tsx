@@ -495,7 +495,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                         width: 38, height: 38, borderRadius: '34%',
                         background: 'rgba(255,255,255,0.08)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)',
+                        fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.5)',
                         border: '2px solid rgba(0,0,0,0.95)',
                       }}>
                         +{row.players.length - 4}
