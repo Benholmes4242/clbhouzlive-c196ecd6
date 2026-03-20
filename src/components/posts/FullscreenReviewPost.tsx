@@ -527,13 +527,7 @@ export function FullscreenReviewPost({
                 <div className="text-[13px] font-semibold text-white truncate">
                   {user.name || 'Golfer'}
                 </div>
-                <div className={cn(
-                  "flex items-center gap-0.5 mt-0.5",
-                  "text-[11px] font-medium",
-                  isOutstanding 
-                    ? "text-amber-400/90"
-                    : "text-white/60"
-                )}>
+                <div className="flex items-center gap-0.5 mt-0.5 text-[11px] font-medium text-amber-400/90">
                   <span>Read review</span>
                   <ChevronRight className="w-3 h-3" />
                 </div>
