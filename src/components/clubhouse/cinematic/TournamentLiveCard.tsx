@@ -236,7 +236,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
         {/* Top bar — LIVE badge + tour/round */}
         <div style={{
           position: 'absolute', top: 0, left: 0, right: 0,
-          padding: '52px 16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          padding: 'calc(max(env(safe-area-inset-top, 44px), 44px) + 8px) 16px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           animation: 'trlive-fadeIn 0.4s ease-out',
         }}>
           {/* LIVE pill */}
