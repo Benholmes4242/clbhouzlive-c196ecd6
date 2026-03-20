@@ -122,7 +122,7 @@ function ProfileHubSheet({
     },
     {
       icon: () => (
-        <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
           <path d="M1 10h2M4 7v6M7 5v10M10 3v14M13 5v10M16 7v6M19 10h-2"
             stroke="#F59E0B" strokeWidth="1.6" strokeLinecap="round"/>
         </svg>
@@ -308,7 +308,7 @@ function ProfileHubSheet({
                         </span>
                       )}
                     </div>
-                    <span className="text-[13px] font-medium text-foreground">{label}</span>
+                    <span className={cn("text-[13px] font-medium", isEcho ? "text-[#B45309]" : "text-foreground")}>{label}</span>
                   </button>
                 ))}
               </div>
