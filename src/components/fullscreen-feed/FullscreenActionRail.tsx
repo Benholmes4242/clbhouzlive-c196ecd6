@@ -252,6 +252,7 @@ export function FullscreenActionRail({ posts, store }: FullscreenActionRailProps
           reviewRating={activePost.review?.rating}
           onCommentPosted={handleCommentPosted}
           onCommentDeleted={handleCommentDeleted}
+          likesCount={likeCount}
         />
       )}
     </>
