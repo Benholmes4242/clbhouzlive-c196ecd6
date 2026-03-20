@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useMediaStore } from '@/components/media-system/store/mediaStore';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 /**
  * Manages comments sheet state and optimistic comment counts.
