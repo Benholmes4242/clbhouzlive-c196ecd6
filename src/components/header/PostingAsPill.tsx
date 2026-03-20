@@ -61,8 +61,8 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
     const getPillStyles = () => {
       if (useGlassTheme) {
         return {
-          background: 'rgba(245, 158, 11, 0.15)',
-          border: '1px solid rgba(245, 158, 11, 0.25)',
+          background: 'rgba(0, 0, 0, 0.35)',
+          border: '1px solid rgba(255, 255, 255, 0.10)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
