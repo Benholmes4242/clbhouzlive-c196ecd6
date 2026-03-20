@@ -13,6 +13,7 @@ export function useClubhouseShare(userId: string | undefined) {
   const handleShare = useCallback((post: FeedPost | null) => {
     if (!post) return;
     analyticsEvents.track('video_share', { post_id: post.id });
+    analyticsEvents.track('post_share', { post_id: post.id });
     if (navigator.share) {
       navigator.share({
         title: post.displayName,

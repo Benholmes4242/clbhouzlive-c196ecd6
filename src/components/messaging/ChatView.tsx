@@ -363,6 +363,13 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
     clearTyping();
     const finalMessageType = messageType || mediaType || 'text';
     await sendMessage(content, replyToId, mediaUrl, finalMessageType, metadata);
+
+    // Track message sent
+    import('@/utils/analyticsEvents').then(({ analyticsEvents }) => {
+      analyticsEvents.track('message_sent', {
+        is_voice_note: finalMessageType === 'voice',
+      });
+    });
   }, [sendMessage, clearTyping]);
 
   const handleSendVoiceNote = useCallback(async (audioBlob: Blob, duration: number) => {

@@ -5,6 +5,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { nanoid } from 'nanoid';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';

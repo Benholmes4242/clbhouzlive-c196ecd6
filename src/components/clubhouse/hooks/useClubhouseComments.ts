@@ -24,7 +24,10 @@ export function useClubhouseComments() {
     }
   }, [commentsOpen]);
 
-  const openComments = useCallback(() => setCommentsOpen(true), []);
+  const openComments = useCallback(() => {
+    setCommentsOpen(true);
+    analyticsEvents.track('post_comment_open', {});
+  }, []);
   const closeComments = useCallback(() => setCommentsOpen(false), []);
 
   const handleCommentPosted = useCallback((post: FeedPost | null) => {

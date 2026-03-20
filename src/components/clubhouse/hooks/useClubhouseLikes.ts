@@ -27,6 +27,7 @@ export function useClubhouseLikes({ userId, activeActor }: UseClubhouseLikesOpti
     setLocalLikeState(prev => new Map(prev).set(post.id, newState));
 
     analyticsEvents.track('video_like', { post_id: post.id, action: current.isLiked ? 'unlike' : 'like' });
+    analyticsEvents.track('post_like', { post_id: post.id, action: current.isLiked ? 'unlike' : 'like' });
 
     likeMutation.mutate(
       {
