@@ -112,8 +112,20 @@ const handler = async (req: Request): Promise<Response> => {
     let isValid = false;
 
     if (INTERNAL_CODE && accessCode === INTERNAL_CODE) {
-      console.log("✅ Internal access code matched (auth callback grant)");
-      isValid = true;
+      // Verify the caller actually has a confirmed email before granting
+      const authHeader = req.headers.get('Authorization');
+      if (authHeader?.startsWith('Bearer ')) {
+        const serviceClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+        const { data: { user } } = await serviceClient.auth.getUser(authHeader.replace('Bearer ', ''));
+        if (user?.email_confirmed_at) {
+          console.log(`✅ Internal access code matched — email confirmed (${user.id})`);
+          isValid = true;
+        } else {
+          console.warn(`⛔ Internal code used but email NOT confirmed (user: ${user?.id ?? 'unknown'})`);
+        }
+      } else {
+        console.warn('⛔ Internal code used without Authorization header — denied');
+      }
     }
 
     // Verify access code against plaintext first (for debugging)

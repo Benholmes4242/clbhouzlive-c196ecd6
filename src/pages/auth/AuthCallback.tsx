@@ -41,7 +41,10 @@ export default function AuthCallback() {
             `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/secure-site-access`,
             {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.access_token}`,
+              },
               body: JSON.stringify({
                 accessCode: import.meta.env.VITE_INTERNAL_ACCESS_CODE,
                 domain: window.location.hostname,
