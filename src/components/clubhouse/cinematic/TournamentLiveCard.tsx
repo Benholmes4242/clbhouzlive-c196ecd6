@@ -435,7 +435,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
               <span style={{ width: 28, textAlign: 'center' as const, fontSize: 15, fontWeight: 700, color: tour.accentColor }}>
                 {isTiedFirst ? 'T1' : '1'}
               </span>
-              <RowAvatar name={leader.playerName} photoUrl={leader.photoUrl} tourSlug={meta.tourSlug} size={Math.round(Math.min(46, Math.max(32, window.innerHeight * 0.05)))} />
+              <RowAvatar name={leader.playerName} photoUrl={leader.photoUrl} tourSlug={meta.tourSlug} size={avatarSize.leader} />
               <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                 {leader.playerName}
               </span>
