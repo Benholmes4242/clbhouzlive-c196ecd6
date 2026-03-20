@@ -143,6 +143,8 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
   const commentCount = commentCountOverride  ?? post.commentCount;
 
   const [heartPopping, setHeartPopping] = useState(false);
+  const leaderboardRef = useRef<HTMLDivElement>(null);
+  const [avatarSize, setAvatarSize] = useState({ leader: 46, row: 42 });
 
   useEffect(() => { ensureKeyframes(); }, []);
 
@@ -204,6 +206,36 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
       .slice(0, 2)
       .map(([pos, players]) => ({ position: pos, players, isTied: players.length > 1 }));
   }, [meta.leaderboard]);
+
+  // Count total leaderboard rows to compute responsive avatar sizes
+  const totalRows = useMemo(() => {
+    let count = leader ? 1 : 0;
+    if (isTiedFirst) count += Math.min(coLeaders.length - 1, 2);
+    count += chaserRows.length;
+    return Math.max(count, 1);
+  }, [leader, isTiedFirst, coLeaders.length, chaserRows.length]);
+
+  // Responsive avatar sizing based on leaderboard container height
+  useEffect(() => {
+    const el = leaderboardRef.current;
+    if (!el) return;
+    const compute = () => {
+      const h = el.clientHeight;
+      // Reserve ~30px for header, then distribute remaining among rows
+      // Each row has ~24px vertical padding + avatar height
+      const available = h - 30;
+      const perRow = available / totalRows;
+      // Avatar = perRow - row padding (24px gap+borders)
+      const raw = Math.floor(perRow - 24);
+      const leaderSize = Math.max(28, Math.min(52, raw));
+      const rowSize = Math.max(26, Math.min(48, raw - 2));
+      setAvatarSize({ leader: leaderSize, row: rowSize });
+    };
+    compute();
+    const ro = new ResizeObserver(compute);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [totalRows]);
 
   return (
     <div style={{
@@ -364,9 +396,9 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
       }}>
 
         {/* Leaderboard */}
-        <div style={{
-          flex: '1 1 auto', overflow: 'auto',
-          WebkitOverflowScrolling: 'touch' as const,
+        <div ref={leaderboardRef} style={{
+          flex: '1 1 auto', overflow: 'hidden',
+          display: 'flex', flexDirection: 'column',
           padding: '10px max(14px, 3vw) 0',
         }}>
           <div style={{
@@ -403,7 +435,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
               <span style={{ width: 28, textAlign: 'center' as const, fontSize: 15, fontWeight: 700, color: tour.accentColor }}>
                 {isTiedFirst ? 'T1' : '1'}
               </span>
-              <RowAvatar name={leader.playerName} photoUrl={leader.photoUrl} tourSlug={meta.tourSlug} size={46} />
+              <RowAvatar name={leader.playerName} photoUrl={leader.photoUrl} tourSlug={meta.tourSlug} size={avatarSize.leader} />
               <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
                 {leader.playerName}
               </span>
@@ -434,7 +466,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                 <span style={{ width: 28, textAlign: 'center' as const, fontSize: 14, fontWeight: 600, color: tour.accentColor }}>
                   T1
                 </span>
-                <RowAvatar name={co.playerName} photoUrl={co.photoUrl} tourSlug={meta.tourSlug} size={42} />
+                <RowAvatar name={co.playerName} photoUrl={co.photoUrl} tourSlug={meta.tourSlug} size={avatarSize.row} />
                 <span style={{
                   flex: 1, fontSize: 'clamp(13px, 3.5vw, 15px)', fontWeight: 500,
                   color: 'rgba(255,255,255,0.8)',
@@ -486,13 +518,13 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                         border: '2px solid rgba(0,0,0,0.95)',
                         overflow: 'hidden',
                       }}>
-                        <RowAvatar name={p.playerName} photoUrl={p.photoUrl} tourSlug={meta.tourSlug} size={42} />
+                        <RowAvatar name={p.playerName} photoUrl={p.photoUrl} tourSlug={meta.tourSlug} size={avatarSize.row} />
                       </div>
                     ))}
                     {row.players.length > 4 && (
                       <div style={{
                         marginLeft: -10, zIndex: 0,
-                        width: 38, height: 38, borderRadius: '34%',
+                        width: avatarSize.row - 4, height: avatarSize.row - 4, borderRadius: '34%',
                         background: 'rgba(255,255,255,0.08)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.5)',
@@ -503,7 +535,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                     )}
                   </div>
                 ) : (
-                  <RowAvatar name={primary.playerName} photoUrl={primary.photoUrl} tourSlug={meta.tourSlug} size={46} />
+                  <RowAvatar name={primary.playerName} photoUrl={primary.photoUrl} tourSlug={meta.tourSlug} size={avatarSize.leader} />
                 )}
 
                 <span style={{
