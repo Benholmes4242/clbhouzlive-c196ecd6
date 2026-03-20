@@ -188,8 +188,8 @@ export function SettingsPageV2() {
           />
           <SettingsToggleRow
             icon={<BarChart2 size={18} />}
-            title="Show in Handicap Leaderboards"
-            subtitle="Appear in lowest handicap and improvement rankings"
+            title="Handicap Leaderboards"
+            subtitle="Show in handicap and improvement rankings"
             iconTheme="privacy"
             checked={privacy.showInHandicapLeaderboards}
             disabled={privacy.isUpdatingHandicapLb}
