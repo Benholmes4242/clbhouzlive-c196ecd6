@@ -580,8 +580,8 @@ async function fetchSocialAnalytics(period: AnalyticsPeriod): Promise<SocialAnal
     newConversations: convs.length,
     followActions: follows.length,
     totalFollows: totalFollowsRes.count ?? 0,
-    messagesTrend: fillBuckets(messages, days),
-    conversationsTrend: fillBuckets(convs, days),
+    messagesTrend: fillBuckets(messages as unknown as { created_at: string }[], days),
+    conversationsTrend: fillBuckets(convs as unknown as { created_at: string }[], days),
     mostFollowed,
   };
 }
