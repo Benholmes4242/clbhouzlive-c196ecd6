@@ -96,7 +96,7 @@ function ChatSkeleton() {
 function DateSeparator({ date }: { date: string }) {
   return (
     <div className="flex justify-center py-5">
-      <span className="px-3 py-1 rounded-full bg-muted text-muted-foreground text-[11px] font-medium tracking-[0.04em] uppercase font-dm-sans">
+      <span className="px-3 py-1 rounded-full bg-muted text-muted-foreground text-[11px] font-medium tracking-[0.04em] uppercase">
         {formatDateHeader(date)}
       </span>
     </div>
@@ -523,7 +523,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           </div>
           
           <div className="flex-1 min-w-0 text-left">
-           <h2 className="text-[16px] font-semibold truncate text-foreground font-dm-sans">
+           <h2 className="text-[16px] font-semibold truncate text-foreground">
               {headerInfo.name}
             </h2>
             <p className="text-[11px] truncate text-muted-foreground">

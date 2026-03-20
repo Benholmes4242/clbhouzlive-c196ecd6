@@ -310,7 +310,7 @@ export function NewConversationModal({
         <div className="px-5 pb-3">
           <h2
             id="new-message-title"
-            className="text-[17px] font-bold text-center font-dm-sans text-foreground"
+            className="text-[17px] font-bold text-center text-foreground"
           >
             New Message
           </h2>

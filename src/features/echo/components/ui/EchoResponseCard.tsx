@@ -88,7 +88,7 @@ export function EchoResponseCard({
           className="px-4 py-4 rounded-[4px_18px_18px_18px] bg-background border"
           style={{ borderColor: 'hsl(var(--border))' }}
         >
-          <div className="text-[14px] prose prose-sm max-w-none text-foreground font-['DM_Sans']" style={{ lineHeight: 1.65 }}>
+          <div className="text-[14px] prose prose-sm max-w-none text-foreground" style={{ lineHeight: 1.65 }}>
             <ReactMarkdown
               allowedElements={ECHO_ALLOWED_ELEMENTS}
               unwrapDisallowed
@@ -192,7 +192,7 @@ export function EchoResponseCard({
               <button
                 key={chip}
                 onClick={() => handleFollowUp(chip)}
-                className="flex items-center justify-between gap-2 px-4 py-3 rounded-2xl text-[13px] font-medium active:bg-[hsl(38,92%,50%)]/5 active:scale-[0.98] transition-all duration-150 bg-background border border-border text-foreground font-['DM_Sans']"
+                className="flex items-center justify-between gap-2 px-4 py-3 rounded-2xl text-[13px] font-medium active:bg-[hsl(38,92%,50%)]/5 active:scale-[0.98] transition-all duration-150 bg-background border border-border text-foreground"
                 aria-label={`Ask: ${chip}`}
               >
                 <span>{chip}</span>

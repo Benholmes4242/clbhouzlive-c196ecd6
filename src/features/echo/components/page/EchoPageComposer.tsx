@@ -121,7 +121,7 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
             disabled={disabled}
             aria-label="Type a message to Echo"
             maxLength={MAX_INPUT_LENGTH}
-            className="flex-1 bg-transparent outline-none text-[14px] text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed font-['DM_Sans']"
+            className="flex-1 bg-transparent outline-none text-[14px] text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed"
           />
 
           {/* Send/Stop/Mic button */}
