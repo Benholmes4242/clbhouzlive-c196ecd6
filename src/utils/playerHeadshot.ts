@@ -18,9 +18,9 @@ const TOUR_FOLDER: Record<string, string> = {
   'korn-ferry': 'Korn%20Ferry',
   liv:  'LIV',
   LIV:  'LIV',
-  champ: 'Champions%20Tour',
-  CHAMP: 'Champions%20Tour',
-  'champions-tour': 'Champions%20Tour',
+  champ: 'PGA%20Champions',
+  CHAMP: 'PGA%20Champions',
+  'champions-tour': 'PGA%20Champions',
 };
 
 /**
