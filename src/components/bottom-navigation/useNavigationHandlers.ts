@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { navigationTabs } from './navigationTabs';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { prefetchProfileVideos, resolveUsernameToId } from '@/utils/profileVideoPrefetch';
 import { useActiveActor } from '@/context/ActiveActorContext';
@@ -27,6 +28,9 @@ export const useNavigationHandlers = () => {
   }, [location.pathname]);
 
   const handleTabClick = (tab: { id: string; path: string | null; isAction?: boolean }) => {
+    // Track nav tab tap
+    analyticsEvents.track('nav_tab_tap', { tab: tab.id });
+
     if (tab.isAction) {
       // Action tabs are handled by the parent component (BottomNavigation)
       return;

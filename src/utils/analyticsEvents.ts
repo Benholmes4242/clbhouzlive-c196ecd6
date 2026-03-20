@@ -1,16 +1,25 @@
 // Analytics event tracking utility
-// Integrated with PostHog via telemetry wrapper
-import { track as posthogTrack } from "@/lib/telemetry";
+// Writes directly to Supabase analytics_events table
+import { supabase } from '@/integrations/supabase/client';
 
 type EventParams = Record<string, any>;
 
 export const analyticsEvents = {
-  track: (eventName: string, params?: EventParams) => {
-    // Console log for development
-    console.log(`[Analytics] ${eventName}`, params);
-    
-    // Send to PostHog
-    posthogTrack(eventName, params || {});
+  track: async (eventName: string, params?: EventParams) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase.from('analytics_events').insert({
+        name: eventName,
+        user_id: user?.id ?? null,
+        props: {
+          ...params,
+          session_id: sessionStorage.getItem('session_id') ?? null,
+          page: window.location.pathname,
+        },
+      });
+    } catch {
+      // Never block UI — analytics is non-critical
+    }
   },
 
   // Shorts squircle specific events

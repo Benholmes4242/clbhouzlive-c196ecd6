@@ -25,6 +25,8 @@ import { MediaSystemProvider } from './media';
 // Eagerly preload hls.js at app startup to eliminate first-load delay
 import '@/utils/hlsLoader';
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { usePageTracking } from '@/hooks/usePageTracking';
 import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { usePresenceTracker } from '@/hooks/usePresenceTracker';
 import { useAudioBridge } from '@/hooks/useAudioBridge';
@@ -234,6 +236,9 @@ function AppRoutes() {
   const location = useLocation();
   const state = location.state as { backgroundLocation?: Location; fromHub?: boolean; fromVideo?: boolean } | null;
   const { shouldHideHeader } = useModalContext();
+  
+  // Page view + time-on-page tracking
+  usePageTracking();
   
   // BUG-1 FIX: Reset shield to transparent on every route change as a baseline.
   // Individual page hooks then opt-in to their own color (e.g. PageRoot → #F8FAFC).
@@ -521,6 +526,16 @@ const AchievementToastWrapper: React.FC = () => {
 const AppInner: React.FC = () => {
   // Global focus re-auth hook
   useReauthOnFocus();
+  
+  // Session start tracking
+  useEffect(() => {
+    const sessionId = crypto.randomUUID();
+    sessionStorage.setItem('session_id', sessionId);
+    analyticsEvents.track('session_start', {
+      session_id: sessionId,
+      referrer: document.referrer || 'direct',
+    });
+  }, []);
   
   // Enforce R2-only policy globally
   useImageUploadSafeguard();
