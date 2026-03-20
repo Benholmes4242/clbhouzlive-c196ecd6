@@ -143,6 +143,8 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
   const commentCount = commentCountOverride  ?? post.commentCount;
 
   const [heartPopping, setHeartPopping] = useState(false);
+  const leaderboardRef = useRef<HTMLDivElement>(null);
+  const [avatarSize, setAvatarSize] = useState({ leader: 46, row: 42 });
 
   useEffect(() => { ensureKeyframes(); }, []);
 
