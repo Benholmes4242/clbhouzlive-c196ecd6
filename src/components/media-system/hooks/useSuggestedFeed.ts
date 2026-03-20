@@ -43,9 +43,9 @@ export function useSuggestedFeed(userId: string | undefined) {
             seenPostIds.current.push(post.id);
           }
         }
-        // Keep only the last 200 to prevent unbounded growth
-        if (seenPostIds.current.length > 200) {
-          seenPostIds.current = seenPostIds.current.slice(-200);
+        // Keep only the last 500 to prevent unbounded growth
+        if (seenPostIds.current.length > 500) {
+          seenPostIds.current = seenPostIds.current.slice(-500);
         }
 
         const lastRow = rows[rows.length - 1];
