@@ -35,7 +35,9 @@ export function getPlayerHeadshotUrl(playerName: string, tourCode: string, heads
   const folder = TOUR_FOLDER[tourCode];
   if (!folder || (!playerName && !headshotOverride)) return SILHOUETTE;
   const nameKey = headshotOverride || playerName;
-  const encoded = encodeURIComponent(nameKey);
+  // Champions Tour R2 files use underscores; all other tours use spaces
+  const filename = folder === 'PGA%20Champions' ? nameKey.replace(/ /g, '_') : nameKey;
+  const encoded = encodeURIComponent(filename);
   return `${R2_BASE}/${folder}/${encoded}.webp`;
 }
 
