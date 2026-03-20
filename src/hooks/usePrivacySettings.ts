@@ -25,6 +25,11 @@ export function usePrivacySettings(
     queryClient.invalidateQueries({ queryKey: ['profile'] });
     queryClient.invalidateQueries({ queryKey: ['user-profile'] });
     queryClient.invalidateQueries({ queryKey: ['liveClubhouseBase'] });
+    queryClient.invalidateQueries({ queryKey: ['lowest-handicap-leaderboard'] });
+    queryClient.invalidateQueries({ queryKey: ['handicap-improvement-leaderboard'] });
+    queryClient.invalidateQueries({ queryKey: ['season-improvement-leaderboard'] });
+    queryClient.invalidateQueries({ queryKey: ['exploration-leaderboard'] });
+    queryClient.invalidateQueries({ queryKey: ['countries-leaderboard'] });
   };
 
   const togglePublic = async (value: boolean) => {
@@ -75,7 +80,7 @@ export function usePrivacySettings(
     try {
       const { error } = await supabase
         .from('user_profiles')
-        .update({ show_in_handicap_leaderboards: value } as any)
+        .update({ show_in_handicap_leaderboards: value })
         .eq('id', userId);
       if (error) throw error;
       invalidate();
@@ -95,7 +100,7 @@ export function usePrivacySettings(
     try {
       const { error } = await supabase
         .from('user_profiles')
-        .update({ show_in_exploration_leaderboards: value } as any)
+        .update({ show_in_exploration_leaderboards: value })
         .eq('id', userId);
       if (error) throw error;
       invalidate();
