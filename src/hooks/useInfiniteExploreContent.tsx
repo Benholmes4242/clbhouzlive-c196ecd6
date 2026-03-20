@@ -155,8 +155,22 @@ export const useInfiniteExploreContent = (
     }
     
     // Fast: Check preloaded content first
-    const preloaded = preloadedContent[currentFilter];
+    let preloaded = preloadedContent[currentFilter];
     if (preloaded && preloaded.length > 0) {
+      // Client-side duration guard: filter out items that don't meet the current duration filter
+      if (durationFilter && durationFilter.from > 0) {
+        preloaded = preloaded.filter(item => {
+          if (item.durationSeconds == null) return true; // non-video items pass through
+          return item.durationSeconds >= durationFilter.from;
+        });
+      }
+      if (durationFilter && durationFilter.to !== null) {
+        preloaded = preloaded.filter(item => {
+          if (item.durationSeconds == null) return true;
+          return item.durationSeconds <= durationFilter.to!;
+        });
+      }
+
       const newContent = [...content, ...preloaded];
       
       // Update cache instantly
