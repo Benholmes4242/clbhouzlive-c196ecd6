@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { navigationTabs } from './navigationTabs';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { prefetchProfileVideos, resolveUsernameToId } from '@/utils/profileVideoPrefetch';
 import { useActiveActor } from '@/context/ActiveActorContext';
