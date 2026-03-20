@@ -503,7 +503,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                     )}
                   </div>
                 ) : (
-                  <RowAvatar name={primary.playerName} photoUrl={primary.photoUrl} tourSlug={meta.tourSlug} size={38} />
+                  <RowAvatar name={primary.playerName} photoUrl={primary.photoUrl} tourSlug={meta.tourSlug} size={46} />
                 )}
 
                 <span style={{
