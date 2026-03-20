@@ -231,6 +231,7 @@ function NavigationRefSetter() {
 
 // Routes component that handles background location pattern for Hub overlays and Video modal
 function AppRoutes() {
+  usePageTracking();
   const location = useLocation();
   const state = location.state as { backgroundLocation?: Location; fromHub?: boolean; fromVideo?: boolean } | null;
   const { shouldHideHeader } = useModalContext();
