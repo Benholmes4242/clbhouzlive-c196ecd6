@@ -557,7 +557,7 @@ function CommentsSheet({
                       {/* Amber eyebrow count */}
                       <span
                         className="text-[11px] font-semibold uppercase tracking-[0.05em] leading-none mb-[3px] transition-colors duration-200"
-                        style={{ color: isActive ? '#F59E0B' : 'transparent' }}
+                        style={{ color: isActive ? '#F59E0B' : isDark ? 'rgba(255,255,255,0.20)' : 'rgba(0,0,0,0.25)' }}
                       >
                         {count > 0 ? count : '\u00A0'}
                       </span>
