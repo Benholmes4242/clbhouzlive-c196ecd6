@@ -25,6 +25,8 @@ import { MediaSystemProvider } from './media';
 // Eagerly preload hls.js at app startup to eliminate first-load delay
 import '@/utils/hlsLoader';
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
+import { analyticsEvents } from '@/utils/analyticsEvents';
+import { usePageTracking } from '@/hooks/usePageTracking';
 import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { usePresenceTracker } from '@/hooks/usePresenceTracker';
 import { useAudioBridge } from '@/hooks/useAudioBridge';
