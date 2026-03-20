@@ -260,7 +260,7 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
             </div>
             
             <div className="px-5 pb-3">
-              <h2 className="text-[17px] font-semibold text-foreground font-['DM_Sans']">History</h2>
+              <h2 className="text-[17px] font-semibold text-foreground">History</h2>
             </div>
             
             <div 

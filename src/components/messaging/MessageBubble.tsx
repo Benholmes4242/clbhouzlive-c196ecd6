@@ -173,7 +173,7 @@ export function MessageBubble({
 
             <div className="p-3">
               <div className="flex items-start justify-between gap-2">
-                <h4 className="font-semibold text-[15px] line-clamp-2 flex-1 text-foreground font-dm-sans">
+                <h4 className="font-semibold text-[15px] line-clamp-2 flex-1 text-foreground">
                   {course.course_name}
                 </h4>
                 
@@ -352,7 +352,7 @@ export function MessageBubble({
 
           {/* Message content */}
           {message.content && (
-            <p className="text-[14px] leading-relaxed whitespace-pre-wrap text-foreground font-dm-sans">
+            <p className="text-[14px] leading-relaxed whitespace-pre-wrap text-foreground">
               {message.content}
             </p>
           )}

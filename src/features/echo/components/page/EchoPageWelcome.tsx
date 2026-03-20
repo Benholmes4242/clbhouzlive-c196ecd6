@@ -91,10 +91,10 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
     <div className="h-full flex flex-col items-center justify-center px-5 pb-32 overflow-visible">
       {/* Greeting block */}
       <div className="text-center mb-2">
-        <h1 className="text-[28px] font-bold tracking-tight text-foreground font-['DM_Sans']">
+        <h1 className="text-[28px] font-bold tracking-tight text-foreground">
           {profile.firstName ? `${greeting}, ${profile.firstName}.` : `${greeting}.`}
         </h1>
-        <p className="text-[15px] text-muted-foreground font-['DM_Sans'] mt-1.5">
+        <p className="text-[15px] text-muted-foreground mt-1.5">
           Your personal caddie is ready.
         </p>
       </div>
@@ -124,7 +124,7 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
       </div>
 
       {/* Hint */}
-      <p className="mt-4 text-[12px] text-muted-foreground/60 text-center font-['DM_Sans']">
+      <p className="mt-4 text-[12px] text-muted-foreground/60 text-center">
         Ask me anything about golf
       </p>
     </div>

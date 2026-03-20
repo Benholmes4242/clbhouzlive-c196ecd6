@@ -35,7 +35,7 @@ export function EchoPageHeader({ onBack, onNew, onHistory, hasMessages }: EchoPa
       {/* Centre: Title when in conversation */}
       <div className="flex-1 flex items-center justify-center">
         {hasMessages && (
-          <span className="text-[15px] font-semibold text-foreground font-['DM_Sans']">
+          <span className="text-[15px] font-semibold text-foreground">
             Echo
           </span>
         )}

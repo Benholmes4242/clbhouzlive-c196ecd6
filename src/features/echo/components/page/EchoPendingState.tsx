@@ -37,12 +37,12 @@ export function EchoPendingState({ prompt }: EchoPendingStateProps) {
           borderColor: 'hsl(var(--border))',
         }}
       >
-        <p className="text-[14px] text-foreground text-center line-clamp-2 font-['DM_Sans']">
+        <p className="text-[14px] text-foreground text-center line-clamp-2">
           "{prompt}"
         </p>
       </div>
 
-      <p className="mt-4 text-[13px] text-muted-foreground text-center font-['DM_Sans']">
+      <p className="mt-4 text-[13px] text-muted-foreground text-center">
         Echo is thinking...
       </p>
     </div>
