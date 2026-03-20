@@ -100,7 +100,7 @@ export function usePrivacySettings(
     try {
       const { error } = await supabase
         .from('user_profiles')
-        .update({ show_in_exploration_leaderboards: value } as any)
+        .update({ show_in_exploration_leaderboards: value })
         .eq('id', userId);
       if (error) throw error;
       invalidate();
