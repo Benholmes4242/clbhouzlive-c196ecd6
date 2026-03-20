@@ -158,8 +158,6 @@ function CommentsSheet({
 
   const totalCount = comments.length;
 
-  // Hide toggle if 0 comments AND 0 likes
-  const showToggle = totalCount > 0 || (likesCount ?? 0) > 0;
 
   // ── Effects ──
 
