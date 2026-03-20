@@ -16,15 +16,15 @@ export function usePrivacySettings(
   const [showHandicap, setShowHandicap] = useState(initialShowHandicap);
   const [showInHandicapLeaderboards, setShowInHandicapLeaderboards] = useState(initialShowInHandicapLeaderboards);
   const [showInExplorationLeaderboards, setShowInExplorationLeaderboards] = useState(initialShowInExplorationLeaderboards);
+  const [isUpdatingPrivacy, setIsUpdatingPrivacy] = useState(false);
+  const [isUpdatingHandicap, setIsUpdatingHandicap] = useState(false);
+  const [isUpdatingHandicapLb, setIsUpdatingHandicapLb] = useState(false);
+  const [isUpdatingExplorationLb, setIsUpdatingExplorationLb] = useState(false);
 
   useEffect(() => { setIsPublic(initialIsPublic); }, [initialIsPublic]);
   useEffect(() => { setShowHandicap(initialShowHandicap); }, [initialShowHandicap]);
   useEffect(() => { setShowInHandicapLeaderboards(initialShowInHandicapLeaderboards); }, [initialShowInHandicapLeaderboards]);
   useEffect(() => { setShowInExplorationLeaderboards(initialShowInExplorationLeaderboards); }, [initialShowInExplorationLeaderboards]);
-  const [isUpdatingPrivacy, setIsUpdatingPrivacy] = useState(false);
-  const [isUpdatingHandicap, setIsUpdatingHandicap] = useState(false);
-  const [isUpdatingHandicapLb, setIsUpdatingHandicapLb] = useState(false);
-  const [isUpdatingExplorationLb, setIsUpdatingExplorationLb] = useState(false);
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['profile'] });
