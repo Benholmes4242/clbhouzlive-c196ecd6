@@ -38,7 +38,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
     <>
       {/* Floating bar - fixed position below the notch/safe area */}
       <div
-        className="fixed left-4 right-4 z-40 pointer-events-auto flex items-center justify-between gap-2 min-w-0"
+        className="fixed left-3 right-3 z-40 pointer-events-auto flex items-center justify-between gap-1 min-w-0"
         style={{
           top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
         }}

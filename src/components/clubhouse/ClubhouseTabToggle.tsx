@@ -20,7 +20,7 @@ export const ClubhouseTabToggle = ({
 }: ClubhouseTabToggleProps) => {
   if (isBusinessActor) {
     return (
-      <div className={cn("flex items-center gap-4 sm:gap-6 relative z-[45]", className)} role="tablist" aria-label="Feed filter">
+      <div className={cn("flex items-center gap-3 relative z-[45]", className)} role="tablist" aria-label="Feed filter">
         <span className="text-sm font-semibold text-white opacity-100 whitespace-nowrap py-3 px-1">
           Suggested
         </span>
@@ -30,7 +30,7 @@ export const ClubhouseTabToggle = ({
 
   return (
     <div
-      className={cn("flex items-center gap-4 sm:gap-6 relative z-[45]", className)}
+      className={cn("flex items-center gap-3 relative z-[45]", className)}
       role="tablist"
       aria-label="Feed filter"
       style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}
@@ -50,7 +50,7 @@ export const ClubhouseTabToggle = ({
               border: 'none',
               cursor: 'pointer',
               padding: '10px 2px 8px',
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: isActive ? 700 : 500,
               color: isActive ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.40)',
               letterSpacing: isActive ? '-0.025em' : '0',
