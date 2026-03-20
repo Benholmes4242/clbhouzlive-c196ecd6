@@ -186,12 +186,12 @@ export function VideoPlayer({
       // Unmuting — fade in to avoid audio pop
       video.muted = false;
       video.volume = 0;
-      const targetVolume = getStore().volume ?? 1;
+      const targetVolume = Math.max(0, Math.min(1, getStore().volume ?? 1));
       const FADE_MS = 120;
       const start = performance.now();
       const step = (now: number) => {
-        const progress = Math.min(1, (now - start) / FADE_MS);
-        video.volume = targetVolume * progress;
+        const progress = Math.max(0, Math.min(1, (now - start) / FADE_MS));
+        video.volume = Math.max(0, Math.min(1, targetVolume * progress));
         if (progress < 1) requestAnimationFrame(step);
         else video.volume = targetVolume;
       };
