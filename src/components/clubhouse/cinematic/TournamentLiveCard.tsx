@@ -207,6 +207,36 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
       .map(([pos, players]) => ({ position: pos, players, isTied: players.length > 1 }));
   }, [meta.leaderboard]);
 
+  // Count total leaderboard rows to compute responsive avatar sizes
+  const totalRows = useMemo(() => {
+    let count = leader ? 1 : 0;
+    if (isTiedFirst) count += Math.min(coLeaders.length - 1, 2);
+    count += chaserRows.length;
+    return Math.max(count, 1);
+  }, [leader, isTiedFirst, coLeaders.length, chaserRows.length]);
+
+  // Responsive avatar sizing based on leaderboard container height
+  useEffect(() => {
+    const el = leaderboardRef.current;
+    if (!el) return;
+    const compute = () => {
+      const h = el.clientHeight;
+      // Reserve ~30px for header, then distribute remaining among rows
+      // Each row has ~24px vertical padding + avatar height
+      const available = h - 30;
+      const perRow = available / totalRows;
+      // Avatar = perRow - row padding (24px gap+borders)
+      const raw = Math.floor(perRow - 24);
+      const leaderSize = Math.max(28, Math.min(52, raw));
+      const rowSize = Math.max(26, Math.min(48, raw - 2));
+      setAvatarSize({ leader: leaderSize, row: rowSize });
+    };
+    compute();
+    const ro = new ResizeObserver(compute);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [totalRows]);
+
   return (
     <div style={{
       position: 'relative', width: '100%', height: '100dvh',
