@@ -186,6 +186,24 @@ export function SettingsPageV2() {
             disabled={privacy.isUpdatingHandicap}
             onCheckedChange={privacy.toggleHandicap}
           />
+          <SettingsToggleRow
+            icon={<BarChart2 size={18} />}
+            title="Show in Handicap Leaderboards"
+            subtitle="Appear in lowest handicap and improvement rankings"
+            iconTheme="privacy"
+            checked={privacy.showInHandicapLeaderboards}
+            disabled={privacy.isUpdatingHandicapLb}
+            onCheckedChange={privacy.toggleHandicapLeaderboards}
+          />
+          <SettingsToggleRow
+            icon={<Map size={18} />}
+            title="Show in Course Leaderboards"
+            subtitle="Appear in courses played and exploration rankings"
+            iconTheme="privacy"
+            checked={privacy.showInExplorationLeaderboards}
+            disabled={privacy.isUpdatingExplorationLb}
+            onCheckedChange={privacy.toggleExplorationLeaderboards}
+          />
           <SettingsChevronRow
             icon={<UserX size={18} />}
             title="Blocked Users"

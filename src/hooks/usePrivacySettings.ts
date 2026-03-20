@@ -3,13 +3,23 @@ import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-export function usePrivacySettings(userId: string | undefined, initialIsPublic: boolean, initialShowHandicap: boolean) {
+export function usePrivacySettings(
+  userId: string | undefined,
+  initialIsPublic: boolean,
+  initialShowHandicap: boolean,
+  initialShowInHandicapLeaderboards: boolean,
+  initialShowInExplorationLeaderboards: boolean,
+) {
   const queryClient = useQueryClient();
 
   const [isPublic, setIsPublic] = useState(initialIsPublic);
   const [showHandicap, setShowHandicap] = useState(initialShowHandicap);
+  const [showInHandicapLeaderboards, setShowInHandicapLeaderboards] = useState(initialShowInHandicapLeaderboards);
+  const [showInExplorationLeaderboards, setShowInExplorationLeaderboards] = useState(initialShowInExplorationLeaderboards);
   const [isUpdatingPrivacy, setIsUpdatingPrivacy] = useState(false);
   const [isUpdatingHandicap, setIsUpdatingHandicap] = useState(false);
+  const [isUpdatingHandicapLb, setIsUpdatingHandicapLb] = useState(false);
+  const [isUpdatingExplorationLb, setIsUpdatingExplorationLb] = useState(false);
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['profile'] });
@@ -57,9 +67,52 @@ export function usePrivacySettings(userId: string | undefined, initialIsPublic: 
     }
   };
 
+  const toggleHandicapLeaderboards = async (value: boolean) => {
+    if (!userId) return;
+    setIsUpdatingHandicapLb(true);
+    const prev = showInHandicapLeaderboards;
+    setShowInHandicapLeaderboards(value);
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ show_in_handicap_leaderboards: value } as any)
+        .eq('id', userId);
+      if (error) throw error;
+      invalidate();
+    } catch {
+      setShowInHandicapLeaderboards(prev);
+      toast.error('Could not update leaderboard setting.');
+    } finally {
+      setIsUpdatingHandicapLb(false);
+    }
+  };
+
+  const toggleExplorationLeaderboards = async (value: boolean) => {
+    if (!userId) return;
+    setIsUpdatingExplorationLb(true);
+    const prev = showInExplorationLeaderboards;
+    setShowInExplorationLeaderboards(value);
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ show_in_exploration_leaderboards: value } as any)
+        .eq('id', userId);
+      if (error) throw error;
+      invalidate();
+    } catch {
+      setShowInExplorationLeaderboards(prev);
+      toast.error('Could not update leaderboard setting.');
+    } finally {
+      setIsUpdatingExplorationLb(false);
+    }
+  };
+
   return {
     isPublic, showHandicap,
+    showInHandicapLeaderboards, showInExplorationLeaderboards,
     isUpdatingPrivacy, isUpdatingHandicap,
+    isUpdatingHandicapLb, isUpdatingExplorationLb,
     togglePublic, toggleHandicap,
+    toggleHandicapLeaderboards, toggleExplorationLeaderboards,
   };
 }

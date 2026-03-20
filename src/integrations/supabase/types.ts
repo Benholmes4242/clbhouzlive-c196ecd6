@@ -11819,6 +11819,8 @@ export type Database = {
           show_achievements_public: boolean | null
           show_additional_home_clubs: boolean
           show_handicap: boolean
+          show_in_exploration_leaderboards: boolean
+          show_in_handicap_leaderboards: boolean
           social_links: Json | null
           tiktok_handle: string
           top100_visible: boolean | null
@@ -11929,6 +11931,8 @@ export type Database = {
           show_achievements_public?: boolean | null
           show_additional_home_clubs?: boolean
           show_handicap?: boolean
+          show_in_exploration_leaderboards?: boolean
+          show_in_handicap_leaderboards?: boolean
           social_links?: Json | null
           tiktok_handle?: string
           top100_visible?: boolean | null
@@ -12039,6 +12043,8 @@ export type Database = {
           show_achievements_public?: boolean | null
           show_additional_home_clubs?: boolean
           show_handicap?: boolean
+          show_in_exploration_leaderboards?: boolean
+          show_in_handicap_leaderboards?: boolean
           social_links?: Json | null
           tiktok_handle?: string
           top100_visible?: boolean | null
@@ -14756,26 +14762,47 @@ export type Database = {
           sender_id: string
         }[]
       }
-      get_countries_leaderboard: {
-        Args: {
-          p_current_user_id?: string
-          p_limit?: number
-          p_offset?: number
-          p_scope?: string
-        }
-        Returns: {
-          avatar_url: string
-          countries_count: number
-          country_list: string[]
-          courses_count: number
-          display_name: string
-          home_club: string
-          is_friend: boolean
-          rank: number
-          user_id: string
-          username: string
-        }[]
-      }
+      get_countries_leaderboard:
+        | {
+            Args: {
+              p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope?: string
+            }
+            Returns: {
+              avatar_url: string
+              countries_count: number
+              country_list: string[]
+              courses_count: number
+              display_name: string
+              home_club: string
+              is_friend: boolean
+              rank: number
+              user_id: string
+              username: string
+            }[]
+          }
+        | {
+            Args: {
+              p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope?: string
+            }
+            Returns: {
+              avatar_url: string
+              countries_count: number
+              country_list: string[]
+              courses_count: number
+              display_name: string
+              home_club: string
+              is_friend: boolean
+              rank: number
+              user_id: string
+              username: string
+            }[]
+          }
       get_course_countries: {
         Args: never
         Returns: {
@@ -14934,6 +14961,34 @@ export type Database = {
               p_metric?: string
               p_offset?: number
               p_scope?: string
+            }
+            Returns: {
+              avatar_url: string
+              continent_list: string[]
+              continents_count: number
+              countries_count: number
+              country_list: string[]
+              courses_count: number
+              display_name: string
+              home_club: string
+              home_club_id: string
+              is_friend: boolean
+              rank: number
+              region_list: string[]
+              regions_count: number
+              user_id: string
+              username: string
+            }[]
+          }
+        | {
+            Args: {
+              p_club_id?: string
+              p_country?: string
+              p_current_user_id?: string
+              p_limit?: number
+              p_metric?: string
+              p_offset?: number
+              p_scope: string
             }
             Returns: {
               avatar_url: string
@@ -15128,6 +15183,28 @@ export type Database = {
               user_id: string
             }[]
           }
+        | {
+            Args: {
+              p_club_id?: string
+              p_country?: string
+              p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope: string
+            }
+            Returns: {
+              club_name: string
+              current_handicap: number
+              display_name: string
+              improvement: number
+              previous_handicap: number
+              primary_club_id: string
+              profile_photo_url: string
+              rank: number
+              user_id: string
+              username: string
+            }[]
+          }
       get_home_clubs: { Args: never; Returns: Json }
       get_home_clubs_for_user:
         | { Args: { p_user_profile_id: string }; Returns: Json }
@@ -15199,26 +15276,47 @@ export type Database = {
           width: number
         }[]
       }
-      get_lowest_handicap_leaderboard: {
-        Args: {
-          p_club_id?: string
-          p_country?: string
-          p_current_user_id?: string
-          p_limit?: number
-          p_offset?: number
-          p_scope?: string
-        }
-        Returns: {
-          avatar_url: string
-          club_name: string
-          country: string
-          display_name: string
-          handicap_index: number
-          is_current_user: boolean
-          rank: number
-          user_id: string
-        }[]
-      }
+      get_lowest_handicap_leaderboard:
+        | {
+            Args: {
+              p_club_id?: string
+              p_country?: string
+              p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope?: string
+            }
+            Returns: {
+              avatar_url: string
+              club_name: string
+              country: string
+              display_name: string
+              handicap_index: number
+              is_current_user: boolean
+              rank: number
+              user_id: string
+            }[]
+          }
+        | {
+            Args: {
+              p_club_id?: string
+              p_country?: string
+              p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope: string
+            }
+            Returns: {
+              avatar_url: string
+              club_name: string
+              country: string
+              display_name: string
+              handicap_index: number
+              is_current_user: boolean
+              rank: number
+              user_id: string
+            }[]
+          }
       get_or_create_dm_conversation: {
         Args: { other_user_id: string }
         Returns: string
@@ -15397,6 +15495,28 @@ export type Database = {
               rank: number
               season_start_handicap: number
               user_id: string
+            }[]
+          }
+        | {
+            Args: {
+              p_club_id?: string
+              p_country?: string
+              p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_scope: string
+            }
+            Returns: {
+              club_name: string
+              current_handicap: number
+              display_name: string
+              improvement: number
+              primary_club_id: string
+              profile_photo_url: string
+              rank: number
+              season_start_handicap: number
+              user_id: string
+              username: string
             }[]
           }
       get_season_recap: {
