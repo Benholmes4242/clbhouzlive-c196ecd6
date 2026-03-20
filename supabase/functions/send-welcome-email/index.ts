@@ -106,9 +106,9 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Clbhouz <notifications@clbhouz.co.uk>',
+        from: 'clbhouz <notifications@clbhouz.co.uk>',
         to: [userEmail],
-        subject: 'Verify your Clbhouz account',
+        subject: 'Verify your clbhouz account',
         html,
       }),
     });
