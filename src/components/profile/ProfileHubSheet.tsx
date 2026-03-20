@@ -308,7 +308,7 @@ function ProfileHubSheet({
                         </span>
                       )}
                     </div>
-                    <span className="text-[13px] font-medium text-foreground">{label}</span>
+                    <span className={cn("text-[13px] font-medium", isEcho ? "text-[#B45309]" : "text-foreground")}>{label}</span>
                   </button>
                 ))}
               </div>
