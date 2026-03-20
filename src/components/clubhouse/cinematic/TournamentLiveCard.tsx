@@ -396,9 +396,9 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
       }}>
 
         {/* Leaderboard */}
-        <div style={{
-          flex: '1 1 auto', overflow: 'auto',
-          WebkitOverflowScrolling: 'touch' as const,
+        <div ref={leaderboardRef} style={{
+          flex: '1 1 auto', overflow: 'hidden',
+          display: 'flex', flexDirection: 'column',
           padding: '10px max(14px, 3vw) 0',
         }}>
           <div style={{
