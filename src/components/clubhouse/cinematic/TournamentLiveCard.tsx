@@ -208,7 +208,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
 
       {/* ══ ZONE 1: HERO — leader portrait (50%, matching Result card) ══ */}
       <div style={{
-        position: 'relative', flex: '0 0 55%', overflow: 'hidden',
+        position: 'relative', flex: '0 0 60%', overflow: 'hidden',
       }}>
         <div ref={heroRef} style={{
           position: 'absolute', inset: '-10px',
