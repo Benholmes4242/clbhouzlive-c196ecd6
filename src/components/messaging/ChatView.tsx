@@ -80,7 +80,7 @@ function groupMessagesByDate(messages: MessageWithSender[]): Map<string, Message
 
 function ChatSkeleton() {
   return (
-    <div className="flex-1 p-4 space-y-4">
+    <div className="flex-1 p-4">
       {[1, 2, 3, 4].map(i => (
         <div key={i} className={`flex ${i % 2 === 0 ? 'justify-end' : 'justify-start'}`}>
           <div className="flex gap-2 max-w-[70%]">
@@ -599,21 +599,28 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
                     : null;
                   const messageReactions = reactions[message.id] || [];
 
+                  const prevMessage = index > 0 ? dateMessages[index - 1] : null;
+                  const isConsecutiveSameSender = prevMessage?.sender_id === message.sender_id;
+
                   return (
-                    <MessageBubble
+                    <div
                       key={message.id}
-                      message={message}
-                      isOwnMessage={isOwn}
-                      showSenderInfo={showSender}
-                      replyToMessage={replyTo}
-                      reactions={messageReactions}
-                      currentUserId={user?.id}
-                      onReply={() => handleReply(message)}
-                      onEdit={() => handleEdit(message)}
-                      onDelete={() => handleDelete(message)}
-                      onToggleReaction={handleToggleReaction(message.id)}
-                      onForward={() => handleForward(message)}
-                    />
+                      className={isConsecutiveSameSender ? 'mt-1' : 'mt-3'}
+                    >
+                      <MessageBubble
+                        message={message}
+                        isOwnMessage={isOwn}
+                        showSenderInfo={showSender}
+                        replyToMessage={replyTo}
+                        reactions={messageReactions}
+                        currentUserId={user?.id}
+                        onReply={() => handleReply(message)}
+                        onEdit={() => handleEdit(message)}
+                        onDelete={() => handleDelete(message)}
+                        onToggleReaction={handleToggleReaction(message.id)}
+                        onForward={() => handleForward(message)}
+                      />
+                    </div>
                   );
                 })}
               </div>
