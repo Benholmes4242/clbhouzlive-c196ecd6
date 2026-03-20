@@ -63,10 +63,10 @@ function generateVolatilityInsight(
   if (coLeaders.length >= 3) return `🔥 ${coLeaders.length}-way tie at the top — this is anyone's tournament to win.`;
   if (coLeaders.length === 2) {
     const other = coLeaders.find(e => e.playerName !== leader?.playerName);
-    return `⚡ ${name} and ${other?.playerName.split(' ').pop() ?? 'a rival'} locked in a duel for the title.`;
+    return `${name} and ${other?.playerName.split(' ').pop() ?? 'a rival'} locked in a duel for the title.`;
   }
   if (volatilityIndex >= 80) return '🔥 Tight race — the leaderboard is packed and anyone can make a move.';
-  if (volatilityIndex >= 60) return '⚡ The field is closing in. Expect drama over the closing holes.';
+  if (volatilityIndex >= 60) return 'The field is closing in. Expect drama over the closing holes.';
   if (volatilityIndex <= 25) return `👑 ${name} is in full control — cruising toward the finish.`;
   return `⛳ ${name} leads the way. The chasers need to make a move soon.`;
 }
@@ -89,8 +89,14 @@ function HeroPhoto({ src, name }: { src: string | null; name: string }) {
           else setFailed(true);
         }}
         style={{
-          position: 'absolute', inset: 0, width: '100%', height: '100%',
-          objectFit: 'cover', objectPosition: 'center 20%',
+          position: 'absolute',
+          left: '50%',
+          bottom: '-4%',
+          width: '94%',
+          height: '88%',
+          transform: 'translateX(-50%)',
+          objectFit: 'contain',
+          objectPosition: 'center bottom',
         }}
       />
     );
@@ -183,7 +189,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
 
   const rLabel = roundLabel(meta.currentRound, meta.totalRounds);
 
-  // Build chaser rows (positions 2+, deduped by position, max 4)
+  // Build chaser rows (positions 2+, deduped by position, max 3 shown overall)
   const chaserRows = useMemo(() => {
     if (!meta.leaderboard || meta.leaderboard.length < 2) return [];
     const byPos = new Map<number, LiveLeaderboardEntry[]>();
@@ -195,7 +201,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
     });
     return Array.from(byPos.entries())
       .sort(([a], [b]) => a - b)
-      .slice(0, 4)
+      .slice(0, 2)
       .map(([pos, players]) => ({ position: pos, players, isTied: players.length > 1 }));
   }, [meta.leaderboard]);
 
@@ -340,17 +346,9 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
         background: 'rgba(255,255,255,0.03)',
         borderTop: `1px solid ${tour.accentColor}22`,
         borderBottom: '1px solid rgba(255,255,255,0.04)',
-        display: 'flex', alignItems: 'flex-start', gap: 10,
         animation: 'trlive-fadeIn 0.6s ease-out both',
         animationDelay: '0.5s',
       }}>
-        <div style={{
-          flex: '0 0 auto', width: 22, height: 22,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 13, marginTop: 1,
-        }}>
-          ⚡
-        </div>
         <div style={{
           fontSize: 14, lineHeight: 1.45, color: 'rgba(255,255,255,0.72)',
           fontStyle: 'italic' as const,
@@ -423,7 +421,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           {/* Co-leaders (if tied at 1st, show other co-leaders) */}
           {isTiedFirst && coLeaders
             .filter(e => e.playerName !== leader?.playerName)
-            .slice(0, 3)
+            .slice(0, 2)
             .map((co, idx) => (
               <div key={`co-${idx}`} style={{
                 display: 'flex', alignItems: 'center', gap: 12,
@@ -456,10 +454,9 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                   {co.scoreDisplay}
                 </span>
               </div>
-            ))
-          }
+            ))}
 
-          {/* Chaser rows (positions 2+) */}
+          {/* Chaser rows (positions 2-3 only) */}
           {chaserRows.map((row, idx) => {
             const primary = row.players[0];
             const stackedAvatars = row.players.slice(0, 4);
@@ -470,7 +467,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                 padding: '9px 0',
                 borderBottom: '1px solid rgba(255,255,255,0.03)',
                 animation: 'trlive-slideIn 0.5s ease-out both',
-                animationDelay: `${0.65 + (isTiedFirst ? coLeaders.length - 1 : 0) * 0.08 + idx * 0.08}s`,
+                animationDelay: `${0.65 + (isTiedFirst ? Math.min(coLeaders.length - 1, 2) : 0) * 0.08 + idx * 0.08}s`,
               }}>
                 <span style={{
                   width: 28, textAlign: 'center' as const, fontSize: 14, fontWeight: 600,
