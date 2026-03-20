@@ -343,25 +343,22 @@ export function FullscreenReviewPost({
             )}
           </div>
           
-          {/* Right: Rating Number (elegant, confident) — tier-aware: amber 9.0+, light slate below */}
+          {/* Right: Rating Number — all tiers use amber */}
           <div className="flex flex-col items-center gap-0 flex-shrink-0">
             <span 
               className="font-bold tracking-tight leading-none"
               style={{ 
                 fontSize: 'clamp(1.5rem, 7vw, 2.25rem)',
                 fontVariantNumeric: 'tabular-nums',
-                color: isOutstanding ? '#f59e0b' : '#cbd5e1',
-                textShadow: isOutstanding
-                  ? '0 0 16px rgba(245, 158, 11, 0.4)' 
-                  : 'none',
+                color: '#f59e0b',
+                textShadow: '0 0 16px rgba(245, 158, 11, 0.4)',
               }}
             >
               {rating === 10 ? '10' : rating.toFixed(1)}
             </span>
-            {/* Smaller, secondary tier label */}
             <span 
               className="text-[9px] font-medium uppercase tracking-wider mt-0.5"
-              style={{ color: isOutstanding ? 'rgba(245, 158, 11, 0.7)' : 'rgba(203, 213, 225, 0.9)' }}
+              style={{ color: 'rgba(245, 158, 11, 0.7)' }}
             >
               {tierData.label}
             </span>
