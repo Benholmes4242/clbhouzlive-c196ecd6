@@ -242,7 +242,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
           {/* LIVE pill */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: 6,
-            background: 'rgba(34,197,94,0.15)', backdropFilter: 'blur(8px)',
+            background: 'rgba(0,0,0,0.55)',
             border: '1px solid rgba(34,197,94,0.40)',
             padding: '5px 12px', borderRadius: 20,
             fontSize: 11, fontWeight: 800, color: '#22C55E',
