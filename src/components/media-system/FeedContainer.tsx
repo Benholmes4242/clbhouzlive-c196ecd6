@@ -125,7 +125,6 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
   useEffect(() => {
     const newOffset = -activeIndexRef.current * itemHeight;
     offsetRef.current = newOffset;
-    setOffsetY(newOffset);
     if (trackRef.current) {
       trackRef.current.style.transform = `translateY(${newOffset}px)`;
     }
