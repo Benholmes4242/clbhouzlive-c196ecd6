@@ -21,11 +21,19 @@ export default function CheckEmailPage() {
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center px-6"
+      className="fixed inset-0 relative flex flex-col items-center justify-center px-6"
       style={{
-        background: 'radial-gradient(ellipse 120% 80% at 50% 20%, rgba(20, 20, 22, 1) 0%, #0a0a0a 100%)',
+        background: 'linear-gradient(180deg, #0d0d0d 0%, #111111 100%)',
+        paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
+      {/* Subtle grain texture */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-[0.02]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+        }}
+      />
       <div
         className="flex flex-col items-center gap-5 p-8 rounded-3xl max-w-sm w-full text-center"
         style={{
