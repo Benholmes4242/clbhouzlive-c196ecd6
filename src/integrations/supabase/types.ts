@@ -15178,37 +15178,70 @@ export type Database = {
         Args: { other_user_id: string }
         Returns: string
       }
-      get_podium_all_time: {
-        Args: {
-          p_club_id?: string
-          p_country?: string
-          p_current_user_id?: string
-          p_scope?: string
-        }
-        Returns: {
-          avatar_url: string
-          courses_count: number
-          display_name: string
-          rank: number
-          user_id: string
-        }[]
-      }
-      get_podium_seasonal: {
-        Args: {
-          p_club_id?: string
-          p_country?: string
-          p_current_user_id?: string
-          p_division_id?: string
-          p_scope?: string
-        }
-        Returns: {
-          avatar_url: string
-          courses_count: number
-          display_name: string
-          rank: number
-          user_id: string
-        }[]
-      }
+      get_podium_all_time:
+        | {
+            Args: {
+              p_club_id?: string
+              p_country?: string
+              p_current_user_id?: string
+              p_scope?: string
+            }
+            Returns: {
+              avatar_url: string
+              courses_count: number
+              display_name: string
+              rank: number
+              user_id: string
+            }[]
+          }
+        | {
+            Args: {
+              p_club_id?: string
+              p_country?: string
+              p_current_user_id?: string
+              p_scope: string
+            }
+            Returns: {
+              avatar_url: string
+              courses_count: number
+              display_name: string
+              rank: number
+              user_id: string
+            }[]
+          }
+      get_podium_seasonal:
+        | {
+            Args: {
+              p_club_id?: string
+              p_country?: string
+              p_current_user_id?: string
+              p_division_id?: string
+              p_scope?: string
+            }
+            Returns: {
+              avatar_url: string
+              courses_count: number
+              display_name: string
+              rank: number
+              user_id: string
+            }[]
+          }
+        | {
+            Args: {
+              p_club_id?: string
+              p_country?: string
+              p_current_user_id?: string
+              p_division_id?: string
+              p_scope: string
+            }
+            Returns: {
+              avatar_url: string
+              courses_count: number
+              display_name: string
+              rank: number
+              user_id: string
+            }[]
+          }
       get_profile_posts: {
         Args: {
           p_actor_id: string
@@ -15700,20 +15733,35 @@ export type Database = {
           regions_count: number
         }[]
       }
-      get_user_podium_proximity: {
-        Args: {
-          p_division_id?: string
-          p_scope?: string
-          p_time_filter?: string
-          p_user_id: string
-        }
-        Returns: {
-          courses_to_podium: number
-          is_on_podium: boolean
-          third_place_courses: number
-          user_position: number
-        }[]
-      }
+      get_user_podium_proximity:
+        | {
+            Args: {
+              p_division_id?: string
+              p_scope?: string
+              p_time_filter?: string
+              p_user_id: string
+            }
+            Returns: {
+              courses_to_podium: number
+              is_on_podium: boolean
+              third_place_courses: number
+              user_position: number
+            }[]
+          }
+        | {
+            Args: {
+              p_division_id?: string
+              p_scope?: string
+              p_time_filter?: string
+              p_user_id: string
+            }
+            Returns: {
+              courses_to_podium: number
+              is_on_podium: boolean
+              third_place_courses: number
+              user_position: number
+            }[]
+          }
       get_user_position_change: {
         Args: { p_days_back?: number; p_user_id: string }
         Returns: number
