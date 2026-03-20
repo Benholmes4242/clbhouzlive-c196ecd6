@@ -464,7 +464,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
             return (
               <div key={`${row.position}-${idx}`} style={{
                 display: 'flex', alignItems: 'center', gap: 12,
-                padding: '9px 0',
+                padding: '11px 0',
                 borderBottom: '1px solid rgba(255,255,255,0.03)',
                 animation: 'trlive-slideIn 0.5s ease-out both',
                 animationDelay: `${0.65 + (isTiedFirst ? Math.min(coLeaders.length - 1, 2) : 0) * 0.08 + idx * 0.08}s`,
