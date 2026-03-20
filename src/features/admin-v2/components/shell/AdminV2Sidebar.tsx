@@ -8,7 +8,7 @@ import {
   LayoutDashboard, BarChart3, Users, CheckCircle, Shield,
   Mail, MapPin, Upload, Trophy, Building2, Image, BookOpen,
   Flag, ClipboardList, Settings, Wrench, Map, FlaskConical,
-  ArrowLeft, ChevronDown, ChevronRight,
+  ArrowLeft, ChevronDown, ChevronRight, Activity, Sparkles, MessageCircle,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -160,9 +160,13 @@ export default function AdminV2Sidebar({ role, can, onNavigate }: SidebarProps) 
       label: 'Analytics',
       requiresFull: true,
       items: [
-        { to: '/admin-v2/analytics/platform', label: 'Platform',  icon: BarChart3 },
-        { to: '/admin-v2/analytics/content',  label: 'Content',   icon: BookOpen },
-        { to: '/admin-v2/analytics/auth',     label: 'Auth & Security', icon: Shield },
+        { to: '/admin-v2/analytics/platform',   label: 'Platform',           icon: BarChart3 },
+        { to: '/admin-v2/analytics/engagement',  label: 'Engagement',         icon: Activity },
+        { to: '/admin-v2/analytics/navigation',  label: 'Pages & Nav',        icon: Map },
+        { to: '/admin-v2/analytics/echo',        label: 'Echo AI',            icon: Sparkles },
+        { to: '/admin-v2/analytics/social',      label: 'Social & Messaging', icon: MessageCircle },
+        { to: '/admin-v2/analytics/content',     label: 'Content',            icon: BookOpen },
+        { to: '/admin-v2/analytics/auth',        label: 'Auth & Security',    icon: Shield },
       ],
     }] : []),
     ...(can.manageAdmins ? [{

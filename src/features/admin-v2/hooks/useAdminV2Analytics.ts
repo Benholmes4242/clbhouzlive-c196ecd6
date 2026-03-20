@@ -255,6 +255,254 @@ async function fetchAuthAnalytics(period: AnalyticsPeriod): Promise<AuthAnalytic
   };
 }
 
+// ─── Engagement analytics types & fetcher ─────────────────────────────────────
+
+export interface EngagementAnalyticsData {
+  totalEvents: number;
+  avgEventsPerUserPerDay: number;
+  uniqueUsers: number;
+  busiestHour: number;
+  dailyTrend: DailyBucket[];
+  topEvents: { name: string; count: number; uniqueUsers: number }[];
+}
+
+async function fetchEngagementAnalytics(period: AnalyticsPeriod): Promise<EngagementAnalyticsData> {
+  const days = periodToDays(period);
+  const since = startOf(period).toISOString();
+
+  const { data: events } = await supabase
+    .from('analytics_events')
+    .select('created_at, name, user_id')
+    .gte('created_at', since)
+    .limit(10000);
+
+  const rows = events ?? [];
+  const totalEvents = rows.length;
+  const userIds = new Set(rows.filter(r => r.user_id).map(r => r.user_id!));
+  const uniqueUsers = userIds.size;
+
+  // Avg events per user per day
+  const avgEventsPerUserPerDay = uniqueUsers > 0 && days > 0
+    ? Math.round((totalEvents / uniqueUsers / days) * 10) / 10
+    : 0;
+
+  // Busiest hour
+  const hourCounts: Record<number, number> = {};
+  for (const r of rows) {
+    const h = new Date(r.created_at).getHours();
+    hourCounts[h] = (hourCounts[h] || 0) + 1;
+  }
+  const busiestHour = Object.entries(hourCounts).sort((a, b) => b[1] - a[1])[0]?.[0]
+    ? parseInt(Object.entries(hourCounts).sort((a, b) => b[1] - a[1])[0][0])
+    : 0;
+
+  // Daily trend
+  const dailyTrend = fillBuckets(rows, days);
+
+  // Top events
+  const eventCounts: Record<string, { count: number; users: Set<string> }> = {};
+  for (const r of rows) {
+    if (!eventCounts[r.name]) eventCounts[r.name] = { count: 0, users: new Set() };
+    eventCounts[r.name].count++;
+    if (r.user_id) eventCounts[r.name].users.add(r.user_id);
+  }
+  const topEvents = Object.entries(eventCounts)
+    .sort((a, b) => b[1].count - a[1].count)
+    .slice(0, 20)
+    .map(([name, d]) => ({ name, count: d.count, uniqueUsers: d.users.size }));
+
+  return { totalEvents, avgEventsPerUserPerDay, uniqueUsers, busiestHour, dailyTrend, topEvents };
+}
+
+// ─── Navigation analytics types & fetcher ─────────────────────────────────────
+
+export interface NavigationAnalyticsData {
+  totalPageViews: number;
+  mostVisitedPage: string;
+  avgSessionDuration: number;
+  topNavTab: string;
+  dailyPageViews: DailyBucket[];
+  pageBreakdown: { path: string; views: number; uniqueUsers: number; avgDuration: number | null }[];
+  navTabBreakdown: { tab: string; count: number }[];
+}
+
+async function fetchNavigationAnalytics(period: AnalyticsPeriod): Promise<NavigationAnalyticsData> {
+  const days = periodToDays(period);
+  const since = startOf(period).toISOString();
+
+  const [pvRes, peRes, ntRes] = await Promise.all([
+    supabase.from('analytics_events').select('created_at, user_id, props').eq('name', 'page_view').gte('created_at', since).limit(5000),
+    supabase.from('analytics_events').select('props').eq('name', 'page_exit').gte('created_at', since).limit(5000),
+    supabase.from('analytics_events').select('props').eq('name', 'nav_tab_tap').gte('created_at', since).limit(5000),
+  ]);
+
+  const pvRows = pvRes.data ?? [];
+  const peRows = peRes.data ?? [];
+  const ntRows = ntRes.data ?? [];
+
+  const totalPageViews = pvRows.length;
+  const dailyPageViews = fillBuckets(pvRows, days);
+
+  // Page breakdown
+  const pathData: Record<string, { views: number; users: Set<string>; durations: number[] }> = {};
+  for (const r of pvRows) {
+    const path = (r.props as any)?.path ?? 'unknown';
+    if (!pathData[path]) pathData[path] = { views: 0, users: new Set(), durations: [] };
+    pathData[path].views++;
+    if (r.user_id) pathData[path].users.add(r.user_id);
+  }
+
+  // Add duration data from page_exit
+  const durationByPath: Record<string, number[]> = {};
+  for (const r of peRows) {
+    const p = (r.props as any)?.path ?? 'unknown';
+    const d = (r.props as any)?.duration_sec;
+    if (typeof d === 'number') {
+      if (!durationByPath[p]) durationByPath[p] = [];
+      durationByPath[p].push(d);
+    }
+  }
+
+  const pageBreakdown = Object.entries(pathData)
+    .sort((a, b) => b[1].views - a[1].views)
+    .slice(0, 30)
+    .map(([path, d]) => ({
+      path,
+      views: d.views,
+      uniqueUsers: d.users.size,
+      avgDuration: durationByPath[path]?.length
+        ? Math.round(durationByPath[path].reduce((a, b) => a + b, 0) / durationByPath[path].length)
+        : null,
+    }));
+
+  const mostVisitedPage = pageBreakdown[0]?.path ?? '—';
+
+  // Avg session duration
+  const allDurations = Object.values(durationByPath).flat();
+  const avgSessionDuration = allDurations.length
+    ? Math.round(allDurations.reduce((a, b) => a + b, 0) / allDurations.length)
+    : 0;
+
+  // Nav tab breakdown
+  const tabCounts: Record<string, number> = {};
+  for (const r of ntRows) {
+    const tab = (r.props as any)?.tab ?? 'unknown';
+    tabCounts[tab] = (tabCounts[tab] || 0) + 1;
+  }
+  const navTabBreakdown = Object.entries(tabCounts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([tab, count]) => ({ tab, count }));
+
+  const topNavTab = navTabBreakdown[0]?.tab ?? '—';
+
+  return { totalPageViews, mostVisitedPage, avgSessionDuration, topNavTab, dailyPageViews, pageBreakdown, navTabBreakdown };
+}
+
+// ─── Echo analytics types & fetcher ───────────────────────────────────────────
+
+export interface EchoAnalyticsData {
+  totalQueries: number;
+  uniqueUsers: number;
+  avgPerUser: number;
+  dailyTrend: DailyBucket[];
+  recentQueries: { queryText: string; username: string | null; createdAt: string }[];
+}
+
+async function fetchEchoAnalytics(period: AnalyticsPeriod): Promise<EchoAnalyticsData> {
+  const days = periodToDays(period);
+  const since = startOf(period).toISOString();
+
+  const { data: events } = await supabase
+    .from('analytics_events')
+    .select('created_at, user_id, props')
+    .eq('name', 'echo_query')
+    .gte('created_at', since)
+    .order('created_at', { ascending: false })
+    .limit(500);
+
+  const rows = events ?? [];
+  const totalQueries = rows.length;
+  const userIds = new Set(rows.filter(r => r.user_id).map(r => r.user_id!));
+  const uniqueUsers = userIds.size;
+  const avgPerUser = uniqueUsers > 0 ? Math.round((totalQueries / uniqueUsers) * 10) / 10 : 0;
+  const dailyTrend = fillBuckets(rows, days);
+
+  // Get usernames for recent queries
+  const recentUserIds = [...new Set(rows.slice(0, 200).filter(r => r.user_id).map(r => r.user_id!))];
+  let usernameMap = new Map<string, string>();
+  if (recentUserIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('user_profiles')
+      .select('id, username')
+      .in('id', recentUserIds.slice(0, 50));
+    usernameMap = new Map((profiles ?? []).map(p => [p.id, p.username ?? '']));
+  }
+
+  const recentQueries = rows.slice(0, 200).map(r => ({
+    queryText: (r.props as any)?.query_text ?? '—',
+    username: r.user_id ? (usernameMap.get(r.user_id) ?? null) : null,
+    createdAt: r.created_at,
+  }));
+
+  return { totalQueries, uniqueUsers, avgPerUser, dailyTrend, recentQueries };
+}
+
+// ─── Social analytics types & fetcher ─────────────────────────────────────────
+
+export interface SocialAnalyticsData {
+  messagesSent: number;
+  newConversations: number;
+  followActions: number;
+  friendRequests: number;
+  dailyMessages: DailyBucket[];
+  topFollowed: { username: string; displayName: string; followerCount: number }[];
+}
+
+async function fetchSocialAnalytics(period: AnalyticsPeriod): Promise<SocialAnalyticsData> {
+  const days = periodToDays(period);
+  const since = startOf(period).toISOString();
+
+  const [msgRes, convRes, followRes, friendRes, topFollowedRes] = await Promise.all([
+    supabase.from('analytics_events').select('created_at').eq('name', 'message_sent').gte('created_at', since).limit(5000),
+    supabase.from('analytics_events').select('created_at').eq('name', 'conversation_started').gte('created_at', since).limit(5000),
+    supabase.from('analytics_events').select('created_at').eq('name', 'social_follow_toggled').gte('created_at', since).limit(5000),
+    supabase.from('analytics_events').select('created_at').eq('name', 'social_friend_request_sent').gte('created_at', since).limit(5000),
+    supabase.from('user_follows' as any).select('followed_id').limit(1000),
+  ]);
+
+  const messagesSent = msgRes.data?.length ?? 0;
+  const newConversations = convRes.data?.length ?? 0;
+  const followActions = followRes.data?.length ?? 0;
+  const friendRequests = friendRes.data?.length ?? 0;
+  const dailyMessages = fillBuckets(msgRes.data ?? [], days);
+
+  // Top followed users
+  const followCounts: Record<string, number> = {};
+  for (const r of (topFollowedRes.data ?? []) as any[]) {
+    const fid = r.followed_id;
+    if (fid) followCounts[fid] = (followCounts[fid] || 0) + 1;
+  }
+  const topIds = Object.entries(followCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
+
+  let topFollowed: SocialAnalyticsData['topFollowed'] = [];
+  if (topIds.length > 0) {
+    const { data: profiles } = await supabase
+      .from('user_profiles')
+      .select('id, username, display_name')
+      .in('id', topIds.map(([id]) => id));
+    const pMap = new Map((profiles ?? []).map(p => [p.id, p]));
+    topFollowed = topIds.map(([id, count]) => ({
+      username: pMap.get(id)?.username ?? 'unknown',
+      displayName: pMap.get(id)?.display_name ?? '',
+      followerCount: count,
+    }));
+  }
+
+  return { messagesSent, newConversations, followActions, friendRequests, dailyMessages, topFollowed };
+}
+
 // ─── Exported hooks ───────────────────────────────────────────────────────────
 
 export function usePlatformAnalytics(period: AnalyticsPeriod) {
@@ -277,6 +525,38 @@ export function useAuthAnalytics(period: AnalyticsPeriod) {
   return useQuery({
     queryKey:  ['admin-v2', 'analytics', 'auth', period],
     queryFn:   () => fetchAuthAnalytics(period),
+    staleTime: 5 * 60_000,
+  });
+}
+
+export function useEngagementAnalytics(period: AnalyticsPeriod) {
+  return useQuery({
+    queryKey:  ['admin-v2', 'analytics', 'engagement', period],
+    queryFn:   () => fetchEngagementAnalytics(period),
+    staleTime: 5 * 60_000,
+  });
+}
+
+export function useNavigationAnalytics(period: AnalyticsPeriod) {
+  return useQuery({
+    queryKey:  ['admin-v2', 'analytics', 'navigation', period],
+    queryFn:   () => fetchNavigationAnalytics(period),
+    staleTime: 5 * 60_000,
+  });
+}
+
+export function useEchoAnalytics(period: AnalyticsPeriod) {
+  return useQuery({
+    queryKey:  ['admin-v2', 'analytics', 'echo', period],
+    queryFn:   () => fetchEchoAnalytics(period),
+    staleTime: 5 * 60_000,
+  });
+}
+
+export function useSocialAnalytics(period: AnalyticsPeriod) {
+  return useQuery({
+    queryKey:  ['admin-v2', 'analytics', 'social', period],
+    queryFn:   () => fetchSocialAnalytics(period),
     staleTime: 5 * 60_000,
   });
 }

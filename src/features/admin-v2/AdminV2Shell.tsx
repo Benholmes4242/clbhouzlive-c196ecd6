@@ -28,6 +28,10 @@ const SettingsPage         = lazy(() => import('./pages/SettingsPage'));
 const PlatformAnalytics    = lazy(() => import('./pages/analytics/PlatformAnalyticsPage'));
 const ContentAnalytics     = lazy(() => import('./pages/analytics/ContentAnalyticsPage'));
 const AuthAnalytics        = lazy(() => import('./pages/analytics/AuthAnalyticsPage'));
+const EngagementAnalytics  = lazy(() => import('./pages/analytics/EngagementAnalyticsPage'));
+const NavigationAnalytics  = lazy(() => import('./pages/analytics/NavigationAnalyticsPage'));
+const EchoAnalytics        = lazy(() => import('./pages/analytics/EchoAnalyticsPage'));
+const SocialAnalytics      = lazy(() => import('./pages/analytics/SocialAnalyticsPage'));
 const GeocodingPage        = lazy(() => import('./pages/tools/GeocodingPage'));
 const TestLabPage          = lazy(() => import('./pages/tools/TestLabPage'));
 
@@ -142,6 +146,10 @@ export default function AdminV2Shell() {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="analytics/platform" element={can.manageAdmins ? <PlatformAnalytics /> : <AdminV2AccessDenied role={role} />} />
+            <Route path="analytics/engagement" element={can.manageAdmins ? <EngagementAnalytics /> : <AdminV2AccessDenied role={role} />} />
+            <Route path="analytics/navigation" element={can.manageAdmins ? <NavigationAnalytics /> : <AdminV2AccessDenied role={role} />} />
+            <Route path="analytics/echo" element={can.manageAdmins ? <EchoAnalytics /> : <AdminV2AccessDenied role={role} />} />
+            <Route path="analytics/social" element={can.manageAdmins ? <SocialAnalytics /> : <AdminV2AccessDenied role={role} />} />
             <Route path="analytics/content" element={can.manageAdmins ? <ContentAnalytics /> : <AdminV2AccessDenied role={role} />} />
             <Route path="analytics/auth" element={can.manageAdmins ? <AuthAnalytics /> : <AdminV2AccessDenied role={role} />} />
             <Route path="users" element={can.manageAdmins ? <UsersPage /> : <AdminV2AccessDenied role={role} />} />

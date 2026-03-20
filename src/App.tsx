@@ -1,4 +1,5 @@
 import React, { Suspense, lazy, useEffect, useLayoutEffect, useMemo } from "react";
+import { usePageTracking } from '@/hooks/usePageTracking';
 import { MessagingProvider } from '@/contexts/MessagingContext';
 
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -231,6 +232,7 @@ function NavigationRefSetter() {
 
 // Routes component that handles background location pattern for Hub overlays and Video modal
 function AppRoutes() {
+  usePageTracking();
   const location = useLocation();
   const state = location.state as { backgroundLocation?: Location; fromHub?: boolean; fromVideo?: boolean } | null;
   const { shouldHideHeader } = useModalContext();
@@ -521,6 +523,18 @@ const AchievementToastWrapper: React.FC = () => {
 const AppInner: React.FC = () => {
   // Global focus re-auth hook
   useReauthOnFocus();
+
+  // ── Analytics: session start + page tracking ──
+  useEffect(() => {
+    const sessionId = crypto.randomUUID();
+    sessionStorage.setItem('session_id', sessionId);
+    import('@/utils/analyticsEvents').then(({ analyticsEvents }) => {
+      analyticsEvents.track('session_start', {
+        session_id: sessionId,
+        referrer: document.referrer || 'direct',
+      });
+    });
+  }, []);
   
   // Enforce R2-only policy globally
   useImageUploadSafeguard();
