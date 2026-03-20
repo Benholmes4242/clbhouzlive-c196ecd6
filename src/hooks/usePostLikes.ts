@@ -30,7 +30,7 @@ export function usePostLikes(postId: string | null, enabled: boolean) {
       // Step 2: fetch profiles for those user_ids
       const { data: profiles, error: profilesError } = await supabase
         .from('user_profiles')
-        .select('id, display_name, username, avatar_url')
+        .select('id, display_name, username, profile_photo_url')
         .in('id', userIds);
 
       if (profilesError) throw profilesError;
@@ -46,7 +46,7 @@ export function usePostLikes(postId: string | null, enabled: boolean) {
           userId: uid,
           displayName: profile?.display_name ?? 'Golfer',
           username: profile?.username ?? '',
-          avatarUrl: profile?.avatar_url ?? null,
+          avatarUrl: profile?.profile_photo_url ?? null,
         } as PostLiker;
       });
     },
