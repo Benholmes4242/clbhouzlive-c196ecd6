@@ -32,8 +32,6 @@ export function RatingPill({ score, tier, label, showRatingInPill = false, class
     : getRatingTheme(score ?? 0);
 
   const displayLabel = label ?? theme.label;
-  const isOutstanding = theme.key === 'OUTSTANDING';
-  
   // Track tier changes for transition animation
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [displayedLabel, setDisplayedLabel] = useState(displayLabel);
@@ -53,23 +51,15 @@ export function RatingPill({ score, tier, label, showRatingInPill = false, class
     }
   }, [theme.key, displayLabel]);
 
-  // Per-tier fill: use accent from theme as bg, white text
-  const pillBg = isOutstanding
-    ? 'bg-[#f59e0b] border-[#f59e0b]'
-    : `border-[${theme.accent}]`;
-
   return (
     <span
       className={cn(
         'inline-flex items-center justify-center',
         'rounded-sq-sm px-3 py-[6px] text-xs font-semibold uppercase tracking-[0.08em]',
         'border rating-label-transition text-white',
-        isOutstanding
-          ? 'bg-[#f59e0b] border-[#f59e0b]'
-          : '',
+        'bg-[#f59e0b] border-[#f59e0b]',
         className
       )}
-      style={!isOutstanding ? { backgroundColor: theme.accent, borderColor: theme.accent } : undefined}
       data-transitioning={isTransitioning}
     >
       {displayedLabel.toUpperCase()}

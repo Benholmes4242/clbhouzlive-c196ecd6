@@ -38,8 +38,6 @@ export const CourseCommunityRating: React.FC<CourseCommunityRatingProps> = ({
     lg: 'w-[18px] h-[18px]',
   }[size];
 
-  const isOutstanding = rating >= 9.0;
-
   return (
     <div className={`flex items-center flex-shrink-0 gap-1.5 ${className}`}>
       {showLogo && (
@@ -53,7 +51,7 @@ export const CourseCommunityRating: React.FC<CourseCommunityRatingProps> = ({
       <span className={cn(
         textClasses,
         'font-semibold tabular-nums',
-        forceNeutral || !isOutstanding ? 'text-foreground' : 'text-amber-500'
+        forceNeutral ? 'text-foreground' : 'text-amber-500'
       )}>
         {rating.toFixed(1)}
       </span>
