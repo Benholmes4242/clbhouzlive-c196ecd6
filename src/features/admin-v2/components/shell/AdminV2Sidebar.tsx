@@ -8,7 +8,7 @@ import {
   LayoutDashboard, BarChart3, Users, CheckCircle, Shield,
   Mail, MapPin, Upload, Trophy, Building2, Image, BookOpen,
   Flag, ClipboardList, Settings, Wrench, Map, FlaskConical,
-  ArrowLeft, ChevronDown, ChevronRight,
+  ArrowLeft, ChevronDown, ChevronRight, Activity, Sparkles, MessageCircle,
 } from 'lucide-react';
 
 interface SidebarProps {
