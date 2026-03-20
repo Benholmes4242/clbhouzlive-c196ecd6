@@ -30,7 +30,7 @@ export const ClubhouseTabToggle = ({
 
   return (
     <div
-      className={cn("flex items-center gap-3 relative z-[45]", className)}
+      className={cn("flex items-center gap-4 sm:gap-7 relative z-[45]", className)}
       role="tablist"
       aria-label="Feed filter"
       style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}
@@ -49,8 +49,8 @@ export const ClubhouseTabToggle = ({
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              padding: '10px 2px 8px',
-              fontSize: 14,
+              padding: '10px 4px 8px',
+              fontSize: 'clamp(14px, 4vw, 17px)',
               fontWeight: isActive ? 700 : 500,
               color: isActive ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.40)',
               letterSpacing: isActive ? '-0.025em' : '0',
