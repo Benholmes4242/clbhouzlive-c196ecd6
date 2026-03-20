@@ -26,7 +26,6 @@ export function useFriendsFeed(userId: string | undefined) {
 
         const { data, error } = await supabase.rpc('get_friends_feed' as any, {
           p_user_id: userId,
-          p_mode: 'popular',
           p_page_size: PAGE_SIZE,
           ...(cursor ? { p_cursor: cursor } : {}),
           p_seen_post_ids: seenPostIds.current,
@@ -50,9 +49,9 @@ export function useFriendsFeed(userId: string | undefined) {
             seenPostIds.current.push(post.id);
           }
         }
-        // Keep only the last 500 to prevent unbounded growth
-        if (seenPostIds.current.length > 500) {
-          seenPostIds.current = seenPostIds.current.slice(-500);
+        // Keep only the last 200 to prevent unbounded growth
+        if (seenPostIds.current.length > 200) {
+          seenPostIds.current = seenPostIds.current.slice(-200);
         }
 
         const lastRow = rows[rows.length - 1];

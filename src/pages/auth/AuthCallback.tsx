@@ -32,41 +32,6 @@ export default function AuthCallback() {
           return;
         }
 
-        // ── Grant gate access for verified user ────────────────────────
-        // A freshly-verified user has a valid Supabase session but no
-        // clubhouz_gate_session. Pass the JWT to secure-site-access so it
-        // can verify server-side and issue a gate token.
-        setMessage('Almost there…');
-
-        try {
-          const gateRes = await fetch(
-            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/secure-site-access`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${session.access_token}`,
-              },
-              body: JSON.stringify({ authGrant: true }),
-            }
-          );
-
-          const gateData = await gateRes.json();
-
-          if (gateRes.ok && gateData?.success) {
-            localStorage.setItem(
-              'clubhouz_gate_session',
-              JSON.stringify({
-                token: gateData.sessionToken,
-                expiresAt: gateData.expiresAt,
-              })
-            );
-          }
-        } catch {
-          // Non-fatal — /edit-profile is also bypassed as safety net
-        }
-        // ───────────────────────────────────────────────────────────────
-
         setMessage('Setting up your profile…');
 
         // Give the DB trigger time to create the profile row

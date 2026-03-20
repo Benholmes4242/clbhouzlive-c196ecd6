@@ -10,7 +10,7 @@ interface AccessGateV2Props {
 
 // Auth route prefixes that should bypass the access gate
 // Using prefixes so any new /auth/* routes are automatically bypassed
-const AUTH_BYPASS_PREFIXES = ['/auth', '/onboarding', '/edit-profile'];
+const AUTH_BYPASS_PREFIXES = ['/auth', '/onboarding'];
 
 // ===== Session Storage Utils =====
 const KEY = 'clubhouz_gate_session';
@@ -425,8 +425,12 @@ const AccessGateV2: React.FC<AccessGateV2Props> = ({ children }) => {
   }, [pathname]);
   
   // If we should bypass, skip the gate entirely (no Router needed)
-  // Gate disabled — all users pass through unconditionally
-  return <>{children}</>;
+  if (shouldBypassEarly) {
+    return <>{children}</>;
+  }
+  
+  // Otherwise render the inner gate which uses useLocation
+  return <AccessGateInner>{children}</AccessGateInner>;
 };
 
 export default AccessGateV2;
