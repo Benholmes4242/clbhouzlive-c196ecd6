@@ -69,6 +69,8 @@ export function SettingsPageV2() {
     user?.id,
     !!(profile as any)?.is_public,
     !!(profile as any)?.show_handicap,
+    (profile as any)?.show_in_handicap_leaderboards ?? true,
+    (profile as any)?.show_in_exploration_leaderboards ?? true,
   );
 
   const deleteAccount = useDeleteAccount(user?.id);
