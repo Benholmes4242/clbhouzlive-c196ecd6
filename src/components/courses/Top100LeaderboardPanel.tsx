@@ -41,7 +41,7 @@ const Top100LeaderboardPanel = () => {
     <div className="w-full pb-6">
       <Tabs value={view} onValueChange={handleViewChange} className="w-full">
         <div
-          className="sticky top-0 z-10 bg-background pb-2 pt-1 px-3"
+          className="sticky top-0 z-10 bg-background pb-2 pt-1 -mx-4 px-4"
         >
           <TabsList className="bg-transparent border-0 px-0 py-0 gap-2 w-full flex justify-center">
             {tabs.map((tab) => (
