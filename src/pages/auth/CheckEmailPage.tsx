@@ -60,12 +60,14 @@ export default function CheckEmailPage() {
         </div>
 
         <p className="text-xs text-white/30 leading-relaxed pt-2">
-          Didn't receive it? Check your spam folder, or{' '}
+          Didn't receive it? Typical — these things always end up in spam.{' '}
+          Check your junk folder, it's almost certainly lurking in there.{' '}
+          Still nothing?{' '}
           <button
             onClick={() => navigate('/auth')}
             className="text-white/50 underline underline-offset-2"
           >
-            go back and try again
+            Go back and try again
           </button>.
         </p>
       </div>
