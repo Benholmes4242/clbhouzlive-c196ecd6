@@ -409,7 +409,7 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
       <div
         ref={trackRef}
         style={{
-          transform: `translateY(${offsetY}px)`,
+          transform: `translateY(${startOffset}px)`,
           willChange: 'transform',
         }}
       >
