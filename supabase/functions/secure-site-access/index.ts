@@ -78,7 +78,55 @@ const handler = async (req: Request): Promise<Response> => {
   }));
 
   try {
-    const { accessCode, domain }: AccessValidationRequest = await req.json();
+    const body = await req.json();
+
+    // ── Path A: Auth-grant for verified users ──────────────────────────
+    // AuthCallback sends { authGrant: true } + Authorization: Bearer <jwt>
+    // Verify the Supabase JWT server-side and issue a gate token.
+    if (body.authGrant === true) {
+      const authHeader = req.headers.get('Authorization');
+      const jwt = authHeader?.replace('Bearer ', '');
+
+      if (!jwt) {
+        return new Response(
+          JSON.stringify({ success: false, message: 'Missing auth token' }),
+          { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        );
+      }
+
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+      const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+      const adminClient = createClient(supabaseUrl, serviceKey);
+      const { data: { user }, error: authErr } = await adminClient.auth.getUser(jwt);
+
+      if (authErr || !user) {
+        console.warn(`❌ Auth-grant rejected — invalid JWT, rid: ${rid}`);
+        return new Response(
+          JSON.stringify({ success: false, message: 'Invalid auth token' }),
+          { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        );
+      }
+
+      console.log(`✅ Auth-grant for verified user ${user.id}, rid: ${rid}`);
+
+      const signedToken = await signGateToken(
+        user.id,
+        'user',
+        SESSION_TTL_MS / 1000
+      );
+      const { verifyGateToken } = await import('../_shared/tokens.ts');
+      const claims = await verifyGateToken(signedToken);
+      const expiresAt = new Date(claims.exp * 1000).toISOString();
+
+      return new Response(
+        JSON.stringify({ success: true, message: 'Access granted', sessionToken: signedToken, expiresAt }),
+        { status: 200, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+      );
+    }
+    // ── End Path A ─────────────────────────────────────────────────────
+
+    // ── Path B: Access-code grant (existing logic) ────────────────────
+    const { accessCode, domain }: AccessValidationRequest = body;
 
     // Get client IP for rate limiting
     const clientIP = req.headers.get("cf-connecting-ip") 
