@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -16,6 +16,11 @@ export function usePrivacySettings(
   const [showHandicap, setShowHandicap] = useState(initialShowHandicap);
   const [showInHandicapLeaderboards, setShowInHandicapLeaderboards] = useState(initialShowInHandicapLeaderboards);
   const [showInExplorationLeaderboards, setShowInExplorationLeaderboards] = useState(initialShowInExplorationLeaderboards);
+
+  useEffect(() => { setIsPublic(initialIsPublic); }, [initialIsPublic]);
+  useEffect(() => { setShowHandicap(initialShowHandicap); }, [initialShowHandicap]);
+  useEffect(() => { setShowInHandicapLeaderboards(initialShowInHandicapLeaderboards); }, [initialShowInHandicapLeaderboards]);
+  useEffect(() => { setShowInExplorationLeaderboards(initialShowInExplorationLeaderboards); }, [initialShowInExplorationLeaderboards]);
   const [isUpdatingPrivacy, setIsUpdatingPrivacy] = useState(false);
   const [isUpdatingHandicap, setIsUpdatingHandicap] = useState(false);
   const [isUpdatingHandicapLb, setIsUpdatingHandicapLb] = useState(false);
