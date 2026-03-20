@@ -26,7 +26,7 @@ const DEFAULT_CONFIG: Record<ContentFilter, { icon: typeof ImageIcon; title: str
   longform: {
     icon: Film,
     title: 'No long-form videos yet',
-    description: 'Videos over 4 minutes will appear here.',
+    description: 'Videos over 3 minutes will appear here.',
     ctaLabel: 'Upload a video',
   },
   shorts: {
