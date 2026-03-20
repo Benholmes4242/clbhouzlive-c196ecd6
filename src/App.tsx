@@ -522,6 +522,16 @@ const AppInner: React.FC = () => {
   // Global focus re-auth hook
   useReauthOnFocus();
   
+  // Session start tracking
+  useEffect(() => {
+    const sessionId = crypto.randomUUID();
+    sessionStorage.setItem('session_id', sessionId);
+    analyticsEvents.track('session_start', {
+      session_id: sessionId,
+      referrer: document.referrer || 'direct',
+    });
+  }, []);
+  
   // Enforce R2-only policy globally
   useImageUploadSafeguard();
   
