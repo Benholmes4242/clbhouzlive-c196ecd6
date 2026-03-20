@@ -107,6 +107,15 @@ const handler = async (req: Request): Promise<Response> => {
         );
       }
 
+      // Require confirmed email — block unverified sessions from self-granting
+      if (!user.email_confirmed_at) {
+        console.warn(`❌ Auth-grant rejected — email not confirmed, user: ${user.id}, rid: ${rid}`);
+        return new Response(
+          JSON.stringify({ success: false, message: 'Email not verified' }),
+          { status: 403, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+        );
+      }
+
       console.log(`✅ Auth-grant for verified user ${user.id}, rid: ${rid}`);
 
       const signedToken = await signGateToken(
