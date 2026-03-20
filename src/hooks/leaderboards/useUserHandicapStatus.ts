@@ -48,6 +48,7 @@ export function useUserHandicapStatus(options: UseUserHandicapStatusOptions = {}
         .select('id', { count: 'exact', head: true })
         .eq('is_public', true)
         .eq('show_handicap', true)
+        .eq('show_in_handicap_leaderboards', true)
         .lt('eg_handicap_index', profile.eg_handicap_index);
 
       const handicapRank = (higherCount ?? 0) + 1;
