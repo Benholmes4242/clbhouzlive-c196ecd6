@@ -514,9 +514,13 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
               <TabsTrigger
                 key={option.value}
                 value={option.value}
-                className="min-h-[36px] px-4 rounded-full text-sm font-semibold transition-all active:scale-[0.97] border-0 shadow-none
-                  data-[state=active]:text-[hsl(var(--tab-sub-active-foreground))] data-[state=active]:shadow-none data-[state=active]:bg-[hsl(var(--tab-sub-active))]
-                  data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground"
+                className="min-h-[36px] px-4 text-sm font-semibold transition-all active:scale-[0.97] border-0 shadow-none
+                  data-[state=active]:text-background data-[state=active]:bg-foreground data-[state=active]:shadow-none
+                  data-[state=inactive]:bg-transparent data-[state=inactive]:text-muted-foreground"
+                style={{
+                  borderRadius: 8,
+                  border: option.value !== sortBy ? '1.5px solid hsl(var(--border))' : 'none',
+                }}
               >
                 {option.label}
               </TabsTrigger>
