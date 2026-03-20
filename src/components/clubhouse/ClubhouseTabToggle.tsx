@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 
 export type ClubhouseTab = 'foryou' | 'friends';
 
