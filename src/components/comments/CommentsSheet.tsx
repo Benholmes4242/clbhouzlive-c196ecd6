@@ -158,8 +158,6 @@ function CommentsSheet({
 
   const totalCount = comments.length;
 
-  // Hide toggle if 0 comments AND 0 likes
-  const showToggle = totalCount > 0 || (likesCount ?? 0) > 0;
 
   // ── Effects ──
 
@@ -536,63 +534,69 @@ function CommentsSheet({
             </div>
 
             {/* Header */}
-            <div className={cn(
-              'flex items-center justify-between px-4 pt-3 pb-3 shrink-0'
-            )}>
-              {/* Left spacer */}
-              <div className="w-11" />
-
-              {/* Centre: Comments | Likes pill toggle */}
-              <div className="flex-1 min-w-0 flex items-center justify-center">
-                {showToggle ? (
-                  <div className={cn(
-                    'flex items-center gap-1 rounded-lg p-0.5',
-                    isDark ? 'bg-white/[0.08]' : 'bg-muted/60'
-                  )}>
-                    {(['comments', 'likes'] as const).map((tab) => {
-                      const isActive = activeTab === tab;
-                      const label = tab === 'comments'
-                        ? (totalCount > 0 ? `${totalCount} ` : '') + 'Comments'
-                        : ((likesCount ?? 0) > 0 ? `${likesCount} ` : '') + 'Likes';
-                      return (
-                        <button
-                          key={tab}
-                          type="button"
-                          onClick={() => {
-                            setActiveTab(tab);
-                            scrollRef.current?.scrollTo({ top: 0 });
-                          }}
-                          className={cn(
-                            'px-3 py-1 rounded-md text-[13px] font-semibold transition-colors min-h-[32px]',
-                            isActive
-                              ? isDark ? 'bg-white/15 text-white' : 'bg-background text-foreground shadow-sm'
-                              : isDark ? 'text-white/40' : 'text-muted-foreground'
-                          )}
-                        >
-                          {label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <span className={cn('text-[16px] font-semibold', isDark ? 'text-white/40' : 'text-muted-foreground')}>
-                    Comments
-                  </span>
-                )}
+            <div
+              className="flex items-end justify-between px-4 pt-3 pb-0 shrink-0"
+              style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.08)'}` }}
+            >
+              {/* Left: tab group */}
+              <div className="flex items-end gap-6">
+                {(['comments', 'likes'] as const).map((tab) => {
+                  const isActive = activeTab === tab;
+                  const count = tab === 'comments' ? totalCount : (likesCount ?? 0);
+                  const label = tab === 'comments' ? 'Comments' : 'Likes';
+                  return (
+                    <button
+                      key={tab}
+                      type="button"
+                      onClick={() => {
+                        setActiveTab(tab);
+                        scrollRef.current?.scrollTo({ top: 0 });
+                      }}
+                      className="relative flex flex-col items-center pb-[10px] min-h-[44px] bg-transparent border-0 cursor-pointer"
+                    >
+                      {/* Amber eyebrow count */}
+                      <span
+                        className="text-[11px] font-semibold uppercase tracking-[0.05em] leading-none mb-[3px] transition-colors duration-200"
+                        style={{ color: isActive ? '#F59E0B' : 'transparent' }}
+                      >
+                        {count > 0 ? count : '\u00A0'}
+                      </span>
+                      {/* Label */}
+                      <span
+                        className="text-[15px] font-semibold leading-snug whitespace-nowrap transition-colors duration-200"
+                        style={{
+                          color: isActive
+                            ? (isDark ? 'rgba(255,255,255,0.92)' : 'rgba(0,0,0,0.90)')
+                            : (isDark ? 'rgba(255,255,255,0.30)' : 'rgba(0,0,0,0.35)')
+                        }}
+                      >
+                        {label}
+                      </span>
+                      {/* Amber underline bar */}
+                      <div
+                        className="absolute bottom-0 left-0 right-0 h-[2.5px] rounded-full transition-opacity duration-200"
+                        style={{
+                          background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
+                          opacity: isActive ? 1 : 0,
+                        }}
+                      />
+                    </button>
+                  );
+                })}
               </div>
 
-              {/* Right: sort toggle (comments tab only) + close button */}
-              <div className="flex items-center shrink-0">
+              {/* Right: sort toggle + close */}
+              <div className="flex items-center gap-1 pb-[6px]">
                 <AnimatePresence>
                   {activeTab === 'comments' && totalCount > 1 && (
                     <motion.div
-                      initial={{ opacity: 0, width: 0 }}
-                      animate={{ opacity: 1, width: 'auto' }}
-                      exit={{ opacity: 0, width: 0 }}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
                       transition={{ duration: 0.15 }}
                       className={cn(
-                        'flex items-center gap-0.5 rounded-lg p-0.5 overflow-hidden',
-                        isDark ? 'bg-white/[0.08]' : 'bg-muted/60'
+                        'flex items-center p-0.5 gap-0.5 rounded-lg',
+                        isDark ? 'bg-white/[0.07]' : 'bg-black/[0.06]'
                       )}
                     >
                       {(['best', 'newest'] as const).map(s => (
@@ -601,10 +605,10 @@ function CommentsSheet({
                           type="button"
                           onClick={() => setSort(s)}
                           className={cn(
-                            'px-2 py-1 rounded-md text-[11px] font-semibold transition-colors min-h-[32px]',
+                            'px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors min-h-[28px] capitalize',
                             sort === s
-                              ? isDark ? 'bg-white/15 text-white' : 'bg-background text-foreground shadow-sm'
-                              : isDark ? 'text-white/40' : 'text-muted-foreground'
+                              ? isDark ? 'bg-white/[0.12] text-white/90' : 'bg-black/[0.10] text-foreground'
+                              : isDark ? 'text-white/35' : 'text-muted-foreground'
                           )}
                         >
                           {s === 'best' ? 'Best' : 'Newest'}
@@ -616,12 +620,9 @@ function CommentsSheet({
                 <button
                   type="button"
                   onClick={onClose}
-                  className={cn(
-                    'w-11 h-11 flex items-center justify-center rounded-full',
-                    isDark ? 'text-white/50 hover:text-white' : 'text-muted-foreground hover:text-foreground'
-                  )}
+                  className="w-9 h-9 flex items-center justify-center rounded-full bg-transparent border-0 cursor-pointer"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-[15px] h-[15px]" style={{ color: isDark ? 'rgba(255,255,255,0.40)' : undefined }} />
                 </button>
               </div>
             </div>
