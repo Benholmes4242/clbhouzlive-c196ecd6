@@ -13,10 +13,10 @@ export const TopBar: React.FC<TopBarProps> = ({ isVisible }) => {
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
       )}
       style={{
-        background: 'rgba(10, 10, 10, 0.85)',
+        background: 'rgba(245, 158, 11, 0.15)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+        borderBottom: '1px solid rgba(245, 158, 11, 0.25)',
         boxShadow: '0 4px 30px rgba(0, 0, 0, 0.4)',
       }}
     >

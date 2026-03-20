@@ -104,11 +104,11 @@ export function FullscreenFeedContent({ posts, startIndex, fetchNextPage, hasNex
         className="fixed left-4 z-[10000] w-11 h-11 rounded-full flex items-center justify-center"
         style={{
           top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
-          background: 'rgba(0, 0, 0, 0.35)',
+          background: 'rgba(245, 158, 11, 0.15)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.25)',
+          border: '1px solid rgba(245, 158, 11, 0.25)',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
         }}
         aria-label="Close fullscreen"
       >
