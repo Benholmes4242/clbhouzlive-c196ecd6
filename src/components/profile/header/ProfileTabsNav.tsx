@@ -33,8 +33,8 @@ const ProfileTabsNav: React.FC<ProfileTabsNavProps> = ({
   };
 
   return (
-    <section className="px-4 bg-[#F8FAFC]" onPointerDown={handlePointerDown}>
-      <div style={{ borderBottom: '1px solid hsl(var(--border))', display: 'flex', gap: 20 }}>
+    <section className="px-4 bg-background" onPointerDown={handlePointerDown}>
+      <div style={{ borderBottom: '1px solid hsl(var(--border))', display: 'flex', gap: 20, justifyContent: 'center' }}>
         {tabs.map((tab) => {
           const isActive = activeSection === tab.id;
           return (
