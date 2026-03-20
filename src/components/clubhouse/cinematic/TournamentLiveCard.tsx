@@ -466,7 +466,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                 <span style={{ width: 28, textAlign: 'center' as const, fontSize: 14, fontWeight: 600, color: tour.accentColor }}>
                   T1
                 </span>
-                <RowAvatar name={co.playerName} photoUrl={co.photoUrl} tourSlug={meta.tourSlug} size={42} />
+                <RowAvatar name={co.playerName} photoUrl={co.photoUrl} tourSlug={meta.tourSlug} size={avatarSize.row} />
                 <span style={{
                   flex: 1, fontSize: 'clamp(13px, 3.5vw, 15px)', fontWeight: 500,
                   color: 'rgba(255,255,255,0.8)',
