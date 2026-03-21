@@ -454,6 +454,26 @@ const ClubhouseContent = () => {
           userId={user.id}
         />
       )}
+
+      {/* Review Bottom Sheet */}
+      <ReviewBottomSheet
+        isOpen={reviewSheetOpen}
+        onClose={() => setReviewSheetOpen(false)}
+        user={{
+          id: activePost?.userId ?? '',
+          name: activePost?.displayName ?? '',
+          username: activePost?.username,
+          avatar: activePost?.avatarUrl,
+        }}
+        courseId={activeReview?.courseId ?? ''}
+        courseName={activeReview?.courseName ?? ''}
+        rating={activeReview?.rating ?? 0}
+        reviewId={activeReview?.reviewId}
+        courseCountry={activeReview?.courseCountry}
+        courseRegion={activeReview?.courseRegion}
+        courseSubCountry={activeReview?.courseSubCountry}
+        reviewText={activeReview?.reviewText}
+      />
     </PageRoot>
   );
 };
