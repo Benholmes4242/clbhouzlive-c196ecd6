@@ -220,7 +220,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     padding: '5px 10px',
                     flexShrink: 0,
                   }}>
-                    <Star size={11} fill={AMBER} color={AMBER} />
                     <span style={{ fontSize: 15, fontWeight: 800, color: AMBER }}>
                       {rating.toFixed(1)}
                     </span>
