@@ -152,7 +152,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         <div
           style={{
             position: 'fixed',
-            bottom: '97px',
+            bottom: '85px',
             left: 16,
             right: 16,
             pointerEvents: 'auto',
