@@ -109,16 +109,30 @@ export const FeedSlide = memo(function FeedSlide({
     if (media?.[0]?.type === 'image') {
       const first = media[0];
       const isLandscape = (first.width ?? 0) > (first.height ?? 1);
-      const objectFit = isSuggestedFeed ? 'cover' : (isLandscape ? 'contain' : 'cover');
+      const objectFit = isLandscape ? 'contain' : 'cover';
+      const imgSrc = first.imageUrl || first.thumbnailUrl || '';
       return (
-        <img
-          src={first.imageUrl || first.thumbnailUrl || ''}
-          alt=""
-          className="absolute inset-0 w-full h-full"
-          style={{ objectFit, background: '#000' }}
-          loading="eager"
-          draggable={false}
-        />
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Blurred background for letterboxing */}
+          <img
+            src={imgSrc}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ filter: 'blur(20px)', transform: 'scale(1.1)' }}
+            draggable={false}
+            aria-hidden="true"
+          />
+          <div className="absolute inset-0 bg-black/30" />
+          {/* Main image */}
+          <img
+            src={imgSrc}
+            alt=""
+            className="absolute inset-0 w-full h-full"
+            style={{ objectFit, position: 'relative', zIndex: 1 }}
+            loading="eager"
+            draggable={false}
+          />
+        </div>
       );
     }
 

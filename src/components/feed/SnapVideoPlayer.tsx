@@ -56,7 +56,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   const userPaused = useClubhouseStore(s => s.userPaused);
 
   const isLandscape = (width ?? 0) > (height ?? 1);
-  const objectFit = isSuggestedFeed ? 'cover' : (isLandscape ? 'contain' : 'cover');
+  const objectFit = isLandscape ? 'contain' : 'cover';
 
   // ── Attach/detach HLS ──
   useEffect(() => {
@@ -220,10 +220,24 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
 
   return (
     <div
-      className="absolute inset-0 w-full h-full"
+      className="absolute inset-0 w-full h-full overflow-hidden"
       style={{ background: '#111' }}
       onClick={handleTap}
     >
+      {/* Blurred background for letterboxing */}
+      {thumbnailUrl && (
+        <>
+          <img
+            src={thumbnailUrl}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ filter: 'blur(20px)', transform: 'scale(1.1)' }}
+            draggable={false}
+            aria-hidden="true"
+          />
+          <div className="absolute inset-0 bg-black/30" />
+        </>
+      )}
       {/* Poster / thumbnail */}
       {thumbnailUrl && (
         <img
