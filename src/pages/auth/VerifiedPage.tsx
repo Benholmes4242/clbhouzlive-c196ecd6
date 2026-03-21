@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 
@@ -6,30 +6,10 @@ export default function VerifiedPage() {
   useHideBottomNav();
   useHideHeader();
 
-  // Bleed behind notch/safe-area like auth pages
   useLayoutEffect(() => {
     document.body.classList.add('route-auth');
     return () => { document.body.classList.remove('route-auth'); };
   }, []);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      window.location.href = 'clbhouz://';
-    }, 1200);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const openApp = () => {
-    window.location.href = 'clbhouz://';
-    setTimeout(() => {
-      const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-      if (isIOS) {
-        window.location.href = 'https://apps.apple.com/app/clbhouz/id6752538886';
-      } else {
-        window.location.href = 'https://clbhouz.co.uk';
-      }
-    }, 2000);
-  };
 
   return (
     <div
@@ -60,32 +40,12 @@ export default function VerifiedPage() {
 
         {/* Subtext */}
         <p style={{ fontSize: 15, fontWeight: 300, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, maxWidth: 280, margin: 0 }}>
-          You're all set. Tap below to open the clbhouz app and complete your profile, or close this page and open the app.
+          Your email has been verified. Return to the clbhouz app and sign in to start your journey.
         </p>
-
-        {/* CTA Button */}
-        <button
-          onClick={openApp}
-          style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-            width: '100%', maxWidth: 280, height: 54,
-            background: '#F5A623', color: '#000',
-            fontSize: 15, fontWeight: 500, border: 'none',
-            borderRadius: 27, cursor: 'pointer',
-            boxShadow: '0 0 32px rgba(245,166,35,0.25), 0 4px 16px rgba(0,0,0,0.4)',
-            fontFamily: 'inherit',
-          }}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="22" y1="2" x2="11" y2="13"/>
-            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-          </svg>
-          Open clbhouz
-        </button>
 
         {/* Note */}
         <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', lineHeight: 1.5, maxWidth: 260, margin: 0 }}>
-          If the app doesn't open, make sure clbhouz is installed on your device.
+          You can close this page.
         </p>
       </div>
 
