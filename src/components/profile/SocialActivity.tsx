@@ -10,7 +10,7 @@ import { ReviewPostViewer } from '@/components/posts/ReviewPostViewer';
 import { ReviewBottomPanel } from '@/components/posts/ReviewBottomPanel';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { isReviewPost as checkIsReviewPost, extractReviewData, extractUserData } from '@/lib/postHelpers';
-// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
+import { useMediaViewer } from '@/hooks/useMediaViewer';
 
 
 const SocialActivity: React.FC<SocialActivityProps> = ({
@@ -24,8 +24,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
   const { posts, loading, fetchUserPosts } = useActivityPosts(userId);
   const [selectedReviewPost, setSelectedReviewPost] = useState<ActivityPost | null>(null);
 
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
+  const { openViewer } = useMediaViewer();
 
   // Filter to only media posts for the unified player
   const mediaPosts = useMemo(() => 
@@ -44,10 +43,10 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
       // Regular posts use the unified fullscreen player
       const postIndex = mediaPosts.findIndex(p => p.id === post.id);
       if (postIndex >= 0) {
-        openFullscreen(mediaPosts, postIndex);
+        openViewer(mediaPosts, postIndex);
       }
     }
-  }, [mediaPosts, openFullscreen]);
+  }, [mediaPosts, openViewer]);
 
   const handlePostUpdated = () => {
     fetchUserPosts();

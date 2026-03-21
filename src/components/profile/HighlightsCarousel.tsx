@@ -12,7 +12,7 @@ import { warmHls, getHlsUrl } from '@/utils/videoPreload';
 import HighlightVideo from './HighlightVideo';
 import HighlightOverlays from './HighlightOverlays';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
-// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
+import { useMediaViewer } from '@/hooks/useMediaViewer';
 
 interface HighlightsCarouselProps {
   userId: string;
@@ -26,8 +26,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
   const railRef = useRef<HTMLDivElement>(null);
   const { isGloballyMuted, toggleGlobalMute, markUserGestureUnmute } = useGlobalAudio();
   const [activeIndex, setActiveIndex] = useState(0);
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
+  const { openViewer } = useMediaViewer();
 
   // Track active index via scroll position
   useEffect(() => {
@@ -120,8 +119,8 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
         country: h.golf_course.country,
       } : undefined,
     }));
-    openFullscreen(items, index);
-  }, [highlights, userId, openFullscreen]);
+    openViewer(items, index);
+  }, [highlights, userId, openViewer]);
 
   if (isLoading) {
     return (

@@ -7,7 +7,7 @@ import LazyImage from '@/components/ui/lazy-image';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import TaggedText from '@/components/posts/TaggedText';
 import CourseLocationRow from '@/components/posts/CourseLocationRow';
-// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
+import { useMediaViewer } from '@/hooks/useMediaViewer';
 
 interface Tag {
   id: string;
@@ -54,8 +54,7 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
   const [showControls, setShowControls] = useState(false);
   const mediaId = useId();
 
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
+  const { openViewer } = useMediaViewer();
 
   const handleVideoClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -100,7 +99,7 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
       likes: 0,
       golfCourse: content.golfCourse,
     }));
-    openFullscreen(mediaItems, index);
+    openViewer(mediaItems, index);
   };
 
   const handleVideoFullscreen = (videoUrl: string) => {
@@ -112,7 +111,7 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
       likes: 0,
       golfCourse: content.golfCourse,
     }];
-    openFullscreen(mediaItems, 0);
+    openViewer(mediaItems, 0);
   };
 
   // Get all images for carousel

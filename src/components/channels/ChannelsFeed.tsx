@@ -4,7 +4,7 @@ import { ChannelVideoCard } from './ChannelVideoCard';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import { useInView } from 'react-intersection-observer';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
-// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
+import { useMediaViewer } from '@/hooks/useMediaViewer';
 
 export const ChannelsFeed: React.FC = () => {
   const { sub } = useDiscoverQuery();
@@ -23,8 +23,7 @@ export const ChannelsFeed: React.FC = () => {
     threshold: 0.5,
   });
 
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
+  const { openViewer } = useMediaViewer();
 
   const allVideos = data?.pages.flatMap(page => page.items) || [];
 
@@ -55,7 +54,7 @@ export const ChannelsFeed: React.FC = () => {
     }));
 
     const startIndex = items.findIndex(i => i.id === video.id);
-    openFullscreen(items, startIndex >= 0 ? startIndex : 0);
+    openViewer(items, startIndex >= 0 ? startIndex : 0);
   };
 
   if (isLoading && allVideos.length === 0) {

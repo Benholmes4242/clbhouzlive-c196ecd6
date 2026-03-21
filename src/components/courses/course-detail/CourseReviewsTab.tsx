@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useMediaViewer } from '@/hooks/useMediaViewer';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -238,8 +239,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     setSearchQuery('');
   };
 
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
+  const { openViewer } = useMediaViewer();
 
   // Convert review media to ExploreContentItem format and open fullscreen
   const handleReviewMediaClick = useCallback((media: ReviewMediaItem[], startIndex: number) => {
@@ -263,8 +263,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       } : undefined,
     }));
     
-    openFullscreen(exploreItems, startIndex);
-  }, [openFullscreen]);
+    openViewer(exploreItems, startIndex);
+  }, [openViewer]);
 
   const reviews = reviewsData || [];
   const myReview = reviews.find((r) => r.user_id === user?.id);
