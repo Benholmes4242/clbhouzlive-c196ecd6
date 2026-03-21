@@ -143,7 +143,7 @@ export function SnapFeed({
         msOverflowStyle: 'none',
         touchAction: 'pan-y',
       }}
-      onWheel={handleWheel}
+      
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
