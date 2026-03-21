@@ -67,7 +67,7 @@ export default function VerifiedPage() {
         </div>
 
         {/* Headline */}
-        <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 28, fontWeight: 700, color: '#fff', lineHeight: 1.2, letterSpacing: '-0.3px', margin: 0 }}>
+        <h1 style={{ fontSize: 28, fontWeight: 700, color: '#fff', lineHeight: 1.2, letterSpacing: '-0.3px', margin: 0 }}>
           Email Verified
         </h1>
 
