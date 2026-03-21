@@ -68,6 +68,25 @@ export function deduplicatePosts(posts: FeedPost[]): FeedPost[] {
   });
 }
 
+// ── Per-Creator Cap ───────────────────────────────────────────────────────────
+export function capPerCreator(posts: FeedPost[]): FeedPost[] {
+  const postCount = new Map<string, number>();
+  const reviewCount = new Map<string, number>();
+  return posts.filter(post => {
+    const key = post.userId;
+    if (isReviewPost(post)) {
+      const count = reviewCount.get(key) ?? 0;
+      if (count >= MAX_REVIEWS_PER_CREATOR) return false;
+      reviewCount.set(key, count + 1);
+    } else if (!isTournamentPost(post)) {
+      const count = postCount.get(key) ?? 0;
+      if (count >= MAX_POSTS_PER_CREATOR) return false;
+      postCount.set(key, count + 1);
+    }
+    return true;
+  });
+}
+
 // ── Review Interleave ──────────────────────────────────────────────────────────
 /**
  * Interleave review posts at a fixed slot within each BLOCK_SIZE block.
