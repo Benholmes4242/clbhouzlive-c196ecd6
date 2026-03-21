@@ -298,6 +298,7 @@ function AppRoutes() {
         <Route path="/auth" element={<AuthWrapped />} />
         <Route path="/auth/callback" element={<Suspense fallback={<GenericPageSkeleton />}><AuthCallback /></Suspense>} />
         <Route path="/auth/verified" element={<Suspense fallback={<GenericPageSkeleton />}><VerifiedPage /></Suspense>} />
+        <Route path="/verified" element={<Suspense fallback={<GenericPageSkeleton />}><VerifiedPage /></Suspense>} />
         <Route path="/auth/reset-password" element={<Suspense fallback={<GenericPageSkeleton />}><ResetPasswordPage /></Suspense>} />
         <Route path="/auth/check-email" element={<Suspense fallback={<GenericPageSkeleton />}><CheckEmailPage /></Suspense>} />
         <Route path="/signup" element={<Suspense fallback={<GenericPageSkeleton />}><Signup /></Suspense>} />
