@@ -98,10 +98,10 @@ export default function AuthCallback() {
             </svg>
           </div>
           <h1 style={{ fontSize: 28, fontWeight: 700, color: '#fff', lineHeight: 1.2, letterSpacing: '-0.3px', margin: 0 }}>
-            You're signed in
+            Almost there
           </h1>
           <p style={{ fontSize: 15, fontWeight: 300, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, maxWidth: 280, margin: 0 }}>
-            Your account is ready. Return to the clbhouz app to start your journey.
+            Your account has been set up. Return to the clbhouz app and sign in to start your journey.
           </p>
           <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', lineHeight: 1.5, maxWidth: 260, margin: 0 }}>
             You can close this page.
