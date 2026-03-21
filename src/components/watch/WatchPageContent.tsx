@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import WatchHeader from '@/components/watch/WatchHeader';
 import WatchGrid from '@/components/watch/WatchGrid';
-import WatchAutoplay from '@/components/watch/WatchAutoplay';
+
 import WatchSearchOverlay from '@/components/watch/WatchSearchOverlay';
 import { useWatchFeed } from '@/components/watch/hooks/useWatchFeed';
 import type { WatchFilter } from '@/components/watch/types';
