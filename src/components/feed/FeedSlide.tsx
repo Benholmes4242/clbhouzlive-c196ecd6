@@ -74,7 +74,20 @@ export const FeedSlide = memo(function FeedSlide({
       );
     }
 
-    // Video posts
+    // Multi-media (any mix of video + image) → FeedImageCarousel
+    if (media && media.length > 1) {
+      return (
+        <FeedImageCarousel
+          mediaItems={media}
+          feedIndex={index}
+          isSuggestedFeed={isSuggestedFeed}
+          isActive={isActive}
+          onDoubleTapLike={() => onLike?.(post)}
+        />
+      );
+    }
+
+    // Single video
     if (media?.[0]?.type === 'video') {
       const first = media[0];
       return (
@@ -90,17 +103,6 @@ export const FeedSlide = memo(function FeedSlide({
           isSuggestedFeed={isSuggestedFeed}
           onDoubleTapLike={() => onLike?.(post)}
           onFirstFrameReady={onFirstFrameReady}
-        />
-      );
-    }
-
-    // Multi-image carousel
-    if (media && media.length > 1 && media.every(m => m.type === 'image')) {
-      return (
-        <FeedImageCarousel
-          mediaItems={media}
-          feedIndex={index}
-          isSuggestedFeed={isSuggestedFeed}
         />
       );
     }
