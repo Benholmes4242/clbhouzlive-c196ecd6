@@ -1,5 +1,6 @@
 import { memo, useEffect, useRef } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 
 interface ExploreTileProps {
   post: FeedPost;
