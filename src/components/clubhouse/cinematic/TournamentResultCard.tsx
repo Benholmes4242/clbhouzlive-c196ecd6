@@ -246,7 +246,7 @@ export const TournamentResultCard: React.FC<TournamentResultCardProps> = ({
 
   return (
     <div style={{
-      position: 'relative', width: '100%', height: '100dvh',
+      position: 'relative', width: '100%', height: '100%',
       background: '#000', overflow: 'hidden',
       display: 'flex', flexDirection: 'column',
     }}>
