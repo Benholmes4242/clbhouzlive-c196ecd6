@@ -174,7 +174,8 @@ export function injectLiveTournamentCards(
 export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
   const noLive = posts.filter(p => p.postType !== 'tournament_live');
   const filtered = filterForSuggested(noLive);
-  const interleaved = interleaveReviews(filtered, 'suggested');
+  const capped = capPerCreator(filtered);
+  const interleaved = interleaveReviews(capped, 'suggested');
   return deduplicatePosts(interleaved);
 }
 
