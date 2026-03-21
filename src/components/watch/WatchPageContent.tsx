@@ -71,7 +71,7 @@ const WatchPageContent: React.FC<WatchPageContentProps> = ({ embedded = false })
         gridRef={gridRef as React.RefObject<HTMLDivElement>}
         userId={userId}
       />
-      <WatchAutoplay posts={posts} gridRef={gridRef as React.RefObject<HTMLDivElement>} />
+      
       <WatchSearchOverlay
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
