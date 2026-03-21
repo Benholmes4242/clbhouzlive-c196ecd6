@@ -235,21 +235,29 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
 
   const CAPSULE_BOTTOM_OFFSET = bottomOffset || '97px';
 
-  // Measure the rail's top edge so the left chevron aligns with it
+  // Measure the top slot (next chevron or like button) to align left chevron
   const railRef = useRef<HTMLDivElement>(null);
-  const [railTop, setRailTop] = useState<number | null>(null);
+  const nextSlotRef = useRef<HTMLDivElement>(null);
+  const [topSlotTop, setTopSlotTop] = useState<number | null>(null);
 
   useEffect(() => {
     const measure = () => {
-      if (railRef.current) {
-        const rect = railRef.current.getBoundingClientRect();
-        setRailTop(rect.top);
+      // If the next-media slot exists, align to it; otherwise align to the rail top (like button)
+      const target = nextSlotRef.current || railRef.current;
+      if (target) {
+        const rect = target.getBoundingClientRect();
+        setTopSlotTop(rect.top);
       }
     };
     measure();
+    // Re-measure after a frame to account for animations
+    const raf = requestAnimationFrame(measure);
     window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, [isVideo, hideMute, onSave, onMore, onNextMedia, hasNextMedia]);
+    return () => {
+      window.removeEventListener('resize', measure);
+      cancelAnimationFrame(raf);
+    };
+  }, [isVideo, hideMute, onSave, onMore, onNextMedia, hasNextMedia, isVisible]);
 
   return (
     <>
