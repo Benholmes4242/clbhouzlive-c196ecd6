@@ -113,9 +113,8 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
           onClick={handleNext}
           style={{
             position: 'absolute',
-            right: 6,
-            top: '50%',
-            transform: 'translateY(-50%)',
+            right: 16,
+            bottom: 97,
             width: 36,
             height: 36,
             borderRadius: '50%',
