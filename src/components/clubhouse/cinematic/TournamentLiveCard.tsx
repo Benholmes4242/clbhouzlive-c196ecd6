@@ -299,6 +299,50 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                     </div>
                   ))}
                 </div>
+
+                {/* Season stats row — driving, accuracy, GIR, putts */}
+                {(meta.leaderStats?.drivingDistance != null ||
+                  meta.leaderStats?.drivingAccuracy != null ||
+                  meta.leaderStats?.greensInReg != null ||
+                  meta.leaderStats?.puttingAverage != null) && (
+                  <>
+                    <div style={{ height: 1, background: 'rgba(255,255,255,0.05)', margin: '8px 0' }} />
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      {meta.leaderStats.drivingDistance != null && (
+                        <div style={{ flex: 1, textAlign: 'center', padding: '7px 4px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                          <div style={{ fontSize: 14, fontWeight: 800, color: 'rgba(255,255,255,0.75)', lineHeight: 1 }}>
+                            {Math.round(meta.leaderStats.drivingDistance)}<span style={{ fontSize: 9, fontWeight: 500 }}>yds</span>
+                          </div>
+                          <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 3 }}>Driver</div>
+                        </div>
+                      )}
+                      {meta.leaderStats.drivingAccuracy != null && (
+                        <div style={{ flex: 1, textAlign: 'center', padding: '7px 4px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                          <div style={{ fontSize: 14, fontWeight: 800, color: 'rgba(255,255,255,0.75)', lineHeight: 1 }}>
+                            {Math.round(meta.leaderStats.drivingAccuracy)}<span style={{ fontSize: 9, fontWeight: 500 }}>%</span>
+                          </div>
+                          <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 3 }}>Accuracy</div>
+                        </div>
+                      )}
+                      {meta.leaderStats.greensInReg != null && (
+                        <div style={{ flex: 1, textAlign: 'center', padding: '7px 4px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                          <div style={{ fontSize: 14, fontWeight: 800, color: 'rgba(255,255,255,0.75)', lineHeight: 1 }}>
+                            {Math.round(meta.leaderStats.greensInReg)}<span style={{ fontSize: 9, fontWeight: 500 }}>%</span>
+                          </div>
+                          <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 3 }}>GIR</div>
+                        </div>
+                      )}
+                      {meta.leaderStats.puttingAverage != null && (
+                        <div style={{ flex: 1, textAlign: 'center', padding: '7px 4px', borderRadius: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                          <div style={{ fontSize: 14, fontWeight: 800, color: 'rgba(255,255,255,0.75)', lineHeight: 1 }}>
+                            {meta.leaderStats.puttingAverage.toFixed(2)}
+                          </div>
+                          <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 3 }}>Putts</div>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
               </>
             )}
 
