@@ -56,25 +56,7 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, fetchNextP
       className="relative aspect-[4/5] overflow-hidden rounded-[4px] cursor-pointer active:scale-[0.97]"
       style={{ transition: 'transform 100ms ease' }}
       
-      onClick={() => {
-        console.log('[WatchTile] clicked', { post, index, allPosts: allPosts?.length });
-        const posts = allPosts ?? [post];
-        const items = posts.flatMap(p =>
-          p.mediaItems.map(m => ({
-            id: m.id,
-            type: m.type,
-            hlsUrl: m.hlsUrl,
-            mp4Url: m.mp4Url,
-            imageUrl: m.imageUrl,
-            thumbnailUrl: m.thumbnailUrl,
-            width: m.width,
-            height: m.height,
-          }))
-        );
-        const startIndex = (allPosts ?? [post]).slice(0, index).reduce((acc, p) => acc + p.mediaItems.length, 0);
-        console.log('[WatchTile] opening viewer', { items: items.length, startIndex });
-        openViewer(items, startIndex);
-      }}
+      onClick={() => open(allPosts ?? [post], index)}
     >
       {/* Poster or placeholder */}
       {thumbnailUrl ? (

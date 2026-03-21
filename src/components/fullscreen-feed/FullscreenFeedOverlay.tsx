@@ -29,7 +29,8 @@ export function FullscreenFeedOverlay() {
   const { followOverrides, handleFollowChange, getFollowState } = useClubhouseFollows({ userId });
   const { commentsOpen, overlayVisible, openComments, closeComments, getCommentCount } = useClubhouseComments();
   const { handleShare } = useClubhouseShare(userId);
-  const { activePost, golfCourse, isOwnPost } = useActivePostDerived(posts, activeIndex);
+  const { activePost, golfCourse, activeReview, isActiveReview } = useActivePostDerived(posts, activeIndex);
+  const isOwnPost = !!(userId && activePost?.userId === userId);
 
   // ESC to close
   useEffect(() => {
