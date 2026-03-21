@@ -518,6 +518,8 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             border: `1px solid ${borderColor}`,
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
           {/* Collapsed State - mode-dependent, crossfade on post change */}
@@ -551,9 +553,9 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             </AnimatePresence>
           )}
 
-          {/* Carousel dots — sit at the very bottom of the capsule pill */}
+          {/* Carousel dots — centered at the bottom of the capsule pill */}
           {dotsSlot && (
-            <div className="flex justify-center py-1.5 pointer-events-auto">
+            <div className="flex justify-center py-1.5">
               {dotsSlot}
             </div>
           )}
