@@ -130,7 +130,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   // Bottom offset override
   bottomOffset,
 }) => {
-  console.log(`[CAPSULE] render user=${user?.name} caption="${caption?.slice(0,20)}" postId=${postId} at t=${performance.now().toFixed(1)}ms`);
+  
   const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
   const capsuleRef = useRef<HTMLDivElement>(null);
