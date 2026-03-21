@@ -93,7 +93,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
         <div
           className="fixed left-0 right-0 z-40 flex justify-center pointer-events-none"
           style={{
-            top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
+            top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 60px)',
           }}
         >
           <FeedCarouselDots
