@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
+
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
@@ -196,9 +197,51 @@ const ClubhouseContent = () => {
   
   // ── Active post derivation ──
   const { activePost, golfCourse, activeReview, isActiveReview, isActiveVideo } = useActivePostDerived(posts, activeIndex);
+
+  // ── Tournament card snap detection ──
+  const [tournamentCardFullySnapped, setTournamentCardFullySnapped] = useState(false);
+
+  useEffect(() => {
+    const currentPost = posts[activeIndex];
+    const isTournament =
+      currentPost?.postType === 'tournament_result' ||
+      currentPost?.postType === 'tournament_live';
+
+    if (!isTournament) {
+      setTournamentCardFullySnapped(false);
+      return;
+    }
+
+    const slideEl = document.querySelector(
+      `[data-index="${activeIndex}"]`
+    ) as HTMLElement | null;
+
+    if (!slideEl) {
+      setTournamentCardFullySnapped(false);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.intersectionRatio >= 0.98) {
+            setTournamentCardFullySnapped(true);
+          }
+        }
+      },
+      { threshold: [0.98] }
+    );
+
+    observer.observe(slideEl);
+    setTournamentCardFullySnapped(false);
+
+    return () => observer.disconnect();
+  }, [activeIndex, posts]);
+
   const isTournamentCardActive =
-    activePost?.postType === 'tournament_result' ||
-    activePost?.postType === 'tournament_live';
+    (activePost?.postType === 'tournament_result' ||
+      activePost?.postType === 'tournament_live') &&
+    tournamentCardFullySnapped;
 
   // Hide bottom nav when tournament card is active.
   // Runs on mount AND whenever isTournamentCardActive changes —
