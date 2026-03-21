@@ -28,7 +28,7 @@ export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: Cou
 
   return (
     <section className="px-4 pt-1 pb-0">
-      <div style={{ borderBottom: '1px solid hsl(var(--border))', display: 'flex', gap: 24, justifyContent: 'center' }}>
+      <div style={{ borderBottom: '1px solid hsl(var(--border))', display: 'flex', gap: 20, justifyContent: 'center' }}>
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
