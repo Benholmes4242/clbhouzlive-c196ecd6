@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
-import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
+
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import type { FeedPost } from '@/components/media-system/types/media';
 
