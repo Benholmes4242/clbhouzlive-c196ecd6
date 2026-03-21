@@ -40,7 +40,7 @@ import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicA
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { FullscreenReviewPost } from '@/components/posts/FullscreenReviewPost';
-import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
+
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { getProfilePathById } from '@/lib/profileRoutes';
 
