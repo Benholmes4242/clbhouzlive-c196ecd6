@@ -227,7 +227,8 @@ export function useTournamentLiveFeed(userId?: string): {
       };
     })
       .filter((p): p is TournamentLiveFeedPost => p !== null);
-  }, [arenaData, postIdMap, liveCountsMap]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [arenaData, postIdMap, liveCountsKey]);
 
   const liveTourSlugs = useMemo(
     () => (arenaData ?? []).map(t => t.tourSlug),
