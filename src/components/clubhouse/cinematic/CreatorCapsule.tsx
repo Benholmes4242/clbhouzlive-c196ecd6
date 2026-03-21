@@ -397,9 +397,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
                 padding: '3px 7px',
               }}
             >
-              <svg width="9" height="9" viewBox="0 0 10 10" fill="#f59e0b">
-                <polygon points="5,0.5 6.2,3.8 9.8,3.8 6.9,5.9 8,9.3 5,7.2 2,9.3 3.1,5.9 0.2,3.8 3.8,3.8" />
-              </svg>
               <span style={{ fontSize: 13, fontWeight: 700, color: accent, lineHeight: 1 }}>
                 {reviewData.rating.toFixed(1)}
               </span>
