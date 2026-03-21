@@ -76,6 +76,7 @@ export function FullscreenFeedOverlay() {
               hasNextPage={false}
               followOverrides={followOverrides}
               onFollowChange={handleFollowChange}
+              startIndex={startIndex}
             />
 
             <FeedOverlayLayer

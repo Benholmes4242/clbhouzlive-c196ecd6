@@ -24,12 +24,14 @@ interface SnapFeedProps {
   onShare?: (post: FeedPost) => void;
   getLikeState?: (post: FeedPost) => { isLiked: boolean; count: number };
   getCommentCount?: (post: FeedPost) => number;
+  startIndex?: number;
 }
 
 export function SnapFeed({
   posts, activeTab, onNearEnd, onRefresh, isRefreshing, hasNextPage,
   followOverrides, onFollowChange, onFirstFrameReady,
   onLike, onComment, onShare, getLikeState, getCommentCount,
+  startIndex,
 }: SnapFeedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<Map<number, HTMLDivElement>>(new Map());
@@ -37,6 +39,20 @@ export function SnapFeed({
   const firstFrameFired = useRef(false);
   const ptrStartY = useRef(0);
   const ptrActive = useRef(false);
+  const hasScrolledToStart = useRef(false);
+
+  // Scroll to startIndex on first mount only
+  useEffect(() => {
+    if (hasScrolledToStart.current) return;
+    if (!startIndex || startIndex === 0) return;
+    const container = containerRef.current;
+    if (!container) return;
+    requestAnimationFrame(() => {
+      const slideHeight = container.clientHeight;
+      container.scrollTo({ top: slideHeight * startIndex, behavior: 'instant' as ScrollBehavior });
+      hasScrolledToStart.current = true;
+    });
+  }, [startIndex]);
 
   const activeIndex = useClubhouseStore(s => s.activeIndex);
   const setActiveIndex = useClubhouseStore(s => s.setActiveIndex);
