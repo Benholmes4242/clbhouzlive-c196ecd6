@@ -8,6 +8,8 @@ const SUGGESTED_MIN_VIDEO_DURATION = 4;
 const SUGGESTED_MAX_ASPECT_RATIO = 1.0; // anything above = landscape = excluded
 const FRIENDS_REVIEW_POSITION = 9;
 const FRIENDS_BLOCK_SIZE = 10;
+const MAX_POSTS_PER_CREATOR = 4;
+const MAX_REVIEWS_PER_CREATOR = 4;
 
 // ── Type Guards ────────────────────────────────────────────────────────────────
 function isTournamentPost(p: FeedPost): boolean {
