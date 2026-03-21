@@ -33,6 +33,7 @@ export const FeedSlide = memo(function FeedSlide({
   onShare,
   getLikeState,
   getCommentCount,
+  snapFeedRef,
 }: FeedSlideProps) {
   const activeIndex = useClubhouseStore(s => s.activeIndex);
   const isActive = activeIndex === index;
