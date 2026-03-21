@@ -103,6 +103,7 @@ export const FeedSlide = memo(function FeedSlide({
           mediaItems={media}
           feedIndex={index}
           isSuggestedFeed={isSuggestedFeed}
+          snapFeedRef={snapFeedRef}
         />
       );
     }
