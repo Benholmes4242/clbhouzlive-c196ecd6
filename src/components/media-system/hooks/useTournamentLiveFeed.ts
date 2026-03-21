@@ -140,93 +140,98 @@ export function useTournamentLiveFeed(userId?: string): {
   const livePosts = useMemo((): TournamentLiveFeedPost[] => {
     if (!arenaData?.length) return [];
 
-    return arenaData
-      .map((tournament): TournamentLiveFeedPost | null => {
-      const allPlayers = [
-        ...(tournament.leader ? [tournament.leader] : []),
-        ...tournament.chasePack,
-      ];
+    // Filter to PGA only, pick the highest-purse tournament
+    const pgaTournaments = arenaData.filter(t => t.tourSlug === 'pga');
+    if (!pgaTournaments.length) return [];
+    const selected = pgaTournaments.reduce((best, t) =>
+      (t.purse ?? 0) >= (best.purse ?? 0) ? t : best
+    );
 
-      const seen = new Set<string>();
-      const leaderboard: LiveLeaderboardEntry[] = allPlayers
-        .filter(p => {
-          if (seen.has(p.playerId)) return false;
-          seen.add(p.playerId);
-          return true;
-        })
-        .sort((a, b) => a.position - b.position)
-        .slice(0, 10)
-        .map(p => ({
-          position:     p.position,
-          positionTied: false,
-          playerId:     p.playerId,
-          playerName:   p.player.fullName,
-          photoUrl:     getPlayerHeadshotUrl(
-            p.player.fullName,
-            p.player.tourCode ?? tournament.tourSlug,
-            p.player.headshotOverride
-          ) || null,
-          country:      p.player.country,
-          scoreDisplay: p.scoreDisplay,
-          score:        p.score,
-          thru:         p.thru,
-          today:        null,
-        }));
+    const tournament = selected;
+    const allPlayers = [
+      ...(tournament.leader ? [tournament.leader] : []),
+      ...tournament.chasePack,
+    ];
 
-      const meta: TournamentLiveMeta = {
-        tournamentId:    tournament.id,
-        tournamentName:  tournament.name,
-        tourSlug:        tournament.tourSlug,
-        tourName:        TOUR_DISPLAY_LABELS[tournament.tourSlug] ?? tournament.tourSlug.toUpperCase(),
-        venueName:       tournament.venueName,
-        venueCity:       tournament.venueCity,
-        currentRound:    tournament.currentRound ?? 1,
-        totalRounds:     tournament.totalRounds,
-        momentumTags:    tournament.momentumTags,
-        volatilityIndex: tournament.volatilityIndex,
-        scoreSpread:     tournament.scoreSpread,
-        leader:          leaderboard[0] ?? null,
-        leaderboard,
-        lastUpdated:     new Date().toISOString(),
-        tourPriority:    TOUR_PRIORITY[tournament.tourSlug] ?? 99,
-        leaderStats:     tournament.leaderStats ?? null,
-      };
+    const seen = new Set<string>();
+    const leaderboard: LiveLeaderboardEntry[] = allPlayers
+      .filter(p => {
+        if (seen.has(p.playerId)) return false;
+        seen.add(p.playerId);
+        return true;
+      })
+      .sort((a, b) => a.position - b.position)
+      .slice(0, 10)
+      .map(p => ({
+        position:     p.position,
+        positionTied: false,
+        playerId:     p.playerId,
+        playerName:   p.player.fullName,
+        photoUrl:     getPlayerHeadshotUrl(
+          p.player.fullName,
+          p.player.tourCode ?? tournament.tourSlug,
+          p.player.headshotOverride
+        ) || null,
+        country:      p.player.country,
+        scoreDisplay: p.scoreDisplay,
+        score:        p.score,
+        thru:         p.thru,
+        today:        null,
+      }));
 
-      // Only use the post ID if it came from the DB — never use a random UUID
-      const realPostId = postIdMap[tournament.id];
-      if (!realPostId) return null;
+    const meta: TournamentLiveMeta = {
+      tournamentId:    tournament.id,
+      tournamentName:  tournament.name,
+      tourSlug:        tournament.tourSlug,
+      tourName:        TOUR_DISPLAY_LABELS[tournament.tourSlug] ?? tournament.tourSlug.toUpperCase(),
+      venueName:       tournament.venueName,
+      venueCity:       tournament.venueCity,
+      currentRound:    tournament.currentRound ?? 1,
+      totalRounds:     tournament.totalRounds,
+      momentumTags:    tournament.momentumTags,
+      volatilityIndex: tournament.volatilityIndex,
+      scoreSpread:     tournament.scoreSpread,
+      leader:          leaderboard[0] ?? null,
+      leaderboard,
+      lastUpdated:     new Date().toISOString(),
+      tourPriority:    TOUR_PRIORITY[tournament.tourSlug] ?? 99,
+      leaderStats:     tournament.leaderStats ?? null,
+    };
 
-      const counts = liveCountsMap[realPostId] ?? {
-        likeCount: 0,
-        commentCount: 0,
-        isLikedByMe: false,
-      };
+    const realPostId = postIdMap[tournament.id];
+    if (!realPostId) return [];
 
-      return {
-        id:              realPostId,
-        userId:          SYSTEM_USER_ID,
-        actorType:       'system',
-        actorId:         SYSTEM_USER_ID,
-        username:        'clbhouz',
-        displayName:     'clbhouz',
-        avatarUrl:       '',
-        isVerified:      true,
-        creatorRelation: 'system',
-        caption:         '',
-        mediaItems:      [],
-        createdAt:       new Date().toISOString(),
-        likeCount:       counts.likeCount,
-        commentCount:    counts.commentCount,
-        shareCount:      0,
-        review:          null,
-        isReview:        false,
-        isLikedByMe:     counts.isLikedByMe,
-        isFollowedByMe:  false,
-        postType:        'tournament_live',
-        liveMeta:        meta,
-      };
-    })
-      .filter((p): p is TournamentLiveFeedPost => p !== null);
+    const counts = liveCountsMap[realPostId] ?? {
+      likeCount: 0,
+      commentCount: 0,
+      isLikedByMe: false,
+    };
+
+    const card: TournamentLiveFeedPost = {
+      id:              realPostId,
+      userId:          SYSTEM_USER_ID,
+      actorType:       'system',
+      actorId:         SYSTEM_USER_ID,
+      username:        'clbhouz',
+      displayName:     'clbhouz',
+      avatarUrl:       '',
+      isVerified:      true,
+      creatorRelation: 'system',
+      caption:         '',
+      mediaItems:      [],
+      createdAt:       new Date().toISOString(),
+      likeCount:       counts.likeCount,
+      commentCount:    counts.commentCount,
+      shareCount:      0,
+      review:          null,
+      isReview:        false,
+      isLikedByMe:     counts.isLikedByMe,
+      isFollowedByMe:  false,
+      postType:        'tournament_live',
+      liveMeta:        meta,
+    };
+
+    return [card];
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [arenaData, postIdMap, liveCountsKey]);
 
