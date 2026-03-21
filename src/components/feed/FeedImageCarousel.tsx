@@ -6,24 +6,17 @@ interface FeedImageCarouselProps {
   mediaItems: MediaItem[];
   feedIndex: number;
   isSuggestedFeed: boolean;
-  snapFeedRef?: React.RefObject<HTMLDivElement>;
 }
 
 export const FeedImageCarousel = memo(function FeedImageCarousel({
   mediaItems,
   feedIndex,
   isSuggestedFeed,
-  snapFeedRef,
 }: FeedImageCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const setCarouselPosition = useClubhouseStore(s => s.setCarouselPosition);
 
-  // Gesture tracking refs
-  const touchStartX = useRef(0);
-  const touchStartY = useRef(0);
-  const touchStartFeedScrollTop = useRef(0);
-  const axis = useRef<'h' | 'v' | null>(null);
-
+  // Track scroll position to update carousel dots
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -31,68 +24,10 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
     setCarouselPosition(feedIndex, idx);
   }, [feedIndex, setCarouselPosition]);
 
+  // Reset scroll on mount
   useEffect(() => {
     setCarouselPosition(feedIndex, 0);
   }, [feedIndex, setCarouselPosition]);
-
-  // Non-passive native touch listeners — MUST be native, not React synthetic
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    const onTouchStart = (e: TouchEvent) => {
-      touchStartX.current = e.touches[0].clientX;
-      touchStartY.current = e.touches[0].clientY;
-      touchStartFeedScrollTop.current = snapFeedRef?.current?.scrollTop ?? 0;
-      axis.current = null;
-    };
-
-    const onTouchMove = (e: TouchEvent) => {
-      const dx = e.touches[0].clientX - touchStartX.current;
-      const dy = e.touches[0].clientY - touchStartY.current;
-
-      // Determine axis on first meaningful movement
-      if (axis.current === null) {
-        if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
-        axis.current = Math.abs(dy) > Math.abs(dx) ? 'v' : 'h';
-      }
-
-      if (axis.current === 'v') {
-        // Prevent carousel from claiming this event
-        e.preventDefault();
-
-        // Drive SnapFeed scroll directly
-        const feed = snapFeedRef?.current;
-        if (feed) {
-          feed.scrollTop = touchStartFeedScrollTop.current - dy;
-        }
-      }
-      // horizontal: let the carousel handle it naturally
-    };
-
-    const onTouchEnd = () => {
-      if (axis.current === 'v') {
-        // Snap to nearest slide
-        const feed = snapFeedRef?.current;
-        if (feed) {
-          const slideHeight = feed.clientHeight;
-          const nearestSlide = Math.round(feed.scrollTop / slideHeight);
-          feed.scrollTo({ top: nearestSlide * slideHeight, behavior: 'smooth' });
-        }
-      }
-      axis.current = null;
-    };
-
-    el.addEventListener('touchstart', onTouchStart, { passive: true });
-    el.addEventListener('touchmove', onTouchMove, { passive: false }); // non-passive: critical
-    el.addEventListener('touchend', onTouchEnd, { passive: true });
-
-    return () => {
-      el.removeEventListener('touchstart', onTouchStart);
-      el.removeEventListener('touchmove', onTouchMove);
-      el.removeEventListener('touchend', onTouchEnd);
-    };
-  }, [snapFeedRef]);
 
   return (
     <div
@@ -103,9 +38,6 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
         WebkitOverflowScrolling: 'touch',
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
-        touchAction: 'pan-x',
-        overscrollBehavior: 'contain',
-        overflowY: 'hidden',
       }}
       onScroll={handleScroll}
     >

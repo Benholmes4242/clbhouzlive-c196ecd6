@@ -141,9 +141,7 @@ export function SnapFeed({
         WebkitOverflowScrolling: 'touch',
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
-        touchAction: 'pan-y',
       }}
-      
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -163,7 +161,6 @@ export function SnapFeed({
           onShare={onShare}
           getLikeState={getLikeState}
           getCommentCount={getCommentCount}
-          snapFeedRef={containerRef}
         />
       ))}
     </div>
