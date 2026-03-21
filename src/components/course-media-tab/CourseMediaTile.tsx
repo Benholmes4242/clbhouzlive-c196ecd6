@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
