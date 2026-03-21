@@ -89,7 +89,7 @@ const AdminSetupPage = () => {
         email: formData.email,
         password: formData.password,
         options: {
-          emailRedirectTo: "https://clbhouz.co.uk/auth/callback",
+          emailRedirectTo: "https://clbhouz.co.uk/verified",
         },
       });
 

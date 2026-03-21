@@ -334,7 +334,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
         email,
         password,
         options: {
-          emailRedirectTo: `${import.meta.env.VITE_APP_URL ?? window.location.origin}/auth/callback`,
+          emailRedirectTo: "https://clbhouz.co.uk/verified",
           data: {
             username: username.trim(),  // Preserve case, just trim whitespace
           }
