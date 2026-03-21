@@ -236,6 +236,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           type="button"
           onClick={async (e) => {
             e.stopPropagation();
+            onBeforeNavigate?.();
             const courseIdentifier = golfCourse.slug || golfCourse.id;
             if (courseIdentifier) {
               navigate(`/courses/${courseIdentifier}`);

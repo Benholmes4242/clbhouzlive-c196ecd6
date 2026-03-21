@@ -21,6 +21,7 @@ interface FeedOverlayLayerProps {
   overlayVisible: boolean;
   isOwnPost: boolean;
   golfCourse?: { id: string; name: string; country?: string } | null;
+  onBeforeNavigate?: () => void;
   activeReview?: {
     reviewId: string;
     courseId: string;
