@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { X, MapPin, Star } from 'lucide-react';
+import { X, MapPin } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 const AMBER = '#f59e0b';
@@ -220,7 +220,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                     padding: '5px 10px',
                     flexShrink: 0,
                   }}>
-                    <Star size={11} fill={AMBER} color={AMBER} />
                     <span style={{ fontSize: 15, fontWeight: 800, color: AMBER }}>
                       {rating.toFixed(1)}
                     </span>
