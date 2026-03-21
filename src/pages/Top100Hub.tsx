@@ -123,7 +123,7 @@ const Top100Hub = () => {
               </TabsTrigger>
               <TabsTrigger 
                 value="my-progress" 
-                className="flex-1 py-2 px-4 text-sm rounded-lg transition-all duration-150 active:scale-[0.97] data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:font-semibold data-[state=active]:shadow-none data-[state=active]:border-0 data-[state=inactive]:text-muted-foreground data-[state=inactive]:font-medium data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none"
+                className="flex-1 py-2 px-4 text-sm rounded-lg transition-all duration-150 active:scale-[0.97] data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:font-semibold data-[state=active]:shadow-none data-[state=active]:border-0 data-[state=inactive]:text-muted-foreground data-[state=inactive]:font-medium data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none after:hidden"
               >
                 My Progress
               </TabsTrigger>
