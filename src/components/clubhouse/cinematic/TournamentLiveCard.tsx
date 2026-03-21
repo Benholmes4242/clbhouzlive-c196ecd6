@@ -249,29 +249,70 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
             border: `1px solid ${AMBER_BORDER}`,
             borderRadius: 16,
             padding: '13px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
           }}>
-            <PlayerAvatar name={leader.playerName} photoUrl={leader.photoUrl} tourSlug={meta.tourSlug} size={50} />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 10, fontWeight: 800, color: AMBER, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 2 }}>
-                {isTied ? `${coLeaders.length}-Way Tie` : 'Tournament Leader'}
+            {/* Avatar + Name + Score row */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <PlayerAvatar name={leader.playerName} photoUrl={leader.photoUrl} tourSlug={meta.tourSlug} size={56} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 10, fontWeight: 800, color: AMBER, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 2 }}>
+                  {isTied ? `${coLeaders.length}-Way Tie` : 'Tournament Leader'}
+                </div>
+                <div style={{ fontSize: 16, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {leader.playerName}
+                </div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
+                  Thru {leader.thru ?? '-'}{leader.today ? ` · Today ${leader.today}` : ''}
+                </div>
               </div>
-              <div style={{ fontSize: 16, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {leader.playerName}
-              </div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
-                Thru {leader.thru ?? '-'}{leader.today ? ` · Today ${leader.today}` : ''}
+              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                <div style={{ fontSize: 38, fontWeight: 900, color: AMBER, lineHeight: 1 }}>
+                  {leader.scoreDisplay}
+                </div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>
+                  vs par
+                </div>
               </div>
             </div>
-            <div style={{ textAlign: 'right', flexShrink: 0 }}>
-              <div style={{ fontSize: 38, fontWeight: 900, color: AMBER, lineHeight: 1 }}>
-                {leader.scoreDisplay}
-              </div>
-              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>
-                vs par
-              </div>
+
+            {/* Row A — Stats tiles (inside leader card) */}
+            {statTiles.length > 0 && (
+              <>
+                <div style={{
+                  height: 1,
+                  background: 'rgba(255,255,255,0.06)',
+                  margin: '12px 0',
+                }} />
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {statTiles.map(t => (
+                    <div key={t.label} style={{
+                      flex: 1,
+                      textAlign: 'center',
+                      padding: '9px 0',
+                      borderRadius: 12,
+                      background: `${t.color}0A`,
+                      border: `1px solid ${t.color}18`,
+                    }}>
+                      <div style={{ fontSize: 18, fontWeight: 800, color: t.color }}>{t.value}</div>
+                      <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: 2 }}>
+                        {t.label}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {/* Row B — Insight line (inside leader card) */}
+            <div style={{
+              ...(statTiles.length > 0
+                ? { marginTop: 10 }
+                : { borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 10, marginTop: 12 }),
+              fontSize: 12,
+              color: 'rgba(255,255,255,0.48)',
+              lineHeight: 1.55,
+              fontStyle: 'italic',
+            }}>
+              {insight}
             </div>
           </div>
         )}
@@ -355,47 +396,8 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
         </div>
       )}
 
-      {/* Zone 4 — Insight strip */}
-      <div style={{
-        flexShrink: 0,
-        margin: '12px 20px',
-        padding: '10px 14px',
-        borderLeft: `2.5px solid ${AMBER}55`,
-        background: `${AMBER}06`,
-        borderRadius: '0 10px 10px 0',
-        fontSize: 12,
-        color: 'rgba(255,255,255,0.48)',
-        lineHeight: 1.55,
-        fontStyle: 'italic',
-      }}>
-        {insight}
-      </div>
 
-      {/* Zone 5 — Stats row */}
-      {statTiles.length > 0 && (
-        <div style={{
-          flexShrink: 0,
-          display: 'flex',
-          gap: 8,
-          padding: '0 20px',
-        }}>
-          {statTiles.map(t => (
-            <div key={t.label} style={{
-              flex: 1,
-              textAlign: 'center',
-              padding: '9px 0',
-              borderRadius: 12,
-              background: `${t.color}0A`,
-              border: `1px solid ${t.color}18`,
-            }}>
-              <div style={{ fontSize: 18, fontWeight: 800, color: t.color }}>{t.value}</div>
-              <div style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: 2 }}>
-                {t.label}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+
 
       {/* Zone 6 — Spacer */}
       <div style={{ flex: 1 }} />
