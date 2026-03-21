@@ -19,6 +19,7 @@ interface FeedSlideProps {
   onShare?: (post: FeedPost) => void;
   getLikeState?: (post: FeedPost) => { isLiked: boolean; count: number };
   getCommentCount?: (post: FeedPost) => number;
+  snapFeedRef?: React.RefObject<HTMLDivElement>;
 }
 
 export const FeedSlide = memo(function FeedSlide({
@@ -32,6 +33,7 @@ export const FeedSlide = memo(function FeedSlide({
   onShare,
   getLikeState,
   getCommentCount,
+  snapFeedRef,
 }: FeedSlideProps) {
   const activeIndex = useClubhouseStore(s => s.activeIndex);
   const isActive = activeIndex === index;
@@ -101,6 +103,7 @@ export const FeedSlide = memo(function FeedSlide({
           mediaItems={media}
           feedIndex={index}
           isSuggestedFeed={isSuggestedFeed}
+          snapFeedRef={snapFeedRef}
         />
       );
     }
