@@ -15,6 +15,9 @@ export const Z = {
   // Toast notifications (highest priority)
   toast: 12000,
   
+  // Media viewer (above everything)
+  mediaViewer: 13000,
+  
   // Search overlay
   searchOverlay: 1100,  // Above header/nav, below modals
   
