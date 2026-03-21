@@ -8,6 +8,8 @@ const SUGGESTED_MIN_VIDEO_DURATION = 4;
 const SUGGESTED_MAX_ASPECT_RATIO = 1.0; // anything above = landscape = excluded
 const FRIENDS_REVIEW_POSITION = 9;
 const FRIENDS_BLOCK_SIZE = 10;
+const MAX_POSTS_PER_CREATOR = 4;
+const MAX_REVIEWS_PER_CREATOR = 4;
 
 // ── Type Guards ────────────────────────────────────────────────────────────────
 function isTournamentPost(p: FeedPost): boolean {
@@ -64,6 +66,25 @@ export function deduplicatePosts(posts: FeedPost[]): FeedPost[] {
   return posts.filter(p => {
     if (seen.has(p.id)) return false;
     seen.add(p.id);
+    return true;
+  });
+}
+
+// ── Per-Creator Cap ───────────────────────────────────────────────────────────
+export function capPerCreator(posts: FeedPost[]): FeedPost[] {
+  const postCount = new Map<string, number>();
+  const reviewCount = new Map<string, number>();
+  return posts.filter(post => {
+    const key = post.userId;
+    if (isReviewPost(post)) {
+      const count = reviewCount.get(key) ?? 0;
+      if (count >= MAX_REVIEWS_PER_CREATOR) return false;
+      reviewCount.set(key, count + 1);
+    } else if (!isTournamentPost(post)) {
+      const count = postCount.get(key) ?? 0;
+      if (count >= MAX_POSTS_PER_CREATOR) return false;
+      postCount.set(key, count + 1);
+    }
     return true;
   });
 }
@@ -155,7 +176,8 @@ export function injectLiveTournamentCards(
 export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
   const noLive = posts.filter(p => p.postType !== 'tournament_live');
   const filtered = filterForSuggested(noLive);
-  const interleaved = interleaveReviews(filtered, 'suggested');
+  const capped = capPerCreator(filtered);
+  const interleaved = interleaveReviews(capped, 'suggested');
   return deduplicatePosts(interleaved);
 }
 
@@ -169,6 +191,7 @@ export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
  */
 export function buildFriendsFeed(posts: FeedPost[]): FeedPost[] {
   const noLive = posts.filter(p => p.postType !== 'tournament_live');
-  const interleaved = interleaveReviews(noLive, 'friends');
+  const capped = capPerCreator(noLive);
+  const interleaved = interleaveReviews(capped, 'friends');
   return deduplicatePosts(interleaved);
 }
