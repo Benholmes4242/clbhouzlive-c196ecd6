@@ -390,7 +390,7 @@ const ClubhouseContent = () => {
             creatorAvatar={activePost.avatarUrl}
             caption={activePost.caption}
             theme="dark"
-            likesCount={activePost?.likeCount ?? null}
+            likesCount={activeLikeState?.count ?? null}
             onCommentPosted={() => handleCommentPosted(activePost)}
             onCommentDeleted={() => activePost && handleCommentDeleted(activePost.id, activePost.commentCount)}
           />
