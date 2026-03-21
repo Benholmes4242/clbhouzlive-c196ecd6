@@ -76,21 +76,24 @@ export function FeedContainer({ posts, initialIndex = 0, onNearEnd, onRefresh, i
   useEffect(() => {
     if (prevPostsRef.current !== posts && posts.length > 0) {
       const prevPosts = prevPostsRef.current;
+      // ID-set comparison: checks all previous IDs are still present (handles reorders + appends)
       const isAppend = prevPosts && prevPosts.length > 0 &&
-        posts.length > prevPosts.length &&
-        posts[0]?.id === prevPosts[0]?.id;
+        posts.length >= prevPosts.length &&
+        prevPosts.every(p => posts.some(np => np.id === p.id));
       
       if (!isAppend) {
         // Full feed switch (tab change) — reset to initialIndex (or 0)
         const startAt = initialIndex ?? 0;
-        const newOffset = -startAt * itemHeight;
-        offsetRef.current = newOffset;
-        activeIndexRef.current = startAt;
-        setOffsetY(newOffset);
-        if (trackRef.current) {
-          trackRef.current.style.transform = `translateY(${newOffset}px)`;
+        if (activeIndexRef.current !== startAt) {
+          const newOffset = -startAt * itemHeight;
+          offsetRef.current = newOffset;
+          activeIndexRef.current = startAt;
+          setOffsetY(newOffset);
+          if (trackRef.current) {
+            trackRef.current.style.transform = `translateY(${newOffset}px)`;
+          }
+          setActiveIndex(startAt);
         }
-        setActiveIndex(startAt);
       }
       // For appends, preserve current position — do nothing
     }

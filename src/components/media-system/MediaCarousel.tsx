@@ -136,7 +136,7 @@ export function MediaCarousel({
         onTouchEnd={handleTouchEnd}
       >
         {mediaItems.map((item, idx) => (
-          <div key={item.id} className="flex-shrink-0 w-full h-full">
+          <div key={`${item.id ?? idx}-${idx}`} className="flex-shrink-0 w-full h-full">
             {item.type === 'video' && item.hlsUrl ? (
               <VideoPlayer
                 hlsUrl={item.hlsUrl}

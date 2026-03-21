@@ -129,6 +129,14 @@ export function useTournamentLiveFeed(userId?: string): {
 
   const liveCountsMap = liveCountsQuery.data ?? {};
 
+  // Stable fingerprint so livePosts memo only rebuilds when counts actually change
+  const liveCountsKey = useMemo(
+    () => Object.entries(liveCountsMap)
+      .map(([id, c]) => `${id}:${c.likeCount}:${c.commentCount}`)
+      .sort().join('|'),
+    [liveCountsMap]
+  );
+
   const livePosts = useMemo((): TournamentLiveFeedPost[] => {
     if (!arenaData?.length) return [];
 

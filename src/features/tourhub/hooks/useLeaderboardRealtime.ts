@@ -63,6 +63,7 @@ export function useMultiLeaderboardRealtime(tournamentIds: (string | null | unde
   const queryClient = useQueryClient();
   const [isConnected, setIsConnected] = useState(true);
   const idsRef = useRef<string>('');
+  const invalidateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Stable key for the dependency
   const validIds = tournamentIds.filter(Boolean) as string[];
@@ -88,10 +89,14 @@ export function useMultiLeaderboardRealtime(tournamentIds: (string | null | unde
             queryClient.invalidateQueries({ queryKey: ['tourhub', 'leaderboard', tid] });
             queryClient.invalidateQueries({ queryKey: ['prediction-tracker', tid] });
             queryClient.invalidateQueries({ queryKey: ['tournament-leaders-winners'] });
-            queryClient.invalidateQueries({ queryKey: ['live-arena'] });
             queryClient.invalidateQueries({ queryKey: ['hero-carousel-data'] });
             queryClient.invalidateQueries({ queryKey: ['overview-live-right-now'] });
             queryClient.invalidateQueries({ queryKey: ['live-leader-teaser'] });
+            // Debounce live-arena invalidation to prevent rapid feed rebuilds
+            if (invalidateTimerRef.current) clearTimeout(invalidateTimerRef.current);
+            invalidateTimerRef.current = setTimeout(() => {
+              queryClient.invalidateQueries({ queryKey: ['live-arena'] });
+            }, 2000);
           }
         }
       )
@@ -102,6 +107,7 @@ export function useMultiLeaderboardRealtime(tournamentIds: (string | null | unde
     idsRef.current = idsKey;
 
     return () => {
+      if (invalidateTimerRef.current) clearTimeout(invalidateTimerRef.current);
       supabase.removeChannel(channel);
     };
   }, [idsKey, queryClient]);
