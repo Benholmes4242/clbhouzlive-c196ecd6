@@ -99,7 +99,9 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
       likes: 0,
       golfCourse: content.golfCourse,
     }));
+    console.log('[PostContent] handleImageClick fired', { imageUrl, index, mediaItems });
     openViewer(mediaItems, index);
+    console.log('[PostContent] openViewer called');
   };
 
   const handleVideoFullscreen = (videoUrl: string) => {
