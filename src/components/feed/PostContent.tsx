@@ -111,9 +111,7 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
       likes: 0,
       golfCourse: content.golfCourse,
     }];
-    console.log('[PostContent] handleVideoFullscreen fired', { videoUrl, mediaItems });
     openViewer(mediaItems, 0);
-    console.log('[PostContent] openViewer called for video');
   };
 
   // Get all images for carousel
