@@ -640,6 +640,7 @@ const AppInner: React.FC = () => {
                                             </Suspense>
                                             {/* Fullscreen Feed Overlay - portal-based, renders above everything */}
                                             <FullscreenFeedOverlay />
+                                            <MediaViewerOverlay />
                                           </UploadResilienceProvider>
                                           </MessagingProvider>
                                         </AuthWrapper>

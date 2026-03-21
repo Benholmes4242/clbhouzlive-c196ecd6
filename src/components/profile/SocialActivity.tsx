@@ -24,8 +24,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
   const { posts, loading, fetchUserPosts } = useActivityPosts(userId);
   const [selectedReviewPost, setSelectedReviewPost] = useState<ActivityPost | null>(null);
 
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
+  const { openViewer } = useMediaViewer();
 
   // Filter to only media posts for the unified player
   const mediaPosts = useMemo(() => 

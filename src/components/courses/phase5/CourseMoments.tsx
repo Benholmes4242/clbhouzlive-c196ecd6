@@ -25,8 +25,7 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
   const { data: moments, isLoading } = useUserCourseMoments(courseId);
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
+  const { openViewer } = useMediaViewer();
 
   // Build fullscreen items from moments
   const fullscreenItems = useMemo(() => {

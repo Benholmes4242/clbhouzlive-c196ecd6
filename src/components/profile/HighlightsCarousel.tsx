@@ -26,8 +26,7 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
   const railRef = useRef<HTMLDivElement>(null);
   const { isGloballyMuted, toggleGlobalMute, markUserGestureUnmute } = useGlobalAudio();
   const [activeIndex, setActiveIndex] = useState(0);
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
+  const { openViewer } = useMediaViewer();
 
   // Track active index via scroll position
   useEffect(() => {

@@ -238,8 +238,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     setSearchQuery('');
   };
 
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
+  const { openViewer } = useMediaViewer();
 
   // Convert review media to ExploreContentItem format and open fullscreen
   const handleReviewMediaClick = useCallback((media: ReviewMediaItem[], startIndex: number) => {

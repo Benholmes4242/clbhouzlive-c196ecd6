@@ -36,8 +36,7 @@ const UserPost = ({ post, allUserPosts = [], source = 'profile', onPostUpdated, 
     onPostDeleted
   });
 
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
+  const { openViewer } = useMediaViewer();
 
   // Filter posts with media for the unified player
   const postsWithMedia = useMemo(() => 

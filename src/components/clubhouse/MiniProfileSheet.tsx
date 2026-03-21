@@ -120,8 +120,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
   const { isFollowing: followState, busy: followBusy, toggle: toggleFollow, ensureInitial } = useFollow(user?.id);
   
   const { posts, loading: postsLoading, error: postsError, isEmpty } = useUserProfilePosts(user?.id);
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
+  const { openViewer } = useMediaViewer();
   const [isClosing, setIsClosing] = useState(false);
   
   const headerRef = React.useRef<HTMLDivElement>(null);

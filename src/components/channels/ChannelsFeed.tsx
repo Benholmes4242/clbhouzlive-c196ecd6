@@ -23,8 +23,7 @@ export const ChannelsFeed: React.FC = () => {
     threshold: 0.5,
   });
 
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
+  const { openViewer } = useMediaViewer();
 
   const allVideos = data?.pages.flatMap(page => page.items) || [];
 

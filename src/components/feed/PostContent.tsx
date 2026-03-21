@@ -54,8 +54,7 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
   const [showControls, setShowControls] = useState(false);
   const mediaId = useId();
 
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
+  const { openViewer } = useMediaViewer();
 
   const handleVideoClick = (e: React.MouseEvent) => {
     e.stopPropagation();

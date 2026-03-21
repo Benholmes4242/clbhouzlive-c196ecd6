@@ -115,8 +115,7 @@ function ReviewCard({
   const [userVote, setUserVote] = React.useState<'helpful' | 'unhelpful' | 'none'>(review.userVote || 'none');
   const [pending, setPending] = React.useState(false);
 
-  // TODO: Wire to new media player
-  const openFullscreen = (...args: any[]) => console.log('[Fullscreen] TODO: Wire to new media player', args);
+  const { openViewer } = useMediaViewer();
 
   const MAX_THUMBS = 3;
 
