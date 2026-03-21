@@ -506,18 +506,11 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
                 : '97px'),
         }}
       >
-        {/* Media navigation dots - centered above capsule */}
-        {dotsSlot && (
-          <div className="flex justify-center mb-3 pointer-events-auto">
-            {dotsSlot}
-          </div>
-        )}
         <motion.div
           layout
           transition={{ layout: { duration: 0.2, ease: 'easeOut' } }}
           className={cn(
             'overflow-hidden',
-            // Both modes use rounded-xl for consistency with ReviewOverlayCore
             'rounded-xl'
           )}
           style={{ 
@@ -525,7 +518,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             border: `1px solid ${borderColor}`,
-            
           }}
         >
           {/* Collapsed State - mode-dependent, crossfade on post change */}
@@ -557,6 +549,13 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
                 </motion.div>
               )}
             </AnimatePresence>
+          )}
+
+          {/* Media navigation dots — centered at the bottom of the capsule pill */}
+          {dotsSlot && (
+            <div className="flex justify-center pt-1.5 pb-0.5 pointer-events-auto">
+              {dotsSlot}
+            </div>
           )}
         </motion.div>
       </motion.div>
