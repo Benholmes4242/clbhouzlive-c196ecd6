@@ -235,8 +235,12 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   borderLeft: `2px solid ${AMBER}44`,
                   paddingLeft: 14,
                   marginBottom: 16,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 10,
+                  WebkitBoxOrient: 'vertical' as const,
+                  overflow: 'hidden',
                 }}>
-                  {reviewText}
+                  "{reviewText}"
                 </div>
               )}
             </div>
