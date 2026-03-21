@@ -32,7 +32,7 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, fetchNextP
   const engagement = post.likeCount + post.commentCount + post.shareCount;
   const tileRef = useRef<HTMLDivElement>(null);
   const hlsUrl = post.mediaItems?.[0]?.hlsUrl;
-  const { openViewer } = useMediaViewer();
+  const { open } = useFullscreenFeedStore();
 
   useEffect(() => {
     const el = tileRef.current;
