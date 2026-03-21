@@ -25,6 +25,7 @@ export const useClubhouseStore = create<ClubhouseState>()((set) => ({
   activeVideoElement: null,
   activeVideoRef: null,
   carouselPositions: new Map(),
+  isTournamentCardActive: false,
 
   setActiveIndex: (idx) => set({ activeIndex: idx }),
   setIsMuted: (v) => set({ isMuted: v }),
