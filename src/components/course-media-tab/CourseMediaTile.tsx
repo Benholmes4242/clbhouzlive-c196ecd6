@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -53,9 +54,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
       style={{ transition: 'transform 100ms ease' }}
       
       onClick={() => {
-        if (allPosts) {
-          // TODO Brief 3: fullscreen feed open
-        }
+        useFullscreenFeedStore.getState().open(allPosts ?? [post], index);
       }}
     >
       {/* Poster or placeholder */}

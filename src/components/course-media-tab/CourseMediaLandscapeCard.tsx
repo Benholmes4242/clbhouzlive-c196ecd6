@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
@@ -49,9 +50,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
       className="relative aspect-video overflow-hidden cursor-pointer rounded-[4px] active:scale-[0.99] transition-transform"
       
       onClick={() => {
-        if (allPosts) {
-          // TODO Brief 3: fullscreen feed open
-        }
+        useFullscreenFeedStore.getState().open(allPosts ?? [post], index);
       }}
       data-course-media-index={index}
     >

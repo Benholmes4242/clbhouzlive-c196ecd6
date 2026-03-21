@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, MessageCircle, Share2, MapPin, Star } from 'lucide-react';
@@ -232,7 +233,7 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
           
           onClick={() => {
             if (allPosts && cardIndex != null) {
-              // TODO Brief 3: fullscreen feed open
+              useFullscreenFeedStore.getState().open(allPosts, cardIndex);
             }
           }}
         >

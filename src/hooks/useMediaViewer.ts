@@ -68,9 +68,7 @@ export const useMediaViewer = create<MediaViewerState>((set, get) => ({
   currentIndex: 0,
 
   openViewer: (rawItems, startIndex = 0) => {
-    console.log('[MediaViewer] openViewer called', { rawItems, startIndex });
     const items = rawItems.map(normalizeItem);
-    console.log('[MediaViewer] normalized items', items);
     set({ isOpen: true, items, currentIndex: Math.max(0, Math.min(startIndex, items.length - 1)) });
   },
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { Star, Play, Heart, MessageCircle, MoreHorizontal } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -53,7 +54,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
       
       onClick={() => {
         if (allPosts && postIndex != null) {
-          // TODO Brief 3: fullscreen feed open
+          useFullscreenFeedStore.getState().open(allPosts, postIndex);
         }
       }}
     >

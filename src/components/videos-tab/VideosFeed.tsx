@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useInView } from 'react-intersection-observer';
 import { Loader2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
@@ -46,16 +47,14 @@ export function VideosFeed({
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // Sync new posts into fullscreen overlay
-  const isFullscreenOpen = false; // TODO Brief 3
-  const fullscreenPostCount = 0; // TODO Brief 3
+  const { isOpen: isFullscreenOpen, appendPosts } = useFullscreenFeedStore();
 
   useEffect(() => {
     if (!isFullscreenOpen) return;
-    if (posts.length > fullscreenPostCount) {
-      const newPosts = posts.slice(fullscreenPostCount);
-      // TODO Brief 3: appendPosts(newPosts);
+    if (posts.length > 0) {
+      appendPosts(posts);
     }
-  }, [posts.length, isFullscreenOpen, fullscreenPostCount]);
+  }, [posts.length, isFullscreenOpen, appendPosts]);
 
   if (isLoading && posts.length === 0) {
     return <VideosFeedSkeleton />;

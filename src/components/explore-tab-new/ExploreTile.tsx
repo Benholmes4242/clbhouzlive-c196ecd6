@@ -1,5 +1,6 @@
 import { memo, useEffect, useRef } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 
 interface ExploreTileProps {
   post: FeedPost;
@@ -36,10 +37,10 @@ function ExploreTileInner({ post, index, allPosts, fetchNextPage, hasNextPage, i
   const courseName = post.courseName || post.review?.courseName;
   const rating = post.review?.rating;
 
+  const { open } = useFullscreenFeedStore();
+
   const handleTap = () => {
-    if (allPosts) {
-      // TODO Brief 3: fullscreen feed open
-    }
+    open(allPosts ?? [post], index);
   };
 
   return (

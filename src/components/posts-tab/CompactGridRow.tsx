@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { Play, Star, Heart, MoreHorizontal } from 'lucide-react';
 import { formatDuration, formatCompact } from './utils';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 
 interface CompactGridRowProps {
   posts: FeedPost[];
@@ -52,9 +53,7 @@ const CompactTile: React.FC<{
       
       onClick={() => {
         if (showMenu) return;
-        if (allPosts) {
-          // TODO Brief 3: fullscreen feed open
-        }
+        useFullscreenFeedStore.getState().open(allPosts ?? [post], globalIndex);
       }}
     >
       {/* Poster image */}
