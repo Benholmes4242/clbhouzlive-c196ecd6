@@ -37,7 +37,7 @@ import { VideoControls } from './VideoControls';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { Volume2, VolumeX } from 'lucide-react';
 import { extractCloudflareUid } from '@/utils/videoIdUtils';
-import { createCachedHlsLoader } from '@/lib/cachedHlsLoader';
+// TODO Brief 3: re-wire cachedHlsLoader
 import { HLSPoolManager } from '@/media/HLSPoolManager';
 import { useBufferingIndicator } from '@/hooks/useBufferingIndicator';
 import { useAudioFade } from '@/hooks/useAudioFade';
