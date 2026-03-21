@@ -21,7 +21,17 @@ interface FeedOverlayLayerProps {
   overlayVisible: boolean;
   isOwnPost: boolean;
   golfCourse?: { id: string; name: string; country?: string } | null;
-  activeReview?: { reviewId: string; courseId: string; courseName: string; courseImageUrl: string | null; rating: number } | null;
+  activeReview?: {
+    reviewId: string;
+    courseId: string;
+    courseName: string;
+    courseImageUrl: string | null;
+    rating: number;
+    courseCountry?: string | null;
+    courseRegion?: string | null;
+    courseSubCountry?: string | null;
+    reviewText?: string | null;
+  } | null;
   isActiveReview?: boolean;
 }
 
