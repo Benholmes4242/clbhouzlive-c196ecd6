@@ -247,8 +247,8 @@ const ClubhouseContent = () => {
   // ── Review tap handler ──
   const handleReviewTap = useCallback(() => {
     if (!activeReview) return;
-    navigate(`/courses/${activeReview.courseId}?tab=reviews&review=${activeReview.reviewId}`);
-  }, [activeReview, navigate]);
+    setReviewSheetOpen(true);
+  }, [activeReview]);
 
   const showRehydrationSkeleton = isRehydrating;
 
