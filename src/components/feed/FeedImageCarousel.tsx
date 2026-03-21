@@ -57,17 +57,29 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
       >
         {mediaItems.map((item, idx) => {
           const isLandscape = (item.width ?? 0) > (item.height ?? 1);
-          const objectFit = isSuggestedFeed ? 'cover' : (isLandscape ? 'contain' : 'cover');
+          const objectFit = isLandscape ? 'contain' : 'cover';
+          const imgSrc = item.imageUrl || item.thumbnailUrl || '';
           return (
             <div
               key={item.id || idx}
-              className="flex-shrink-0 w-full h-full relative"
+              className="flex-shrink-0 w-full h-full relative overflow-hidden"
             >
+              {/* Blurred background for letterboxing */}
               <img
-                src={item.imageUrl || item.thumbnailUrl || ''}
+                src={imgSrc}
                 alt=""
-                className="w-full h-full"
-                style={{ objectFit, background: '#000' }}
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ filter: 'blur(20px)', transform: 'scale(1.1)' }}
+                draggable={false}
+                aria-hidden="true"
+              />
+              <div className="absolute inset-0 bg-black/30" />
+              {/* Main image */}
+              <img
+                src={imgSrc}
+                alt=""
+                className="absolute inset-0 w-full h-full"
+                style={{ objectFit, position: 'relative', zIndex: 1 }}
                 loading={idx === 0 ? 'eager' : 'lazy'}
                 draggable={false}
               />
