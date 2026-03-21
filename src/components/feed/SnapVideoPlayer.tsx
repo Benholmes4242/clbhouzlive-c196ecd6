@@ -56,7 +56,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   const userPaused = useClubhouseStore(s => s.userPaused);
 
   const isLandscape = (width ?? 0) > (height ?? 1);
-  const objectFit = isSuggestedFeed ? 'cover' : (isLandscape ? 'contain' : 'cover');
+  const objectFit = isLandscape ? 'contain' : 'cover';
 
   // ── Attach/detach HLS ──
   useEffect(() => {
