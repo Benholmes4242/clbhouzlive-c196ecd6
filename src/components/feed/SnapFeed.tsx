@@ -141,6 +141,7 @@ export function SnapFeed({
         WebkitOverflowScrolling: 'touch',
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
+        touchAction: 'pan-y',
       }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}

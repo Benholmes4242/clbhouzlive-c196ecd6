@@ -38,6 +38,8 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
         WebkitOverflowScrolling: 'touch',
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
+        touchAction: 'pan-x',
+        overscrollBehavior: 'contain',
       }}
       onScroll={handleScroll}
     >
