@@ -7,7 +7,7 @@ export interface MediaViewerItem {
   mp4Url?: string;
   imageUrl?: string;
   thumbnailUrl?: string;
-  src?: string; // fallback URL used by call sites
+  src?: string;
   width?: number;
   height?: number;
 }
@@ -16,11 +16,50 @@ interface MediaViewerState {
   isOpen: boolean;
   items: MediaViewerItem[];
   currentIndex: number;
-  openViewer: (items: MediaViewerItem[], startIndex?: number) => void;
+  openViewer: (items: any[], startIndex?: number) => void;
   closeViewer: () => void;
   goTo: (index: number) => void;
   next: () => void;
   prev: () => void;
+}
+
+/** Normalize any item shape into MediaViewerItem */
+function normalizeItem(raw: any): MediaViewerItem {
+  const type: 'video' | 'image' =
+    raw.type === 'video' || raw.mediaType === 'video'
+      ? 'video'
+      : 'image';
+
+  // Resolve the display URL
+  const src =
+    raw.src ||
+    raw.mediaUrl ||
+    raw.media_url ||
+    raw.imageUrl ||
+    raw.hlsUrl ||
+    raw.mp4Url ||
+    raw.post_media?.[0]?.media_url ||
+    '';
+
+  const thumbnailUrl =
+    raw.thumbnailUrl ||
+    raw.thumbnailSrc ||
+    raw.posterUrl ||
+    raw.poster_url ||
+    raw.post_media?.[0]?.poster_url ||
+    undefined;
+
+  return {
+    id: raw.id || String(Math.random()),
+    type,
+    src,
+    imageUrl: type === 'image' ? src : undefined,
+    hlsUrl: type === 'video' && src.includes('.m3u8') ? src : raw.hlsUrl,
+    mp4Url: type === 'video' && !src.includes('.m3u8') ? src : raw.mp4Url,
+    thumbnailUrl,
+    width: raw.width,
+    height: raw.height,
+  };
 }
 
 export const useMediaViewer = create<MediaViewerState>((set, get) => ({
@@ -28,8 +67,10 @@ export const useMediaViewer = create<MediaViewerState>((set, get) => ({
   items: [],
   currentIndex: 0,
 
-  openViewer: (items, startIndex = 0) =>
-    set({ isOpen: true, items, currentIndex: Math.max(0, Math.min(startIndex, items.length - 1)) }),
+  openViewer: (rawItems, startIndex = 0) => {
+    const items = rawItems.map(normalizeItem);
+    set({ isOpen: true, items, currentIndex: Math.max(0, Math.min(startIndex, items.length - 1)) });
+  },
 
   closeViewer: () => set({ isOpen: false, items: [], currentIndex: 0 }),
 
