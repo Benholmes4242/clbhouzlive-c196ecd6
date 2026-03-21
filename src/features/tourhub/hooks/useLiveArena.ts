@@ -318,7 +318,7 @@ export function useLiveArena() {
     queryFn: fetchLiveArenaData,
     staleTime: 30_000,             // 30s — matches sync interval
     refetchInterval: false,        // No polling — Realtime pushes updates
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,   // Realtime handles updates; focus refetch triggers unnecessary feed rebuilds
     gcTime: 1000 * 60 * 10, // 10 minutes
   });
 }

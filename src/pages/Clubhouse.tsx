@@ -220,9 +220,14 @@ const ClubhouseContent = () => {
   // ── Live tournament injection ──
   const { livePosts, liveTourSlugs } = useTournamentLiveFeed(user?.id);
   
+  // Stable fingerprints to prevent unnecessary rebuilds of the posts array
+  const livePostIds = useMemo(() => livePosts.map(p => p.id).join(','), [livePosts]);
+  const liveTourSlugsKey = liveTourSlugs.join(',');
+  
   const posts = useMemo(
     () => injectLiveTournamentCards(activeFeed.posts, livePosts, liveTourSlugs),
-    [activeFeed.posts, livePosts, liveTourSlugs]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [activeFeed.posts, livePostIds, liveTourSlugsKey]
   );
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? true;

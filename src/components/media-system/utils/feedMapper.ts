@@ -146,6 +146,13 @@ export function groupMultiMedia(posts: FeedPost[]): FeedPost[] {
   }
   for (const post of map.values()) {
     post.mediaItems.sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+    // Deduplicate by media_id to prevent duplicate React keys
+    const seenIds = new Set<string>();
+    post.mediaItems = post.mediaItems.filter(item => {
+      if (!item.id || seenIds.has(item.id)) return false;
+      seenIds.add(item.id);
+      return true;
+    });
   }
   return Array.from(map.values());
 }
