@@ -102,6 +102,8 @@ interface CreatorCapsuleProps {
   /** Post ID for crossfade animation on post change */
   postId?: string;
 
+  /** Called before any in-component navigate() to allow overlay cleanup */
+  onBeforeNavigate?: () => void;
 
   /** Override the bottom offset (default: 'calc(30px + 80px)' for tab bar context).
    *  Use for fullscreen viewer where there's no tab bar. */
@@ -127,6 +129,8 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   onReviewTap,
   // Post ID for crossfade
   postId,
+  // Before-navigate callback
+  onBeforeNavigate,
   // Bottom offset override
   bottomOffset,
 }) => {
@@ -149,6 +153,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   const handleToggle = useCallback(() => {
     if (isReview) {
       // In review mode, tap navigates to course
+      onBeforeNavigate?.();
       onReviewTap?.();
       return;
     }
@@ -175,13 +180,14 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   }, [isExpanded, isReview]);
 
   const handleViewProfile = useCallback(() => {
+    onBeforeNavigate?.();
     if (onViewProfile) {
       onViewProfile();
     } else {
       const path = getProfilePathById(user.id);
       navigate(path);
     }
-  }, [navigate, onViewProfile, user.id]);
+  }, [navigate, onViewProfile, onBeforeNavigate, user.id]);
 
   // Clean caption: strip embedded "Played at" course text
   const cleanCaption = caption ? removeGolfCourseFromContent(caption) : '';
@@ -230,6 +236,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           type="button"
           onClick={async (e) => {
             e.stopPropagation();
+            onBeforeNavigate?.();
             const courseIdentifier = golfCourse.slug || golfCourse.id;
             if (courseIdentifier) {
               navigate(`/courses/${courseIdentifier}`);
