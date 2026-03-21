@@ -39,7 +39,6 @@ export const FeedCarouselDots: React.FC<FeedCarouselDotsProps> = ({ count, activ
                   : 'w-[5px] h-0.5 bg-white/30'
             }`}
           />
-          />
         );
       })}
     </div>
