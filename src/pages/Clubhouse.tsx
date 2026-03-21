@@ -197,18 +197,16 @@ const ClubhouseContent = () => {
   // Runs on mount AND whenever isTournamentCardActive changes —
   // so returning to Clubhouse with a tournament card in view correctly re-hides the nav.
   const { setVisible: setBottomNavVisible } = useBottomNavigation();
-  useEffect(() => {
-    setBottomNavVisible(!isTournamentCardActive);
-    return () => setBottomNavVisible(true);
-  }, [isTournamentCardActive, setBottomNavVisible]);
+  const setStoreTournamentActive = useClubhouseStore(s => s.setIsTournamentCardActive);
 
-  // Force re-evaluate on mount in case we're returning from another page
-  // that called setVisible(true) (e.g. TournamentDetailPage).
   useEffect(() => {
+    setStoreTournamentActive(isTournamentCardActive);
     setBottomNavVisible(!isTournamentCardActive);
-    // No cleanup — the effect above handles unmount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // intentionally empty — mount only
+    return () => {
+      setStoreTournamentActive(false);
+      setBottomNavVisible(true);
+    };
+  }, [isTournamentCardActive, setBottomNavVisible, setStoreTournamentActive]);
   
   // ── Optimistic like state ──
   const { handleLike, getActiveLikeState, resetLikes } = useClubhouseLikes({ userId: user?.id, activeActor });

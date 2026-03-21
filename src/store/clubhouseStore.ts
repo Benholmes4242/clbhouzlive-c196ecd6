@@ -38,4 +38,5 @@ export const useClubhouseStore = create<ClubhouseState>()((set) => ({
       next.set(feedIdx, mediaIdx);
       return { carouselPositions: next };
     }),
+  setIsTournamentCardActive: (active) => set({ isTournamentCardActive: active }),
 }));

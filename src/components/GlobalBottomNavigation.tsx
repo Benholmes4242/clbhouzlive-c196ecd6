@@ -85,7 +85,8 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const isClubhouseRoute = CLUBHOUSE_ROUTES.includes(location.pathname);
   const isWarmGradientRoute = WARM_GRADIENT_ROUTES.some(r => location.pathname.startsWith(r));
   
-  const showNavigation = isVisible && !shouldHideForRoute;
+  const isTournamentCardActive = useClubhouseStore(s => s.isTournamentCardActive);
+  const showNavigation = isVisible && !shouldHideForRoute && !(isClubhouseRoute && isTournamentCardActive);
 
   // Audit on mount
   useEffect(() => {
