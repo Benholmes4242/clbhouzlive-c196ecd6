@@ -149,6 +149,10 @@ export interface ExtractedReviewData {
   rating: number;
   tierLabel: string;
   sourceReviewId: string;
+  courseCountry?: string | null;
+  courseRegion?: string | null;
+  courseSubCountry?: string | null;
+  reviewText?: string | null;
 }
 
 export function extractReviewData(post: any): ExtractedReviewData | null {
