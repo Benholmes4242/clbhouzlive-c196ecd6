@@ -180,13 +180,14 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   }, [isExpanded, isReview]);
 
   const handleViewProfile = useCallback(() => {
+    onBeforeNavigate?.();
     if (onViewProfile) {
       onViewProfile();
     } else {
       const path = getProfilePathById(user.id);
       navigate(path);
     }
-  }, [navigate, onViewProfile, user.id]);
+  }, [navigate, onViewProfile, onBeforeNavigate, user.id]);
 
   // Clean caption: strip embedded "Played at" course text
   const cleanCaption = caption ? removeGolfCourseFromContent(caption) : '';
