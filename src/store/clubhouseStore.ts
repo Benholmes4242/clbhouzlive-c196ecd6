@@ -28,7 +28,6 @@ export const useClubhouseStore = create<ClubhouseState>()((set) => ({
   isTournamentCardActive: false,
 
   setActiveIndex: (idx) => {
-    console.log(`[STORE] activeIndex → ${idx} at t=${performance.now().toFixed(1)}ms`);
     set({ activeIndex: idx });
   },
   setIsMuted: (v) => set({ isMuted: v }),

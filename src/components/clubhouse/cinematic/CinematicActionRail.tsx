@@ -230,7 +230,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   bottomOffset,
   hideMute = false,
 }) => {
-  console.log(`[RAIL] render postId=${postId} isVideo=${isVideo} at t=${performance.now().toFixed(1)}ms`);
+  
   // Idle opacity: 75% when not interacted, full when interacted or active
   const idleOpacity = hasInteracted ? 1 : 0.75;
 

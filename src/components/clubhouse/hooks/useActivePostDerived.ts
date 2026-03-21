@@ -8,7 +8,7 @@ import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
  */
 export function useActivePostDerived(posts: FeedPost[], activeIndex: number) {
   const activePostId = posts[activeIndex]?.id;
-  console.log(`[DERIVED] recomputing for postId=${activePostId} activeIndex=${activeIndex} at t=${performance.now().toFixed(1)}ms`);
+  
 
   const activePost = useMemo(
     () => posts.find(p => p.id === activePostId) ?? null,
