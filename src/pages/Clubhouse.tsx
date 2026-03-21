@@ -234,6 +234,7 @@ const ClubhouseContent = () => {
   // Season Recap Modal
   const { data: seasonRecap } = useSeasonRecap(user?.id);
   const [showRecapModal, setShowRecapModal] = useState(false);
+  const [reviewSheetOpen, setReviewSheetOpen] = useState(false);
 
   useEffect(() => {
     if (seasonRecap) {
