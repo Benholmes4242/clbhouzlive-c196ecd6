@@ -5,7 +5,8 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { haptic } from '@/utils/haptics';
 
 const NEAR_END_THRESHOLD = 3;
-const INTERSECTION_THRESHOLD = 0.7;
+const ACTIVE_SLIDE_RATIO = 0.98;
+const INTERSECTION_THRESHOLDS = [0.7, 0.85, 0.95, ACTIVE_SLIDE_RATIO];
 const PTR_DISTANCE = 80;
 
 interface SnapFeedProps {
@@ -47,13 +48,13 @@ export function SnapFeed({
     observerRef.current = new IntersectionObserver((entries) => {
       let bestEntry: IntersectionObserverEntry | null = null;
       for (const entry of entries) {
-        if (entry.isIntersecting) {
-          if (!bestEntry || entry.intersectionRatio > bestEntry.intersectionRatio) {
-            bestEntry = entry;
-          }
+        if (!entry.isIntersecting) continue;
+        if (!bestEntry || entry.intersectionRatio > bestEntry.intersectionRatio) {
+          bestEntry = entry;
         }
       }
-      if (bestEntry) {
+
+      if (bestEntry && bestEntry.intersectionRatio >= ACTIVE_SLIDE_RATIO) {
         const idx = Number((bestEntry.target as HTMLElement).dataset.index);
         if (!isNaN(idx)) {
           setActiveIndex(idx);
@@ -62,7 +63,7 @@ export function SnapFeed({
           }
         }
       }
-    }, { threshold: [INTERSECTION_THRESHOLD] });
+    }, { threshold: INTERSECTION_THRESHOLDS });
 
     // Observe all current slides
     slideRefs.current.forEach((el) => {
