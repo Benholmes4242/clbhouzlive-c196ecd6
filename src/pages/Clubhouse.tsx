@@ -288,6 +288,8 @@ const ClubhouseContent = () => {
           }}
           isBusinessActor={isBusinessActor}
           user={user}
+          carouselCount={posts[activeIndex]?.mediaItems?.length ?? 0}
+          carouselIndex={currentMediaIndex}
         />
       </div>
 
