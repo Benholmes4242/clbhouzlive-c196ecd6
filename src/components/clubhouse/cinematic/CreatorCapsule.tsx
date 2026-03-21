@@ -153,6 +153,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   const handleToggle = useCallback(() => {
     if (isReview) {
       // In review mode, tap navigates to course
+      onBeforeNavigate?.();
       onReviewTap?.();
       return;
     }
