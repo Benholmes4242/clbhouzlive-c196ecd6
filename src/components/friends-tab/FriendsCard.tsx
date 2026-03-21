@@ -62,7 +62,7 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          onViewPreload(hlsUrl);
+          // TODO Brief 3: onViewPreload
         }
       },
       { threshold: 0.5 }
@@ -233,14 +233,6 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
           onClick={() => {
             if (allPosts && cardIndex != null) {
               // TODO Brief 3: fullscreen feed open
-          // useFullscreenFeed.getState().open({
-                posts: allPosts,
-                startIndex: cardIndex,
-                sourceId: 'friends',
-                fetchNextPage,
-                hasNextPage,
-                isFetchingNextPage,
-              });
             }
           }}
         >

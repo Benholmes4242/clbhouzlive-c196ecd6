@@ -34,7 +34,7 @@ const CompactTile: React.FC<{
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          onViewPreload(hlsUrl);
+          // TODO Brief 3: onViewPreload
         }
       },
       { threshold: 0.5 }
@@ -54,11 +54,6 @@ const CompactTile: React.FC<{
         if (showMenu) return;
         if (allPosts) {
           // TODO Brief 3: fullscreen feed open
-          // useFullscreenFeed.getState().open({
-            posts: allPosts,
-            startIndex: globalIndex,
-            sourceId: 'posts',
-          });
         }
       }}
     >

@@ -21,7 +21,7 @@ function ExploreTileInner({ post, index, allPosts, fetchNextPage, hasNextPage, i
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          onViewPreload(hlsUrl);
+          // TODO Brief 3: onViewPreload
         }
       },
       { threshold: 0.5 }
@@ -39,14 +39,6 @@ function ExploreTileInner({ post, index, allPosts, fetchNextPage, hasNextPage, i
   const handleTap = () => {
     if (allPosts) {
       // TODO Brief 3: fullscreen feed open
-          // useFullscreenFeed.getState().open({
-        posts: allPosts,
-        startIndex: index,
-        sourceId: 'explore',
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-      });
     }
   };
 

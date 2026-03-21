@@ -36,7 +36,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          onViewPreload(hlsUrl);
+          // TODO Brief 3: onViewPreload
         }
       },
       { threshold: 0.5 }
@@ -55,14 +55,6 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
       onClick={() => {
         if (allPosts) {
           // TODO Brief 3: fullscreen feed open
-          // useFullscreenFeed.getState().open({
-            posts: allPosts,
-            startIndex: index,
-            sourceId: 'course-media',
-            fetchNextPage,
-            hasNextPage,
-            isFetchingNextPage,
-          });
         }
       }}
     >

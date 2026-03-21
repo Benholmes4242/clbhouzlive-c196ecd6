@@ -38,7 +38,7 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, fetchNextP
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          onViewPreload(hlsUrl);
+          // TODO Brief 3: onViewPreload
         }
       },
       { threshold: 0.5 }
@@ -57,14 +57,6 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, fetchNextP
       onClick={() => {
         if (allPosts) {
           // TODO Brief 3: fullscreen feed open
-          // useFullscreenFeed.getState().open({
-            posts: allPosts,
-            startIndex: index,
-            sourceId: 'watch',
-            fetchNextPage,
-            hasNextPage,
-            isFetchingNextPage,
-          });
         }
       }}
     >

@@ -50,7 +50,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          onViewPreload(hlsUrl);
+          // TODO Brief 3: onViewPreload
         }
       },
       { threshold: 0.5 }
@@ -75,14 +75,6 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
   const handleTap = () => {
     if (allPosts) {
       // TODO Brief 3: fullscreen feed open
-          // useFullscreenFeed.getState().open({
-        posts: allPosts,
-        startIndex: cardIndex,
-        sourceId: 'videos',
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-      });
     }
   };
 

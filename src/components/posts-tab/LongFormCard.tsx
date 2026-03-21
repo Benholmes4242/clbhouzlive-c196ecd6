@@ -28,7 +28,7 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          onViewPreload(hlsUrl);
+          // TODO Brief 3: onViewPreload
         }
       },
       { threshold: 0.5 }
@@ -45,11 +45,6 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
       onClick={() => {
         if (allPosts && postIndex != null) {
           // TODO Brief 3: fullscreen feed open
-          // useFullscreenFeed.getState().open({
-            posts: allPosts,
-            startIndex: postIndex,
-            sourceId: 'posts',
-          });
         }
       }}
     >
