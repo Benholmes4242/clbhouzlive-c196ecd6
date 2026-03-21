@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
-
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
@@ -197,55 +196,9 @@ const ClubhouseContent = () => {
   
   // ── Active post derivation ──
   const { activePost, golfCourse, activeReview, isActiveReview, isActiveVideo } = useActivePostDerived(posts, activeIndex);
-
-  // ── Fully snapped slide tracking (decoupled from 50% activeIndex switching) ──
-  const [fullySnappedIndex, setFullySnappedIndex] = useState(activeIndex);
-  const slideVisibilityRatiosRef = useRef(new Map<number, number>());
-
-  useEffect(() => {
-    if (posts.length === 0) return;
-
-    const scope = clubhouseRootRef.current ?? document.body;
-    const slideEls = Array.from(scope.querySelectorAll<HTMLElement>('[data-index]'));
-    if (slideEls.length === 0) return;
-
-    slideVisibilityRatiosRef.current = new Map();
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const idx = Number((entry.target as HTMLElement).dataset.index);
-          if (!Number.isNaN(idx)) {
-            slideVisibilityRatiosRef.current.set(idx, entry.intersectionRatio);
-          }
-        }
-
-        let bestIdx: number | null = null;
-        let bestRatio = 0.98;
-
-        for (const [idx, ratio] of slideVisibilityRatiosRef.current.entries()) {
-          if (ratio >= 0.98 && ratio >= bestRatio) {
-            bestIdx = idx;
-            bestRatio = ratio;
-          }
-        }
-
-        if (bestIdx !== null) {
-          setFullySnappedIndex(bestIdx);
-        }
-      },
-      { threshold: [0.98] }
-    );
-
-    slideEls.forEach((el) => observer.observe(el));
-
-    return () => observer.disconnect();
-  }, [posts]);
-
-  const fullySnappedPost = posts[fullySnappedIndex] ?? null;
   const isTournamentCardActive =
-    fullySnappedPost?.postType === 'tournament_result' ||
-    fullySnappedPost?.postType === 'tournament_live';
+    activePost?.postType === 'tournament_result' ||
+    activePost?.postType === 'tournament_live';
 
   // Hide bottom nav when tournament card is active.
   // Runs on mount AND whenever isTournamentCardActive changes —
