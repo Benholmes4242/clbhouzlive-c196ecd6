@@ -225,9 +225,11 @@ const ClubhouseContent = () => {
   const liveTourSlugsKey = liveTourSlugs.join(',');
   
   const posts = useMemo(
-    () => injectLiveTournamentCards(activeFeed.posts, livePosts, liveTourSlugs),
+    () => activeTab === 'foryou'
+      ? injectLiveTournamentCards(activeFeed.posts, livePosts, liveTourSlugs)
+      : activeFeed.posts,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [activeFeed.posts, livePostIds, liveTourSlugsKey]
+    [activeFeed.posts, activeTab, livePostIds, liveTourSlugsKey]
   );
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? true;

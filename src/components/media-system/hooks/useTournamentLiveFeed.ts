@@ -235,10 +235,12 @@ export function useTournamentLiveFeed(userId?: string): {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [arenaData, postIdMap, liveCountsKey]);
 
-  const liveTourSlugs = useMemo(
-    () => (arenaData ?? []).map(t => t.tourSlug),
-    [arenaData]
-  );
+  const liveTourSlugs = useMemo(() => {
+    const pga = (arenaData ?? []).filter(t => t.tourSlug === 'pga');
+    if (!pga.length) return [];
+    const selected = pga.reduce((best, t) => (t.purse ?? 0) >= (best.purse ?? 0) ? t : best);
+    return [selected.tourSlug];
+  }, [arenaData]);
 
   return {
     livePosts,
