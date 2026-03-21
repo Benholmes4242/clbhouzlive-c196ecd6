@@ -51,6 +51,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   overlayVisible,
   isOwnPost,
   golfCourse,
+  onBeforeNavigate,
   activeReview,
   isActiveReview,
 }: FeedOverlayLayerProps) {
