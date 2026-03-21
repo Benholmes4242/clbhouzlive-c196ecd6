@@ -190,7 +190,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
 
   return (
     <div style={{
-      height: '100dvh',
+      height: '100%',
       overflow: 'hidden',
       display: 'flex',
       flexDirection: 'column',
