@@ -189,6 +189,7 @@ export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
  */
 export function buildFriendsFeed(posts: FeedPost[]): FeedPost[] {
   const noLive = posts.filter(p => p.postType !== 'tournament_live');
-  const interleaved = interleaveReviews(noLive, 'friends');
+  const capped = capPerCreator(noLive);
+  const interleaved = interleaveReviews(capped, 'friends');
   return deduplicatePosts(interleaved);
 }
