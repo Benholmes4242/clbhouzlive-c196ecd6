@@ -43,13 +43,6 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
     return () => window.removeEventListener('carousel-goto', handler);
   }, [feedIndex, goTo]);
 
-  const handlePrev = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    goTo(currentIndex - 1);
-  }, [currentIndex, goTo]);
-
-  const showPrev = currentIndex > 0;
-
   return (
     <div className="absolute inset-0" style={{ touchAction: 'pan-y' }}>
       {/* Scroll container — no touch scrolling, programmatic only */}
@@ -82,35 +75,7 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
           );
         })}
       </div>
-
-      {/* Left chevron — only prev, right chevron is in the action rail */}
-      {showPrev && (
-        <button
-          type="button"
-          onClick={handlePrev}
-          style={{
-            position: 'absolute',
-            left: 16,
-            bottom: 97,
-            width: 36,
-            height: 36,
-            borderRadius: '50%',
-            background: 'rgba(0,0,0,0.35)',
-            backdropFilter: 'blur(8px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: 'none',
-            cursor: 'pointer',
-            zIndex: 10,
-            touchAction: 'manipulation',
-          }}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-      )}
+      {/* All carousel navigation (prev/next) is handled by CinematicActionRail */}
     </div>
   );
 });
