@@ -12,7 +12,7 @@ import { MediaItem } from '@/types/media';
 import { ExploreContentItem } from '@/components/explore/types';
 import { getStreamPoster } from '@/utils/stream';
 import { FLAGS } from '@/config/flags';
-// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
+import { useMediaViewer } from '@/hooks/useMediaViewer';
 
 type Review = {
   id: string;

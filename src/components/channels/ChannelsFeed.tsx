@@ -4,7 +4,7 @@ import { ChannelVideoCard } from './ChannelVideoCard';
 import { useDiscoverQuery } from '@/utils/useDiscoverQuery';
 import { useInView } from 'react-intersection-observer';
 import { InlineSpinner } from '@/components/ui/InlineSpinner';
-// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
+import { useMediaViewer } from '@/hooks/useMediaViewer';
 
 export const ChannelsFeed: React.FC = () => {
   const { sub } = useDiscoverQuery();

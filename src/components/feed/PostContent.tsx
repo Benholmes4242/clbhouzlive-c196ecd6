@@ -7,7 +7,7 @@ import LazyImage from '@/components/ui/lazy-image';
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
 import TaggedText from '@/components/posts/TaggedText';
 import CourseLocationRow from '@/components/posts/CourseLocationRow';
-// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
+import { useMediaViewer } from '@/hooks/useMediaViewer';
 
 interface Tag {
   id: string;

@@ -7,7 +7,7 @@ import {
   useUserPostLogic,
   UserPostData
 } from './user-post';
-// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
+import { useMediaViewer } from '@/hooks/useMediaViewer';
 
 interface UserPostProps {
   post: UserPostData;

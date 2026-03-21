@@ -10,7 +10,7 @@ import { ReviewPostViewer } from '@/components/posts/ReviewPostViewer';
 import { ReviewBottomPanel } from '@/components/posts/ReviewBottomPanel';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { isReviewPost as checkIsReviewPost, extractReviewData, extractUserData } from '@/lib/postHelpers';
-// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
+import { useMediaViewer } from '@/hooks/useMediaViewer';
 
 
 const SocialActivity: React.FC<SocialActivityProps> = ({

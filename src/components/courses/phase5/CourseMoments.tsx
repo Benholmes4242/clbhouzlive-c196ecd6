@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { useUserCourseMoments } from '@/hooks/useUserCourseMoments';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigate } from 'react-router-dom';
-// REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
+import { useMediaViewer } from '@/hooks/useMediaViewer';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface CourseMomentsProps {
