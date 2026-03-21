@@ -40,6 +40,7 @@ import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicA
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { FullscreenReviewPost } from '@/components/posts/FullscreenReviewPost';
+import { ReviewBottomSheet } from '@/components/posts/ReviewBottomSheet';
 
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { getProfilePathById } from '@/lib/profileRoutes';
@@ -233,6 +234,7 @@ const ClubhouseContent = () => {
   // Season Recap Modal
   const { data: seasonRecap } = useSeasonRecap(user?.id);
   const [showRecapModal, setShowRecapModal] = useState(false);
+  const [reviewSheetOpen, setReviewSheetOpen] = useState(false);
 
   useEffect(() => {
     if (seasonRecap) {
@@ -245,8 +247,8 @@ const ClubhouseContent = () => {
   // ── Review tap handler ──
   const handleReviewTap = useCallback(() => {
     if (!activeReview) return;
-    navigate(`/courses/${activeReview.courseId}?tab=reviews&review=${activeReview.reviewId}`);
-  }, [activeReview, navigate]);
+    setReviewSheetOpen(true);
+  }, [activeReview]);
 
   const showRehydrationSkeleton = isRehydrating;
 
@@ -452,6 +454,26 @@ const ClubhouseContent = () => {
           userId={user.id}
         />
       )}
+
+      {/* Review Bottom Sheet */}
+      <ReviewBottomSheet
+        isOpen={reviewSheetOpen}
+        onClose={() => setReviewSheetOpen(false)}
+        user={{
+          id: activePost?.userId ?? '',
+          name: activePost?.displayName ?? '',
+          username: activePost?.username,
+          avatar: activePost?.avatarUrl,
+        }}
+        courseId={activeReview?.courseId ?? ''}
+        courseName={activeReview?.courseName ?? ''}
+        rating={activeReview?.rating ?? 0}
+        reviewId={activeReview?.reviewId}
+        courseCountry={activeReview?.courseCountry}
+        courseRegion={activeReview?.courseRegion}
+        courseSubCountry={activeReview?.courseSubCountry}
+        reviewText={activeReview?.reviewText}
+      />
     </PageRoot>
   );
 };
