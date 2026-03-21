@@ -242,7 +242,7 @@ const MiniProfileSheetContent = ({ user, isOpen, onClose, onFollow }: MiniProfil
           avatar: user.avatar || '',
         },
       }));
-      openFullscreen(items, 0);
+      openViewer(items, 0);
     }
   };
 

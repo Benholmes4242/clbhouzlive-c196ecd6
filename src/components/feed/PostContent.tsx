@@ -99,7 +99,7 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
       likes: 0,
       golfCourse: content.golfCourse,
     }));
-    openFullscreen(mediaItems, index);
+    openViewer(mediaItems, index);
   };
 
   const handleVideoFullscreen = (videoUrl: string) => {
@@ -111,7 +111,7 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
       likes: 0,
       golfCourse: content.golfCourse,
     }];
-    openFullscreen(mediaItems, 0);
+    openViewer(mediaItems, 0);
   };
 
   // Get all images for carousel

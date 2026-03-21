@@ -54,7 +54,7 @@ export const ChannelsFeed: React.FC = () => {
     }));
 
     const startIndex = items.findIndex(i => i.id === video.id);
-    openFullscreen(items, startIndex >= 0 ? startIndex : 0);
+    openViewer(items, startIndex >= 0 ? startIndex : 0);
   };
 
   if (isLoading && allVideos.length === 0) {

@@ -49,9 +49,9 @@ export const CourseMoments: React.FC<CourseMomentsProps> = ({
 
   const handleMomentTap = useCallback((index: number) => {
     if (fullscreenItems.length > 0) {
-      openFullscreen(fullscreenItems, index);
+      openViewer(fullscreenItems, index);
     }
-  }, [fullscreenItems, openFullscreen]);
+  }, [fullscreenItems, openViewer]);
 
   if (isLoading) {
     return (

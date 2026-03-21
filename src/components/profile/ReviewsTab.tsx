@@ -134,7 +134,7 @@ function ReviewCard({
           avatar: review.user.avatarUrl,
         },
       }));
-      openFullscreen(mediaItems, index);
+      openViewer(mediaItems, index);
     }
   };
 

@@ -49,16 +49,16 @@ const UserPost = ({ post, allUserPosts = [], source = 'profile', onPostUpdated, 
     if (isMobile || source === 'profile') {
       const postIndex = postsWithMedia.findIndex(p => p.id === post.id);
       if (postIndex >= 0) {
-        openFullscreen(postsWithMedia, postIndex);
+        openViewer(postsWithMedia, postIndex);
       }
     } else {
       // For index feed, also use unified fullscreen
       const postIndex = postsWithMedia.findIndex(p => p.id === post.id);
       if (postIndex >= 0) {
-        openFullscreen(postsWithMedia, postIndex);
+        openViewer(postsWithMedia, postIndex);
       }
     }
-  }, [isMobile, source, postsWithMedia, post.id, openFullscreen]);
+  }, [isMobile, source, postsWithMedia, post.id, openViewer]);
 
   return (
     <>

@@ -262,8 +262,8 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       } : undefined,
     }));
     
-    openFullscreen(exploreItems, startIndex);
-  }, [openFullscreen]);
+    openViewer(exploreItems, startIndex);
+  }, [openViewer]);
 
   const reviews = reviewsData || [];
   const myReview = reviews.find((r) => r.user_id === user?.id);

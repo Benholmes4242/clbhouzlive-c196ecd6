@@ -43,10 +43,10 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
       // Regular posts use the unified fullscreen player
       const postIndex = mediaPosts.findIndex(p => p.id === post.id);
       if (postIndex >= 0) {
-        openFullscreen(mediaPosts, postIndex);
+        openViewer(mediaPosts, postIndex);
       }
     }
-  }, [mediaPosts, openFullscreen]);
+  }, [mediaPosts, openViewer]);
 
   const handlePostUpdated = () => {
     fetchUserPosts();

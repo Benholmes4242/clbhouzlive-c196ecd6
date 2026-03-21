@@ -119,8 +119,8 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
         country: h.golf_course.country,
       } : undefined,
     }));
-    openFullscreen(items, index);
-  }, [highlights, userId, openFullscreen]);
+    openViewer(items, index);
+  }, [highlights, userId, openViewer]);
 
   if (isLoading) {
     return (
