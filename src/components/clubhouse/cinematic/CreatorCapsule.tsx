@@ -102,6 +102,8 @@ interface CreatorCapsuleProps {
   /** Post ID for crossfade animation on post change */
   postId?: string;
 
+  /** Called before any in-component navigate() to allow overlay cleanup */
+  onBeforeNavigate?: () => void;
 
   /** Override the bottom offset (default: 'calc(30px + 80px)' for tab bar context).
    *  Use for fullscreen viewer where there's no tab bar. */
