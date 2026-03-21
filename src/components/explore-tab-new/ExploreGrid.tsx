@@ -7,7 +7,6 @@ import { FeaturedRegionHero } from './FeaturedRegionHero';
 import { TrendingCoursesStrip } from './TrendingCoursesStrip';
 import { ExploreRegionsStrip } from './ExploreRegionsStrip';
 import { ReviewsOfTheWeekStrip } from './ReviewsOfTheWeekStrip';
-import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 
 const TRENDING_AFTER = 6;
 const REGIONS_AFTER = 18;
@@ -58,14 +57,14 @@ export default function ExploreGrid({
   }, [inView, loadMore]);
 
   // Sync new posts into fullscreen overlay
-  const isFullscreenOpen = useFullscreenFeed(s => s.isOpen);
-  const fullscreenPostCount = useFullscreenFeed(s => s.posts.length);
+  // TODO Brief 3: const isFullscreenOpen = useFullscreenFeed(s => s.isOpen);
+  // TODO Brief 3: const fullscreenPostCount = useFullscreenFeed(s => s.posts.length);
 
   useEffect(() => {
     if (!isFullscreenOpen) return;
     if (coursePosts.length > fullscreenPostCount) {
       const newPosts = coursePosts.slice(fullscreenPostCount);
-      useFullscreenFeed.getState().appendPosts(newPosts);
+      // TODO Brief 3: useFullscreenFeed.getState().appendPosts(newPosts);
     }
   }, [coursePosts.length, isFullscreenOpen, fullscreenPostCount]);
 

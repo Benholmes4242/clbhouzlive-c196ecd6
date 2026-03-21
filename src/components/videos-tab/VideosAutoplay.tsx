@@ -1,5 +1,4 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { getSharedBandwidth } from '@/components/media-system/utils/sharedBandwidth';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 const POOL_SIZE = 2;
@@ -119,18 +118,18 @@ export function VideosAutoplay({ posts, feedRef }: VideosAutoplayProps) {
         return;
       }
 
-      const { createCachedLoader } = await import('@/components/media-system/utils/cachedHlsLoader');
+      // TODO: re-wire cachedHlsLoader in Brief 3
 
       if (activeMapRef.current.get(slot) !== cardIndex) return;
 
       const hls = new Hls({
         startLevel: -1,
         capLevelToPlayerSize: false,
-        abrEwmaDefaultEstimate: getSharedBandwidth() > 0 ? getSharedBandwidth() : 8_000_000,
+        abrEwmaDefaultEstimate: 5_000_000 > 0 ? 5_000_000 : 8_000_000,
         maxBufferLength: 8,
         maxMaxBufferLength: 16,
         enableWorker: true,
-        loader: createCachedLoader(Hls),
+        loader: undefined,
       });
 
       hlsRefs.current[slot] = hls;

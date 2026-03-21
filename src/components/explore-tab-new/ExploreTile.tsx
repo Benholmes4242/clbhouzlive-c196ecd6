@@ -1,7 +1,5 @@
 import { memo, useEffect, useRef } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
-import { preTouchPreload, onViewPreload } from '@/components/media-system/utils/preTouchPreload';
 
 interface ExploreTileProps {
   post: FeedPost;
@@ -40,7 +38,8 @@ function ExploreTileInner({ post, index, allPosts, fetchNextPage, hasNextPage, i
 
   const handleTap = () => {
     if (allPosts) {
-      useFullscreenFeed.getState().open({
+      // TODO Brief 3: fullscreen feed open
+          // useFullscreenFeed.getState().open({
         posts: allPosts,
         startIndex: index,
         sourceId: 'explore',
@@ -56,7 +55,7 @@ function ExploreTileInner({ post, index, allPosts, fetchNextPage, hasNextPage, i
       ref={tileRef}
       type="button"
       onClick={handleTap}
-      onTouchStart={() => preTouchPreload(post.mediaItems?.[0]?.hlsUrl)}
+      
       aria-label={courseName ? `View ${courseName}` : 'View post'}
       className="relative aspect-[4/5] rounded-[4px] overflow-hidden bg-muted focus:outline-none"
       data-explore-index={index}

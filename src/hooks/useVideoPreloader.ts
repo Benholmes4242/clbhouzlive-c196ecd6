@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { getSharedBandwidth } from '@/components/media-system/utils/sharedBandwidth';
 import Hls from 'hls.js';
 import { logVideoTelemetry } from '@/utils/videoTelemetry';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
@@ -86,7 +85,7 @@ export function useVideoPreloader(
           maxMaxBufferLength: 10,                 // Cap preload buffer
           backBufferLength: 2,
           lowLatencyMode: false,
-          abrEwmaDefaultEstimate: getSharedBandwidth() > 0 ? getSharedBandwidth() : 1_000_000,
+          abrEwmaDefaultEstimate: 5_000_000 > 0 ? 5_000_000 : 1_000_000,
           abrBandWidthFactor: 0.95,
           abrBandWidthUpFactor: 0.5,
           highBufferWatchdogPeriod: 1,

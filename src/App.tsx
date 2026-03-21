@@ -28,7 +28,6 @@ import '@/utils/hlsLoader';
 import { useImageUploadSafeguard } from '@/hooks/useImageUploadSafeguard';
 import { useGlobalMemoryMonitor } from '@/hooks/useMemoryMonitor';
 import { usePresenceTracker } from '@/hooks/usePresenceTracker';
-import { useAudioBridge } from '@/hooks/useAudioBridge';
 import { useLocationBroadcast } from '@/features/nearby/hooks/useLocationBroadcast';
 import { TopTenProvider } from '@/context/TopTenContext';
 import { VideoPlaybackProvider } from '@/context/VideoPlaybackContext';
@@ -558,7 +557,7 @@ const AppInner: React.FC = () => {
   useCourseRatingsRealtime();
   
   // Bidirectional audio mute sync between MediaStore ↔ GlobalAudioContext
-  useAudioBridge();
+  // TODO: re-wire audio bridge in Brief 3
   
   // Register media cache service worker for persistent HLS segment caching
   useEffect(() => {
