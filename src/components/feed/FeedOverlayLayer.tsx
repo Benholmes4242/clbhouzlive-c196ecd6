@@ -165,6 +165,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
             reviewText: activeReview.reviewText,
           } : undefined}
           onReviewTap={onReviewTap}
+          onBeforeNavigate={onBeforeNavigate}
           postId={activePost.id}
         />
       </div>
