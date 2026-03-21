@@ -121,6 +121,10 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           onMore={onMore}
           isVideo={isVideo}
           isReviewPost={isActiveReview}
+          onNextMedia={handleNextMedia}
+          onPrevMedia={handlePrevMedia}
+          hasNextMedia={hasNextMedia}
+          hasPrevMedia={hasPrevMedia}
         />
       </div>
 
