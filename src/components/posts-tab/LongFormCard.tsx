@@ -45,7 +45,7 @@ export const LongFormCard: React.FC<LongFormCardProps> = ({ post, allPosts, post
       
       onClick={() => {
         if (allPosts && postIndex != null) {
-          // TODO Brief 3: fullscreen feed open
+          useFullscreenFeedStore.getState().open(allPosts, postIndex);
         }
       }}
     >

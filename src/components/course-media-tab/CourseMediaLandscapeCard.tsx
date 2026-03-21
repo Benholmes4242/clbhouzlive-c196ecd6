@@ -50,9 +50,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
       className="relative aspect-video overflow-hidden cursor-pointer rounded-[4px] active:scale-[0.99] transition-transform"
       
       onClick={() => {
-        if (allPosts) {
-          // TODO Brief 3: fullscreen feed open
-        }
+        useFullscreenFeedStore.getState().open(allPosts ?? [post], index);
       }}
       data-course-media-index={index}
     >

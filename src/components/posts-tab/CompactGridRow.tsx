@@ -54,9 +54,7 @@ const CompactTile: React.FC<{
       
       onClick={() => {
         if (showMenu) return;
-        if (allPosts) {
-          // TODO Brief 3: fullscreen feed open
-        }
+        useFullscreenFeedStore.getState().open(allPosts ?? [post], globalIndex);
       }}
     >
       {/* Poster image */}

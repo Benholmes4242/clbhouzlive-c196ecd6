@@ -54,7 +54,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
       
       onClick={() => {
         if (allPosts && postIndex != null) {
-          // TODO Brief 3: fullscreen feed open
+          useFullscreenFeedStore.getState().open(allPosts, postIndex);
         }
       }}
     >

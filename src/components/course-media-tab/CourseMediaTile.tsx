@@ -54,9 +54,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
       style={{ transition: 'transform 100ms ease' }}
       
       onClick={() => {
-        if (allPosts) {
-          // TODO Brief 3: fullscreen feed open
-        }
+        useFullscreenFeedStore.getState().open(allPosts ?? [post], index);
       }}
     >
       {/* Poster or placeholder */}
