@@ -42,7 +42,7 @@ export function useFriendsFeed(userId: string | undefined) {
 
         const rows = ((data ?? []) as unknown as FeedRpcRow[]);
         const posts = groupMultiMedia(rows.map(mapRowToFeedPost));
-        const interleaved = interleaveReviews(posts, 'friends');
+        const interleaved = buildFriendsFeed(posts);
 
         for (const post of interleaved) {
           if (!seenPostIds.current.includes(post.id)) {
