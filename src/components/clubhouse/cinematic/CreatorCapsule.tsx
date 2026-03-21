@@ -589,7 +589,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           bottom: bottomOffset 
             ? bottomOffset 
             : (isReview 
-                ? '105px'
+                ? '97px'
                 : '97px'),
         }}
       >

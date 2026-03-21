@@ -131,6 +131,10 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
             rating: activeReview.rating,
             tierLabel: '',
             sourceReviewId: activeReview.reviewId,
+            courseCountry: activeReview.courseCountry,
+            courseRegion: activeReview.courseRegion,
+            courseSubCountry: activeReview.courseSubCountry,
+            reviewText: activeReview.reviewText,
           } : undefined}
           onReviewTap={onReviewTap}
           postId={activePost.id}
