@@ -61,6 +61,7 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   const activeVideoElement = useClubhouseStore(s => s.activeVideoElement);
 
   const activePost = posts[activeIndex] ?? null;
+  console.log(`[OVERLAY] render activePost=${activePost?.id} idx=${activeIndex} at t=${performance.now().toFixed(1)}ms`);
   if (!activePost) return null;
 
   const isTournamentCard =

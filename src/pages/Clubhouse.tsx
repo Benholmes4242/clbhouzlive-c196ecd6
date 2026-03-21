@@ -143,6 +143,10 @@ const ClubhouseContent = () => {
   const carouselPositions = useClubhouseStore(s => s.carouselPositions);
   const currentMediaIndex = carouselPositions.get(activeIndex) ?? 0;
 
+  useEffect(() => {
+    console.log(`[CLUBHOUSE] activeIndex changed to ${activeIndex} at t=${performance.now().toFixed(1)}ms`);
+  }, [activeIndex]);
+
   // ── GlobalAudio bridge ──
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
   useEffect(() => {

@@ -57,6 +57,7 @@ export function SnapFeed({
       if (bestEntry && bestEntry.intersectionRatio >= ACTIVE_SLIDE_RATIO) {
         const idx = Number((bestEntry.target as HTMLElement).dataset.index);
         if (!isNaN(idx)) {
+          console.log(`[IO] threshold crossed idx=${idx} ratio=${bestEntry.intersectionRatio.toFixed(3)} at t=${performance.now().toFixed(1)}ms`);
           setActiveIndex(idx);
           if (hasNextPage && idx >= posts.length - NEAR_END_THRESHOLD) {
             onNearEnd();
