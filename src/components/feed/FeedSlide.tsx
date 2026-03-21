@@ -19,6 +19,7 @@ interface FeedSlideProps {
   onShare?: (post: FeedPost) => void;
   getLikeState?: (post: FeedPost) => { isLiked: boolean; count: number };
   getCommentCount?: (post: FeedPost) => number;
+  snapFeedRef?: React.RefObject<HTMLDivElement>;
 }
 
 export const FeedSlide = memo(function FeedSlide({
