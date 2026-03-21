@@ -123,7 +123,6 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           } : undefined}
           onReviewTap={onReviewTap}
           postId={activePost.id}
-          postId={activePost.id}
         />
       </div>
 
