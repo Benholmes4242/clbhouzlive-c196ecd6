@@ -1,4 +1,5 @@
 import { useRef, useEffect, useCallback, type RefObject } from 'react';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useInView } from 'react-intersection-observer';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { ExploreTile } from './ExploreTile';
