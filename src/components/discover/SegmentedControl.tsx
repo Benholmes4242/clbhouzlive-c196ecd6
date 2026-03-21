@@ -24,10 +24,10 @@ const SegmentedControl: React.FC<SegmentedControlProps> = ({
   className,
 }) => {
   return (
-    <section className={cn('py-0 px-4 bg-background', className)}>
+    <section className={cn('py-0 px-4 bg-background flex justify-center', className)}>
       <div
         role="tablist"
-        style={{ borderBottom: '1px solid hsl(var(--border))', display: 'flex', gap: 20, justifyContent: 'center' }}
+        style={{ borderBottom: '1px solid hsl(var(--border))', display: 'inline-flex', gap: 20, justifyContent: 'center' }}
       >
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
