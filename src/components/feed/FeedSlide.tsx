@@ -120,11 +120,11 @@ export const FeedSlide = memo(function FeedSlide({
             src={imgSrc}
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
-            style={{ filter: 'blur(20px)', transform: 'scale(1.1)' }}
+            style={{ filter: 'blur(40px)', transform: 'scale(1.15)', opacity: 0.6 }}
             draggable={false}
             aria-hidden="true"
           />
-          <div className="absolute inset-0 bg-black/30" />
+          <div className="absolute inset-0 bg-black/55" />
           {/* Main image */}
           <img
             src={imgSrc}
