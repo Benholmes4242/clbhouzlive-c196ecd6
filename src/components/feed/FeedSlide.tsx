@@ -29,6 +29,7 @@ export const FeedSlide = memo(function FeedSlide({
   onFirstFrameReady,
   onLike,
   onComment,
+  onShare,
   getLikeState,
   getCommentCount,
 }: FeedSlideProps) {
@@ -39,7 +40,7 @@ export const FeedSlide = memo(function FeedSlide({
 
   // ── Content routing ──
   const renderContent = () => {
-    // Tournament cards
+    // Tournament live card
     if (post.postType === 'tournament_live') {
       const likeState = getLikeState?.(post) ?? { isLiked: false, count: 0 };
       const commentCount = getCommentCount?.(post) ?? 0;
@@ -55,6 +56,7 @@ export const FeedSlide = memo(function FeedSlide({
       );
     }
 
+    // Tournament result card
     if (post.postType === 'tournament_result') {
       const likeState = getLikeState?.(post) ?? { isLiked: false, count: 0 };
       const commentCount = getCommentCount?.(post) ?? 0;
@@ -62,8 +64,10 @@ export const FeedSlide = memo(function FeedSlide({
         <TournamentResultCard
           post={post as unknown as TournamentResultFeedPost}
           isActive={isActive}
-          onComment={onComment}
+          isVisible={isActive}
           onLike={() => onLike?.(post)}
+          onComment={() => onComment?.()}
+          onShare={() => onShare?.(post)}
           likeOverride={likeState}
           commentCountOverride={commentCount}
         />

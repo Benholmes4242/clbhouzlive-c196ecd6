@@ -3,7 +3,6 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
-import { FullscreenReviewPost } from '@/components/posts/FullscreenReviewPost';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import type { FeedPost } from '@/components/media-system/types/media';
 
@@ -21,6 +20,9 @@ interface FeedOverlayLayerProps {
   onReviewTap: () => void;
   overlayVisible: boolean;
   isOwnPost: boolean;
+  golfCourse?: { id: string; name: string; country?: string } | null;
+  activeReview?: { reviewId: string; courseId: string; courseName: string; courseImageUrl: string | null; rating: number } | null;
+  isActiveReview?: boolean;
 }
 
 export const FeedOverlayLayer = memo(function FeedOverlayLayer({
@@ -37,6 +39,9 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   onReviewTap,
   overlayVisible,
   isOwnPost,
+  golfCourse,
+  activeReview,
+  isActiveReview,
 }: FeedOverlayLayerProps) {
   const activeIndex = useClubhouseStore(s => s.activeIndex);
   const isMuted = useClubhouseStore(s => s.isMuted);
@@ -74,48 +79,58 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
       {/* Action Rail */}
       <div style={{ pointerEvents: 'auto' }}>
         <CinematicActionRail
-          likeCount={likeState.count}
-          commentCount={commentCount}
-          shareCount={activePost.shareCount}
-          isLiked={likeState.isLiked}
+          postId={activePost.id}
+          likesCount={likeState.count}
+          commentsCount={commentCount}
+          hasLiked={likeState.isLiked}
           isMuted={isMuted}
+          isVisible={overlayVisible}
           onLike={() => onLike(activePost)}
           onComment={onComment}
           onShare={() => onShare(activePost)}
           onMuteToggle={toggleMute}
           onMore={onMore}
           isVideo={isVideo}
-          isOwnPost={isOwnPost}
+          isReviewPost={isActiveReview}
         />
       </div>
 
       {/* Creator Capsule */}
       <div style={{ pointerEvents: 'auto' }}>
         <CreatorCapsule
-          username={activePost.username}
-          displayName={activePost.displayName}
-          avatarUrl={activePost.avatarUrl}
+          user={{
+            id: activePost.userId,
+            name: activePost.displayName,
+            username: activePost.username,
+            avatar: activePost.avatarUrl,
+          }}
           caption={activePost.caption}
-          isVerified={activePost.isVerified}
-          isFollowed={isFollowed}
+          tags={activePost.tags}
+          golfCourse={golfCourse ? { id: golfCourse.id, name: golfCourse.name, country: golfCourse.country } : null}
+          isFollowing={isFollowed}
+          isOwnPost={isOwnPost}
+          isVisible={overlayVisible}
           onFollow={() => onFollow(activePost)}
           onViewProfile={onViewProfile}
-          courseName={activePost.courseName}
-          courseId={activePost.courseId}
-          tags={activePost.tags}
-          isOwnPost={isOwnPost}
+          isReview={isActiveReview}
+          reviewData={activeReview ? {
+            courseId: activeReview.courseId,
+            courseName: activeReview.courseName,
+            courseLocation: undefined,
+            rating: activeReview.rating,
+            tierLabel: '',
+            sourceReviewId: activeReview.reviewId,
+          } : undefined}
+          onReviewTap={onReviewTap}
+          postId={activePost.id}
+          dotsSlot={mediaCount > 1 ? (
+            <MediaNavigationDots
+              mediaCount={mediaCount}
+              currentIndex={currentMediaIndex}
+            />
+          ) : undefined}
         />
       </div>
-
-      {/* Media Navigation Dots */}
-      {mediaCount > 1 && (
-        <div className="absolute bottom-[120px] left-0 right-0 flex justify-center" style={{ pointerEvents: 'auto' }}>
-          <MediaNavigationDots
-            total={mediaCount}
-            current={currentMediaIndex}
-          />
-        </div>
-      )}
 
       {/* Video Scrubber */}
       {isVideo && activeVideoElement && (
@@ -124,16 +139,6 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
             videoEl={activeVideoElement}
             height={3}
             variant="fullscreen"
-          />
-        </div>
-      )}
-
-      {/* Review Overlay */}
-      {activePost.isReview && activePost.review && (
-        <div style={{ pointerEvents: 'auto' }}>
-          <FullscreenReviewPost
-            review={activePost.review}
-            onTap={onReviewTap}
           />
         </div>
       )}
