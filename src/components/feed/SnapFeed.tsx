@@ -5,8 +5,8 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { haptic } from '@/utils/haptics';
 
 const NEAR_END_THRESHOLD = 3;
-const ACTIVE_SLIDE_RATIO = 0.98;
-const INTERSECTION_THRESHOLDS = [0.7, 0.85, 0.95, ACTIVE_SLIDE_RATIO];
+const ACTIVE_SLIDE_RATIO = 1.0;
+const INTERSECTION_THRESHOLDS = [0.7, 0.85, 0.95, 0.99, ACTIVE_SLIDE_RATIO];
 const PTR_DISTANCE = 80;
 
 interface SnapFeedProps {
