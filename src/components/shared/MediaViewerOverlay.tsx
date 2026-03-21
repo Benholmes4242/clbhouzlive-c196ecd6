@@ -71,7 +71,6 @@ const ImageSlide: React.FC<{ item: MediaViewerItem }> = ({ item }) => {
 /* ─── Main overlay ─── */
 export const MediaViewerOverlay: React.FC = () => {
   const { isOpen, items, currentIndex, closeViewer, next, prev, goTo } = useMediaViewer();
-  console.log('[MediaViewerOverlay] render — isOpen:', isOpen, 'items:', items.length);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
