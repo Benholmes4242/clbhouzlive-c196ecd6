@@ -27,7 +27,10 @@ export const useClubhouseStore = create<ClubhouseState>()((set) => ({
   carouselPositions: new Map(),
   isTournamentCardActive: false,
 
-  setActiveIndex: (idx) => set({ activeIndex: idx }),
+  setActiveIndex: (idx) => {
+    console.log(`[STORE] activeIndex → ${idx} at t=${performance.now().toFixed(1)}ms`);
+    set({ activeIndex: idx });
+  },
   setIsMuted: (v) => set({ isMuted: v }),
   toggleMute: () => set((s) => ({ isMuted: !s.isMuted })),
   setUserPaused: (v) => set({ userPaused: v }),
