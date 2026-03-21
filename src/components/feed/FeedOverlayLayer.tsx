@@ -123,14 +123,29 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           } : undefined}
           onReviewTap={onReviewTap}
           postId={activePost.id}
-          dotsSlot={mediaCount > 1 ? (
-            <MediaNavigationDots
-              mediaCount={mediaCount}
-              currentIndex={currentMediaIndex}
-            />
-          ) : undefined}
         />
       </div>
+
+      {/* Media navigation dots — centered horizontally, sitting just above the creator capsule */}
+      {mediaCount > 1 && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: 'calc(97px + 68px + 10px)',
+            left: 0,
+            right: 0,
+            display: 'flex',
+            justifyContent: 'center',
+            pointerEvents: 'auto',
+            zIndex: 31,
+          }}
+        >
+          <MediaNavigationDots
+            mediaCount={mediaCount}
+            currentIndex={currentMediaIndex}
+          />
+        </div>
+      )}
 
       {/* Video Scrubber — anchored to the top edge of the bottom nav bar */}
       {isVideo && activeVideoElement && (
