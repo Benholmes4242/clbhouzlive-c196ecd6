@@ -108,6 +108,8 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           <MediaNavigationDots
             mediaCount={mediaCount}
             currentIndex={currentMediaIndex}
+            bottomOffset="auto"
+            className="!static"
           />
         </div>
       )}
