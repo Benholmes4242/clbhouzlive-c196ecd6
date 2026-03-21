@@ -58,16 +58,14 @@ export default function ExploreGrid({
   }, [inView, loadMore]);
 
   // Sync new posts into fullscreen overlay
-  const isFullscreenOpen = false; // TODO Brief 3
-  const fullscreenPostCount = 0; // TODO Brief 3
+  const { isOpen: isFullscreenOpen, appendPosts } = useFullscreenFeedStore();
 
   useEffect(() => {
     if (!isFullscreenOpen) return;
-    if (coursePosts.length > fullscreenPostCount) {
-      const newPosts = coursePosts.slice(fullscreenPostCount);
-      // TODO Brief 3: appendPosts(newPosts);
+    if (coursePosts.length > 0) {
+      appendPosts(coursePosts);
     }
-  }, [coursePosts.length, isFullscreenOpen, fullscreenPostCount]);
+  }, [coursePosts.length, isFullscreenOpen, appendPosts]);
 
   if (isLoading) {
     return <ExploreGridSkeleton />;

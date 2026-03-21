@@ -73,10 +73,10 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
   const courseNameToShow = post.review?.courseName || post.courseName || extractedCourse?.name || null;
   const courseIdToShow = post.review?.courseId || post.courseId || null;
 
+  const { open } = useFullscreenFeedStore();
+
   const handleTap = () => {
-    if (allPosts) {
-      // TODO Brief 3: fullscreen feed open
-    }
+    open(allPosts ?? [post], cardIndex);
   };
 
   const toggleLike = async () => {

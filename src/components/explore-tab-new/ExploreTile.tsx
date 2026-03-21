@@ -37,10 +37,10 @@ function ExploreTileInner({ post, index, allPosts, fetchNextPage, hasNextPage, i
   const courseName = post.courseName || post.review?.courseName;
   const rating = post.review?.rating;
 
+  const { open } = useFullscreenFeedStore();
+
   const handleTap = () => {
-    if (allPosts) {
-      // TODO Brief 3: fullscreen feed open
-    }
+    open(allPosts ?? [post], index);
   };
 
   return (

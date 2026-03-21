@@ -233,7 +233,7 @@ export const FriendsCard = React.memo(function FriendsCard({ post, userId, cardI
           
           onClick={() => {
             if (allPosts && cardIndex != null) {
-              // TODO Brief 3: fullscreen feed open
+              useFullscreenFeedStore.getState().open(allPosts, cardIndex);
             }
           }}
         >
