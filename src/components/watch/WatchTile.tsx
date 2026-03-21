@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Heart, Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { useMediaViewer } from '@/hooks/useMediaViewer';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
@@ -31,6 +32,7 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, fetchNextP
   const engagement = post.likeCount + post.commentCount + post.shareCount;
   const tileRef = useRef<HTMLDivElement>(null);
   const hlsUrl = post.mediaItems?.[0]?.hlsUrl;
+  const { openViewer } = useMediaViewer();
 
   useEffect(() => {
     const el = tileRef.current;
@@ -55,9 +57,23 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, fetchNextP
       style={{ transition: 'transform 100ms ease' }}
       
       onClick={() => {
-        if (allPosts) {
-          // TODO Brief 3: fullscreen feed open
-        }
+        console.log('[WatchTile] clicked', { post, index, allPosts: allPosts?.length });
+        const posts = allPosts ?? [post];
+        const items = posts.flatMap(p =>
+          p.mediaItems.map(m => ({
+            id: m.id,
+            type: m.type,
+            hlsUrl: m.hlsUrl,
+            mp4Url: m.mp4Url,
+            imageUrl: m.imageUrl,
+            thumbnailUrl: m.thumbnailUrl,
+            width: m.width,
+            height: m.height,
+          }))
+        );
+        const startIndex = (allPosts ?? [post]).slice(0, index).reduce((acc, p) => acc + p.mediaItems.length, 0);
+        console.log('[WatchTile] opening viewer', { items: items.length, startIndex });
+        openViewer(items, startIndex);
       }}
     >
       {/* Poster or placeholder */}
