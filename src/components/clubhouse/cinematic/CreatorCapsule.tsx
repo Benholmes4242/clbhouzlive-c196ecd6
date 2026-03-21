@@ -551,9 +551,9 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             </AnimatePresence>
           )}
 
-          {/* Media navigation dots — centered at the bottom of the capsule pill */}
+          {/* Carousel dots — sit at the very bottom of the capsule pill */}
           {dotsSlot && (
-            <div className="flex justify-center pt-1.5 pb-0.5 pointer-events-auto">
+            <div className="flex justify-center py-1.5 pointer-events-auto">
               {dotsSlot}
             </div>
           )}
