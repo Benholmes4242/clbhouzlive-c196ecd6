@@ -128,7 +128,8 @@ export const MediaViewerOverlay: React.FC = () => {
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[9999] bg-black flex flex-col"
+          className="fixed inset-0 bg-black flex flex-col"
+          style={{ zIndex: 13000 }}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
