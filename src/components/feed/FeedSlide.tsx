@@ -132,6 +132,16 @@ export const FeedSlide = memo(function FeedSlide({
     );
   };
 
+  // DEBUG — wheel and touch events
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    console.log(`[SLIDE-${index}] wheel deltaX=${e.deltaX.toFixed(1)} deltaY=${e.deltaY.toFixed(1)} isActive=${isActive} mediaCount=${media?.length ?? 0} postType=${post.postType} defaultPrevented=${e.defaultPrevented}`);
+  }, [index, isActive, post.postType, media?.length]);
+
+  const handleTouchStartDebug = useCallback((e: React.TouchEvent) => {
+    const t = e.touches[0];
+    console.log(`[SLIDE-${index}] touchstart x=${t.clientX.toFixed(0)} y=${t.clientY.toFixed(0)} isActive=${isActive} mediaCount=${media?.length ?? 0}`);
+  }, [index, isActive, media?.length]);
+
   return (
     <div
       ref={setRef}
@@ -142,6 +152,8 @@ export const FeedSlide = memo(function FeedSlide({
         scrollSnapAlign: 'start',
         background: '#000',
       }}
+      onWheel={handleWheel}
+      onTouchStart={handleTouchStartDebug}
     >
       {renderContent()}
     </div>
