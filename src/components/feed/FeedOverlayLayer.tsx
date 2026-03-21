@@ -95,6 +95,25 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
         />
       </div>
 
+      {/* Media navigation dots — centered horizontally, sitting just above the creator capsule */}
+      {mediaCount > 1 && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            pointerEvents: 'auto',
+            paddingBottom: 8,
+          }}
+        >
+          <MediaNavigationDots
+            mediaCount={mediaCount}
+            currentIndex={currentMediaIndex}
+            bottomOffset="auto"
+            className="!static"
+          />
+        </div>
+      )}
+
       {/* Creator Capsule */}
       <div style={{ pointerEvents: 'auto' }}>
         <CreatorCapsule
@@ -125,27 +144,6 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           postId={activePost.id}
         />
       </div>
-
-      {/* Media navigation dots — centered horizontally, sitting just above the creator capsule */}
-      {mediaCount > 1 && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: 'calc(97px + 68px + 10px)',
-            left: 0,
-            right: 0,
-            display: 'flex',
-            justifyContent: 'center',
-            pointerEvents: 'auto',
-            zIndex: 31,
-          }}
-        >
-          <MediaNavigationDots
-            mediaCount={mediaCount}
-            currentIndex={currentMediaIndex}
-          />
-        </div>
-      )}
 
       {/* Video Scrubber — anchored to the top edge of the bottom nav bar */}
       {isVideo && activeVideoElement && (
