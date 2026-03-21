@@ -171,6 +171,7 @@ export function SnapFeed({
   return (
     <div
       ref={containerRef}
+      data-snap-feed
       className="absolute inset-0 overflow-y-auto"
       style={{
         scrollSnapType: 'y mandatory',
