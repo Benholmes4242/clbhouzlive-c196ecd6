@@ -502,12 +502,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
                 : '97px'),
         }}
       >
-        {/* Media navigation dots - centered above capsule */}
-        {dotsSlot && (
-          <div className="flex justify-center mb-3 pointer-events-auto">
-            {dotsSlot}
-          </div>
-        )}
         <motion.div
           layout
           transition={{ layout: { duration: 0.2, ease: 'easeOut' } }}
