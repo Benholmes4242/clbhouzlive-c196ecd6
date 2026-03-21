@@ -356,7 +356,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
               {/* Avatars */}
               <div style={{ display: 'flex', flexShrink: 0 }}>
                 {row.players.slice(0, 3).map((p, i) => (
-                  <div key={p.playerId} style={{ marginLeft: i > 0 ? -10 : 0, border: '2px solid #080a0e', borderRadius: '34%', position: 'relative', zIndex: 3 - i }}>
+                  <div key={p.playerId} style={{ marginLeft: i > 0 ? -10 : 0, borderRadius: '34%', position: 'relative', zIndex: 3 - i }}>
                     <PlayerAvatar name={p.playerName} photoUrl={p.photoUrl} tourSlug={meta.tourSlug} size={28} />
                   </div>
                 ))}
@@ -365,7 +365,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
                     marginLeft: -10, width: 28, height: 28, borderRadius: '34%',
                     background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)',
-                    border: '2px solid #080a0e',
+                    
                   }}>
                     +{row.players.length - 3}
                   </div>
