@@ -107,6 +107,11 @@ const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
 
 const ClubhouseContent = () => {
   const { isRehydrating } = useRehydrationSafe();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ['media-feed', 'suggested'] });
+  }, []);
   const { pathname } = useLocation();
   
   useEffect(() => {
