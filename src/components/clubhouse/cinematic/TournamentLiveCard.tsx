@@ -190,7 +190,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
 
   return (
     <div style={{
-      height: '100dvh',
+      height: '100%',
       overflow: 'hidden',
       display: 'flex',
       flexDirection: 'column',
@@ -209,7 +209,7 @@ export const TournamentLiveCard: React.FC<TournamentLiveCardProps> = ({
         flexShrink: 0,
         position: 'relative',
         background: 'linear-gradient(160deg, #141c2e 0%, #0a1020 55%, #080a0e 100%)',
-        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 56px)',
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)',
         paddingLeft: 20,
         paddingRight: 20,
         paddingBottom: 16,
