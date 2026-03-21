@@ -9,7 +9,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ImageWithFallback } from '@/components/common/ImageWithFallback';
 import { SheetPlaybackProvider, useSheetPlayback } from './SheetPlaybackContext';
-import { VideoThumbPlayer } from './VideoThumbPlayer';
+// TODO Brief 3: re-wire VideoThumbPlayer
 import { getProfilePathById } from '@/lib/profileRoutes';
 
 interface UserProfile {
@@ -62,12 +62,8 @@ function RecentPostTile({
   if (isVideo) {
     return (
       <div className="recent-post-tile relative aspect-square rounded-2xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.04)' }}>
-        <VideoThumbPlayer
-          url={media.url}
-          ioRoot={ioRoot}
-          className="w-full h-full"
-        />
-        {/* Gradient overlay for better contrast */}
+        {/* TODO Brief 3: re-wire VideoThumbPlayer */}
+        <img src={media.posterUrl} alt="" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
       </div>
     );

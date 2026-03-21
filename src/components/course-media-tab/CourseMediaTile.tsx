@@ -2,8 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import { Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
-import { preTouchPreload, onViewPreload } from '@/components/media-system/utils/preTouchPreload';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
@@ -38,7 +36,7 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          onViewPreload(hlsUrl);
+          // TODO Brief 3: onViewPreload
         }
       },
       { threshold: 0.5 }
@@ -53,17 +51,10 @@ export const CourseMediaTile: React.FC<CourseMediaTileProps> = ({ post, index, a
       data-course-media-index={index}
       className="relative aspect-[4/5] overflow-hidden rounded-[4px] cursor-pointer active:scale-[0.97]"
       style={{ transition: 'transform 100ms ease' }}
-      onTouchStart={() => preTouchPreload(media?.hlsUrl)}
+      
       onClick={() => {
         if (allPosts) {
-          useFullscreenFeed.getState().open({
-            posts: allPosts,
-            startIndex: index,
-            sourceId: 'course-media',
-            fetchNextPage,
-            hasNextPage,
-            isFetchingNextPage,
-          });
+          // TODO Brief 3: fullscreen feed open
         }
       }}
     >

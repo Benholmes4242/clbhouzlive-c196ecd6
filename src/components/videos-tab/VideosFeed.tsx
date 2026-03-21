@@ -6,7 +6,6 @@ import type { VideosFilter } from './hooks/useVideosFeed';
 import { VideoCard } from './VideoCard';
 import { VideosFeedSkeleton } from './VideosFeedSkeleton';
 import { VideosAutoplay } from './VideosAutoplay';
-import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 
 interface VideosFeedProps {
   posts: FeedPost[];
@@ -47,14 +46,14 @@ export function VideosFeed({
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // Sync new posts into fullscreen overlay
-  const isFullscreenOpen = useFullscreenFeed(s => s.isOpen);
-  const fullscreenPostCount = useFullscreenFeed(s => s.posts.length);
+  const isFullscreenOpen = false; // TODO Brief 3
+  const fullscreenPostCount = 0; // TODO Brief 3
 
   useEffect(() => {
     if (!isFullscreenOpen) return;
     if (posts.length > fullscreenPostCount) {
       const newPosts = posts.slice(fullscreenPostCount);
-      useFullscreenFeed.getState().appendPosts(newPosts);
+      // TODO Brief 3: appendPosts(newPosts);
     }
   }, [posts.length, isFullscreenOpen, fullscreenPostCount]);
 

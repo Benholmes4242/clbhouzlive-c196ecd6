@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { useMediaStore } from '@/components/media-system/store/mediaStore';
+// TODO: re-wire mediaStore setActiveIndex in Brief 3
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import { clubhouseDebug } from '@/debug/clubhouseDebug';
+// TODO: re-wire clubhouseDebug in Brief 3
 
 interface UseFeedNavOptions {
   activeTab: string;
@@ -25,8 +25,7 @@ export function useClubhouseFeedNav({ activeTab, activeFeed, onTabSwitch }: UseF
   useEffect(() => {
     if (prevTabRef.current !== activeTab) {
       analyticsEvents.track('feed_tab_switch', { from: prevTabRef.current, to: activeTab });
-      clubhouseDebug.tabChange(prevTabRef.current, activeTab);
-      useMediaStore.getState().setActiveIndex(0);
+      // TODO Brief 3: useMediaStore.getState().setActiveIndex(0);
       onTabSwitch();
       prevTabRef.current = activeTab;
     }

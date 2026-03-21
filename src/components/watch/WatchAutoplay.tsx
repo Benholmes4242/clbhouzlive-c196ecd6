@@ -1,5 +1,4 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { getSharedBandwidth } from '@/components/media-system/utils/sharedBandwidth';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 const VIDEO_POOL_SIZE = 2;
@@ -74,7 +73,7 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     tileEl.appendChild(video);
 
     const { default: Hls } = await import('hls.js');
-    const { createCachedLoader } = await import('@/components/media-system/utils/cachedHlsLoader');
+    // TODO: re-wire cachedHlsLoader in Brief 3
     if (activeMapRef.current.get(slot) !== tileIdx) return;
 
     if (!Hls.isSupported()) {
@@ -86,11 +85,11 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     const hls = new Hls({
       startLevel: -1,
       capLevelToPlayerSize: false,
-      abrEwmaDefaultEstimate: getSharedBandwidth() > 0 ? getSharedBandwidth() : 8_000_000,
+      abrEwmaDefaultEstimate: 5_000_000 > 0 ? 5_000_000 : 8_000_000,
       maxBufferLength: 5,
       maxMaxBufferLength: 10,
       enableWorker: true,
-      loader: createCachedLoader(Hls),
+      loader: undefined,
     });
     hlsPoolRef.current[slot] = hls;
     hls.loadSource(hlsUrl);

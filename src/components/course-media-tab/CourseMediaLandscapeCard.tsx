@@ -2,8 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import { Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
-import { preTouchPreload, onViewPreload } from '@/components/media-system/utils/preTouchPreload';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
@@ -35,7 +33,7 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          onViewPreload(hlsUrl);
+          // TODO Brief 3: onViewPreload
         }
       },
       { threshold: 0.5 }
@@ -49,17 +47,10 @@ export const CourseMediaLandscapeCard: React.FC<CourseMediaLandscapeCardProps> =
       ref={tileRef}
       style={{ gridColumn: '1 / -1' }}
       className="relative aspect-video overflow-hidden cursor-pointer rounded-[4px] active:scale-[0.99] transition-transform"
-      onTouchStart={() => preTouchPreload(media?.hlsUrl)}
+      
       onClick={() => {
         if (allPosts) {
-          useFullscreenFeed.getState().open({
-            posts: allPosts,
-            startIndex: index,
-            sourceId: 'course-media',
-            fetchNextPage,
-            hasNextPage,
-            isFetchingNextPage,
-          });
+          // TODO Brief 3: fullscreen feed open
         }
       }}
       data-course-media-index={index}

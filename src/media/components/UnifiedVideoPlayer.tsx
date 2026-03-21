@@ -37,7 +37,7 @@ import { VideoControls } from './VideoControls';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { Volume2, VolumeX } from 'lucide-react';
 import { extractCloudflareUid } from '@/utils/videoIdUtils';
-import { createCachedHlsLoader } from '@/lib/cachedHlsLoader';
+// TODO Brief 3: re-wire cachedHlsLoader
 import { HLSPoolManager } from '@/media/HLSPoolManager';
 import { useBufferingIndicator } from '@/hooks/useBufferingIndicator';
 import { useAudioFade } from '@/hooks/useAudioFade';
@@ -53,7 +53,10 @@ import {
   logVideoElementUnmount,
 } from '@/media/mobileVideoDebug';
 
-import { getSharedBandwidth, saveSharedBandwidth, setNativeHlsSource } from '@/components/media-system/utils/sharedBandwidth';
+// TODO Brief 3: re-wire sharedBandwidth
+const getSharedBandwidth = () => 5_000_000;
+const saveSharedBandwidth = (_bw: number) => {};
+const setNativeHlsSource = async (video: HTMLVideoElement, url: string) => { video.src = url; };
 
 // ============ Types ============
 
@@ -805,7 +808,8 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
             enableWorker: true,
 
             // Wire up cached loader for prefetched segments
-            loader: cloudflareUid ? createCachedHlsLoader(cloudflareUid) : undefined,
+            // TODO Brief 3: re-wire cachedHlsLoader
+            // loader: cloudflareUid ? createCachedHlsLoader(cloudflareUid) : undefined,
           });
 
           hls.on(Hls.Events.MANIFEST_PARSED, () => {

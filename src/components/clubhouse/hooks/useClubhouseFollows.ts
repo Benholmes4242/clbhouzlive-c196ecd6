@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { useFollowMutation } from '@/components/media-system/hooks/useFollowMutation';
+// TODO: re-import useFollowMutation from new feed system in Brief 3
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 interface UseClubhouseFollowsOptions {
@@ -11,7 +11,7 @@ interface UseClubhouseFollowsOptions {
  * Manages optimistic follow state for the Clubhouse feed.
  */
 export function useClubhouseFollows({ userId }: UseClubhouseFollowsOptions) {
-  const followMutation = useFollowMutation();
+  // TODO Brief 3: const followMutation = useFollowMutation();
   const [followOverrides, setFollowOverrides] = useState<Map<string, boolean>>(new Map());
 
   const handleFollow = useCallback((post: FeedPost | null) => {
@@ -29,27 +29,9 @@ export function useClubhouseFollows({ userId }: UseClubhouseFollowsOptions) {
       return next;
     });
 
-    analyticsEvents.track('video_follow', { target_id: post.userId, action: currentlyFollowed ? 'unfollow' : 'follow' });
-
-    followMutation.mutate(
-      {
-        targetUserId: post.userId,
-        targetActorType: post.actorType as 'personal' | 'business',
-        targetActorId: post.actorId,
-        currentUserId: userId,
-        isFollowed: currentlyFollowed,
-      },
-      {
-        onError: () => {
-          setFollowOverrides(prev => {
-            const next = new Map(prev);
-            next.set(post.userId, currentlyFollowed);
-            return next;
-          });
-        },
-      },
-    );
-  }, [userId, followOverrides, followMutation]);
+    analyticsEvents.track('feed_follow', { target_user_id: post.userId, action: currentlyFollowed ? 'unfollow' : 'follow' });
+    // TODO Brief 3: followMutation.mutate(...)
+  }, [userId, followOverrides]);
 
   const handleFollowChange = useCallback((targetUserId: string, isFollowed: boolean) => {
     setFollowOverrides(prev => {
@@ -61,12 +43,12 @@ export function useClubhouseFollows({ userId }: UseClubhouseFollowsOptions) {
 
   const getFollowState = useCallback((post: FeedPost | null): boolean => {
     if (!post) return false;
-    return followOverrides.has(post.userId)
-      ? followOverrides.get(post.userId)!
-      : post.isFollowedByMe;
+    return followOverrides.has(post.userId) ? followOverrides.get(post.userId)! : post.isFollowedByMe;
   }, [followOverrides]);
 
-  const resetFollows = useCallback(() => setFollowOverrides(new Map()), []);
+  const resetFollows = useCallback(() => {
+    setFollowOverrides(new Map());
+  }, []);
 
   return { followOverrides, handleFollow, handleFollowChange, getFollowState, resetFollows };
 }

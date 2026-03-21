@@ -1,8 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Heart, Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
-import { preTouchPreload, onViewPreload } from '@/components/media-system/utils/preTouchPreload';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
@@ -40,7 +38,7 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, fetchNextP
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          onViewPreload(hlsUrl);
+          // TODO Brief 3: onViewPreload
         }
       },
       { threshold: 0.5 }
@@ -55,17 +53,10 @@ const WatchTile: React.FC<WatchTileProps> = ({ post, index, allPosts, fetchNextP
       data-watch-index={index}
       className="relative aspect-[4/5] overflow-hidden rounded-[4px] cursor-pointer active:scale-[0.97]"
       style={{ transition: 'transform 100ms ease' }}
-      onTouchStart={() => preTouchPreload(post.mediaItems?.[0]?.hlsUrl)}
+      
       onClick={() => {
         if (allPosts) {
-          useFullscreenFeed.getState().open({
-            posts: allPosts,
-            startIndex: index,
-            sourceId: 'watch',
-            fetchNextPage,
-            hasNextPage,
-            isFetchingNextPage,
-          });
+          // TODO Brief 3: fullscreen feed open
         }
       }}
     >

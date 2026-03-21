@@ -1,55 +1,16 @@
 import { useEffect } from 'react';
-import { useMediaStore } from '@/components/media-system/store/mediaStore';
+// TODO: re-wire mediaStore in Brief 3
 
 /**
  * Manages app-lifecycle side effects for the Clubhouse feed:
- * - Pause/resume on visibility change (app background/foreground)
- * - Auto-resume on network reconnect
  * - Screen Wake Lock acquisition
  *
- * Accepts an optional getStore resolver for scoped stores (e.g. fullscreen overlay).
- * When omitted, falls back to the global useMediaStore.
+ * Video pause/resume logic removed — mediaStore deleted in Brief 1.
+ * Will be re-wired in Brief 3 with new scroll-snap feed.
  */
 export function useClubhouseLifecycle(
-  getStore?: () => { activeVideoElement: HTMLVideoElement | null; userPaused: boolean }
+  _getStore?: () => { activeVideoElement: HTMLVideoElement | null; userPaused: boolean }
 ) {
-  // resolveStore is a plain getter function (not a hook).
-  // getStore, if provided, must also be a plain getter (not a hook call).
-  // useMediaStore.getState() is the Zustand imperative API — safe to call anywhere.
-  const resolveStore = getStore ?? (() => useMediaStore.getState());
-
-  // Pause/resume on visibility change (app background)
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      const state = resolveStore();
-      const activeEl = state.activeVideoElement;
-      if (!activeEl) return;
-
-      if (document.hidden) {
-        if (!activeEl.paused) activeEl.pause();
-      } else {
-        if (activeEl.paused && !state.userPaused) {
-          activeEl.play().catch(() => {});
-        }
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [resolveStore]);
-
-  // Auto-resume on network reconnect
-  useEffect(() => {
-    const handleOnline = () => {
-      const state = resolveStore();
-      const activeEl = state.activeVideoElement;
-      if (activeEl && activeEl.paused && !state.userPaused) {
-        activeEl.play().catch(() => {});
-      }
-    };
-    window.addEventListener('online', handleOnline);
-    return () => window.removeEventListener('online', handleOnline);
-  }, [resolveStore]);
-
   // Screen Wake Lock
   useEffect(() => {
     let wakeLock: WakeLockSentinel | null = null;

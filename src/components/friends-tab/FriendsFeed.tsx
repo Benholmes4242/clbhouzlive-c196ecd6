@@ -5,7 +5,6 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { FriendsCard } from './FriendsCard';
 import { FriendsFeedSkeleton } from './FriendsFeedSkeleton';
 import { FriendsAutoplay } from './FriendsAutoplay';
-import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
 
 interface FriendsFeedProps {
   posts: FeedPost[];
@@ -44,14 +43,14 @@ export function FriendsFeed({
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // Sync new posts into fullscreen overlay
-  const isFullscreenOpen = useFullscreenFeed(s => s.isOpen);
-  const fullscreenPostCount = useFullscreenFeed(s => s.posts.length);
+  const isFullscreenOpen = false; // TODO Brief 3
+  const fullscreenPostCount = 0; // TODO Brief 3
 
   useEffect(() => {
     if (!isFullscreenOpen) return;
     if (posts.length > fullscreenPostCount) {
       const newPosts = posts.slice(fullscreenPostCount);
-      useFullscreenFeed.getState().appendPosts(newPosts);
+      // TODO Brief 3: appendPosts(newPosts);
     }
   }, [posts.length, isFullscreenOpen, fullscreenPostCount]);
 

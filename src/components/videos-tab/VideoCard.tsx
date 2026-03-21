@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Heart, MessageCircle, Share2, MapPin } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
-import { preTouchPreload, onViewPreload } from '@/components/media-system/utils/preTouchPreload';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import CommentsSheet from '@/components/comments/CommentsSheet';
@@ -52,7 +50,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          onViewPreload(hlsUrl);
+          // TODO Brief 3: onViewPreload
         }
       },
       { threshold: 0.5 }
@@ -76,14 +74,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
 
   const handleTap = () => {
     if (allPosts) {
-      useFullscreenFeed.getState().open({
-        posts: allPosts,
-        startIndex: cardIndex,
-        sourceId: 'videos',
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-      });
+      // TODO Brief 3: fullscreen feed open
     }
   };
 
@@ -232,7 +223,7 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
           data-media-wrapper
           className="relative w-full aspect-[16/9.5] bg-muted cursor-pointer"
           onClick={handleTap}
-          onTouchStart={() => preTouchPreload(firstVideo?.hlsUrl)}
+          
           aria-label={`Play video by ${post.displayName}`}
         >
           {thumbnailUrl && (

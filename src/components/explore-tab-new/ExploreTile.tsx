@@ -1,7 +1,5 @@
 import { memo, useEffect, useRef } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
-import { preTouchPreload, onViewPreload } from '@/components/media-system/utils/preTouchPreload';
 
 interface ExploreTileProps {
   post: FeedPost;
@@ -23,7 +21,7 @@ function ExploreTileInner({ post, index, allPosts, fetchNextPage, hasNextPage, i
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          onViewPreload(hlsUrl);
+          // TODO Brief 3: onViewPreload
         }
       },
       { threshold: 0.5 }
@@ -40,14 +38,7 @@ function ExploreTileInner({ post, index, allPosts, fetchNextPage, hasNextPage, i
 
   const handleTap = () => {
     if (allPosts) {
-      useFullscreenFeed.getState().open({
-        posts: allPosts,
-        startIndex: index,
-        sourceId: 'explore',
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-      });
+      // TODO Brief 3: fullscreen feed open
     }
   };
 
@@ -56,7 +47,7 @@ function ExploreTileInner({ post, index, allPosts, fetchNextPage, hasNextPage, i
       ref={tileRef}
       type="button"
       onClick={handleTap}
-      onTouchStart={() => preTouchPreload(post.mediaItems?.[0]?.hlsUrl)}
+      
       aria-label={courseName ? `View ${courseName}` : 'View post'}
       className="relative aspect-[4/5] rounded-[4px] overflow-hidden bg-muted focus:outline-none"
       data-explore-index={index}

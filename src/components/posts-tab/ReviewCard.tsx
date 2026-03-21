@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { Star, Play, Heart, MessageCircle, MoreHorizontal } from 'lucide-react';
-import { useFullscreenFeed } from '@/components/fullscreen-feed/hooks/useFullscreenFeed';
-import { preTouchPreload, onViewPreload } from '@/components/media-system/utils/preTouchPreload';
 import { formatDistanceToNow } from 'date-fns';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { formatCompact } from './utils';
@@ -27,7 +25,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          onViewPreload(hlsUrl);
+          // TODO Brief 3: onViewPreload
         }
       },
       { threshold: 0.5 }
@@ -52,14 +50,10 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({ post, allPosts, postInde
     <div
       ref={tileRef}
       className="bg-card overflow-hidden cursor-pointer active:scale-[0.99] transition-transform"
-      onTouchStart={() => preTouchPreload(userMedia?.hlsUrl)}
+      
       onClick={() => {
         if (allPosts && postIndex != null) {
-          useFullscreenFeed.getState().open({
-            posts: allPosts,
-            startIndex: postIndex,
-            sourceId: 'posts',
-          });
+          // TODO Brief 3: fullscreen feed open
         }
       }}
     >
