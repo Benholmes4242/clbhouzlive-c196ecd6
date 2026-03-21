@@ -6,6 +6,7 @@ import { useModalState } from '@/hooks/useModalDetector';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { useModalContext } from '@/contexts/ModalContext';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 
 // Note: usePrefetch is accessed via useAppPrefetch to avoid static/dynamic import conflict
 import { useAppPrefetch } from '@/hooks/useAppPrefetch';
