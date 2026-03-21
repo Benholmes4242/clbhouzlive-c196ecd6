@@ -102,8 +102,6 @@ interface CreatorCapsuleProps {
   /** Post ID for crossfade animation on post change */
   postId?: string;
 
-  /** Optional slot rendered centered above the capsule (e.g. media navigation dots) */
-  dotsSlot?: React.ReactNode;
 
   /** Override the bottom offset (default: 'calc(30px + 80px)' for tab bar context).
    *  Use for fullscreen viewer where there's no tab bar. */
