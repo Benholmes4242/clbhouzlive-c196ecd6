@@ -61,7 +61,7 @@ export function useSuggestedFeed(userId: string | undefined) {
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as string | undefined,
     enabled: !!userId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: 0,
     gcTime: 10 * 60 * 1000,
   });
 

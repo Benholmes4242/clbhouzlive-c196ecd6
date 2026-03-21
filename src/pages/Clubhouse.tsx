@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
 import { PageRoot } from '@/components/layout/PageRoot';
@@ -106,6 +107,11 @@ const MoreOptionsDrawer: React.FC<MoreOptionsDrawerProps> = ({
 
 const ClubhouseContent = () => {
   const { isRehydrating } = useRehydrationSafe();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ['media-feed', 'suggested'] });
+  }, []);
   const { pathname } = useLocation();
   
   useEffect(() => {
