@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
-// TODO: re-wire mediaStore setActiveIndex in Brief 3
+import { useClubhouseStore } from '@/store/clubhouseStore';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-// TODO: re-wire clubhouseDebug in Brief 3
 
 interface UseFeedNavOptions {
   activeTab: string;
@@ -12,7 +11,7 @@ interface UseFeedNavOptions {
     hasNextPage: boolean | undefined;
     isFetchingNextPage: boolean;
   };
-  onTabSwitch: () => void; // resets likes/follows/comments
+  onTabSwitch: () => void;
 }
 
 /**
@@ -25,7 +24,7 @@ export function useClubhouseFeedNav({ activeTab, activeFeed, onTabSwitch }: UseF
   useEffect(() => {
     if (prevTabRef.current !== activeTab) {
       analyticsEvents.track('feed_tab_switch', { from: prevTabRef.current, to: activeTab });
-      // TODO Brief 3: useMediaStore.getState().setActiveIndex(0);
+      useClubhouseStore.getState().setActiveIndex(0);
       onTabSwitch();
       prevTabRef.current = activeTab;
     }
