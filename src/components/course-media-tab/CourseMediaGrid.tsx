@@ -1,4 +1,5 @@
 import React, { forwardRef, useEffect, useRef } from 'react';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { AlertCircle, Camera, Loader2 } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { CourseMediaTile } from './CourseMediaTile';
