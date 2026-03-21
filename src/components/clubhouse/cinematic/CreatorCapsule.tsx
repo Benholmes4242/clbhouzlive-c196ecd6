@@ -129,6 +129,8 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   onReviewTap,
   // Post ID for crossfade
   postId,
+  // Before-navigate callback
+  onBeforeNavigate,
   // Bottom offset override
   bottomOffset,
 }) => {
