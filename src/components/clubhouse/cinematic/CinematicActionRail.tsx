@@ -282,6 +282,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
           ariaLabel="Next media"
           showCount={false}
           idleOpacity={idleOpacity}
+          slotRef={nextSlotRef}
         />
       )}
 
