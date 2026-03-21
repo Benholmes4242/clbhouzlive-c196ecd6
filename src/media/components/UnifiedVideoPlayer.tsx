@@ -808,7 +808,8 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
             enableWorker: true,
 
             // Wire up cached loader for prefetched segments
-            loader: cloudflareUid ? createCachedHlsLoader(cloudflareUid) : undefined,
+            // TODO Brief 3: re-wire cachedHlsLoader
+            // loader: cloudflareUid ? createCachedHlsLoader(cloudflareUid) : undefined,
           });
 
           hls.on(Hls.Events.MANIFEST_PARSED, () => {

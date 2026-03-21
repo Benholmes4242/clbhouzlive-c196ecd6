@@ -559,13 +559,7 @@ const AppInner: React.FC = () => {
   // Bidirectional audio mute sync between MediaStore ↔ GlobalAudioContext
   // TODO: re-wire audio bridge in Brief 3
   
-  // Register media cache service worker for persistent HLS segment caching
-  useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/media-cache-sw.js', { scope: '/' })
-        .catch(() => {});
-    }
-  }, []);
+  // TODO Brief 3: re-wire media cache service worker
   // NOTE: useOnboardingEnforcer moved inside BrowserRouter (see OnboardingEnforcerWrapper below)
   
   // Run chat history migration once on app init
