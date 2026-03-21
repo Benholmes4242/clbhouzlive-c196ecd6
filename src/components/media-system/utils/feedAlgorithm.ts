@@ -153,7 +153,8 @@ export function injectLiveTournamentCards(
  * Tournament injection happens in Clubhouse.tsx (needs live data from hook).
  */
 export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
-  const filtered = filterForSuggested(posts);
+  const noLive = posts.filter(p => p.postType !== 'tournament_live');
+  const filtered = filterForSuggested(noLive);
   const interleaved = interleaveReviews(filtered, 'suggested');
   return deduplicatePosts(interleaved);
 }
@@ -167,6 +168,7 @@ export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
  * No tournament injection in friends feed.
  */
 export function buildFriendsFeed(posts: FeedPost[]): FeedPost[] {
-  const interleaved = interleaveReviews(posts, 'friends');
+  const noLive = posts.filter(p => p.postType !== 'tournament_live');
+  const interleaved = interleaveReviews(noLive, 'friends');
   return deduplicatePosts(interleaved);
 }
