@@ -33,14 +33,13 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
     <div
       ref={scrollRef}
       className="absolute inset-0 flex overflow-x-auto"
-      style={{
-        scrollSnapType: 'x mandatory',
-        WebkitOverflowScrolling: 'touch',
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none',
-        touchAction: 'pan-x',
-        overscrollBehavior: 'contain',
-      }}
+  style={{
+    scrollSnapType: 'x mandatory',
+    WebkitOverflowScrolling: 'touch',
+    scrollbarWidth: 'none',
+    msOverflowStyle: 'none',
+    touchAction: 'pan-x',
+  }}
       onScroll={handleScroll}
     >
       <style>{`::-webkit-scrollbar { display: none; }`}</style>
