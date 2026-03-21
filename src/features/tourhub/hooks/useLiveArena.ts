@@ -268,6 +268,27 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
         .order('round_number', { ascending: true });
 
       if (scorecardData && scorecardData.length > 0) {
+        // Fetch leader season stats
+        let drivingDistance: number | null = null;
+        let drivingAccuracy: number | null = null;
+        let greensInReg: number | null = null;
+        let puttingAverage: number | null = null;
+
+        const { data: seasonStats } = await supabase
+          .from('sr_player_statistics')
+          .select('driving_distance, driving_accuracy, greens_in_reg, putting_average')
+          .eq('player_id', leader.playerId)
+          .order('season_id', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (seasonStats) {
+          drivingDistance = seasonStats.driving_distance;
+          drivingAccuracy = seasonStats.driving_accuracy;
+          greensInReg     = seasonStats.greens_in_reg;
+          puttingAverage  = seasonStats.putting_average;
+        }
+
         leaderStats = {
           totalBirdies: scorecardData.reduce((sum, r) => sum + (r.birdies ?? 0), 0),
           totalEagles:  scorecardData.reduce((sum, r) => sum + (r.eagles  ?? 0), 0),
@@ -276,6 +297,10 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
           rounds:       [1, 2, 3, 4].map(n =>
             scorecardData.find(r => r.round_number === n)?.round_score ?? null
           ),
+          drivingDistance,
+          drivingAccuracy,
+          greensInReg,
+          puttingAverage,
         };
       }
     }

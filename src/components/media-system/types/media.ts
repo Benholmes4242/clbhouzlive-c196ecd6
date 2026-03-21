@@ -155,6 +155,10 @@ export interface TournamentLiveMeta {
     totalBogeys:  number;
     totalPars:    number;
     rounds:       (number | null)[];
+    drivingDistance?: number | null;
+    drivingAccuracy?: number | null;
+    greensInReg?:     number | null;
+    puttingAverage?:  number | null;
   } | null;
 }
 
