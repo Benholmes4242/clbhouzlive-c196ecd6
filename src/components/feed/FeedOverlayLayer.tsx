@@ -21,7 +21,17 @@ interface FeedOverlayLayerProps {
   overlayVisible: boolean;
   isOwnPost: boolean;
   golfCourse?: { id: string; name: string; country?: string } | null;
-  activeReview?: { reviewId: string; courseId: string; courseName: string; courseImageUrl: string | null; rating: number } | null;
+  activeReview?: {
+    reviewId: string;
+    courseId: string;
+    courseName: string;
+    courseImageUrl: string | null;
+    rating: number;
+    courseCountry?: string | null;
+    courseRegion?: string | null;
+    courseSubCountry?: string | null;
+    reviewText?: string | null;
+  } | null;
   isActiveReview?: boolean;
 }
 
@@ -121,6 +131,10 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
             rating: activeReview.rating,
             tierLabel: '',
             sourceReviewId: activeReview.reviewId,
+            courseCountry: activeReview.courseCountry,
+            courseRegion: activeReview.courseRegion,
+            courseSubCountry: activeReview.courseSubCountry,
+            reviewText: activeReview.reviewText,
           } : undefined}
           onReviewTap={onReviewTap}
           postId={activePost.id}
