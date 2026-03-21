@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { X, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 const AMBER = '#f59e0b';
