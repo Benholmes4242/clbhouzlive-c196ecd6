@@ -5,8 +5,8 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { haptic } from '@/utils/haptics';
 
 const NEAR_END_THRESHOLD = 3;
-const ACTIVE_SLIDE_RATIO = 1.0;
-const INTERSECTION_THRESHOLDS = [0.7, 0.85, 0.95, 0.99, ACTIVE_SLIDE_RATIO];
+const ACTIVE_SLIDE_RATIO = 0.5;
+const INTERSECTION_THRESHOLDS = [0.5];
 const PTR_DISTANCE = 80;
 
 interface SnapFeedProps {
@@ -122,6 +122,24 @@ export function SnapFeed({
       onFirstFrameReady?.();
     }
   }, [onFirstFrameReady]);
+
+  // ── Scroll-based instant activeIndex update ──
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const onScroll = () => {
+      const slideHeight = el.clientHeight;
+      if (slideHeight === 0) return;
+      const idx = Math.round(el.scrollTop / slideHeight);
+      if (idx !== activeIndex) {
+        setActiveIndex(idx);
+      }
+    };
+
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, [activeIndex, setActiveIndex]);
 
   // ── Prefetch next 2 HLS manifests ──
   useEffect(() => {
