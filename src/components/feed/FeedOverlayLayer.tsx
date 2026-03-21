@@ -123,18 +123,43 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           } : undefined}
           onReviewTap={onReviewTap}
           postId={activePost.id}
-          dotsSlot={mediaCount > 1 ? (
-            <MediaNavigationDots
-              mediaCount={mediaCount}
-              currentIndex={currentMediaIndex}
-            />
-          ) : undefined}
+          postId={activePost.id}
         />
       </div>
 
-      {/* Video Scrubber */}
+      {/* Media navigation dots — centered horizontally, sitting just above the creator capsule */}
+      {mediaCount > 1 && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: 'calc(97px + 68px + 10px)',
+            left: 0,
+            right: 0,
+            display: 'flex',
+            justifyContent: 'center',
+            pointerEvents: 'auto',
+            zIndex: 31,
+          }}
+        >
+          <MediaNavigationDots
+            mediaCount={mediaCount}
+            currentIndex={currentMediaIndex}
+          />
+        </div>
+      )}
+
+      {/* Video Scrubber — anchored to the top edge of the bottom nav bar */}
       {isVideo && activeVideoElement && (
-        <div className="absolute bottom-[100px] left-4 right-16" style={{ pointerEvents: 'auto' }}>
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '97px',
+            left: 16,
+            right: 16,
+            pointerEvents: 'auto',
+            zIndex: 31,
+          }}
+        >
           <VideoScrubber
             videoEl={activeVideoElement}
             height={3}
