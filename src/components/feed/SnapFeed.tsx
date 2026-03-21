@@ -95,18 +95,28 @@ export function SnapFeed({
     }
   }, [activeTab]);
 
+  // DEBUG — wheel events
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    const el = containerRef.current;
+    console.log(`[SNAPFEED] wheel deltaX=${e.deltaX.toFixed(1)} deltaY=${e.deltaY.toFixed(1)} scrollTop=${el?.scrollTop.toFixed(0)} scrollHeight=${el?.scrollHeight} clientHeight=${el?.clientHeight} target=${(e.target as HTMLElement).className?.toString().slice(0, 60)}`);
+  }, []);
+
   // ── Pull-to-refresh ──
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const el = containerRef.current;
+    const t = e.touches[0];
+    console.log(`[SNAPFEED] touchstart x=${t.clientX.toFixed(0)} y=${t.clientY.toFixed(0)} scrollTop=${el?.scrollTop.toFixed(0)}`);
     if (!el || el.scrollTop > 5) return;
-    ptrStartY.current = e.touches[0].clientY;
+    ptrStartY.current = t.clientY;
     ptrActive.current = true;
   }, []);
 
   const handleTouchEnd = useCallback(async (e: React.TouchEvent) => {
+    const t = e.changedTouches[0];
+    const delta = t.clientY - ptrStartY.current;
+    console.log(`[SNAPFEED] touchend ptrActive=${ptrActive.current} delta=${delta.toFixed(0)}`);
     if (!ptrActive.current) return;
     ptrActive.current = false;
-    const delta = e.changedTouches[0].clientY - ptrStartY.current;
     if (delta > PTR_DISTANCE && !isRefreshing) {
       haptic('medium');
       await onRefresh();
