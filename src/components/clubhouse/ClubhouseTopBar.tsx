@@ -1,7 +1,6 @@
 /**
  * ClubhouseTopBar - Floating top bar for Clubhouse page
- * Contains: Tab Toggle (Suggested | Friends) + Search + Profile Pill
- * Replaces the CompactHeader on the Clubhouse page
+ * Contains: Tab Toggle (Suggested | Friends) + Search + Profile Pill + Carousel Dots
  */
 
 import React, { useState, useRef } from 'react';
@@ -15,12 +14,15 @@ import { ClubhouseTabToggle, type ClubhouseTab } from '@/components/clubhouse/Cl
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { cn } from '@/lib/utils';
 import type { User } from '@supabase/supabase-js';
+import { FeedCarouselDots } from '@/components/feed/FeedCarouselDots';
 
 interface ClubhouseTopBarProps {
   activeTab: ClubhouseTab;
   onTabChange: (tab: ClubhouseTab) => void;
   isBusinessActor?: boolean;
   user: User | null;
+  carouselCount?: number;
+  carouselIndex?: number;
 }
 
 export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
@@ -28,6 +30,8 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
   onTabChange,
   isBusinessActor = false,
   user,
+  carouselCount,
+  carouselIndex,
 }) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -43,7 +47,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
           top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
         }}
       >
-        {/* Left: Tab Toggle — flex-1 lets it take available space and shrink */}
+        {/* Left: Tab Toggle */}
         <div className="flex-1 min-w-0">
           <ClubhouseTabToggle
             activeTab={activeTab}
@@ -52,7 +56,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
           />
         </div>
 
-        {/* Right: Search + Profile Pill — shrink-0 on search, pill compresses */}
+        {/* Right: Search + Profile Pill */}
         <div className="flex items-center gap-1 flex-shrink-0 ml-1">
           <Button
             variant="ghost"
@@ -83,6 +87,21 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
           )}
         </div>
       </div>
+
+      {/* Carousel dots — centered below the top bar controls */}
+      {carouselCount && carouselCount > 1 && (
+        <div
+          className="fixed left-0 right-0 z-40 flex justify-center pointer-events-none"
+          style={{
+            top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
+          }}
+        >
+          <FeedCarouselDots
+            count={carouselCount}
+            activeIndex={carouselIndex ?? 0}
+          />
+        </div>
+      )}
 
       {/* PostingAs Menu */}
       {user && (
