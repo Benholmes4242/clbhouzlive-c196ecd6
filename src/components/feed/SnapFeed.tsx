@@ -123,6 +123,24 @@ export function SnapFeed({
     }
   }, [onFirstFrameReady]);
 
+  // ── Scroll-based instant activeIndex update ──
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const onScroll = () => {
+      const slideHeight = el.clientHeight;
+      if (slideHeight === 0) return;
+      const idx = Math.round(el.scrollTop / slideHeight);
+      if (idx !== activeIndex) {
+        setActiveIndex(idx);
+      }
+    };
+
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, [activeIndex, setActiveIndex]);
+
   // ── Prefetch next 2 HLS manifests ──
   useEffect(() => {
     const next = posts.slice(activeIndex + 1, activeIndex + 3);
