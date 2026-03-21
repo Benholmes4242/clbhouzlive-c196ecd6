@@ -3,6 +3,7 @@
  */
 
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { Trophy, Clock, RefreshCw, AlertCircle, ChevronLeft } from 'lucide-react';
@@ -38,6 +39,8 @@ const VALID_TABS: TournamentTab[] = ['overview', 'leaderboard', 'summary', 'tee-
 
 export function TournamentDetailPage() {
   const { tournamentId } = useParams<{ tournamentId: string }>();
+  const { setVisible } = useBottomNavigation();
+  useEffect(() => { setVisible(true); }, [setVisible]);
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
