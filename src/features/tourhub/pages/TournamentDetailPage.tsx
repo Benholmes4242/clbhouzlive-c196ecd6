@@ -39,6 +39,8 @@ const VALID_TABS: TournamentTab[] = ['overview', 'leaderboard', 'summary', 'tee-
 
 export function TournamentDetailPage() {
   const { tournamentId } = useParams<{ tournamentId: string }>();
+  const { setVisible } = useBottomNavigation();
+  useEffect(() => { setVisible(true); }, [setVisible]);
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
