@@ -127,8 +127,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   onReviewTap,
   // Post ID for crossfade
   postId,
-  // Dots slot
-  dotsSlot,
   // Bottom offset override
   bottomOffset,
 }) => {
