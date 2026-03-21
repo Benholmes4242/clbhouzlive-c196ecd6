@@ -48,6 +48,7 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
     // Auth pages and onboarding-exempt routes
     const isAuthPage = location.pathname === '/auth' 
       || location.pathname === '/auth/verified' 
+      || location.pathname === '/verified'
       || location.pathname === '/auth/callback'
       || location.pathname === '/auth/check-email'
       || location.pathname === '/auth/reset-password';
