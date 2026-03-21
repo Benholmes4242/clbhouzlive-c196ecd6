@@ -118,18 +118,21 @@ export function injectLiveTournamentCards(
     return aPriority - bPriority;
   });
 
+  // Cap to a single tournament card
+  const cappedTournament = tournament.slice(0, 1);
+
   const result: FeedPost[] = [];
   let regularIdx    = 0;
   let tournamentIdx = 0;
 
-  while (regularIdx < regular.length || tournamentIdx < tournament.length) {
+  while (regularIdx < regular.length || tournamentIdx < cappedTournament.length) {
     for (let slot = 1; slot <= BLOCK_SIZE; slot++) {
-      if (slot === SLOT_WITHIN_BLOCK && tournamentIdx < tournament.length) {
-        result.push(tournament[tournamentIdx++]);
+      if (slot === SLOT_WITHIN_BLOCK && tournamentIdx < cappedTournament.length) {
+        result.push(cappedTournament[tournamentIdx++]);
       } else if (regularIdx < regular.length) {
         result.push(regular[regularIdx++]);
       }
-      if (regularIdx >= regular.length && tournamentIdx >= tournament.length) break;
+      if (regularIdx >= regular.length && tournamentIdx >= cappedTournament.length) break;
     }
   }
 
