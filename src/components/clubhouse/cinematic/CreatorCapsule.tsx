@@ -582,7 +582,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           'pointer-events-auto',
           // Review mode: narrower, floating with more edge spacing
           isReview 
-            ? 'left-5 right-auto max-w-[280px]' 
+            ? 'left-5 right-auto max-w-[300px]' 
             : 'left-4 max-w-[65vw] min-w-[160px]'
         )}
         style={{
