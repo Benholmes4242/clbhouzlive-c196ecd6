@@ -9,7 +9,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ImageWithFallback } from '@/components/common/ImageWithFallback';
 import { SheetPlaybackProvider, useSheetPlayback } from './SheetPlaybackContext';
-import { VideoThumbPlayer } from './VideoThumbPlayer';
+// TODO Brief 3: re-wire VideoThumbPlayer
 import { getProfilePathById } from '@/lib/profileRoutes';
 
 interface UserProfile {
