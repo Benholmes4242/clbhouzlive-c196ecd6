@@ -3,7 +3,6 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { Play, Star, Heart, MoreHorizontal } from 'lucide-react';
 import { formatDuration, formatCompact } from './utils';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
-import { formatDuration, formatCompact } from './utils';
 
 interface CompactGridRowProps {
   posts: FeedPost[];
