@@ -521,7 +521,7 @@ function CommentsSheet({
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className={cn(
-              'fixed inset-x-0 bottom-0 z-[101] w-full rounded-t-[20px]',
+              'fixed inset-x-0 bottom-0 z-[211] w-full rounded-t-[20px]',
               'md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-[560px]',
               'flex flex-col',
               isDark ? 'bg-[#0d0d0d]' : 'bg-background'
