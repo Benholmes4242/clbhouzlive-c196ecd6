@@ -1,45 +1,4 @@
-import { createPortal } from 'react-dom';
-import { useLocation } from 'react-router-dom';
-import { useFullscreenFeed } from './hooks/useFullscreenFeed';
-import { FullscreenFeedContent } from './FullscreenFeedContent';
-
+// TODO Brief 3: FullscreenFeedOverlay will be rebuilt with new scroll-snap feed
 export function FullscreenFeedOverlay() {
-  const isOpen = useFullscreenFeed((s) => s.isOpen);
-  const posts = useFullscreenFeed((s) => s.posts);
-  const startIndex = useFullscreenFeed((s) => s.startIndex);
-  const fetchNextPage = useFullscreenFeed((s) => s.fetchNextPage);
-  const hasNextPage = useFullscreenFeed((s) => s.hasNextPage);
-  const isFetchingNextPage = useFullscreenFeed((s) => s.isFetchingNextPage);
-  const { pathname } = useLocation();
-
-  // Never render over the Clubhouse feed — it has its own action rail
-  const isClubhouse = pathname === '/' || pathname === '/clubhouse';
-
-  if (isClubhouse) return null;
-
-  // Never unmount when posts exist — keeps pool and pre-created instances alive
-  // Only hide visually when closed
-  if (posts.length === 0) return null;
-
-  return createPortal(
-    <div
-      data-fullscreen-portal=""
-      aria-hidden={!isOpen}
-      className="fixed inset-0 z-[9999] bg-black"
-      style={{
-        isolation: 'isolate',
-        visibility: isOpen ? 'visible' : 'hidden',
-        pointerEvents: isOpen ? 'auto' : 'none',
-      }}
-    >
-      <FullscreenFeedContent
-        posts={posts}
-        startIndex={startIndex}
-        fetchNextPage={fetchNextPage}
-        hasNextPage={hasNextPage}
-        isFetchingNextPage={isFetchingNextPage}
-      />
-    </div>,
-    document.body
-  );
+  return null;
 }
