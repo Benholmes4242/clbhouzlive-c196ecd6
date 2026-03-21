@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Heart, Film } from 'lucide-react';
 import type { FeedPost } from '@/components/media-system/types/media';
-import { useMediaViewer } from '@/hooks/useMediaViewer';
+import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 
 function formatDuration(seconds?: number): string {
   if (!seconds) return '0:00';
