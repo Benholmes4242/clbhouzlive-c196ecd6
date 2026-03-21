@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { X, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 const AMBER = '#f59e0b';
@@ -135,7 +135,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
 
             {/* Header row */}
             <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
               padding: '12px 20px 16px',
               borderBottom: '1px solid rgba(255,255,255,0.07)',
               flexShrink: 0,
@@ -146,18 +146,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               }}>
                 REVIEW
               </span>
-              <button
-                onClick={onClose}
-                style={{
-                  width: 44, height: 44,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  background: 'rgba(255,255,255,0.06)',
-                  borderRadius: '50%',
-                  border: 'none', cursor: 'pointer',
-                }}
-              >
-                <X size={18} color="rgba(255,255,255,0.5)" />
-              </button>
             </div>
 
             {/* Scrollable body */}
@@ -247,8 +235,12 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                   borderLeft: `2px solid ${AMBER}44`,
                   paddingLeft: 14,
                   marginBottom: 16,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 10,
+                  WebkitBoxOrient: 'vertical' as const,
+                  overflow: 'hidden',
                 }}>
-                  {reviewText}
+                  "{reviewText}"
                 </div>
               )}
             </div>
