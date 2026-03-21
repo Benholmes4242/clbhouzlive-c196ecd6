@@ -173,7 +173,8 @@ const ClubhouseContent = () => {
   const posts = useMemo(() => {
     if (activeTab === 'foryou') {
       const base = buildSuggestedFeed(activeFeed.posts);
-      return injectLiveTournamentCards(base, livePosts, liveTourSlugs);
+      return injectLiveTournamentCards(base, livePosts, liveTourSlugs)
+        .filter(p => p.postType !== 'tournament_live');
     } else {
       return buildFriendsFeed(activeFeed.posts);
     }
