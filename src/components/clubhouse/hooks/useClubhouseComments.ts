@@ -1,14 +1,26 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
-// TODO: re-wire video pause/resume in Brief 3 (mediaStore deleted)
+import { useClubhouseStore } from '@/store/clubhouseStore';
 import { analyticsEvents } from '@/utils/analyticsEvents';
 
 /**
  * Manages comments sheet state and optimistic comment counts.
+ * Re-wired for Brief 3: pauses/resumes video via ClubhouseStore.
  */
 export function useClubhouseComments() {
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [commentCountOverrides, setCommentCountOverrides] = useState<Map<string, number>>(new Map());
+
+  // Pause/resume video when comments open/close
+  useEffect(() => {
+    const { activeVideoElement, userPaused } = useClubhouseStore.getState();
+    if (!activeVideoElement) return;
+    if (commentsOpen) {
+      if (!activeVideoElement.paused) activeVideoElement.pause();
+    } else {
+      if (!userPaused) activeVideoElement.play().catch(() => {});
+    }
+  }, [commentsOpen]);
 
   const openComments = useCallback(() => {
     setCommentsOpen(true);
