@@ -198,50 +198,54 @@ const ClubhouseContent = () => {
   // ── Active post derivation ──
   const { activePost, golfCourse, activeReview, isActiveReview, isActiveVideo } = useActivePostDerived(posts, activeIndex);
 
-  // ── Tournament card snap detection ──
-  const [tournamentCardFullySnapped, setTournamentCardFullySnapped] = useState(false);
+  // ── Fully snapped slide tracking (decoupled from 50% activeIndex switching) ──
+  const [fullySnappedIndex, setFullySnappedIndex] = useState(activeIndex);
+  const slideVisibilityRatiosRef = useRef(new Map<number, number>());
 
   useEffect(() => {
-    const currentPost = posts[activeIndex];
-    const isTournament =
-      currentPost?.postType === 'tournament_result' ||
-      currentPost?.postType === 'tournament_live';
+    if (posts.length === 0) return;
 
-    if (!isTournament) {
-      setTournamentCardFullySnapped(false);
-      return;
-    }
+    const scope = clubhouseRootRef.current ?? document.body;
+    const slideEls = Array.from(scope.querySelectorAll<HTMLElement>('[data-index]'));
+    if (slideEls.length === 0) return;
 
-    const slideEl = document.querySelector(
-      `[data-index="${activeIndex}"]`
-    ) as HTMLElement | null;
-
-    if (!slideEl) {
-      setTournamentCardFullySnapped(false);
-      return;
-    }
+    slideVisibilityRatiosRef.current = new Map();
 
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.intersectionRatio >= 0.98) {
-            setTournamentCardFullySnapped(true);
+          const idx = Number((entry.target as HTMLElement).dataset.index);
+          if (!Number.isNaN(idx)) {
+            slideVisibilityRatiosRef.current.set(idx, entry.intersectionRatio);
           }
+        }
+
+        let bestIdx: number | null = null;
+        let bestRatio = 0.98;
+
+        for (const [idx, ratio] of slideVisibilityRatiosRef.current.entries()) {
+          if (ratio >= 0.98 && ratio >= bestRatio) {
+            bestIdx = idx;
+            bestRatio = ratio;
+          }
+        }
+
+        if (bestIdx !== null) {
+          setFullySnappedIndex(bestIdx);
         }
       },
       { threshold: [0.98] }
     );
 
-    observer.observe(slideEl);
-    setTournamentCardFullySnapped(false);
+    slideEls.forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
-  }, [activeIndex, posts]);
+  }, [posts]);
 
+  const fullySnappedPost = posts[fullySnappedIndex] ?? null;
   const isTournamentCardActive =
-    (activePost?.postType === 'tournament_result' ||
-      activePost?.postType === 'tournament_live') &&
-    tournamentCardFullySnapped;
+    fullySnappedPost?.postType === 'tournament_result' ||
+    fullySnappedPost?.postType === 'tournament_live';
 
   // Hide bottom nav when tournament card is active.
   // Runs on mount AND whenever isTournamentCardActive changes —
