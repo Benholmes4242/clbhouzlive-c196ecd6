@@ -102,8 +102,6 @@ interface CreatorCapsuleProps {
   /** Post ID for crossfade animation on post change */
   postId?: string;
 
-  /** Optional slot rendered centered above the capsule (e.g. media navigation dots) */
-  dotsSlot?: React.ReactNode;
 
   /** Override the bottom offset (default: 'calc(30px + 80px)' for tab bar context).
    *  Use for fullscreen viewer where there's no tab bar. */
@@ -129,8 +127,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   onReviewTap,
   // Post ID for crossfade
   postId,
-  // Dots slot
-  dotsSlot,
   // Bottom offset override
   bottomOffset,
 }) => {
@@ -506,12 +502,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
                 : '97px'),
         }}
       >
-        {/* Media navigation dots - centered above capsule */}
-        {dotsSlot && (
-          <div className="flex justify-center mb-3 pointer-events-auto">
-            {dotsSlot}
-          </div>
-        )}
         <motion.div
           layout
           transition={{ layout: { duration: 0.2, ease: 'easeOut' } }}
