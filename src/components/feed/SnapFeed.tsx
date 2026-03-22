@@ -25,14 +25,13 @@ interface SnapFeedProps {
   getLikeState?: (post: FeedPost) => { isLiked: boolean; count: number };
   getCommentCount?: (post: FeedPost) => number;
   startIndex?: number;
-  onHubPageChange?: (index: number) => void;
 }
 
 export function SnapFeed({
   posts, activeTab, onNearEnd, onRefresh, isRefreshing, hasNextPage,
   followOverrides, onFollowChange, onFirstFrameReady,
   onLike, onComment, onShare, getLikeState, getCommentCount,
-  startIndex, onHubPageChange,
+  startIndex,
 }: SnapFeedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<Map<number, HTMLDivElement>>(new Map());
@@ -199,7 +198,6 @@ export function SnapFeed({
           onShare={onShare}
           getLikeState={getLikeState}
           getCommentCount={getCommentCount}
-          onHubPageChange={onHubPageChange}
         />
       ))}
     </div>

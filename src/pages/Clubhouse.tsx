@@ -31,9 +31,9 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 // ── Data hooks ──
 import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFeed';
 import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
-import { useTournamentHubPages } from '@/components/media-system/hooks/useTournamentHubPages';
-import type { FeedPost, TournamentHubFeedPost } from '@/components/media-system/types/media';
-import { buildSuggestedFeed, buildFriendsFeed, injectTournamentHubCard } from '@/components/media-system/utils/feedAlgorithm';
+import type { FeedPost, TournamentResultFeedPost } from '@/components/media-system/types/media';
+import { TournamentResultCard } from '@/components/clubhouse/cinematic/TournamentResultCard';
+import { buildSuggestedFeed, buildFriendsFeed } from '@/components/media-system/utils/feedAlgorithm';
 
 // ── Clubhouse UI overlays ──
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
@@ -164,17 +164,13 @@ const ClubhouseContent = () => {
   const friendsFeed = useFriendsFeed(user?.id);
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
   
-  // ── Tournament Hub ──
-  const { hubPost } = useTournamentHubPages(user?.id);
-  const [hubCardPageIndex, setHubCardPageIndex] = useState(0);
-  
   const posts = useMemo(() => {
     if (activeTab === 'foryou') {
-      const base = buildSuggestedFeed(activeFeed.posts);
-      return injectTournamentHubCard(base, hubPost);
+      return buildSuggestedFeed(activeFeed.posts);
+    } else {
+      return buildFriendsFeed(activeFeed.posts);
     }
-    return buildFriendsFeed(activeFeed.posts);
-  }, [activeFeed.posts, activeTab, hubPost]);
+  }, [activeFeed.posts, activeTab]);
 
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? true;
@@ -341,7 +337,6 @@ const ClubhouseContent = () => {
             onShare={(post) => handleShare(post)}
             getLikeState={(post) => getActiveLikeState(post)}
             getCommentCount={(post) => getCommentCount(post)}
-            onHubPageChange={setHubCardPageIndex}
           />
 
           {/* Overlay layer — action rail, creator capsule, scrubber, dots */}
@@ -372,11 +367,7 @@ const ClubhouseContent = () => {
           <CommentsSheet
             isOpen={commentsOpen}
             onClose={closeComments}
-            postId={
-              activePost.postType === 'tournament_hub'
-                ? (activePost as TournamentHubFeedPost).pages[hubCardPageIndex]?.postId ?? activePost.id
-                : activePost.id
-            }
+            postId={activePost.id}
             currentUserId={user?.id}
             creatorUserId={activePost.userId}
             creatorName={activePost.displayName}
