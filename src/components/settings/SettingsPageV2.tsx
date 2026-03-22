@@ -95,7 +95,7 @@ export function SettingsPageV2() {
       style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)' }}
     >
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 pt-3 pb-4">
+      <div className="flex items-center gap-3 px-4 pt-1 pb-4">
         <button
           onClick={() => navigate(-1)}
           className="w-9 h-9 rounded-full bg-black/[0.06] flex items-center justify-center text-foreground flex-shrink-0"
