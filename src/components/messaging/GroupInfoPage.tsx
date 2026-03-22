@@ -438,17 +438,18 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         <div className="mt-4">
           <div className="flex items-center justify-between mb-2 px-1">
             <span
-              className="text-[9px] font-medium uppercase"
-              style={{ color: 'hsl(var(--muted-foreground) / 0.6)', letterSpacing: '0.05em' }}
+              className="text-[11px] font-bold uppercase"
+              style={{ color: '#64748b', letterSpacing: '0.1em' }}
             >
               {conversation.participants.length} Members
             </span>
             {isAdmin && (
               <button
                 onClick={() => setIsAddMembersOpen(true)}
-              className="flex items-center gap-1 text-[13px] font-semibold active:opacity-70 transition-opacity text-[hsl(35,80%,43%)]"
-            >
-              <UserPlus size={14} className="text-[hsl(35,80%,43%)]" />
+                className="flex items-center gap-1.5 text-[13px] font-semibold active:opacity-70 transition-opacity"
+                style={{ color: '#F5A623' }}
+              >
+                <UserPlus size={14} style={{ color: '#F5A623' }} />
                 Add
               </button>
             )}
