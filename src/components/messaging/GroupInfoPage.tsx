@@ -41,14 +41,14 @@ interface GroupInfoPageProps {
 
 /* ── shared card style ── */
 const warmCard: React.CSSProperties = {
-  background: 'hsl(var(--background) / 0.7)',
-  border: '1px solid hsl(var(--border))',
-  borderRadius: 14,
+  background: '#ffffff',
+  border: '1px solid rgba(0,0,0,0.06)',
+  borderRadius: 16,
+  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
 };
 const insetDivider: React.CSSProperties = {
   height: 1,
-  marginLeft: 56,
-  backgroundColor: 'hsl(var(--muted))',
+  backgroundColor: 'rgba(0,0,0,0.05)',
 };
 
 export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
@@ -261,9 +261,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col overflow-hidden"
-      style={{
-        backgroundColor: 'hsl(var(--background))',
-      }}
+      style={{ backgroundColor: '#F8FAFC' }}
     >
       {/* ── Header ── */}
       <div
@@ -271,24 +269,23 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         style={{
           height: 'calc(56px + env(safe-area-inset-top, 0px))',
           paddingTop: 'env(safe-area-inset-top, 0px)',
-          background: 'hsl(var(--background) / 0.9)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          borderBottom: '1px solid hsl(var(--border))',
+          background: '#F8FAFC',
+          borderBottom: '1px solid rgba(0,0,0,0.06)',
         }}
       >
         <button
           onClick={onClose}
-          className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+          className="w-9 h-9 -ml-1 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+          style={{ background: 'rgba(0,0,0,0.05)' }}
         >
-          <ChevronLeft size={22} className="text-foreground/60" />
+          <ChevronLeft size={20} style={{ color: '#475569' }} strokeWidth={2.5} />
         </button>
         <div className="flex-1 text-center">
-          <span className="text-[16px] font-semibold" style={{ color: 'hsl(var(--foreground))' }}>
+          <span className="text-[17px] font-bold" style={{ color: '#0f172a' }}>
             Group Info
           </span>
         </div>
-        <div className="w-11" />
+        <div className="w-9" />
       </div>
 
       {/* ── Scrollable content ── */}
@@ -297,12 +294,9 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         <div className="flex flex-col items-center pt-6 pb-4">
           {/* Avatar */}
           <div className="relative">
-            <div
-              className="rounded-full p-[3px]"
-              style={{ background: 'hsl(var(--background) / 0.7)' }}
-            >
+            <div style={{ filter: 'drop-shadow(0 4px 20px rgba(245,166,35,0.20))' }}>
               <SquircleAvatar
-                size={112}
+                size={96}
                 src={conversation.avatar_url || undefined}
                 alt={conversation.name || 'Group'}
                 fallback={getInitials(conversation.name || 'Group')}
@@ -315,7 +309,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
                   className="absolute bottom-1 right-1 w-8 h-8 rounded-full flex items-center justify-center shadow-md active:scale-[0.97] transition-transform disabled:opacity-50"
-                  style={{ background: '#f59e0b' }}
+                  style={{ background: '#f59e0b', border: '2px solid #F8FAFC' }}
                 >
                   <Camera size={16} className="text-white" />
                 </button>
@@ -345,7 +339,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
               </div>
             ) : (
               <>
-                <h2 className="text-xl font-semibold" style={{ color: 'hsl(var(--foreground))' }}>
+                <h2 className="text-[22px] font-extrabold" style={{ color: '#0f172a', letterSpacing: '-0.3px' }}>
                   {conversation.name}
                 </h2>
                 {isAdmin && (
@@ -360,7 +354,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
             )}
           </div>
 
-          <p className="text-[13px] font-medium mt-1" style={{ color: 'hsl(var(--muted-foreground))' }}>
+          <p className="text-[13px] font-medium mt-1" style={{ color: '#64748b' }}>
             {conversation.participants.length} members
           </p>
 
@@ -402,22 +396,26 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
             className="w-full flex items-center justify-between px-4 py-[14px] active:opacity-80 transition-opacity"
           >
             <div className="flex items-center gap-3">
-              <Image size={20} style={{ color: 'hsl(var(--muted-foreground))' }} />
-              <span className="text-[14px] font-medium" style={{ color: 'hsl(var(--foreground))' }}>Shared Media</span>
+              <div className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0" style={{ background: 'rgba(0,0,0,0.04)' }}>
+                <Image size={17} style={{ color: '#64748b' }} />
+              </div>
+              <span className="text-[14px] font-medium" style={{ color: '#0f172a' }}>Shared Media</span>
             </div>
-            <ChevronRight size={16} style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }} />
+            <ChevronRight size={14} style={{ color: '#d1d5db' }} />
           </button>
 
           <div style={insetDivider} />
 
           <div className="flex items-center justify-between px-4 py-[14px]">
             <div className="flex items-center gap-3">
-              {isMuted ? (
-                <BellOff size={20} style={{ color: 'hsl(var(--muted-foreground))' }} />
-              ) : (
-                <Bell size={20} style={{ color: 'hsl(var(--muted-foreground))' }} />
-              )}
-              <span className="text-[14px] font-medium" style={{ color: 'hsl(var(--foreground))' }}>Notifications</span>
+              <div className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0" style={{ background: 'rgba(0,0,0,0.04)' }}>
+                {isMuted ? (
+                  <BellOff size={17} style={{ color: '#64748b' }} />
+                ) : (
+                  <Bell size={17} style={{ color: '#64748b' }} />
+                )}
+              </div>
+              <span className="text-[14px] font-medium" style={{ color: '#0f172a' }}>Notifications</span>
             </div>
             {/* Warm toggle */}
             <button
@@ -441,17 +439,18 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         <div className="mt-4">
           <div className="flex items-center justify-between mb-2 px-1">
             <span
-              className="text-[9px] font-medium uppercase"
-              style={{ color: 'hsl(var(--muted-foreground) / 0.6)', letterSpacing: '0.05em' }}
+              className="text-[11px] font-bold uppercase"
+              style={{ color: '#64748b', letterSpacing: '0.1em' }}
             >
               {conversation.participants.length} Members
             </span>
             {isAdmin && (
               <button
                 onClick={() => setIsAddMembersOpen(true)}
-              className="flex items-center gap-1 text-[13px] font-semibold active:opacity-70 transition-opacity text-[hsl(35,80%,43%)]"
-            >
-              <UserPlus size={14} className="text-[hsl(35,80%,43%)]" />
+                className="flex items-center gap-1.5 text-[13px] font-semibold active:opacity-70 transition-opacity"
+                style={{ color: '#F5A623' }}
+              >
+                <UserPlus size={14} style={{ color: '#F5A623' }} />
                 Add
               </button>
             )}
@@ -464,7 +463,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                 <div className="flex items-center justify-between px-4 py-3">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <SquircleAvatar
-                      size={40}
+                      size={42}
                       src={participant.profile?.profile_photo_url || undefined}
                       alt={participant.profile?.display_name || participant.profile?.username || '?'}
                       fallback={getInitials(participant.profile?.display_name || participant.profile?.username || '?')}
@@ -486,9 +485,10 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                           <span
                             className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-[1px] rounded-lg"
                             style={{
-                             color: '#d97706',
-                               background: 'rgba(245, 158, 11, 0.08)',
-                             }}
+                              color: '#d97706',
+                              background: 'rgba(245, 158, 11, 0.08)',
+                              border: '1px solid rgba(245,166,35,0.18)',
+                            }}
                           >
                             {participant.user_id === conversation.created_by ? (
                               <ShieldCheck size={11} />
@@ -544,41 +544,49 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
             onClick={handleArchive}
             className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"
           >
-            <Archive size={20} style={{ color: 'hsl(var(--foreground))' }} />
-            <span className="text-[14px] font-medium" style={{ color: 'hsl(var(--foreground))' }}>Archive Chat</span>
+            <div className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0" style={{ background: 'rgba(0,0,0,0.04)' }}>
+              <Archive size={17} style={{ color: '#64748b' }} />
+            </div>
+            <span className="text-[14px] font-medium" style={{ color: '#0f172a' }}>Archive Chat</span>
           </button>
 
           {!isCreator && (
             <>
-               <div style={{ height: 1, backgroundColor: 'rgba(245, 158, 11, 0.06)' }} />
+              <div style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.05)' }} />
               <button
                 onClick={handleLeaveGroup}
                 className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"
               >
-                <LogOut size={20} style={{ color: 'hsl(var(--foreground))' }} />
-                <span className="text-[14px] font-medium" style={{ color: 'hsl(var(--foreground))' }}>Exit Group</span>
+                <div className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0" style={{ background: 'rgba(0,0,0,0.04)' }}>
+                  <LogOut size={17} style={{ color: '#64748b' }} />
+                </div>
+                <span className="text-[14px] font-medium" style={{ color: '#0f172a' }}>Exit Group</span>
               </button>
             </>
           )}
 
-           <div style={{ height: 1, backgroundColor: 'rgba(245, 158, 11, 0.06)' }} />
+           <div style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.05)' }} />
           <button
             onClick={() => setIsReportOpen(true)}
             className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"
           >
-            <Flag size={20} style={{ color: 'hsl(var(--foreground))' }} />
-            <span className="text-[14px] font-medium" style={{ color: 'hsl(var(--foreground))' }}>Report Group</span>
+            <div className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0" style={{ background: 'rgba(0,0,0,0.04)' }}>
+              <Flag size={17} style={{ color: '#64748b' }} />
+            </div>
+            <span className="text-[14px] font-medium" style={{ color: '#0f172a' }}>Report Group</span>
           </button>
 
           {isAdmin && (
             <>
-              <div style={{ height: 1, backgroundColor: 'rgba(245, 158, 11, 0.06)' }} />
+              <div style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.05)' }} />
               <button
                 onClick={handleDeleteGroup}
                 className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"
               >
-                <Trash2 size={20} style={{ color: 'hsl(var(--destructive))' }} />
-                <span className="text-[14px] font-medium" style={{ color: 'hsl(var(--destructive))' }}>Delete Group for Everyone</span>
+                <div className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0" style={{ background: 'rgba(239,68,68,0.08)' }}>
+                  <Trash2 size={17} style={{ color: '#ef4444' }} />
+                </div>
+                <span className="text-[14px] font-medium" style={{ color: '#ef4444' }}>Delete Group for Everyone</span>
               </button>
             </>
           )}
