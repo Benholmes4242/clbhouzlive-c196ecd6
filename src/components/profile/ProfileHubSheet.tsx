@@ -290,54 +290,73 @@ function ProfileHubSheet({
               {/* ── Quick actions — #3 vertical card layout ── */}
               <div className="grid grid-cols-2 gap-2.5 py-4">
                 {quickActions.map(({ icon: Icon, label, route, badge, badgeColor, isEcho }) => (
-                  <button
-                    key={label}
-                    type="button"
-                    onClick={() => handleNav(route)}
-                    className="relative flex flex-col items-start justify-between p-3.5 rounded-2xl transition-colors duration-150 active:scale-[0.97]"
-                    style={{
-                      height: 80,
-                      background: isEcho
-                        ? 'linear-gradient(135deg, rgba(245,166,35,0.14) 0%, rgba(245,166,35,0.06) 100%)'
-                        : '#ffffff',
-                      border: isEcho ? '1px solid rgba(245,166,35,0.32)' : '1px solid rgba(0,0,0,0.07)',
-                      boxShadow: isEcho ? '0 2px 12px rgba(245,166,35,0.12)' : '0 1px 4px rgba(0,0,0,0.05)',
-                    }}
-                  >
-                    {/* Badge — top right */}
-                    {badge > 0 && (
-                      <span
-                        className="absolute top-2.5 right-2.5 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold text-white flex items-center justify-center"
-                        style={{ background: badgeColor === 'bg-primary' ? 'hsl(var(--primary))' : 'hsl(var(--destructive))' }}
-                      >
-                        {badge > 99 ? '99+' : badge}
-                      </span>
-                    )}
-
-                    {/* Icon in box — top left */}
-                    <div
-                      className="flex items-center justify-center rounded-[10px]"
+                  isEcho ? (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => handleNav(route)}
+                      className="relative flex flex-col items-start justify-between p-3.5 rounded-2xl active:scale-[0.97] transition-all duration-150 overflow-hidden"
                       style={{
-                        width: 36,
-                        height: 36,
-                        background: isEcho ? 'rgba(245,158,11,0.12)' : 'rgba(0,0,0,0.05)',
+                        height: 80,
+                        background: 'linear-gradient(135deg, #F5A623 0%, #E8920A 100%)',
+                        border: 'none',
+                        boxShadow: '0 4px 16px rgba(245,166,35,0.40), 0 1px 4px rgba(0,0,0,0.08)',
                       }}
                     >
-                      <Icon
-                        className={isEcho ? '' : 'w-[18px] h-[18px]'}
-                        style={{ color: isEcho ? '#F59E0B' : '#475569' }}
-                        {...(!isEcho ? { strokeWidth: 2 } : {})}
+                      {/* Sheen overlay */}
+                      <div
+                        className="absolute inset-0 pointer-events-none"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%)',
+                        }}
                       />
-                    </div>
 
-                    {/* Label — bottom left */}
-                    <span
-                      className="text-[13px] font-bold leading-none w-full text-left"
-                      style={{ color: isEcho ? '#92400E' : '#0f172a', letterSpacing: '-0.1px' }}
+                      <AnimatedEchoWave size={28} color="#ffffff" active={true} />
+
+                      <span
+                        className="text-[13px] font-extrabold leading-none w-full text-left"
+                        style={{ color: '#ffffff', letterSpacing: '-0.1px' }}
+                      >
+                        {label}
+                      </span>
+                    </button>
+                  ) : (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => handleNav(route)}
+                      className="relative flex flex-col items-start justify-between p-3.5 rounded-2xl transition-colors duration-150 active:scale-[0.97]"
+                      style={{
+                        height: 80,
+                        background: '#ffffff',
+                        border: '1px solid rgba(0,0,0,0.07)',
+                        boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+                      }}
                     >
-                      {label}
-                    </span>
-                  </button>
+                      {badge > 0 && (
+                        <span
+                          className="absolute top-2.5 right-2.5 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold text-white flex items-center justify-center"
+                          style={{ background: badgeColor === 'bg-primary' ? 'hsl(var(--primary))' : 'hsl(var(--destructive))' }}
+                        >
+                          {badge > 99 ? '99+' : badge}
+                        </span>
+                      )}
+
+                      <div
+                        className="flex items-center justify-center rounded-[10px]"
+                        style={{ width: 36, height: 36, background: 'rgba(0,0,0,0.05)' }}
+                      >
+                        <Icon className="w-[18px] h-[18px]" style={{ color: '#475569' }} strokeWidth={2} />
+                      </div>
+
+                      <span
+                        className="text-[13px] font-bold leading-none w-full text-left"
+                        style={{ color: '#0f172a', letterSpacing: '-0.1px' }}
+                      >
+                        {label}
+                      </span>
+                    </button>
+                  )
                 ))}
               </div>
 
