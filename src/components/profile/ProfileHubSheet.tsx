@@ -237,10 +237,13 @@ function ProfileHubSheet({
                         style={{ scrollSnapAlign: 'start' }}
                       >
                         <div className="relative">
-                          {/* #7 — amber outline on active profile */}
+                          {/* Amber border flush on active profile */}
                           <div
-                            className="rounded-[34%]"
-                            style={isActive ? { outline: '2.5px solid hsl(38,92%,50%)', outlineOffset: '2px' } : undefined}
+                            className={cn("rounded-[34%]", isActive && "ring-0")}
+                            style={{
+                              border: isActive ? '2.5px solid hsl(38,92%,50%)' : '2.5px solid transparent',
+                              boxShadow: isActive ? '0 2px 10px rgba(245,166,35,0.25)' : undefined,
+                            }}
                           >
                             <SquircleAvatar
                               size={48}
