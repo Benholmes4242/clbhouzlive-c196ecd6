@@ -216,10 +216,7 @@ export function MessageInput({
   return (
     <div 
       className="flex-none px-4 pt-2 border-t"
-      style={{ background: '#F8FAFC', borderColor: 'rgba(0,0,0,0.06)' }}
-      style={{
-        paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
-      }}
+      style={{ background: '#F8FAFC', borderColor: 'rgba(0,0,0,0.06)', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}
     >
       {/* Reply preview */}
       {replyingTo && (
