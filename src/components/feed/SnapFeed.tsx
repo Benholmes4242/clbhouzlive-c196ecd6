@@ -56,6 +56,7 @@ export function SnapFeed({
 
   const activeIndex = useClubhouseStore(s => s.activeIndex);
   const setActiveIndex = useClubhouseStore(s => s.setActiveIndex);
+  const setIsTournamentCardActive = useClubhouseStore(s => s.setIsTournamentCardActive);
 
   // ── IntersectionObserver setup ──
   useEffect(() => {

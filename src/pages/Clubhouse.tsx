@@ -196,18 +196,16 @@ const ClubhouseContent = () => {
   
   // ── Active post derivation ──
   const { activePost, golfCourse, activeReview, isActiveReview, isActiveVideo } = useActivePostDerived(posts, activeIndex);
-  const isTournamentCardActive =
+  const activePostIsTournament =
     activePost?.postType === 'tournament_result' ||
     activePost?.postType === 'tournament_live';
+  const isTournamentCardActive = useClubhouseStore(s => s.isTournamentCardActive);
 
-  // Hide bottom nav when tournament card is active.
-  // Runs on mount AND whenever isTournamentCardActive changes —
-  // so returning to Clubhouse with a tournament card in view correctly re-hides the nav.
+  // Hide bottom nav only once the tournament card top has actually reached the viewport top.
   const { setVisible: setBottomNavVisible } = useBottomNavigation();
   const setStoreTournamentActive = useClubhouseStore(s => s.setIsTournamentCardActive);
 
   useEffect(() => {
-    setStoreTournamentActive(isTournamentCardActive);
     setBottomNavVisible(!isTournamentCardActive);
     return () => {
       setStoreTournamentActive(false);
