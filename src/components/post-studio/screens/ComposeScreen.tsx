@@ -1048,6 +1048,9 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           </AnimatePresence>
         </div>
 
+        {/* Close centering wrapper */}
+        </div>
+
         {/* Processing indicator */}
         <AnimatePresence>
           {isProcessing && (
