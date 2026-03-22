@@ -164,15 +164,20 @@ const ClubhouseContent = () => {
   const friendsFeed = useFriendsFeed(user?.id);
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
   
+  // ── Tournament Hub ──
+  const { hubPost } = useTournamentHubPages(user?.id);
+  const [hubCardPageIndex, setHubCardPageIndex] = useState(0);
+  
   const posts = useMemo(() => {
     if (activeTab === 'foryou') {
-      return buildSuggestedFeed(activeFeed.posts);
-    } else {
-      return buildFriendsFeed(activeFeed.posts);
+      const base = buildSuggestedFeed(activeFeed.posts);
+      return injectTournamentHubCard(base, hubPost);
     }
-  }, [activeFeed.posts, activeTab]);
+    return buildFriendsFeed(activeFeed.posts);
+  }, [activeFeed.posts, activeTab, hubPost]);
 
   const isLoading = activeFeed.isLoading;
+  const isTournamentCardActive = activePost?.postType === 'tournament_hub';
   const hasNextPage = activeFeed.hasNextPage ?? true;
   
   // Skeleton timing

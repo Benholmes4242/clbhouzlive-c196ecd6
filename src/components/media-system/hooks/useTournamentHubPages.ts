@@ -193,6 +193,18 @@ export function useTournamentHubPages(userId?: string): {
 
       const insight = volatilityInsight(t.volatilityIndex, leader?.playerName ?? null, isTied, coLeaders.length);
 
+      const rawStats = t.leaderStats;
+      const leaderStats = rawStats ? {
+        totalEagles: rawStats.totalEagles,
+        totalBirdies: rawStats.totalBirdies,
+        totalPars: rawStats.totalPars,
+        totalBogeys: rawStats.totalBogeys,
+        drivingDistance: rawStats.drivingDistance ?? null,
+        drivingAccuracy: rawStats.drivingAccuracy ?? null,
+        greensInReg: rawStats.greensInReg ?? null,
+        puttingAverage: rawStats.puttingAverage ?? null,
+      } : null;
+
       result.push({
         tournamentId: t.id,
         tournamentName: t.name,
@@ -208,7 +220,7 @@ export function useTournamentHubPages(userId?: string): {
         totalRounds: t.totalRounds,
         leader,
         chasers,
-        leaderStats: t.leaderStats ?? null,
+        leaderStats,
         insight,
         startDate: t.startDate,
         endDate: t.endDate,
