@@ -215,7 +215,8 @@ export function MessageInput({
 
   return (
     <div 
-      className="flex-none px-4 pt-2 bg-background/80 backdrop-blur-xl border-t border-border/20"
+      className="flex-none px-4 pt-2 border-t"
+      style={{ background: '#F8FAFC', borderColor: 'rgba(0,0,0,0.06)' }}
       style={{
         paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)',
       }}
