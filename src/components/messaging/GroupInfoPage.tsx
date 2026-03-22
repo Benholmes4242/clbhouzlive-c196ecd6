@@ -576,13 +576,15 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
 
           {isAdmin && (
             <>
-              <div style={{ height: 1, backgroundColor: 'rgba(245, 158, 11, 0.06)' }} />
+              <div style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.05)' }} />
               <button
                 onClick={handleDeleteGroup}
                 className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"
               >
-                <Trash2 size={20} style={{ color: 'hsl(var(--destructive))' }} />
-                <span className="text-[14px] font-medium" style={{ color: 'hsl(var(--destructive))' }}>Delete Group for Everyone</span>
+                <div className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0" style={{ background: 'rgba(239,68,68,0.08)' }}>
+                  <Trash2 size={17} style={{ color: '#ef4444' }} />
+                </div>
+                <span className="text-[14px] font-medium" style={{ color: '#ef4444' }}>Delete Group for Everyone</span>
               </button>
             </>
           )}
