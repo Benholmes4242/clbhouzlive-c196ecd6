@@ -51,13 +51,8 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   if (!inApp && !isPublicPath) {
     return <BetaGatePage />;
   }
-    if (loading && !wasLoadingRef.current) {
-      wasLoadingRef.current = true;
-      logOrangeLoaderShow(); // Logged for audit, but no UI blocks
-    } else if (!loading && wasLoadingRef.current) {
-      logOrangeLoaderHide();
-    }
-  }, [loading]);
+
+
 
   // NEVER block with a loading screen - always render children
   // Session resolves in the background
