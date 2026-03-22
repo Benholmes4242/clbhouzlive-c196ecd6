@@ -30,8 +30,8 @@ export function AdditionalClubsList({
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <label className="text-[13px] font-medium text-muted-foreground">Additional Clubs</label>
+      <div className="flex items-center justify-between mb-3">
+        <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">Additional Clubs</label>
         <VisibilityDropdown value={visibility as any} onChange={onVisibilityChange as any} />
       </div>
 
@@ -40,7 +40,7 @@ export function AdditionalClubsList({
           {clubs.map((club) => (
             <div
               key={club.id}
-              className="flex items-center justify-between bg-muted rounded-xl px-4 py-3 min-h-[44px]"
+              className="flex items-center justify-between bg-[#F8FAFC] border border-border/60 rounded-[10px] px-4 py-3 min-h-[44px]"
             >
               <p className="text-[14px] font-medium text-foreground">{club.name}</p>
               <button
@@ -63,7 +63,7 @@ export function AdditionalClubsList({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search for a club"
-            className="w-full bg-muted border-0 rounded-xl pl-9 pr-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors"
+            className="w-full bg-[#F8FAFC] border border-border/60 rounded-[10px] pl-9 pr-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
           />
           {query.length >= 2 && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-xl shadow-lg z-20 max-h-48 overflow-y-auto">
@@ -88,9 +88,15 @@ export function AdditionalClubsList({
       ) : (
         <button
           onClick={() => setShowSearch(true)}
-          className="flex items-center gap-2 text-primary text-[14px] font-medium min-h-[44px]"
+          className="flex items-center gap-2.5 text-[14px] font-semibold min-h-[44px]"
+          style={{ color: 'hsl(38,92%,50%)' }}
         >
-          <Plus size={16} />
+          <div
+            className="w-6 h-6 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: 'rgba(245,166,35,0.12)' }}
+          >
+            <Plus size={14} style={{ color: 'hsl(38,92%,50%)' }} />
+          </div>
           Add a club
         </button>
       )}

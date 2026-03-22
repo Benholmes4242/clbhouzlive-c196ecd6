@@ -26,7 +26,7 @@ export function CollegeSelector({ collegeName, collegeId, onSelect }: Props) {
 
   return (
     <div>
-      <label className="text-[13px] font-medium text-muted-foreground mb-1.5 block">
+      <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground mb-2 block">
         College / University
       </label>
       <div ref={containerRef} className="relative">
@@ -37,7 +37,7 @@ export function CollegeSelector({ collegeName, collegeId, onSelect }: Props) {
           onChange={(e) => { setQuery(e.target.value); setIsOpen(true); }}
           onFocus={() => setIsOpen(true)}
           placeholder="Search your college or university"
-          className="w-full bg-muted border-0 rounded-xl pl-9 pr-10 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors"
+          className="w-full bg-[#F8FAFC] border border-border/60 rounded-[10px] pl-9 pr-10 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
         />
         {query && (
           <button
