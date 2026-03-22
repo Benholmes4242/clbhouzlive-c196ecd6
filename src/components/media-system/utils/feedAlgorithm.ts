@@ -16,6 +16,31 @@ function isReviewPost(p: FeedPost): boolean {
   return !!p.isReview;
 }
 
+function createBlankSlotPost(): FeedPost {
+  return {
+    id: 'blank-slot-3',
+    userId: '',
+    actorType: 'system',
+    actorId: '',
+    username: '',
+    displayName: '',
+    avatarUrl: '',
+    isVerified: false,
+    creatorRelation: 'system',
+    caption: '',
+    mediaItems: [],
+    createdAt: new Date().toISOString(),
+    likeCount: 0,
+    commentCount: 0,
+    shareCount: 0,
+    review: null,
+    isReview: false,
+    isLikedByMe: false,
+    isFollowedByMe: false,
+    postType: 'blank',
+  } as unknown as FeedPost;
+}
+
 // ── Suggested Feed Filter ──────────────────────────────────────────────────────
 /**
  * Filter posts for the Suggested (For You) feed.
