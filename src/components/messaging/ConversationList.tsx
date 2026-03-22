@@ -230,6 +230,10 @@ export function ConversationList({
 
   // Filter conversations
   const filteredConversations = conversations.filter(conversation => {
+    // Apply filter type
+    if (filterType === 'unread' && conversation.unread_count <= 0) return false;
+    if (filterType === 'groups' && conversation.type !== 'group') return false;
+    
     if (!searchQuery.trim()) return true;
     
     const query = searchQuery.toLowerCase();
