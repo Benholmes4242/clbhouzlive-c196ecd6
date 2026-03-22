@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { Mail } from 'lucide-react';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
@@ -18,6 +19,31 @@ export default function CheckEmailPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const email = (location.state as { email?: string })?.email || 'your inbox';
+
+  // Auto-navigate when Supabase detects email verification
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session?.user?.email_confirmed_at) {
+        navigate('/', { replace: true });
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  // Re-check session when app returns from background
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'visible') {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user?.email_confirmed_at) {
+          navigate('/', { replace: true });
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    handleVisibilityChange();
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [navigate]);
 
   return (
     <div
