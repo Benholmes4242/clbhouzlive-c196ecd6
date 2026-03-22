@@ -308,7 +308,7 @@ export function MessageInput({
         </button>
 
         {/* Input container - pill style */}
-        <div className="flex-1 flex items-end gap-2 rounded-[22px] px-4 py-2 bg-background/80 border border-border/40">
+        <div className="flex-1 flex items-end gap-2 rounded-[22px] px-4 py-2" style={{ background: '#fff', border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
            {/* Emoji picker */}
            <EmojiPickerPopover onEmojiSelect={handleEmojiSelect} />
           
