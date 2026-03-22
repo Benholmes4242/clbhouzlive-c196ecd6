@@ -188,24 +188,6 @@ const ClubhouseContent = () => {
   
   // ── Active post derivation ──
   const { activePost, golfCourse, activeReview, isActiveReview, isActiveVideo } = useActivePostDerived(posts, activeIndex);
-  const isTournamentCardActive =
-    activePost?.postType === 'tournament_result' ||
-    activePost?.postType === 'tournament_live';
-
-  // Hide bottom nav when tournament card is active.
-  // Runs on mount AND whenever isTournamentCardActive changes —
-  // so returning to Clubhouse with a tournament card in view correctly re-hides the nav.
-  const { setVisible: setBottomNavVisible } = useBottomNavigation();
-  const setStoreTournamentActive = useClubhouseStore(s => s.setIsTournamentCardActive);
-
-  useEffect(() => {
-    setStoreTournamentActive(isTournamentCardActive);
-    setBottomNavVisible(!isTournamentCardActive);
-    return () => {
-      setStoreTournamentActive(false);
-      setBottomNavVisible(true);
-    };
-  }, [isTournamentCardActive, setBottomNavVisible, setStoreTournamentActive]);
   
   // ── Optimistic like state ──
   const { handleLike, getActiveLikeState, resetLikes } = useClubhouseLikes({ userId: user?.id, activeActor });
