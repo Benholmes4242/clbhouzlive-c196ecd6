@@ -141,50 +141,81 @@ function MessagesPageInner() {
 
   // Mobile: Conversation list
   if (isMobile) {
+    const totalUnread = conversations?.reduce((sum, conv) => sum + (conv.unread_count || 0), 0) ?? 0;
+    
     return (
-      <div className="min-h-screen flex flex-col relative bg-background">
-        <div className="relative z-10 flex flex-col min-h-screen">
+      <div className="min-h-screen flex flex-col relative bg-[#F8FAFC]">
+        <div className="relative z-10 flex flex-col min-h-screen bg-[#F8FAFC]">
           <OfflineBanner />
           {/* Header */}
           <header 
             className="flex-none px-[18px] flex items-center justify-between"
             style={{
-              paddingTop: 'calc(54px + env(safe-area-inset-top, 0px))',
-              height: 'calc(56px + 54px + env(safe-area-inset-top, 0px))',
-              background: 'hsl(var(--background) / 0.9)',
-              backdropFilter: 'blur(24px)',
-              WebkitBackdropFilter: 'blur(24px)',
-              borderBottom: '1px solid hsl(var(--border))',
+              paddingTop: '8px',
+              height: '56px',
+              borderBottom: '1px solid rgba(0,0,0,0.06)',
             }}
           >
             <button
               onClick={() => navigate(-1)}
-              className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+              className="w-9 h-9 -ml-1 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+              style={{ background: 'rgba(0,0,0,0.05)' }}
               aria-label="Back"
             >
-              <ChevronLeft className="w-5 h-5 text-foreground/60" />
+              <ChevronLeft className="w-5 h-5" style={{ color: '#475569' }} strokeWidth={2.5} />
             </button>
 
-            <span className="text-[16px] font-semibold text-foreground font-dm-sans">Messages</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[16px] font-semibold text-foreground font-dm-sans">Messages</span>
+              {totalUnread > 0 && (
+                <span
+                  className="min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center text-[11px] font-bold text-white"
+                  style={{ background: 'hsl(38,92%,50%)' }}
+                >
+                  {totalUnread > 99 ? '99+' : totalUnread}
+                </span>
+              )}
+            </div>
 
             <button 
               onClick={handleNewConversation}
-              className="w-11 h-11 -mr-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+              className="w-9 h-9 -mr-1 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+              style={{
+                background: 'hsl(38,92%,50%)',
+                boxShadow: '0 2px 8px rgba(245,166,35,0.35)',
+              }}
               aria-label="New conversation"
             >
-              <Plus className="w-5 h-5 text-foreground/60" />
+              <PenSquare className="w-[17px] h-[17px] text-white" strokeWidth={2.2} />
             </button>
           </header>
           
           {/* Search bar */}
-          <div className="px-4 py-2">
-            <ConversationSearchBar
-              value={searchInput}
-              onChange={handleSearchChange}
-              onNewConversation={handleNewConversation}
-              hideNewButton
-            />
+          <div className="px-4 pt-2 pb-1">
+            <div
+              className="flex items-center gap-2.5 px-3 rounded-xl"
+              style={{
+                background: '#fff',
+                border: '1px solid rgba(0,0,0,0.07)',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                height: 40,
+              }}
+            >
+              <ConversationSearchBar
+                value={searchInput}
+                onChange={handleSearchChange}
+                onNewConversation={handleNewConversation}
+                hideNewButton
+              />
+            </div>
           </div>
+
+          {/* Filter chips */}
+          <FilterChips
+            totalUnread={totalUnread}
+            conversationFilter={conversationFilter}
+            onFilterChange={setConversationFilter}
+          />
           
           {showNotificationPrompt && (
             <div className="px-4 pb-3">
@@ -201,6 +232,7 @@ function MessagesPageInner() {
               selectedConversationId={selectedConversationId || undefined}
               searchQuery={searchQuery}
               onNewConversation={handleNewConversation}
+              filterType={conversationFilter}
             />
           </div>
           
