@@ -47,8 +47,13 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
 
   // Web-only beta gate: if not in Median app and not on a public path, show gate
   const inApp = isMedianApp();
+  const isDevOrPreview =
+    import.meta.env.DEV ||
+    window.location.hostname.includes('lovable.app') ||
+    window.location.hostname.includes('lovableproject.com') ||
+    window.location.hostname === 'localhost';
   const isPublicPath = PUBLIC_PATHS.some(p => location.pathname.startsWith(p));
-  if (!inApp && !isPublicPath) {
+  if (!inApp && !isDevOrPreview && !isPublicPath) {
     return <BetaGatePage />;
   }
 
