@@ -25,6 +25,11 @@ export interface AdminCourseRow {
   created_at:     string;
   avg_rating:     number | null;
   review_count:   number | null;
+  city:           string | null;
+  phone:          string | null;
+  holes:          number | null;
+  par:            number | null;
+  yardage:        number | null;
 }
 
 export type CourseFilterList = 'all' | 'global' | 'gbi' | 'usa' | 'europe' | 'unranked';
@@ -41,7 +46,8 @@ const COURSE_COLUMNS = `
   id, name, country, sub_country, region, continent,
   global_rank, regional_rank, usa_rank,
   thumbnail_image, latitude, longitude,
-  website_url, description, created_at
+  website_url, description, created_at,
+  city, phone, holes, par, yardage
 `;
 
 function applySearch(query: any, search: string) {
@@ -96,6 +102,11 @@ function mapCourseRow(
     created_at:     c.created_at,
     avg_rating:     ratingsMap.get(c.id)?.avg_overall_score ?? null,
     review_count:   ratingsMap.get(c.id)?.review_count ?? null,
+    city:           c.city ?? null,
+    phone:          c.phone ?? null,
+    holes:          c.holes ?? null,
+    par:            c.par ?? null,
+    yardage:        c.yardage ?? null,
   };
 }
 
@@ -207,13 +218,39 @@ async function fetchSingleCourse(id: string): Promise<AdminCourseRow | null> {
 
 async function updateCourse(
   id: string,
-  updates: Partial<Pick<AdminCourseRow, 'name' | 'global_rank' | 'regional_rank' | 'usa_rank' | 'website_url' | 'description'>>
+  updates: Partial<Pick<AdminCourseRow,
+    'name' | 'global_rank' | 'regional_rank' | 'usa_rank' |
+    'website_url' | 'description' | 'city' | 'phone' |
+    'holes' | 'par' | 'yardage'
+  >>
 ): Promise<void> {
   const { error } = await supabase
     .from('golf_courses')
     .update(updates)
     .eq('id', id);
   if (error) throw error;
+}
+
+async function uploadCoursePhoto(courseId: string, file: File): Promise<string> {
+  const ext = file.name.split('.').pop();
+  const path = `course-photos/${courseId}-${Date.now()}.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('course-images')
+    .upload(path, file, { upsert: true });
+  if (uploadError) throw uploadError;
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('course-images')
+    .getPublicUrl(path);
+
+  const { error: updateError } = await supabase
+    .from('golf_courses')
+    .update({ thumbnail_image: publicUrl })
+    .eq('id', courseId);
+  if (updateError) throw updateError;
+
+  return publicUrl;
 }
 
 // ─── Main hook ────────────────────────────────────────────────────────────────
@@ -279,6 +316,17 @@ export function useAdminV2Courses() {
     onError: () => toast.error('Failed to update course'),
   });
 
+  // ── Photo upload mutation ──
+  const photoMutation = useMutation({
+    mutationFn: ({ courseId, file }: { courseId: string; file: File }) =>
+      uploadCoursePhoto(courseId, file),
+    onSuccess: () => {
+      toast.success('Photo updated');
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'courses'] });
+    },
+    onError: () => toast.error('Failed to upload photo'),
+  });
+
   // ── Handlers ──
   const handleSearch = (v: string) => { setSearch(v); setPage(1); };
   const handleFilter = (v: string) => { setListFilter(v as CourseFilterList); setPage(1); };
@@ -301,5 +349,8 @@ export function useAdminV2Courses() {
     updateCourse: (id: string, updates: Parameters<typeof updateCourse>[1]) =>
       updateMutation.mutate({ id, updates }),
     isUpdating: updateMutation.isPending,
+    uploadPhoto: (courseId: string, file: File) =>
+      photoMutation.mutate({ courseId, file }),
+    isUploadingPhoto: photoMutation.isPending,
   };
 }

@@ -174,10 +174,14 @@ function CourseDrawer({
   course,
   onClose,
   onUpdate,
+  onUploadPhoto,
+  isUploadingPhoto,
 }: {
   course: AdminCourseRow | null;
   onClose: () => void;
   onUpdate: (id: string, updates: any) => void;
+  onUploadPhoto: (courseId: string, file: File) => void;
+  isUploadingPhoto: boolean;
 }) {
   const navigate = useNavigate();
 
@@ -213,8 +217,8 @@ function CourseDrawer({
       {!course ? null : (
         <div className="space-y-6">
 
-          {/* Hero image */}
-          <div className="rounded-xl overflow-hidden border border-border/60 bg-muted aspect-[16/9]">
+          {/* Hero image with upload button */}
+          <div className="relative rounded-xl overflow-hidden border border-border/60 bg-muted aspect-[16/9]">
             {course.thumbnail_image ? (
               <img src={course.thumbnail_image} alt={course.name} className="w-full h-full object-cover" />
             ) : (
@@ -222,33 +226,74 @@ function CourseDrawer({
                 <Image className="h-10 w-10 text-muted-foreground/30" />
               </div>
             )}
+            <label className="absolute bottom-2 right-2 cursor-pointer">
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file && course) onUploadPhoto(course.id, file);
+                }}
+              />
+              <div
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold text-white"
+                style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)' }}
+              >
+                {isUploadingPhoto ? (
+                  <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Upload className="h-3.5 w-3.5" />
+                )}
+                {isUploadingPhoto ? 'Uploading…' : 'Change photo'}
+              </div>
+            </label>
           </div>
 
-          {/* Rank badges */}
+          {/* Top 100 Lists */}
           <div className="space-y-3">
-            <AdminSectionHeader title="Rankings" />
-            <div className="grid grid-cols-1 gap-3">
-              {([
-                { label: 'Global',   rank: course.global_rank,   color: 'hsl(var(--accent-amber))' },
-                { label: 'Regional', rank: course.regional_rank, color: '#3b82f6' },
-                { label: 'USA',      rank: course.usa_rank,      color: '#dc2626' },
-              ] as const).map(({ label, rank, color }) => (
-                <div key={label} className="flex items-center justify-between">
-                  <span className="text-[12.5px] text-muted-foreground">{label} Top 100</span>
-                  <InlineEditField
-                    value={rank}
-                    type="number"
-                    placeholder="—"
-                    onSave={(v) => {
-                      const key = label === 'Global' ? 'global_rank'
-                                : label === 'USA'    ? 'usa_rank'
-                                : 'regional_rank';
-                      onUpdate(course.id, { [key]: v ? Number(v) : null });
-                    }}
-                  />
+            <AdminSectionHeader title="Top 100 Lists" />
+            {([
+              { label: 'Global Top 100',   rankKey: 'global_rank' as const,   color: 'hsl(var(--accent-amber))' },
+              { label: 'Regional Top 100', rankKey: 'regional_rank' as const, color: '#3b82f6' },
+              { label: 'USA Top 100',      rankKey: 'usa_rank' as const,      color: '#dc2626' },
+            ]).map(({ label, rankKey, color }) => (
+              <div key={rankKey} className="flex items-center gap-3 p-3 rounded-xl border border-border/60 bg-muted/30">
+                <div className="flex-1">
+                  <p className="text-[13px] font-medium text-foreground">{label}</p>
+                  {course[rankKey] && (
+                    <p className="text-[11.5px] text-muted-foreground mt-0.5">
+                      Currently ranked #{course[rankKey]}
+                    </p>
+                  )}
                 </div>
-              ))}
-            </div>
+                {course[rankKey] ? (
+                  <div className="flex items-center gap-2">
+                    <InlineEditField
+                      value={course[rankKey]}
+                      type="number"
+                      placeholder="Rank"
+                      onSave={(v) => onUpdate(course.id, { [rankKey]: v ? Number(v) : null })}
+                    />
+                    <AdminButton
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onUpdate(course.id, { [rankKey]: null })}
+                    >
+                      Remove
+                    </AdminButton>
+                  </div>
+                ) : (
+                  <AdminButton
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onUpdate(course.id, { [rankKey]: 999 })}
+                  >
+                    Add to list
+                  </AdminButton>
+                )}
+              </div>
+            ))}
           </div>
 
           {/* Details */}
@@ -280,6 +325,30 @@ function CourseDrawer({
                 />
               </div>
             </div>
+          </div>
+
+          {/* Course Specs */}
+          <div className="space-y-3">
+            <AdminSectionHeader title="Course Specs" />
+            {([
+              { label: 'Holes',   key: 'holes',   type: 'number' as const },
+              { label: 'Par',     key: 'par',     type: 'number' as const },
+              { label: 'Yardage', key: 'yardage', type: 'number' as const },
+              { label: 'City',    key: 'city',    type: 'text' as const },
+              { label: 'Phone',   key: 'phone',   type: 'text' as const },
+            ] as const).map(({ label, key, type }) => (
+              <div key={key} className="flex items-center justify-between gap-4">
+                <span className="text-[12.5px] text-muted-foreground flex-shrink-0">{label}</span>
+                <div className="flex-1 text-right">
+                  <InlineEditField
+                    value={(course as any)[key]}
+                    type={type}
+                    placeholder="—"
+                    onSave={(v) => onUpdate(course.id, { [key]: type === 'number' ? (v ? Number(v) : null) : (v || null) })}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Location */}
@@ -368,6 +437,8 @@ export default function CoursesPage() {
     selectedIds, setSelectedIds,
     drawerCourseId, setDrawerCourseId, drawerCourse,
     updateCourse,
+    uploadPhoto,
+    isUploadingPhoto,
   } = useAdminV2Courses();
 
   const columns = React.useMemo(() => [
@@ -573,6 +644,8 @@ export default function CoursesPage() {
         course={drawerCourse}
         onClose={() => setDrawerCourseId(null)}
         onUpdate={updateCourse}
+        onUploadPhoto={uploadPhoto}
+        isUploadingPhoto={isUploadingPhoto}
       />
 
     </div>
