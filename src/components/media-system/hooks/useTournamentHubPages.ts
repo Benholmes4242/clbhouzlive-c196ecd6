@@ -94,7 +94,7 @@ export function useTournamentHubPages(userId?: string): {
       const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
       const { data } = await supabase
         .from('sr_tournaments')
-        .select('id, name, tour_slug, purse, status, start_date, end_date, venue_name, venue_city, venue_par, venue_yardage, event_type')
+        .select('id, name, purse, status, start_date, end_date, venue_name, venue_city, venue_par, venue_yardage, event_type')
         .eq('status', 'closed')
         .gte('end_date', sevenDaysAgo)
         .order('end_date', { ascending: false });
