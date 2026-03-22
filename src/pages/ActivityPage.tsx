@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { useActivityFeed, ActivityTabId, ACTIVITY_TABS, ActivityNotification, ChipFilterKind, checkContentExists } from '@/hooks/useActivityFeed';
-import { ActivityBucket } from '@/components/activity/ActivityBucket';
-import { AtAGlanceChips } from '@/components/activity/AtAGlanceChips';
+import { useActivityFeed, ActivityNotification, ChipFilterKind, checkContentExists } from '@/hooks/useActivityFeed';
+import { ActivityNotificationRow } from '@/components/activity/ActivityNotificationRow';
+import { FeaturedNotificationCard } from '@/components/activity/FeaturedNotificationCard';
 import { ActivityEmptyState } from '@/components/activity/ActivityEmptyState';
 import { ActivitySkeleton } from '@/components/activity/ActivitySkeleton';
 import { NotificationActionsSheet } from '@/components/activity/NotificationActionsSheet';
@@ -12,37 +12,47 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
-import { useActiveActor } from '@/context/ActiveActorContext';
 import { ActivityPageSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
 import { AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
+
+const FRIEND_TYPES = new Set([
+  'friend_request', 'friend_accept', 'friend_accepted',
+  'friend_request_sent', 'friend_declined', 'friend_cancelled',
+]);
+
+const SOCIAL_TYPES = new Set([
+  'like', 'comment', 'mention', 'tag', 'follow', 'new_post',
+]);
+
+const FILTER_CHIPS = ['All', 'Social', 'Friends'] as const;
+type ChipFilter = typeof FILTER_CHIPS[number];
 
 const ActivityPage: React.FC = () => {
   // ============================================
-  // ALL HOOKS FIRST - No conditional returns above this section
+  // ALL HOOKS FIRST
   // ============================================
-  const [activeTab, setActiveTab] = useState<ActivityTabId>('all');
-  const [activeChipFilter, setActiveChipFilter] = useState<ChipFilterKind>(null);
-  
+  const [chipFilter, setChipFilter] = useState<ChipFilter>('All');
+
   const { isRehydrating } = useRehydrationSafe();
   const [isRefreshing, setIsRefreshing] = useState(false);
-  
+
   const [actionSheetOpen, setActionSheetOpen] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState<ActivityNotification | null>(null);
-  
-  const effectiveChipFilter = activeTab === 'all' ? activeChipFilter : null;
-  const { data, isLoading, isFetching, isFetched, error } = useActivityFeed(activeTab, effectiveChipFilter);
-  
+
+  // Always fetch 'all' tab with no chip filter — we filter client-side
+  const { data, isLoading, isFetching, isFetched, error } = useActivityFeed('all', null);
+
   const { user } = useSupabaseSession();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { activeActor } = useActiveActor();
-  
+
   const hasMarkedSeen = useRef(false);
   const [sessionNewIds, setSessionNewIds] = useState<string[] | null>(null);
   const [sessionNewCount, setSessionNewCount] = useState<number | null>(null);
   const [hasInitializedNew, setHasInitializedNew] = useState(false);
-  
+
   // On first load: capture "New" IDs, mark them read, but keep showing in "New"
   useEffect(() => {
     if (hasInitializedNew) return;
@@ -53,38 +63,38 @@ const ActivityPage: React.FC = () => {
       }
       return;
     }
-    
+
     const ids = data.buckets.new.map((n) => n.id);
     setSessionNewIds(ids);
     setSessionNewCount(ids.length);
     setHasInitializedNew(true);
-    
+
     const markSeen = async () => {
       const now = new Date().toISOString();
-      
+
       queryClient.setQueryData(['user-profile', user.id], (old: any) => {
         if (!old) return old;
         return { ...old, last_notifications_seen_at: now };
       });
-      
+
       await supabase
         .from('user_profiles')
         .update({ last_notifications_seen_at: now })
         .eq('id', user.id);
-      
+
       await supabase
         .from('notifications')
         .update({ is_read: true })
         .eq('user_id', user.id)
         .lte('created_at', now);
-      
+
       hasMarkedSeen.current = true;
       queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
     };
-    
+
     void markSeen();
   }, [user?.id, isLoading, data, queryClient, hasInitializedNew]);
-  
+
   // On unmount: invalidate so next visit shows items in proper time buckets
   useEffect(() => {
     return () => {
@@ -92,35 +102,28 @@ const ActivityPage: React.FC = () => {
     };
   }, [queryClient]);
 
-  const sessionNewItems = React.useMemo(() => {
+  const sessionNewItems = useMemo(() => {
     if (!sessionNewIds || !data?.allItems) return null;
     const byId = new Map(data.allItems.map((n) => [n.id, n]));
     return sessionNewIds.map((id) => byId.get(id)).filter(Boolean) as ActivityNotification[];
   }, [sessionNewIds, data?.allItems]);
 
   // ============================================
-  // EARLY RETURNS - Only AFTER all hooks
+  // EARLY RETURNS
   // ============================================
   if (isRehydrating) {
     return <ActivityPageSkeleton />;
   }
 
+  // ============================================
+  // HANDLERS
+  // ============================================
   const handleRefresh = async () => {
     if (isRefreshing) return;
     setIsRefreshing(true);
     await queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
     await queryClient.invalidateQueries({ queryKey: ['activity-unread-count'] });
     setTimeout(() => setIsRefreshing(false), 500);
-  };
-
-  const buckets = data?.buckets;
-  const counts = data?.counts;
-
-  const handleTabChange = (tabId: ActivityTabId) => {
-    setActiveTab(tabId);
-    if (tabId !== 'all') {
-      setActiveChipFilter(null);
-    }
   };
 
   const handleMarkRead = async (id: string) => {
@@ -192,15 +195,31 @@ const ActivityPage: React.FC = () => {
     }
   };
 
-  const handleChipClick = (kind: 'new' | 'mentions' | 'friends' | 'reviews' | 'messages') => {
-    if (activeChipFilter === kind) {
-      setActiveChipFilter(null);
-    } else {
-      setActiveChipFilter(kind as ChipFilterKind);
-    }
+  // ============================================
+  // DERIVED DATA
+  // ============================================
+  const buckets = data?.buckets;
+  const effectiveNewItems = sessionNewItems ?? buckets?.new ?? [];
+
+  // Combine all "earlier" items (everything except new)
+  const earlierItems = [
+    ...(buckets?.today?.filter(i => !i.is_unread && (!sessionNewIds || !sessionNewIds.includes(i.id))) ?? []),
+    ...(buckets?.yesterday ?? []),
+    ...(buckets?.thisWeek ?? []),
+    ...(buckets?.earlier ?? []),
+  ];
+
+  // Apply chip filter
+  const applyFilter = (items: ActivityNotification[]) => {
+    if (chipFilter === 'All') return items;
+    if (chipFilter === 'Social') return items.filter(i => SOCIAL_TYPES.has(i.type));
+    if (chipFilter === 'Friends') return items.filter(i => FRIEND_TYPES.has(i.type));
+    return items;
   };
 
-  const effectiveNewItems = sessionNewItems ?? buckets?.new ?? [];
+  const filteredNewItems = applyFilter(effectiveNewItems);
+  const filteredEarlierItems = applyFilter(earlierItems);
+
   const allItems = data?.allItems ?? [];
   const hasNotifications = allItems.length > 0;
   const showSkeleton = !data;
@@ -208,67 +227,53 @@ const ActivityPage: React.FC = () => {
 
   return (
     <PageRoot>
-      <div className="flex flex-col min-h-full bg-[#F8FAFC] pt-[var(--sat)]">
+      <div className="flex flex-col min-h-full bg-[hsl(150,15%,95%)] pt-[var(--sat)]">
         <div className="max-w-2xl mx-auto w-full flex flex-col flex-1">
 
           {/* Header */}
-          <div className="px-4 pt-4 pb-2 text-center">
-            <h1
-              onClick={handleRefresh}
-              className={cn(
-                "font-display text-[28px] font-semibold leading-tight text-foreground cursor-pointer transition-opacity",
-                isRefreshing && "opacity-50"
-              )}
-              aria-label="Activity - tap to refresh"
-            >
-              Activity
-            </h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Updates from your golf network
-            </p>
+          <div className="px-5 pt-4 pb-0 flex items-end justify-between">
+            <div>
+              <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-muted-foreground mb-1">
+                Today
+              </p>
+              <h1
+                onClick={handleRefresh}
+                className={cn(
+                  "font-display text-[28px] font-semibold leading-tight text-foreground cursor-pointer transition-opacity",
+                  isRefreshing && "opacity-50"
+                )}
+                aria-label="Notifications - tap to refresh"
+              >
+                Notifications
+              </h1>
+            </div>
+            {sessionNewCount && sessionNewCount > 0 ? (
+              <span className="mb-1.5 inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-semibold bg-[hsl(38,92%,50%)] text-white">
+                {sessionNewCount} new
+              </span>
+            ) : null}
           </div>
 
-          {/* Tabs — Tier 1 dark fill pills */}
-          <div className="flex justify-center gap-2 px-4 pb-1">
-            {ACTIVITY_TABS.map((tab) => (
+          {/* Filter chips */}
+          <div className="flex gap-2 px-5 pt-3 pb-2 overflow-x-auto scrollbar-none">
+            {FILTER_CHIPS.map(chip => (
               <button
-                key={tab.id}
-                role="tab"
-                aria-selected={activeTab === tab.id}
-                aria-controls={`activity-panel-${tab.id}`}
-                id={`activity-tab-${tab.id}`}
-                onClick={() => handleTabChange(tab.id)}
+                key={chip}
+                onClick={() => setChipFilter(chip)}
                 className={cn(
-                  "px-4 py-2 min-h-[44px] flex items-center text-sm font-medium rounded-full transition-all duration-150 whitespace-nowrap active:scale-[0.97]",
-                  activeTab === tab.id
+                  "shrink-0 px-4 py-1.5 rounded-full text-[12.5px] font-semibold transition-all active:scale-[0.95]",
+                  chipFilter === chip
                     ? "bg-foreground text-background"
-                    : "bg-transparent text-muted-foreground hover:text-foreground"
+                    : "bg-foreground/[0.07] text-muted-foreground"
                 )}
               >
-                {tab.label}
+                {chip}
               </button>
             ))}
           </div>
 
-          {/* Chips (All tab only) */}
-          {activeTab === 'all' && counts && (
-            <div className="px-4 pb-3">
-              <AtAGlanceChips
-                counts={counts}
-                onChipClick={handleChipClick}
-                activeFilter={activeChipFilter}
-                sessionNewCount={sessionNewCount}
-              />
-            </div>
-          )}
-
           {/* Content */}
-          <div
-            role="tabpanel"
-            id={`activity-panel-${activeTab}`}
-            aria-labelledby={`activity-tab-${activeTab}`}
-            className="flex-1"
-          >
+          <div className="flex-1 mt-2">
             {showSkeleton ? (
               <div className="px-4">
                 <ActivitySkeleton />
@@ -286,75 +291,63 @@ const ActivityPage: React.FC = () => {
                 </p>
                 <button
                   onClick={() => queryClient.invalidateQueries({ queryKey: ['activity-feed'] })}
-                  className="px-6 py-2.5 bg-[hsl(38,92%,50%)] text-white text-sm font-medium rounded-full active:scale-[0.97] transition-transform"
+                  className="px-6 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-full active:scale-[0.97] transition-transform"
                 >
                   Try again
                 </button>
               </div>
             ) : showEmptyState ? (
               <div className="px-4">
-                <ActivityEmptyState tab={activeTab} />
+                <ActivityEmptyState tab="all" />
               </div>
-            ) : buckets && (
-              <div className="w-full mt-4 space-y-0">
-                {/* New (unread) */}
-                {effectiveNewItems.length > 0 && (
-                  <ActivityBucket
-                    label="New"
-                    items={effectiveNewItems}
-                    sticky
-                    accent
-                    onNotificationClick={handleNotificationClick}
-                    onOpenActionsSheet={openActionsSheet}
-                    currentUserId={user?.id}
-                    sessionNewIds={sessionNewIds}
-                  />
+            ) : (
+              <div className="w-full space-y-0">
+                {/* Tier 1 — Featured cards for new/unread */}
+                {filteredNewItems.length > 0 && (
+                  <div className="px-4 space-y-3 pb-4">
+                    {filteredNewItems.map((item, i) => (
+                      <FeaturedNotificationCard
+                        key={item.id}
+                        notification={item}
+                        index={i}
+                        onClick={() => handleNotificationClick(item)}
+                        onOpenActionsSheet={() => openActionsSheet(item)}
+                        currentUserId={user?.id}
+                      />
+                    ))}
+                  </div>
                 )}
 
-                {/* Today */}
-                {buckets.today.length > 0 && (
-                  <ActivityBucket
-                    label="Today"
-                    items={buckets.today.filter(i =>
-                      !i.is_unread && (!sessionNewIds || !sessionNewIds.includes(i.id))
-                    )}
-                    onNotificationClick={handleNotificationClick}
-                    onOpenActionsSheet={openActionsSheet}
-                    currentUserId={user?.id}
-                  />
-                )}
+                {/* Tier 2 — Compact list for earlier */}
+                {filteredEarlierItems.length > 0 && (
+                  <div>
+                    {/* Divider label */}
+                    <div className="px-5 pt-2 pb-2">
+                      <span className="text-[11px] font-bold tracking-[0.08em] uppercase text-muted-foreground/60">
+                        Earlier
+                      </span>
+                    </div>
 
-                {/* Yesterday */}
-                {buckets.yesterday.length > 0 && (
-                  <ActivityBucket
-                    label="Yesterday"
-                    items={buckets.yesterday}
-                    onNotificationClick={handleNotificationClick}
-                    onOpenActionsSheet={openActionsSheet}
-                    currentUserId={user?.id}
-                  />
-                )}
-
-                {/* This Week */}
-                {buckets.thisWeek.length > 0 && (
-                  <ActivityBucket
-                    label="This Week"
-                    items={buckets.thisWeek}
-                    onNotificationClick={handleNotificationClick}
-                    onOpenActionsSheet={openActionsSheet}
-                    currentUserId={user?.id}
-                  />
-                )}
-
-                {/* Earlier */}
-                {buckets.earlier.length > 0 && (
-                  <ActivityBucket
-                    label="Earlier"
-                    items={buckets.earlier}
-                    onNotificationClick={handleNotificationClick}
-                    onOpenActionsSheet={openActionsSheet}
-                    currentUserId={user?.id}
-                  />
+                    {/* White card container */}
+                    <div className="mx-3 rounded-2xl bg-background border border-border/50 overflow-hidden divide-y divide-border/40">
+                      {filteredEarlierItems.map((item, i) => (
+                        <motion.div
+                          key={item.id}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.25 + i * 0.04 }}
+                        >
+                          <ActivityNotificationRow
+                            notification={item}
+                            onClick={() => handleNotificationClick(item)}
+                            onOpenActionsSheet={() => openActionsSheet(item)}
+                            currentUserId={user?.id}
+                            isSessionNew={false}
+                          />
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
             )}
