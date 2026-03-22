@@ -846,7 +846,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isProcessing}
                     style={{
-                      flex: 1,
+                      flex: 1.2,
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
@@ -860,15 +860,15 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     }}
                   >
                     <div style={{
-                      width: 44, height: 44, borderRadius: 14,
-                      background: 'rgba(255,255,255,0.08)',
-                      border: '1px solid rgba(255,255,255,0.12)',
+                      width: 52, height: 52, borderRadius: 16,
+                      background: 'rgba(255,255,255,0.10)',
+                      border: '1px solid rgba(255,255,255,0.15)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
-                      <ImageIcon className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.75)' }} strokeWidth={1.75} />
+                      <ImageIcon className="w-[22px] h-[22px]" style={{ color: 'rgba(255,255,255,0.88)' }} strokeWidth={1.75} />
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.80)', marginBottom: 2 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.88)', marginBottom: 2 }}>
                         Add from Library
                       </div>
                       <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
