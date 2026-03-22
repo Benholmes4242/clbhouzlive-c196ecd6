@@ -395,10 +395,12 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
             className="w-full flex items-center justify-between px-4 py-[14px] active:opacity-80 transition-opacity"
           >
             <div className="flex items-center gap-3">
-              <Image size={20} style={{ color: 'hsl(var(--muted-foreground))' }} />
-              <span className="text-[14px] font-medium" style={{ color: 'hsl(var(--foreground))' }}>Shared Media</span>
+              <div className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0" style={{ background: 'rgba(0,0,0,0.04)' }}>
+                <Image size={17} style={{ color: '#64748b' }} />
+              </div>
+              <span className="text-[14px] font-medium" style={{ color: '#0f172a' }}>Shared Media</span>
             </div>
-            <ChevronRight size={16} style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }} />
+            <ChevronRight size={14} style={{ color: '#d1d5db' }} />
           </button>
 
           <div style={insetDivider} />
