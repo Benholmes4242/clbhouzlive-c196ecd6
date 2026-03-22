@@ -245,7 +245,7 @@ export function useTournamentHubPages(userId?: string): {
 
     // Build result pages
     const resultPages: TournamentHubPage[] = (recentResults ?? []).map(t => {
-      const slug = t.tour_slug || deriveTourSlug(t.name, (t as any).event_type);
+      const slug = deriveTourSlug(t.name, t.event_type ?? undefined);
       const realPostId = postIdMap[t.id] ?? '';
       const counts = liveCountsMap[realPostId] ?? { likeCount: 0, commentCount: 0, isLikedByMe: false };
       return {
