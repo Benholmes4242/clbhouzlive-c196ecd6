@@ -41,8 +41,7 @@ const COURSE_COLUMNS = `
   id, name, country, sub_country, region, continent,
   global_rank, regional_rank, usa_rank,
   thumbnail_image, latitude, longitude,
-  website_url, description, created_at,
-  city, phone, holes, par, yardage
+  website_url, description, created_at
 `;
 
 function applySearch(query: any, search: string) {
