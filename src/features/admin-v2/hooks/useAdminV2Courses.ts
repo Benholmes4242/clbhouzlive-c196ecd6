@@ -209,8 +209,7 @@ async function updateCourse(
   id: string,
   updates: Partial<Pick<AdminCourseRow,
     'name' | 'global_rank' | 'regional_rank' | 'usa_rank' |
-    'website_url' | 'description' | 'city' | 'phone' |
-    'holes' | 'par' | 'yardage'
+    'website_url' | 'description'
   >>
 ): Promise<void> {
   const { error } = await supabase

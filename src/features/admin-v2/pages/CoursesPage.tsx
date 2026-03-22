@@ -327,29 +327,6 @@ function CourseDrawer({
             </div>
           </div>
 
-          {/* Course Specs */}
-          <div className="space-y-3">
-            <AdminSectionHeader title="Course Specs" />
-            {([
-              { label: 'Holes',   key: 'holes',   type: 'number' as const },
-              { label: 'Par',     key: 'par',     type: 'number' as const },
-              { label: 'Yardage', key: 'yardage', type: 'number' as const },
-              { label: 'City',    key: 'city',    type: 'text' as const },
-              { label: 'Phone',   key: 'phone',   type: 'text' as const },
-            ] as const).map(({ label, key, type }) => (
-              <div key={key} className="flex items-center justify-between gap-4">
-                <span className="text-[12.5px] text-muted-foreground flex-shrink-0">{label}</span>
-                <div className="flex-1 text-right">
-                  <InlineEditField
-                    value={(course as any)[key]}
-                    type={type}
-                    placeholder="—"
-                    onSave={(v) => onUpdate(course.id, { [key]: type === 'number' ? (v ? Number(v) : null) : (v || null) })}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
 
           {/* Location */}
           <div className="space-y-3">
