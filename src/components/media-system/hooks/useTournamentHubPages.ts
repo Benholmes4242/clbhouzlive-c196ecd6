@@ -49,7 +49,7 @@ export function useTournamentHubPages(userId?: string): {
   const pgaLive = useMemo(() => (arenaData ?? []).filter(t => t.tourSlug === PGA_SLUG), [arenaData]);
 
   // ── Recent Completed PGA Tournaments (last 7 days) ──
-  const { data: pgaResults, isLoading: resultsLoading } = useQuery({
+  const { data: pgaResults, isLoading: resultsLoading } = useQuery<any[]>({
     queryKey: ['tournament-hub-results-pga'],
     queryFn: async () => {
       const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
@@ -61,7 +61,7 @@ export function useTournamentHubPages(userId?: string): {
         .gte('end_date', sevenDaysAgo)
         .order('end_date', { ascending: false })
         .limit(3);
-      return data ?? [];
+      return (data ?? []) as any[];
     },
     staleTime: 5 * 60_000,
   });
