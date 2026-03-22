@@ -199,6 +199,7 @@ export function SnapFeed({
           onShare={onShare}
           getLikeState={getLikeState}
           getCommentCount={getCommentCount}
+          onHubPageChange={onHubPageChange}
         />
       ))}
     </div>
