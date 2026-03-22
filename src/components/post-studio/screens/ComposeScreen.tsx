@@ -890,24 +890,24 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                       justifyContent: 'center',
                       gap: 8,
                       padding: '20px 12px',
-                      background: 'transparent',
+                      background: 'rgba(0,0,0,0.15)',
                       border: 'none',
                       cursor: 'pointer',
                     }}
                   >
                     <div style={{
                       width: 44, height: 44, borderRadius: 14,
-                      background: 'rgba(255,255,255,0.08)',
-                      border: '1px solid rgba(255,255,255,0.12)',
+                      background: 'rgba(255,255,255,0.06)',
+                      border: '1px solid rgba(255,255,255,0.09)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
                       <Camera className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.75)' }} strokeWidth={1.75} />
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.80)', marginBottom: 2 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 2 }}>
                         Take a Photo
                       </div>
-                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>
                         Camera
                       </div>
                     </div>
