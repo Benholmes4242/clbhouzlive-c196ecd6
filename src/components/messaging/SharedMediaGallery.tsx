@@ -3,7 +3,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { ChevronLeft, Image, Link, MapPin, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Image, Link, MapPin, Loader2, ExternalLink } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
@@ -92,67 +92,92 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
     fetchSharedContent();
   }, [conversationId]);
 
+  const tabTriggerClass = "flex-1 flex flex-col items-center gap-0 pt-[10px] pb-[10px] rounded-none bg-transparent shadow-none text-[14px] font-medium text-[#94a3b8] relative data-[state=active]:font-bold data-[state=active]:text-[#0f172a] data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=inactive]:text-[#94a3b8] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:rounded-t-[2px] after:bg-transparent data-[state=active]:after:bg-[#F5A623]";
+
   return (
-    <div className="fixed inset-0 bg-background z-50 flex flex-col" style={{ paddingTop: 'var(--sat, 0px)' }}>
+    <div
+      className="fixed inset-0 z-50 flex flex-col"
+      style={{
+        paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+        background: '#F8FAFC',
+      }}
+    >
       {/* Header */}
-      <div className="flex items-center h-14 px-4 border-b border-border/40">
+      <header
+        className="flex-none flex items-center px-4 justify-between"
+        style={{
+          paddingTop: '8px',
+          paddingBottom: '10px',
+          borderBottom: '1px solid rgba(0,0,0,0.06)',
+        }}
+      >
         <button
           onClick={onClose}
-          className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center hover:bg-muted/50"
+          className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 active:scale-[0.97]"
+          style={{ background: 'rgba(0,0,0,0.05)' }}
         >
-          <ChevronLeft className="w-6 h-6 text-foreground/60" />
+          <ChevronLeft size={20} style={{ color: '#0f172a' }} />
         </button>
-        <h1 className="flex-1 text-center text-lg font-semibold text-foreground">
-          Media, Links, and Courses
+        <h1
+          className="flex-1 text-center font-bold text-[#0f172a]"
+          style={{ fontSize: 17, letterSpacing: '-0.3px' }}
+        >
+          Shared Media
         </h1>
-        <div className="w-10" />
-      </div>
+        <div className="w-9" />
+      </header>
 
       {/* Tabs */}
-      <Tabs defaultValue="media" className="flex-1 flex flex-col">
-        <TabsList className="mx-4 mt-4 grid grid-cols-3 h-10 bg-muted/60 rounded-full p-1">
-          <TabsTrigger
-            value="media"
-            className="rounded-full text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
-          >
-            <Image className="w-4 h-4 mr-1" />
+      <Tabs defaultValue="media" className="flex-1 flex flex-col min-h-0">
+        <TabsList
+          className="w-full grid grid-cols-3 h-auto rounded-none bg-transparent p-0 shadow-none"
+          style={{ borderBottom: '1px solid rgba(0,0,0,0.06)' }}
+        >
+          <TabsTrigger value="media" className={tabTriggerClass}>
+            <span className="data-[state=active]:text-[#F5A623] data-[state=inactive]:text-[#94a3b8]">
+              <Image className="w-4 h-4" />
+            </span>
             Media ({media.length})
           </TabsTrigger>
-          <TabsTrigger
-            value="courses"
-            className="rounded-full text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
-          >
-            <MapPin className="w-4 h-4 mr-1" />
+          <TabsTrigger value="courses" className={tabTriggerClass}>
+            <span className="data-[state=active]:text-[#F5A623] data-[state=inactive]:text-[#94a3b8]">
+              <MapPin className="w-4 h-4" />
+            </span>
             Courses ({courses.length})
           </TabsTrigger>
-          <TabsTrigger
-            value="links"
-            className="rounded-full text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm"
-          >
-            <Link className="w-4 h-4 mr-1" />
+          <TabsTrigger value="links" className={tabTriggerClass}>
+            <span className="data-[state=active]:text-[#F5A623] data-[state=inactive]:text-[#94a3b8]">
+              <Link className="w-4 h-4" />
+            </span>
             Links ({links.length})
           </TabsTrigger>
         </TabsList>
 
         {loading ? (
           <div className="flex-1 flex items-center justify-center">
-            <Loader2 className="w-8 h-8 text-primary/50 animate-spin" />
+            <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#F5A623' }} />
           </div>
         ) : (
           <>
-            <TabsContent value="media" className="flex-1 overflow-y-auto p-4" style={{ paddingBottom: 'var(--sab, 0px)' }}>
+            <TabsContent value="media" className="flex-1 overflow-y-auto p-0 pb-8">
               {media.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <Image className="w-12 h-12 mx-auto mb-2 text-primary/30" />
-                  <p>No media shared yet</p>
+                <div className="text-center py-12">
+                  <div
+                    className="w-14 h-14 rounded-[14px] mx-auto mb-3 flex items-center justify-center"
+                    style={{ background: 'rgba(245,166,35,0.08)' }}
+                  >
+                    <Image size={24} style={{ color: '#F5A623' }} />
+                  </div>
+                  <p className="text-[14px] font-semibold text-[#0f172a]">No media shared yet</p>
+                  <p className="text-[13px] text-[#94a3b8] mt-1">Photos and videos will appear here</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-3 gap-1">
+                <div className="grid grid-cols-3 gap-[2px]">
                   {media.map(item => (
                     <button
                       key={item.id}
                       onClick={() => setSelectedImage(item.url)}
-                      className="aspect-square rounded-lg overflow-hidden bg-muted/30"
+                      className="aspect-square overflow-hidden bg-muted/30"
                     >
                       {item.type === 'image' ? (
                         <img src={item.url} alt="" className="w-full h-full object-cover" />
@@ -165,66 +190,96 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
               )}
             </TabsContent>
 
-            <TabsContent value="courses" className="flex-1 overflow-y-auto p-4 space-y-3" style={{ paddingBottom: 'var(--sab, 0px)' }}>
+            <TabsContent value="courses" className="flex-1 overflow-y-auto px-4 pt-4 pb-8 space-y-[10px]">
               {courses.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <MapPin className="w-12 h-12 mx-auto mb-2 text-primary/30" />
-                  <p>No courses shared yet</p>
+                <div className="text-center py-12">
+                  <div
+                    className="w-14 h-14 rounded-[14px] mx-auto mb-3 flex items-center justify-center"
+                    style={{ background: 'rgba(34,197,94,0.08)' }}
+                  >
+                    <MapPin size={24} style={{ color: '#22c55e' }} />
+                  </div>
+                  <p className="text-[14px] font-semibold text-[#0f172a]">No courses shared yet</p>
+                  <p className="text-[13px] text-[#94a3b8] mt-1">Course shares will appear here</p>
                 </div>
               ) : (
-                courses.map(course => (
-                  <a
-                    key={course.id}
-                    href={course.url}
-                    className="flex items-center gap-3 p-3 rounded-2xl bg-primary/5 hover:bg-primary/10"
-                  >
-                    {course.thumbnail ? (
-                      <img
-                        src={course.thumbnail}
-                        alt={course.title}
-                        className="w-16 h-16 rounded-lg object-cover"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 rounded-lg bg-primary flex items-center justify-center">
-                        <span className="text-2xl">⛳</span>
+                courses.map(course => {
+                  const date = new Date(course.createdAt).toLocaleDateString();
+                  return (
+                    <a
+                      key={course.id}
+                      href={course.url}
+                      className="flex items-center gap-3 px-4 py-3 bg-white rounded-[14px] border border-[rgba(0,0,0,0.07)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+                    >
+                      {/* Squircle thumbnail */}
+                      {course.thumbnail ? (
+                        <img
+                          src={course.thumbnail}
+                          alt={course.title}
+                          className="w-11 h-11 object-cover shrink-0"
+                          style={{ borderRadius: '34%' }}
+                        />
+                      ) : (
+                        <div
+                          className="w-11 h-11 shrink-0 flex items-center justify-center"
+                          style={{ borderRadius: '34%', background: 'rgba(34,197,94,0.08)' }}
+                        >
+                          <span className="text-lg">⛳</span>
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-semibold text-[#0f172a] truncate">
+                          {course.title || 'Golf Course'}
+                        </p>
+                        <p className="text-[12px] text-[#94a3b8] mt-[2px]">{date}</p>
                       </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-foreground truncate">
-                        {course.title || 'Golf Course'}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(course.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </a>
-                ))
+                      <ChevronRight size={16} className="text-[#94a3b8] shrink-0" />
+                    </a>
+                  );
+                })
               )}
             </TabsContent>
 
-            <TabsContent value="links" className="flex-1 overflow-y-auto p-4 space-y-2" style={{ paddingBottom: 'var(--sab, 0px)' }}>
+            <TabsContent value="links" className="flex-1 overflow-y-auto px-4 pt-4 pb-8 space-y-[10px]">
               {links.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <Link className="w-12 h-12 mx-auto mb-2 text-primary/30" />
-                  <p>No links shared yet</p>
+                <div className="text-center py-12">
+                  <div
+                    className="w-14 h-14 rounded-[14px] mx-auto mb-3 flex items-center justify-center"
+                    style={{ background: 'rgba(99,102,241,0.08)' }}
+                  >
+                    <Link size={24} style={{ color: '#6366F1' }} />
+                  </div>
+                  <p className="text-[14px] font-semibold text-[#0f172a]">No links shared yet</p>
+                  <p className="text-[13px] text-[#94a3b8] mt-1">Links will appear here</p>
                 </div>
               ) : (
-                links.map(link => (
-                  <a
-                    key={link.id}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block p-3 rounded-2xl bg-primary/5 hover:bg-primary/10"
-                  >
-                    <p className="text-primary truncate text-sm">
-                      {link.url}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {new Date(link.createdAt).toLocaleDateString()}
-                    </p>
-                  </a>
-                ))
+                links.map(link => {
+                  const date = new Date(link.createdAt).toLocaleDateString();
+                  return (
+                    <a
+                      key={link.id}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-4 py-3 bg-white rounded-[14px] border border-[rgba(0,0,0,0.07)] shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+                    >
+                      <div
+                        className="w-9 h-9 rounded-[10px] shrink-0 flex items-center justify-center"
+                        style={{ background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.15)', color: '#6366F1' }}
+                      >
+                        <Link size={16} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-semibold text-[#0f172a] truncate">
+                          {link.url.replace(/https?:\/\/(www\.)?/, '').split('/')[0]}
+                        </p>
+                        <p className="text-[12px] text-[#64748b] truncate mt-[2px]">{link.url}</p>
+                        <p className="text-[11px] text-[#94a3b8] mt-[2px]">{date}</p>
+                      </div>
+                      <ExternalLink size={14} className="text-[#94a3b8] shrink-0" />
+                    </a>
+                  );
+                })
               )}
             </TabsContent>
           </>
@@ -240,7 +295,7 @@ export function SharedMediaGallery({ conversationId, onClose }: SharedMediaGalle
           <button
             onClick={() => setSelectedImage(null)}
             className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
-            style={{ marginTop: 'var(--sat, 0px)' }}
+            style={{ marginTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
           >
             <ChevronLeft className="w-6 h-6 text-white rotate-180" />
           </button>
