@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, User, Mail, Lock, Bell, Shield, EyeOff, UserX, HelpCircle, Flag, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Map } from 'lucide-react';
+import { ChevronLeft, ChevronRight, User, Mail, Lock, Bell, Shield, EyeOff, UserX, HelpCircle, Flag, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Map } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useCreatorSettings } from '@/hooks/useCreatorSettings';
@@ -36,6 +36,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 function maskEmail(email: string): string {
   const [local, domain] = email.split('@');
@@ -83,33 +84,59 @@ export function SettingsPageV2() {
 
   if (loading) return <SettingsSkeleton />;
 
+  const p = profile as any;
+  const handicapSuffix = p?.eg_handicap_index != null
+    ? ` · ${p.eg_handicap_index > 0 ? '+' : ''}${p.eg_handicap_index} hcp`
+    : '';
+
   return (
     <div
-      className="min-h-screen bg-background"
+      className="min-h-screen bg-[#F8FAFC]"
       style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)' }}
     >
       {/* Header */}
-      <div className="flex items-center gap-2 px-4 pt-4 pb-2">
+      <div className="flex items-center gap-3 px-4 pt-3 pb-4">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center justify-center min-h-[44px] min-w-[44px] -ml-2 text-foreground"
+          className="w-9 h-9 rounded-full bg-black/[0.06] flex items-center justify-center text-foreground flex-shrink-0"
           aria-label="Back"
         >
-          <ChevronLeft size={24} strokeWidth={2.5} />
+          <ChevronLeft size={20} strokeWidth={2.5} />
         </button>
-        <h1 className="text-[16px] font-semibold text-foreground">Settings</h1>
+        <h1 className="text-[22px] font-extrabold tracking-[-0.5px] text-foreground">
+          Settings
+        </h1>
+      </div>
+
+      {/* Profile hero card */}
+      <div className="px-4 pb-4">
+        <button
+          onClick={() => navigate(`/profile/${p?.username}`)}
+          className="w-full flex items-center gap-3.5 p-3.5 rounded-2xl bg-card border border-border/60 shadow-sm text-left active:scale-[0.98] transition-transform"
+        >
+          <SquircleAvatar
+            src={p?.profile_photo_url}
+            alt={p?.display_name || ''}
+            size={52}
+            fallback={p?.display_name?.charAt(0) || '?'}
+            hideRing
+          />
+          <div className="flex-1 min-w-0">
+            <p className="text-[16px] font-semibold text-foreground truncate">
+              {p?.display_name || 'Your Profile'}
+            </p>
+            <p className="text-[13px] text-muted-foreground truncate">
+              @{p?.username}{handicapSuffix}
+            </p>
+          </div>
+          <ChevronRight size={18} className="text-muted-foreground/40 flex-shrink-0" />
+        </button>
       </div>
 
       <div className="px-4 pb-32 space-y-6">
 
         {/* Account */}
         <SettingsSection title="Account">
-          <SettingsChevronRow
-            icon={<User size={18} />}
-            title="Profile"
-            iconTheme="account"
-            onClick={() => navigate('/profile')}
-          />
           <SettingsChevronRow
             icon={<Mail size={18} />}
             title="Email"
