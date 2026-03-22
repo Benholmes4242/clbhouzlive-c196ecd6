@@ -19,9 +19,6 @@ interface Props {
   onYoutubeChange: (v: string) => void;
 }
 
-const INPUT_CLS = 'flex-1 bg-muted border-0 rounded-r-xl px-3 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors';
-const PREFIX_CLS = 'flex items-center justify-center w-11 bg-muted rounded-l-xl text-muted-foreground shrink-0 self-stretch';
-
 function SocialRow({
   icon, placeholder, value, onChange,
 }: {
@@ -31,8 +28,10 @@ function SocialRow({
   onChange: (v: string) => void;
 }) {
   return (
-    <div className="flex items-stretch">
-      <div className={PREFIX_CLS}>{icon}</div>
+    <div className="flex overflow-hidden rounded-[10px] border border-border/60">
+      <div className="w-11 flex-shrink-0 flex items-center justify-center bg-[#F0F4F3] text-muted-foreground border-r border-border/60">
+        {icon}
+      </div>
       <input
         type="text"
         value={value}
@@ -41,7 +40,7 @@ function SocialRow({
         autoCapitalize="none"
         autoCorrect="off"
         spellCheck={false}
-        className={INPUT_CLS}
+        className="flex-1 bg-[#F8FAFC] px-3 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 transition-colors"
       />
     </div>
   );
@@ -53,7 +52,7 @@ export function SocialLinksSection({
 }: Props) {
   return (
     <div className="space-y-2">
-      <label className="text-[13px] font-medium text-muted-foreground block mb-1">Social Links</label>
+      <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground block mb-1">Social Links</label>
       <SocialRow icon={<Instagram size={16} />} placeholder="instagram username" value={instagram} onChange={onInstagramChange} />
       <SocialRow icon={<Twitter size={16} />} placeholder="twitter username" value={twitter} onChange={onTwitterChange} />
       <SocialRow icon={<TikTokIcon />} placeholder="tiktok username" value={tiktok} onChange={onTiktokChange} />

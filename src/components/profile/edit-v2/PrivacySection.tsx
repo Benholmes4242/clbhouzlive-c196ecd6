@@ -13,14 +13,19 @@ export function PrivacySection({ isPublic, onChange }: Props) {
       onClick={() => onChange(!isPublic)}
     >
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
+        <div
+          className="w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0"
+          style={{
+            backgroundColor: isPublic ? 'rgba(245,166,35,0.12)' : 'hsl(210,15%,93%)',
+          }}
+        >
           {isPublic
             ? <Globe size={18} className="text-[hsl(38,92%,50%)]" />
             : <Lock size={18} className="text-muted-foreground" />
           }
         </div>
         <div>
-          <p className="text-[15px] font-medium text-foreground">
+          <p className="text-[15px] font-semibold text-foreground">
             {isPublic ? 'Public Profile' : 'Private Profile'}
           </p>
           <p className="text-[12px] text-muted-foreground">
