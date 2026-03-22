@@ -38,13 +38,6 @@ export const FeedSlide = memo(function FeedSlide({
 
   // ── Content routing ──
   const renderContent = () => {
-    // Blank placeholder card
-    if (post.postType === 'blank') {
-      return (
-        <div style={{ position: 'absolute', inset: 0, background: '#000000' }} />
-      );
-    }
-
     // Multi-media (any mix of video + image) → FeedImageCarousel
     if (media && media.length > 1) {
       return (
