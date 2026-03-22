@@ -25,11 +25,6 @@ export interface AdminCourseRow {
   created_at:     string;
   avg_rating:     number | null;
   review_count:   number | null;
-  city:           string | null;
-  phone:          string | null;
-  holes:          number | null;
-  par:            number | null;
-  yardage:        number | null;
 }
 
 export type CourseFilterList = 'all' | 'global' | 'gbi' | 'usa' | 'europe' | 'unranked';
