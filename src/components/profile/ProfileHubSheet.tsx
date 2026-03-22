@@ -220,7 +220,7 @@ function ProfileHubSheet({
                   Switch Profile
                 </div>
                 <div
-                  className="flex gap-3 overflow-x-auto pb-1 no-scrollbar"
+                  className="flex gap-3 overflow-x-auto pb-2 pt-1 no-scrollbar"
                   style={{
                     scrollSnapType: 'x mandatory',
                     WebkitOverflowScrolling: 'touch',
@@ -237,10 +237,13 @@ function ProfileHubSheet({
                         style={{ scrollSnapAlign: 'start' }}
                       >
                         <div className="relative">
-                          {/* #7 — amber outline on active profile */}
+                          {/* Amber border flush on active profile */}
                           <div
-                            className="rounded-[34%]"
-                            style={isActive ? { outline: '2.5px solid hsl(38,92%,50%)', outlineOffset: '2px' } : undefined}
+                            className={cn("rounded-[34%]", isActive && "ring-0")}
+                            style={{
+                              border: isActive ? '2.5px solid hsl(38,92%,50%)' : '2.5px solid transparent',
+                              boxShadow: isActive ? '0 2px 10px rgba(245,166,35,0.25)' : undefined,
+                            }}
                           >
                             <SquircleAvatar
                               size={48}
@@ -253,7 +256,7 @@ function ProfileHubSheet({
                           {/* #7 — amber check badge */}
                           {isActive && (
                             <div
-                              className="absolute -bottom-0.5 -right-0.5 w-[18px] h-[18px] rounded-full flex items-center justify-center ring-2 ring-background"
+                              className="absolute -bottom-1 -right-1 w-[18px] h-[18px] rounded-full flex items-center justify-center ring-2 ring-[#F8FAFC]"
                               style={{ background: 'hsl(38,92%,50%)' }}
                             >
                               <Check className="w-3 h-3 text-white" />
@@ -300,9 +303,11 @@ function ProfileHubSheet({
                     className="relative flex flex-col items-start justify-between p-3.5 rounded-2xl transition-colors duration-150 active:scale-[0.97]"
                     style={{
                       height: 80,
-                      background: isEcho ? 'rgba(245,158,11,0.08)' : '#ffffff',
-                      border: isEcho ? '1px solid rgba(245,158,11,0.22)' : '1px solid rgba(0,0,0,0.07)',
-                      boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+                      background: isEcho
+                        ? 'linear-gradient(135deg, rgba(245,166,35,0.14) 0%, rgba(245,166,35,0.06) 100%)'
+                        : '#ffffff',
+                      border: isEcho ? '1px solid rgba(245,166,35,0.32)' : '1px solid rgba(0,0,0,0.07)',
+                      boxShadow: isEcho ? '0 2px 12px rgba(245,166,35,0.12)' : '0 1px 4px rgba(0,0,0,0.05)',
                     }}
                   >
                     {/* Badge — top right */}
@@ -332,7 +337,10 @@ function ProfileHubSheet({
                     </div>
 
                     {/* Label — bottom left */}
-                    <span className={cn("text-[13px] font-medium", isEcho ? "text-[#B45309]" : "text-foreground")}>
+                    <span
+                      className="text-[13px] font-bold leading-none w-full text-left"
+                      style={{ color: isEcho ? '#92400E' : '#0f172a', letterSpacing: '-0.1px' }}
+                    >
                       {label}
                     </span>
                   </button>
