@@ -1,6 +1,6 @@
 // PublishScreen — Step 2: Clean review before posting
 import React, { useCallback, useState, useEffect } from 'react';
-import { Globe, Users, Lock, Clock, ChevronRight, Zap, MapPin, AtSign } from 'lucide-react';
+import { Globe, Users, Lock, Clock, ChevronRight, Zap, MapPin } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StudioHeader } from '../components/StudioHeader';
 import { usePostStudioContext } from '../usePostStudio';
