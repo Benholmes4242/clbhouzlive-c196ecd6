@@ -13,7 +13,7 @@ const MAX_REVIEWS_PER_CREATOR = 4;
 
 // ── Type Guards ────────────────────────────────────────────────────────────────
 function isTournamentPost(p: FeedPost): boolean {
-  return p.postType === 'tournament_result' || p.postType === 'tournament_live' || p.postType === 'tournament_hub';
+  return p.postType === 'tournament_result' || p.postType === 'tournament_live';
 }
 
 function isReviewPost(p: FeedPost): boolean {
@@ -127,7 +127,7 @@ export function interleaveReviews(posts: FeedPost[], tab: FeedTab): FeedPost[] {
  * Tournament injection happens in Clubhouse.tsx (needs live data from hook).
  */
 export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
-  const noLive = posts.filter(p => p.postType !== 'tournament_live' && p.postType !== 'tournament_result' && p.postType !== 'tournament_hub');
+  const noLive = posts.filter(p => p.postType !== 'tournament_live' && p.postType !== 'tournament_result');
   const filtered = filterForSuggested(noLive);
   const capped = capPerCreator(filtered);
   const interleaved = interleaveReviews(capped, 'suggested');
@@ -143,29 +143,8 @@ export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
  * No tournament injection in friends feed.
  */
 export function buildFriendsFeed(posts: FeedPost[]): FeedPost[] {
-  const noLive = posts.filter(p => p.postType !== 'tournament_live' && p.postType !== 'tournament_hub');
+  const noLive = posts.filter(p => p.postType !== 'tournament_live');
   const capped = capPerCreator(noLive);
   const interleaved = interleaveReviews(capped, 'friends');
   return deduplicatePosts(interleaved);
-}
-
-/**
- * Inject the TournamentHubCard at slot 4 of the suggested feed.
- * One card only, always at slot 4 of block 1. Does not recur.
- */
-export function injectTournamentHubCard(
-  feedPosts: FeedPost[],
-  hubPost: FeedPost | null
-): FeedPost[] {
-  if (!hubPost) return feedPosts;
-  const regular = feedPosts.filter(p => !isTournamentPost(p));
-  const SLOT = SUGGESTED_TOURNAMENT_SLOT - 1; // 0-indexed = 3
-  const result: FeedPost[] = [];
-  let injected = false;
-  for (let i = 0; i < regular.length; i++) {
-    if (i === SLOT && !injected) { result.push(hubPost); injected = true; }
-    result.push(regular[i]);
-  }
-  if (!injected) result.push(hubPost);
-  return deduplicatePosts(result);
 }
