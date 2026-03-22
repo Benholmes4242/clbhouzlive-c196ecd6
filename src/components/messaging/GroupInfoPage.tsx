@@ -462,7 +462,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                 <div className="flex items-center justify-between px-4 py-3">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <SquircleAvatar
-                      size={40}
+                      size={42}
                       src={participant.profile?.profile_photo_url || undefined}
                       alt={participant.profile?.display_name || participant.profile?.username || '?'}
                       fallback={getInitials(participant.profile?.display_name || participant.profile?.username || '?')}
