@@ -117,53 +117,6 @@ export function interleaveReviews(posts: FeedPost[], tab: FeedTab): FeedPost[] {
   return result;
 }
 
-// ── Tournament Card Injection (Suggested only) ────────────────────────────────
-/**
- * Inject live or completed tournament card into the suggested feed.
- * Rules:
- * 1. Maximum ONE tournament card per feed (live beats completed).
- * 2. Card appears at slot SUGGESTED_TOURNAMENT_SLOT (4) of the FIRST block only.
- * 3. If a live card is present, completed cards for the same tour are suppressed.
- * 4. If no slot 4 exists yet, append at end.
- * 5. Does NOT recur in subsequent blocks.
- */
-export function injectLiveTournamentCards(
-  feedPosts: FeedPost[],
-  livePosts: FeedPost[],
-  liveTourSlugs: string[]
-): FeedPost[] {
-  // Step 1: Suppress completed result cards for currently-live tours
-  const filtered = feedPosts.filter(post => {
-    if (post.postType !== 'tournament_result') return true;
-    const meta = (post as any).tournamentMeta as { tour_slug?: string } | undefined;
-    if (!meta?.tour_slug) return true;
-    return !liveTourSlugs.includes(meta.tour_slug);
-  });
-
-  // Step 2: Pick the single best tournament card (live > completed, highest purse)
-  const liveCard = livePosts.length > 0 ? livePosts[0] : null;
-  const resultCards = filtered.filter(p => p.postType === 'tournament_result');
-  const tournamentCard: FeedPost | null = liveCard ?? (resultCards.length > 0 ? resultCards[0] : null);
-  if (!tournamentCard) return filtered;
-
-  // Step 3: Build regular stream (exclude all tournament posts)
-  const regular = filtered.filter(p => !isTournamentPost(p));
-
-  // Step 4: Insert at slot 4 of block 1 only
-  const SLOT = SUGGESTED_TOURNAMENT_SLOT - 1; // 0-indexed = 3
-  const result: FeedPost[] = [];
-  let injected = false;
-  for (let i = 0; i < regular.length; i++) {
-    if (i === SLOT && !injected) {
-      result.push(tournamentCard);
-      injected = true;
-    }
-    result.push(regular[i]);
-  }
-  // If feed has fewer than 4 posts, append at end
-  if (!injected) result.push(tournamentCard);
-  return deduplicatePosts(result);
-}
 
 // ── Full Suggested Feed Pipeline ──────────────────────────────────────────────
 /**
