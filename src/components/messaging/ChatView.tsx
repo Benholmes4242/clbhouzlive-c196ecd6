@@ -529,7 +529,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
           </div>
           
           <div className="flex-1 min-w-0 text-left">
-           <h2 className="text-[16px] font-semibold truncate text-foreground">
+           <h2 className="text-[15px] font-bold truncate text-foreground" style={{ letterSpacing: '-0.2px' }}>
               {headerInfo.name}
             </h2>
             <p className="text-[11px] truncate text-muted-foreground">
