@@ -939,11 +939,23 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             <motion.button
               whileTap={{ scale: 0.96 }}
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl"
-              style={{ border: '1.5px dashed rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.03)' }}
+              className="flex items-center gap-1.5"
+              style={{
+                padding: '6px 12px 6px 8px',
+                borderRadius: 10,
+                border: '1.5px dashed rgba(255,255,255,0.13)',
+                background: 'rgba(255,255,255,0.02)',
+              }}
             >
-              <Plus className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={2} />
-              <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.35)' }}>Add more</span>
+              <div style={{
+                width: 22, height: 22, borderRadius: 6,
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.10)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Plus className="w-3 h-3" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={2} />
+              </div>
+              <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.30)' }}>Add more</span>
             </motion.button>
           </div>
         )}
@@ -1001,11 +1013,17 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     onClick={() => openPanel('course')}
                     className="flex items-center gap-2 px-3 py-1.5 rounded-xl"
                     style={{
-                      background: 'rgba(255,255,255,0.08)',
-                      border: '1px solid rgba(255,255,255,0.14)',
+                      background: 'rgba(34,197,94,0.07)',
+                      border: '1px solid rgba(34,197,94,0.16)',
                     }}
                   >
-                    <span className="text-sm">⛳</span>
+                    <div style={{
+                      width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+                      background: 'rgba(34,197,94,0.12)',
+                      border: '1px solid rgba(34,197,94,0.20)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 14,
+                    }}>⛳</div>
                     <div className="text-left">
                       <p className="text-[13px] font-semibold leading-none" style={{ color: 'rgba(255,255,255,0.90)' }}>
                         {course.courseName}
@@ -1036,11 +1054,26 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     layout
                     whileTap={{ scale: 0.95 }}
                     onClick={() => openPanel('course')}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
-                    style={{ border: '1.5px dashed rgba(255,255,255,0.15)', background: 'transparent' }}
+                    className="flex items-center gap-1.5"
+                    style={{
+                      display: 'inline-flex',
+                      alignSelf: 'flex-start',
+                      padding: '7px 12px 7px 8px',
+                      borderRadius: 12,
+                      border: '1.5px dashed rgba(34,197,94,0.20)',
+                      background: 'transparent',
+                      cursor: 'pointer',
+                    }}
                   >
-                    <span className="text-sm">⛳</span>
-                    <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.30)' }}>Add course</span>
+                    <div style={{
+                      width: 24, height: 24, borderRadius: 7, flexShrink: 0,
+                      background: 'rgba(34,197,94,0.08)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 12,
+                    }}>⛳</div>
+                    <span className="text-[12.5px] font-medium" style={{ color: 'rgba(34,197,94,0.50)' }}>
+                      Add course
+                    </span>
                   </motion.button>
                 )}
               </motion.div>
@@ -1067,7 +1100,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           )}
         </AnimatePresence>
 
-        <div className="h-4" />
+        <div className="h-2" />
       </div>
 
       {/* ── Bottom action rail ── */}
