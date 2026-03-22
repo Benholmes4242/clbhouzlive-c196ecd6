@@ -173,7 +173,7 @@ function buildContenderCards(
   topContenders: any[]
 ): ContenderCard[] {
   // All 5 picks as contender cards (skip #1, that's the featured card in carousel)
-  return topContenders.slice(1, 5).map((p, i) => ({
+  return topContenders.slice(1, 3).map((p, i) => ({
     id: p.playerId,
     name: p.playerName,
     countryCode: p.country,
