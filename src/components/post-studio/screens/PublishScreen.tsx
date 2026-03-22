@@ -1,6 +1,6 @@
 // PublishScreen — Step 2: Clean review before posting
 import React, { useCallback, useState, useEffect } from 'react';
-import { Globe, Users, Lock, Clock, ChevronRight, Zap, MapPin, AtSign } from 'lucide-react';
+import { Globe, Users, Lock, Clock, ChevronRight, Zap, MapPin } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StudioHeader } from '../components/StudioHeader';
 import { usePostStudioContext } from '../usePostStudio';
@@ -113,8 +113,15 @@ export function PublishScreen() {
 
         {/* ── Media preview — clean, minimal scrim ── */}
         {firstItem && (
-          <div className="mx-4 mt-4 overflow-hidden" style={{ borderRadius: 16, boxShadow: '0 4px 24px rgba(0,0,0,0.40)' }}>
-            {/* Thumbnail */}
+          <div
+            className="mx-4 mt-4 overflow-hidden"
+            style={{
+              borderRadius: 18,
+              border: '1px solid rgba(255,255,255,0.08)',
+              boxShadow: '0 4px 32px rgba(0,0,0,0.50)',
+            }}
+          >
+            {/* Thumbnail — clean, no caption overlay */}
             <div className="relative" style={{ aspectRatio: '4/3' }}>
               {firstItem.mediaType === 'video' ? (
                 firstItem.posterPreviewUrl ? (
@@ -160,39 +167,112 @@ export function PublishScreen() {
                   {itemCount} Media
                 </div>
               )}
-              {/* Caption overlay */}
-              {hasCaption && (
-                <div className="absolute bottom-0 left-0 right-0 px-4 pb-3">
-                  <p className="text-sm leading-relaxed line-clamp-2" style={{ color: 'rgba(255,255,255,0.85)' }}>
-                    {state.caption}
-                  </p>
-                </div>
-              )}
             </div>
 
-            {/* Metadata row — course tags and mentions, same style as step 1 pills */}
+            {/* Caption strip */}
+            {hasCaption && (
+              <div
+                style={{
+                  padding: '12px 14px 10px',
+                  background: 'rgba(255,255,255,0.025)',
+                  borderTop: '1px solid rgba(255,255,255,0.06)',
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: 14,
+                    lineHeight: 1.6,
+                    color: 'rgba(255,255,255,0.88)',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {state.caption}
+                </p>
+              </div>
+            )}
+
+            {/* Metadata — course pills + individual tagged user pills */}
             {(state.taggedCourses.length > 0 || state.mentions.length > 0) && (
               <div
-                className="flex flex-wrap gap-1.5 px-4 py-3"
-                style={{ background: 'rgba(255,255,255,0.03)', borderTop: '1px solid rgba(255,255,255,0.06)' }}
+                style={{
+                  padding: '10px 14px 12px',
+                  background: 'rgba(255,255,255,0.015)',
+                  borderTop: '1px solid rgba(255,255,255,0.05)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 8,
+                }}
               >
-                {state.taggedCourses.map((course) => (
-                  <div
-                    key={course.courseId}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[12px] font-medium"
-                    style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.70)', border: '1px solid rgba(255,255,255,0.12)' }}
-                  >
-                    <span>⛳</span>
-                    <span>{course.courseName}</span>
+                {/* Course pills row */}
+                {state.taggedCourses.length > 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {state.taggedCourses.map((course) => (
+                      <div
+                        key={course.courseId}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 5,
+                          padding: '4px 10px 4px 6px', borderRadius: 10,
+                          background: 'rgba(34,197,94,0.08)',
+                          border: '1px solid rgba(34,197,94,0.18)',
+                          fontSize: 12, fontWeight: 500,
+                          color: 'rgba(255,255,255,0.80)',
+                        }}
+                      >
+                        <span style={{ fontSize: 12 }}>⛳</span>
+                        <span>{course.courseName}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
+
+                {/* Tagged users — individual pills */}
                 {state.mentions.length > 0 && (
-                  <div
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[12px] font-medium"
-                    style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.55)', border: '1px solid rgba(255,255,255,0.10)' }}
-                  >
-                    <AtSign className="w-3 h-3" strokeWidth={2} />
-                    <span>{state.mentions.length} tagged</span>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {state.mentions.map((mention) => (
+                      <div
+                        key={mention.entityId ?? mention.start}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 7,
+                          padding: '4px 10px 4px 5px', borderRadius: 10,
+                          background: 'rgba(255,255,255,0.06)',
+                          border: '1px solid rgba(255,255,255,0.10)',
+                        }}
+                      >
+                        {mention.avatarUrl ? (
+                          <img
+                            src={mention.avatarUrl}
+                            alt={mention.displayName}
+                            style={{
+                              width: 20, height: 20, borderRadius: '50%',
+                              objectFit: 'cover', flexShrink: 0,
+                            }}
+                          />
+                        ) : (
+                          <div
+                            style={{
+                              width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
+                              background: 'rgba(255,255,255,0.15)',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.70)',
+                            }}
+                          >
+                            {mention.displayName?.charAt(0)?.toUpperCase() ?? '?'}
+                          </div>
+                        )}
+                        <span
+                          style={{
+                            fontSize: 12, fontWeight: 600,
+                            color: 'rgba(255,255,255,0.80)',
+                          }}
+                        >
+                          @{mention.username ?? mention.displayName}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -206,7 +286,18 @@ export function PublishScreen() {
             className="mx-4 mt-4 px-4 py-4 rounded-2xl"
             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
           >
-            <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>
+            <p
+              style={{
+                margin: 0,
+                fontSize: 14,
+                lineHeight: 1.6,
+                color: 'rgba(255,255,255,0.75)',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}
+            >
               {state.caption}
             </p>
           </div>
@@ -217,7 +308,7 @@ export function PublishScreen() {
 
           {/* Section label */}
           <div className="px-4 pt-3 pb-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
-            <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: 'rgba(255,255,255,0.28)' }}>
+            <p className="text-[11px] font-bold uppercase tracking-[0.1em]" style={{ color: 'rgba(255,255,255,0.28)' }}>
               Before you post
             </p>
           </div>
@@ -229,11 +320,19 @@ export function PublishScreen() {
             className="w-full flex items-center gap-3 px-4 py-4 min-h-[56px]"
             style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.06)' }}
           >
-            <div className="w-9 h-9 flex items-center justify-center shrink-0">
-              <visibilityConfig.Icon className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={1.75} />
+            <div
+              style={{
+                width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'rgba(255,255,255,0.50)',
+              }}
+            >
+              <visibilityConfig.Icon className="w-[18px] h-[18px]" strokeWidth={1.75} />
             </div>
             <div className="flex-1 text-left">
-              <p className="text-[13px] font-semibold" style={{ color: TEXT_PRIMARY }}>Audience</p>
+              <p className="text-[14px] font-semibold" style={{ color: TEXT_PRIMARY }}>Audience</p>
               <p className="text-[11px] mt-0.5" style={{ color: TEXT_TERTIARY }}>{visibilityConfig.desc}</p>
             </div>
             <div className="flex items-center gap-1.5">
@@ -249,11 +348,19 @@ export function PublishScreen() {
             className="w-full flex items-center gap-3 px-4 py-4 min-h-[56px]"
             style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.06)' }}
           >
-            <div className="w-9 h-9 flex items-center justify-center shrink-0">
-              <Clock className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={1.75} />
+            <div
+              style={{
+                width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'rgba(255,255,255,0.50)',
+              }}
+            >
+              <Clock className="w-[18px] h-[18px]" strokeWidth={1.75} />
             </div>
             <div className="flex-1 text-left">
-              <p className="text-[13px] font-semibold" style={{ color: TEXT_PRIMARY }}>Schedule</p>
+              <p className="text-[14px] font-semibold" style={{ color: TEXT_PRIMARY }}>Schedule</p>
               <p className="text-[11px] mt-0.5" style={{ color: TEXT_TERTIARY }}>
                 {state.scheduledAt ? 'Scheduled for later' : 'Post immediately'}
               </p>
