@@ -518,7 +518,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             <SquircleAvatar
               src={headerInfo.avatarUrl}
               alt={headerInfo.name}
-              size={40}
+              size={38}
               fallback={headerInfo.initials}
               hideRing
             />
