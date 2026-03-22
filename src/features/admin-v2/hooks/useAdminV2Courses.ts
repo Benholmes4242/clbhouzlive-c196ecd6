@@ -96,11 +96,6 @@ function mapCourseRow(
     created_at:     c.created_at,
     avg_rating:     ratingsMap.get(c.id)?.avg_overall_score ?? null,
     review_count:   ratingsMap.get(c.id)?.review_count ?? null,
-    city:           c.city ?? null,
-    phone:          c.phone ?? null,
-    holes:          c.holes ?? null,
-    par:            c.par ?? null,
-    yardage:        c.yardage ?? null,
   };
 }
 
