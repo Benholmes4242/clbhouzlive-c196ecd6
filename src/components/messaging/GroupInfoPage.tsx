@@ -294,14 +294,15 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         <div className="flex flex-col items-center pt-6 pb-4">
           {/* Avatar */}
           <div className="relative">
-            <SquircleAvatar
-              size={96}
-              src={conversation.avatar_url || undefined}
-              alt={conversation.name || 'Group'}
-              fallback={getInitials(conversation.name || 'Group')}
-              hideRing
-              style={{ boxShadow: '0 4px 20px rgba(245,166,35,0.20)' }}
-            />
+            <div style={{ filter: 'drop-shadow(0 4px 20px rgba(245,166,35,0.20))' }}>
+              <SquircleAvatar
+                size={96}
+                src={conversation.avatar_url || undefined}
+                alt={conversation.name || 'Group'}
+                fallback={getInitials(conversation.name || 'Group')}
+                hideRing
+              />
+            </div>
             {isAdmin && (
               <>
                 <button
