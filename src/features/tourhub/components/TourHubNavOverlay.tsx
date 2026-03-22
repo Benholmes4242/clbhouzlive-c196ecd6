@@ -1,6 +1,6 @@
 /**
- * TourHubNavOverlay - Premium frosted-glass overlay menu for Tour Hub navigation
- * Glassmorphic card-style nav items with live data teasers and cinematic animations
+ * TourHubNavOverlay - Premium overlay menu for Tour Hub navigation
+ * Card-style nav items with live data teasers and cinematic animations
  */
 
 import React, { useEffect, useCallback, useRef, useState } from 'react';
@@ -315,9 +315,7 @@ export function TourHubNavOverlay({
             }}
             style={{
               width: '100vw',
-              background: 'hsl(var(--background) / 0.85)',
-              backdropFilter: 'blur(24px) saturate(1.4)',
-              WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
+              background: '#F8FAFC',
             }}
             role="dialog"
             aria-modal="true"
@@ -348,18 +346,6 @@ export function TourHubNavOverlay({
             {/* Header spacer for safe area */}
             <div style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }} />
             
-            {/* Back button */}
-            <div className="flex items-center px-5 pt-4 pb-2">
-              <button
-                onClick={onClose}
-                className="flex items-center gap-2 text-muted-foreground active:opacity-70 transition-opacity min-h-[44px]"
-                aria-label="Close menu"
-              >
-                <ChevronRight className="w-5 h-5 rotate-180" />
-                <span className="text-[15px] font-medium">Back</span>
-              </button>
-            </div>
-            
             {/* Scrollable content — rankings + nav items together */}
             <div
               className="flex-1 overflow-y-auto min-h-0"
@@ -375,21 +361,22 @@ export function TourHubNavOverlay({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.08 }}
-                className="px-5 pb-4"
+                className="px-5 pb-4 pt-4"
               >
                 {/* Section header */}
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <Trophy className="w-4 h-4" style={{ color: TOUR_COLORS.intelligenceGoldLight }} />
-                    <h3 className="text-[15px] font-bold text-foreground">
+                    <span className="text-[11px] font-bold uppercase" style={{ letterSpacing: "0.1em", color: "#94a3b8" }}>
                       World Rankings
-                    </h3>
+                    </span>
                   </div>
                   
                   <motion.button
                     onClick={handleViewAllRankings}
                     whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground transition-opacity active:opacity-70 outline-none focus:outline-none focus-visible:outline-none"
+                    className="flex items-center gap-0.5 text-[13px] font-semibold transition-opacity active:opacity-70 outline-none focus:outline-none focus-visible:outline-none"
+                    style={{ color: "#F5A623" }}
                   >
                     View all
                     <ChevronRight className="w-3.5 h-3.5" />
@@ -423,13 +410,12 @@ export function TourHubNavOverlay({
                           style={{
                             scrollSnapAlign: 'start',
                             background: isFirst 
-                              ? 'linear-gradient(135deg, rgba(252, 211, 77, 0.10) 0%, rgba(245, 158, 11, 0.06) 100%)'
-                              : 'hsl(var(--card) / 0.6)',
-                            backdropFilter: 'blur(8px)',
-                            WebkitBackdropFilter: 'blur(8px)',
+                              ? 'rgba(245,166,35,0.09)'
+                              : 'rgba(255,255,255,0.80)',
                             border: isFirst 
-                              ? '1.5px solid rgba(245, 158, 11, 0.25)'
-                              : '1px solid hsl(var(--border) / 0.3)',
+                              ? '1.5px solid rgba(245,166,35,0.22)'
+                              : '1px solid rgba(0,0,0,0.07)',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
                             minWidth: '155px',
                           }}
                         >
@@ -481,7 +467,7 @@ export function TourHubNavOverlay({
             )}
             
             {/* Divider */}
-            <div className="h-px mx-5 border-t border-border/30" />
+            <div className="h-px mx-5" style={{ background: 'rgba(0,0,0,0.07)' }} />
             
             {/* Nav + Link items */}
             <div className="px-5 py-5">
@@ -504,12 +490,9 @@ export function TourHubNavOverlay({
                       onClick={() => handleItemClick(item.value)}
                       className="w-full flex items-center gap-3.5 p-4 rounded-2xl text-left relative overflow-hidden"
                       style={{
-                        background: isActive 
-                          ? 'hsl(var(--card) / 0.8)' 
-                          : 'hsl(var(--card) / 0.5)',
-                        border: isActive
-                          ? '1px solid hsl(var(--border) / 0.4)'
-                          : '1px solid hsl(var(--border) / 0.2)',
+                        background: isActive ? '#ffffff' : 'rgba(255,255,255,0.60)',
+                        border: isActive ? '1px solid rgba(0,0,0,0.08)' : '1px solid rgba(0,0,0,0.05)',
+                        boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.07)' : '0 1px 2px rgba(0,0,0,0.03)',
                       }}
                       aria-current={isActive ? 'page' : undefined}
                       aria-label={getAriaLabel(item)}
@@ -518,15 +501,11 @@ export function TourHubNavOverlay({
                       <div 
                         className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
                         style={{
-                          background: isActive 
-                            ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(245, 158, 11, 0.06))'
-                            : 'hsl(var(--muted) / 0.7)',
-                          color: isActive ? '#D97706' : undefined,
+                          background: isActive ? 'rgba(245,166,35,0.10)' : 'rgba(0,0,0,0.04)',
+                          color: isActive ? '#d97706' : '#64748b',
                         }}
                       >
-                        <div className={isActive ? '' : 'text-muted-foreground'}>
-                          {item.icon}
-                        </div>
+                        {item.icon}
                       </div>
                       
                       {/* Text content */}
@@ -534,9 +513,9 @@ export function TourHubNavOverlay({
                         {/* Title row — badge inline on the right */}
                         <div className="flex items-center justify-between gap-2">
                           <div 
-                          className="text-[15px] font-semibold"
+                          className="text-[15px] font-bold"
                           style={{ 
-                            color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--foreground) / 0.8)',
+                            color: '#0f172a',
                             letterSpacing: '-0.2px',
                           }}
                           >
@@ -568,15 +547,16 @@ export function TourHubNavOverlay({
                     onClick={() => handleLinkClick(item.path)}
                     className="w-full flex items-center gap-3.5 p-4 rounded-2xl text-left"
                     style={{
-                      background: 'hsl(var(--card) / 0.5)',
-                      border: '1px solid hsl(var(--border) / 0.2)',
+                      background: 'rgba(255,255,255,0.60)',
+                      border: '1px solid rgba(0,0,0,0.05)',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
                     }}
                     aria-label={`${item.label} — ${item.subtitle}`}
                   >
                     {/* Icon in circle */}
                     <div 
-                      className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-muted-foreground"
-                      style={{ background: 'hsl(var(--muted) / 0.7)' }}
+                      className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
+                      style={{ background: 'rgba(0,0,0,0.04)', color: '#64748b' }}
                     >
                       {item.icon}
                     </div>
@@ -585,8 +565,8 @@ export function TourHubNavOverlay({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span 
-                          className="text-[15px] font-semibold"
-                          style={{ color: 'hsl(var(--foreground) / 0.8)' }}
+                          className="text-[15px] font-bold"
+                          style={{ color: '#0f172a' }}
                         >
                           {item.label}
                         </span>
