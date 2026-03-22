@@ -64,111 +64,74 @@ export interface FeedPost {
   courseName?: string;
   courseId?: string;
   postType?: string;
-  tournamentMeta?: TournamentResultMeta | null;
 }
 
-/** Tournament result metadata snapshot */
-export interface TournamentResultMeta {
-  id: string;
-  post_id: string;
-  tournament_id: string;
-  tournament_name: string;
-  venue_name: string | null;
-  venue_city: string | null;
-  venue_country: string | null;
-  tour_slug: string;
-  tour_name: string;
-  tour_priority: number;
-  winner_id: string | null;
-  winner_name: string;
-  winner_score: number;
-  winner_score_display: string;
-  winner_photo_url: string | null;
-  winner_by: string | null;
-  stat_eagles: number;
-  stat_birdies: number;
-  stat_pars: number;
-  stat_bogeys: number;
-  stat_driving_distance: number | null;
-  stat_fairways_pct: number | null;
-  stat_gir_pct: number | null;
-  stat_putts: number | null;
-  podium_rows: PodiumRow[];
-  course_image_url: string | null;
-  injected_at: string;
+// ── Tournament Hub Types ──────────────────────────────────────────────────────
+
+export type TournamentHubPageState = 'live' | 'result' | 'upcoming';
+
+export interface TournamentHubLeader {
+  playerId: string;
+  playerName: string;
+  photoUrl: string | null;
+  scoreDisplay: string;
+  score: number;
+  thru: string | null;
+  today: string | null;
 }
 
-export interface PodiumRow {
+export interface TournamentHubChaser {
   position: number;
-  label: string;
-  players: Array<{
-    name: string;
-    photoUrl: string | null;
-    score: string;
-  }>;
+  playerName: string;
+  photoUrl: string | null;
+  scoreDisplay: string;
   isTied: boolean;
 }
 
-/** Tournament result feed post variant */
-export interface TournamentResultFeedPost extends Omit<FeedPost, 'mediaItems' | 'review' | 'isReview'> {
-  postType: 'tournament_result';
-  tournamentMeta: TournamentResultMeta;
+export interface TournamentHubStats {
+  totalEagles: number;
+  totalBirdies: number;
+  totalPars: number;
+  totalBogeys: number;
+  drivingDistance: number | null;
+  drivingAccuracy: number | null;
+  greensInReg: number | null;
+  puttingAverage: number | null;
+}
+
+export interface TournamentHubPage {
+  tournamentId: string;
+  tournamentName: string;
+  tourSlug: string;
+  tourName: string;
+  purse: number | null;
+  state: TournamentHubPageState;
+  venueName: string | null;
+  venueCity: string | null;
+  venuePar: number | null;
+  venueYardage: number | null;
+  currentRound: number;
+  totalRounds: number;
+  leader: TournamentHubLeader | null;
+  chasers: TournamentHubChaser[];
+  leaderStats: TournamentHubStats | null;
+  insight: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  defendingChamp: string | null;
+  defendingScore: string | null;
+  postId: string;
+  likeCount: number;
+  commentCount: number;
+  isLikedByMe: boolean;
+}
+
+export interface TournamentHubFeedPost extends Omit<FeedPost, 'mediaItems' | 'review' | 'isReview'> {
+  postType: 'tournament_hub';
+  pages: TournamentHubPage[];
   mediaItems: MediaItem[];
   review: null;
   isReview: false;
-}
-
-/** Live tournament player row for feed card */
-export interface LiveLeaderboardEntry {
-  position:     number;
-  positionTied: boolean;
-  playerId:     string;
-  playerName:   string;
-  photoUrl:     string | null;
-  country:      string | null;
-  scoreDisplay: string;     // '-15', '+2', 'E'
-  score:        number;     // raw integer for gap calculation
-  thru:         string | null; // '14', 'F', '-'
-  today:        string | null; // today's round score '+3', '-2'
-}
-
-/** Live tournament metadata for feed card */
-export interface TournamentLiveMeta {
-  tournamentId:   string;
-  tournamentName: string;
-  tourSlug:       string;
-  tourName:       string;
-  venueName:      string | null;
-  venueCity:      string | null;
-  currentRound:   number;
-  totalRounds:    number;
-  momentumTags:   string[];
-  volatilityIndex:number;
-  scoreSpread:    number;
-  leader:         LiveLeaderboardEntry | null;
-  leaderboard:    LiveLeaderboardEntry[];
-  lastUpdated:    string;
-  tourPriority:   number;
-  leaderStats: {
-    totalBirdies: number;
-    totalEagles:  number;
-    totalBogeys:  number;
-    totalPars:    number;
-    rounds:       (number | null)[];
-    drivingDistance?: number | null;
-    drivingAccuracy?: number | null;
-    greensInReg?:     number | null;
-    puttingAverage?:  number | null;
-  } | null;
-}
-
-/** Live tournament feed post — client-side synthetic, never stored in DB */
-export interface TournamentLiveFeedPost extends Omit<FeedPost, 'mediaItems' | 'review' | 'isReview'> {
-  postType:    'tournament_live';
-  liveMeta:    TournamentLiveMeta;
-  mediaItems:  MediaItem[];
-  review:      null;
-  isReview:    false;
 }
 
 export interface VideoSessionState {
@@ -188,9 +151,9 @@ export interface PoolElement {
 function getPoolSize(): number {
   const deviceMemory = (navigator as any).deviceMemory;
   if (deviceMemory && deviceMemory <= 4) {
-    return 3; // Reduced pool on low-memory devices
+    return 3;
   }
-  return 5; // Full pool on capable devices
+  return 5;
 }
 
 const _poolSize = getPoolSize();
@@ -255,7 +218,6 @@ export interface FeedRpcRow {
   is_followed_by_me: boolean;
   engagement_score: number;
   post_type?: string | null;
-  tournament_meta?: TournamentResultMeta | null;
   post_tags?: FeedPostTag[] | null;
 }
 
