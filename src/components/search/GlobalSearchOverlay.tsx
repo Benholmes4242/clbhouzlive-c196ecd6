@@ -101,6 +101,27 @@ function TrendingSkeletonSection() {
   );
 }
 
+/* ── Reusable white card wrapper ── */
+
+function WhiteCard({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div
+      className={`mx-4 overflow-hidden rounded-2xl ${className}`}
+      style={{
+        background: '#ffffff',
+        border: '1px solid rgba(0,0,0,0.06)',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function CardDivider() {
+  return <div style={{ height: 1, background: 'rgba(0,0,0,0.05)' }} />;
+}
+
 /* ─── Main component ─── */
 
 interface GlobalSearchOverlayProps {
@@ -215,7 +236,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[1100] bg-background flex flex-col md:items-center"
+          className="fixed inset-0 z-[1100] bg-[#F8FAFC] flex flex-col md:items-center"
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
@@ -224,11 +245,22 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
           {/* Header */}
           <div
             className="w-full md:max-w-[560px] flex items-center gap-3 px-4 pb-3"
-            style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+            style={{
+              paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+              borderBottom: '1px solid rgba(0,0,0,0.06)',
+            }}
           >
-            {/* Search input container */}
-            <div className="flex-1 flex items-center gap-2 h-11 px-3 rounded-xl bg-muted">
-              <Search className="w-4 h-4 text-muted-foreground shrink-0" />
+            {/* Search input container — white pill */}
+            <div
+              className="flex-1 flex items-center gap-2 px-3 rounded-full"
+              style={{
+                height: 44,
+                background: '#ffffff',
+                border: '1px solid rgba(0,0,0,0.08)',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+              }}
+            >
+              <Search className="w-4 h-4 shrink-0" style={{ color: '#94a3b8' }} />
               <input
                 ref={inputRef}
                 type="text"
@@ -247,16 +279,22 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                   className="shrink-0 flex items-center justify-center min-h-[44px] min-w-[44px] -mr-3"
                   aria-label="Clear"
                 >
-                  <X className="w-4 h-4 text-muted-foreground" />
+                  <div
+                    className="flex items-center justify-center rounded-full"
+                    style={{ width: 22, height: 22, background: 'rgba(0,0,0,0.06)' }}
+                  >
+                    <X className="w-[11px] h-[11px]" style={{ color: '#64748b' }} strokeWidth={2.5} />
+                  </div>
                 </button>
               )}
             </div>
 
-            {/* Cancel button */}
+            {/* Cancel button — amber */}
             <button
               type="button"
               onClick={handleClose}
-              className="shrink-0 text-sm font-medium text-primary min-h-[44px] px-1"
+              className="shrink-0 text-[14px] font-semibold min-h-[44px] px-1"
+              style={{ color: '#F5A623' }}
             >
               Cancel
             </button>
@@ -274,39 +312,48 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                 {recent.length > 0 && (
                   <div>
                     <div className="flex items-center justify-between px-4 pt-4 pb-2">
-                      <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                      <span
+                        className="text-[11px] font-bold uppercase"
+                        style={{ letterSpacing: '0.1em', color: '#94a3b8' }}
+                      >
                         Recent Searches
                       </span>
                       <button
                         type="button"
                         onClick={handleClearAll}
-                        className="text-[11px] font-semibold text-primary"
+                        className="text-[11px] font-semibold"
+                        style={{ color: '#F5A623' }}
                       >
                         Clear all
                       </button>
                     </div>
-                    <div className="flex flex-col">
-                      {recent.map(item => (
-                        <div key={item.id} className="min-h-[44px] flex items-center px-4 gap-3">
-                          <Clock className="w-4 h-4 text-muted-foreground shrink-0" />
-                          <button
-                            type="button"
-                            onClick={() => commitRecentSearch(item.query)}
-                            className="flex-1 text-left text-sm text-foreground truncate min-w-0 block"
-                          >
-                            {item.query}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteRecent(item.id)}
-                            className="shrink-0 flex items-center justify-center min-h-[44px] min-w-[44px] -mr-3 text-muted-foreground/50"
-                            aria-label={`Remove ${item.query}`}
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
+                    <WhiteCard>
+                      {recent.map((item, index) => (
+                        <div key={item.id}>
+                          <div className="min-h-[44px] flex items-center px-4 gap-3">
+                            <Clock className="w-[15px] h-[15px] shrink-0" style={{ color: '#94a3b8' }} />
+                            <button
+                              type="button"
+                              onClick={() => commitRecentSearch(item.query)}
+                              className="flex-1 text-left truncate min-w-0 block text-[14px] font-medium"
+                              style={{ color: '#0f172a' }}
+                            >
+                              {item.query}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteRecent(item.id)}
+                              className="shrink-0 flex items-center justify-center w-7 h-7 rounded-full"
+                              style={{ background: 'rgba(0,0,0,0.04)' }}
+                              aria-label={`Remove ${item.query}`}
+                            >
+                              <X className="w-[11px] h-[11px]" style={{ color: '#94a3b8' }} strokeWidth={2.5} />
+                            </button>
+                          </div>
+                          {index < recent.length - 1 && <CardDivider />}
                         </div>
                       ))}
-                    </div>
+                    </WhiteCard>
                   </div>
                 )}
 
@@ -316,41 +363,46 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                 ) : trending.length > 0 ? (
                   <div>
                     <div className="px-4 pt-4 pb-2">
-                      <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                      <span
+                        className="text-[11px] font-bold uppercase"
+                        style={{ letterSpacing: '0.1em', color: '#94a3b8' }}
+                      >
                         Today's Picks
                       </span>
                     </div>
-                    <div className="flex flex-col">
-                      {trending.slice(0, 8).map(item => (
-                        <button
-                          key={item.id ?? item.label}
-                          type="button"
-                          onClick={() => {
-                          if (item.id) {
-                              handleSaveRecent(item.label);
-                              navigate(`/courses/${item.id}`);
-                              onClose();
-                            } else {
-                              commitRecentSearch(item.label);
-                            }
-                          }}
-                          className="min-h-[56px] flex items-center px-4 gap-3 w-full active:bg-muted/50"
-                        >
-                          <div className="w-10 h-10 rounded-xl bg-muted overflow-hidden shrink-0">
-                            {item.image && (
-                              <img src={item.image} alt="" className="w-full h-full object-cover" />
-                            )}
-                          </div>
-                          <div className="flex-1 text-left min-w-0">
-                            <p className="text-sm text-foreground truncate">{item.label}</p>
-                            {item.subtitle && (
-                              <p className="text-xs text-muted-foreground truncate">{item.subtitle}</p>
-                            )}
-                          </div>
-                          <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-                        </button>
+                    <WhiteCard>
+                      {trending.slice(0, 8).map((item, index) => (
+                        <div key={item.id ?? item.label}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (item.id) {
+                                handleSaveRecent(item.label);
+                                navigate(`/courses/${item.id}`);
+                                onClose();
+                              } else {
+                                commitRecentSearch(item.label);
+                              }
+                            }}
+                            className="min-h-[56px] flex items-center px-4 gap-3 w-full active:bg-black/[0.02]"
+                          >
+                            <div className="w-[42px] h-[42px] rounded-[12px] bg-muted overflow-hidden shrink-0">
+                              {item.image && (
+                                <img src={item.image} alt="" className="w-full h-full object-cover" />
+                              )}
+                            </div>
+                            <div className="flex-1 text-left min-w-0">
+                              <p className="text-[14px] font-medium truncate" style={{ color: '#0f172a' }}>{item.label}</p>
+                              {item.subtitle && (
+                                <p className="text-[12px] truncate" style={{ color: '#94a3b8' }}>{item.subtitle}</p>
+                              )}
+                            </div>
+                            <ChevronRight className="w-[14px] h-[14px] shrink-0" style={{ color: '#d1d5db' }} />
+                          </button>
+                          {index < Math.min(trending.length, 8) - 1 && <CardDivider />}
+                        </div>
                       ))}
-                    </div>
+                    </WhiteCard>
                   </div>
                 ) : null}
               </>
@@ -368,36 +420,39 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                   {clubs.length > 0 && (
                     <div>
                       <div className="px-4 pt-4 pb-2">
-                        <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                        <span
+                          className="text-[11px] font-bold uppercase"
+                          style={{ letterSpacing: '0.1em', color: '#94a3b8' }}
+                        >
                           Courses
                         </span>
                       </div>
-                      {clubs.map((course, idx) => (
-                        <div key={course.id}>
-                          <button
-                            type="button"
-                            onClick={() => selectCourse(course)}
-                            className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-muted/50"
-                          >
-                            <div className="w-10 h-10 rounded-xl bg-muted overflow-hidden shrink-0">
-                              {course.logo_url && (
-                                <img src={course.logo_url} alt="" className="w-full h-full object-cover" />
-                              )}
-                            </div>
-                            <div className="flex-1 min-w-0 text-left">
-                              <p className="text-sm font-medium text-foreground truncate">{course.name}</p>
-                              <p className="text-xs text-muted-foreground truncate">
-                                {[course.region, course.country].filter(Boolean).join(', ')}
-                                {course.global_rank && ` · #${course.global_rank} World`}
-                              </p>
-                            </div>
-                            <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-                          </button>
-                          {idx < clubs.length - 1 && (
-                            <div className="ml-[52px] border-b border-border/30" />
-                          )}
-                        </div>
-                      ))}
+                      <WhiteCard>
+                        {clubs.map((course, idx) => (
+                          <div key={course.id}>
+                            <button
+                              type="button"
+                              onClick={() => selectCourse(course)}
+                              className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-black/[0.02]"
+                            >
+                              <div className="w-[42px] h-[42px] rounded-[12px] bg-muted overflow-hidden shrink-0">
+                                {course.logo_url && (
+                                  <img src={course.logo_url} alt="" className="w-full h-full object-cover" />
+                                )}
+                              </div>
+                              <div className="flex-1 min-w-0 text-left">
+                                <p className="text-[14px] font-medium truncate" style={{ color: '#0f172a' }}>{course.name}</p>
+                                <p className="text-[12px] truncate" style={{ color: '#94a3b8' }}>
+                                  {[course.region, course.country].filter(Boolean).join(', ')}
+                                  {course.global_rank && ` · #${course.global_rank} World`}
+                                </p>
+                              </div>
+                              <ChevronRight className="w-[14px] h-[14px] shrink-0" style={{ color: '#d1d5db' }} />
+                            </button>
+                            {idx < clubs.length - 1 && <CardDivider />}
+                          </div>
+                        ))}
+                      </WhiteCard>
                     </div>
                   )}
 
@@ -405,43 +460,46 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                   {people.length > 0 && (
                     <div>
                       <div className="px-4 pt-4 pb-2">
-                        <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                        <span
+                          className="text-[11px] font-bold uppercase"
+                          style={{ letterSpacing: '0.1em', color: '#94a3b8' }}
+                        >
                           People
                         </span>
                       </div>
-                      {people.map((person, idx) => (
-                        <div key={person.id}>
-                          <button
-                            type="button"
-                            onClick={() => selectPerson(person)}
-                            className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-muted/50"
-                          >
-                            <div className="w-10 h-10 clbhouz-squircle bg-muted overflow-hidden shrink-0 relative">
-                              {person.avatar_url && (
-                                <img src={person.avatar_url} alt="" className="w-full h-full object-cover" />
-                              )}
-                            </div>
-                            <div className="flex-1 min-w-0 text-left">
-                              <div className="flex items-center gap-1 min-w-0">
-                                <p className="text-sm font-medium text-foreground truncate">{person.display_name}</p>
-                                {person.verified && <BadgeCheck className="w-3.5 h-3.5 text-primary shrink-0" />}
+                      <WhiteCard>
+                        {people.map((person, idx) => (
+                          <div key={person.id}>
+                            <button
+                              type="button"
+                              onClick={() => selectPerson(person)}
+                              className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-black/[0.02]"
+                            >
+                              <div className="w-[42px] h-[42px] clbhouz-squircle bg-muted overflow-hidden shrink-0 relative">
+                                {person.avatar_url && (
+                                  <img src={person.avatar_url} alt="" className="w-full h-full object-cover" />
+                                )}
                               </div>
-                              <p className="text-xs text-muted-foreground truncate">
-                                {person.username && !person.username.includes('@')
-                                  ? `@${person.username}`
-                                  : ''}
-                                {person.home_club_name
-                                  ? `${person.username && !person.username.includes('@') ? ' · ' : ''}${person.home_club_name}`
-                                  : ''}
-                              </p>
-                            </div>
-                            <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-                          </button>
-                          {idx < people.length - 1 && (
-                            <div className="ml-[52px] border-b border-border/30" />
-                          )}
-                        </div>
-                      ))}
+                              <div className="flex-1 min-w-0 text-left">
+                                <div className="flex items-center gap-1 min-w-0">
+                                  <p className="text-[14px] font-medium truncate" style={{ color: '#0f172a' }}>{person.display_name}</p>
+                                  {person.verified && <BadgeCheck className="w-3.5 h-3.5 text-primary shrink-0" />}
+                                </div>
+                                <p className="text-[12px] truncate" style={{ color: '#94a3b8' }}>
+                                  {person.username && !person.username.includes('@')
+                                    ? `@${person.username}`
+                                    : ''}
+                                  {person.home_club_name
+                                    ? `${person.username && !person.username.includes('@') ? ' · ' : ''}${person.home_club_name}`
+                                    : ''}
+                                </p>
+                              </div>
+                              <ChevronRight className="w-[14px] h-[14px] shrink-0" style={{ color: '#d1d5db' }} />
+                            </button>
+                            {idx < people.length - 1 && <CardDivider />}
+                          </div>
+                        ))}
+                      </WhiteCard>
                     </div>
                   )}
 
@@ -449,52 +507,58 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                   {businesses.length > 0 && (
                     <div>
                       <div className="px-4 pt-4 pb-2">
-                        <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+                        <span
+                          className="text-[11px] font-bold uppercase"
+                          style={{ letterSpacing: '0.1em', color: '#94a3b8' }}
+                        >
                           Businesses
                         </span>
                       </div>
-                      {businesses.map((business, idx) => (
-                        <div key={business.id}>
-                          <button
-                            type="button"
-                            onClick={() => selectBusiness(business)}
-                            className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-muted/50"
-                          >
-                            <div className="w-10 h-10 clbhouz-squircle bg-muted overflow-hidden shrink-0 relative flex items-center justify-center">
-                              {business.logo_url
-                                ? <img src={business.logo_url} alt="" className="w-full h-full object-cover" />
-                                : <Briefcase className="w-5 h-5 text-muted-foreground" />
-                              }
-                            </div>
-                            <div className="flex-1 min-w-0 text-left">
-                              <div className="flex items-center gap-1 min-w-0">
-                                <p className="text-sm font-medium text-foreground truncate">{business.name}</p>
-                                {business.verified && <BadgeCheck className="w-3.5 h-3.5 text-primary shrink-0" />}
+                      <WhiteCard>
+                        {businesses.map((business, idx) => (
+                          <div key={business.id}>
+                            <button
+                              type="button"
+                              onClick={() => selectBusiness(business)}
+                              className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-black/[0.02]"
+                            >
+                              <div className="w-[42px] h-[42px] clbhouz-squircle bg-muted overflow-hidden shrink-0 relative flex items-center justify-center">
+                                {business.logo_url
+                                  ? <img src={business.logo_url} alt="" className="w-full h-full object-cover" />
+                                  : <Briefcase className="w-5 h-5 text-muted-foreground" />
+                                }
                               </div>
-                              <p className="text-xs text-muted-foreground truncate">
-                                {[business.city, business.country].filter(Boolean).join(', ')}
-                              </p>
-                            </div>
-                            <ChevronRight className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-                          </button>
-                          {idx < businesses.length - 1 && (
-                            <div className="ml-[52px] border-b border-border/30" />
-                          )}
-                        </div>
-                      ))}
+                              <div className="flex-1 min-w-0 text-left">
+                                <div className="flex items-center gap-1 min-w-0">
+                                  <p className="text-[14px] font-medium truncate" style={{ color: '#0f172a' }}>{business.name}</p>
+                                  {business.verified && <BadgeCheck className="w-3.5 h-3.5 text-primary shrink-0" />}
+                                </div>
+                                <p className="text-[12px] truncate" style={{ color: '#94a3b8' }}>
+                                  {[business.city, business.country].filter(Boolean).join(', ')}
+                                </p>
+                              </div>
+                              <ChevronRight className="w-[14px] h-[14px] shrink-0" style={{ color: '#d1d5db' }} />
+                            </button>
+                            {idx < businesses.length - 1 && <CardDivider />}
+                          </div>
+                        ))}
+                      </WhiteCard>
                     </div>
                   )}
                 </motion.div>
               ) : showNoResults ? (
                 <motion.div key="search-no-results" {...FADE_PROPS}>
                   <div className="flex flex-col items-center justify-center py-20 px-6 gap-3">
-                    <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-                      <Search className="w-7 h-7 text-muted-foreground/40" />
+                    <div
+                      className="w-16 h-16 rounded-full flex items-center justify-center"
+                      style={{ background: 'rgba(0,0,0,0.05)' }}
+                    >
+                      <Search className="w-7 h-7" style={{ color: '#94a3b8' }} />
                     </div>
-                    <p className="text-sm font-medium text-foreground">
+                    <p className="text-[14px] font-medium" style={{ color: '#0f172a' }}>
                       No results for "<span className="inline-block max-w-[180px] truncate align-bottom">{debouncedQuery}</span>"
                     </p>
-                    <p className="text-xs text-muted-foreground text-center max-w-[240px] md:max-w-[360px]">
+                    <p className="text-[12px] text-center max-w-[240px] md:max-w-[360px]" style={{ color: '#94a3b8' }}>
                       Try searching for a course name, player, or business
                     </p>
                   </div>
