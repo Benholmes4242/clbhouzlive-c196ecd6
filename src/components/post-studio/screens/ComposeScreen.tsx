@@ -689,8 +689,18 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               width: 320,
               height: 320,
               borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.02) 50%, transparent 75%)',
+              background: 'radial-gradient(circle, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.025) 50%, transparent 75%)',
               animation: 'studio-orb-breathe 5s ease-in-out infinite',
+            }} />
+            <div style={{
+              position: 'absolute',
+              top: '28%',
+              left: '62%',
+              width: 140,
+              height: 140,
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(245,166,35,0.04) 0%, transparent 70%)',
+              animation: 'studio-orb-breathe 6s ease-in-out infinite reverse',
             }} />
             <div style={{
               position: 'absolute',
