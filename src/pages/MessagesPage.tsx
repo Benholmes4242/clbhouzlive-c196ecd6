@@ -32,6 +32,7 @@ function MessagesPageInner() {
   const [newConversationTab, setNewConversationTab] = useState<'direct' | 'group'>('direct');
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [conversationFilter, setConversationFilter] = useState<'all' | 'unread' | 'groups'>('all');
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
