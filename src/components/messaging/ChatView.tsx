@@ -521,13 +521,13 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             <SquircleAvatar
               src={headerInfo.avatarUrl}
               alt={headerInfo.name}
-              size={40}
+              size={38}
               fallback={headerInfo.initials}
               hideRing
             />
             {/* Online indicator for DMs */}
             {!isGroupChat && otherUserPresence?.status === 'online' && (
-              <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background" />
+              <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#F8FAFC]" />
             )}
           </div>
           
