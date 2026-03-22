@@ -1100,7 +1100,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           )}
         </AnimatePresence>
 
-        <div className="h-4" />
+        <div className="h-2" />
       </div>
 
       {/* ── Bottom action rail ── */}
