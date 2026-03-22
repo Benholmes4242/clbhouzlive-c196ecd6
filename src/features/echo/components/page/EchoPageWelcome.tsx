@@ -4,7 +4,9 @@
 
 import React, { useMemo } from 'react';
 import { ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { haptic } from '@/utils/haptics';
+import { AnimatedEchoWave } from '@/features/echo/components/ui/AnimatedEchoWave';
 import type { EchoProfile } from '@/features/echo/hooks/useEchoProfile';
 
 interface EchoPageWelcomeProps {
@@ -89,23 +91,40 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
 
   return (
     <div className="h-full flex flex-col items-center justify-center px-5 pb-32 overflow-visible">
+      {/* Animated waveform hero */}
+      <motion.div
+        className="flex items-center justify-center my-6"
+        initial={{ scale: 0.85, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.45, ease: [0.22, 0.61, 0.36, 1] }}
+      >
+        <div
+          className="w-[88px] h-[88px] rounded-full flex items-center justify-center"
+          style={{
+            background: 'radial-gradient(circle, rgba(245,166,35,0.12) 0%, transparent 70%)',
+          }}
+        >
+          <AnimatedEchoWave size={44} active={true} />
+        </div>
+      </motion.div>
+
       {/* Greeting block */}
       <div className="text-center mb-2">
-        <h1 className="text-[28px] font-bold tracking-tight text-foreground">
+        <h1 className="text-[28px] font-bold tracking-tight" style={{ color: '#0f172a' }}>
           {profile.firstName ? `${greeting}, ${profile.firstName}.` : `${greeting}.`}
         </h1>
-        <p className="text-[15px] text-muted-foreground mt-1.5">
+        <p className="text-[15px] mt-1.5" style={{ color: '#64748b' }}>
           Your personal caddie is ready.
         </p>
       </div>
 
-      {/* Echo identity mark */}
-      <div className="flex items-center gap-3 my-8 w-full max-w-[340px]">
-        <div className="flex-1 h-px bg-border" />
-        <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-          Echo
+      {/* Divider with label */}
+      <div className="flex items-center gap-3 my-6 w-full max-w-[340px]">
+        <div className="flex-1 h-px" style={{ background: 'rgba(0,0,0,0.06)' }} />
+        <span className="text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: '#94a3b8' }}>
+          Try asking
         </span>
-        <div className="flex-1 h-px bg-border" />
+        <div className="flex-1 h-px" style={{ background: 'rgba(0,0,0,0.06)' }} />
       </div>
 
       {/* Prompt chips */}
@@ -114,17 +133,22 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
           <button
             key={index}
             onClick={() => handleChipClick(prompt)}
-            className="px-4 py-3 rounded-2xl text-[13px] font-medium text-left active:bg-[hsl(38,92%,50%)]/5 active:scale-[0.98] transition-all duration-150 flex items-center justify-between gap-2 bg-background border border-border"
+            className="px-4 py-3 rounded-[14px] text-[13px] font-medium text-left active:scale-[0.98] transition-all duration-150 flex items-center justify-between gap-2"
+            style={{
+              background: '#ffffff',
+              border: '1px solid rgba(0,0,0,0.07)',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+            }}
             aria-label={`Ask Echo: ${prompt}`}
           >
-            <span className="text-foreground">{prompt}</span>
-            <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground" />
+            <span style={{ color: '#0f172a' }}>{prompt}</span>
+            <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#94a3b8' }} />
           </button>
         ))}
       </div>
 
       {/* Hint */}
-      <p className="mt-4 text-[12px] text-muted-foreground/60 text-center">
+      <p className="mt-4 text-[12px] text-center" style={{ color: 'rgba(100,116,139,0.6)' }}>
         Ask me anything about golf
       </p>
     </div>

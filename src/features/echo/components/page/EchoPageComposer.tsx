@@ -86,10 +86,8 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
       <div
         className="flex-none px-4 py-3"
         style={{
-          background: 'hsl(var(--background) / 0.95)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderTop: '1px solid hsl(var(--border))',
+          background: '#F8FAFC',
+          borderTop: '1px solid rgba(0,0,0,0.06)',
           paddingBottom: 'calc(var(--sab, env(safe-area-inset-bottom, 0px)) + 12px)',
         }}
       >
@@ -109,7 +107,12 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
 
         {/* Pill container */}
         <div
-          className="flex items-center gap-2 rounded-full pl-4 pr-2 py-2 bg-background border border-border"
+          className="flex items-center gap-2 rounded-full pl-4 pr-2 py-2"
+          style={{
+            background: '#ffffff',
+            border: '1px solid rgba(0,0,0,0.08)',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+          }}
         >
           <input
             ref={ref}
@@ -145,9 +148,13 @@ export const EchoPageComposer = forwardRef<HTMLInputElement, EchoPageComposerPro
             <button
               onClick={handleMicClick}
               className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-[0.97] border border-border",
+                "w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-[0.97]",
                 isListening && "animate-pulse bg-destructive border-destructive"
               )}
+              style={!isListening ? {
+                background: 'rgba(0,0,0,0.04)',
+                border: '1px solid rgba(0,0,0,0.07)',
+              } : undefined}
               aria-label={isListening ? "Stop listening" : "Voice input"}
             >
               <Mic className={cn("w-4 h-4", isListening ? "text-white" : "text-muted-foreground")} />

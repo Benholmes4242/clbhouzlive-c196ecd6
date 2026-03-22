@@ -1,5 +1,5 @@
 /**
- * EchoResponseCard - Left-aligned assistant bubble
+ * EchoResponseCard - Left-aligned assistant bubble with waveform avatar
  */
 
 import React, { useState, useMemo } from 'react';
@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { haptic } from '@/utils/haptics';
 import { generateFollowUps, ECHO_ALLOWED_ELEMENTS } from '@/features/echo/utils/echoFormat';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { AnimatedEchoWave } from '@/features/echo/components/ui/AnimatedEchoWave';
 
 const COURSE_PATTERNS = [
   /\b([A-Z][a-zA-Z\s''-]+(?:Golf Club|Golf Course|Golf Links|Country Club))\b/g,
@@ -81,12 +82,21 @@ export function EchoResponseCard({
   };
 
   return (
-    <div className="flex justify-start">
-      <div className="max-w-[92%]">
+    <div className="flex justify-start gap-2 items-start">
+      {/* Waveform avatar */}
+      <div className="flex-shrink-0 mt-1">
+        <AnimatedEchoWave size={18} active={true} />
+      </div>
+
+      <div className="max-w-[88%]">
         {/* Main bubble */}
         <div
-          className="px-4 py-4 rounded-[4px_18px_18px_18px] bg-background border"
-          style={{ borderColor: 'hsl(var(--border))' }}
+          className="px-4 py-4 rounded-[4px_18px_18px_18px]"
+          style={{
+            background: '#ffffff',
+            border: '1px solid rgba(0,0,0,0.07)',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+          }}
         >
           <div className="text-[14px] prose prose-sm max-w-none text-foreground" style={{ lineHeight: 1.65 }}>
             <ReactMarkdown
