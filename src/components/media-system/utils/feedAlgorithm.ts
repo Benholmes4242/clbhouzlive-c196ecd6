@@ -164,7 +164,10 @@ export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
   const filtered = filterForSuggested(noHub);
   const capped = capPerCreator(filtered);
   const interleaved = interleaveReviews(capped, 'suggested');
-  return deduplicatePosts(interleaved);
+  const deduped = deduplicatePosts(interleaved);
+  // Inject blank black card at slot 3 (0-indexed position 2)
+  deduped.splice(2, 0, createBlankSlotPost());
+  return deduped;
 }
 
 // ── Full Friends Feed Pipeline ────────────────────────────────────────────────
