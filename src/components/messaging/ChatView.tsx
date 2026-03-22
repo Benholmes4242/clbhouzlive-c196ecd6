@@ -570,7 +570,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
       ) : (
         <div 
           ref={containerRef}
-          className="flex-1 min-h-0 overflow-y-auto px-4 py-4"
+          className="flex-1 min-h-0 overflow-y-auto px-4 py-4 bg-[#F8FAFC]"
           onScroll={handleScroll}
         >
           {/* Load more button */}
