@@ -424,7 +424,7 @@ const ClubhouseContent = () => {
       )}
 
       {/* ═══ COMMENTS + MORE OPTIONS (regular posts) ═══ */}
-      {activePost && posts.length > 0 && !isTournamentCardActive && (
+      {activePost && posts.length > 0 && !activePostIsTournament && (
         <>
           <CommentsSheet
             isOpen={commentsOpen}

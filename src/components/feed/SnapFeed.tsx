@@ -148,15 +148,34 @@ export function SnapFeed({
     const onScroll = () => {
       const slideHeight = el.clientHeight;
       if (slideHeight === 0) return;
+
       const idx = Math.round(el.scrollTop / slideHeight);
       if (idx !== activeIndex) {
         setActiveIndex(idx);
       }
+
+      const containerTop = el.getBoundingClientRect().top;
+      let tournamentTopReached = false;
+
+      slideRefs.current.forEach((slide) => {
+        if (tournamentTopReached) return;
+        const sentinel = slide.querySelector('[data-tournament-top-sentinel]') as HTMLElement | null;
+        if (!sentinel) return;
+
+        const sentinelTop = sentinel.getBoundingClientRect().top;
+        const slideBottom = slide.getBoundingClientRect().bottom;
+        if (Math.abs(sentinelTop - containerTop) <= 2 && slideBottom > containerTop + 2) {
+          tournamentTopReached = true;
+        }
+      });
+
+      setIsTournamentCardActive(tournamentTopReached);
     };
 
     el.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
     return () => el.removeEventListener('scroll', onScroll);
-  }, [activeIndex, setActiveIndex]);
+  }, [activeIndex, setActiveIndex, setIsTournamentCardActive]);
 
   // ── Prefetch next 2 HLS manifests ──
   useEffect(() => {
