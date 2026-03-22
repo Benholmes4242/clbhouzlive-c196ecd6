@@ -177,7 +177,6 @@ const ClubhouseContent = () => {
   }, [activeFeed.posts, activeTab, hubPost]);
 
   const isLoading = activeFeed.isLoading;
-  const isTournamentCardActive = activePost?.postType === 'tournament_hub';
   const hasNextPage = activeFeed.hasNextPage ?? true;
   
   // Skeleton timing
