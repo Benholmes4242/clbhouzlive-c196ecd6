@@ -372,7 +372,11 @@ const ClubhouseContent = () => {
           <CommentsSheet
             isOpen={commentsOpen}
             onClose={closeComments}
-            postId={activePost.id}
+            postId={
+              activePost.postType === 'tournament_hub'
+                ? (activePost as TournamentHubFeedPost).pages[hubCardPageIndex]?.postId ?? activePost.id
+                : activePost.id
+            }
             currentUserId={user?.id}
             creatorUserId={activePost.userId}
             creatorName={activePost.displayName}
