@@ -33,7 +33,8 @@ import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFe
 import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
 import type { FeedPost, TournamentResultFeedPost } from '@/components/media-system/types/media';
 import { TournamentResultCard } from '@/components/clubhouse/cinematic/TournamentResultCard';
-import { buildSuggestedFeed, buildFriendsFeed } from '@/components/media-system/utils/feedAlgorithm';
+import { buildSuggestedFeed, buildFriendsFeed, injectTournamentHubCard } from '@/components/media-system/utils/feedAlgorithm';
+import { useTournamentHubPages } from '@/components/media-system/hooks/useTournamentHubPages';
 
 // ── Clubhouse UI overlays ──
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
