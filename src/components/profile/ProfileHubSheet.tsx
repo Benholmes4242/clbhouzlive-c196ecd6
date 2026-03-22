@@ -256,7 +256,7 @@ function ProfileHubSheet({
                           {/* #7 — amber check badge */}
                           {isActive && (
                             <div
-                              className="absolute -bottom-0.5 -right-0.5 w-[18px] h-[18px] rounded-full flex items-center justify-center ring-2 ring-background"
+                              className="absolute -bottom-1 -right-1 w-[18px] h-[18px] rounded-full flex items-center justify-center ring-2 ring-[#F8FAFC]"
                               style={{ background: 'hsl(38,92%,50%)' }}
                             >
                               <Check className="w-3 h-3 text-white" />
