@@ -25,6 +25,7 @@ interface SnapFeedProps {
   getLikeState?: (post: FeedPost) => { isLiked: boolean; count: number };
   getCommentCount?: (post: FeedPost) => number;
   startIndex?: number;
+  onHubPageChange?: (index: number) => void;
 }
 
 export function SnapFeed({
