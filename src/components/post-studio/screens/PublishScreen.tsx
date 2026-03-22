@@ -286,7 +286,18 @@ export function PublishScreen() {
             className="mx-4 mt-4 px-4 py-4 rounded-2xl"
             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
           >
-            <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>
+            <p
+              style={{
+                margin: 0,
+                fontSize: 14,
+                lineHeight: 1.6,
+                color: 'rgba(255,255,255,0.75)',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}
+            >
               {state.caption}
             </p>
           </div>
