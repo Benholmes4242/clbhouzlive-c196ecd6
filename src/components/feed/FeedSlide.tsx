@@ -40,6 +40,18 @@ export const FeedSlide = memo(function FeedSlide({
 
   // ── Content routing ──
   const renderContent = () => {
+    // Tournament hub carousel card
+    if (post.postType === 'tournament_hub') {
+      return (
+        <TournamentHubCard
+          post={post as unknown as TournamentHubFeedPost}
+          isActive={isActive}
+          onComment={() => onComment?.()}
+          onLike={() => onLike?.(post)}
+        />
+      );
+    }
+
     // Tournament result card
     if (post.postType === 'tournament_result') {
       const likeState = getLikeState?.(post) ?? { isLiked: false, count: 0 };
