@@ -644,6 +644,8 @@ export default function CoursesPage() {
         course={drawerCourse}
         onClose={() => setDrawerCourseId(null)}
         onUpdate={updateCourse}
+        onUploadPhoto={uploadPhoto}
+        isUploadingPhoto={isUploadingPhoto}
       />
 
     </div>
