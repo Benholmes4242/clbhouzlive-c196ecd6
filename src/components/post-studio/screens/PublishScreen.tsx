@@ -320,8 +320,16 @@ export function PublishScreen() {
             className="w-full flex items-center gap-3 px-4 py-4 min-h-[56px]"
             style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.06)' }}
           >
-            <div className="w-9 h-9 flex items-center justify-center shrink-0">
-              <visibilityConfig.Icon className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={1.75} />
+            <div
+              style={{
+                width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'rgba(255,255,255,0.50)',
+              }}
+            >
+              <visibilityConfig.Icon className="w-[18px] h-[18px]" strokeWidth={1.75} />
             </div>
             <div className="flex-1 text-left">
               <p className="text-[13px] font-semibold" style={{ color: TEXT_PRIMARY }}>Audience</p>
