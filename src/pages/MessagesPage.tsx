@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { MessageCircle, Plus, ChevronLeft, PenSquare } from 'lucide-react';
+import { MessageCircle, Plus, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMessagingContext } from '@/contexts/MessagingContext';
@@ -17,7 +17,7 @@ function MessagesPageInner() {
   const navigate = useNavigate();
   const { conversationId: urlConversationId } = useParams<{ conversationId?: string }>();
   const { user } = useSupabaseSession();
-  const { loading, conversations } = useMessagingContext();
+  const { loading } = useMessagingContext();
   const isMobile = useIsMobile();
   
   useHideBottomNav();
@@ -33,7 +33,6 @@ function MessagesPageInner() {
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchParams, setSearchParams] = useSearchParams();
-  const [conversationFilter, setConversationFilter] = useState<'all' | 'unread' | 'groups'>('all');
 
   useEffect(() => {
     const newParam = searchParams.get('new');
@@ -109,7 +108,7 @@ function MessagesPageInner() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center relative bg-[#F8FAFC]">
+      <div className="min-h-screen flex items-center justify-center relative bg-background">
         <div className="text-center relative z-10">
           <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-muted">
             <MessageCircle className="h-8 w-8 text-muted-foreground" />
@@ -142,93 +141,49 @@ function MessagesPageInner() {
 
   // Mobile: Conversation list
   if (isMobile) {
-    const totalUnread = conversations?.reduce((sum, conv) => sum + (conv.unread_count || 0), 0) ?? 0;
-
     return (
-      <div className="min-h-screen flex flex-col relative bg-[#F8FAFC]">
+      <div className="min-h-screen flex flex-col relative bg-background">
         <div className="relative z-10 flex flex-col min-h-screen">
           <OfflineBanner />
           {/* Header */}
           <header 
             className="flex-none px-[18px] flex items-center justify-between"
             style={{
-              paddingTop: '8px',
-              height: '56px',
+              paddingTop: 'calc(54px + env(safe-area-inset-top, 0px))',
+              height: 'calc(56px + 54px + env(safe-area-inset-top, 0px))',
+              background: 'hsl(var(--background) / 0.9)',
+              backdropFilter: 'blur(24px)',
+              WebkitBackdropFilter: 'blur(24px)',
+              borderBottom: '1px solid hsl(var(--border))',
             }}
           >
             <button
               onClick={() => navigate(-1)}
-              className="w-9 h-9 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
-              style={{ background: 'rgba(0,0,0,0.05)' }}
+              className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
               aria-label="Back"
             >
-              <ChevronLeft className="w-5 h-5" style={{ color: '#475569' }} strokeWidth={2.5} />
+              <ChevronLeft className="w-5 h-5 text-foreground/60" />
             </button>
 
-            <div className="flex items-center gap-2">
-              <span className="text-[16px] font-semibold text-foreground font-dm-sans">Messages</span>
-              {totalUnread > 0 && (
-                <span 
-                  className="min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center text-[11px] font-bold text-white"
-                  style={{ background: 'hsl(38,92%,50%)' }}
-                >
-                  {totalUnread > 99 ? '99+' : totalUnread}
-                </span>
-              )}
-            </div>
+            <span className="text-[16px] font-semibold text-foreground font-dm-sans">Messages</span>
 
             <button 
               onClick={handleNewConversation}
-              className="w-9 h-9 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
-              style={{ 
-                background: 'hsl(38,92%,50%)',
-                boxShadow: '0 2px 8px rgba(245,166,35,0.35)',
-              }}
+              className="w-11 h-11 -mr-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
               aria-label="New conversation"
             >
-              <PenSquare className="w-4 h-4 text-white" />
+              <Plus className="w-5 h-5 text-foreground/60" />
             </button>
           </header>
           
           {/* Search bar */}
-          <div className="px-4 pt-2 pb-1">
-            <div
-              className="flex items-center gap-2.5 px-3 rounded-xl"
-              style={{
-                background: '#fff',
-                border: '1px solid rgba(0,0,0,0.07)',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                height: 40,
-              }}
-            >
-              <ConversationSearchBar
-                value={searchInput}
-                onChange={handleSearchChange}
-                onNewConversation={handleNewConversation}
-                hideNewButton
-              />
-            </div>
-          </div>
-
-          {/* Filter chips */}
-          <div className="flex items-center gap-2 px-4 pt-2 pb-1">
-            {([
-              { key: 'all' as const, label: 'All' },
-              { key: 'unread' as const, label: totalUnread > 0 ? `Unread (${totalUnread})` : 'Unread' },
-              { key: 'groups' as const, label: 'Groups' },
-            ]).map(chip => (
-              <button
-                key={chip.key}
-                onClick={() => setConversationFilter(chip.key)}
-                className="px-3.5 py-1 rounded-full text-[12.5px] font-semibold transition-colors duration-150 active:scale-[0.97]"
-                style={{
-                  background: conversationFilter === chip.key ? '#0f172a' : 'rgba(0,0,0,0.05)',
-                  color: conversationFilter === chip.key ? '#fff' : '#64748b',
-                }}
-              >
-                {chip.label}
-              </button>
-            ))}
+          <div className="px-4 py-2">
+            <ConversationSearchBar
+              value={searchInput}
+              onChange={handleSearchChange}
+              onNewConversation={handleNewConversation}
+              hideNewButton
+            />
           </div>
           
           {showNotificationPrompt && (
@@ -246,7 +201,6 @@ function MessagesPageInner() {
               selectedConversationId={selectedConversationId || undefined}
               searchQuery={searchQuery}
               onNewConversation={handleNewConversation}
-              filterType={conversationFilter}
             />
           </div>
           

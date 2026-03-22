@@ -18,7 +18,6 @@ interface ConversationListProps {
   selectedConversationId?: string;
   searchQuery?: string;
   onNewConversation?: () => void;
-  filterType?: 'all' | 'unread' | 'groups';
 }
 
 function formatRelativeTime(dateString: string | null): string {
@@ -70,7 +69,10 @@ function getConversationDisplay(
   };
 }
 
+// Component to show typing indicator or message preview
+// Only subscribes to typing indicators when isActive to avoid N simultaneous realtime channels
 function ConversationTypingOrPreview({ conversationId, preview, isActive }: { conversationId: string; preview: string | null; isActive: boolean }) {
+  // Only subscribe to typing indicators for the active conversation
   const { typingUsers } = useTypingIndicator(isActive ? conversationId : '');
   
   if (isActive && typingUsers.length > 0) {
@@ -149,8 +151,7 @@ export function ConversationList({
   onSelectConversation, 
   selectedConversationId,
   searchQuery = '',
-  onNewConversation,
-  filterType = 'all',
+  onNewConversation
 }: ConversationListProps) {
   const { conversations, loading, fetchConversations } = useMessagingContext();
   const { user } = useSupabaseSession();
@@ -225,8 +226,8 @@ export function ConversationList({
     }
   };
 
-  // Filter conversations by search query
-  const searchFiltered = conversations.filter(conversation => {
+  // Filter conversations
+  const filteredConversations = conversations.filter(conversation => {
     if (!searchQuery.trim()) return true;
     
     const query = searchQuery.toLowerCase();
@@ -234,13 +235,6 @@ export function ConversationList({
     const lastMessage = conversation.last_message_preview?.toLowerCase() || '';
     
     return name.toLowerCase().includes(query) || lastMessage.includes(query);
-  });
-
-  // Apply filterType (all / unread / groups)
-  const filteredConversations = searchFiltered.filter(conv => {
-    if (filterType === 'unread') return (conv.unread_count ?? 0) > 0;
-    if (filterType === 'groups') return conv.type === 'group';
-    return true;
   });
 
   if (loading) {
@@ -288,36 +282,26 @@ export function ConversationList({
               onSelectConversation(conversation.id);
             }}
             className={cn(
-              "w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors duration-100 cursor-pointer",
-              "active:bg-black/[0.03]",
+              "w-full px-4 py-3.5 flex items-center gap-3 text-left transition-colors duration-150",
+              "active:bg-[hsl(38,92%,50%)]/10",
               isSelected && "bg-[hsl(38,92%,50%)]/5",
               isArchived && "opacity-70"
             )}
           >
-            {/* Avatar */}
+            {/* Avatar - Group icon or user photo */}
             <div className="relative flex-shrink-0">
               {isGroup && !avatarUrl ? (
-                <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center bg-[hsl(38,92%,50%)]">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center bg-[hsl(38,92%,50%)]">
                   <Users className="w-5 h-5 text-white" />
                 </div>
               ) : (
                 <SquircleAvatar
                   src={avatarUrl}
                   alt={name}
-                  size={50}
+                  size={48}
                   fallback={initials}
                   hideRing
                 />
-              )}
-              {/* Unread badge on avatar — amber */}
-              {hasUnread && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center ring-2 ring-[#F8FAFC]"
-                  style={{ background: '#F5A623' }}
-                >
-                  <span className="text-[10px] font-bold text-white leading-none">
-                    {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
-                  </span>
-                </span>
               )}
             </div>
 
@@ -325,9 +309,13 @@ export function ConversationList({
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2 mb-0.5">
                 <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                  {/* Unread dot */}
+                  {hasUnread && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[hsl(38,92%,50%)] flex-shrink-0" />
+                  )}
                   <span className={cn(
-                    "text-[14.5px] truncate",
-                    hasUnread ? "font-bold text-foreground" : "font-semibold text-foreground"
+                    "text-[14px] truncate text-foreground",
+                    hasUnread ? "font-semibold" : "font-semibold"
                   )}>
                     {name}
                   </span>
@@ -335,33 +323,42 @@ export function ConversationList({
                     <BellOff className="w-3.5 h-3.5 flex-shrink-0 text-muted-foreground" />
                   )}
                 </div>
-                <span 
-                  className={cn(
-                    "text-[11.5px] font-medium shrink-0",
-                    !hasUnread && "text-muted-foreground"
-                  )}
-                  style={{ color: hasUnread ? '#F5A623' : undefined }}
-                >
-                  {formatRelativeTime(conversation.last_message_at)}
-                </span>
+                <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+                  <span className={cn(
+                    "text-[11px] font-normal",
+                    hasUnread ? "text-[hsl(35,80%,43%)]" : "text-muted-foreground"
+                  )}>
+                    {formatRelativeTime(conversation.last_message_at)}
+                  </span>
+                </div>
               </div>
               
-              <p className={cn(
-                "text-[13px] truncate",
-                hasUnread ? "text-foreground/70 font-medium" : "text-muted-foreground font-normal"
-              )}>
-                <ConversationTypingOrPreview 
-                  conversationId={conversation.id}
-                  preview={conversation.last_message_preview}
-                  isActive={selectedConversationId === conversation.id}
-                />
-              </p>
+              <div className="flex items-center justify-between">
+                <p className={cn(
+                  "text-[13px] truncate flex-1 font-normal",
+                  hasUnread ? "text-foreground" : "text-muted-foreground"
+                )}>
+                  <ConversationTypingOrPreview 
+                    conversationId={conversation.id}
+                    preview={conversation.last_message_preview}
+                    isActive={selectedConversationId === conversation.id}
+                  />
+                </p>
+                
+                {hasUnread && (
+                   <span className="ml-2 min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center bg-[hsl(38,92%,50%)]">
+                    <span className="text-[12px] font-bold text-white">
+                      {conversation.unread_count > 99 ? '99+' : conversation.unread_count}
+                    </span>
+                  </span>
+                )}
+              </div>
             </div>
           </button>
           
-          {/* Hairline divider */}
+          {/* Divider - inset after avatar, Apple Messages style */}
           {showDivider && (
-            <div className="h-px bg-black/[0.05] mx-4" />
+            <div className="h-px ml-[76px] bg-border/30" />
           )}
         </div>
       </SwipeableConversationItem>
@@ -389,7 +386,7 @@ export function ConversationList({
         </div>
       )}
 
-      {/* Conversations */}
+      {/* Conversations card — warm glass container */}
       <div className="overflow-hidden rounded-2xl">
         {filteredConversations.map((conversation, index) => 
           renderConversationItem(conversation, false, index, filteredConversations.length)
