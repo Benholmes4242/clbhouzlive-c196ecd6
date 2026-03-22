@@ -360,7 +360,7 @@ export function PublishScreen() {
               <Clock className="w-[18px] h-[18px]" strokeWidth={1.75} />
             </div>
             <div className="flex-1 text-left">
-              <p className="text-[13px] font-semibold" style={{ color: TEXT_PRIMARY }}>Schedule</p>
+              <p className="text-[14px] font-semibold" style={{ color: TEXT_PRIMARY }}>Schedule</p>
               <p className="text-[11px] mt-0.5" style={{ color: TEXT_TERTIARY }}>
                 {state.scheduledAt ? 'Scheduled for later' : 'Post immediately'}
               </p>
