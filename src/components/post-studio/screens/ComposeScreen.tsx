@@ -689,8 +689,18 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               width: 320,
               height: 320,
               borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.02) 50%, transparent 75%)',
+              background: 'radial-gradient(circle, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.025) 50%, transparent 75%)',
               animation: 'studio-orb-breathe 5s ease-in-out infinite',
+            }} />
+            <div style={{
+              position: 'absolute',
+              top: '28%',
+              left: '62%',
+              width: 140,
+              height: 140,
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(245,166,35,0.04) 0%, transparent 70%)',
+              animation: 'studio-orb-breathe 6s ease-in-out infinite reverse',
             }} />
             <div style={{
               position: 'absolute',
@@ -710,6 +720,17 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             }} />
           </div>
         )}
+
+        {/* ── Centering wrapper — centres content when empty, anchors top when active ── */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: '100%',
+            justifyContent: hasMedia || state.caption.length > 0 ? 'flex-start' : 'center',
+            paddingBottom: 16,
+          }}
+        >
 
         {/* ── Today's Prompt — visible when canvas is blank ── */}
         {state.caption.length === 0 && !hasMedia && (
@@ -825,7 +846,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isProcessing}
                     style={{
-                      flex: 1,
+                      flex: 1.2,
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
@@ -839,15 +860,15 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     }}
                   >
                     <div style={{
-                      width: 44, height: 44, borderRadius: 14,
-                      background: 'rgba(255,255,255,0.08)',
-                      border: '1px solid rgba(255,255,255,0.12)',
+                      width: 52, height: 52, borderRadius: 16,
+                      background: 'rgba(255,255,255,0.10)',
+                      border: '1px solid rgba(255,255,255,0.15)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
-                      <ImageIcon className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.75)' }} strokeWidth={1.75} />
+                      <ImageIcon className="w-[22px] h-[22px]" style={{ color: 'rgba(255,255,255,0.88)' }} strokeWidth={1.75} />
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.80)', marginBottom: 2 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.88)', marginBottom: 2 }}>
                         Add from Library
                       </div>
                       <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
@@ -869,24 +890,24 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                       justifyContent: 'center',
                       gap: 8,
                       padding: '20px 12px',
-                      background: 'transparent',
+                      background: 'rgba(0,0,0,0.15)',
                       border: 'none',
                       cursor: 'pointer',
                     }}
                   >
                     <div style={{
                       width: 44, height: 44, borderRadius: 14,
-                      background: 'rgba(255,255,255,0.08)',
-                      border: '1px solid rgba(255,255,255,0.12)',
+                      background: 'rgba(255,255,255,0.06)',
+                      border: '1px solid rgba(255,255,255,0.09)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
                       <Camera className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.75)' }} strokeWidth={1.75} />
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.80)', marginBottom: 2 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 2 }}>
                         Take a Photo
                       </div>
-                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>
                         Camera
                       </div>
                     </div>
@@ -944,20 +965,20 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 onClick={() => openPanel('course')}
                 className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl"
                 style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.09)',
+                  background: 'rgba(34,197,94,0.06)',
+                  border: '1px solid rgba(34,197,94,0.14)',
                 }}
               >
                 <div
                   className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: 'rgba(255,255,255,0.08)' }}
+                  style={{ background: 'rgba(34,197,94,0.10)', border: '1px solid rgba(34,197,94,0.18)' }}
                 >
                   <span className="text-base">⛳</span>
                 </div>
                 <span className="flex-1 text-left text-[14px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
                   Where did you play?
                 </span>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'rgba(255,255,255,0.20)', flexShrink: 0 }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'rgba(34,197,94,0.35)', flexShrink: 0 }}>
                   <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </motion.button>
@@ -1025,6 +1046,9 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               </motion.div>
             )}
           </AnimatePresence>
+        </div>
+
+        {/* Close centering wrapper */}
         </div>
 
         {/* Processing indicator */}
