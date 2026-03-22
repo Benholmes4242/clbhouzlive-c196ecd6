@@ -181,10 +181,11 @@ function MessagesPageInner() {
           <OfflineBanner />
           {/* Header */}
           <header 
-            className="flex-none px-[18px] flex items-center justify-between"
+            className="flex-none px-4 flex items-center justify-between"
             style={{
-              paddingTop: '8px',
-              height: '56px',
+              paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+              paddingBottom: '10px',
+              background: '#F8FAFC',
               borderBottom: '1px solid rgba(0,0,0,0.06)',
             }}
           >
