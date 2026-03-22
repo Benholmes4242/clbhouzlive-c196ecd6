@@ -54,7 +54,7 @@ export const LikelyWinnersCarousel = memo(function LikelyWinnersCarousel({
   const courseImageUrl =
     venueImageQuery.data?.imageUrl || (tournamentName ? getFallbackCourseImage(tournamentName) : undefined);
 
-  const contenderCards = cards.filter(c => c.type === 'contender').slice(0, 2);
+  const contenderCards = cards.filter(c => c.type === 'contender').slice(0, 4);
 
   const allPicks: PickCard[] = [
     {

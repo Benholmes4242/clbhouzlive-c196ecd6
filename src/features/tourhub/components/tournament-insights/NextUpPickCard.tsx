@@ -381,7 +381,7 @@ export function NextUpPickCard({
     },
     ...cards
       .filter(c => c.type === 'contender')
-      .slice(0, 2)
+      .slice(0, 4)
       .map(c => ({
         id: c.id,
         name: c.name,
