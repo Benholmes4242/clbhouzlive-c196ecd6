@@ -12,10 +12,6 @@ const MAX_POSTS_PER_CREATOR = 4;
 const MAX_REVIEWS_PER_CREATOR = 4;
 
 // ── Type Guards ────────────────────────────────────────────────────────────────
-function isTournamentPost(p: FeedPost): boolean {
-  return p.postType === 'tournament_result' || p.postType === 'tournament_live';
-}
-
 function isReviewPost(p: FeedPost): boolean {
   return !!p.isReview;
 }
@@ -25,12 +21,12 @@ function isReviewPost(p: FeedPost): boolean {
  * Filter posts for the Suggested (For You) feed.
  * PORTRAIT VIDEO ONLY. Excludes landscape videos and sub-4-second clips.
  * Images pass if portrait or multi-image carousel.
- * Tournament/review posts pass regardless (injected separately).
+ * Review posts pass regardless (injected separately).
  */
 export function filterForSuggested(posts: FeedPost[]): FeedPost[] {
   return posts.filter(post => {
-    // Tournament and review posts bypass media filters
-    if (isTournamentPost(post) || isReviewPost(post)) return true;
+    // Review posts bypass media filters
+    if (isReviewPost(post)) return true;
 
     const media = post.mediaItems;
     if (!media || media.length === 0) return false;
@@ -80,7 +76,7 @@ export function capPerCreator(posts: FeedPost[]): FeedPost[] {
       const count = reviewCount.get(key) ?? 0;
       if (count >= MAX_REVIEWS_PER_CREATOR) return false;
       reviewCount.set(key, count + 1);
-    } else if (!isTournamentPost(post)) {
+    } else {
       const count = postCount.get(key) ?? 0;
       if (count >= MAX_POSTS_PER_CREATOR) return false;
       postCount.set(key, count + 1);
@@ -98,8 +94,8 @@ export function interleaveReviews(posts: FeedPost[], tab: FeedTab): FeedPost[] {
   const reviewSlot = tab === 'suggested' ? SUGGESTED_REVIEW_POSITION : FRIENDS_REVIEW_POSITION;
   const blockSize = tab === 'suggested' ? SUGGESTED_BLOCK_SIZE : FRIENDS_BLOCK_SIZE;
 
-  const reviews: FeedPost[] = posts.filter(p => isReviewPost(p) && !isTournamentPost(p));
-  const regular: FeedPost[] = posts.filter(p => !isReviewPost(p) && !isTournamentPost(p));
+  const reviews: FeedPost[] = posts.filter(p => isReviewPost(p));
+  const regular: FeedPost[] = posts.filter(p => !isReviewPost(p));
 
   const result: FeedPost[] = [];
   let regularIdx = 0, reviewIdx = 0, slotInBlock = 1;
@@ -118,6 +114,18 @@ export function interleaveReviews(posts: FeedPost[], tab: FeedTab): FeedPost[] {
 }
 
 
+// ── Tournament Hub Card Injection ─────────────────────────────────────────────
+/**
+ * Inject a single tournament hub card at slot 4 (index 3) of the suggested feed.
+ */
+export function injectTournamentHubCard(posts: FeedPost[], hubCard: FeedPost | null): FeedPost[] {
+  if (!hubCard) return posts;
+  const result = [...posts];
+  const slot = Math.min(SUGGESTED_TOURNAMENT_SLOT - 1, result.length);
+  result.splice(slot, 0, hubCard);
+  return result;
+}
+
 // ── Full Suggested Feed Pipeline ──────────────────────────────────────────────
 /**
  * Apply the complete suggested feed pipeline:
@@ -127,8 +135,8 @@ export function interleaveReviews(posts: FeedPost[], tab: FeedTab): FeedPost[] {
  * Tournament injection happens in Clubhouse.tsx (needs live data from hook).
  */
 export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
-  const noLive = posts.filter(p => p.postType !== 'tournament_live' && p.postType !== 'tournament_result');
-  const filtered = filterForSuggested(noLive);
+  const noHub = posts.filter(p => p.postType !== 'tournament_hub');
+  const filtered = filterForSuggested(noHub);
   const capped = capPerCreator(filtered);
   const interleaved = interleaveReviews(capped, 'suggested');
   return deduplicatePosts(interleaved);
@@ -143,8 +151,8 @@ export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
  * No tournament injection in friends feed.
  */
 export function buildFriendsFeed(posts: FeedPost[]): FeedPost[] {
-  const noLive = posts.filter(p => p.postType !== 'tournament_live');
-  const capped = capPerCreator(noLive);
+  const noHub = posts.filter(p => p.postType !== 'tournament_hub');
+  const capped = capPerCreator(noHub);
   const interleaved = interleaveReviews(capped, 'friends');
   return deduplicatePosts(interleaved);
 }
