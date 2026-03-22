@@ -563,13 +563,15 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
             </>
           )}
 
-           <div style={{ height: 1, backgroundColor: 'rgba(245, 158, 11, 0.06)' }} />
+           <div style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.05)' }} />
           <button
             onClick={() => setIsReportOpen(true)}
             className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"
           >
-            <Flag size={20} style={{ color: 'hsl(var(--foreground))' }} />
-            <span className="text-[14px] font-medium" style={{ color: 'hsl(var(--foreground))' }}>Report Group</span>
+            <div className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0" style={{ background: 'rgba(0,0,0,0.04)' }}>
+              <Flag size={17} style={{ color: '#64748b' }} />
+            </div>
+            <span className="text-[14px] font-medium" style={{ color: '#0f172a' }}>Report Group</span>
           </button>
 
           {isAdmin && (
