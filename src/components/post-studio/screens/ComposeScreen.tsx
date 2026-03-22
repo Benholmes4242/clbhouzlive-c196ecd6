@@ -965,20 +965,20 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 onClick={() => openPanel('course')}
                 className="flex items-center gap-3 w-full px-3.5 py-3 rounded-2xl"
                 style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.09)',
+                  background: 'rgba(34,197,94,0.06)',
+                  border: '1px solid rgba(34,197,94,0.14)',
                 }}
               >
                 <div
                   className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                  style={{ background: 'rgba(255,255,255,0.08)' }}
+                  style={{ background: 'rgba(34,197,94,0.10)', border: '1px solid rgba(34,197,94,0.18)' }}
                 >
                   <span className="text-base">⛳</span>
                 </div>
                 <span className="flex-1 text-left text-[14px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
                   Where did you play?
                 </span>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'rgba(255,255,255,0.20)', flexShrink: 0 }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'rgba(34,197,94,0.35)', flexShrink: 0 }}>
                   <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </motion.button>
