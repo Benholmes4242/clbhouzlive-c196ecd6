@@ -156,7 +156,7 @@ export const FeedSlide = memo(function FeedSlide({
       style={{
         height: '100dvh',
         scrollSnapAlign: 'start',
-        scrollSnapStop: post.postType === 'tournament_live' ? 'always' : undefined,
+        scrollSnapStop: 'always',
         background: '#000',
       }}
     >
