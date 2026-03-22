@@ -485,9 +485,10 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
                           <span
                             className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-[1px] rounded-lg"
                             style={{
-                             color: '#d97706',
-                               background: 'rgba(245, 158, 11, 0.08)',
-                             }}
+                              color: '#d97706',
+                              background: 'rgba(245, 158, 11, 0.08)',
+                              border: '1px solid rgba(245,166,35,0.18)',
+                            }}
                           >
                             {participant.user_id === conversation.created_by ? (
                               <ShieldCheck size={11} />
