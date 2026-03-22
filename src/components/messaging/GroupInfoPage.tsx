@@ -353,7 +353,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
             )}
           </div>
 
-          <p className="text-[13px] font-medium mt-1" style={{ color: 'hsl(var(--muted-foreground))' }}>
+          <p className="text-[13px] font-medium mt-1" style={{ color: '#64748b' }}>
             {conversation.participants.length} members
           </p>
 
