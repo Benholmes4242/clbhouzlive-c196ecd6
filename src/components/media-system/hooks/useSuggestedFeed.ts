@@ -35,7 +35,7 @@ export function useSuggestedFeed(userId: string | undefined) {
         }
 
         const rows = ((data ?? []) as unknown as FeedRpcRow[]);
-        console.log('[feed] first post isFollowedByMe:', rows[0]?.is_followed_by_me);
+        
         const posts = groupMultiMedia(rows.map(mapRowToFeedPost));
         const interleaved = buildSuggestedFeed(posts);
 
