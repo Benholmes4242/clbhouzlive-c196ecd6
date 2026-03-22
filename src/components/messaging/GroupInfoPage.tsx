@@ -261,9 +261,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col overflow-hidden"
-      style={{
-        backgroundColor: 'hsl(var(--background))',
-      }}
+      style={{ backgroundColor: '#F8FAFC' }}
     >
       {/* ── Header ── */}
       <div
@@ -271,24 +269,23 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         style={{
           height: 'calc(56px + env(safe-area-inset-top, 0px))',
           paddingTop: 'env(safe-area-inset-top, 0px)',
-          background: 'hsl(var(--background) / 0.9)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          borderBottom: '1px solid hsl(var(--border))',
+          background: '#F8FAFC',
+          borderBottom: '1px solid rgba(0,0,0,0.06)',
         }}
       >
         <button
           onClick={onClose}
-          className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+          className="w-9 h-9 -ml-1 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+          style={{ background: 'rgba(0,0,0,0.05)' }}
         >
-          <ChevronLeft size={22} className="text-foreground/60" />
+          <ChevronLeft size={20} style={{ color: '#475569' }} strokeWidth={2.5} />
         </button>
         <div className="flex-1 text-center">
-          <span className="text-[16px] font-semibold" style={{ color: 'hsl(var(--foreground))' }}>
+          <span className="text-[17px] font-bold" style={{ color: '#0f172a' }}>
             Group Info
           </span>
         </div>
-        <div className="w-11" />
+        <div className="w-9" />
       </div>
 
       {/* ── Scrollable content ── */}
