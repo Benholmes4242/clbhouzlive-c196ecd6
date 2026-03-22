@@ -492,25 +492,24 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
   const isTyping = typingUsers.length > 0;
 
   return (
-    <div className="flex flex-col h-full min-h-0 pt-safe">
-      {/* Header - Cleo glass style */}
+    <div className="flex flex-col h-full min-h-0 bg-[#F8FAFC]">
+      {/* Header */}
       <header 
         className="flex-shrink-0 px-[18px] flex items-center gap-3"
         style={{
-          height: 'calc(52px + max(env(safe-area-inset-top, 0px), 47px))',
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-          background: 'hsl(var(--background) / 0.9)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '1px solid hsl(var(--border))',
+          paddingTop: '6px',
+          paddingBottom: '10px',
+          background: '#F8FAFC',
+          borderBottom: '1px solid rgba(0,0,0,0.06)',
         }}
       >
         {/* Back button */}
         <button 
           onClick={onBack}
-          className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+          className="w-9 h-9 -ml-1 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+          style={{ background: 'rgba(0,0,0,0.05)' }}
         >
-          <ChevronLeft className="w-5 h-5 text-foreground/60" />
+          <ChevronLeft className="w-5 h-5" style={{ color: '#475569' }} strokeWidth={2.5} />
         </button>
         
         {/* Avatar + Info */}
