@@ -470,7 +470,7 @@ function formatPredictions(
     reasons: ensureThreeReasons(p.reasons),
   }));
 
-  const topContenders = rawContenders.slice(0, 5);
+  const topContenders = rawContenders.slice(0, 3);
 
   return {
     tournament: {
