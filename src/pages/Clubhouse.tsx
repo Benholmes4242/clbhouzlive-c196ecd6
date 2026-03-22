@@ -163,15 +163,17 @@ const ClubhouseContent = () => {
   // ── Feed hooks ──
   const suggestedFeed = useSuggestedFeed(user?.id);
   const friendsFeed = useFriendsFeed(user?.id);
+  const { hubPost } = useTournamentHubPages(user?.id);
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
   
   const posts = useMemo(() => {
     if (activeTab === 'foryou') {
-      return buildSuggestedFeed(activeFeed.posts);
+      const base = buildSuggestedFeed(activeFeed.posts);
+      return injectTournamentHubCard(base, hubPost);
     } else {
       return buildFriendsFeed(activeFeed.posts);
     }
-  }, [activeFeed.posts, activeTab]);
+  }, [activeFeed.posts, activeTab, hubPost]);
 
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? true;
