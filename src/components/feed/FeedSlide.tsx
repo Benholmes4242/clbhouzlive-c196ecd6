@@ -2,7 +2,8 @@ import React, { memo } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapVideoPlayer } from './SnapVideoPlayer';
 import { FeedImageCarousel } from './FeedImageCarousel';
-import type { FeedPost } from '@/components/media-system/types/media';
+import { TournamentHubCard } from '@/components/clubhouse/cinematic/TournamentHubCard';
+import type { FeedPost, TournamentHubFeedPost } from '@/components/media-system/types/media';
 
 interface FeedSlideProps {
   post: FeedPost;
@@ -17,6 +18,7 @@ interface FeedSlideProps {
   onShare?: (post: FeedPost) => void;
   getLikeState?: (post: FeedPost) => { isLiked: boolean; count: number };
   getCommentCount?: (post: FeedPost) => number;
+  onHubPageChange?: (index: number) => void;
 }
 
 export const FeedSlide = memo(function FeedSlide({
@@ -30,6 +32,7 @@ export const FeedSlide = memo(function FeedSlide({
   onShare,
   getLikeState,
   getCommentCount,
+  onHubPageChange,
 }: FeedSlideProps) {
   const activeIndex = useClubhouseStore(s => s.activeIndex);
   const isActive = activeIndex === index;
@@ -38,6 +41,19 @@ export const FeedSlide = memo(function FeedSlide({
 
   // ── Content routing ──
   const renderContent = () => {
+    // Tournament Hub Card — full custom chrome
+    if (post.postType === 'tournament_hub') {
+      return (
+        <TournamentHubCard
+          post={post as TournamentHubFeedPost}
+          isActive={isActive}
+          onComment={onComment}
+          onLike={() => onLike?.(post)}
+          onPageChange={onHubPageChange}
+        />
+      );
+    }
+
     // Multi-media (any mix of video + image) → FeedImageCarousel
     if (media && media.length > 1) {
       return (
