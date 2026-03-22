@@ -2,7 +2,6 @@ import type { FeedPost, FeedTab } from '../types/media';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const SUGGESTED_REVIEW_POSITION = 7;
-const SUGGESTED_TOURNAMENT_SLOT = 4;
 const SUGGESTED_BLOCK_SIZE = 10;
 const SUGGESTED_MIN_VIDEO_DURATION = 4;
 const SUGGESTED_MAX_ASPECT_RATIO = 1.0; // anything above = landscape = excluded
@@ -12,25 +11,15 @@ const MAX_POSTS_PER_CREATOR = 4;
 const MAX_REVIEWS_PER_CREATOR = 4;
 
 // ── Type Guards ────────────────────────────────────────────────────────────────
-function isTournamentPost(p: FeedPost): boolean {
-  return p.postType === 'tournament_result' || p.postType === 'tournament_live';
-}
-
 function isReviewPost(p: FeedPost): boolean {
   return !!p.isReview;
 }
 
 // ── Suggested Feed Filter ──────────────────────────────────────────────────────
-/**
- * Filter posts for the Suggested (For You) feed.
- * PORTRAIT VIDEO ONLY. Excludes landscape videos and sub-4-second clips.
- * Images pass if portrait or multi-image carousel.
- * Tournament/review posts pass regardless (injected separately).
- */
 export function filterForSuggested(posts: FeedPost[]): FeedPost[] {
   return posts.filter(post => {
-    // Tournament and review posts bypass media filters
-    if (isTournamentPost(post) || isReviewPost(post)) return true;
+    // Review posts bypass media filters
+    if (isReviewPost(post)) return true;
 
     const media = post.mediaItems;
     if (!media || media.length === 0) return false;
@@ -42,16 +31,13 @@ export function filterForSuggested(posts: FeedPost[]): FeedPost[] {
     const first = media[0];
 
     if (first.type === 'video') {
-      // Exclude landscape videos
       const ar = (first.width && first.height) ? first.width / first.height : 0;
       if (ar > SUGGESTED_MAX_ASPECT_RATIO) return false;
-      // Exclude sub-4-second clips
       if (first.duration !== undefined && first.duration < SUGGESTED_MIN_VIDEO_DURATION) return false;
       return true;
     }
 
     if (first.type === 'image') {
-      // Portrait images only (height >= width)
       if (first.width && first.height && first.width > first.height) return false;
       return true;
     }
@@ -80,7 +66,7 @@ export function capPerCreator(posts: FeedPost[]): FeedPost[] {
       const count = reviewCount.get(key) ?? 0;
       if (count >= MAX_REVIEWS_PER_CREATOR) return false;
       reviewCount.set(key, count + 1);
-    } else if (!isTournamentPost(post)) {
+    } else {
       const count = postCount.get(key) ?? 0;
       if (count >= MAX_POSTS_PER_CREATOR) return false;
       postCount.set(key, count + 1);
@@ -90,16 +76,12 @@ export function capPerCreator(posts: FeedPost[]): FeedPost[] {
 }
 
 // ── Review Interleave ──────────────────────────────────────────────────────────
-/**
- * Interleave review posts at a fixed slot within each BLOCK_SIZE block.
- * Suggested: slot 7 of every 10. Friends: slot 9 of every 10.
- */
 export function interleaveReviews(posts: FeedPost[], tab: FeedTab): FeedPost[] {
   const reviewSlot = tab === 'suggested' ? SUGGESTED_REVIEW_POSITION : FRIENDS_REVIEW_POSITION;
   const blockSize = tab === 'suggested' ? SUGGESTED_BLOCK_SIZE : FRIENDS_BLOCK_SIZE;
 
-  const reviews: FeedPost[] = posts.filter(p => isReviewPost(p) && !isTournamentPost(p));
-  const regular: FeedPost[] = posts.filter(p => !isReviewPost(p) && !isTournamentPost(p));
+  const reviews: FeedPost[] = posts.filter(p => isReviewPost(p));
+  const regular: FeedPost[] = posts.filter(p => !isReviewPost(p));
 
   const result: FeedPost[] = [];
   let regularIdx = 0, reviewIdx = 0, slotInBlock = 1;
@@ -117,34 +99,39 @@ export function interleaveReviews(posts: FeedPost[], tab: FeedTab): FeedPost[] {
   return result;
 }
 
+/**
+ * Inject the TournamentHubCard at slot 4 of the suggested feed.
+ * One card only, always at slot 4, never repeats.
+ */
+export function injectTournamentHubCard(
+  feedPosts: FeedPost[],
+  hubPost: FeedPost | null
+): FeedPost[] {
+  if (!hubPost) return feedPosts;
+  const SLOT = 3; // slot 4, 0-indexed
+  const result: FeedPost[] = [];
+  let injected = false;
+  for (let i = 0; i < feedPosts.length; i++) {
+    if (i === SLOT && !injected) { result.push(hubPost); injected = true; }
+    result.push(feedPosts[i]);
+  }
+  if (!injected) result.push(hubPost);
+  return deduplicatePosts(result);
+}
 
 // ── Full Suggested Feed Pipeline ──────────────────────────────────────────────
-/**
- * Apply the complete suggested feed pipeline:
- * 1. Filter (portrait video only, min duration, portrait images)
- * 2. Interleave reviews at slot 7 of every 10-block
- * 3. Deduplicate
- * Tournament injection happens in Clubhouse.tsx (needs live data from hook).
- */
 export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
-  const noLive = posts.filter(p => p.postType !== 'tournament_live' && p.postType !== 'tournament_result');
-  const filtered = filterForSuggested(noLive);
+  const noHub = posts.filter(p => p.postType !== 'tournament_hub');
+  const filtered = filterForSuggested(noHub);
   const capped = capPerCreator(filtered);
   const interleaved = interleaveReviews(capped, 'suggested');
   return deduplicatePosts(interleaved);
 }
 
 // ── Full Friends Feed Pipeline ────────────────────────────────────────────────
-/**
- * Apply the complete friends feed pipeline:
- * 1. No media filter (all aspect ratios, all durations)
- * 2. Interleave reviews at slot 9 of every 10-block
- * 3. Deduplicate
- * No tournament injection in friends feed.
- */
 export function buildFriendsFeed(posts: FeedPost[]): FeedPost[] {
-  const noLive = posts.filter(p => p.postType !== 'tournament_live');
-  const capped = capPerCreator(noLive);
+  const noHub = posts.filter(p => p.postType !== 'tournament_hub');
+  const capped = capPerCreator(noHub);
   const interleaved = interleaveReviews(capped, 'friends');
   return deduplicatePosts(interleaved);
 }
