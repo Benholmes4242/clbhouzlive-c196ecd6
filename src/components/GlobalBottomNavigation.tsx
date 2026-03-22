@@ -6,7 +6,7 @@ import { useModalState } from '@/hooks/useModalDetector';
 import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 import { useModalContext } from '@/contexts/ModalContext';
 import { usePostStudioStore } from '@/stores/usePostStudioStore';
-import { useClubhouseStore } from '@/store/clubhouseStore';
+
 
 // Note: usePrefetch is accessed via useAppPrefetch to avoid static/dynamic import conflict
 import { useAppPrefetch } from '@/hooks/useAppPrefetch';
@@ -86,8 +86,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const isClubhouseRoute = CLUBHOUSE_ROUTES.includes(location.pathname);
   const isWarmGradientRoute = WARM_GRADIENT_ROUTES.some(r => location.pathname.startsWith(r));
   
-  const isTournamentCardActive = useClubhouseStore(s => s.isTournamentCardActive);
-  const showNavigation = isVisible && !shouldHideForRoute && !(isClubhouseRoute && isTournamentCardActive);
+  const showNavigation = isVisible && !shouldHideForRoute;
 
   // Audit on mount
   useEffect(() => {

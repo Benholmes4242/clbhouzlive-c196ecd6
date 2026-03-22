@@ -20,7 +20,7 @@ import { useClubhouseSkeletonTiming } from '@/hooks/useClubhouseSkeletonTiming';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import { ClubhouseTabProvider, useClubhouseTab } from '@/contexts/ClubhouseTabContext';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
-import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
+
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 // ── New feed components ──
@@ -33,8 +33,7 @@ import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFe
 import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
 import type { FeedPost, TournamentResultFeedPost } from '@/components/media-system/types/media';
 import { TournamentResultCard } from '@/components/clubhouse/cinematic/TournamentResultCard';
-import { useTournamentLiveFeed } from '@/components/media-system/hooks/useTournamentLiveFeed';
-import { buildSuggestedFeed, buildFriendsFeed, injectLiveTournamentCards } from '@/components/media-system/utils/feedAlgorithm';
+import { buildSuggestedFeed, buildFriendsFeed } from '@/components/media-system/utils/feedAlgorithm';
 
 // ── Clubhouse UI overlays ──
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
@@ -165,20 +164,13 @@ const ClubhouseContent = () => {
   const friendsFeed = useFriendsFeed(user?.id);
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
   
-  // ── Live tournament injection ──
-  const { livePosts, liveTourSlugs } = useTournamentLiveFeed(user?.id);
-  const livePostIds = useMemo(() => livePosts.map(p => p.id).join(','), [livePosts]);
-  const liveTourSlugsKey = liveTourSlugs.join(',');
-  
   const posts = useMemo(() => {
     if (activeTab === 'foryou') {
-      const base = buildSuggestedFeed(activeFeed.posts);
-      return injectLiveTournamentCards(base, livePosts, liveTourSlugs);
+      return buildSuggestedFeed(activeFeed.posts);
     } else {
       return buildFriendsFeed(activeFeed.posts);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeFeed.posts, activeTab, livePostIds, liveTourSlugsKey]);
+  }, [activeFeed.posts, activeTab]);
 
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? true;
@@ -196,24 +188,6 @@ const ClubhouseContent = () => {
   
   // ── Active post derivation ──
   const { activePost, golfCourse, activeReview, isActiveReview, isActiveVideo } = useActivePostDerived(posts, activeIndex);
-  const isTournamentCardActive =
-    activePost?.postType === 'tournament_result' ||
-    activePost?.postType === 'tournament_live';
-
-  // Hide bottom nav when tournament card is active.
-  // Runs on mount AND whenever isTournamentCardActive changes —
-  // so returning to Clubhouse with a tournament card in view correctly re-hides the nav.
-  const { setVisible: setBottomNavVisible } = useBottomNavigation();
-  const setStoreTournamentActive = useClubhouseStore(s => s.setIsTournamentCardActive);
-
-  useEffect(() => {
-    setStoreTournamentActive(isTournamentCardActive);
-    setBottomNavVisible(!isTournamentCardActive);
-    return () => {
-      setStoreTournamentActive(false);
-      setBottomNavVisible(true);
-    };
-  }, [isTournamentCardActive, setBottomNavVisible, setStoreTournamentActive]);
   
   // ── Optimistic like state ──
   const { handleLike, getActiveLikeState, resetLikes } = useClubhouseLikes({ userId: user?.id, activeActor });
@@ -287,13 +261,7 @@ const ClubhouseContent = () => {
       />
 
       {/* Floating top bar */}
-      <div style={{
-        opacity: isTournamentCardActive ? 0 : 1,
-        pointerEvents: isTournamentCardActive ? 'none' : 'auto',
-        transition: 'opacity 0.18s ease',
-        position: 'relative',
-        zIndex: 50,
-      }}>
+      <div style={{ position: 'relative', zIndex: 50 }}>
         <ClubhouseTopBar
           activeTab={activeTab}
           onTabChange={(tab) => {
@@ -393,40 +361,8 @@ const ClubhouseContent = () => {
         </>
       ) : null}
 
-      {/* ═══ COMMENTS + MORE OPTIONS (tournament cards) ═══ */}
-      {activePost && posts.length > 0 &&
-        (activePost.postType === 'tournament_result' || activePost.postType === 'tournament_live') && (
-        <>
-          <CommentsSheet
-            isOpen={commentsOpen}
-            onClose={closeComments}
-            postId={activePost.id}
-            currentUserId={user?.id}
-            creatorUserId={activePost.userId}
-            creatorName={activePost.displayName}
-            creatorAvatar={activePost.avatarUrl}
-            caption={activePost.caption}
-            theme="dark"
-            likesCount={activeLikeState?.count ?? null}
-            onCommentPosted={() => handleCommentPosted(activePost)}
-            onCommentDeleted={() => activePost && handleCommentDeleted(activePost.id, activePost.commentCount)}
-          />
-          <MoreOptionsDrawer
-            open={moreOptionsOpen}
-            onOpenChange={setMoreOptionsOpen}
-            onReport={() => handleReport(activePost)}
-            onNotInterested={() => handleNotInterested(activePost)}
-            onCopyLink={() => {
-              navigator.clipboard.writeText(`${window.location.origin}/post/${activePost.id}`);
-              toast.success('Link copied');
-              setMoreOptionsOpen(false);
-            }}
-          />
-        </>
-      )}
-
-      {/* ═══ COMMENTS + MORE OPTIONS (regular posts) ═══ */}
-      {activePost && posts.length > 0 && !isTournamentCardActive && (
+      {/* ═══ COMMENTS + MORE OPTIONS ═══ */}
+      {activePost && posts.length > 0 && (
         <>
           <CommentsSheet
             isOpen={commentsOpen}
