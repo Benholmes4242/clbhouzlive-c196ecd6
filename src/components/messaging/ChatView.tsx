@@ -95,8 +95,11 @@ function ChatSkeleton() {
 
 function DateSeparator({ date }: { date: string }) {
   return (
-    <div className="flex justify-center py-5">
-      <span className="px-3 py-1 rounded-full bg-muted text-muted-foreground text-[11px] font-medium tracking-[0.04em] uppercase">
+    <div className="flex justify-center my-3">
+      <span 
+        className="text-[11px] font-semibold uppercase tracking-[0.04em] px-3.5 py-1 rounded-full"
+        style={{ background: 'rgba(0,0,0,0.06)', color: '#64748b' }}
+      >
         {formatDateHeader(date)}
       </span>
     </div>
@@ -489,25 +492,24 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
   const isTyping = typingUsers.length > 0;
 
   return (
-    <div className="flex flex-col h-full min-h-0 pt-safe">
-      {/* Header - Cleo glass style */}
+    <div className="flex flex-col h-full min-h-0 bg-[#F8FAFC]">
+      {/* Header */}
       <header 
         className="flex-shrink-0 px-[18px] flex items-center gap-3"
         style={{
-          height: 'calc(52px + max(env(safe-area-inset-top, 0px), 47px))',
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-          background: 'hsl(var(--background) / 0.9)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '1px solid hsl(var(--border))',
+          paddingTop: '6px',
+          paddingBottom: '10px',
+          background: '#F8FAFC',
+          borderBottom: '1px solid rgba(0,0,0,0.06)',
         }}
       >
         {/* Back button */}
         <button 
           onClick={onBack}
-          className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+          className="w-9 h-9 -ml-1 rounded-full flex items-center justify-center active:scale-[0.97] transition-transform"
+          style={{ background: 'rgba(0,0,0,0.05)' }}
         >
-          <ChevronLeft className="w-5 h-5 text-foreground/60" />
+          <ChevronLeft className="w-5 h-5" style={{ color: '#475569' }} strokeWidth={2.5} />
         </button>
         
         {/* Avatar + Info */}
@@ -519,18 +521,18 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             <SquircleAvatar
               src={headerInfo.avatarUrl}
               alt={headerInfo.name}
-              size={40}
+              size={38}
               fallback={headerInfo.initials}
               hideRing
             />
             {/* Online indicator for DMs */}
             {!isGroupChat && otherUserPresence?.status === 'online' && (
-              <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background" />
+              <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#F8FAFC]" />
             )}
           </div>
           
           <div className="flex-1 min-w-0 text-left">
-           <h2 className="text-[16px] font-semibold truncate text-foreground">
+           <h2 className="text-[15px] font-bold truncate text-foreground" style={{ letterSpacing: '-0.2px' }}>
               {headerInfo.name}
             </h2>
             <p className="text-[11px] truncate text-muted-foreground">
@@ -571,7 +573,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
       ) : (
         <div 
           ref={containerRef}
-          className="flex-1 min-h-0 overflow-y-auto px-4 py-4"
+          className="flex-1 min-h-0 overflow-y-auto px-4 py-4 bg-[#F8FAFC]"
           onScroll={handleScroll}
         >
           {/* Load more button */}
