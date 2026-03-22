@@ -35,7 +35,7 @@ export function WizardNavigation({
         <Button
           onClick={onNext}
           disabled={(isFinalStep && (!isValid || !isDirty)) || isSaving}
-          className="flex-1 min-h-[50px] rounded-xl text-[15px] font-semibold bg-foreground hover:bg-foreground/90 text-background border-0"
+          className="flex-1 min-h-[52px] rounded-[14px] text-[15px] font-semibold bg-foreground hover:bg-foreground/90 text-background border-0"
         >
           {isSaving ? (
             <><Loader2 size={18} className="animate-spin mr-2" /> Saving…</>

@@ -42,12 +42,15 @@ export function PhotosIdentityStep({
         />
       </div>
 
-      <SectionCard>
-        <div className="space-y-3">
-          <div>
-            <div className="flex justify-between items-baseline mb-1.5">
-              <label className="text-[13px] font-medium text-muted-foreground">Display Name</label>
-              <span className="text-[11px] text-muted-foreground">
+      <SectionCard noPadding>
+        <div>
+          {/* Display Name field */}
+          <div className="px-4 pt-4 pb-3 border-b border-border/50">
+            <div className="flex justify-between items-baseline mb-2">
+              <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                Display Name
+              </label>
+              <span className="text-[11px] text-muted-foreground/60">
                 {form.displayName.length}/{DISPLAY_NAME_MAX}
               </span>
             </div>
@@ -57,22 +60,25 @@ export function PhotosIdentityStep({
               maxLength={DISPLAY_NAME_MAX}
               onChange={(e) => onFieldChange('displayName', e.target.value)}
               placeholder="Your full name"
-              className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
+              className="w-full bg-[#F8FAFC] border border-border/60 rounded-[10px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
             />
             {displayNameError && (
               <p className="text-[12px] text-destructive mt-1">{displayNameError}</p>
             )}
           </div>
 
-          <div>
-            <div className="flex justify-between items-baseline mb-1.5">
-              <label className="text-[13px] font-medium text-muted-foreground">Username</label>
+          {/* Username field */}
+          <div className="px-4 pt-3 pb-4">
+            <div className="flex justify-between items-baseline mb-2">
+              <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                Username
+              </label>
               {usernameIsLocked && (
-                <span className="text-[11px] text-muted-foreground">
+                <span className="text-[11px] text-muted-foreground/60">
                   Contact{' '}
                   <a
                     href="mailto:support@clbhouz.co.uk"
-                    className="underline text-muted-foreground"
+                    className="underline text-muted-foreground/60"
                   >
                     support@clbhouz.co.uk
                   </a>
@@ -81,7 +87,7 @@ export function PhotosIdentityStep({
               )}
             </div>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[15px] text-muted-foreground">@</span>
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[15px] text-muted-foreground">@</span>
               <input
                 type="text"
                 value={form.username}
@@ -89,7 +95,7 @@ export function PhotosIdentityStep({
                 readOnly={usernameIsLocked}
                 onChange={(e) => !usernameIsLocked && onFieldChange('username', e.target.value)}
                 placeholder="username"
-                className={`w-full bg-muted border-0 rounded-xl pl-8 pr-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors ${usernameIsLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`w-full bg-[#F8FAFC] border border-border/60 rounded-[10px] pl-8 pr-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors ${usernameIsLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
               />
             </div>
           </div>

@@ -32,7 +32,6 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Create a preview URL for the cropper
       const reader = new FileReader();
       reader.onload = () => {
         setCropperImage(reader.result as string);
@@ -40,12 +39,10 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
       };
       reader.readAsDataURL(file);
     }
-    // Reset input so same file can be selected again
     e.target.value = '';
   };
 
   const handleCropComplete = useCallback((croppedBlob: Blob) => {
-    // Convert blob to File for upload
     const file = new File([croppedBlob], 'profile-photo.jpg', { type: 'image/jpeg' });
     onFileChange(file);
     setCropperImage(null);
@@ -61,14 +58,14 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
   return (
     <div>
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-foreground">Profile Photo</h3>
+        <h3 className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">Profile Photo</h3>
         <p className="text-xs text-muted-foreground">
-          Your photo appears as a squircle across Clbhouz
+          Your photo appears as a squircle across clbhouz
         </p>
       </div>
 
       <div className="flex items-center gap-4">
-        {/* Large profile photo preview - matches ProfileAvatarRing lg size (144px) */}
+        {/* Profile photo preview — 100px squircle */}
         <div className="relative">
           <button
             type="button"
@@ -81,7 +78,7 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
                 "border-4 border-background shadow-xl"
               )}
               style={{
-                width: '144px',
+                width: '100px',
                 aspectRatio: '1 / 1.05',
                 borderRadius: '34%',
               }}
@@ -98,23 +95,23 @@ export const ProfilePhotoCard: React.FC<ProfilePhotoCardProps> = ({
                     className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
                     style={{ borderRadius: '34%' }}
                   >
-                    <Camera className="w-8 h-8 text-white" />
+                    <Camera className="w-6 h-6 text-white" />
                   </div>
                 </>
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-                  <User className="w-14 h-14 text-muted-foreground/50" />
+                  <User className="w-10 h-10 text-muted-foreground/50" />
                 </div>
               )}
             </div>
             
-            {/* Upload button badge */}
+            {/* Upload button badge — 28px */}
             <div className={cn(
-              "absolute -bottom-1 -right-1 w-10 h-10 rounded-full shadow-lg flex items-center justify-center",
+              "absolute -bottom-1 -right-1 w-7 h-7 rounded-full shadow-lg flex items-center justify-center",
               "bg-[hsl(38,92%,50%)] text-white",
               "group-hover:scale-110 transition-transform"
             )}>
-              <Plus className="w-5 h-5" />
+              <Plus className="w-3.5 h-3.5" />
             </div>
           </button>
         </div>

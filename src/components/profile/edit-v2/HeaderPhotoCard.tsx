@@ -32,7 +32,6 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Create a preview URL for the cropper
       const reader = new FileReader();
       reader.onload = () => {
         setCropperImage(reader.result as string);
@@ -40,12 +39,10 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
       };
       reader.readAsDataURL(file);
     }
-    // Reset input so same file can be selected again
     e.target.value = '';
   };
 
   const handleCropComplete = useCallback((croppedBlob: Blob) => {
-    // Convert blob to File for upload
     const file = new File([croppedBlob], 'header-photo.jpg', { type: 'image/jpeg' });
     onFileChange(file);
     setCropperImage(null);
@@ -62,7 +59,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
     <div>
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-foreground">Header Photo</h3>
+          <h3 className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">Header Photo</h3>
           <p className="text-xs text-muted-foreground">
             Appears at the top of your profile
           </p>
@@ -94,7 +91,7 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
         onClick={handleClick}
         className={cn(
           "relative w-full overflow-hidden rounded-2xl border-2 border-dashed transition-all",
-          "h-[200px] flex flex-col items-center justify-center",
+          "h-[180px] flex flex-col items-center justify-center",
           "group",
           displayUrl 
             ? "border-transparent" 
@@ -108,10 +105,11 @@ export const HeaderPhotoCard: React.FC<HeaderPhotoCardProps> = ({
               alt="Header preview"
               className="h-full w-full object-cover object-center rounded-xl"
             />
-            {/* Hover overlay */}
-            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center rounded-xl">
-              <Camera className="w-8 h-8 text-white mb-2" />
-              <span className="text-white text-sm font-medium">Change photo</span>
+            {/* Always-visible frosted camera overlay */}
+            <div className="absolute inset-0 bg-black/30 flex items-center justify-center rounded-xl">
+              <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/20">
+                <Camera className="w-5 h-5 text-white" />
+              </div>
             </div>
           </>
         ) : (

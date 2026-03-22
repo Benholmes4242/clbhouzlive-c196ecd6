@@ -10,7 +10,7 @@ export function WizardProgress({ step }: Props) {
       {([1, 2, 3] as WizardStep[]).map((s) => (
         <div
           key={s}
-          className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+          className={`h-[3px] flex-1 rounded-full transition-all duration-300 ${
             s <= step ? 'bg-[hsl(38,92%,50%)]' : 'bg-muted'
           }`}
         />

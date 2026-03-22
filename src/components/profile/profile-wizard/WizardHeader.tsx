@@ -13,19 +13,24 @@ export function WizardHeader({ step, isFirstStep, onBack, onClose, onSkip }: Pro
   return (
     <div
       className="flex items-center justify-between px-4 bg-background border-b border-border"
-      style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)', height: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)' }}
+      style={{
+        paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
+        height: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
+      }}
     >
+      {/* Left — circular close/back button */}
       <button
         onClick={isFirstStep ? onClose : onBack}
-        className="flex items-center justify-center min-h-[44px] min-w-[44px] -ml-2 text-foreground"
+        className="w-9 h-9 rounded-full bg-black/[0.06] flex items-center justify-center text-foreground flex-shrink-0"
         aria-label={isFirstStep ? 'Close' : 'Back'}
       >
         {isFirstStep
-          ? <X size={20} strokeWidth={2} />
-          : <ChevronLeft size={22} strokeWidth={2.5} />
+          ? <X size={16} strokeWidth={2.5} />
+          : <ChevronLeft size={18} strokeWidth={2.5} />
         }
       </button>
 
+      {/* Centre — step eyebrow + title */}
       <div className="text-center">
         <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground">
           Step {step} of 3
@@ -35,20 +40,21 @@ export function WizardHeader({ step, isFirstStep, onBack, onClose, onSkip }: Pro
         </p>
       </div>
 
+      {/* Right — Skip or Close */}
       {onSkip ? (
         <button
           onClick={onSkip}
           className="flex items-center justify-center min-h-[44px] -mr-2 text-muted-foreground text-[13px] font-medium"
         >
-          Skip for now
+          Skip
         </button>
       ) : (
         <button
           onClick={onClose}
-          className="flex items-center justify-center min-h-[44px] min-w-[44px] -mr-2 text-muted-foreground"
+          className="w-9 h-9 rounded-full bg-black/[0.06] flex items-center justify-center text-muted-foreground flex-shrink-0"
           aria-label="Close"
         >
-          <X size={20} strokeWidth={2} />
+          <X size={16} strokeWidth={2.5} />
         </button>
       )}
     </div>
