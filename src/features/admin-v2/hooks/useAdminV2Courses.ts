@@ -2,6 +2,8 @@ import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useDebounce } from '@/hooks/useDebounce';
+import { useGolfCoursesStats } from '@/hooks/admin/useGolfCoursesStats';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -33,34 +35,50 @@ interface CourseRatingAggregateRow {
   review_count:      number | null;
 }
 
-// ─── Fetchers ─────────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-async function fetchCourses(): Promise<AdminCourseRow[]> {
-  const { data, error } = await supabase
-    .from('golf_courses')
-    .select(`
-      id, name, country, sub_country, region, continent,
-      global_rank, regional_rank, usa_rank,
-      thumbnail_image, latitude, longitude,
-      website_url, description, created_at
-    `)
-    .order('name', { ascending: true })
-    .limit(5000);
+const COURSE_COLUMNS = `
+  id, name, country, sub_country, region, continent,
+  global_rank, regional_rank, usa_rank,
+  thumbnail_image, latitude, longitude,
+  website_url, description, created_at
+`;
 
-  if (error) throw error;
+function applySearch(query: any, search: string) {
+  if (search.trim()) {
+    const q = search.trim();
+    query = query.or(`name.ilike.%${q}%,country.ilike.%${q}%,sub_country.ilike.%${q}%`);
+  }
+  return query;
+}
 
-  // Separate query for ratings (view — no FK for PostgREST nested select)
-  const courseIds = (data ?? []).map(c => c.id);
-  const { data: ratingsData } = await (supabase
-    .from('course_rating_aggregates' as any)
-    .select('course_id, avg_overall_score, review_count')
-    .in('course_id', courseIds) as any as Promise<{ data: CourseRatingAggregateRow[] | null; error: any }>);
+function applyFilter(query: any, listFilter: CourseFilterList) {
+  switch (listFilter) {
+    case 'global':
+      return query.not('global_rank', 'is', null);
+    case 'usa':
+      return query.not('usa_rank', 'is', null);
+    case 'europe':
+      return query.not('regional_rank', 'is', null);
+    case 'gbi':
+      return query
+        .not('regional_rank', 'is', null)
+        .in('country', ['England', 'Scotland', 'Wales', 'Ireland', 'Northern Ireland']);
+    case 'unranked':
+      return query
+        .is('global_rank', null)
+        .is('regional_rank', null)
+        .is('usa_rank', null);
+    default:
+      return query;
+  }
+}
 
-  const ratingsMap = new Map(
-    (ratingsData ?? []).map(r => [r.course_id, r])
-  );
-
-  return (data ?? []).map((c: any) => ({
+function mapCourseRow(
+  c: any,
+  ratingsMap: Map<string, CourseRatingAggregateRow>,
+): AdminCourseRow {
+  return {
     id:             c.id,
     name:           c.name,
     country:        c.country,
@@ -78,7 +96,113 @@ async function fetchCourses(): Promise<AdminCourseRow[]> {
     created_at:     c.created_at,
     avg_rating:     ratingsMap.get(c.id)?.avg_overall_score ?? null,
     review_count:   ratingsMap.get(c.id)?.review_count ?? null,
-  }));
+  };
+}
+
+// ─── Server-side fetchers ─────────────────────────────────────────────────────
+
+interface FetchParams {
+  search: string;
+  listFilter: CourseFilterList;
+  page: number;
+  pageSize: number;
+}
+
+async function fetchCourses({ search, listFilter, page, pageSize }: FetchParams) {
+  let query = supabase
+    .from('golf_courses')
+    .select(COURSE_COLUMNS, { count: 'exact' })
+    .order('name', { ascending: true });
+
+  query = applySearch(query, search);
+  query = applyFilter(query, listFilter);
+
+  const from = (page - 1) * pageSize;
+  query = query.range(from, from + pageSize - 1);
+
+  const { data, error, count } = await query;
+  if (error) throw error;
+
+  // Ratings scoped to this page only
+  const courseIds = (data ?? []).map((c: any) => c.id);
+  const ratingsMap = new Map<string, CourseRatingAggregateRow>();
+
+  if (courseIds.length > 0) {
+    const { data: ratingsData } = await (supabase
+      .from('course_rating_aggregates' as any)
+      .select('course_id, avg_overall_score, review_count')
+      .in('course_id', courseIds) as any as Promise<{ data: CourseRatingAggregateRow[] | null; error: any }>);
+
+    (ratingsData ?? []).forEach(r => ratingsMap.set(r.course_id, r));
+  }
+
+  return {
+    courses: (data ?? []).map((c: any) => mapCourseRow(c, ratingsMap)),
+    totalCount: count ?? 0,
+  };
+}
+
+/** Parallel count queries for each filter tab */
+async function fetchFilterCounts(search: string) {
+  const buildQuery = () => {
+    let q = supabase.from('golf_courses').select('*', { count: 'exact', head: true });
+    return applySearch(q, search);
+  };
+
+  const [all, global, usa, europe, unranked] = await Promise.all([
+    buildQuery(),
+    buildQuery().then(async _ => {
+      // Promise.all doesn't chain .not() on a promise — build inline
+      let q = supabase.from('golf_courses').select('*', { count: 'exact', head: true });
+      q = applySearch(q, search);
+      return q.not('global_rank', 'is', null);
+    }),
+    (() => {
+      let q = supabase.from('golf_courses').select('*', { count: 'exact', head: true });
+      q = applySearch(q, search);
+      return q.not('usa_rank', 'is', null);
+    })(),
+    (() => {
+      let q = supabase.from('golf_courses').select('*', { count: 'exact', head: true });
+      q = applySearch(q, search);
+      return q.not('regional_rank', 'is', null);
+    })(),
+    (() => {
+      let q = supabase.from('golf_courses').select('*', { count: 'exact', head: true });
+      q = applySearch(q, search);
+      return q.is('global_rank', null).is('regional_rank', null).is('usa_rank', null);
+    })(),
+  ]);
+
+  return {
+    all:      all.count ?? 0,
+    global:   global.count ?? 0,
+    gbi:      0, // not shown in filter bar
+    usa:      usa.count ?? 0,
+    europe:   europe.count ?? 0,
+    unranked: unranked.count ?? 0,
+  };
+}
+
+/** Fetch a single course for the drawer */
+async function fetchSingleCourse(id: string): Promise<AdminCourseRow | null> {
+  const { data, error } = await supabase
+    .from('golf_courses')
+    .select(COURSE_COLUMNS)
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error || !data) return null;
+
+  const ratingsMap = new Map<string, CourseRatingAggregateRow>();
+  const { data: ratingData } = await (supabase
+    .from('course_rating_aggregates' as any)
+    .select('course_id, avg_overall_score, review_count')
+    .eq('course_id', id)
+    .maybeSingle() as any as Promise<{ data: CourseRatingAggregateRow | null; error: any }>);
+
+  if (ratingData) ratingsMap.set(ratingData.course_id, ratingData);
+  return mapCourseRow(data, ratingsMap);
 }
 
 async function updateCourse(
@@ -99,87 +223,70 @@ export function useAdminV2Courses() {
   const [search, setSearch]           = useState('');
   const [listFilter, setListFilter]   = useState<CourseFilterList>('all');
   const [page, setPage]               = useState(1);
-  const [pageSize, setPageSize]       = useState(25);
+  const [pageSize, setPageSize]       = useState(100);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [drawerCourseId, setDrawerCourseId] = useState<string | null>(null);
 
-  const { data: allCourses = [], isLoading, refetch } = useQuery({
-    queryKey:  ['admin-v2', 'courses', 'all'],
-    queryFn:   fetchCourses,
-    staleTime: 5 * 60_000,
+  const debouncedSearch = useDebounce(search, 300);
+
+  // ── Server-side paginated course list ──
+  const { data: courseData, isLoading, refetch } = useQuery({
+    queryKey:  ['admin-v2', 'courses', 'list', debouncedSearch, listFilter, page, pageSize],
+    queryFn:   () => fetchCourses({ search: debouncedSearch, listFilter, page, pageSize }),
+    staleTime: 60_000,
     refetchOnWindowFocus: false,
   });
 
-  // Client-side filter + search
-  const filtered = useMemo(() => {
-    let rows = allCourses;
+  const courses      = courseData?.courses ?? [];
+  const filteredCount = courseData?.totalCount ?? 0;
 
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      rows = rows.filter(c =>
-        c.name.toLowerCase().includes(q) ||
-        c.country.toLowerCase().includes(q) ||
-        (c.sub_country ?? '').toLowerCase().includes(q)
-      );
-    }
+  // ── Filter tab counts ──
+  const { data: countsData } = useQuery({
+    queryKey:  ['admin-v2', 'courses', 'counts', debouncedSearch],
+    queryFn:   () => fetchFilterCounts(debouncedSearch),
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  });
 
-    switch (listFilter) {
-      case 'global':   rows = rows.filter(c => c.global_rank != null);   break;
-      case 'gbi':      rows = rows.filter(c => c.regional_rank != null && ['England','Scotland','Wales','Ireland','Northern Ireland'].includes(c.country)); break;
-      case 'usa':      rows = rows.filter(c => c.usa_rank != null);       break;
-      case 'europe':   rows = rows.filter(c => c.regional_rank != null);  break;
-      case 'unranked': rows = rows.filter(c => c.global_rank == null && c.regional_rank == null && c.usa_rank == null); break;
-    }
+  const counts = countsData ?? { all: 0, global: 0, gbi: 0, usa: 0, europe: 0, unranked: 0 };
 
-    return rows;
-  }, [allCourses, search, listFilter]);
+  // ── KPI stats from the dedicated stats hook (server-side counts) ──
+  const { data: kpiStats } = useGolfCoursesStats();
 
-  const paginated = useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return filtered.slice(start, start + pageSize);
-  }, [filtered, page, pageSize]);
+  const stats = useMemo(() => ({
+    total:      kpiStats?.totalCourses ?? 0,
+    geocoded:   (kpiStats?.totalCourses ?? 0) - (kpiStats?.missingCoordinates ?? 0),
+    withImages: (kpiStats?.totalCourses ?? 0) - (kpiStats?.missingImages ?? 0),
+    inTop100:   kpiStats?.verifiedCourses ?? 0,
+  }), [kpiStats]);
 
-  const handleSearch = (v: string) => { setSearch(v); setPage(1); };
-  const handleFilter = (v: string) => { setListFilter(v as CourseFilterList); setPage(1); };
+  // ── Drawer course (fetched individually) ──
+  const { data: drawerCourse = null } = useQuery({
+    queryKey:  ['admin-v2', 'courses', 'detail', drawerCourseId],
+    queryFn:   () => fetchSingleCourse(drawerCourseId!),
+    enabled:   !!drawerCourseId,
+    staleTime: 30_000,
+  });
 
-  // Detail — find from cache
-  const drawerCourse = useMemo(
-    () => allCourses.find(c => c.id === drawerCourseId) ?? null,
-    [allCourses, drawerCourseId]
-  );
-
-  // Update mutation
+  // ── Update mutation ──
   const updateMutation = useMutation({
     mutationFn: ({ id, updates }: { id: string; updates: Parameters<typeof updateCourse>[1] }) =>
       updateCourse(id, updates),
     onSuccess: () => {
       toast.success('Course updated');
-      qc.invalidateQueries({ queryKey: ['admin-v2', 'courses', 'all'] });
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'courses'] });
     },
     onError: () => toast.error('Failed to update course'),
   });
 
-  // Stats
-  const stats = useMemo(() => ({
-    total:     allCourses.length,
-    geocoded:  allCourses.filter(c => c.latitude != null && c.longitude != null).length,
-    withImages:allCourses.filter(c => c.thumbnail_image != null).length,
-    inTop100:  allCourses.filter(c => c.global_rank != null).length,
-  }), [allCourses]);
-
-  const counts = useMemo(() => ({
-    all:      allCourses.length,
-    global:   allCourses.filter(c => c.global_rank != null).length,
-    gbi:      allCourses.filter(c => c.usa_rank == null && c.regional_rank != null).length,
-    usa:      allCourses.filter(c => c.usa_rank != null).length,
-    europe:   allCourses.filter(c => c.regional_rank != null).length,
-    unranked: allCourses.filter(c => c.global_rank == null && c.regional_rank == null && c.usa_rank == null).length,
-  }), [allCourses]);
+  // ── Handlers ──
+  const handleSearch = (v: string) => { setSearch(v); setPage(1); };
+  const handleFilter = (v: string) => { setListFilter(v as CourseFilterList); setPage(1); };
 
   return {
-    courses:       paginated,
-    allCount:      allCourses.length,
-    filteredCount: filtered.length,
+    courses,
+    allCount:      counts.all,
+    filteredCount,
     isLoading,
     refetch,
     stats,
