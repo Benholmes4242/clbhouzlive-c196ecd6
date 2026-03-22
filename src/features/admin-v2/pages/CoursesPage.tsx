@@ -437,6 +437,8 @@ export default function CoursesPage() {
     selectedIds, setSelectedIds,
     drawerCourseId, setDrawerCourseId, drawerCourse,
     updateCourse,
+    uploadPhoto,
+    isUploadingPhoto,
   } = useAdminV2Courses();
 
   const columns = React.useMemo(() => [
