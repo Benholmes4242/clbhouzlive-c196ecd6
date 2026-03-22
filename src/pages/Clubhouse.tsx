@@ -20,7 +20,7 @@ import { useClubhouseSkeletonTiming } from '@/hooks/useClubhouseSkeletonTiming';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import { ClubhouseTabProvider, useClubhouseTab } from '@/contexts/ClubhouseTabContext';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
-import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
+
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 // ── New feed components ──
