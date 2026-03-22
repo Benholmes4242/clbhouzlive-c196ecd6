@@ -67,6 +67,15 @@ function ProfileHubSheet({
     (sum, conv) => sum + (conv.unread_count || 0), 0
   ) || 0;
 
+  const sheetY = useMotionValue(0);
+  const handleSheetDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    if (info.offset.y > 100 || info.velocity.y > 500) {
+      onClose();
+    } else {
+      animate(sheetY, 0, { type: 'spring', damping: 25, stiffness: 300 });
+    }
+  };
+
   const [localActiveId, setLocalActiveId] = useState(currentActor.id);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
