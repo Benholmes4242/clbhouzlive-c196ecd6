@@ -13,6 +13,37 @@ import { useInAppNotifications } from '@/hooks/useInAppNotifications';
 import { useDebouncedCallback } from '@/hooks/useDebouncedCallback';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 
+type ConversationFilterType = 'all' | 'unread' | 'groups';
+
+function FilterChips({ totalUnread, conversationFilter, onFilterChange }: {
+  totalUnread: number;
+  conversationFilter: ConversationFilterType;
+  onFilterChange: (f: ConversationFilterType) => void;
+}) {
+  const chips = [
+    { key: 'all' as const, label: 'All' },
+    { key: 'unread' as const, label: totalUnread > 0 ? `Unread (${totalUnread})` : 'Unread' },
+    { key: 'groups' as const, label: 'Groups' },
+  ];
+  return (
+    <div className="flex items-center gap-2 px-4 pt-1.5 pb-1">
+      {chips.map(chip => (
+        <button
+          key={chip.key}
+          onClick={() => onFilterChange(chip.key)}
+          className="px-3.5 py-1 rounded-full text-[12.5px] font-semibold transition-colors duration-150 active:scale-[0.97]"
+          style={{
+            background: conversationFilter === chip.key ? '#0f172a' : 'rgba(0,0,0,0.05)',
+            color: conversationFilter === chip.key ? '#fff' : '#64748b',
+          }}
+        >
+          {chip.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function MessagesPageInner() {
   const navigate = useNavigate();
   const { conversationId: urlConversationId } = useParams<{ conversationId?: string }>();
