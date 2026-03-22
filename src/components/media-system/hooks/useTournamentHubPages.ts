@@ -72,7 +72,7 @@ export function useTournamentHubPages(userId?: string): {
     queryFn: async () => {
       const now = new Date().toISOString();
       const twentyOneDays = new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toISOString();
-      const { data } = await supabase
+      const { data } = await (supabase
         .from('sr_tournaments')
         .select('id, name, tour_slug, purse, start_date, end_date, venue_name, venue_city, venue_par, venue_yardage')
         .eq('status', 'scheduled')
@@ -80,8 +80,8 @@ export function useTournamentHubPages(userId?: string): {
         .gte('start_date', now)
         .lte('start_date', twentyOneDays)
         .order('start_date', { ascending: true })
-        .limit(2);
-      return data ?? [];
+        .limit(2) as any);
+      return (data ?? []) as any[];
     },
     staleTime: 30 * 60_000,
   });
