@@ -721,6 +721,17 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           </div>
         )}
 
+        {/* ── Centering wrapper — centres content when empty, anchors top when active ── */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: '100%',
+            justifyContent: hasMedia || state.caption.length > 0 ? 'flex-start' : 'center',
+            paddingBottom: 16,
+          }}
+        >
+
         {/* ── Today's Prompt — visible when canvas is blank ── */}
         {state.caption.length === 0 && !hasMedia && (
            <div
