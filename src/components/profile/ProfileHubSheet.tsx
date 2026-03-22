@@ -6,7 +6,8 @@
 import { memo, useState, useEffect, useCallback } from 'react';
 import { AnimatedEchoWave } from '@/features/echo/components/ui/AnimatedEchoWave';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
+import type { PanInfo } from 'framer-motion';
 import {
   User, MessageCircle, Bell, Pencil,
   Building2, Settings, ChevronRight, LogOut,
@@ -65,6 +66,15 @@ function ProfileHubSheet({
   const unreadMessageCount = conversations?.reduce(
     (sum, conv) => sum + (conv.unread_count || 0), 0
   ) || 0;
+
+  const sheetY = useMotionValue(0);
+  const handleSheetDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    if (info.offset.y > 100 || info.velocity.y > 500) {
+      onClose();
+    } else {
+      animate(sheetY, 0, { type: 'spring', damping: 25, stiffness: 300 });
+    }
+  };
 
   const [localActiveId, setLocalActiveId] = useState(currentActor.id);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -177,18 +187,23 @@ function ProfileHubSheet({
 
           {/* Panel — #1 bg-[#F8FAFC] */}
           <motion.div
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.4 }}
+            onDragEnd={handleSheetDragEnd}
+            style={{
+              y: sheetY,
+              maxHeight: '92dvh',
+              paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+            }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 32, stiffness: 320 }}
             className="fixed inset-x-0 bottom-0 z-[9999] w-full rounded-t-[24px] bg-[#F8FAFC] flex flex-col md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[560px]"
-            style={{
-              maxHeight: '92dvh',
-              paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-            }}
           >
             {/* Drag handle */}
-            <div className="flex justify-center pt-2.5 pb-1 shrink-0">
+            <div className="flex justify-center pt-2.5 pb-1 shrink-0 touch-none cursor-grab active:cursor-grabbing">
               <div className="w-9 h-1 rounded-full bg-muted-foreground/25" />
             </div>
 
