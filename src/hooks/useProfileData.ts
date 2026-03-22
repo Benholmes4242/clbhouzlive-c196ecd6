@@ -116,7 +116,7 @@ export const useProfileData = () => {
   return {
     user,
     profile,
-    loading: loading || profileLoading,
+    loading: loading || (!!user?.id && profileLoading),
     error: profileError,
     setProfile,
     fetchProfile: fetchProfileById, // Support calling with optional userId

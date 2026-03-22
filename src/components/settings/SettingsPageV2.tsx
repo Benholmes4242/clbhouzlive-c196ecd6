@@ -90,10 +90,7 @@ export function SettingsPageV2() {
     : '';
 
   return (
-    <div
-      className="min-h-screen bg-[#F8FAFC]"
-      style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 8px)' }}
-    >
+    <div className="min-h-screen bg-[#F8FAFC]">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 pt-1 pb-4">
         <button
