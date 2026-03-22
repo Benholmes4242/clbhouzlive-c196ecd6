@@ -261,13 +261,7 @@ const ClubhouseContent = () => {
       />
 
       {/* Floating top bar */}
-      <div style={{
-        opacity: isTournamentCardActive ? 0 : 1,
-        pointerEvents: isTournamentCardActive ? 'none' : 'auto',
-        transition: 'opacity 0.18s ease',
-        position: 'relative',
-        zIndex: 50,
-      }}>
+      <div style={{ position: 'relative', zIndex: 50 }}>
         <ClubhouseTopBar
           activeTab={activeTab}
           onTabChange={(tab) => {
