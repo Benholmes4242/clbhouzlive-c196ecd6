@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { MessageCircle, Plus, ChevronLeft } from 'lucide-react';
+import { MessageCircle, Plus, ChevronLeft, PenSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useMessagingContext } from '@/contexts/MessagingContext';
