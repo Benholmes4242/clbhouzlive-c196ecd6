@@ -524,7 +524,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
             />
             {/* Online indicator for DMs */}
             {!isGroupChat && otherUserPresence?.status === 'online' && (
-              <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background" />
+              <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#F8FAFC]" />
             )}
           </div>
           
