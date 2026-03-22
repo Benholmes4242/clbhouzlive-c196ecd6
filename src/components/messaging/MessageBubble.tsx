@@ -49,7 +49,7 @@ function formatMessageTime(dateString: string): string {
 
 function ReadReceipt({ status }: { status: 'sent' | 'delivered' | 'read' }) {
   if (status === 'read') {
-    return <CheckCheck className="w-3.5 h-3.5 text-[hsl(38,92%,50%)]/60" />;
+    return <CheckCheck className="w-3.5 h-3.5" style={{ color: 'rgba(245,166,35,0.85)' }} />;
   }
   if (status === 'delivered') {
     return <CheckCheck className="w-3.5 h-3.5 text-muted-foreground" />;
