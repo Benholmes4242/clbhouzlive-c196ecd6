@@ -341,6 +341,7 @@ const ClubhouseContent = () => {
             onShare={(post) => handleShare(post)}
             getLikeState={(post) => getActiveLikeState(post)}
             getCommentCount={(post) => getCommentCount(post)}
+            onHubPageChange={setHubCardPageIndex}
           />
 
           {/* Overlay layer — action rail, creator capsule, scrubber, dots */}
