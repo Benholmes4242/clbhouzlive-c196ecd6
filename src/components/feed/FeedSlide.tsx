@@ -18,6 +18,7 @@ interface FeedSlideProps {
   onShare?: (post: FeedPost) => void;
   getLikeState?: (post: FeedPost) => { isLiked: boolean; count: number };
   getCommentCount?: (post: FeedPost) => number;
+  onHubPageChange?: (index: number) => void;
 }
 
 export const FeedSlide = memo(function FeedSlide({
