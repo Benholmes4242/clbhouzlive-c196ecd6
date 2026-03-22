@@ -169,9 +169,8 @@ export const FeedSlide = memo(function FeedSlide({
             position: 'absolute',
             top: 0,
             left: 0,
-            width: 0,
-            height: 0,
-            overflow: 'hidden',
+            right: 0,
+            height: 1,
             pointerEvents: 'none',
             opacity: 0,
           }}
