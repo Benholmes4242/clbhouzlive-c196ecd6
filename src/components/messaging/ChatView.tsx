@@ -497,7 +497,7 @@ export function ChatView({ conversationId, onBack }: ChatViewProps) {
       <header 
         className="flex-shrink-0 px-[18px] flex items-center gap-3"
         style={{
-          paddingTop: '6px',
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
           paddingBottom: '10px',
           background: '#F8FAFC',
           borderBottom: '1px solid rgba(0,0,0,0.06)',
