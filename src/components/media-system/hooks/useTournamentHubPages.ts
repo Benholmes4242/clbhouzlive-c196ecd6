@@ -53,14 +53,14 @@ export function useTournamentHubPages(userId?: string): {
     queryKey: ['tournament-hub-results-pga'],
     queryFn: async () => {
       const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-      const { data } = await supabase
+      const { data } = await (supabase
         .from('sr_tournaments')
         .select('id, name, tour_slug, purse, start_date, end_date, venue_name, venue_city, venue_par, venue_yardage')
         .eq('status', 'closed')
         .eq('tour_slug', PGA_SLUG)
         .gte('end_date', sevenDaysAgo)
         .order('end_date', { ascending: false })
-        .limit(3);
+        .limit(3) as any);
       return (data ?? []) as any[];
     },
     staleTime: 5 * 60_000,
