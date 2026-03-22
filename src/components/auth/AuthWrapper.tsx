@@ -4,6 +4,10 @@ import { useLocation, Navigate } from 'react-router-dom';
 import { logOrangeLoaderShow, logOrangeLoaderHide } from '@/utils/bootTimeline';
 import { useSessionTimeout } from '@/hooks/useSessionTimeout';
 import { useOnboardingStatus } from '@/hooks/useOnboardingStatus';
+import { isMedianApp } from '@/utils/median/isMedianApp';
+import BetaGatePage from '@/pages/BetaGatePage';
+
+const PUBLIC_PATHS = ['/auth', '/auth/verified', '/verified', '/auth/callback', '/auth/check-email', '/auth/reset-password'];
 
 interface AuthWrapperProps {
   children: React.ReactNode;
@@ -16,12 +20,20 @@ interface AuthWrapperProps {
  * Session resolves in the background while the app renders immediately.
  * 
  * Enforces:
+ * 0. Beta gate — web visitors see holding page (Median app bypasses)
  * 1. Authentication — unauthenticated users redirected to /auth
  * 2. Onboarding — users who haven't completed profile setup redirected to /edit-profile
  */
 const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   const { user, loading } = useSupabaseSession();
   const location = useLocation();
+
+  // Web-only beta gate: if not in Median app and not on a public path, show gate
+  const inApp = isMedianApp();
+  const isPublicPath = PUBLIC_PATHS.some(p => location.pathname.startsWith(p));
+  if (!inApp && !isPublicPath) {
+    return <BetaGatePage />;
+  }
   const wasLoadingRef = useRef(false);
 
   // FIX 6: Enforce 30-day session timeout
