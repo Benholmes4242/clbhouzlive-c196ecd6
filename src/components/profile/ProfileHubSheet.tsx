@@ -237,22 +237,15 @@ function ProfileHubSheet({
                         style={{ scrollSnapAlign: 'start' }}
                       >
                         <div className="relative">
-                          {/* Amber border flush on active profile */}
-                          <div
-                            className={cn("rounded-[34%]", isActive && "ring-0")}
-                            style={{
-                              border: isActive ? '2.5px solid hsl(38,92%,50%)' : '2.5px solid transparent',
-                              boxShadow: isActive ? '0 2px 10px rgba(245,166,35,0.25)' : undefined,
-                            }}
-                          >
-                            <SquircleAvatar
-                              size={48}
-                              src={profile.avatarUrl}
-                              alt={profile.name}
-                              fallback={profile.name?.charAt(0)?.toUpperCase()}
-                              hideRing
-                            />
-                          </div>
+                          <SquircleAvatar
+                            size={48}
+                            src={profile.avatarUrl}
+                            alt={profile.name}
+                            fallback={profile.name?.charAt(0)?.toUpperCase()}
+                            ringColor={isActive ? 'hsl(38,92%,50%)' : undefined}
+                            hideRing={!isActive}
+                            enableGlow={isActive}
+                          />
                           {/* #7 — amber check badge */}
                           {isActive && (
                             <div
