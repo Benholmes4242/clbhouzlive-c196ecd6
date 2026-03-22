@@ -17,7 +17,7 @@ function MessagesPageInner() {
   const navigate = useNavigate();
   const { conversationId: urlConversationId } = useParams<{ conversationId?: string }>();
   const { user } = useSupabaseSession();
-  const { loading } = useMessagingContext();
+  const { loading, conversations } = useMessagingContext();
   const isMobile = useIsMobile();
   
   useHideBottomNav();
