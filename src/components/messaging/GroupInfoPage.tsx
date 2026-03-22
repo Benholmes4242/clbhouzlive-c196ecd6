@@ -542,8 +542,10 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
             onClick={handleArchive}
             className="w-full flex items-center gap-3 px-4 py-[14px] active:opacity-70 transition-opacity"
           >
-            <Archive size={20} style={{ color: 'hsl(var(--foreground))' }} />
-            <span className="text-[14px] font-medium" style={{ color: 'hsl(var(--foreground))' }}>Archive Chat</span>
+            <div className="w-[34px] h-[34px] rounded-[10px] flex items-center justify-center shrink-0" style={{ background: 'rgba(0,0,0,0.04)' }}>
+              <Archive size={17} style={{ color: '#64748b' }} />
+            </div>
+            <span className="text-[14px] font-medium" style={{ color: '#0f172a' }}>Archive Chat</span>
           </button>
 
           {!isCreator && (
