@@ -337,7 +337,10 @@ function ProfileHubSheet({
                     </div>
 
                     {/* Label — bottom left */}
-                    <span className={cn("text-[13px] font-medium", isEcho ? "text-[#B45309]" : "text-foreground")}>
+                    <span
+                      className="text-[13px] font-bold leading-none w-full text-left"
+                      style={{ color: isEcho ? '#92400E' : '#0f172a', letterSpacing: '-0.1px' }}
+                    >
                       {label}
                     </span>
                   </button>
