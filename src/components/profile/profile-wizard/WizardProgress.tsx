@@ -6,7 +6,7 @@ interface Props {
 
 export function WizardProgress({ step }: Props) {
   return (
-    <div className="flex gap-1.5 px-4 pt-3 pb-2 bg-background">
+    <div className="flex gap-1.5 px-4 pt-3 pb-0 bg-background">
       {([1, 2, 3] as WizardStep[]).map((s) => (
         <div
           key={s}
