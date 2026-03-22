@@ -15376,6 +15376,7 @@ export type Database = {
           display_order: number
           duration_ms: number
           height: number
+          is_followed_by_me: boolean
           media_id: string
           media_type: string
           media_url: string
