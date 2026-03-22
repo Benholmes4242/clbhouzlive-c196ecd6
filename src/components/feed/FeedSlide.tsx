@@ -2,7 +2,8 @@ import React, { memo } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapVideoPlayer } from './SnapVideoPlayer';
 import { FeedImageCarousel } from './FeedImageCarousel';
-import type { FeedPost } from '@/components/media-system/types/media';
+import { TournamentHubCard } from '@/components/clubhouse/cinematic/TournamentHubCard';
+import type { FeedPost, TournamentHubFeedPost } from '@/components/media-system/types/media';
 
 interface FeedSlideProps {
   post: FeedPost;
