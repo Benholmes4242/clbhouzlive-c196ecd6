@@ -152,7 +152,8 @@ export function ConversationList({
   onSelectConversation, 
   selectedConversationId,
   searchQuery = '',
-  onNewConversation
+  onNewConversation,
+  filterType = 'all'
 }: ConversationListProps) {
   const { conversations, loading, fetchConversations } = useMessagingContext();
   const { user } = useSupabaseSession();
