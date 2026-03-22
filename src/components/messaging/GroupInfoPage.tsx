@@ -338,7 +338,7 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
               </div>
             ) : (
               <>
-                <h2 className="text-xl font-semibold" style={{ color: 'hsl(var(--foreground))' }}>
+                <h2 className="text-[22px] font-extrabold" style={{ color: '#0f172a', letterSpacing: '-0.3px' }}>
                   {conversation.name}
                 </h2>
                 {isAdmin && (
