@@ -25,11 +25,6 @@ export interface AdminCourseRow {
   created_at:     string;
   avg_rating:     number | null;
   review_count:   number | null;
-  city:           string | null;
-  phone:          string | null;
-  holes:          number | null;
-  par:            number | null;
-  yardage:        number | null;
 }
 
 export type CourseFilterList = 'all' | 'global' | 'gbi' | 'usa' | 'europe' | 'unranked';
@@ -46,8 +41,7 @@ const COURSE_COLUMNS = `
   id, name, country, sub_country, region, continent,
   global_rank, regional_rank, usa_rank,
   thumbnail_image, latitude, longitude,
-  website_url, description, created_at,
-  city, phone, holes, par, yardage
+  website_url, description, created_at
 `;
 
 function applySearch(query: any, search: string) {
@@ -102,11 +96,6 @@ function mapCourseRow(
     created_at:     c.created_at,
     avg_rating:     ratingsMap.get(c.id)?.avg_overall_score ?? null,
     review_count:   ratingsMap.get(c.id)?.review_count ?? null,
-    city:           c.city ?? null,
-    phone:          c.phone ?? null,
-    holes:          c.holes ?? null,
-    par:            c.par ?? null,
-    yardage:        c.yardage ?? null,
   };
 }
 
@@ -220,8 +209,7 @@ async function updateCourse(
   id: string,
   updates: Partial<Pick<AdminCourseRow,
     'name' | 'global_rank' | 'regional_rank' | 'usa_rank' |
-    'website_url' | 'description' | 'city' | 'phone' |
-    'holes' | 'par' | 'yardage'
+    'website_url' | 'description'
   >>
 ): Promise<void> {
   const { error } = await supabase
