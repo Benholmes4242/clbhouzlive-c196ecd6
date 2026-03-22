@@ -27,6 +27,13 @@ interface AuthWrapperProps {
 const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   const { user, loading } = useSupabaseSession();
   const location = useLocation();
+  const wasLoadingRef = useRef(false);
+
+  // FIX 6: Enforce 30-day session timeout
+  useSessionTimeout();
+
+  // FIX I2: Check onboarding status for authenticated users
+  const { data: onboardingData } = useOnboardingStatus(user?.id);
 
   // Web-only beta gate: if not in Median app and not on a public path, show gate
   const inApp = isMedianApp();
@@ -34,7 +41,6 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   if (!inApp && !isPublicPath) {
     return <BetaGatePage />;
   }
-  const wasLoadingRef = useRef(false);
 
   // FIX 6: Enforce 30-day session timeout
   useSessionTimeout();
