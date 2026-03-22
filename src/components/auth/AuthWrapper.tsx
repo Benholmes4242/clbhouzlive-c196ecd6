@@ -35,16 +35,22 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   // FIX I2: Check onboarding status for authenticated users
   const { data: onboardingData } = useOnboardingStatus(user?.id);
 
+  // Track orange loader show/hide for boot timeline (audit only, no UI shown)
+  useEffect(() => {
+    if (loading && !wasLoadingRef.current) {
+      wasLoadingRef.current = true;
+      logOrangeLoaderShow();
+    } else if (!loading && wasLoadingRef.current) {
+      logOrangeLoaderHide();
+    }
+  }, [loading]);
+
   // Web-only beta gate: if not in Median app and not on a public path, show gate
   const inApp = isMedianApp();
   const isPublicPath = PUBLIC_PATHS.some(p => location.pathname.startsWith(p));
   if (!inApp && !isPublicPath) {
     return <BetaGatePage />;
   }
-
-
-  // Track orange loader show/hide for boot timeline (audit only, no UI shown)
-  useEffect(() => {
     if (loading && !wasLoadingRef.current) {
       wasLoadingRef.current = true;
       logOrangeLoaderShow(); // Logged for audit, but no UI blocks
