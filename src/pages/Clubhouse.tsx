@@ -33,7 +33,8 @@ import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFe
 import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
 import type { FeedPost, TournamentResultFeedPost } from '@/components/media-system/types/media';
 import { TournamentResultCard } from '@/components/clubhouse/cinematic/TournamentResultCard';
-import { buildSuggestedFeed, buildFriendsFeed } from '@/components/media-system/utils/feedAlgorithm';
+import { buildSuggestedFeed, buildFriendsFeed, injectTournamentHubCard } from '@/components/media-system/utils/feedAlgorithm';
+import { useTournamentHubPages } from '@/components/media-system/hooks/useTournamentHubPages';
 
 // ── Clubhouse UI overlays ──
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
@@ -162,15 +163,17 @@ const ClubhouseContent = () => {
   // ── Feed hooks ──
   const suggestedFeed = useSuggestedFeed(user?.id);
   const friendsFeed = useFriendsFeed(user?.id);
+  const { hubPost } = useTournamentHubPages(user?.id);
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
   
   const posts = useMemo(() => {
     if (activeTab === 'foryou') {
-      return buildSuggestedFeed(activeFeed.posts);
+      const base = buildSuggestedFeed(activeFeed.posts);
+      return injectTournamentHubCard(base, hubPost);
     } else {
       return buildFriendsFeed(activeFeed.posts);
     }
-  }, [activeFeed.posts, activeTab]);
+  }, [activeFeed.posts, activeTab, hubPost]);
 
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? true;

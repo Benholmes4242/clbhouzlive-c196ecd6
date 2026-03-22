@@ -171,6 +171,15 @@ export interface TournamentLiveFeedPost extends Omit<FeedPost, 'mediaItems' | 'r
   isReview:    false;
 }
 
+/** Tournament hub carousel feed post — contains pages for multiple tournaments */
+export interface TournamentHubFeedPost extends Omit<FeedPost, 'mediaItems' | 'review' | 'isReview'> {
+  postType: 'tournament_hub';
+  pages: import('./TournamentHubPage').TournamentHubPage[];
+  mediaItems: MediaItem[];
+  review: null;
+  isReview: false;
+}
+
 export interface VideoSessionState {
   currentTime: number;
   wasMuted: boolean;
