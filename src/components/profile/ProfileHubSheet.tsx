@@ -6,7 +6,8 @@
 import { memo, useState, useEffect, useCallback } from 'react';
 import { AnimatedEchoWave } from '@/features/echo/components/ui/AnimatedEchoWave';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
+import type { PanInfo } from 'framer-motion';
 import {
   User, MessageCircle, Bell, Pencil,
   Building2, Settings, ChevronRight, LogOut,
