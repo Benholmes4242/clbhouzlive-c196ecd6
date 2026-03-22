@@ -16,6 +16,31 @@ function isReviewPost(p: FeedPost): boolean {
   return !!p.isReview;
 }
 
+function createBlankSlotPost(): FeedPost {
+  return {
+    id: 'blank-slot-3',
+    userId: '',
+    actorType: 'system',
+    actorId: '',
+    username: '',
+    displayName: '',
+    avatarUrl: '',
+    isVerified: false,
+    creatorRelation: 'system',
+    caption: '',
+    mediaItems: [],
+    createdAt: new Date().toISOString(),
+    likeCount: 0,
+    commentCount: 0,
+    shareCount: 0,
+    review: null,
+    isReview: false,
+    isLikedByMe: false,
+    isFollowedByMe: false,
+    postType: 'blank',
+  } as unknown as FeedPost;
+}
+
 // ── Suggested Feed Filter ──────────────────────────────────────────────────────
 /**
  * Filter posts for the Suggested (For You) feed.
@@ -139,7 +164,10 @@ export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
   const filtered = filterForSuggested(noHub);
   const capped = capPerCreator(filtered);
   const interleaved = interleaveReviews(capped, 'suggested');
-  return deduplicatePosts(interleaved);
+  const deduped = deduplicatePosts(interleaved);
+  // Inject blank black card at slot 3 (0-indexed position 2)
+  deduped.splice(2, 0, createBlankSlotPost());
+  return deduped;
 }
 
 // ── Full Friends Feed Pipeline ────────────────────────────────────────────────
