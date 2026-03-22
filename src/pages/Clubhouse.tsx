@@ -164,20 +164,13 @@ const ClubhouseContent = () => {
   const friendsFeed = useFriendsFeed(user?.id);
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
   
-  // ── Live tournament injection ──
-  const { livePosts, liveTourSlugs } = useTournamentLiveFeed(user?.id);
-  const livePostIds = useMemo(() => livePosts.map(p => p.id).join(','), [livePosts]);
-  const liveTourSlugsKey = liveTourSlugs.join(',');
-  
   const posts = useMemo(() => {
     if (activeTab === 'foryou') {
-      const base = buildSuggestedFeed(activeFeed.posts);
-      return injectLiveTournamentCards(base, livePosts, liveTourSlugs);
+      return buildSuggestedFeed(activeFeed.posts);
     } else {
       return buildFriendsFeed(activeFeed.posts);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeFeed.posts, activeTab, livePostIds, liveTourSlugsKey]);
+  }, [activeFeed.posts, activeTab]);
 
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? true;
