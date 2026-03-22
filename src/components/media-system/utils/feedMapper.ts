@@ -46,7 +46,7 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
       review: null,
       isReview: false,
       isLikedByMe: row.is_liked_by_me ?? false,
-      isFollowedByMe: false,
+      isFollowedByMe: !!row.is_followed_by_me,
       courseName: row.tournament_meta.venue_name ?? undefined,
       courseId: undefined,
       postType: 'tournament_result',

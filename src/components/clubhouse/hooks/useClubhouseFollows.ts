@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { toast } from 'sonner';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { useFollowMutation } from '@/components/media-system/hooks/useFollowMutation';
 import { analyticsEvents } from '@/utils/analyticsEvents';
@@ -9,20 +10,34 @@ interface UseClubhouseFollowsOptions {
 
 /**
  * Manages optimistic follow state for the Clubhouse feed.
- * Re-wired for Brief 3: calls useFollowMutation.
+ * Uses refs for stable callbacks to prevent re-render cascades.
  */
 export function useClubhouseFollows({ userId }: UseClubhouseFollowsOptions) {
   const followMutation = useFollowMutation();
   const [followOverrides, setFollowOverrides] = useState<Map<string, boolean>>(new Map());
 
+  // Stable ref for followOverrides to avoid stale closures
+  const followOverridesRef = useRef(followOverrides);
+  useEffect(() => {
+    followOverridesRef.current = followOverrides;
+  }, [followOverrides]);
+
+  // Busy guard to prevent rapid-fire mutations
+  const isMutatingRef = useRef(false);
+
   const handleFollow = useCallback((post: FeedPost | null) => {
     if (!userId || !post) return;
     if (userId === post.userId) return;
+    if (isMutatingRef.current) return;
 
-    const currentlyFollowed = followOverrides.has(post.userId)
-      ? followOverrides.get(post.userId)!
+    isMutatingRef.current = true;
+
+    const currentOverrides = followOverridesRef.current;
+    const currentlyFollowed = currentOverrides.has(post.userId)
+      ? currentOverrides.get(post.userId)!
       : post.isFollowedByMe;
 
+    // Optimistic update
     setFollowOverrides(prev => {
       const next = new Map(prev);
       next.set(post.userId, !currentlyFollowed);
@@ -40,14 +55,22 @@ export function useClubhouseFollows({ userId }: UseClubhouseFollowsOptions) {
         isFollowed: currentlyFollowed,
       },
       {
-        onError: () => setFollowOverrides(prev => {
-          const n = new Map(prev);
-          n.set(post.userId, currentlyFollowed);
-          return n;
-        }),
+        onError: (error) => {
+          console.error('[useClubhouseFollows] follow mutation failed:', error);
+          // Revert optimistic update
+          setFollowOverrides(prev => {
+            const next = new Map(prev);
+            next.set(post.userId, currentlyFollowed);
+            return next;
+          });
+          toast.error('Could not update follow status. Please try again.');
+        },
+        onSettled: () => {
+          isMutatingRef.current = false;
+        },
       }
     );
-  }, [userId, followOverrides, followMutation]);
+  }, [userId, followMutation]);
 
   const handleFollowChange = useCallback((targetUserId: string, isFollowed: boolean) => {
     setFollowOverrides(prev => {
