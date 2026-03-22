@@ -294,25 +294,21 @@ export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
         <div className="flex flex-col items-center pt-6 pb-4">
           {/* Avatar */}
           <div className="relative">
-            <div
-              className="rounded-full p-[3px]"
-              style={{ background: 'hsl(var(--background) / 0.7)' }}
-            >
-              <SquircleAvatar
-                size={112}
-                src={conversation.avatar_url || undefined}
-                alt={conversation.name || 'Group'}
-                fallback={getInitials(conversation.name || 'Group')}
-                hideRing
-              />
-            </div>
+            <SquircleAvatar
+              size={96}
+              src={conversation.avatar_url || undefined}
+              alt={conversation.name || 'Group'}
+              fallback={getInitials(conversation.name || 'Group')}
+              hideRing
+              style={{ boxShadow: '0 4px 20px rgba(245,166,35,0.20)' }}
+            />
             {isAdmin && (
               <>
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
                   className="absolute bottom-1 right-1 w-8 h-8 rounded-full flex items-center justify-center shadow-md active:scale-[0.97] transition-transform disabled:opacity-50"
-                  style={{ background: '#f59e0b' }}
+                  style={{ background: '#f59e0b', border: '2px solid #F8FAFC' }}
                 >
                   <Camera size={16} className="text-white" />
                 </button>
