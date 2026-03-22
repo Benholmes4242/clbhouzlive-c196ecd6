@@ -173,7 +173,8 @@ const ClubhouseContent = () => {
   const posts = useMemo(() => {
     if (activeTab === 'foryou') {
       const base = buildSuggestedFeed(activeFeed.posts);
-      return injectLiveTournamentCards(base, livePosts, liveTourSlugs);
+      return injectLiveTournamentCards(base, livePosts, liveTourSlugs)
+        .filter(p => p.postType !== 'tournament_live');
     } else {
       return buildFriendsFeed(activeFeed.posts);
     }
@@ -196,16 +197,18 @@ const ClubhouseContent = () => {
   
   // ── Active post derivation ──
   const { activePost, golfCourse, activeReview, isActiveReview, isActiveVideo } = useActivePostDerived(posts, activeIndex);
-  const activePostIsTournament =
+  const isTournamentCardActive =
     activePost?.postType === 'tournament_result' ||
     activePost?.postType === 'tournament_live';
-  const isTournamentCardActive = useClubhouseStore(s => s.isTournamentCardActive);
 
-  // Hide bottom nav only once the tournament card top has actually reached the viewport top.
+  // Hide bottom nav when tournament card is active.
+  // Runs on mount AND whenever isTournamentCardActive changes —
+  // so returning to Clubhouse with a tournament card in view correctly re-hides the nav.
   const { setVisible: setBottomNavVisible } = useBottomNavigation();
   const setStoreTournamentActive = useClubhouseStore(s => s.setIsTournamentCardActive);
 
   useEffect(() => {
+    setStoreTournamentActive(isTournamentCardActive);
     setBottomNavVisible(!isTournamentCardActive);
     return () => {
       setStoreTournamentActive(false);
@@ -424,7 +427,7 @@ const ClubhouseContent = () => {
       )}
 
       {/* ═══ COMMENTS + MORE OPTIONS (regular posts) ═══ */}
-      {activePost && posts.length > 0 && !activePostIsTournament && (
+      {activePost && posts.length > 0 && !isTournamentCardActive && (
         <>
           <CommentsSheet
             isOpen={commentsOpen}

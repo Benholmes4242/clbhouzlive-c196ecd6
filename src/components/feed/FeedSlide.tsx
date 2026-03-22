@@ -37,7 +37,6 @@ export const FeedSlide = memo(function FeedSlide({
   const isActive = activeIndex === index;
   const isSuggestedFeed = activeTab === 'foryou';
   const media = post.mediaItems;
-  const isTournamentCard = post.postType === 'tournament_live' || post.postType === 'tournament_result';
 
   // ── Content routing ──
   const renderContent = () => {
@@ -157,25 +156,9 @@ export const FeedSlide = memo(function FeedSlide({
       style={{
         height: '100dvh',
         scrollSnapAlign: 'start',
-        scrollSnapStop: 'always',
         background: '#000',
       }}
     >
-      {isTournamentCard && (
-        <div
-          data-tournament-top-sentinel
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 1,
-            pointerEvents: 'none',
-            opacity: 0,
-          }}
-        />
-      )}
       {renderContent()}
     </div>
   );

@@ -61,18 +61,17 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   const carouselPositions = useClubhouseStore(s => s.carouselPositions);
   const setCarouselPosition = useClubhouseStore(s => s.setCarouselPosition);
   const activeVideoElement = useClubhouseStore(s => s.activeVideoElement);
-  const isTournamentCardActive = useClubhouseStore(s => s.isTournamentCardActive);
 
   const activePost = posts[activeIndex] ?? null;
   
   if (!activePost) return null;
 
-  const activePostIsTournament =
+  const isTournamentCard =
     activePost.postType === 'tournament_live' ||
     activePost.postType === 'tournament_result';
 
-  // Hide action rail + creator capsule as soon as the tournament card is the active slide.
-  if (activePostIsTournament) return null;
+  // Hide overlays on tournament cards
+  if (isTournamentCard) return null;
 
   const likeState = getLikeState(activePost);
   const commentCount = getCommentCount(activePost);
