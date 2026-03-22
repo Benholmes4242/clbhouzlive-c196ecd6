@@ -316,6 +316,17 @@ export function useAdminV2Courses() {
     onError: () => toast.error('Failed to update course'),
   });
 
+  // ── Photo upload mutation ──
+  const photoMutation = useMutation({
+    mutationFn: ({ courseId, file }: { courseId: string; file: File }) =>
+      uploadCoursePhoto(courseId, file),
+    onSuccess: () => {
+      toast.success('Photo updated');
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'courses'] });
+    },
+    onError: () => toast.error('Failed to upload photo'),
+  });
+
   // ── Handlers ──
   const handleSearch = (v: string) => { setSearch(v); setPage(1); };
   const handleFilter = (v: string) => { setListFilter(v as CourseFilterList); setPage(1); };
@@ -338,5 +349,8 @@ export function useAdminV2Courses() {
     updateCourse: (id: string, updates: Parameters<typeof updateCourse>[1]) =>
       updateMutation.mutate({ id, updates }),
     isUpdating: updateMutation.isPending,
+    uploadPhoto: (courseId: string, file: File) =>
+      photoMutation.mutate({ courseId, file }),
+    isUploadingPhoto: photoMutation.isPending,
   };
 }
