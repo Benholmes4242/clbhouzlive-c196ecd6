@@ -31,8 +31,9 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 // ── Data hooks ──
 import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFeed';
 import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
-import type { FeedPost } from '@/components/media-system/types/media';
-import { buildSuggestedFeed, buildFriendsFeed } from '@/components/media-system/utils/feedAlgorithm';
+import { useTournamentHubPages } from '@/components/media-system/hooks/useTournamentHubPages';
+import type { FeedPost, TournamentHubFeedPost } from '@/components/media-system/types/media';
+import { buildSuggestedFeed, buildFriendsFeed, injectTournamentHubCard } from '@/components/media-system/utils/feedAlgorithm';
 
 // ── Clubhouse UI overlays ──
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
