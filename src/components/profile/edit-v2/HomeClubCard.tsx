@@ -44,7 +44,7 @@ export function HomeClubCard({
 
   return (
     <div className="space-y-3">
-      <label className="text-[13px] font-medium text-muted-foreground block">Home Club</label>
+      <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground block">Home Club</label>
       <div ref={containerRef} className="relative">
         <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -54,7 +54,7 @@ export function HomeClubCard({
             onChange={(e) => { setQuery(e.target.value); setIsOpen(true); }}
             onFocus={() => setIsOpen(true)}
             placeholder="Search for your home club"
-            className="w-full bg-muted border-0 rounded-xl pl-9 pr-10 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-colors"
+            className="w-full bg-[#F8FAFC] border border-border/60 rounded-[10px] pl-9 pr-10 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
           />
           {query && (
             <button
@@ -94,7 +94,7 @@ export function HomeClubCard({
       </div>
 
       <div className="flex items-center justify-between">
-        <p className="text-[13px] text-muted-foreground">Visibility</p>
+        <p className="text-[12px] text-muted-foreground/70">Visibility</p>
         <VisibilityDropdown value={visibility as any} onChange={onVisibilityChange as any} />
       </div>
     </div>
