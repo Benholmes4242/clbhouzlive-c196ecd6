@@ -332,7 +332,7 @@ export function PublishScreen() {
               <visibilityConfig.Icon className="w-[18px] h-[18px]" strokeWidth={1.75} />
             </div>
             <div className="flex-1 text-left">
-              <p className="text-[13px] font-semibold" style={{ color: TEXT_PRIMARY }}>Audience</p>
+              <p className="text-[14px] font-semibold" style={{ color: TEXT_PRIMARY }}>Audience</p>
               <p className="text-[11px] mt-0.5" style={{ color: TEXT_TERTIARY }}>{visibilityConfig.desc}</p>
             </div>
             <div className="flex items-center gap-1.5">
