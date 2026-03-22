@@ -41,7 +41,7 @@ export const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(
         className={cn(
           `page-root w-full max-w-[480px] mx-auto flex flex-col ${immersiveStatusBar ? 'bg-black' : 'bg-[var(--bg-page)]'}`,
           !fixedHeight && "min-h-[100vh]",
-          fixedHeight && "h-[100dvh]",
+          fixedHeight && "h-[100dvh] overflow-hidden",
           className
         )}
         style={{

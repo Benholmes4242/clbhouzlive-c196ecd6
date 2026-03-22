@@ -172,14 +172,12 @@ export function SnapFeed({
     <div
       ref={containerRef}
       data-snap-feed
-      className="absolute inset-0 overflow-y-auto overflow-x-hidden"
+      className="absolute inset-0 overflow-y-auto"
       style={{
         scrollSnapType: 'y mandatory',
         WebkitOverflowScrolling: 'touch',
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
-        overscrollBehavior: 'contain',
-        willChange: 'transform',
       }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
