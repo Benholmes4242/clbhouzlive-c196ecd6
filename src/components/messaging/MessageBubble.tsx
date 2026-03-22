@@ -302,12 +302,16 @@ export function MessageBubble({
         {/* Message bubble */}
         <div
           className={cn(
-            "px-[14px] py-[10px] break-words relative group backdrop-blur-[12px]",
+            "px-[14px] py-[10px] break-words relative group",
             isPressed && "opacity-80",
             isOwnMessage 
-              ? "rounded-[18px_18px_4px_18px] bg-[hsl(38,92%,50%)]/[0.08] border border-[hsl(38,92%,50%)]/[0.12]"
-              : "rounded-[18px_18px_18px_4px] bg-background/80 border border-border/40"
+              ? "rounded-[18px_18px_4px_18px]"
+              : "rounded-[18px_18px_18px_4px]"
           )}
+          style={isOwnMessage 
+            ? { background: 'rgba(245,166,35,0.10)', border: '1px solid rgba(245,166,35,0.18)', boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }
+            : { background: '#ffffff', border: '1px solid rgba(0,0,0,0.07)' }
+          }
           onTouchCancel={() => setIsPressed(false)}
         >
           {/* Reply preview */}
