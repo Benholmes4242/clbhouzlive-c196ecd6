@@ -133,7 +133,10 @@ export const MediaViewerOverlay: React.FC = () => {
           onTouchEnd={handleTouchEnd}
         >
           {/* Header */}
-          <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4">
+          <div
+            className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 pb-4"
+            style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)' }}
+          >
             <button
               onClick={closeViewer}
               className="w-11 h-11 rounded-full bg-black/50 flex items-center justify-center text-white"
