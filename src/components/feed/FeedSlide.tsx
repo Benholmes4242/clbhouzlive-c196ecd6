@@ -37,6 +37,7 @@ export const FeedSlide = memo(function FeedSlide({
   const isActive = activeIndex === index;
   const isSuggestedFeed = activeTab === 'foryou';
   const media = post.mediaItems;
+  const isTournamentCard = post.postType === 'tournament_live' || post.postType === 'tournament_result';
 
   // ── Content routing ──
   const renderContent = () => {
