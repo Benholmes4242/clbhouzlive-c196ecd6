@@ -45,7 +45,7 @@ export function SettingsToggleRow({
       <div
         className={cn(
           'relative flex items-center w-full',
-          'min-h-[60px] py-3',
+          'min-h-[52px] py-2.5',
           isIndented ? 'pl-6 pr-4' : 'px-4',
           disabled && 'opacity-50',
           isLoading && 'opacity-75',
@@ -53,8 +53,8 @@ export function SettingsToggleRow({
       >
         <div className="flex items-center flex-1 min-w-0 gap-3">
           {icon && (
-            <div className={cn('flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center', theme.bg)}>
-              <div className={cn('w-5 h-5', theme.text)}>{icon}</div>
+            <div className={cn('flex-shrink-0 w-9 h-9 rounded-[10px] flex items-center justify-center', theme.bg)}>
+              <div className={cn('w-[18px] h-[18px]', theme.text)}>{icon}</div>
             </div>
           )}
           <div className="flex-1 min-w-0">

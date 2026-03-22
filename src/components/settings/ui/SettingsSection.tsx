@@ -30,18 +30,20 @@ export function SettingsSection({
       {/* Section header */}
       <h2 
         className={cn(
-          'text-[11px] font-semibold uppercase tracking-[1.5px] mb-3 ml-1',
+          'text-[11px] font-semibold uppercase tracking-[0.1em] mb-2 ml-1',
           isDanger ? 'text-destructive' : 'text-muted-foreground'
         )}
       >
         {title}
       </h2>
 
-      {/* Content — cardless for default, subtle tint for danger */}
+      {/* Content */}
       <div
         className={cn(
           'w-full rounded-2xl overflow-hidden',
-          isDanger ? 'bg-destructive/5' : 'bg-card'
+          isDanger
+            ? 'bg-destructive/5 border border-destructive/10'
+            : 'bg-card border border-border/60 shadow-sm'
         )}
       >
         {children}

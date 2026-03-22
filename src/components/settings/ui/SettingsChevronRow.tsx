@@ -42,7 +42,7 @@ export function SettingsChevronRow({
       disabled={disabled}
       className={cn(
         'relative w-full flex items-center text-left',
-        'min-h-[60px] px-4 py-3',
+        'min-h-[52px] px-4 py-2.5',
         'transition-all duration-150',
         'cursor-pointer active:bg-muted active:scale-[0.98]',
         disabled && 'opacity-50 cursor-not-allowed',
@@ -50,8 +50,8 @@ export function SettingsChevronRow({
     >
       <div className="flex items-center flex-1 min-w-0 gap-3">
         {icon && (
-          <div className={cn('flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center', theme.bg)}>
-            <div className={cn('w-5 h-5', theme.text)}>{icon}</div>
+          <div className={cn('flex-shrink-0 w-9 h-9 rounded-[10px] flex items-center justify-center', theme.bg)}>
+            <div className={cn('w-[18px] h-[18px]', theme.text)}>{icon}</div>
           </div>
         )}
         <div className="flex-1 min-w-0">

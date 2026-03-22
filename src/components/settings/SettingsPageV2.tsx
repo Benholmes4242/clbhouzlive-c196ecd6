@@ -138,12 +138,6 @@ export function SettingsPageV2() {
         {/* Account */}
         <SettingsSection title="Account">
           <SettingsChevronRow
-            icon={<User size={18} />}
-            title="Profile"
-            iconTheme="account"
-            onClick={() => navigate('/profile')}
-          />
-          <SettingsChevronRow
             icon={<Mail size={18} />}
             title="Email"
             value={user?.email ? maskEmail(user.email) : undefined}
