@@ -227,7 +227,7 @@ const ActivityPage: React.FC = () => {
 
   return (
     <PageRoot>
-      <div className="flex flex-col min-h-full bg-[hsl(150,15%,95%)] pt-[var(--sat)]">
+      <div className="flex flex-col min-h-full bg-[#F8FAFC]">
         <div className="max-w-2xl mx-auto w-full flex flex-col flex-1">
 
           {/* Header */}
