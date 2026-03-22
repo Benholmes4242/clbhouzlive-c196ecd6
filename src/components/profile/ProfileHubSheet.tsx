@@ -178,18 +178,23 @@ function ProfileHubSheet({
 
           {/* Panel — #1 bg-[#F8FAFC] */}
           <motion.div
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.4 }}
+            onDragEnd={handleSheetDragEnd}
+            style={{
+              y: sheetY,
+              maxHeight: '92dvh',
+              paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+            }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 32, stiffness: 320 }}
             className="fixed inset-x-0 bottom-0 z-[9999] w-full rounded-t-[24px] bg-[#F8FAFC] flex flex-col md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[560px]"
-            style={{
-              maxHeight: '92dvh',
-              paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-            }}
           >
             {/* Drag handle */}
-            <div className="flex justify-center pt-2.5 pb-1 shrink-0">
+            <div className="flex justify-center pt-2.5 pb-1 shrink-0 touch-none cursor-grab active:cursor-grabbing">
               <div className="w-9 h-1 rounded-full bg-muted-foreground/25" />
             </div>
 
