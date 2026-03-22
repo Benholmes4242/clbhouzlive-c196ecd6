@@ -1,9 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
-import { Search, MapPin, Calendar, ImagePlus, X, Plus, Loader2 } from 'lucide-react';
+import { Search, MapPin, Calendar, ImagePlus, X, Plus, Loader2, ChevronRight } from 'lucide-react';
 import { BottomSheet } from '@/components/ui/BottomSheet';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -88,7 +85,6 @@ export function ShareContentModal({
       course_image_url: course.thumbnail_image || undefined,
       location: locationParts.length > 0 ? locationParts.join(', ') : undefined,
       rating: avgRating || undefined,
-      // Ranking data
       world_rank: course.global_rank || undefined,
       country_rank: course.regional_rank || course.usa_rank || undefined,
       country_code: course.country || undefined,
@@ -112,12 +108,10 @@ export function ShareContentModal({
       return;
     }
     
-    // Filter for images and videos only
     const validFiles = files.filter(file => 
       file.type.startsWith('image/') || file.type.startsWith('video/')
     );
     
-    // Create previews
     validFiles.forEach(file => {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -128,7 +122,6 @@ export function ShareContentModal({
     
     setSelectedMedia(prev => [...prev, ...validFiles]);
     
-    // Reset input
     if (mediaInputRef.current) {
       mediaInputRef.current.value = '';
     }
@@ -144,7 +137,6 @@ export function ShareContentModal({
     
     setIsUploading(true);
     try {
-      // Upload each file and collect URLs
       const uploadedUrls: string[] = [];
       
       for (const file of selectedMedia) {
@@ -165,7 +157,6 @@ export function ShareContentModal({
         uploadedUrls.push(publicUrl);
       }
       
-      // Send as moment_share with multiple images
       onShare(
         `Shared ${uploadedUrls.length} photo${uploadedUrls.length > 1 ? 's' : ''} 📸`,
         'moment_share',
@@ -199,20 +190,24 @@ export function ShareContentModal({
       open={open}
       onClose={handleClose}
       zIndexBase={1500}
+      className="!bg-[#F8FAFC] !rounded-t-[22px]"
     >
-      <div className="px-4" style={{ maxHeight: 'calc(85vh - 40px)', overflowY: 'auto', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)' }}>
+      <div className="px-4" style={{ maxHeight: 'calc(85vh - 40px)', overflowY: 'auto', paddingBottom: '24px' }}>
         {/* Title */}
-        <h2 className="text-lg font-semibold text-foreground mb-4">Share Golf Content</h2>
+        <h2 className="text-[18px] font-bold mb-4" style={{ color: '#0f172a', letterSpacing: '-0.2px' }}>Share Golf Content</h2>
         
         {/* Tab switcher */}
-        <div className="flex bg-muted rounded-xl p-1 mb-4">
+        <div
+          className="flex p-[3px] mb-4"
+          style={{ background: 'rgba(0,0,0,0.05)', borderRadius: 12 }}
+        >
           <button
             onClick={() => setActiveTab('courses')}
             className={cn(
-              "flex-1 py-2 rounded-lg text-sm font-medium transition-all",
+              "flex-1 py-2 rounded-[10px] text-sm transition-all",
               activeTab === 'courses' 
-                ? "bg-background text-foreground shadow-sm" 
-                : "text-muted-foreground"
+                ? "bg-white text-[#0f172a] font-bold shadow-[0_1px_4px_rgba(0,0,0,0.10)]" 
+                : "text-[#64748b] font-medium"
             )}
           >
             Courses
@@ -220,10 +215,10 @@ export function ShareContentModal({
           <button
             onClick={() => setActiveTab('teetimes')}
             className={cn(
-              "flex-1 py-2 rounded-lg text-sm font-medium transition-all",
+              "flex-1 py-2 rounded-[10px] text-sm transition-all",
               activeTab === 'teetimes' 
-                ? "bg-background text-foreground shadow-sm" 
-                : "text-muted-foreground"
+                ? "bg-white text-[#0f172a] font-bold shadow-[0_1px_4px_rgba(0,0,0,0.10)]" 
+                : "text-[#64748b] font-medium"
             )}
           >
             Tee Times
@@ -231,10 +226,10 @@ export function ShareContentModal({
           <button
             onClick={() => setActiveTab('moments')}
             className={cn(
-              "flex-1 py-2 rounded-lg text-sm font-medium transition-all",
+              "flex-1 py-2 rounded-[10px] text-sm transition-all",
               activeTab === 'moments' 
-                ? "bg-background text-foreground shadow-sm" 
-                : "text-muted-foreground"
+                ? "bg-white text-[#0f172a] font-bold shadow-[0_1px_4px_rgba(0,0,0,0.10)]" 
+                : "text-[#64748b] font-medium"
             )}
           >
             Moments
@@ -244,76 +239,105 @@ export function ShareContentModal({
         {/* Courses Tab */}
         {activeTab === 'courses' && (
           <div className="space-y-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search courses..."
+            {/* White card search bar */}
+            <div
+              className="flex items-center gap-2 px-3 h-[44px]"
+              style={{
+                background: '#ffffff',
+                borderRadius: 12,
+                border: '1px solid rgba(0,0,0,0.07)',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+              }}
+            >
+              <Search size={17} style={{ color: '#94a3b8', flexShrink: 0 }} />
+              <input
+                placeholder="Search courses…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
+                className="flex-1 bg-transparent border-none outline-none text-[15px] text-[#0f172a] placeholder:text-[#94a3b8]"
               />
             </div>
 
-            <ScrollArea className="h-[50vh]">
-              {coursesLoading ? (
-                <div className="space-y-2">
-                  {[1, 2, 3].map(i => (
-                    <Skeleton key={i} className="h-16 w-full rounded-lg" />
-                  ))}
-                </div>
-              ) : courses.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  No courses found
-                </div>
-              ) : (
-                <div className="space-y-2 pr-2">
-                  {courses.map(course => (
-                    <button
-                      key={course.id}
-                      onClick={() => handleShareCourse(course)}
-                      className="w-full flex items-center gap-3 p-2 rounded-lg text-left transition-colors hover:bg-muted border border-transparent"
-                    >
-                      <div className="h-12 w-12 rounded-lg overflow-hidden bg-muted flex-shrink-0">
-                        {course.thumbnail_image ? (
-                          <img 
-                            src={course.thumbnail_image} 
-                            alt={course.name}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <div className="h-full w-full flex items-center justify-center text-xl">
-                            ⛳
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate text-foreground">{course.name}</p>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          {(course.region || course.country) && (
-                            <span className="flex items-center gap-1">
-                              <MapPin className="h-3 w-3" />
-                              {[course.region, course.country].filter(Boolean).join(', ')}
-                            </span>
+            {/* Eyebrow label */}
+            <p
+              className="text-[11px] font-bold uppercase px-1 pt-1"
+              style={{ color: '#64748b', letterSpacing: '0.1em' }}
+            >
+              Recently Played
+            </p>
+
+            {/* Course list — no ScrollArea wrapper */}
+            {coursesLoading ? (
+              <div className="space-y-2">
+                {[1, 2, 3].map(i => (
+                  <Skeleton key={i} className="h-16 w-full rounded-lg" />
+                ))}
+              </div>
+            ) : courses.length === 0 ? (
+              <div className="text-center py-8" style={{ color: '#64748b' }}>
+                No courses found
+              </div>
+            ) : (
+              <div>
+                {courses.map((course, index) => {
+                  const isLast = index === courses.length - 1;
+                  return (
+                    <div key={course.id}>
+                      <button
+                        onClick={() => handleShareCourse(course)}
+                        className="w-full flex items-center gap-3 py-[10px] text-left min-h-[44px]"
+                      >
+                        <div className="h-12 w-12 overflow-hidden bg-[#f1f5f9] flex-shrink-0" style={{ borderRadius: '34%' }}>
+                          {course.thumbnail_image ? (
+                            <img 
+                              src={course.thumbnail_image} 
+                              alt={course.name}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center text-xl">
+                              ⛳
+                            </div>
                           )}
                         </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </ScrollArea>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate" style={{ color: '#0f172a' }}>{course.name}</p>
+                          <div className="flex items-center gap-2 text-xs" style={{ color: '#64748b' }}>
+                            {(course.region || course.country) && (
+                              <span className="flex items-center gap-1">
+                                <MapPin className="h-3 w-3" />
+                                {[course.region, course.country].filter(Boolean).join(', ')}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <ChevronRight size={14} style={{ color: '#d1d5db', flexShrink: 0 }} />
+                      </button>
+                      {!isLast && (
+                        <div style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.05)' }} />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 
         {/* Tee Times Tab */}
         {activeTab === 'teetimes' && (
           <div className="flex flex-col items-center justify-center py-12">
-            <Calendar className="h-12 w-12 text-muted-foreground mb-3" />
-            <p className="text-muted-foreground text-sm text-center">
-              Tee time sharing coming soon!
+            <div
+              className="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center mb-3"
+              style={{ background: 'rgba(245,166,35,0.10)' }}
+            >
+              <Calendar size={24} style={{ color: '#F5A623' }} />
+            </div>
+            <p className="text-[15px] font-semibold text-center" style={{ color: '#0f172a' }}>
+              Tee time sharing coming soon
             </p>
-            <p className="text-muted-foreground text-xs text-center mt-1">
-              You'll be able to share your upcoming games here.
+            <p className="text-xs text-center mt-1" style={{ color: '#64748b' }}>
+              You'll be able to share upcoming games directly in chat.
             </p>
           </div>
         )}
@@ -325,7 +349,7 @@ export function ShareContentModal({
             {mediaPreviews.length > 0 && (
               <div className="grid grid-cols-3 gap-2">
                 {mediaPreviews.map((preview, index) => (
-                  <div key={index} className="relative aspect-square rounded-xl overflow-hidden bg-muted">
+                  <div key={index} className="relative aspect-square rounded-xl overflow-hidden bg-[#f1f5f9]">
                     {isVideo(selectedMedia[index]) ? (
                       <video 
                         src={preview} 
@@ -358,7 +382,7 @@ export function ShareContentModal({
                 {selectedMedia.length < MAX_MEDIA && (
                   <button
                     onClick={() => mediaInputRef.current?.click()}
-                    className="aspect-square rounded-xl border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                    className="aspect-square rounded-[12px] border-2 border-dashed border-[rgba(245,166,35,0.35)] bg-[rgba(245,166,35,0.08)] flex flex-col items-center justify-center gap-1 text-[#F5A623] transition-colors"
                   >
                     <Plus size={24} />
                     <span className="text-xs mt-1">Add</span>
@@ -367,15 +391,20 @@ export function ShareContentModal({
               </div>
             )}
             
-            {/* Empty state - big add button */}
+            {/* Empty state - amber-tinted dashed zone */}
             {mediaPreviews.length === 0 && (
               <button
                 onClick={() => mediaInputRef.current?.click()}
-                className="w-full py-16 rounded-2xl border-2 border-dashed border-muted-foreground/30 flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                className="w-full min-h-[160px] rounded-[16px] border-2 border-dashed border-[rgba(245,166,35,0.30)] bg-[rgba(245,166,35,0.08)] flex flex-col items-center justify-center gap-[10px] transition-colors"
               >
-                <ImagePlus size={48} className="mb-2" />
-                <span className="font-medium">Select Photos & Videos</span>
-                <span className="text-xs mt-1">Up to {MAX_MEDIA} items</span>
+                <div
+                  className="w-[48px] h-[48px] rounded-[14px] flex items-center justify-center"
+                  style={{ background: 'rgba(245,166,35,0.12)' }}
+                >
+                  <ImagePlus size={24} style={{ color: '#F5A623' }} />
+                </div>
+                <span className="font-semibold text-[15px]" style={{ color: '#0f172a' }}>Select Photos & Videos</span>
+                <span className="text-xs" style={{ color: '#64748b' }}>Up to {MAX_MEDIA} items</span>
               </button>
             )}
             
@@ -389,22 +418,26 @@ export function ShareContentModal({
               className="hidden"
             />
             
-            {/* Share button */}
+            {/* Share CTA button */}
             {selectedMedia.length > 0 && (
-              <Button
+              <button
                 onClick={handleShareMedia}
                 disabled={isUploading}
-                className="w-full h-12 text-base"
+                className="w-full h-[52px] rounded-[14px] text-[16px] font-bold text-white flex items-center justify-center gap-2 active:scale-[0.98] transition-transform disabled:opacity-60"
+                style={{
+                  background: '#F5A623',
+                  boxShadow: '0 4px 14px rgba(245,166,35,0.35)',
+                }}
               >
                 {isUploading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Uploading...
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Uploading…
                   </>
                 ) : (
                   <>Share {selectedMedia.length} item{selectedMedia.length > 1 ? 's' : ''}</>
                 )}
-              </Button>
+              </button>
             )}
           </div>
         )}

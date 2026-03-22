@@ -22,7 +22,6 @@
    DropdownMenu,
    DropdownMenuContent,
    DropdownMenuItem,
-   DropdownMenuSeparator,
    DropdownMenuTrigger,
  } from '@/components/ui/dropdown-menu';
  import {
@@ -54,6 +53,23 @@
    onBack?: () => void;
    otherUserName?: string;
  }
+
+ /* Icon box helper */
+ function IconBox({ bg, color, children }: { bg: string; color: string; children: React.ReactNode }) {
+   return (
+     <div
+       className="w-[36px] h-[36px] rounded-[10px] flex items-center justify-center shrink-0"
+       style={{ background: bg }}
+     >
+       {children}
+     </div>
+   );
+ }
+
+ /* Hairline divider */
+ function Hairline() {
+   return <div style={{ height: 1, backgroundColor: 'rgba(0,0,0,0.05)' }} />;
+ }
  
  export function ChatHeaderMenu({
    conversation,
@@ -74,21 +90,19 @@
    const [showClearChatDialog, setShowClearChatDialog] = useState(false);
    const [showLeaveGroupDialog, setShowLeaveGroupDialog] = useState(false);
    
-   // Get current user's participant record
    const myParticipant = conversation.participants.find(p => p.user_id === currentUserId);
    const isMuted = myParticipant?.is_muted ?? false;
- 
+
    const handleViewProfile = () => {
      haptic('light');
      if (otherUserId) {
        navigate(`/profile/${otherUserId}`);
      }
    };
- 
+
    const handleToggleMute = async () => {
      haptic('light');
      try {
-      // TODO: toggle_conversation_mute RPC needs to be added to Supabase generated types
       const { error } = await (supabase.rpc as Function)('toggle_conversation_mute', {
          p_conversation_id: conversation.id,
          p_mute: !isMuted,
@@ -101,11 +115,7 @@
        toast.error("Couldn't update");
      }
    };
- 
-   // WARNING: This operation sets deleted_at on ALL messages in the conversation,
-   // affecting ALL participants — not just the current user.
-   // A per-user soft-delete (e.g. a user_id column on deleted messages) is needed
-   // to scope this correctly. Do not ship a "Clear Chat" UI without fixing this first.
+
    const handleClearChatConfirmed = async () => {
      haptic('medium');
      try {
@@ -117,27 +127,26 @@
        if (error) throw error;
        
        toast.success('Chat cleared');
-       navigate(0); // React Router reload
+       navigate(0);
      } catch {
        toast.error("Couldn't clear chat");
      }
    };
- 
+
    const handleBlockUser = () => {
      haptic('medium');
      if (!otherUserId) return;
      setShowBlockDialog(true);
    };
- 
+
    const handleReport = () => {
      haptic('light');
      setShowReportSheet(true);
    };
- 
+
    const handleLeaveGroupConfirmed = async () => {
      haptic('medium');
      try {
-      // TODO: leave_group_conversation RPC needs to be added to Supabase generated types
       const { error } = await (supabase.rpc as Function)('leave_group_conversation', {
          p_conversation_id: conversation.id,
        });
@@ -150,7 +159,10 @@
        toast.error("Couldn't leave group");
      }
    };
- 
+
+   const menuItemClass = "gap-3 px-[14px] py-[10px] cursor-pointer min-h-[44px] focus:bg-[rgba(0,0,0,0.03)]";
+   const destructiveItemClass = "gap-3 px-[14px] py-[10px] cursor-pointer min-h-[44px] focus:bg-[rgba(0,0,0,0.03)] text-destructive focus:text-destructive";
+
    return (
      <>
        <DropdownMenu>
@@ -161,68 +173,90 @@
         </DropdownMenuTrigger>
         <DropdownMenuContent 
           align="end" 
-          className="w-56 bg-background border border-border shadow-lg rounded-xl z-50"
+          className="w-56 bg-[#F8FAFC] border border-[rgba(0,0,0,0.07)] shadow-[0_8px_32px_rgba(0,0,0,0.13),0_2px_8px_rgba(0,0,0,0.07)] rounded-[14px] z-50 overflow-hidden p-0"
         >
          {isGroupChat ? (
            <>
              {/* Group Chat Menu */}
              <DropdownMenuItem 
                onClick={onOpenGroupInfo}
-               className="gap-3 py-3 cursor-pointer"
+               className={menuItemClass}
              >
-               <Info className="w-4 h-4" />
-               Group Info
+               <IconBox bg="#EFF6FF" color="#3B82F6">
+                 <Info size={17} style={{ color: '#3B82F6' }} />
+               </IconBox>
+               <span style={{ color: '#0f172a' }}>Group Info</span>
              </DropdownMenuItem>
+             
+             <Hairline />
              
              <DropdownMenuItem 
                onClick={onSearchInChat}
-               className="gap-3 py-3 cursor-pointer"
+               className={menuItemClass}
              >
-               <Search className="w-4 h-4" />
-               Search in Chat
+               <IconBox bg="#F0FDF4" color="#22C55E">
+                 <Search size={17} style={{ color: '#22C55E' }} />
+               </IconBox>
+               <span style={{ color: '#0f172a' }}>Search in Chat</span>
              </DropdownMenuItem>
+             
+             <Hairline />
              
              <DropdownMenuItem 
                onClick={handleToggleMute}
-               className="gap-3 py-3 cursor-pointer"
+               className={menuItemClass}
              >
                {isMuted ? (
                  <>
-                   <Bell className="w-4 h-4" />
-                   Unmute Notifications
+                   <IconBox bg="rgba(245,166,35,0.10)" color="#F5A623">
+                     <Bell size={17} style={{ color: '#F5A623' }} />
+                   </IconBox>
+                   <span style={{ color: '#0f172a' }}>Unmute Notifications</span>
                  </>
                ) : (
                  <>
-                   <BellOff className="w-4 h-4" />
-                   Mute Notifications
+                   <IconBox bg="#FFF7ED" color="#F97316">
+                     <BellOff size={17} style={{ color: '#F97316' }} />
+                   </IconBox>
+                   <span style={{ color: '#0f172a' }}>Mute Notifications</span>
                  </>
                )}
              </DropdownMenuItem>
              
+             <Hairline />
+             
              <DropdownMenuItem 
                onClick={onViewSharedMedia}
-               className="gap-3 py-3 cursor-pointer"
+               className={menuItemClass}
              >
-               <Image className="w-4 h-4" />
-               Shared Media
+               <IconBox bg="#F5F3FF" color="#8B5CF6">
+                 <Image size={17} style={{ color: '#8B5CF6' }} />
+               </IconBox>
+               <span style={{ color: '#0f172a' }}>Shared Media</span>
              </DropdownMenuItem>
              
-             <DropdownMenuSeparator />
+             <Hairline />
              
              <DropdownMenuItem 
                onClick={() => setShowLeaveGroupDialog(true)}
-               className="gap-3 py-3 cursor-pointer text-destructive focus:text-destructive"
+               className={destructiveItemClass}
              >
-               <LogOut className="w-4 h-4" />
-               Leave Group
+               <IconBox bg="rgba(239,68,68,0.08)" color="#ef4444">
+                 <LogOut size={17} style={{ color: '#ef4444' }} />
+               </IconBox>
+               <span style={{ color: '#ef4444' }}>Leave Group</span>
              </DropdownMenuItem>
+             
+             <Hairline />
              
              <DropdownMenuItem 
                onClick={handleReport}
-               className="gap-3 py-3 cursor-pointer text-destructive focus:text-destructive"
+               className={destructiveItemClass}
              >
-               <Flag className="w-4 h-4" />
-               Report Group
+               <IconBox bg="rgba(239,68,68,0.08)" color="#ef4444">
+                 <Flag size={17} style={{ color: '#ef4444' }} />
+               </IconBox>
+               <span style={{ color: '#ef4444' }}>Report Group</span>
              </DropdownMenuItem>
            </>
          ) : (
@@ -230,69 +264,95 @@
              {/* DM Menu */}
              <DropdownMenuItem 
                onClick={handleViewProfile}
-               className="gap-3 py-3 cursor-pointer"
+               className={menuItemClass}
              >
-               <User className="w-4 h-4" />
-               View Profile
+               <IconBox bg="#EFF6FF" color="#3B82F6">
+                 <User size={17} style={{ color: '#3B82F6' }} />
+               </IconBox>
+               <span style={{ color: '#0f172a' }}>View Profile</span>
              </DropdownMenuItem>
+             
+             <Hairline />
              
              <DropdownMenuItem 
                onClick={onSearchInChat}
-               className="gap-3 py-3 cursor-pointer"
+               className={menuItemClass}
              >
-               <Search className="w-4 h-4" />
-               Search in Chat
+               <IconBox bg="#F0FDF4" color="#22C55E">
+                 <Search size={17} style={{ color: '#22C55E' }} />
+               </IconBox>
+               <span style={{ color: '#0f172a' }}>Search in Chat</span>
              </DropdownMenuItem>
+             
+             <Hairline />
              
              <DropdownMenuItem 
                onClick={handleToggleMute}
-               className="gap-3 py-3 cursor-pointer"
+               className={menuItemClass}
              >
                {isMuted ? (
                  <>
-                   <Bell className="w-4 h-4" />
-                   Unmute Notifications
+                   <IconBox bg="rgba(245,166,35,0.10)" color="#F5A623">
+                     <Bell size={17} style={{ color: '#F5A623' }} />
+                   </IconBox>
+                   <span style={{ color: '#0f172a' }}>Unmute Notifications</span>
                  </>
                ) : (
                  <>
-                   <BellOff className="w-4 h-4" />
-                   Mute Notifications
+                   <IconBox bg="#FFF7ED" color="#F97316">
+                     <BellOff size={17} style={{ color: '#F97316' }} />
+                   </IconBox>
+                   <span style={{ color: '#0f172a' }}>Mute Notifications</span>
                  </>
                )}
              </DropdownMenuItem>
              
+             <Hairline />
+             
              <DropdownMenuItem 
                onClick={onViewSharedMedia}
-               className="gap-3 py-3 cursor-pointer"
+               className={menuItemClass}
              >
-               <Image className="w-4 h-4" />
-               Shared Media
+               <IconBox bg="#F5F3FF" color="#8B5CF6">
+                 <Image size={17} style={{ color: '#8B5CF6' }} />
+               </IconBox>
+               <span style={{ color: '#0f172a' }}>Shared Media</span>
              </DropdownMenuItem>
              
-             <DropdownMenuSeparator />
+             <Hairline />
              
              <DropdownMenuItem 
                onClick={() => setShowClearChatDialog(true)}
-               className="gap-3 py-3 cursor-pointer"
+               className={menuItemClass}
              >
-               <Trash2 className="w-4 h-4" />
-               Clear Chat
+               <IconBox bg="rgba(239,68,68,0.08)" color="#ef4444">
+                 <Trash2 size={17} style={{ color: '#ef4444' }} />
+               </IconBox>
+               <span style={{ color: '#0f172a' }}>Clear Chat</span>
              </DropdownMenuItem>
+             
+             <Hairline />
              
              <DropdownMenuItem 
                onClick={handleBlockUser}
-               className="gap-3 py-3 cursor-pointer text-destructive focus:text-destructive"
+               className={destructiveItemClass}
              >
-               <Ban className="w-4 h-4" />
-               Block User
+               <IconBox bg="rgba(239,68,68,0.08)" color="#ef4444">
+                 <Ban size={17} style={{ color: '#ef4444' }} />
+               </IconBox>
+               <span style={{ color: '#ef4444' }}>Block User</span>
              </DropdownMenuItem>
+             
+             <Hairline />
              
              <DropdownMenuItem 
                onClick={handleReport}
-               className="gap-3 py-3 cursor-pointer text-destructive focus:text-destructive"
+               className={destructiveItemClass}
              >
-               <Flag className="w-4 h-4" />
-               Report
+               <IconBox bg="rgba(239,68,68,0.08)" color="#ef4444">
+                 <Flag size={17} style={{ color: '#ef4444' }} />
+               </IconBox>
+               <span style={{ color: '#ef4444' }}>Report</span>
              </DropdownMenuItem>
            </>
          )}
