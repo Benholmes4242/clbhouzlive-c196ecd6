@@ -1054,11 +1054,26 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                     layout
                     whileTap={{ scale: 0.95 }}
                     onClick={() => openPanel('course')}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl"
-                    style={{ border: '1.5px dashed rgba(255,255,255,0.15)', background: 'transparent' }}
+                    className="flex items-center gap-1.5"
+                    style={{
+                      display: 'inline-flex',
+                      alignSelf: 'flex-start',
+                      padding: '7px 12px 7px 8px',
+                      borderRadius: 12,
+                      border: '1.5px dashed rgba(34,197,94,0.20)',
+                      background: 'transparent',
+                      cursor: 'pointer',
+                    }}
                   >
-                    <span className="text-sm">⛳</span>
-                    <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.30)' }}>Add course</span>
+                    <div style={{
+                      width: 24, height: 24, borderRadius: 7, flexShrink: 0,
+                      background: 'rgba(34,197,94,0.08)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 12,
+                    }}>⛳</div>
+                    <span className="text-[12.5px] font-medium" style={{ color: 'rgba(34,197,94,0.50)' }}>
+                      Add course
+                    </span>
                   </motion.button>
                 )}
               </motion.div>
