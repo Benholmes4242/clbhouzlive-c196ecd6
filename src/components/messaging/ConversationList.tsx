@@ -18,6 +18,7 @@ interface ConversationListProps {
   selectedConversationId?: string;
   searchQuery?: string;
   onNewConversation?: () => void;
+  filterType?: 'all' | 'unread' | 'groups';
 }
 
 function formatRelativeTime(dateString: string | null): string {
