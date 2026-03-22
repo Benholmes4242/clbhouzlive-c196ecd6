@@ -42,11 +42,6 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
     return <BetaGatePage />;
   }
 
-  // FIX 6: Enforce 30-day session timeout
-  useSessionTimeout();
-
-  // FIX I2: Check onboarding status for authenticated users
-  const { data: onboardingData } = useOnboardingStatus(user?.id);
 
   // Track orange loader show/hide for boot timeline (audit only, no UI shown)
   useEffect(() => {
