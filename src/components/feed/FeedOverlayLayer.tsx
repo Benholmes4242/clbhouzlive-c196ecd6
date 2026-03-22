@@ -71,8 +71,8 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
     activePost.postType === 'tournament_live' ||
     activePost.postType === 'tournament_result';
 
-  // Hide overlays whenever the active post is a tournament card
-  if (activePostIsTournament) return null;
+  // Hide overlays only once the tournament card is fully snapped in.
+  if (activePostIsTournament && isTournamentCardActive) return null;
 
   const likeState = getLikeState(activePost);
   const commentCount = getCommentCount(activePost);
