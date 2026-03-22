@@ -31,13 +31,10 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 // ── Data hooks ──
 import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFeed';
 import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
-import type { FeedPost, TournamentResultFeedPost } from '@/components/media-system/types/media';
-import { TournamentResultCard } from '@/components/clubhouse/cinematic/TournamentResultCard';
+import type { FeedPost } from '@/components/media-system/types/media';
 import { buildSuggestedFeed, buildFriendsFeed } from '@/components/media-system/utils/feedAlgorithm';
 
 // ── Clubhouse UI overlays ──
-import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
-import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { FullscreenReviewPost } from '@/components/posts/FullscreenReviewPost';
 import { ReviewBottomSheet } from '@/components/posts/ReviewBottomSheet';
