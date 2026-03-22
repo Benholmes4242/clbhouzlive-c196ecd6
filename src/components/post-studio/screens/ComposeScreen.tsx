@@ -939,11 +939,23 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             <motion.button
               whileTap={{ scale: 0.96 }}
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl"
-              style={{ border: '1.5px dashed rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.03)' }}
+              className="flex items-center gap-1.5"
+              style={{
+                padding: '6px 12px 6px 8px',
+                borderRadius: 10,
+                border: '1.5px dashed rgba(255,255,255,0.13)',
+                background: 'rgba(255,255,255,0.02)',
+              }}
             >
-              <Plus className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={2} />
-              <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.35)' }}>Add more</span>
+              <div style={{
+                width: 22, height: 22, borderRadius: 6,
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.10)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Plus className="w-3 h-3" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={2} />
+              </div>
+              <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.30)' }}>Add more</span>
             </motion.button>
           </div>
         )}
