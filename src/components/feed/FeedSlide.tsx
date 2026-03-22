@@ -41,6 +41,19 @@ export const FeedSlide = memo(function FeedSlide({
 
   // ── Content routing ──
   const renderContent = () => {
+    // Tournament Hub Card — full custom chrome
+    if (post.postType === 'tournament_hub') {
+      return (
+        <TournamentHubCard
+          post={post as TournamentHubFeedPost}
+          isActive={isActive}
+          onComment={onComment}
+          onLike={() => onLike?.(post)}
+          onPageChange={onHubPageChange}
+        />
+      );
+    }
+
     // Multi-media (any mix of video + image) → FeedImageCarousel
     if (media && media.length > 1) {
       return (
