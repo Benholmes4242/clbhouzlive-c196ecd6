@@ -303,9 +303,11 @@ function ProfileHubSheet({
                     className="relative flex flex-col items-start justify-between p-3.5 rounded-2xl transition-colors duration-150 active:scale-[0.97]"
                     style={{
                       height: 80,
-                      background: isEcho ? 'rgba(245,158,11,0.08)' : '#ffffff',
-                      border: isEcho ? '1px solid rgba(245,158,11,0.22)' : '1px solid rgba(0,0,0,0.07)',
-                      boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+                      background: isEcho
+                        ? 'linear-gradient(135deg, rgba(245,166,35,0.14) 0%, rgba(245,166,35,0.06) 100%)'
+                        : '#ffffff',
+                      border: isEcho ? '1px solid rgba(245,166,35,0.32)' : '1px solid rgba(0,0,0,0.07)',
+                      boxShadow: isEcho ? '0 2px 12px rgba(245,166,35,0.12)' : '0 1px 4px rgba(0,0,0,0.05)',
                     }}
                   >
                     {/* Badge — top right */}
