@@ -7,7 +7,6 @@ interface ClubhouseState {
   activeVideoElement: HTMLVideoElement | null;
   activeVideoRef: React.RefObject<HTMLVideoElement> | null;
   carouselPositions: Map<number, number>;
-  isTournamentCardActive: boolean;
 
   setActiveIndex: (idx: number) => void;
   setIsMuted: (v: boolean) => void;
@@ -15,7 +14,6 @@ interface ClubhouseState {
   setUserPaused: (v: boolean) => void;
   setActiveVideoElement: (el: HTMLVideoElement | null, ref: React.RefObject<HTMLVideoElement> | null) => void;
   setCarouselPosition: (feedIdx: number, mediaIdx: number) => void;
-  setIsTournamentCardActive: (active: boolean) => void;
 }
 
 export const useClubhouseStore = create<ClubhouseState>()((set) => ({
@@ -25,7 +23,6 @@ export const useClubhouseStore = create<ClubhouseState>()((set) => ({
   activeVideoElement: null,
   activeVideoRef: null,
   carouselPositions: new Map(),
-  isTournamentCardActive: false,
 
   setActiveIndex: (idx) => {
     set({ activeIndex: idx });
@@ -40,5 +37,4 @@ export const useClubhouseStore = create<ClubhouseState>()((set) => ({
       next.set(feedIdx, mediaIdx);
       return { carouselPositions: next };
     }),
-  setIsTournamentCardActive: (active) => set({ isTournamentCardActive: active }),
 }));

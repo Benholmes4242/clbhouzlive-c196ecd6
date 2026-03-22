@@ -127,7 +127,7 @@ export function interleaveReviews(posts: FeedPost[], tab: FeedTab): FeedPost[] {
  * Tournament injection happens in Clubhouse.tsx (needs live data from hook).
  */
 export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
-  const noLive = posts.filter(p => p.postType !== 'tournament_live');
+  const noLive = posts.filter(p => p.postType !== 'tournament_live' && p.postType !== 'tournament_result');
   const filtered = filterForSuggested(noLive);
   const capped = capPerCreator(filtered);
   const interleaved = interleaveReviews(capped, 'suggested');

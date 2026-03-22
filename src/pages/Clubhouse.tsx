@@ -361,40 +361,8 @@ const ClubhouseContent = () => {
         </>
       ) : null}
 
-      {/* ═══ COMMENTS + MORE OPTIONS (tournament cards) ═══ */}
-      {activePost && posts.length > 0 &&
-        (activePost.postType === 'tournament_result' || activePost.postType === 'tournament_live') && (
-        <>
-          <CommentsSheet
-            isOpen={commentsOpen}
-            onClose={closeComments}
-            postId={activePost.id}
-            currentUserId={user?.id}
-            creatorUserId={activePost.userId}
-            creatorName={activePost.displayName}
-            creatorAvatar={activePost.avatarUrl}
-            caption={activePost.caption}
-            theme="dark"
-            likesCount={activeLikeState?.count ?? null}
-            onCommentPosted={() => handleCommentPosted(activePost)}
-            onCommentDeleted={() => activePost && handleCommentDeleted(activePost.id, activePost.commentCount)}
-          />
-          <MoreOptionsDrawer
-            open={moreOptionsOpen}
-            onOpenChange={setMoreOptionsOpen}
-            onReport={() => handleReport(activePost)}
-            onNotInterested={() => handleNotInterested(activePost)}
-            onCopyLink={() => {
-              navigator.clipboard.writeText(`${window.location.origin}/post/${activePost.id}`);
-              toast.success('Link copied');
-              setMoreOptionsOpen(false);
-            }}
-          />
-        </>
-      )}
-
-      {/* ═══ COMMENTS + MORE OPTIONS (regular posts) ═══ */}
-      {activePost && posts.length > 0 && !isTournamentCardActive && (
+      {/* ═══ COMMENTS + MORE OPTIONS ═══ */}
+      {activePost && posts.length > 0 && (
         <>
           <CommentsSheet
             isOpen={commentsOpen}
