@@ -308,7 +308,7 @@ export function PublishScreen() {
 
           {/* Section label */}
           <div className="px-4 pt-3 pb-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
-            <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: 'rgba(255,255,255,0.28)' }}>
+            <p className="text-[11px] font-bold uppercase tracking-[0.1em]" style={{ color: 'rgba(255,255,255,0.28)' }}>
               Before you post
             </p>
           </div>
