@@ -218,13 +218,39 @@ async function fetchSingleCourse(id: string): Promise<AdminCourseRow | null> {
 
 async function updateCourse(
   id: string,
-  updates: Partial<Pick<AdminCourseRow, 'name' | 'global_rank' | 'regional_rank' | 'usa_rank' | 'website_url' | 'description'>>
+  updates: Partial<Pick<AdminCourseRow,
+    'name' | 'global_rank' | 'regional_rank' | 'usa_rank' |
+    'website_url' | 'description' | 'city' | 'phone' |
+    'holes' | 'par' | 'yardage'
+  >>
 ): Promise<void> {
   const { error } = await supabase
     .from('golf_courses')
     .update(updates)
     .eq('id', id);
   if (error) throw error;
+}
+
+async function uploadCoursePhoto(courseId: string, file: File): Promise<string> {
+  const ext = file.name.split('.').pop();
+  const path = `course-photos/${courseId}-${Date.now()}.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('course-images')
+    .upload(path, file, { upsert: true });
+  if (uploadError) throw uploadError;
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('course-images')
+    .getPublicUrl(path);
+
+  const { error: updateError } = await supabase
+    .from('golf_courses')
+    .update({ thumbnail_image: publicUrl })
+    .eq('id', courseId);
+  if (updateError) throw updateError;
+
+  return publicUrl;
 }
 
 // ─── Main hook ────────────────────────────────────────────────────────────────
