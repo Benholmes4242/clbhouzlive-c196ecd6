@@ -155,6 +155,9 @@ function ProfileHubSheet({
     { icon: Settings, label: 'Settings', route: '/settings' },
   ];
 
+  // ── Section label class ──
+  const sectionLabelClass = "text-[11px] font-bold uppercase tracking-[0.1em] text-muted-foreground mb-2";
+
   // ── Portal content ──
 
   const content = (
@@ -171,13 +174,13 @@ function ProfileHubSheet({
             onClick={onClose}
           />
 
-          {/* Panel */}
+          {/* Panel — #1 bg-[#F8FAFC] */}
           <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 32, stiffness: 320 }}
-            className="fixed inset-x-0 bottom-0 z-[9999] w-full rounded-t-[24px] bg-background flex flex-col md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[560px]"
+            className="fixed inset-x-0 bottom-0 z-[9999] w-full rounded-t-[24px] bg-[#F8FAFC] flex flex-col md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[560px]"
             style={{
               maxHeight: '92dvh',
               paddingBottom: 'env(safe-area-inset-bottom, 0px)',
@@ -213,7 +216,7 @@ function ProfileHubSheet({
               {/* ── Switch profile ── */}
               <div className="pb-3">
 
-                <div className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground/60 mb-2.5">
+                <div className={sectionLabelClass}>
                   Switch Profile
                 </div>
                 <div
@@ -234,7 +237,11 @@ function ProfileHubSheet({
                         style={{ scrollSnapAlign: 'start' }}
                       >
                         <div className="relative">
-                          <div className="rounded-[34%]">
+                          {/* #7 — amber outline on active profile */}
+                          <div
+                            className="rounded-[34%]"
+                            style={isActive ? { outline: '2.5px solid hsl(38,92%,50%)', outlineOffset: '2px' } : undefined}
+                          >
                             <SquircleAvatar
                               size={48}
                               src={profile.avatarUrl}
@@ -243,9 +250,13 @@ function ProfileHubSheet({
                               hideRing
                             />
                           </div>
+                          {/* #7 — amber check badge */}
                           {isActive && (
-                            <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-primary flex items-center justify-center ring-2 ring-background">
-                              <Check className="w-3 h-3 text-primary-foreground" />
+                            <div
+                              className="absolute -bottom-0.5 -right-0.5 w-[18px] h-[18px] rounded-full flex items-center justify-center ring-2 ring-background"
+                              style={{ background: 'hsl(38,92%,50%)' }}
+                            >
+                              <Check className="w-3 h-3 text-white" />
                             </div>
                           )}
                         </div>
@@ -279,36 +290,51 @@ function ProfileHubSheet({
               {/* ── Divider ── */}
               <div className="h-px bg-border/50 -mx-4" />
 
-              {/* ── Quick actions ── */}
-              <div className="grid grid-cols-2 gap-2 py-4">
+              {/* ── Quick actions — #3 vertical card layout ── */}
+              <div className="grid grid-cols-2 gap-2.5 py-4">
                 {quickActions.map(({ icon: Icon, label, route, badge, badgeColor, isEcho }) => (
                   <button
                     key={label}
                     type="button"
                     onClick={() => handleNav(route)}
-                    className={cn(
-                      "relative flex items-center gap-3 rounded-2xl px-4 min-h-[56px] transition-colors duration-150",
-                      isEcho
-                        ? "hover:opacity-90 active:opacity-70"
-                        : "bg-muted hover:bg-muted/40 active:bg-muted/70"
-                    )}
-                    style={isEcho ? {
-                      background: 'rgba(245, 158, 11, 0.10)',
-                      border: '1px solid rgba(245, 158, 11, 0.22)',
-                    } : undefined}
+                    className="relative flex flex-col items-start justify-between p-3.5 rounded-2xl transition-colors duration-150 active:scale-[0.97]"
+                    style={{
+                      height: 80,
+                      background: isEcho ? 'rgba(245,158,11,0.08)' : '#ffffff',
+                      border: isEcho ? '1px solid rgba(245,158,11,0.22)' : '1px solid rgba(0,0,0,0.07)',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+                    }}
                   >
-                    <div className="relative">
-                      <Icon className={isEcho ? "" : "w-[18px] h-[18px] text-muted-foreground"} />
-                      {badge > 0 && (
-                        <span className={cn(
-                          'absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold text-white flex items-center justify-center',
-                          badgeColor
-                        )}>
-                          {badge > 99 ? '99+' : badge}
-                        </span>
-                      )}
+                    {/* Badge — top right */}
+                    {badge > 0 && (
+                      <span
+                        className="absolute top-2.5 right-2.5 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold text-white flex items-center justify-center"
+                        style={{ background: badgeColor === 'bg-primary' ? 'hsl(var(--primary))' : 'hsl(var(--destructive))' }}
+                      >
+                        {badge > 99 ? '99+' : badge}
+                      </span>
+                    )}
+
+                    {/* Icon in box — top left */}
+                    <div
+                      className="flex items-center justify-center rounded-[10px]"
+                      style={{
+                        width: 36,
+                        height: 36,
+                        background: isEcho ? 'rgba(245,158,11,0.12)' : 'rgba(0,0,0,0.05)',
+                      }}
+                    >
+                      <Icon
+                        className={isEcho ? '' : 'w-[18px] h-[18px]'}
+                        style={{ color: isEcho ? '#F59E0B' : '#475569' }}
+                        {...(!isEcho ? { strokeWidth: 2 } : {})}
+                      />
                     </div>
-                    <span className={cn("text-[13px] font-medium", isEcho ? "text-[#B45309]" : "text-foreground")}>{label}</span>
+
+                    {/* Label — bottom left */}
+                    <span className={cn("text-[13px] font-medium", isEcho ? "text-[#B45309]" : "text-foreground")}>
+                      {label}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -316,22 +342,33 @@ function ProfileHubSheet({
               {/* ── Divider ── */}
               <div className="h-px bg-border/50 -mx-4" />
 
-              {/* ── Account section ── */}
+              {/* ── Account section — #4 icon boxes ── */}
               <div className="py-3">
-                <div className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground/60 mb-1">
+                <div className={sectionLabelClass}>
                   Account
                 </div>
-                {accountRows.map(({ icon: Icon, label, route }) => (
-                  <button
-                    key={label}
-                    type="button"
-                    onClick={() => handleNav(route)}
-                    className="w-full flex items-center gap-3 min-h-[48px] hover:bg-muted/40 active:bg-muted/50 rounded-xl px-2 -mx-2 transition-colors duration-150"
-                  >
-                    <Icon className="w-4 h-4 text-muted-foreground" />
-                    <span className="flex-1 text-left text-[14px] font-medium text-foreground">{label}</span>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
-                  </button>
+                {accountRows.map(({ icon: Icon, label, route }, index) => (
+                  <div key={label}>
+                    {index > 0 && <div className="h-px bg-border/30 mx-1" />}
+                    <button
+                      type="button"
+                      onClick={() => handleNav(route)}
+                      className="w-full flex items-center gap-3 min-h-[48px] hover:bg-muted/40 active:bg-muted/50 rounded-xl px-2 -mx-2 transition-colors duration-150"
+                    >
+                      <div
+                        className="flex items-center justify-center rounded-[10px]"
+                        style={{
+                          width: 34,
+                          height: 34,
+                          background: 'rgba(0,0,0,0.05)',
+                        }}
+                      >
+                        <Icon className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                      <span className="flex-1 text-left text-[14px] font-medium text-foreground">{label}</span>
+                      <ChevronRight className="w-[13px] h-[13px] text-muted-foreground/30" />
+                    </button>
+                  </div>
                 ))}
               </div>
 
@@ -340,7 +377,7 @@ function ProfileHubSheet({
                 <>
                   <div className="h-px bg-border/50 -mx-4" />
                   <div className="py-3">
-                    <div className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground/60 mb-1">
+                    <div className={sectionLabelClass}>
                       Admin
                     </div>
                     <button
@@ -362,7 +399,7 @@ function ProfileHubSheet({
               {/* ── Divider ── */}
               <div className="h-px bg-border/50 -mx-4" />
 
-              {/* ── Logout ── */}
+              {/* ── Logout — #6 pill buttons ── */}
               <div className="py-3 pb-6">
                 {!showLogoutConfirm ? (
                   <button
@@ -378,14 +415,14 @@ function ProfileHubSheet({
                     <button
                       type="button"
                       onClick={() => setShowLogoutConfirm(false)}
-                      className="flex-1 min-h-[44px] rounded-xl border border-border text-[13px] font-semibold text-muted-foreground hover:bg-muted/40 active:bg-muted/50 transition-colors duration-150"
+                      className="flex-1 min-h-[50px] rounded-full border border-border/60 bg-black/[0.04] text-[14px] font-semibold text-muted-foreground hover:bg-muted/40 active:bg-muted/50 transition-colors duration-150"
                     >
                       Cancel
                     </button>
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="flex-1 min-h-[44px] rounded-xl bg-destructive text-[13px] font-semibold text-destructive-foreground hover:bg-destructive/90 active:bg-destructive/80 transition-colors duration-150"
+                      className="flex-1 min-h-[50px] rounded-full bg-destructive text-[14px] font-bold text-destructive-foreground hover:bg-destructive/90 active:bg-destructive/80 transition-colors duration-150"
                     >
                       Sign out
                     </button>
