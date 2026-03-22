@@ -41,14 +41,14 @@ interface GroupInfoPageProps {
 
 /* ── shared card style ── */
 const warmCard: React.CSSProperties = {
-  background: 'hsl(var(--background) / 0.7)',
-  border: '1px solid hsl(var(--border))',
-  borderRadius: 14,
+  background: '#ffffff',
+  border: '1px solid rgba(0,0,0,0.06)',
+  borderRadius: 16,
+  boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
 };
 const insetDivider: React.CSSProperties = {
   height: 1,
-  marginLeft: 56,
-  backgroundColor: 'hsl(var(--muted))',
+  backgroundColor: 'rgba(0,0,0,0.05)',
 };
 
 export const GroupInfoPage: React.FC<GroupInfoPageProps> = ({
