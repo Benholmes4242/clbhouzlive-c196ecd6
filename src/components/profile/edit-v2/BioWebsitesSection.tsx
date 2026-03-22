@@ -19,9 +19,9 @@ export function BioWebsitesSection({
   return (
     <div className="space-y-4">
       <div>
-        <div className="flex justify-between items-baseline mb-1.5">
-          <label className="text-[13px] font-medium text-muted-foreground">Bio</label>
-          <span className={`text-[11px] ${bio.length > BIO_MAX * 0.9 ? 'text-destructive' : 'text-muted-foreground'}`}>
+        <div className="flex justify-between items-baseline mb-2">
+          <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">Bio</label>
+          <span className={`text-[11px] ${bio.length > BIO_MAX * 0.9 ? 'text-destructive' : 'text-muted-foreground/60'}`}>
             {bio.length}/{BIO_MAX}
           </span>
         </div>
@@ -31,13 +31,13 @@ export function BioWebsitesSection({
           maxLength={BIO_MAX}
           rows={4}
           placeholder="Tell the clbhouz community about yourself and your golf game…"
-          className="w-full bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors resize-none"
+          className="w-full bg-[#F8FAFC] border border-border/60 rounded-[10px] px-3.5 py-2.5 text-[15px] leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors resize-none"
         />
         {bioError && <p className="text-[12px] text-destructive mt-1">{bioError}</p>}
       </div>
 
       <div>
-        <label className="text-[13px] font-medium text-muted-foreground mb-2 block">Websites</label>
+        <label className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground mb-2 block">Websites</label>
         <div className="space-y-2">
           {websites.map((site) => (
             <div key={site.id} className="flex items-center gap-2">
@@ -47,7 +47,7 @@ export function BioWebsitesSection({
                 value={site.url}
                 onChange={(e) => onUpdateWebsite(site.id, e.target.value)}
                 placeholder="https://yoursite.com"
-                className="flex-1 bg-muted border-0 rounded-xl px-4 py-3 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
+                className="flex-1 bg-[#F8FAFC] border border-border/60 rounded-[10px] px-3.5 py-2.5 text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[hsl(38,92%,50%)]/40 focus:bg-background transition-colors"
               />
               <button
                 onClick={() => onRemoveWebsite(site.id)}
@@ -63,9 +63,15 @@ export function BioWebsitesSection({
           {websites.length < 3 && (
             <button
               onClick={onAddWebsite}
-              className="flex items-center gap-2 text-[hsl(36,77%,49%)] text-[14px] font-medium min-h-[44px]"
+              className="flex items-center gap-2.5 text-[14px] font-semibold min-h-[44px]"
+              style={{ color: 'hsl(38,92%,50%)' }}
             >
-              <Plus size={16} />
+              <div
+                className="w-6 h-6 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: 'rgba(245,166,35,0.12)' }}
+              >
+                <Plus size={14} style={{ color: 'hsl(38,92%,50%)' }} />
+              </div>
               Add website
             </button>
           )}
