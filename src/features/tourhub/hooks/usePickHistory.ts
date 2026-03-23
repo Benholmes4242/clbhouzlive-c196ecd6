@@ -12,6 +12,7 @@ export interface PickHistoryEntry {
   shortName: string;
   topPickName: string;
   topPickPlayerId: string;
+  predictedRank: number;
   actualPosition: number | null;
   actualPositionTied: boolean;
   isWinner: boolean;
