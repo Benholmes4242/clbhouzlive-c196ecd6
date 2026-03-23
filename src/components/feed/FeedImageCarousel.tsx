@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, memo } from 'react';
+import React, { useCallback, useEffect, useState, useRef, memo } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapVideoPlayer } from './SnapVideoPlayer';
 import type { MediaItem } from '@/components/media-system/types/media';
@@ -20,6 +20,16 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
 }: FeedImageCarouselProps) {
   const setCarouselPosition = useClubhouseStore(s => s.setCarouselPosition);
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  // ── Horizontal swipe state ──
+  const containerRef = useRef<HTMLDivElement>(null);
+  const touchRef = useRef<{
+    startX: number;
+    startY: number;
+    locked: 'none' | 'horizontal' | 'vertical';
+    swiping: boolean;
+  }>({ startX: 0, startY: 0, locked: 'none', swiping: false });
+  const [swipeOffset, setSwipeOffset] = useState(0);
 
   useEffect(() => {
     setCarouselPosition(feedIndex, 0);
@@ -44,17 +54,86 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
     return () => window.removeEventListener('carousel-goto', handler);
   }, [feedIndex, goTo]);
 
+  // ── Touch handlers for horizontal swipe ──
+  const LOCK_THRESHOLD = 10;  // px before we decide axis
+  const SWIPE_THRESHOLD = 50; // px to trigger slide change
+
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    touchRef.current = {
+      startX: touch.clientX,
+      startY: touch.clientY,
+      locked: 'none',
+      swiping: false,
+    };
+    setSwipeOffset(0);
+  }, []);
+
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    const t = touchRef.current;
+    const touch = e.touches[0];
+    const dx = touch.clientX - t.startX;
+    const dy = touch.clientY - t.startY;
+
+    if (t.locked === 'none') {
+      // Haven't decided axis yet — wait for enough movement
+      if (Math.abs(dx) < LOCK_THRESHOLD && Math.abs(dy) < LOCK_THRESHOLD) return;
+      t.locked = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical';
+    }
+
+    if (t.locked === 'vertical') return; // Let vertical scroll through
+
+    // Horizontal lock — prevent vertical scroll
+    e.preventDefault();
+    t.swiping = true;
+
+    // Add resistance at edges
+    const atStart = currentSlide === 0 && dx > 0;
+    const atEnd = currentSlide === mediaItems.length - 1 && dx < 0;
+    const dampened = (atStart || atEnd) ? dx * 0.25 : dx;
+    setSwipeOffset(dampened);
+  }, [currentSlide, mediaItems.length]);
+
+  const onTouchEnd = useCallback(() => {
+    const t = touchRef.current;
+    if (t.locked === 'horizontal' && t.swiping) {
+      if (swipeOffset < -SWIPE_THRESHOLD && currentSlide < mediaItems.length - 1) {
+        goTo(currentSlide + 1);
+      } else if (swipeOffset > SWIPE_THRESHOLD && currentSlide > 0) {
+        goTo(currentSlide - 1);
+      }
+    }
+    touchRef.current = { startX: 0, startY: 0, locked: 'none', swiping: false };
+    setSwipeOffset(0);
+  }, [swipeOffset, currentSlide, mediaItems.length, goTo]);
+
   return (
-    <div className="absolute inset-0" style={{ touchAction: 'pan-y' }}>
+    <div
+      ref={containerRef}
+      className="absolute inset-0"
+      style={{ touchAction: 'pan-y' }}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      onTouchCancel={onTouchEnd}
+    >
       {mediaItems.map((item, idx) => {
         const isVisible = currentSlide === idx;
+        // Calculate transform for swipe animation
+        const offset = (idx - currentSlide) * 100;
+        const pixelShift = isVisible ? swipeOffset : 0;
 
         if (item.type === 'video') {
           return (
             <div
               key={item.id || idx}
               className="absolute inset-0"
-              style={{ opacity: isVisible ? 1 : 0, pointerEvents: isVisible ? 'auto' : 'none' }}
+              style={{
+                opacity: isVisible ? 1 : 0,
+                pointerEvents: isVisible ? 'auto' : 'none',
+                transform: isVisible && swipeOffset !== 0 ? `translateX(${pixelShift}px)` : undefined,
+                willChange: swipeOffset !== 0 ? 'transform' : undefined,
+              }}
             >
               <SnapVideoPlayer
                 hlsUrl={item.hlsUrl || ''}
@@ -80,7 +159,12 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
           <div
             key={item.id || idx}
             className="absolute inset-0 overflow-hidden"
-            style={{ opacity: isVisible ? 1 : 0, pointerEvents: isVisible ? 'auto' : 'none' }}
+            style={{
+              opacity: isVisible ? 1 : 0,
+              pointerEvents: isVisible ? 'auto' : 'none',
+              transform: isVisible && swipeOffset !== 0 ? `translateX(${pixelShift}px)` : undefined,
+              willChange: swipeOffset !== 0 ? 'transform' : undefined,
+            }}
           >
             {/* Blurred background for letterboxing */}
             <img
@@ -107,5 +191,4 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
     </div>
   );
 });
-
 export default FeedImageCarousel;
