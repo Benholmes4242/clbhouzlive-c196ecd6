@@ -48,7 +48,7 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
         </button>
       </div>
 
-      {/* Filter chips — orange gradient */}
+      {/* Filter chips — pill style */}
       <div className="flex items-center justify-center gap-2">
         {FILTERS.map(({ key, label }) => {
           const isActive = activeFilter === key;
@@ -56,13 +56,12 @@ export const CourseMediaHeader: React.FC<CourseMediaHeaderProps> = ({
             <button
               key={key}
               onClick={() => onFilterChange(key)}
-              className="min-h-[34px] px-4 text-sm font-semibold transition-colors"
+              className="min-h-[34px] px-4 text-sm font-semibold transition-colors active:scale-[0.97]"
               style={{
                 borderRadius: 8,
-                background: isActive ? 'linear-gradient(90deg, #F59E0B, #F7931E)' : 'transparent',
+                background: isActive ? 'hsl(var(--foreground))' : 'transparent',
                 color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
                 border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
-                boxShadow: isActive ? '0 2px 8px rgba(247,147,30,0.20)' : 'none',
               }}
             >
               {label}
