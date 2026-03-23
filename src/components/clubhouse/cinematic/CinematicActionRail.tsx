@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, Music, MoreHorizontal, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Heart, MessageSquare, Send, Bookmark, Volume2, VolumeX, Music, MoreHorizontal } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Z } from '@/config/zIndex';
@@ -26,10 +26,6 @@ interface CinematicActionRailProps {
   onMuteToggle: () => void;
   onMore?: () => void;
   isReviewPost?: boolean;
-  onNextMedia?: () => void;
-  onPrevMedia?: () => void;
-  hasNextMedia?: boolean;
-  hasPrevMedia?: boolean;
   /** Whether the current media item is a video (controls mute button visibility) */
   isVideo?: boolean;
   /** Whether user has interacted (reduces idle opacity until interaction) */
@@ -219,10 +215,6 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
   onMuteToggle,
   onMore,
   isReviewPost = false,
-  onNextMedia,
-  onPrevMedia,
-  hasNextMedia = false,
-  hasPrevMedia = false,
   isVideo = false,
   hasInteracted = false,
   audioMode,
@@ -258,7 +250,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       window.removeEventListener('resize', measure);
       cancelAnimationFrame(raf);
     };
-  }, [isVideo, hideMute, onSave, onMore, onNextMedia, hasNextMedia, isVisible]);
+  }, [isVideo, hideMute, onSave, onMore, isVisible]);
 
   return (
     <>
@@ -283,19 +275,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         zIndex: Z.echo,
       }}
     >
-      {/* Slot 1: Right chevron — top of rail, only when there's a next media item */}
-      {onNextMedia && hasNextMedia && (
-        <ActionSlot
-          icon={ChevronRight}
-          onClick={onNextMedia}
-          ariaLabel="Next media"
-          showCount={false}
-          idleOpacity={idleOpacity}
-          slotRef={nextSlotRef}
-        />
-      )}
-
-      {/* Slot 2: Like */}
+      {/* Slot 1: Like */}
       <ActionSlot
         icon={Heart}
         count={likesCount}
@@ -364,40 +344,6 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       )}
 
     </motion.div>
-
-    {/* Left chevron — mirrors the top slot of the rail exactly */}
-    {onPrevMedia && hasPrevMedia && (
-      <motion.div
-        initial={{ opacity: 0, x: -8 }}
-        animate={{ opacity: isVisible ? 1 : 0, x: isVisible ? 0 : -8 }}
-        transition={{ duration: 0.12, ease: 'easeOut' }}
-        className="fixed left-4 pointer-events-auto flex flex-col items-center"
-        style={{
-          top: topSlotTop !== null ? topSlotTop : undefined,
-          bottom: topSlotTop !== null ? undefined : CAPSULE_BOTTOM_OFFSET,
-          zIndex: Z.echo,
-          height: SLOT_HEIGHT,
-          opacity: idleOpacity,
-        }}
-      >
-        <motion.button
-          whileTap={pressFeedback}
-          onClick={onPrevMedia}
-          aria-label="Previous media"
-          className="rounded-full flex items-center justify-center"
-          style={{
-            width: ICON_SIZE,
-            height: ICON_SIZE,
-            background: 'rgba(0, 0, 0, 0.35)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.10)',
-          }}
-        >
-          <ChevronLeft className="w-5 h-5 text-white" strokeWidth={2} />
-        </motion.button>
-      </motion.div>
-    )}
     </>
   );
 };
