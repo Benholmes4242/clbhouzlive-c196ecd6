@@ -387,16 +387,20 @@ export const TournamentInsights = memo(function TournamentInsights() {
   };
 
   const renderResultsContent = () => {
-    // data is guaranteed non-null here (outer guard at line 138 returns null if !data)
     if (!data?.tournament) return null;
 
     return (
-      <TournamentResultsCard
-        tournamentId={data.tournament.id}
-        tournamentName={data.tournament.name}
-        courseName={data.tournament.courseName}
-        location={data.tournament.location}
-      />
+      <>
+        <TournamentResultsCard
+          tournamentId={data.tournament.id}
+          tournamentName={data.tournament.name}
+          courseName={data.tournament.courseName}
+          location={data.tournament.location}
+          allPicks={tracker?.allPicks}
+          tourSlug="pga"
+        />
+        <PickRecordRail />
+      </>
     );
   };
 
