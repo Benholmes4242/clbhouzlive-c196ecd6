@@ -38,6 +38,7 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
   const [isSortViewModalOpen, setIsSortViewModalOpen] = useState(false);
   const [isCoursePickerOpen, setIsCoursePickerOpen] = useState(false);
   const { viewType, sortType, setViewType, setSortType, isHydrated } = useViewPreference();
+  const queryClient = useQueryClient();
   
   const {
     courses,
