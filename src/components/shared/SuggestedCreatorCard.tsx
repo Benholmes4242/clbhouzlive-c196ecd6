@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { SuggestedCreator } from '@/components/watch/hooks/useSuggestedCreators';
 
 function shortName(displayName: string): string {
@@ -96,51 +97,20 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
         ...(removing ? { width: 0, opacity: 0 } : {}),
       }}
     >
-      {/* Avatar with amber ring */}
+      {/* Avatar — SquircleAvatar for consistent shape across all surfaces */}
       <div
         onClick={handleProfileTap}
-        className="cursor-pointer"
-        style={{
-          width: 88,
-          aspectRatio: '1 / 1.05',
-          borderRadius: '34%',
-          border: '1.5px solid rgba(245, 158, 11, 0.85)',
-          padding: 2,
-          flexShrink: 0,
-          position: 'relative',
-        }}
+        className="cursor-pointer relative"
+        style={{ width: 88, flexShrink: 0 }}
       >
-        <div
-          style={{
-            width: '100%',
-            height: '100%',
-            borderRadius: '34%',
-            overflow: 'hidden',
-            background: isDark ? 'rgba(255,255,255,0.1)' : 'hsl(var(--muted))',
-          }}
-        >
-          {creator.avatarUrl ? (
-            <img
-              src={creator.avatarUrl}
-              alt=""
-              className="w-full h-full object-cover"
-              style={{ borderRadius: '34%' }}
-            />
-          ) : (
-            <div
-              className="w-full h-full flex items-center justify-center"
-              style={{
-                background: isDark ? 'rgba(255,255,255,0.1)' : 'hsl(var(--muted))',
-                color: isDark ? 'rgba(255,255,255,0.5)' : 'hsl(var(--muted-foreground))',
-                fontSize: 24,
-                fontWeight: 600,
-                borderRadius: '34%',
-              }}
-            >
-              {initials}
-            </div>
-          )}
-        </div>
+        <SquircleAvatar
+          size={88}
+          src={creator.avatarUrl}
+          alt={creator.displayName}
+          fallback={initials}
+          ringColor="rgba(245, 158, 11, 0.85)"
+          hideRing={false}
+        />
 
         {/* Verified badge */}
         {creator.isVerified && (
@@ -155,6 +125,7 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
               borderRadius: '50%',
               background: '#D97706',
               border: isDark ? '2px solid #000' : '2px solid hsl(var(--background))',
+              zIndex: 2,
             }}
           >
             <Check className="text-white" style={{ width: 10, height: 10 }} strokeWidth={3} />
