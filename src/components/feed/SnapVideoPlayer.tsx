@@ -253,7 +253,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
       <video
         ref={videoRef}
         playsInline
-        preload="none"
+        preload="metadata"
         poster={thumbnailUrl || undefined}
         className="absolute inset-0 w-full h-full"
         style={{

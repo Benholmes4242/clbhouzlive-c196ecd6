@@ -53,9 +53,11 @@ import {
   logVideoElementUnmount,
 } from '@/media/mobileVideoDebug';
 
-// TODO Brief 3: re-wire sharedBandwidth
-const getSharedBandwidth = () => 5_000_000;
-const saveSharedBandwidth = (_bw: number) => {};
+let _sharedBandwidth = 8_000_000;
+const getSharedBandwidth = () => _sharedBandwidth;
+const saveSharedBandwidth = (bw: number) => {
+  if (bw > 0) _sharedBandwidth = bw;
+};
 const setNativeHlsSource = async (video: HTMLVideoElement, url: string) => { video.src = url; };
 
 // ============ Types ============
