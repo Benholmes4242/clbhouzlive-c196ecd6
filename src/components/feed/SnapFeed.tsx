@@ -1,10 +1,12 @@
 import React, { useRef, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { FeedSlide } from './FeedSlide';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { haptic } from '@/utils/haptics';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { registerInPool } from '@/utils/hlsPoolPreloader';
+import { pauseAllAudio } from '@/utils/globalVideoMute';
 
 
 const NEAR_END_THRESHOLD = 3;
@@ -72,6 +74,12 @@ export function SnapFeed({
 
   const activeIndex = useClubhouseStore(s => s.activeIndex);
   const setActiveIndex = useClubhouseStore(s => s.setActiveIndex);
+  const location = useLocation();
+
+  // Pause all audio when route changes away
+  useEffect(() => {
+    pauseAllAudio();
+  }, [location.pathname]);
 
   // ── IntersectionObserver setup ──
   useEffect(() => {

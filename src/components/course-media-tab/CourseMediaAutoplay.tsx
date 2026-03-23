@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { attachHlsToTile, prefetchTile } from '@/hooks/useTileVideoPlayer';
+import { registerAudioSource, unregisterAudioSource } from '@/utils/globalVideoMute';
 
 const ATTACH_THRESHOLD = 0.6;
 const DETACH_THRESHOLD = 0.2;
@@ -25,6 +26,18 @@ export const CourseMediaAutoplay: React.FC<CourseMediaAutoplayProps> = ({ posts,
     const connection = (navigator as any).connection;
     const type = connection?.effectiveType || '4g';
     return type === '2g' || type === 'slow-2g';
+  }, []);
+
+  // Register with global audio mutex
+  useEffect(() => {
+    registerAudioSource('course-media-autoplay', () => {
+      const video = videoRef.current;
+      if (video) {
+        video.pause();
+        video.muted = true;
+      }
+    });
+    return () => unregisterAudioSource('course-media-autoplay');
   }, []);
 
   

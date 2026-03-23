@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { pauseAllAudio } from '@/utils/globalVideoMute';
 
 export interface MediaViewerItem {
   id: string;
@@ -68,6 +69,7 @@ export const useMediaViewer = create<MediaViewerState>((set, get) => ({
   currentIndex: 0,
 
   openViewer: (rawItems, startIndex = 0) => {
+    pauseAllAudio();
     const items = rawItems.map(normalizeItem);
     set({ isOpen: true, items, currentIndex: Math.max(0, Math.min(startIndex, items.length - 1)) });
   },

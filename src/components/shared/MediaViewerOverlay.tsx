@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Volume2, VolumeX } from 'lucide-react';
 import Hls from 'hls.js';
 import { useMediaViewer, type MediaViewerItem } from '@/hooks/useMediaViewer';
+import { registerAudioSource, unregisterAudioSource } from '@/utils/globalVideoMute';
 
 /* ─── Video slide ─── */
 const VideoSlide: React.FC<{ item: MediaViewerItem }> = ({ item }) => {
@@ -11,6 +12,18 @@ const VideoSlide: React.FC<{ item: MediaViewerItem }> = ({ item }) => {
   const hlsRef = useRef<Hls | null>(null);
 
   const videoSrc = item.hlsUrl || item.mp4Url || item.src || '';
+
+  // Register with global audio mutex
+  useEffect(() => {
+    const id = `media-viewer-video`;
+    registerAudioSource(id, () => {
+      if (ref.current) {
+        ref.current.muted = true;
+        ref.current.pause();
+      }
+    });
+    return () => unregisterAudioSource(id);
+  }, []);
 
   useEffect(() => {
     const el = ref.current;
