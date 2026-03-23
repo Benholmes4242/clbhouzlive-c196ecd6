@@ -7,14 +7,6 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 const AMBER = '#f59e0b';
 
-function getTierLabel(rating: number): string {
-  if (rating >= 9.0) return 'Outstanding';
-  if (rating >= 8.0) return 'Excellent';
-  if (rating >= 7.0) return 'Very Good';
-  if (rating >= 6.5) return 'Good';
-  return 'Fair';
-}
-
 export interface ReviewBottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
@@ -62,8 +54,6 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     navigate(url);
   }, [courseId, reviewId, navigate, onClose]);
 
-  const tierLabel = getTierLabel(rating);
-
   const locationParts = [
     courseSubCountry || courseRegion,
     courseCountry,
@@ -76,6 +66,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
     .map(w => w[0]?.toUpperCase() ?? '')
     .slice(0, 2)
     .join('');
+
+  const formattedRating = rating === 10 ? '10' : rating.toFixed(1);
 
   const content = (
     <AnimatePresence>
@@ -110,11 +102,13 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               bottom: 0,
               zIndex: 101,
               borderRadius: '20px 20px 0 0',
-              background: '#0d0d0d',
+              background: '#0d0904',
               maxHeight: '85dvh',
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
+              border: '1px solid rgba(245, 158, 11, 0.22)',
+              borderBottom: 'none',
             }}
           >
             {/* Amber accent bar */}
@@ -133,116 +127,167 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               }} />
             </div>
 
-            {/* Header row */}
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
-              padding: '12px 20px 16px',
-              borderBottom: '1px solid rgba(255,255,255,0.07)',
-              flexShrink: 0,
-            }}>
-              <span style={{
-                fontSize: 10, fontWeight: 800, color: AMBER,
-                letterSpacing: '0.1em', textTransform: 'uppercase',
-              }}>
-                REVIEW
-              </span>
-            </div>
-
             {/* Scrollable body */}
-            <div style={{ flex: 1, overflow: 'auto', WebkitOverflowScrolling: 'touch', padding: '16px 20px 0' }}>
-              {/* Creator row */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-                <SquircleAvatar
-                  size={40}
-                  src={user.avatar}
-                  alt={user.name}
-                  fallback={initials}
-                  hideRing
-                />
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>
-                    {user.name}
-                  </div>
-                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
-                    reviewed this course
-                  </div>
-                </div>
+            <div style={{
+              flex: 1,
+              overflow: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              padding: '16px 20px 0',
+              position: 'relative',
+            }}>
+              {/* Score watermark — Verdict Card signature */}
+              <div style={{
+                position: 'absolute',
+                top: -20,
+                right: -8,
+                fontSize: 160,
+                fontWeight: 900,
+                color: 'rgba(245,158,11,0.055)',
+                lineHeight: 1,
+                letterSpacing: '-0.05em',
+                userSelect: 'none',
+                pointerEvents: 'none',
+                fontFamily: 'Georgia, serif',
+              }}>
+                {formattedRating}
               </div>
 
-              {/* Course card */}
-              <div style={{
-                background: `${AMBER}06`,
-                border: `1px solid ${AMBER}22`,
-                borderRadius: 16,
-                padding: '14px 16px',
-                marginBottom: reviewText ? 16 : 16,
-              }}>
-                {/* Tier eyebrow */}
+              {/* Content — above watermark */}
+              <div style={{ position: 'relative' }}>
+                {/* COURSE REVIEW badge + live score */}
                 <div style={{
-                  fontSize: 10, fontWeight: 800, color: AMBER,
-                  letterSpacing: '0.1em', textTransform: 'uppercase',
-                  marginBottom: 6,
-                }}>
-                  {tierLabel}
-                </div>
-
-                {/* Course name + rating pill */}
-                <div style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  gap: 10, marginBottom: locationStr ? 8 : 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: 12,
                 }}>
                   <div style={{
-                    fontSize: 17, fontWeight: 700, color: '#fff',
-                    flex: 1, minWidth: 0,
-                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                  }}>
-                    {courseName}
-                  </div>
-
-                  {/* Rating pill */}
-                  <div style={{
-                    display: 'flex', alignItems: 'center', gap: 4,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 5,
                     background: 'rgba(245,158,11,0.12)',
-                    border: `0.5px solid ${AMBER}55`,
-                    borderRadius: 10,
-                    padding: '5px 10px',
-                    flexShrink: 0,
+                    border: '0.5px solid rgba(245,158,11,0.35)',
+                    borderRadius: 6,
+                    padding: '3px 8px',
                   }}>
-                    <span style={{ fontSize: 15, fontWeight: 800, color: AMBER }}>
-                      {rating.toFixed(1)}
+                    <span style={{
+                      fontSize: 9,
+                      fontWeight: 800,
+                      color: AMBER,
+                      letterSpacing: '0.14em',
+                      textTransform: 'uppercase',
+                    }}>
+                      ★ Course Review
                     </span>
                   </div>
+
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
+                    <span style={{
+                      fontSize: 28,
+                      fontWeight: 900,
+                      color: AMBER,
+                      lineHeight: 1,
+                      letterSpacing: '-0.04em',
+                      fontFamily: 'Georgia, serif',
+                    }}>
+                      {formattedRating}
+                    </span>
+                    <span style={{
+                      fontSize: 12,
+                      fontWeight: 500,
+                      color: 'rgba(245,158,11,0.45)',
+                    }}>
+                      /10
+                    </span>
+                  </div>
+                </div>
+
+                {/* Course name — serif headline */}
+                <div style={{
+                  fontSize: 28,
+                  fontWeight: 900,
+                  color: '#ffffff',
+                  lineHeight: 1.15,
+                  letterSpacing: '-0.03em',
+                  fontFamily: 'Georgia, serif',
+                  marginBottom: 6,
+                }}>
+                  {courseName}
                 </div>
 
                 {/* Location */}
                 {locationStr && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <MapPin size={11} color="rgba(255,255,255,0.35)" />
-                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    marginBottom: 14,
+                  }}>
+                    <MapPin size={12} color="rgba(255,255,255,0.35)" />
+                    <span style={{
+                      fontSize: 12,
+                      color: 'rgba(255,255,255,0.38)',
+                    }}>
                       {locationStr}
                     </span>
                   </div>
                 )}
-              </div>
 
-              {/* Review text */}
-              {reviewText && (
+                {/* Divider — amber fade */}
                 <div style={{
-                  fontSize: 14,
-                  color: 'rgba(255,255,255,0.65)',
-                  lineHeight: 1.6,
-                  fontStyle: 'italic',
-                  borderLeft: `2px solid ${AMBER}44`,
-                  paddingLeft: 14,
-                  marginBottom: 16,
-                  display: '-webkit-box',
-                  WebkitLineClamp: 10,
-                  WebkitBoxOrient: 'vertical' as const,
-                  overflow: 'hidden',
+                  height: 0.5,
+                  background: `linear-gradient(90deg, rgba(245,158,11,0.3) 0%, transparent 80%)`,
+                  marginBottom: 14,
+                }} />
+
+                {/* Reviewer row */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  marginBottom: 14,
                 }}>
-                  "{reviewText}"
+                  <SquircleAvatar
+                    size={36}
+                    src={user.avatar}
+                    alt={user.name}
+                    fallback={initials}
+                    hideRing
+                  />
+                  <div>
+                    <div style={{
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: 'rgba(255,255,255,0.85)',
+                    }}>
+                      {user.name}
+                    </div>
+                    <div style={{
+                      fontSize: 11,
+                      color: 'rgba(255,255,255,0.35)',
+                    }}>
+                      reviewed this course
+                    </div>
+                  </div>
                 </div>
-              )}
+
+                {/* Review text */}
+                {reviewText && (
+                  <div style={{
+                    fontSize: 14,
+                    color: 'rgba(255,255,255,0.42)',
+                    lineHeight: 1.6,
+                    fontStyle: 'italic',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 10,
+                    WebkitBoxOrient: 'vertical' as const,
+                    overflow: 'hidden',
+                    marginBottom: 16,
+                  }}>
+                    "{reviewText}"
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* CTA buttons */}
@@ -250,7 +295,7 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               display: 'flex', gap: 12,
               padding: '14px 20px',
               paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
-              borderTop: '1px solid rgba(255,255,255,0.06)',
+              borderTop: '1px solid rgba(245,158,11,0.1)',
               flexShrink: 0,
             }}>
               <button
@@ -273,15 +318,15 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
                 onClick={handleGoToReview}
                 style={{
                   flex: 1,
-                  background: 'linear-gradient(135deg, rgba(245,158,11,0.65), rgba(190,118,5,0.52))',
-                  border: `1px solid ${AMBER}44`,
+                  background: AMBER,
+                  border: 'none',
                   borderRadius: 14,
                   padding: '13px 16px',
-                  color: '#fff',
+                  color: '#0d0904',
                   fontSize: 13,
                   fontWeight: 700,
                   cursor: 'pointer',
-                  boxShadow: '0 4px 20px rgba(245,158,11,0.18)',
+                  boxShadow: '0 4px 20px rgba(245,158,11,0.25)',
                 }}
               >
                 Go to Review
