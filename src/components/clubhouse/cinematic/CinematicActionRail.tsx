@@ -344,40 +344,6 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       )}
 
     </motion.div>
-
-    {/* Left chevron — mirrors the top slot of the rail exactly */}
-    {onPrevMedia && hasPrevMedia && (
-      <motion.div
-        initial={{ opacity: 0, x: -8 }}
-        animate={{ opacity: isVisible ? 1 : 0, x: isVisible ? 0 : -8 }}
-        transition={{ duration: 0.12, ease: 'easeOut' }}
-        className="fixed left-4 pointer-events-auto flex flex-col items-center"
-        style={{
-          top: topSlotTop !== null ? topSlotTop : undefined,
-          bottom: topSlotTop !== null ? undefined : CAPSULE_BOTTOM_OFFSET,
-          zIndex: Z.echo,
-          height: SLOT_HEIGHT,
-          opacity: idleOpacity,
-        }}
-      >
-        <motion.button
-          whileTap={pressFeedback}
-          onClick={onPrevMedia}
-          aria-label="Previous media"
-          className="rounded-full flex items-center justify-center"
-          style={{
-            width: ICON_SIZE,
-            height: ICON_SIZE,
-            background: 'rgba(0, 0, 0, 0.35)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.10)',
-          }}
-        >
-          <ChevronLeft className="w-5 h-5 text-white" strokeWidth={2} />
-        </motion.button>
-      </motion.div>
-    )}
     </>
   );
 };
