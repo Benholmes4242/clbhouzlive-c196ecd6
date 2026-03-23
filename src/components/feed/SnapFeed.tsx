@@ -180,7 +180,7 @@ export function SnapFeed({
     next.forEach(post => {
       const url = post.mediaItems?.[0]?.hlsUrl;
       if (url) {
-        fetch(url, { method: 'HEAD', mode: 'no-cors' }).catch(() => {});
+        preloadHlsManifest(url).catch(() => {});
       }
     });
   }, [activeIndex, posts]);
