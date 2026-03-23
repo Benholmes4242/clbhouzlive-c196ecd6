@@ -33,7 +33,7 @@ export async function registerInPool(hlsUrl: string): Promise<void> {
     const Hls = await loadHlsJs();
     if (!Hls || !Hls.isSupported()) return;
 
-    const cloudflareUid = extractCloudflareUid(hlsUrl);
+    if (!Hls || !Hls.isSupported()) return;
 
     // Create hidden video element for preloading
     const preloadVideo = document.createElement('video');
