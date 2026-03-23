@@ -30,6 +30,8 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
     swiping: boolean;
   }>({ startX: 0, startY: 0, locked: 'none', swiping: false });
   const [swipeOffset, setSwipeOffset] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     setCarouselPosition(feedIndex, 0);
@@ -55,10 +57,11 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
   }, [feedIndex, goTo]);
 
   // ── Touch handlers for horizontal swipe ──
-  const LOCK_THRESHOLD = 10;  // px before we decide axis
-  const SWIPE_THRESHOLD = 50; // px to trigger slide change
+  const LOCK_THRESHOLD = 10;
+  const SWIPE_THRESHOLD = 50;
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
+    if (isAnimating) return;
     const touch = e.touches[0];
     touchRef.current = {
       startX: touch.clientX,
@@ -67,50 +70,107 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
       swiping: false,
     };
     setSwipeOffset(0);
-  }, []);
+    setIsDragging(false);
+  }, [isAnimating]);
 
   const onTouchMove = useCallback((e: React.TouchEvent) => {
+    if (isAnimating) return;
     const t = touchRef.current;
     const touch = e.touches[0];
     const dx = touch.clientX - t.startX;
     const dy = touch.clientY - t.startY;
 
     if (t.locked === 'none') {
-      // Haven't decided axis yet — wait for enough movement
       if (Math.abs(dx) < LOCK_THRESHOLD && Math.abs(dy) < LOCK_THRESHOLD) return;
       t.locked = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical';
     }
 
-    if (t.locked === 'vertical') return; // Let vertical scroll through
+    if (t.locked === 'vertical') return;
 
-    // Horizontal lock — prevent vertical scroll
     e.preventDefault();
     t.swiping = true;
+    setIsDragging(true);
 
-    // Add resistance at edges
     const atStart = currentSlide === 0 && dx > 0;
     const atEnd = currentSlide === mediaItems.length - 1 && dx < 0;
     const dampened = (atStart || atEnd) ? dx * 0.25 : dx;
     setSwipeOffset(dampened);
-  }, [currentSlide, mediaItems.length]);
+  }, [currentSlide, mediaItems.length, isAnimating]);
 
   const onTouchEnd = useCallback(() => {
     const t = touchRef.current;
+    if (isAnimating) return;
+
     if (t.locked === 'horizontal' && t.swiping) {
+      const containerWidth = containerRef.current?.offsetWidth || 430;
+      let targetSlide = currentSlide;
+
       if (swipeOffset < -SWIPE_THRESHOLD && currentSlide < mediaItems.length - 1) {
-        goTo(currentSlide + 1);
+        targetSlide = currentSlide + 1;
       } else if (swipeOffset > SWIPE_THRESHOLD && currentSlide > 0) {
-        goTo(currentSlide - 1);
+        targetSlide = currentSlide - 1;
       }
+
+      if (targetSlide !== currentSlide) {
+        // Animate to the target: set offset to full width in the swipe direction
+        setIsAnimating(true);
+        const direction = targetSlide > currentSlide ? -containerWidth : containerWidth;
+        setSwipeOffset(direction);
+
+        // After transition completes, snap to new slide
+        setTimeout(() => {
+          setIsDragging(false);
+          setSwipeOffset(0);
+          setIsAnimating(false);
+          goTo(targetSlide);
+        }, 300);
+      } else {
+        // Snap back — animate offset back to 0
+        setIsAnimating(true);
+        setSwipeOffset(0);
+        setTimeout(() => {
+          setIsDragging(false);
+          setIsAnimating(false);
+        }, 300);
+      }
+    } else {
+      setIsDragging(false);
+      setSwipeOffset(0);
     }
+
     touchRef.current = { startX: 0, startY: 0, locked: 'none', swiping: false };
-    setSwipeOffset(0);
-  }, [swipeOffset, currentSlide, mediaItems.length, goTo]);
+  }, [swipeOffset, currentSlide, mediaItems.length, goTo, isAnimating]);
+
+  // Determine which slides need to be rendered (current + adjacent for smooth sliding)
+  const getSlideTransform = (idx: number): { translateX: string; opacity: number; pointerEvents: 'auto' | 'none' } => {
+    const containerWidth = containerRef.current?.offsetWidth || 430;
+    const diff = idx - currentSlide;
+
+    // Only render current and immediately adjacent slides
+    if (Math.abs(diff) > 1) {
+      return { translateX: `${diff * containerWidth}px`, opacity: 0, pointerEvents: 'none' };
+    }
+
+    // Base position: each slide offset by full container width
+    const baseOffset = diff * containerWidth;
+    const finalOffset = baseOffset + swipeOffset;
+
+    const isCurrentOrAdjacent = diff === 0 || (isDragging || isAnimating);
+    return {
+      translateX: `${finalOffset}px`,
+      opacity: isCurrentOrAdjacent ? 1 : 0,
+      pointerEvents: diff === 0 && !isAnimating ? 'auto' : 'none',
+    };
+  };
+
+  const transitionStyle = (isAnimating && !isDragging) || isAnimating
+    ? 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+    : 'none';
 
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0"
+      className="absolute inset-0 overflow-hidden"
       style={{ touchAction: 'pan-y' }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
@@ -118,23 +178,24 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
       onTouchCancel={onTouchEnd}
     >
       {mediaItems.map((item, idx) => {
-        const isVisible = currentSlide === idx;
-        // Calculate transform for swipe animation
-        const offset = (idx - currentSlide) * 100;
-        const pixelShift = isVisible ? swipeOffset : 0;
+        const diff = Math.abs(idx - currentSlide);
+        // Only render current slide and its immediate neighbours
+        if (diff > 1 && !isDragging && !isAnimating) return null;
+
+        const { translateX, opacity, pointerEvents } = getSlideTransform(idx);
+        const isVisible = idx === currentSlide;
+
+        const slideStyle: React.CSSProperties = {
+          transform: `translateX(${translateX})`,
+          opacity,
+          pointerEvents,
+          transition: transitionStyle,
+          willChange: isDragging || isAnimating ? 'transform' : undefined,
+        };
 
         if (item.type === 'video') {
           return (
-            <div
-              key={item.id || idx}
-              className="absolute inset-0"
-              style={{
-                opacity: isVisible ? 1 : 0,
-                pointerEvents: isVisible ? 'auto' : 'none',
-                transform: isVisible && swipeOffset !== 0 ? `translateX(${pixelShift}px)` : undefined,
-                willChange: swipeOffset !== 0 ? 'transform' : undefined,
-              }}
-            >
+            <div key={item.id || idx} className="absolute inset-0" style={slideStyle}>
               <SnapVideoPlayer
                 hlsUrl={item.hlsUrl || ''}
                 mp4Url={item.mp4Url}
@@ -151,22 +212,11 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
           );
         }
 
-        // Image slide
         const isLandscape = (item.width ?? 0) > (item.height ?? 1);
         const objectFit = isLandscape ? 'contain' : 'cover';
         const imgSrc = item.imageUrl || item.thumbnailUrl || '';
         return (
-          <div
-            key={item.id || idx}
-            className="absolute inset-0 overflow-hidden"
-            style={{
-              opacity: isVisible ? 1 : 0,
-              pointerEvents: isVisible ? 'auto' : 'none',
-              transform: isVisible && swipeOffset !== 0 ? `translateX(${pixelShift}px)` : undefined,
-              willChange: swipeOffset !== 0 ? 'transform' : undefined,
-            }}
-          >
-            {/* Blurred background for letterboxing */}
+          <div key={item.id || idx} className="absolute inset-0 overflow-hidden" style={slideStyle}>
             <img
               src={imgSrc}
               alt=""
@@ -176,7 +226,6 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
               aria-hidden="true"
             />
             <div className="absolute inset-0 bg-black/55" />
-            {/* Main image */}
             <img
               src={imgSrc}
               alt=""
