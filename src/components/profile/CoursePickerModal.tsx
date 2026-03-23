@@ -45,6 +45,7 @@ const CoursePickerModal: React.FC<CoursePickerModalProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCourses, setSelectedCourses] = useState<Set<string>>(new Set());
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const queryClient = useQueryClient();
   
 
   // Get all courses for the region
