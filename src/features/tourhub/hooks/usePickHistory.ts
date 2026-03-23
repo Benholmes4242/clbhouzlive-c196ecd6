@@ -55,17 +55,33 @@ export function usePickHistory() {
 
       const tournamentIds = predRows.map(r => r.tournament_id);
 
-      // Step 2: batch fetch event winners
-      const { data: winnersData } = await supabase
-        .from('event_winners')
-        .select('tournament_id, player_id, score_to_par, player:sr_players(full_name, sr_id)')
-        .in('tournament_id', tournamentIds);
+      // Step 2: batch fetch ALL leaderboard data for all tournaments at once
+      const { data: leaderboardData } = await supabase
+        .from('sr_leaderboards')
+        .select('tournament_id, position, position_tied, score, sr_players!inner(sr_id, full_name)')
+        .in('tournament_id', tournamentIds)
+        .not('position', 'is', null);
 
-      const winnersMap = new Map(
-        (winnersData || []).map(w => [w.tournament_id, w])
-      );
+      // Build lookup: tournamentId -> { bySrId, byName }
+      const lbByTournament = new Map<string, {
+        bySrId: Map<string, { position: number; tied: boolean; score: number | null }>;
+        byName: Map<string, { position: number; tied: boolean; score: number | null }>;
+      }>();
 
-      // Step 3: build entries with leaderboard lookups for actual positions
+      for (const row of (leaderboardData || [])) {
+        const tid = row.tournament_id;
+        if (!lbByTournament.has(tid)) {
+          lbByTournament.set(tid, { bySrId: new Map(), byName: new Map() });
+        }
+        const maps = lbByTournament.get(tid)!;
+        const srId = (row.sr_players as any)?.sr_id;
+        const fullName = (row.sr_players as any)?.full_name;
+        const entry = { position: row.position, tied: row.position_tied || false, score: (row as any).score ?? null };
+        if (srId) maps.bySrId.set(srId, entry);
+        if (fullName) maps.byName.set(fullName.toLowerCase(), entry);
+      }
+
+      // Step 3: build entries using pre-built leaderboard maps
       const entries: PickHistoryEntry[] = [];
 
       for (const row of predRows) {
@@ -83,27 +99,15 @@ export function usePickHistory() {
         const playerId = topPick.playerId || topPick.player_id || topPick.pgaTourId || '';
         if (!playerName) continue;
 
-        const winner = winnersMap.get(row.tournament_id);
-        const winnerName = (winner?.player as any)?.full_name ?? '';
-        const isWin = !!(winnerName && winnerName.toLowerCase() === playerName.toLowerCase());
+        // Look up actual finishing position from leaderboard (sr_id first, name fallback)
+        const maps = lbByTournament.get(row.tournament_id);
+        const lbEntry = maps?.bySrId.get(playerId)
+          ?? maps?.byName.get(playerName.toLowerCase());
 
-        // Fetch actual finishing position from leaderboard
-        let actualPosition: number | null = isWin ? 1 : null;
-        let actualPositionTied = false;
-
-        if (!isWin && playerId) {
-          const { data: lbRow } = await supabase
-            .from('sr_leaderboards')
-            .select('position, position_tied, sr_players!inner(sr_id)')
-            .eq('tournament_id', row.tournament_id)
-            .eq('sr_players.sr_id', playerId)
-            .maybeSingle();
-
-          if (lbRow) {
-            actualPosition = lbRow.position;
-            actualPositionTied = lbRow.position_tied || false;
-          }
-        }
+        const isWin = lbEntry?.position === 1;
+        const actualPosition = lbEntry?.position ?? null;
+        const actualPositionTied = lbEntry?.tied ?? false;
+        const scoreToPar = lbEntry?.score ?? null;
 
         entries.push({
           tournamentId: row.tournament_id,
@@ -114,7 +118,7 @@ export function usePickHistory() {
           actualPosition,
           actualPositionTied,
           isWinner: isWin,
-          scoreToPar: isWin ? (winner?.score_to_par ?? null) : null,
+          scoreToPar,
           year: tournament.start_date
             ? new Date(tournament.start_date).getFullYear().toString()
             : new Date().getFullYear().toString(),
