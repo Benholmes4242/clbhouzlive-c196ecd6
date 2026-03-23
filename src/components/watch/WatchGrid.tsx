@@ -93,6 +93,7 @@ const WatchGrid: React.FC<WatchGridProps> = ({
 
   return (
     <>
+      <SuggestedCreatorsStrip userId={userId} />
       <div
         ref={gridRef}
         className="grid grid-cols-3 gap-[2px] px-[2px]"
@@ -109,7 +110,6 @@ const WatchGrid: React.FC<WatchGridProps> = ({
             />
           </div>
         ))}
-        {posts.length > 8 && <SuggestedCreatorsStrip userId={userId} />}
       </div>
 
       {/* Sentinel for infinite scroll */}
