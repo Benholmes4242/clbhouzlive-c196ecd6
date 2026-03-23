@@ -46,7 +46,7 @@ const BetaGate: React.FC<{ onUnlock: () => void }> = ({ onUnlock }) => {
           onChange={(e) => setPw(e.target.value)}
           autoFocus
           className="w-full px-4 py-3 rounded-lg text-sm text-white placeholder-white/30 outline-none focus:ring-2"
-          style={{ background: '#222', border: '1px solid #333', focusRingColor: '#f59e0b' }}
+          style={{ background: '#222', border: '1px solid #333' }}
         />
         <button
           type="submit"
