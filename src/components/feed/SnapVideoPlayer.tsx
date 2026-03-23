@@ -3,7 +3,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { loadHlsJs } from '@/utils/hlsLoader';
 import { haptic } from '@/utils/haptics';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
-import { feedPerf } from '@/utils/feedPerf';
+
 import { isPrefetchComplete } from '@/utils/hlsPreload';
 import { extractCloudflareUid } from '@/utils/videoIdUtils';
 import { getSharedBandwidth, saveSharedBandwidth } from '@/utils/sharedBandwidth';
@@ -78,7 +78,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
         if (hlsRef.current) {
           hlsRef.current.stopLoad();
         }
-        feedPerf.onDeactivation(feedIndex, hlsUrl, 'stopped');
+        
       } else {
         // Far away — fully destroy to free memory
         if (hlsRef.current) {
@@ -89,7 +89,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
         video.load();
         setVideoReady(false);
         setShowReplay(false);
-        feedPerf.onDeactivation(feedIndex, hlsUrl, 'destroyed');
+        
       }
       useClubhouseStore.getState().setActiveVideoElement(null, null);
       return;
@@ -99,7 +99,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     let cancelled = false;
 
     const attach = async () => {
-      feedPerf.onActivation(feedIndex, hlsUrl, getSharedBandwidth());
+      
 
       // If HLS instance already exists (was stopped, not destroyed), resume it
       if (hlsRef.current) {
@@ -130,25 +130,14 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
         // Prefetch status check — use Cloudflare UID to match hlsPreload's key
         const videoId = extractCloudflareUid(hlsUrl) || hlsUrl;
         const prefetchStatus = isPrefetchComplete(videoId) ? 'hit' : 'miss';
-        feedPerf.onPrefetchCheck(feedIndex, hlsUrl, prefetchStatus);
 
         // Check pool for a pre-buffered instance first
-        feedPerf.onHlsAttachStart(feedIndex, hlsUrl);
         const pooledHls = HLSPoolManager.promote(hlsUrl, video);
-        feedPerf.onPoolCheck(feedIndex, hlsUrl, !!pooledHls);
 
         if (pooledHls) {
           hlsRef.current = pooledHls;
           pooledHls.startLoad();
 
-          // Wire perf listeners on pooled instance
-          pooledHls.on(Hls.Events.MANIFEST_PARSED, () => {
-            feedPerf.onHlsManifestParsed(feedIndex, hlsUrl, pooledHls.levels.length);
-          });
-          pooledHls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
-            const level = pooledHls.levels[data.level];
-            if (level) feedPerf.onQualitySwitch(feedIndex, hlsUrl, level.height, Math.round(level.bitrate / 1000));
-          });
           pooledHls.on(Hls.Events.FRAG_LOADED, (_, data) => {
             if (data.frag?.stats?.bwEstimate && data.frag.stats.bwEstimate > 0) {
               saveSharedBandwidth(data.frag.stats.bwEstimate);
@@ -160,14 +149,6 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
           hls.loadSource(hlsUrl || mp4Url || '');
           hls.attachMedia(video);
 
-          // Wire perf listeners on new instance
-          hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            feedPerf.onHlsManifestParsed(feedIndex, hlsUrl, hls.levels.length);
-          });
-          hls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
-            const level = hls.levels[data.level];
-            if (level) feedPerf.onQualitySwitch(feedIndex, hlsUrl, level.height, Math.round(level.bitrate / 1000));
-          });
           hls.on(Hls.Events.FRAG_LOADED, (_, data) => {
             if (data.frag?.stats?.bwEstimate && data.frag.stats.bwEstimate > 0) {
               saveSharedBandwidth(data.frag.stats.bwEstimate);
@@ -227,15 +208,14 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
 
     const handlePlaying = () => {
       setVideoReady(true);
-      feedPerf.onFirstFrame(feedIndex, hlsUrl);
       if (!firstFrameFiredRef.current) {
         firstFrameFiredRef.current = true;
         onFirstFrameReady?.();
       }
     };
 
-    const handleWaiting = () => feedPerf.onStallStart(feedIndex, hlsUrl);
-    const handlePlayingRecovery = () => feedPerf.onStallEnd(feedIndex, hlsUrl);
+    const handleWaiting = () => {};
+    const handlePlayingRecovery = () => {};
 
     video.addEventListener('playing', handlePlaying);
     video.addEventListener('waiting', handleWaiting);

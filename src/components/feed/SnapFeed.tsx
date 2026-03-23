@@ -5,7 +5,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { haptic } from '@/utils/haptics';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
 import { registerInPool } from '@/utils/hlsPoolPreloader';
-import { feedPerf } from '@/utils/feedPerf';
+
 
 const NEAR_END_THRESHOLD = 3;
 const ACTIVE_SLIDE_RATIO = 0.5;
@@ -103,7 +103,7 @@ export function SnapFeed({
                 .catch(() => {});
             }
           });
-          feedPerf.onViewportEntry(idx, postsRef.current[idx]?.mediaItems?.[0]?.hlsUrl ?? '');
+          
           pendingIndexRef.current = idx;
           if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
           debounceTimerRef.current = setTimeout(() => {
