@@ -86,17 +86,26 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
     };
   }
 
-  const tags: FeedPostTag[] = Array.isArray(row.post_tags)
-    ? row.post_tags.map((tag) => ({
-        id: tag.id,
-        entity_type: tag.entity_type,
-        entity_id: tag.entity_id,
-        name: tag.name,
-        username: tag.username,
-        start_index: tag.start_index ?? 0,
-        end_index: tag.end_index ?? 0,
-      }))
-    : [];
+  const rawTags = (() => {
+    if (!row.post_tags) return [];
+    if (Array.isArray(row.post_tags)) return row.post_tags;
+    if (typeof row.post_tags === 'string') {
+      try { return JSON.parse(row.post_tags); } catch { return []; }
+    }
+    return [];
+  })();
+
+  const tags: FeedPostTag[] = rawTags
+    .filter((tag: any) => tag && tag.entity_type && tag.entity_id)
+    .map((tag: any) => ({
+      id: tag.id ?? '',
+      entity_type: tag.entity_type,
+      entity_id: tag.entity_id,
+      name: tag.name ?? '',
+      username: tag.username ?? null,
+      start_index: tag.start_index ?? 0,
+      end_index: tag.end_index ?? 0,
+    }));
 
   return {
     id: row.post_id,
