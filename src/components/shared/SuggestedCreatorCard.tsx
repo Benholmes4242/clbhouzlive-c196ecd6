@@ -64,7 +64,13 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
           onFollowed?.(creator.userId);
           setTimeout(() => setRemoving(true), 1200);
         }
-        queryClient.invalidateQueries({ queryKey: ['suggested-creators'] });
+        // Optimistically remove followed user from cache, then background refetch
+        queryClient.setQueryData(
+          ['suggested-creators', currentUserId],
+          (old: SuggestedCreator[] | undefined) =>
+            old ? old.filter((c) => c.userId !== creator.userId) : old,
+        );
+        queryClient.invalidateQueries({ queryKey: ['suggested-creators', currentUserId] });
       } catch {
         setFollowing(wasFollowing);
       } finally {

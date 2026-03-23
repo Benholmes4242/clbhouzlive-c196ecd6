@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface SuggestedCreator {
@@ -46,5 +46,6 @@ export function useSuggestedCreators(userId: string | undefined) {
     enabled: !!userId,
     staleTime: 5 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 }

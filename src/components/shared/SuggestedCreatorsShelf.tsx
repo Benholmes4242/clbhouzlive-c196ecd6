@@ -24,7 +24,7 @@ export const SuggestedCreatorsShelf: React.FC<SuggestedCreatorsShelfProps> = ({
   const isDark = variant === 'dark';
 
   // Guard: don't render if not loading and < 2 creators
-  if (!isLoading && (!creators || creators.length < 2)) return null;
+  if (!isLoading && (!creators || creators.length < 1)) return null;
 
   return (
     <div
