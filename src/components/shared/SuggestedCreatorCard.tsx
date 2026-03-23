@@ -5,11 +5,8 @@ import { Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { SuggestedCreator } from '@/components/watch/hooks/useSuggestedCreators';
 
-function shortName(displayName: string): string {
-  const parts = (displayName || '').trim().split(/\s+/);
-  if (parts.length < 2) return parts[0] || '?';
-  return `${parts[0]} ${parts[parts.length - 1][0]}.`;
-}
+
+
 
 interface SuggestedCreatorCardProps {
   creator: SuggestedCreator;
@@ -102,7 +99,7 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
         className="cursor-pointer"
         style={{
           width: 88,
-          aspectRatio: '1 / 1.05',
+          aspectRatio: '1 / 1',
           borderRadius: '34%',
           border: '1.5px solid rgba(245, 158, 11, 0.85)',
           padding: 2,
@@ -175,7 +172,7 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
           lineHeight: '16px',
         }}
       >
-        {shortName(creator.displayName)}
+        {creator.displayName}
       </p>
 
       {/* Stat pill */}
@@ -255,7 +252,7 @@ export const SuggestedCreatorCardShimmer: React.FC = () => (
       className="animate-[shimmer_1.5s_infinite]"
       style={{
         width: 88,
-        aspectRatio: '1 / 1.05',
+        aspectRatio: '1 / 1',
         borderRadius: '34%',
         background: 'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted)/0.5) 50%, hsl(var(--muted)) 75%)',
         backgroundSize: '200% 100%',
