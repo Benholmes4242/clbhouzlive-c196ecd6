@@ -172,7 +172,7 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
           lineHeight: '16px',
         }}
       >
-        {shortName(creator.displayName)}
+        {creator.displayName}
       </p>
 
       {/* Stat pill */}
