@@ -120,10 +120,18 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
       if (useNative) {
         video.src = hlsUrl || mp4Url || '';
       } else {
-        const hls = new Hls(HLS_CONFIG);
-        hlsRef.current = hls;
-        hls.loadSource(hlsUrl || mp4Url || '');
-        hls.attachMedia(video);
+        // Check pool for a pre-buffered instance first
+        const pooledHls = HLSPoolManager.promote(hlsUrl, video);
+
+        if (pooledHls) {
+          hlsRef.current = pooledHls;
+          pooledHls.startLoad();
+        } else {
+          const hls = new Hls(HLS_CONFIG);
+          hlsRef.current = hls;
+          hls.loadSource(hlsUrl || mp4Url || '');
+          hls.attachMedia(video);
+        }
       }
 
       video.muted = useClubhouseStore.getState().isMuted;
