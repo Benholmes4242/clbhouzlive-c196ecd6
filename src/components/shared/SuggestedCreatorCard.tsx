@@ -172,43 +172,41 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
         )}
       </div>
 
-      {/* Stat pill — only show HCP, hide video count */}
-      {creator.handicap != null && (
-        <div
-          className="flex items-center justify-center rounded-full"
-          style={{
-            fontSize: 10,
-            fontWeight: 600,
-            height: 'auto',
-            padding: '3px 10px',
-            marginTop: 4,
-            lineHeight: '1',
-            borderRadius: 9999,
-            ...(isDark
-              ? { background: 'rgba(245,158,11,0.15)', color: '#F59E0B' }
-              : { background: '#FEF3C7', color: '#92400E' }),
-          }}
-        >
-          {`HCP ${creator.handicap}`}
-        </div>
-      )}
-
-      {/* Home club */}
-      {creator.homeCourse && (
-        <p
-          className="text-center truncate"
-          style={{
-            fontSize: 11,
-            fontWeight: 400,
-            color: isDark ? 'rgba(255,255,255,0.5)' : 'hsl(var(--muted-foreground))',
-            maxWidth: 108,
-            marginTop: 2,
-            lineHeight: '14px',
-          }}
-        >
-          {creator.homeCourse}
-        </p>
-      )}
+      {/* Stat pill + home club — fixed height so Follow button stays aligned */}
+      <div style={{ height: 36, marginTop: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
+        {creator.handicap != null && (
+          <div
+            className="flex items-center justify-center rounded-full"
+            style={{
+              fontSize: 10,
+              fontWeight: 600,
+              padding: '3px 10px',
+              lineHeight: '1',
+              borderRadius: 9999,
+              ...(isDark
+                ? { background: 'rgba(245,158,11,0.15)', color: '#F59E0B' }
+                : { background: '#FEF3C7', color: '#92400E' }),
+            }}
+          >
+            {`HCP ${creator.handicap}`}
+          </div>
+        )}
+        {creator.homeCourse && (
+          <p
+            className="text-center truncate"
+            style={{
+              fontSize: 11,
+              fontWeight: 400,
+              color: isDark ? 'rgba(255,255,255,0.5)' : 'hsl(var(--muted-foreground))',
+              maxWidth: 108,
+              marginTop: 2,
+              lineHeight: '14px',
+            }}
+          >
+            {creator.homeCourse}
+          </p>
+        )}
+      </div>
 
       {/* Follow button */}
       <button
