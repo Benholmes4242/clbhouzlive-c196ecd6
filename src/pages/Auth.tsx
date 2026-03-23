@@ -78,9 +78,6 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
   const lastResendEmail = useRef("");
   const hasNavigated = useRef(false);
   
-  useHideBottomNav();
-  useHideHeader();
-
   useLayoutEffect(() => {
     document.body.classList.add('route-auth');
     return () => { document.body.classList.remove('route-auth'); };
@@ -89,11 +86,6 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
   if (!betaUnlocked) {
     return <BetaGate onUnlock={() => setBetaUnlocked(true)} />;
   }
-
-  useLayoutEffect(() => {
-    document.body.classList.add('route-auth');
-    return () => { document.body.classList.remove('route-auth'); };
-  }, []);
 
   async function checkProfileAndOnboarding(userId: string): Promise<{
     hasProfile: boolean;
