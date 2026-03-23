@@ -10,6 +10,7 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { FeedCarouselDots } from '@/components/feed/FeedCarouselDots';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -108,6 +109,10 @@ interface CreatorCapsuleProps {
   /** Override the bottom offset (default: 'calc(30px + 80px)' for tab bar context).
    *  Use for fullscreen viewer where there's no tab bar. */
   bottomOffset?: string;
+
+  /** Carousel dot indicators — rendered 8px above the capsule */
+  carouselCount?: number;
+  carouselActiveIndex?: number;
 }
 
 export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
@@ -133,6 +138,9 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   onBeforeNavigate,
   // Bottom offset override
   bottomOffset,
+  // Carousel dots
+  carouselCount = 0,
+  carouselActiveIndex = 0,
 }) => {
   
   const [isExpanded, setIsExpanded] = useState(false);
@@ -597,6 +605,16 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
                 : '97px'),
         }}
       >
+        {/* Carousel dots — positioned 8px above capsule */}
+        {carouselCount > 1 && (
+          <div
+            className="absolute left-0 right-0 flex justify-center pointer-events-none"
+            style={{ bottom: '100%', marginBottom: 8 }}
+          >
+            <FeedCarouselDots count={carouselCount} activeIndex={carouselActiveIndex} />
+          </div>
+        )}
+
         <motion.div
           layout
           transition={{ layout: { duration: 0.2, ease: 'easeOut' } }}

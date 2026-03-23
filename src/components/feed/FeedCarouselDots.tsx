@@ -33,10 +33,10 @@ export const FeedCarouselDots: React.FC<FeedCarouselDotsProps> = ({ count, activ
             aria-selected={isActive}
             className={`rounded-full transition-all duration-200 ease-out ${
               isActive
-                ? 'w-4 h-0.5 bg-white/90'
+                ? 'w-4 h-[3px] bg-white/90'
                 : isEdge
-                  ? 'w-1 h-0.5 bg-white/30'
-                  : 'w-[5px] h-0.5 bg-white/30'
+                  ? 'w-1 h-[3px] bg-white/30'
+                  : 'w-[5px] h-[3px] bg-white/30'
             }`}
           />
         );
