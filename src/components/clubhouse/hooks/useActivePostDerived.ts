@@ -17,6 +17,8 @@ export function useActivePostDerived(posts: FeedPost[], activeIndex: number) {
 
   const golfCourse = useMemo(() => {
     if (!activePost) return undefined;
+
+    // Priority 1: review post — always has real course id
     if (activePost.review) {
       return {
         id: activePost.review.courseId,
@@ -24,6 +26,18 @@ export function useActivePostDerived(posts: FeedPost[], activeIndex: number) {
         courseCountry: activePost.review.courseCountry || null,
       };
     }
+
+    // Priority 2: golf_club tag — has real course UUID as entity_id
+    const courseTag = activePost.tags?.find(t => t.entity_type === 'golf_club');
+    if (courseTag) {
+      return {
+        id: courseTag.entity_id,
+        name: courseTag.name,
+        courseCountry: null,
+      };
+    }
+
+    // Priority 3: caption text extraction — no real id, fallback only
     if (activePost.caption) {
       const extracted = extractGolfCourseFromContent(activePost.caption);
       if (extracted) {
@@ -34,8 +48,9 @@ export function useActivePostDerived(posts: FeedPost[], activeIndex: number) {
         };
       }
     }
+
     return undefined;
-  }, [activePost?.id, activePost?.review, activePost?.caption]);
+  }, [activePost?.id, activePost?.review, activePost?.tags, activePost?.caption]);
 
   const activeReview = activePost?.review ?? null;
   const isActiveReview = activePost?.isReview ?? false;
