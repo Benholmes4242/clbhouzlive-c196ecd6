@@ -107,19 +107,9 @@ export default function AuthCallback() {
           <img
             src="/images/clbhouz-logo.png"
             alt="clbhouz"
-            style={{ height: 48, width: 'auto', opacity: 0.8, marginBottom: 8 }}
+            className="h-16 w-auto opacity-90"
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
-          <div style={{
-            width: 72, height: 72, borderRadius: '50%',
-            background: 'rgba(245,166,35,0.15)',
-            border: '1.5px solid rgba(245,166,35,0.3)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#F5A623" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
-          </div>
           <h1 style={{ fontSize: 28, fontWeight: 700, color: '#fff', lineHeight: 1.2, letterSpacing: '-0.3px', margin: 0 }}>
             Almost there
           </h1>
