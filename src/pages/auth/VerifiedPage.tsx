@@ -63,12 +63,12 @@ export default function VerifiedPage() {
 
         {/* Subtext */}
         <p style={{ fontSize: 15, fontWeight: 300, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, maxWidth: 280, margin: 0 }}>
-          Your email has been verified. Return to the clbhouz app and sign in to start your journey.
+          Your email has been verified. Please close your clbhouz app and reopen to sign in and start your journey.
         </p>
 
         {/* Note */}
         <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', lineHeight: 1.5, maxWidth: 260, margin: 0 }}>
-          You can close this page.
+          You can now close this page.
         </p>
       </div>
 
