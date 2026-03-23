@@ -13,6 +13,18 @@ const VideoSlide: React.FC<{ item: MediaViewerItem }> = ({ item }) => {
 
   const videoSrc = item.hlsUrl || item.mp4Url || item.src || '';
 
+  // Register with global audio mutex
+  useEffect(() => {
+    const id = `media-viewer-video`;
+    registerAudioSource(id, () => {
+      if (ref.current) {
+        ref.current.muted = true;
+        ref.current.pause();
+      }
+    });
+    return () => unregisterAudioSource(id);
+  }, []);
+
   useEffect(() => {
     const el = ref.current;
     if (!el || !videoSrc) return;

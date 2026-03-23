@@ -63,6 +63,19 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   const isMuted = useClubhouseStore(s => s.isMuted);
   const userPaused = useClubhouseStore(s => s.userPaused);
 
+  // Register with global audio mutex
+  useEffect(() => {
+    const id = `snap-video-${feedIndex}`;
+    registerAudioSource(id, () => {
+      const video = videoRef.current;
+      if (video) {
+        video.muted = true;
+      }
+      useClubhouseStore.getState().setIsMuted(true);
+    });
+    return () => unregisterAudioSource(id);
+  }, [feedIndex]);
+
   const isLandscape = (width ?? 0) > (height ?? 1);
   const objectFit = isLandscape ? 'contain' : 'cover';
 

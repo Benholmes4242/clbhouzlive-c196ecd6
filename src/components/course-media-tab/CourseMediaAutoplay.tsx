@@ -28,6 +28,18 @@ export const CourseMediaAutoplay: React.FC<CourseMediaAutoplayProps> = ({ posts,
     return type === '2g' || type === 'slow-2g';
   }, []);
 
+  // Register with global audio mutex
+  useEffect(() => {
+    registerAudioSource('course-media-autoplay', () => {
+      const video = videoRef.current;
+      if (video) {
+        video.pause();
+        video.muted = true;
+      }
+    });
+    return () => unregisterAudioSource('course-media-autoplay');
+  }, []);
+
   
 
   const prewarmTile = useCallback(async (hlsUrl: string) => {

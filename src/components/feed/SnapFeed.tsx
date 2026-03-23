@@ -74,6 +74,12 @@ export function SnapFeed({
 
   const activeIndex = useClubhouseStore(s => s.activeIndex);
   const setActiveIndex = useClubhouseStore(s => s.setActiveIndex);
+  const location = useLocation();
+
+  // Pause all audio when route changes away
+  useEffect(() => {
+    pauseAllAudio();
+  }, [location.pathname]);
 
   // ── IntersectionObserver setup ──
   useEffect(() => {
