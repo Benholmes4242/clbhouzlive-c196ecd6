@@ -107,12 +107,6 @@ export default function AuthCallback() {
           <img
             src="/images/clbhouz-logo.png"
             alt="clbhouz"
-            style={{ height: 48, width: 'auto', opacity: 0.8, marginBottom: 8 }}
-            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-          />
-          <img
-            src="/images/clbhouz-logo.png"
-            alt="clbhouz"
             className="h-16 w-auto opacity-90"
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
