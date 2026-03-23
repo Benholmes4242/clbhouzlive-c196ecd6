@@ -171,6 +171,11 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
               activeMap.set(slot, idx);
               detachSlot(slot, prevTile);
               attachToTile(slot, idx, hlsUrl, el);
+
+              // Prefetch next tile
+              const nextPost = postsRef.current[idx + 1];
+              const nextHlsUrl = nextPost?.mediaItems?.[0]?.hlsUrl;
+              if (nextHlsUrl) prefetchTile(nextHlsUrl);
             }
           } else {
             if (activeMap.get(slot) === idx) {

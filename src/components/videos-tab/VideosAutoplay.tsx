@@ -176,6 +176,11 @@ export function VideosAutoplay({ posts, feedRef }: VideosAutoplayProps) {
             if (mediaEl) {
               activeMapRef.current.set(freeSlot, bestIdx);
               attachToCard(freeSlot, bestIdx, post, mediaEl);
+
+              // Prefetch next tile
+              const nextPost = posts[bestIdx + 1];
+              const nextHlsUrl = nextPost?.mediaItems?.[0]?.hlsUrl;
+              if (nextHlsUrl) prefetchTile(nextHlsUrl);
             }
           }
         }

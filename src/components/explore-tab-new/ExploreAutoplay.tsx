@@ -178,6 +178,11 @@ export default function ExploreAutoplay({ posts, gridRef }: ExploreAutoplayProps
           if (tile && post && media && (media.hlsUrl || media.mp4Url)) {
             activeMapRef.current.set(freeSlot, bestIdx);
             attachToTile(freeSlot, bestIdx, post, tile);
+
+            // Prefetch next tile
+            const nextPost = posts[bestIdx + 1];
+            const nextHlsUrl = nextPost?.mediaItems?.[0]?.hlsUrl;
+            if (nextHlsUrl) prefetchTile(nextHlsUrl);
           }
         }
       }
