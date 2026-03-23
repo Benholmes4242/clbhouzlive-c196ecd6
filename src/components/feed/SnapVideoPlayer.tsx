@@ -93,6 +93,21 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     let cancelled = false;
 
     const attach = async () => {
+      // If HLS instance already exists (was stopped, not destroyed), resume it
+      if (hlsRef.current) {
+        hlsRef.current.startLoad();
+        video.muted = useClubhouseStore.getState().isMuted;
+        try {
+          await video.play();
+        } catch {
+          video.muted = true;
+          useClubhouseStore.getState().setIsMuted(true);
+          video.play().catch(() => {});
+        }
+        useClubhouseStore.getState().setActiveVideoElement(video, videoRef);
+        return;
+      }
+
       const Hls = await loadHlsJs();
 
       if (cancelled) return;
