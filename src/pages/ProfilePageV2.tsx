@@ -13,6 +13,7 @@ import { useUserProfile } from '@/hooks/useUserProfile.tsx';
 import { useTop100Overview } from '@/hooks/useTop100Overview';
 import PostsTabContent from '@/components/posts-tab/PostsTabContent';
 import { usePersonalPostsCount } from '@/hooks/usePersonalPostsCount';
+import { usePersonalReviewsCount } from '@/hooks/usePersonalReviewsCount';
 import { getProfileType, getProfileTabs } from '@/hooks/useProfileType';
 import { useFollow } from '@/hooks/useFollow';
 import { useFriendship } from '@/hooks/useFriendship';
@@ -153,6 +154,7 @@ const ProfilePageV2Content: React.FC = () => {
   const { data: top100Overview } = useTop100Overview(profileUserId);
   // Post count comes from usePersonalPostsCount below
   const { data: postsCount = 0, isLoading: postsCountLoading } = usePersonalPostsCount(profileUserId);
+  const { data: reviewsCount = 0, isLoading: reviewsCountLoading } = usePersonalReviewsCount(profileUserId);
   const { data: achievements } = useProfileAchievements(profileUserId);
   
   // Determine if viewing own profile
@@ -887,6 +889,26 @@ const ProfilePageV2Content: React.FC = () => {
             <AnimatedNumber 
               value={postsCount} 
               isLoading={postsCountLoading}
+              minCh={2}
+              className="text-base font-semibold text-foreground"
+            />
+          </motion.button>
+          
+          <div className="w-px h-6 bg-border/50 self-center" />
+
+          {/* Reviews */}
+          <motion.button
+            onClick={() => setActiveMiniNav('posts')}
+            className="pb-3 flex items-center gap-2 min-h-[44px] rounded-lg active:scale-[0.97] transition-transform"
+            variants={{
+              hidden: { opacity: 0, y: 4 },
+              show: { opacity: 1, y: 0, transition: { duration: 0.22, ease: 'easeOut' } }
+            }}
+          >
+            <span className="text-sm text-muted-foreground">Reviews</span>
+            <AnimatedNumber 
+              value={reviewsCount} 
+              isLoading={reviewsCountLoading}
               minCh={2}
               className="text-base font-semibold text-foreground"
             />
