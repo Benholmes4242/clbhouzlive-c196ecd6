@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { invalidateCourseRatingCaches } from '@/utils/invalidateCourseRatingCaches';
 import {
   Dialog,
   DialogContent,
@@ -142,34 +143,23 @@ const EditRatingModal = ({
       if (error) throw error;
     },
     onSuccess: async () => {
-      queryClient.invalidateQueries({ queryKey: ['course-rating-stats', courseId] });
-      queryClient.invalidateQueries({ queryKey: ['user-course-rating', courseId] });
-      queryClient.invalidateQueries({ queryKey: ['course-reviews-full', courseId] });
-      queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', courseId] });
-      
-      // Invalidate Top 10 carousel ratings so updated scores show immediately
-      queryClient.invalidateQueries({ queryKey: ['user-course-ratings-breakdown'], exact: false });
-      
-      // Force refetch community aggregates
-      await queryClient.refetchQueries({ 
-        queryKey: ['course-rating-aggregates', courseId] 
-      });
-      
-      // Invalidate AND refetch feed caches so cards update immediately
-      queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
+      // Invalidate all course rating caches via shared helper
+      invalidateCourseRatingCaches(queryClient);
+
+      // Additional delete-specific invalidations
       queryClient.invalidateQueries({ queryKey: ['golf-courses-search'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['friends-courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['explore-courses'], exact: false });
-      
-      // EXPLORE MAP FIX: Invalidate exploration status to update world map continent fill
       queryClient.invalidateQueries({ queryKey: ['user-exploration-status'], exact: false });
-      
-      // Force refetch the feed queries to show updated ratings
+
+      // Force refetch critical queries
+      await queryClient.refetchQueries({ queryKey: ['course-rating-aggregates', courseId] });
       await queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false });
       await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
       await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
-      
+      await queryClient.refetchQueries({ queryKey: ['userProfile'], type: 'active', exact: false });
+      await queryClient.refetchQueries({ queryKey: ['userTop100Courses'], type: 'active', exact: false });
+      await queryClient.refetchQueries({ queryKey: ['user-played-courses-full'], type: 'active', exact: false });
+      await queryClient.refetchQueries({ queryKey: ['user-top-ten-courses'], type: 'active', exact: false });
+
       toast.success("Rating removed");
       
       setIsSubmitting(false);
