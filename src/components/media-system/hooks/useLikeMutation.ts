@@ -19,7 +19,8 @@ export function useLikeMutation() {
           .from('post_likes')
           .delete()
           .eq('post_id', postId)
-          .eq('user_id', userId);
+          .eq('actor_id', actorId)
+          .eq('actor_type', actorType);
         if (error) throw error;
       } else {
         const { error } = await supabase
@@ -35,10 +36,8 @@ export function useLikeMutation() {
       console.error('[Like] Mutation failed:', error);
     },
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['media-feed'],
-        refetchType: 'none',
-      });
+      queryClient.invalidateQueries({ queryKey: ['media-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['user-post-likes'] });
     },
   });
 }

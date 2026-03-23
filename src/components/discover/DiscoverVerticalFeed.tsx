@@ -421,12 +421,10 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
       if (action === 'like') {
         const { data, error } = await supabase
           .from('post_likes')
-          .insert({
-            post_id: postId,
-            user_id: user.id,
-            actor_type: 'personal',
-            actor_id: user.id
-          })
+          .upsert(
+            { post_id: postId, user_id: user.id, actor_type: 'personal', actor_id: user.id },
+            { onConflict: 'post_id,actor_type,actor_id', ignoreDuplicates: true }
+          )
           .select()
           .single();
         
@@ -455,6 +453,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
           return oldData.filter(id => id !== variables.postId);
         }
       });
+      queryClient.invalidateQueries({ queryKey: ['media-feed'] });
     },
     onError: (error) => {
       console.error('Like/unlike error:', error);
