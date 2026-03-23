@@ -80,34 +80,12 @@ const CourseRatingSystem = ({
       return await optimisticNewRating(courseId, rating);
     },
     onSuccess: async () => {
-      queryClient.invalidateQueries({ queryKey: ['course-rating-stats', courseId] });
-      queryClient.invalidateQueries({ queryKey: ['user-course-rating', courseId] });
-      queryClient.invalidateQueries({ queryKey: ['course-reviews-full', courseId] });
-      queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates', courseId] });
+      invalidateCourseRatingCaches(queryClient);
       
-      // Invalidate Top 10 carousel ratings so updated scores show immediately
-      queryClient.invalidateQueries({ queryKey: ['user-course-ratings-breakdown'], exact: false });
-      
-      // Invalidate Course History queries so rating changes reflect immediately
-      queryClient.invalidateQueries({ queryKey: ['user-course-activity'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-played-courses-full'], exact: false });
-      
-      // Force refetch community aggregates
-      await queryClient.refetchQueries({ 
-        queryKey: ['course-rating-aggregates', courseId] 
-      });
-      
-      // Invalidate AND refetch feed caches so cards update immediately
-      queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['golf-courses-search'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['friends-courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['explore-courses'], exact: false });
-      
-      // Force refetch the feed queries to show updated ratings
-      await queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false });
-      await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
-      await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
+      await queryClient.refetchQueries({ queryKey: ['userProfile'], type: 'active', exact: false });
+      await queryClient.refetchQueries({ queryKey: ['userTop100Courses'], type: 'active', exact: false });
+      await queryClient.refetchQueries({ queryKey: ['user-played-courses-full'], type: 'active', exact: false });
+      await queryClient.refetchQueries({ queryKey: ['user-top-ten-courses'], type: 'active', exact: false });
       
       toast.success("Rating submitted");
       
