@@ -105,17 +105,7 @@ export function PreviewStep({
             creator={creator}
             showReviewCapsule={false}
           >
-            <button
-              onClick={onClose}
-              className="absolute z-50 w-11 h-11 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center transition-all active:scale-95"
-              style={{
-                top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 12px)',
-                left: '16px',
-              }}
-              aria-label="Close"
-            >
-              <X className="h-5 w-5 text-white" />
-            </button>
+            {/* Close button removed — Skip CTA handles exit */}
 
             {viewerMedia.length > 1 && (
               <PhotoCounterBadge current={1} total={viewerMedia.length} />
@@ -223,13 +213,10 @@ function PreviewCTA({ onSkip, onShare, isSharing, title, visibility = 'anyone' }
 
   return (
     <div 
-      className="absolute bottom-0 inset-x-0 pb-[env(safe-area-inset-bottom)] px-4 pointer-events-auto z-30"
-      style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.7) 25%, rgba(0,0,0,0.3) 50%, transparent 100%)', paddingTop: '5rem' }}
+      className="absolute top-0 inset-x-0 pt-[env(safe-area-inset-top)] px-4 pointer-events-auto z-30"
+      style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0.3) 70%, transparent 100%)', paddingBottom: '3rem' }}
     >
-      <div className="space-y-3 pb-4">
-        {title && (
-          <p className="text-white/90 text-base font-medium line-clamp-2 text-center max-w-xs mx-auto">"{title}"</p>
-        )}
+      <div className="space-y-3 pt-4">
         <div className="text-center text-white">
           <h3 className="text-lg font-semibold">Share this review to your Clubhouse feed?</h3>
           <p className="text-sm text-white/70 mt-1">Your review has been saved. Share it as a post for others to see.</p>
