@@ -1661,6 +1661,11 @@ body.route-clubhouse .app-shell {
   padding-bottom: 0 !important;
 }
 
+body.route-fullscreen-overlay .app-shell {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
 body.route-auth .app-shell {
   padding-top: 0 !important;
   padding-bottom: 0 !important;

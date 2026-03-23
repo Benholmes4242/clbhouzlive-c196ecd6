@@ -44,7 +44,24 @@ export function FullscreenFeedOverlay() {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
-      return () => { document.body.style.overflow = ""; };
+
+      // ── Safe area bleed (mirrors Clubhouse) ──
+      document.body.classList.add('route-fullscreen-overlay');
+      const shield = document.getElementById('safe-area-shield');
+      if (shield) shield.style.backgroundColor = 'transparent';
+      document.documentElement.style.backgroundColor = '#000000';
+      document.body.style.backgroundColor = '#000000';
+      try {
+        (window as any).median?.statusbar?.set({ style: 'dark', color: '00000000', overlay: true, blur: false });
+      } catch {}
+
+      return () => {
+        document.body.style.overflow = "";
+        document.body.classList.remove('route-fullscreen-overlay');
+        if (shield) shield.style.backgroundColor = 'transparent';
+        document.documentElement.style.backgroundColor = 'transparent';
+        document.body.style.backgroundColor = 'transparent';
+      };
     }
   }, [isOpen]);
 
