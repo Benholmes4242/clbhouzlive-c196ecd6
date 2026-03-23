@@ -88,6 +88,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
         setVideoReady(false);
         setShowReplay(false);
         loopCountRef.current = 0;
+        feedPerf.onDeactivation(feedIndex, hlsUrl, 'destroyed');
       }
       useClubhouseStore.getState().setActiveVideoElement(null, null);
       return;
