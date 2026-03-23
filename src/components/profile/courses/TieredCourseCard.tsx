@@ -216,7 +216,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             className="w-[72px] self-stretch object-cover flex-shrink-0 rounded-l-xl"
           />
         ) : (
-          <div className="w-[72px] h-[76px] bg-muted flex-shrink-0" />
+          <div className="w-[72px] self-stretch bg-muted flex-shrink-0 rounded-l-xl" />
         )}
 
         {/* Content - flexible column */}
