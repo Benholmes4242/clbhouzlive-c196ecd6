@@ -11,7 +11,7 @@ const HLS_CONFIG = {
   maxBufferLength: 30,
   maxMaxBufferLength: 60,
   startLevel: -1,
-  capLevelToPlayerSize: true,
+  capLevelToPlayerSize: false,
   abrEwmaDefaultEstimate: 8_000_000,
 };
 
