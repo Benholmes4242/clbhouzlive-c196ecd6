@@ -105,17 +105,7 @@ export function PreviewStep({
             creator={creator}
             showReviewCapsule={false}
           >
-            <button
-              onClick={onClose}
-              className="absolute z-50 w-11 h-11 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center transition-all active:scale-95"
-              style={{
-                top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 12px)',
-                left: '16px',
-              }}
-              aria-label="Close"
-            >
-              <X className="h-5 w-5 text-white" />
-            </button>
+            {/* Close button removed — Skip CTA handles exit */}
 
             {viewerMedia.length > 1 && (
               <PhotoCounterBadge current={1} total={viewerMedia.length} />
