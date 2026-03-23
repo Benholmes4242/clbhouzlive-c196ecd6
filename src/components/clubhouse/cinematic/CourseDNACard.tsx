@@ -13,9 +13,11 @@ interface CourseDNACardProps {
 }
 
 export function CourseDNACard({ courseId, courseName, courseCountry, mapboxToken, onNavigate }: CourseDNACardProps) {
-  const { user } = useSupabaseSession();
+  const navigate = useNavigate();
   const { data: courseData } = useCourseCardData(courseId, true);
-  const { isPlayed, isBucket, togglePlayed, toggleBucket } = useCoursePlayedState(courseId, user?.id);
+  const { status, isLoading: statusLoading, setWantToPlay, isUpdating } = useCoursePersonalStatus(courseId);
+  const isPlayed = status.status === 'played';
+  const isWantToPlay = status.status === 'want_to_play';
 
   const mapUrl = courseData?.latitude && courseData?.longitude
     ? `https://api.mapbox.com/styles/v1/mapbox/satellite-v9/static/${courseData.longitude},${courseData.latitude},14,0/320x90@2x?access_token=${mapboxToken}`
