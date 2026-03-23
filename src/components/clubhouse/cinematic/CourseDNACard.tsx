@@ -179,7 +179,8 @@ export function CourseDNACard({ courseId, courseName, courseCountry, mapboxToken
             type="button"
             onClick={(e) => { e.stopPropagation(); toggleBucket(); }}
             style={{
-              flex: 1, height: 30, borderRadius: 8,
+              flex: 1, minWidth: 0, whiteSpace: 'nowrap' as const, padding: '0 10px',
+              height: 30, borderRadius: 8,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               gap: 4, fontSize: 11, fontWeight: 600, cursor: 'pointer',
               background: isBucket ? 'rgba(239,68,68,0.12)' : 'rgba(255,255,255,0.06)',
