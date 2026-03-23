@@ -17,7 +17,7 @@ const HLS_CONFIG = {
   maxMaxBufferLength: 60,
   startLevel: -1,
   capLevelToPlayerSize: false,
-  abrEwmaDefaultEstimate: 8_000_000,
+  abrEwmaDefaultEstimate: getSharedBandwidth(),
 };
 
 const LONG_VIDEO_THRESHOLD = 10; // seconds
