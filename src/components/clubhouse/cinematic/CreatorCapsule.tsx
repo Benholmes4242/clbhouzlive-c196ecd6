@@ -233,28 +233,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
 
   const expandedInner = (
     <div className="px-3 pb-3 space-y-3">
-      {/* Creator row — tappable to view profile */}
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          handleViewProfile();
-        }}
-        className="flex items-center gap-2 w-full active:opacity-70 transition-opacity"
-        style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
-      >
-        <SquircleAvatar
-          size={32}
-          src={user?.avatar}
-          alt={user?.name ?? 'Creator'}
-          fallback={initials}
-          hideRing
-        />
-        <span className="text-[13px] font-semibold text-white truncate">
-          {user?.name || 'Golfer'}
-        </span>
-      </button>
-
       {/* Caption (scrollable) */}
       {cleanCaption && (
         <div
@@ -555,22 +533,30 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         'active:opacity-100 focus-visible:outline-none'
       )}
     >
-      {/* Avatar */}
-      <SquircleAvatar
-        size={40}
-        src={user?.avatar}
-        alt={user?.name ?? 'Creator'}
-        fallback={initials}
-        hideRing
-      />
+      {/* Avatar + Name — tappable for profile */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleViewProfile();
+        }}
+        className="flex items-center gap-3 flex-shrink-0 active:opacity-70 transition-opacity"
+        style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+      >
+        <SquircleAvatar
+          size={40}
+          src={user?.avatar}
+          alt={user?.name ?? 'Creator'}
+          fallback={initials}
+          hideRing
+        />
+        <span className="text-[13px] font-semibold text-white truncate">
+          {user?.name || 'Golfer'}
+        </span>
+      </button>
 
       {/* Display Name - never username */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
-          <span className="text-[13px] font-semibold text-white truncate">
-            {user?.name || 'Golfer'}
-          </span>
-        </div>
         
         {/* Caption preview (collapsed) */}
         {!isExpanded && truncatedCaption && (
