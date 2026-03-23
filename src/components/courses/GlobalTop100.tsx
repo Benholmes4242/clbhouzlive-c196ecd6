@@ -206,20 +206,19 @@ const GlobalTop100 = () => {
         return b.name.localeCompare(a.name);
       case 'official':
       default:
-        const getListRank = (memberships: any[], slug: string) =>
-          memberships.find((m: any) => m.list_slug === slug)?.rank ?? 999;
-        const rankA = selectedList === 'global'  ? getListRank(a.list_memberships, 'global')
-                    : selectedList === 'usa'     ? getListRank(a.list_memberships, 'usa')
-                    : selectedList === 'gb-i'    ? getListRank(a.list_memberships, 'gb-i')
-                    : selectedList === 'europe'  ? getListRank(a.list_memberships, 'europe')
-                    : a.list_memberships[0]?.rank ?? 999;
-        const rankB = selectedList === 'global'  ? getListRank(b.list_memberships, 'global')
-                    : selectedList === 'usa'     ? getListRank(b.list_memberships, 'usa')
-                    : selectedList === 'gb-i'    ? getListRank(b.list_memberships, 'gb-i')
-                    : selectedList === 'europe'  ? getListRank(b.list_memberships, 'europe')
-                    : b.list_memberships[0]?.rank ?? 999;
+        // Sort by the relevant rank based on selected list
+        const rankA = selectedList.includes('global') ? a.list_memberships.find(m => m.list_slug.includes('global'))?.rank :
+                     selectedList.includes('usa') ? a.list_memberships.find(m => m.list_slug.includes('usa'))?.rank :
+                     selectedList.includes('gb-i') ? a.list_memberships.find(m => m.list_slug.includes('gb-i'))?.rank :
+                     selectedList.includes('europe') ? a.list_memberships.find(m => m.list_slug.includes('europe'))?.rank :
+                     a.list_memberships[0]?.rank;
+        const rankB = selectedList.includes('global') ? b.list_memberships.find(m => m.list_slug.includes('global'))?.rank :
+                     selectedList.includes('usa') ? b.list_memberships.find(m => m.list_slug.includes('usa'))?.rank :
+                     selectedList.includes('gb-i') ? b.list_memberships.find(m => m.list_slug.includes('gb-i'))?.rank :
+                     selectedList.includes('europe') ? b.list_memberships.find(m => m.list_slug.includes('europe'))?.rank :
+                     b.list_memberships[0]?.rank;
         
-        return rankA - rankB;
+        return (rankA || 999) - (rankB || 999);
     }
   });
 

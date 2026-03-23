@@ -51,7 +51,6 @@ function applySortToQuery(query: any, sortOption: SortOption) {
     case 'official_rating':
     default:
       query = query.order('global_rank', { ascending: true, nullsFirst: false });
-      query = query.order('regional_rank', { ascending: true, nullsFirst: false });
       query = query.order('name', { ascending: true });
       break;
   }

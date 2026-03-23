@@ -3,7 +3,6 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CourseRankBadges from './CourseRankBadges';
-import { extractRanksFromMemberships } from '@/utils/rankingUtils';
 
 interface CourseListItemProps {
   course: any;
@@ -73,23 +72,16 @@ const CourseListItem: React.FC<CourseListItemProps> = ({
       </div>
 
       {/* Top right badges */}
-      {(() => {
-        const ranks = course.list_memberships?.length
-          ? extractRanksFromMemberships(course.list_memberships, course.country)
-          : { globalRank: course.global_rank, regionalRank: course.regional_rank, usaRank: course.usa_rank };
-        return (
-          <CourseRankBadges
-            globalRank={ranks.globalRank}
-            regionalRank={ranks.regionalRank}
-            usaRank={ranks.usaRank}
-            country={course.country}
-            viewContext={viewContext}
-            userRating={userRating}
-            showUserRating={showUserRating}
-            positioning="top-left"
-          />
-        );
-      })()}
+      <CourseRankBadges
+        globalRank={course.global_rank}
+        regionalRank={course.regional_rank}
+        usaRank={course.usa_rank}
+        country={course.country}
+        viewContext={viewContext}
+        userRating={userRating}
+        showUserRating={showUserRating}
+        positioning="top-left"
+      />
     </div>
   );
 };
