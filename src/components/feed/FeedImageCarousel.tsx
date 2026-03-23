@@ -222,6 +222,7 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
                 height={item.height}
                 duration={item.duration}
                 isActive={isActive && isVisible}
+                activeIndex={useClubhouseStore.getState().activeIndex}
                 feedIndex={feedIndex}
                 isSuggestedFeed={isSuggestedFeed}
                 onDoubleTapLike={onDoubleTapLike}
