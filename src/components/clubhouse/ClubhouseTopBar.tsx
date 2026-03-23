@@ -14,7 +14,7 @@ import { ClubhouseTabToggle, type ClubhouseTab } from '@/components/clubhouse/Cl
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
 import { cn } from '@/lib/utils';
 import type { User } from '@supabase/supabase-js';
-import { FeedCarouselDots } from '@/components/feed/FeedCarouselDots';
+
 
 interface ClubhouseTopBarProps {
   activeTab: ClubhouseTab;
