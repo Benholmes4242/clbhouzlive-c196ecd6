@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { SuggestedCreator } from '@/components/watch/hooks/useSuggestedCreators';
 
 function shortName(displayName: string): string {
