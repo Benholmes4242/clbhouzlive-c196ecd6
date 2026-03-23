@@ -12,7 +12,7 @@ const HLS_CONFIG = {
   maxMaxBufferLength: 60,
   startLevel: -1,
   capLevelToPlayerSize: true,
-  abrEwmaDefaultEstimate: 500_000,
+  abrEwmaDefaultEstimate: 8_000_000,
 };
 
 const LONG_VIDEO_THRESHOLD = 10; // seconds
