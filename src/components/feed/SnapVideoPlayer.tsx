@@ -100,7 +100,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     let cancelled = false;
 
     const attach = async () => {
-      feedPerf.onActivation(feedIndex, hlsUrl, 8_000_000);
+      feedPerf.onActivation(feedIndex, hlsUrl, getSharedBandwidth());
 
       // If HLS instance already exists (was stopped, not destroyed), resume it
       if (hlsRef.current) {
