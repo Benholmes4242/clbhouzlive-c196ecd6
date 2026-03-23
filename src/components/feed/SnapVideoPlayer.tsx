@@ -3,6 +3,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { loadHlsJs } from '@/utils/hlsLoader';
 import { haptic } from '@/utils/haptics';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
+import { registerAudioSource, unregisterAudioSource } from '@/utils/globalVideoMute';
 
 import { isPrefetchComplete } from '@/utils/hlsPreload';
 import { extractCloudflareUid } from '@/utils/videoIdUtils';
