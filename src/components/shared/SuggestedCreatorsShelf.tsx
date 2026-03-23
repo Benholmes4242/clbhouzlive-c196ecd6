@@ -55,7 +55,6 @@ export const SuggestedCreatorsShelf: React.FC<SuggestedCreatorsShelfProps> = ({
           {title}
         </span>
       </div>
-      </div>
 
       {/* Scroll row */}
       <div
