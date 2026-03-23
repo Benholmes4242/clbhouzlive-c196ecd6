@@ -98,7 +98,9 @@ export function SnapFeed({
           nextPosts.forEach(post => {
             const hlsUrl = post?.mediaItems?.[0]?.hlsUrl;
             if (hlsUrl) {
-              preloadHlsManifest(hlsUrl).catch(() => {});
+              preloadHlsManifest(hlsUrl)
+                .then(() => registerInPool(hlsUrl))
+                .catch(() => {});
             }
           });
           feedPerf.onViewportEntry(idx, postsRef.current[idx]?.mediaItems?.[0]?.hlsUrl ?? '');
