@@ -41,6 +41,17 @@ export function SnapFeed({
   const ptrActive = useRef(false);
   const hasScrolledToStart = useRef(false);
 
+  // ── Stable refs for observer callback (avoid reconnecting observer) ──
+  const postsLengthRef = useRef(posts.length);
+  const hasNextPageRef = useRef(hasNextPage);
+  const onNearEndRef = useRef(onNearEnd);
+  const lastSetIndexRef = useRef(0);
+  const lastSetTimeRef = useRef(0);
+
+  useEffect(() => { postsLengthRef.current = posts.length; }, [posts.length]);
+  useEffect(() => { hasNextPageRef.current = hasNextPage; }, [hasNextPage]);
+  useEffect(() => { onNearEndRef.current = onNearEnd; }, [onNearEnd]);
+
   // Scroll to startIndex on first mount only
   useEffect(() => {
     if (hasScrolledToStart.current) return;
@@ -73,10 +84,17 @@ export function SnapFeed({
       if (bestEntry && bestEntry.intersectionRatio >= ACTIVE_SLIDE_RATIO) {
         const idx = Number((bestEntry.target as HTMLElement).dataset.index);
         if (!isNaN(idx)) {
-          
+          // Guard against snap-back: ignore backwards jumps within 500ms of a forward one
+          const now = Date.now();
+          if (idx < lastSetIndexRef.current && now - lastSetTimeRef.current < 500) {
+            return;
+          }
+          lastSetIndexRef.current = idx;
+          lastSetTimeRef.current = now;
+
           setActiveIndex(idx);
-          if (hasNextPage && idx >= posts.length - NEAR_END_THRESHOLD) {
-            onNearEnd();
+          if (hasNextPageRef.current && idx >= postsLengthRef.current - NEAR_END_THRESHOLD) {
+            onNearEndRef.current();
           }
         }
       }
@@ -90,7 +108,7 @@ export function SnapFeed({
     return () => {
       observerRef.current?.disconnect();
     };
-  }, [posts.length, hasNextPage, onNearEnd, setActiveIndex]);
+  }, [setActiveIndex]);
 
   // ── Register/unregister slide refs ──
   const setSlideRef = useCallback((idx: number, el: HTMLDivElement | null) => {
