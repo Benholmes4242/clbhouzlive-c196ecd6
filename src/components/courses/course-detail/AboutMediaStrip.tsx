@@ -38,6 +38,7 @@ interface AboutMediaStripProps {
 const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick }) => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+  const { openViewer } = useMediaViewer();
   
   const maxItems = isMobile ? 3 : 9;
   const fetchLimit = isMobile ? 10 : 20;
