@@ -3,7 +3,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { loadHlsJs } from '@/utils/hlsLoader';
 import { haptic } from '@/utils/haptics';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
-import { feedPerf } from '@/utils/feedPerf';
+
 import { isPrefetchComplete } from '@/utils/hlsPreload';
 import { extractCloudflareUid } from '@/utils/videoIdUtils';
 import { getSharedBandwidth, saveSharedBandwidth } from '@/utils/sharedBandwidth';
