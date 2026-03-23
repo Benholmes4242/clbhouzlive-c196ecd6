@@ -32,12 +32,15 @@ export function useFriendsFeed({ userId, mode, searchQuery, enabled: externalEna
 
       const cursor = typeof pageParam === 'string' ? pageParam : undefined;
 
+      if (searchQuery) seenPostIds.current = [];
+
       const params: Record<string, unknown> = {
         p_user_id: userId,
         p_mode: mode,
         p_page_size: PAGE_SIZE,
-        p_seen_post_ids: seenPostIds.current,
       };
+
+      if (!searchQuery) params.p_seen_post_ids = seenPostIds.current;
 
       if (cursor) params.p_cursor = cursor;
       if (searchQuery) params.p_search_query = searchQuery;
