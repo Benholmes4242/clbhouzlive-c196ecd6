@@ -560,6 +560,11 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             <span className="text-[11px] text-white/50 truncate">
               {courseDisplayLabel}
             </span>
+            {golfCourse?.globalRank && (
+              <span className="text-[10px] font-bold flex-shrink-0" style={{ color: '#F59E0B' }}>
+                · #{golfCourse.globalRank} World
+              </span>
+            )}
           </div>
         )}
       </div>
