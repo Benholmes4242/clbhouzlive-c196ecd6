@@ -59,6 +59,7 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
   // ── Touch handlers for horizontal swipe ──
   const LOCK_THRESHOLD = 10;
   const SWIPE_THRESHOLD = 50;
+  const isDraggingHorizontally = useRef(false);
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     if (isAnimating) return;
@@ -69,33 +70,51 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
       locked: 'none',
       swiping: false,
     };
+    isDraggingHorizontally.current = false;
     setSwipeOffset(0);
     setIsDragging(false);
   }, [isAnimating]);
 
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
-    if (isAnimating) return;
-    const t = touchRef.current;
-    const touch = e.touches[0];
-    const dx = touch.clientX - t.startX;
-    const dy = touch.clientY - t.startY;
-
-    if (t.locked === 'none') {
-      if (Math.abs(dx) < LOCK_THRESHOLD && Math.abs(dy) < LOCK_THRESHOLD) return;
-      t.locked = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical';
-    }
-
-    if (t.locked === 'vertical') return;
-
-    e.preventDefault();
-    t.swiping = true;
-    setIsDragging(true);
-
-    const atStart = currentSlide === 0 && dx > 0;
-    const atEnd = currentSlide === mediaItems.length - 1 && dx < 0;
-    const dampened = (atStart || atEnd) ? dx * 0.25 : dx;
-    setSwipeOffset(dampened);
+  // Native touchmove with { passive: false } so preventDefault() works
+  const touchMoveStateRef = useRef({ currentSlide, mediaItemsLength: mediaItems.length, isAnimating });
+  useEffect(() => {
+    touchMoveStateRef.current = { currentSlide, mediaItemsLength: mediaItems.length, isAnimating };
   }, [currentSlide, mediaItems.length, isAnimating]);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const handleTouchMove = (e: TouchEvent) => {
+      const { isAnimating: anim, currentSlide: cs, mediaItemsLength: len } = touchMoveStateRef.current;
+      if (anim) return;
+      const t = touchRef.current;
+      const touch = e.touches[0];
+      const dx = touch.clientX - t.startX;
+      const dy = touch.clientY - t.startY;
+
+      if (t.locked === 'none') {
+        if (Math.abs(dx) < LOCK_THRESHOLD && Math.abs(dy) < LOCK_THRESHOLD) return;
+        t.locked = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical';
+      }
+
+      if (t.locked === 'vertical') {
+        isDraggingHorizontally.current = false;
+        return;
+      }
+
+      e.preventDefault();
+      isDraggingHorizontally.current = true;
+      t.swiping = true;
+      setIsDragging(true);
+
+      const atStart = cs === 0 && dx > 0;
+      const atEnd = cs === len - 1 && dx < 0;
+      const dampened = (atStart || atEnd) ? dx * 0.25 : dx;
+      setSwipeOffset(dampened);
+    };
+    el.addEventListener('touchmove', handleTouchMove, { passive: false });
+    return () => el.removeEventListener('touchmove', handleTouchMove);
+  }, []);
 
   const onTouchEnd = useCallback(() => {
     const t = touchRef.current;
