@@ -33,17 +33,29 @@ export function usePickHistory() {
   return useQuery({
     queryKey: ['tourhub', 'pick-history'],
     queryFn: async (): Promise<PickHistoryEntry[]> => {
-      // Step 1: fetch predictions with tournament data
+      // Step 0: Get PGA season IDs (same approach as useAIPredictions)
+      const { data: seasons } = await supabase
+        .from('sr_seasons')
+        .select('id')
+        .ilike('tour_name', 'pga')
+        .order('year', { ascending: false })
+        .limit(3);
+
+      const pgaSeasonIds = (seasons || []).map((s: any) => s.id);
+      if (!pgaSeasonIds.length) return [];
+
+      // Step 1: fetch predictions with tournament data (PGA only)
       const { data: predRows, error: predError } = await supabase
         .from('ai_predictions')
         .select(`
           tournament_id,
           predictions,
           sr_tournaments!inner(
-            id, name, status, start_date
+            id, name, status, start_date, season_id
           )
         `)
         .in('sr_tournaments.status', ['closed', 'complete'])
+        .in('sr_tournaments.season_id', pgaSeasonIds)
         .order('sr_tournaments(start_date)', { ascending: false })
         .limit(10);
 
