@@ -111,7 +111,13 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
   }, [posts]);
 
   const handleDelete = (postId: string, postUserId?: string) => {
-    deletePost(postId, 'personal', postUserId || userId, userId);
+    const post = posts.find(p => p.id === postId);
+    deletePost(
+      postId,
+      (post?.actorType as 'personal' | 'business') ?? 'personal',
+      post?.actorId ?? postUserId ?? userId,
+      userId
+    );
   };
 
   if (isLoading) {

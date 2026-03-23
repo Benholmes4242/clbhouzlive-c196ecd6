@@ -121,7 +121,12 @@ export const useUserPostLogic = ({
     const confirmDelete = window.confirm('Are you sure you want to delete this post?');
     if (!confirmDelete) return;
 
-    await deletePost(post.id);
+    await deletePost(
+      post.id,
+      post.actor_type as 'personal' | 'business',
+      post.actor_id,
+      user?.id
+    );
     onPostDeleted?.();
   };
 
