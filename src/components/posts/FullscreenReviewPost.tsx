@@ -325,7 +325,7 @@ export function FullscreenReviewPost({
             tierLabel: tierData.label,
             sourceReviewId: reviewId || '',
           }}
-          onReviewTap={handleOpenReviewSheet}
+          onReviewTap={() => handleOpenReviewSheet({} as React.MouseEvent)}
           isVisible={true}
           caption=""
           golfCourse={null}
