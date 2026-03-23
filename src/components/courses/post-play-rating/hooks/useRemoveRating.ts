@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { Course } from '../types';
+import { invalidateCourseRatingCaches } from '@/utils/invalidateCourseRatingCaches';
 
 interface UseRemoveRatingOptions {
   course: Course | null;
