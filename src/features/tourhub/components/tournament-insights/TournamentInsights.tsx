@@ -20,6 +20,10 @@ import { StaleBadge } from './StaleBadge';
 import IntelligenceTabSwitcher from './components/IntelligenceTabSwitcher';
 import { TournamentResultsCard } from './TournamentResultsCard';
 import { NextUpPickCard } from './NextUpPickCard';
+import { usePickHistory, type PickHistoryEntry } from '../../hooks/usePickHistory';
+import { createPortal } from 'react-dom';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { useNavigate } from 'react-router-dom';
 
 type IntelligenceTab = 'courseDNA' | 'predictions';
 
@@ -45,8 +49,276 @@ const TournamentInsightsSkeleton = () => (
     <div className="h-40 bg-black/[0.04] rounded-2xl" />
   </div>
 );
+// ─── Pick Record Rail ────────────────────────────────────────────────────────
 
-export const TournamentInsights = memo(function TournamentInsights() {
+function PickRecordRail() {
+  const navigate = useNavigate();
+  const { data: pickHistory, isLoading } = usePickHistory();
+  const [selectedEntry, setSelectedEntry] = React.useState<PickHistoryEntry | null>(null);
+
+  if (isLoading) {
+    return (
+      <div style={{ padding: '16px 0 8px' }}>
+        <div style={{ padding: '0 16px 10px' }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.8, textTransform: 'uppercase' as const, color: 'hsl(var(--muted-foreground))' }}>
+            Tournament Intelligence
+          </div>
+          <div style={{ fontSize: 17, fontWeight: 800, color: 'hsl(var(--foreground))' }}>Pick Record</div>
+        </div>
+        <div style={{ display: 'flex', gap: 8, padding: '0 16px 16px', overflow: 'hidden' }}>
+          {[1,2,3,4].map(i => (
+            <div key={i} className="animate-pulse" style={{ width: 110, height: 90, borderRadius: 14, background: 'hsl(var(--muted) / 0.4)', flexShrink: 0 }} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!pickHistory.length) return null;
+
+  const wins = pickHistory.filter(e => e.isWinner).length;
+  const top5 = pickHistory.filter(e => e.actualPosition !== null && e.actualPosition <= 5).length;
+
+  return (
+    <>
+      <div style={{ padding: '16px 0 8px' }}>
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '0 16px 10px' }}>
+          <div>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.8, textTransform: 'uppercase' as const, color: 'hsl(var(--muted-foreground))' }}>
+              Tournament Intelligence
+            </div>
+            <div style={{ fontSize: 17, fontWeight: 800, color: 'hsl(var(--foreground))' }}>Pick Record</div>
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {wins > 0 && (
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 4,
+                padding: '3px 8px', borderRadius: 8,
+                background: 'rgba(245,158,11,0.1)',
+                border: '1px solid rgba(245,158,11,0.35)',
+              }}>
+                <span style={{ fontSize: 10 }}>🏆</span>
+                <span style={{ fontSize: 11, fontWeight: 800, color: 'hsl(var(--accent-amber))' }}>{wins} win{wins !== 1 ? 's' : ''}</span>
+              </div>
+            )}
+            {top5 > 0 && (
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 4,
+                padding: '3px 8px', borderRadius: 8,
+                background: 'rgba(22,163,74,0.08)',
+                border: '1px solid rgba(22,163,74,0.25)',
+              }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#16A34A' }}>{top5} top 5</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Scrollable rail */}
+        <div style={{
+          display: 'flex', gap: 8, padding: '0 16px 16px',
+          overflowX: 'auto', scrollbarWidth: 'none',
+          WebkitOverflowScrolling: 'touch',
+        }}>
+          {pickHistory.map((entry) => {
+            const surname = entry.topPickName.split(' ').pop() ?? entry.topPickName;
+            return (
+              <div
+                key={entry.tournamentId}
+                onClick={() => setSelectedEntry(entry)}
+                style={{
+                  width: 110, flexShrink: 0, borderRadius: 14, padding: 12,
+                  cursor: 'pointer',
+                  background: entry.isWinner
+                    ? 'linear-gradient(160deg, rgba(255,248,225,0.95), rgba(255,252,238,0.98))'
+                    : 'hsl(var(--card))',
+                  border: entry.isWinner
+                    ? '1.5px solid rgba(245,158,11,0.4)'
+                    : '1px solid hsl(var(--border))',
+                  boxShadow: entry.isWinner ? '0 0 12px rgba(245,158,11,0.1)' : 'none',
+                }}
+              >
+                {/* Tournament short name */}
+                <div style={{
+                  fontSize: 11, fontWeight: 700,
+                  color: entry.isWinner ? 'hsl(var(--accent-amber))' : 'hsl(var(--muted-foreground))',
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
+                  marginBottom: 4,
+                }}>
+                  {entry.shortName}
+                </div>
+
+                {/* Player surname */}
+                <div style={{
+                  fontSize: 14, fontWeight: 700,
+                  color: 'hsl(var(--foreground))',
+                  lineHeight: 1.2, marginBottom: 8,
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
+                }}>
+                  {surname}
+                </div>
+
+                {/* Result badge */}
+                {entry.isWinner ? (
+                  <div style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 3,
+                    padding: '2px 7px', borderRadius: 6,
+                    background: 'rgba(245,158,11,0.15)',
+                    fontSize: 11, fontWeight: 700, color: '#92400E',
+                  }}>
+                    🏆 Won
+                  </div>
+                ) : entry.actualPosition && entry.actualPosition <= 5 ? (
+                  <div style={{
+                    display: 'inline-block',
+                    padding: '2px 7px', borderRadius: 6,
+                    background: 'rgba(22,163,74,0.08)',
+                    fontSize: 11, fontWeight: 700, color: '#16A34A',
+                  }}>
+                    {entry.actualPositionTied ? 'T' : ''}{entry.actualPosition}{['st','nd','rd'][((entry.actualPosition % 100) - 20) % 10 - 1] || ['st','nd','rd'][(entry.actualPosition % 100) - 1] || 'th'}
+                  </div>
+                ) : (
+                  <div style={{
+                    display: 'inline-block',
+                    padding: '2px 7px', borderRadius: 6,
+                    background: 'hsl(var(--muted) / 0.3)',
+                    fontSize: 11, fontWeight: 600, color: 'hsl(var(--muted-foreground))',
+                  }}>
+                    {entry.actualPosition
+                      ? `${entry.actualPositionTied ? 'T' : ''}${entry.actualPosition}th`
+                      : '—'}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Bottom sheet */}
+      {typeof window !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {selectedEntry && (
+            <>
+              <motion.div
+                key="pick-sheet-backdrop"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setSelectedEntry(null)}
+                style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 9998 }}
+              />
+              <motion.div
+                key="pick-sheet"
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '100%' }}
+                transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+                style={{
+                  position: 'fixed', bottom: 0, left: 0, right: 0,
+                  background: 'hsl(var(--card))',
+                  borderTopLeftRadius: 20, borderTopRightRadius: 20,
+                  zIndex: 9999,
+                  borderTop: selectedEntry.isWinner ? '2px solid hsl(var(--accent-amber))' : '1px solid hsl(var(--border))',
+                  paddingBottom: 'env(safe-area-inset-bottom, 16px)',
+                }}
+              >
+                {/* Drag handle */}
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '10px 0 6px' }}>
+                  <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(0,0,0,0.1)' }} />
+                </div>
+
+                <div style={{ padding: '4px 20px 20px' }}>
+                  {/* Year */}
+                  <div style={{
+                    fontSize: 10, fontWeight: 700, letterSpacing: 1.8,
+                    textTransform: 'uppercase' as const,
+                    color: 'hsl(var(--muted-foreground))',
+                    marginBottom: 6,
+                  }}>
+                    {selectedEntry.year}
+                  </div>
+
+                  {/* Tournament name + badge */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: 'hsl(var(--foreground))', flex: 1 }}>
+                      {selectedEntry.tournamentName}
+                    </div>
+                    {selectedEntry.isWinner && (
+                      <div style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 4,
+                        padding: '4px 10px', borderRadius: 8,
+                        background: 'rgba(245,158,11,0.15)',
+                        fontSize: 11, fontWeight: 800, color: '#92400E',
+                        flexShrink: 0,
+                      }}>
+                        🏆 Called It
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Pick result card */}
+                  <div style={{
+                    borderRadius: 14, padding: '14px 16px',
+                    marginBottom: 16,
+                    background: selectedEntry.isWinner
+                      ? 'rgba(245,158,11,0.06)'
+                      : 'hsl(var(--muted) / 0.3)',
+                    border: selectedEntry.isWinner
+                      ? '1px solid rgba(245,158,11,0.2)'
+                      : '1px solid hsl(var(--border))',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  }}>
+                    <div>
+                      <div style={{ fontSize: 18, fontWeight: 700, color: 'hsl(var(--foreground))', marginBottom: 3 }}>
+                        {selectedEntry.topPickName}
+                      </div>
+                      <div style={{ fontSize: 13, color: 'hsl(var(--muted-foreground))' }}>
+                        {selectedEntry.scoreToPar !== null
+                          ? (selectedEntry.scoreToPar === 0 ? 'E' : selectedEntry.scoreToPar < 0 ? String(selectedEntry.scoreToPar) : `+${selectedEntry.scoreToPar}`)
+                          : '—'}
+                      </div>
+                    </div>
+                    <div style={{
+                      fontSize: 24, fontWeight: 900,
+                      color: selectedEntry.isWinner ? 'hsl(var(--accent-amber))' : 'hsl(var(--foreground))',
+                      background: selectedEntry.isWinner ? 'rgba(245,158,11,0.1)' : 'hsl(var(--muted) / 0.3)',
+                      borderRadius: 10, padding: '6px 12px',
+                    }}>
+                      {selectedEntry.isWinner ? '🏆' : selectedEntry.actualPosition ?? '—'}
+                    </div>
+                  </div>
+
+                  {/* CTA button */}
+                  <button
+                    onClick={() => {
+                      setSelectedEntry(null);
+                      navigate(`/tourhub/tournament/${selectedEntry.tournamentId}`);
+                    }}
+                    style={{
+                      width: '100%', padding: '14px 0',
+                      borderRadius: 14, border: '1px solid hsl(var(--border))',
+                      background: 'hsl(var(--card))',
+                      fontSize: 13, fontWeight: 600,
+                      color: 'hsl(var(--foreground))',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    View Full Tournament
+                  </button>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+    </>
+  );
+}
+
+
   const {
     data,
     isLoading,
@@ -383,16 +655,20 @@ export const TournamentInsights = memo(function TournamentInsights() {
   };
 
   const renderResultsContent = () => {
-    // data is guaranteed non-null here (outer guard at line 138 returns null if !data)
     if (!data?.tournament) return null;
 
     return (
-      <TournamentResultsCard
-        tournamentId={data.tournament.id}
-        tournamentName={data.tournament.name}
-        courseName={data.tournament.courseName}
-        location={data.tournament.location}
-      />
+      <>
+        <TournamentResultsCard
+          tournamentId={data.tournament.id}
+          tournamentName={data.tournament.name}
+          courseName={data.tournament.courseName}
+          location={data.tournament.location}
+          allPicks={tracker?.allPicks}
+          tourSlug="pga"
+        />
+        <PickRecordRail />
+      </>
     );
   };
 
