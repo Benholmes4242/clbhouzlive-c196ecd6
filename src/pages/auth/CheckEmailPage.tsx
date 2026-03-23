@@ -78,7 +78,7 @@ export default function CheckEmailPage() {
     <div
       className="fixed inset-0 flex flex-col items-center justify-center px-6"
       style={{
-        background: 'linear-gradient(180deg, #0d0d0d 0%, #111111 100%)',
+        background: '#0D0D0D',
         paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
