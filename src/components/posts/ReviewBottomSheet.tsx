@@ -92,6 +92,14 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
           {/* Sheet */}
           <motion.div
             key="review-sheet"
+            drag="y"
+            dragConstraints={{ top: 0 }}
+            dragElastic={{ top: 0, bottom: 0.3 }}
+            onDragEnd={(_, info) => {
+              if (info.velocity.y > 300 || info.offset.y > 120) {
+                onClose();
+              }
+            }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
