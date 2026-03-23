@@ -331,7 +331,7 @@ export function FullscreenReviewPost({
           golfCourse={null}
           isFollowing={false}
           isOwnPost={true}
-          bottomOffset="calc(env(safe-area-inset-bottom, 0px) + 160px)"
+          bottomOffset="calc(env(safe-area-inset-bottom, 0px) + 56px)"
         />
       ) : mode === 'live' ? (
         <motion.button
