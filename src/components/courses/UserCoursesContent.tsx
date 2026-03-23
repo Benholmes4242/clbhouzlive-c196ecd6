@@ -104,6 +104,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [isCoursePickerOpen, setIsCoursePickerOpen] = useState(false);
   const { viewType, setViewType, isHydrated } = useViewPreference();
+  const queryClient = useQueryClient();
   const isMobile = useIsMobile();
   
   // Always call the hook to avoid conditional hook errors
