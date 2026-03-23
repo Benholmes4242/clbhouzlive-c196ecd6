@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useReviewUpload } from '@/uploads/useReviewUpload';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { invalidateCourseRatingCaches } from '@/utils/invalidateCourseRatingCaches';
 import { useOptimisticReviewUpdate } from '@/hooks/useOptimisticReviewUpdate';
 import type { 
   WizardState, 
