@@ -246,7 +246,11 @@ const AuthForm: React.FC<AuthFormProps> = ({
     
     if (error) {
       trackLoginFailed('email', sanitiseErrorForAnalytics(error.message), Date.now() - startTime);
-      setPasswordError("Email or password is incorrect");
+      if (error.message.includes('Email not confirmed') || error.message.includes('email_not_confirmed')) {
+        setPasswordError("Your email isn't verified yet — check your inbox for the link we sent.");
+      } else {
+        setPasswordError("Email or password is incorrect");
+      }
       setSubmitting(false);
     } else if (data?.user) {
       trackLoginSuccess('email', Date.now() - startTime);
