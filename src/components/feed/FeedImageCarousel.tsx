@@ -102,7 +102,7 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
         return;
       }
 
-      e.preventDefault();
+      // No preventDefault needed — touchAction: 'none' on container handles it
       isDraggingHorizontally.current = true;
       t.swiping = true;
       setIsDragging(true);
