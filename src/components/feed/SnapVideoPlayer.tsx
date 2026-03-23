@@ -40,6 +40,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   height,
   duration,
   isActive,
+  activeIndex,
   feedIndex,
   isSuggestedFeed,
   onDoubleTapLike,
