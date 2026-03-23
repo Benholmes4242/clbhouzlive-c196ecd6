@@ -9,6 +9,7 @@ import { ActivitySkeleton } from '@/components/activity/ActivitySkeleton';
 import { NotificationActionsSheet } from '@/components/activity/NotificationActionsSheet';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
+import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
