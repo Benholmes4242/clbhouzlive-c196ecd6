@@ -9,8 +9,7 @@ import { toast } from 'sonner';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 
-import { cn } from '@/lib/utils';
-import { Compass, Flag, EyeOff, Link as LinkIcon } from 'lucide-react';
+import { Compass, Flag, EyeOff, Link as LinkIcon, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
