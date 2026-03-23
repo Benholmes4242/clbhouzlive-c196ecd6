@@ -19,6 +19,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ChevronUp, User, Music, ChevronRight } from 'lucide-react';
 import { FiMapPin } from 'react-icons/fi';
 import { getProfilePathById } from '@/lib/profileRoutes';
+import { CourseDNACard } from './CourseDNACard';
 
 import { getOverlayRatingColors, type ExtractedReviewData } from '@/lib/postHelpers';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
@@ -53,6 +54,12 @@ interface GolfCourseInfo {
   slug?: string | null;
   /** Country name for display (e.g. 'Portugal') */
   courseCountry?: string | null;
+  // Extended fields for CourseDNACard
+  globalRank?: number | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  thumbnailImage?: string | null;
+  hasHostedMajor?: boolean | null;
 }
 
 interface MusicTrackInfo {
@@ -238,17 +245,29 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         </div>
       )}
 
-      {/* Golf Course CTA - one-line gap after caption */}
-      {golfCourse && courseDisplayLabel && (
+      {/* Golf Course CTA — CourseDNACard when id available, fallback row otherwise */}
+      {golfCourse?.id && (() => {
+        const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2xiaG91eiIsImEiOiJjbTVyejIzMXcxemx2MmpzZDU3YjkxNjNkIn0.H_w9d-UAvvMRkJ_9DoVQ-A';
+        return <CourseDNACard
+          courseId={golfCourse.id}
+          courseName={golfCourse.name || ''}
+          courseCountry={golfCourse.courseCountry || golfCourse.country || ''}
+          mapboxToken={MAPBOX_TOKEN}
+          onNavigate={() => {
+            onBeforeNavigate?.();
+            navigate(`/courses/${golfCourse.slug || golfCourse.id}`);
+          }}
+        />;
+      })()}
+
+      {/* Fallback for caption-extracted courses with no id */}
+      {!golfCourse?.id && golfCourse?.name && courseDisplayLabel && (
         <button
           type="button"
           onClick={async (e) => {
             e.stopPropagation();
             onBeforeNavigate?.();
-            const courseIdentifier = golfCourse.slug || golfCourse.id;
-            if (courseIdentifier) {
-              navigate(`/courses/${courseIdentifier}`);
-            } else if (golfCourse.name) {
+            if (golfCourse.name) {
               try {
                 const { data } = await supabase
                   .from('golf_courses')
@@ -542,6 +561,11 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             <span className="text-[11px] text-white/50 truncate">
               {courseDisplayLabel}
             </span>
+            {golfCourse?.globalRank && (
+              <span className="text-[10px] font-bold flex-shrink-0" style={{ color: '#F59E0B' }}>
+                · #{golfCourse.globalRank} World
+              </span>
+            )}
           </div>
         )}
       </div>
