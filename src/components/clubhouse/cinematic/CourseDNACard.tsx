@@ -43,7 +43,16 @@ export function CourseDNACard({ courseId, courseName, courseCountry, mapboxToken
             src={mapUrl}
             alt={courseName}
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            loading="lazy"
+           loading="lazy"
+            onError={(e) => {
+              const img = e.currentTarget;
+              const fallback = courseData?.thumbnailImage;
+              if (fallback && img.src !== fallback) {
+                img.src = fallback;
+              } else {
+                img.style.display = 'none';
+              }
+            }}
           />
         )}
         {/* Gradient overlay */}
