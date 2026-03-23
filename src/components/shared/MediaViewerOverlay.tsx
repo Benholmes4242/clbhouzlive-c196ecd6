@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Volume2, VolumeX } from 'lucide-react';
 import Hls from 'hls.js';
 import { useMediaViewer, type MediaViewerItem } from '@/hooks/useMediaViewer';
+import { registerAudioSource, unregisterAudioSource } from '@/utils/globalVideoMute';
 
 /* ─── Video slide ─── */
 const VideoSlide: React.FC<{ item: MediaViewerItem }> = ({ item }) => {
