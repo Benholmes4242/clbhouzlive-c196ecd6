@@ -16,6 +16,7 @@ import { toast } from 'sonner';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useReviewUpload } from '@/uploads/useReviewUpload';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import { invalidateCourseRatingCaches } from '@/utils/invalidateCourseRatingCaches';
 import { useOptimisticReviewUpdate } from '@/hooks/useOptimisticReviewUpdate';
 import type { 
   WizardState, 
@@ -331,8 +332,6 @@ export function useReviewWizard({
       }
 
       // --- Force refetch critical queries (not just invalidate) ---
-      // refetchQueries with type:'all' fetches even for inactive observers,
-      // ensuring fresh data when the user switches to the Reviews tab.
       if (course?.id) {
         void queryClient.refetchQueries({ queryKey: ['course-reviews-full', course.id], exact: false, type: 'all' });
         void queryClient.refetchQueries({ queryKey: ['course-rating-aggregates', course.id], type: 'all' });
@@ -360,12 +359,9 @@ export function useReviewWizard({
         queryClient.invalidateQueries({ queryKey: ['course-ratings', course.id] });
       }
       
-      // Global queries that may be affected
+      // Global queries
       queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
-      queryClient.invalidateQueries({ queryKey: ['user-course-rating'] });
       if (currentUserId) {
-        queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses', currentUserId], refetchType: 'all' });
-        
         // Clear exclusion for this course so it can auto-populate back
         if (course?.id) {
           supabase
@@ -377,35 +373,12 @@ export function useReviewWizard({
         }
       }
       queryClient.invalidateQueries({ queryKey: ['review-media'] });
-
-      // Profile Courses tab — immediate refresh for own reviews
-      queryClient.invalidateQueries({ queryKey: ['user-course-activity'] });
-      queryClient.invalidateQueries({ queryKey: ['user-course-ratings-breakdown'] });
-      queryClient.invalidateQueries({ queryKey: ['user-played-courses-full'] });
-      
-      // Previously missing invalidations
-      queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['reviews-of-the-week'] });
       queryClient.invalidateQueries({ queryKey: ['user-exploration-status'] });
       queryClient.invalidateQueries({ queryKey: ['exploration-leaderboard'] });
 
-      // Top 100 tab — both key variants to be safe
-      queryClient.invalidateQueries({ queryKey: ['userTop100Courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-top100-courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-avg-rating'], exact: false });
-
-      // Top 100 progress — both key variants
-      queryClient.invalidateQueries({ queryKey: ['top100-progress-user'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['top100-progress-for-user'], exact: false });
-
-      // Personal Top 10 — additional variant
-      queryClient.invalidateQueries({ queryKey: ['userTopTenCourses'], exact: false });
-
-      // Played courses hooks
-      queryClient.invalidateQueries({ queryKey: ['played-courses-with-averages'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-course-ratings'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['top100-course-leaderboard'], exact: false });
+      // Invalidate all course rating caches via shared helper
+      invalidateCourseRatingCaches(queryClient);
 
       // Force immediate refetch of active profile queries
       void queryClient.refetchQueries({ queryKey: ['userTop100Courses'], type: 'active', exact: false });

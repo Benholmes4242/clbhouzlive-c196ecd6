@@ -11,7 +11,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Search, X, Plus } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { invalidateCourseRatingCaches } from '@/utils/invalidateCourseRatingCaches';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import CountryFlag from '@/components/ui/country-flag';
@@ -44,6 +45,7 @@ const CoursePickerModal: React.FC<CoursePickerModalProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCourses, setSelectedCourses] = useState<Set<string>>(new Set());
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const queryClient = useQueryClient();
   
 
   // Get all courses for the region
@@ -140,6 +142,9 @@ const CoursePickerModal: React.FC<CoursePickerModalProps> = ({
       if (error) throw error;
 
       toast.success("Courses Added!", { description: `Added ${selectedCourses.size} course${selectedCourses.size > 1 ? 's' : ''} with default rating. Tap to edit your rating.` });
+
+      // Invalidate all course rating caches
+      invalidateCourseRatingCaches(queryClient);
 
       onCoursesAdded();
       setSelectedCourses(new Set());
