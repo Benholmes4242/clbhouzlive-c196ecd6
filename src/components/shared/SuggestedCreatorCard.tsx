@@ -154,10 +154,10 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
           <p
             className="truncate"
             style={{
-              fontSize: 11,
-              fontWeight: 500,
-              color: isDark ? 'rgba(255,255,255,0.7)' : 'hsl(var(--muted-foreground))',
-              lineHeight: '14px',
+              fontSize: 13,
+              fontWeight: 600,
+              color: isDark ? '#ffffff' : 'hsl(var(--foreground))',
+              lineHeight: '16px',
               marginTop: 1,
             }}
           >
