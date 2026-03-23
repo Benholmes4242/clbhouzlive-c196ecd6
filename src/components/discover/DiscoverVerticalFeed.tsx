@@ -533,7 +533,13 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
     const confirmed = window.confirm('Are you sure you want to delete this post?');
     if (!confirmed) return;
     
-    await deletePost(postId);
+    const post = posts.find(p => p.id === postId);
+    await deletePost(
+      postId,
+      post?.actor_type as 'personal' | 'business',
+      post?.actor_id,
+      user?.id
+    );
     onClose(); // Close the modal after deletion
   };
 
