@@ -1,8 +1,8 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useCourseCardData } from '../hooks/useCourseCardData';
-import { useCoursePlayedState } from '../hooks/useCoursePlayedState';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useCoursePersonalStatus } from '@/hooks/useCoursePersonalStatus';
+import { useNavigate } from 'react-router-dom';
 
 interface CourseDNACardProps {
   courseId: string;
