@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfilePosts } from './hooks/useProfilePosts';
-import { PostsCountSummary } from './PostsCountSummary';
+
 import { HybridPostsFeed } from './HybridPostsFeed';
 import { PostsAutoplay } from './PostsAutoplay';
 
