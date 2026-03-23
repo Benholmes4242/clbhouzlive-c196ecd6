@@ -40,7 +40,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
 
   return (
     <div className="flex flex-col min-h-0">
-      <PostsCountSummary counts={postCounts} isLoading={isLoading} hideReviews={hideReviewsCount} />
+      
       <HybridPostsFeed
         posts={posts}
         userId={user?.id}
