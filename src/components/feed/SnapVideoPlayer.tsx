@@ -20,7 +20,7 @@ const HLS_CONFIG = {
   abrEwmaDefaultEstimate: getSharedBandwidth(),
 };
 
-const LONG_VIDEO_THRESHOLD = 10; // seconds
+
 
 interface SnapVideoPlayerProps {
   hlsUrl: string;
