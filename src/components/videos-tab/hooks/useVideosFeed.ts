@@ -25,12 +25,15 @@ export function useVideosFeed({ userId, filter, searchQuery, enabled: externalEn
 
       const cursor = typeof pageParam === 'string' ? pageParam : undefined;
 
+      if (searchQuery) seenPostIds.current = [];
+
       const params: Record<string, unknown> = {
         p_user_id: userId,
         p_mode: filter,
         p_page_size: PAGE_SIZE,
-        p_seen_post_ids: seenPostIds.current,
       };
+
+      if (!searchQuery) params.p_seen_post_ids = seenPostIds.current;
 
       if (cursor) params.p_cursor = cursor;
       if (searchQuery) params.p_search_query = searchQuery;
