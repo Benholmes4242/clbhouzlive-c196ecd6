@@ -217,7 +217,7 @@ function PreviewCTA({ onSkip, onShare, isSharing, title, visibility = 'anyone' }
       <div 
         className="absolute inset-x-0 px-4 pointer-events-auto z-30"
         style={{ 
-          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
+          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 42px)',
         }}
       >
         <div className="space-y-3">
