@@ -61,19 +61,6 @@ export function CourseDNACard({ courseId, courseName, courseCountry, mapboxToken
           background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%)',
         }} />
 
-        {/* Rank badge top-right */}
-        {rank && (
-          <div style={{
-            position: 'absolute', top: 6, right: 6,
-            background: 'rgba(0,0,0,0.65)',
-            backdropFilter: 'blur(8px)',
-            borderRadius: 6, padding: '2px 6px',
-            fontSize: 10, fontWeight: 700, color: '#F59E0B',
-            letterSpacing: '0.02em',
-          }}>
-            #{rank} World
-          </div>
-        )}
 
         {/* Major venue badge */}
         {hasHostedMajor && (
