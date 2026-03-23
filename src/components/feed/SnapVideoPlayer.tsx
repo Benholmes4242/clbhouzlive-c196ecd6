@@ -66,17 +66,25 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     if (!video) return;
 
     if (!isActive) {
-      // Detach
       video.pause();
-      if (hlsRef.current) {
-        hlsRef.current.destroy();
-        hlsRef.current = null;
+      const distance = Math.abs(feedIndex - activeIndex);
+      if (distance <= 2) {
+        // Adjacent slide — stop loading but keep buffer intact
+        if (hlsRef.current) {
+          hlsRef.current.stopLoad();
+        }
+      } else {
+        // Far away — fully destroy to free memory
+        if (hlsRef.current) {
+          hlsRef.current.destroy();
+          hlsRef.current = null;
+        }
+        video.removeAttribute('src');
+        video.load();
+        setVideoReady(false);
+        setShowReplay(false);
+        loopCountRef.current = 0;
       }
-      video.removeAttribute('src');
-      video.load();
-      setVideoReady(false);
-      setShowReplay(false);
-      loopCountRef.current = 0;
       useClubhouseStore.getState().setActiveVideoElement(null, null);
       return;
     }
