@@ -72,6 +72,7 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
   isHighlighted,
   onToggleHelpful,
   onMediaClick,
+  onUserClick,
   disabled,
 }) => {
   const { user, score, text, createdAt, isHelpful, isUnhelpful, helpfulCount, unhelpfulCount, isMock, media } =
