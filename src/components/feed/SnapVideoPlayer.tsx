@@ -78,7 +78,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
         if (hlsRef.current) {
           hlsRef.current.stopLoad();
         }
-        feedPerf.onDeactivation(feedIndex, hlsUrl, 'stopped');
+        
       } else {
         // Far away — fully destroy to free memory
         if (hlsRef.current) {
