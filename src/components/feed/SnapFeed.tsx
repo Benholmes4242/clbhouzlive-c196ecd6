@@ -174,6 +174,7 @@ export function SnapFeed({
       style={{
         scrollSnapType: 'y mandatory',
         WebkitOverflowScrolling: 'touch',
+        overscrollBehavior: 'none',
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
       }}
