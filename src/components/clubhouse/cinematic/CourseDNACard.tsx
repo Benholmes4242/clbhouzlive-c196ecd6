@@ -182,7 +182,7 @@ export function CourseDNACard({ courseId, courseName, courseCountry, mapboxToken
               flex: 1, minWidth: 0, whiteSpace: 'nowrap' as const, padding: '0 16px',
               height: 30, borderRadius: 8,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              gap: 4, fontSize: 11, fontWeight: 600, cursor: 'pointer',
+              gap: 3, fontSize: 11, fontWeight: 600, cursor: 'pointer',
               background: isBucket ? 'rgba(239,68,68,0.12)' : 'rgba(255,255,255,0.06)',
               color: isBucket ? '#F87171' : 'rgba(255,255,255,0.5)',
               border: isBucket ? '0.5px solid rgba(239,68,68,0.35)' : '0.5px solid rgba(255,255,255,0.1)',
