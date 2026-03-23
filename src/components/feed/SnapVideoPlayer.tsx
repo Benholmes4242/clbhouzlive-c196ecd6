@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useCallback, useState, memo } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { loadHlsJs } from '@/utils/hlsLoader';
 import { haptic } from '@/utils/haptics';
+import { HLSPoolManager } from '@/media/HLSPoolManager';
 import type HlsType from 'hls.js';
 
 const HLS_CONFIG = {
