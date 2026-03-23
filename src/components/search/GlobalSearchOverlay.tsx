@@ -1,6 +1,8 @@
 import { memo, useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, Clock, BadgeCheck, Briefcase, ChevronRight } from 'lucide-react';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 import { useNavigate } from 'react-router-dom';
 import { useDebounce } from '@/hooks/useDebounce';
 import {
@@ -131,6 +133,7 @@ interface GlobalSearchOverlayProps {
 
 function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
   const navigate = useNavigate();
+  const { user } = useSupabaseSession();
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputValue, setInputValue] = useState('');
   const debouncedQuery = useDebounce(inputValue, 250);
@@ -356,6 +359,19 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                     </WhiteCard>
                   </div>
                 )}
+
+                {/* Suggested creators shelf */}
+                <SuggestedCreatorsShelf
+                  userId={user?.id}
+                  title="Golfers to follow"
+                  showViewAll={true}
+                  onViewAll={() => { navigate('/golfers'); onClose(); }}
+                  containerStyle={{
+                    borderTop: '1px solid rgba(0,0,0,0.05)',
+                    borderBottom: '1px solid rgba(0,0,0,0.05)',
+                    background: '#ffffff',
+                  }}
+                />
 
                 {/* Today's Picks — skeleton while loading, real list when resolved */}
                 {trendingLoading ? (

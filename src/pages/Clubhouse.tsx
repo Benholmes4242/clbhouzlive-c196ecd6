@@ -9,8 +9,7 @@ import { toast } from 'sonner';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 
-import { cn } from '@/lib/utils';
-import { Compass, Flag, EyeOff, Link as LinkIcon } from 'lucide-react';
+import { Compass, Flag, EyeOff, Link as LinkIcon, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
@@ -39,6 +38,7 @@ import { buildSuggestedFeed, buildFriendsFeed } from '@/components/media-system/
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
 import CommentsSheet from '@/components/comments/CommentsSheet';
+import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 import { FullscreenReviewPost } from '@/components/posts/FullscreenReviewPost';
 import { ReviewBottomSheet } from '@/components/posts/ReviewBottomSheet';
 
@@ -304,22 +304,42 @@ const ClubhouseContent = () => {
 
       {/* ═══ MAIN FEED AREA ═══ */}
       {!isLoading && posts.length === 0 ? (
-        <div
-          className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
-          style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 64px)' }}
-        >
-          <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
-            <Compass className="w-8 h-8 text-white/30" />
+        activeTab === 'friends' ? (
+          <div
+            className="flex flex-col w-full"
+            style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 72px)' }}
+          >
+            <div className="flex flex-col items-center px-8 text-center pb-6">
+              <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center mb-4">
+                <Users className="w-7 h-7 text-white/30" />
+              </div>
+              <p className="text-[17px] font-semibold text-white mb-1">
+                No posts from friends yet
+              </p>
+              <p className="text-[13px] text-white/50 leading-relaxed">
+                Follow golfers below to start building your feed
+              </p>
+            </div>
+            <SuggestedCreatorsShelf
+              userId={user?.id}
+              variant="dark"
+              title="Golfers to follow"
+              showViewAll={true}
+              onViewAll={() => navigate('/golfers')}
+            />
           </div>
-          <p className="text-lg font-semibold text-white">
-            {activeTab === 'friends' ? 'No posts from friends yet' : 'No posts to show'}
-          </p>
-          <p className="text-sm text-white/50 mt-2">
-            {activeTab === 'friends' 
-              ? 'Follow golfers to see their posts here' 
-              : 'Check back soon for new content'}
-          </p>
-        </div>
+        ) : (
+          <div
+            className="flex flex-col items-center justify-center min-h-screen px-8 text-center"
+            style={{ paddingTop: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 64px)' }}
+          >
+            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-4">
+              <Compass className="w-8 h-8 text-white/30" />
+            </div>
+            <p className="text-lg font-semibold text-white">No posts to show</p>
+            <p className="text-sm text-white/50 mt-2">Check back soon for new content</p>
+          </div>
+        )
       ) : posts.length > 0 ? (
         <>
           <SnapFeed

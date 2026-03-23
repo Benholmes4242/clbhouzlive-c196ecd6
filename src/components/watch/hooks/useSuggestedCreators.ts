@@ -22,7 +22,7 @@ export function useSuggestedCreators(userId: string | undefined) {
 
       const { data, error } = await supabase.rpc('get_suggested_creators', {
         p_user_id: userId,
-        p_limit: 8,
+        p_limit: 12,
       } as any);
 
       if (error) {

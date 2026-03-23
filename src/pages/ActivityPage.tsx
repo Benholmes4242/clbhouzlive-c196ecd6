@@ -9,6 +9,7 @@ import { ActivitySkeleton } from '@/components/activity/ActivitySkeleton';
 import { NotificationActionsSheet } from '@/components/activity/NotificationActionsSheet';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
+import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
@@ -297,9 +298,18 @@ const ActivityPage: React.FC = () => {
                 </button>
               </div>
             ) : showEmptyState ? (
-              <div className="px-4">
-                <ActivityEmptyState tab="all" />
-              </div>
+              <>
+                <SuggestedCreatorsShelf
+                  userId={user?.id}
+                  title="Golfers you might know"
+                  showViewAll={true}
+                  onViewAll={() => navigate('/golfers')}
+                  containerStyle={{ marginTop: 8 }}
+                />
+                <div className="px-4 pt-2">
+                  <ActivityEmptyState tab="all" />
+                </div>
+              </>
             ) : (
               <div className="w-full space-y-0">
                 {/* Tier 1 — Featured cards for new/unread */}
@@ -316,6 +326,16 @@ const ActivityPage: React.FC = () => {
                       />
                     ))}
                   </div>
+                )}
+
+                {/* Suggested creators after new notifications */}
+                {filteredNewItems.length > 0 && (
+                  <SuggestedCreatorsShelf
+                    userId={user?.id}
+                    title="You might also know"
+                    showViewAll={false}
+                    containerStyle={{ marginTop: 4, marginBottom: 4 }}
+                  />
                 )}
 
                 {/* Tier 2 — Compact list for earlier */}
