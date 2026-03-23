@@ -139,23 +139,21 @@ export function SnapFeed({
     }
   }, [onFirstFrameReady]);
 
-  // ── Scroll-based instant activeIndex update ──
+  // ── scrollend safety fallback (fires once after snap settles) ──
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
-    const onScroll = () => {
+    const onScrollEnd = () => {
       const slideHeight = el.clientHeight;
       if (slideHeight === 0) return;
       const idx = Math.round(el.scrollTop / slideHeight);
-      if (idx !== activeIndex) {
-        setActiveIndex(idx);
-      }
+      setActiveIndex(idx);
     };
 
-    el.addEventListener('scroll', onScroll, { passive: true });
-    return () => el.removeEventListener('scroll', onScroll);
-  }, [activeIndex, setActiveIndex]);
+    el.addEventListener('scrollend', onScrollEnd, { passive: true });
+    return () => el.removeEventListener('scrollend', onScrollEnd);
+  }, [setActiveIndex]);
 
   // ── Prefetch next 2 HLS manifests ──
   useEffect(() => {
@@ -176,6 +174,7 @@ export function SnapFeed({
       style={{
         scrollSnapType: 'y mandatory',
         WebkitOverflowScrolling: 'touch',
+        overscrollBehavior: 'none',
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
       }}

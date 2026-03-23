@@ -139,6 +139,7 @@ export const FeedSlide = memo(function FeedSlide({
       style={{
         height: '100dvh',
         scrollSnapAlign: 'start',
+        scrollSnapStop: 'always',
         background: '#000',
       }}
     >
