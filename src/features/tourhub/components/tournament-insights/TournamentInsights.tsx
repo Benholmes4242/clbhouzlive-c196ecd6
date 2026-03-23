@@ -318,7 +318,7 @@ function PickRecordRail() {
   );
 }
 
-
+export const TournamentInsights = memo(function TournamentInsights() {
   const {
     data,
     isLoading,
