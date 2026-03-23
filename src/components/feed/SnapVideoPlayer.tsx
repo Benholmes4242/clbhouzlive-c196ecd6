@@ -25,6 +25,7 @@ interface SnapVideoPlayerProps {
   height?: number;
   duration?: number;
   isActive: boolean;
+  activeIndex: number;
   feedIndex: number;
   isSuggestedFeed: boolean;
   onDoubleTapLike?: () => void;
@@ -39,6 +40,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   height,
   duration,
   isActive,
+  activeIndex,
   feedIndex,
   isSuggestedFeed,
   onDoubleTapLike,
@@ -64,17 +66,25 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     if (!video) return;
 
     if (!isActive) {
-      // Detach
       video.pause();
-      if (hlsRef.current) {
-        hlsRef.current.destroy();
-        hlsRef.current = null;
+      const distance = Math.abs(feedIndex - activeIndex);
+      if (distance <= 2) {
+        // Adjacent slide — stop loading but keep buffer intact
+        if (hlsRef.current) {
+          hlsRef.current.stopLoad();
+        }
+      } else {
+        // Far away — fully destroy to free memory
+        if (hlsRef.current) {
+          hlsRef.current.destroy();
+          hlsRef.current = null;
+        }
+        video.removeAttribute('src');
+        video.load();
+        setVideoReady(false);
+        setShowReplay(false);
+        loopCountRef.current = 0;
       }
-      video.removeAttribute('src');
-      video.load();
-      setVideoReady(false);
-      setShowReplay(false);
-      loopCountRef.current = 0;
       useClubhouseStore.getState().setActiveVideoElement(null, null);
       return;
     }
@@ -83,6 +93,21 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     let cancelled = false;
 
     const attach = async () => {
+      // If HLS instance already exists (was stopped, not destroyed), resume it
+      if (hlsRef.current) {
+        hlsRef.current.startLoad();
+        video.muted = useClubhouseStore.getState().isMuted;
+        try {
+          await video.play();
+        } catch {
+          video.muted = true;
+          useClubhouseStore.getState().setIsMuted(true);
+          video.play().catch(() => {});
+        }
+        useClubhouseStore.getState().setActiveVideoElement(video, videoRef);
+        return;
+      }
+
       const Hls = await loadHlsJs();
 
       if (cancelled) return;
@@ -123,7 +148,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
         hlsRef.current = null;
       }
     };
-  }, [isActive, hlsUrl, mp4Url]);
+  }, [isActive, activeIndex, feedIndex, hlsUrl, mp4Url]);
 
   // ── Sync muted state ──
   useEffect(() => {
