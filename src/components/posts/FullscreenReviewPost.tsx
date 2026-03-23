@@ -12,6 +12,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
+import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
 // Respect reduced motion preference
 const prefersReducedMotion = typeof window !== 'undefined' 
   ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
