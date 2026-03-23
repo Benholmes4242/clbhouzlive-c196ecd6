@@ -311,8 +311,13 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
         userId={targetUserId || ''}
         region="global"
         onCoursesAdded={() => {
-          // Refetch data when courses are added
-          window.location.reload();
+          queryClient.invalidateQueries({ queryKey: ['user-played-courses-full'], exact: false });
+          queryClient.invalidateQueries({ queryKey: ['user-course-activity'], exact: false });
+          queryClient.invalidateQueries({ queryKey: ['userTop100Courses'], exact: false });
+          queryClient.invalidateQueries({ queryKey: ['top100-progress-user'], exact: false });
+          queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'], exact: false });
+          queryClient.invalidateQueries({ queryKey: ['userProfile'], exact: false });
+          queryClient.invalidateQueries({ queryKey: ['allPlayedCourses'], exact: false });
         }}
       />
     </div>

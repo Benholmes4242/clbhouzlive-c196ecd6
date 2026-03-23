@@ -110,30 +110,12 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
       return await optimisticNewRating(course.id, rating[0]);
     },
     onSuccess: async () => {
-      queryClient.invalidateQueries({ queryKey: ['user-course'] });
-      queryClient.invalidateQueries({ queryKey: ['course-rating-stats'] });
-      queryClient.invalidateQueries({ queryKey: ['user-played-course'] });
-      queryClient.invalidateQueries({ queryKey: ['my-courses'] });
-      queryClient.invalidateQueries({ queryKey: ['quest-courses'] });
-      queryClient.invalidateQueries({ queryKey: ['userTop100Courses'] });
-      queryClient.invalidateQueries({ queryKey: ['course-rating-aggregates'], exact: false });
-      
-      // Invalidate want-to-play queries (course is now played, should be removed from want-to-play)
-      queryClient.invalidateQueries({ queryKey: ['user-want-to-play'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['course-personal-status'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-course-summary'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-course-activity'], exact: false });
-      
-      // Invalidate AND refetch feed caches so cards update immediately
-      queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['golf-courses-search'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['friends-courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['explore-courses'], exact: false });
-      
-      // Force refetch the feed queries to show updated ratings
-      await queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false });
-      await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
+      // Invalidate all course rating caches via shared helper
+      invalidateCourseRatingCaches(queryClient);
+
+      // Force refetch active feed queries for immediate card updates
+      await queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false, type: 'active' });
+      await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false, type: 'active' });
       await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
       
       toast.success("Rating saved");

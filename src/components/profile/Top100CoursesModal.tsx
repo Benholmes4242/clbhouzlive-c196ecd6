@@ -172,8 +172,11 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
         userId={userId}
         region={region}
         onCoursesAdded={() => {
-          // This will trigger a refetch of the courses data
-          // The useTop100CoursesList hook should handle invalidating queries
+          queryClient.invalidateQueries({ queryKey: ['userTop100Courses'], exact: false });
+          queryClient.invalidateQueries({ queryKey: ['top100-progress-user'], exact: false });
+          queryClient.invalidateQueries({ queryKey: ['top100-overview'], exact: false });
+          queryClient.invalidateQueries({ queryKey: ['top100-list-summaries'], exact: false });
+          queryClient.invalidateQueries({ queryKey: ['userProfile'], exact: false });
         }}
       />
     </>

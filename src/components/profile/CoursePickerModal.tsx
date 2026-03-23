@@ -143,6 +143,9 @@ const CoursePickerModal: React.FC<CoursePickerModalProps> = ({
 
       toast.success("Courses Added!", { description: `Added ${selectedCourses.size} course${selectedCourses.size > 1 ? 's' : ''} with default rating. Tap to edit your rating.` });
 
+      // Invalidate all course rating caches
+      invalidateCourseRatingCaches(queryClient);
+
       onCoursesAdded();
       setSelectedCourses(new Set());
       onClose();

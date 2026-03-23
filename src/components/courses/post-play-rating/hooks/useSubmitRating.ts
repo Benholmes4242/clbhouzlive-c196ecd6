@@ -159,62 +159,14 @@ export function useSubmitRating({
         facilities: variables.facilities ?? undefined,
       });
 
-      // Invalidate all related queries
-      queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['user-course-ratings-breakdown'], exact: false });
-      
-      await queryClient.refetchQueries({ queryKey: ['user-course-rating', course?.id, userId] });
-      await queryClient.refetchQueries({ queryKey: ['course-rating-aggregates', course?.id] });
-      
-      queryClient.invalidateQueries({ queryKey: ['course-rating-distribution', course?.id], exact: false });
-      await queryClient.refetchQueries({ queryKey: ['course-rating-distribution', course?.id], exact: false });
-      
-      await queryClient.refetchQueries({ queryKey: ['course-reviews-full'], type: 'all' });
-      
-      queryClient.invalidateQueries({ queryKey: ['user-course-reviews'] });
-      queryClient.invalidateQueries({ queryKey: ['user-played-course', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['friends-courses'] });
-      queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['explore-courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['top100-course-leaderboard'], exact: false });
-      
-      await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false, type: 'active' });
-      await queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false, type: 'active' });
-      await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
-      
-      queryClient.invalidateQueries({ queryKey: ['top100-progress-for-user'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['quest-courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['top100-leaderboard'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-top100-courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['userPlayedCourses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-want-to-play'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['course-personal-status'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-course-summary'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-course-activity'], exact: false });
-
-      // Profile courses tab
-      queryClient.invalidateQueries({ queryKey: ['user-played-courses-full'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-avg-rating'], exact: false });
-
-      // Top 100 tab — both key variants to be safe
-      queryClient.invalidateQueries({ queryKey: ['userTop100Courses'], exact: false });
-
-      // Personal Top 10
-      queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['userTopTenCourses'], exact: false });
-
-      // Top 100 progress — both key variants
-      queryClient.invalidateQueries({ queryKey: ['top100-progress-user'], exact: false });
-
-      // Played courses hooks
-      queryClient.invalidateQueries({ queryKey: ['played-courses-with-averages'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-course-ratings'], exact: false });
+      // Invalidate all related queries via shared helper
+      invalidateCourseRatingCaches(queryClient);
 
       // Force immediate refetch of active profile queries
       await queryClient.refetchQueries({ queryKey: ['userTop100Courses'], type: 'active', exact: false });
       await queryClient.refetchQueries({ queryKey: ['user-played-courses-full'], type: 'active', exact: false });
       await queryClient.refetchQueries({ queryKey: ['user-top-ten-courses'], type: 'active', exact: false });
+      await queryClient.refetchQueries({ queryKey: ['course-reviews-full'], type: 'all' });
 
       // Remove from want_to_play shortlist (if present) now that course is played
       if (isNewReview) {
