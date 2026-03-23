@@ -85,6 +85,8 @@ export function TournamentResultsCard({
   tournamentName,
   courseName,
   location,
+  allPicks,
+  tourSlug,
 }: TournamentResultsCardProps) {
   const navigate = useNavigate();
   useEffect(() => { ensureKeyframes(); }, []);
