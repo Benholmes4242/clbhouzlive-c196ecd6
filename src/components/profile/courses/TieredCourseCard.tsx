@@ -76,7 +76,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
         
         <div className="flex">
           {/* Thumbnail - LARGER for Top 100 */}
-          <div className="relative flex-shrink-0">
+          <div className="relative flex-shrink-0 self-stretch">
             {course.thumbnail_image ? (
               <img
                 src={course.thumbnail_image}
