@@ -182,6 +182,35 @@ export function useSubmitRating({
         } catch (shortlistError) {
           console.error('[Rating] Shortlist cleanup failed but rating succeeded:', shortlistError);
         }
+
+        // Update courses_logged_all_time since no DB trigger maintains it yet
+        if (userId && course?.id) {
+          try {
+            const { data: currentProfile } = await supabase
+              .from('user_profiles')
+              .select('courses_logged_all_time')
+              .eq('id', userId)
+              .single();
+
+            if (currentProfile) {
+              await supabase
+                .from('user_profiles')
+                .update({
+                  courses_logged_all_time: (currentProfile.courses_logged_all_time ?? 0) + 1
+                })
+                .eq('id', userId);
+            }
+
+            // Refetch userProfile to show updated count immediately
+            await queryClient.refetchQueries({
+              queryKey: ['userProfile', userId],
+              type: 'active',
+              exact: false
+            });
+          } catch (profileError) {
+            console.error('[Rating] courses_logged_all_time update failed:', profileError);
+          }
+        }
       }
 
       onSuccess(ratingId);
