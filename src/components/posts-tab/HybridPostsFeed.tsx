@@ -114,8 +114,8 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
     const post = posts.find(p => p.id === postId);
     deletePost(
       postId,
-      (post?.actor_type as 'personal' | 'business') ?? 'personal',
-      post?.actor_id ?? postUserId ?? userId,
+      (post?.actorType as 'personal' | 'business') ?? 'personal',
+      post?.actorId ?? postUserId ?? userId,
       userId
     );
   };

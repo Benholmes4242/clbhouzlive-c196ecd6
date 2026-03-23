@@ -536,8 +536,8 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
     const post = posts.find(p => p.id === postId);
     await deletePost(
       postId,
-      post?.actor_type as 'personal' | 'business',
-      post?.actor_id,
+      post?.actorType as 'personal' | 'business',
+      post?.actorId,
       user?.id
     );
     onClose(); // Close the modal after deletion
