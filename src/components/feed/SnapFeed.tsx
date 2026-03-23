@@ -87,6 +87,7 @@ export function SnapFeed({
         const idx = Number((bestEntry.target as HTMLElement).dataset.index);
         if (!isNaN(idx)) {
           // Debounce: if multiple slides fire within 80ms, use the last one
+          feedPerf.onViewportEntry(idx, posts[idx]?.mediaItems?.[0]?.hlsUrl ?? '');
           pendingIndexRef.current = idx;
           if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
           debounceTimerRef.current = setTimeout(() => {

@@ -215,14 +215,24 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
 
     const handlePlaying = () => {
       setVideoReady(true);
+      feedPerf.onFirstFrame(feedIndex, hlsUrl);
       if (!firstFrameFiredRef.current) {
         firstFrameFiredRef.current = true;
         onFirstFrameReady?.();
       }
     };
 
+    const handleWaiting = () => feedPerf.onStallStart(feedIndex, hlsUrl);
+    const handlePlayingRecovery = () => feedPerf.onStallEnd(feedIndex, hlsUrl);
+
     video.addEventListener('playing', handlePlaying);
-    return () => video.removeEventListener('playing', handlePlaying);
+    video.addEventListener('waiting', handleWaiting);
+    video.addEventListener('playing', handlePlayingRecovery);
+    return () => {
+      video.removeEventListener('playing', handlePlaying);
+      video.removeEventListener('waiting', handleWaiting);
+      video.removeEventListener('playing', handlePlayingRecovery);
+    };
   }, [onFirstFrameReady]);
 
   // ── Gapless loop ──
