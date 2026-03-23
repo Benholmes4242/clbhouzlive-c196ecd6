@@ -522,16 +522,8 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
 
   // Regular mode collapsed content
   const regularCollapsedContent = (
-    <button
-      type="button"
-      onClick={handleToggle}
-      className={cn(
-        'w-full flex items-center gap-3 px-3 py-2.5',
-        'text-left',
-        // No hover/active/focus states - static identity element
-        'hover:bg-transparent active:bg-transparent focus:bg-transparent',
-        'active:opacity-100 focus-visible:outline-none'
-      )}
+    <div
+      className="w-full flex items-center gap-3 px-3 py-2.5"
     >
       {/* Avatar + Name — tappable for profile */}
       <button
@@ -555,9 +547,8 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         </span>
       </button>
 
-      {/* Display Name - never username */}
-      <div className="flex-1 min-w-0">
-        
+      {/* Caption + course location — tappable for toggle */}
+      <div onClick={handleToggle} style={{ cursor: 'pointer', flex: 1, minWidth: 0 }}>
         {/* Caption preview (collapsed) */}
         {!isExpanded && truncatedCaption && (
           <div className="text-[11px] text-white/60 line-clamp-1 mt-0.5" style={{ ['--mention-color' as any]: 'rgba(255,255,255,0.75)' }}>
@@ -590,14 +581,17 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
       </div>
 
       {/* Expand/Collapse chevron */}
-      <motion.div
-        animate={{ rotate: isExpanded ? 180 : 0 }}
-        transition={{ duration: 0.2 }}
-        className="flex-shrink-0"
+      <button
+        type="button"
+        onClick={handleToggle}
+        className="flex-shrink-0 p-1 -mr-1 active:opacity-70"
+        style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
       >
-        <ChevronUp className="w-4 h-4 text-white/50" />
-      </motion.div>
-    </button>
+        <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
+          <ChevronUp className="w-4 h-4 text-white/50" />
+        </motion.div>
+      </button>
+    </div>
   );
 
   // Determine border color based on mode
