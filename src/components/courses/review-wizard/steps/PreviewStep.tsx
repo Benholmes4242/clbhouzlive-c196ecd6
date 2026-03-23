@@ -212,34 +212,48 @@ function PreviewCTA({ onSkip, onShare, isSharing, title, visibility = 'anyone' }
   const VisIcon = visInfo.icon;
 
   return (
-    <div 
-      className="absolute top-0 inset-x-0 pt-[env(safe-area-inset-top)] px-4 pointer-events-auto z-30"
-      style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0.3) 70%, transparent 100%)', paddingBottom: '3rem' }}
-    >
-      <div className="space-y-3 pt-4">
-        <div className="text-center text-white">
-          <h3 className="text-lg font-semibold">Share this review to your Clubhouse feed?</h3>
-          <p className="text-sm text-white/70 mt-1">Your review has been saved. Share it as a post for others to see.</p>
-        </div>
-        <div className="flex flex-col gap-2 max-w-xs mx-auto w-full">
-          <button
-            className="w-full h-12 rounded-full text-white font-semibold gap-2 active:scale-[0.97] transition-all duration-200 flex items-center justify-center shadow-md disabled:opacity-50"
-            style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
-            onClick={onShare}
-            disabled={isSharing}
-          >
-            <Share2 className="h-5 w-5" />
-            {isSharing ? 'Sharing...' : 'Share to Clubhouse'}
-          </button>
-          <div className="flex items-center justify-center gap-1.5 text-white/50">
-            <VisIcon className="w-3 h-3" />
-            <span className="text-[11px]">{visInfo.label}</span>
+    <>
+      {/* Top: Share prompt + button */}
+      <div 
+        className="absolute inset-x-0 px-4 pointer-events-auto z-30"
+        style={{ 
+          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
+        }}
+      >
+        <div className="space-y-3">
+          <div className="text-center text-white">
+            <h3 className="text-lg font-semibold drop-shadow-md">Share this review to your Clubhouse feed?</h3>
+            <p className="text-sm text-white/70 mt-1 drop-shadow-sm">Your review has been saved. Share it as a post for others to see.</p>
           </div>
-          <Button variant="ghost" className="w-full text-white/70 hover:text-white hover:bg-white/10" onClick={onSkip} disabled={isSharing}>
-            Skip for Now
-          </Button>
+          <div className="flex flex-col gap-2 max-w-xs mx-auto w-full">
+            <button
+              className="w-full h-12 rounded-full text-white font-semibold gap-2 active:scale-[0.97] transition-all duration-200 flex items-center justify-center shadow-md disabled:opacity-50"
+              style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
+              onClick={onShare}
+              disabled={isSharing}
+            >
+              <Share2 className="h-5 w-5" />
+              {isSharing ? 'Sharing...' : 'Share to Clubhouse'}
+            </button>
+            <div className="flex items-center justify-center gap-1.5 text-white/50">
+              <VisIcon className="w-3 h-3" />
+              <span className="text-[11px]">{visInfo.label}</span>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Bottom: Skip for Now */}
+      <div 
+        className="absolute inset-x-0 px-4 pointer-events-auto z-30 flex justify-center"
+        style={{ 
+          bottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
+        }}
+      >
+        <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10" onClick={onSkip} disabled={isSharing}>
+          Skip for Now
+        </Button>
+      </div>
+    </>
   );
 }
