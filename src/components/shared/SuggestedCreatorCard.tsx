@@ -184,10 +184,11 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
         style={{
           fontSize: 10,
           fontWeight: 600,
-          height: 12,
-          padding: '0 10px',
+          height: 'auto',
+          padding: '3px 10px',
           marginTop: 4,
-          lineHeight: '12px',
+          lineHeight: '1',
+          borderRadius: 9999,
           ...(creator.handicap != null
             ? isDark
               ? { background: 'rgba(245,158,11,0.15)', color: '#F59E0B' }
