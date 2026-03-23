@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { Course } from '../types';
+import { invalidateCourseRatingCaches } from '@/utils/invalidateCourseRatingCaches';
 
 interface UseRemoveRatingOptions {
   course: Course | null;
@@ -57,48 +58,16 @@ export function useRemoveRating({
     onSuccess: async () => {
       console.log('[Delete Rating] onSuccess - starting invalidations');
       
-      const { data: userResponse } = await supabase.auth.getUser();
-      const userId = userResponse?.user?.id;
+      invalidateCourseRatingCaches(queryClient);
       
-      // Invalidate all related queries
-      queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
-      
-      await queryClient.refetchQueries({ queryKey: ['user-course-rating', course?.id, userId] });
-      await queryClient.refetchQueries({ queryKey: ['course-rating-aggregates', course?.id] });
-      
-      queryClient.invalidateQueries({ queryKey: ['course-rating-distribution', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['course-reviews-full', course?.id] });
-      
-      await queryClient.refetchQueries({ 
-        queryKey: ['course-reviews-full'],
-        type: 'active',
-        exact: false
-      });
-      
-      queryClient.invalidateQueries({ queryKey: ['user-course', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['user-top100-course', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['userTop100Courses'] });
-      queryClient.invalidateQueries({ queryKey: ['userTop100CoursesInRegion'] });
-      queryClient.invalidateQueries({ queryKey: ['top100-courses'] });
-      queryClient.invalidateQueries({ queryKey: ['course-detail', course?.id] });
-      queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['golf-courses-infinite'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['explore-courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['top100-course-leaderboard'], exact: false });
-      
-      await queryClient.refetchQueries({ queryKey: ['top100CoursesByRegion'], exact: false, type: 'active' });
-      await queryClient.refetchQueries({ queryKey: ['golf-courses-infinite'], exact: false, type: 'active' });
-      await queryClient.refetchQueries({ queryKey: ['explore-courses'], exact: false, type: 'active' });
-      
-      queryClient.invalidateQueries({ queryKey: ['top100-progress-for-user'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['quest-courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['top100-leaderboard'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-top100-courses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['userPlayedCourses'], exact: false });
-      queryClient.invalidateQueries({ queryKey: ['user-exploration-status'], exact: false });
+      await queryClient.refetchQueries({ queryKey: ['userProfile'], type: 'active', exact: false });
+      await queryClient.refetchQueries({ queryKey: ['userTop100Courses'], type: 'active', exact: false });
+      await queryClient.refetchQueries({ queryKey: ['user-played-courses-full'], type: 'active', exact: false });
+      await queryClient.refetchQueries({ queryKey: ['user-top-ten-courses'], type: 'active', exact: false });
       
       // Trigger badge checking for the user (non-blocking)
       try {
+        const { data: userResponse } = await supabase.auth.getUser();
         if (userResponse.user) {
           console.log('[Delete Rating] Checking badges for user:', userResponse.user.id);
           await supabase.rpc('check_and_award_badges', { user_id_param: userResponse.user.id });
