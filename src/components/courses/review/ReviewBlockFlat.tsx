@@ -99,35 +99,61 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          {/* Avatar */}
-          <div className="relative">
-            {user.avatarUrl ? (
-              <SquircleAvatar
-                src={user.avatarUrl}
-                alt={user.name}
-                size={40}
-                fallback={user.initials}
-              />
-            ) : (
-              <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-sm font-semibold text-foreground">
-                {user.initials}
-              </div>
-            )}
-          </div>
-
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-foreground">{user.name}</span>
-              {isMine && (
-                <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-[#f59e0b]/10 text-[#d97706]">
-                  You
-                </span>
+        {onUserClick ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onUserClick();
+            }}
+            className="flex items-center gap-3 active:opacity-70 transition-opacity"
+            style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}
+          >
+            <div className="relative">
+              {user.avatarUrl ? (
+                <SquircleAvatar src={user.avatarUrl} alt={user.name} size={40} fallback={user.initials} />
+              ) : (
+                <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-sm font-semibold text-foreground">
+                  {user.initials}
+                </div>
               )}
             </div>
-            <span className="text-sm text-muted-foreground">{formatDate(createdAt)}</span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-foreground">{user.name}</span>
+                {isMine && (
+                  <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-[#f59e0b]/10 text-[#d97706]">
+                    You
+                  </span>
+                )}
+              </div>
+              <span className="text-sm text-muted-foreground">{formatDate(createdAt)}</span>
+            </div>
+          </button>
+        ) : (
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              {user.avatarUrl ? (
+                <SquircleAvatar src={user.avatarUrl} alt={user.name} size={40} fallback={user.initials} />
+              ) : (
+                <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-sm font-semibold text-foreground">
+                  {user.initials}
+                </div>
+              )}
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-foreground">{user.name}</span>
+                {isMine && (
+                  <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-[#f59e0b]/10 text-[#d97706]">
+                    You
+                  </span>
+                )}
+              </div>
+              <span className="text-sm text-muted-foreground">{formatDate(createdAt)}</span>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Score badge */}
         <div

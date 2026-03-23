@@ -179,9 +179,13 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
             <button
               key={media.id}
               type="button"
-              onClick={(e) => {
+            onClick={(e) => {
                 e.stopPropagation();
-                onSeeAllClick();
+                if (showOverflow) {
+                  onSeeAllClick();
+                } else {
+                  openViewer(mediaTiles, index);
+                }
               }}
               className="relative overflow-hidden w-full aspect-square focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow hover:shadow-md border border-border/60 sm:border-border/40 active:scale-[0.98]"
               aria-label="Open Media tab"

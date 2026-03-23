@@ -591,6 +591,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                         handleReviewMediaClick(review.media, index);
                       }
                     }}
+                    onUserClick={() => navigate(getProfilePathById(review.user_id))}
                   />
                   {/* Existing response */}
                   {response && <ResponseDisplay response={response} />}
