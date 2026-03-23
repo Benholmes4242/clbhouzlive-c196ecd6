@@ -243,10 +243,7 @@ export const ClubhouzCalledItSection: React.FC<ClubhouzCalledItSectionProps> = (
         </div>
 
         <div style={{
-          borderRadius: 14,
-          border: '1px solid hsl(var(--border))',
           overflow: 'hidden',
-          background: 'hsl(var(--card))',
         }}>
           {sorted.map((pick, idx) => {
             const pickIsWinner = pick.actualPosition === 1;
