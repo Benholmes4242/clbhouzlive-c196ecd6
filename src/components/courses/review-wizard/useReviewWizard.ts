@@ -385,32 +385,13 @@ export function useReviewWizard({
       void queryClient.refetchQueries({ queryKey: ['user-played-courses-full'], type: 'active', exact: false });
       void queryClient.refetchQueries({ queryKey: ['user-top-ten-courses'], type: 'active', exact: false });
 
-      // Update courses_logged_all_time for new reviews
-      if (!isEditMode && currentUserId && course?.id) {
-        try {
-          const { data: currentProfile } = await supabase
-            .from('user_profiles')
-            .select('courses_logged_all_time')
-            .eq('id', currentUserId)
-            .single();
-
-          if (currentProfile) {
-            await supabase
-              .from('user_profiles')
-              .update({
-                courses_logged_all_time: (currentProfile.courses_logged_all_time ?? 0) + 1
-              })
-              .eq('id', currentUserId);
-          }
-
-          await queryClient.refetchQueries({
-            queryKey: ['userProfile', currentUserId],
-            type: 'active',
-            exact: false
-          });
-        } catch (profileError) {
-          console.error('[ReviewWizard] courses_logged_all_time update failed:', profileError);
-        }
+      // Refetch userProfile to reflect DB trigger updates (courses_logged)
+      if (!isEditMode && currentUserId) {
+        void queryClient.refetchQueries({
+          queryKey: ['userProfile', currentUserId],
+          type: 'active',
+          exact: false
+        });
       }
 
       // For edit mode, go directly to success
