@@ -605,6 +605,16 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
                 : '97px'),
         }}
       >
+        {/* Carousel dots — positioned 8px above capsule */}
+        {carouselCount > 1 && (
+          <div
+            className="absolute left-0 right-0 flex justify-center pointer-events-none"
+            style={{ bottom: '100%', marginBottom: 8 }}
+          >
+            <FeedCarouselDots count={carouselCount} activeIndex={carouselActiveIndex} />
+          </div>
+        )}
+
         <motion.div
           layout
           transition={{ layout: { duration: 0.2, ease: 'easeOut' } }}
