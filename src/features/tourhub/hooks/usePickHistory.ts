@@ -12,6 +12,7 @@ export interface PickHistoryEntry {
   shortName: string;
   topPickName: string;
   topPickPlayerId: string;
+  predictedRank: number;
   actualPosition: number | null;
   actualPositionTied: boolean;
   isWinner: boolean;
@@ -100,37 +101,58 @@ export function usePickHistory() {
         const tournament = (row as any).sr_tournaments;
         if (!tournament) continue;
 
-        const predictions = (row.predictions as any[]) || [];
-        const sortedPreds = [...predictions].sort(
-          (a, b) => (a.rank ?? a.predictedRank ?? 99) - (b.rank ?? b.predictedRank ?? 99)
-        );
-        const topPick = sortedPreds[0];
-        if (!topPick) continue;
-
-        const playerName = topPick.playerName || topPick.player_name || topPick.name || '';
-        const playerId = topPick.playerId || topPick.player_id || topPick.pgaTourId || '';
-        if (!playerName) continue;
-
-        // Look up actual finishing position from leaderboard (sr_id first, name fallback)
+        const rawPredictions = (row.predictions as any[]) || [];
         const maps = lbByTournament.get(row.tournament_id);
-        const lbEntry = maps?.bySrId.get(playerId)
-          ?? maps?.byName.get(playerName.toLowerCase());
+        if (!maps) continue;
 
-        const isWin = lbEntry?.position === 1;
-        const actualPosition = lbEntry?.position ?? null;
-        const actualPositionTied = lbEntry?.tied ?? false;
-        const scoreToPar = lbEntry?.score ?? null;
+        // Check ALL picks against leaderboard, find the best finisher
+        let bestPick: {
+          playerName: string;
+          playerId: string;
+          predictedRank: number;
+          actualPosition: number | null;
+          actualPositionTied: boolean;
+          isWinner: boolean;
+          scoreToPar: number | null;
+        } | null = null;
+
+        for (const pick of rawPredictions) {
+          const playerName: string = pick.playerName || pick.player_name || pick.name || '';
+          const playerId: string = String(pick.playerId || pick.pgaTourId || '');
+          const predictedRank: number = pick.rank || pick.predictedRank || 99;
+          if (!playerName) continue;
+
+          const lbEntry = maps.bySrId.get(playerId)
+            ?? maps.byName.get(playerName.toLowerCase());
+
+          const actualPosition = lbEntry?.position ?? null;
+          const actualPositionTied = lbEntry?.tied ?? false;
+          const isWinner = actualPosition === 1;
+          const scoreToPar = lbEntry?.score ?? null;
+
+          // Keep this pick if it finished better than current best
+          // Null positions (MC/WD) are treated as worst
+          if (
+            bestPick === null ||
+            (actualPosition !== null && (bestPick.actualPosition === null || actualPosition < bestPick.actualPosition))
+          ) {
+            bestPick = { playerName, playerId, predictedRank, actualPosition, actualPositionTied, isWinner, scoreToPar };
+          }
+        }
+
+        if (!bestPick) continue;
 
         entries.push({
           tournamentId: row.tournament_id,
           tournamentName: tournament.name || '',
           shortName: getShortName(tournament.name || ''),
-          topPickName: playerName,
-          topPickPlayerId: playerId,
-          actualPosition,
-          actualPositionTied,
-          isWinner: isWin,
-          scoreToPar,
+          topPickName: bestPick.playerName,
+          topPickPlayerId: bestPick.playerId,
+          predictedRank: bestPick.predictedRank,
+          actualPosition: bestPick.actualPosition,
+          actualPositionTied: bestPick.actualPositionTied,
+          isWinner: bestPick.isWinner,
+          scoreToPar: bestPick.scoreToPar,
           year: tournament.start_date
             ? new Date(tournament.start_date).getFullYear().toString()
             : new Date().getFullYear().toString(),

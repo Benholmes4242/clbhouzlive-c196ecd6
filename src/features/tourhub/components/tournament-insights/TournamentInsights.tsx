@@ -153,10 +153,16 @@ function PickRecordRail() {
                 <div style={{
                   fontSize: 14, fontWeight: 700,
                   color: 'hsl(var(--foreground))',
-                  lineHeight: 1.2, marginBottom: 8,
+                  lineHeight: 1.2, marginBottom: 2,
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
                 }}>
                   {surname}
+                </div>
+                {/* Predicted rank label */}
+                <div style={{
+                  fontSize: 9, color: 'hsl(var(--muted-foreground))', marginBottom: 6,
+                }}>
+                  Pick #{entry.predictedRank}
                 </div>
 
                 {/* Result badge */}
