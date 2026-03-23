@@ -44,12 +44,14 @@ export function SnapFeed({
   const hasScrolledToStart = useRef(false);
 
   // ── Stable refs for observer callback (avoid reconnecting observer) ──
+  const postsRef = useRef(posts);
   const postsLengthRef = useRef(posts.length);
   const hasNextPageRef = useRef(hasNextPage);
   const onNearEndRef = useRef(onNearEnd);
   const pendingIndexRef = useRef<number | null>(null);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  useEffect(() => { postsRef.current = posts; }, [posts]);
   useEffect(() => { postsLengthRef.current = posts.length; }, [posts.length]);
   useEffect(() => { hasNextPageRef.current = hasNextPage; }, [hasNextPage]);
   useEffect(() => { onNearEndRef.current = onNearEnd; }, [onNearEnd]);
