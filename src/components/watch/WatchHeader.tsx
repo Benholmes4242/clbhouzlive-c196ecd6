@@ -16,11 +16,11 @@ interface WatchHeaderProps {
   embedded?: boolean;
 }
 
-const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange, onOpenSearch, embedded = false }) => {
+const WatchHeader: React.FC<WatchHeaderProps> = ({ activeFilter, onFilterChange, onOpenSearch }) => {
   return (
     <div
       className="sticky z-30 bg-background pb-0 pt-0 px-0"
-      style={{ top: embedded ? '47px' : '0px', borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
+      style={{ top: '0px', borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
     >
       <div className="px-4 pt-3 pb-2">
         <button
