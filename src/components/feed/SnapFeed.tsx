@@ -3,6 +3,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { FeedSlide } from './FeedSlide';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { haptic } from '@/utils/haptics';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
 
 const NEAR_END_THRESHOLD = 3;
 const ACTIVE_SLIDE_RATIO = 0.5;
@@ -180,7 +181,7 @@ export function SnapFeed({
     next.forEach(post => {
       const url = post.mediaItems?.[0]?.hlsUrl;
       if (url) {
-        fetch(url, { method: 'HEAD', mode: 'no-cors' }).catch(() => {});
+        preloadHlsManifest(url).catch(() => {});
       }
     });
   }, [activeIndex, posts]);

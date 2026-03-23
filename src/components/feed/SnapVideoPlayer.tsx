@@ -11,8 +11,8 @@ const HLS_CONFIG = {
   maxBufferLength: 30,
   maxMaxBufferLength: 60,
   startLevel: -1,
-  capLevelToPlayerSize: true,
-  abrEwmaDefaultEstimate: 500_000,
+  capLevelToPlayerSize: false,
+  abrEwmaDefaultEstimate: 8_000_000,
 };
 
 const LONG_VIDEO_THRESHOLD = 10; // seconds
@@ -253,7 +253,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
       <video
         ref={videoRef}
         playsInline
-        preload="none"
+        preload="metadata"
         poster={thumbnailUrl || undefined}
         className="absolute inset-0 w-full h-full"
         style={{
