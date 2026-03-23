@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { attachHlsToTile, prefetchTile } from '@/hooks/useTileVideoPlayer';
 
 const ATTACH_THRESHOLD = 0.6;
 const DETACH_THRESHOLD = 0.2;
