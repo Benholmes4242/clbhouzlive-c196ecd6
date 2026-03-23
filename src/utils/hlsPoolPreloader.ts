@@ -33,8 +33,6 @@ export async function registerInPool(hlsUrl: string): Promise<void> {
     const Hls = await loadHlsJs();
     if (!Hls || !Hls.isSupported()) return;
 
-    if (!Hls || !Hls.isSupported()) return;
-
     // Create hidden video element for preloading
     const preloadVideo = document.createElement('video');
     preloadVideo.muted = true;
