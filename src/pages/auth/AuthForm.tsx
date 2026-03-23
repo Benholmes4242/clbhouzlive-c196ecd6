@@ -618,6 +618,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
             onSubmit={handleLogin}
             onBack={handleBackToEmail}
             onForgotPassword={handleOpenForgotPassword}
+            onResendVerification={handleResendVerification}
           />
         )}
         

@@ -10,6 +10,7 @@ interface PasswordSheetContentProps {
   onSubmit: () => void;
   onBack: () => void;
   onForgotPassword: () => void;
+  onResendVerification?: () => void;
 }
 
 const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
@@ -21,6 +22,7 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
   onSubmit,
   onBack,
   onForgotPassword,
+  onResendVerification,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isFocused, setIsFocused] = useState(false);
@@ -29,7 +31,7 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
     setTimeout(() => inputRef.current?.focus(), 100);
   }, []);
 
-  const isPasswordValid = password.length >= 6;
+  const isPasswordValid = password.length >= 8;
   const isDisabled = submitting || !isPasswordValid;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -102,7 +104,19 @@ const PasswordSheetContent: React.FC<PasswordSheetContentProps> = ({
           }
         `}</style>
         {passwordError && (
-          <p id="password-error" role="alert" className="text-[#E03131] text-[13px] mt-2">{passwordError}</p>
+          <div className="mt-2">
+            <p id="password-error" role="alert" className="text-[#E03131] text-[13px]">{passwordError}</p>
+            {passwordError.includes("isn't verified") && onResendVerification && (
+              <button
+                type="button"
+                onClick={onResendVerification}
+                className="text-[13px] underline underline-offset-2 mt-1.5 transition-colors"
+                style={{ color: 'rgba(245, 158, 11, 0.85)' }}
+              >
+                Resend verification email
+              </button>
+            )}
+          </div>
         )}
       </div>
       
