@@ -130,32 +130,127 @@ export function PreviewStep({
             <X className="h-5 w-5" />
           </button>
           <div className="flex-1 flex flex-col items-center justify-center">
-            <div className="w-full max-w-sm bg-card rounded-2xl border border-border/50 overflow-hidden shadow-sm">
-              {course && (
-                <div className="flex items-center gap-3 p-4 border-b border-border">
-                  {course.thumbnail_image && (
-                    <img src={course.thumbnail_image} alt={course.name} className="w-14 h-14 rounded-xl object-cover" />
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground truncate">{course.name}</h3>
-                    {courseLocation && <p className="text-sm text-muted-foreground">{courseLocation}</p>}
+            <div 
+              className="w-full max-w-sm rounded-2xl overflow-hidden"
+              style={{
+                background: 'rgba(20, 13, 4, 0.95)',
+                border: '1px solid rgba(245, 158, 11, 0.22)',
+                position: 'relative',
+              }}
+            >
+              {/* Watermark score */}
+              <div style={{
+                position: 'absolute',
+                top: -14,
+                right: -6,
+                fontSize: 120,
+                fontWeight: 900,
+                color: 'rgba(245,158,11,0.055)',
+                lineHeight: 1,
+                letterSpacing: '-0.05em',
+                userSelect: 'none',
+                pointerEvents: 'none',
+                fontFamily: 'Georgia, serif',
+              }}>
+                {rating?.toFixed(1) || '0.0'}
+              </div>
+
+              {/* Amber accent bar */}
+              <div style={{ height: 2.5, background: 'linear-gradient(90deg, rgba(245,158,11,0.8), transparent)' }} />
+
+              <div style={{ padding: '10px 14px 13px', position: 'relative' }}>
+                {/* Row 1: Badge + score */}
+                <div className="flex items-center justify-between mb-2">
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    background: 'rgba(245,158,11,0.12)',
+                    border: '0.5px solid rgba(245,158,11,0.35)',
+                    borderRadius: 6,
+                    padding: '3px 8px',
+                  }}>
+                    <span style={{
+                      fontSize: 8,
+                      fontWeight: 800,
+                      color: '#f59e0b',
+                      letterSpacing: '0.14em',
+                      textTransform: 'uppercase',
+                    }}>
+                      ★ Course Review
+                    </span>
+                  </div>
+                  <div className="flex items-baseline gap-0.5">
+                    <span style={{
+                      fontSize: 24,
+                      fontWeight: 900,
+                      color: '#f59e0b',
+                      lineHeight: 1,
+                      letterSpacing: '-0.04em',
+                      fontFamily: 'Georgia, serif',
+                    }}>
+                      {rating?.toFixed(1) || '0.0'}
+                    </span>
+                    <span style={{ fontSize: 10, fontWeight: 500, color: 'rgba(245,158,11,0.45)' }}>/10</span>
                   </div>
                 </div>
-              )}
-              <div className="p-4 text-center border-b border-border">
-                <div className="inline-flex items-baseline gap-1">
-                  <span className="text-4xl font-bold" style={{ color: (rating ?? 0) >= 9.0 ? '#f59e0b' : '#6b7280' }}>
-                    {rating?.toFixed(1) || '0.0'}
+
+                {/* Row 2: Course name */}
+                {course && (
+                  <div style={{
+                    fontSize: 18,
+                    fontWeight: 900,
+                    color: '#ffffff',
+                    lineHeight: 1.15,
+                    letterSpacing: '-0.03em',
+                    fontFamily: 'Georgia, serif',
+                    marginBottom: 4,
+                  }}>
+                    {course.name}
+                  </div>
+                )}
+
+                {/* Row 3: Location */}
+                {courseLocation && (
+                  <div className="flex items-center gap-1.5 mb-2.5">
+                    <span style={{ fontSize: 11 }}>📍</span>
+                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)' }}>{courseLocation}</span>
+                  </div>
+                )}
+
+                {/* Divider */}
+                <div style={{ height: 0.5, background: 'linear-gradient(90deg, rgba(245,158,11,0.3) 0%, transparent 80%)', marginBottom: 10 }} />
+
+                {/* Row 4: Reviewer */}
+                <div className="flex items-center gap-2 mb-2">
+                  {creator.avatar ? (
+                    <img src={creator.avatar} alt={creator.name} className="w-7 h-7 rounded-lg object-cover" />
+                  ) : (
+                    <div className="w-7 h-7 rounded-lg bg-amber-500/20 flex items-center justify-center text-xs font-bold text-amber-400">
+                      {creator.name?.charAt(0)?.toUpperCase() || '?'}
+                    </div>
+                  )}
+                  <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
+                    {creator.name || 'Golfer'}
                   </span>
-                  <span className="text-lg text-muted-foreground">/10</span>
                 </div>
+
+                {/* Row 5: Review text */}
+                {review && (
+                  <div style={{
+                    fontSize: 12,
+                    color: 'rgba(255,255,255,0.42)',
+                    lineHeight: 1.5,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical' as const,
+                    overflow: 'hidden',
+                    fontStyle: 'italic',
+                  }}>
+                    "{review}"
+                  </div>
+                )}
               </div>
-              {(title || review) && (
-                <div className="p-4">
-                  {title && <h4 className="font-semibold text-foreground mb-1">{title}</h4>}
-                  {review && <p className="text-sm text-muted-foreground line-clamp-3">{review}</p>}
-                </div>
-              )}
             </div>
           </div>
           
