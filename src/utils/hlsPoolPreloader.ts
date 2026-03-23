@@ -50,7 +50,6 @@ export async function registerInPool(hlsUrl: string): Promise<void> {
       startLevel: -1,
       capLevelToPlayerSize: false,
       abrEwmaDefaultEstimate: getSharedBandwidth(),
-      loader: cloudflareUid ? createCachedHlsLoader(cloudflareUid) : undefined,
     });
 
     hls.loadSource(hlsUrl);
