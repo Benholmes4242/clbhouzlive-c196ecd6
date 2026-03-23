@@ -104,53 +104,13 @@ export function FriendsAutoplay({ posts, feedRef }: FriendsAutoplayProps) {
     video.addEventListener('canplay', onCanPlay, { once: true });
     (video as any)._friendsCanPlayHandler = onCanPlay;
 
-    const isNativeHls = video.canPlayType('application/vnd.apple.mpegurl') !== '';
-
-    if (!hlsUrl || isNativeHls) {
-      video.src = hlsUrl || mp4Fallback!;
-      video.play().catch(() => {});
-      return;
-    }
-
     try {
-      const { default: Hls } = await import('hls.js');
-      if (!Hls.isSupported()) {
-        if (mp4Fallback) { video.src = mp4Fallback; video.play().catch(() => {}); }
-        return;
-      }
-
-      // TODO: re-wire cachedHlsLoader in Brief 3
-
-      if (activeMapRef.current.get(slot) !== cardIndex) return;
-
-      const hls = new Hls({
-        startLevel: -1,
-        capLevelToPlayerSize: false,
-        abrEwmaDefaultEstimate: 5_000_000 > 0 ? 5_000_000 : 8_000_000,
-        maxBufferLength: 8,
-        maxMaxBufferLength: 16,
-        enableWorker: true,
-        loader: undefined,
+      const hls = await attachHlsToTile({
+        hlsUrl: hlsUrl || '',
+        mp4Fallback: mp4Fallback || undefined,
+        video,
       });
-
       hlsRefs.current[slot] = hls;
-      hls.loadSource(hlsUrl);
-      hls.attachMedia(video);
-
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        if (activeMapRef.current.get(slot) !== cardIndex) return;
-        hls.currentLevel = 0;
-        video.play().catch(() => {});
-      });
-
-      hls.on(Hls.Events.ERROR, (_: any, data: any) => {
-        if (data.fatal && mp4Fallback) {
-          hls.destroy();
-          hlsRefs.current[slot] = null;
-          video.src = mp4Fallback;
-          video.play().catch(() => {});
-        }
-      });
     } catch { /* silent */ }
   }, []);
 
