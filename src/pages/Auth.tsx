@@ -81,6 +81,11 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
   useHideBottomNav();
   useHideHeader();
 
+  useLayoutEffect(() => {
+    document.body.classList.add('route-auth');
+    return () => { document.body.classList.remove('route-auth'); };
+  }, []);
+
   if (!betaUnlocked) {
     return <BetaGate onUnlock={() => setBetaUnlocked(true)} />;
   }
