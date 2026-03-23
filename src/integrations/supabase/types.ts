@@ -14050,6 +14050,7 @@ export type Database = {
       cleanup_old_gate_attempts: { Args: never; Returns: undefined }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
       cleanup_stale_typing_indicators: { Args: never; Returns: undefined }
+      cleanup_unverified_profiles: { Args: never; Returns: undefined }
       clear_typing_indicator: {
         Args: { p_conversation_id: string }
         Returns: undefined
