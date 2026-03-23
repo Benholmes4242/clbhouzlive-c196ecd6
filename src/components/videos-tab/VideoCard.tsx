@@ -88,12 +88,10 @@ export const VideoCard = React.memo(function VideoCard({ post, userId, cardIndex
 
     try {
       if (newLiked) {
-        const { error } = await supabase.from('post_likes').insert({
-          post_id: post.id,
-          user_id: userId,
-          actor_id: userId,
-          actor_type: 'personal',
-        });
+        const { error } = await supabase.from('post_likes').upsert(
+          { post_id: post.id, user_id: userId, actor_id: userId, actor_type: 'personal' },
+          { onConflict: 'post_id,actor_type,actor_id', ignoreDuplicates: true }
+        );
         if (error) throw error;
       } else {
         const { error } = await supabase.from('post_likes').delete().match({
