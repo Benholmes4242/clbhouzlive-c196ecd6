@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { attachHlsToTile, prefetchTile } from '@/hooks/useTileVideoPlayer';
 
 const ATTACH_THRESHOLD = 0.6;
 const DETACH_THRESHOLD = 0.2;
@@ -118,34 +119,15 @@ export const PostsAutoplay: React.FC<PostsAutoplayProps> = ({ posts, gridRef }) 
     tileEl.style.position = 'relative';
     tileEl.appendChild(video);
 
-    const { default: Hls } = await import('hls.js');
-    // TODO: re-wire cachedHlsLoader in Brief 3
-
     if (activeIndexRef.current !== tileIdx) return;
 
-    if (!Hls.isSupported()) {
-      video.src = hlsUrl;
-      video.play().catch(() => {});
-      return;
-    }
-
-    const hls = new Hls({
-      startLevel: -1,
-      capLevelToPlayerSize: false,
-      abrEwmaDefaultEstimate: 5_000_000 > 0 ? 5_000_000 : 8_000_000,
-      maxBufferLength: 8,
-      maxMaxBufferLength: 16,
-      enableWorker: true,
-      loader: undefined,
-    });
-    hlsRef.current = hls;
-    hls.loadSource(hlsUrl);
-    hls.attachMedia(video);
-    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-      if (activeIndexRef.current !== tileIdx) return;
-      hls.currentLevel = 0;
-      video.play().catch(() => {});
-    });
+    try {
+      const hls = await attachHlsToTile({
+        hlsUrl,
+        video,
+      });
+      hlsRef.current = hls;
+    } catch { /* silent */ }
 
     if ((video as any)._onCanPlay) {
       video.removeEventListener('canplay', (video as any)._onCanPlay);
@@ -182,6 +164,11 @@ export const PostsAutoplay: React.FC<PostsAutoplayProps> = ({ posts, gridRef }) 
           if (entry.intersectionRatio >= ATTACH_THRESHOLD) {
             if (activeIndexRef.current !== idx) {
               attachToTile(idx, hlsUrl, el);
+
+              // Prefetch next tile
+              const nextPost = postsRef.current[idx + 1];
+              const nextHlsUrl = nextPost?.mediaItems?.[0]?.hlsUrl;
+              if (nextHlsUrl) prefetchTile(nextHlsUrl);
             }
           } else if (entry.intersectionRatio < DETACH_THRESHOLD) {
             if (activeIndexRef.current === idx) {

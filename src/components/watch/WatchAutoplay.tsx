@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { attachHlsToTile, prefetchTile } from '@/hooks/useTileVideoPlayer';
 
 const VIDEO_POOL_SIZE = 2;
 const AUTOPLAY_THRESHOLD = 0.5;
@@ -72,35 +73,15 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
     tileEl.style.position = 'relative';
     tileEl.appendChild(video);
 
-    const { default: Hls } = await import('hls.js');
-    // TODO: re-wire cachedHlsLoader in Brief 3
     if (activeMapRef.current.get(slot) !== tileIdx) return;
 
-    if (!Hls.isSupported()) {
-      video.src = hlsUrl;
-      video.play().catch(() => {});
-      return;
-    }
-
-    const hls = new Hls({
-      startLevel: -1,
-      capLevelToPlayerSize: false,
-      abrEwmaDefaultEstimate: 5_000_000 > 0 ? 5_000_000 : 8_000_000,
-      maxBufferLength: 5,
-      maxMaxBufferLength: 10,
-      enableWorker: true,
-      loader: undefined,
-    });
-    hlsPoolRef.current[slot] = hls;
-    hls.loadSource(hlsUrl);
-    hls.attachMedia(video);
-    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-      if (activeMapRef.current.get(slot) !== tileIdx) return;
-      hls.currentLevel = 0;
-      // @ts-ignore
-      hls.autoLevelEnabled = false;
-      video.play().catch(() => {});
-    });
+    try {
+      const hls = await attachHlsToTile({
+        hlsUrl,
+        video,
+      });
+      hlsPoolRef.current[slot] = hls;
+    } catch { /* silent */ }
 
     if ((video as any)._onPlaying) {
       video.removeEventListener('playing', (video as any)._onPlaying);
@@ -190,6 +171,11 @@ const WatchAutoplay: React.FC<WatchAutoplayProps> = ({ posts, gridRef }) => {
               activeMap.set(slot, idx);
               detachSlot(slot, prevTile);
               attachToTile(slot, idx, hlsUrl, el);
+
+              // Prefetch next tile
+              const nextPost = postsRef.current[idx + 1];
+              const nextHlsUrl = nextPost?.mediaItems?.[0]?.hlsUrl;
+              if (nextHlsUrl) prefetchTile(nextHlsUrl);
             }
           } else {
             if (activeMap.get(slot) === idx) {
