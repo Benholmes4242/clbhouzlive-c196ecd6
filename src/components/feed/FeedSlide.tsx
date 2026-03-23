@@ -136,6 +136,8 @@ export const FeedSlide = memo(function FeedSlide({
       ref={setRef}
       data-index={index}
       className="relative w-full overflow-hidden flex-shrink-0"
+      aria-hidden={!isActive}
+      {...(!isActive ? { inert: '' } : {})}
       style={{
         height: '100dvh',
         scrollSnapAlign: 'start',

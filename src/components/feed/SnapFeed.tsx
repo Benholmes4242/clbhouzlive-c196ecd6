@@ -107,6 +107,7 @@ export function SnapFeed({
 
     return () => {
       observerRef.current?.disconnect();
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     };
   }, [setActiveIndex]);
 
