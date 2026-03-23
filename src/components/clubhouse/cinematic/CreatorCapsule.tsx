@@ -160,10 +160,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     setIsExpanded(false);
   }, [postId]);
 
-  const reviewRatingColors = isReview && reviewData
-    ? getOverlayRatingColors(reviewData.rating)
-    : null;
-  const isOutstanding = isReview && reviewData && reviewData.rating >= 9.0;
 
   const handleToggle = useCallback(() => {
     if (isReview) {
