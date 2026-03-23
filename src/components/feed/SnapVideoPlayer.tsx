@@ -149,14 +149,6 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
           hls.loadSource(hlsUrl || mp4Url || '');
           hls.attachMedia(video);
 
-          // Wire perf listeners on new instance
-          hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            feedPerf.onHlsManifestParsed(feedIndex, hlsUrl, hls.levels.length);
-          });
-          hls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
-            const level = hls.levels[data.level];
-            if (level) feedPerf.onQualitySwitch(feedIndex, hlsUrl, level.height, Math.round(level.bitrate / 1000));
-          });
           hls.on(Hls.Events.FRAG_LOADED, (_, data) => {
             if (data.frag?.stats?.bwEstimate && data.frag.stats.bwEstimate > 0) {
               saveSharedBandwidth(data.frag.stats.bwEstimate);
