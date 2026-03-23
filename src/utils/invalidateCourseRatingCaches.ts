@@ -56,4 +56,7 @@ export function invalidateCourseRatingCaches(queryClient: QueryClient) {
   queryClient.invalidateQueries({ queryKey: ['quest-courses'], exact: false });
   queryClient.invalidateQueries({ queryKey: ['userPlayedCourses'], exact: false });
   queryClient.invalidateQueries({ queryKey: ['allPlayedCourses'], exact: false });
+
+  // ── Reviews count (profile header) ──
+  queryClient.invalidateQueries({ queryKey: ['actor-reviews-count'], exact: false });
 }
