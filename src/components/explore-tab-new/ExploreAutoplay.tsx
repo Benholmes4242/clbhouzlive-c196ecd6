@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import type { RefObject } from 'react';
 import type { FeedPost } from '@/components/media-system/types/media';
+import { attachHlsToTile, prefetchTile } from '@/hooks/useTileVideoPlayer';
 
 const POOL_SIZE = 2;
 const ATTACH_THRESHOLD = 0.6;
