@@ -37,7 +37,7 @@ export function usePickHistory() {
       const { data: seasons } = await supabase
         .from('sr_seasons')
         .select('id')
-        .ilike('tour_name', 'pga')
+        .eq('tour_name', 'pga')
         .order('year', { ascending: false })
         .limit(3);
 
