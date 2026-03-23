@@ -45,8 +45,8 @@ export function SnapFeed({
   const postsLengthRef = useRef(posts.length);
   const hasNextPageRef = useRef(hasNextPage);
   const onNearEndRef = useRef(onNearEnd);
-  const lastSetIndexRef = useRef(0);
-  const lastSetTimeRef = useRef(0);
+  const pendingIndexRef = useRef<number | null>(null);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => { postsLengthRef.current = posts.length; }, [posts.length]);
   useEffect(() => { hasNextPageRef.current = hasNextPage; }, [hasNextPage]);
