@@ -257,6 +257,8 @@ export interface FeedRpcRow {
   post_type?: string | null;
   tournament_meta?: TournamentResultMeta | null;
   post_tags?: FeedPostTag[] | null;
+  course_id?: string | null;
+  course_name?: string | null;
 }
 
 /** Timing constants */

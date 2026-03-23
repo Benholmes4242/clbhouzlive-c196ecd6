@@ -27,7 +27,16 @@ export function useActivePostDerived(posts: FeedPost[], activeIndex: number) {
       };
     }
 
-    // Priority 2: golf_club tag — has real course UUID as entity_id
+    // Priority 2: direct course_id on the post
+    if (activePost.courseId) {
+      return {
+        id: activePost.courseId,
+        name: activePost.courseName || null,
+        courseCountry: null,
+      };
+    }
+
+    // Priority 3: golf_club tag — has real course UUID as entity_id
     const courseTag = activePost.tags?.find(t => t.entity_type === 'golf_club');
     if (courseTag) {
       return {
@@ -37,7 +46,7 @@ export function useActivePostDerived(posts: FeedPost[], activeIndex: number) {
       };
     }
 
-    // Priority 3: caption text extraction — no real id, fallback only
+    // Priority 4: caption text extraction — no real id, fallback only
     if (activePost.caption) {
       const extracted = extractGolfCourseFromContent(activePost.caption);
       if (extracted) {
@@ -50,7 +59,7 @@ export function useActivePostDerived(posts: FeedPost[], activeIndex: number) {
     }
 
     return undefined;
-  }, [activePost?.id, activePost?.review, activePost?.tags, activePost?.caption]);
+  }, [activePost?.id, activePost?.review, activePost?.courseId, activePost?.courseName, activePost?.tags, activePost?.caption]);
 
   const activeReview = activePost?.review ?? null;
   const isActiveReview = activePost?.isReview ?? false;
