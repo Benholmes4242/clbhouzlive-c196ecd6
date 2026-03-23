@@ -298,9 +298,18 @@ const ActivityPage: React.FC = () => {
                 </button>
               </div>
             ) : showEmptyState ? (
-              <div className="px-4">
-                <ActivityEmptyState tab="all" />
-              </div>
+              <>
+                <SuggestedCreatorsShelf
+                  userId={user?.id}
+                  title="Golfers you might know"
+                  showViewAll={true}
+                  onViewAll={() => navigate('/golfers')}
+                  containerStyle={{ marginTop: 8 }}
+                />
+                <div className="px-4 pt-2">
+                  <ActivityEmptyState tab="all" />
+                </div>
+              </>
             ) : (
               <div className="w-full space-y-0">
                 {/* Tier 1 — Featured cards for new/unread */}
