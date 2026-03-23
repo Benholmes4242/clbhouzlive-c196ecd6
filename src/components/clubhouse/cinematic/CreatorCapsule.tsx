@@ -244,17 +244,29 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         </div>
       )}
 
-      {/* Golf Course CTA - one-line gap after caption */}
-      {golfCourse && courseDisplayLabel && (
+      {/* Golf Course CTA — CourseDNACard when id available, fallback row otherwise */}
+      {golfCourse?.id && (() => {
+        const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2xiaG91eiIsImEiOiJjbTVyejIzMXcxemx2MmpzZDU3YjkxNjNkIn0.H_w9d-UAvvMRkJ_9DoVQ-A';
+        return <CourseDNACard
+          courseId={golfCourse.id}
+          courseName={golfCourse.name || ''}
+          courseCountry={golfCourse.courseCountry || golfCourse.country || ''}
+          mapboxToken={MAPBOX_TOKEN}
+          onNavigate={() => {
+            onBeforeNavigate?.();
+            navigate(`/courses/${golfCourse.slug || golfCourse.id}`);
+          }}
+        />;
+      })()}
+
+      {/* Fallback for caption-extracted courses with no id */}
+      {!golfCourse?.id && golfCourse?.name && courseDisplayLabel && (
         <button
           type="button"
           onClick={async (e) => {
             e.stopPropagation();
             onBeforeNavigate?.();
-            const courseIdentifier = golfCourse.slug || golfCourse.id;
-            if (courseIdentifier) {
-              navigate(`/courses/${courseIdentifier}`);
-            } else if (golfCourse.name) {
+            if (golfCourse.name) {
               try {
                 const { data } = await supabase
                   .from('golf_courses')
