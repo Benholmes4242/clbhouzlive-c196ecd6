@@ -18,17 +18,21 @@ export function WizardHeader({ step, isFirstStep, onBack, onClose, onSkip }: Pro
         height: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 56px)',
       }}
     >
-      {/* Left — circular close/back button */}
-      <button
-        onClick={isFirstStep ? onClose : onBack}
-        className="w-9 h-9 rounded-full bg-black/[0.06] flex items-center justify-center text-foreground flex-shrink-0"
-        aria-label={isFirstStep ? 'Close' : 'Back'}
-      >
-        {isFirstStep
-          ? <X size={16} strokeWidth={2.5} />
-          : <ChevronLeft size={18} strokeWidth={2.5} />
-        }
-      </button>
+      {/* Left — hide on first step when Skip is available, show back on subsequent steps */}
+      {(!isFirstStep || !onSkip) ? (
+        <button
+          onClick={isFirstStep ? onClose : onBack}
+          className="w-9 h-9 rounded-full bg-black/[0.06] flex items-center justify-center text-foreground flex-shrink-0"
+          aria-label={isFirstStep ? 'Close' : 'Back'}
+        >
+          {isFirstStep
+            ? <X size={16} strokeWidth={2.5} />
+            : <ChevronLeft size={18} strokeWidth={2.5} />
+          }
+        </button>
+      ) : (
+        <div className="w-9 h-9 flex-shrink-0" />
+      )}
 
       {/* Centre — step eyebrow + title */}
       <div className="text-center">
