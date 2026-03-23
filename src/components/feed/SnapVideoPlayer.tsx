@@ -150,6 +150,11 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
             const level = pooledHls.levels[data.level];
             if (level) feedPerf.onQualitySwitch(feedIndex, hlsUrl, level.height, Math.round(level.bitrate / 1000));
           });
+          pooledHls.on(Hls.Events.FRAG_LOADED, (_, data) => {
+            if (data.frag?.stats?.bwEstimate && data.frag.stats.bwEstimate > 0) {
+              saveSharedBandwidth(data.frag.stats.bwEstimate);
+            }
+          });
         } else {
           const hls = new Hls(HLS_CONFIG);
           hlsRef.current = hls;
