@@ -31,6 +31,7 @@ import type { ExploreContentItem } from '@/components/explore/types';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
 import { AlertCircle } from 'lucide-react';
+import { getProfilePathById } from '@/lib/profileRoutes';
 
 export type SortOption = ReviewsSortBy;
 
@@ -590,6 +591,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                         handleReviewMediaClick(review.media, index);
                       }
                     }}
+                    onUserClick={() => navigate(getProfilePathById(review.user_id))}
                   />
                   {/* Existing response */}
                   {response && <ResponseDisplay response={response} />}
