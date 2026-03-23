@@ -25,6 +25,7 @@ interface SnapVideoPlayerProps {
   height?: number;
   duration?: number;
   isActive: boolean;
+  activeIndex: number;
   feedIndex: number;
   isSuggestedFeed: boolean;
   onDoubleTapLike?: () => void;
