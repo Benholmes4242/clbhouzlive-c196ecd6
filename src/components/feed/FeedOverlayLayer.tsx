@@ -108,6 +108,21 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
 
 
 
+      {/* Carousel dots — 8px above Creator Capsule */}
+      {mediaCount > 1 && (
+        <div
+          className="fixed left-0 right-0 flex justify-center pointer-events-none"
+          style={{
+            bottom: 'calc(97px + 8px)',
+            zIndex: 31,
+            opacity: overlayVisible ? 1 : 0,
+            transition: 'opacity 0.18s ease',
+          }}
+        >
+          <FeedCarouselDots count={mediaCount} activeIndex={currentMediaIdx} />
+        </div>
+      )}
+
       {/* Creator Capsule */}
       <div style={{ pointerEvents: 'auto' }}>
         <CreatorCapsule
