@@ -71,10 +71,26 @@ export const ClubhouzCalledItSection: React.FC<ClubhouzCalledItSectionProps> = (
 
   if (!allPicks.length) return null;
 
-  // Sort by predictedRank — #1 pick is hero
-  const sorted = [...allPicks].sort((a, b) => a.predictedRank - b.predictedRank);
+  // Sort table by actual finishing position (best first), cuts/WDs/nulls at bottom
+  const sorted = [...allPicks].sort((a, b) => {
+    const aFinished = a.actualPosition !== null &&
+      a.performanceStatus !== 'cut' &&
+      a.performanceStatus !== 'withdrawn';
+    const bFinished = b.actualPosition !== null &&
+      b.performanceStatus !== 'cut' &&
+      b.performanceStatus !== 'withdrawn';
+
+    if (aFinished && bFinished) return (a.actualPosition!) - (b.actualPosition!);
+    if (aFinished) return -1;
+    if (bFinished) return 1;
+    return 0;
+  });
+
+  // Hero = best finishing pick (first in sorted array)
   const heroPick = sorted[0];
-  const isWinner = heroPick.actualPosition === 1;
+  const isWinner = heroPick?.actualPosition === 1 &&
+    heroPick?.performanceStatus !== 'cut' &&
+    heroPick?.performanceStatus !== 'withdrawn';
   const heroAvatar = getPlayerHeadshotUrl(heroPick.playerName, tourSlug ?? 'pga') ?? PLAYER_SILHOUETTE_URL;
 
   return (
