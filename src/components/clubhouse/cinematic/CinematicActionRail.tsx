@@ -26,10 +26,6 @@ interface CinematicActionRailProps {
   onMuteToggle: () => void;
   onMore?: () => void;
   isReviewPost?: boolean;
-  onNextMedia?: () => void;
-  onPrevMedia?: () => void;
-  hasNextMedia?: boolean;
-  hasPrevMedia?: boolean;
   /** Whether the current media item is a video (controls mute button visibility) */
   isVideo?: boolean;
   /** Whether user has interacted (reduces idle opacity until interaction) */
