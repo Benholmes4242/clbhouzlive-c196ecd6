@@ -433,16 +433,27 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
         <div className="px-3 pt-2.5 pb-2.5">
           {/* Row 1: Avatar + Name + Rating pill */}
           <div className="flex items-center gap-2 mb-2">
-            <SquircleAvatar
-              size={32}
-              src={user?.avatar}
-              alt={user?.name ?? 'Creator'}
-              fallback={initials}
-              hideRing
-            />
-            <span className="flex-1 min-w-0 text-[13px] font-semibold text-white truncate">
-              {user?.name || 'Golfer'}
-            </span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onBeforeNavigate?.();
+                handleViewProfile();
+              }}
+              className="flex items-center gap-2 min-w-0 flex-1 active:opacity-70 transition-opacity"
+              style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}
+            >
+              <SquircleAvatar
+                size={32}
+                src={user?.avatar}
+                alt={user?.name ?? 'Creator'}
+                fallback={initials}
+                hideRing
+              />
+              <span className="flex-1 min-w-0 text-[13px] font-semibold text-white truncate">
+                {user?.name || 'Golfer'}
+              </span>
+            </button>
             {/* Rating pill */}
             <div
               className="flex items-center gap-1 flex-shrink-0"
