@@ -36,10 +36,8 @@ export function useLikeMutation() {
       console.error('[Like] Mutation failed:', error);
     },
     onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['media-feed'],
-        refetchType: 'none',
-      });
+      queryClient.invalidateQueries({ queryKey: ['media-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['user-post-likes'] });
     },
   });
 }
