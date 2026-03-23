@@ -223,6 +223,14 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   // by letting layout reflow immediately while the expanded panel animates out.
   const popLayoutForGolfTag = !!golfCourse;
 
+  // Get initials for avatar fallback
+  const initials = user?.name
+    ?.split(' ')
+    .slice(0, 2)
+    .map(part => part[0])
+    .join('')
+    .toUpperCase() || '?';
+
   const expandedInner = (
     <div className="px-3 pb-3 space-y-3">
       {/* Creator row — tappable to view profile */}
