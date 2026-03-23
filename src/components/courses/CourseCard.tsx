@@ -28,6 +28,7 @@ interface Course {
   longitude?: number | null;
   website_url?: string | null;
   average_rating?: number | null;
+  list_memberships?: Array<{ list_slug: string; rank: number }>;
 }
 
 interface CourseCardProps {
