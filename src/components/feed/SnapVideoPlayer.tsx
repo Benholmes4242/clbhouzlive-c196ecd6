@@ -148,7 +148,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
         hlsRef.current = null;
       }
     };
-  }, [isActive, hlsUrl, mp4Url]);
+  }, [isActive, activeIndex, feedIndex, hlsUrl, mp4Url]);
 
   // ── Sync muted state ──
   useEffect(() => {
