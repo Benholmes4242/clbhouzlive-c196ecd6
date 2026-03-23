@@ -4,6 +4,7 @@ import { FeedSlide } from './FeedSlide';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { haptic } from '@/utils/haptics';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { registerInPool } from '@/utils/hlsPoolPreloader';
 import { feedPerf } from '@/utils/feedPerf';
 
 const NEAR_END_THRESHOLD = 3;
@@ -97,7 +98,9 @@ export function SnapFeed({
           nextPosts.forEach(post => {
             const hlsUrl = post?.mediaItems?.[0]?.hlsUrl;
             if (hlsUrl) {
-              preloadHlsManifest(hlsUrl).catch(() => {});
+              preloadHlsManifest(hlsUrl)
+                .then(() => registerInPool(hlsUrl))
+                .catch(() => {});
             }
           });
           feedPerf.onViewportEntry(idx, postsRef.current[idx]?.mediaItems?.[0]?.hlsUrl ?? '');
