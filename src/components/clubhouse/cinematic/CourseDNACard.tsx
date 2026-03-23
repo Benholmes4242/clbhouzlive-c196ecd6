@@ -162,7 +162,7 @@ export function CourseDNACard({ courseId, courseName, courseCountry, mapboxToken
               flex: 1, minWidth: 0, whiteSpace: 'nowrap' as const, padding: '0 16px',
               height: 30, borderRadius: 8,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              gap: 4, fontSize: 11, fontWeight: 600, cursor: 'pointer',
+              gap: 3, fontSize: 11, fontWeight: 600, cursor: 'pointer',
               background: isPlayed ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.06)',
               color: isPlayed ? '#F59E0B' : 'rgba(255,255,255,0.5)',
               border: isPlayed ? '0.5px solid rgba(245,158,11,0.4)' : '0.5px solid rgba(255,255,255,0.1)',
@@ -182,14 +182,14 @@ export function CourseDNACard({ courseId, courseName, courseCountry, mapboxToken
               flex: 1, minWidth: 0, whiteSpace: 'nowrap' as const, padding: '0 16px',
               height: 30, borderRadius: 8,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              gap: 4, fontSize: 11, fontWeight: 600, cursor: 'pointer',
+              gap: 3, fontSize: 11, fontWeight: 600, cursor: 'pointer',
               background: isBucket ? 'rgba(239,68,68,0.12)' : 'rgba(255,255,255,0.06)',
               color: isBucket ? '#F87171' : 'rgba(255,255,255,0.5)',
               border: isBucket ? '0.5px solid rgba(239,68,68,0.35)' : '0.5px solid rgba(255,255,255,0.1)',
               transition: 'all 0.15s',
             }}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill={isBucket ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill={isBucket ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
             Bucket list
