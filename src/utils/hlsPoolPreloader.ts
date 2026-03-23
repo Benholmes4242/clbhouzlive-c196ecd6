@@ -11,8 +11,6 @@
 import { HLSPoolManager } from '@/media/HLSPoolManager';
 import { loadHlsJs } from '@/utils/hlsLoader';
 import { getSharedBandwidth } from '@/utils/sharedBandwidth';
-import { createCachedHlsLoader } from '@/utils/hlsBlobCache';
-import { extractCloudflareUid } from '@/utils/videoIdUtils';
 
 // Track which URLs have a pool instance being prepared
 const poolPreloadInFlight = new Set<string>();
