@@ -73,16 +73,23 @@ const CourseListItem: React.FC<CourseListItemProps> = ({
       </div>
 
       {/* Top right badges */}
-      <CourseRankBadges
-        globalRank={course.global_rank}
-        regionalRank={course.regional_rank}
-        usaRank={course.usa_rank}
-        country={course.country}
-        viewContext={viewContext}
-        userRating={userRating}
-        showUserRating={showUserRating}
-        positioning="top-left"
-      />
+      {(() => {
+        const ranks = course.list_memberships?.length
+          ? extractRanksFromMemberships(course.list_memberships, course.country)
+          : { globalRank: course.global_rank, regionalRank: course.regional_rank, usaRank: course.usa_rank };
+        return (
+          <CourseRankBadges
+            globalRank={ranks.globalRank}
+            regionalRank={ranks.regionalRank}
+            usaRank={ranks.usaRank}
+            country={course.country}
+            viewContext={viewContext}
+            userRating={userRating}
+            showUserRating={showUserRating}
+            positioning="top-left"
+          />
+        );
+      })()}
     </div>
   );
 };
