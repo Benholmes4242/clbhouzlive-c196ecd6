@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 
 const BetaGatePage: React.FC = () => {
   const [logoError, setLogoError] = useState(false);
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(false);
 
   useEffect(() => {
     document.body.classList.add('route-auth');
@@ -11,17 +9,6 @@ const BetaGatePage: React.FC = () => {
       document.body.classList.remove('route-auth');
     };
   }, []);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password === 'clbhouz**') {
-      sessionStorage.setItem('beta_access', 'true');
-      window.location.reload();
-    } else {
-      setError(true);
-      setTimeout(() => setError(false), 2000);
-    }
-  };
 
   return (
     <div
