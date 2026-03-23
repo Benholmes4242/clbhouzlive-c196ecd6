@@ -8,7 +8,7 @@ import UserCoursesRegionalTiles from './user/UserCoursesRegionalTiles';
 import CourseCard from './CourseCard';
 import CourseListItem from './CourseListItem';
 import { EmptyTop100State } from './user/UserCoursesEmptyStates';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import ViewToggle from '@/components/profile/ViewToggle';
 import { useViewPreference } from '@/hooks/useViewPreference';
