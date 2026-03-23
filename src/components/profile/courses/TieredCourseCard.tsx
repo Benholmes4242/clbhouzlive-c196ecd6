@@ -83,7 +83,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
                 alt={course.name}
                 loading="lazy"
                 decoding="async"
-                className="w-24 h-[88px] object-cover transition-transform duration-300 group-hover:scale-105 rounded-[10px]"
+                className="w-24 self-stretch object-cover transition-transform duration-300 group-hover:scale-105 rounded-l-xl"
               />
             ) : (
               <div className="w-24 h-[88px] bg-gradient-to-br from-muted to-muted/50" />
