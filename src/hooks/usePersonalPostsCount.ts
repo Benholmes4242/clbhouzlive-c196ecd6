@@ -16,7 +16,8 @@ export function usePersonalPostsCount(userId?: string) {
         .from('posts')
         .select('*', { count: 'exact', head: true })
         .eq('actor_type', 'personal')
-        .eq('actor_id', userId!);
+        .eq('actor_id', userId!)
+        .is('source_review_id', null); // Exclude review posts — counted separately
 
       if (error) {
         console.error('[usePersonalPostsCount] error', error);
