@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 
 const BetaGatePage: React.FC = () => {
   const [logoError, setLogoError] = useState(false);
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(false);
 
   useEffect(() => {
     document.body.classList.add('route-auth');
@@ -11,17 +9,6 @@ const BetaGatePage: React.FC = () => {
       document.body.classList.remove('route-auth');
     };
   }, []);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password === 'clbhouz**') {
-      sessionStorage.setItem('beta_access', 'true');
-      window.location.reload();
-    } else {
-      setError(true);
-      setTimeout(() => setError(false), 2000);
-    }
-  };
 
   return (
     <div
@@ -124,66 +111,6 @@ const BetaGatePage: React.FC = () => {
           Download on TestFlight
         </a>
 
-        {/* Divider */}
-        <div
-          style={{
-            width: '100%',
-            maxWidth: 280,
-            height: 1,
-            background: 'rgba(255,255,255,0.08)',
-            marginTop: 8,
-          }}
-        />
-
-        {/* Password gate */}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, width: '100%', maxWidth: 280 }}>
-          <span
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: '0.2em',
-              textTransform: 'uppercase',
-              color: '#F5A623',
-            }}
-          >
-            Beta Access
-          </span>
-          <input
-            type="password"
-            placeholder="Enter password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '12px 16px',
-              borderRadius: 10,
-              border: '1px solid rgba(255,255,255,0.12)',
-              background: 'rgba(255,255,255,0.06)',
-              color: '#fff',
-              fontSize: 14,
-              outline: 'none',
-            }}
-          />
-          <button
-            type="submit"
-            style={{
-              width: '100%',
-              padding: '12px 0',
-              borderRadius: 10,
-              background: '#F5A623',
-              color: '#000',
-              fontSize: 14,
-              fontWeight: 600,
-              border: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            Enter
-          </button>
-          {error && (
-            <p style={{ fontSize: 12, color: '#f87171', margin: 0 }}>Incorrect password</p>
-          )}
-        </form>
       </div>
 
       {/* Footer */}
