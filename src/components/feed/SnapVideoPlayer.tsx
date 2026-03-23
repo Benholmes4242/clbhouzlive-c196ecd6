@@ -169,6 +169,11 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
             const level = hls.levels[data.level];
             if (level) feedPerf.onQualitySwitch(feedIndex, hlsUrl, level.height, Math.round(level.bitrate / 1000));
           });
+          hls.on(Hls.Events.FRAG_LOADED, (_, data) => {
+            if (data.frag?.stats?.bwEstimate && data.frag.stats.bwEstimate > 0) {
+              saveSharedBandwidth(data.frag.stats.bwEstimate);
+            }
+          });
         }
       }
 
