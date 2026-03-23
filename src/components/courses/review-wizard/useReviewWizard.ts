@@ -389,6 +389,29 @@ export function useReviewWizard({
       queryClient.invalidateQueries({ queryKey: ['user-exploration-status'] });
       queryClient.invalidateQueries({ queryKey: ['exploration-leaderboard'] });
 
+      // Top 100 tab — both key variants to be safe
+      queryClient.invalidateQueries({ queryKey: ['userTop100Courses'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['user-top100-courses'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['user-avg-rating'], exact: false });
+
+      // Top 100 progress — both key variants
+      queryClient.invalidateQueries({ queryKey: ['top100-progress-user'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['top100-progress-for-user'], exact: false });
+
+      // Personal Top 10 — additional variant
+      queryClient.invalidateQueries({ queryKey: ['userTopTenCourses'], exact: false });
+
+      // Played courses hooks
+      queryClient.invalidateQueries({ queryKey: ['played-courses-with-averages'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['user-course-ratings'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['top100CoursesByRegion'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['top100-course-leaderboard'], exact: false });
+
+      // Force immediate refetch of active profile queries
+      await queryClient.refetchQueries({ queryKey: ['userTop100Courses'], type: 'active', exact: false });
+      await queryClient.refetchQueries({ queryKey: ['user-played-courses-full'], type: 'active', exact: false });
+      await queryClient.refetchQueries({ queryKey: ['user-top-ten-courses'], type: 'active', exact: false });
+
       // For edit mode, go directly to success
       // For new reviews, go to preview step first
       if (isEditMode) {

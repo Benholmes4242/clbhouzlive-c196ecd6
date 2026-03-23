@@ -192,6 +192,29 @@ export function useSubmitRating({
       queryClient.invalidateQueries({ queryKey: ['user-course-summary'], exact: false });
       queryClient.invalidateQueries({ queryKey: ['user-course-activity'], exact: false });
 
+      // Profile courses tab
+      queryClient.invalidateQueries({ queryKey: ['user-played-courses-full'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['user-avg-rating'], exact: false });
+
+      // Top 100 tab — both key variants to be safe
+      queryClient.invalidateQueries({ queryKey: ['userTop100Courses'], exact: false });
+
+      // Personal Top 10
+      queryClient.invalidateQueries({ queryKey: ['user-top-ten-courses'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['userTopTenCourses'], exact: false });
+
+      // Top 100 progress — both key variants
+      queryClient.invalidateQueries({ queryKey: ['top100-progress-user'], exact: false });
+
+      // Played courses hooks
+      queryClient.invalidateQueries({ queryKey: ['played-courses-with-averages'], exact: false });
+      queryClient.invalidateQueries({ queryKey: ['user-course-ratings'], exact: false });
+
+      // Force immediate refetch of active profile queries
+      await queryClient.refetchQueries({ queryKey: ['userTop100Courses'], type: 'active', exact: false });
+      await queryClient.refetchQueries({ queryKey: ['user-played-courses-full'], type: 'active', exact: false });
+      await queryClient.refetchQueries({ queryKey: ['user-top-ten-courses'], type: 'active', exact: false });
+
       // Remove from want_to_play shortlist (if present) now that course is played
       if (isNewReview) {
         try {
