@@ -154,6 +154,7 @@ const ProfilePageV2Content: React.FC = () => {
   const { data: top100Overview } = useTop100Overview(profileUserId);
   // Post count comes from usePersonalPostsCount below
   const { data: postsCount = 0, isLoading: postsCountLoading } = usePersonalPostsCount(profileUserId);
+  const { data: reviewsCount = 0, isLoading: reviewsCountLoading } = usePersonalReviewsCount(profileUserId);
   const { data: achievements } = useProfileAchievements(profileUserId);
   
   // Determine if viewing own profile
