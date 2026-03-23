@@ -20,6 +20,8 @@ import './index.css'
 import './styles/superellipse.css'
 import './styles/theme.css'
 import './styles/theme-tokens.css'
+import '@/utils/feedPerf';
+import '@/lib/analytics/videoPerformance';
 
 import { initializePerformanceMonitoring } from './utils/performanceInit'
 import { initWebVitals, sendToAnalytics, initPerformanceObserver } from './analytics/webVitals'
