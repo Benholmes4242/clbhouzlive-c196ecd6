@@ -102,7 +102,7 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
         return;
       }
 
-      e.preventDefault();
+      // No preventDefault needed — touchAction: 'none' on container handles it
       isDraggingHorizontally.current = true;
       t.swiping = true;
       setIsDragging(true);
@@ -190,7 +190,7 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
     <div
       ref={containerRef}
       className="absolute inset-0 overflow-hidden"
-      style={{ touchAction: 'pan-y' }}
+      style={{ touchAction: 'none' }}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
       onTouchCancel={onTouchEnd}
