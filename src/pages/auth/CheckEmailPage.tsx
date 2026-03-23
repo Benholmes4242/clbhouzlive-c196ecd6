@@ -9,7 +9,7 @@ import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 export default function CheckEmailPage() {
   useHideBottomNav();
   useHideHeader();
-  useMedianStatusBar('dark', '#0d0d0d', true, false);
+  useMedianStatusBar('dark', '#000000', true, false);
 
   useLayoutEffect(() => {
     document.body.classList.add('route-auth');
