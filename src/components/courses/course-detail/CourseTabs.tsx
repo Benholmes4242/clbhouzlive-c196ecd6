@@ -60,7 +60,7 @@ export function CourseTabs({ activeTab, onChange, reviewCount, mediaCount }: Cou
                   right: 0,
                   height: 2.5,
                   borderRadius: 2,
-                  background: 'linear-gradient(90deg, #F59E0B, #F7931E)',
+                  background: 'hsl(var(--foreground))',
                 }} />
               )}
             </button>
