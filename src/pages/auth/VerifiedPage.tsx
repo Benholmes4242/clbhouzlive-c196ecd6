@@ -74,7 +74,7 @@ export default function VerifiedPage() {
 
       {/* Footer */}
       <div style={{ position: 'fixed', bottom: 28, left: 0, right: 0, textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,0.12)', letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>
-        clbhouz · Golf Social
+        clbhouz · stay in play
       </div>
     </div>
   );
