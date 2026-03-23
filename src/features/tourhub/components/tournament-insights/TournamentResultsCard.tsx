@@ -14,6 +14,8 @@ import { useTop5Leaderboard } from '../../hooks/useTop5Leaderboard';
 import { useVenueImage } from '../../hooks/useVenueImage';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { ClubhouzCalledItSection } from './ClubhouzCalledItSection';
+import type { TrackedPrediction } from './types';
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -22,6 +24,8 @@ interface TournamentResultsCardProps {
   tournamentName: string;
   courseName: string;
   location?: string;
+  allPicks?: TrackedPrediction[];
+  tourSlug?: string;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
