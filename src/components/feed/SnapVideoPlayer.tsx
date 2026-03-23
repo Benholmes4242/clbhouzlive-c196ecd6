@@ -288,7 +288,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     const video = videoRef.current;
     if (!video) return;
     setShowReplay(false);
-    loopCountRef.current = 0;
+    
     video.currentTime = 0;
     video.play().catch(() => {});
   }, []);
