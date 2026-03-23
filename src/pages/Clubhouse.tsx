@@ -38,6 +38,7 @@ import { buildSuggestedFeed, buildFriendsFeed } from '@/components/media-system/
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
 import CommentsSheet from '@/components/comments/CommentsSheet';
+import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 import { FullscreenReviewPost } from '@/components/posts/FullscreenReviewPost';
 import { ReviewBottomSheet } from '@/components/posts/ReviewBottomSheet';
 
