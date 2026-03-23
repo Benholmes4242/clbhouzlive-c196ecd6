@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { invalidateCourseRatingCaches } from '@/utils/invalidateCourseRatingCaches';
 
 /**
  * Ratings-only hook: "played" = has a rating in course_ratings
@@ -38,12 +39,14 @@ export function useUserPlayedCourse(courseId: string | undefined, userId: string
         .eq('user_id', userId);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-played-course', courseId, userId] });
-      queryClient.invalidateQueries({ queryKey: ['user-course-activity', userId] });
-      queryClient.invalidateQueries({ queryKey: ['userTop100Courses', userId] });
-      queryClient.invalidateQueries({ queryKey: ['course-ratings'] });
-      queryClient.invalidateQueries({ queryKey: ['quest-courses'] });
+    onSuccess: async () => {
+      invalidateCourseRatingCaches(queryClient);
+
+      // Force refetch critical profile queries
+      await queryClient.refetchQueries({ queryKey: ['userProfile'], type: 'active', exact: false });
+      await queryClient.refetchQueries({ queryKey: ['userTop100Courses'], type: 'active', exact: false });
+      await queryClient.refetchQueries({ queryKey: ['user-played-courses-full'], type: 'active', exact: false });
+      await queryClient.refetchQueries({ queryKey: ['user-top-ten-courses'], type: 'active', exact: false });
     },
   });
 
