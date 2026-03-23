@@ -21,7 +21,7 @@ import { FiMapPin } from 'react-icons/fi';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import { CourseDNACard } from './CourseDNACard';
 
-import { getOverlayRatingColors, type ExtractedReviewData } from '@/lib/postHelpers';
+import { type ExtractedReviewData } from '@/lib/postHelpers';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
 
