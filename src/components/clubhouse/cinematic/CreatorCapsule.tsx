@@ -708,7 +708,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             'rounded-xl'
           )}
           style={{ 
-            background: 'rgba(0, 0, 0, 0.35)',
+            background: isReview ? 'rgba(20, 13, 4, 0.95)' : 'rgba(0, 0, 0, 0.35)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             border: `1px solid ${borderColor}`,
