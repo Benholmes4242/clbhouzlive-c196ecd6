@@ -4,6 +4,7 @@
  * Uses Radix Slider with rating-slider-primary class and slate/gold styling.
  */
 import React, { useState } from 'react';
+import { invalidateCourseRatingCaches } from '@/utils/invalidateCourseRatingCaches';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
