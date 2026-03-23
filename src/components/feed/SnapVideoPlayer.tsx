@@ -253,20 +253,9 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     if (!video) return;
 
     const handleEnded = () => {
-      const isShort = (duration ?? video.duration ?? 0) <= LONG_VIDEO_THRESHOLD;
-      if (isShort) {
-        // Loop continuously
-        video.currentTime = 0;
-        video.play().catch(() => {});
-      } else {
-        loopCountRef.current++;
-        if (loopCountRef.current <= 1) {
-          video.currentTime = 0;
-          video.play().catch(() => {});
-        } else {
-          setShowReplay(true);
-        }
-      }
+      // All videos loop continuously in the feed
+      video.currentTime = 0;
+      video.play().catch(() => {});
     };
 
     video.addEventListener('ended', handleEnded);
