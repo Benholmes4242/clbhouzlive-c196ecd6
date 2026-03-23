@@ -493,6 +493,8 @@ const AuthForm: React.FC<AuthFormProps> = ({
     // D5: Clear password state when sheet closes
     setPassword('');
     setConfirmPassword('');
+    setUsername('');
+    setUsernameAvailable(null);
   };
 
   const handleBackToEmail = () => {

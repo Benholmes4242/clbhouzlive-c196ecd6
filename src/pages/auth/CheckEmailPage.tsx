@@ -20,27 +20,56 @@ export default function CheckEmailPage() {
   const navigate = useNavigate();
   const email = (location.state as { email?: string })?.email || 'your inbox';
 
-  // Auto-navigate when Supabase detects email verification
+  // Belt-and-suspenders: auto-navigate if Supabase detects email verification via another mechanism
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session?.user?.email_confirmed_at) {
-        navigate('/', { replace: true });
+        navigate('/edit-profile', { replace: true });
       }
     });
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  // Re-check session when app returns from background
+  // Fix 2: Read handshake token written by VerifiedPage in SFSafariViewController
   useEffect(() => {
     const handleVisibilityChange = async () => {
-      if (document.visibilityState === 'visible') {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user?.email_confirmed_at) {
-          navigate('/', { replace: true });
-        }
+      if (document.visibilityState !== 'visible') return;
+
+      // Path A: session already in WebView (defensive)
+      const { data: { session: existing } } = await supabase.auth.getSession();
+      if (existing?.user?.email_confirmed_at) {
+        navigate('/edit-profile', { replace: true });
+        return;
       }
+
+      // Path B: read handshake token written by VerifiedPage
+      try {
+        const raw = localStorage.getItem('clbhouz_email_verified_session');
+        if (!raw) return;
+
+        const payload = JSON.parse(raw);
+        // Only accept tokens written in the last 10 minutes
+        if (!payload.access_token || !payload.refresh_token || Date.now() - payload.ts > 10 * 60 * 1000) {
+          localStorage.removeItem('clbhouz_email_verified_session');
+          return;
+        }
+
+        const { data: { session }, error } = await supabase.auth.setSession({
+          access_token: payload.access_token,
+          refresh_token: payload.refresh_token,
+        });
+
+        localStorage.removeItem('clbhouz_email_verified_session');
+
+        if (error || !session?.user) return;
+
+        // New user — always go to edit-profile (has_completed_onboarding is false)
+        navigate('/edit-profile', { replace: true });
+      } catch {}
     };
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    // Also run immediately in case they're already back
     handleVisibilityChange();
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [navigate]);
