@@ -88,20 +88,6 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
         </div>
       </div>
 
-      {/* Carousel dots — centered below the top bar controls */}
-      {carouselCount && carouselCount > 1 && (
-        <div
-          className="fixed left-0 right-0 z-40 flex justify-center pointer-events-none"
-          style={{
-            top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 72px)',
-          }}
-        >
-          <FeedCarouselDots
-            count={carouselCount}
-            activeIndex={carouselIndex ?? 0}
-          />
-        </div>
-      )}
 
       {/* PostingAs Menu */}
       {user && (
