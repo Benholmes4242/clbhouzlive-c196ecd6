@@ -3,6 +3,8 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { loadHlsJs } from '@/utils/hlsLoader';
 import { haptic } from '@/utils/haptics';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
+import { feedPerf } from '@/utils/feedPerf';
+import { isPrefetchComplete } from '@/utils/hlsPreload';
 import type HlsType from 'hls.js';
 
 const HLS_CONFIG = {
@@ -74,6 +76,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
         if (hlsRef.current) {
           hlsRef.current.stopLoad();
         }
+        feedPerf.onDeactivation(feedIndex, hlsUrl, 'stopped');
       } else {
         // Far away — fully destroy to free memory
         if (hlsRef.current) {
@@ -85,6 +88,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
         setVideoReady(false);
         setShowReplay(false);
         loopCountRef.current = 0;
+        feedPerf.onDeactivation(feedIndex, hlsUrl, 'destroyed');
       }
       useClubhouseStore.getState().setActiveVideoElement(null, null);
       return;
@@ -94,6 +98,8 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     let cancelled = false;
 
     const attach = async () => {
+      feedPerf.onActivation(feedIndex, hlsUrl, 8_000_000);
+
       // If HLS instance already exists (was stopped, not destroyed), resume it
       if (hlsRef.current) {
         hlsRef.current.startLoad();
@@ -120,17 +126,41 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
       if (useNative) {
         video.src = hlsUrl || mp4Url || '';
       } else {
+        // Prefetch status check
+        const prefetchStatus = isPrefetchComplete(hlsUrl) ? 'hit' : 'miss';
+        feedPerf.onPrefetchCheck(feedIndex, hlsUrl, prefetchStatus);
+
         // Check pool for a pre-buffered instance first
+        feedPerf.onHlsAttachStart(feedIndex, hlsUrl);
         const pooledHls = HLSPoolManager.promote(hlsUrl, video);
+        feedPerf.onPoolCheck(feedIndex, hlsUrl, !!pooledHls);
 
         if (pooledHls) {
           hlsRef.current = pooledHls;
           pooledHls.startLoad();
+
+          // Wire perf listeners on pooled instance
+          pooledHls.on(Hls.Events.MANIFEST_PARSED, () => {
+            feedPerf.onHlsManifestParsed(feedIndex, hlsUrl, pooledHls.levels.length);
+          });
+          pooledHls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
+            const level = pooledHls.levels[data.level];
+            if (level) feedPerf.onQualitySwitch(feedIndex, hlsUrl, level.height, Math.round(level.bitrate / 1000));
+          });
         } else {
           const hls = new Hls(HLS_CONFIG);
           hlsRef.current = hls;
           hls.loadSource(hlsUrl || mp4Url || '');
           hls.attachMedia(video);
+
+          // Wire perf listeners on new instance
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            feedPerf.onHlsManifestParsed(feedIndex, hlsUrl, hls.levels.length);
+          });
+          hls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
+            const level = hls.levels[data.level];
+            if (level) feedPerf.onQualitySwitch(feedIndex, hlsUrl, level.height, Math.round(level.bitrate / 1000));
+          });
         }
       }
 
@@ -185,14 +215,24 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
 
     const handlePlaying = () => {
       setVideoReady(true);
+      feedPerf.onFirstFrame(feedIndex, hlsUrl);
       if (!firstFrameFiredRef.current) {
         firstFrameFiredRef.current = true;
         onFirstFrameReady?.();
       }
     };
 
+    const handleWaiting = () => feedPerf.onStallStart(feedIndex, hlsUrl);
+    const handlePlayingRecovery = () => feedPerf.onStallEnd(feedIndex, hlsUrl);
+
     video.addEventListener('playing', handlePlaying);
-    return () => video.removeEventListener('playing', handlePlaying);
+    video.addEventListener('waiting', handleWaiting);
+    video.addEventListener('playing', handlePlayingRecovery);
+    return () => {
+      video.removeEventListener('playing', handlePlaying);
+      video.removeEventListener('waiting', handleWaiting);
+      video.removeEventListener('playing', handlePlayingRecovery);
+    };
   }, [onFirstFrameReady]);
 
   // ── Gapless loop ──

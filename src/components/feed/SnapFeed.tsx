@@ -4,6 +4,7 @@ import { FeedSlide } from './FeedSlide';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { haptic } from '@/utils/haptics';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { feedPerf } from '@/utils/feedPerf';
 
 const NEAR_END_THRESHOLD = 3;
 const ACTIVE_SLIDE_RATIO = 0.5;
@@ -86,6 +87,7 @@ export function SnapFeed({
         const idx = Number((bestEntry.target as HTMLElement).dataset.index);
         if (!isNaN(idx)) {
           // Debounce: if multiple slides fire within 80ms, use the last one
+          feedPerf.onViewportEntry(idx, posts[idx]?.mediaItems?.[0]?.hlsUrl ?? '');
           pendingIndexRef.current = idx;
           if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
           debounceTimerRef.current = setTimeout(() => {
