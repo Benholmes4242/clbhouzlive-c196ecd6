@@ -84,10 +84,17 @@ export function SnapFeed({
       if (bestEntry && bestEntry.intersectionRatio >= ACTIVE_SLIDE_RATIO) {
         const idx = Number((bestEntry.target as HTMLElement).dataset.index);
         if (!isNaN(idx)) {
-          
+          // Guard against snap-back: ignore backwards jumps within 500ms of a forward one
+          const now = Date.now();
+          if (idx < lastSetIndexRef.current && now - lastSetTimeRef.current < 500) {
+            return;
+          }
+          lastSetIndexRef.current = idx;
+          lastSetTimeRef.current = now;
+
           setActiveIndex(idx);
-          if (hasNextPage && idx >= posts.length - NEAR_END_THRESHOLD) {
-            onNearEnd();
+          if (hasNextPageRef.current && idx >= postsLengthRef.current - NEAR_END_THRESHOLD) {
+            onNearEndRef.current();
           }
         }
       }
@@ -101,7 +108,7 @@ export function SnapFeed({
     return () => {
       observerRef.current?.disconnect();
     };
-  }, [posts.length, hasNextPage, onNearEnd, setActiveIndex]);
+  }, [setActiveIndex]);
 
   // ── Register/unregister slide refs ──
   const setSlideRef = useCallback((idx: number, el: HTMLDivElement | null) => {

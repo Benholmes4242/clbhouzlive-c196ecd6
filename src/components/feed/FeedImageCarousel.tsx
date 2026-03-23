@@ -192,7 +192,6 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
       className="absolute inset-0 overflow-hidden"
       style={{ touchAction: 'pan-y' }}
       onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
       onTouchCancel={onTouchEnd}
     >
