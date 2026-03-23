@@ -166,30 +166,26 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
         )}
       </div>
 
-      {/* Stat pill */}
-      <div
-        className="flex items-center justify-center rounded-full"
-        style={{
-          fontSize: 10,
-          fontWeight: 600,
-          height: 'auto',
-          padding: '3px 10px',
-          marginTop: 4,
-          lineHeight: '1',
-          borderRadius: 9999,
-          ...(creator.handicap != null
-            ? isDark
+      {/* Stat pill — only show HCP, hide video count */}
+      {creator.handicap != null && (
+        <div
+          className="flex items-center justify-center rounded-full"
+          style={{
+            fontSize: 10,
+            fontWeight: 600,
+            height: 'auto',
+            padding: '3px 10px',
+            marginTop: 4,
+            lineHeight: '1',
+            borderRadius: 9999,
+            ...(isDark
               ? { background: 'rgba(245,158,11,0.15)', color: '#F59E0B' }
-              : { background: '#FEF3C7', color: '#92400E' }
-            : isDark
-              ? { background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)' }
-              : { background: 'hsl(var(--muted))', color: 'hsl(var(--muted-foreground))' }),
-        }}
-      >
-        {creator.handicap != null
-          ? `HCP ${creator.handicap}`
-          : `${creator.videoCount} videos`}
-      </div>
+              : { background: '#FEF3C7', color: '#92400E' }),
+          }}
+        >
+          {`HCP ${creator.handicap}`}
+        </div>
+      )}
 
       {/* Home club */}
       {creator.homeCourse && (
