@@ -199,7 +199,7 @@ function ProfileHubSheet({
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 32, stiffness: 320 }}
+            transition={{ type: 'tween', duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
             className="fixed inset-x-0 bottom-0 z-[9999] w-full rounded-t-[24px] bg-[#F8FAFC] flex flex-col md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:w-full md:max-w-[560px]"
           >
             {/* Drag handle */}
