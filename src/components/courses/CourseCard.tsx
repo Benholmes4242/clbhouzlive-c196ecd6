@@ -4,6 +4,7 @@ import { useOpenCourseModal } from '@/hooks/useOpenCourseModal';
 import { useParallax } from '@/hooks/useParallax';
 import CourseRankBadges from './CourseRankBadges';
 import CourseCardBackground from './CourseCardBackground';
+import { extractRanksFromMemberships } from '@/utils/rankingUtils';
 import CourseCardAIQuote from './CourseCardAIQuote';
 import CourseCardLocation from './CourseCardLocation';
 import { useMemoryMonitor } from '@/hooks/useMemoryMonitor';
@@ -27,6 +28,7 @@ interface Course {
   longitude?: number | null;
   website_url?: string | null;
   average_rating?: number | null;
+  list_memberships?: Array<{ list_slug: string; rank: number }>;
 }
 
 interface CourseCardProps {
@@ -219,23 +221,29 @@ const CourseCard: React.FC<CourseCardProps> = ({
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none z-0" />
 
         {/* Frosted glass ranking badges */}
-        {!hideRankingBadges && !badgesOnTop && (
-          <CourseRankBadges 
-            globalRank={course.global_rank ?? null}
-            regionalRank={course.regional_rank ?? null}
-            usaRank={course.usa_rank ?? null}
-            country={course.country}
-            viewContext={viewContext}
-            userRating={userRating}
-            showUserRating={showUserRating}
-            averageRating={course.average_rating}
-            showAverageRating={showAverageRating}
-            positioning={showRatingOnRight ? 'top-right' : 'top-left'}
-            xp={xp}
-            showXP={showXP}
-            splitBadges={showRatingOnRight}
-          />
-        )}
+        {!hideRankingBadges && !badgesOnTop && (() => {
+          // Prefer list_memberships (authoritative) over stale DB columns
+          const ranks = course.list_memberships?.length
+            ? extractRanksFromMemberships(course.list_memberships as any, course.country)
+            : { globalRank: course.global_rank ?? null, regionalRank: course.regional_rank ?? null, usaRank: course.usa_rank ?? null };
+          return (
+            <CourseRankBadges 
+              globalRank={ranks.globalRank}
+              regionalRank={ranks.regionalRank}
+              usaRank={ranks.usaRank}
+              country={course.country}
+              viewContext={viewContext}
+              userRating={userRating}
+              showUserRating={showUserRating}
+              averageRating={course.average_rating}
+              showAverageRating={showAverageRating}
+              positioning={showRatingOnRight ? 'top-right' : 'top-left'}
+              xp={xp}
+              showXP={showXP}
+              splitBadges={showRatingOnRight}
+            />
+          );
+        })()}
 
         {/* User rating, average rating, and XP badges - separate from rankings */}
         {(showUserRating || showAverageRating || showXP) && (
