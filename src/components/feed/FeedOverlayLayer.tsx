@@ -74,26 +74,6 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   const isFollowed = getFollowState(activePost);
   const isVideo = activePost.mediaItems?.[0]?.type === 'video';
 
-  // Carousel navigation for multi-image posts
-  const mediaCount = activePost.mediaItems?.length ?? 0;
-  const currentMediaIdx = carouselPositions.get(activeIndex) ?? 0;
-  const hasNextMedia = mediaCount > 1 && currentMediaIdx < mediaCount - 1;
-  const hasPrevMedia = mediaCount > 1 && currentMediaIdx > 0;
-
-  const handleNextMedia = () => {
-    if (hasNextMedia) {
-      setCarouselPosition(activeIndex, currentMediaIdx + 1);
-      // Scroll the carousel programmatically via a custom event
-      window.dispatchEvent(new CustomEvent('carousel-goto', { detail: { feedIndex: activeIndex, mediaIndex: currentMediaIdx + 1 } }));
-    }
-  };
-  const handlePrevMedia = () => {
-    if (hasPrevMedia) {
-      setCarouselPosition(activeIndex, currentMediaIdx - 1);
-      window.dispatchEvent(new CustomEvent('carousel-goto', { detail: { feedIndex: activeIndex, mediaIndex: currentMediaIdx - 1 } }));
-    }
-  };
-
   return (
     <div
       className="fixed inset-0"
@@ -120,10 +100,6 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           onMore={onMore}
           isVideo={isVideo}
           isReviewPost={isActiveReview}
-          onNextMedia={handleNextMedia}
-          onPrevMedia={handlePrevMedia}
-          hasNextMedia={hasNextMedia}
-          hasPrevMedia={hasPrevMedia}
         />
       </div>
 
