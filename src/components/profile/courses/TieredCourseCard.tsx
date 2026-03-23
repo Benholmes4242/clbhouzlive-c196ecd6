@@ -150,18 +150,19 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
         className="bg-card rounded-xl border border-border overflow-hidden cursor-pointer hover:border-border transition-colors"
       >
         <div className="flex">
-          {/* Thumbnail - smaller, muted */}
-          {course.thumbnail_image ? (
-            <img
-              src={course.thumbnail_image}
-              alt={course.name}
-              loading="lazy"
-              decoding="async"
-              className="w-16 h-full object-cover flex-shrink-0 opacity-80 rounded-l-xl"
-            />
-          ) : (
-            <div className="w-16 h-full bg-muted/50 flex-shrink-0 rounded-l-xl" />
-          )}
+          <div className="relative flex-shrink-0 self-stretch">
+            {course.thumbnail_image ? (
+              <img
+                src={course.thumbnail_image}
+                alt={course.name}
+                loading="lazy"
+                decoding="async"
+                className="w-16 h-full object-cover opacity-80 rounded-l-xl"
+              />
+            ) : (
+              <div className="w-16 h-full bg-muted/50 rounded-l-xl" />
+            )}
+          </div>
 
           {/* Content - flexible column */}
           <div className="flex-1 py-2 px-2.5 flex flex-col justify-center min-w-0">
