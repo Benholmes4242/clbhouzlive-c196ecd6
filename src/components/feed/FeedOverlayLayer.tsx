@@ -119,7 +119,11 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           }}
           caption={activePost.caption}
           tags={activePost.tags}
-          golfCourse={golfCourse ? { id: golfCourse.id, name: golfCourse.name, country: golfCourse.country } : null}
+          golfCourse={golfCourse ? { 
+            id: golfCourse.id, 
+            name: golfCourse.name, 
+            country: (golfCourse as any).courseCountry ?? (golfCourse as any).country ?? null
+          } : null}
           isFollowing={isFollowed}
           isOwnPost={isOwnPost}
           isVisible={overlayVisible}
