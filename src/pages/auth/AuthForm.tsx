@@ -225,14 +225,14 @@ const AuthForm: React.FC<AuthFormProps> = ({
   const handleLogin = async () => {
     // Validation
     const isEmailValid = email.includes('@') && email.includes('.');
-    const isPasswordValid = password.length >= 6;
+    const isPasswordValid = password.length >= 8;
     
     if (!isEmailValid) {
       setEmailError("Please enter a valid email address");
       return;
     }
     if (!isPasswordValid) {
-      setPasswordError("Password must be at least 6 characters");
+      setPasswordError("Password must be at least 8 characters");
       return;
     }
 
@@ -246,7 +246,11 @@ const AuthForm: React.FC<AuthFormProps> = ({
     
     if (error) {
       trackLoginFailed('email', sanitiseErrorForAnalytics(error.message), Date.now() - startTime);
-      setPasswordError("Email or password is incorrect");
+      if (error.message.includes('Email not confirmed') || error.message.includes('email_not_confirmed')) {
+        setPasswordError("Your email isn't verified yet — check your inbox for the link we sent.");
+      } else {
+        setPasswordError("Email or password is incorrect");
+      }
       setSubmitting(false);
     } else if (data?.user) {
       trackLoginSuccess('email', Date.now() - startTime);
@@ -271,18 +275,32 @@ const AuthForm: React.FC<AuthFormProps> = ({
     
     if (error) {
       trackLoginFailed('email', sanitiseErrorForAnalytics(error.message), Date.now() - startTime);
-      setAuthNotice({
-        type: 'error',
-        message: error.message.includes('Invalid login') 
-          ? 'Email or password is incorrect' 
-          : 'Something went wrong. Please try again.',
-      });
+      let msg: string;
+      if (error.message.includes('Email not confirmed') || error.message.includes('email_not_confirmed')) {
+        msg = "Your email isn't verified yet — check your inbox for the link we sent.";
+      } else if (error.message.includes('Invalid login')) {
+        msg = 'Email or password is incorrect';
+      } else {
+        msg = 'Something went wrong. Please try again.';
+      }
+      setAuthNotice({ type: 'error', message: msg });
       setSubmitting(false);
     } else if (data?.user) {
       trackLoginSuccess('email', Date.now() - startTime);
       // Show success animation before redirect
       setSuccessMessage('Welcome back!');
       setShowSuccessAnimation(true);
+    }
+  };
+
+  // Handler for resending verification email
+  const handleResendVerification = async () => {
+    if (!email) return;
+    try {
+      await supabase.auth.resend({ type: 'signup', email });
+      setAuthNotice({ type: 'success', message: 'Verification email resent — check your inbox.' });
+    } catch {
+      setAuthNotice({ type: 'error', message: 'Could not resend. Please try again.' });
     }
   };
 
@@ -352,6 +370,13 @@ const AuthForm: React.FC<AuthFormProps> = ({
       if (error) {
         if ((error as any)?.status === 429) {
           setErrorMsg('Too many attempts. Please wait a moment before trying again.');
+        } else if (
+          error.message.toLowerCase().includes('unique') ||
+          error.message.toLowerCase().includes('duplicate') ||
+          (error as any)?.code === '23505'
+        ) {
+          setUsernameAvailable(false);
+          setErrorMsg("That username was just taken — please choose another");
         } else if (error.message.includes('already registered')) {
           setEmailError("This email is already registered");
           setView('email');
@@ -479,6 +504,8 @@ const AuthForm: React.FC<AuthFormProps> = ({
     // D5: Clear password state when sheet closes
     setPassword('');
     setConfirmPassword('');
+    setUsername('');
+    setUsernameAvailable(null);
   };
 
   const handleBackToEmail = () => {
@@ -591,6 +618,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
             onSubmit={handleLogin}
             onBack={handleBackToEmail}
             onForgotPassword={handleOpenForgotPassword}
+            onResendVerification={handleResendVerification}
           />
         )}
         

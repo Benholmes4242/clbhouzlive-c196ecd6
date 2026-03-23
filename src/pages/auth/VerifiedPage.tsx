@@ -1,6 +1,7 @@
-import { useLayoutEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function VerifiedPage() {
   useHideBottomNav();
@@ -9,6 +10,28 @@ export default function VerifiedPage() {
   useLayoutEffect(() => {
     document.body.classList.add('route-auth');
     return () => { document.body.classList.remove('route-auth'); };
+  }, []);
+
+  // Fix 1: Write session tokens to localStorage so the WebView can pick them up
+  useEffect(() => {
+    const passSessionToApp = async () => {
+      // Give detectSessionInUrl time to process the URL hash tokens
+      await new Promise(r => setTimeout(r, 400));
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      try {
+        localStorage.setItem('clbhouz_email_verified_session', JSON.stringify({
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+          expires_at: session.expires_at,
+          ts: Date.now(),
+        }));
+      } catch {}
+    };
+
+    passSessionToApp();
   }, []);
 
   return (
