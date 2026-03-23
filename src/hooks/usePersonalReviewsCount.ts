@@ -23,6 +23,6 @@ export function usePersonalReviewsCount(userId?: string) {
 
       return count ?? 0;
     },
-    staleTime: 60_000,
+    staleTime: 0,
   });
 }
