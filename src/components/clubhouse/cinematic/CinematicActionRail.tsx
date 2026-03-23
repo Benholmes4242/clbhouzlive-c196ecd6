@@ -250,7 +250,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
       window.removeEventListener('resize', measure);
       cancelAnimationFrame(raf);
     };
-  }, [isVideo, hideMute, onSave, onMore, onNextMedia, hasNextMedia, isVisible]);
+  }, [isVideo, hideMute, onSave, onMore, isVisible]);
 
   return (
     <>
