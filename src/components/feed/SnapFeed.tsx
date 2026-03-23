@@ -44,12 +44,14 @@ export function SnapFeed({
   const hasScrolledToStart = useRef(false);
 
   // ── Stable refs for observer callback (avoid reconnecting observer) ──
+  const postsRef = useRef(posts);
   const postsLengthRef = useRef(posts.length);
   const hasNextPageRef = useRef(hasNextPage);
   const onNearEndRef = useRef(onNearEnd);
   const pendingIndexRef = useRef<number | null>(null);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  useEffect(() => { postsRef.current = posts; }, [posts]);
   useEffect(() => { postsLengthRef.current = posts.length; }, [posts.length]);
   useEffect(() => { hasNextPageRef.current = hasNextPage; }, [hasNextPage]);
   useEffect(() => { onNearEndRef.current = onNearEnd; }, [onNearEnd]);
@@ -87,7 +89,18 @@ export function SnapFeed({
         const idx = Number((bestEntry.target as HTMLElement).dataset.index);
         if (!isNaN(idx)) {
           // Debounce: if multiple slides fire within 80ms, use the last one
-          feedPerf.onViewportEntry(idx, posts[idx]?.mediaItems?.[0]?.hlsUrl ?? '');
+          // Prefetch next 2 slides immediately — before debounce, using current posts
+          const nextPosts = [
+            postsRef.current[idx + 1],
+            postsRef.current[idx + 2],
+          ];
+          nextPosts.forEach(post => {
+            const hlsUrl = post?.mediaItems?.[0]?.hlsUrl;
+            if (hlsUrl) {
+              preloadHlsManifest(hlsUrl).catch(() => {});
+            }
+          });
+          feedPerf.onViewportEntry(idx, postsRef.current[idx]?.mediaItems?.[0]?.hlsUrl ?? '');
           pendingIndexRef.current = idx;
           if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
           debounceTimerRef.current = setTimeout(() => {
