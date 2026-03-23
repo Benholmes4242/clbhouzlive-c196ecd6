@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfilePosts } from './hooks/useProfilePosts';
-import { PostsCountSummary } from './PostsCountSummary';
+
 import { HybridPostsFeed } from './HybridPostsFeed';
 import { PostsAutoplay } from './PostsAutoplay';
 
@@ -40,7 +40,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
 
   return (
     <div className="flex flex-col min-h-0">
-      <PostsCountSummary counts={postCounts} isLoading={isLoading} hideReviews={hideReviewsCount} />
+      
       <HybridPostsFeed
         posts={posts}
         userId={user?.id}
