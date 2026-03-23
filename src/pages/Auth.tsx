@@ -15,7 +15,56 @@ type AuthNotice = {
   message: string;
 } | null;
 
+const BetaGate: React.FC<{ onUnlock: () => void }> = ({ onUnlock }) => {
+  const [pw, setPw] = useState('');
+  const [error, setError] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (pw === 'clbhouz**') {
+      sessionStorage.setItem('beta_access', 'true');
+      onUnlock();
+    } else {
+      setError(true);
+      setTimeout(() => setError(false), 2000);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 flex flex-col items-center justify-center" style={{ background: '#111', zIndex: 9999 }}>
+      <img src="/clbhouz-logo.png" alt="Clbhouz" className="h-10 mb-10" onError={(e) => {
+        (e.target as HTMLImageElement).style.display = 'none';
+      }} />
+      <span className="text-[11px] font-bold tracking-[0.2em] uppercase mb-3" style={{ color: '#f59e0b' }}>
+        Beta Access
+      </span>
+      <form onSubmit={handleSubmit} className="flex flex-col items-center gap-3 w-64">
+        <input
+          type="password"
+          placeholder="Enter password"
+          value={pw}
+          onChange={(e) => setPw(e.target.value)}
+          autoFocus
+          className="w-full px-4 py-3 rounded-lg text-sm text-white placeholder-white/30 outline-none focus:ring-2"
+          style={{ background: '#222', border: '1px solid #333' }}
+        />
+        <button
+          type="submit"
+          className="w-full py-3 rounded-lg text-sm font-semibold text-black transition-opacity hover:opacity-90"
+          style={{ background: '#f59e0b' }}
+        >
+          Enter
+        </button>
+        {error && (
+          <p className="text-[12px] mt-1" style={{ color: '#f87171' }}>Incorrect password</p>
+        )}
+      </form>
+    </div>
+  );
+};
+
 const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
+  const [betaUnlocked, setBetaUnlocked] = useState(() => sessionStorage.getItem('beta_access') === 'true');
   const [isSignUp, setIsSignUp] = useState(defaultSignUp);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,13 +78,14 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
   const lastResendEmail = useRef("");
   const hasNavigated = useRef(false);
   
-  useHideBottomNav();
-  useHideHeader();
-
   useLayoutEffect(() => {
     document.body.classList.add('route-auth');
     return () => { document.body.classList.remove('route-auth'); };
   }, []);
+
+  if (!betaUnlocked) {
+    return <BetaGate onUnlock={() => setBetaUnlocked(true)} />;
+  }
 
   async function checkProfileAndOnboarding(userId: string): Promise<{
     hasProfile: boolean;
