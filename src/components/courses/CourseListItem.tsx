@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CourseRankBadges from './CourseRankBadges';
+import { extractRanksFromMemberships } from '@/utils/rankingUtils';
 
 interface CourseListItemProps {
   course: any;
