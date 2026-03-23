@@ -5,6 +5,8 @@ import { haptic } from '@/utils/haptics';
 import { HLSPoolManager } from '@/media/HLSPoolManager';
 import { feedPerf } from '@/utils/feedPerf';
 import { isPrefetchComplete } from '@/utils/hlsPreload';
+import { extractCloudflareUid } from '@/utils/videoIdUtils';
+import { getSharedBandwidth, saveSharedBandwidth } from '@/utils/sharedBandwidth';
 import type HlsType from 'hls.js';
 
 const HLS_CONFIG = {
@@ -15,7 +17,7 @@ const HLS_CONFIG = {
   maxMaxBufferLength: 60,
   startLevel: -1,
   capLevelToPlayerSize: false,
-  abrEwmaDefaultEstimate: 8_000_000,
+  abrEwmaDefaultEstimate: getSharedBandwidth(),
 };
 
 const LONG_VIDEO_THRESHOLD = 10; // seconds
@@ -98,7 +100,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
     let cancelled = false;
 
     const attach = async () => {
-      feedPerf.onActivation(feedIndex, hlsUrl, 8_000_000);
+      feedPerf.onActivation(feedIndex, hlsUrl, getSharedBandwidth());
 
       // If HLS instance already exists (was stopped, not destroyed), resume it
       if (hlsRef.current) {
@@ -126,8 +128,9 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
       if (useNative) {
         video.src = hlsUrl || mp4Url || '';
       } else {
-        // Prefetch status check
-        const prefetchStatus = isPrefetchComplete(hlsUrl) ? 'hit' : 'miss';
+        // Prefetch status check — use Cloudflare UID to match hlsPreload's key
+        const videoId = extractCloudflareUid(hlsUrl) || hlsUrl;
+        const prefetchStatus = isPrefetchComplete(videoId) ? 'hit' : 'miss';
         feedPerf.onPrefetchCheck(feedIndex, hlsUrl, prefetchStatus);
 
         // Check pool for a pre-buffered instance first
@@ -147,6 +150,11 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
             const level = pooledHls.levels[data.level];
             if (level) feedPerf.onQualitySwitch(feedIndex, hlsUrl, level.height, Math.round(level.bitrate / 1000));
           });
+          pooledHls.on(Hls.Events.FRAG_LOADED, (_, data) => {
+            if (data.frag?.stats?.bwEstimate && data.frag.stats.bwEstimate > 0) {
+              saveSharedBandwidth(data.frag.stats.bwEstimate);
+            }
+          });
         } else {
           const hls = new Hls(HLS_CONFIG);
           hlsRef.current = hls;
@@ -160,6 +168,11 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
           hls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
             const level = hls.levels[data.level];
             if (level) feedPerf.onQualitySwitch(feedIndex, hlsUrl, level.height, Math.round(level.bitrate / 1000));
+          });
+          hls.on(Hls.Events.FRAG_LOADED, (_, data) => {
+            if (data.frag?.stats?.bwEstimate && data.frag.stats.bwEstimate > 0) {
+              saveSharedBandwidth(data.frag.stats.bwEstimate);
+            }
           });
         }
       }
