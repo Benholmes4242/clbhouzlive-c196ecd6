@@ -5,7 +5,6 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useEventWinners } from './useEventWinner';
 
 export interface PickHistoryEntry {
   tournamentId: string;
@@ -24,7 +23,6 @@ export interface PickHistoryEntry {
 function getShortName(name: string): string {
   const skipWords = new Set(['open', 'classic', 'invitational', 'championship', 'tournament', 'the', 'at']);
   const words = name.split(/\s+/).filter(Boolean);
-  // Try to find a distinctive word
   for (const w of words) {
     if (!skipWords.has(w.toLowerCase()) && w.length > 2) return w;
   }
@@ -32,11 +30,11 @@ function getShortName(name: string): string {
 }
 
 export function usePickHistory() {
-  // Step 1: fetch predictions with tournament data
-  const predQuery = useQuery({
-    queryKey: ['tourhub', 'pick-history-predictions'],
-    queryFn: async () => {
-      const { data, error } = await supabase
+  return useQuery({
+    queryKey: ['tourhub', 'pick-history'],
+    queryFn: async (): Promise<PickHistoryEntry[]> => {
+      // Step 1: fetch predictions with tournament data
+      const { data: predRows, error: predError } = await supabase
         .from('ai_predictions')
         .select(`
           tournament_id,
@@ -49,67 +47,83 @@ export function usePickHistory() {
         .order('sr_tournaments(start_date)', { ascending: false })
         .limit(10);
 
-      if (error) {
-        console.error('usePickHistory predictions error:', error);
+      if (predError) {
+        console.error('usePickHistory predictions error:', predError);
         return [];
       }
-      return data ?? [];
-    },
-    staleTime: 30 * 60 * 1000,
-    gcTime: 60 * 60 * 1000,
-  });
+      if (!predRows?.length) return [];
 
-  const tournamentIds = (predQuery.data ?? []).map(r => r.tournament_id);
+      const tournamentIds = predRows.map(r => r.tournament_id);
 
-  // Step 2: batch fetch event winners
-  const winnersQuery = useEventWinners(tournamentIds);
+      // Step 2: batch fetch event winners
+      const { data: winnersData } = await supabase
+        .from('event_winners')
+        .select('tournament_id, player_id, score_to_par, player:sr_players(full_name, sr_id)')
+        .in('tournament_id', tournamentIds);
 
-  // Step 3: combine
-  const combined = useQuery({
-    queryKey: ['tourhub', 'pick-history', tournamentIds.sort().join(','), winnersQuery.data ? 'ready' : 'waiting'],
-    queryFn: (): PickHistoryEntry[] => {
-      const preds = predQuery.data ?? [];
-      const winnersMap = winnersQuery.data ?? new Map();
+      const winnersMap = new Map(
+        (winnersData || []).map(w => [w.tournament_id, w])
+      );
 
+      // Step 3: build entries with leaderboard lookups for actual positions
       const entries: PickHistoryEntry[] = [];
-      for (const row of preds) {
-        const winner = winnersMap.get(row.tournament_id);
-        if (!winner?.player) continue;
 
-        const predictions = row.predictions as any[];
-        const topPick = predictions?.[0];
+      for (const row of predRows) {
+        const tournament = (row as any).sr_tournaments;
+        if (!tournament) continue;
+
+        const predictions = (row.predictions as any[]) || [];
+        const sortedPreds = [...predictions].sort(
+          (a, b) => (a.rank ?? a.predictedRank ?? 99) - (b.rank ?? b.predictedRank ?? 99)
+        );
+        const topPick = sortedPreds[0];
         if (!topPick) continue;
 
-        const tournament = row.sr_tournaments as any;
-        const startDate = tournament?.start_date ?? '';
-        const year = startDate ? new Date(startDate).getFullYear().toString() : '';
+        const playerName = topPick.playerName || topPick.player_name || topPick.name || '';
+        const playerId = topPick.playerId || topPick.player_id || topPick.pgaTourId || '';
+        if (!playerName) continue;
 
-        // Check if top pick won
-        const isWinner = topPick.playerId === winner.player_id;
+        const winner = winnersMap.get(row.tournament_id);
+        const winnerName = (winner?.player as any)?.full_name ?? '';
+        const isWin = !!(winnerName && winnerName.toLowerCase() === playerName.toLowerCase());
+
+        // Fetch actual finishing position from leaderboard
+        let actualPosition: number | null = isWin ? 1 : null;
+        let actualPositionTied = false;
+
+        if (!isWin && playerId) {
+          const { data: lbRow } = await supabase
+            .from('sr_leaderboards')
+            .select('position, position_tied, sr_players!inner(sr_id)')
+            .eq('tournament_id', row.tournament_id)
+            .eq('sr_players.sr_id', playerId)
+            .maybeSingle();
+
+          if (lbRow) {
+            actualPosition = lbRow.position;
+            actualPositionTied = lbRow.position_tied || false;
+          }
+        }
 
         entries.push({
           tournamentId: row.tournament_id,
-          tournamentName: tournament?.name ?? '',
-          shortName: getShortName(tournament?.name ?? ''),
-          topPickName: topPick.playerName ?? topPick.name ?? '',
-          topPickPlayerId: topPick.playerId ?? '',
-          actualPosition: isWinner ? 1 : null, // We only know winner position from event_winners
-          actualPositionTied: false,
-          isWinner,
-          scoreToPar: winner.score_to_par,
-          year,
+          tournamentName: tournament.name || '',
+          shortName: getShortName(tournament.name || ''),
+          topPickName: playerName,
+          topPickPlayerId: playerId,
+          actualPosition,
+          actualPositionTied,
+          isWinner: isWin,
+          scoreToPar: isWin ? (winner?.score_to_par ?? null) : null,
+          year: tournament.start_date
+            ? new Date(tournament.start_date).getFullYear().toString()
+            : new Date().getFullYear().toString(),
         });
       }
 
-      return entries;
+      return entries.filter(e => e.topPickName).slice(0, 10);
     },
-    enabled: !!predQuery.data && predQuery.data.length > 0 && !!winnersQuery.data,
     staleTime: 30 * 60 * 1000,
     gcTime: 60 * 60 * 1000,
   });
-
-  return {
-    data: combined.data ?? [],
-    isLoading: predQuery.isLoading || winnersQuery.isLoading || combined.isLoading,
-  };
 }
