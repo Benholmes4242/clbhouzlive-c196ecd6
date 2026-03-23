@@ -4,6 +4,7 @@ import { useOpenCourseModal } from '@/hooks/useOpenCourseModal';
 import { useParallax } from '@/hooks/useParallax';
 import CourseRankBadges from './CourseRankBadges';
 import CourseCardBackground from './CourseCardBackground';
+import { extractRanksFromMemberships } from '@/utils/rankingUtils';
 import CourseCardAIQuote from './CourseCardAIQuote';
 import CourseCardLocation from './CourseCardLocation';
 import { useMemoryMonitor } from '@/hooks/useMemoryMonitor';
