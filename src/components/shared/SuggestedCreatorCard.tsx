@@ -99,7 +99,7 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
         className="cursor-pointer"
         style={{
           width: 88,
-          aspectRatio: '1 / 1.05',
+          aspectRatio: '1 / 1',
           borderRadius: '34%',
           border: '1.5px solid rgba(245, 158, 11, 0.85)',
           padding: 2,
