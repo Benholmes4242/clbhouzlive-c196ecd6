@@ -62,17 +62,17 @@ const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
     >
       <div className="flex">
         {/* Thumbnail */}
-        <div className="relative flex-shrink-0">
+        <div className="relative flex-shrink-0 self-stretch">
           {course.thumbnail_image ? (
             <img
               src={course.thumbnail_image}
               alt={course.course_name}
               loading="lazy"
               decoding="async"
-              className="w-20 h-20 rounded-lg object-cover transition-transform duration-300 group-hover:scale-105"
+              className="w-20 h-full object-cover rounded-l-xl transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
-            <div className="w-20 h-20 bg-muted flex items-center justify-center">
+            <div className="w-20 h-full bg-muted flex items-center justify-center rounded-l-xl">
               <MapPin className="w-6 h-6 text-muted-foreground" />
             </div>
           )}
