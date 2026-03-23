@@ -137,6 +137,9 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   onBeforeNavigate,
   // Bottom offset override
   bottomOffset,
+  // Carousel dots
+  carouselCount = 0,
+  carouselActiveIndex = 0,
 }) => {
   
   const [isExpanded, setIsExpanded] = useState(false);
