@@ -275,19 +275,7 @@ export const CinematicActionRail: React.FC<CinematicActionRailProps> = ({
         zIndex: Z.echo,
       }}
     >
-      {/* Slot 1: Right chevron — top of rail, only when there's a next media item */}
-      {onNextMedia && hasNextMedia && (
-        <ActionSlot
-          icon={ChevronRight}
-          onClick={onNextMedia}
-          ariaLabel="Next media"
-          showCount={false}
-          idleOpacity={idleOpacity}
-          slotRef={nextSlotRef}
-        />
-      )}
-
-      {/* Slot 2: Like */}
+      {/* Slot 1: Like */}
       <ActionSlot
         icon={Heart}
         count={likesCount}
