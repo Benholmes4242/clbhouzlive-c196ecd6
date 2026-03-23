@@ -38,7 +38,7 @@ export default function VerifiedPage() {
     <div
       className="fixed inset-0 flex flex-col items-center justify-center px-6"
       style={{
-        background: 'radial-gradient(ellipse 70% 50% at 50% -10%, rgba(245,166,35,0.18) 0%, transparent 60%), radial-gradient(ellipse 100% 80% at 50% 110%, rgba(245,166,35,0.06) 0%, transparent 60%), #080808',
+        background: '#080808',
       }}
     >
       {/* Grain overlay */}
