@@ -514,7 +514,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
               <TabsTrigger
                 key={option.value}
                 value={option.value}
-                className="min-h-[36px] px-4 text-sm font-semibold transition-all active:scale-[0.97] border-0 shadow-none
+                className="min-h-[36px] px-4 text-sm font-semibold transition-all active:scale-[0.97] border-0 shadow-none after:hidden
                   data-[state=active]:text-background data-[state=active]:bg-foreground data-[state=active]:shadow-none
                   data-[state=inactive]:bg-transparent data-[state=inactive]:text-muted-foreground"
                 style={{
