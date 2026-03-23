@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useInView } from 'react-intersection-observer';
 import { Loader2 } from 'lucide-react';
@@ -6,6 +6,7 @@ import type { FeedPost } from '@/components/media-system/types/media';
 import { FriendsCard } from './FriendsCard';
 import { FriendsFeedSkeleton } from './FriendsFeedSkeleton';
 import { FriendsAutoplay } from './FriendsAutoplay';
+import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 
 interface FriendsFeedProps {
   posts: FeedPost[];
