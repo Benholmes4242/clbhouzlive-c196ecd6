@@ -647,7 +647,7 @@ const UnifiedVideoPlayerInner = forwardRef<UnifiedVideoPlayerRef, UnifiedVideoPl
           } else if (hlsBlobCache.isPending(cloudflareUid)) {
             // Prefetch is in progress — wait for it to complete (max 3 seconds)
             videoDebug('hlsEvents', 'Waiting for prefetch to complete', { uid: cloudflareUid });
-            await hlsBlobCache.waitForReady(cloudflareUid, 3000);
+            // Removed: 3s waitForReady was blocking HLS setup unnecessarily
           }
         }
 
