@@ -55,7 +55,7 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
   const hlsRef = useRef<HlsType | null>(null);
   const [videoReady, setVideoReady] = useState(false);
   const [showReplay, setShowReplay] = useState(false);
-  const loopCountRef = useRef(0);
+  
   const lastTapRef = useRef(0);
   const firstFrameFiredRef = useRef(false);
 
