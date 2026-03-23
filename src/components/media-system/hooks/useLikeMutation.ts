@@ -19,7 +19,8 @@ export function useLikeMutation() {
           .from('post_likes')
           .delete()
           .eq('post_id', postId)
-          .eq('user_id', userId);
+          .eq('actor_id', actorId)
+          .eq('actor_type', actorType);
         if (error) throw error;
       } else {
         const { error } = await supabase
