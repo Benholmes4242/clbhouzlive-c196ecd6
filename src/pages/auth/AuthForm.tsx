@@ -293,6 +293,17 @@ const AuthForm: React.FC<AuthFormProps> = ({
     }
   };
 
+  // Handler for resending verification email
+  const handleResendVerification = async () => {
+    if (!email) return;
+    try {
+      await supabase.auth.resend({ type: 'signup', email });
+      setAuthNotice({ type: 'success', message: 'Verification email resent — check your inbox.' });
+    } catch {
+      setAuthNotice({ type: 'error', message: 'Could not resend. Please try again.' });
+    }
+  };
+
   // Handler for forgot password from hero screen
   const handleInlineForgotPassword = (forgotEmail: string) => {
     setEmail(forgotEmail);
