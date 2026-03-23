@@ -213,7 +213,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             alt={course.name}
             loading="lazy"
             decoding="async"
-            className="w-[72px] h-[76px] object-cover flex-shrink-0 rounded-[10px]"
+            className="w-[72px] self-stretch object-cover flex-shrink-0 rounded-l-xl"
           />
         ) : (
           <div className="w-[72px] h-[76px] bg-muted flex-shrink-0" />
