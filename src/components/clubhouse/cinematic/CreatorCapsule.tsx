@@ -396,14 +396,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     </div>
   );
 
-  // Get initials for avatar fallback
-  const initials = user?.name
-    ?.split(' ')
-    .slice(0, 2)
-    .map(part => part[0])
-    .join('')
-    .toUpperCase() || '?';
-
   // Review mode content - matches regular capsule layout exactly
   const reviewContent = reviewData && (() => {
     const accent = '#f59e0b';
