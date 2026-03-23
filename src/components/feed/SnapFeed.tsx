@@ -41,6 +41,17 @@ export function SnapFeed({
   const ptrActive = useRef(false);
   const hasScrolledToStart = useRef(false);
 
+  // ── Stable refs for observer callback (avoid reconnecting observer) ──
+  const postsLengthRef = useRef(posts.length);
+  const hasNextPageRef = useRef(hasNextPage);
+  const onNearEndRef = useRef(onNearEnd);
+  const lastSetIndexRef = useRef(0);
+  const lastSetTimeRef = useRef(0);
+
+  useEffect(() => { postsLengthRef.current = posts.length; }, [posts.length]);
+  useEffect(() => { hasNextPageRef.current = hasNextPage; }, [hasNextPage]);
+  useEffect(() => { onNearEndRef.current = onNearEnd; }, [onNearEnd]);
+
   // Scroll to startIndex on first mount only
   useEffect(() => {
     if (hasScrolledToStart.current) return;
