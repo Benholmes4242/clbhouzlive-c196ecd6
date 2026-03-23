@@ -453,6 +453,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
           return oldData.filter(id => id !== variables.postId);
         }
       });
+      queryClient.invalidateQueries({ queryKey: ['media-feed'] });
     },
     onError: (error) => {
       console.error('Like/unlike error:', error);
