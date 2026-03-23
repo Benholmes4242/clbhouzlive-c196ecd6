@@ -122,6 +122,12 @@ export function FullscreenFeedOverlay() {
         onClose={closeComments}
         postId={activePost?.id ?? ""}
         currentUserId={userId}
+        creatorUserId={activePost?.userId}
+        creatorName={activePost?.displayName}
+        creatorAvatar={activePost?.avatarUrl}
+        caption={activePost?.caption}
+        theme="dark"
+        likesCount={getActiveLikeState(activePost!)?.count ?? null}
       />
     </>
   );
