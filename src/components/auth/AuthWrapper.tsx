@@ -53,7 +53,8 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
     window.location.hostname.includes('lovableproject.com') ||
     window.location.hostname === 'localhost';
   const isPublicPath = PUBLIC_PATHS.some(p => location.pathname.startsWith(p));
-  if (!inApp && !isDevOrPreview && !isPublicPath) {
+  const hasBetaAccess = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('beta_access') === 'true';
+  if (!inApp && !isDevOrPreview && !isPublicPath && !hasBetaAccess) {
     return <BetaGatePage />;
   }
 
