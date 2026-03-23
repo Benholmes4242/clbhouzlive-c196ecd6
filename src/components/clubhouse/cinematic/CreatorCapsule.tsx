@@ -108,6 +108,10 @@ interface CreatorCapsuleProps {
   /** Override the bottom offset (default: 'calc(30px + 80px)' for tab bar context).
    *  Use for fullscreen viewer where there's no tab bar. */
   bottomOffset?: string;
+
+  /** Carousel dot indicators — rendered 8px above the capsule */
+  carouselCount?: number;
+  carouselActiveIndex?: number;
 }
 
 export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
