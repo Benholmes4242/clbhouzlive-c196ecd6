@@ -360,6 +360,19 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                   </div>
                 )}
 
+                {/* Suggested creators shelf */}
+                <SuggestedCreatorsShelf
+                  userId={user?.id}
+                  title="Golfers to follow"
+                  showViewAll={true}
+                  onViewAll={() => { navigate('/golfers'); onClose(); }}
+                  containerStyle={{
+                    borderTop: '1px solid rgba(0,0,0,0.05)',
+                    borderBottom: '1px solid rgba(0,0,0,0.05)',
+                    background: '#ffffff',
+                  }}
+                />
+
                 {/* Today's Picks — skeleton while loading, real list when resolved */}
                 {trendingLoading ? (
                   <TrendingSkeletonSection />

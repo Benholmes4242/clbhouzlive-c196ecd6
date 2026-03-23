@@ -328,6 +328,16 @@ const ActivityPage: React.FC = () => {
                   </div>
                 )}
 
+                {/* Suggested creators after new notifications */}
+                {filteredNewItems.length > 0 && (
+                  <SuggestedCreatorsShelf
+                    userId={user?.id}
+                    title="You might also know"
+                    showViewAll={false}
+                    containerStyle={{ marginTop: 4, marginBottom: 4 }}
+                  />
+                )}
+
                 {/* Tier 2 — Compact list for earlier */}
                 {filteredEarlierItems.length > 0 && (
                   <div>

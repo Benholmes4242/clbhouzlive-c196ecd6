@@ -88,18 +88,34 @@ export function FriendsFeed({
     <div ref={feedContainerRef} className="flex flex-col gap-3 pb-4 pt-2">
       <FriendsAutoplay posts={posts} feedRef={feedContainerRef} />
       {posts.map((post, i) => (
-        <div key={post.id} data-card-index={i}>
-          <FriendsCard
-            post={post}
-            userId={userId}
-            cardIndex={i}
-            allPosts={posts}
-            fetchNextPage={fetchNextPage}
-            hasNextPage={hasNextPage}
-            isFetchingNextPage={isFetchingNextPage}
-          />
-        </div>
+        <React.Fragment key={post.id}>
+          <div data-card-index={i}>
+            <FriendsCard
+              post={post}
+              userId={userId}
+              cardIndex={i}
+              allPosts={posts}
+              fetchNextPage={fetchNextPage}
+              hasNextPage={hasNextPage}
+              isFetchingNextPage={isFetchingNextPage}
+            />
+          </div>
+          {i === 4 && (
+            <SuggestedCreatorsShelf
+              userId={userId}
+              title="Golfers you might know"
+              showViewAll={false}
+            />
+          )}
+        </React.Fragment>
       ))}
+      {posts.length > 0 && posts.length < 5 && (
+        <SuggestedCreatorsShelf
+          userId={userId}
+          title="Golfers you might know"
+          showViewAll={false}
+        />
+      )}
 
       {/* Infinite scroll sentinel */}
       <div ref={sentinelRef} className="h-1" />
