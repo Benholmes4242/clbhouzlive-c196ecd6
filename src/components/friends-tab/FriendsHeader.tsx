@@ -21,10 +21,10 @@ export function FriendsHeader({
 }: FriendsHeaderProps) {
   return (
     <div
-      className="sticky z-30 bg-background pb-0 pt-2 px-0"
+      className="sticky z-30 bg-background pb-0 pt-0 px-0"
       style={{ top: embedded ? '47px' : '0px', borderBottom: '1px solid hsl(var(--border) / 0.12)' }}
     >
-      <div className="px-4 pb-2">
+      <div className="px-4 pt-3 pb-2">
         <button
           onClick={onOpenSearch}
           className="flex items-center gap-2 w-full h-10 px-3 rounded-xl bg-muted text-muted-foreground text-sm"
