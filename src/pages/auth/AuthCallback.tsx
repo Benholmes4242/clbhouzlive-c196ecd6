@@ -66,6 +66,29 @@ export default function AuthCallback() {
     run();
   }, [navigate, isInMedianApp]);
 
+  // In SFVC/Safari: extract session tokens and write to localStorage for WebView pickup
+  useEffect(() => {
+    if (isInMedianApp) return;
+
+    const passSessionToWebView = async () => {
+      await new Promise(r => setTimeout(r, 300));
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      try {
+        localStorage.setItem('clbhouz_oauth_session', JSON.stringify({
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+          expires_at: session.expires_at,
+          ts: Date.now(),
+        }));
+      } catch {}
+    };
+
+    passSessionToWebView();
+  }, [isInMedianApp]);
+
   if (!isInMedianApp) {
     return (
       <div

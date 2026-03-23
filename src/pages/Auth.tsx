@@ -26,19 +26,17 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const lastResendEmail = useRef(""); // to avoid spamming resend if email field is empty
+  const lastResendEmail = useRef("");
+  const hasNavigated = useRef(false);
   
-  // Hide bottom navigation and header on auth pages
   useHideBottomNav();
   useHideHeader();
 
-  // Bleed behind notch/safe-area like Clubhouse & Tour Hub
   useLayoutEffect(() => {
     document.body.classList.add('route-auth');
     return () => { document.body.classList.remove('route-auth'); };
   }, []);
 
-  // Helper to check profile and onboarding status
   async function checkProfileAndOnboarding(userId: string): Promise<{
     hasProfile: boolean;
     hasCompletedOnboarding: boolean;
@@ -55,18 +53,17 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
     };
   }
 
+  // Redirect if user is already authenticated
   useEffect(() => {
-    // Only redirect if user is already authenticated when component mounts
-    if (user) {
+    if (user && !hasNavigated.current) {
+      hasNavigated.current = true;
       const redirectUser = async () => {
         const { hasProfile, hasCompletedOnboarding } = await checkProfileAndOnboarding(user.id);
         const redirectPath = searchParams.get('redirect');
         
         if (!hasProfile || !hasCompletedOnboarding) {
-          // Profile doesn't exist or onboarding not complete - redirect to edit profile
           navigate("/edit-profile", { replace: true });
         } else {
-          // Fully onboarded - go to requested page or home
           navigate(redirectPath || "/", { replace: true });
         }
       };
@@ -75,7 +72,60 @@ const Auth: React.FC<AuthProps> = ({ defaultSignUp = false }) => {
     }
   }, [user, navigate, searchParams]);
 
-  // Clear all auth messages helper
+  // Catch session from OAuth (Apple/Google) completed in SFSafariViewController.
+  // The callback page writes tokens to localStorage; we read them when the app resumes.
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState !== 'visible') return;
+
+      // Always clear stuck spinner immediately
+      setSubmitting(false);
+
+      if (hasNavigated.current) return;
+
+      // 1. Direct session check (works if Supabase resolved via URL hash)
+      const { data: { session: existingSession } } = await supabase.auth.getSession();
+      if (existingSession?.user) {
+        hasNavigated.current = true;
+        const { hasProfile, hasCompletedOnboarding } = await checkProfileAndOnboarding(existingSession.user.id);
+        const redirectPath = searchParams.get('redirect');
+        navigate(!hasProfile || !hasCompletedOnboarding ? '/edit-profile' : (redirectPath || '/'), { replace: true });
+        return;
+      }
+
+      // 2. Check for handshake token written by the SFVC callback page
+      try {
+        const raw = localStorage.getItem('clbhouz_oauth_session');
+        if (!raw) return;
+
+        const payload = JSON.parse(raw);
+        // Only accept tokens written in the last 5 minutes
+        if (!payload.access_token || !payload.refresh_token || Date.now() - payload.ts > 5 * 60 * 1000) {
+          localStorage.removeItem('clbhouz_oauth_session');
+          return;
+        }
+
+        const { data: { session }, error } = await supabase.auth.setSession({
+          access_token: payload.access_token,
+          refresh_token: payload.refresh_token,
+        });
+
+        // Clean up handshake token regardless
+        localStorage.removeItem('clbhouz_oauth_session');
+
+        if (error || !session?.user) return;
+
+        hasNavigated.current = true;
+        const { hasProfile, hasCompletedOnboarding } = await checkProfileAndOnboarding(session.user.id);
+        const redirectPath = searchParams.get('redirect');
+        navigate(!hasProfile || !hasCompletedOnboarding ? '/edit-profile' : (redirectPath || '/'), { replace: true });
+      } catch {}
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [navigate, searchParams]);
+
   const clearAuthMessages = () => {
     setErrorMsg(null);
     setResendMsg(null);
