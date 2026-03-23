@@ -72,7 +72,7 @@ const WantToPlayCard: React.FC<WantToPlayCardProps> = ({
               className="w-20 h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
-            <div className="w-20 h-20 bg-muted flex items-center justify-center">
+            <div className="w-20 h-full bg-muted flex items-center justify-center">
               <MapPin className="w-6 h-6 text-muted-foreground" />
             </div>
           )}
