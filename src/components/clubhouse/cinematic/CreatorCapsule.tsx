@@ -53,6 +53,12 @@ interface GolfCourseInfo {
   slug?: string | null;
   /** Country name for display (e.g. 'Portugal') */
   courseCountry?: string | null;
+  // Extended fields for CourseDNACard
+  globalRank?: number | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  thumbnailImage?: string | null;
+  hasHostedMajor?: boolean | null;
 }
 
 interface MusicTrackInfo {
