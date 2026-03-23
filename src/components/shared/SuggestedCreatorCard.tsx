@@ -252,7 +252,7 @@ export const SuggestedCreatorCardShimmer: React.FC = () => (
       className="animate-[shimmer_1.5s_infinite]"
       style={{
         width: 88,
-        aspectRatio: '1 / 1.05',
+        aspectRatio: '1 / 1',
         borderRadius: '34%',
         background: 'linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--muted)/0.5) 50%, hsl(var(--muted)) 75%)',
         backgroundSize: '200% 100%',
