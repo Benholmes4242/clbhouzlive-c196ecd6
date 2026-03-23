@@ -86,7 +86,7 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
                 className="w-24 self-stretch object-cover transition-transform duration-300 group-hover:scale-105 rounded-l-xl"
               />
             ) : (
-              <div className="w-24 h-[88px] bg-gradient-to-br from-muted to-muted/50" />
+              <div className="w-24 self-stretch bg-gradient-to-br from-muted to-muted/50 rounded-l-xl" />
             )}
             {/* Top 100 icon overlay - Chartreus */}
             <div 
