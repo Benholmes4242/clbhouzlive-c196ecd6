@@ -128,8 +128,9 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
       if (useNative) {
         video.src = hlsUrl || mp4Url || '';
       } else {
-        // Prefetch status check
-        const prefetchStatus = isPrefetchComplete(hlsUrl) ? 'hit' : 'miss';
+        // Prefetch status check — use Cloudflare UID to match hlsPreload's key
+        const videoId = extractCloudflareUid(hlsUrl) || hlsUrl;
+        const prefetchStatus = isPrefetchComplete(videoId) ? 'hit' : 'miss';
         feedPerf.onPrefetchCheck(feedIndex, hlsUrl, prefetchStatus);
 
         // Check pool for a pre-buffered instance first
