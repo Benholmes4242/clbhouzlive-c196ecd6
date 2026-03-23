@@ -4,6 +4,7 @@ import { FeedSlide } from './FeedSlide';
 import type { FeedPost } from '@/components/media-system/types/media';
 import { haptic } from '@/utils/haptics';
 import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { registerInPool } from '@/utils/hlsPoolPreloader';
 import { feedPerf } from '@/utils/feedPerf';
 
 const NEAR_END_THRESHOLD = 3;
