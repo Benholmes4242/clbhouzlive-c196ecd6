@@ -8,6 +8,7 @@ import { useClubMedia } from '@/hooks/useClubMedia';
 import { ChevronRight } from 'lucide-react';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { SectionHeading } from './SectionHeading';
+import { useMediaViewer } from '@/hooks/useMediaViewer';
 
 // LocalMediaItem interface
 interface LocalMediaItem {
