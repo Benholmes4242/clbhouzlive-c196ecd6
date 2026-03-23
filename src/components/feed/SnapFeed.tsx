@@ -45,8 +45,8 @@ export function SnapFeed({
   const postsLengthRef = useRef(posts.length);
   const hasNextPageRef = useRef(hasNextPage);
   const onNearEndRef = useRef(onNearEnd);
-  const lastSetIndexRef = useRef(0);
-  const lastSetTimeRef = useRef(0);
+  const pendingIndexRef = useRef<number | null>(null);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => { postsLengthRef.current = posts.length; }, [posts.length]);
   useEffect(() => { hasNextPageRef.current = hasNextPage; }, [hasNextPage]);
@@ -84,18 +84,18 @@ export function SnapFeed({
       if (bestEntry && bestEntry.intersectionRatio >= ACTIVE_SLIDE_RATIO) {
         const idx = Number((bestEntry.target as HTMLElement).dataset.index);
         if (!isNaN(idx)) {
-          // Guard against snap-back: ignore backwards jumps within 500ms of a forward one
-          const now = Date.now();
-          if (idx < lastSetIndexRef.current && now - lastSetTimeRef.current < 500) {
-            return;
-          }
-          lastSetIndexRef.current = idx;
-          lastSetTimeRef.current = now;
-
-          setActiveIndex(idx);
-          if (hasNextPageRef.current && idx >= postsLengthRef.current - NEAR_END_THRESHOLD) {
-            onNearEndRef.current();
-          }
+          // Debounce: if multiple slides fire within 80ms, use the last one
+          pendingIndexRef.current = idx;
+          if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+          debounceTimerRef.current = setTimeout(() => {
+            if (pendingIndexRef.current !== null) {
+              setActiveIndex(pendingIndexRef.current);
+              if (hasNextPageRef.current && pendingIndexRef.current >= postsLengthRef.current - NEAR_END_THRESHOLD) {
+                onNearEndRef.current();
+              }
+              pendingIndexRef.current = null;
+            }
+          }, 80);
         }
       }
     }, { threshold: INTERSECTION_THRESHOLDS });
@@ -107,6 +107,7 @@ export function SnapFeed({
 
     return () => {
       observerRef.current?.disconnect();
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     };
   }, [setActiveIndex]);
 
