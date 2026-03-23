@@ -93,34 +93,15 @@ export const CourseMediaAutoplay: React.FC<CourseMediaAutoplayProps> = ({ posts,
     tileEl.style.position = 'relative';
     tileEl.appendChild(video);
 
-    const { default: Hls } = await import('hls.js');
-    // TODO: re-wire cachedHlsLoader in Brief 3
-
     if (activeIndexRef.current !== tileIdx) return;
 
-    if (!Hls.isSupported()) {
-      video.src = hlsUrl;
-      video.play().catch(() => {});
-      return;
-    }
-
-    const hls = new Hls({
-      startLevel: -1,
-      capLevelToPlayerSize: false,
-      abrEwmaDefaultEstimate: 5_000_000 > 0 ? 5_000_000 : 8_000_000,
-      maxBufferLength: 8,
-      maxMaxBufferLength: 16,
-      enableWorker: true,
-      loader: undefined,
-    });
-    hlsRef.current = hls;
-    hls.loadSource(hlsUrl);
-    hls.attachMedia(video);
-    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-      if (activeIndexRef.current !== tileIdx) return;
-      hls.currentLevel = 0;
-      video.play().catch(() => {});
-    });
+    try {
+      const hls = await attachHlsToTile({
+        hlsUrl,
+        video,
+      });
+      hlsRef.current = hls;
+    } catch { /* silent */ }
 
     // Cleanup stale listeners
     if ((video as any)._onCanPlay) {
