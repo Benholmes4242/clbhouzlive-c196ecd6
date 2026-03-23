@@ -38,7 +38,7 @@ export default function VerifiedPage() {
     <div
       className="fixed inset-0 flex flex-col items-center justify-center px-6"
       style={{
-        background: '#080808',
+        background: '#0D0D0D',
       }}
     >
       {/* Grain overlay */}
