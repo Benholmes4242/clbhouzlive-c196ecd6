@@ -78,7 +78,7 @@ export default function CheckEmailPage() {
     <div
       className="fixed inset-0 flex flex-col items-center justify-center px-6"
       style={{
-        background: '#0D0D0D',
+        background: '#000000',
         paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
