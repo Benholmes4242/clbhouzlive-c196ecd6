@@ -83,10 +83,10 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
                 alt={course.name}
                 loading="lazy"
                 decoding="async"
-                className="w-24 h-[88px] object-cover transition-transform duration-300 group-hover:scale-105 rounded-[10px]"
+                className="w-24 h-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
             ) : (
-              <div className="w-24 h-[88px] bg-gradient-to-br from-muted to-muted/50" />
+              <div className="w-24 h-full bg-gradient-to-br from-muted to-muted/50" />
             )}
             {/* Top 100 icon overlay - Chartreus */}
             <div 
@@ -157,10 +157,10 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
               alt={course.name}
               loading="lazy"
               decoding="async"
-              className="w-16 h-[68px] object-cover flex-shrink-0 opacity-80 rounded-[10px]"
+              className="w-16 h-full object-cover flex-shrink-0 opacity-80"
             />
           ) : (
-            <div className="w-16 h-[68px] bg-muted/50 flex-shrink-0" />
+            <div className="w-16 h-full bg-muted/50 flex-shrink-0" />
           )}
 
           {/* Content - flexible column */}
@@ -213,10 +213,10 @@ export const TieredCourseCard: React.FC<TieredCourseCardProps> = ({
             alt={course.name}
             loading="lazy"
             decoding="async"
-            className="w-[72px] h-[76px] object-cover flex-shrink-0 rounded-[10px]"
+            className="w-[72px] h-full object-cover flex-shrink-0"
           />
         ) : (
-          <div className="w-[72px] h-[76px] bg-muted flex-shrink-0" />
+          <div className="w-[72px] h-full bg-muted flex-shrink-0" />
         )}
 
         {/* Content - flexible column */}
