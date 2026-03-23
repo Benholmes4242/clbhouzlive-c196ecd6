@@ -54,21 +54,7 @@ export const SuggestedCreatorsShelf: React.FC<SuggestedCreatorsShelfProps> = ({
         >
           {title}
         </span>
-        {showViewAll && onViewAll && (
-          <button
-            onClick={onViewAll}
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: '#F59E0B',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            See all
-          </button>
-        )}
+      </div>
       </div>
 
       {/* Scroll row */}
