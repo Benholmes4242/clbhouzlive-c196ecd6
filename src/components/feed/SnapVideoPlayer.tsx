@@ -126,17 +126,41 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
       if (useNative) {
         video.src = hlsUrl || mp4Url || '';
       } else {
+        // Prefetch status check
+        const prefetchStatus = isPrefetchComplete(hlsUrl) ? 'hit' : 'miss';
+        feedPerf.onPrefetchCheck(feedIndex, hlsUrl, prefetchStatus);
+
         // Check pool for a pre-buffered instance first
+        feedPerf.onHlsAttachStart(feedIndex, hlsUrl);
         const pooledHls = HLSPoolManager.promote(hlsUrl, video);
+        feedPerf.onPoolCheck(feedIndex, hlsUrl, !!pooledHls);
 
         if (pooledHls) {
           hlsRef.current = pooledHls;
           pooledHls.startLoad();
+
+          // Wire perf listeners on pooled instance
+          pooledHls.on(Hls.Events.MANIFEST_PARSED, () => {
+            feedPerf.onHlsManifestParsed(feedIndex, hlsUrl, pooledHls.levels.length);
+          });
+          pooledHls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
+            const level = pooledHls.levels[data.level];
+            if (level) feedPerf.onQualitySwitch(feedIndex, hlsUrl, level.height, Math.round(level.bitrate / 1000));
+          });
         } else {
           const hls = new Hls(HLS_CONFIG);
           hlsRef.current = hls;
           hls.loadSource(hlsUrl || mp4Url || '');
           hls.attachMedia(video);
+
+          // Wire perf listeners on new instance
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            feedPerf.onHlsManifestParsed(feedIndex, hlsUrl, hls.levels.length);
+          });
+          hls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
+            const level = hls.levels[data.level];
+            if (level) feedPerf.onQualitySwitch(feedIndex, hlsUrl, level.height, Math.round(level.bitrate / 1000));
+          });
         }
       }
 
