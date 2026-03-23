@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { pauseAllAudio } from '@/utils/globalVideoMute';
 
 export interface MediaViewerItem {
   id: string;
