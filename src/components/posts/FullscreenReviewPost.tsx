@@ -307,8 +307,33 @@ export function FullscreenReviewPost({
         />
       )}
       
-      {/* Review info overlay — top panel for both preview and live */}
-      {(mode === 'preview' || mode === 'live') ? (
+      {/* Review info overlay — preview uses CreatorCapsule (matches Clubhouse), live uses top panel */}
+      {mode === 'preview' && user ? (
+        <CreatorCapsule
+          user={{
+            id: 'preview',
+            name: user.name || 'You',
+            username: user.username,
+            avatar: user.avatar,
+          }}
+          isReview={true}
+          reviewData={{
+            courseId,
+            courseName,
+            courseLocation: heroSubtitle || '',
+            rating,
+            tierLabel: tierData.label,
+            sourceReviewId: reviewId || '',
+          }}
+          onReviewTap={() => handleOpenReviewSheet({} as React.MouseEvent)}
+          isVisible={true}
+          caption=""
+          golfCourse={null}
+          isFollowing={false}
+          isOwnPost={true}
+          bottomOffset="calc(env(safe-area-inset-bottom, 0px) + 160px)"
+        />
+      ) : mode === 'live' ? (
         <motion.button
           initial={false}
           animate={{ opacity: 1, y: 0 }}
