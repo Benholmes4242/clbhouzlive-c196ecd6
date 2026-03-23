@@ -360,6 +360,17 @@ export function TournamentResultsCard({
       {/* ── DIVIDER ─────────────────────────────────────────────────── */}
       <div style={{ height: 1, background: 'hsl(var(--border))', margin: '0' }} />
 
+      {/* ── CLBHOUZ CALLED IT ───────────────────────────────────────── */}
+      {allPicks && allPicks.length > 0 && (
+        <div style={{
+          background: 'rgba(245,158,11,0.015)',
+          borderTop: '1px solid hsl(var(--border))',
+          borderBottom: '1px solid hsl(var(--border))',
+        }}>
+          <ClubhouzCalledItSection allPicks={allPicks} tourSlug={tourSlug} />
+        </div>
+      )}
+
       {/* ── FINAL LEADERBOARD ───────────────────────────────────────── */}
       <div style={{ padding: '12px 16px 8px' }}>
         <div style={{

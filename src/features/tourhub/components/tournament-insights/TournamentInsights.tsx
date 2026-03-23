@@ -20,6 +20,10 @@ import { StaleBadge } from './StaleBadge';
 import IntelligenceTabSwitcher from './components/IntelligenceTabSwitcher';
 import { TournamentResultsCard } from './TournamentResultsCard';
 import { NextUpPickCard } from './NextUpPickCard';
+import { usePickHistory, type PickHistoryEntry } from '../../hooks/usePickHistory';
+import { createPortal } from 'react-dom';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { useNavigate } from 'react-router-dom';
 
 type IntelligenceTab = 'courseDNA' | 'predictions';
 
