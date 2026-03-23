@@ -10,6 +10,10 @@ export interface CourseCardData {
   country: string | null;
   region: string | null;
   subCountry: string | null;
+  courseType: string | null;
+  regionalRank: number | null;
+  countryRank: number | null;
+  majorChampionships: string[] | null;
 }
 
 export function useCourseCardData(courseId: string | null | undefined, enabled: boolean) {
@@ -19,7 +23,7 @@ export function useCourseCardData(courseId: string | null | undefined, enabled: 
       if (!courseId) throw new Error('No course id');
       const { data, error } = await supabase
         .from('golf_courses')
-        .select('global_rank, latitude, longitude, thumbnail_image, has_hosted_major, country, region, sub_country')
+        .select('global_rank, latitude, longitude, thumbnail_image, has_hosted_major, country, region, sub_country, course_type, regional_rank, country_rank, major_championships')
         .eq('id', courseId)
         .maybeSingle();
       if (error || !data) throw new Error('Course not found');
@@ -32,6 +36,10 @@ export function useCourseCardData(courseId: string | null | undefined, enabled: 
         country: data.country,
         region: data.region,
         subCountry: data.sub_country,
+        courseType: data.course_type,
+        regionalRank: data.regional_rank,
+        countryRank: data.country_rank,
+        majorChampionships: data.major_championships,
       };
     },
     enabled: !!courseId && enabled,

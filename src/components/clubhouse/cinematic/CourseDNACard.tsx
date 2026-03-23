@@ -112,6 +112,47 @@ export function CourseDNACard({ courseId, courseName, courseCountry, mapboxToken
           <ChevronRight style={{ width: 16, height: 16, color: 'rgba(255,255,255,0.4)', flexShrink: 0, marginTop: 2 }} />
         </div>
 
+        {/* Stats chips — only render non-null values, max 3 */}
+        {(() => {
+          const stats: { label: string; value: string }[] = [];
+          if (courseData?.courseType) {
+            const label = courseData.courseType.charAt(0).toUpperCase() + courseData.courseType.slice(1);
+            stats.push({ label: 'Type', value: label });
+          }
+          if (courseData?.globalRank) {
+            stats.push({ label: 'World', value: `#${courseData.globalRank}` });
+          }
+          if (courseData?.countryRank) {
+            stats.push({ label: region, value: `#${courseData.countryRank}` });
+          }
+          if (courseData?.majorChampionships?.length) {
+            stats.push({ label: 'Majors', value: `${courseData.majorChampionships.length}` });
+          }
+          const visible = stats.slice(0, 3);
+          if (!visible.length) return null;
+          return (
+            <div style={{ display: 'flex', gap: 5, marginBottom: 8 }}>
+              {visible.map((s) => (
+                <div key={s.label} style={{
+                  flex: 1,
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '0.5px solid rgba(255,255,255,0.08)',
+                  borderRadius: 7,
+                  padding: '4px 6px',
+                  textAlign: 'center' as const,
+                }}>
+                  <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase' as const, letterSpacing: '0.05em', marginBottom: 2 }}>
+                    {s.label}
+                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>
+                    {s.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
+
         {/* Played / Bucket list toggles */}
         <div style={{ display: 'flex', gap: 6 }}>
           <button
@@ -130,7 +171,7 @@ export function CourseDNACard({ courseId, courseName, courseCountry, mapboxToken
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="20 6 9 17 4 12" />
             </svg>
-            I've played this
+            Played
           </button>
 
           <button
