@@ -208,15 +208,14 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
 
     const handlePlaying = () => {
       setVideoReady(true);
-      feedPerf.onFirstFrame(feedIndex, hlsUrl);
       if (!firstFrameFiredRef.current) {
         firstFrameFiredRef.current = true;
         onFirstFrameReady?.();
       }
     };
 
-    const handleWaiting = () => feedPerf.onStallStart(feedIndex, hlsUrl);
-    const handlePlayingRecovery = () => feedPerf.onStallEnd(feedIndex, hlsUrl);
+    const handleWaiting = () => {};
+    const handlePlayingRecovery = () => {};
 
     video.addEventListener('playing', handlePlaying);
     video.addEventListener('waiting', handleWaiting);
