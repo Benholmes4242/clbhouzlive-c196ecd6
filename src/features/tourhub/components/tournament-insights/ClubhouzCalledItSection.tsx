@@ -112,14 +112,24 @@ export const ClubhouzCalledItSection: React.FC<ClubhouzCalledItSectionProps> = (
         overflow: 'hidden',
         position: 'relative',
         background: isWinner
-          ? 'linear-gradient(135deg, rgba(255,248,230,0.95), rgba(255,252,240,0.98))'
+          ? 'linear-gradient(135deg, rgba(255,248,230,0.95) 0%, rgba(255,252,240,0.98) 100%)'
           : 'rgba(240,253,244,0.95)',
         border: isWinner
           ? '1.5px solid rgba(245,158,11,0.5)'
           : '1px solid rgba(22,163,74,0.3)',
-        boxShadow: isWinner ? '0 0 20px rgba(245,158,11,0.12)' : 'none',
+        boxShadow: isWinner
+          ? '0 0 20px rgba(245,158,11,0.12), 0 4px 16px rgba(0,0,0,0.06)'
+          : '0 4px 16px rgba(0,0,0,0.06)',
       }}>
-        {/* Winner shimmer overlay */}
+        {/* Amber top bar */}
+        {isWinner && (
+          <div style={{
+            height: 3,
+            background: 'linear-gradient(90deg, #F59E0B, rgba(245,158,11,0.2))',
+          }} />
+        )}
+
+        {/* Gold shimmer overlay */}
         {isWinner && (
           <div style={{
             position: 'absolute', inset: 0,
@@ -131,14 +141,6 @@ export const ClubhouzCalledItSection: React.FC<ClubhouzCalledItSectionProps> = (
           }} />
         )}
 
-        {/* Winner top bar */}
-        {isWinner && (
-          <div style={{
-            height: 3,
-            background: 'linear-gradient(90deg, #F59E0B, rgba(245,158,11,0.2))',
-          }} />
-        )}
-
         <div style={{ padding: '16px 18px', position: 'relative', zIndex: 1 }}>
           {/* Stamp badge + pick rank */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
@@ -146,13 +148,13 @@ export const ClubhouzCalledItSection: React.FC<ClubhouzCalledItSectionProps> = (
               display: 'inline-flex', alignItems: 'center', gap: 5,
               padding: '5px 10px',
               borderRadius: 8,
-              background: isWinner ? 'rgba(245,158,11,0.15)' : 'rgba(22,163,74,0.12)',
+              background: isWinner ? '#F59E0B' : 'rgba(22,163,74,0.12)',
               animation: 'stampIn 0.5s ease-out 0.3s both',
             }}>
               <span style={{ fontSize: 12 }}>{isWinner ? '🏆' : '✓'}</span>
               <span style={{
                 fontSize: 11, fontWeight: 800,
-                color: isWinner ? '#92400E' : '#ffffff',
+                color: isWinner ? '#451A03' : '#16A34A',
                 letterSpacing: '0.02em',
               }}>
                 {isWinner ? 'Clbhouz Called It' : 'Top Pick'}
@@ -166,48 +168,65 @@ export const ClubhouzCalledItSection: React.FC<ClubhouzCalledItSectionProps> = (
               fontSize: 11, fontWeight: 700,
               color: 'hsl(var(--muted-foreground))',
             }}>
-              #1
+              Pick #{heroPick.predictedRank}
             </div>
           </div>
 
-          {/* Player name */}
-          <div style={{
-            fontSize: 22, fontWeight: 900,
-            color: 'hsl(var(--foreground))',
-            letterSpacing: '-0.02em',
-            lineHeight: 1.15,
-            marginBottom: 4,
-            animation: 'fadeUp 0.4s ease-out 0.3s both',
-          }}>
-            {heroPick.playerName}
-          </div>
+          {/* Player name + result */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 4 }}>
+            <div>
+              <div style={{
+                fontSize: 24, fontWeight: 900,
+                color: 'hsl(var(--foreground))',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.15,
+                marginBottom: 4,
+                animation: 'fadeUp 0.4s ease-out 0.3s both',
+              }}>
+                {heroPick.playerName}
+              </div>
+              <div style={{
+                fontSize: 13, fontWeight: 600,
+                color: isWinner ? '#92400E' : '#16A34A',
+                animation: 'fadeUp 0.4s ease-out 0.4s both',
+              }}>
+                {isWinner
+                  ? 'Won the tournament'
+                  : heroPick.actualPosition
+                    ? `Finished ${heroPick.actualPositionTied ? 'T' : ''}${getOrdinal(heroPick.actualPosition)}`
+                    : heroPick.performanceStatus === 'cut'
+                      ? 'Missed the cut'
+                      : heroPick.performanceStatus === 'withdrawn'
+                        ? 'Withdrawn'
+                        : 'Did not finish'
+                }
+              </div>
+            </div>
 
-          {/* Result line */}
-          <div style={{
-            fontSize: 13, fontWeight: 600,
-            color: isWinner ? 'hsl(var(--accent-amber))' : '#16A34A',
-            marginBottom: 10,
-          }}>
-            {isWinner
-              ? 'Won the tournament'
-              : heroPick.actualPosition
-                ? `Finished ${heroPick.actualPositionTied ? 'T' : ''}${getOrdinal(heroPick.actualPosition)}`
-                : heroPick.performanceStatus === 'cut'
-                  ? 'Missed the cut'
-                  : heroPick.performanceStatus === 'withdrawn'
-                    ? 'Withdrawn'
-                    : 'Did not finish'
-            }
-          </div>
-
-          {/* Score */}
-          <div style={{
-            fontSize: 32, fontWeight: 900,
-            color: isWinner ? 'hsl(var(--accent-amber))' : 'hsl(var(--foreground))',
-            letterSpacing: '-0.04em',
-            lineHeight: 1,
-          }}>
-            {formatScore(heroPick.score)}
+            {/* Score — right-aligned */}
+            <div style={{ textAlign: 'right' as const, flexShrink: 0 }}>
+              <div style={{
+                fontSize: 36, fontWeight: 900,
+                color: isWinner ? '#D97706' : 'hsl(var(--foreground))',
+                letterSpacing: '-0.04em',
+                lineHeight: 1,
+              }}>
+                {heroPick.score !== null && heroPick.score !== undefined
+                  ? heroPick.score > 0 ? `+${heroPick.score}` : `${heroPick.score}`
+                  : '—'}
+              </div>
+              {isWinner && (
+                <div style={{
+                  fontSize: 9, fontWeight: 800,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase' as const,
+                  color: '#B45309',
+                  marginTop: 2,
+                }}>
+                  Winner
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
