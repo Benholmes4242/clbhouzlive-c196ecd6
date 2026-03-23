@@ -6,10 +6,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import type { SuggestedCreator } from '@/components/watch/hooks/useSuggestedCreators';
 
-function shortName(displayName: string): string {
+function splitName(displayName: string): { first: string; last: string } {
   const parts = (displayName || '').trim().split(/\s+/);
-  if (parts.length < 2) return parts[0] || '?';
-  return `${parts[0]} ${parts[parts.length - 1][0]}.`;
+  if (parts.length < 2) return { first: parts[0] || '?', last: '' };
+  return { first: parts[0], last: parts.slice(1).join(' ') };
 }
 
 interface SuggestedCreatorCardProps {
