@@ -133,21 +133,38 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
         )}
       </div>
 
-      {/* Name */}
-      <p
+      {/* Name — two lines */}
+      <div
         onClick={handleProfileTap}
-        className="text-center truncate cursor-pointer"
-        style={{
-          fontSize: 13,
-          fontWeight: 600,
-          color: isDark ? '#ffffff' : 'hsl(var(--foreground))',
-          maxWidth: 108,
-          marginTop: 8,
-          lineHeight: '16px',
-        }}
+        className="text-center cursor-pointer"
+        style={{ maxWidth: 108, marginTop: 8 }}
       >
-        {shortName(creator.displayName)}
-      </p>
+        <p
+          className="truncate"
+          style={{
+            fontSize: 13,
+            fontWeight: 600,
+            color: isDark ? '#ffffff' : 'hsl(var(--foreground))',
+            lineHeight: '16px',
+          }}
+        >
+          {splitName(creator.displayName).first}
+        </p>
+        {splitName(creator.displayName).last && (
+          <p
+            className="truncate"
+            style={{
+              fontSize: 11,
+              fontWeight: 500,
+              color: isDark ? 'rgba(255,255,255,0.7)' : 'hsl(var(--muted-foreground))',
+              lineHeight: '14px',
+              marginTop: 1,
+            }}
+          >
+            {splitName(creator.displayName).last}
+          </p>
+        )}
+      </div>
 
       {/* Stat pill */}
       <div
