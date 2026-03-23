@@ -522,33 +522,32 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
 
   // Regular mode collapsed content
   const regularCollapsedContent = (
-    <div
-      className="w-full flex items-center gap-3 px-3 py-2.5"
-    >
-      {/* Avatar + Name — tappable for profile */}
+    <div className="w-full flex items-center gap-3 px-3 py-2.5">
+
+      {/* Avatar — tappable for profile */}
       <button
         type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          handleViewProfile();
-        }}
-        className="flex items-center gap-3 flex-shrink-0 active:opacity-70 transition-opacity"
+        onClick={(e) => { e.stopPropagation(); handleViewProfile(); }}
+        className="flex-shrink-0 active:opacity-70 transition-opacity"
         style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
       >
-        <SquircleAvatar
-          size={40}
-          src={user?.avatar}
-          alt={user?.name ?? 'Creator'}
-          fallback={initials}
-          hideRing
-        />
-        <span className="text-[13px] font-semibold text-white truncate">
-          {user?.name || 'Golfer'}
-        </span>
+        <SquircleAvatar size={40} src={user?.avatar} alt={user?.name ?? 'Creator'} fallback={initials} hideRing />
       </button>
 
-      {/* Caption + course location — tappable for toggle */}
-      <div onClick={handleToggle} style={{ cursor: 'pointer', flex: 1, minWidth: 0 }}>
+      {/* Name + caption + course — fills remaining space, taps toggle */}
+      <div className="flex-1 min-w-0" onClick={handleToggle} style={{ cursor: 'pointer' }}>
+        {/* Name — tappable for profile, stops propagation so it doesn't toggle */}
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); handleViewProfile(); }}
+          className="active:opacity-70 transition-opacity"
+          style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}
+        >
+          <span className="text-[13px] font-semibold text-white truncate">
+            {user?.name || 'Golfer'}
+          </span>
+        </button>
+
         {/* Caption preview (collapsed) */}
         {!isExpanded && truncatedCaption && (
           <div className="text-[11px] text-white/60 line-clamp-1 mt-0.5" style={{ ['--mention-color' as any]: 'rgba(255,255,255,0.75)' }}>
