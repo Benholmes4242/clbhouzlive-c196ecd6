@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { invalidateCourseRatingCaches } from '@/utils/invalidateCourseRatingCaches';
 import {
   Dialog,
   DialogContent,
