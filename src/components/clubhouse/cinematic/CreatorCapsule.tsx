@@ -619,7 +619,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           // Review mode: narrower, floating with more edge spacing
           isReview 
             ? 'left-5 right-auto max-w-[300px]' 
-            : 'left-4 max-w-[75vw] min-w-[160px]'
+            : 'left-4 max-w-[80vw] min-w-[200px]'
         )}
         style={{
           bottom: bottomOffset 
