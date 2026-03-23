@@ -5,11 +5,8 @@ import { Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { SuggestedCreator } from '@/components/watch/hooks/useSuggestedCreators';
 
-function shortName(displayName: string): string {
-  const parts = (displayName || '').trim().split(/\s+/);
-  if (parts.length < 2) return parts[0] || '?';
-  return `${parts[0]} ${parts[parts.length - 1][0]}.`;
-}
+
+
 
 interface SuggestedCreatorCardProps {
   creator: SuggestedCreator;
