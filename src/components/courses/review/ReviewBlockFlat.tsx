@@ -34,6 +34,7 @@ interface ReviewBlockFlatProps {
   isHighlighted?: boolean;
   onToggleHelpful?: (id: string, value: 'helpful' | 'unhelpful' | 'clear') => void;
   onMediaClick?: (index: number) => void;
+  onUserClick?: () => void;
   disabled?: boolean;
 }
 
