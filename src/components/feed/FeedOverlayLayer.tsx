@@ -73,6 +73,8 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   const commentCount = getCommentCount(activePost);
   const isFollowed = getFollowState(activePost);
   const isVideo = activePost.mediaItems?.[0]?.type === 'video';
+  const mediaCount = activePost.mediaItems?.length ?? 0;
+  const currentMediaIdx = carouselPositions.get(activeIndex) ?? 0;
 
   return (
     <div
