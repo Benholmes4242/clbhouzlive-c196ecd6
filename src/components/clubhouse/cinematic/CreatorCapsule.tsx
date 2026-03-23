@@ -21,7 +21,7 @@ import { FiMapPin } from 'react-icons/fi';
 import { getProfilePathById } from '@/lib/profileRoutes';
 import { CourseDNACard } from './CourseDNACard';
 
-import { getOverlayRatingColors, type ExtractedReviewData } from '@/lib/postHelpers';
+import { type ExtractedReviewData } from '@/lib/postHelpers';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import PostContentWithTags from '@/components/posts/PostContentWithTags';
 
@@ -160,10 +160,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     setIsExpanded(false);
   }, [postId]);
 
-  const reviewRatingColors = isReview && reviewData
-    ? getOverlayRatingColors(reviewData.rating)
-    : null;
-  const isOutstanding = isReview && reviewData && reviewData.rating >= 9.0;
 
   const handleToggle = useCallback(() => {
     if (isReview) {
@@ -377,14 +373,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   // Review mode content - matches regular capsule layout exactly
   const reviewContent = reviewData && (() => {
     const accent = '#f59e0b';
-    const tierLabel = (() => {
-      const r = reviewData.rating;
-      if (r >= 9.0) return 'Outstanding';
-      if (r >= 8.0) return 'Excellent';
-      if (r >= 7.0) return 'Very Good';
-      if (r >= 6.5) return 'Good';
-      return 'Fair';
-    })();
 
     const locationParts = [
       (reviewData as any).courseSubCountry || (reviewData as any).courseRegion,
@@ -400,108 +388,158 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           e.stopPropagation();
           onReviewTap?.();
         }}
-        style={{ cursor: 'pointer' }}
+        style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden' }}
       >
-        {/* Tier-coloured accent bar at very top */}
+        {/* Watermark score — bleeds into background */}
+        <div style={{
+          position: 'absolute',
+          top: -14,
+          right: -6,
+          fontSize: 120,
+          fontWeight: 900,
+          color: 'rgba(245,158,11,0.055)',
+          lineHeight: 1,
+          letterSpacing: '-0.05em',
+          userSelect: 'none',
+          pointerEvents: 'none',
+          fontFamily: 'Georgia, serif',
+        }}>
+          {reviewData.rating.toFixed(1)}
+        </div>
+
+        {/* Amber accent bar */}
         <div style={{
           height: 2.5,
           background: `linear-gradient(90deg, ${accent}CC, transparent)`,
         }} />
 
-        <div className="px-3 pt-2.5 pb-2.5">
-          {/* Row 1: Avatar + Name + Rating pill */}
-          <div className="flex items-center gap-2 mb-2">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onBeforeNavigate?.();
-                handleViewProfile();
-              }}
-              className="flex items-center gap-2 min-w-0 flex-1 active:opacity-70 transition-opacity"
-              style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}
-            >
-              <SquircleAvatar
-                size={32}
-                src={user?.avatar}
-                alt={user?.name ?? 'Creator'}
-                fallback={initials}
-                hideRing
-              />
-              <span className="flex-1 min-w-0 text-[13px] font-semibold text-white truncate">
-                {user?.name || 'Golfer'}
+        <div style={{ padding: '10px 14px 13px', position: 'relative' }}>
+          {/* Row 1: COURSE REVIEW badge + live score */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 8,
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+              background: 'rgba(245,158,11,0.12)',
+              border: '0.5px solid rgba(245,158,11,0.35)',
+              borderRadius: 6,
+              padding: '3px 8px',
+            }}>
+              <span style={{
+                fontSize: 8,
+                fontWeight: 800,
+                color: accent,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase' as const,
+              }}>
+                ★ Course Review
               </span>
-            </button>
-            {/* Rating pill */}
-            <div
-              className="flex items-center gap-1 flex-shrink-0"
-              style={{
-                background: 'rgba(245,158,11,0.15)',
-                border: '0.5px solid rgba(245,158,11,0.4)',
-                borderRadius: 8,
-                padding: '3px 7px',
-              }}
-            >
-              <span style={{ fontSize: 13, fontWeight: 700, color: accent, lineHeight: 1 }}>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
+              <span style={{
+                fontSize: 24,
+                fontWeight: 900,
+                color: accent,
+                lineHeight: 1,
+                letterSpacing: '-0.04em',
+                fontFamily: 'Georgia, serif',
+              }}>
                 {reviewData.rating.toFixed(1)}
+              </span>
+              <span style={{
+                fontSize: 10,
+                fontWeight: 500,
+                color: 'rgba(245,158,11,0.45)',
+              }}>
+                /10
               </span>
             </div>
           </div>
 
-          {/* Row 2: Course name */}
-          <div
-            className="text-[13px] font-semibold text-white/95 mb-1 truncate"
-            style={{ lineHeight: 1.3 }}
-          >
+          {/* Row 2: Course name — the headline */}
+          <div style={{
+            fontSize: 18,
+            fontWeight: 900,
+            color: '#ffffff',
+            lineHeight: 1.15,
+            letterSpacing: '-0.03em',
+            fontFamily: 'Georgia, serif',
+            marginBottom: 4,
+          }}>
             {reviewData.courseName}
           </div>
 
-          {/* Row 3: Location + tier label */}
-          {(locationStr || tierLabel) && (
-            <div className="flex items-center gap-1.5 mb-1.5">
-              {(reviewData as any).courseCountry && (
-                <span style={{ fontSize: 11 }}>📍</span>
-              )}
-              {locationStr && (
-                <span className="text-[11px] text-white/50 truncate">
-                  {locationStr}
-                </span>
-              )}
-              {tierLabel && (
-                <span
-                  className="flex-shrink-0"
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 700,
-                    color: accent,
-                    letterSpacing: '0.08em',
-                    opacity: 0.85,
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  · {tierLabel}
-                </span>
-              )}
+          {/* Row 3: Location */}
+          {locationStr && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+              marginBottom: 10,
+            }}>
+              <span style={{ fontSize: 11 }}>📍</span>
+              <span style={{
+                fontSize: 11,
+                color: 'rgba(255,255,255,0.38)',
+              }}>
+                {locationStr}
+              </span>
             </div>
           )}
 
-          {/* Row 4: Review text preview (2 lines max) */}
+          {/* Divider */}
+          <div style={{
+            height: 0.5,
+            background: `linear-gradient(90deg, rgba(245,158,11,0.3) 0%, transparent 80%)`,
+            marginBottom: 10,
+          }} />
+
+          {/* Row 4: Reviewer */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            marginBottom: 8,
+          }}>
+            <SquircleAvatar
+              size={28}
+              src={user?.avatar}
+              alt={user?.name ?? 'Creator'}
+              fallback={initials}
+              hideRing
+            />
+            <span style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: 'rgba(255,255,255,0.7)',
+            }}>
+              {user?.name || 'Golfer'}
+            </span>
+          </div>
+
+          {/* Row 5: Review text preview */}
           {captionText && (
-            <div
-              className="text-[11px] text-white/50 mb-2"
-              style={{
-                lineHeight: 1.4,
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-              }}
-            >
-              {captionText}
+            <div style={{
+              fontSize: 12,
+              color: 'rgba(255,255,255,0.42)',
+              lineHeight: 1.5,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical' as const,
+              overflow: 'hidden',
+              marginBottom: 11,
+              fontStyle: 'italic',
+            }}>
+              "{captionText}"
             </div>
           )}
 
-          {/* Row 5: Read review CTA */}
+          {/* Row 6: Read review CTA */}
           <motion.button
             whileTap={{ scale: 0.97 }}
             type="button"
@@ -509,10 +547,20 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
               e.stopPropagation();
               onReviewTap?.();
             }}
-            className="flex items-center gap-0.5"
-            style={{ color: accent }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              color: accent,
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+            }}
           >
-            <span style={{ fontSize: 12, fontWeight: 600 }}>Read review</span>
+            <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.02em' }}>
+              Read full review
+            </span>
             <ChevronRight className="w-3 h-3" />
           </motion.button>
         </div>
@@ -595,7 +643,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
 
   // Determine border color based on mode
   const borderColor = isReview
-    ? 'rgba(210, 180, 97, 0.3)' 
+    ? 'rgba(245, 158, 11, 0.22)' 
     : 'rgba(255, 255, 255, 0.08)';
 
   return (
@@ -630,7 +678,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           'pointer-events-auto',
           // Review mode: narrower, floating with more edge spacing
           isReview 
-            ? 'left-5 right-auto max-w-[300px]' 
+            ? 'left-5 right-auto max-w-[320px]' 
             : 'left-4 max-w-[75vw] min-w-[160px]'
         )}
         style={{
@@ -660,7 +708,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             'rounded-xl'
           )}
           style={{ 
-            background: 'rgba(0, 0, 0, 0.35)',
+            background: isReview ? 'rgba(20, 13, 4, 0.95)' : 'rgba(0, 0, 0, 0.35)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             border: `1px solid ${borderColor}`,
