@@ -225,14 +225,14 @@ const AuthForm: React.FC<AuthFormProps> = ({
   const handleLogin = async () => {
     // Validation
     const isEmailValid = email.includes('@') && email.includes('.');
-    const isPasswordValid = password.length >= 6;
+    const isPasswordValid = password.length >= 8;
     
     if (!isEmailValid) {
       setEmailError("Please enter a valid email address");
       return;
     }
     if (!isPasswordValid) {
-      setPasswordError("Password must be at least 6 characters");
+      setPasswordError("Password must be at least 8 characters");
       return;
     }
 
