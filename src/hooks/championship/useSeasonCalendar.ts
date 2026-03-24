@@ -70,6 +70,8 @@ export function useSeasonCalendar() {
           is_current: isCurrent,
           days_remaining: daysRemaining,
           days_until_start: daysUntilStart,
+          sponsor_name: s.sponsor_name ?? null,
+          prize_description: s.prize_description ?? null,
         } as Season;
       });
     },

@@ -545,6 +545,12 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           isLoading={!seasonCalendar}
           onSeasonClick={(id) => console.log('Season chip clicked:', id)}
           seasonColor={seasonThemeColor}
+          sponsorName={currentSeason.sponsor_name ?? null}
+          prizeDescription={currentSeason.prize_description ?? null}
+          leaderCourses={allEntries[0]?.courses_this_season ?? 0}
+          yourCourses={currentUserEntry?.courses_this_season ?? 0}
+          yourSeasonRank={currentUserEntry?.current_rank ?? 0}
+          totalSeasonPlayers={allEntries.length}
         />
       )}
 
