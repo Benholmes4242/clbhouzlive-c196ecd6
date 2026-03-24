@@ -312,7 +312,7 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
 
   if (isLoading) {
     return (
-      <div className="px-5">
+      <div className="px-3">
         <HandicapLeaderboardSkeleton />
       </div>
     );
