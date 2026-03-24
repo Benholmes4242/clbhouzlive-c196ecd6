@@ -157,8 +157,8 @@ export const ReviewBlockFlat: React.FC<ReviewBlockFlatProps> = ({
 
         {/* Score badge */}
         <div
-          className="px-2.5 py-1 rounded-lg text-sm font-bold text-white"
-          style={{ background: 'linear-gradient(135deg, #f59e0b, #fbbf24)' }}
+          className="px-2.5 py-1 rounded-lg text-sm font-bold text-foreground"
+          style={{ background: 'rgba(245,158,11,0.06)' }}
         >
           {score.toFixed(1)}
         </div>
