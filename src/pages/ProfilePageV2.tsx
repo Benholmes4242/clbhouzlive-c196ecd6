@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { cn } from '@/lib/utils';
@@ -31,7 +32,7 @@ import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { safeGoBack } from '@/utils/navigation';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
-import { useQueryClient } from '@tanstack/react-query';
+
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
 import {
@@ -115,40 +116,28 @@ const ProfilePageV2Content: React.FC = () => {
   useMedianStatusBar("dark", "transparent", true, false);
   
   // If viewing via /profile/:username, fetch that profile; otherwise show own profile
-  const [profileUserId, setProfileUserId] = useState<string | undefined>(undefined);
-  const [isProfileDeleted, setIsProfileDeleted] = useState(false);
-  const [profileNotFound, setProfileNotFound] = useState(false);
-  
-  useEffect(() => {
-    const fetchProfileByUsernameOrId = async () => {
-      setIsProfileDeleted(false);
-      setProfileNotFound(false);
-      
-      if (routeUsername) {
-        // Support both UUID and username in route param
-        // Fetch id and deleted_at to check if profile exists and is active
-        const query = supabase.from('user_profiles').select('id, deleted_at');
-        const { data, error } = await (isUuid(routeUsername)
-          ? query.eq('id', routeUsername)
-          : query.eq('username', routeUsername)
-        ).maybeSingle();
-        
-        if (error || !data) {
-          setProfileNotFound(true);
-          setProfileUserId(undefined);
-        } else if (data.deleted_at != null) {
-          // Profile is soft-deleted
-          setIsProfileDeleted(true);
-          setProfileUserId(undefined);
-        } else {
-          setProfileUserId(data.id);
-        }
-      } else {
-        setProfileUserId(user?.id);
-      }
-    };
-    fetchProfileByUsernameOrId();
-  }, [routeUsername, user?.id]);
+  // Resolve profileUserId — cached query for username routes, synchronous for own profile
+  const { data: resolvedProfileId } = useQuery({
+    queryKey: ['profile-id-by-username', routeUsername],
+    enabled: !!routeUsername,
+    staleTime: 10 * 60 * 1000,
+    queryFn: async () => {
+      const query = supabase.from('user_profiles').select('id, deleted_at');
+      const { data, error } = await (isUuid(routeUsername!)
+        ? query.eq('id', routeUsername!)
+        : query.eq('username', routeUsername!)
+      ).maybeSingle();
+      if (error || !data) return { id: null as string | null, deleted: false, notFound: true };
+      if (data.deleted_at != null) return { id: null as string | null, deleted: true, notFound: false };
+      return { id: data.id, deleted: false, notFound: false };
+    },
+  });
+
+  const profileUserId: string | undefined = routeUsername
+    ? (resolvedProfileId?.id ?? undefined)
+    : user?.id;
+  const isProfileDeleted = resolvedProfileId?.deleted === true;
+  const profileNotFound = resolvedProfileId?.notFound === true;
   
   const { data: profile, isLoading: profileLoading } = useUserProfile(profileUserId);
   const { data: top100Overview } = useTop100Overview(profileUserId);
