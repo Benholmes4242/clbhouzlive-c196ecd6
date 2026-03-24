@@ -146,9 +146,13 @@ export const CourseSeasonSpotlight: React.FC<CourseSeasonSpotlightProps> = ({ on
                   fontSize: 12,
                   fontWeight: 600,
                   color: 'rgba(255,255,255,0.85)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
                 }}
               >
-                ⭐ {spotlight.avg_rating.toFixed(1)} ({spotlight.rating_count})
+                <img src="/assets/logomark-orange.png" alt="" style={{ width: 14, height: 14 }} />
+                {spotlight.avg_rating.toFixed(1)}
               </div>
             </div>
           </div>
