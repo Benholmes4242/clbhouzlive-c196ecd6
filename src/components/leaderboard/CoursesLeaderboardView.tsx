@@ -530,6 +530,14 @@ export function CoursesLeaderboardView() {
         </section>
       ) : null}
 
+      {/* 1b. Season Spotlight — NEW */}
+      <CourseSeasonSpotlight onCourseClick={handleCourseClick} />
+
+      {/* 1c. Bucket List Strip — NEW */}
+      <div className="-mx-3">
+        <BucketListStrip onCourseClick={handleCourseClick} />
+      </div>
+
       {/* 2. Sort tabs — single row */}
       <div className="mt-4">
         <CourseFilters
@@ -538,14 +546,27 @@ export function CoursesLeaderboardView() {
         />
       </div>
 
+      {/* 2b. Region pills — NEW */}
+      <CourseRegionPills
+        value={quickRegion}
+        onChange={(r) => {
+          handleScopeChange(r === 'global' ? 'global' : 'country');
+          setQuickRegion(r);
+          if (r !== 'global') {
+            setSelectedRegion(null);
+            setSelectedSubRegion(null);
+          }
+        }}
+      />
+
       {/* Course Rankings Section */}
-      <section className="-mx-5">
-        <div className="px-5 mb-5">
+      <section className="-mx-3">
+        <div className="px-3 mb-5">
           <h2 className="text-2xl font-bold text-foreground" style={{ letterSpacing: '-0.3px' }}>Course Rankings</h2>
           <p className="text-base text-muted-foreground mt-0.5">
-            {sort === 'most_played' && "The world's greatest courses by rounds played"}
-            {sort === 'highest_rated' && "The world's greatest courses by community rating"}
-            {sort === 'rising' && "The world's greatest courses trending right now"}
+            {sort === 'most_played' && `The world's greatest courses by rounds played${quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
+            {sort === 'highest_rated' && `The world's greatest courses by community rating${quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
+            {sort === 'rising' && `The world's greatest courses trending right now${quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
           </p>
         </div>
 
