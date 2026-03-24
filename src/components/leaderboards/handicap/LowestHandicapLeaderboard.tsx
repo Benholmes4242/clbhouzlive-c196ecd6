@@ -39,7 +39,7 @@ function HandicapLeaderboardSkeleton() {
 
 function InlineRetryCard({ onRetry }: { onRetry: () => void }) {
   return (
-    <div className="py-4 px-5">
+    <div className="py-4 px-3">
       <button
         onClick={onRetry}
         className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-muted text-sm text-muted-foreground active:scale-[0.98] active:opacity-70 transition-all"
@@ -52,7 +52,7 @@ function InlineRetryCard({ onRetry }: { onRetry: () => void }) {
 
 function InitialErrorState({ onRetry }: { onRetry: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-5 text-center space-y-4">
+    <div className="flex flex-col items-center justify-center py-12 px-3 text-center space-y-4">
       <p className="text-muted-foreground text-sm">Something went wrong loading the leaderboard.</p>
       <button
         onClick={onRetry}
@@ -67,7 +67,7 @@ function InitialErrorState({ onRetry }: { onRetry: () => void }) {
 // --- Empty State ---
 function EmptyState({ scope, clubName }: { scope: string; clubName?: string | null }) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-5 text-center space-y-4">
+    <div className="flex flex-col items-center justify-center py-16 px-3 text-center space-y-4">
       <div className="flex items-center justify-center" style={{ opacity: 0.2 }}>
         <Target size={48} className="text-muted-foreground" />
       </div>
@@ -303,7 +303,7 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
   // Initial error
   if (isError && allEntries.length === 0 && !isLoading) {
     return (
-      <div className="px-5 space-y-5">
+      <div className="px-3 space-y-4">
         {scopeSelector}
         <InitialErrorState onRetry={() => refetch()} />
       </div>
@@ -312,7 +312,7 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
 
   if (isLoading) {
     return (
-      <div className="px-5">
+      <div className="px-3">
         <HandicapLeaderboardSkeleton />
       </div>
     );
@@ -320,7 +320,7 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
 
   if (!isError && allEntries.length === 0) {
     return (
-      <div className="px-5 space-y-5">
+      <div className="px-3 space-y-4">
         {scopeSelector}
         <EmptyState scope={scope} clubName={clubName} />
       </div>

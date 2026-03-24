@@ -10,7 +10,7 @@ export function ExplorationProgressStrip({ userId }: ExplorationProgressStripPro
 
   if (isLoading) {
     return (
-      <div className="px-4 py-3">
+      <div className="px-2 py-3">
         <div className="h-12 bg-muted/30 rounded-xl animate-pulse" />
       </div>
     );
@@ -18,7 +18,7 @@ export function ExplorationProgressStrip({ userId }: ExplorationProgressStripPro
 
   if (!status || status.countries_count === 0) {
     return (
-      <div className="px-4 py-3">
+      <div className="px-2 py-3">
         <div className="flex items-center justify-center gap-2 p-4 bg-teal-50 rounded-xl border border-teal-100">
           <Globe className="w-5 h-5 text-teal-600" />
           <span className="text-sm text-teal-700">
@@ -40,7 +40,7 @@ export function ExplorationProgressStrip({ userId }: ExplorationProgressStripPro
   };
 
   return (
-    <div className="px-4 py-3">
+    <div className="px-2 py-3">
       <div className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl p-4 border border-teal-100/50">
         <div className="flex items-center justify-center gap-8">
           {/* Countries */}

@@ -26,7 +26,7 @@ export function HandicapPodium({ entries, currentUserId, mode, seasonColor }: Ha
   const delays = { 1: 0, 2: 0.1, 3: 0.2 };
 
   return (
-    <div className="w-full pt-4 pb-8 px-5">
+    <div className="w-full pt-4 pb-8 px-3">
       <div className="flex items-start justify-center gap-3">
         {/* 2nd place (left) */}
         <HandicapPodiumSlot

@@ -25,7 +25,7 @@ export function GlobalGolfersMapStatsRow({
 
   return (
     <div 
-      className="flex items-center gap-3 px-4 py-3 rounded-xl"
+      className="flex items-center gap-3 px-2 py-3 rounded-xl"
       style={{
         background: gradient.subtleTint,
         border: `1px solid ${gradient.tint}`,
