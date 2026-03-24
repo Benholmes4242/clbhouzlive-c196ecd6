@@ -65,7 +65,7 @@ export function ExplorerProfileCard({
               size={48}
               src={avatarUrl || undefined}
               alt={displayName}
-              fallbackText={displayName.charAt(0)}
+              fallback={displayName.charAt(0)}
             />
           </div>
 
