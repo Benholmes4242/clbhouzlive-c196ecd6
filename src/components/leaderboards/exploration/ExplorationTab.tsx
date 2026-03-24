@@ -490,9 +490,9 @@ export function ExplorationTab() {
       )}
 
       {/* Initial loading */}
-      {isLoading ? (
-        <LeaderboardLoading />
-      ) : !isError && allEntries.length === 0 ? (
+      {isLoading && allEntries.length === 0 ? (
+        <GlobalTabSkeleton />
+      ) : !isError && allEntries.length === 0 && !isLoading ? (
         <LeaderboardEmpty
           title="No explorers yet"
           description={
