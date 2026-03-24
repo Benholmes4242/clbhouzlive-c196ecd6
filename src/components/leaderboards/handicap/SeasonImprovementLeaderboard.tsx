@@ -75,8 +75,10 @@ export function SeasonImprovementLeaderboard({
       {/* Insight Banner */}
       <HandicapInsightBanner 
         userRank={userRank} 
-        improvement30d={userImprovement}
-        mode="season" 
+        mode="season"
+        scope="global"
+        scopeLabel="globally"
+        userId={user?.id}
       />
 
       {/* Rankings List (4th onwards) */}
