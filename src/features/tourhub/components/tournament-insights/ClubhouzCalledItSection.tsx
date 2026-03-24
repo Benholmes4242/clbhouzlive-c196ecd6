@@ -102,7 +102,7 @@ export const ClubhouzCalledItSection: React.FC<ClubhouzCalledItSectionProps> = (
         color: 'hsl(var(--muted-foreground))',
         marginBottom: 12, paddingLeft: 16,
       }}>
-        Clbhouz Called It
+        clbhouz Called It
       </div>
 
       {/* ── HERO PICK CARD ─────────────────────────────────────────── */}
