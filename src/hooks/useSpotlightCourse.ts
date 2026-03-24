@@ -29,16 +29,17 @@ export interface SpotlightCourse {
  * as the period start. When the season flips automatically, this card
  * resets and re-ranks from the new season start date.
  */
-export function useSpotlightCourse(currentUserId?: string) {
+export function useSpotlightCourse() {
   return useQuery<SpotlightCourse | null>({
-    queryKey: ['spotlight-course', 'season', currentUserId],
+    queryKey: ['spotlight-course', 'season'],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
       const { data, error } = await supabase.rpc('get_course_leaderboard', {
         p_sort_by: 'most_played',
         p_time_period: 'season',
         p_limit: 1,
         p_offset: 0,
-        p_current_user_id: currentUserId ?? null,
+        p_current_user_id: user?.id ?? null,
         p_country: null,
         p_sub_country: null,
         p_exclude_countries: null,

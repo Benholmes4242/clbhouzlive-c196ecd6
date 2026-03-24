@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useSpotlightCourse } from '@/hooks/useSpotlightCourse';
-import { useAuth } from '@/hooks/useAuth';
 
 interface CourseSeasonSpotlightProps {
   onCourseClick: (courseId: string) => void;
 }
 
 export const CourseSeasonSpotlight: React.FC<CourseSeasonSpotlightProps> = ({ onCourseClick }) => {
-  const { user } = useAuth();
-  const { data: spotlight, isLoading } = useSpotlightCourse(user?.id);
+  const { data: spotlight, isLoading } = useSpotlightCourse();
   const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
