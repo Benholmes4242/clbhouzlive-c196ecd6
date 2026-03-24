@@ -113,10 +113,10 @@ function UserSearch({
       if (!query.trim() || query.length < 2) return [];
       const { data } = await supabase
         .from('user_profiles')
-        .select('id, display_name, avatar_url')
+        .select('id, display_name, profile_photo_url')
         .ilike('display_name', `%${query}%`)
         .limit(8);
-      return (data ?? []) as UserSearchResult[];
+      return (data ?? []).map((d: any) => ({ id: d.id, display_name: d.display_name, avatar_url: d.profile_photo_url })) as UserSearchResult[];
     },
     enabled: query.length >= 2,
     staleTime: 10_000,
