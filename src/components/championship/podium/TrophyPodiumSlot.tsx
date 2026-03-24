@@ -16,37 +16,40 @@ interface TrophyPodiumSlotProps {
 
 const POSITION_CONFIG = {
   1: {
-    avatarSize: 120,
     mobileAvatarSize: 120,
     nameClass: 'text-[17px] font-bold',
     crownSize: 36,
     verticalOffset: 0,
     boxShadow: '0 8px 28px hsl(var(--accent-amber) / 0.25)',
-    podiumHeight: 88,
-    courseSize: 22,
-    courseWeight: 900,
+    statSize: 24,
+    statWeight: 800,
+    labelSize: 13,
+    badgeSize: 26,
+    badgeBg: 'hsl(var(--accent-amber))',
   },
   2: {
-    avatarSize: 88,
     mobileAvatarSize: 88,
     nameClass: 'text-[15px] font-semibold',
     crownSize: 0,
     verticalOffset: 24,
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-    podiumHeight: 68,
-    courseSize: 18,
-    courseWeight: 700,
+    statSize: 20,
+    statWeight: 700,
+    labelSize: 12,
+    badgeSize: 22,
+    badgeBg: '#A8B4C0',
   },
   3: {
-    avatarSize: 88,
     mobileAvatarSize: 88,
     nameClass: 'text-[15px] font-semibold',
     crownSize: 0,
     verticalOffset: 40,
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-    podiumHeight: 52,
-    courseSize: 18,
-    courseWeight: 700,
+    statSize: 20,
+    statWeight: 700,
+    labelSize: 12,
+    badgeSize: 22,
+    badgeBg: '#C4956A',
   },
 } as const;
 
@@ -158,12 +161,12 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
         <div
           className="absolute -bottom-1.5 -right-0.5 flex items-center justify-center font-bold text-white shadow-md"
           style={{
-            width: position === 1 ? 26 : 22,
-            height: position === 1 ? 26 : 22,
+            width: config.badgeSize,
+            height: config.badgeSize,
             borderRadius: '50%',
-            backgroundColor: position === 1 ? 'hsl(var(--accent-amber))' : position === 2 ? '#A8B4C0' : '#C4956A',
+            backgroundColor: config.badgeBg,
             border: '2px solid hsl(var(--background))',
-            fontSize: (position === 1 ? 26 : 22) * 0.45,
+            fontSize: config.badgeSize * 0.45,
             boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
           }}
         >
@@ -171,50 +174,29 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
         </div>
       </div>
 
-      {/* Podium base block */}
-      <div
-        className="w-full mt-2 flex flex-col items-center justify-center"
-        style={{
-          height: config.podiumHeight,
-          borderRadius: '10px 10px 0 0',
-          background: position === 1
-            ? `linear-gradient(180deg, ${seasonThemeColor}20 0%, ${seasonThemeColor}08 100%)`
-            : '#F8FAFC',
-          borderTop: position === 1
-            ? `2px solid ${seasonThemeColor}40`
-            : '1px solid #E2E8F0',
-        }}
-      >
-        {/* Name */}
-        <p className={cn('text-foreground leading-tight text-center', config.nameClass)}>
+      {/* Name */}
+      <div className="mt-3 text-center">
+        <p className={cn('text-foreground leading-tight', config.nameClass)}>
           {nameParts.firstName}
         </p>
         {nameParts.lastName && (
-          <p className={cn('text-foreground leading-tight text-center', config.nameClass)}>
+          <p className={cn('text-foreground leading-tight', config.nameClass)}>
             {nameParts.lastName}
           </p>
         )}
-
-        {/* Course count — hero stat */}
-        <motion.div
-          className="text-center mt-0.5"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: animationDelay + 0.3, duration: 0.3 }}
-        >
-          <span
-            className="font-black leading-none"
-            style={{
-              color: position === 1 ? seasonThemeColor : '#0F172A',
-              fontSize: config.courseSize,
-              fontWeight: config.courseWeight,
-            }}
-          >
-            {entry.courses_logged}
-          </span>
-          <span className="text-[10px] text-muted-foreground ml-0.5 block">courses</span>
-        </motion.div>
       </div>
+
+      {/* Course count */}
+      <motion.p
+        className="font-bold mt-0.5"
+        style={{ color: seasonThemeColor, fontSize: config.statSize, fontWeight: config.statWeight }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: animationDelay + 0.3, duration: 0.3 }}
+      >
+        {entry.courses_logged}
+        <span className="font-normal text-muted-foreground ml-1" style={{ fontSize: config.labelSize }}>courses</span>
+      </motion.p>
     </motion.div>
   );
 };
