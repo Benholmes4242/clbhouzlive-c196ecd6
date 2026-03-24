@@ -171,7 +171,7 @@ const ClubhouseContent = () => {
   }, [activeFeed.posts]);
 
   const isLoading = activeFeed.isLoading;
-  const hasNextPage = activeFeed.hasNextPage ?? true;
+  const hasNextPage = activeFeed.hasNextPage ?? false;
   
   // Skeleton timing
   const { 
