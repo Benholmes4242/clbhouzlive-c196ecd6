@@ -706,7 +706,7 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode, on
             </div>
           )}
         </div>
-      </button>
+      </div>
 
       {/* Inset divider — starts after avatar column */}
       <div className="ml-[72px] border-b border-border/30" />
