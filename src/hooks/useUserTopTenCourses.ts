@@ -78,10 +78,17 @@ export function useUserTopTenCourses(userId: string | undefined) {
       // 2. Get exclusions
       const { data: exclusionsData } = await supabase
         .from('user_top10_exclusions')
-        .select('course_id')
+        .select('course_id, position')
         .eq('user_id', userId);
 
       const excludedIds = (exclusionsData || []).map(e => e.course_id);
+
+      // Positions the user deliberately left empty — auto-fill must not touch these
+      const intentionallyEmptyPositions = new Set(
+        (exclusionsData || [])
+          .map(e => e.position)
+          .filter((p): p is number => p !== null && p !== undefined)
+      );
 
       // 3. Calculate how many auto slots we need
       const autoSlotsNeeded = 10 - pinnedCourses.length;
