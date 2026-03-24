@@ -576,6 +576,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                   handleReviewMediaClick(filteredMyReview.media, index);
                 }
               }}
+              onUserClick={() => navigate(getProfilePathById(filteredMyReview.user_id))}
             />
             {/* Response for my review */}
             {(() => {
