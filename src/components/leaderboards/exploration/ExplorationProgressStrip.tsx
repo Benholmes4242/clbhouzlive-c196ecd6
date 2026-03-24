@@ -10,7 +10,7 @@ export function ExplorationProgressStrip({ userId }: ExplorationProgressStripPro
 
   if (isLoading) {
     return (
-      <div className="px-4 py-3">
+      <div className="px-2 py-3">
         <div className="h-12 bg-muted/30 rounded-xl animate-pulse" />
       </div>
     );
