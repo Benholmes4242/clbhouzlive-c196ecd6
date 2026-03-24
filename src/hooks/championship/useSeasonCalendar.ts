@@ -18,6 +18,12 @@ export interface Season {
   days_until_start: number | null;
   sponsor_name: string | null;
   prize_description: string | null;
+  season_winner_user_id: string | null;
+  season_winner_courses: number | null;
+  prize_claimed: boolean;
+  winner_display_name?: string | null;
+  winner_avatar_url?: string | null;
+  winner_club_name?: string | null;
 }
 
 export function useSeasonCalendar() {
