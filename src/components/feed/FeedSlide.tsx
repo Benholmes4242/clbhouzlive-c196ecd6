@@ -39,6 +39,11 @@ export const FeedSlide = memo(function FeedSlide({
 
   // ── Content routing ──
   const renderContent = () => {
+    // Blank system card — pure black, no content
+    if (post.postType === 'blank') {
+      return null;
+    }
+
     // Tournament result card
     if (post.postType === 'tournament_result') {
       const likeState = getLikeState?.(post) ?? { isLiked: false, count: 0 };

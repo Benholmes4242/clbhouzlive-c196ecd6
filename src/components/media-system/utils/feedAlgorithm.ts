@@ -131,7 +131,36 @@ export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
   const filtered = filterForSuggested(noLive);
   const capped = capPerCreator(filtered);
   const interleaved = interleaveReviews(capped, 'suggested');
-  return deduplicatePosts(interleaved);
+  const deduped = deduplicatePosts(interleaved);
+
+  // Inject a blank system card at slot 3 (index 2)
+  if (deduped.length >= 2) {
+    const blankPost: FeedPost = {
+      id: '__blank_system__',
+      userId: '__system__',
+      actorType: 'system',
+      actorId: '__system__',
+      username: '',
+      displayName: '',
+      avatarUrl: '',
+      isVerified: false,
+      creatorRelation: 'system',
+      caption: '',
+      mediaItems: [],
+      createdAt: new Date().toISOString(),
+      likeCount: 0,
+      commentCount: 0,
+      shareCount: 0,
+      review: null,
+      isReview: false,
+      isLikedByMe: false,
+      isFollowedByMe: false,
+      postType: 'blank',
+    };
+    deduped.splice(2, 0, blankPost);
+  }
+
+  return deduped;
 }
 
 // ── Full Friends Feed Pipeline ────────────────────────────────────────────────
