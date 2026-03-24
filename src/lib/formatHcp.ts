@@ -69,12 +69,13 @@ export function getHandicapStatusLabel(handicap: number): string | null {
 export function getHandicapStatusColor(handicap: number, _seasonColor?: string): string {
   const tier = getHandicapTier(handicap);
   switch (tier) {
-    case 'plus': return '#C1A84C';
+    case 'elite': return '#C1A84C';
     case 'scratch': return '#2D6A4F';
-    case 'single': return '#F5A623';
-    case 'low': return '#5B7FA6';
-    case 'mid': return '#8896A8';
-    case 'high': return '#B0BAC7';
+    case 'player': return '#F5A623';
+    case 'single': return '#3B82F6';
+    case 'midfielder': return '#5B7FA6';
+    case 'weekend': return '#8896A8';
+    case 'hacker': return '#B0BAC7';
   }
 }
 
