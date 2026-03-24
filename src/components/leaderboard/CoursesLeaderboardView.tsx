@@ -22,6 +22,9 @@ import {
   type CourseTimeRange,
   type CourseScope 
 } from './courses';
+import { CourseRegionPills, type QuickRegion } from './courses/CourseRegionPills';
+import { BucketListStrip } from './courses/BucketListStrip';
+import { CourseSeasonSpotlight } from './courses/CourseSeasonSpotlight';
 
 const PAGE_SIZE = 20;
 
