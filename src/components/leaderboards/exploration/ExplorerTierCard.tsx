@@ -42,7 +42,7 @@ export function ExplorerTierCard({
         <div className="flex items-start gap-3">
           {/* Icon tile */}
           <div
-            className="flex items-center justify-center flex-shrink-0"
+            className="flex items-center justify-center flex-shrink-0 overflow-visible"
             style={{
               width: 52,
               height: 52,
@@ -51,7 +51,7 @@ export function ExplorerTierCard({
               border: `1.5px solid ${tier.color}30`,
             }}
           >
-            <span style={{ fontSize: 26 }}>{tier.icon}</span>
+            <span style={{ fontSize: 26, lineHeight: 1 }}>{tier.icon}</span>
           </div>
 
           {/* Text */}
