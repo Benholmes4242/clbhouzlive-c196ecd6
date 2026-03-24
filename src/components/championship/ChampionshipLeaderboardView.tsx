@@ -193,7 +193,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
       const { data, error } = await supabase
         .from('user_profiles')
-        .select('primary_club_id, handicap_index, country, golf_clubs!user_profiles_primary_club_id_fkey(id, name)')
+        .select('primary_club_id, country, golf_clubs!user_profiles_primary_club_id_fkey(id, name)')
         .eq('id', userId)
         .single();
 
@@ -207,8 +207,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         const clubData = Array.isArray(data.golf_clubs) ? data.golf_clubs[0] : data.golf_clubs;
         setUserHomeClubName(clubData?.name || null);
       }
-      setUserHandicap((data as any)?.handicap_index ?? null);
-      setUserCountry((data as any)?.country ?? null);
+      setUserCountry(data?.country ?? null);
     };
 
     fetchUserProfile();
