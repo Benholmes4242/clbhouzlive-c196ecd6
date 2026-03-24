@@ -95,7 +95,7 @@ export const CourseStatusToggle: React.FC<CourseStatusToggleProps> = ({
           }}
         >
           {isPlayed && <Check className="h-4 w-4" />}
-          {isPlayed ? 'Played' : 'Mark Played'}
+          {isPlayed ? 'Played' : 'Mark as Played'}
         </button>
 
         {/* Want to Play — Outline with orange tint when active */}

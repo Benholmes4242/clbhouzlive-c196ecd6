@@ -64,7 +64,9 @@ export function useRemoveRating({
       await queryClient.refetchQueries({ queryKey: ['userTop100Courses'], type: 'active', exact: false });
       await queryClient.refetchQueries({ queryKey: ['user-played-courses-full'], type: 'active', exact: false });
       await queryClient.refetchQueries({ queryKey: ['user-top-ten-courses'], type: 'active', exact: false });
-      
+      await queryClient.refetchQueries({ queryKey: ['course-personal-status'], type: 'active', exact: false });
+      await queryClient.refetchQueries({ queryKey: ['user-course-moments'], type: 'active', exact: false });
+
       // Trigger badge checking for the user (non-blocking)
       try {
         const { data: userResponse } = await supabase.auth.getUser();
