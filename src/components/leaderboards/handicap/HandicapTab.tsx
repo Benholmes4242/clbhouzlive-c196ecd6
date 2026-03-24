@@ -163,7 +163,7 @@ export function HandicapTab() {
           <div className="space-y-3">
             {/* Scope pills — Section 4.2 */}
             <div
-              className="flex overflow-x-auto no-scrollbar justify-center"
+              className="flex overflow-x-auto no-scrollbar"
               style={{ gap: 8 }}
             >
               {SCOPE_OPTIONS.map(opt => {

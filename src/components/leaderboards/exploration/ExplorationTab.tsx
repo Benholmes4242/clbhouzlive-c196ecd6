@@ -43,7 +43,37 @@ function ExplorationLeaderboardSkeleton() {
         <div key={i} className="flex items-center gap-3 p-3">
           <Skeleton className="h-8 w-6 rounded" />
           <Skeleton className="h-10 w-10 rounded-lg" />
-          <div className="flex-1 space-y-1.5">
+          <div className="flex-1 min-w-0 space-y-1.5">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+          <Skeleton className="h-6 w-16" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Full-page skeleton for initial Global tab load */
+function GlobalTabSkeleton() {
+  return (
+    <div className="flex flex-col px-3 pt-3 space-y-4 animate-pulse">
+      {/* Profile card skeleton */}
+      <Skeleton className="h-[130px] w-full rounded-[18px]" />
+      {/* Tier card skeleton */}
+      <Skeleton className="h-[100px] w-full rounded-[18px]" />
+      {/* Map preview skeleton */}
+      <Skeleton className="h-[180px] w-full rounded-[18px]" />
+      {/* Continent stats skeleton */}
+      <Skeleton className="h-12 w-full rounded-xl" />
+      {/* View mode toggle skeleton */}
+      <Skeleton className="h-9 w-48 rounded-full mx-auto" />
+      {/* Leaderboard rows */}
+      {[...Array(3)].map((_, i) => (
+        <div key={i} className="flex items-center gap-3 p-3">
+          <Skeleton className="h-8 w-6 rounded" />
+          <Skeleton className="h-10 w-10 rounded-lg" />
+          <div className="flex-1 min-w-0 space-y-1.5">
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-3 w-20" />
           </div>
@@ -372,24 +402,41 @@ export function ExplorationTab() {
 
   return (
     <div className="flex flex-col px-3 pt-3" style={{ gap: 14 }}>
-      {/* 1. Explorer Profile Card (NEW) */}
-      {user && userStatus && (countriesPlayed > 0 || (currentUserEntry?.courses_count ?? 0) > 0) && (
-        <ExplorerProfileCard
-          displayName={currentUserProfile?.display_name ?? user.email ?? 'You'}
-          avatarUrl={currentUserProfile?.profile_photo_url ?? null}
-          homeClub={userHomeClubName}
-          userId={user.id}
-          coursesCount={currentUserEntry?.courses_count ?? 0}
-          countriesCount={countriesPlayed}
-          continentsCount={continentsPlayed}
-          countryList={userStatus.country_list ?? []}
-          globalRank={userStatus.global_rank ?? null}
-          seasonColor={seasonThemeColor}
-        />
-      )}
+      {/* 1 + 2. Explorer Status Section — Profile + Tier merged */}
+      {user && userStatus && (countriesPlayed > 0 || (currentUserEntry?.courses_count ?? 0) > 0) ? (
+        <div className="flex flex-col">
+          {/* Eyebrow label */}
+          <p className="text-muted-foreground uppercase tracking-wider" style={{ fontSize: 10, fontWeight: 600, letterSpacing: '1.2px', marginBottom: 6 }}>
+            Your Explorer Status
+          </p>
 
-      {/* 2. Explorer Tier Card + Ladder (NEW) */}
-      {user && userStatus && (
+          <div className="flex flex-col gap-2">
+            <ExplorerProfileCard
+              displayName={currentUserProfile?.display_name ?? user.email ?? 'You'}
+              avatarUrl={currentUserProfile?.profile_photo_url ?? null}
+              homeClub={userHomeClubName}
+              userId={user.id}
+              coursesCount={currentUserEntry?.courses_count ?? 0}
+              countriesCount={countriesPlayed}
+              continentsCount={continentsPlayed}
+              countryList={userStatus.country_list ?? []}
+              globalRank={userStatus.global_rank ?? null}
+              seasonColor={seasonThemeColor}
+            />
+
+            {/* Amber divider */}
+            <div style={{ height: 1, background: 'hsl(var(--accent-amber) / 0.12)' }} />
+
+            <ExplorerTierCard
+              tier={userTier}
+              nextTier={nextTier}
+              countriesCount={countriesPlayed}
+              continentsCount={continentsPlayed}
+            />
+            <ExplorerTierLadder currentTier={userTier} />
+          </div>
+        </div>
+      ) : user && userStatus && (
         <div>
           <ExplorerTierCard
             tier={userTier}
@@ -443,9 +490,9 @@ export function ExplorationTab() {
       )}
 
       {/* Initial loading */}
-      {isLoading ? (
-        <LeaderboardLoading />
-      ) : !isError && allEntries.length === 0 ? (
+      {isLoading && allEntries.length === 0 ? (
+        <GlobalTabSkeleton />
+      ) : !isError && allEntries.length === 0 && !isLoading ? (
         <LeaderboardEmpty
           title="No explorers yet"
           description={

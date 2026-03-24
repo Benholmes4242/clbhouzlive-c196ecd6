@@ -24,7 +24,7 @@ const getRankSuffix = (rank: number): string => {
   }
 };
 
-const MAX_FLAGS = 8;
+const MAX_FLAGS = 6;
 
 export function ExplorerProfileCard({
   displayName,

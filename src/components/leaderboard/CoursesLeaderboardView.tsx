@@ -406,19 +406,29 @@ export function CoursesLeaderboardView() {
   if (isLoading && allCourses.length === 0 && !isError) {
     return (
       <div className="space-y-4 pb-8 animate-fade-in">
-        <div className="px-4 space-y-4">
-          <Skeleton className="h-10 w-full rounded-xl" />
-          <Skeleton className="h-10 w-full rounded-xl" />
+        {/* Bucket list strip skeleton */}
+        <Skeleton className="h-[72px] w-full rounded-xl" />
+        {/* Season spotlight skeleton */}
+        <Skeleton className="h-[88px] w-full rounded-2xl" />
+        {/* Filter pills row */}
+        <div className="flex gap-2 px-4">
+          <Skeleton className="h-9 w-20 rounded-full" />
+          <Skeleton className="h-9 w-20 rounded-full" />
+          <Skeleton className="h-9 w-20 rounded-full" />
+          <Skeleton className="h-9 w-20 rounded-full" />
         </div>
+        {/* Course rows */}
         <div className="space-y-0">
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+          {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="flex items-center gap-3 py-3 px-4 border-b border-border">
               <Skeleton className="w-6 h-5 rounded" />
-              <Skeleton className="w-14 h-10 rounded-lg" />
-              <div className="flex-1 space-y-2">
+              <Skeleton className="w-14 h-14 rounded-xl flex-shrink-0" />
+              <div className="flex-1 space-y-1.5">
                 <Skeleton className="h-4 w-3/4" />
                 <Skeleton className="h-3 w-1/2" />
+                <Skeleton className="h-3 w-2/3" />
               </div>
+              <Skeleton className="w-6 h-10 rounded" />
             </div>
           ))}
         </div>
