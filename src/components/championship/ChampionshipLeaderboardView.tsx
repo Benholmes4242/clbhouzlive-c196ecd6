@@ -670,6 +670,30 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
             onUserClick={handleUserClick}
           />
         )}
+        {timeFilter === 'all_time' && completedSeasonsWithWinners.length > 0 && (
+          <div className="space-y-4 mb-4">
+            {completedSeasonsWithWinners.map(season => {
+              const winnerId = season.season_winner_user_id!;
+              const profile = winnerProfiles[winnerId];
+              const seasonId = mapToSeasonId(season.name);
+              const config = getSeasonConfig(seasonId);
+              return (
+                <SeasonWinnerCard
+                  key={season.season_id}
+                  seasonLabel={config.title}
+                  winnerName={profile?.display_name || 'Champion'}
+                  winnerAvatarUrl={profile?.avatar_url}
+                  winnerClubName={profile?.club_name}
+                  winnerCourses={season.season_winner_courses ?? 0}
+                  sponsorName={season.sponsor_name}
+                  prizeDescription={season.prize_description}
+                  prizeClaimed={season.prize_claimed}
+                  endDate={season.end_date}
+                />
+              );
+            })}
+          </div>
+        )}
         {timeFilter === 'all_time' && allTimePodiumData && allTimePodiumData.length > 0 && (
           <HallOfFamePodium
             entries={allTimePodiumData}
