@@ -446,11 +446,30 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       {/* Compact rating context */}
       <section className="px-4 py-4">
         <div className="flex flex-col items-center gap-1">
-          <span
-            className="text-[40px] font-extrabold leading-none tabular-nums text-foreground"
-          >
-            {communityScore.toFixed(1)}
-          </span>
+          {/* Score ring */}
+          <div className="relative w-24 h-24">
+            <svg className="w-24 h-24 -rotate-90">
+              <circle cx="48" cy="48" r="42" fill="none" stroke="rgba(245,158,11,0.06)" strokeWidth="8" />
+              <circle 
+                cx="48" cy="48" r="42" fill="none" 
+                stroke="url(#reviewsScoreGradient)" 
+                strokeWidth="8" strokeLinecap="round"
+                strokeDasharray={`${(communityScore / 10) * 2 * Math.PI * 42} ${2 * Math.PI * 42}`}
+                className="transition-all duration-1000 ease-out"
+              />
+              <defs>
+                <linearGradient id="reviewsScoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#f59e0b" />
+                  <stop offset="100%" stopColor="#fbbf24" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-3xl font-bold text-foreground tabular-nums leading-none">
+                {communityScore.toFixed(1)}
+              </span>
+            </div>
+          </div>
           <span
             className="text-sm font-bold uppercase tracking-[0.05em]"
             style={{ color: '#d97706' }}
