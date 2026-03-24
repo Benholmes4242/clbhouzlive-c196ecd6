@@ -78,7 +78,7 @@ export function useSuggestedFeed(userId: string | undefined) {
   );
 
   const resetSeen = useCallback(() => {
-    seenPostIds.current = [];
+    seenPostIds.current = new Set();
   }, []);
 
   return {
