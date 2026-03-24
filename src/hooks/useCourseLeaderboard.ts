@@ -40,6 +40,7 @@ type UseCourseLeaderboardArgs = {
   pageSize?: number;
   region?: string | null;
   subRegion?: string | null;
+  excludeCountries?: string[] | null;
 };
 
 type CourseLeaderboardPage = {
