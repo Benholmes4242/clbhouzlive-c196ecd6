@@ -402,24 +402,41 @@ export function ExplorationTab() {
 
   return (
     <div className="flex flex-col px-3 pt-3" style={{ gap: 14 }}>
-      {/* 1. Explorer Profile Card (NEW) */}
-      {user && userStatus && (countriesPlayed > 0 || (currentUserEntry?.courses_count ?? 0) > 0) && (
-        <ExplorerProfileCard
-          displayName={currentUserProfile?.display_name ?? user.email ?? 'You'}
-          avatarUrl={currentUserProfile?.profile_photo_url ?? null}
-          homeClub={userHomeClubName}
-          userId={user.id}
-          coursesCount={currentUserEntry?.courses_count ?? 0}
-          countriesCount={countriesPlayed}
-          continentsCount={continentsPlayed}
-          countryList={userStatus.country_list ?? []}
-          globalRank={userStatus.global_rank ?? null}
-          seasonColor={seasonThemeColor}
-        />
-      )}
+      {/* 1 + 2. Explorer Status Section — Profile + Tier merged */}
+      {user && userStatus && (countriesPlayed > 0 || (currentUserEntry?.courses_count ?? 0) > 0) ? (
+        <div className="flex flex-col">
+          {/* Eyebrow label */}
+          <p className="text-muted-foreground uppercase tracking-wider" style={{ fontSize: 10, fontWeight: 600, letterSpacing: '1.2px', marginBottom: 6 }}>
+            Your Explorer Status
+          </p>
 
-      {/* 2. Explorer Tier Card + Ladder (NEW) */}
-      {user && userStatus && (
+          <div className="flex flex-col gap-2">
+            <ExplorerProfileCard
+              displayName={currentUserProfile?.display_name ?? user.email ?? 'You'}
+              avatarUrl={currentUserProfile?.profile_photo_url ?? null}
+              homeClub={userHomeClubName}
+              userId={user.id}
+              coursesCount={currentUserEntry?.courses_count ?? 0}
+              countriesCount={countriesPlayed}
+              continentsCount={continentsPlayed}
+              countryList={userStatus.country_list ?? []}
+              globalRank={userStatus.global_rank ?? null}
+              seasonColor={seasonThemeColor}
+            />
+
+            {/* Amber divider */}
+            <div style={{ height: 1, background: 'hsl(var(--accent-amber) / 0.12)' }} />
+
+            <ExplorerTierCard
+              tier={userTier}
+              nextTier={nextTier}
+              countriesCount={countriesPlayed}
+              continentsCount={continentsPlayed}
+            />
+            <ExplorerTierLadder currentTier={userTier} />
+          </div>
+        </div>
+      ) : user && userStatus && (
         <div>
           <ExplorerTierCard
             tier={userTier}
