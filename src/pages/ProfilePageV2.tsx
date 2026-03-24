@@ -32,7 +32,7 @@ import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { safeGoBack } from '@/utils/navigation';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
-import { useQueryClient } from '@tanstack/react-query';
+
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
 import {
