@@ -134,6 +134,13 @@ export const MediaViewerOverlay: React.FC = () => {
     return () => window.removeEventListener('keydown', handler);
   }, [isOpen, closeViewer, next, prev]);
 
+  // Pause all feed audio when viewer is open or slide changes
+  useEffect(() => {
+    if (isOpen) {
+      pauseAllAudio();
+    }
+  }, [isOpen, currentIndex]);
+
   // lock body scroll
   useEffect(() => {
     if (isOpen) {
