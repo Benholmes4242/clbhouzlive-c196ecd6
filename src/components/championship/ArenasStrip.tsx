@@ -99,7 +99,7 @@ export const ArenasStrip: React.FC<ArenasStripProps> = ({
             >
               <span className="text-base mb-1">{pill.icon}</span>
               <span
-                className="text-xl font-black leading-none"
+                className="text-[22px] font-black leading-none"
                 style={{ color: isActive ? pill.color : 'hsl(var(--foreground))' }}
               >
                 {pill.rank !== null ? `${pill.rank}${getRankSuffix(pill.rank)}` : '—'}
