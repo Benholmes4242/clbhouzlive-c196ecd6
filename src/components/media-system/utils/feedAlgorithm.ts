@@ -122,10 +122,15 @@ export function interleaveReviews(posts: FeedPost[], tab: FeedTab): FeedPost[] {
 const SUGGESTED_VIDEO_RATIO = 0.8; // 80% of regular (non-review) slots should be video
 
 /**
- * Weight the filtered post array toward video content.
- * Distributes videos and images in the configured ratio
- * while preserving relative chronological order within each type.
- * Review posts are untouched — they are handled by interleaveReviews separately.
+ * Weights non-review posts toward the configured video/image ratio.
+ *
+ * IMPORTANT CONTRACT:
+ * - This function intentionally STRIPS review posts from its return value.
+ * - Reviews are handled exclusively by interleaveReviews() at fixed slot positions.
+ * - Callers (buildSuggestedFeed) must re-append reviews from the input array
+ *   before passing to interleaveReviews, otherwise reviews will never appear.
+ *
+ * Do NOT change this to return reviews — it will break interleaveReviews slot logic.
  */
 export function weightByMediaType(posts: FeedPost[]): FeedPost[] {
   const reviews = posts.filter(p => isReviewPost(p));
