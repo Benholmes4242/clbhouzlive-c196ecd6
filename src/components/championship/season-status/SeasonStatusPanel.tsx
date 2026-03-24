@@ -1,7 +1,8 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { ActiveSeasonCard } from './ActiveSeasonCard';
-import { type SeasonId } from '@/lib/seasonConfig';
+import { SeasonSponsorCard } from './SeasonSponsorCard';
+import { type SeasonId, getSeasonConfig } from '@/lib/seasonConfig';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 
@@ -16,6 +17,13 @@ interface SeasonStatusPanelProps {
   onSeasonClick?: (seasonId: SeasonId) => void;
   seasonColor?: string;
   className?: string;
+  // Sponsor props
+  sponsorName?: string | null;
+  prizeDescription?: string | null;
+  leaderCourses?: number;
+  yourCourses?: number;
+  yourSeasonRank?: number;
+  totalSeasonPlayers?: number;
 }
 
 /**
@@ -32,6 +40,12 @@ export const SeasonStatusPanel: React.FC<SeasonStatusPanelProps> = ({
   onSeasonClick,
   seasonColor,
   className,
+  sponsorName,
+  prizeDescription,
+  leaderCourses,
+  yourCourses,
+  yourSeasonRank,
+  totalSeasonPlayers,
 }) => {
   if (isLoading) {
     return (
@@ -70,7 +84,7 @@ export const SeasonStatusPanel: React.FC<SeasonStatusPanelProps> = ({
   }
 
   return (
-    <div className={cn(className)}>
+    <div className={cn(className, 'space-y-4')}>
       <ActiveSeasonCard
         seasonId={currentSeasonId}
         daysRemaining={daysRemaining}
@@ -79,6 +93,20 @@ export const SeasonStatusPanel: React.FC<SeasonStatusPanelProps> = ({
         onSeasonSelect={onSeasonClick}
         seasonColor={seasonColor}
       />
+
+      {sponsorName && prizeDescription && (
+        <SeasonSponsorCard
+          sponsorName={sponsorName}
+          prizeDescription={prizeDescription}
+          seasonColor={seasonColor ?? '#006747'}
+          seasonLabel={getSeasonConfig(currentSeasonId).title}
+          leaderCourses={leaderCourses ?? 0}
+          yourCourses={yourCourses ?? 0}
+          yourSeasonRank={yourSeasonRank ?? 0}
+          totalSeasonPlayers={totalSeasonPlayers ?? 0}
+          daysRemaining={daysRemaining}
+        />
+      )}
     </div>
   );
 };

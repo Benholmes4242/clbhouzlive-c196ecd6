@@ -1,0 +1,1 @@
+UPDATE championship_seasons SET sponsor_name = 'golftrips.co.uk', prize_description = '5-night golf trip to Portugal' WHERE name ILIKE '%major%';

@@ -16,6 +16,8 @@ export interface Season {
   is_current: boolean;
   days_remaining: number | null;
   days_until_start: number | null;
+  sponsor_name: string | null;
+  prize_description: string | null;
 }
 
 export function useSeasonCalendar() {
@@ -33,7 +35,7 @@ export function useSeasonCalendar() {
       const now = new Date().toISOString();
       const { data: fallbackData, error: fallbackError } = await supabase
         .from('championship_seasons' as any)
-        .select('id, season_number, name, tagline, description, icon, color, status, start_date, end_date')
+        .select('id, season_number, name, tagline, description, icon, color, status, start_date, end_date, sponsor_name, prize_description')
         .order('start_date', { ascending: true });
       
       if (fallbackError || !fallbackData) {
@@ -68,6 +70,8 @@ export function useSeasonCalendar() {
           is_current: isCurrent,
           days_remaining: daysRemaining,
           days_until_start: daysUntilStart,
+          sponsor_name: s.sponsor_name ?? null,
+          prize_description: s.prize_description ?? null,
         } as Season;
       });
     },
