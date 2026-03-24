@@ -17,6 +17,8 @@ interface Course {
   prestige_tags: string[];
   current_user_played: boolean;
   current_user_play_count: number;
+  friends_count?: number;
+  friends_avg_rating?: number | null;
 }
 
 interface Props {
