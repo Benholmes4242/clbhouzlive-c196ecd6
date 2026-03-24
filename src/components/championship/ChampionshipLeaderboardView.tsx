@@ -11,6 +11,7 @@ import {
   useDivisionConfig,
   useSeasonCalendar,
 } from '@/hooks/championship';
+import { useArenaRanks } from '@/hooks/championship/useArenaRanks';
 import {
   ChampionshipFilters,
   BeatRivalCTA,
