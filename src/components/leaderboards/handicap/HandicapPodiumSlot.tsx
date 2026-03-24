@@ -49,7 +49,6 @@ export function HandicapPodiumSlot({
   mode = 'lowest',
 }: HandicapPodiumSlotProps) {
   const config = POSITION_CONFIG[rank];
-  const firstName = formatFirstName(displayName);
   const statusLabel = getHandicapStatusLabel(handicap);
   const badgeStyle = getHandicapBadgeStyle(handicap);
 
