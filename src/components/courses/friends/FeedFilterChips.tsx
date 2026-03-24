@@ -1,7 +1,7 @@
 import React from 'react';
 import { PillTabs, type PillOption } from '@/components/ui/PillTabs';
 
-export type FeedFilter = 'all' | 'trending' | 'new_for_you' | 'rounds';
+export type FeedFilter = 'all' | 'trending' | 'new_for_you';
 
 interface FeedFilterChipsProps {
   activeFilter: FeedFilter;
@@ -12,7 +12,6 @@ const FILTER_OPTIONS: PillOption[] = [
   { id: 'all', label: 'All' },
   { id: 'trending', label: 'Trending' },
   { id: 'new_for_you', label: 'New for you' },
-  { id: 'rounds', label: 'Rounds' },
 ];
 
 const FeedFilterChips: React.FC<FeedFilterChipsProps> = ({ activeFilter, onFilterChange }) => {
