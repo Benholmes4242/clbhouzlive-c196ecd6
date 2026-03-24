@@ -240,15 +240,15 @@ export function useUserTopTenCourses(userId: string | undefined) {
 
       }
 
-      // Add to exclusions so it won't auto-populate
+      // Add to exclusions so it won't auto-populate — preserve the vacated position
       const { error: excludeError } = await supabase
         .from('user_top10_exclusions')
         .upsert({
           user_id: userId,
           course_id: courseId,
+          position: course?.position ?? null,
         }, {
           onConflict: 'user_id,course_id',
-          ignoreDuplicates: true,
         });
 
       if (excludeError) throw excludeError;
