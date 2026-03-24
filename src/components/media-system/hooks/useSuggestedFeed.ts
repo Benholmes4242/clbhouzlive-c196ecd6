@@ -39,19 +39,21 @@ export function useSuggestedFeed(userId: string | undefined) {
         const posts = groupMultiMedia(rows.map(mapRowToFeedPost));
         const interleaved = buildSuggestedFeed(posts);
 
-        for (const post of interleaved) {
+        // Track ALL fetched post IDs — including ones filtered out —
+        // so the RPC doesn't waste candidate slots returning them again
+        for (const post of posts) {
           if (!seenPostIds.current.includes(post.id)) {
             seenPostIds.current.push(post.id);
           }
         }
-        // Keep only the last 200 to prevent unbounded growth
-        if (seenPostIds.current.length > 200) {
-          seenPostIds.current = seenPostIds.current.slice(-200);
+        if (seenPostIds.current.length > 500) {
+          seenPostIds.current = seenPostIds.current.slice(-500);
         }
 
         const lastRow = rows[rows.length - 1];
+        // Always advance cursor if we got any rows back — even if all were filtered.
         const nextCursor: string | undefined =
-          rows.length >= PAGE_SIZE ? lastRow.post_created_at : undefined;
+          rows.length > 0 ? lastRow.post_created_at : undefined;
 
         return { posts: interleaved, nextCursor };
       } catch (err) {
