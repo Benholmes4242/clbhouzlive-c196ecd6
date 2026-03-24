@@ -172,7 +172,12 @@ export function weightByMediaType(posts: FeedPost[]): FeedPost[] {
     }
   }
 
-  return [...regular, ...reviews];
+  // Return only weighted non-reviews. Reviews are excluded here because
+  // interleaveReviews (which runs next) separates reviews from the input
+  // and re-injects them at fixed slots. If we appended reviews at the end,
+  // they'd be stripped out and re-injected anyway — but bunching them at
+  // the tail could cause position drift if the array is truncated.
+  return regular;
 }
 
 // ── Full Suggested Feed Pipeline ──────────────────────────────────────────────
