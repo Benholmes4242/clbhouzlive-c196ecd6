@@ -91,11 +91,11 @@ export const CourseSeasonSpotlight: React.FC<CourseSeasonSpotlightProps> = ({ on
               display: 'inline-flex',
               gap: 6,
               alignItems: 'center',
-              animation: 'stampIn 0.4s cubic-bezier(0.34,1.56,0.64,1) 0.3s both',
+              animation: 'stampIn 0.5s ease-out 0.3s both',
             }}
           >
             <span style={{ fontSize: 12 }}>🔥</span>
-            <span style={{ fontSize: 11, fontWeight: 800, color: '#1a0e00', textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 11, fontWeight: 800, color: '#1a0e00', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
               This Season's Hottest
             </span>
           </div>
