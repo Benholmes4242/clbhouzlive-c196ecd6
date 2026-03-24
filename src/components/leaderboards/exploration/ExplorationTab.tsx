@@ -424,15 +424,6 @@ export function ExplorationTab() {
         </div>
       )}
 
-      {/* 5. Continent Breakdown Grid (NEW) */}
-      {allEntries.length > 0 && (
-        <ContinentBreakdownGrid
-          entries={allEntries}
-          activeContinent={activeContinent}
-          onContinentSelect={setActiveContinent}
-          seasonColor={seasonThemeColor}
-        />
-      )}
 
       {/* 6. View Mode Toggle (NEW) */}
       <ViewModeToggle value={viewMode} onChange={setViewMode} />
