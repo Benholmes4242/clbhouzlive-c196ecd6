@@ -72,7 +72,7 @@ export const ArenasStrip: React.FC<ArenasStripProps> = ({
 
   return (
     <div className="space-y-2">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground px-1">
+      <p className="text-[10px] font-semibold uppercase tracking-wider px-1" style={{ color: '#F5A623' }}>
         Your Rankings{seasonLabel ? ` · ${seasonLabel}` : ''}
       </p>
       <div
@@ -87,10 +87,10 @@ export const ArenasStrip: React.FC<ArenasStripProps> = ({
               onClick={() => onArenaChange(pill.id)}
               className="flex-shrink-0 flex flex-col items-center transition-all active:scale-[0.96]"
               style={{
-                minWidth: 88,
+                minWidth: 80,
                 borderRadius: 14,
                 padding: '10px 14px',
-                backgroundColor: isActive ? `${pill.color}0D` : 'hsl(var(--card))',
+                backgroundColor: isActive ? `${pill.color}15` : 'hsl(var(--card))',
                 border: isActive
                   ? `1.5px solid ${pill.color}88`
                   : '1.5px solid hsl(var(--border))',
@@ -99,9 +99,10 @@ export const ArenasStrip: React.FC<ArenasStripProps> = ({
             >
               <span className="text-base mb-1">{pill.icon}</span>
               <span
-                className="text-xl font-black leading-none"
+                className="text-[22px] font-black leading-none"
                 style={{ color: isActive ? pill.color : 'hsl(var(--foreground))' }}
               >
+                {/* TODO: Country and Club pills may show "—" when arenas RPC doesn't return rank for this user — data issue, not visual */}
                 {pill.rank !== null ? `${pill.rank}${getRankSuffix(pill.rank)}` : '—'}
               </span>
               <span className="text-[11px] font-semibold text-foreground mt-0.5 truncate max-w-[72px]">
