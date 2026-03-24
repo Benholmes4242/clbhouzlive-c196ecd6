@@ -195,6 +195,8 @@ export function HandicapTab() {
               <ClubSearchBar
                 selectedClubId={selectedClubId}
                 selectedClubName={selectedClubName}
+                userHomeClubId={userHomeClubId}
+                userHomeClubName={userHomeClubName}
                 onClubSelect={handleClubSelect}
               />
             )}
