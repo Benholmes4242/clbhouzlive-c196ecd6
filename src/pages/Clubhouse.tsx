@@ -32,7 +32,7 @@ import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFe
 import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
 import type { FeedPost, TournamentResultFeedPost } from '@/components/media-system/types/media';
 import { TournamentResultCard } from '@/components/clubhouse/cinematic/TournamentResultCard';
-import { buildSuggestedFeed, buildFriendsFeed } from '@/components/media-system/utils/feedAlgorithm';
+// buildSuggestedFeed/buildFriendsFeed are called inside the feed hooks — not here
 
 // ── Clubhouse UI overlays ──
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
@@ -165,12 +165,10 @@ const ClubhouseContent = () => {
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
   
   const posts = useMemo(() => {
-    if (activeTab === 'foryou') {
-      return buildSuggestedFeed(activeFeed.posts);
-    } else {
-      return buildFriendsFeed(activeFeed.posts);
-    }
-  }, [activeFeed.posts, activeTab]);
+    // Feed hooks already apply buildSuggestedFeed/buildFriendsFeed internally.
+    // Do NOT re-apply here — double-processing shifts review positions.
+    return activeFeed.posts;
+  }, [activeFeed.posts]);
 
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? true;
