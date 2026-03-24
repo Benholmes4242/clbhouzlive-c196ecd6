@@ -27,6 +27,7 @@ import { DivisionProgressPreview } from './DivisionProgressPreview';
 import { LeaderboardRowV3 } from './LeaderboardRowV3';
 import { RankCelebration } from './RankCelebration';
 import { MotivationalCarousel } from './MotivationalCarousel';
+import { SeasonRaceCard } from './SeasonRaceCard';
 // HallOfFameHeader is now integrated into HallOfFamePodium
 import { ClubSearchBar } from '@/components/leaderboards/exploration/ClubSearchBar';
 import { CountrySelector } from '@/components/leaderboards/shared/CountrySelector';
@@ -551,6 +552,20 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           yourCourses={currentUserEntry?.courses_this_season ?? 0}
           yourSeasonRank={currentUserEntry?.current_rank ?? 0}
           totalSeasonPlayers={allEntries.length}
+        />
+      )}
+
+      {/* 1b. Season Race Card — live position in season race */}
+      {timeFilter === 'seasonal' && currentSeason && (currentUserEntry?.courses_this_season ?? 0) > 0 && (
+        <SeasonRaceCard
+          seasonLabel={getSeasonConfig(currentSeasonId).title}
+          seasonColor={seasonThemeColor}
+          yourCourses={currentUserEntry?.courses_this_season ?? 0}
+          leaderCourses={allEntries[0]?.courses_this_season ?? 0}
+          yourRank={currentUserEntry?.current_rank ?? 0}
+          totalPlayers={allEntries.length}
+          daysRemaining={currentSeason.days_remaining ?? 0}
+          majorsBonusActive={currentSeasonId === 'major'}
         />
       )}
 
