@@ -47,6 +47,8 @@ type CourseLeaderboardPage = {
   entries: CourseLeaderboardEntry[];
 };
 
+const ROW_EXCLUDE = ['Britain & Ireland', 'USA', 'Continental Europe'];
+
 /**
  * Hook to fetch ALL courses with reviews (no Top 100 restriction).
  * For Top 100 only courses, use useTop100CourseLeaderboard instead.
@@ -61,6 +63,8 @@ export function useCourseLeaderboard(args: UseCourseLeaderboardArgs = {}) {
     subRegion = null,
     excludeCountries = null,
   } = args;
+
+  const isExcludeMode = excludeCountries && excludeCountries.length > 0;
 
   return useInfiniteQuery<CourseLeaderboardPage>({
     queryKey: ['course-leaderboard', scope, timeRange, sort, region, subRegion, excludeCountries],
