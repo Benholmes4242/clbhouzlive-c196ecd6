@@ -633,38 +633,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
 
   return (
     <>
-      {/* Backdrop for tap-outside when expanded */}
-      <AnimatePresence>
-        {isExpanded && !isReview && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-[49] bg-transparent"
-            onClick={() => setIsExpanded(false)}
-            onTouchMove={(e) => {
-              // Let touch scroll events pass through to the feed beneath
-              // so users can swipe to next post while capsule is expanded
-              e.stopPropagation();
-              const touch = e.touches[0];
-              const target = document.elementFromPoint(touch.clientX, touch.clientY);
-              if (target) {
-                const scrollContainer = (target as Element).closest('[data-snap-feed]') as HTMLElement | null;
-                if (scrollContainer) {
-                  scrollContainer.dispatchEvent(new TouchEvent('touchmove', {
-                    bubbles: true,
-                    cancelable: true,
-                    touches: Array.from(e.nativeEvent.touches) as unknown as Touch[],
-                    changedTouches: Array.from(e.nativeEvent.changedTouches) as unknown as Touch[],
-                  }));
-                }
-              }
-            }}
-          />
-        )}
-      </AnimatePresence>
-
       {/* Capsule Container - Enhanced glass effect */}
       <motion.div
         ref={capsuleRef}
