@@ -177,7 +177,7 @@ function HandicapRow({
       </div>
 
       {/* Handicap number + tier label stacked */}
-      <div className="flex-shrink-0 flex flex-col items-center justify-center" style={{ minWidth: 56 }}>
+      <div className="flex-shrink-0 flex flex-col items-center justify-center" style={{ width: 72 }}>
         <span style={{ color: handicapColor, fontSize: 20, fontWeight: 800, lineHeight: 1 }}>
           {formatHcp(handicap)}
         </span>
@@ -190,7 +190,7 @@ function HandicapRow({
               color: categoryBadge.text,
               borderRadius: 6,
               padding: '2px 6px',
-              maxWidth: 64,
+              maxWidth: 68,
             }}
           >
             {statusLabel}
