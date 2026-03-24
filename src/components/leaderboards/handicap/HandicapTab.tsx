@@ -162,8 +162,8 @@ export function HandicapTab() {
           <div className="space-y-3">
             {/* Scope pills — Section 4.2 */}
             <div
-              className="flex overflow-x-auto no-scrollbar"
-              style={{ gap: 6 }}
+              className="flex overflow-x-auto no-scrollbar justify-center"
+              style={{ gap: 8 }}
             >
               {SCOPE_OPTIONS.map(opt => {
                 const isActive = scope === opt.id;
@@ -171,18 +171,13 @@ export function HandicapTab() {
                   <button
                     key={opt.id}
                     onClick={() => setScope(opt.id)}
-                    className="flex-shrink-0 active:scale-[0.97] transition-all"
-                    style={{
-                      padding: '7px 14px',
-                      borderRadius: 20,
-                      fontSize: 13,
-                      fontWeight: 700,
-                      minHeight: 44,
-                      background: isActive ? '#F5A623' : 'white',
-                      color: isActive ? 'white' : '#64748B',
-                      border: isActive ? '1.5px solid #F5A623' : '1.5px solid rgba(0,0,0,0.07)',
-                      cursor: 'pointer',
-                    }}
+                    className={cn(
+                      'flex-shrink-0 min-h-[36px] px-4 text-sm font-semibold transition-all active:scale-[0.97] shadow-none',
+                      isActive
+                        ? 'bg-foreground text-white border-0'
+                        : 'bg-transparent text-muted-foreground border-[1.5px] border-border'
+                    )}
+                    style={{ borderRadius: 8 }}
                   >
                     {opt.label}
                   </button>

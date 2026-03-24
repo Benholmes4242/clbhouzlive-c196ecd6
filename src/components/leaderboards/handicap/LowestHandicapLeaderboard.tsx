@@ -138,26 +138,14 @@ function HandicapRow({
       </span>
 
       {/* Avatar */}
-      <div
-        className="overflow-hidden flex-shrink-0"
-        style={{
-          width: 40,
-          height: 40,
-          borderRadius: '50%',
-          border: isMe ? '2.5px solid #F5A623' : 'none',
-        }}
-      >
-        {entry.avatar_url ? (
-          <img src={entry.avatar_url} alt={entry.display_name || ''} className="w-full h-full object-cover" />
-        ) : (
-          <div
-            className="w-full h-full flex items-center justify-center font-semibold"
-            style={{ background: '#F1F5F9', color: '#64748B', fontSize: 14 }}
-          >
-            {initials}
-          </div>
-        )}
-      </div>
+      <SquircleAvatar
+        size={52}
+        src={entry.avatar_url}
+        alt={entry.display_name || ''}
+        fallback={initials}
+        thinRing
+        className="flex-shrink-0"
+      />
 
       {/* Name + Location + Club */}
       <div className="flex-1 min-w-0">
