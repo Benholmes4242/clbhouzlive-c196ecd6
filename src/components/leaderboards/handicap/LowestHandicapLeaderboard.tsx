@@ -52,7 +52,7 @@ function InlineRetryCard({ onRetry }: { onRetry: () => void }) {
 
 function InitialErrorState({ onRetry }: { onRetry: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-5 text-center space-y-4">
+    <div className="flex flex-col items-center justify-center py-12 px-3 text-center space-y-4">
       <p className="text-muted-foreground text-sm">Something went wrong loading the leaderboard.</p>
       <button
         onClick={onRetry}
