@@ -204,12 +204,16 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         return;
       }
 
+      const clubData = Array.isArray(data.golf_clubs) ? data.golf_clubs[0] : data.golf_clubs;
       if (data?.primary_club_id) {
         setUserHomeClubId(data.primary_club_id);
-        const clubData = Array.isArray(data.golf_clubs) ? data.golf_clubs[0] : data.golf_clubs;
         setUserHomeClubName(clubData?.name || null);
       }
-      setUserCountry((data as any)?.country ?? null);
+      // Country: prefer home club's country (matches gc.country in RPC filter).
+      // Fall back to user_profiles.country for users without a home club.
+      const clubCountry = (clubData as any)?.country ?? null;
+      const profileCountry = (data as any)?.country ?? null;
+      setUserCountry(clubCountry || profileCountry || null);
       setUserHandicap((data as any)?.eg_handicap_index ?? null);
     };
 
