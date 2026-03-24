@@ -72,8 +72,9 @@ export const ReviewPostViewer: React.FC<ReviewPostViewerProps> = ({
     courseName,
     courseLocation: heroSubtitle || '',
     rating,
-    tierLabel: '', // Computed by theme function in CreatorCapsule
+    tierLabel: '',
     sourceReviewId: sourceReviewId || '',
+    reviewText: reviewText || null,
   };
   
   // Handle "Read full review" tap - navigate to course reviews tab with reviewId
