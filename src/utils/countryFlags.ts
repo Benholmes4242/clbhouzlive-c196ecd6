@@ -170,6 +170,22 @@ export const countryToFlagCode: Record<string, string> = {
   'Benin': 'BJ',
   'Algeria': 'DZ',
   
+  // Southern / Eastern Europe
+  'GREECE': 'GR',
+  'Greece': 'GR',
+  'CZECH REPUBLIC': 'CZ',
+  'Czech Republic': 'CZ',
+  'POLAND': 'PL',
+  'Poland': 'PL',
+  'ROMANIA': 'RO',
+  'Romania': 'RO',
+  'HUNGARY': 'HU',
+  'Hungary': 'HU',
+  'TURKEY': 'TR',
+  'Turkey': 'TR',
+  'HONG KONG': 'HK',
+  'Hong Kong': 'HK',
+
   // Middle East
   'UNITED ARAB EMIRATES': 'AE',
   'United Arab Emirates': 'AE',
@@ -180,6 +196,8 @@ export const countryToFlagCode: Record<string, string> = {
   'Qatar': 'QA',
   'SAUDI ARABIA': 'SA',
   'Saudi Arabia': 'SA',
+  'BAHRAIN': 'BH',
+  'Bahrain': 'BH',
 
   // Regions with no single representative flag — explicitly null
   // These are intentionally unmapped; the null guard in UI components
