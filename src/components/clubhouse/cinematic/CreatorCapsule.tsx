@@ -652,11 +652,12 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
               if (target) {
                 const scrollContainer = (target as Element).closest('[data-snap-feed]') as HTMLElement | null;
                 if (scrollContainer) {
-                  scrollContainer.dispatchEvent(new TouchEvent('touchmove', {
+                  const te = new TouchEvent('touchmove', {
                     bubbles: true,
                     cancelable: true,
-                    touches: e.nativeEvent.touches,
-                    changedTouches: e.nativeEvent.changedTouches,
+                    touches: Array.from(e.nativeEvent.touches) as unknown as Touch[],
+                    changedTouches: Array.from(e.nativeEvent.changedTouches) as unknown as Touch[],
+                  });
                   }));
                 }
               }
