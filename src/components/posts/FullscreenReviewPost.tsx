@@ -264,25 +264,49 @@ export function FullscreenReviewPost({
             transition={{ duration: prefersReducedMotion ? 0 : 0.3, ease: 'easeInOut' }}
           >
             {currentMedia.media_type === 'video' ? (
-              <HLSPlayer
-                key={`review-video-${currentMedia.id}-${currentIndex}`}
-                ref={videoPlayerRef}
-                src={currentMedia.media_url}
-                className="w-full h-full object-cover"
-                muted={isMuted}
-                loop={true}
-                autoplay={true}
-                showMuteButton={false}
-                showPlayButton={false}
-                mediaId={`review-preview-${currentMedia.id}`}
-              />
+              <>
+                {/* Blurred letterbox background for video */}
+                <div
+                  className="absolute inset-0 bg-black"
+                  style={{ zIndex: 0 }}
+                />
+                {/* Main video — contain so nothing is cropped */}
+                <div className="absolute inset-0" style={{ zIndex: 1 }}>
+                  <HLSPlayer
+                    key={`review-video-${currentMedia.id}-${currentIndex}`}
+                    ref={videoPlayerRef}
+                    src={currentMedia.media_url}
+                    className="w-full h-full object-contain"
+                    muted={isMuted}
+                    loop={true}
+                    autoplay={true}
+                    showMuteButton={false}
+                    showPlayButton={false}
+                    mediaId={`review-preview-${currentMedia.id}`}
+                  />
+                </div>
+              </>
             ) : (
-              <img
-                src={currentMedia.media_url}
-                alt={courseName}
-                className="w-full h-full object-cover"
-                draggable={false}
-              />
+              <>
+                {/* Blurred letterbox background */}
+                <img
+                  src={currentMedia.media_url}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ filter: 'blur(40px)', transform: 'scale(1.15)', opacity: 0.6 }}
+                  draggable={false}
+                  aria-hidden="true"
+                />
+                <div className="absolute inset-0 bg-black/55" />
+                {/* Main image — contain so nothing is cropped */}
+                <img
+                  src={currentMedia.media_url}
+                  alt={courseName}
+                  className="absolute inset-0 w-full h-full"
+                  style={{ objectFit: 'contain', position: 'relative', zIndex: 1 }}
+                  draggable={false}
+                />
+              </>
             )}
           </motion.div>
         </AnimatePresence>
