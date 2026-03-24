@@ -1635,7 +1635,9 @@ export type Database = {
           icon: string | null
           id: string
           name: string
+          prize_description: string | null
           season_number: number
+          sponsor_name: string | null
           start_date: string
           status: string
           tagline: string | null
@@ -1648,7 +1650,9 @@ export type Database = {
           icon?: string | null
           id?: string
           name: string
+          prize_description?: string | null
           season_number: number
+          sponsor_name?: string | null
           start_date: string
           status?: string
           tagline?: string | null
@@ -1661,7 +1665,9 @@ export type Database = {
           icon?: string | null
           id?: string
           name?: string
+          prize_description?: string | null
           season_number?: number
+          sponsor_name?: string | null
           start_date?: string
           status?: string
           tagline?: string | null
