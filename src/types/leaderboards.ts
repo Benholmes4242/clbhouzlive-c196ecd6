@@ -4,7 +4,7 @@
  */
 
 export type LeaderboardScope = 'global' | 'friends' | 'club' | 'country';
-export type ExplorationMetric = 'countries' | 'continents';
+export type ExplorationMetric = 'countries' | 'continents' | 'courses';
 
 export interface ExplorationLeaderboardEntry {
   rank: number;
