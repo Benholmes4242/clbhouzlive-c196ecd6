@@ -138,7 +138,7 @@ export const CourseReviewsSummary: React.FC<CourseReviewsSummaryProps> = ({
             {/* Number and tier label group - centered together */}
             <div className="flex flex-col items-center mb-2">
               <div className="flex items-baseline gap-1 mb-2">
-                <span className="text-4xl font-semibold tracking-tight text-[#f59e0b]">
+                <span className="text-4xl font-semibold tracking-tight text-foreground">
                   {averageRating.toFixed(1)}
                 </span>
               </div>
