@@ -555,6 +555,20 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         />
       )}
 
+      {/* 1b. Season Race Card — live position in season race */}
+      {timeFilter === 'seasonal' && currentSeason && (currentUserEntry?.courses_this_season ?? 0) > 0 && (
+        <SeasonRaceCard
+          seasonLabel={getSeasonConfig(currentSeasonId).title}
+          seasonColor={seasonThemeColor}
+          yourCourses={currentUserEntry?.courses_this_season ?? 0}
+          leaderCourses={allEntries[0]?.courses_this_season ?? 0}
+          yourRank={currentUserEntry?.current_rank ?? 0}
+          totalPlayers={allEntries.length}
+          daysRemaining={currentSeason.days_remaining ?? 0}
+          majorsBonusActive={currentSeasonId === 'major'}
+        />
+      )}
+
       {/* 2. Time Filter Toggle */}
       <div>
         <TimeModeToggle
