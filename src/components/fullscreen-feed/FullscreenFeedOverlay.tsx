@@ -80,7 +80,7 @@ export function FullscreenFeedOverlay() {
               onClick={close}
               className="absolute left-4 z-[210] rounded-full flex items-center justify-center"
               style={{
-                top: "calc(env(safe-area-inset-top, 0px) + 12px)",
+                top: "calc(env(safe-area-inset-top, 20px) + 12px)",
                 width: 44,
                 height: 44,
                 background: 'rgba(0, 0, 0, 0.35)',

@@ -111,7 +111,8 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({
       <Button
         variant="ghost"
         size="icon"
-        className="absolute top-4 right-4 z-10 text-white hover:bg-white/10"
+        className="absolute right-4 z-10 text-white hover:bg-white/10"
+        style={{ top: "calc(env(safe-area-inset-top, 20px) + 12px)" }}
         onClick={onClose}
       >
         <X className="h-6 w-6" />
