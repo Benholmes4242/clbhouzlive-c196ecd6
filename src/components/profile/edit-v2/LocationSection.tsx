@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { MapPin, ChevronDown, Search, X } from 'lucide-react';
+import { MAP_CONFIG } from '@/config/maps';
 
 // ─── Country list ─────────────────────────────────────────────────────────────
 // Golf-primary markets first, then alphabetical.
@@ -17,7 +18,7 @@ const COUNTRIES = [
   'Saudi Arabia', 'United Arab Emirates', 'Zimbabwe',
 ];
 
-const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2xiaG91eiIsImEiOiJjbTVyejIzMXcxemx2MmpzZDU3YjkxNjNkIn0.H_w9d-UAvvMRkJ_9DoVQ-A';
+// Use the shared Mapbox token from env (VITE_MAPBOX_ACCESS_TOKEN)
 
 function getMapboxCountryCode(country: string): string {
   const map: Record<string, string> = {
@@ -153,7 +154,7 @@ function CitySearch({ value, onChange, country }: { value: string; onChange: (v:
       setLoading(true);
       try {
         const params = new URLSearchParams({
-          access_token: MAPBOX_TOKEN,
+          access_token: MAP_CONFIG.TOKEN,
           types: 'place',
           limit: '6',
           language: 'en',
