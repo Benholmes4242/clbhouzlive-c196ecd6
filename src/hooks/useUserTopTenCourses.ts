@@ -136,8 +136,11 @@ export function useUserTopTenCourses(userId: string | undefined) {
         let nextAutoPosition = 1;
 
         autoCourses = filteredRated.map((r: any) => {
-          // Find next available position
-          while (usedPositions.has(nextAutoPosition) && nextAutoPosition <= 10) {
+          // Skip positions already used AND positions intentionally left empty by the user
+          while (
+            (usedPositions.has(nextAutoPosition) || intentionallyEmptyPositions.has(nextAutoPosition))
+            && nextAutoPosition <= 10
+          ) {
             nextAutoPosition++;
           }
           const position = nextAutoPosition;
