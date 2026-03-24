@@ -427,7 +427,48 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     return data;
   }, [seasonCalendar]);
 
-  // Calculate motivational carousel data
+  // Completed seasons with winners (for SeasonWinnerCard in all-time mode)
+  const completedSeasonsWithWinners = useMemo(() => {
+    if (!seasonCalendar) return [];
+    return seasonCalendar
+      .filter(s => s.status === 'completed' && s.season_winner_user_id)
+      .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime());
+  }, [seasonCalendar]);
+
+  // Fetch winner profiles for completed seasons
+  const [winnerProfiles, setWinnerProfiles] = useState<Record<string, { display_name: string; avatar_url: string | null; club_name: string | null }>>({});
+
+  useEffect(() => {
+    const fetchWinnerProfiles = async () => {
+      const winnerIds = completedSeasonsWithWinners
+        .map(s => s.season_winner_user_id)
+        .filter((id): id is string => !!id);
+      
+      if (winnerIds.length === 0) return;
+
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, avatar_url, golf_clubs!user_profiles_primary_club_id_fkey(name)')
+        .in('id', winnerIds);
+
+      if (data) {
+        const profiles: typeof winnerProfiles = {};
+        data.forEach((p: any) => {
+          const clubData = Array.isArray(p.golf_clubs) ? p.golf_clubs[0] : p.golf_clubs;
+          profiles[p.id] = {
+            display_name: p.display_name || 'Champion',
+            avatar_url: p.avatar_url,
+            club_name: clubData?.name || null,
+          };
+        });
+        setWinnerProfiles(profiles);
+      }
+    };
+
+    fetchWinnerProfiles();
+  }, [completedSeasonsWithWinners]);
+
+
   const currentUserEntry = useMemo(() => {
     return allEntries.find(e => e.is_current_user) || null;
   }, [allEntries]);
