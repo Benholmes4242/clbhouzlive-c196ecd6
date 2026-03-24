@@ -26,11 +26,45 @@ function HandicapLeaderboardSkeleton() {
         <div key={i} className="flex items-center gap-3 p-3">
           <Skeleton className="h-5 w-6 rounded" />
           <Skeleton className="h-11 w-11 rounded-lg" />
-          <div className="flex-1 space-y-1.5">
+          <div className="flex-1 min-w-0 space-y-1.5">
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-3 w-20" />
           </div>
           <Skeleton className="h-6 w-16" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Full-page skeleton for initial Handicap tab load */
+function HandicapPageSkeleton() {
+  return (
+    <div className="space-y-4 animate-pulse">
+      {/* Scope pills row */}
+      <div className="flex gap-2 justify-center">
+        <Skeleton className="h-9 w-20 rounded-lg" />
+        <Skeleton className="h-9 w-20 rounded-lg" />
+        <Skeleton className="h-9 w-16 rounded-lg" />
+        <Skeleton className="h-9 w-20 rounded-lg" />
+      </div>
+      {/* Podium */}
+      <div className="flex items-end justify-center gap-2 py-4">
+        <Skeleton className="h-[90px] w-[30%] rounded-xl" />
+        <Skeleton className="h-[110px] w-[38%] rounded-xl" />
+        <Skeleton className="h-[90px] w-[30%] rounded-xl" />
+      </div>
+      {/* Leaderboard rows */}
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="flex items-center gap-3 p-3">
+          <Skeleton className="h-5 w-6 rounded" />
+          <Skeleton className="h-11 w-11 rounded-lg" />
+          <div className="flex-1 min-w-0 space-y-1.5">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+          <Skeleton className="w-[72px] h-8 rounded" />
         </div>
       ))}
     </div>
