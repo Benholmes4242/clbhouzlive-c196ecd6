@@ -24,14 +24,7 @@ export function HandicapPodium({ entries, currentUserId, mode }: HandicapPodiumP
   const third = entries[2];
 
   return (
-    <div
-      style={{
-        background: 'white',
-        borderRadius: 20,
-        padding: '20px 16px 16px',
-        border: '1px solid rgba(0,0,0,0.07)',
-      }}
-    >
+    <div style={{ padding: '8px 0 0' }}>
       <div className="flex items-end justify-center gap-3">
         {/* 2nd place (left) */}
         <HandicapPodiumSlot

@@ -34,15 +34,16 @@ export function formatHcp(value: unknown): string {
  * Mid Figure: 18.0 – 27.9
  * High Figure: 28.0+
  */
-export type HandicapTier = 'plus' | 'scratch' | 'single' | 'low' | 'mid' | 'high';
+export type HandicapTier = 'elite' | 'scratch' | 'player' | 'single' | 'midfielder' | 'weekend' | 'hacker';
 
 export function getHandicapTier(handicap: number): HandicapTier {
-  if (handicap < 0) return 'plus';
-  if (handicap < 1) return 'scratch';
-  if (handicap < 10) return 'single';
-  if (handicap < 18) return 'low';
-  if (handicap < 28) return 'mid';
-  return 'high';
+  if (handicap <= -0.6) return 'elite';
+  if (handicap <= 0.5) return 'scratch';
+  if (handicap <= 5) return 'player';
+  if (handicap <= 10) return 'single';
+  if (handicap <= 20) return 'midfielder';
+  if (handicap <= 30) return 'weekend';
+  return 'hacker';
 }
 
 /**
@@ -51,12 +52,13 @@ export function getHandicapTier(handicap: number): HandicapTier {
 export function getHandicapStatusLabel(handicap: number): string | null {
   const tier = getHandicapTier(handicap);
   switch (tier) {
-    case 'plus': return 'Plus Figure';
+    case 'elite': return 'Elite';
     case 'scratch': return 'Scratch';
+    case 'player': return 'Player';
     case 'single': return 'Single Figure';
-    case 'low': return 'Low Cap';
-    case 'mid': return 'Mid Figure';
-    case 'high': return 'High Figure';
+    case 'midfielder': return 'Midfielder';
+    case 'weekend': return 'Weekend Warrior';
+    case 'hacker': return 'Happy Hacker';
   }
 }
 
@@ -67,12 +69,13 @@ export function getHandicapStatusLabel(handicap: number): string | null {
 export function getHandicapStatusColor(handicap: number, _seasonColor?: string): string {
   const tier = getHandicapTier(handicap);
   switch (tier) {
-    case 'plus': return '#C1A84C';
+    case 'elite': return '#C1A84C';
     case 'scratch': return '#2D6A4F';
-    case 'single': return '#F5A623';
-    case 'low': return '#5B7FA6';
-    case 'mid': return '#8896A8';
-    case 'high': return '#B0BAC7';
+    case 'player': return '#F5A623';
+    case 'single': return '#3B82F6';
+    case 'midfielder': return '#5B7FA6';
+    case 'weekend': return '#8896A8';
+    case 'hacker': return '#B0BAC7';
   }
 }
 
@@ -86,17 +89,19 @@ export function getHandicapBadgeStyle(handicap: number, _seasonColor?: string): 
 } {
   const tier = getHandicapTier(handicap);
   switch (tier) {
-    case 'plus':
+    case 'elite':
       return { bg: '#FBF5E6', text: '#C1A84C', border: 'transparent' };
     case 'scratch':
       return { bg: '#EBF5EF', text: '#2D6A4F', border: 'transparent' };
-    case 'single':
+    case 'player':
       return { bg: '#FFF7E6', text: '#F5A623', border: 'transparent' };
-    case 'low':
+    case 'single':
+      return { bg: '#EFF6FF', text: '#3B82F6', border: 'transparent' };
+    case 'midfielder':
       return { bg: '#EEF3FA', text: '#5B7FA6', border: 'transparent' };
-    case 'mid':
+    case 'weekend':
       return { bg: '#F1F5F9', text: '#8896A8', border: 'transparent' };
-    case 'high':
+    case 'hacker':
       return { bg: '#F8FAFC', text: '#B0BAC7', border: 'transparent' };
   }
 }

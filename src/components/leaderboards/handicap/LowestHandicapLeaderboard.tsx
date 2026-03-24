@@ -159,53 +159,41 @@ function HandicapRow({
         )}
       </div>
 
-      {/* Name + Club + Tier */}
+      {/* Name + Location + Club */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
-          <p className="font-bold truncate" style={{ fontSize: 14, color: '#0F172A' }}>
-            {entry.display_name || 'Unknown'}
+        <p className="font-bold" style={{ fontSize: 14, color: '#0F172A' }}>
+          {entry.display_name || 'Unknown'}
+        </p>
+        {(entry.city || entry.country) && (
+          <p style={{ fontSize: 11, color: '#94A3B8' }}>
+            {[entry.city, entry.country].filter(Boolean).join(', ')}
           </p>
-          {isMe && (
-            <span
-              className="font-bold uppercase flex-shrink-0"
-              style={{ fontSize: 9, color: '#F5A623', letterSpacing: '0.04em' }}
-            >
-              You
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-1.5 mt-0.5">
-          {statusLabel && (
-            <span
-              className="font-semibold uppercase tracking-wide"
-              style={{
-                fontSize: 9,
-                background: categoryBadge.bg,
-                color: categoryBadge.text,
-                borderRadius: 6,
-                padding: '1px 5px',
-              }}
-            >
-              {statusLabel}
-            </span>
-          )}
-          {entry.club_name && (
-            <span className="truncate" style={{ fontSize: 10, color: '#94A3B8' }}>
-              {entry.club_name}
-            </span>
-          )}
-        </div>
+        )}
+        {entry.club_name && (
+          <p style={{ fontSize: 11, color: '#94A3B8' }}>
+            {entry.club_name}
+          </p>
+        )}
       </div>
 
-      {/* Handicap value + country */}
-      <div className="flex-shrink-0 text-right">
-        <span style={{ color: handicapColor, fontSize: 18, fontWeight: 800 }}>
+      {/* Handicap number + tier pill (centered vertically) */}
+      <div className="flex-shrink-0 flex flex-col items-center justify-center">
+        <span style={{ color: handicapColor, fontSize: 20, fontWeight: 800, lineHeight: 1 }}>
           {formatHcp(handicap)}
         </span>
-        {entry.country && (
-          <p className="truncate" style={{ fontSize: 10, color: '#94A3B8' }}>
-            {entry.country}
-          </p>
+        {statusLabel && (
+          <span
+            className="font-semibold uppercase tracking-wide mt-1"
+            style={{
+              fontSize: 8,
+              background: categoryBadge.bg,
+              color: categoryBadge.text,
+              borderRadius: 6,
+              padding: '1px 6px',
+            }}
+          >
+            {statusLabel}
+          </span>
         )}
       </div>
     </Link>
