@@ -29,7 +29,7 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
       const cursor = typeof pageParam === 'string' ? pageParam : undefined;
 
       const params: Record<string, any> = {
-        p_user_id: userId,
+        p_user_id: userId ?? '',
         p_actor_type: actorType,
         p_actor_id: actorId,
         p_page_size: PAGE_SIZE,
