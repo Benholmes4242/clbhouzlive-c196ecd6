@@ -492,13 +492,25 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             marginBottom: 10,
           }} />
 
-          {/* Row 4: Reviewer */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            marginBottom: 8,
-          }}>
+          {/* Row 4: Reviewer — tappable to navigate to profile */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleViewProfile();
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              marginBottom: 8,
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              textAlign: 'left',
+            }}
+          >
             <SquircleAvatar
               size={28}
               src={user?.avatar}
@@ -513,7 +525,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
             }}>
               {user?.name || 'Golfer'}
             </span>
-          </div>
+          </button>
 
 
 
