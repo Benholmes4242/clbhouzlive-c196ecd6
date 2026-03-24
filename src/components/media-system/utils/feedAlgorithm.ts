@@ -203,9 +203,6 @@ export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
   const interleaved = interleaveReviews(weighted, 'suggested');
   const deduped = deduplicatePosts(interleaved);
 
-  console.log('[FeedAlgorithm] Final order:', deduped.map((p, i) =>
-    `${i + 1}:${p.isReview ? 'REVIEW' : p.mediaItems[0]?.type === 'video' ? 'video' : 'image'}`
-  ).join(', '));
 
   return deduped;
 }
