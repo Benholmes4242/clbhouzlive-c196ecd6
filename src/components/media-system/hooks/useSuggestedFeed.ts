@@ -8,7 +8,7 @@ import { mapRowToFeedPost, groupMultiMedia } from '../utils/feedMapper';
 const PAGE_SIZE = 30;
 
 export function useSuggestedFeed(userId: string | undefined) {
-  const seenPostIds = useRef<string[]>([]);
+  const seenPostIds = useRef<Set<string>>(new Set());
 
   const query = useInfiniteQuery({
     queryKey: ['media-feed', 'suggested', userId],
