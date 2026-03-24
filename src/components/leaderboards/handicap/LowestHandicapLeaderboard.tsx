@@ -39,7 +39,7 @@ function HandicapLeaderboardSkeleton() {
 
 function InlineRetryCard({ onRetry }: { onRetry: () => void }) {
   return (
-    <div className="py-4 px-5">
+    <div className="py-4 px-3">
       <button
         onClick={onRetry}
         className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-muted text-sm text-muted-foreground active:scale-[0.98] active:opacity-70 transition-all"
