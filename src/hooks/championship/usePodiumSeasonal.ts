@@ -31,11 +31,11 @@ export function usePodiumSeasonal({
     queryKey: ['podium', 'seasonal', scope, divisionId, clubId, country, currentUserId],
     queryFn: async () => {
       const { data, error } = await supabase.rpc('get_podium_seasonal', {
-        p_scope: scope,
-        p_division_id: divisionId ?? null,
-        p_current_user_id: currentUserId ?? null,
-        p_club_id: scope === 'club' ? clubId : null,
-        p_country: scope === 'country' ? country : null,
+        p_scope: scope as string,
+        p_current_user_id: currentUserId ? String(currentUserId) : null,
+        p_club_id: clubId ? String(clubId) : null,
+        p_country: country ? String(country) : null,
+        p_division_id: divisionId ? String(divisionId) : null,
       });
 
       if (error) {
