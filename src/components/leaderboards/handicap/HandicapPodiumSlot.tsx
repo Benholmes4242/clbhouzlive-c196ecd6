@@ -36,7 +36,7 @@ const POSITION_CONFIG = {
   },
 } as const;
 
-const formatFirstName = (name: string) => name.trim().split(' ')[0];
+// Show full name on podium
 
 export function HandicapPodiumSlot({
   rank,
