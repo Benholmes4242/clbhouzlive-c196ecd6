@@ -131,9 +131,14 @@ export function HandicapPodiumSlot({
           </div>
         </div>
 
+        {/* Full name above podium */}
+        <p className="font-bold text-center w-full mt-2 mb-1" style={{ fontSize: 11, color: '#0F172A', maxWidth: config.avatarSize + 32 }}>
+          {displayName}
+        </p>
+
         {/* Podium block */}
         <div
-          className="flex flex-col items-center mt-1.5"
+          className="flex flex-col items-center"
           style={{
             width: config.avatarSize + 24,
             height: config.podiumHeight,
@@ -148,11 +153,6 @@ export function HandicapPodiumSlot({
             borderBottom: 'none',
           }}
         >
-          {/* First name */}
-          <p className="font-bold text-center truncate w-full" style={{ fontSize: 11, color: '#0F172A' }}>
-            {firstName}
-          </p>
-
           {/* Handicap value */}
           <motion.p
             className="font-bold"

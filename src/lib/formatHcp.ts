@@ -89,17 +89,19 @@ export function getHandicapBadgeStyle(handicap: number, _seasonColor?: string): 
 } {
   const tier = getHandicapTier(handicap);
   switch (tier) {
-    case 'plus':
+    case 'elite':
       return { bg: '#FBF5E6', text: '#C1A84C', border: 'transparent' };
     case 'scratch':
       return { bg: '#EBF5EF', text: '#2D6A4F', border: 'transparent' };
-    case 'single':
+    case 'player':
       return { bg: '#FFF7E6', text: '#F5A623', border: 'transparent' };
-    case 'low':
+    case 'single':
+      return { bg: '#EFF6FF', text: '#3B82F6', border: 'transparent' };
+    case 'midfielder':
       return { bg: '#EEF3FA', text: '#5B7FA6', border: 'transparent' };
-    case 'mid':
+    case 'weekend':
       return { bg: '#F1F5F9', text: '#8896A8', border: 'transparent' };
-    case 'high':
+    case 'hacker':
       return { bg: '#F8FAFC', text: '#B0BAC7', border: 'transparent' };
   }
 }
