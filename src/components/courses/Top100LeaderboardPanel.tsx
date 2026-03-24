@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Tabs, TabsContent } from '@/components/ui/tabs';
-import SegmentedControl from '@/components/discover/SegmentedControl';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 import { ChampionshipLeaderboardView } from '@/components/championship';
 import { CoursesLeaderboardView } from '@/components/leaderboard/CoursesLeaderboardView';
 import { ExplorationTab, HandicapTab } from '@/components/leaderboards';
@@ -40,12 +40,25 @@ const Top100LeaderboardPanel = () => {
   return (
     <div className="w-full pb-6">
       <Tabs value={view} onValueChange={handleViewChange} className="w-full">
-        <div className="sticky top-0 z-10 bg-background pb-2 pt-1 -mx-4 px-4">
-          <SegmentedControl
-            tabs={tabs}
-            activeTab={view}
-            onTabChange={handleViewChange}
-          />
+        <div
+          className="sticky top-0 z-10 bg-background pb-2 pt-1 -mx-4 px-4"
+        >
+          <TabsList className="bg-transparent border-0 px-0 py-0 gap-2 w-full flex justify-center">
+            {tabs.map((tab) => (
+              <TabsTrigger
+                key={tab.id}
+                value={tab.id}
+                className="min-h-[36px] px-4 text-sm font-semibold transition-all active:scale-[0.97] shadow-none after:hidden
+                  data-[state=active]:text-white data-[state=active]:shadow-none data-[state=active]:bg-foreground data-[state=active]:border-0
+                  data-[state=inactive]:text-muted-foreground data-[state=inactive]:bg-transparent data-[state=inactive]:border-[1.5px] data-[state=inactive]:border-border"
+                style={{
+                  borderRadius: 8,
+                }}
+              >
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
         </div>
 
         <TabsContent value="championship" className="mt-0">
