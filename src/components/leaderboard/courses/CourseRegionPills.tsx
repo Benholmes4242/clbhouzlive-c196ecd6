@@ -9,7 +9,7 @@ interface CourseRegionPillsProps {
 
 const REGION_OPTIONS = [
   { id: 'global' as const, label: 'Global', flag: '🌍' },
-  { id: 'gb-i' as const, label: 'GB&I', flag: '🇬🇧' },
+  { id: 'gb-i' as const, label: 'GB&I', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
   { id: 'usa' as const, label: 'USA', flag: '🇺🇸' },
   { id: 'europe' as const, label: 'Europe', flag: '🇪🇺' },
 ];
