@@ -47,7 +47,7 @@ type CourseLeaderboardPage = {
   entries: CourseLeaderboardEntry[];
 };
 
-const ROW_EXCLUDE = ['Britain & Ireland', 'USA', 'Continental Europe'];
+
 
 /**
  * Hook to fetch ALL courses with reviews (no Top 100 restriction).
