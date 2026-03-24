@@ -137,12 +137,7 @@ export function useCourseLeaderboard(args: UseCourseLeaderboardArgs = {}) {
           current_user_play_count: row.has_played ? 1 : 0,
         }));
 
-      // Client-side exclusion filter for "Rest of World"
-      const entries = isExcludeMode
-        ? allEntries.filter(e => !excludeCountries!.includes(e.country ?? ''))
-        : allEntries;
-
-      return { entries };
+      return { entries: allEntries };
     },
     getNextPageParam: (lastPage, allPages) => {
       if (lastPage.entries.length < pageSize) return undefined;
