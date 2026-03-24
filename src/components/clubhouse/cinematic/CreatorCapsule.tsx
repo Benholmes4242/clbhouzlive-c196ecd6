@@ -155,10 +155,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   const capsuleRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef<number | null>(null);
 
-  // Collapse when active post changes
-  useEffect(() => {
-    setIsExpanded(false);
-  }, [postId]);
 
 
   const handleToggle = useCallback(() => {
