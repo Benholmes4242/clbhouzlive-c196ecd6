@@ -87,7 +87,6 @@ export function ExplorerTierCard({
             ✨ Maximum tier reached
           </p>
         )}
-      </div>
     </div>
   );
 }
