@@ -590,9 +590,12 @@ const UserRowFlat: React.FC<UserRowFlatProps> = ({ user, currentUserId, mode, on
 
   return (
     <>
-      <button
+      <div
+        role="button"
+        tabIndex={0}
         onClick={handleRowClick}
-        className="w-full flex items-start gap-3 px-4 py-4 text-left transition-colors active:bg-muted/50"
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleRowClick(); }}
+        className="w-full flex items-start gap-3 px-4 py-4 text-left transition-colors active:bg-muted/50 cursor-pointer"
       >
         {/* Avatar */}
         <SquircleAvatar
