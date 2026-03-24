@@ -87,7 +87,7 @@ export const ArenasStrip: React.FC<ArenasStripProps> = ({
               onClick={() => onArenaChange(pill.id)}
               className="flex-shrink-0 flex flex-col items-center transition-all active:scale-[0.96]"
               style={{
-                minWidth: 88,
+                minWidth: 80,
                 borderRadius: 14,
                 padding: '10px 14px',
                 backgroundColor: isActive ? `${pill.color}0D` : 'hsl(var(--card))',
