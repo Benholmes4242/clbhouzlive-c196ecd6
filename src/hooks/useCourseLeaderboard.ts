@@ -59,6 +59,7 @@ export function useCourseLeaderboard(args: UseCourseLeaderboardArgs = {}) {
     pageSize = 20,
     region = null,
     subRegion = null,
+    excludeCountries = null,
   } = args;
 
   return useInfiniteQuery<CourseLeaderboardPage>({
