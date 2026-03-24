@@ -303,7 +303,7 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
   // Initial error
   if (isError && allEntries.length === 0 && !isLoading) {
     return (
-      <div className="px-5 space-y-5">
+      <div className="px-3 space-y-4">
         {scopeSelector}
         <InitialErrorState onRetry={() => refetch()} />
       </div>
