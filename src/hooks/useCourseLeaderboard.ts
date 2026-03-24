@@ -40,6 +40,7 @@ type UseCourseLeaderboardArgs = {
   pageSize?: number;
   region?: string | null;
   subRegion?: string | null;
+  excludeCountries?: string[] | null;
 };
 
 type CourseLeaderboardPage = {
@@ -58,10 +59,11 @@ export function useCourseLeaderboard(args: UseCourseLeaderboardArgs = {}) {
     pageSize = 20,
     region = null,
     subRegion = null,
+    excludeCountries = null,
   } = args;
 
   return useInfiniteQuery<CourseLeaderboardPage>({
-    queryKey: ['course-leaderboard', scope, timeRange, sort, region, subRegion],
+    queryKey: ['course-leaderboard', scope, timeRange, sort, region, subRegion, excludeCountries],
     initialPageParam: 0,
     placeholderData: keepPreviousData,
     queryFn: async ({ pageParam }): Promise<CourseLeaderboardPage> => {
@@ -85,6 +87,7 @@ export function useCourseLeaderboard(args: UseCourseLeaderboardArgs = {}) {
         p_offset: pageParam as number,
         p_country: scope === 'country' ? region : null,
         p_sub_country: scope === 'country' ? subRegion : null,
+        p_exclude_countries: excludeCountries ?? undefined,
       });
 
       if (error) throw error;

@@ -144,8 +144,11 @@ export function CoursesLeaderboardView() {
     'gb-i': 'Britain & Ireland',
     'usa': 'USA',
     'europe': 'Continental Europe',
+    'row': null,
   };
   const quickRegionCountry = QUICK_REGION_TO_COUNTRY[quickRegion];
+
+  const ROW_EXCLUDE_COUNTRIES = ['Britain & Ireland', 'USA', 'Continental Europe'];
 
   // Scroll position preservation refs for filter changes
   const scrollPositionRef = useRef<number>(0);
@@ -194,16 +197,19 @@ export function CoursesLeaderboardView() {
   } = useCourseLeaderboard({
     scope: quickRegion === 'global'
       ? (scope === 'country' ? 'country' : 'worldwide')
-      : 'country',
+      : quickRegion === 'row'
+        ? 'worldwide'
+        : 'country',
     timeRange,
     sort,
     pageSize: PAGE_SIZE,
-    region: quickRegion !== 'global'
+    region: quickRegion !== 'global' && quickRegion !== 'row'
       ? quickRegionCountry
       : (scope === 'country' ? selectedRegion : null),
     subRegion: quickRegion !== 'global'
       ? null
       : (scope === 'country' ? selectedSubRegion : null),
+    excludeCountries: quickRegion === 'row' ? ROW_EXCLUDE_COUNTRIES : null,
   });
 
   // Flatten pages — memoized for stable reference
@@ -550,7 +556,7 @@ export function CoursesLeaderboardView() {
       <CourseRegionPills
         value={quickRegion}
         onChange={(r) => {
-          handleScopeChange(r === 'global' ? 'global' : 'country');
+          handleScopeChange(r === 'global' || r === 'row' ? 'global' : 'country');
           setQuickRegion(r);
           if (r !== 'global') {
             setSelectedRegion(null);
@@ -564,9 +570,9 @@ export function CoursesLeaderboardView() {
         <div className="px-3 mb-5">
           <h2 className="text-2xl font-bold text-foreground" style={{ letterSpacing: '-0.3px' }}>Course Rankings</h2>
           <p className="text-base text-muted-foreground mt-0.5">
-            {sort === 'most_played' && `The world's greatest courses by rounds played${quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
-            {sort === 'highest_rated' && `The world's greatest courses by community rating${quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
-            {sort === 'rising' && `The world's greatest courses trending right now${quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
+            {sort === 'most_played' && `The world's greatest courses by rounds played${quickRegion === 'row' ? ' — Rest of World' : quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
+            {sort === 'highest_rated' && `The world's greatest courses by community rating${quickRegion === 'row' ? ' — Rest of World' : quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
+            {sort === 'rising' && `The world's greatest courses trending right now${quickRegion === 'row' ? ' — Rest of World' : quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
           </p>
         </div>
 

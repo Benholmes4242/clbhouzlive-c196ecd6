@@ -2,7 +2,7 @@ import React from 'react';
 import { Globe } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 
-export type QuickRegion = 'global' | 'gb-i' | 'usa' | 'europe';
+export type QuickRegion = 'global' | 'gb-i' | 'usa' | 'europe' | 'row';
 
 interface CourseRegionPillsProps {
   value: QuickRegion;
@@ -14,6 +14,7 @@ const REGION_OPTIONS = [
   { id: 'gb-i' as const, label: 'GB&I', country: 'Britain & Ireland' },
   { id: 'usa' as const, label: 'USA', country: 'USA' },
   { id: 'europe' as const, label: 'Europe', country: 'Continental Europe' },
+  { id: 'row' as const, label: 'Rest of World', country: null },
 ];
 
 export const CourseRegionPills: React.FC<CourseRegionPillsProps> = ({ value, onChange }) => {
@@ -53,6 +54,8 @@ export const CourseRegionPills: React.FC<CourseRegionPillsProps> = ({ value, onC
           >
             {region.country ? (
               <CountryFlag country={region.country} size="sm" className="shrink-0" />
+            ) : region.id === 'row' ? (
+              <span style={{ fontSize: 14 }}>🌏</span>
             ) : (
               <Globe className="h-4 w-4 shrink-0" />
             )}

@@ -14819,33 +14819,62 @@ export type Database = {
           thumbnail_url: string
         }[]
       }
-      get_course_leaderboard: {
-        Args: {
-          p_country?: string
-          p_current_user_id?: string
-          p_limit?: number
-          p_offset?: number
-          p_sort_by?: string
-          p_sort_order?: string
-          p_sub_country?: string
-          p_time_period?: string
-        }
-        Returns: {
-          avg_rating: number
-          city: string
-          club_name: string
-          country: string
-          course_id: string
-          course_name: string
-          has_played: boolean
-          image_url: string
-          rank: number
-          rank_change: number
-          rating_count: number
-          region: string
-          total_rounds: number
-        }[]
-      }
+      get_course_leaderboard:
+        | {
+            Args: {
+              p_country?: string
+              p_current_user_id?: string
+              p_limit?: number
+              p_offset?: number
+              p_sort_by?: string
+              p_sort_order?: string
+              p_sub_country?: string
+              p_time_period?: string
+            }
+            Returns: {
+              avg_rating: number
+              city: string
+              club_name: string
+              country: string
+              course_id: string
+              course_name: string
+              has_played: boolean
+              image_url: string
+              rank: number
+              rank_change: number
+              rating_count: number
+              region: string
+              total_rounds: number
+            }[]
+          }
+        | {
+            Args: {
+              p_country?: string
+              p_current_user_id?: string
+              p_exclude_countries?: string[]
+              p_limit?: number
+              p_offset?: number
+              p_sort_by?: string
+              p_sort_order?: string
+              p_sub_country?: string
+              p_time_period?: string
+            }
+            Returns: {
+              avg_rating: number
+              city: string
+              club_name: string
+              country: string
+              course_id: string
+              course_name: string
+              has_played: boolean
+              image_url: string
+              rank: number
+              rank_change: number
+              rating_count: number
+              region: string
+              total_rounds: number
+            }[]
+          }
       get_course_media: {
         Args: {
           p_course_id: string
