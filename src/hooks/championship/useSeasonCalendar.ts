@@ -16,6 +16,8 @@ export interface Season {
   is_current: boolean;
   days_remaining: number | null;
   days_until_start: number | null;
+  sponsor_name: string | null;
+  prize_description: string | null;
 }
 
 export function useSeasonCalendar() {

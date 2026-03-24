@@ -13,6 +13,9 @@ export interface SeasonConfig {
   subtitle: string;     // Tagline: "Get match ready"
   themeColor: string;   // Hex colour token
   Icon: LucideIcon;
+  // Populated at runtime from DB, not hardcoded
+  sponsorName?: string | null;
+  prizeDescription?: string | null;
 }
 
 export type SeasonChipStatus = 'locked' | 'upcoming' | 'completed' | 'active';
