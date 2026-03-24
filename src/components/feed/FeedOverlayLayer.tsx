@@ -69,6 +69,9 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   // Hide overlays on tournament result cards (they have their own chrome)
   if (activePost.postType === 'tournament_result') return null;
 
+  // Hide all overlays on blank system cards
+  if (activePost.postType === 'blank') return null;
+
   const likeState = getLikeState(activePost);
   const commentCount = getCommentCount(activePost);
   const isFollowed = getFollowState(activePost);
