@@ -115,20 +115,14 @@ const Top100Hub = () => {
 
           {/* Tabs: Courses | My Progress */}
           <Tabs value={activeTab} onValueChange={(v) => handleTabChange(v as ValidTab)} className="w-full">
-            <TabsList className="flex gap-1 rounded-xl bg-muted/60 p-1 mb-5 border-0">
-              <TabsTrigger 
-                value="courses" 
-                className="flex-1 py-2 px-4 text-sm rounded-lg transition-all duration-150 active:scale-[0.97] data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:font-semibold data-[state=active]:shadow-none data-[state=active]:border-0 data-[state=inactive]:text-muted-foreground data-[state=inactive]:font-medium data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none after:hidden"
-              >
-                Courses
-              </TabsTrigger>
-              <TabsTrigger 
-                value="my-progress" 
-                className="flex-1 py-2 px-4 text-sm rounded-lg transition-all duration-150 active:scale-[0.97] data-[state=active]:bg-foreground data-[state=active]:text-background data-[state=active]:font-semibold data-[state=active]:shadow-none data-[state=active]:border-0 data-[state=inactive]:text-muted-foreground data-[state=inactive]:font-medium data-[state=inactive]:bg-transparent data-[state=inactive]:border-0 data-[state=inactive]:shadow-none after:hidden"
-              >
-                My Progress
-              </TabsTrigger>
-            </TabsList>
+            <SegmentedControl
+              tabs={[
+                { id: 'courses', label: 'Courses' },
+                { id: 'my-progress', label: 'My Progress' },
+              ]}
+              activeTab={activeTab}
+              onTabChange={(v) => handleTabChange(v as ValidTab)}
+            />
 
             <TabsContent value="courses" className="mt-0">
               {/* Progress Summary */}
