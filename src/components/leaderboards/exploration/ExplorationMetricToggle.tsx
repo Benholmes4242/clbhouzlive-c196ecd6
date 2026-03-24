@@ -9,6 +9,7 @@ interface ExplorationMetricToggleProps {
 const metricOptions: { id: ExplorationMetric; label: string }[] = [
   { id: 'countries', label: 'Countries' },
   { id: 'continents', label: 'Continents' },
+  { id: 'courses', label: 'Courses' },
 ];
 
 /**
