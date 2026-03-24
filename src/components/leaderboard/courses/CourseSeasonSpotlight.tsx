@@ -123,10 +123,8 @@ export const CourseSeasonSpotlight: React.FC<CourseSeasonSpotlightProps> = ({ on
             {/* HUD glass stat chips */}
             <div style={{ display: 'flex', gap: 10 }}>
               <div
+                className="glass-dark"
                 style={{
-                  background: 'rgba(0,0,0,0.35)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255,255,255,0.1)',
                   borderRadius: 8,
                   padding: '5px 10px',
                   fontSize: 12,
@@ -137,10 +135,8 @@ export const CourseSeasonSpotlight: React.FC<CourseSeasonSpotlightProps> = ({ on
                 🏌️ {spotlight.total_rounds} plays this season
               </div>
               <div
+                className="glass-dark"
                 style={{
-                  background: 'rgba(0,0,0,0.35)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255,255,255,0.1)',
                   borderRadius: 8,
                   padding: '5px 10px',
                   fontSize: 12,
