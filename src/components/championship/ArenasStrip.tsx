@@ -90,7 +90,7 @@ export const ArenasStrip: React.FC<ArenasStripProps> = ({
                 minWidth: 80,
                 borderRadius: 14,
                 padding: '10px 14px',
-                backgroundColor: isActive ? `${pill.color}0D` : 'hsl(var(--card))',
+                backgroundColor: isActive ? `${pill.color}15` : 'hsl(var(--card))',
                 border: isActive
                   ? `1.5px solid ${pill.color}88`
                   : '1.5px solid hsl(var(--border))',
