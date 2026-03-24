@@ -67,7 +67,7 @@ function InitialErrorState({ onRetry }: { onRetry: () => void }) {
 // --- Empty State ---
 function EmptyState({ scope, clubName }: { scope: string; clubName?: string | null }) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-5 text-center space-y-4">
+    <div className="flex flex-col items-center justify-center py-16 px-3 text-center space-y-4">
       <div className="flex items-center justify-center" style={{ opacity: 0.2 }}>
         <Target size={48} className="text-muted-foreground" />
       </div>

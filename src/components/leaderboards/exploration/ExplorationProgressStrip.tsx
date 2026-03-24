@@ -40,7 +40,7 @@ export function ExplorationProgressStrip({ userId }: ExplorationProgressStripPro
   };
 
   return (
-    <div className="px-4 py-3">
+    <div className="px-2 py-3">
       <div className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-xl p-4 border border-teal-100/50">
         <div className="flex items-center justify-center gap-8">
           {/* Countries */}

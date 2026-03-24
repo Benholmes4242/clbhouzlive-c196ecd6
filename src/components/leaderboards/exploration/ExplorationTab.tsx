@@ -371,7 +371,7 @@ export function ExplorationTab() {
   );
 
   return (
-    <div className="flex flex-col px-5 pt-4" style={{ gap: 20 }}>
+    <div className="flex flex-col px-3 pt-3" style={{ gap: 14 }}>
       {/* 1. Explorer Profile Card (NEW) */}
       {user && userStatus && (countriesPlayed > 0 || (currentUserEntry?.courses_count ?? 0) > 0) && (
         <ExplorerProfileCard
