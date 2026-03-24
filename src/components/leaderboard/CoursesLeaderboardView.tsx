@@ -570,9 +570,9 @@ export function CoursesLeaderboardView() {
         <div className="px-3 mb-5">
           <h2 className="text-2xl font-bold text-foreground" style={{ letterSpacing: '-0.3px' }}>Course Rankings</h2>
           <p className="text-base text-muted-foreground mt-0.5">
-            {sort === 'most_played' && `The world's greatest courses by rounds played${quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
-            {sort === 'highest_rated' && `The world's greatest courses by community rating${quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
-            {sort === 'rising' && `The world's greatest courses trending right now${quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
+            {sort === 'most_played' && `The world's greatest courses by rounds played${quickRegion === 'row' ? ' — Rest of World' : quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
+            {sort === 'highest_rated' && `The world's greatest courses by community rating${quickRegion === 'row' ? ' — Rest of World' : quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
+            {sort === 'rising' && `The world's greatest courses trending right now${quickRegion === 'row' ? ' — Rest of World' : quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
           </p>
         </div>
 
