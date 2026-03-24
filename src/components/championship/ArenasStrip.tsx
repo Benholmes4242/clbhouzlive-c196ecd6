@@ -67,7 +67,6 @@ export const ArenasStrip: React.FC<ArenasStripProps> = ({
     { id: 'global', icon: '🌍', rank: globalRank, label: 'Global', total: globalTotal, color: ARENA_COLORS.global },
     { id: 'country', icon: countryFlag || '🏳️', rank: countryRank, label: countryLabel || 'Country', total: countryTotal, color: ARENA_COLORS.country },
     { id: 'club', icon: '⛳', rank: clubRank, label: clubLabel || 'My Club', total: clubTotal, color: ARENA_COLORS.club },
-    { id: 'handicap', icon: '🎯', rank: handicapRank, label: handicapLabel || 'Handicap', total: handicapTotal, color: ARENA_COLORS.handicap },
   ];
 
   return (
@@ -75,10 +74,7 @@ export const ArenasStrip: React.FC<ArenasStripProps> = ({
       <p className="text-[10px] font-bold uppercase tracking-wider px-1" style={{ color: '#F5A623', letterSpacing: '0.12em' }}>
         Your Rankings{seasonLabel ? ` · ${seasonLabel}` : ''}
       </p>
-      <div
-        className="flex gap-2 overflow-x-auto pb-1"
-        style={{ scrollbarWidth: 'none' }}
-      >
+      <div className="flex gap-2">
         {pills.map((pill) => {
           const isActive = activeArena === pill.id;
           // A pill is unavailable when we have no data context for it
@@ -88,9 +84,8 @@ export const ArenasStrip: React.FC<ArenasStripProps> = ({
             <button
               key={pill.id}
               onClick={() => !isUnavailable && onArenaChange(pill.id)}
-              className="flex-shrink-0 flex flex-col items-center transition-all active:scale-[0.96]"
+              className="flex-1 flex flex-col items-center transition-all active:scale-[0.96]"
               style={{
-                minWidth: 80,
                 borderRadius: 14,
                 padding: '10px 12px',
                 backgroundColor: isActive ? `${pill.color}15` : '#FFFFFF',
