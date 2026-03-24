@@ -40,24 +40,8 @@ export function ExplorerProfileCard({
   const remaining = countryList.length - MAX_FLAGS;
 
   return (
-    <div
-      style={{
-        borderRadius: 20,
-        overflow: 'hidden',
-        border: '1.5px solid hsl(var(--accent-amber) / 0.25)',
-        boxShadow: '0 0 20px hsl(var(--accent-amber) / 0.08), 0 4px 16px rgba(0,0,0,0.05)',
-        background: 'linear-gradient(135deg, hsl(var(--accent-amber) / 0.05), hsl(var(--accent-amber) / 0.02))',
-      }}
-    >
-      {/* Top accent bar */}
-      <div
-        style={{
-          height: 3,
-          background: 'linear-gradient(90deg, hsl(var(--accent-amber)), hsl(var(--accent-amber) / 0.2))',
-        }}
-      />
-
-      <div style={{ padding: '14px 16px 16px' }}>
+    <div>
+      <div>
         {/* Header row */}
         <div className="flex items-start gap-3">
           <div style={{ outline: '2.5px solid hsl(var(--accent-amber) / 0.5)', borderRadius: 14 }}>
