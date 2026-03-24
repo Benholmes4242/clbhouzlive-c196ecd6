@@ -77,7 +77,7 @@ export const SeasonRaceCard: React.FC<SeasonRaceCardProps> = ({
           </div>
           <div className="text-right">
             <p
-              className="text-[28px] font-black leading-none"
+              className="text-[32px] font-black leading-none"
               style={{ color: seasonColor }}
             >
               {yourRank}{getRankSuffix(yourRank)}
