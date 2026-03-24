@@ -40,16 +40,6 @@ const FriendsActivityFeed: React.FC<FriendsActivityFeedProps> = ({
   const feedItems = useMemo(() => {
     const items: FeedItem[] = [];
 
-    if (activeFilter === 'rounds') {
-      const sortedRecent = [...recent].sort(
-        (a, b) => new Date(b.played_at).getTime() - new Date(a.played_at).getTime()
-      );
-      sortedRecent.forEach((hit) => {
-        items.push({ type: 'single', hit });
-      });
-      return items;
-    }
-
     const courseMap = new Map<string, CourseWithFriends>();
     courses.forEach((c) => courseMap.set(c.course_id, c));
 
