@@ -165,12 +165,10 @@ const ClubhouseContent = () => {
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
   
   const posts = useMemo(() => {
-    if (activeTab === 'foryou') {
-      return buildSuggestedFeed(activeFeed.posts);
-    } else {
-      return buildFriendsFeed(activeFeed.posts);
-    }
-  }, [activeFeed.posts, activeTab]);
+    // Feed hooks already apply buildSuggestedFeed/buildFriendsFeed internally.
+    // Do NOT re-apply here — double-processing shifts review positions.
+    return activeFeed.posts;
+  }, [activeFeed.posts]);
 
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? true;

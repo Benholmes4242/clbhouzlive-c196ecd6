@@ -194,9 +194,20 @@ export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
   const noLive = posts.filter(p => p.postType !== 'tournament_live' && p.postType !== 'tournament_result');
   const filtered = filterForSuggested(noLive);
   const capped = capPerCreator(filtered);
-  const weighted = weightByMediaType(capped);
+
+  // weightByMediaType only returns non-review posts (weighted 80/20 video/image).
+  // We must re-add review posts so interleaveReviews can inject them at fixed slots.
+  const reviews = capped.filter(p => isReviewPost(p));
+  const weighted = [...weightByMediaType(capped), ...reviews];
+
   const interleaved = interleaveReviews(weighted, 'suggested');
-  return deduplicatePosts(interleaved);
+  const deduped = deduplicatePosts(interleaved);
+
+  console.log('[FeedAlgorithm] Final order:', deduped.map((p, i) =>
+    `${i + 1}:${p.isReview ? 'REVIEW' : p.mediaItems[0]?.type === 'video' ? 'video' : 'image'}`
+  ).join(', '));
+
+  return deduped;
 }
 
 // ── Full Friends Feed Pipeline ────────────────────────────────────────────────
