@@ -34,15 +34,16 @@ export function formatHcp(value: unknown): string {
  * Mid Figure: 18.0 – 27.9
  * High Figure: 28.0+
  */
-export type HandicapTier = 'plus' | 'scratch' | 'single' | 'low' | 'mid' | 'high';
+export type HandicapTier = 'elite' | 'scratch' | 'player' | 'single' | 'midfielder' | 'weekend' | 'hacker';
 
 export function getHandicapTier(handicap: number): HandicapTier {
-  if (handicap < 0) return 'plus';
-  if (handicap < 1) return 'scratch';
-  if (handicap < 10) return 'single';
-  if (handicap < 18) return 'low';
-  if (handicap < 28) return 'mid';
-  return 'high';
+  if (handicap <= -0.6) return 'elite';
+  if (handicap <= 0.5) return 'scratch';
+  if (handicap <= 5) return 'player';
+  if (handicap <= 10) return 'single';
+  if (handicap <= 20) return 'midfielder';
+  if (handicap <= 30) return 'weekend';
+  return 'hacker';
 }
 
 /**
