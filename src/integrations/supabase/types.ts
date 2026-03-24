@@ -1635,8 +1635,11 @@ export type Database = {
           icon: string | null
           id: string
           name: string
+          prize_claimed: boolean | null
           prize_description: string | null
           season_number: number
+          season_winner_courses: number | null
+          season_winner_user_id: string | null
           sponsor_name: string | null
           start_date: string
           status: string
@@ -1650,8 +1653,11 @@ export type Database = {
           icon?: string | null
           id?: string
           name: string
+          prize_claimed?: boolean | null
           prize_description?: string | null
           season_number: number
+          season_winner_courses?: number | null
+          season_winner_user_id?: string | null
           sponsor_name?: string | null
           start_date: string
           status?: string
@@ -1665,8 +1671,11 @@ export type Database = {
           icon?: string | null
           id?: string
           name?: string
+          prize_claimed?: boolean | null
           prize_description?: string | null
           season_number?: number
+          season_winner_courses?: number | null
+          season_winner_user_id?: string | null
           sponsor_name?: string | null
           start_date?: string
           status?: string
