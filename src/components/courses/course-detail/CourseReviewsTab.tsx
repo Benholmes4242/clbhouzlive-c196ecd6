@@ -447,13 +447,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
       <section className="px-4 py-4">
         <div className="flex flex-col items-center gap-1">
           <span
-            className="text-[40px] font-extrabold leading-none tabular-nums"
-            style={{
-              background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
+            className="text-[40px] font-extrabold leading-none tabular-nums text-foreground"
           >
             {communityScore.toFixed(1)}
           </span>
