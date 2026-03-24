@@ -241,17 +241,22 @@ export function useUserTopTenCourses(userId: string | undefined) {
           .eq('user_id', userId);
 
         // Re-insert all other courses as pinned at their exact positions
-        const { error: snapshotError } = await supabase
-          .from('user_top_ten_courses')
-          .insert(
-            otherCourses.map(c => ({
-              user_id: userId,
-              course_id: c.course_id,
-              position: c.position,
-              is_pinned: true,
-            }))
-          );
-        if (snapshotError) throw snapshotError;
+        // Filter to valid positions only (1-10) to satisfy DB constraint
+        const validCourses = otherCourses.filter(c => c.position >= 1 && c.position <= 10);
+        
+        if (validCourses.length > 0) {
+          const { error: snapshotError } = await supabase
+            .from('user_top_ten_courses')
+            .insert(
+              validCourses.map(c => ({
+                user_id: userId,
+                course_id: c.course_id,
+                position: c.position,
+                is_pinned: true,
+              }))
+            );
+          if (snapshotError) throw snapshotError;
+        }
       } else {
         // No other courses — just delete if it was pinned
         await supabase
