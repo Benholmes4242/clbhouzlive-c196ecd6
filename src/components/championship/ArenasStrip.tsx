@@ -72,7 +72,7 @@ export const ArenasStrip: React.FC<ArenasStripProps> = ({
 
   return (
     <div className="space-y-2">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground px-1">
+      <p className="text-[10px] font-semibold uppercase tracking-wider px-1" style={{ color: '#F5A623' }}>
         Your Rankings{seasonLabel ? ` · ${seasonLabel}` : ''}
       </p>
       <div
