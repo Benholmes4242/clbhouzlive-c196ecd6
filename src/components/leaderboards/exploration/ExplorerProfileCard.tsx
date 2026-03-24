@@ -107,11 +107,11 @@ export function ExplorerProfileCard({
 
         {/* Passport flags */}
         {countryList.length > 0 && (
-          <div className="mt-3">
-            <p className="text-muted-foreground uppercase" style={{ fontSize: 10, opacity: 0.6, marginBottom: 6 }}>
+          <div className="mt-3 flex flex-col items-center">
+            <p className="text-muted-foreground uppercase text-center" style={{ fontSize: 10, opacity: 0.6, marginBottom: 6 }}>
               Countries Played
             </p>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap justify-center gap-1.5">
               {flagsToShow.map((country) => (
                 <div
                   key={country}
