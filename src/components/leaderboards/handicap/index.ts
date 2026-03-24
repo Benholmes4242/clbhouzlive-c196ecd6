@@ -6,3 +6,4 @@ export { HandicapPodium } from './HandicapPodium';
 export { HandicapPodiumSlot } from './HandicapPodiumSlot';
 export { HandicapInsightBanner } from './HandicapInsightBanner';
 export { HandicapStatusPill } from './HandicapStatusPill';
+export { HandicapMoverStrip } from './HandicapMoverStrip';
