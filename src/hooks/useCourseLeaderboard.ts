@@ -87,6 +87,7 @@ export function useCourseLeaderboard(args: UseCourseLeaderboardArgs = {}) {
         p_offset: pageParam as number,
         p_country: scope === 'country' ? region : null,
         p_sub_country: scope === 'country' ? subRegion : null,
+        p_exclude_countries: excludeCountries ?? undefined,
       });
 
       if (error) throw error;

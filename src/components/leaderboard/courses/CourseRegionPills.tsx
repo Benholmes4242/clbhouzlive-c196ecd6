@@ -54,6 +54,8 @@ export const CourseRegionPills: React.FC<CourseRegionPillsProps> = ({ value, onC
           >
             {region.country ? (
               <CountryFlag country={region.country} size="sm" className="shrink-0" />
+            ) : region.id === 'row' ? (
+              <span style={{ fontSize: 14 }}>🌏</span>
             ) : (
               <Globe className="h-4 w-4 shrink-0" />
             )}
