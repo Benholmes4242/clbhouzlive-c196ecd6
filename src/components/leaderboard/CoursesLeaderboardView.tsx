@@ -197,18 +197,18 @@ export function CoursesLeaderboardView() {
   } = useCourseLeaderboard({
     scope: quickRegion === 'global'
       ? (scope === 'country' ? 'country' : 'worldwide')
-      : quickRegion === 'row'
-        ? 'worldwide'
-        : 'country',
+      : 'worldwide',
     timeRange,
     sort,
     pageSize: PAGE_SIZE,
-    region: quickRegion !== 'global' && quickRegion !== 'row'
-      ? quickRegionCountry
-      : (scope === 'country' ? selectedRegion : null),
-    subRegion: quickRegion !== 'global'
-      ? null
-      : (scope === 'country' ? selectedSubRegion : null),
+    region: quickRegion === 'global'
+      ? (scope === 'country' ? selectedRegion : null)
+      : quickRegion === 'row'
+        ? null
+        : quickRegionCountry,
+    subRegion: quickRegion === 'global'
+      ? (scope === 'country' ? selectedSubRegion : null)
+      : null,
     excludeCountries: quickRegion === 'row' ? ROW_EXCLUDE_COUNTRIES : null,
   });
 
