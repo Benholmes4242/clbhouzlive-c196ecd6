@@ -528,6 +528,22 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           </button>
 
 
+          {/* Row 5: Review text preview */}
+          {captionText && (
+            <div style={{
+              fontSize: 12,
+              color: 'rgba(255,255,255,0.42)',
+              lineHeight: 1.5,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical' as const,
+              overflow: 'hidden',
+              marginBottom: 11,
+              fontStyle: 'italic',
+            }}>
+              "{captionText}"
+            </div>
+          )}
 
           {/* Row 6: Read review CTA */}
           <motion.button
