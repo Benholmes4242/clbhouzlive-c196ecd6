@@ -271,19 +271,20 @@ export function FullscreenReviewPost({
                   style={{ zIndex: 0 }}
                 />
                 {/* Main video — contain so nothing is cropped */}
-                <HLSPlayer
-                  key={`review-video-${currentMedia.id}-${currentIndex}`}
-                  ref={videoPlayerRef}
-                  src={currentMedia.media_url}
-                  className="absolute inset-0 w-full h-full"
-                  style={{ objectFit: 'contain', zIndex: 1 }}
-                  muted={isMuted}
-                  loop={true}
-                  autoplay={true}
-                  showMuteButton={false}
-                  showPlayButton={false}
-                  mediaId={`review-preview-${currentMedia.id}`}
-                />
+                <div className="absolute inset-0" style={{ zIndex: 1 }}>
+                  <HLSPlayer
+                    key={`review-video-${currentMedia.id}-${currentIndex}`}
+                    ref={videoPlayerRef}
+                    src={currentMedia.media_url}
+                    className="w-full h-full object-contain"
+                    muted={isMuted}
+                    loop={true}
+                    autoplay={true}
+                    showMuteButton={false}
+                    showPlayButton={false}
+                    mediaId={`review-preview-${currentMedia.id}`}
+                  />
+                </div>
               </>
             ) : (
               <>
