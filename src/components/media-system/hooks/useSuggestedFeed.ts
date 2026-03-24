@@ -5,7 +5,7 @@ import type { FeedPost, FeedRpcRow } from '../types/media';
 import { buildSuggestedFeed, deduplicatePosts } from '../utils/feedAlgorithm';
 import { mapRowToFeedPost, groupMultiMedia } from '../utils/feedMapper';
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 30;
 
 export function useSuggestedFeed(userId: string | undefined) {
   const seenPostIds = useRef<string[]>([]);
