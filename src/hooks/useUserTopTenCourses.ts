@@ -227,26 +227,47 @@ export function useUserTopTenCourses(userId: string | undefined) {
       if (!userId) throw new Error('No user ID');
 
       const course = topTen.find(c => c.course_id === courseId);
+      if (!course) return;
 
-      // Delete from pinned if it was pinned
-      if (course?.is_pinned) {
-        const { error: deleteError } = await supabase
+      // Step 1 — Snapshot all OTHER current courses as pinned at their current positions.
+      // This converts any auto-populated entries into real DB rows so gaps are preserved.
+      const otherCourses = topTen.filter(c => c.course_id !== courseId);
+
+      if (otherCourses.length > 0) {
+        // Delete all existing rows for this user first (clean slate)
+        await supabase
+          .from('user_top_ten_courses')
+          .delete()
+          .eq('user_id', userId);
+
+        // Re-insert all other courses as pinned at their exact positions
+        const { error: snapshotError } = await supabase
+          .from('user_top_ten_courses')
+          .insert(
+            otherCourses.map(c => ({
+              user_id: userId,
+              course_id: c.course_id,
+              position: c.position,
+              is_pinned: true,
+            }))
+          );
+        if (snapshotError) throw snapshotError;
+      } else {
+        // No other courses — just delete if it was pinned
+        await supabase
           .from('user_top_ten_courses')
           .delete()
           .eq('user_id', userId)
           .eq('course_id', courseId);
-
-        if (deleteError) throw deleteError;
-
       }
 
-      // Add to exclusions so it won't auto-populate — preserve the vacated position
+      // Step 2 — Add removed course to exclusions with its vacated position
       const { error: excludeError } = await supabase
         .from('user_top10_exclusions')
         .upsert({
           user_id: userId,
           course_id: courseId,
-          position: course?.position ?? null,
+          position: course.position,
         }, {
           onConflict: 'user_id,course_id',
         });
