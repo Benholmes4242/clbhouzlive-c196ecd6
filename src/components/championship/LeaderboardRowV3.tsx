@@ -24,6 +24,9 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
   onClick,
   seasonColor = 'hsl(var(--accent-amber))',
 }) => {
+  const isTop3 = rank <= 3;
+  const isFirst = rank === 1;
+
   return (
     <div
       role="button"
@@ -32,7 +35,7 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
       onClick={onClick}
       onKeyDown={(e) => e.key === 'Enter' && onClick?.()}
       className={cn(
-        "flex items-center gap-3 py-4 px-5 transition-all duration-200 cursor-pointer",
+        "flex items-center gap-3 py-4 px-5 transition-all duration-200 cursor-pointer relative",
         "active:scale-[0.98] active:opacity-90",
         isCurrentUser && "rounded-xl"
       )}
@@ -45,6 +48,14 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
         }),
       }}
     >
+      {/* Left accent bar on current user */}
+      {isCurrentUser && (
+        <div
+          className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r"
+          style={{ backgroundColor: seasonColor }}
+        />
+      )}
+
       {/* Position — plain typographic rank */}
       <span
         className="flex-shrink-0 text-center"
@@ -53,11 +64,12 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
           fontSize: 13,
           fontWeight: 700,
           fontVariantNumeric: 'tabular-nums',
-          color: rank === 1
-            ? 'hsl(var(--accent-amber))'
+          color: isTop3
+            ? '#F5A623'
             : 'hsl(var(--muted-foreground))',
         }}
       >
+        {isFirst && <span style={{ fontSize: 12, marginRight: 1 }}>👑</span>}
         {rank}
       </span>
 
@@ -76,6 +88,14 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
       <div className="flex-1 min-w-0">
         <p className="text-[16px] font-semibold truncate text-foreground" style={{ letterSpacing: '-0.2px' }}>
           {name}
+          {isCurrentUser && (
+            <span
+              className="ml-1.5 text-[9px] font-bold uppercase align-middle"
+              style={{ color: '#F5A623' }}
+            >
+              YOU
+            </span>
+          )}
         </p>
         {homeClubName && (
           <p className="text-[13px] text-muted-foreground truncate">{homeClubName}</p>
@@ -85,7 +105,11 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
       {/* Score */}
       <div
         className="flex-shrink-0"
-        style={{ color: 'hsl(var(--accent-amber))', fontSize: 22, fontWeight: 800 }}
+        style={{
+          color: isTop3 ? '#F5A623' : '#0F172A',
+          fontSize: 18,
+          fontWeight: 700,
+        }}
       >
         {courses}
       </div>

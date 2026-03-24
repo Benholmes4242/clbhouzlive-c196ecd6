@@ -19,34 +19,34 @@ const POSITION_CONFIG = {
     avatarSize: 120,
     mobileAvatarSize: 120,
     nameClass: 'text-[17px] font-bold',
-    statSize: 24,
-    statWeight: 800,
-    labelSize: 13,
     crownSize: 36,
     verticalOffset: 0,
     boxShadow: '0 8px 28px hsl(var(--accent-amber) / 0.25)',
+    podiumHeight: 88,
+    courseSize: 22,
+    courseWeight: 900,
   },
   2: {
     avatarSize: 88,
     mobileAvatarSize: 88,
     nameClass: 'text-[15px] font-semibold',
-    statSize: 20,
-    statWeight: 700,
-    labelSize: 12,
     crownSize: 0,
     verticalOffset: 24,
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+    podiumHeight: 68,
+    courseSize: 18,
+    courseWeight: 700,
   },
   3: {
     avatarSize: 88,
     mobileAvatarSize: 88,
     nameClass: 'text-[15px] font-semibold',
-    statSize: 20,
-    statWeight: 700,
-    labelSize: 12,
     crownSize: 0,
     verticalOffset: 40,
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+    podiumHeight: 52,
+    courseSize: 18,
+    courseWeight: 700,
   },
 } as const;
 
@@ -90,8 +90,23 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
         ease: 'easeOut',
       }}
     >
+      {/* YOU badge for current user */}
+      {isCurrentUser && (
+        <div
+          className="mb-1 px-2 py-0.5 rounded-full"
+          style={{
+            backgroundColor: `${seasonThemeColor}15`,
+            border: `1px solid ${seasonThemeColor}40`,
+          }}
+        >
+          <span className="text-[9px] font-bold uppercase" style={{ color: seasonThemeColor }}>
+            YOU
+          </span>
+        </div>
+      )}
+
       {/* Crown for 1st place */}
-      {position === 1 && (
+      {position === 1 && !isCurrentUser && (
         <motion.div
           className="mb-1"
           initial={{ scale: 0, rotate: -10 }}
@@ -137,7 +152,7 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
             width: config.mobileAvatarSize,
             height: config.mobileAvatarSize,
             borderRadius: '50%',
-            border: 'none',
+            border: isCurrentUser ? `3px solid hsl(var(--accent-amber))` : 'none',
             boxShadow: config.boxShadow,
           }}
         >
@@ -154,7 +169,7 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
           )}
         </div>
 
-        {/* Rank badge — matching HallOfFamePodium */}
+        {/* Rank badge */}
         <div
           className="absolute -bottom-1.5 -right-0.5 flex items-center justify-center font-bold text-white shadow-md"
           style={{
@@ -171,29 +186,50 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
         </div>
       </div>
 
-      {/* Name */}
-      <div className="mt-3 text-center">
-        <p className={cn('text-foreground leading-tight', config.nameClass)}>
+      {/* Podium base block */}
+      <div
+        className="w-full mt-2 flex flex-col items-center justify-center"
+        style={{
+          height: config.podiumHeight,
+          borderRadius: '10px 10px 0 0',
+          background: position === 1
+            ? `linear-gradient(180deg, ${seasonThemeColor}20 0%, ${seasonThemeColor}08 100%)`
+            : '#F8FAFC',
+          borderTop: position === 1
+            ? `2px solid ${seasonThemeColor}40`
+            : '1px solid #E2E8F0',
+        }}
+      >
+        {/* Name */}
+        <p className={cn('text-foreground leading-tight text-center', config.nameClass)}>
           {nameParts.firstName}
         </p>
         {nameParts.lastName && (
-          <p className={cn('text-foreground leading-tight', config.nameClass)}>
+          <p className={cn('text-foreground leading-tight text-center', config.nameClass)}>
             {nameParts.lastName}
           </p>
         )}
-      </div>
 
-      {/* Stat */}
-      <motion.p
-        className="font-bold mt-0.5"
-        style={{ color: 'hsl(var(--accent-amber))', fontSize: config.statSize, fontWeight: config.statWeight }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: animationDelay + 0.3, duration: 0.3 }}
-      >
-        {entry.courses_logged}
-        <span className="font-normal text-muted-foreground ml-1" style={{ fontSize: config.labelSize }}>courses</span>
-      </motion.p>
+        {/* Course count — hero stat */}
+        <motion.div
+          className="text-center mt-0.5"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: animationDelay + 0.3, duration: 0.3 }}
+        >
+          <span
+            className="font-black leading-none"
+            style={{
+              color: position === 1 ? seasonThemeColor : '#0F172A',
+              fontSize: config.courseSize,
+              fontWeight: config.courseWeight,
+            }}
+          >
+            {entry.courses_logged}
+          </span>
+          <span className="text-[10px] text-muted-foreground ml-0.5 block">courses</span>
+        </motion.div>
+      </div>
     </motion.div>
   );
 };

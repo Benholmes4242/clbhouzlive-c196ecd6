@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { getSeasonConfig, SEASON_ORDER, type SeasonId } from '@/lib/seasonConfig';
 import { getSeasonGradient } from '@/lib/colorUtils';
-import { Lock } from 'lucide-react';
+import { Lock, Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface SeasonData {
@@ -42,8 +42,8 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
     return () => clearTimeout(timer);
   }, [progressPercent]);
 
-  // Progress ring geometry — scaled up for premium feel
-  const ringSize = 96;
+  // Progress ring geometry — compact 80px
+  const ringSize = 80;
   const ringStroke = 6;
   const ringRadius = (ringSize - ringStroke) / 2;
   const ringCircumference = ringRadius * 2 * Math.PI;
@@ -51,6 +51,11 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
 
   // Unique gradient ID to avoid SVG conflicts
   const gradientId = `seasonRingGradient-${seasonId}`;
+
+  // Urgency states
+  const isUrgent = daysRemaining <= 14;
+  const isCritical = daysRemaining <= 7;
+  const isFinal = daysRemaining <= 3;
 
   // Season state logic
   const getSeasonState = (id: SeasonId): 'active' | 'completed' | 'locked' => {
@@ -71,21 +76,16 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
     }
   };
 
-  // Get the color for each season tab icon
-  const getTabSeasonColor = (id: SeasonId): string => {
-    return getSeasonConfig(id).themeColor;
-  };
-
   return (
     <motion.div
-      className={cn('space-y-5 py-5 px-5', className)}
+      className={cn('space-y-4 py-5 px-5', className)}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35 }}
     >
       {/* Season Header Row */}
       <div className="flex items-center gap-4">
-        {/* Progress Ring — Statement piece with gradient stroke */}
+        {/* Progress Ring — 80px compact */}
         <div className="flex-shrink-0 relative" style={{ width: ringSize, height: ringSize }}>
           <svg width={ringSize} height={ringSize} className="transform -rotate-90">
             <defs>
@@ -95,13 +95,13 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
                 <stop offset="100%" stopColor={gradient.light} />
               </linearGradient>
             </defs>
-            {/* Track */}
+            {/* Track — urgency tint when <=14 days */}
             <circle
               cx={ringSize / 2}
               cy={ringSize / 2}
               r={ringRadius}
               fill="none"
-              stroke="hsl(var(--border) / 0.3)"
+              stroke={isUrgent ? `${color}20` : 'hsl(var(--border) / 0.3)'}
               strokeWidth={ringStroke}
             />
             {/* Progress arc */}
@@ -115,25 +115,36 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
               strokeDasharray={ringCircumference}
               strokeDashoffset={ringOffset}
               strokeLinecap="round"
-              className="transition-all duration-[800ms] ease-out"
+              className={cn(
+                'transition-all duration-[800ms] ease-out',
+                isCritical && 'animate-pulse'
+              )}
             />
           </svg>
-          {/* Center number */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-[28px] font-bold text-foreground leading-none">{daysRemaining}</span>
+          {/* Center number + label */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span
+              className="text-[28px] font-bold leading-none"
+              style={{ color: isUrgent ? color : 'hsl(var(--foreground))' }}
+            >
+              {daysRemaining}
+            </span>
+            <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground mt-0.5">
+              days left
+            </span>
           </div>
         </div>
 
         {/* Season Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs font-medium text-muted-foreground uppercase" style={{ letterSpacing: '0.05em', fontSize: '12px' }}>
+            <span className="font-medium text-muted-foreground uppercase" style={{ letterSpacing: '0.05em', fontSize: '10px' }}>
               Current Season
             </span>
             {/* Active badge — season-colored pill with pulsing dot */}
             <div
               className="inline-flex items-center gap-1.5 rounded-full"
-              style={{ backgroundColor: gradient.tint, padding: '6px 14px' }}
+              style={{ backgroundColor: gradient.tint, padding: '4px 10px' }}
             >
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-50" style={{ backgroundColor: color }} />
@@ -151,18 +162,26 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
           <p className="text-[14px] text-muted-foreground mt-0.5">
             {config.subtitle}
           </p>
+          {isFinal && (
+            <p className="text-[11px] font-bold mt-1" style={{ color }}>
+              Final days!
+            </p>
+          )}
         </div>
       </div>
 
-      {/* Season Selector — 2×2 grid of independent tiles */}
-      <div className="grid grid-cols-2 gap-2.5">
+      {/* Season Selector — Horizontal pill strip */}
+      <div
+        className="flex gap-2 overflow-x-auto"
+        style={{ scrollbarWidth: 'none' }}
+      >
         {SEASON_ORDER.map((id) => {
           const seasonConfig = getSeasonConfig(id);
-          const SeasonIcon = seasonConfig.Icon;
           const state = getSeasonState(id);
           const isLocked = state === 'locked';
           const isActive = state === 'active';
-          const tabColor = getTabSeasonColor(id);
+          const isCompleted = state === 'completed';
+          const tabColor = seasonConfig.themeColor;
           const daysUntil = seasonData[id]?.daysUntilAvailable;
 
           return (
@@ -170,62 +189,46 @@ export const ActiveSeasonCard: React.FC<ActiveSeasonCardProps> = ({
               key={id}
               onClick={() => !isLocked && onSeasonSelect?.(id)}
               disabled={isLocked}
-              className={cn(
-                'relative flex flex-col items-start gap-2 p-3.5 rounded-2xl text-left',
-                'transition-all duration-200 active:scale-[0.97]',
-                isActive && 'bg-card shadow-sm',
-                !isActive && !isLocked && 'bg-muted/40',
-                isLocked && 'bg-muted/20 cursor-not-allowed',
-              )}
+              className="flex-shrink-0 flex items-center gap-1.5 transition-all duration-200 active:scale-[0.96]"
               style={{
-                border: isActive
-                  ? `1.5px solid ${tabColor}30`
-                  : '1.5px solid hsl(var(--border) / 0.3)',
+                height: 36,
+                padding: '0 14px',
+                borderRadius: 18,
+                fontSize: 13,
+                fontWeight: 600,
+                opacity: isLocked ? 0.6 : 1,
+                cursor: isLocked ? 'not-allowed' : 'pointer',
+                ...(isActive ? {
+                  backgroundColor: `${tabColor}18`,
+                  border: `1.5px solid ${tabColor}60`,
+                  color: tabColor,
+                } : isCompleted ? {
+                  backgroundColor: '#F1F5F9',
+                  border: '1px solid #E2E8F0',
+                  color: '#64748B',
+                } : {
+                  backgroundColor: 'transparent',
+                  border: '1px solid #E2E8F0',
+                  color: '#94A3B8',
+                }),
               }}
             >
-              {/* Icon row */}
-              <div className="flex items-center justify-between w-full">
-                <SeasonIcon
-                  className="w-5 h-5"
-                  style={{
-                    color: isActive ? tabColor : 'hsl(var(--muted-foreground))',
-                    opacity: isLocked ? 0.4 : 1,
-                  }}
+              {isActive && (
+                <span
+                  className="w-1.5 h-1.5 rounded-full animate-pulse"
+                  style={{ backgroundColor: tabColor }}
                 />
-                {isActive && (
-                  <span
-                    className="w-2 h-2 rounded-full"
-                    style={{ backgroundColor: tabColor }}
-                  />
-                )}
-                {isLocked && (
-                  <Lock className="w-3.5 h-3.5 text-muted-foreground/40" />
-                )}
-              </div>
-
-              {/* Label */}
-              <div>
-                <p
-                  className={cn(
-                    'font-semibold leading-tight',
-                    isActive ? 'text-foreground' : 'text-muted-foreground',
-                    isLocked && 'opacity-40',
-                  )}
-                  style={{ fontSize: 13 }}
-                >
-                  {getShortName(id)}
-                </p>
-                {isLocked && daysUntil && daysUntil <= 60 && (
-                  <p className="text-[11px] text-muted-foreground/50 mt-0.5">
-                    In {daysUntil}d
-                  </p>
-                )}
-                {isActive && (
-                  <p className="text-[11px] mt-0.5" style={{ color: tabColor }}>
-                    Active
-                  </p>
-                )}
-              </div>
+              )}
+              {isCompleted && (
+                <Check className="w-3 h-3" style={{ color: '#64748B' }} />
+              )}
+              {isLocked && (
+                <Lock className="w-3 h-3" style={{ color: '#94A3B8' }} />
+              )}
+              {getShortName(id)}
+              {isLocked && daysUntil && daysUntil <= 14 && (
+                <span className="text-[11px] opacity-70 ml-0.5">in {daysUntil}d</span>
+              )}
             </button>
           );
         })}

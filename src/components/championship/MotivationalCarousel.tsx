@@ -29,6 +29,7 @@ interface Props {
   isInTop10: boolean;
   isInTop3: boolean;
   streak?: number;
+  seasonColor?: string;
 }
 
 export const MotivationalCarousel: React.FC<Props> = ({
@@ -42,10 +43,12 @@ export const MotivationalCarousel: React.FC<Props> = ({
   isInTop10,
   isInTop3,
   streak,
+  seasonColor,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const amberColor = 'hsl(var(--accent-amber))';
+  const accentColor = seasonColor || amberColor;
   const messages: MotivationalMessage[] = [];
 
   if (isInTop3 && currentRank) {
@@ -180,24 +183,31 @@ export const MotivationalCarousel: React.FC<Props> = ({
       className="relative overflow-hidden px-5 py-4"
       style={{
         background: 'hsl(var(--accent-amber) / 0.05)',
-        borderLeft: '3px solid hsl(var(--accent-amber))',
         borderRadius: '16px',
         boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)',
       }}
     >
+      {/* Top accent bar — replaces left border */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[3px]"
+        style={{
+          background: `linear-gradient(90deg, ${accentColor}, ${accentColor}40)`,
+        }}
+      />
+
       {/* Content */}
       <div className="relative flex items-center gap-3">
-        {/* Trophy icon */}
+        {/* Premium icon box — rounded square */}
         <div
-          className="flex-shrink-0 rounded-full flex items-center justify-center"
+          className="flex-shrink-0 flex items-center justify-center"
           style={{
-            width: 40,
-            height: 40,
-            backgroundColor: 'hsl(var(--accent-amber) / 0.12)',
-            boxShadow: '0 0 8px hsl(var(--accent-amber) / 0.15)',
+            width: 36,
+            height: 36,
+            borderRadius: 10,
+            backgroundColor: `${currentMessage.iconColor}15`,
           }}
         >
-          <Icon className="w-5 h-5" style={{ color: amberColor }} />
+          <Icon className="w-[18px] h-[18px]" style={{ color: currentMessage.iconColor }} />
         </div>
 
         {/* Text */}
@@ -215,7 +225,7 @@ export const MotivationalCarousel: React.FC<Props> = ({
 
       {/* Dot indicators */}
       {sortedMessages.length > 1 && (
-        <div className="flex items-center justify-center gap-1.5 mt-2">
+        <div className="flex items-center justify-center gap-1 mt-2">
           {sortedMessages.map((_, idx) => (
             <button
               key={idx}
@@ -228,14 +238,14 @@ export const MotivationalCarousel: React.FC<Props> = ({
                 style={{
                   ...(idx === currentIndex
                     ? {
-                        width: '16px',
-                        height: '4px',
-                        backgroundColor: 'hsl(var(--accent-amber))',
+                        width: 6,
+                        height: 6,
+                        backgroundColor: accentColor,
                       }
                     : {
-                        width: '4px',
-                        height: '4px',
-                        backgroundColor: 'hsl(var(--border))',
+                        width: 4,
+                        height: 4,
+                        backgroundColor: '#E2E8F0',
                       }),
                 }}
               />
