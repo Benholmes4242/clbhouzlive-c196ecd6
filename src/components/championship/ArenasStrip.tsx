@@ -102,6 +102,7 @@ export const ArenasStrip: React.FC<ArenasStripProps> = ({
                 className="text-[22px] font-black leading-none"
                 style={{ color: isActive ? pill.color : 'hsl(var(--foreground))' }}
               >
+                {/* TODO: Country and Club pills may show "—" when arenas RPC doesn't return rank for this user — data issue, not visual */}
                 {pill.rank !== null ? `${pill.rank}${getRankSuffix(pill.rank)}` : '—'}
               </span>
               <span className="text-[11px] font-semibold text-foreground mt-0.5 truncate max-w-[72px]">

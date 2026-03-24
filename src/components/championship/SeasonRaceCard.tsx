@@ -127,16 +127,16 @@ export const SeasonRaceCard: React.FC<SeasonRaceCardProps> = ({
             className="flex-1 px-3 py-2 text-center"
             style={{
               borderRadius: 10,
-              backgroundColor: 'hsl(45 93% 47% / 0.08)',
-              border: '1px solid hsl(45 93% 47% / 0.2)',
+              backgroundColor: 'rgba(245,158,11,0.08)',
+              border: '1px solid rgba(245,158,11,0.25)',
             }}
           >
             <p className="text-[10px] text-muted-foreground font-medium">
               {rankAbove ? `To reach ${rankAbove}${getRankSuffix(rankAbove)}` : 'You\'re #1!'}
             </p>
             <p
-              className="text-sm font-extrabold"
-              style={{ color: 'hsl(45 93% 30%)' }}
+              className="text-[15px] font-extrabold"
+              style={{ color: '#92400E' }}
             >
               {gap > 0 ? `+${gap} courses` : '🏆 Leading'}
             </p>
@@ -147,21 +147,17 @@ export const SeasonRaceCard: React.FC<SeasonRaceCardProps> = ({
             className="flex-1 px-3 py-2 text-center"
             style={{
               borderRadius: 10,
-              backgroundColor: majorsBonusActive
-                ? `${seasonColor}08`
-                : 'hsl(var(--muted) / 0.3)',
-              border: majorsBonusActive
-                ? `1px solid ${seasonColor}20`
-                : '1px solid hsl(var(--border))',
+              backgroundColor: 'rgba(245,158,11,0.08)',
+              border: '1px solid rgba(245,158,11,0.25)',
             }}
           >
             <p className="text-[10px] text-muted-foreground font-medium">
               {majorsBonusActive ? 'Majors count' : 'Keep playing'}
             </p>
             <p
-              className="text-sm font-extrabold"
+              className="text-[15px] font-extrabold"
               style={{
-                color: majorsBonusActive ? seasonColor : 'hsl(var(--foreground))',
+                color: majorsBonusActive ? '#92400E' : '#92400E',
               }}
             >
               {majorsBonusActive ? '×2 pts' : 'Stay consistent'}
