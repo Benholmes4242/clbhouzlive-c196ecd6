@@ -42,18 +42,22 @@ export function useSuggestedFeed(userId: string | undefined) {
         // Track ALL fetched post IDs — including ones filtered out —
         // so the RPC doesn't waste candidate slots returning them again
         for (const post of posts) {
-          if (!seenPostIds.current.includes(post.id)) {
-            seenPostIds.current.push(post.id);
-          }
+          seenPostIds.current.add(post.id);
         }
-        if (seenPostIds.current.length > 500) {
-          seenPostIds.current = seenPostIds.current.slice(-500);
+        // Cap at 500 to prevent unbounded growth
+        if (seenPostIds.current.size > 500) {
+          const arr = Array.from(seenPostIds.current);
+          seenPostIds.current = new Set(arr.slice(-500));
         }
 
         const lastRow = rows[rows.length - 1];
-        // Always advance cursor if we got any rows back — even if all were filtered.
+        // Only advance cursor if we got filtered posts AND raw rows.
+        // If rows came back but all were filtered, stop pagination to prevent
+        // an infinite fetch loop burning through the entire posts table.
         const nextCursor: string | undefined =
-          rows.length > 0 ? lastRow.post_created_at : undefined;
+          rows.length > 0 && interleaved.length > 0
+            ? lastRow.post_created_at
+            : undefined;
 
         return { posts: interleaved, nextCursor };
       } catch (err) {
