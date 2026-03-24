@@ -136,7 +136,16 @@ export function CoursesLeaderboardView() {
     const saved = readSavedFilters();
     return saved?.subRegion ?? null;
   });
+  const [quickRegion, setQuickRegion] = useState<QuickRegion>('global');
   const [gamesHubOpen, setGamesHubOpen] = useState(false);
+
+  const QUICK_REGION_TO_COUNTRY: Record<QuickRegion, string | null> = {
+    'global': null,
+    'gb-i': 'Britain & Ireland',
+    'usa': 'USA',
+    'europe': 'Continental Europe',
+  };
+  const quickRegionCountry = QUICK_REGION_TO_COUNTRY[quickRegion];
 
   // Scroll position preservation refs for filter changes
   const scrollPositionRef = useRef<number>(0);
