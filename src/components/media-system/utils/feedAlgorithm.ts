@@ -1,9 +1,9 @@
 import type { FeedPost, FeedTab } from '../types/media';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-const SUGGESTED_REVIEW_POSITION = 7;
+const SUGGESTED_REVIEW_POSITION = 4;
 const SUGGESTED_TOURNAMENT_SLOT = 4;
-const SUGGESTED_BLOCK_SIZE = 10;
+const SUGGESTED_BLOCK_SIZE = 6;
 const SUGGESTED_MIN_VIDEO_DURATION = 4;
 const SUGGESTED_MAX_ASPECT_RATIO = 1.0; // anything above = landscape = excluded
 const FRIENDS_REVIEW_POSITION = 9;
@@ -118,19 +118,79 @@ export function interleaveReviews(posts: FeedPost[], tab: FeedTab): FeedPost[] {
 }
 
 
+// ── Video/Image Weighting ─────────────────────────────────────────────────────
+const SUGGESTED_VIDEO_RATIO = 0.8; // 80% of regular (non-review) slots should be video
+
+/**
+ * Weight the filtered post array toward video content.
+ * Distributes videos and images in the configured ratio
+ * while preserving relative chronological order within each type.
+ * Review posts are untouched — they are handled by interleaveReviews separately.
+ */
+export function weightByMediaType(posts: FeedPost[]): FeedPost[] {
+  const reviews = posts.filter(p => isReviewPost(p));
+  const videos = posts.filter(p => !isReviewPost(p) && p.mediaItems.some(m => m.type === 'video'));
+  const images = posts.filter(p => !isReviewPost(p) && !p.mediaItems.some(m => m.type === 'video'));
+
+  const regularCount = videos.length + images.length;
+  if (regularCount === 0) return posts;
+
+  // Calculate target counts based on ratio
+  const targetVideoCount = Math.round(regularCount * SUGGESTED_VIDEO_RATIO);
+  const targetImageCount = regularCount - targetVideoCount;
+
+  // Take up to the target count from each bucket (already sorted newest-first)
+  const selectedVideos = videos.slice(0, targetVideoCount);
+  const selectedImages = images.slice(0, targetImageCount);
+
+  // If one bucket runs short, backfill from the other
+  const videoShortfall = targetVideoCount - selectedVideos.length;
+  const imageShortfall = targetImageCount - selectedImages.length;
+
+  const backfilledVideos = videoShortfall > 0
+    ? [...selectedVideos, ...images.slice(targetImageCount, targetImageCount + videoShortfall)]
+    : selectedVideos;
+
+  const backfilledImages = imageShortfall > 0
+    ? [...selectedImages, ...videos.slice(targetVideoCount, targetVideoCount + imageShortfall)]
+    : selectedImages;
+
+  // Interleave videos and images to distribute them evenly rather than all videos first
+  const regular: FeedPost[] = [];
+  let vi = 0, ii = 0;
+  const videoWeight = SUGGESTED_VIDEO_RATIO;
+
+  while (vi < backfilledVideos.length || ii < backfilledImages.length) {
+    // Determine whether next slot should be video or image based on ratio
+    const videosDue = vi / (backfilledVideos.length || 1) <= videoWeight || ii >= backfilledImages.length;
+    if (videosDue && vi < backfilledVideos.length) {
+      regular.push(backfilledVideos[vi++]);
+    } else if (ii < backfilledImages.length) {
+      regular.push(backfilledImages[ii++]);
+    } else {
+      regular.push(backfilledVideos[vi++]);
+    }
+  }
+
+  return [...regular, ...reviews];
+}
+
 // ── Full Suggested Feed Pipeline ──────────────────────────────────────────────
 /**
  * Apply the complete suggested feed pipeline:
  * 1. Filter (portrait video only, min duration, portrait images)
- * 2. Interleave reviews at slot 7 of every 10-block
- * 3. Deduplicate
+ * 2. Cap per creator
+ * 3. Weight toward 80% video / 20% image
+ * 4. Interleave reviews at slot 4 of every 6-block
+ * 5. Deduplicate
  * Tournament injection happens in Clubhouse.tsx (needs live data from hook).
  */
 export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
   const noLive = posts.filter(p => p.postType !== 'tournament_live' && p.postType !== 'tournament_result');
   const filtered = filterForSuggested(noLive);
   const capped = capPerCreator(filtered);
-  const interleaved = interleaveReviews(capped, 'suggested');
+  const weighted = weightByMediaType(capped);
+  const interleaved = interleaveReviews(weighted, 'suggested');
   return deduplicatePosts(interleaved);
 }
 
