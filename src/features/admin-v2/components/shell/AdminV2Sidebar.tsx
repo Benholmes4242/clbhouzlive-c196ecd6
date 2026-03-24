@@ -9,6 +9,7 @@ import {
   Mail, MapPin, Upload, Trophy, Building2, Image, BookOpen,
   Flag, ClipboardList, Settings, Wrench, Map, FlaskConical,
   ArrowLeft, ChevronDown, ChevronRight, Activity, Sparkles, MessageCircle,
+  Medal,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -189,6 +190,7 @@ export default function AdminV2Sidebar({ role, can, onNavigate }: SidebarProps) 
         ...(can.manageAdmins ? [
           { to: '/admin-v2/tour',          label: 'Tour Data',          icon: Trophy },
           { to: '/admin-v2/tour/players',  label: 'Tour Players',       icon: Users },
+          { to: '/admin-v2/leaderboards',  label: 'Leaderboards',       icon: Medal },
           { to: '/admin-v2/businesses',    label: 'Business Directory', icon: Building2 },
         ] : []),
       ],

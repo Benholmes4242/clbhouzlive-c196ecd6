@@ -32,6 +32,7 @@ const EngagementAnalytics  = lazy(() => import('./pages/analytics/EngagementAnal
 const NavigationAnalytics  = lazy(() => import('./pages/analytics/NavigationAnalyticsPage'));
 const EchoAnalytics        = lazy(() => import('./pages/analytics/EchoAnalyticsPage'));
 const SocialAnalytics      = lazy(() => import('./pages/analytics/SocialAnalyticsPage'));
+const LeaderboardsPage     = lazy(() => import('./pages/LeaderboardsPage'));
 const GeocodingPage        = lazy(() => import('./pages/tools/GeocodingPage'));
 const TestLabPage          = lazy(() => import('./pages/tools/TestLabPage'));
 
@@ -160,6 +161,7 @@ export default function AdminV2Shell() {
             <Route path="courses/import" element={<CourseImportPage />} />
             <Route path="tour" element={can.manageAdmins ? <TourPage /> : <AdminV2AccessDenied role={role} />} />
             <Route path="tour/players" element={can.manageAdmins ? <TourPlayersPage /> : <AdminV2AccessDenied role={role} />} />
+            <Route path="leaderboards" element={can.manageAdmins ? <LeaderboardsPage /> : <AdminV2AccessDenied role={role} />} />
             <Route path="businesses" element={can.manageAdmins ? <BusinessesPage /> : <AdminV2AccessDenied role={role} />} />
             <Route path="assets" element={can.manageAdmins ? <AssetsPage /> : <AdminV2AccessDenied role={role} />} />
             <Route path="assets/logos" element={can.manageAdmins ? <LogosPage /> : <AdminV2AccessDenied role={role} />} />
