@@ -71,7 +71,8 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
       if (video) {
         video.muted = true;
       }
-      useClubhouseStore.getState().setIsMuted(true);
+      // Do NOT call setIsMuted(true) — this would wipe the user's global preference.
+      // The mutex only silences this specific element; the global preference is unchanged.
     });
     return () => unregisterAudioSource(id);
   }, [feedIndex]);
