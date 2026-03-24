@@ -556,7 +556,7 @@ export function CoursesLeaderboardView() {
       <CourseRegionPills
         value={quickRegion}
         onChange={(r) => {
-          handleScopeChange(r === 'global' ? 'global' : 'country');
+          handleScopeChange(r === 'global' || r === 'row' ? 'global' : 'country');
           setQuickRegion(r);
           if (r !== 'global') {
             setSelectedRegion(null);
