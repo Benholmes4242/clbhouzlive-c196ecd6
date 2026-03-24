@@ -88,7 +88,8 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
           size={48}
           alt={name}
           fallback={name?.charAt(0) || '?'}
-          hideRing
+          hideRing={!isCurrentUser}
+          ringColor={isCurrentUser ? '#f59e0b' : undefined}
         />
       </div>
 
