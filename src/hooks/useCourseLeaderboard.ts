@@ -81,18 +81,20 @@ export function useCourseLeaderboard(args: UseCourseLeaderboardArgs = {}) {
         'rising': 'trending',
       };
 
+      // When excluding countries (Rest of World), fetch more and filter client-side
+      const fetchSize = isExcludeMode ? pageSize * 3 : pageSize;
+
       // Use the new RPC that shows ALL reviewed courses (no Top 100 restriction)
       const { data, error } = await supabase.rpc('get_course_leaderboard', {
         p_sort_by: sortByMap[sort] || 'rating',
         p_sort_order: 'desc',
         p_time_period: timeRange === 'this_season' ? 'year' : timeRange,
         p_current_user_id: user?.id ?? null,
-        p_limit: pageSize,
+        p_limit: fetchSize,
         p_offset: pageParam as number,
         p_country: scope === 'country' ? region : null,
         p_sub_country: scope === 'country' ? subRegion : null,
-        p_exclude_countries: excludeCountries ?? undefined,
-      });
+      } as any);
 
       if (error) throw error;
 
