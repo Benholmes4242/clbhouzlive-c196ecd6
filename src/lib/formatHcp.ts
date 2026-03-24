@@ -26,65 +26,77 @@ export function formatHcp(value: unknown): string {
 }
 
 /**
+ * Handicap tier definitions matching the design system.
+ * Plus Figure: < 0 (stored negative)
+ * Scratch: 0.0 – 0.9
+ * Single Figure: 1.0 – 9.9
+ * Low Cap: 10.0 – 17.9
+ * Mid Figure: 18.0 – 27.9
+ * High Figure: 28.0+
+ */
+export type HandicapTier = 'plus' | 'scratch' | 'single' | 'low' | 'mid' | 'high';
+
+export function getHandicapTier(handicap: number): HandicapTier {
+  if (handicap < 0) return 'plus';
+  if (handicap < 1) return 'scratch';
+  if (handicap < 10) return 'single';
+  if (handicap < 18) return 'low';
+  if (handicap < 28) return 'mid';
+  return 'high';
+}
+
+/**
  * Get a status label based on handicap value.
- * 
- * Plus Figure: < -0.4 (plus handicap, e.g., +2.3 stored as -2.3)
- * Scratch: -0.4 to 0.4 (playing to par)
- * Single Figure: 0.5 to 9.9
- * 10.0+: No label (standard/high handicappers)
  */
 export function getHandicapStatusLabel(handicap: number): string | null {
-  if (handicap < -0.4) return 'Plus Figure';
-  if (handicap >= -0.4 && handicap <= 0.4) return 'Scratch';
-  if (handicap >= 0.5 && handicap <= 9.9) return 'Single Figure';
-  if (handicap >= 10.0 && handicap <= 19.9) return 'Mid Figure';
-  if (handicap >= 20.0) return 'High Figure';
-  return null;
+  const tier = getHandicapTier(handicap);
+  switch (tier) {
+    case 'plus': return 'Plus Figure';
+    case 'scratch': return 'Scratch';
+    case 'single': return 'Single Figure';
+    case 'low': return 'Low Cap';
+    case 'mid': return 'Mid Figure';
+    case 'high': return 'High Figure';
+  }
 }
 
 /**
- * Get status color based on handicap value.
- * Plus/Scratch = amber, Single Figure = amber (slightly softer), Mid/High = muted.
+ * Get status color based on handicap tier.
+ * Uses the brief's exact tier colour system.
  */
 export function getHandicapStatusColor(handicap: number, _seasonColor?: string): string {
-  if (handicap < -0.4) return 'hsl(var(--accent-amber))';
-  if (handicap >= -0.4 && handicap <= 0.4) return 'hsl(var(--accent-amber))';
-  if (handicap >= 0.5 && handicap <= 9.9) return 'hsl(var(--accent-amber) / 0.8)';
-  return 'hsl(var(--muted-foreground))';
+  const tier = getHandicapTier(handicap);
+  switch (tier) {
+    case 'plus': return '#C1A84C';
+    case 'scratch': return '#2D6A4F';
+    case 'single': return '#F5A623';
+    case 'low': return '#5B7FA6';
+    case 'mid': return '#8896A8';
+    case 'high': return '#B0BAC7';
+  }
 }
 
 /**
- * Get handicap category badge styling.
- * All tiers use amber-based or muted tokens — no season color dependency.
+ * Get handicap category badge styling per tier.
  */
 export function getHandicapBadgeStyle(handicap: number, _seasonColor?: string): {
   bg: string;
   text: string;
   border: string;
 } {
-  if (handicap < -0.4) return {
-    bg: 'hsl(var(--accent-amber) / 0.12)',
-    text: 'hsl(var(--accent-amber))',
-    border: 'hsl(var(--accent-amber) / 0.25)',
-  };
-  if (handicap >= -0.4 && handicap <= 0.4) return {
-    bg: 'hsl(var(--accent-amber) / 0.12)',
-    text: 'hsl(var(--accent-amber))',
-    border: 'hsl(var(--accent-amber) / 0.25)',
-  };
-  if (handicap >= 0.5 && handicap <= 9.9) return {
-    bg: 'hsl(var(--accent-amber) / 0.1)',
-    text: 'hsl(var(--accent-amber))',
-    border: 'hsl(var(--accent-amber) / 0.2)',
-  };
-  if (handicap >= 10.0 && handicap <= 19.9) return {
-    bg: 'hsl(var(--muted) / 0.5)',
-    text: 'hsl(var(--muted-foreground))',
-    border: 'hsl(var(--border) / 0.3)',
-  };
-  return {
-    bg: 'hsl(var(--muted) / 0.3)',
-    text: 'hsl(var(--muted-foreground))',
-    border: 'hsl(var(--border) / 0.2)',
-  };
+  const tier = getHandicapTier(handicap);
+  switch (tier) {
+    case 'plus':
+      return { bg: '#FBF5E6', text: '#C1A84C', border: 'transparent' };
+    case 'scratch':
+      return { bg: '#EBF5EF', text: '#2D6A4F', border: 'transparent' };
+    case 'single':
+      return { bg: '#FFF7E6', text: '#F5A623', border: 'transparent' };
+    case 'low':
+      return { bg: '#EEF3FA', text: '#5B7FA6', border: 'transparent' };
+    case 'mid':
+      return { bg: '#F1F5F9', text: '#8896A8', border: 'transparent' };
+    case 'high':
+      return { bg: '#F8FAFC', text: '#B0BAC7', border: 'transparent' };
+  }
 }

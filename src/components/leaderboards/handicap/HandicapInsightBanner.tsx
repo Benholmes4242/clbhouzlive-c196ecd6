@@ -1,76 +1,96 @@
-import { Trophy, TrendingDown, Target, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import { formatHcp } from '@/lib/formatHcp';
+import { Link } from 'react-router-dom';
 
 interface HandicapInsightBannerProps {
   userRank?: number | null;
-  improvement30d?: number | null;
+  topHandicap?: number | null;
+  userHandicap?: number | null;
+  userId?: string | null;
+  scope: string;
+  scopeLabel: string;
   mode: 'lowest' | 'improved' | 'season';
 }
 
-function getRankMessage(rank: number): { message: string; highlightRank: boolean } {
-  if (rank === 1) return { message: `You're #1 — top of the leaderboard!`, highlightRank: true };
-  if (rank <= 3) return { message: `You're #${rank} — leading the pack!`, highlightRank: true };
-  if (rank <= 10) return { message: `You're #${rank} — in the top 10!`, highlightRank: true };
-  if (rank <= 50) return { message: `You're #${rank} — climbing the ranks!`, highlightRank: false };
-  return { message: `You're #${rank} — keep grinding!`, highlightRank: false };
+function getIcon(rank: number): string {
+  if (rank === 1) return '🏆';
+  if (rank === 2) return '🥈';
+  if (rank <= 10) return '📉';
+  return '⛳';
 }
 
-export function HandicapInsightBanner({ 
-  userRank, 
-  improvement30d,
-  mode 
+export function HandicapInsightBanner({
+  userRank,
+  topHandicap,
+  userHandicap,
+  userId,
+  scope,
+  scopeLabel,
+  mode,
 }: HandicapInsightBannerProps) {
-  let message: string | null = null;
-  let Icon = Target;
-  let isTopRank = false;
-  let highlightNumber = '';
+  if (userRank === null || userRank === undefined) return null;
 
-  if (userRank !== null && userRank !== undefined) {
-    const result = getRankMessage(userRank);
-    message = result.message;
-    Icon = Trophy;
-    isTopRank = result.highlightRank;
-    highlightNumber = `#${userRank}`;
+  const icon = getIcon(userRank);
+
+  // Calculate gap to #1 for rank 2
+  const gap =
+    userRank === 2 && topHandicap !== null && topHandicap !== undefined && userHandicap !== null && userHandicap !== undefined
+      ? userHandicap - topHandicap
+      : null;
+
+  let messageNode: React.ReactNode;
+
+  if (userRank === 1) {
+    messageNode = (
+      <>
+        You're <span className="font-bold" style={{ color: '#F5A623' }}>#{userRank}</span> {scopeLabel} — the best handicap!
+      </>
+    );
+  } else if (userRank === 2 && gap !== null) {
+    messageNode = (
+      <>
+        Drop <span className="font-bold" style={{ color: '#F5A623' }}>{formatHcp(gap)}</span> shots to take the top spot {scopeLabel}
+      </>
+    );
+  } else if (userRank <= 10) {
+    messageNode = (
+      <>
+        You're <span className="font-bold" style={{ color: '#F5A623' }}>#{userRank}</span> {scopeLabel} — in the top 10
+      </>
+    );
+  } else {
+    messageNode = (
+      <>
+        You're <span className="font-bold" style={{ color: '#F5A623' }}>#{userRank}</span> {scopeLabel} — keep improving
+      </>
+    );
   }
 
-  // Show improvement insight if in improved/season mode
-  if (!message && improvement30d !== null && improvement30d !== undefined && improvement30d > 0) {
-    if (mode === 'improved') {
-      message = `Great progress: -${improvement30d.toFixed(1)} in 30 days`;
-      Icon = TrendingDown;
-    } else if (mode === 'season') {
-      message = `Season improvement: -${improvement30d.toFixed(1)}`;
-      Icon = TrendingDown;
-    }
-  }
-
-  if (!message) return null;
-
-  return (
+  const content = (
     <div
-      className="mx-5 flex items-center gap-3 rounded-[14px]"
+      className="flex items-center gap-3"
       style={{
-        background: 'hsl(var(--accent-amber) / 0.06)',
-        border: '1px solid hsl(var(--accent-amber) / 0.15)',
-        padding: '12px 16px',
+        background: '#FFFBF0',
+        border: '1px solid rgba(245, 166, 35, 0.2)',
+        borderRadius: 14,
+        padding: '12px 14px',
       }}
     >
-      <div
-        className="flex-shrink-0 flex items-center justify-center"
-        style={{ filter: 'drop-shadow(0 0 8px hsl(var(--accent-amber) / 0.2))' }}
-      >
-        <Icon size={28} style={{ color: 'hsl(var(--accent-amber))' }} />
-      </div>
-      <p className="text-sm font-semibold text-foreground flex-1">
-        {isTopRank && highlightNumber ? (
-          <>
-            You're <span className="font-bold" style={{ color: 'hsl(var(--accent-amber))' }}>{highlightNumber}</span>
-            {message.substring(message.indexOf('—'))}
-          </>
-        ) : (
-          message
-        )}
+      <span style={{ fontSize: 20, flexShrink: 0 }}>{icon}</span>
+      <p className="flex-1 text-[13px] font-semibold" style={{ color: '#0F172A' }}>
+        {messageNode}
       </p>
-      <ChevronRight size={16} className="text-muted-foreground/50 flex-shrink-0" />
+      <ChevronRight size={16} style={{ color: '#94A3B8', flexShrink: 0 }} />
     </div>
   );
+
+  if (userId) {
+    return (
+      <Link to={`/profile/${userId}`} className="block active:scale-[0.98] transition-transform">
+        {content}
+      </Link>
+    );
+  }
+
+  return content;
 }
