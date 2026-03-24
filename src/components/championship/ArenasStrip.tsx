@@ -81,35 +81,45 @@ export const ArenasStrip: React.FC<ArenasStripProps> = ({
       >
         {pills.map((pill) => {
           const isActive = activeArena === pill.id;
+          // A pill is unavailable when we have no data context for it
+          // (e.g. user has no home club so country/club rank can't be computed)
+          // TODO: Country and Club pills may show "N/A" when arenas RPC doesn't return rank — data issue, not visual
+          const isUnavailable = pill.id !== 'global' && pill.total === 0 && pill.rank === null;
           return (
             <button
               key={pill.id}
-              onClick={() => onArenaChange(pill.id)}
+              onClick={() => !isUnavailable && onArenaChange(pill.id)}
               className="flex-shrink-0 flex flex-col items-center transition-all active:scale-[0.96]"
               style={{
                 minWidth: 80,
                 borderRadius: 14,
-                padding: '10px 14px',
+                padding: '10px 12px',
                 backgroundColor: isActive ? `${pill.color}15` : 'hsl(var(--card))',
                 border: isActive
                   ? `1.5px solid ${pill.color}88`
                   : '1.5px solid hsl(var(--border))',
                 boxShadow: isActive ? `0 0 12px ${pill.color}25` : 'none',
+                opacity: isUnavailable ? 0.45 : 1,
+                cursor: isUnavailable ? 'default' : 'pointer',
               }}
             >
               <span className="text-base mb-1">{pill.icon}</span>
               <span
-                className="text-[22px] font-black leading-none"
-                style={{ color: isActive ? pill.color : 'hsl(var(--foreground))' }}
+                className="font-black leading-none"
+                style={{
+                  fontSize: isUnavailable ? 13 : 22,
+                  color: isUnavailable
+                    ? 'hsl(var(--muted-foreground))'
+                    : isActive ? pill.color : 'hsl(var(--foreground))',
+                }}
               >
-                {/* TODO: Country and Club pills may show "—" when arenas RPC doesn't return rank for this user — data issue, not visual */}
-                {pill.rank !== null ? `${pill.rank}${getRankSuffix(pill.rank)}` : '—'}
+                {isUnavailable ? 'N/A' : pill.rank !== null ? `${pill.rank}${getRankSuffix(pill.rank)}` : '—'}
               </span>
               <span className="text-[11px] font-semibold text-foreground mt-0.5 truncate max-w-[72px]">
                 {pill.label}
               </span>
               <span className="text-[10px] text-muted-foreground">
-                {pill.total > 0 ? `${pill.total.toLocaleString()} players` : '—'}
+                {isUnavailable ? 'Set profile' : pill.total > 0 ? `${pill.total.toLocaleString()} players` : '—'}
               </span>
             </button>
           );
