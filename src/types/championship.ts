@@ -105,7 +105,7 @@ export interface SeasonBadge {
 }
 
 // Filter/UI State Types
-export type ChampionshipArenaMode = 'global' | 'division' | 'friends' | 'club' | 'country';
+export type ChampionshipArenaMode = 'global' | 'division' | 'friends' | 'club' | 'country' | 'handicap';
 
 export interface ChampionshipFilters {
   arenaMode: ChampionshipArenaMode;
