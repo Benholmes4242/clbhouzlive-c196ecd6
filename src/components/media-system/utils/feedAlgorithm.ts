@@ -29,8 +29,8 @@ function isReviewPost(p: FeedPost): boolean {
  */
 export function filterForSuggested(posts: FeedPost[]): FeedPost[] {
   return posts.filter(post => {
-    // Tournament posts bypass media filters, reviews do not
-    if (isTournamentPost(post)) return true;
+    // Tournament and review posts bypass media filters
+    if (isTournamentPost(post) || isReviewPost(post)) return true;
 
     const media = post.mediaItems;
     if (!media || media.length === 0) return false;
