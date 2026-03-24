@@ -37,16 +37,16 @@ export function useArenaRanks(
       // Run all queries in parallel
       const promises: Promise<void>[] = [];
 
-      // Country rank
+      // Country rank — p_scope='country' + p_country filter
       if (country) {
         promises.push(
           (async () => {
             const { data, error } = await supabase
               .rpc('get_championship_leaderboard' as any, {
-                p_time_filter: 'seasonal',
+                p_scope: 'country',
                 p_limit: 1000,
                 p_offset: 0,
-                p_country: country,
+                p_country: String(country),
               });
             if (!error && Array.isArray(data)) {
               result.countryTotal = data.length;
@@ -57,16 +57,16 @@ export function useArenaRanks(
         );
       }
 
-      // Club rank
+      // Club rank — p_scope='club' + p_club_id filter (uuid param)
       if (clubId) {
         promises.push(
           (async () => {
             const { data, error } = await supabase
               .rpc('get_championship_leaderboard' as any, {
-                p_time_filter: 'seasonal',
+                p_scope: 'club',
                 p_limit: 1000,
                 p_offset: 0,
-                p_club_id: clubId,
+                p_club_id: clubId, // uuid type — pass directly, no String() cast
               });
             if (!error && Array.isArray(data)) {
               result.clubTotal = data.length;
@@ -77,13 +77,16 @@ export function useArenaRanks(
         );
       }
 
-      // Handicap rank — client-side filter from global leaderboard
+      // Handicap rank — get_lowest_handicap_leaderboard returns eg_handicap_index.
+      // Client-side band filter: ±1.5 strokes around user's handicap.
+      // get_championship_leaderboard does not return handicap_index so we use the
+      // handicap-specific RPC instead.
       if (handicapIndex !== null) {
         promises.push(
           (async () => {
             const { data, error } = await supabase
-              .rpc('get_championship_leaderboard' as any, {
-                p_time_filter: 'seasonal',
+              .rpc('get_lowest_handicap_leaderboard' as any, {
+                p_scope: 'global',
                 p_limit: 1000,
                 p_offset: 0,
               });

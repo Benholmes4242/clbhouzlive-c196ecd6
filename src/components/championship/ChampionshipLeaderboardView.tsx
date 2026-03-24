@@ -195,7 +195,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
 
       const { data, error } = await supabase
         .from('user_profiles')
-        .select('primary_club_id, country, golf_clubs!user_profiles_primary_club_id_fkey(id, name)')
+        .select('primary_club_id, country, eg_handicap_index, golf_clubs!user_profiles_primary_club_id_fkey(id, name)')
         .eq('id', userId)
         .single();
 
@@ -209,7 +209,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         const clubData = Array.isArray(data.golf_clubs) ? data.golf_clubs[0] : data.golf_clubs;
         setUserHomeClubName(clubData?.name || null);
       }
-      setUserCountry(data?.country ?? null);
+      setUserCountry((data as any)?.country ?? null);
+      setUserHandicap((data as any)?.eg_handicap_index ?? null);
     };
 
     fetchUserProfile();
@@ -487,11 +488,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   }, [rivals]);
 
   // Derive handicap from currentUserEntry if available
-  useEffect(() => {
-    if (currentUserEntry && (currentUserEntry as any).handicap_index != null) {
-      setUserHandicap((currentUserEntry as any).handicap_index);
-    }
-  }, [currentUserEntry]);
+  // userHandicap is now set from profile fetch (eg_handicap_index) — more reliable than leaderboard entry
 
   // Helper: country flag emoji
   const getCountryFlag = (country: string): string => {
