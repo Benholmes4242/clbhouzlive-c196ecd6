@@ -16,16 +16,8 @@ import {
 import { CountrySelector } from '../shared/CountrySelector';
 import { ExplorationPodium } from './ExplorationPodium';
 import { MiniGlobePreview } from './MiniGlobePreview';
-import { GlobalGolfersMapStatsRow } from './GlobalGolfersMapStatsRow';
 import { ClubSearchBar } from './ClubSearchBar';
 import { usePlayedCourseCoordinates } from '@/hooks/usePlayedCourseCoordinates';
-import { ContinentBreakdownGrid } from './ContinentBreakdownGrid';
-import { ExplorerProfileCard } from './ExplorerProfileCard';
-import { ViewModeToggle } from './ViewModeToggle';
-import { CountryLeaderboard } from './CountryLeaderboard';
-import { ExplorerTierCard } from './ExplorerTierCard';
-import { ExplorerTierLadder } from './ExplorerTierLadder';
-import { getUserTier, getNextTier } from '@/config/explorerTiers';
 import type { LeaderboardScope, ExplorationMetric } from '@/types/leaderboards';
 
 // --- Constants ---
@@ -95,6 +87,8 @@ export function ExplorationTab() {
   const navigate = useNavigate();
   const savedFilters = useRef(loadSavedFilters()).current;
 
+  // Globe played dots always use amber per design system (not season-themed)
+  // Globe played dots always use amber per design system (not season-themed)
   const seasonThemeColor = '#f59e0b';
 
   const [scope, setScope] = useState<LeaderboardScope>(() => savedFilters?.scope ?? 'global');
@@ -104,8 +98,6 @@ export function ExplorationTab() {
   const [selectedCountry, setSelectedCountry] = useState<string | null>(() => savedFilters?.selectedCountry ?? null);
   const [userHomeClubId, setUserHomeClubId] = useState<string | null>(null);
   const [userHomeClubName, setUserHomeClubName] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'player' | 'country'>(() => savedFilters?.viewMode ?? 'player');
-  const [activeContinent, setActiveContinent] = useState<string | null>(null);
   
   const [scrollTop, setScrollTop] = useState(0);
 
@@ -119,14 +111,14 @@ export function ExplorationTab() {
   // Save filters
   useEffect(() => {
     sessionStorage.setItem(STORAGE_KEY_FILTERS, JSON.stringify({
-      scope, metric, selectedClubId, selectedClubName, selectedCountry, viewMode,
+      scope, metric, selectedClubId, selectedClubName, selectedCountry,
     }));
     isFilterChangeRef.current = true;
     scrollPositionRef.current = (() => {
       const rootEl = document.getElementById('root');
       return (rootEl && rootEl.scrollTop > 0) ? rootEl.scrollTop : window.scrollY;
     })();
-  }, [scope, metric, selectedClubId, selectedClubName, selectedCountry, viewMode]);
+  }, [scope, metric, selectedClubId, selectedClubName, selectedCountry]);
 
   // Preserve scroll on filter change
   useLayoutEffect(() => {
@@ -222,45 +214,6 @@ export function ExplorationTab() {
     navigate('/top100?view=map');
   }, [navigate]);
 
-  // Current user's entry from leaderboard
-  const currentUserEntry = useMemo(
-    () => allEntries.find(e => e.user_id === user?.id) ?? null,
-    [allEntries, user?.id]
-  );
-
-  // Current user profile data
-  const [currentUserProfile, setCurrentUserProfile] = useState<{
-    display_name: string | null;
-    profile_photo_url: string | null;
-  } | null>(null);
-
-  useEffect(() => {
-    async function fetchProfile() {
-      if (!user?.id) return;
-      const { data } = await supabase
-        .from('user_profiles')
-        .select('display_name, profile_photo_url')
-        .eq('id', user.id)
-        .maybeSingle();
-      if (data) setCurrentUserProfile(data);
-    }
-    fetchProfile();
-  }, [user?.id]);
-
-  // Continent filtering
-  const filteredEntries = useMemo(() => {
-    if (!activeContinent) return allEntries;
-    return allEntries.filter(e =>
-      e.continent_list?.includes(activeContinent)
-    );
-  }, [allEntries, activeContinent]);
-
-  // Explorer tier
-  const continentsPlayed = userStatus?.continent_list?.filter(c => c !== 'Antarctica').length ?? 0;
-  const countriesPlayed = userStatus?.countries_count ?? 0;
-  const userTier = useMemo(() => getUserTier(countriesPlayed, continentsPlayed), [countriesPlayed, continentsPlayed]);
-  const nextTier = useMemo(() => getNextTier(userTier.id), [userTier.id]);
-
   // Scroll restore
   useEffect(() => {
     if (hasRestoredScroll.current || allEntries.length === 0) return;
@@ -312,8 +265,6 @@ export function ExplorationTab() {
     switch (metric) {
       case 'continents':
         return entry.continents_count;
-      case 'courses':
-        return entry.courses_count;
       default:
         return entry.countries_count;
     }
@@ -329,24 +280,27 @@ export function ExplorationTab() {
   };
 
   const getMetricColor = (_rank: number): string => {
+    // All stat numbers use season color for consistency
     return '';
   };
 
-  const podiumEntries = filteredEntries.slice(0, 3);
+  const podiumEntries = allEntries.slice(0, 3);
+
+  const countriesPlayed = userStatus?.countries_count ?? 0;
 
   // Virtualization
   const virtualizedContent = useMemo(() => {
-    if (filteredEntries.length <= VIRTUALIZATION_THRESHOLD) return null;
+    if (allEntries.length <= VIRTUALIZATION_THRESHOLD) return null;
     const containerOffset = listContainerRef.current?.offsetTop ?? 0;
     const relativeScroll = Math.max(0, scrollTop - containerOffset);
     const viewportHeight = window.innerHeight;
     const startIndex = Math.max(0, Math.floor(relativeScroll / ROW_HEIGHT) - OVERSCAN);
     const visibleCount = Math.ceil(viewportHeight / ROW_HEIGHT) + OVERSCAN * 2;
-    const endIndex = Math.min(filteredEntries.length, startIndex + visibleCount);
-    const totalHeight = filteredEntries.length * ROW_HEIGHT;
+    const endIndex = Math.min(allEntries.length, startIndex + visibleCount);
+    const totalHeight = allEntries.length * ROW_HEIGHT;
     const offsetY = startIndex * ROW_HEIGHT;
     return { startIndex, endIndex, totalHeight, offsetY };
-  }, [filteredEntries.length, scrollTop]);
+  }, [allEntries.length, scrollTop]);
 
   // Render entries helper
   const renderEntry = (entry: any, index: number) => (
@@ -371,37 +325,8 @@ export function ExplorationTab() {
   );
 
   return (
-    <div className="flex flex-col px-3 pt-3" style={{ gap: 14 }}>
-      {/* 1. Explorer Profile Card (NEW) */}
-      {user && userStatus && (countriesPlayed > 0 || (currentUserEntry?.courses_count ?? 0) > 0) && (
-        <ExplorerProfileCard
-          displayName={currentUserProfile?.display_name ?? user.email ?? 'You'}
-          avatarUrl={currentUserProfile?.profile_photo_url ?? null}
-          homeClub={userHomeClubName}
-          userId={user.id}
-          coursesCount={currentUserEntry?.courses_count ?? 0}
-          countriesCount={countriesPlayed}
-          continentsCount={continentsPlayed}
-          countryList={userStatus.country_list ?? []}
-          globalRank={userStatus.global_rank ?? null}
-          seasonColor={seasonThemeColor}
-        />
-      )}
-
-      {/* 2. Explorer Tier Card + Ladder (NEW) */}
-      {user && userStatus && (
-        <div>
-          <ExplorerTierCard
-            tier={userTier}
-            nextTier={nextTier}
-            countriesCount={countriesPlayed}
-            continentsCount={continentsPlayed}
-          />
-          <ExplorerTierLadder currentTier={userTier} />
-        </div>
-      )}
-
-      {/* 3. World Map (UNCHANGED) */}
+    <div className="flex flex-col px-5 pt-4" style={{ gap: 20 }}>
+      {/* 1. World Map — 16px below sub-tabs (pt-4) */}
       {user && (
         <MiniGlobePreview
           playedCoordinates={playedCoordinates ?? []}
@@ -410,46 +335,18 @@ export function ExplorationTab() {
         />
       )}
 
-      {/* 4. Continents Achievement Banner (UNCHANGED) */}
-      {user && userStatus && (
-        <div>
-          <GlobalGolfersMapStatsRow
-            continentsPlayed={continentsPlayed}
-            continentsTotal={6}
-            countriesPlayed={countriesPlayed}
-            viewMode={metric}
-            onViewModeChange={setMetric}
-            seasonColor={seasonThemeColor}
-          />
-        </div>
-      )}
+      {/* 3. Scope Selector */}
+      <div className="flex justify-center">
+        <LeaderboardScopeSelector value={scope} onChange={setScope} showClub={false} showCountry={false} />
+      </div>
 
-      {/* 5. Continent Breakdown Grid (NEW) */}
-      {allEntries.length > 0 && (
-        <ContinentBreakdownGrid
-          entries={allEntries}
-          activeContinent={activeContinent}
-          onContinentSelect={setActiveContinent}
-          seasonColor={seasonThemeColor}
-        />
-      )}
-
-      {/* 6. View Mode Toggle (NEW) */}
-      <ViewModeToggle value={viewMode} onChange={setViewMode} />
-
-      {/* 7. Scope Selector (UNCHANGED — only in player mode) */}
-      {viewMode === 'player' && (
-        <div className="flex justify-center">
-          <LeaderboardScopeSelector value={scope} onChange={setScope} showClub={false} showCountry={false} />
-        </div>
-      )}
 
       {/* Initial error */}
       {isError && allEntries.length === 0 && !isLoading && (
         <div>
           <InitialErrorState onRetry={() => refetch()} />
         </div>
-      )}
+       )}
 
       {/* Initial loading */}
       {isLoading ? (
@@ -466,55 +363,47 @@ export function ExplorationTab() {
           }
         />
       ) : allEntries.length > 0 ? (
-        viewMode === 'player' ? (
-          <div>
-            {/* Podium */}
-            <ExplorationPodium 
-              entries={podiumEntries} 
-              metric={metric}
-              currentUserId={user?.id}
-              seasonColor={seasonThemeColor}
-            />
-
-            {/* Rankings List */}
-            <div ref={listContainerRef} className="flex flex-col">
-              {virtualizedContent ? (
-                <div style={{ height: virtualizedContent.totalHeight, position: 'relative' }}>
-                  <div style={{ transform: `translateY(${virtualizedContent.offsetY}px)`, position: 'absolute', width: '100%' }}>
-                    {filteredEntries.slice(virtualizedContent.startIndex, virtualizedContent.endIndex).map((entry, i) =>
-                      renderEntry(entry, virtualizedContent.startIndex + i)
-                    )}
-                  </div>
-                </div>
-              ) : (
-                filteredEntries.map((entry, i) => renderEntry(entry, i))
-              )}
-            </div>
-
-            {/* Sentinel + loading skeleton */}
-            {hasNextPage && !isError && (
-              <div ref={sentinelRef}>
-                {isFetchingNextPage && <ExplorationLeaderboardSkeleton />}
-              </div>
-            )}
-
-            {/* Inline retry on pagination error */}
-            {isError && !isFetchingNextPage && allEntries.length > 0 && (
-              <InlineRetryCard onRetry={() => fetchNextPage()} />
-            )}
-
-            {/* Loading indicator during retry */}
-            {isError && isFetchingNextPage && allEntries.length > 0 && (
-              <ExplorationLeaderboardSkeleton />
-            )}
-          </div>
-        ) : (
-          /* By Country view (NEW) */
-          <CountryLeaderboard
-            entries={allEntries}
+        <div>
+          {/* Podium */}
+          <ExplorationPodium 
+            entries={podiumEntries} 
+            metric={metric}
+            currentUserId={user?.id}
             seasonColor={seasonThemeColor}
           />
-        )
+
+          {/* Rankings List */}
+          <div ref={listContainerRef} className="flex flex-col">
+            {virtualizedContent ? (
+              <div style={{ height: virtualizedContent.totalHeight, position: 'relative' }}>
+                <div style={{ transform: `translateY(${virtualizedContent.offsetY}px)`, position: 'absolute', width: '100%' }}>
+                  {allEntries.slice(virtualizedContent.startIndex, virtualizedContent.endIndex).map((entry, i) =>
+                    renderEntry(entry, virtualizedContent.startIndex + i)
+                  )}
+                </div>
+              </div>
+            ) : (
+              allEntries.map((entry, i) => renderEntry(entry, i))
+            )}
+          </div>
+
+          {/* Sentinel + loading skeleton */}
+          {hasNextPage && !isError && (
+            <div ref={sentinelRef}>
+              {isFetchingNextPage && <ExplorationLeaderboardSkeleton />}
+            </div>
+          )}
+
+          {/* Inline retry on pagination error */}
+          {isError && !isFetchingNextPage && allEntries.length > 0 && (
+            <InlineRetryCard onRetry={() => fetchNextPage()} />
+          )}
+
+          {/* Loading indicator during retry */}
+          {isError && isFetchingNextPage && allEntries.length > 0 && (
+            <ExplorationLeaderboardSkeleton />
+          )}
+        </div>
       ) : null}
 
     </div>
