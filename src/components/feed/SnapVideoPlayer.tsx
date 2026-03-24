@@ -123,8 +123,9 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
         try {
           await video.play();
         } catch {
+          // Autoplay blocked — mute this element only to recover playback.
+          // Do NOT reset the global store preference; the user's unmute choice must persist.
           video.muted = true;
-          useClubhouseStore.getState().setIsMuted(true);
           video.play().catch(() => {});
         }
         useClubhouseStore.getState().setActiveVideoElement(video, videoRef);
