@@ -52,12 +52,13 @@ export function getHandicapTier(handicap: number): HandicapTier {
 export function getHandicapStatusLabel(handicap: number): string | null {
   const tier = getHandicapTier(handicap);
   switch (tier) {
-    case 'plus': return 'Plus Figure';
+    case 'elite': return 'Elite';
     case 'scratch': return 'Scratch';
+    case 'player': return 'Player';
     case 'single': return 'Single Figure';
-    case 'low': return 'Low Cap';
-    case 'mid': return 'Mid Figure';
-    case 'high': return 'High Figure';
+    case 'midfielder': return 'Midfielder';
+    case 'weekend': return 'Weekend Warrior';
+    case 'hacker': return 'Happy Hacker';
   }
 }
 
