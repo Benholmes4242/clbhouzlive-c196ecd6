@@ -22,7 +22,23 @@ export function ExplorerTierCard({
     : 100;
 
   return (
-    <div>
+    <div
+      style={{
+        borderRadius: 18,
+        overflow: 'hidden',
+        border: `1.5px solid ${tier.color}40`,
+        background: `linear-gradient(135deg, ${tier.color}08, ${tier.color}03)`,
+      }}
+    >
+      {/* Top bar */}
+      <div
+        style={{
+          height: 3,
+          background: `linear-gradient(90deg, ${tier.color}, ${tier.color}20)`,
+        }}
+      />
+
+      <div style={{ padding: '14px 16px' }}>
         <div className="flex items-start gap-3">
           {/* Icon tile */}
           <div
@@ -87,6 +103,7 @@ export function ExplorerTierCard({
             ✨ Maximum tier reached
           </p>
         )}
+      </div>
     </div>
   );
 }
