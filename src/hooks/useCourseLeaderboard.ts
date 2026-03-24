@@ -63,7 +63,7 @@ export function useCourseLeaderboard(args: UseCourseLeaderboardArgs = {}) {
   } = args;
 
   return useInfiniteQuery<CourseLeaderboardPage>({
-    queryKey: ['course-leaderboard', scope, timeRange, sort, region, subRegion],
+    queryKey: ['course-leaderboard', scope, timeRange, sort, region, subRegion, excludeCountries],
     initialPageParam: 0,
     placeholderData: keepPreviousData,
     queryFn: async ({ pageParam }): Promise<CourseLeaderboardPage> => {
