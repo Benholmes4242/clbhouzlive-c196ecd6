@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Volume2, VolumeX } from 'lucide-react';
 import Hls from 'hls.js';
 import { useMediaViewer, type MediaViewerItem } from '@/hooks/useMediaViewer';
-import { registerAudioSource, unregisterAudioSource } from '@/utils/globalVideoMute';
+import { registerAudioSource, unregisterAudioSource, pauseAllAudio, pauseAllExcept } from '@/utils/globalVideoMute';
 
 /* ─── Video slide ─── */
 const VideoSlide: React.FC<{ item: MediaViewerItem }> = ({ item }) => {
@@ -14,16 +14,17 @@ const VideoSlide: React.FC<{ item: MediaViewerItem }> = ({ item }) => {
   const videoSrc = item.hlsUrl || item.mp4Url || item.src || '';
 
   // Register with global audio mutex
+  const audioId = `media-viewer-${item.id}`;
+
   useEffect(() => {
-    const id = `media-viewer-video`;
-    registerAudioSource(id, () => {
+    registerAudioSource(audioId, () => {
       if (ref.current) {
         ref.current.muted = true;
         ref.current.pause();
       }
     });
-    return () => unregisterAudioSource(id);
-  }, []);
+    return () => unregisterAudioSource(audioId);
+  }, [audioId]);
 
   useEffect(() => {
     const el = ref.current;
@@ -62,7 +63,18 @@ const VideoSlide: React.FC<{ item: MediaViewerItem }> = ({ item }) => {
         poster={item.thumbnailUrl}
       />
       <button
-        onClick={(e) => { e.stopPropagation(); setMuted(m => !m); }}
+        onClick={(e) => {
+          e.stopPropagation();
+          setMuted(prev => {
+            if (prev) {
+              pauseAllExcept(audioId);
+              if (ref.current) ref.current.muted = false;
+            } else {
+              if (ref.current) ref.current.muted = true;
+            }
+            return !prev;
+          });
+        }}
         className="absolute bottom-6 right-6 w-11 h-11 rounded-full bg-black/50 flex items-center justify-center text-white"
       >
         {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
@@ -121,6 +133,13 @@ export const MediaViewerOverlay: React.FC = () => {
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [isOpen, closeViewer, next, prev]);
+
+  // Pause all feed audio when viewer is open or slide changes
+  useEffect(() => {
+    if (isOpen) {
+      pauseAllAudio();
+    }
+  }, [isOpen, currentIndex]);
 
   // lock body scroll
   useEffect(() => {
