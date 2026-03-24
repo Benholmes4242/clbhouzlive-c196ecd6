@@ -112,6 +112,7 @@ export const MiniGlobePreview: React.FC<MiniGlobePreviewProps> = ({
       fadeDuration: 0,
     };
     (mapOptions as any).pixelRatio = 1;
+    (mapboxgl as any).config.EVENTS_URL = '';
     const map = new mapboxgl.Map(mapOptions);
 
     mapRef.current = map;

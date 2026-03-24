@@ -145,7 +145,7 @@ export function applyClbhouzMapStyle(
   const labelHaloColor = darkMode ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.8)';
 
   // Background
-  try { map.setPaintProperty('background', 'background-color', resolvedLandColor); } catch {}
+  try { if (map.getLayer('background')) { map.setPaintProperty('background', 'background-color', resolvedLandColor); } } catch {}
 
   const remainingLayers = map.getStyle().layers ?? [];
   for (const layer of remainingLayers) {
