@@ -28,9 +28,9 @@ export const CourseSeasonSpotlight: React.FC<CourseSeasonSpotlightProps> = ({ on
           100% { background-position: 200% center; }
         }
         @keyframes stampIn {
-          0% { opacity: 0; transform: scale(1.2) rotate(-3deg); }
-          60% { transform: scale(0.97) rotate(1deg); }
-          100% { opacity: 1; transform: scale(1) rotate(0deg); }
+          0% { opacity: 0; transform: scale(1.3) rotate(-6deg); }
+          60% { opacity: 1; transform: scale(0.96) rotate(1deg); }
+          100% { opacity: 1; transform: scale(1) rotate(-1deg); }
         }
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(8px); }
@@ -91,11 +91,11 @@ export const CourseSeasonSpotlight: React.FC<CourseSeasonSpotlightProps> = ({ on
               display: 'inline-flex',
               gap: 6,
               alignItems: 'center',
-              animation: 'stampIn 0.4s cubic-bezier(0.34,1.56,0.64,1) 0.3s both',
+              animation: 'stampIn 0.5s ease-out 0.3s both',
             }}
           >
             <span style={{ fontSize: 12 }}>🔥</span>
-            <span style={{ fontSize: 11, fontWeight: 800, color: '#1a0e00', textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 11, fontWeight: 800, color: '#1a0e00', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
               This Season's Hottest
             </span>
           </div>

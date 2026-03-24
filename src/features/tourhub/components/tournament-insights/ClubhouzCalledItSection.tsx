@@ -102,7 +102,7 @@ export const ClubhouzCalledItSection: React.FC<ClubhouzCalledItSectionProps> = (
         color: 'hsl(var(--muted-foreground))',
         marginBottom: 12, paddingLeft: 16,
       }}>
-        Clbhouz Called It
+        clbhouz Called It
       </div>
 
       {/* ── HERO PICK CARD ─────────────────────────────────────────── */}
@@ -157,7 +157,7 @@ export const ClubhouzCalledItSection: React.FC<ClubhouzCalledItSectionProps> = (
                 color: isWinner ? '#451A03' : '#16A34A',
                 letterSpacing: '0.02em',
               }}>
-                {isWinner ? 'Clbhouz Called It' : 'Top Pick'}
+                {isWinner ? 'clbhouz Called It' : 'Top Pick'}
               </span>
             </div>
 
