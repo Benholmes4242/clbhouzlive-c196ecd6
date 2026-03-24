@@ -706,6 +706,27 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         />
       )}
 
+      {/* 6b. Arenas Strip — rank pills */}
+      {timeFilter === 'seasonal' && currentUserEntry && (
+        <ArenasStrip
+          activeArena={arenaMode}
+          onArenaChange={handleArenaModeChange}
+          globalRank={currentUserEntry.current_rank ?? null}
+          globalTotal={allEntries.length}
+          countryRank={arenaRanks?.countryRank ?? null}
+          countryLabel={userCountry || 'Country'}
+          countryFlag={userCountry ? getCountryFlag(userCountry) : '🏳️'}
+          countryTotal={arenaRanks?.countryTotal ?? 0}
+          clubRank={arenaRanks?.clubRank ?? null}
+          clubLabel={userHomeClubName || 'My Club'}
+          clubTotal={arenaRanks?.clubTotal ?? 0}
+          handicapRank={arenaRanks?.handicapRank ?? null}
+          handicapLabel={getHandicapBandLabel(userHandicap)}
+          handicapTotal={arenaRanks?.handicapTotal ?? 0}
+          seasonLabel={getSeasonConfig(currentSeasonId).title}
+        />
+      )}
+
       {/* 7. Filters - Scope Toggle */}
       <div className="w-full">
         <ChampionshipFilters
