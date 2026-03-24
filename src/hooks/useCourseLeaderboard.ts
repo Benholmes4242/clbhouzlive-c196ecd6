@@ -115,8 +115,7 @@ export function useCourseLeaderboard(args: UseCourseLeaderboardArgs = {}) {
         has_played: boolean;
       }>;
 
-      return {
-        entries: rows.map((row, index) => ({
+      const allEntries = rows.map((row, index) => ({
           course_id: row.course_id,
           course_name: row.course_name,
           country: row.country,
@@ -143,8 +142,14 @@ export function useCourseLeaderboard(args: UseCourseLeaderboardArgs = {}) {
           current_user_played: row.has_played ?? false,
           current_user_rating: null,
           current_user_play_count: row.has_played ? 1 : 0,
-        })),
-      };
+        }));
+
+      // Client-side exclusion filter for "Rest of World"
+      const entries = isExcludeMode
+        ? allEntries.filter(e => !excludeCountries!.includes(e.country ?? ''))
+        : allEntries;
+
+      return { entries };
     },
     getNextPageParam: (lastPage, allPages) => {
       if (lastPage.entries.length < pageSize) return undefined;
