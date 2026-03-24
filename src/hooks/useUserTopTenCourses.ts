@@ -238,18 +238,6 @@ export function useUserTopTenCourses(userId: string | undefined) {
 
         if (deleteError) throw deleteError;
 
-        // Repack remaining pinned positions
-        const remainingPinned = topTen
-          .filter(c => c.course_id !== courseId && c.is_pinned)
-          .sort((a, b) => a.position - b.position);
-
-        if (remainingPinned.length > 0) {
-          const { error: reorderError } = await supabase.rpc('reorder_after_removal', {
-            p_user_id: userId,
-            p_course_ids: remainingPinned.map(c => c.course_id),
-          });
-          if (reorderError) throw reorderError;
-        }
       }
 
       // Add to exclusions so it won't auto-populate
