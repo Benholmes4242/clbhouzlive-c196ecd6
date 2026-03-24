@@ -245,6 +245,37 @@ export function SnapFeed({
           getCommentCount={getCommentCount}
         />
       ))}
+
+      {!hasNextPage && posts.length > 0 && (
+        <div
+          className="w-full flex-shrink-0 flex flex-col items-center justify-center bg-background"
+          style={{
+            height: '100%',
+            scrollSnapAlign: 'start',
+            scrollSnapStop: 'always',
+          }}
+        >
+          <div className="flex flex-col items-center gap-4 px-8 text-center">
+            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+              <span className="text-3xl">⛳</span>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-lg font-bold text-foreground">
+                You've seen it all
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                You're all caught up. Check back later for new posts.
+              </p>
+            </div>
+            <button
+              onClick={() => containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="mt-2 px-6 py-2.5 rounded-full bg-foreground text-background text-sm font-semibold active:scale-[0.97] transition-all"
+            >
+              Back to top
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
