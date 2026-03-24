@@ -183,7 +183,8 @@ export default function ShortsViewer({ items, initialIndex, isOpen, onClose }: S
       {/* Close Button - Top Left (before ranking pill) */}
       <button
         onClick={onClose}
-        className="absolute top-4 left-4 z-50 w-10 h-10 rounded-full backdrop-blur-md bg-black/35 border border-white/10 flex items-center justify-center text-white hover:bg-black/50 transition-colors"
+        className="absolute left-4 z-50 w-10 h-10 rounded-full backdrop-blur-md bg-black/35 border border-white/10 flex items-center justify-center text-white hover:bg-black/50 transition-colors"
+        style={{ top: "calc(env(safe-area-inset-top, 20px) + 12px)" }}
         aria-label="Close viewer"
       >
         <X className="w-5 h-5" />
