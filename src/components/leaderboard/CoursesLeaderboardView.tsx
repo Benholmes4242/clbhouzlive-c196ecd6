@@ -22,6 +22,9 @@ import {
   type CourseTimeRange,
   type CourseScope 
 } from './courses';
+import { CourseRegionPills, type QuickRegion } from './courses/CourseRegionPills';
+import { BucketListStrip } from './courses/BucketListStrip';
+import { CourseSeasonSpotlight } from './courses/CourseSeasonSpotlight';
 
 const PAGE_SIZE = 20;
 
@@ -133,7 +136,16 @@ export function CoursesLeaderboardView() {
     const saved = readSavedFilters();
     return saved?.subRegion ?? null;
   });
+  const [quickRegion, setQuickRegion] = useState<QuickRegion>('global');
   const [gamesHubOpen, setGamesHubOpen] = useState(false);
+
+  const QUICK_REGION_TO_COUNTRY: Record<QuickRegion, string | null> = {
+    'global': null,
+    'gb-i': 'Britain & Ireland',
+    'usa': 'USA',
+    'europe': 'Continental Europe',
+  };
+  const quickRegionCountry = QUICK_REGION_TO_COUNTRY[quickRegion];
 
   // Scroll position preservation refs for filter changes
   const scrollPositionRef = useRef<number>(0);
@@ -180,12 +192,18 @@ export function CoursesLeaderboardView() {
     isFetchingNextPage,
     refetch,
   } = useCourseLeaderboard({
-    scope: scope === 'country' ? 'country' : 'worldwide',
+    scope: quickRegion === 'global'
+      ? (scope === 'country' ? 'country' : 'worldwide')
+      : 'country',
     timeRange,
     sort,
     pageSize: PAGE_SIZE,
-    region: scope === 'country' ? selectedRegion : null,
-    subRegion: scope === 'country' ? selectedSubRegion : null,
+    region: quickRegion !== 'global'
+      ? quickRegionCountry
+      : (scope === 'country' ? selectedRegion : null),
+    subRegion: quickRegion !== 'global'
+      ? null
+      : (scope === 'country' ? selectedSubRegion : null),
   });
 
   // Flatten pages — memoized for stable reference
@@ -512,6 +530,14 @@ export function CoursesLeaderboardView() {
         </section>
       ) : null}
 
+      {/* 1b. Season Spotlight — NEW */}
+      <CourseSeasonSpotlight onCourseClick={handleCourseClick} />
+
+      {/* 1c. Bucket List Strip — NEW */}
+      <div className="-mx-3">
+        <BucketListStrip onCourseClick={handleCourseClick} />
+      </div>
+
       {/* 2. Sort tabs — single row */}
       <div className="mt-4">
         <CourseFilters
@@ -520,14 +546,27 @@ export function CoursesLeaderboardView() {
         />
       </div>
 
+      {/* 2b. Region pills — NEW */}
+      <CourseRegionPills
+        value={quickRegion}
+        onChange={(r) => {
+          handleScopeChange(r === 'global' ? 'global' : 'country');
+          setQuickRegion(r);
+          if (r !== 'global') {
+            setSelectedRegion(null);
+            setSelectedSubRegion(null);
+          }
+        }}
+      />
+
       {/* Course Rankings Section */}
-      <section className="-mx-5">
-        <div className="px-5 mb-5">
+      <section className="-mx-3">
+        <div className="px-3 mb-5">
           <h2 className="text-2xl font-bold text-foreground" style={{ letterSpacing: '-0.3px' }}>Course Rankings</h2>
           <p className="text-base text-muted-foreground mt-0.5">
-            {sort === 'most_played' && "The world's greatest courses by rounds played"}
-            {sort === 'highest_rated' && "The world's greatest courses by community rating"}
-            {sort === 'rising' && "The world's greatest courses trending right now"}
+            {sort === 'most_played' && `The world's greatest courses by rounds played${quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
+            {sort === 'highest_rated' && `The world's greatest courses by community rating${quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
+            {sort === 'rising' && `The world's greatest courses trending right now${quickRegion !== 'global' ? ` in ${QUICK_REGION_TO_COUNTRY[quickRegion]}` : ''}`}
           </p>
         </div>
 

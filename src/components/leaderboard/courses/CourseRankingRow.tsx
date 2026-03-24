@@ -17,6 +17,8 @@ interface Course {
   prestige_tags: string[];
   current_user_played: boolean;
   current_user_play_count: number;
+  friends_count?: number;
+  friends_avg_rating?: number | null;
 }
 
 interface Props {
@@ -108,6 +110,34 @@ export const CourseRankingRow: React.FC<Props> = ({ course, rank, sort, seasonCo
             Played by {course.unique_players || course.times_played}
           </span>
         </div>
+
+        {/* Friends signal chip */}
+        {(course.friends_count ?? 0) > 0 && (
+          <div
+            className="inline-flex items-center gap-1 mt-1"
+            style={{
+              background: 'hsl(var(--accent-amber) / 0.07)',
+              border: '1px solid hsl(var(--accent-amber) / 0.2)',
+              borderRadius: 6,
+              padding: '2px 8px',
+            }}
+          >
+            <span style={{ fontSize: 11 }}>👥</span>
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                color: 'hsl(var(--accent-amber))',
+              }}
+            >
+              {course.friends_count}
+              {course.friends_count === 1 ? ' friend' : ' friends'} played
+              {course.friends_avg_rating != null
+                ? ` · ${course.friends_avg_rating.toFixed(1)} avg`
+                : ''}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Right side: played status + rank movement */}
