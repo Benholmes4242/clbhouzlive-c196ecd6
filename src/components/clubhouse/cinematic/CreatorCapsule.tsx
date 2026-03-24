@@ -155,10 +155,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   const capsuleRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef<number | null>(null);
 
-  // Collapse when active post changes
-  useEffect(() => {
-    setIsExpanded(false);
-  }, [postId]);
 
 
   const handleToggle = useCallback(() => {
@@ -180,10 +176,7 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
     if (startYRef.current === null) return;
     const deltaY = e.changedTouches[0].clientY - startYRef.current;
     
-    if (isExpanded && deltaY > 40) {
-      // Swipe down when expanded: collapse
-      setIsExpanded(false);
-    } else if (!isExpanded && !isReview && deltaY < -40) {
+    if (!isExpanded && !isReview && deltaY < -40) {
       // Swipe up when collapsed: expand (regular mode only)
       setIsExpanded(true);
     }
