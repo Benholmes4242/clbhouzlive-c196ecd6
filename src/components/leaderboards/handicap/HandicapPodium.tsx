@@ -211,24 +211,35 @@ export function HandicapPodium({ entries, currentUserId, mode }: HandicapPodiumP
                   )}
                 </div>
 
-                {/* Handicap stat — amber number + tier label */}
-                <motion.p
-                  className="font-bold mt-0.5"
-                  style={{ color: 'hsl(var(--accent-amber))', fontSize: config.statSize, fontWeight: config.statWeight }}
+                {/* Handicap stat + tier pill */}
+                <motion.div
+                  className="flex flex-col items-center mt-0.5"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: delay + 0.3, duration: 0.3 }}
                 >
-                  {formatHcp(handicap)}
+                  <p
+                    className="font-bold"
+                    style={{ color: 'hsl(var(--accent-amber))', fontSize: config.statSize, fontWeight: config.statWeight }}
+                  >
+                    {formatHcp(handicap)}
+                  </p>
                   {statusLabel && (
                     <span
-                      className="font-normal text-muted-foreground ml-1"
-                      style={{ fontSize: config.labelSize }}
+                      className="font-semibold uppercase tracking-wide text-center leading-tight mt-0.5"
+                      style={{
+                        fontSize: 8,
+                        background: badgeStyle.bg,
+                        color: badgeStyle.text,
+                        borderRadius: 6,
+                        padding: '2px 6px',
+                        maxWidth: 68,
+                      }}
                     >
                       {statusLabel}
                     </span>
                   )}
-                </motion.p>
+                </motion.div>
               </Link>
             </motion.div>
           );
