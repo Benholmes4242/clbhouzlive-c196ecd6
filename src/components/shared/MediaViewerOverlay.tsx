@@ -63,7 +63,18 @@ const VideoSlide: React.FC<{ item: MediaViewerItem }> = ({ item }) => {
         poster={item.thumbnailUrl}
       />
       <button
-        onClick={(e) => { e.stopPropagation(); setMuted(m => !m); }}
+        onClick={(e) => {
+          e.stopPropagation();
+          setMuted(prev => {
+            if (prev) {
+              pauseAllExcept(audioId);
+              if (ref.current) ref.current.muted = false;
+            } else {
+              if (ref.current) ref.current.muted = true;
+            }
+            return !prev;
+          });
+        }}
         className="absolute bottom-6 right-6 w-11 h-11 rounded-full bg-black/50 flex items-center justify-center text-white"
       >
         {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
