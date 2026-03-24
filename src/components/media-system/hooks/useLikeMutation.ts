@@ -36,7 +36,10 @@ export function useLikeMutation() {
       console.error('[Like] Mutation failed:', error);
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['media-feed'] });
+      // Do NOT invalidate media-feed — the feed uses optimistic local state
+      // for likes (useClubhouseLikes). Invalidating the feed causes a full
+      // refetch which empties the feed because seen post IDs exclude everything
+      // already shown.
       queryClient.invalidateQueries({ queryKey: ['user-post-likes'] });
     },
   });
