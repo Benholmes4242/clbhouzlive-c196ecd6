@@ -67,7 +67,6 @@ export const ArenasStrip: React.FC<ArenasStripProps> = ({
     { id: 'global', icon: '🌍', rank: globalRank, label: 'Global', total: globalTotal, color: ARENA_COLORS.global },
     { id: 'country', icon: countryFlag || '🏳️', rank: countryRank, label: countryLabel || 'Country', total: countryTotal, color: ARENA_COLORS.country },
     { id: 'club', icon: '⛳', rank: clubRank, label: clubLabel || 'My Club', total: clubTotal, color: ARENA_COLORS.club },
-    { id: 'handicap', icon: '🎯', rank: handicapRank, label: handicapLabel || 'Handicap', total: handicapTotal, color: ARENA_COLORS.handicap },
   ];
 
   return (
