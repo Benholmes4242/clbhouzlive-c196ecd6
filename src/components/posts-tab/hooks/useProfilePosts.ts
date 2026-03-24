@@ -25,7 +25,6 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
   const query = useInfiniteQuery({
     queryKey: ['profile-posts', actorType, actorId, userId],
     queryFn: async ({ pageParam }) => {
-      if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
 
       const cursor = typeof pageParam === 'string' ? pageParam : undefined;
 
