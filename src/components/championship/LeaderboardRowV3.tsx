@@ -24,9 +24,6 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
   onClick,
   seasonColor = 'hsl(var(--accent-amber))',
 }) => {
-  const isTop3 = rank <= 3;
-  const isFirst = rank === 1;
-
   return (
     <div
       role="button"
@@ -35,7 +32,7 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
       onClick={onClick}
       onKeyDown={(e) => e.key === 'Enter' && onClick?.()}
       className={cn(
-        "flex items-center gap-3 py-4 px-5 transition-all duration-200 cursor-pointer relative",
+        "flex items-center gap-3 py-3.5 px-2 transition-all duration-200 cursor-pointer",
         "active:scale-[0.98] active:opacity-90",
         isCurrentUser && "rounded-xl"
       )}
@@ -48,30 +45,41 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
         }),
       }}
     >
-      {/* Left accent bar on current user */}
-      {isCurrentUser && (
-        <div
-          className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r"
-          style={{ backgroundColor: seasonColor }}
-        />
-      )}
-
-      {/* Position — plain typographic rank */}
-      <span
-        className="flex-shrink-0 text-center"
-        style={{
-          width: 28,
-          fontSize: 13,
-          fontWeight: 700,
-          fontVariantNumeric: 'tabular-nums',
-          color: isTop3
-            ? '#F5A623'
-            : 'hsl(var(--muted-foreground))',
-        }}
+      {/* Position — fixed-width column, crown floats above via absolute so number stays aligned */}
+      <div
+        className="flex-shrink-0 flex flex-col items-center justify-center relative"
+        style={{ width: 28, minWidth: 28 }}
       >
-        {isFirst && <span style={{ fontSize: 12, marginRight: 1 }}>👑</span>}
-        {rank}
-      </span>
+        {rank === 1 && (
+          <span
+            style={{
+              position: 'absolute',
+              top: -14,
+              fontSize: 11,
+              lineHeight: 1,
+              userSelect: 'none',
+            }}
+            aria-hidden="true"
+          >
+            👑
+          </span>
+        )}
+        <span
+          style={{
+            fontSize: 13,
+            fontWeight: 700,
+            fontVariantNumeric: 'tabular-nums',
+            color: rank === 1
+              ? 'hsl(var(--accent-amber))'
+              : rank <= 3
+                ? 'hsl(var(--accent-amber))'
+                : 'hsl(var(--muted-foreground))',
+            lineHeight: 1,
+          }}
+        >
+          {rank}
+        </span>
+      </div>
 
       {/* Avatar */}
       <div className="flex-shrink-0" style={{ width: 48, height: 48 }}>
@@ -88,14 +96,6 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
       <div className="flex-1 min-w-0">
         <p className="text-[16px] font-semibold truncate text-foreground" style={{ letterSpacing: '-0.2px' }}>
           {name}
-          {isCurrentUser && (
-            <span
-              className="ml-1.5 text-[9px] font-bold uppercase align-middle"
-              style={{ color: '#F5A623' }}
-            >
-              YOU
-            </span>
-          )}
         </p>
         {homeClubName && (
           <p className="text-[13px] text-muted-foreground truncate">{homeClubName}</p>
@@ -105,11 +105,7 @@ export const LeaderboardRowV3: React.FC<LeaderboardRowV3Props> = ({
       {/* Score */}
       <div
         className="flex-shrink-0"
-        style={{
-          color: isTop3 ? '#F5A623' : '#0F172A',
-          fontSize: 18,
-          fontWeight: 700,
-        }}
+        style={{ color: 'hsl(var(--accent-amber))', fontSize: 22, fontWeight: 800 }}
       >
         {courses}
       </div>
