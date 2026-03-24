@@ -268,6 +268,14 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const { data: divisions } = useDivisionConfig();
   const { data: seasonCalendar } = useSeasonCalendar();
 
+  // Arena ranks for the ArenasStrip
+  const { data: arenaRanks } = useArenaRanks(
+    userId,
+    userCountry,
+    userHomeClubId,
+    userHandicap,
+  );
+
   // Podium data fetching
   const { data: seasonalPodiumData } = usePodiumSeasonal({
     scope: podiumScope,
