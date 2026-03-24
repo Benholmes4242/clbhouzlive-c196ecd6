@@ -186,19 +186,19 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     } catch { /* ignore */ }
   }, [arenaMode, timeFilter, divisionFilter, selectedClubId, selectedCountry]);
 
-  // Fetch user's home club
+  // Fetch user's home club, handicap, and country
   useEffect(() => {
-    const fetchUserHomeClub = async () => {
+    const fetchUserProfile = async () => {
       if (!userId) return;
 
       const { data, error } = await supabase
         .from('user_profiles')
-        .select('primary_club_id, golf_clubs!user_profiles_primary_club_id_fkey(id, name)')
+        .select('primary_club_id, handicap_index, country, golf_clubs!user_profiles_primary_club_id_fkey(id, name)')
         .eq('id', userId)
         .single();
 
       if (error) {
-        console.error('Error fetching user home club:', error);
+        console.error('Error fetching user profile:', error);
         return;
       }
 
@@ -207,9 +207,11 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         const clubData = Array.isArray(data.golf_clubs) ? data.golf_clubs[0] : data.golf_clubs;
         setUserHomeClubName(clubData?.name || null);
       }
+      setUserHandicap((data as any)?.handicap_index ?? null);
+      setUserCountry((data as any)?.country ?? null);
     };
 
-    fetchUserHomeClub();
+    fetchUserProfile();
   }, [userId]);
 
   // Auto-select home club when switching to club mode
