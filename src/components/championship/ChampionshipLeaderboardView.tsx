@@ -444,6 +444,34 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     return rivals.find(r => r.gap > 0) || null;
   }, [rivals]);
 
+  // Derive handicap from currentUserEntry if available
+  useEffect(() => {
+    if (currentUserEntry && (currentUserEntry as any).handicap_index != null) {
+      setUserHandicap((currentUserEntry as any).handicap_index);
+    }
+  }, [currentUserEntry]);
+
+  // Helper: country flag emoji
+  const getCountryFlag = (country: string): string => {
+    const flags: Record<string, string> = {
+      'england': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'scotland': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'wales': '🏴󠁧󠁢󠁷󠁬󠁳󠁿',
+      'ireland': '🇮🇪', 'united states': '🇺🇸', 'usa': '🇺🇸', 'canada': '🇨🇦',
+      'australia': '🇦🇺', 'france': '🇫🇷', 'germany': '🇩🇪', 'spain': '🇪🇸',
+      'portugal': '🇵🇹', 'italy': '🇮🇹', 'japan': '🇯🇵', 'south korea': '🇰🇷',
+      'sweden': '🇸🇪', 'norway': '🇳🇴', 'denmark': '🇩🇰', 'netherlands': '🇳🇱',
+      'south africa': '🇿🇦', 'new zealand': '🇳🇿', 'united kingdom': '🇬🇧',
+    };
+    return flags[country.toLowerCase()] || '🏳️';
+  };
+
+  // Helper: handicap band label
+  const getHandicapBandLabel = (hcp: number | null): string => {
+    if (hcp === null) return 'Handicap';
+    const low = Math.floor(hcp - 1.5);
+    const high = Math.ceil(hcp + 1.5);
+    return `Hdcp ${low}–${high}`;
+  };
+
   const handleLogCourse = () => {
     navigate('/courses');
   };
