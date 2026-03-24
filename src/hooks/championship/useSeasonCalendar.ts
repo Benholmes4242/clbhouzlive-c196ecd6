@@ -41,7 +41,7 @@ export function useSeasonCalendar() {
       const now = new Date().toISOString();
       const { data: fallbackData, error: fallbackError } = await supabase
         .from('championship_seasons' as any)
-        .select('id, season_number, name, tagline, description, icon, color, status, start_date, end_date, sponsor_name, prize_description')
+        .select('id, season_number, name, tagline, description, icon, color, status, start_date, end_date, sponsor_name, prize_description, season_winner_user_id, season_winner_courses, prize_claimed')
         .order('start_date', { ascending: true });
       
       if (fallbackError || !fallbackData) {
