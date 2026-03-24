@@ -44,12 +44,14 @@ export function ExplorerProfileCard({
       <div>
         {/* Header row */}
         <div className="flex items-start gap-3">
-          <SquircleAvatar
-            size={48}
-            src={avatarUrl || undefined}
-            alt={displayName}
-            fallback={displayName.charAt(0)}
-          />
+          <div style={{ outline: '2.5px solid hsl(var(--accent-amber) / 0.5)', borderRadius: 14 }}>
+            <SquircleAvatar
+              size={48}
+              src={avatarUrl || undefined}
+              alt={displayName}
+              fallback={displayName.charAt(0)}
+            />
+          </div>
 
           <div className="flex-1 min-w-0">
             <p className="text-muted-foreground uppercase tracking-wider" style={{ fontSize: 10 }}>
