@@ -32,7 +32,7 @@ import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFe
 import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
 import type { FeedPost, TournamentResultFeedPost } from '@/components/media-system/types/media';
 import { TournamentResultCard } from '@/components/clubhouse/cinematic/TournamentResultCard';
-import { buildSuggestedFeed, buildFriendsFeed } from '@/components/media-system/utils/feedAlgorithm';
+// buildSuggestedFeed/buildFriendsFeed are called inside the feed hooks — not here
 
 // ── Clubhouse UI overlays ──
 import { CinematicActionRail } from '@/components/clubhouse/cinematic/CinematicActionRail';
