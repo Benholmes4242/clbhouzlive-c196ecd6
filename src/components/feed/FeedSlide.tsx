@@ -44,6 +44,7 @@ export const FeedSlide = memo(function FeedSlide({
       return null;
     }
 
+
     // Tournament result card
     if (post.postType === 'tournament_result') {
       const likeState = getLikeState?.(post) ?? { isLiked: false, count: 0 };
