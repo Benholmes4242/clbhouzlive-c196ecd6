@@ -157,7 +157,7 @@ export const ClubhouzCalledItSection: React.FC<ClubhouzCalledItSectionProps> = (
                 color: isWinner ? '#451A03' : '#16A34A',
                 letterSpacing: '0.02em',
               }}>
-                {isWinner ? 'clbhouz Called It' : 'Top Pick'}
+                {isWinner ? 'clbhouz called it' : 'Top Pick'}
               </span>
             </div>
 
