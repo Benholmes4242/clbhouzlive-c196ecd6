@@ -138,6 +138,8 @@ export const FeedSlide = memo(function FeedSlide({
     );
   };
 
+  const isBlank = post.postType === 'blank';
+
   return (
     <div
       ref={setRef}
@@ -150,6 +152,9 @@ export const FeedSlide = memo(function FeedSlide({
         scrollSnapAlign: 'start',
         scrollSnapStop: 'always',
         background: '#000',
+        // Blank cards sit above the fixed overlay layer (z-30) so
+        // the previous post's action-rail / capsule can't bleed through
+        ...(isBlank ? { position: 'relative' as const, zIndex: 40 } : {}),
       }}
     >
       {renderContent()}
