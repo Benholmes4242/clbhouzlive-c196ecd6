@@ -84,8 +84,8 @@ function CountryPicker({ value, onChange }: { value: string; onChange: (v: strin
 
       {open && (
         <div
-          className="absolute left-0 right-0 z-50 bg-background border border-border rounded-[12px] shadow-xl overflow-hidden"
-          style={{ top: 'calc(100% + 6px)', maxHeight: 280 }}
+          className="absolute left-0 right-0 z-50 border border-border rounded-[12px] shadow-xl overflow-hidden"
+          style={{ top: 'calc(100% + 6px)', maxHeight: 280, background: '#FFFFFF' }}
         >
           <div className="p-2 border-b border-border/60">
             <div className="relative">
@@ -96,6 +96,7 @@ function CountryPicker({ value, onChange }: { value: string; onChange: (v: strin
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search countries..."
+                style={{ color: '#0F172A' }}
                 className="w-full bg-[#F8FAFC] rounded-[8px] pl-8 pr-3 py-2 text-[13px] focus:outline-none focus:ring-1 focus:ring-[hsl(38,92%,50%)]/40"
               />
             </div>
@@ -109,12 +110,14 @@ function CountryPicker({ value, onChange }: { value: string; onChange: (v: strin
                   key={c}
                   type="button"
                   onClick={() => { onChange(c); setOpen(false); setSearch(''); }}
-                  className="w-full text-left px-4 py-2.5 text-[14px] transition-colors hover:bg-[#F8FAFC]"
+                  className="w-full text-left px-4 py-2.5 text-[14px] transition-colors"
                   style={{
-                    background: c === value ? 'rgba(245,159,11,0.08)' : undefined,
-                    color: c === value ? 'hsl(38,92%,40%)' : 'hsl(var(--foreground))',
+                    background: c === value ? 'rgba(245,159,11,0.08)' : 'transparent',
+                    color: c === value ? '#92400E' : '#0F172A',
                     fontWeight: c === value ? 600 : 400,
                   }}
+                  onMouseEnter={e => { if (c !== value) (e.currentTarget as HTMLElement).style.background = '#F8FAFC'; }}
+                  onMouseLeave={e => { if (c !== value) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
                 >
                   {c}
                 </button>
@@ -211,18 +214,21 @@ function CitySearch({ value, onChange, country }: { value: string; onChange: (v:
 
       {open && results.length > 0 && (
         <div
-          className="absolute left-0 right-0 z-50 bg-background border border-border rounded-[12px] shadow-xl overflow-hidden"
-          style={{ top: 'calc(100% + 6px)' }}
+          className="absolute left-0 right-0 z-50 border border-border rounded-[12px] shadow-xl overflow-hidden"
+          style={{ top: 'calc(100% + 6px)', background: '#FFFFFF' }}
         >
           {results.map(city => (
             <button
               key={city}
               type="button"
               onClick={() => { setQuery(city); onChange(city); setResults([]); setOpen(false); }}
-              className="w-full text-left px-4 py-2.5 text-[14px] hover:bg-[#F8FAFC] transition-colors flex items-center gap-2"
+              className="w-full text-left px-4 py-2.5 text-[14px] transition-colors flex items-center gap-2"
+              style={{ color: '#0F172A', background: 'transparent' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#F8FAFC'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
             >
-              <MapPin size={13} className="text-muted-foreground flex-shrink-0" />
-              <span>{city}</span>
+              <MapPin size={13} style={{ color: '#94A3B8', flexShrink: 0 }} />
+              <span style={{ color: '#0F172A' }}>{city}</span>
             </button>
           ))}
         </div>
