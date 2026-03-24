@@ -11,6 +11,7 @@ import {
   useDivisionConfig,
   useSeasonCalendar,
 } from '@/hooks/championship';
+import { useArenaRanks } from '@/hooks/championship/useArenaRanks';
 import {
   ChampionshipFilters,
   BeatRivalCTA,
@@ -28,6 +29,7 @@ import { LeaderboardRowV3 } from './LeaderboardRowV3';
 import { RankCelebration } from './RankCelebration';
 import { MotivationalCarousel } from './MotivationalCarousel';
 import { SeasonRaceCard } from './SeasonRaceCard';
+import { ArenasStrip } from './ArenasStrip';
 // HallOfFameHeader is now integrated into HallOfFamePodium
 import { ClubSearchBar } from '@/components/leaderboards/exploration/ClubSearchBar';
 import { CountrySelector } from '@/components/leaderboards/shared/CountrySelector';
@@ -142,7 +144,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const [selectedRival, setSelectedRival] = useState<UserRival | null>(null);
   const [showCelebration, setShowCelebration] = useState(false);
   const [previousRank, setPreviousRank] = useState<number | null>(null);
-  
+  const [userHandicap, setUserHandicap] = useState<number | null>(null);
+  const [userCountry, setUserCountry] = useState<string | null>(null);
 
   // Club-related state (restored from persistence)
   const [selectedClubId, setSelectedClubId] = useState<string | null>(() => {
@@ -184,19 +187,19 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     } catch { /* ignore */ }
   }, [arenaMode, timeFilter, divisionFilter, selectedClubId, selectedCountry]);
 
-  // Fetch user's home club
+  // Fetch user's home club, handicap, and country
   useEffect(() => {
-    const fetchUserHomeClub = async () => {
+    const fetchUserProfile = async () => {
       if (!userId) return;
 
       const { data, error } = await supabase
         .from('user_profiles')
-        .select('primary_club_id, golf_clubs!user_profiles_primary_club_id_fkey(id, name)')
+        .select('primary_club_id, country, golf_clubs!user_profiles_primary_club_id_fkey(id, name)')
         .eq('id', userId)
         .single();
 
       if (error) {
-        console.error('Error fetching user home club:', error);
+        console.error('Error fetching user profile:', error);
         return;
       }
 
@@ -205,9 +208,10 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
         const clubData = Array.isArray(data.golf_clubs) ? data.golf_clubs[0] : data.golf_clubs;
         setUserHomeClubName(clubData?.name || null);
       }
+      setUserCountry(data?.country ?? null);
     };
 
-    fetchUserHomeClub();
+    fetchUserProfile();
   }, [userId]);
 
   // Auto-select home club when switching to club mode
@@ -263,6 +267,14 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const { data: rivals, isLoading: rivalsLoading } = useUserRivals(userId, 5);
   const { data: divisions } = useDivisionConfig();
   const { data: seasonCalendar } = useSeasonCalendar();
+
+  // Arena ranks for the ArenasStrip
+  const { data: arenaRanks } = useArenaRanks(
+    userId,
+    userCountry,
+    userHomeClubId,
+    userHandicap,
+  );
 
   // Podium data fetching
   const { data: seasonalPodiumData } = usePodiumSeasonal({
@@ -431,6 +443,34 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     if (!rivals?.length) return null;
     return rivals.find(r => r.gap > 0) || null;
   }, [rivals]);
+
+  // Derive handicap from currentUserEntry if available
+  useEffect(() => {
+    if (currentUserEntry && (currentUserEntry as any).handicap_index != null) {
+      setUserHandicap((currentUserEntry as any).handicap_index);
+    }
+  }, [currentUserEntry]);
+
+  // Helper: country flag emoji
+  const getCountryFlag = (country: string): string => {
+    const flags: Record<string, string> = {
+      'england': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'scotland': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'wales': '🏴󠁧󠁢󠁷󠁬󠁳󠁿',
+      'ireland': '🇮🇪', 'united states': '🇺🇸', 'usa': '🇺🇸', 'canada': '🇨🇦',
+      'australia': '🇦🇺', 'france': '🇫🇷', 'germany': '🇩🇪', 'spain': '🇪🇸',
+      'portugal': '🇵🇹', 'italy': '🇮🇹', 'japan': '🇯🇵', 'south korea': '🇰🇷',
+      'sweden': '🇸🇪', 'norway': '🇳🇴', 'denmark': '🇩🇰', 'netherlands': '🇳🇱',
+      'south africa': '🇿🇦', 'new zealand': '🇳🇿', 'united kingdom': '🇬🇧',
+    };
+    return flags[country.toLowerCase()] || '🏳️';
+  };
+
+  // Helper: handicap band label
+  const getHandicapBandLabel = (hcp: number | null): string => {
+    if (hcp === null) return 'Handicap';
+    const low = Math.floor(hcp - 1.5);
+    const high = Math.ceil(hcp + 1.5);
+    return `Hdcp ${low}–${high}`;
+  };
 
   const handleLogCourse = () => {
     navigate('/courses');
@@ -663,6 +703,27 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
           isInTop10={isInTop10}
           isInTop3={isInTop3}
           streak={undefined}
+        />
+      )}
+
+      {/* 6b. Arenas Strip — rank pills */}
+      {timeFilter === 'seasonal' && currentUserEntry && (
+        <ArenasStrip
+          activeArena={arenaMode}
+          onArenaChange={handleArenaModeChange}
+          globalRank={currentUserEntry.current_rank ?? null}
+          globalTotal={allEntries.length}
+          countryRank={arenaRanks?.countryRank ?? null}
+          countryLabel={userCountry || 'Country'}
+          countryFlag={userCountry ? getCountryFlag(userCountry) : '🏳️'}
+          countryTotal={arenaRanks?.countryTotal ?? 0}
+          clubRank={arenaRanks?.clubRank ?? null}
+          clubLabel={userHomeClubName || 'My Club'}
+          clubTotal={arenaRanks?.clubTotal ?? 0}
+          handicapRank={arenaRanks?.handicapRank ?? null}
+          handicapLabel={getHandicapBandLabel(userHandicap)}
+          handicapTotal={arenaRanks?.handicapTotal ?? 0}
+          seasonLabel={getSeasonConfig(currentSeasonId).title}
         />
       )}
 
