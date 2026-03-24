@@ -645,6 +645,11 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
     return { totalHeight, visibleEntries, offsetY, startIndex };
   }, [useVirtualization, allEntries, scrollTop]);
 
+  // Full-page skeleton for initial load
+  if (leaderboardLoading && allEntries.length === 0) {
+    return <ChampionshipPageSkeleton />;
+  }
+
   return (
     <div className={cn('flex flex-col px-3 py-4', className)} style={{ gap: 20 }}>
       {/* 1. Season Status Panel — floats on page background, no card wrapper */}

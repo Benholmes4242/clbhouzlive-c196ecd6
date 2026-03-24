@@ -370,8 +370,13 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
     );
   }
 
-  if (isLoading) {
-    return <HandicapLeaderboardSkeleton />;
+  if (isLoading && allEntries.length === 0) {
+    return (
+      <div className="space-y-4">
+        {scopeSelector}
+        <HandicapPageSkeleton />
+      </div>
+    );
   }
 
   if (!isError && allEntries.length === 0) {

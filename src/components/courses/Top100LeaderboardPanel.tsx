@@ -43,12 +43,12 @@ const Top100LeaderboardPanel = () => {
         <div
           className="sticky top-0 z-10 bg-background pb-2 pt-1 -mx-4 px-4"
         >
-          <TabsList className="bg-transparent border-0 px-0 py-0 gap-2 w-full flex justify-center">
+          <TabsList className="bg-transparent border-0 px-0 py-0 gap-2 w-full flex">
             {tabs.map((tab) => (
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}
-                className="min-h-[36px] px-4 text-sm font-semibold transition-all active:scale-[0.97] shadow-none after:hidden
+                className="flex-1 min-h-[36px] px-2 sm:px-4 text-xs sm:text-sm font-semibold transition-all active:scale-[0.97] shadow-none after:hidden
                   data-[state=active]:text-white data-[state=active]:shadow-none data-[state=active]:bg-foreground data-[state=active]:border-0
                   data-[state=inactive]:text-muted-foreground data-[state=inactive]:bg-transparent data-[state=inactive]:border-[1.5px] data-[state=inactive]:border-border"
                 style={{
