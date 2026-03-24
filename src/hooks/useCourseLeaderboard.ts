@@ -47,6 +47,8 @@ type CourseLeaderboardPage = {
   entries: CourseLeaderboardEntry[];
 };
 
+const ROW_EXCLUDE = ['Britain & Ireland', 'USA', 'Continental Europe'];
+
 /**
  * Hook to fetch ALL courses with reviews (no Top 100 restriction).
  * For Top 100 only courses, use useTop100CourseLeaderboard instead.
@@ -61,6 +63,8 @@ export function useCourseLeaderboard(args: UseCourseLeaderboardArgs = {}) {
     subRegion = null,
     excludeCountries = null,
   } = args;
+
+  const isExcludeMode = excludeCountries && excludeCountries.length > 0;
 
   return useInfiniteQuery<CourseLeaderboardPage>({
     queryKey: ['course-leaderboard', scope, timeRange, sort, region, subRegion, excludeCountries],
@@ -77,18 +81,20 @@ export function useCourseLeaderboard(args: UseCourseLeaderboardArgs = {}) {
         'rising': 'trending',
       };
 
+      // When excluding countries (Rest of World), fetch more and filter client-side
+      const fetchSize = isExcludeMode ? pageSize * 3 : pageSize;
+
       // Use the new RPC that shows ALL reviewed courses (no Top 100 restriction)
       const { data, error } = await supabase.rpc('get_course_leaderboard', {
         p_sort_by: sortByMap[sort] || 'rating',
         p_sort_order: 'desc',
         p_time_period: timeRange === 'this_season' ? 'year' : timeRange,
         p_current_user_id: user?.id ?? null,
-        p_limit: pageSize,
+        p_limit: fetchSize,
         p_offset: pageParam as number,
         p_country: scope === 'country' ? region : null,
         p_sub_country: scope === 'country' ? subRegion : null,
-        p_exclude_countries: excludeCountries ?? undefined,
-      });
+      } as any);
 
       if (error) throw error;
 
@@ -109,8 +115,7 @@ export function useCourseLeaderboard(args: UseCourseLeaderboardArgs = {}) {
         has_played: boolean;
       }>;
 
-      return {
-        entries: rows.map((row, index) => ({
+      const allEntries = rows.map((row, index) => ({
           course_id: row.course_id,
           course_name: row.course_name,
           country: row.country,
@@ -137,8 +142,14 @@ export function useCourseLeaderboard(args: UseCourseLeaderboardArgs = {}) {
           current_user_played: row.has_played ?? false,
           current_user_rating: null,
           current_user_play_count: row.has_played ? 1 : 0,
-        })),
-      };
+        }));
+
+      // Client-side exclusion filter for "Rest of World"
+      const entries = isExcludeMode
+        ? allEntries.filter(e => !excludeCountries!.includes(e.country ?? ''))
+        : allEntries;
+
+      return { entries };
     },
     getNextPageParam: (lastPage, allPages) => {
       if (lastPage.entries.length < pageSize) return undefined;
