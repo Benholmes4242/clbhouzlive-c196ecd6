@@ -14011,6 +14011,7 @@ export type Database = {
         Args: { user_a: string; user_b: string }
         Returns: boolean
       }
+      auto_flip_season: { Args: never; Returns: undefined }
       backfill_course_top100_memberships: {
         Args: never
         Returns: {
