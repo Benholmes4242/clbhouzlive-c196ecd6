@@ -36,6 +36,11 @@ interface ReviewPostViewerProps extends Omit<FullscreenReviewPostProps, 'childre
   sourceReviewId?: string;
   
   /**
+   * Review text content for the verdict card
+   */
+  reviewText?: string | null;
+  
+  /**
    * Whether to show the bottom review capsule
    * Set to false for preview mode (shows CTA bar instead)
    */
