@@ -2,7 +2,7 @@
 // Used by the Unified Podium component in Championship Mode
 
 export type PodiumMode = 'seasonal' | 'all_time';
-export type PodiumScope = 'global' | 'division' | 'friends' | 'club' | 'country';
+export type PodiumScope = 'global' | 'division' | 'friends' | 'club' | 'country' | 'handicap';
 
 export interface PodiumEntry {
   podium_position: 1 | 2 | 3;
