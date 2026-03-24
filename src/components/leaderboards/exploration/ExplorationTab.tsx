@@ -43,7 +43,37 @@ function ExplorationLeaderboardSkeleton() {
         <div key={i} className="flex items-center gap-3 p-3">
           <Skeleton className="h-8 w-6 rounded" />
           <Skeleton className="h-10 w-10 rounded-lg" />
-          <div className="flex-1 space-y-1.5">
+          <div className="flex-1 min-w-0 space-y-1.5">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+          <Skeleton className="h-6 w-16" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Full-page skeleton for initial Global tab load */
+function GlobalTabSkeleton() {
+  return (
+    <div className="flex flex-col px-3 pt-3 space-y-4 animate-pulse">
+      {/* Profile card skeleton */}
+      <Skeleton className="h-[130px] w-full rounded-[18px]" />
+      {/* Tier card skeleton */}
+      <Skeleton className="h-[100px] w-full rounded-[18px]" />
+      {/* Map preview skeleton */}
+      <Skeleton className="h-[180px] w-full rounded-[18px]" />
+      {/* Continent stats skeleton */}
+      <Skeleton className="h-12 w-full rounded-xl" />
+      {/* View mode toggle skeleton */}
+      <Skeleton className="h-9 w-48 rounded-full mx-auto" />
+      {/* Leaderboard rows */}
+      {[...Array(3)].map((_, i) => (
+        <div key={i} className="flex items-center gap-3 p-3">
+          <Skeleton className="h-8 w-6 rounded" />
+          <Skeleton className="h-10 w-10 rounded-lg" />
+          <div className="flex-1 min-w-0 space-y-1.5">
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-3 w-20" />
           </div>
