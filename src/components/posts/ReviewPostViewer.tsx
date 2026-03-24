@@ -36,6 +36,11 @@ interface ReviewPostViewerProps extends Omit<FullscreenReviewPostProps, 'childre
   sourceReviewId?: string;
   
   /**
+   * Review text content for the verdict card
+   */
+  reviewText?: string | null;
+  
+  /**
    * Whether to show the bottom review capsule
    * Set to false for preview mode (shows CTA bar instead)
    */
@@ -53,6 +58,7 @@ export const ReviewPostViewer: React.FC<ReviewPostViewerProps> = ({
   courseName,
   heroSubtitle,
   sourceReviewId,
+  reviewText,
   showReviewCapsule = true,
   children,
   mode,
@@ -67,8 +73,9 @@ export const ReviewPostViewer: React.FC<ReviewPostViewerProps> = ({
     courseName,
     courseLocation: heroSubtitle || '',
     rating,
-    tierLabel: '', // Computed by theme function in CreatorCapsule
+    tierLabel: '',
     sourceReviewId: sourceReviewId || '',
+    reviewText: reviewText || null,
   };
   
   // Handle "Read full review" tap - navigate to course reviews tab with reviewId
