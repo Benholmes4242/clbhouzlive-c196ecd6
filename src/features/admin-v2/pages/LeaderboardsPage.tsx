@@ -128,10 +128,11 @@ function UserSearch({
       if (!currentWinnerId) return null;
       const { data } = await supabase
         .from('user_profiles')
-        .select('id, display_name, avatar_url')
+        .select('id, display_name, profile_photo_url')
         .eq('id', currentWinnerId)
         .single();
-      return data as UserSearchResult | null;
+      if (!data) return null;
+      return { id: data.id, display_name: data.display_name, avatar_url: data.profile_photo_url } as UserSearchResult | null;
     },
     enabled: !!currentWinnerId,
   });
