@@ -138,7 +138,7 @@ export const SeasonSponsorCard: React.FC<SeasonSponsorCardProps> = ({
 
           <div className="flex items-center justify-between">
             <span className="text-[11px]" style={{ color: 'hsl(var(--muted-foreground))' }}>
-              {gap > 0 ? `${gap} behind the lead` : gap === 0 && yourCourses > 0 ? 'You're in the lead!' : 'Play a course to start'}
+              {gap > 0 ? `${gap} behind the lead` : gap === 0 && yourCourses > 0 ? "You're in the lead!" : 'Play a course to start'}
             </span>
             <span className="text-[11px] font-semibold" style={{ color: seasonColor }}>
               {ordinal(yourSeasonRank)} of {totalSeasonPlayers}
