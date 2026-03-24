@@ -90,23 +90,8 @@ export const TrophyPodiumSlot: React.FC<TrophyPodiumSlotProps> = ({
         ease: 'easeOut',
       }}
     >
-      {/* YOU badge for current user */}
-      {isCurrentUser && (
-        <div
-          className="mb-1 px-2 py-0.5 rounded-full"
-          style={{
-            backgroundColor: `${seasonThemeColor}15`,
-            border: `1px solid ${seasonThemeColor}40`,
-          }}
-        >
-          <span className="text-[9px] font-bold uppercase" style={{ color: seasonThemeColor }}>
-            YOU
-          </span>
-        </div>
-      )}
-
       {/* Crown for 1st place */}
-      {position === 1 && !isCurrentUser && (
+      {position === 1 && (
         <motion.div
           className="mb-1"
           initial={{ scale: 0, rotate: -10 }}
