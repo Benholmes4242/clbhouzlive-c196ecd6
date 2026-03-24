@@ -72,6 +72,8 @@ const getMetricValue = (entry: ExplorationLeaderboardEntry, metric: ExplorationM
   switch (metric) {
     case 'continents':
       return entry.continents_count;
+    case 'courses':
+      return entry.courses_count;
     default:
       return entry.countries_count;
   }
@@ -81,6 +83,8 @@ const getMetricLabel = (metric: ExplorationMetric): string => {
   switch (metric) {
     case 'continents':
       return 'continents';
+    case 'courses':
+      return 'courses';
     default:
       return 'countries';
   }
