@@ -58,6 +58,7 @@ export const ReviewPostViewer: React.FC<ReviewPostViewerProps> = ({
   courseName,
   heroSubtitle,
   sourceReviewId,
+  reviewText,
   showReviewCapsule = true,
   children,
   mode,
