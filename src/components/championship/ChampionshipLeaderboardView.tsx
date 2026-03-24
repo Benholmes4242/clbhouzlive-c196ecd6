@@ -143,7 +143,8 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   const [selectedRival, setSelectedRival] = useState<UserRival | null>(null);
   const [showCelebration, setShowCelebration] = useState(false);
   const [previousRank, setPreviousRank] = useState<number | null>(null);
-  
+  const [userHandicap, setUserHandicap] = useState<number | null>(null);
+  const [userCountry, setUserCountry] = useState<string | null>(null);
 
   // Club-related state (restored from persistence)
   const [selectedClubId, setSelectedClubId] = useState<string | null>(() => {
