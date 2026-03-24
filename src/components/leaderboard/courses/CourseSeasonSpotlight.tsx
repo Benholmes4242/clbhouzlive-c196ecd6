@@ -75,24 +75,12 @@ export const CourseSeasonSpotlight: React.FC<CourseSeasonSpotlightProps> = ({ on
           />
         )}
 
-        {/* Dark gradient overlay */}
+        {/* Dark overlay - flat, no gradient */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 55%, rgba(0,0,0,0.05) 100%)',
-          }}
-        />
-
-        {/* Amber shimmer */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            pointerEvents: 'none',
-            background: 'linear-gradient(105deg, transparent 35%, rgba(245,158,11,0.08) 50%, transparent 65%)',
-            backgroundSize: '200% 100%',
-            animation: 'shimmerAmber 4s linear infinite',
+            background: 'rgba(0,0,0,0.55)',
           }}
         />
 
