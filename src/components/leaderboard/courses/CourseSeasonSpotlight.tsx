@@ -28,9 +28,9 @@ export const CourseSeasonSpotlight: React.FC<CourseSeasonSpotlightProps> = ({ on
           100% { background-position: 200% center; }
         }
         @keyframes stampIn {
-          0% { opacity: 0; transform: scale(1.2) rotate(-3deg); }
-          60% { transform: scale(0.97) rotate(1deg); }
-          100% { opacity: 1; transform: scale(1) rotate(0deg); }
+          0% { opacity: 0; transform: scale(1.3) rotate(-6deg); }
+          60% { opacity: 1; transform: scale(0.96) rotate(1deg); }
+          100% { opacity: 1; transform: scale(1) rotate(-1deg); }
         }
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(8px); }
