@@ -1,9 +1,9 @@
 import type { FeedPost, FeedTab } from '../types/media';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-const SUGGESTED_REVIEW_POSITION = 7;
+const SUGGESTED_REVIEW_POSITION = 4;
 const SUGGESTED_TOURNAMENT_SLOT = 4;
-const SUGGESTED_BLOCK_SIZE = 10;
+const SUGGESTED_BLOCK_SIZE = 6;
 const SUGGESTED_MIN_VIDEO_DURATION = 4;
 const SUGGESTED_MAX_ASPECT_RATIO = 1.0; // anything above = landscape = excluded
 const FRIENDS_REVIEW_POSITION = 9;
