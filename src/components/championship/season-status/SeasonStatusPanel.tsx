@@ -84,7 +84,7 @@ export const SeasonStatusPanel: React.FC<SeasonStatusPanelProps> = ({
   }
 
   return (
-    <div className={cn(className, 'space-y-4')}>
+    <div className={cn(className, 'space-y-3')}>
       <ActiveSeasonCard
         seasonId={currentSeasonId}
         daysRemaining={daysRemaining}

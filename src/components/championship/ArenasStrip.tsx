@@ -71,7 +71,16 @@ export const ArenasStrip: React.FC<ArenasStripProps> = ({
   ];
 
   return (
-    <div className="space-y-2">
+    <div
+      className="space-y-1.5"
+      style={{
+        backgroundColor: 'hsl(var(--card))',
+        borderRadius: 16,
+        padding: 14,
+        border: '1px solid #E2E8F0',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+      }}
+    >
       <p className="text-[10px] font-semibold uppercase tracking-wider px-1" style={{ color: '#F5A623' }}>
         Your Rankings{seasonLabel ? ` · ${seasonLabel}` : ''}
       </p>
@@ -81,9 +90,6 @@ export const ArenasStrip: React.FC<ArenasStripProps> = ({
       >
         {pills.map((pill) => {
           const isActive = activeArena === pill.id;
-          // A pill is unavailable when we have no data context for it
-          // (e.g. user has no home club so country/club rank can't be computed)
-          // TODO: Country and Club pills may show "N/A" when arenas RPC doesn't return rank — data issue, not visual
           const isUnavailable = pill.id !== 'global' && pill.total === 0 && pill.rank === null;
           return (
             <button

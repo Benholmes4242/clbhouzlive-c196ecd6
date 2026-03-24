@@ -618,7 +618,7 @@ export function ChampionshipLeaderboardView({ className }: ChampionshipLeaderboa
   }, [useVirtualization, allEntries, scrollTop]);
 
   return (
-    <div className={cn('flex flex-col px-5 py-5', className)} style={{ gap: 20 }}>
+    <div className={cn('flex flex-col px-5 py-5', className)} style={{ gap: 14 }}>
       {/* 1. Season Status Panel — floats on page background, no card wrapper */}
       {timeFilter === 'seasonal' && currentSeason && (
         <SeasonStatusPanel

@@ -1,7 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Check, ChevronDown, Trophy } from 'lucide-react';
-import { getSeasonGradient } from '@/lib/colorUtils';
 
 interface Division {
   id: string;
@@ -36,8 +35,6 @@ export const DivisionProgressPreview: React.FC<Props> = ({
 }) => {
   if (!currentDivision) return null;
 
-  const gradient = getSeasonGradient(seasonColor);
-
   const calculateProgress = (): number => {
     if (!nextDivision) return 100;
     const range = nextDivision.threshold - currentDivision.threshold;
@@ -46,102 +43,85 @@ export const DivisionProgressPreview: React.FC<Props> = ({
   };
 
   const progressPercent = calculateProgress();
+  const isMaxDivision = !nextDivision;
 
   return (
-    <div className="px-5 py-4">
-      {/* Current Club Row */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2.5">
-          {/* Season-colored check circle */}
-          <div
-            className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-            style={{ backgroundColor: seasonColor, width: 28, height: 28 }}
-          >
-            <Check className="w-4 h-4 text-white" strokeWidth={3} />
-          </div>
-          <span className="text-[18px] font-bold text-foreground">
-            {currentDivision.name}
-          </span>
-          {/* CURRENT pill badge with pulsing dot */}
-          <div
-            className="inline-flex items-center gap-1.5 px-2 py-0.5"
-            style={{
-              backgroundColor: gradient.tint,
-              borderRadius: '6px',
-            }}
-          >
-            <span className="relative flex h-1.5 w-1.5">
-              <span
-                className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-50"
-                style={{ backgroundColor: seasonColor }}
-              />
-              <span
-                className="relative inline-flex rounded-full h-1.5 w-1.5"
-                style={{ backgroundColor: seasonColor }}
-              />
-            </span>
-            <span
-              className="font-semibold uppercase tracking-wide"
-              style={{ color: seasonColor, fontSize: '13px', padding: '5px 12px' }}
-            >
-              Current
-            </span>
-          </div>
+    <div className="px-5 py-2">
+      {/* Compact single row */}
+      <div
+        className="flex items-center gap-3"
+        style={{
+          height: 48,
+          background: 'hsl(var(--card))',
+          borderRadius: 14,
+          border: '1px solid #E2E8F0',
+          padding: '0 14px',
+        }}
+      >
+        {/* Check circle */}
+        <div
+          className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
+          style={{ backgroundColor: seasonColor }}
+        >
+          {isMaxDivision ? (
+            <Trophy className="w-3.5 h-3.5 text-white" />
+          ) : (
+            <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+          )}
         </div>
+
+        {/* Division name */}
+        <span className="text-[14px] font-bold text-foreground flex-shrink-0">
+          {currentDivision.name}
+        </span>
+
+        {/* Progress bar */}
+        {nextDivision && (
+          <div className="flex-1 mx-1">
+            <div
+              className="h-[4px] rounded-full overflow-hidden"
+              style={{ backgroundColor: '#F1F5F9' }}
+            >
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  width: `${progressPercent}%`,
+                  backgroundColor: seasonColor,
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {isMaxDivision && <div className="flex-1" />}
+
+        {/* "N to next" text */}
+        <span
+          className="text-[12px] font-semibold flex-shrink-0"
+          style={{ color: seasonColor }}
+        >
+          {isMaxDivision ? 'Max Division!' : `${coursesToNext} to ${nextDivision.name}`}
+        </span>
       </div>
 
-      {/* Progress bar */}
-      {nextDivision && (
-        <div className="mb-3">
-          <div
-            className="h-2 rounded-full overflow-hidden"
-            style={{ backgroundColor: 'rgba(0, 0, 0, 0.06)' }}
-          >
-            <div
-              className="h-full rounded-full transition-all duration-500"
-              style={{
-                width: `${progressPercent}%`,
-                background: `linear-gradient(to right, ${gradient.dark}, ${gradient.light})`,
-              }}
-            />
-          </div>
-          {/* "X to Next" label */}
-          <div className="flex justify-end mt-1.5">
-            <span className="text-[15px] text-muted-foreground">
-              <span className="text-[18px] font-bold" style={{ color: seasonColor }}>
-                {coursesToNext}
-              </span>{' '}
-              to {nextDivision.name}
-            </span>
-          </div>
-        </div>
-      )}
-
-      {!nextDivision && (
-        <div className="flex items-center gap-2 mb-3">
-          <Trophy className="w-4 h-4" style={{ color: '#D4A853' }} />
-          <span className="text-xs font-medium" style={{ color: '#D4A853' }}>
-            Max Division!
+      {/* Toggle — right-aligned text link */}
+      <div className="flex justify-end mt-1.5">
+        <button
+          onClick={onToggle}
+          className="flex items-center gap-1 active:scale-[0.98] transition-transform"
+        >
+          <span className="text-[13px] font-semibold" style={{ color: seasonColor }}>
+            {isExpanded ? 'Hide Ladder' : 'View Ladder'}
           </span>
-        </div>
-      )}
-
-      {/* Toggle */}
-      <button
-        onClick={onToggle}
-        className="w-full flex items-center justify-center gap-1.5 pt-1 active:scale-[0.98] transition-transform"
-      >
-        <span className="text-[15px] font-semibold" style={{ color: seasonColor }}>
-          {isExpanded ? 'Hide Division Ladder' : 'View Division Ladder'}
-        </span>
-        <ChevronDown
-          className="w-[18px] h-[18px] transition-transform duration-200"
-          style={{
-            color: seasonColor,
-            transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-          }}
-        />
-      </button>
+          <ChevronDown
+            className="w-[16px] h-[16px] transition-transform duration-200"
+            style={{
+              color: seasonColor,
+              transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+            }}
+          />
+        </button>
+      </div>
     </div>
   );
 };

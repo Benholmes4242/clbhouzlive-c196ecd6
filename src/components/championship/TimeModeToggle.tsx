@@ -1,5 +1,4 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
 
 interface TimeModeToggleProps {
   value: 'seasonal' | 'all_time';
@@ -8,8 +7,7 @@ interface TimeModeToggleProps {
 }
 
 /**
- * TimeModeToggle — Premium pill toggle for Season / All-Time.
- * Dynamically derives the year label from the active season.
+ * TimeModeToggle — Full-width segmented control for Season / All-Time.
  */
 export const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
   value,
@@ -24,20 +22,30 @@ export const TimeModeToggle: React.FC<TimeModeToggleProps> = ({
   ];
 
   return (
-    <div className="w-full px-1">
-      <div className="flex gap-2 justify-center">
+    <div className="w-full">
+      <div
+        className="flex gap-1"
+        style={{
+          backgroundColor: '#F1F5F9',
+          borderRadius: 12,
+          padding: 3,
+        }}
+      >
         {options.map((option) => {
           const isActive = value === option.id;
           return (
             <button
               key={option.id}
               onClick={() => onChange(option.id)}
-              className="shrink-0 min-h-[36px] px-4 text-sm font-semibold transition-colors flex items-center active:scale-[0.97]"
+              className="flex-1 flex items-center justify-center transition-all duration-200 active:scale-[0.97]"
               style={{
-                borderRadius: 8,
-                background: isActive ? 'hsl(var(--foreground))' : 'transparent',
-                color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
-                border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
+                height: 38,
+                borderRadius: 10,
+                fontSize: 13,
+                fontWeight: isActive ? 700 : 500,
+                background: isActive ? 'hsl(var(--card))' : 'transparent',
+                color: isActive ? '#0F172A' : '#64748B',
+                boxShadow: isActive ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
               }}
             >
               {option.label}
