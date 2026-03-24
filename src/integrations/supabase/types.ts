@@ -12706,18 +12706,21 @@ export type Database = {
           course_id: string
           created_at: string
           id: string
+          position: number | null
           user_id: string
         }
         Insert: {
           course_id: string
           created_at?: string
           id?: string
+          position?: number | null
           user_id: string
         }
         Update: {
           course_id?: string
           created_at?: string
           id?: string
+          position?: number | null
           user_id?: string
         }
         Relationships: [

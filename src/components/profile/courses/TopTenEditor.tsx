@@ -97,6 +97,13 @@ export const TopTenEditor: React.FC<TopTenEditorProps> = ({ userId, isOwnProfile
   const { topTen, isLoading, removeCourse, reorderTopTen } = useUserTopTenCourses(userId);
   const [showAddModal, setShowAddModal] = useState(false);
 
+  // Build a full 10-slot grid — empty slots show as placeholders
+  const slots = Array.from({ length: 10 }, (_, i) => {
+    const position = i + 1;
+    const course = topTen.find(c => c.position === position);
+    return { position, course: course ?? null };
+  });
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -153,25 +160,14 @@ export const TopTenEditor: React.FC<TopTenEditorProps> = ({ userId, isOwnProfile
         )}
       </div>
 
-      {topTen.length === 0 ? (
-        <div className="bg-card/30 border border-border/50 rounded-2xl p-12 text-center">
-          <div className="text-muted-foreground mb-4">
-            {isOwnProfile
-              ? "You haven't added any courses to your Top 10 yet"
-              : "This user hasn't created their Top 10 yet"}
-          </div>
-          {isOwnProfile && (
-            <Button onClick={() => setShowAddModal(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Your First Course
-            </Button>
-          )}
-        </div>
-      ) : (
-        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={topTen.map(c => c.id)} strategy={verticalListSortingStrategy}>
-            <div className="space-y-3">
-              {topTen.map((course) => (
+      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext
+          items={slots.map(s => s.course?.id ?? `empty-${s.position}`)}
+          strategy={verticalListSortingStrategy}
+        >
+          <div className="space-y-3">
+            {slots.map(({ position, course }) =>
+              course ? (
                 <SortableItem
                   key={course.id}
                   course={course}
@@ -179,11 +175,32 @@ export const TopTenEditor: React.FC<TopTenEditorProps> = ({ userId, isOwnProfile
                   onRemove={() => removeCourse(course.course_id)}
                   onTap={() => handleCourseClick(course.course_id)}
                 />
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
-      )}
+              ) : (
+                <div
+                  key={`empty-${position}`}
+                  className="border border-dashed border-border/40 rounded-xl p-4 flex items-center gap-4"
+                  style={{ opacity: 0.5 }}
+                >
+                  <div className="flex-shrink-0 w-8 text-center">
+                    <div className="text-2xl font-bold text-muted-foreground">{position}</div>
+                  </div>
+                  <div className="flex-1 text-sm text-muted-foreground italic">
+                    Empty — tap + to add a course
+                  </div>
+                  {isOwnProfile && (
+                    <button
+                      onClick={() => setShowAddModal(true)}
+                      className="flex-shrink-0 w-9 h-9 rounded-full border border-border/50 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-border transition-colors"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              )
+            )}
+          </div>
+        </SortableContext>
+      </DndContext>
 
       {isOwnProfile && showAddModal && (
         <AddCourseModal

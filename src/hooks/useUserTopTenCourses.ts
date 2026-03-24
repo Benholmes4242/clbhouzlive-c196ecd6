@@ -78,10 +78,17 @@ export function useUserTopTenCourses(userId: string | undefined) {
       // 2. Get exclusions
       const { data: exclusionsData } = await supabase
         .from('user_top10_exclusions')
-        .select('course_id')
+        .select('course_id, position')
         .eq('user_id', userId);
 
       const excludedIds = (exclusionsData || []).map(e => e.course_id);
+
+      // Positions the user deliberately left empty — auto-fill must not touch these
+      const intentionallyEmptyPositions = new Set(
+        (exclusionsData || [])
+          .map(e => e.position)
+          .filter((p): p is number => p !== null && p !== undefined)
+      );
 
       // 3. Calculate how many auto slots we need
       const autoSlotsNeeded = 10 - pinnedCourses.length;
@@ -129,8 +136,11 @@ export function useUserTopTenCourses(userId: string | undefined) {
         let nextAutoPosition = 1;
 
         autoCourses = filteredRated.map((r: any) => {
-          // Find next available position
-          while (usedPositions.has(nextAutoPosition) && nextAutoPosition <= 10) {
+          // Skip positions already used AND positions intentionally left empty by the user
+          while (
+            (usedPositions.has(nextAutoPosition) || intentionallyEmptyPositions.has(nextAutoPosition))
+            && nextAutoPosition <= 10
+          ) {
             nextAutoPosition++;
           }
           const position = nextAutoPosition;
@@ -228,29 +238,17 @@ export function useUserTopTenCourses(userId: string | undefined) {
 
         if (deleteError) throw deleteError;
 
-        // Repack remaining pinned positions
-        const remainingPinned = topTen
-          .filter(c => c.course_id !== courseId && c.is_pinned)
-          .sort((a, b) => a.position - b.position);
-
-        if (remainingPinned.length > 0) {
-          const { error: reorderError } = await supabase.rpc('reorder_after_removal', {
-            p_user_id: userId,
-            p_course_ids: remainingPinned.map(c => c.course_id),
-          });
-          if (reorderError) throw reorderError;
-        }
       }
 
-      // Add to exclusions so it won't auto-populate
+      // Add to exclusions so it won't auto-populate — preserve the vacated position
       const { error: excludeError } = await supabase
         .from('user_top10_exclusions')
         .upsert({
           user_id: userId,
           course_id: courseId,
+          position: course?.position ?? null,
         }, {
           onConflict: 'user_id,course_id',
-          ignoreDuplicates: true,
         });
 
       if (excludeError) throw excludeError;
