@@ -93,7 +93,9 @@ const FriendsActivityFeed: React.FC<FriendsActivityFeedProps> = ({
   return (
     <div className="space-y-4">
       {/* Filter Chips — always rendered so user can switch tabs */}
-      <FeedFilterChips activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+      <div className="flex justify-center">
+        <FeedFilterChips activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+      </div>
 
       {feedItems.length === 0 ? (
         <div className="py-8 text-center">
