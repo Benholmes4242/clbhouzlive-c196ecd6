@@ -144,8 +144,11 @@ export function CoursesLeaderboardView() {
     'gb-i': 'Britain & Ireland',
     'usa': 'USA',
     'europe': 'Continental Europe',
+    'row': null,
   };
   const quickRegionCountry = QUICK_REGION_TO_COUNTRY[quickRegion];
+
+  const ROW_EXCLUDE_COUNTRIES = ['Britain & Ireland', 'USA', 'Continental Europe'];
 
   // Scroll position preservation refs for filter changes
   const scrollPositionRef = useRef<number>(0);
