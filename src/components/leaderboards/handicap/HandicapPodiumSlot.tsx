@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
-import { Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { formatHcp, getHandicapStatusLabel, getHandicapStatusColor, getHandicapBadgeStyle } from '@/lib/formatHcp';
+import { formatHcp, getHandicapStatusLabel, getHandicapBadgeStyle } from '@/lib/formatHcp';
 import { motion } from 'framer-motion';
+import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
 interface HandicapPodiumSlotProps {
   rank: 1 | 2 | 3;
@@ -12,53 +12,31 @@ interface HandicapPodiumSlotProps {
   handicap: number;
   isCurrentUser?: boolean;
   animationDelay?: number;
-  seasonColor?: string;
+  mode?: 'lowest' | 'improved' | 'season';
 }
 
 const POSITION_CONFIG = {
   1: {
-    avatarSize: 120,
-    borderWidth: 0.5,
-    badgeSize: 26,
-    nameSize: 17,
-    nameWeight: 700,
-    statSize: 24,
-    statWeight: 800,
-    glowShadow: '0 8px 28px hsl(var(--accent-amber) / 0.25)',
+    avatarSize: 64,
+    podiumHeight: 92,
+    badgeSize: 18,
     showCrown: true,
-    verticalOffset: 0,
   },
   2: {
-    avatarSize: 88,
-    borderWidth: 0.5,
-    badgeSize: 22,
-    nameSize: 15,
-    nameWeight: 600,
-    statSize: 20,
-    statWeight: 700,
-    glowShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+    avatarSize: 52,
+    podiumHeight: 72,
+    badgeSize: 18,
     showCrown: false,
-    verticalOffset: 24,
   },
   3: {
-    avatarSize: 88,
-    borderWidth: 0.5,
-    badgeSize: 22,
-    nameSize: 15,
-    nameWeight: 600,
-    statSize: 20,
-    statWeight: 700,
-    glowShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+    avatarSize: 48,
+    podiumHeight: 60,
+    badgeSize: 18,
     showCrown: false,
-    verticalOffset: 40,
   },
 } as const;
 
-const formatNameTwoLines = (name: string) => {
-  const parts = name.trim().split(' ');
-  if (parts.length === 1) return { firstName: parts[0], lastName: null };
-  return { firstName: parts[0], lastName: parts.slice(1).join(' ') };
-};
+const formatFirstName = (name: string) => name.trim().split(' ')[0];
 
 export function HandicapPodiumSlot({
   rank,
@@ -68,13 +46,12 @@ export function HandicapPodiumSlot({
   handicap,
   isCurrentUser = false,
   animationDelay = 0,
-  seasonColor,
+  mode = 'lowest',
 }: HandicapPodiumSlotProps) {
   const config = POSITION_CONFIG[rank];
-  const nameParts = formatNameTwoLines(displayName);
+  const firstName = formatFirstName(displayName);
   const statusLabel = getHandicapStatusLabel(handicap);
-  const badgeStyle = getHandicapBadgeStyle(handicap, seasonColor);
-  const handicapColor = getHandicapStatusColor(handicap, seasonColor);
+  const badgeStyle = getHandicapBadgeStyle(handicap);
 
   const initials = displayName
     ?.split(' ')
@@ -90,122 +67,123 @@ export function HandicapPodiumSlot({
       animate={{ opacity: 1, y: 0 }}
       whileTap={{ scale: 0.97 }}
       transition={{ duration: 0.4, delay: animationDelay, ease: 'easeOut' }}
-      style={{ marginTop: config.verticalOffset }}
     >
       <Link to={`/profile/${userId}`} className="flex flex-col items-center">
-        {/* Crown for 1st place */}
-        {config.showCrown && (
-          <motion.div
+        {/* "You" label */}
+        {isCurrentUser && (
+          <p
+            className="font-bold uppercase mb-0.5"
+            style={{ fontSize: 9, letterSpacing: '0.12em', color: '#F5A623' }}
+          >
+            You
+          </p>
+        )}
+
+        {/* Crown emoji for 1st place */}
+        {config.showCrown && !isCurrentUser && (
+          <motion.span
             className="mb-1"
+            style={{ fontSize: 20 }}
             initial={{ scale: 0, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: animationDelay + 0.3, duration: 0.4, type: 'spring', stiffness: 200 }}
           >
-            <Crown
-              size={36}
-              style={{ color: 'hsl(var(--accent-amber))', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))' }}
-              fill="#f59e0b"
-              strokeWidth={1.5}
-            />
-          </motion.div>
+            👑
+          </motion.span>
         )}
 
-        {/* Avatar with ring — CIRCULAR */}
+        {/* Avatar */}
         <div className="relative">
-          {/* Spotlight glow for #1 */}
-          {rank === 1 && (
-            <div
-              className="absolute -inset-8 -z-10"
-              style={{
-                background: 'radial-gradient(ellipse at center, hsl(var(--accent-amber) / 0.08) 0%, transparent 70%)',
-              }}
-            />
-          )}
-
           <div
-            className="relative overflow-hidden"
+            className="overflow-hidden"
             style={{
               width: config.avatarSize,
               height: config.avatarSize,
               borderRadius: '50%',
-              border: 'none',
-              boxShadow: config.glowShadow,
+              border: rank === 1 ? '2.5px solid #F5A623' : '1.5px solid rgba(0,0,0,0.07)',
             }}
           >
             {avatarUrl ? (
               <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground font-semibold text-xl">
+              <div
+                className="w-full h-full flex items-center justify-center font-semibold"
+                style={{ background: '#F1F5F9', color: '#64748B', fontSize: config.avatarSize * 0.35 }}
+              >
                 {initials}
               </div>
             )}
           </div>
 
-          {/* Rank badge — filled circle matching TrophyPodiumSlot */}
+          {/* Rank badge */}
           <div
-            className="absolute -bottom-1.5 -right-0.5 flex items-center justify-center font-bold text-white shadow-md"
+            className="absolute -bottom-1 -right-0.5 flex items-center justify-center font-extrabold text-white"
             style={{
-              width: rank === 1 ? 26 : 22,
-              height: rank === 1 ? 26 : 22,
+              width: config.badgeSize,
+              height: config.badgeSize,
               borderRadius: '50%',
-              backgroundColor: rank === 1 ? 'hsl(var(--accent-amber))' : rank === 2 ? '#A8B4C0' : '#C4956A',
-              border: '2px solid hsl(var(--background))',
-              fontSize: (rank === 1 ? 26 : 22) * 0.45,
-              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
+              backgroundColor: rank === 1 ? '#F5A623' : '#E2E8F0',
+              color: rank === 1 ? 'white' : '#64748B',
+              border: '1.5px solid white',
+              fontSize: 9,
             }}
           >
             {rank}
           </div>
         </div>
 
-        {/* Name */}
-        <div className="mt-2.5 text-center max-w-[120px]">
-          {/* "You" label */}
-          {isCurrentUser && (
-            <p className="text-xs font-medium mb-0.5" style={{ color: seasonColor || 'hsl(var(--accent-amber))' }}>You</p>
-          )}
-          <p
-            className="text-foreground leading-tight"
-            style={{ fontSize: config.nameSize, fontWeight: config.nameWeight }}
-          >
-            {nameParts.firstName}
+        {/* Podium block */}
+        <div
+          className="flex flex-col items-center mt-1.5"
+          style={{
+            width: config.avatarSize + 24,
+            height: config.podiumHeight,
+            borderRadius: '10px 10px 0 0',
+            padding: '8px 4px',
+            background: rank === 1
+              ? 'linear-gradient(180deg, rgba(245,166,35,0.13) 0%, rgba(245,166,35,0.07) 100%)'
+              : '#F8FAFC',
+            border: rank === 1
+              ? '1px solid rgba(245,166,35,0.27)'
+              : '1px solid rgba(0,0,0,0.07)',
+            borderBottom: 'none',
+          }}
+        >
+          {/* First name */}
+          <p className="font-bold text-center truncate w-full" style={{ fontSize: 11, color: '#0F172A' }}>
+            {firstName}
           </p>
-          {nameParts.lastName && (
-            <p
-              className="text-foreground leading-tight"
-              style={{ fontSize: config.nameSize, fontWeight: config.nameWeight }}
+
+          {/* Handicap value */}
+          <motion.p
+            className="font-bold"
+            style={{
+              fontSize: rank === 1 ? 18 : 15,
+              color: rank === 1 ? '#F5A623' : '#0F172A',
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: animationDelay + 0.3, duration: 0.3 }}
+          >
+            {formatHcp(handicap)}
+          </motion.p>
+
+          {/* Tier pill */}
+          {statusLabel && (
+            <span
+              className="font-semibold uppercase tracking-wide text-center mt-0.5"
+              style={{
+                fontSize: 8,
+                background: badgeStyle.bg,
+                color: badgeStyle.text,
+                borderRadius: 6,
+                padding: '1px 5px',
+              }}
             >
-              {nameParts.lastName}
-            </p>
+              {statusLabel}
+            </span>
           )}
         </div>
-
-        {/* Handicap value — category colored */}
-        <motion.p
-          className="mt-1"
-          style={{ color: handicapColor, fontSize: config.statSize, fontWeight: config.statWeight }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: animationDelay + 0.3, duration: 0.3 }}
-        >
-          {formatHcp(handicap)}
-        </motion.p>
-
-        {/* Handicap category badge */}
-        {statusLabel && (
-          <div
-            className="inline-flex items-center justify-center text-xs font-semibold uppercase tracking-wide mt-1.5 rounded-lg text-center"
-            style={{
-              background: badgeStyle.bg,
-              color: badgeStyle.text,
-              border: `1px solid ${badgeStyle.border}`,
-              padding: '4px 10px',
-              width: 'auto',
-            }}
-          >
-            {statusLabel}
-          </div>
-        )}
       </Link>
     </motion.div>
   );

@@ -10,34 +10,39 @@ interface HandicapPodiumProps {
   seasonColor?: string;
 }
 
-function getHandicapValue(entry: PodiumEntry, mode: string): number {
+function getHandicapValue(entry: PodiumEntry): number {
   if ('handicap_index' in entry) return entry.handicap_index;
   if ('current_handicap' in entry) return entry.current_handicap;
   return 0;
 }
 
-export function HandicapPodium({ entries, currentUserId, mode, seasonColor }: HandicapPodiumProps) {
+export function HandicapPodium({ entries, currentUserId, mode }: HandicapPodiumProps) {
   if (entries.length < 3) return null;
 
   const first = entries[0];
   const second = entries[1];
   const third = entries[2];
 
-  const delays = { 1: 0, 2: 0.1, 3: 0.2 };
-
   return (
-    <div className="w-full pt-4 pb-8 px-3">
-      <div className="flex items-start justify-center gap-3">
+    <div
+      style={{
+        background: 'white',
+        borderRadius: 20,
+        padding: '20px 16px 16px',
+        border: '1px solid rgba(0,0,0,0.07)',
+      }}
+    >
+      <div className="flex items-end justify-center gap-3">
         {/* 2nd place (left) */}
         <HandicapPodiumSlot
           rank={2}
           userId={second.user_id}
           displayName={second.display_name || 'Unknown'}
           avatarUrl={second.avatar_url}
-          handicap={getHandicapValue(second, mode)}
+          handicap={getHandicapValue(second)}
           isCurrentUser={second.user_id === currentUserId}
-          animationDelay={delays[2]}
-          seasonColor={seasonColor}
+          animationDelay={0.1}
+          mode={mode}
         />
 
         {/* 1st place (center) */}
@@ -46,10 +51,10 @@ export function HandicapPodium({ entries, currentUserId, mode, seasonColor }: Ha
           userId={first.user_id}
           displayName={first.display_name || 'Unknown'}
           avatarUrl={first.avatar_url}
-          handicap={getHandicapValue(first, mode)}
+          handicap={getHandicapValue(first)}
           isCurrentUser={first.user_id === currentUserId}
-          animationDelay={delays[1]}
-          seasonColor={seasonColor}
+          animationDelay={0}
+          mode={mode}
         />
 
         {/* 3rd place (right) */}
@@ -58,10 +63,10 @@ export function HandicapPodium({ entries, currentUserId, mode, seasonColor }: Ha
           userId={third.user_id}
           displayName={third.display_name || 'Unknown'}
           avatarUrl={third.avatar_url}
-          handicap={getHandicapValue(third, mode)}
+          handicap={getHandicapValue(third)}
           isCurrentUser={third.user_id === currentUserId}
-          animationDelay={delays[3]}
-          seasonColor={seasonColor}
+          animationDelay={0.2}
+          mode={mode}
         />
       </div>
     </div>

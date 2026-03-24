@@ -78,8 +78,10 @@ export function HandicapImprovementLeaderboard({
       {/* Insight Banner */}
       <HandicapInsightBanner 
         userRank={userRank} 
-        improvement30d={userImprovement}
-        mode="improved" 
+        mode="improved"
+        scope="global"
+        scopeLabel="globally"
+        userId={user?.id}
       />
 
       {/* Rankings List (4th onwards) */}

@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Target } from 'lucide-react';
 
 import { useLowestHandicapLeaderboard } from '@/hooks/leaderboards';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { formatHcp, getHandicapStatusLabel, getHandicapStatusColor, getHandicapBadgeStyle } from '@/lib/formatHcp';
 import { HandicapPodium } from './HandicapPodium';
 import { HandicapInsightBanner } from './HandicapInsightBanner';
+import { HandicapMoverStrip } from './HandicapMoverStrip';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { cn } from '@/lib/utils';
@@ -65,21 +65,21 @@ function InitialErrorState({ onRetry }: { onRetry: () => void }) {
 }
 
 // --- Empty State ---
-function EmptyState({ scope, clubName }: { scope: string; clubName?: string | null }) {
+function EmptyState({ scope, clubName, country }: { scope: string; clubName?: string | null; country?: string | null }) {
+  const message = (() => {
+    if (scope === 'club' && clubName) return `No handicaps from ${clubName} yet — invite your club mates`;
+    if (scope === 'country' && country) return `No ${country} players yet`;
+    if (scope === 'friends') return 'None of your friends have a handicap yet';
+    return 'No handicaps recorded yet. Add your handicap to appear here!';
+  })();
+
   return (
     <div className="flex flex-col items-center justify-center py-16 px-3 text-center space-y-4">
-      <div className="flex items-center justify-center" style={{ opacity: 0.2 }}>
-        <Target size={48} className="text-muted-foreground" />
-      </div>
-      <p className="text-base text-muted-foreground">
-        {scope === 'club' && clubName
-          ? `No handicaps from ${clubName} yet. Invite your club mates!`
-          : "No handicaps recorded. Add your handicap to appear here!"}
-      </p>
+      <p className="text-base text-muted-foreground">{message}</p>
       <Link
         to="/profile/edit"
         className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-all active:scale-[0.97]"
-        style={{ backgroundColor: 'hsl(var(--accent-amber))' }}
+        style={{ backgroundColor: '#F5A623' }}
       >
         Add Handicap
       </Link>
@@ -87,22 +87,20 @@ function EmptyState({ scope, clubName }: { scope: string; clubName?: string | nu
   );
 }
 
-// --- Handicap Row ---
+// --- Handicap Row (Section 8 spec) ---
 function HandicapRow({
   entry,
   userId,
-  seasonColor,
 }: {
   entry: any;
   userId?: string;
-  seasonColor?: string;
 }) {
-  const isCurrentUser = entry.user_id === userId;
+  const isMe = entry.user_id === userId;
   const rank = entry.rank;
   const handicap = entry.handicap_index;
   const statusLabel = getHandicapStatusLabel(handicap);
-  const handicapColor = getHandicapStatusColor(handicap, seasonColor);
-  const categoryBadge = getHandicapBadgeStyle(handicap, seasonColor);
+  const handicapColor = getHandicapStatusColor(handicap);
+  const categoryBadge = getHandicapBadgeStyle(handicap);
 
   const initials = (entry.display_name || '?')
     .split(' ')
@@ -114,78 +112,123 @@ function HandicapRow({
   return (
     <Link
       to={`/profile/${entry.user_id}`}
-      className={cn(
-        'w-full py-4 flex items-center gap-3 transition-colors active:scale-[0.98]',
-        isCurrentUser ? 'px-4' : 'px-5',
-      )}
+      className="flex items-center gap-3 active:scale-[0.98] transition-transform"
       style={{
-        borderBottom: isCurrentUser ? undefined : '1px solid hsl(var(--border) / 0.25)',
-        ...(isCurrentUser ? {
-          background: 'hsl(var(--accent-amber) / 0.08)',
-          border: '2px solid hsl(var(--accent-amber) / 0.2)',
-          borderRadius: 12,
-        } : {}),
+        background: isMe ? '#FFFBF0' : 'white',
+        border: isMe ? '1px solid rgba(245,166,35,0.27)' : '1px solid rgba(0,0,0,0.07)',
+        borderRadius: 14,
+        padding: '12px 14px',
+        marginBottom: 6,
+        minHeight: 44,
       }}
     >
       {/* Rank */}
       <span
         style={{
-          width: 24,
-          fontSize: 12,
+          width: 20,
+          fontSize: 13,
           fontWeight: 700,
           fontVariantNumeric: 'tabular-nums',
           textAlign: 'center',
           flexShrink: 0,
-          color: rank === 1
-            ? 'hsl(var(--accent-amber))'
-            : 'hsl(var(--muted-foreground))',
+          color: rank <= 3 ? '#F5A623' : '#64748B',
         }}
       >
         {rank}
       </span>
 
       {/* Avatar */}
-      <SquircleAvatar
-        size={48}
-        src={entry.avatar_url}
-        alt={entry.display_name || 'Golfer'}
-        fallback={initials}
-        hideRing
-      />
-
-      {/* Name & category */}
-      <div className="flex-1 min-w-0">
-        <p className="font-semibold text-foreground truncate"
-          style={{ fontSize: 16 }}
-        >
-          {entry.display_name || 'Unknown'}
-        </p>
-        {statusLabel && (
-          <span
-            className="inline-block font-semibold uppercase tracking-wide mt-0.5 rounded-md"
-            style={{
-              fontSize: 11,
-              background: categoryBadge.bg,
-              color: categoryBadge.text,
-              border: `1px solid ${categoryBadge.border}`,
-              padding: '2px 6px',
-            }}
+      <div
+        className="overflow-hidden flex-shrink-0"
+        style={{
+          width: 40,
+          height: 40,
+          borderRadius: '50%',
+          border: isMe ? '2.5px solid #F5A623' : 'none',
+        }}
+      >
+        {entry.avatar_url ? (
+          <img src={entry.avatar_url} alt={entry.display_name || ''} className="w-full h-full object-cover" />
+        ) : (
+          <div
+            className="w-full h-full flex items-center justify-center font-semibold"
+            style={{ background: '#F1F5F9', color: '#64748B', fontSize: 14 }}
           >
-            {statusLabel}
-          </span>
+            {initials}
+          </div>
         )}
       </div>
 
-      {/* Handicap number */}
-      <div className="flex-shrink-0">
-        <span
-          style={{ color: handicapColor, fontSize: 22, fontWeight: 800 }}
-        >
+      {/* Name + Club + Tier */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5">
+          <p className="font-bold truncate" style={{ fontSize: 14, color: '#0F172A' }}>
+            {entry.display_name || 'Unknown'}
+          </p>
+          {isMe && (
+            <span
+              className="font-bold uppercase flex-shrink-0"
+              style={{ fontSize: 9, color: '#F5A623', letterSpacing: '0.04em' }}
+            >
+              You
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-1.5 mt-0.5">
+          {statusLabel && (
+            <span
+              className="font-semibold uppercase tracking-wide"
+              style={{
+                fontSize: 9,
+                background: categoryBadge.bg,
+                color: categoryBadge.text,
+                borderRadius: 6,
+                padding: '1px 5px',
+              }}
+            >
+              {statusLabel}
+            </span>
+          )}
+          {entry.club_name && (
+            <span className="truncate" style={{ fontSize: 10, color: '#94A3B8' }}>
+              {entry.club_name}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Handicap value + country */}
+      <div className="flex-shrink-0 text-right">
+        <span style={{ color: handicapColor, fontSize: 18, fontWeight: 800 }}>
           {formatHcp(handicap)}
         </span>
+        {entry.country && (
+          <p className="truncate" style={{ fontSize: 10, color: '#94A3B8' }}>
+            {entry.country}
+          </p>
+        )}
       </div>
     </Link>
   );
+}
+
+// --- Scope label helper ---
+function getScopeLabel(scope: string, country?: string | null, clubName?: string | null): string {
+  switch (scope) {
+    case 'country': return country ? `in ${country}` : 'in your country';
+    case 'club': return clubName ? `at ${clubName}` : 'at your club';
+    case 'friends': return 'among friends';
+    default: return 'globally';
+  }
+}
+
+function getScopeContext(scope: string, country?: string | null, clubName?: string | null): string {
+  switch (scope) {
+    case 'country': return country ? `${country} · Country leaderboard` : 'Country leaderboard';
+    case 'club': return clubName ? `${clubName} · Club leaderboard` : 'Club leaderboard';
+    case 'friends': return 'Friends · People you follow';
+    default: return 'Global · All clbhouz members';
+  }
 }
 
 // --- Main component ---
@@ -285,6 +328,12 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
   // Find current user's rank
   const currentUserEntry = allEntries.find(e => e.user_id === user?.id);
   const userRank = currentUserEntry?.rank;
+  const topHandicap = allEntries.length > 0 ? (allEntries[0] as any).handicap_index : null;
+  const userHandicap = currentUserEntry ? (currentUserEntry as any).handicap_index : null;
+
+  // Scope label
+  const scopeLabel = getScopeLabel(scope, country, clubName);
+  const scopeContext = getScopeContext(scope, country, clubName);
 
   // Virtualization
   const virtualizedContent = useMemo(() => {
@@ -303,7 +352,7 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
   // Initial error
   if (isError && allEntries.length === 0 && !isLoading) {
     return (
-      <div className="px-3 space-y-4">
+      <div className="space-y-4">
         {scopeSelector}
         <InitialErrorState onRetry={() => refetch()} />
       </div>
@@ -311,60 +360,73 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
   }
 
   if (isLoading) {
-    return (
-      <div className="px-3">
-        <HandicapLeaderboardSkeleton />
-      </div>
-    );
+    return <HandicapLeaderboardSkeleton />;
   }
 
   if (!isError && allEntries.length === 0) {
     return (
-      <div className="px-3 space-y-4">
+      <div className="space-y-4">
         {scopeSelector}
-        <EmptyState scope={scope} clubName={clubName} />
+        <EmptyState scope={scope} clubName={clubName} country={country} />
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="space-y-3">
       {/* Podium */}
       {allEntries.length >= 3 && (
         <HandicapPodium
           entries={allEntries.slice(0, 3)}
           currentUserId={user?.id}
           mode="lowest"
-          seasonColor={seasonColor}
         />
       )}
 
       {/* Scope Selector */}
-      {scopeSelector && (
-        <div className="mt-5">
-          {scopeSelector}
-        </div>
-      )}
+      {scopeSelector}
+
+      {/* Context label */}
+      <p className="text-center" style={{ fontSize: 11, color: '#94A3B8' }}>
+        {scopeContext}
+      </p>
 
       {/* Insight Banner */}
-      <div className="mt-5">
-        <HandicapInsightBanner userRank={userRank} mode="lowest" />
-      </div>
+      <HandicapInsightBanner
+        userRank={userRank}
+        topHandicap={topHandicap}
+        userHandicap={userHandicap}
+        userId={user?.id}
+        scope={scope}
+        scopeLabel={scopeLabel}
+        mode="lowest"
+      />
+
+      {/* Recent Movers Strip — placeholder until RPC returns movement data */}
+      <HandicapMoverStrip entries={allEntries} currentUserId={user?.id} />
+
+      {/* Leaderboard eyebrow */}
+      <p
+        className="font-bold uppercase"
+        style={{ fontSize: 10, letterSpacing: '0.12em', color: '#F5A623' }}
+      >
+        Rankings
+      </p>
 
       {/* Rankings List */}
       {allEntries.length > 0 && (
-        <div ref={listContainerRef} className="mt-4" onClick={handleEntryClick}>
+        <div ref={listContainerRef} onClick={handleEntryClick}>
           {virtualizedContent ? (
             <div style={{ height: virtualizedContent.totalHeight, position: 'relative' }}>
               <div style={{ transform: `translateY(${virtualizedContent.offsetY}px)`, position: 'absolute', width: '100%' }}>
                 {allEntries.slice(virtualizedContent.startIndex, virtualizedContent.endIndex).map(entry => (
-                  <HandicapRow key={entry.user_id} entry={entry} userId={user?.id} seasonColor={seasonColor} />
+                  <HandicapRow key={entry.user_id} entry={entry} userId={user?.id} />
                 ))}
               </div>
             </div>
           ) : (
             allEntries.map(entry => (
-              <HandicapRow key={entry.user_id} entry={entry} userId={user?.id} seasonColor={seasonColor} />
+              <HandicapRow key={entry.user_id} entry={entry} userId={user?.id} />
             ))
           )}
         </div>
@@ -385,7 +447,6 @@ export function LowestHandicapLeaderboard({ scope, clubId, clubName, country, sc
       {isError && isFetchingNextPage && allEntries.length > 0 && (
         <HandicapLeaderboardSkeleton />
       )}
-
     </div>
   );
 }
