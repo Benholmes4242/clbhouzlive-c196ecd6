@@ -202,12 +202,13 @@ export function UploadProgressBanner() {
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ y: -100, opacity: 0 }}
+        initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        exit={{ y: -100, opacity: 0 }}
-        className="fixed top-0 left-0 right-0 z-[60] safe-area-top"
+        exit={{ y: -20, opacity: 0 }}
+        className="fixed left-0 right-0 z-[60] px-3"
+        style={{ top: "calc(var(--sat, 47px) + 8px)" }}
       >
-        <div className="bg-background/95 backdrop-blur-lg border-b border-border/30 shadow-lg">
+        <div className="bg-background/95 backdrop-blur-lg border border-border/30 shadow-lg rounded-2xl overflow-hidden">
           {visibleUploads.map((upload) => (
             <UploadProgressItem
               key={upload.jobId}
