@@ -32,30 +32,15 @@ const FriendsCoursesPanel: React.FC = () => {
   }, [isError, error, user?.id, timeframe]);
 
   const { data: userPlayedCourseIds } = useQuery({
-    queryKey: ['user-played-course-ids', user?.id],
+    queryKey: ['user-played-course-ids-from-ratings', user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      // Try with played=true first, fall back to all rows if none found
       const { data, error } = await supabase
-        .from('user_courses' as any)
+        .from('course_ratings')
         .select('course_id')
-        .eq('user_id', user!.id)
-        .eq('played', true);
+        .eq('user_id', user!.id);
       if (error) throw error;
-      
-      // If no played=true rows, check if any rows exist at all (played flag may not be set)
-      if (!data || data.length === 0) {
-        const { data: allData, error: allError } = await supabase
-          .from('user_courses' as any)
-          .select('course_id')
-          .eq('user_id', user!.id);
-        if (allError) throw allError;
-        console.log('[userPlayedCourseIds] played=true: 0, all user_courses rows:', allData?.length ?? 0);
-        return new Set((allData || []).map((r: any) => r.course_id));
-      }
-      
-      console.log('[userPlayedCourseIds] found:', data.length, 'played courses');
-      return new Set(data.map((r: any) => r.course_id));
+      return new Set((data || []).map((r: any) => r.course_id));
     },
     staleTime: 5 * 60 * 1000,
   });
