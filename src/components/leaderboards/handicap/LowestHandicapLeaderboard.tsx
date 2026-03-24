@@ -161,35 +161,36 @@ function HandicapRow({
 
       {/* Name + Location + Club */}
       <div className="flex-1 min-w-0">
-        <p className="font-bold" style={{ fontSize: 14, color: '#0F172A' }}>
+        <p className="font-bold truncate" style={{ fontSize: 14, color: '#0F172A' }}>
           {entry.display_name || 'Unknown'}
         </p>
         {(entry.city || entry.country) && (
-          <p style={{ fontSize: 11, color: '#94A3B8' }}>
+          <p className="truncate" style={{ fontSize: 11, color: '#94A3B8' }}>
             {[entry.city, entry.country].filter(Boolean).join(', ')}
           </p>
         )}
         {entry.club_name && (
-          <p style={{ fontSize: 11, color: '#94A3B8' }}>
+          <p className="truncate" style={{ fontSize: 11, color: '#94A3B8' }}>
             {entry.club_name}
           </p>
         )}
       </div>
 
-      {/* Handicap number + tier pill (centered vertically) */}
-      <div className="flex-shrink-0 flex flex-col items-center justify-center">
+      {/* Handicap number + tier label stacked */}
+      <div className="flex-shrink-0 flex flex-col items-center justify-center" style={{ minWidth: 56 }}>
         <span style={{ color: handicapColor, fontSize: 20, fontWeight: 800, lineHeight: 1 }}>
           {formatHcp(handicap)}
         </span>
         {statusLabel && (
           <span
-            className="font-semibold uppercase tracking-wide mt-1"
+            className="font-semibold uppercase tracking-wide mt-1 text-center leading-tight"
             style={{
               fontSize: 8,
               background: categoryBadge.bg,
               color: categoryBadge.text,
               borderRadius: 6,
-              padding: '1px 6px',
+              padding: '2px 6px',
+              maxWidth: 64,
             }}
           >
             {statusLabel}
