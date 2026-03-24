@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useSpotlightCourse } from '@/hooks/useSpotlightCourse';
+import { useAuth } from '@/hooks/useAuth';
 
 interface CourseSeasonSpotlightProps {
   onCourseClick: (courseId: string) => void;
 }
 
 export const CourseSeasonSpotlight: React.FC<CourseSeasonSpotlightProps> = ({ onCourseClick }) => {
-  const { data: spotlight, isLoading } = useSpotlightCourse();
+  const { user } = useAuth();
+  const { data: spotlight, isLoading } = useSpotlightCourse(user?.id);
   const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
@@ -18,7 +20,7 @@ export const CourseSeasonSpotlight: React.FC<CourseSeasonSpotlightProps> = ({ on
 
   if (isLoading || !spotlight) return null;
 
-  const location = [spotlight.sub_country, spotlight.country].filter(Boolean).join(', ');
+  const location = [spotlight.city, spotlight.country].filter(Boolean).join(', ');
 
   return (
     <>
@@ -53,9 +55,9 @@ export const CourseSeasonSpotlight: React.FC<CourseSeasonSpotlightProps> = ({ on
         }}
       >
         {/* Background image */}
-        {spotlight.thumbnail_image ? (
+        {spotlight.image_url ? (
           <img
-            src={spotlight.thumbnail_image}
+            src={spotlight.image_url}
             alt={spotlight.course_name}
             style={{
               position: 'absolute',
@@ -75,9 +77,8 @@ export const CourseSeasonSpotlight: React.FC<CourseSeasonSpotlightProps> = ({ on
           />
         )}
 
-        {/* Bottom gradient for text readability — matches standard card scrim */}
+        {/* Bottom gradient for text readability */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
-
 
         {/* Stamp badge */}
         {revealed && (
@@ -135,7 +136,7 @@ export const CourseSeasonSpotlight: React.FC<CourseSeasonSpotlightProps> = ({ on
                   color: 'rgba(255,255,255,0.85)',
                 }}
               >
-                🔥 {Math.round(spotlight.trending_score)} trend score
+                🏌️ {spotlight.total_rounds} plays this season
               </div>
               <div
                 style={{
@@ -149,7 +150,7 @@ export const CourseSeasonSpotlight: React.FC<CourseSeasonSpotlightProps> = ({ on
                   color: 'rgba(255,255,255,0.85)',
                 }}
               >
-                👥 {spotlight.review_count} rounds this season
+                ⭐ {spotlight.avg_rating.toFixed(1)} ({spotlight.rating_count})
               </div>
             </div>
           </div>
