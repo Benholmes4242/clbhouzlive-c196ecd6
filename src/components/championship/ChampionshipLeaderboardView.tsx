@@ -30,6 +30,7 @@ import { RankCelebration } from './RankCelebration';
 import { MotivationalCarousel } from './MotivationalCarousel';
 import { SeasonRaceCard } from './SeasonRaceCard';
 import { ArenasStrip } from './ArenasStrip';
+import { SeasonWinnerCard } from './SeasonWinnerCard';
 // HallOfFameHeader is now integrated into HallOfFamePodium
 import { ClubSearchBar } from '@/components/leaderboards/exploration/ClubSearchBar';
 import { CountrySelector } from '@/components/leaderboards/shared/CountrySelector';
