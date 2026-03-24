@@ -78,6 +78,9 @@ export function useSeasonCalendar() {
           days_until_start: daysUntilStart,
           sponsor_name: s.sponsor_name ?? null,
           prize_description: s.prize_description ?? null,
+          season_winner_user_id: s.season_winner_user_id ?? null,
+          season_winner_courses: s.season_winner_courses ?? null,
+          prize_claimed: s.prize_claimed ?? false,
         } as Season;
       });
     },
