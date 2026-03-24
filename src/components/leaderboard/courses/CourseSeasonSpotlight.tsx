@@ -75,6 +75,9 @@ export const CourseSeasonSpotlight: React.FC<CourseSeasonSpotlightProps> = ({ on
           />
         )}
 
+        {/* Bottom gradient for text readability — matches standard card scrim */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
+
 
         {/* Stamp badge */}
         {revealed && (
