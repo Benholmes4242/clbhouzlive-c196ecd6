@@ -90,6 +90,7 @@ export function usePGACard(userId?: string): {
       return data ?? null;
     },
     staleTime: 30 * 60_000,
+    enabled: !topLive && !recentResult,
   });
 
   // ── Result leaderboard (final standings) ──
