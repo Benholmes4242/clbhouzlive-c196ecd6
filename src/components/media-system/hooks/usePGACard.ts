@@ -525,7 +525,9 @@ export function usePGACard(userId?: string): {
         postId,
         ...eng,
         defendingChampion: u.defending_champion ?? null,
-        defendingChampionPhotoUrl: null,
+        defendingChampionPhotoUrl: u.defending_champion
+          ? (getPlayerHeadshotUrl(u.defending_champion, PGA_TOUR_SLUG) ?? null)
+          : null,
         pastWinners: pastWinnersRaw.length > 0 ? pastWinnersRaw : null,
       };
     }

@@ -941,16 +941,18 @@ export const PGACard: React.FC<PGACardProps> = ({
               animation: 'slideUp 0.5s ease-out both',
               animationDelay: '0.35s',
             }}>
-              {/* Avatar */}
+              {/* Avatar — squircle */}
               <div style={{
-                width: 52, height: 52, borderRadius: '50%', flexShrink: 0,
+                width: 52, height: 52, borderRadius: SQUIRCLE_RADIUS, flexShrink: 0,
                 overflow: 'hidden',
                 border: `2px solid ${ACCENT}44`,
                 background: 'rgba(255,255,255,0.06)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 {cd.defendingChampionPhotoUrl
-                  ? <img src={cd.defendingChampionPhotoUrl} alt={defendingChampion} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ? <img src={cd.defendingChampionPhotoUrl} alt={defendingChampion} style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                    />
                   : <span style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>
                       {getInitials(defendingChampion)}
                     </span>
@@ -984,10 +986,8 @@ export const PGACard: React.FC<PGACardProps> = ({
                 </div>
               </div>
 
-              {/* Trophy badge */}
-              <div style={{ flexShrink: 0, opacity: 0.18 }}>
-                <Trophy style={{ width: 28, height: 28, color: ACCENT }} />
-              </div>
+              {/* Trophy emoji */}
+              <span style={{ flexShrink: 0, fontSize: 26, opacity: 0.18 }}>🏆</span>
             </div>
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center gap-2 text-white/30" style={{ margin: '8px clamp(14px, 3.5vw, 20px)' }}>
