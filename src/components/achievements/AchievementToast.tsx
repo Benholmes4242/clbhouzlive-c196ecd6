@@ -53,7 +53,7 @@ export const AchievementToast: React.FC<AchievementToastProps> = ({
   };
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none max-w-md w-full px-4">
+    <div className="fixed bottom-[109px] left-1/2 -translate-x-1/2 z-[9999] pointer-events-none max-w-md w-full px-4">
       <div
         className={`
           pointer-events-auto
