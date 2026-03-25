@@ -104,7 +104,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         </div>
 
         {/* Content overlay - bottom (above reaction strip) */}
-        <div className="absolute bottom-[46px] left-0 right-0 p-5 pb-3.5">
+        <div className="absolute bottom-[52px] left-0 right-0 px-4 pb-3 pt-8">
           {/* Course name */}
           <h3 
             className="text-white font-semibold text-xl leading-tight mb-1 line-clamp-2"
