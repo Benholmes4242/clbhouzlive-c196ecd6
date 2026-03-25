@@ -7,6 +7,7 @@ import { WantToPlaySection } from './courses/WantToPlaySection';
 import { AllCoursesList } from './courses/AllCoursesList';
 import { AddCourseModal } from './courses/AddCourseModal';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { TopTenActivityFeed } from './courses/TopTenActivityFeed';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
