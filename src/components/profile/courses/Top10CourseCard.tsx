@@ -144,7 +144,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                 {rating === 10 ? '10' : rating.toFixed(1)}
               </span>
               <span 
-                className="text-xs font-medium tracking-wide uppercase"
+                className="text-[10px] font-medium tracking-wide uppercase"
                 style={{ color: 'rgba(245, 158, 11, 0.75)' }}
               >
                 {tierData.label}
