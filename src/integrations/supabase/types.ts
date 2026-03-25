@@ -10187,6 +10187,59 @@ export type Database = {
           },
         ]
       }
+      top_ten_comment_mentions: {
+        Row: {
+          comment_id: string
+          created_at: string | null
+          id: string
+          mentioned_user_id: string
+          mentioned_username: string
+        }
+        Insert: {
+          comment_id: string
+          created_at?: string | null
+          id?: string
+          mentioned_user_id: string
+          mentioned_username: string
+        }
+        Update: {
+          comment_id?: string
+          created_at?: string | null
+          id?: string
+          mentioned_user_id?: string
+          mentioned_username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "top_ten_comment_mentions_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "top_ten_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_comment_mentions_mentioned_user_id_fkey"
+            columns: ["mentioned_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "top_ten_comment_mentions_mentioned_user_id_fkey"
+            columns: ["mentioned_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_comment_mentions_mentioned_user_id_fkey"
+            columns: ["mentioned_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       top_ten_comments: {
         Row: {
           body: string
@@ -10195,6 +10248,7 @@ export type Database = {
           created_at: string | null
           id: string
           is_deleted: boolean | null
+          parent_id: string | null
           target_user_id: string
         }
         Insert: {
@@ -10204,6 +10258,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           is_deleted?: boolean | null
+          parent_id?: string | null
           target_user_id: string
         }
         Update: {
@@ -10213,6 +10268,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           is_deleted?: boolean | null
+          parent_id?: string | null
           target_user_id?: string
         }
         Relationships: [
@@ -10242,6 +10298,13 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "top_ten_comments"
             referencedColumns: ["id"]
           },
           {

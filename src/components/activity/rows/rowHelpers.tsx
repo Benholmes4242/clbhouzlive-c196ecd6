@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, ShieldOff, Clock, CalendarDays, MapPin, CheckCircle2, UserCheck, Star } from 'lucide-react';
+import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, ShieldOff, Clock, CalendarDays, MapPin, CheckCircle2, UserCheck, Star, AtSign } from 'lucide-react';
 import { FiMapPin } from 'react-icons/fi';
 import { cn } from '@/lib/utils';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
@@ -152,6 +152,10 @@ export function getNotificationBadgeIcon(type: string) {
       return <MessageCircle className={cn(iconClass, "text-[#334E3D]")} />;
     case 'top_ten_comment':
       return <MessageCircle className={cn(iconClass, "text-amber-500")} />;
+    case 'top_ten_reply':
+      return <MessageCircle className={cn(iconClass, "text-amber-500")} />;
+    case 'top_ten_mention':
+      return <AtSign className={cn(iconClass, "text-amber-500")} />;
     default:
       return <Bell className={cn(iconClass, "text-muted-foreground")} />;
   }
