@@ -340,7 +340,9 @@ export function usePGACard(userId?: string): {
         score: lp.score ?? 0,
         thru: null,
         today: null,
-        scoringStats: resultScorecards.length ? aggregateScoringStats(resultScorecards, lp.player?.id ?? '') : null,
+        scoringStats: resultMeta?.stat_birdies != null
+          ? { eagles: resultMeta.stat_eagles ?? 0, birdies: resultMeta.stat_birdies ?? 0, pars: resultMeta.stat_pars ?? 0, bogeys: resultMeta.stat_bogeys ?? 0, doubleBogeys: 0 }
+          : resultScorecards.length ? aggregateScoringStats(resultScorecards, lp.player?.id ?? '') : null,
       } : null;
 
       const chasers: PGACardChaser[] = lb
