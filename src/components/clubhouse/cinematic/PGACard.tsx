@@ -76,8 +76,36 @@ export const PGACard: React.FC<PGACardProps> = ({
   getCommentCount,
 }) => {
   const cd = post.cardData;
+  const isLoading = (post as any).isLoading ?? false;
   const likeState = getLikeState?.(post) ?? { isLiked: cd.isLikedByMe, count: cd.likeCount };
   const commentCount = getCommentCount?.(post) ?? cd.commentCount;
+
+  // ── Skeleton state ──
+  const showSkeleton = isLoading ||
+    (cd.state === 'live' && !cd.leader) ||
+    (cd.state === 'result' && !cd.leader);
+
+  if (showSkeleton) {
+    return (
+      <div className="h-full w-full flex flex-col" style={{ background: '#080a0e' }}>
+        <div style={{ height: 2.5, background: 'linear-gradient(90deg, rgba(245,158,11,0.8), transparent)', flexShrink: 0 }} />
+        <div className="flex-1 flex flex-col gap-4 p-5 pt-14">
+          <div className="rounded-lg animate-pulse" style={{ height: 24, width: '70%', background: 'rgba(255,255,255,0.08)' }} />
+          <div className="rounded-2xl animate-pulse" style={{ height: 180, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }} />
+          <div className="rounded-xl animate-pulse" style={{ height: 62, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }} />
+          <div className="flex flex-col gap-3 flex-1">
+            {[0, 1, 2].map(i => (
+              <div key={i} className="rounded-xl animate-pulse flex-1" style={{ minHeight: 44, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }} />
+            ))}
+          </div>
+        </div>
+        <div className="flex gap-3 px-5 pt-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)', borderTop: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
+          <div className="rounded-2xl animate-pulse" style={{ width: 64, height: 44, background: 'rgba(255,255,255,0.06)' }} />
+          <div className="rounded-2xl animate-pulse flex-1" style={{ height: 44, background: 'rgba(245,158,11,0.15)' }} />
+        </div>
+      </div>
+    );
+  }
 
   // Gradient glow color per state
   const glowColor = cd.state === 'live'
