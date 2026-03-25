@@ -65,6 +65,7 @@ export function getNotificationBadgeIcon(type: string) {
     case 'like':
       return <Heart className={cn(iconClass, "text-[#F7931E]")} fill="currentColor" />;
     case 'comment':
+    case 'comment_reply':
       return <MessageCircle className={cn(iconClass, "text-blue-500")} />;
     case 'mention':
     case 'tag':

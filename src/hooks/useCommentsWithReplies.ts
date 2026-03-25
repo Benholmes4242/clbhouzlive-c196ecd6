@@ -311,6 +311,47 @@ export function useCommentsWithReplies(postId: string | null, onCommentDeleted?:
         throw new Error(msg);
       }
 
+      const newCommentId = data.id;
+      const currentUserId = user.id;
+
+      // ── Mention notifications (non-blocking) ─────────────────────
+      try {
+        const mentionMatches = content.match(/@([\w]+(?:\s[\w]+)*)/g) ?? [];
+        for (const match of mentionMatches) {
+          const username = match.slice(1).trim();
+          const { data: mentionedUser } = await supabase
+            .from('user_profiles')
+            .select('id, username')
+            .eq('username', username)
+            .single();
+          if (!mentionedUser) continue;
+          if (mentionedUser.id === currentUserId) continue;
+
+          const { data: commenterProfile } = await supabase
+            .from('user_profiles')
+            .select('display_name')
+            .eq('id', currentUserId)
+            .single();
+          const commenterName = commenterProfile?.display_name ?? 'Someone';
+
+          await supabase.from('notifications').insert({
+            user_id: mentionedUser.id,
+            recipient_actor_type: 'personal',
+            recipient_actor_id: mentionedUser.id,
+            actor_id: currentUserId,
+            type: 'mention',
+            title: `${commenterName} mentioned you in a comment`,
+            message: content.length > 60 ? content.slice(0, 60) + '…' : content,
+            entity_type: 'comment',
+            entity_id: newCommentId,
+            is_read: false,
+            data: { post_id: postId },
+          });
+        }
+      } catch {
+        // Mention notifications are non-blocking
+      }
+
       // Handle reply notifications client-side (edge function doesn't do this yet)
       if (parentId) {
         const { data: parentComment } = await supabase
@@ -345,7 +386,7 @@ export function useCommentsWithReplies(postId: string | null, onCommentDeleted?:
               title: 'New reply',
               message: 'replied to your comment',
               entity_type: 'comment',
-              entity_id: data.id,
+              entity_id: newCommentId,
               data: {
                 post_id: postId,
                 parent_comment_id: parentId,
@@ -357,7 +398,43 @@ export function useCommentsWithReplies(postId: string | null, onCommentDeleted?:
         }
       }
 
-      return data.id;
+      // ── Top-level comment notification to post owner (non-blocking) ──
+      try {
+        if (!parentId && postId) {
+          const { data: postData } = await supabase
+            .from('posts')
+            .select('user_id')
+            .eq('id', postId)
+            .single();
+          const postOwnerId = postData?.user_id;
+
+          if (postOwnerId && postOwnerId !== currentUserId) {
+            const { data: commenterProfile } = await supabase
+              .from('user_profiles')
+              .select('display_name')
+              .eq('id', currentUserId)
+              .single();
+            const commenterName = commenterProfile?.display_name ?? 'Someone';
+
+            await supabase.from('notifications').insert({
+              user_id: postOwnerId,
+              recipient_actor_type: 'personal',
+              recipient_actor_id: postOwnerId,
+              actor_id: currentUserId,
+              type: 'comment',
+              title: `${commenterName} commented on your post`,
+              message: content.length > 60 ? content.slice(0, 60) + '…' : content,
+              entity_type: 'post',
+              entity_id: postId,
+              is_read: false,
+            });
+          }
+        }
+      } catch {
+        // Non-blocking
+      }
+
+      return newCommentId;
     },
     onMutate: async ({ content, parentId, mediaUrl, mediaType, voiceDurationSeconds }) => {
       // Optimistic insert
