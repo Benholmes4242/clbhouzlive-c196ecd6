@@ -173,7 +173,7 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
       </div>
 
       {/* Stat pill + home club — fixed height so Follow button stays aligned */}
-      <div style={{ height: 36, marginTop: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
+      <div style={{ height: 36, marginTop: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
         {creator.handicap != null && (
           <div
             className="flex items-center justify-center rounded-full"
