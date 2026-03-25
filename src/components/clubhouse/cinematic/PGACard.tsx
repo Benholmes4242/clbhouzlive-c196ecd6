@@ -445,8 +445,10 @@ export const PGACard: React.FC<PGACardProps> = ({
                       flex: 1, textAlign: 'center',
                       padding: '5px 2px 4px',
                       borderRadius: 8,
-                      background: 'rgba(255,255,255,0.025)',
-                      border: '1px solid rgba(255,255,255,0.04)',
+                      background: 'rgba(0,0,0,0.45)',
+                      backdropFilter: 'blur(12px)',
+                      WebkitBackdropFilter: 'blur(12px)',
+                      border: '1px solid rgba(255,255,255,0.10)',
                     }}>
                       <div style={{ fontSize: 'clamp(12px, 3vw, 14px)', fontWeight: 700, color: 'rgba(255,255,255,0.7)', lineHeight: 1 }}>
                         {stat.v ?? '—'}
