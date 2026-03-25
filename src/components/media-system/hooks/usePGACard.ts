@@ -178,7 +178,7 @@ export function usePGACard(userId?: string): {
       const leader: PGACardLeader | null = lp ? {
         playerId: lp.playerId,
         playerName: lp.player.fullName,
-        photoUrl: getPlayerHeadshotUrl(lp.player.fullName, PGA, lp.player.headshotOverride) ?? null,
+        photoUrl: getPlayerHeadshotUrl(lp.player.fullName, PGA_TOUR_SLUG, lp.player.headshotOverride) ?? null,
         scoreDisplay: lp.scoreDisplay,
         score: lp.score,
         thru: lp.thru,
