@@ -6,7 +6,8 @@ import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import type { PGACardFeedPost, PGACardData, PGACardLeader, PGACardChaser, PGACardStats } from '../types/media';
 
 const SYSTEM_USER_ID = 'b8437384-291a-4d85-b81f-24c1068235dd';
-const PGA = 'pga';
+const PGA_TOUR_ID = 'b52068af-28e4-4e91-bdbb-037591b0ff84';
+const PGA_TOUR_SLUG = 'pga';
 const RESULT_WINDOW_DAYS = 3;
 
 // ── Insight helper ──
@@ -48,7 +49,7 @@ export function usePGACard(userId?: string): {
   // ── Live tournaments from useLiveArena ──
   const { data: arenaData, isLoading: arenaLoading } = useLiveArena();
   const pgaLive = useMemo(
-    () => (arenaData ?? []).filter(t => t.tourSlug === PGA).sort((a, b) => (b.purse ?? 0) - (a.purse ?? 0)),
+    () => (arenaData ?? []).filter(t => t.tourSlug === PGA_TOUR_SLUG).sort((a, b) => (b.purse ?? 0) - (a.purse ?? 0)),
     [arenaData]
   );
   const topLive = pgaLive[0] ?? null;
@@ -58,11 +59,17 @@ export function usePGACard(userId?: string): {
     queryKey: ['pga-card-result'],
     queryFn: async () => {
       const cutoff = new Date(Date.now() - RESULT_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString();
-      const { data } = await (supabase
-        .from('sr_tournaments') as any)
-        .select('id,name,purse,start_date,end_date,venue_name,venue_city,venue_par,venue_yardage,status')
-        .eq('tour_slug', PGA)
+      const { data: seasons } = await supabase
+        .from('sr_seasons')
+        .select('id')
+        .eq('tour_id', PGA_TOUR_ID);
+      const seasonIds = (seasons ?? []).map(s => s.id);
+      if (!seasonIds.length) return null;
+      const { data } = await supabase
+        .from('sr_tournaments')
+        .select('id, name, purse, start_date, end_date, venue_name, venue_city, venue_par, venue_yardage, status, season_id')
         .eq('status', 'closed')
+        .in('season_id', seasonIds)
         .gte('end_date', cutoff)
         .order('end_date', { ascending: false })
         .limit(1)
@@ -78,11 +85,17 @@ export function usePGACard(userId?: string): {
     queryKey: ['pga-card-upcoming'],
     queryFn: async () => {
       const now = new Date().toISOString();
-      const { data } = await (supabase
-        .from('sr_tournaments') as any)
-        .select('id,name,purse,start_date,end_date,venue_name,venue_city,venue_par,venue_yardage,status')
-        .eq('tour_slug', PGA)
+      const { data: seasons } = await supabase
+        .from('sr_seasons')
+        .select('id')
+        .eq('tour_id', PGA_TOUR_ID);
+      const seasonIds = (seasons ?? []).map(s => s.id);
+      if (!seasonIds.length) return null;
+      const { data } = await supabase
+        .from('sr_tournaments')
+        .select('id, name, purse, start_date, end_date, venue_name, venue_city, venue_par, venue_yardage, status, season_id')
         .eq('status', 'scheduled')
+        .in('season_id', seasonIds)
         .gte('start_date', now)
         .order('start_date', { ascending: true })
         .limit(1)
@@ -165,7 +178,7 @@ export function usePGACard(userId?: string): {
       const leader: PGACardLeader | null = lp ? {
         playerId: lp.playerId,
         playerName: lp.player.fullName,
-        photoUrl: getPlayerHeadshotUrl(lp.player.fullName, PGA, lp.player.headshotOverride) ?? null,
+        photoUrl: getPlayerHeadshotUrl(lp.player.fullName, PGA_TOUR_SLUG, lp.player.headshotOverride) ?? null,
         scoreDisplay: lp.scoreDisplay,
         score: lp.score,
         thru: lp.thru,
@@ -178,7 +191,7 @@ export function usePGACard(userId?: string): {
         .map(p => ({
           position: p!.position,
           playerName: p!.player.fullName,
-          photoUrl: getPlayerHeadshotUrl(p!.player.fullName, PGA, p!.player.headshotOverride) ?? null,
+          photoUrl: getPlayerHeadshotUrl(p!.player.fullName, PGA_TOUR_SLUG, p!.player.headshotOverride) ?? null,
           scoreDisplay: p!.scoreDisplay,
           isTied: lb.filter(x => x?.position === p?.position).length > 1,
         }));
