@@ -134,6 +134,7 @@ async function fetchUserDetail(userId: string): Promise<AdminUserDetail> {
     followers:      followers.count ?? 0,
     following:      following.count ?? 0,
     top100_played:  top100.count ?? 0,
+    last_seen_at:   null,
   };
 }
 
