@@ -70,6 +70,7 @@ export function usePGACard(userId?: string): {
       return data ?? null;
     },
     staleTime: 5 * 60_000,
+    enabled: !topLive,
   });
 
   // ── Next upcoming PGA event ──
@@ -89,6 +90,7 @@ export function usePGACard(userId?: string): {
       return data ?? null;
     },
     staleTime: 30 * 60_000,
+    enabled: !topLive && !recentResult,
   });
 
   // ── Result leaderboard (final standings) ──
@@ -109,7 +111,7 @@ export function usePGACard(userId?: string): {
         .limit(10);
       return data ?? [];
     },
-    enabled: !!recentResult,
+    enabled: !!recentResult && !topLive,
     staleTime: 10 * 60_000,
   });
 
@@ -250,9 +252,13 @@ export function usePGACard(userId?: string): {
       const wonBy = lp && lb[1]
         ? Math.abs((lp.score ?? 0) - (lb[1].score ?? 0))
         : null;
-      const wonByText = wonBy != null
-        ? wonBy === 1 ? 'Won by 1 shot' : `Won by ${wonBy} shots`
-        : null;
+      const wonByText = wonBy == null
+        ? null
+        : wonBy === 0
+        ? 'Won in a playoff'
+        : wonBy === 1
+        ? 'Won by 1 shot'
+        : `Won by ${wonBy} shots`;
 
       return {
         tournamentId: r.id,
@@ -304,7 +310,8 @@ export function usePGACard(userId?: string): {
     }
 
     return null;
-  }, [topLive, recentResult, nextUpcoming, resultLeaderboard, postId, eng]);
+  }, [topLive, recentResult, nextUpcoming, resultLeaderboard, postId,
+      engagementData?.likeCount, engagementData?.commentCount, engagementData?.isLikedByMe]);
 
   const pgaCard: PGACardFeedPost | null = cardData ? {
     id: 'pga-card',

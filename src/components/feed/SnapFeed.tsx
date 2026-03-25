@@ -272,7 +272,7 @@ export function SnapFeed({
         <div
           className="w-full flex-shrink-0 flex flex-col items-center justify-center bg-background"
           style={{
-            height: '100%',
+            height: '100dvh',
             scrollSnapAlign: 'start',
             scrollSnapStop: 'always',
           }}
