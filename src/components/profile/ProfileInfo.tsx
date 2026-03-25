@@ -57,6 +57,10 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         profileId={profile?.id}
         bio={bio}
         profileUsername={profile?.username}
+        instagramHandle={profile?.instagram_handle}
+        twitterHandle={profile?.twitter_handle}
+        tiktokHandle={profile?.tiktok_handle}
+        youtubeHandle={profile?.youtube_handle}
       />
 
       {/* Home Club - Show for all personal profiles */}
