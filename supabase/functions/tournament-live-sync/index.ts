@@ -529,23 +529,6 @@ async function syncTournament(
           console.warn(`[LiveSync] Final tee times failed for ${tournament.name}: ${e.message}`);
         }
       }
-
-      // ── Inject tournament result post into Clubhouse feed ──────
-      try {
-        const injectUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/inject-tournament-post`;
-        const injectResponse = await fetch(injectUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
-          },
-          body: JSON.stringify({ tournamentId: tournament.id }),
-        });
-        const injectResult = await injectResponse.json();
-        console.log(`[LiveSync] inject-tournament-post result for ${tournament.name}:`, JSON.stringify(injectResult));
-      } catch (injectErr) {
-        console.error(`[LiveSync] inject-tournament-post failed for ${tournament.name} (non-blocking):`, (injectErr as Error).message);
-      }
     }
   } else {
     // Update last_live_sync timestamp and current_round

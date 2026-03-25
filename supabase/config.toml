@@ -182,8 +182,6 @@ verify_jwt = false
 [functions.cloudflare-r2-delete]
 verify_jwt = false
 
-[functions.inject-tournament-post]
-verify_jwt = false
 
 [functions.upsert-live-tournament-post]
 verify_jwt = false
