@@ -5,6 +5,7 @@
  * - Full-bleed hero image with gradient overlay
  * - Frosted glass rank badge (top left)
  * - Frosted glass rating chip (bottom)
+ * - Frosted glass reaction strip overlay
  * - 280x360px taller aspect ratio
  * - 24px rounded corners
  * - Layered shadow with press state
@@ -20,6 +21,9 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useTopTenReactions, REACTION_CONFIG, ReactionType } from '@/hooks/useTopTenReactions';
+import { useTopTenComments } from '@/hooks/useTopTenComments';
+import { TopTenCardComments } from './TopTenCardComments';
 
 interface Top10CourseCardProps {
   course: TopTenCourse;
@@ -28,6 +32,7 @@ interface Top10CourseCardProps {
   className?: string;
   isOwnProfile?: boolean;
   userId?: string;
+  privacySetting?: string;
 }
 
 export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
@@ -37,9 +42,15 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   className,
   isOwnProfile = true,
   userId,
+  privacySetting,
 }) => {
   const navigate = useNavigate();
   const [isReviewSheetOpen, setIsReviewSheetOpen] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  
+  const targetUserId = userId ?? '';
+  const { counts, myReaction, toggleReaction } = useTopTenReactions(targetUserId, course.course_id);
+  const { comments } = useTopTenComments(targetUserId, course.course_id);
   
   // Fetch the review text for the bottom sheet
   const { data: reviewData } = useQuery({
@@ -50,7 +61,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         .from('course_ratings')
         .select('id, review')
         .eq('course_id', course.course_id)
-        .eq('user_id', userId)
+        .eq('user_id', userId!)
         .maybeSingle();
       
       if (error) throw error;
@@ -60,7 +71,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   });
   
   const handleCardClick = () => {
-    setIsReviewSheetOpen(true);
+    setCommentsOpen(true);
   };
   
   const handleCloseReviewSheet = useCallback(() => {
@@ -83,7 +94,6 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   
   // Get tier info for rating display
   const tierData = rating !== undefined ? getScoreTier(rating) : null;
-  // All tiers now use unified amber
   
   // Location subtitle
   const heroSubtitle = course.sub_country || course.country;
@@ -134,8 +144,8 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           <span className="text-white font-semibold text-sm">#{position}</span>
         </div>
 
-        {/* Content overlay - bottom */}
-        <div className="absolute bottom-0 left-0 right-0 p-5">
+        {/* Content overlay - bottom (above reaction strip) */}
+        <div className="absolute bottom-[40px] left-0 right-0 p-5 pb-2">
           {/* Course name */}
           <h3 
             className="text-white font-semibold text-lg leading-tight mb-1 line-clamp-2"
@@ -148,7 +158,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           
           {/* Location */}
           <p 
-            className="text-white/70 text-sm mb-4"
+            className="text-white/70 text-sm mb-3"
             style={{
               textShadow: '0 1px 4px rgba(0,0,0,0.2)',
             }}
@@ -184,12 +194,57 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           )}
         </div>
 
+        {/* Reaction strip — overlaid at bottom of card image */}
+        <div
+          className="absolute bottom-0 left-0 right-0 flex"
+          style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}
+        >
+          {(Object.entries(REACTION_CONFIG) as [ReactionType, typeof REACTION_CONFIG[ReactionType]][]).map(([type, config], idx) => {
+            const count = counts[type] ?? 0;
+            const isActive = myReaction === type;
+            const isLast = idx === Object.keys(REACTION_CONFIG).length - 1;
+            return (
+              <button
+                key={type}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (!isOwnProfile) toggleReaction(type);
+                }}
+                className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5
+                  transition-all active:scale-95
+                  ${isActive ? 'bg-amber-500/25' : 'bg-black/45'}
+                  ${!isLast ? 'border-r border-white/[0.08]' : ''}
+                  ${isOwnProfile ? 'cursor-default' : 'cursor-pointer'}
+                `}
+                style={{ backdropFilter: 'blur(12px)' }}
+                disabled={isOwnProfile}
+              >
+                <span className="text-sm">{config.emoji}</span>
+                <span className={`text-[10px] font-medium ${isActive ? 'text-amber-400' : 'text-white/60'}`}>
+                  {count > 0 ? count : '·'}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
         {/* Subtle tap indicator - bottom right */}
-        <div className="absolute bottom-5 right-5">
+        <div className="absolute bottom-[44px] right-5">
           <ChevronRight className="w-5 h-5 text-white/40" />
         </div>
       </motion.div>
       
+      {/* Comments sheet */}
+      <TopTenCardComments
+        isOpen={commentsOpen}
+        onClose={() => setCommentsOpen(false)}
+        targetUserId={targetUserId}
+        courseId={course.course_id}
+        courseName={course.name}
+        isOwnProfile={isOwnProfile ?? true}
+        privacySetting={privacySetting ?? 'followers'}
+      />
+
       {/* Review Bottom Sheet - Liquid Glass with swipe-to-dismiss */}
       <BottomSheet 
         open={isReviewSheetOpen} 

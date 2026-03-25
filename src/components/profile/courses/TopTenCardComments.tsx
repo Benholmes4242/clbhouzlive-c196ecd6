@@ -13,7 +13,7 @@ interface TopTenCardCommentsProps {
   courseId: string;
   courseName: string;
   isOwnProfile: boolean;
-  privacySetting?: 'open' | 'followers' | 'off';
+  privacySetting?: string;
 }
 
 export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
