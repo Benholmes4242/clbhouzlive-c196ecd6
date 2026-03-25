@@ -89,7 +89,7 @@ export const PGACard: React.FC<PGACardProps> = ({
   getCommentCount,
 }) => {
   const cd = post.cardData;
-  const isLoading = (post as any).isLoading ?? false;
+  const isLoading = post.isLoading ?? false;
   const likeState = getLikeState?.(post) ?? { isLiked: cd.isLikedByMe, count: cd.likeCount };
   const commentCount = getCommentCount?.(post) ?? cd.commentCount;
 
