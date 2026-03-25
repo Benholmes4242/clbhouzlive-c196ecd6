@@ -163,6 +163,13 @@ const ClubhouseContent = () => {
     setGlobalMute(isMuted);
   }, [isMuted, setGlobalMute]);
 
+  // ── Hide chrome when PGA card is active ──
+  const { setVisible: setBottomNavVisible } = useBottomNavigation();
+  useEffect(() => {
+    setBottomNavVisible(!isTournamentCardActive);
+    return () => { setBottomNavVisible(true); };
+  }, [isTournamentCardActive, setBottomNavVisible]);
+
   // ── Feed hooks ──
   const suggestedFeed = useSuggestedFeed(user?.id);
   const friendsFeed = useFriendsFeed(user?.id);
