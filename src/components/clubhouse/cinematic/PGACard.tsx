@@ -322,7 +322,7 @@ export const PGACard: React.FC<PGACardProps> = ({
 
           {/* Tour badge — top left */}
           <div style={{
-            position: 'absolute', top: 'clamp(12px, 3vw, 18px)', left: 'clamp(14px, 3.5vw, 20px)',
+            position: 'absolute', top: 'calc(env(safe-area-inset-top, 44px) + 16px)', left: 'clamp(14px, 3.5vw, 20px)',
             display: 'flex', alignItems: 'center', gap: 6,
           }}>
             <span style={{
