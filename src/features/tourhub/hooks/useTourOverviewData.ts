@@ -65,10 +65,10 @@ export function useTourOverviewData() {
   // Derive season status
   const seasonStatus = useMemo(() => {
     if (!tournaments || tournaments.length === 0) return 'upcoming';
-    const hasLive = tournaments.some(t => t.status === 'inprogress');
-    if (hasLive) return 'live';
-    const allClosed = tournaments.every(t => t.status === 'closed');
-    if (allClosed) return 'completed';
+    const now = new Date();
+    if (tournaments.some(t => getTournamentDisplayState(t.status, t.end_date, now) === 'live')) return 'live';
+    const allDone = tournaments.every(t => t.status === 'closed' || t.status === 'complete');
+    if (allDone) return 'completed';
     return 'active';
   }, [tournaments]);
 
