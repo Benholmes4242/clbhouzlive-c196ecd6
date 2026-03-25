@@ -18,6 +18,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { TOUR_CONFIG, type TourId } from './useOverviewData';
 import { useTournamentsCache, type CachedTournament } from '@/hooks/useTournamentsCache';
 import { getContextLabel } from '../utils/tournamentClassification';
+import { getTournamentDisplayState } from '@/utils/tournamentState';
 
 // Tour priority order for sorting live tournaments
 const TOUR_PRIORITY: TourId[] = ['pga', 'liv', 'euro', 'lpga', 'pgad', 'champ'];
@@ -239,10 +240,17 @@ export function useHeroCarouselData() {
         if (liveByTour[tournament.tourSlug]) liveByTour[tournament.tourSlug].push(tournament);
       });
 
-      completedTournaments.forEach(t => {
-        const tournament = transformTournament(t, true);
-        if (completedByTour[tournament.tourSlug]) completedByTour[tournament.tourSlug].push(tournament);
-      });
+      // Only include completed tournaments within the 2-day result window
+      const now = new Date();
+      completedTournaments
+        .filter(t => getTournamentDisplayState(t.status, t.end_date, now) === 'result')
+        .forEach(t => {
+          const tournament = transformTournament(t, true);
+          if (completedByTour[tournament.tourSlug]) completedByTour[tournament.tourSlug].push(tournament);
+        });
+      
+      // Tournaments outside the result window become upcoming fallbacks — skip them
+      // (they'll naturally not appear since no slide is created for them)
 
       upcomingTournaments.forEach(t => {
         const tournament = transformTournament(t, false);
@@ -277,10 +285,11 @@ export function useHeroCarouselData() {
         if (a.tournament.isMajor !== b.tournament.isMajor) return a.tournament.isMajor ? -1 : 1;
         return TOUR_PRIORITY.indexOf(a.tournament.tourSlug) - TOUR_PRIORITY.indexOf(b.tournament.tourSlug);
       });
+      // Tour priority first, then by end date
       completedSlides.sort((a, b) => {
-        const dateDiff = new Date(b.tournament.endDate).getTime() - new Date(a.tournament.endDate).getTime();
-        if (dateDiff !== 0) return dateDiff;
-        return (b.tournament.purse || 0) - (a.tournament.purse || 0);
+        const tourDiff = TOUR_PRIORITY.indexOf(a.tournament.tourSlug) - TOUR_PRIORITY.indexOf(b.tournament.tourSlug);
+        if (tourDiff !== 0) return tourDiff;
+        return new Date(b.tournament.endDate).getTime() - new Date(a.tournament.endDate).getTime();
       });
       upcomingSlides.sort((a, b) => new Date(a.tournament.startDate).getTime() - new Date(b.tournament.startDate).getTime());
 
