@@ -38,6 +38,21 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
+  // Fetch privacy setting for the profile owner
+  const { data: privacyData } = useQuery({
+    queryKey: ['top-ten-privacy', userId],
+    enabled: !!userId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('top_ten_comments_privacy')
+        .eq('id', userId)
+        .single();
+      return (data?.top_ten_comments_privacy ?? 'followers') as 'open' | 'followers' | 'off';
+    },
+    staleTime: 5 * 60_000,
+  });
+
   // Stable sorted course IDs for consistent query key (only for pinned courses without ratings)
   const courseIdsNeedingRatings = React.useMemo(() => 
     topTen
