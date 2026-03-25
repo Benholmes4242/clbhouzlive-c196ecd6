@@ -164,13 +164,15 @@ const ClubhouseContent = () => {
   // ── Feed hooks ──
   const suggestedFeed = useSuggestedFeed(user?.id);
   const friendsFeed = useFriendsFeed(user?.id);
+  const { pgaCard } = usePGACard(user?.id);
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
   
   const posts = useMemo(() => {
-    // Feed hooks already apply buildSuggestedFeed/buildFriendsFeed internally.
-    // Do NOT re-apply here — double-processing shifts review positions.
+    if (activeTab === 'foryou') {
+      return injectPGACard(activeFeed.posts, pgaCard as unknown as FeedPost);
+    }
     return activeFeed.posts;
-  }, [activeFeed.posts]);
+  }, [activeFeed.posts, activeTab, pgaCard]);
 
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? false;
