@@ -236,6 +236,12 @@ export interface PGACardData {
   likeCount:       number;
   commentCount:    number;
   isLikedByMe:     boolean;
+  championSeasonStats?: {
+    drivingDistance:  number | null;
+    drivingAccuracy: number | null;
+    greensInReg:     number | null;
+    puttingAverage:  number | null;
+  } | null;
 }
 
 export interface PGACardFeedPost extends Omit<FeedPost, 'mediaItems' | 'review' | 'isReview'> {
