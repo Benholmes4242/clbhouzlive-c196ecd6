@@ -9,7 +9,7 @@ import {
   Mail, MapPin, Upload, Trophy, Building2, Image, BookOpen,
   Flag, ClipboardList, Settings, Wrench, Map, FlaskConical,
   ArrowLeft, ChevronDown, ChevronRight, Activity, Sparkles, MessageCircle,
-  Medal,
+  Medal, TrendingUp, Layers,
 } from 'lucide-react';
 
 interface SidebarProps {
