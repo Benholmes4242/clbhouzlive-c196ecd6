@@ -928,120 +928,90 @@ export const PGACard: React.FC<PGACardProps> = ({
             ))}
           </div>
 
-          {/* Past Winners header */}
-          <div style={{
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            padding: '6px clamp(14px, 3.5vw, 20px) 4px',
-          }}>
-            <span style={{
-              fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 700,
-              letterSpacing: '1.2px', color: 'rgba(255,255,255,0.35)',
-              textTransform: 'uppercase',
-            }}>
-              Past Winners
-            </span>
+          {/* Defending Champion Block */}
+          {defendingChampion ? (
             <div style={{
-              display: 'flex', alignItems: 'center', gap: 4,
-              color: 'rgba(255,255,255,0.25)',
-              fontSize: 'clamp(9px, 2vw, 11px)',
+              position: 'relative',
+              margin: '8px clamp(14px, 3.5vw, 20px)',
+              padding: '16px 16px 14px',
+              borderRadius: 14,
+              background: `linear-gradient(135deg, ${ACCENT}0d, ${ACCENT}05)`,
+              border: `1px solid ${ACCENT}22`,
+              overflow: 'hidden',
+              animation: 'slideUp 0.5s ease-out both',
+              animationDelay: '0.35s',
             }}>
-              <Trophy style={{ width: 11, height: 11 }} />
-              Recent history
-            </div>
-          </div>
-
-          {/* Past winner rows */}
-          <div style={{
-            flex: '1 1 auto',
-            overflow: 'hidden',
-            padding: '0 clamp(14px, 3.5vw, 20px)',
-            display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly',
-          }}>
-            {pastWinners && pastWinners.length > 0 ? (
-              pastWinners.map((pw, i) => (
-                <div key={`${pw.year}-${i}`} style={{
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  padding: '8px 10px',
-                  borderRadius: 10,
-                  background: i === 0 ? `${ACCENT}0d` : 'transparent',
-                  border: i === 0 ? `1px solid ${ACCENT}22` : '1px solid transparent',
-                  animation: 'slideUp 0.5s ease-out both',
-                  animationDelay: `${0.4 + i * 0.08}s`,
-                }}>
-                  <span style={{
-                    width: 22, textAlign: 'center',
-                    fontSize: 'clamp(12px, 3vw, 14px)', fontWeight: 700,
-                    color: i === 0 ? ACCENT : 'rgba(255,255,255,0.35)',
-                  }}>
-                    {i + 1}
-                  </span>
-                  <RowAvatar src={pw.photoUrl} name={pw.playerName} size={28} />
-                  <span style={{
-                    flex: 1, fontSize: 'clamp(13px, 3.2vw, 15px)',
-                    fontWeight: i === 0 ? 700 : 500,
-                    color: i === 0 ? '#fff' : 'rgba(255,255,255,0.65)',
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                  }}>
-                    {pw.playerName}
-                  </span>
-                  <span style={{
-                    fontSize: 'clamp(11px, 2.5vw, 12px)',
-                    fontWeight: 500, color: 'rgba(255,255,255,0.25)',
-                    marginRight: 6,
-                  }}>
-                    {pw.year}
-                  </span>
-                  {pw.scoreDisplay && (
-                    <span style={{
-                      fontSize: 'clamp(13px, 3.2vw, 15px)', fontWeight: 700,
-                      color: i === 0 ? ACCENT : 'rgba(255,255,255,0.45)',
-                    }}>
-                      {pw.scoreDisplay}
-                    </span>
-                  )}
-                </div>
-              ))
-            ) : defendingChampion ? (
+              {/* Ambient glow — top right */}
               <div style={{
-                display: 'flex', alignItems: 'center', gap: 10,
-                padding: '8px 10px',
-                borderRadius: 10,
-                background: `${ACCENT}0d`,
-                border: `1px solid ${ACCENT}22`,
-                animation: 'slideUp 0.5s ease-out both',
-                animationDelay: '0.4s',
+                position: 'absolute', top: -20, right: -20,
+                width: 80, height: 80,
+                borderRadius: '50%',
+                background: `radial-gradient(circle, ${ACCENT}18, transparent 70%)`,
+                pointerEvents: 'none',
+                animation: 'shieldGlow 3s ease-in-out infinite',
+              }} />
+
+              {/* Avatar */}
+              <div style={{
+                width: 52, height: 52, borderRadius: '50%',
+                margin: '0 auto 10px',
+                overflow: 'hidden',
+                border: `2px solid ${ACCENT}44`,
+                background: 'rgba(255,255,255,0.06)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <span style={{
-                  width: 22, textAlign: 'center',
-                  fontSize: 'clamp(12px, 3vw, 14px)', fontWeight: 700,
-                  color: ACCENT,
+                {cd.defendingChampionPhotoUrl
+                  ? <img src={cd.defendingChampionPhotoUrl} alt={defendingChampion} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  : <span style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>
+                      {getInitials(defendingChampion)}
+                    </span>
+                }
+              </div>
+
+              {/* Text */}
+              <div style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 600,
+                  color: ACCENT_LIGHT, textTransform: 'uppercase', letterSpacing: '1px',
+                  marginBottom: 4,
                 }}>
-                  1
-                </span>
-                <RowAvatar src={null} name={defendingChampion} size={28} />
-                <span style={{
-                  flex: 1, fontSize: 'clamp(13px, 3.2vw, 15px)', fontWeight: 700,
-                  color: '#fff',
-                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  <Shield style={{ width: 11, height: 11 }} />
+                  Defending Champion
+                </div>
+
+                <div style={{
+                  fontSize: 'clamp(16px, 4.2vw, 20px)', fontWeight: 800,
+                  color: '#fff', lineHeight: 1.2,
                 }}>
                   {defendingChampion}
-                </span>
-                <span style={{
-                  fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 600,
-                  color: 'rgba(255,255,255,0.3)',
+                </div>
+
+                <div style={{
+                  fontSize: 'clamp(10px, 2.5vw, 12px)', fontWeight: 500,
+                  color: 'rgba(255,255,255,0.35)', marginTop: 4,
+                  fontStyle: 'italic',
                 }}>
-                  Defending
-                </span>
+                  Can they go back-to-back?
+                </div>
               </div>
-            ) : (
-              <div className="flex-1 flex flex-col items-center justify-center gap-2 text-white/30">
-                <Calendar className="w-8 h-8" />
-                <span className="text-[12px]">
-                  Tournament starts {cd.startDate ? new Date(cd.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'soon'}
-                </span>
+
+              {/* Trophy badge */}
+              <div style={{
+                position: 'absolute', top: 10, right: 12,
+                opacity: 0.12,
+              }}>
+                <Trophy style={{ width: 22, height: 22, color: ACCENT }} />
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center gap-2 text-white/30" style={{ margin: '8px clamp(14px, 3.5vw, 20px)' }}>
+              <Calendar className="w-8 h-8" />
+              <span className="text-[12px]">
+                Tournament starts {cd.startDate ? new Date(cd.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'soon'}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* ── ZONE 3: CTA BAR ── */}
