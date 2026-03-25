@@ -121,6 +121,11 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
         />
       </div>
 
+      {/* Top 10 Activity Feed */}
+      <div className="mt-4">
+        <TopTenActivityFeed targetUserId={userId} />
+      </div>
+
       {/* Section 3: Courses to Play (Aspirational) */}
       {/* Slightly tighter 20px spacing */}
       <div className="mt-5">
