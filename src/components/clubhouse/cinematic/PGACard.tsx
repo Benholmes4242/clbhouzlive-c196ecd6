@@ -480,6 +480,13 @@ export const PGACard: React.FC<PGACardProps> = ({
             }}>
               Final Standings
             </span>
+            <button
+              onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/tournament/${cd.tournamentId}`); }}
+              className="flex items-center gap-1 text-amber-500 text-xs font-semibold active:opacity-70 transition-opacity"
+            >
+              Full Results
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
           </div>
 
           {/* Rows — fills remaining space evenly */}
