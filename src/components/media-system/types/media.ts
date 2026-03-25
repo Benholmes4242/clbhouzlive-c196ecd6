@@ -195,6 +195,7 @@ export interface PGACardData {
   isLikedByMe:     boolean;
   winnerBy?:       string | null;
   defendingChampion?: string | null;
+  defendingChampionPhotoUrl?: string | null;
   pastWinners?:    PGACardPastWinner[] | null;
   championSeasonStats?: {
     drivingDistance:  number | null;

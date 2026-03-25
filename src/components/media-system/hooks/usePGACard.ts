@@ -409,6 +409,7 @@ export function usePGACard(userId?: string): {
         postId,
         ...eng,
         defendingChampion: null,
+        defendingChampionPhotoUrl: null,
         pastWinners: null,
       };
     }
@@ -488,6 +489,7 @@ export function usePGACard(userId?: string): {
         postId,
         ...eng,
         defendingChampion: null,
+        defendingChampionPhotoUrl: null,
         pastWinners: null,
         championSeasonStats: championSeasonStats ? {
           drivingDistance: championSeasonStats.driving_distance,
@@ -523,6 +525,7 @@ export function usePGACard(userId?: string): {
         postId,
         ...eng,
         defendingChampion: u.defending_champion ?? null,
+        defendingChampionPhotoUrl: null,
         pastWinners: pastWinnersRaw.length > 0 ? pastWinnersRaw : null,
       };
     }
