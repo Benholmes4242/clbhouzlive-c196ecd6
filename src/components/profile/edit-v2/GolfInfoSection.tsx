@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { VisibilityDropdown, VisibilityValue } from './VisibilityDropdown';
 import HandicapSyncInlineNotice from './HandicapSyncInlineNotice';
+import { HandicapInput } from './HandicapInput';
 import { useCollegeMediaSearch, useCollegeMediaByName, CollegeMediaResult } from '@/hooks/useCollegeMediaSearch';
 import { SectionHeader } from './SectionHeader';
 
