@@ -529,6 +529,37 @@ async function syncTournament(
           console.warn(`[LiveSync] Final tee times failed for ${tournament.name}: ${e.message}`);
         }
       }
+
+      // ── Final all-rounds scorecard sync on tournament close ──────
+      if (tourSlug) {
+        console.log(`[LiveSync] Running final all-rounds scorecard sync for ${tournament.name}`);
+        for (const round of [1, 2, 3, 4]) {
+          try {
+            console.log(`[LiveSync] Syncing scorecard round ${round} for ${tournament.name}`);
+            const syncUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/sportradar-sync`;
+            await fetch(syncUrl, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                action: 'scorecards',
+                tournamentId: tournament.sr_id,
+                tourId: tourSlug,
+                year: year,
+                roundNumber: round,
+              }),
+            });
+            console.log(`[LiveSync] Scorecard round ${round} completed for ${tournament.name}`);
+          } catch (e) {
+            console.warn(`[LiveSync] Scorecard round ${round} failed for ${tournament.name}: ${e.message}`);
+          }
+          // Small delay between rounds to avoid Sportradar rate limiting
+          if (round < 4) await new Promise(r => setTimeout(r, 500));
+        }
+        console.log(`[LiveSync] Final all-rounds scorecard sync finished for ${tournament.name}`);
+      }
     }
   } else {
     // Update last_live_sync timestamp and current_round
