@@ -730,8 +730,8 @@ async function fetchCreatorLeaderboard(period: AnalyticsPeriod): Promise<Creator
     if (!uid) continue;
     const existing = userStats.get(uid) ?? { posts: 0, likes: 0, comments: 0, shares: 0 };
     existing.posts++;
-    existing.likes += (p.post_likes as any[])?.length ?? 0;
-    existing.comments += (p.post_comments as any[])?.length ?? 0;
+    existing.likes += (p.post_likes as unknown as any[])?.length ?? 0;
+    existing.comments += (p.post_comments as unknown as any[])?.length ?? 0;
     userStats.set(uid, existing);
   }
 
