@@ -5,12 +5,19 @@ import {
   UserPlus, Users, Shield, CheckCircle,
   Copy, ExternalLink, MoreHorizontal,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 
-import { useAdminV2Users, type AdminUserRow, type AdminUserDetail } from '../hooks/useAdminV2Users';
+import {
+  useAdminV2Users,
+  useUserActivityTimeline,
+  type AdminUserRow,
+  type AdminUserDetail,
+  type UserFilterStatus,
+  type UserActivityEvent,
+} from '../hooks/useAdminV2Users';
 import {
   AdminTable,
   AdminPageHeader,
@@ -142,6 +149,87 @@ function RowMenu({ user, onViewProfile }: { user: AdminUserRow; onViewProfile: (
   );
 }
 
+// ─── Activity timeline ────────────────────────────────────────────────────────
+
+const EVENT_COLORS: Record<UserActivityEvent['type'], string> = {
+  signup:        '#17C964',
+  post:          '#1D6FF5',
+  review:        '#F5A623',
+  follow:        '#7C3AED',
+  login:         '#94A3B8',
+  page_view:     '#94A3B8',
+  message:       '#94A3B8',
+  course_played: '#0891B2',
+};
+
+function formatEventTime(timestamp: string): string {
+  const d = new Date(timestamp);
+  const diffMs = Date.now() - d.getTime();
+  const diffDays = diffMs / (1000 * 60 * 60 * 24);
+  if (diffDays < 7) {
+    return formatDistanceToNow(d, { addSuffix: false }) + ' ago';
+  }
+  return format(d, 'd MMM');
+}
+
+function ActivityTimeline({ userId }: { userId: string }) {
+  const { data: events, isLoading, isError } = useUserActivityTimeline(userId);
+
+  if (isError) {
+    return (
+      <div className="space-y-3">
+        <AdminSectionHeader title="Activity (last 90 days)" />
+        <p className="text-[12px] text-muted-foreground">Failed to load activity</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <AdminSectionHeader title="Activity (last 90 days)" />
+      {isLoading ? (
+        <div className="space-y-3 animate-pulse">
+          {[1, 2, 3, 4, 5].map(i => (
+            <div key={i} className="flex items-center gap-3">
+              <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#F1F5F9' }} />
+              <div className="flex-1 space-y-1">
+                <div className="h-3 w-32 rounded" style={{ background: '#F1F5F9' }} />
+                <div className="h-2.5 w-20 rounded" style={{ background: '#F1F5F9' }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : !events?.length ? (
+        <p className="text-[12px] text-muted-foreground">No recent activity</p>
+      ) : (
+        <div className="max-h-[400px] overflow-y-auto space-y-0.5 pr-1">
+          {events.map(event => (
+            <div key={event.id} className="flex items-start gap-3 py-2">
+              <div
+                className="w-2.5 h-2.5 rounded-full mt-1 flex-shrink-0"
+                style={{ background: EVENT_COLORS[event.type] }}
+              />
+              <div className="flex-1 min-w-0">
+                <p className="text-[13px] font-medium" style={{ color: '#334155' }}>
+                  {event.label}
+                </p>
+                {event.detail && (
+                  <p className="text-[11px] truncate" style={{ color: '#94A3B8' }}>
+                    {event.detail}
+                  </p>
+                )}
+              </div>
+              <span className="text-[11px] whitespace-nowrap flex-shrink-0" style={{ color: '#94A3B8' }}>
+                {formatEventTime(event.timestamp)}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── User detail drawer ───────────────────────────────────────────────────────
 
 function UserDetailDrawer({
@@ -258,7 +346,7 @@ function UserDetailDrawer({
 
           {/* Stats grid */}
           <div className="space-y-3">
-            <AdminSectionHeader title="Activity" />
+            <AdminSectionHeader title="Stats" />
             <div className="grid grid-cols-2 gap-3">
               <StatTile label="Posts" value={detail.posts_count} />
               <StatTile label="Reviews" value={detail.reviews_count} />
@@ -282,6 +370,9 @@ function UserDetailDrawer({
             </div>
           )}
 
+          {/* Activity Timeline */}
+          {userId && <ActivityTimeline userId={userId} />}
+
         </div>
       )}
     </AdminDrawer>
@@ -291,6 +382,9 @@ function UserDetailDrawer({
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function UsersPage() {
+  const [searchParams] = useSearchParams();
+  const initialFilter = (searchParams.get('filter') as UserFilterStatus) || 'all';
+
   const {
     users, allFilteredUsers, allCount, filteredCount, isLoading,
     search, setSearch,
@@ -301,6 +395,13 @@ export default function UsersPage() {
     userDetail, detailLoading,
     updateRole,
   } = useAdminV2Users();
+
+  // Apply URL filter on mount
+  React.useEffect(() => {
+    if (initialFilter && initialFilter !== 'all') {
+      setFilter(initialFilter);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const columns = React.useMemo(() => [
     col.display({
@@ -376,6 +477,8 @@ export default function UsersPage() {
     { id: 'verified',   label: 'Verified',   count: counts.verified,   variant: 'success' as const },
     { id: 'unverified', label: 'Unverified', count: counts.unverified },
     { id: 'admin',      label: 'Admins',     count: counts.admin,      variant: 'warning' as const },
+    { id: 'new_today',  label: 'New Today',  variant: 'success' as const },
+    { id: 'active_24h', label: 'Active 24h', variant: 'success' as const },
   ];
 
   return (
