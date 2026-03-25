@@ -2,9 +2,8 @@ import React, { memo } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapVideoPlayer } from './SnapVideoPlayer';
 import { FeedImageCarousel } from './FeedImageCarousel';
-import { TournamentResultCard } from '@/components/clubhouse/cinematic/TournamentResultCard';
 import { PGACard } from '@/components/clubhouse/cinematic/PGACard';
-import type { FeedPost, TournamentResultFeedPost, PGACardFeedPost } from '@/components/media-system/types/media';
+import type { FeedPost, PGACardFeedPost } from '@/components/media-system/types/media';
 
 interface FeedSlideProps {
   post: FeedPost;
@@ -49,24 +48,6 @@ export const FeedSlide = memo(function FeedSlide({
           onLike={() => onLike?.(post)}
           getLikeState={getLikeState}
           getCommentCount={getCommentCount}
-        />
-      );
-    }
-
-    // Tournament result card
-    if (post.postType === 'tournament_result') {
-      const likeState = getLikeState?.(post) ?? { isLiked: false, count: 0 };
-      const commentCount = getCommentCount?.(post) ?? 0;
-      return (
-        <TournamentResultCard
-          post={post as unknown as TournamentResultFeedPost}
-          isActive={isActive}
-          isVisible={isActive}
-          onLike={() => onLike?.(post)}
-          onComment={() => onComment?.()}
-          onShare={() => onShare?.(post)}
-          likeOverride={likeState}
-          commentCountOverride={commentCount}
         />
       );
     }
