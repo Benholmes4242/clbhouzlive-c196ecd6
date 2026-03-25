@@ -217,7 +217,8 @@ export const PGACard: React.FC<PGACardProps> = ({
   // Countdown for upcoming
   const countdown = useMemo(() => {
     if (cd.state !== 'upcoming' || !cd.startDate) return null;
-    const diff = new Date(cd.startDate).getTime() - Date.now();
+    const startDateTime = cd.startDate.includes('T') ? cd.startDate : `${cd.startDate}T12:00:00`;
+    const diff = new Date(startDateTime).getTime() - Date.now();
     if (diff <= 0) return { days: 0, hours: 0, minutes: 0 };
     return {
       days: Math.floor(diff / (1000 * 60 * 60 * 24)),
