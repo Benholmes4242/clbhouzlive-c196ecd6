@@ -224,3 +224,15 @@ export function buildFriendsFeed(posts: FeedPost[]): FeedPost[] {
   const interleaved = interleaveReviews(capped, 'friends');
   return deduplicatePosts(interleaved);
 }
+
+/**
+ * Inject PGA card at slot 3 (0-indexed position 2) of the suggested feed.
+ * If pgaCard is null, feed is returned unchanged.
+ */
+export function injectPGACard(feedPosts: FeedPost[], pgaCard: FeedPost | null): FeedPost[] {
+  if (!pgaCard) return feedPosts;
+  const without = feedPosts.filter(p => (p as any).postType !== 'pga_card');
+  const result = [...without];
+  result.splice(2, 0, pgaCard);
+  return result;
+}
