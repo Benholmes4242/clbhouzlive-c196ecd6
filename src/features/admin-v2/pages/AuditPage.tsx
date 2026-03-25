@@ -30,6 +30,14 @@ function getCategory(action: string): string {
   return 'system';
 }
 
+function getBorderColor(action: string): string {
+  const cat = getCategory(action);
+  if (cat === 'create') return '#17C964';
+  if (cat === 'delete') return '#F31260';
+  if (cat === 'update') return '#1D6FF5';
+  return '#E2E8F0';
+}
+
 function ActionBadge({ action }: { action: string }) {
   const cat = getCategory(action);
   const styles: Record<string, string> = {
@@ -46,13 +54,23 @@ function ActionBadge({ action }: { action: string }) {
   );
 }
 
+function toTitleCase(str: string): string {
+  return str.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
 function AuditRow({ entry }: { entry: AuditEntry }) {
   const [expanded, setExpanded] = useState(false);
   const hasDetails = entry.details && Object.keys(entry.details).length > 0;
 
   return (
     <div className="border-b border-border/30 last:border-0">
-      <div className="flex items-start gap-3 px-4 py-3">
+      <div
+        className="flex items-start gap-3 px-4 py-3"
+        style={{
+          borderLeft: `3px solid ${getBorderColor(entry.action)}`,
+          minHeight: 52,
+        }}
+      >
         <div className="pt-0.5 flex-shrink-0">
           <ActionBadge action={entry.action} />
         </div>
@@ -88,10 +106,19 @@ function AuditRow({ entry }: { entry: AuditEntry }) {
       </div>
 
       {expanded && entry.details && (
-        <div className="px-4 pb-3">
-          <pre className="text-[11px] text-muted-foreground bg-muted/40 rounded-lg p-3 overflow-x-auto">
-            {JSON.stringify(entry.details, null, 2)}
-          </pre>
+        <div className="px-4 pb-3" style={{ marginLeft: 3 }}>
+          <div style={{ background: '#F8FAFC', borderRadius: 10, padding: '12px 16px' }}>
+            {Object.entries(entry.details).map(([key, val]) => (
+              <div key={key} className="flex items-start gap-3 py-1.5" style={{ borderBottom: '1px solid #F1F5F9' }}>
+                <span style={{ fontSize: 12, color: '#64748B', minWidth: 120, fontWeight: 500 }}>
+                  {toTitleCase(key)}
+                </span>
+                <span style={{ fontSize: 12, color: '#0F172A', fontFamily: 'monospace', wordBreak: 'break-all' }}>
+                  {typeof val === 'object' ? JSON.stringify(val) : String(val ?? '—')}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

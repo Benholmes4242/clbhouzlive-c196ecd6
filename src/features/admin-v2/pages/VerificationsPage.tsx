@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { formatDistanceToNow, format } from 'date-fns';
 import {
   CheckCircle, XCircle, Clock, Building2,
@@ -10,6 +10,29 @@ import {
   AdminPageHeader, AdminFilterBar, AdminStatusPill,
   AdminButton, AdminSectionHeader, AdminDrawer, AdminKpiCard,
 } from '../components/ui';
+
+// ─── Priority helpers ─────────────────────────────────────────────────────────
+
+function getPriority(createdAt: string): 'overdue' | 'pending' | 'new' {
+  const age = Date.now() - new Date(createdAt).getTime();
+  if (age > 72 * 3600_000) return 'overdue';
+  if (age > 24 * 3600_000) return 'pending';
+  return 'new';
+}
+
+function PriorityPill({ priority }: { priority: 'overdue' | 'pending' | 'new' }) {
+  const styles = {
+    overdue: { background: '#FEE2E2', color: '#DC2626' },
+    pending: { background: '#FEF3C7', color: '#D97706' },
+    new:     { background: '#DCFCE7', color: '#16A34A' },
+  };
+  const labels = { overdue: 'Overdue', pending: 'Pending', new: 'New' };
+  return (
+    <span style={{ ...styles[priority], fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20 }}>
+      {labels[priority]}
+    </span>
+  );
+}
 
 // ─── Type pill ────────────────────────────────────────────────────────────────
 
@@ -55,7 +78,6 @@ function VerificationDrawer({
     onDecide(item.id, item.type, decision, adminNote);
     setAdminNote('');
     setConfirming(null);
-    // Do not close here — onDecide's mutation calls onClose on success
   };
 
   const isPendingItem = item?.status === 'pending';
@@ -69,58 +91,41 @@ function VerificationDrawer({
     >
       {!item ? null : (
         <div className="space-y-6">
-
-          {/* Status + type */}
           <div className="flex items-center gap-2 flex-wrap">
             <TypePill type={item.type} />
             <AdminStatusPill
-              status={
-                item.status === 'approved' ? 'active' :
-                item.status === 'pending'  ? 'pending' : 'error'
-              }
+              status={item.status === 'approved' ? 'active' : item.status === 'pending' ? 'pending' : 'error'}
               label={item.status.charAt(0).toUpperCase() + item.status.slice(1)}
             />
+            <PriorityPill priority={getPriority(item.createdAt)} />
           </div>
 
-          {/* Details */}
           <div className="space-y-3">
             <div className="flex items-center justify-between text-[13px]">
               <span className="text-muted-foreground">Submitted</span>
-              <span className="text-foreground">
-                {format(new Date(item.createdAt), 'd MMM yyyy, HH:mm')}
-              </span>
+              <span className="text-foreground">{format(new Date(item.createdAt), 'd MMM yyyy, HH:mm')}</span>
             </div>
             <div className="flex items-center justify-between text-[13px]">
               <span className="text-muted-foreground">Requested by</span>
-              <span className="font-mono text-foreground text-[12px]">
-                {item.requestedBy?.slice(0, 8)}…
-              </span>
+              <span className="font-mono text-foreground text-[12px]">{item.requestedBy?.slice(0, 8)}…</span>
             </div>
             {item.reviewedAt && (
               <div className="flex items-center justify-between text-[13px]">
                 <span className="text-muted-foreground">Reviewed</span>
-                <span className="text-foreground">
-                  {format(new Date(item.reviewedAt), 'd MMM yyyy')}
-                </span>
+                <span className="text-foreground">{format(new Date(item.reviewedAt), 'd MMM yyyy')}</span>
               </div>
             )}
           </div>
 
-          {/* Type-specific content */}
           {item.type === 'business' && item.domain && (
             <div className="space-y-3">
               <AdminSectionHeader title="Domain" />
               <div className="rounded-lg border border-border/60 px-4 py-3">
                 <div className="flex items-center justify-between text-[13px]">
                   <span className="text-muted-foreground">Domain</span>
-                  <a
-                    href={`https://${item.domain}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-foreground flex items-center gap-1 hover:opacity-70"
-                  >
-                    {item.domain}
-                    <ExternalLink className="h-3 w-3" />
+                  <a href={`https://${item.domain}`} target="_blank" rel="noopener noreferrer"
+                    className="text-foreground flex items-center gap-1 hover:opacity-70">
+                    {item.domain}<ExternalLink className="h-3 w-3" />
                   </a>
                 </div>
               </div>
@@ -137,40 +142,28 @@ function VerificationDrawer({
                 </div>
               )}
               {item.evidenceUrl && (
-                <a
-                  href={item.evidenceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-border/60 text-[13px] text-foreground hover:bg-muted/60 transition-colors"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  View Evidence
+                <a href={item.evidenceUrl} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-border/60 text-[13px] text-foreground hover:bg-muted/60 transition-colors">
+                  <ExternalLink className="h-3.5 w-3.5" />View Evidence
                 </a>
               )}
             </div>
           )}
 
-          {/* Applicant's note */}
           {item.note && (
             <div className="space-y-2">
               <AdminSectionHeader title="Applicant Note" />
-              <p className="text-[13px] text-muted-foreground bg-muted/40 rounded-lg px-4 py-3">
-                {item.note}
-              </p>
+              <p className="text-[13px] text-muted-foreground bg-muted/40 rounded-lg px-4 py-3">{item.note}</p>
             </div>
           )}
 
-          {/* Admin note (existing) */}
           {item.adminNote && (
             <div className="space-y-2">
               <AdminSectionHeader title="Admin Note" />
-              <p className="text-[13px] text-muted-foreground bg-muted/40 rounded-lg px-4 py-3">
-                {item.adminNote}
-              </p>
+              <p className="text-[13px] text-muted-foreground bg-muted/40 rounded-lg px-4 py-3">{item.adminNote}</p>
             </div>
           )}
 
-          {/* Decision area */}
           {isPendingItem && (
             <div className="space-y-3 pt-2 border-t border-border/60">
               <AdminSectionHeader title="Decision" />
@@ -183,33 +176,19 @@ function VerificationDrawer({
               />
               {confirming === 'rejected' && !adminNote.trim() && (
                 <p className="text-[12px] text-red-500 flex items-center gap-1">
-                  <XCircle className="h-3.5 w-3.5" />
-                  A note is required when rejecting a request.
+                  <XCircle className="h-3.5 w-3.5" />A note is required when rejecting a request.
                 </p>
               )}
               <div className="flex gap-2">
-                <AdminButton
-                  variant="primary"
-                  icon={CheckCircle}
-                  loading={isPending}
-                  onClick={() => handleDecide('approved')}
-                  className="flex-1"
-                >
+                <AdminButton variant="primary" icon={CheckCircle} loading={isPending} onClick={() => handleDecide('approved')} className="flex-1">
                   Approve
                 </AdminButton>
-                <AdminButton
-                  variant="danger"
-                  icon={XCircle}
-                  loading={isPending}
-                  onClick={() => handleDecide('rejected')}
-                  className="flex-1"
-                >
+                <AdminButton variant="danger" icon={XCircle} loading={isPending} onClick={() => handleDecide('rejected')} className="flex-1">
                   Reject
                 </AdminButton>
               </div>
             </div>
           )}
-
         </div>
       )}
     </AdminDrawer>
@@ -221,48 +200,71 @@ function VerificationDrawer({
 function VerificationCard({
   item,
   onClick,
+  onQuickDecide,
+  isDeciding,
 }: {
   item: VerificationRow;
   onClick: () => void;
+  onQuickDecide: (id: string, type: 'business' | 'golfer', decision: 'approved' | 'rejected') => void;
+  isDeciding: boolean;
 }) {
-  return (
-    <button
-      onClick={onClick}
-      className="w-full text-left flex items-center gap-4 px-4 py-3 hover:bg-muted/40 transition-colors active:bg-muted/60"
-    >
-      {/* Icon */}
-      <div className={cn(
-        'w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0',
-        item.type === 'business'
-          ? 'bg-blue-50 dark:bg-blue-500/15'
-          : 'bg-purple-50 dark:bg-purple-500/15',
-      )}>
-        {item.type === 'business'
-          ? <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-          : <User className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-        }
-      </div>
+  const priority = getPriority(item.createdAt);
+  const isPending = item.status === 'pending';
 
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <TypePill type={item.type} />
-          <AdminStatusPill
-            status={
-              item.status === 'approved' ? 'active' :
-              item.status === 'pending'  ? 'pending' : 'error'
-            }
-            label={item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-          />
+  return (
+    <div className="group w-full flex items-center gap-4 px-4 py-3 hover:bg-muted/40 transition-colors">
+      <button onClick={onClick} className="flex items-center gap-4 flex-1 min-w-0 text-left">
+        <div className={cn(
+          'w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0',
+          item.type === 'business' ? 'bg-blue-50 dark:bg-blue-500/15' : 'bg-purple-50 dark:bg-purple-500/15',
+        )}>
+          {item.type === 'business'
+            ? <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            : <User className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+          }
         </div>
-        <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
-          <Clock className="h-3 w-3" />
-          {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
-        </p>
-      </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <TypePill type={item.type} />
+            <AdminStatusPill
+              status={item.status === 'approved' ? 'active' : item.status === 'pending' ? 'pending' : 'error'}
+              label={item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+            />
+            {isPending && <PriorityPill priority={priority} />}
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
+            <Clock className="h-3 w-3" />
+            {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
+          </p>
+        </div>
+      </button>
+
+      {/* Quick actions on hover */}
+      {isPending && (
+        <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+          <button
+            onClick={(e) => { e.stopPropagation(); onQuickDecide(item.id, item.type, 'approved'); }}
+            disabled={isDeciding}
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-colors"
+            style={{ background: '#DCFCE7', color: '#16A34A' }}
+            title="Approve"
+          >
+            <CheckCircle className="h-4 w-4" />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); onQuickDecide(item.id, item.type, 'rejected'); }}
+            disabled={isDeciding}
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-colors"
+            style={{ background: '#FEE2E2', color: '#DC2626' }}
+            title="Reject"
+          >
+            <XCircle className="h-4 w-4" />
+          </button>
+        </div>
+      )}
 
       <ChevronDown className="h-4 w-4 text-muted-foreground/40 -rotate-90 flex-shrink-0" />
-    </button>
+    </div>
   );
 }
 
@@ -282,6 +284,14 @@ export default function VerificationsPage() {
     return true;
   });
 
+  // Summary stats
+  const pendingItems = data.filter(v => v.status === 'pending');
+  const overdueCount = pendingItems.filter(v => getPriority(v.createdAt) === 'overdue').length;
+  const oldestAge = pendingItems.length > 0
+    ? Math.max(...pendingItems.map(v => Date.now() - new Date(v.createdAt).getTime()))
+    : 0;
+  const oldestDays = Math.floor(oldestAge / (24 * 3600_000));
+
   return (
     <div style={{ padding: 24, background: '#F8FAFC', minHeight: '100%' }} className="max-w-4xl mx-auto space-y-6">
 
@@ -294,6 +304,37 @@ export default function VerificationsPage() {
           </AdminButton>
         }
       />
+
+      {/* Summary banner */}
+      <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14, padding: '16px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+        {isLoading ? (
+          <div className="flex gap-8 animate-pulse">
+            {[1,2,3].map(i => <div key={i} className="h-10 w-24 rounded" style={{ background: '#F1F5F9' }} />)}
+          </div>
+        ) : pendingItems.length === 0 ? (
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#17C964' }} />
+            <p style={{ fontSize: 13, fontWeight: 600, color: '#17C964' }}>All caught up — no pending verifications</p>
+          </div>
+        ) : (
+          <div className="flex items-center gap-8 flex-wrap" style={{ rowGap: 12 }}>
+            <div>
+              <p style={{ fontSize: 20, fontWeight: 700, color: '#0F172A' }}>{pendingItems.length}</p>
+              <p style={{ fontSize: 11, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Pending</p>
+            </div>
+            <div style={{ width: 1, height: 28, background: '#F1F5F9' }} />
+            <div>
+              <p style={{ fontSize: 20, fontWeight: 700, color: overdueCount > 0 ? '#DC2626' : '#0F172A' }}>{overdueCount}</p>
+              <p style={{ fontSize: 11, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Overdue (&gt;72h)</p>
+            </div>
+            <div style={{ width: 1, height: 28, background: '#F1F5F9' }} />
+            <div>
+              <p style={{ fontSize: 20, fontWeight: 700, color: '#0F172A' }}>{oldestDays}d</p>
+              <p style={{ fontSize: 11, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Oldest Request</p>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* KPI strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -348,6 +389,10 @@ export default function VerificationsPage() {
                 key={item.id}
                 item={item}
                 onClick={() => setDrawerItem(item)}
+                onQuickDecide={(id, type, decision) =>
+                  reviewMutation.mutate({ id, type, decision, adminNote: '' })
+                }
+                isDeciding={reviewMutation.isPending}
               />
             ))}
           </div>
