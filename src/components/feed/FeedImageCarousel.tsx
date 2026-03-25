@@ -112,7 +112,20 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
     setCarouselPosition(feedIndex, clamped);
   }, [feedIndex, mediaItems.length, setCarouselPosition]);
 
-  // Listen for programmatic carousel-goto events from the action rail
+  // Preload adjacent video slides into the HLS pool — mirrors SnapFeed's vertical preload
+  useEffect(() => {
+    const adjacentIndices = [currentSlide - 1, currentSlide + 1];
+    adjacentIndices.forEach(i => {
+      const item = mediaItems[i];
+      if (!item || item.type !== 'video') return;
+      const hlsUrl = item.hlsUrl || '';
+      if (!hlsUrl || hlsUrl.startsWith('blob:')) return;
+      preloadHlsManifest(hlsUrl)
+        .then(() => registerInPool(hlsUrl))
+        .catch(() => {});
+    });
+  }, [currentSlide, mediaItems]);
+
   useEffect(() => {
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail;
