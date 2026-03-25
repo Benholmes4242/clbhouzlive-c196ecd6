@@ -196,7 +196,20 @@ export function UploadProgressBanner() {
     setActiveUploads(prev => prev.filter(u => u.jobId !== jobId));
   };
   
-  const visibleUploads = activeUploads.filter(u => !dismissedJobs.has(u.jobId));
+  // TEMP: force visible for positioning test — remove after sign-off
+  const testUploads: ActiveUpload[] = [{
+    jobId: 'test-123',
+    uploadType: 'post',
+    status: 'uploading',
+    currentFile: 1,
+    totalFiles: 3,
+    fileName: 'golf-swing.mp4',
+    percentage: 45,
+    speed: 1200000,
+    eta: 8,
+    hasFiles: true,
+  }];
+  const visibleUploads = testUploads; // replace the real visibleUploads temporarily
   if (visibleUploads.length === 0) return null;
   
   return (
