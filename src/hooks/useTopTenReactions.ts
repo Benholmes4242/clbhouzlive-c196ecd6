@@ -7,7 +7,7 @@ export type ReactionType = 'agree' | 'interesting' | 'want_to_play';
 
 export const REACTION_CONFIG: Record<ReactionType, { emoji: string; label: string }> = {
   agree: { emoji: '🔥', label: 'Great pick' },
-  interesting: { emoji: '👀', label: 'Interesting' },
+  interesting: { emoji: '👀', label: 'Really?' },
   want_to_play: { emoji: '⭐', label: 'On my list' },
 };
 
