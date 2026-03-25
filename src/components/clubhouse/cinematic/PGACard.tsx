@@ -389,34 +389,74 @@ export const PGACard: React.FC<PGACardProps> = ({
                 </span>
               )}
             </div>
+
+            {/* Scoring stats row — directly under score */}
+            {leaderStats && (
+              <div style={{
+                display: 'flex', gap: 4, marginTop: 12,
+              }}>
+                {[
+                  { v: leaderStats.eagles, label: 'Eagles', color: '#F59E0B' },
+                  { v: leaderStats.birdies, label: 'Birdies', color: '#22C55E' },
+                  { v: leaderStats.pars, label: 'Pars', color: 'rgba(255,255,255,0.75)' },
+                  { v: leaderStats.bogeys, label: 'Bogeys', color: '#F97316' },
+                  { v: leaderStats.doubleBogeys, label: 'Doubles', color: '#EF4444' },
+                ].map(stat => (
+                  <div key={stat.label} style={{
+                    flex: 1, textAlign: 'center',
+                    padding: '7px 2px 5px',
+                    borderRadius: 8,
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                  }}>
+                    <div style={{ fontSize: 'clamp(16px, 4vw, 20px)', fontWeight: 800, color: stat.color, lineHeight: 1 }}>
+                      {stat.v}
+                    </div>
+                    <div style={{ fontSize: 'clamp(7px, 1.8vw, 9px)', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 3 }}>
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Season averages row */}
+            {seasonStats && (
+              <div style={{ marginTop: 8 }}>
+                <div style={{
+                  fontSize: 'clamp(8px, 2vw, 9px)', fontWeight: 700,
+                  color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase',
+                  letterSpacing: '1px', marginBottom: 4,
+                }}>
+                  Season Averages
+                </div>
+                <div style={{ display: 'flex', gap: 4 }}>
+                  {[
+                    { v: seasonStats.drivingDistance ? `${Math.round(seasonStats.drivingDistance)}y` : null, label: 'Driver' },
+                    { v: seasonStats.drivingAccuracy ? `${Math.round(seasonStats.drivingAccuracy)}%` : null, label: 'Accuracy' },
+                    { v: seasonStats.greensInReg ? `${Math.round(seasonStats.greensInReg)}%` : null, label: 'GIR' },
+                    { v: seasonStats.puttingAverage ?? null, label: 'Putting' },
+                  ].map(stat => (
+                    <div key={stat.label} style={{
+                      flex: 1, textAlign: 'center',
+                      padding: '5px 2px 4px',
+                      borderRadius: 8,
+                      background: 'rgba(255,255,255,0.025)',
+                      border: '1px solid rgba(255,255,255,0.04)',
+                    }}>
+                      <div style={{ fontSize: 'clamp(12px, 3vw, 14px)', fontWeight: 700, color: 'rgba(255,255,255,0.7)', lineHeight: 1 }}>
+                        {stat.v ?? '—'}
+                      </div>
+                      <div style={{ fontSize: 'clamp(7px, 1.8vw, 9px)', fontWeight: 600, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 3 }}>
+                        {stat.label}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
-
-        {/* ── ZONE 2: AI INSIGHT ── */}
-        {cd.insight && (
-          <div style={{
-            flex: '0 0 auto',
-            padding: 'clamp(8px, 2vw, 12px) clamp(14px, 3.5vw, 20px)',
-            background: 'rgba(255,255,255,0.025)',
-            borderTop: `1px solid ${ACCENT}22`,
-            borderBottom: '1px solid rgba(255,255,255,0.04)',
-            display: 'flex', alignItems: 'flex-start', gap: 8,
-          }}>
-            <span style={{ fontSize: 13, lineHeight: 1, flexShrink: 0, marginTop: 1 }}>⚡</span>
-            <div style={{
-              fontSize: 'clamp(11px, 2.8vw, 13px)',
-              lineHeight: 1.4,
-              color: 'rgba(255,255,255,0.65)',
-              fontStyle: 'italic',
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-            }}>
-              {cd.insight}
-            </div>
-          </div>
-        )}
 
         {/* ── ZONE 3: LEADERBOARD ── */}
         <div style={{
@@ -554,42 +594,7 @@ export const PGACard: React.FC<PGACardProps> = ({
               );
             })}
 
-            {/* Stats line — compact single row */}
-            {leaderStats && (
-              <div style={{
-                display: 'flex', gap: 'clamp(6px, 2vw, 10px)',
-                padding: '6px 10px',
-                borderTop: '1px solid rgba(255,255,255,0.05)',
-                justifyContent: 'space-around',
-                animation: 'trc-fadeIn 0.5s ease-out both',
-                animationDelay: '0.9s',
-              }}>
-                {[
-                  { v: leaderStats.eagles, label: 'Eagles', color: '#F59E0B', show: leaderStats.eagles > 0 },
-                  { v: leaderStats.birdies, label: 'Birdies', color: '#22C55E', show: true },
-                  { v: leaderStats.pars, label: 'Pars', color: '#94A3B8', show: true },
-                  { v: leaderStats.bogeys, label: 'Bogeys', color: '#EF4444', show: true },
-                  ...(seasonStats?.drivingDistance ? [{ v: Math.round(seasonStats.drivingDistance), label: 'Driver', color: 'rgba(255,255,255,0.55)', show: true, suffix: 'y' }] : []),
-                ].filter(s => s.show).map(stat => (
-                  <div key={stat.label} style={{ textAlign: 'center' }}>
-                    <div style={{
-                      fontSize: 'clamp(14px, 3.5vw, 16px)', fontWeight: 700,
-                      color: stat.color, lineHeight: 1,
-                    }}>
-                      {stat.v}{'suffix' in stat ? (stat as any).suffix : ''}
-                    </div>
-                    <div style={{
-                      fontSize: 'clamp(8px, 2vw, 10px)', fontWeight: 600,
-                      color: 'rgba(255,255,255,0.35)',
-                      letterSpacing: 0.5, marginTop: 2,
-                      textTransform: 'uppercase',
-                    }}>
-                      {stat.label}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            {/* Stats moved to hero zone */}
           </div>
         </div>
 
