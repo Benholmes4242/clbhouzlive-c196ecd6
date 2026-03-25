@@ -289,7 +289,6 @@ export interface FeedRpcRow {
   engagement_score: number;
   post_type?: string | null;
   post_tags?: FeedPostTag[] | null;
-  post_tags?: FeedPostTag[] | null;
   course_id?: string | null;
   course_name?: string | null;
 }
