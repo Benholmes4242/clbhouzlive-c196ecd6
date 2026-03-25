@@ -10,8 +10,8 @@ export function useTopTenActivity(targetUserId: string) {
         supabase.from('top_ten_reactions')
           .select(`
             id, reactor_id, reaction_type, created_at, course_id,
-            golf_courses!course_id ( name ),
-            user_profiles!reactor_id ( display_name, profile_photo_url )
+            golf_courses!top_ten_reactions_course_id_fkey ( name ),
+            user_profiles!top_ten_reactions_reactor_id_profiles_fkey ( display_name, profile_photo_url )
           `)
           .eq('target_user_id', targetUserId)
           .order('created_at', { ascending: false })
@@ -19,8 +19,8 @@ export function useTopTenActivity(targetUserId: string) {
         supabase.from('top_ten_comments')
           .select(`
             id, commenter_id, body, created_at, course_id,
-            golf_courses!course_id ( name ),
-            user_profiles!commenter_id ( display_name, profile_photo_url )
+            golf_courses!top_ten_comments_course_id_fkey ( name ),
+            user_profiles!top_ten_comments_commenter_id_profiles_fkey ( display_name, profile_photo_url )
           `)
           .eq('target_user_id', targetUserId)
           .eq('is_deleted', false)
