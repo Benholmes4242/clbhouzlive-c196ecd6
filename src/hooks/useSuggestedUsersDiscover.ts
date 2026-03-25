@@ -69,7 +69,8 @@ export const useSuggestedUsersDiscover = () => {
           username,
           profile_photo_url,
           home_club,
-          eg_handicap_index
+          eg_handicap_index,
+          created_at
         `)
         .neq('id', currentUser.id)
         .eq('is_public', true)
