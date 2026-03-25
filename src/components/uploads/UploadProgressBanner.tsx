@@ -196,7 +196,20 @@ export function UploadProgressBanner() {
     setActiveUploads(prev => prev.filter(u => u.jobId !== jobId));
   };
   
-  const visibleUploads = activeUploads.filter(u => !dismissedJobs.has(u.jobId));
+  // TEMP: force visible for positioning test — remove after sign-off
+  const testUploads: ActiveUpload[] = [{
+    jobId: 'test-123',
+    uploadType: 'post',
+    status: 'uploading',
+    currentFile: 1,
+    totalFiles: 3,
+    fileName: 'golf-swing.mp4',
+    percentage: 45,
+    speed: 1200000,
+    eta: 8,
+    hasFiles: true,
+  }];
+  const visibleUploads = testUploads; // replace the real visibleUploads temporarily
   if (visibleUploads.length === 0) return null;
   
   return (
@@ -206,7 +219,7 @@ export function UploadProgressBanner() {
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: -20, opacity: 0 }}
         className="fixed left-0 right-0 z-[60] px-3"
-        style={{ top: "calc(var(--sat, 47px) + 8px)" }}
+        style={{ bottom: "109px" }}
       >
         <div className="bg-background/95 backdrop-blur-lg border border-border/30 shadow-lg rounded-2xl overflow-hidden">
           {visibleUploads.map((upload) => (
