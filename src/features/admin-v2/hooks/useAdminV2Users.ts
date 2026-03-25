@@ -19,6 +19,7 @@ export interface AdminUserRow {
   is_verified:     boolean;
   created_at:      string;
   role:            string | null;
+  last_seen_at:    string | null;
 }
 
 export interface AdminUserDetail extends AdminUserRow {
