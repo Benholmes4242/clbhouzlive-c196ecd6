@@ -250,9 +250,13 @@ export function usePGACard(userId?: string): {
       const wonBy = lp && lb[1]
         ? Math.abs((lp.score ?? 0) - (lb[1].score ?? 0))
         : null;
-      const wonByText = wonBy != null
-        ? wonBy === 1 ? 'Won by 1 shot' : `Won by ${wonBy} shots`
-        : null;
+      const wonByText = wonBy == null
+        ? null
+        : wonBy === 0
+        ? 'Won in a playoff'
+        : wonBy === 1
+        ? 'Won by 1 shot'
+        : `Won by ${wonBy} shots`;
 
       return {
         tournamentId: r.id,
