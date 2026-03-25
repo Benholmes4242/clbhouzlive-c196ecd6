@@ -22,8 +22,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useTopTenReactions, REACTION_CONFIG, ReactionType } from '@/hooks/useTopTenReactions';
-import { useTopTenComments } from '@/hooks/useTopTenComments';
 import { TopTenCardComments } from './TopTenCardComments';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface Top10CourseCardProps {
   course: TopTenCourse;
