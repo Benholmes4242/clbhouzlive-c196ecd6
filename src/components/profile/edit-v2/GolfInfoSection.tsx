@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { VisibilityDropdown, VisibilityValue } from './VisibilityDropdown';
 import HandicapSyncInlineNotice from './HandicapSyncInlineNotice';
+import { HandicapInput } from './HandicapInput';
 import { useCollegeMediaSearch, useCollegeMediaByName, CollegeMediaResult } from '@/hooks/useCollegeMediaSearch';
 import { SectionHeader } from './SectionHeader';
 
@@ -765,23 +766,10 @@ export const GolfInfoSection: React.FC<GolfInfoSectionProps> = ({
 
         {/* Handicap Index */}
         <div className="space-y-1.5">
-          <Label htmlFor="handicap" className="text-xs text-muted-foreground">
-            Handicap Index
-          </Label>
-          <Input
-            id="handicap"
-            type="number"
-            step="0.1"
-            min="-10"
-            max="54"
+          <HandicapInput
             value={handicap}
-            onChange={(e) => onChange('handicap', e.target.value)}
-            placeholder="e.g. 12.4"
-            className="h-11"
+            onChange={(v) => onChange('handicap', v)}
           />
-          <p className="text-[11px] text-muted-foreground">
-            Enter your current handicap index (optional).
-          </p>
           
           {/* Handicap Sync Interest Notice */}
           {userId && (
