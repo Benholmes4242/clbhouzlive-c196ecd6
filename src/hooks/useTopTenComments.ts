@@ -59,25 +59,29 @@ export function useTopTenComments(targetUserId: string, courseId: string) {
       if (error) throw error;
       // Fire notification — only when commenting on someone else's top ten
       if (user.id !== targetUserId) {
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('display_name')
-          .eq('id', user.id)
-          .single();
-        const name = profile?.display_name ?? 'Someone';
-        await supabase.from('notifications').insert({
-          user_id: targetUserId,
-          recipient_actor_type: 'personal',
-          recipient_actor_id: targetUserId,
-          actor_id: user.id,
-          type: 'top_ten_comment',
-          title: `${name} commented on your Top 10`,
-          message: body.trim().length > 60 ? body.trim().slice(0, 60) + '…' : body.trim(),
-          entity_type: 'top_ten',
-          entity_id: courseId,
-          is_read: false,
-          data: { target_user_id: targetUserId },
-        });
+        try {
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('display_name')
+            .eq('id', user.id)
+            .single();
+          const name = profile?.display_name ?? 'Someone';
+          await supabase.from('notifications').insert({
+            user_id: targetUserId,
+            recipient_actor_type: 'personal',
+            recipient_actor_id: targetUserId,
+            actor_id: user.id,
+            type: 'top_ten_comment',
+            title: `${name} commented on your Top 10`,
+            message: body.trim().length > 60 ? body.trim().slice(0, 60) + '…' : body.trim(),
+            entity_type: 'top_ten',
+            entity_id: courseId,
+            is_read: false,
+            data: { target_user_id: targetUserId },
+          });
+        } catch {
+          // Notification failure is non-blocking — comment was already saved
+        }
       }
     },
     onSuccess: () => {
