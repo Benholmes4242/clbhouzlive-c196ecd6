@@ -76,6 +76,7 @@ export function useTopTenComments(targetUserId: string, courseId: string) {
           entity_type: 'top_ten',
           entity_id: courseId,
           is_read: false,
+          data: { target_user_id: targetUserId },
         });
       }
     },
@@ -91,10 +92,12 @@ export function useTopTenComments(targetUserId: string, courseId: string) {
   const deleteComment = useMutation({
     mutationFn: async (commentId: string) => {
       if (!user) throw new Error('Not authenticated');
-      await supabase.from('top_ten_comments')
+      const { error } = await supabase
+        .from('top_ten_comments')
         .update({ is_deleted: true })
         .eq('id', commentId)
-        .eq('commenter_id', user.id);
+        .or(`commenter_id.eq.${user.id},target_user_id.eq.${user.id}`);
+      if (error) throw error;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: qk }),
   });

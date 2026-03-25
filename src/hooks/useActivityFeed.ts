@@ -241,7 +241,8 @@ function getContextUrl(notification: any): string {
     return `/clubs/${entity_id}`;
   }
   if (entity_type === 'top_ten') {
-    return `/profile/${actor_id}?tab=courses`;
+    const targetId = data?.target_user_id ?? notification.user_id;
+    return `/profile/${targetId}?tab=courses`;
   }
   // Business member/access navigation
   if (type === 'business_member_added' || type === 'business_access_approved') {
