@@ -409,6 +409,7 @@ export function usePGACard(userId?: string): {
         postId,
         ...eng,
         defendingChampion: null,
+        defendingChampionPhotoUrl: null,
         pastWinners: null,
       };
     }
