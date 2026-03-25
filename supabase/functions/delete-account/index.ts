@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
     const adminClient = createClient(supabaseUrl, supabaseServiceKey)
 
     // Generate anonymized values
-    const anonymizedUsername = `deleted_user_${user.id.slice(0, 8)}`
+    const anonymizedUsername = `deleted_user_${user.id}`
     const anonymizedDisplayName = 'Deleted User'
     const deletedAt = new Date().toISOString()
 
@@ -461,6 +461,13 @@ Deno.serve(async (req) => {
       )
     }
 
+    // Hard delete from auth.users so the account is fully gone
+    const { error: authDeleteError } = await adminClient.auth.admin.deleteUser(user.id);
+    if (authDeleteError) {
+      console.error('[delete-account] Failed to delete auth user:', authDeleteError.message);
+      // Non-fatal — profile is already anonymised, continue
+    }
+
     // Log the deletion in admin_audit_log
     await adminClient
       .from('admin_audit_log')
@@ -478,9 +485,6 @@ Deno.serve(async (req) => {
       })
 
     console.log(`[delete-account] Successfully deleted user ${user.id}`, deletionResults)
-
-    // Sign out the user
-    await userClient.auth.signOut()
 
     return new Response(
       JSON.stringify({ success: true, message: 'Account deleted successfully' }),

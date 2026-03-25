@@ -33,15 +33,20 @@ export function useDeleteAccount(userId: string | undefined) {
     if (!userId || deleteConfirmText !== 'DELETE') return;
     setIsDeleting(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('No session');
+      // Force a session refresh to ensure token is valid before calling the edge function
+      const { data: { session }, error: sessionError } = await supabase.auth.refreshSession();
+      if (sessionError || !session) throw new Error('Session expired — please log in again');
+
       const { error } = await supabase.functions.invoke('delete-account', {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       if (error) throw error;
       await supabase.auth.signOut();
-    } catch {
-      toast.error('Could not delete account. Please contact support.');
+    } catch (err) {
+      console.error('[deleteAccount] Error:', err);
+      toast.error('Could not delete account.', {
+        description: err instanceof Error ? err.message : String(err),
+      });
       setIsDeleting(false);
     }
   };
