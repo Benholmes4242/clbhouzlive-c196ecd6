@@ -45,7 +45,6 @@ export const FeedSlide = memo(function FeedSlide({
       return (
         <PGACard
           post={post as unknown as PGACardFeedPost}
-          isActive={isActive}
           onComment={() => onComment?.()}
           onLike={() => onLike?.(post)}
           getLikeState={getLikeState}
