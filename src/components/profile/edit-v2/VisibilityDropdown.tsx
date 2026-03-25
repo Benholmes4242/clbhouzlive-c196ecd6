@@ -57,6 +57,27 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
     });
   };
 
+  const handleOpenChange = (nextOpen: boolean) => {
+    console.log('[VisibilityDropdown]', {
+      source: 'select',
+      eventType: 'openChange',
+      value,
+      disabled,
+      nextOpen,
+    });
+  };
+
+  const handleValueChange = (nextValue: string) => {
+    console.log('[VisibilityDropdown]', {
+      source: 'select',
+      eventType: 'valueChange',
+      value,
+      disabled,
+      nextValue,
+    });
+    onChange(nextValue as VisibilityValue);
+  };
+
   return (
     <div
       className={cn("flex items-center gap-1.5", className)}
@@ -65,7 +86,7 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
       onClick={logEvent('wrapper')}
     >
       {isPrivate && <Lock className="h-3.5 w-3.5 text-muted-foreground" />}
-      <Select value={value} onValueChange={onChange} disabled={disabled}>
+      <Select value={value} onValueChange={handleValueChange} onOpenChange={handleOpenChange} disabled={disabled}>
         <SelectTrigger 
           onTouchStart={logEvent('trigger')}
           onPointerDown={logEvent('trigger')}
@@ -81,7 +102,31 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
             <span className="ml-1 font-semibold text-foreground">{selectedOption.label}</span>
           </SelectValue>
         </SelectTrigger>
-        <SelectContent align="end" position="popper" className="min-w-[200px] bg-white border-slate-200 z-[200] rounded-sq-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+        <SelectContent
+          align="end"
+          position="popper"
+          onPointerDownOutside={(event) => {
+            const target = event.target as HTMLElement | null;
+            console.log('[VisibilityDropdown]', {
+              source: 'content',
+              eventType: 'pointerDownOutside',
+              value,
+              disabled,
+              targetTag: target?.tagName,
+              targetText: target?.textContent?.slice(0, 60) || '',
+            });
+          }}
+          onCloseAutoFocus={(event) => {
+            console.log('[VisibilityDropdown]', {
+              source: 'content',
+              eventType: 'closeAutoFocus',
+              value,
+              disabled,
+              defaultPrevented: event.defaultPrevented,
+            });
+          }}
+          className="min-w-[200px] bg-white border-slate-200 z-[200] rounded-sq-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+        >
           {VISIBILITY_OPTIONS.map((option) => {
             const OptionIcon = option.icon;
             const isSelected = option.value === value;
