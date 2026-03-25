@@ -3,12 +3,6 @@ import { Toaster as Sonner, toast } from "sonner"
 
 type ToasterProps = React.ComponentProps<typeof Sonner>
 
-/**
- * Unified dark-glass toaster for Clbhouz
- * - All types share the same dark frosted base
- * - Only the icon color changes per type (amber/red/orange/blue)
- * - 3s default duration, max 2 visible
- */
 const Toaster = ({ ...props }: ToasterProps) => {
   useEffect(() => {
     const t = setTimeout(() => {
@@ -21,19 +15,13 @@ const Toaster = ({ ...props }: ToasterProps) => {
   }, []);
 
   return (
-    <>
-      <style>{`
-        [data-sonner-toaster][data-position="bottom-center"] {
-          bottom: 97px !important;
-        }
-      `}</style>
-      <Sonner
-        theme="dark"
-        position="bottom-center"
-        duration={3000}
-        visibleToasts={2}
-        expand={false}
-        toastOptions={{
+    <Sonner
+      theme="dark"
+      position="bottom-center"
+      duration={3000}
+      visibleToasts={2}
+      expand={false}
+      toastOptions={{
         className: 'clbhouz-toast',
         style: {
           background: 'rgba(28, 28, 30, 0.92)',
@@ -55,7 +43,6 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }}
       {...props}
     />
-    </>
   )
 }
 
