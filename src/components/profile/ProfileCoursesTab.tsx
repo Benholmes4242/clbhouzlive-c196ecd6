@@ -7,6 +7,7 @@ import { WantToPlaySection } from './courses/WantToPlaySection';
 import { AllCoursesList } from './courses/AllCoursesList';
 import { AddCourseModal } from './courses/AddCourseModal';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
+import { TopTenActivityFeed } from './courses/TopTenActivityFeed';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -118,6 +119,11 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
           onManage={() => setShowAddModal(true)}
           displayName={displayName}
         />
+      </div>
+
+      {/* Top 10 Activity Feed */}
+      <div className="mt-4">
+        <TopTenActivityFeed targetUserId={userId} />
       </div>
 
       {/* Section 3: Courses to Play (Aspirational) */}

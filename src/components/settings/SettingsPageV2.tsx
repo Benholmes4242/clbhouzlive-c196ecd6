@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, User, Mail, Lock, Bell, Shield, EyeOff, UserX, HelpCircle, Flag, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Map } from 'lucide-react';
+import { ChevronLeft, ChevronRight, User, Mail, Lock, Bell, Shield, EyeOff, UserX, HelpCircle, Flag, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Map, Star } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useCreatorSettings } from '@/hooks/useCreatorSettings';
@@ -228,6 +228,31 @@ export function SettingsPageV2() {
             disabled={privacy.isUpdatingExplorationLb}
             onCheckedChange={privacy.toggleExplorationLeaderboards}
           />
+          {/* Top 10 Comments Privacy */}
+          <div className="flex items-center gap-3 px-4 py-3">
+            <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+              <Star size={18} className="text-amber-500" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[15px] font-medium text-foreground">Top 10 Comments</p>
+              <p className="text-[13px] text-muted-foreground">Who can react and comment on your Top 10</p>
+            </div>
+            <select
+              value={(p as any)?.top_ten_comments_privacy ?? 'followers'}
+              onChange={async (e) => {
+                if (!user?.id) return;
+                await supabase
+                  .from('user_profiles')
+                  .update({ top_ten_comments_privacy: e.target.value })
+                  .eq('id', user.id);
+              }}
+              className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
+            >
+              <option value="open">Everyone</option>
+              <option value="followers">Followers only</option>
+              <option value="off">Off</option>
+            </select>
+          </div>
           <SettingsChevronRow
             icon={<UserX size={18} />}
             title="Blocked Users"
