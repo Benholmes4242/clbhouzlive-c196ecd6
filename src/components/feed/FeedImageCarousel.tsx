@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useState, useRef, memo } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapVideoPlayer } from './SnapVideoPlayer';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { registerInPool } from '@/utils/hlsPoolPreloader';
 import type { MediaItem } from '@/components/media-system/types/media';
 
 interface FeedImageCarouselProps {
@@ -92,7 +94,17 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
   useEffect(() => {
     setCarouselPosition(feedIndex, 0);
     setCurrentSlide(0);
-  }, [feedIndex, setCarouselPosition]);
+    // Pre-warm slide 1 on mount so first horizontal swipe is instant
+    const firstAdjacent = mediaItems[1];
+    if (firstAdjacent?.type === 'video') {
+      const hlsUrl = firstAdjacent.hlsUrl || '';
+      if (hlsUrl && !hlsUrl.startsWith('blob:')) {
+        preloadHlsManifest(hlsUrl)
+          .then(() => registerInPool(hlsUrl))
+          .catch(() => {});
+      }
+    }
+  }, [feedIndex, setCarouselPosition, mediaItems]);
 
   const goTo = useCallback((idx: number) => {
     const clamped = Math.max(0, Math.min(idx, mediaItems.length - 1));
@@ -100,7 +112,20 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
     setCarouselPosition(feedIndex, clamped);
   }, [feedIndex, mediaItems.length, setCarouselPosition]);
 
-  // Listen for programmatic carousel-goto events from the action rail
+  // Preload adjacent video slides into the HLS pool — mirrors SnapFeed's vertical preload
+  useEffect(() => {
+    const adjacentIndices = [currentSlide - 1, currentSlide + 1];
+    adjacentIndices.forEach(i => {
+      const item = mediaItems[i];
+      if (!item || item.type !== 'video') return;
+      const hlsUrl = item.hlsUrl || '';
+      if (!hlsUrl || hlsUrl.startsWith('blob:')) return;
+      preloadHlsManifest(hlsUrl)
+        .then(() => registerInPool(hlsUrl))
+        .catch(() => {});
+    });
+  }, [currentSlide, mediaItems]);
+
   useEffect(() => {
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail;
