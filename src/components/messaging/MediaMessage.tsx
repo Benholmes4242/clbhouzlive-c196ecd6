@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import { Loader2, Play, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
+import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 
 interface MediaMessageProps {
   type: 'image' | 'video';
@@ -14,6 +15,12 @@ export function MediaMessage({ type, url, className }: MediaMessageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
+  const { ref: zoomRef, imgRef, style: zoomStyle, reset: resetZoom } = usePinchZoomPointer();
+
+  // Reset zoom when closing
+  useEffect(() => {
+    if (!fullscreen) resetZoom();
+  }, [fullscreen, resetZoom]);
 
   if (error) {
     return (
@@ -59,11 +66,15 @@ export function MediaMessage({ type, url, className }: MediaMessageProps) {
             >
               <X className="h-5 w-5" />
             </button>
-            <img
-              src={url}
-              alt="Full size attachment"
-              className="max-w-full max-h-[90vh] object-contain rounded-lg"
-            />
+            <div ref={zoomRef} style={zoomStyle}>
+              <img
+                ref={imgRef}
+                src={url}
+                alt="Full size attachment"
+                className="max-w-full max-h-[90vh] object-contain rounded-lg"
+                draggable={false}
+              />
+            </div>
           </DialogContent>
         </Dialog>
       </>

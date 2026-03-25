@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 
 interface CommentImageProps {
   mediaUrl: string;
@@ -13,6 +14,7 @@ export const CommentImage: React.FC<CommentImageProps> = ({ mediaUrl, isDark }) 
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const { ref: zoomRef, imgRef, style: zoomStyle, reset: resetZoom } = usePinchZoomPointer();
 
   useEffect(() => {
     supabase.storage
@@ -23,6 +25,11 @@ export const CommentImage: React.FC<CommentImageProps> = ({ mediaUrl, isDark }) 
         else setHasError(true);
       });
   }, [mediaUrl]);
+
+  // Reset zoom when closing
+  useEffect(() => {
+    if (!isExpanded) resetZoom();
+  }, [isExpanded, resetZoom]);
 
   if (hasError) return null;
 
@@ -54,13 +61,19 @@ export const CommentImage: React.FC<CommentImageProps> = ({ mediaUrl, isDark }) 
             onClick={() => setIsExpanded(false)}
           >
             <button
-              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"
+              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center z-10"
               onClick={() => setIsExpanded(false)}
               style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
             >
               <X className="w-5 h-5 text-white" />
             </button>
-            <img src={signedUrl} alt="" className="max-w-full max-h-full object-contain p-4" />
+            <div
+              ref={zoomRef}
+              style={zoomStyle}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img ref={imgRef} src={signedUrl} alt="" className="max-w-full max-h-full object-contain p-4" draggable={false} />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

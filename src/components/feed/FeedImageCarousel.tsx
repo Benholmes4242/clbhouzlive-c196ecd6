@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState, useRef, memo } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapVideoPlayer } from './SnapVideoPlayer';
+import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import type { MediaItem } from '@/components/media-system/types/media';
 
 interface FeedImageCarouselProps {
@@ -9,7 +10,59 @@ interface FeedImageCarouselProps {
   isSuggestedFeed: boolean;
   isActive?: boolean;
   onDoubleTapLike?: () => void;
+  onZoomChange?: (isZoomed: boolean) => void;
 }
+
+// Inner component for each zoomable image slide
+const ZoomableImageSlide: React.FC<{
+  imgSrc: string;
+  objectFit: 'cover' | 'contain';
+  loading: 'eager' | 'lazy';
+  onZoomChange?: (isZoomed: boolean) => void;
+  slideIndex: number;
+  currentSlide: number;
+}> = memo(({ imgSrc, objectFit, loading, onZoomChange, slideIndex, currentSlide }) => {
+  const { ref, imgRef, style, scale, reset } = usePinchZoomPointer();
+
+  // Reset zoom when this slide is no longer current
+  useEffect(() => {
+    if (slideIndex !== currentSlide) reset();
+  }, [slideIndex, currentSlide, reset]);
+
+  // Report zoom state
+  useEffect(() => {
+    onZoomChange?.(scale > 1);
+  }, [scale, onZoomChange]);
+
+  return (
+    <div className="absolute inset-0 overflow-hidden">
+      <img
+        src={imgSrc}
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ filter: 'blur(40px)', transform: 'scale(1.15)', opacity: 0.6 }}
+        draggable={false}
+        aria-hidden="true"
+      />
+      <div className="absolute inset-0 bg-black/55" />
+      <div
+        ref={ref}
+        style={{ ...style, position: 'absolute', inset: 0, zIndex: 1 }}
+      >
+        <img
+          ref={imgRef}
+          src={imgSrc}
+          alt=""
+          className="w-full h-full"
+          style={{ objectFit }}
+          loading={loading}
+          draggable={false}
+        />
+      </div>
+    </div>
+  );
+});
+ZoomableImageSlide.displayName = 'ZoomableImageSlide';
 
 export const FeedImageCarousel = memo(function FeedImageCarousel({
   mediaItems,
@@ -17,10 +70,12 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
   isSuggestedFeed,
   isActive = false,
   onDoubleTapLike,
+  onZoomChange,
 }: FeedImageCarouselProps) {
   const activeIndex = useClubhouseStore(s => s.activeIndex);
   const setCarouselPosition = useClubhouseStore(s => s.setCarouselPosition);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isImageZoomed, setIsImageZoomed] = useState(false);
 
   // ── Horizontal swipe state ──
   const containerRef = useRef<HTMLDivElement>(null);
@@ -57,13 +112,19 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
     return () => window.removeEventListener('carousel-goto', handler);
   }, [feedIndex, goTo]);
 
+  // Propagate zoom state to parent
+  const handleImageZoomChange = useCallback((zoomed: boolean) => {
+    setIsImageZoomed(zoomed);
+    onZoomChange?.(zoomed);
+  }, [onZoomChange]);
+
   // ── Touch handlers for horizontal swipe ──
   const LOCK_THRESHOLD = 10;
   const SWIPE_THRESHOLD = 50;
   const isDraggingHorizontally = useRef(false);
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
-    if (isAnimating) return;
+    if (isAnimating || isImageZoomed) return;
     const touch = e.touches[0];
     touchRef.current = {
       startX: touch.clientX,
@@ -74,20 +135,20 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
     isDraggingHorizontally.current = false;
     setSwipeOffset(0);
     setIsDragging(false);
-  }, [isAnimating]);
+  }, [isAnimating, isImageZoomed]);
 
   // Native touchmove with { passive: false } so preventDefault() works
-  const touchMoveStateRef = useRef({ currentSlide, mediaItemsLength: mediaItems.length, isAnimating });
+  const touchMoveStateRef = useRef({ currentSlide, mediaItemsLength: mediaItems.length, isAnimating, isImageZoomed });
   useEffect(() => {
-    touchMoveStateRef.current = { currentSlide, mediaItemsLength: mediaItems.length, isAnimating };
-  }, [currentSlide, mediaItems.length, isAnimating]);
+    touchMoveStateRef.current = { currentSlide, mediaItemsLength: mediaItems.length, isAnimating, isImageZoomed };
+  }, [currentSlide, mediaItems.length, isAnimating, isImageZoomed]);
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const handleTouchMove = (e: TouchEvent) => {
-      const { isAnimating: anim, currentSlide: cs, mediaItemsLength: len } = touchMoveStateRef.current;
-      if (anim) return;
+      const { isAnimating: anim, currentSlide: cs, mediaItemsLength: len, isImageZoomed: zoomed } = touchMoveStateRef.current;
+      if (anim || zoomed) return;
       const t = touchRef.current;
       const touch = e.touches[0];
       const dx = touch.clientX - t.startX;
@@ -103,7 +164,6 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
         return;
       }
 
-      // No preventDefault needed — touchAction: 'none' on container handles it
       isDraggingHorizontally.current = true;
       t.swiping = true;
       setIsDragging(true);
@@ -119,7 +179,7 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
 
   const onTouchEnd = useCallback(() => {
     const t = touchRef.current;
-    if (isAnimating) return;
+    if (isAnimating || isImageZoomed) return;
 
     if (t.locked === 'horizontal' && t.swiping) {
       const containerWidth = containerRef.current?.offsetWidth || 430;
@@ -132,12 +192,10 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
       }
 
       if (targetSlide !== currentSlide) {
-        // Animate to the target: set offset to full width in the swipe direction
         setIsAnimating(true);
         const direction = targetSlide > currentSlide ? -containerWidth : containerWidth;
         setSwipeOffset(direction);
 
-        // After transition completes, snap to new slide
         setTimeout(() => {
           setIsDragging(false);
           setSwipeOffset(0);
@@ -145,7 +203,6 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
           goTo(targetSlide);
         }, 300);
       } else {
-        // Snap back — animate offset back to 0
         setIsAnimating(true);
         setSwipeOffset(0);
         setTimeout(() => {
@@ -159,19 +216,16 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
     }
 
     touchRef.current = { startX: 0, startY: 0, locked: 'none', swiping: false };
-  }, [swipeOffset, currentSlide, mediaItems.length, goTo, isAnimating]);
+  }, [swipeOffset, currentSlide, mediaItems.length, goTo, isAnimating, isImageZoomed]);
 
-  // Determine which slides need to be rendered (current + adjacent for smooth sliding)
   const getSlideTransform = (idx: number): { translateX: string; opacity: number; pointerEvents: 'auto' | 'none' } => {
     const containerWidth = containerRef.current?.offsetWidth || 430;
     const diff = idx - currentSlide;
 
-    // Only render current and immediately adjacent slides
     if (Math.abs(diff) > 1) {
       return { translateX: `${diff * containerWidth}px`, opacity: 0, pointerEvents: 'none' };
     }
 
-    // Base position: each slide offset by full container width
     const baseOffset = diff * containerWidth;
     const finalOffset = baseOffset + swipeOffset;
 
@@ -191,14 +245,13 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
     <div
       ref={containerRef}
       className="absolute inset-0 overflow-hidden"
-      style={{ touchAction: 'pan-y' }}
+      style={{ touchAction: isImageZoomed ? 'none' : 'pan-y' }}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
       onTouchCancel={onTouchEnd}
     >
       {mediaItems.map((item, idx) => {
         const diff = Math.abs(idx - currentSlide);
-        // Only render current slide and its immediate neighbours
         if (diff > 1 && !isDragging && !isAnimating) return null;
 
         const { translateX, opacity, pointerEvents } = getSlideTransform(idx);
@@ -236,23 +289,14 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
         const objectFit = isLandscape ? 'contain' : 'cover';
         const imgSrc = item.imageUrl || item.thumbnailUrl || '';
         return (
-          <div key={item.id || idx} className="absolute inset-0 overflow-hidden" style={slideStyle}>
-            <img
-              src={imgSrc}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{ filter: 'blur(40px)', transform: 'scale(1.15)', opacity: 0.6 }}
-              draggable={false}
-              aria-hidden="true"
-            />
-            <div className="absolute inset-0 bg-black/55" />
-            <img
-              src={imgSrc}
-              alt=""
-              className="absolute inset-0 w-full h-full"
-              style={{ objectFit, position: 'relative', zIndex: 1 }}
+          <div key={item.id || idx} className="absolute inset-0" style={slideStyle}>
+            <ZoomableImageSlide
+              imgSrc={imgSrc}
+              objectFit={objectFit}
               loading={idx === 0 ? 'eager' : 'lazy'}
-              draggable={false}
+              onZoomChange={handleImageZoomChange}
+              slideIndex={idx}
+              currentSlide={currentSlide}
             />
           </div>
         );

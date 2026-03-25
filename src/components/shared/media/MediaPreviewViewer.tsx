@@ -1,7 +1,8 @@
-// MediaPreviewViewer — Fullscreen media viewer with swipe
-import React, { useState } from 'react';
+// MediaPreviewViewer — Fullscreen media viewer with swipe and pinch-zoom
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import type { OrderedMediaItem } from './types';
 
 interface MediaPreviewViewerProps {
@@ -21,7 +22,15 @@ export function MediaPreviewViewer({
   coverIndex = 0,
 }: MediaPreviewViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const { ref: zoomRef, imgRef, style: zoomStyle, scale, reset: resetZoom } = usePinchZoomPointer();
+  const isZoomed = scale > 1;
   const item = items[currentIndex];
+
+  // Reset zoom on slide change
+  useEffect(() => {
+    resetZoom();
+  }, [currentIndex, resetZoom]);
+
   if (!item) return null;
 
   return (
@@ -60,15 +69,19 @@ export function MediaPreviewViewer({
             className="max-w-full max-h-full object-contain"
           />
         ) : (
-          <img
-            src={item.previewUrl}
-            alt=""
-            className="max-w-full max-h-full object-contain"
-          />
+          <div ref={zoomRef} style={zoomStyle}>
+            <img
+              ref={imgRef}
+              src={item.previewUrl}
+              alt=""
+              className="max-w-full max-h-full object-contain"
+              draggable={false}
+            />
+          </div>
         )}
 
-        {/* Nav buttons */}
-        {currentIndex > 0 && (
+        {/* Nav buttons — hidden when zoomed */}
+        {currentIndex > 0 && !isZoomed && (
           <button
             onClick={() => setCurrentIndex(currentIndex - 1)}
             className="absolute left-2 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"
@@ -76,7 +89,7 @@ export function MediaPreviewViewer({
             <ChevronLeft className="w-5 h-5 text-white" />
           </button>
         )}
-        {currentIndex < items.length - 1 && (
+        {currentIndex < items.length - 1 && !isZoomed && (
           <button
             onClick={() => setCurrentIndex(currentIndex + 1)}
             className="absolute right-2 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"

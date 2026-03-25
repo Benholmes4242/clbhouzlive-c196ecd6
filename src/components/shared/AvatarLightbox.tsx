@@ -1,15 +1,5 @@
 /**
- * AvatarLightbox - Fullscreen avatar/profile photo viewer
- * 
- * Features:
- * - Squircle shape to match app design system
- * - Framer-motion animations
- * - Tap outside / X button / Escape key to dismiss
- * - Swipe down to dismiss on mobile
- * - Body scroll lock when open
- * - Fallback for missing/broken images
- * - Hardware back button closes lightbox
- * - iOS safe area awareness
+ * AvatarLightbox - Fullscreen avatar/profile photo viewer with pinch-zoom
  */
 
 import React, { useEffect, useCallback, useState, useRef } from 'react';
@@ -17,19 +7,14 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 
 export interface AvatarLightboxProps {
-  /** Whether the lightbox is open */
   isOpen: boolean;
-  /** Close callback */
   onClose: () => void;
-  /** Image URL to display */
   imageUrl: string;
-  /** Alt text for the image */
   altText?: string;
-  /** Shape of the avatar */
   shape?: 'circle' | 'squircle';
-  /** Fallback initial letter if no image */
   fallbackInitial?: string;
 }
 
@@ -43,20 +28,18 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
 }) => {
   const [imgFailed, setImgFailed] = useState(false);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const { ref: zoomRef, imgRef, style: zoomStyle, scale, reset: resetZoom } = usePinchZoomPointer();
+  const isZoomed = scale > 1;
 
-  // Reset image error state when URL changes
   useEffect(() => {
     setImgFailed(false);
-  }, [imageUrl]);
+    resetZoom();
+  }, [imageUrl, resetZoom]);
 
-  // Handle escape key
   const handleEscape = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      onClose();
-    }
+    if (e.key === 'Escape') onClose();
   }, [onClose]);
 
-  // Scroll lock + escape key + focus management
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
     const originalPosition = document.body.style.position;
@@ -70,8 +53,6 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollY}px`;
       document.body.style.width = '100%';
-
-      // Focus close button on open
       requestAnimationFrame(() => {
         closeBtnRef.current?.focus();
       });
@@ -83,13 +64,10 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
       document.body.style.position = originalPosition;
       document.body.style.top = originalTop;
       document.body.style.width = originalWidth;
-      if (isOpen) {
-        window.scrollTo(0, scrollY);
-      }
+      if (isOpen) window.scrollTo(0, scrollY);
     };
   }, [isOpen, handleEscape]);
 
-  // Hardware back button: close lightbox instead of navigating away
   useEffect(() => {
     if (!isOpen) return;
     window.history.pushState({ lightbox: true }, '');
@@ -98,24 +76,15 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
     return () => window.removeEventListener('popstate', handlePop);
   }, [isOpen, onClose]);
 
-  // Handle backdrop click
   const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
+    if (e.target === e.currentTarget) onClose();
   };
 
-  // Swipe down to dismiss
   const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    if (info.offset.y > 100 || info.velocity.y > 500) {
-      onClose();
-    }
+    if (info.offset.y > 100 || info.velocity.y > 500) onClose();
   };
 
-  const shapeClass = shape === 'circle' 
-    ? 'rounded-full' 
-    : 'clbhouz-squircle';
-
+  const shapeClass = shape === 'circle' ? 'rounded-full' : 'clbhouz-squircle';
   const showFallback = !imageUrl || imgFailed;
 
   const content = (
@@ -140,7 +109,7 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
             exit={{ opacity: 0 }}
           />
 
-          {/* Close button — safe area aware */}
+          {/* Close button */}
           <motion.button
             ref={closeBtnRef}
             className="absolute right-4 z-50 w-11 h-11 flex items-center justify-center text-white/80 hover:text-white bg-black/30 rounded-full transition-colors"
@@ -155,7 +124,7 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
             <X className="w-6 h-6" />
           </motion.button>
 
-          {/* Avatar container - draggable for swipe dismiss */}
+          {/* Avatar container - draggable for swipe dismiss, disabled when zoomed */}
           <motion.div
             className={cn(
               'relative overflow-hidden shadow-2xl',
@@ -165,16 +134,12 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ 
-              type: 'spring', 
-              damping: 25, 
-              stiffness: 300 
-            }}
-            drag="y"
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            drag={isZoomed ? false : "y"}
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={0.7}
             onDragEnd={handleDragEnd}
-            style={{ touchAction: 'none' }}
+            style={{ touchAction: isZoomed ? 'none' : 'none' }}
           >
             {showFallback ? (
               fallbackInitial ? (
@@ -189,17 +154,20 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
                 </div>
               )
             ) : (
-              <img
-                src={imageUrl}
-                alt={altText}
-                className="w-full h-full object-cover"
-                draggable={false}
-                onError={() => setImgFailed(true)}
-              />
+              <div ref={zoomRef} style={zoomStyle} className="w-full h-full">
+                <img
+                  ref={imgRef}
+                  src={imageUrl}
+                  alt={altText}
+                  className="w-full h-full object-cover"
+                  draggable={false}
+                  onError={() => setImgFailed(true)}
+                />
+              </div>
             )}
           </motion.div>
 
-          {/* Hint text — safe area aware */}
+          {/* Hint text */}
           <motion.p
             className="absolute left-0 right-0 text-center text-white/50 text-sm"
             style={{ bottom: 'max(24px, calc(env(safe-area-inset-bottom, 0px) + 16px))' }}
@@ -208,14 +176,13 @@ export const AvatarLightbox: React.FC<AvatarLightboxProps> = ({
             exit={{ opacity: 0 }}
             transition={{ delay: 0.3 }}
           >
-            Tap outside or swipe down to close
+            {isZoomed ? 'Double-tap to reset zoom' : 'Tap outside or swipe down to close'}
           </motion.p>
         </motion.div>
       )}
     </AnimatePresence>
   );
 
-  // Render in portal
   return createPortal(content, document.body);
 };
 
