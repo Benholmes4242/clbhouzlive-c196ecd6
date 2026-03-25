@@ -33,6 +33,8 @@ const NavigationAnalytics  = lazy(() => import('./pages/analytics/NavigationAnal
 const EchoAnalytics        = lazy(() => import('./pages/analytics/EchoAnalyticsPage'));
 const SocialAnalytics      = lazy(() => import('./pages/analytics/SocialAnalyticsPage'));
 const RetentionAnalytics   = lazy(() => import('./pages/analytics/RetentionPage'));
+const ContentPerformance   = lazy(() => import('./pages/analytics/ContentPerformancePage'));
+const CreatorLeaderboard   = lazy(() => import('./pages/analytics/CreatorLeaderboardPage'));
 const LeaderboardsPage     = lazy(() => import('./pages/LeaderboardsPage'));
 const GeocodingPage        = lazy(() => import('./pages/tools/GeocodingPage'));
 const TestLabPage          = lazy(() => import('./pages/tools/TestLabPage'));
