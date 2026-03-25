@@ -156,7 +156,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
           {[1, 2].map((i) => (
              <div 
               key={i} 
-              className="flex-shrink-0 w-[227px] h-[292px] bg-muted rounded-[22px] animate-pulse" 
+              className="flex-shrink-0 w-[245px] h-[315px] bg-muted rounded-[24px] animate-pulse" 
             />
           ))}
         </div>

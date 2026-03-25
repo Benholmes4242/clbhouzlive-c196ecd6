@@ -220,10 +220,6 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           })}
         </div>
 
-        {/* Subtle tap indicator - bottom right */}
-        <div className="absolute bottom-[50px] right-5">
-          <ChevronRight className="w-5 h-5 text-white/40" />
-        </div>
       </motion.div>
       
       {/* Comments sheet */}
