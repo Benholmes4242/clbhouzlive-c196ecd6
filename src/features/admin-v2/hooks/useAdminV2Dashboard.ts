@@ -310,16 +310,23 @@ export function useAdminV2Dashboard() {
         staleTime: 30_000,
         refetchInterval: 60_000,
       },
+      {
+        queryKey: ['admin-v2', 'dashboard', 'glance'],
+        queryFn:  fetchTodayGlance,
+        staleTime: 2 * 60_000,
+        refetchInterval: 5 * 60_000,
+      },
     ],
   });
 
-  const [kpisQ, queueQ, trendQ, auditQ] = results;
+  const [kpisQ, queueQ, trendQ, auditQ, glanceQ] = results;
 
   return {
     kpis:        { data: kpisQ.data,  isLoading: kpisQ.isLoading  },
     queue:       { data: queueQ.data, isLoading: queueQ.isLoading },
     trend:       { data: trendQ.data, isLoading: trendQ.isLoading },
     audit:       { data: auditQ.data, isLoading: auditQ.isLoading },
+    glance:      { data: glanceQ.data, isLoading: glanceQ.isLoading },
     isAnyLoading: results.some(r => r.isLoading),
     refetchAll:  () => results.forEach(r => r.refetch()),
   };
