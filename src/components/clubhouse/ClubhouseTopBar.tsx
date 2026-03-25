@@ -34,6 +34,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
   user,
   carouselCount,
   carouselIndex,
+  hidden = false,
 }) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
