@@ -77,6 +77,7 @@ export function SettingsPageV2() {
 
   const deleteAccount = useDeleteAccount(user?.id);
   const { sheets, open, close } = useSettingsSheets();
+  const queryClient = useQueryClient();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
