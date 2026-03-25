@@ -64,7 +64,6 @@ export interface FeedPost {
   courseName?: string;
   courseId?: string;
   postType?: string;
-  postType?: string;
 }
 
 
