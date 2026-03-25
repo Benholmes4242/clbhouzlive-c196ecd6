@@ -154,6 +154,7 @@ export default function AdminV2Shell() {
             <Route path="analytics/social" element={can.manageAdmins ? <SocialAnalytics /> : <AdminV2AccessDenied role={role} />} />
             <Route path="analytics/content" element={can.manageAdmins ? <ContentAnalytics /> : <AdminV2AccessDenied role={role} />} />
             <Route path="analytics/auth" element={can.manageAdmins ? <AuthAnalytics /> : <AdminV2AccessDenied role={role} />} />
+            <Route path="analytics/retention" element={can.manageAdmins ? <RetentionAnalytics /> : <AdminV2AccessDenied role={role} />} />
             <Route path="users" element={can.manageAdmins ? <UsersPage /> : <AdminV2AccessDenied role={role} />} />
             <Route path="verifications" element={can.manageAdmins ? <VerificationsPage /> : <AdminV2AccessDenied role={role} />} />
             <Route path="team" element={can.manageAdmins ? <TeamPage /> : <AdminV2AccessDenied role={role} />} />

@@ -129,7 +129,7 @@ async function fetchUserActivityTimeline(userId: string): Promise<UserActivityEv
   const [profile, posts, reviews, follows, analyticsEvents, courses] = await Promise.all([
     supabase.from('user_profiles').select('created_at, display_name').eq('id', userId).single(),
     supabase.from('posts').select('id, created_at, content').eq('user_id', userId).gte('created_at', iso).order('created_at', { ascending: false }).limit(50),
-    supabase.from('course_ratings').select('id, created_at, overall_score, golf_course_id').eq('user_id', userId).gte('created_at', iso).order('created_at', { ascending: false }).limit(50),
+    supabase.from('course_ratings').select('id, created_at, golf_course_id').eq('user_id', userId).gte('created_at', iso).order('created_at', { ascending: false }).limit(50),
     supabase.from('user_follows').select('id, created_at, following_id').eq('follower_id', userId).gte('created_at', iso).order('created_at', { ascending: false }).limit(30),
     supabase.from('analytics_events').select('id, created_at, name, props').eq('user_id', userId).gte('created_at', iso).in('name', ['login_success', 'page_view', 'message_sent']).order('created_at', { ascending: false }).limit(100),
     supabase.from('user_courses').select('id, created_at, course_id').eq('user_id', userId).eq('played', true).gte('created_at', iso).order('created_at', { ascending: false }).limit(30),
