@@ -30,7 +30,17 @@ export interface AdminUserDetail extends AdminUserRow {
   top100_played:  number;
 }
 
-export type UserFilterStatus = 'all' | 'verified' | 'unverified' | 'admin';
+export type UserFilterStatus = 'all' | 'verified' | 'unverified' | 'admin' | 'new_today' | 'active_24h';
+
+// ─── Activity Timeline Types ──────────────────────────────────────────────────
+
+export interface UserActivityEvent {
+  id: string;
+  type: 'signup' | 'post' | 'review' | 'follow' | 'login' | 'page_view' | 'message' | 'course_played';
+  label: string;
+  detail: string | null;
+  timestamp: string;
+}
 
 // ─── Fetchers ─────────────────────────────────────────────────────────────────
 
@@ -50,7 +60,7 @@ async function fetchAllUsers(): Promise<AdminUserRow[]> {
     `)
     .is('deleted_at', null)
     .order('created_at', { ascending: false })
-    .limit(10000); // Explicit limit — Supabase default is 1000 which silently truncates
+    .limit(10000);
 
   if (error) throw error;
 
@@ -109,6 +119,75 @@ async function fetchUserDetail(userId: string): Promise<AdminUserDetail> {
   };
 }
 
+// ─── Activity Timeline Fetcher ────────────────────────────────────────────────
+
+async function fetchUserActivityTimeline(userId: string): Promise<UserActivityEvent[]> {
+  const since = new Date();
+  since.setDate(since.getDate() - 90);
+  const iso = since.toISOString();
+
+  const [profile, posts, reviews, follows, analyticsEvents, courses] = await Promise.all([
+    supabase.from('user_profiles').select('created_at, display_name').eq('id', userId).single(),
+    supabase.from('posts').select('id, created_at, content').eq('user_id', userId).gte('created_at', iso).order('created_at', { ascending: false }).limit(50),
+    supabase.from('course_ratings').select('id, created_at, rating, course_id').eq('user_id', userId).gte('created_at', iso).order('created_at', { ascending: false }).limit(50),
+    supabase.from('user_follows').select('id, created_at, following_id').eq('follower_id', userId).gte('created_at', iso).order('created_at', { ascending: false }).limit(30),
+    supabase.from('analytics_events').select('id, created_at, name, props').eq('user_id', userId).gte('created_at', iso).in('name', ['login_success', 'page_view', 'message_sent']).order('created_at', { ascending: false }).limit(100),
+    supabase.from('user_courses').select('id, created_at, course_id').eq('user_id', userId).eq('played', true).gte('created_at', iso).order('created_at', { ascending: false }).limit(30),
+  ]);
+
+  const events: UserActivityEvent[] = [];
+
+  if (profile.data) {
+    events.push({ id: 'signup', type: 'signup', label: 'Joined Clbhouz', detail: null, timestamp: profile.data.created_at });
+  }
+
+  for (const p of posts.data ?? []) {
+    events.push({ id: `post-${p.id}`, type: 'post', label: 'Published a post', detail: p.content?.slice(0, 80) || null, timestamp: p.created_at });
+  }
+
+  for (const r of reviews.data ?? []) {
+    events.push({ id: `review-${r.id}`, type: 'review', label: 'Submitted a review', detail: r.rating ? `Rating: ${r.rating}` : null, timestamp: r.created_at });
+  }
+
+  for (const f of follows.data ?? []) {
+    events.push({ id: `follow-${f.id}`, type: 'follow', label: 'Followed a user', detail: null, timestamp: f.created_at });
+  }
+
+  for (const c of courses.data ?? []) {
+    events.push({ id: `course-${c.id}`, type: 'course_played', label: 'Marked course as played', detail: null, timestamp: c.created_at });
+  }
+
+  for (const e of analyticsEvents.data ?? []) {
+    const label = e.name === 'login_success' ? 'Logged in'
+      : e.name === 'message_sent' ? 'Sent a message'
+      : 'Viewed a page';
+    const detail = e.name === 'page_view' ? (e.props as any)?.path ?? null : null;
+    events.push({
+      id: `ae-${e.id}`,
+      type: e.name === 'login_success' ? 'login' : e.name === 'message_sent' ? 'message' : 'page_view',
+      label,
+      detail,
+      timestamp: e.created_at,
+    });
+  }
+
+  return events.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 150);
+}
+
+// ─── Active users set (for active_24h filter) ─────────────────────────────────
+
+async function fetchActiveUserIds24h(): Promise<string[]> {
+  const since = new Date(Date.now() - 24 * 3600_000).toISOString();
+  const { data } = await supabase
+    .from('analytics_events')
+    .select('user_id')
+    .gte('created_at', since)
+    .not('user_id', 'is', null)
+    .limit(10000);
+  const ids = new Set((data ?? []).map(r => r.user_id).filter(Boolean) as string[]);
+  return [...ids];
+}
+
 // ─── Main hook ────────────────────────────────────────────────────────────────
 
 export function useAdminV2Users() {
@@ -125,6 +204,13 @@ export function useAdminV2Users() {
     queryFn:   fetchAllUsers,
     staleTime: 5 * 60_000,
     refetchOnWindowFocus: true,
+  });
+
+  const { data: activeUserIds = [] } = useQuery({
+    queryKey: ['admin-v2', 'users', 'active-24h'],
+    queryFn: fetchActiveUserIds24h,
+    staleTime: 3 * 60_000,
+    enabled: filter === 'active_24h',
   });
 
   const { data: userDetail, isLoading: detailLoading } = useQuery({
@@ -150,9 +236,18 @@ export function useAdminV2Users() {
     if (filter === 'verified')   rows = rows.filter(u => u.is_verified);
     if (filter === 'unverified') rows = rows.filter(u => !u.is_verified);
     if (filter === 'admin')      rows = rows.filter(u => !!u.role);
+    if (filter === 'new_today') {
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+      rows = rows.filter(u => new Date(u.created_at) >= startOfToday);
+    }
+    if (filter === 'active_24h') {
+      const activeSet = new Set(activeUserIds);
+      rows = rows.filter(u => activeSet.has(u.id));
+    }
 
     return rows;
-  }, [allUsers, search, filter]);
+  }, [allUsers, search, filter, activeUserIds]);
 
   const paginated = useMemo(() => {
     const start = (page - 1) * pageSize;
@@ -170,7 +265,6 @@ export function useAdminV2Users() {
         const { error } = await supabase.from('user_roles').delete().eq('user_id', userId);
         if (error) throw error;
       } else {
-        // Delete existing role first to guarantee single role per user
         await supabase.from('user_roles').delete().eq('user_id', userId);
         const { error } = await supabase.from('user_roles').insert(
           { user_id: userId, role: role as AppRole }
@@ -214,4 +308,15 @@ export function useAdminV2Users() {
       roleMutation.mutate({ userId, role }),
     roleUpdating: roleMutation.isPending,
   };
+}
+
+// ─── Activity Timeline Hook ───────────────────────────────────────────────────
+
+export function useUserActivityTimeline(userId: string | null) {
+  return useQuery({
+    queryKey: ['admin-v2', 'users', 'timeline', userId],
+    queryFn: () => fetchUserActivityTimeline(userId!),
+    enabled: !!userId,
+    staleTime: 2 * 60_000,
+  });
 }

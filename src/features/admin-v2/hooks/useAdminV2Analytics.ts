@@ -22,6 +22,10 @@ export interface PlatformAnalyticsData {
   avgDau:       number;
   peakDau:      number;
   retentionD7:  number | null;
+  wau:          number;
+  mau:          number;
+  dauMauRatio:  number;
+  wauTrend:     DailyBucket[];
 }
 
 export interface ContentAnalyticsData {
@@ -114,10 +118,12 @@ async function fetchPlatformAnalytics(period: AnalyticsPeriod): Promise<Platform
   const days  = periodToDays(period);
   const since = startOf(period).toISOString();
 
-  const [allUsers, newUsers, activeEvents] = await Promise.all([
+  const [allUsers, newUsers, activeEvents, wauRes, mauRes] = await Promise.all([
     supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null),
     supabase.from('user_profiles').select('created_at').gte('created_at', since).is('deleted_at', null),
     supabase.from('analytics_events').select('created_at, user_id').gte('created_at', since).not('user_id', 'is', null),
+    supabase.from('analytics_events').select('user_id').gte('created_at', new Date(Date.now() - 7 * 24 * 3600_000).toISOString()).not('user_id', 'is', null).limit(50000),
+    supabase.from('analytics_events').select('user_id').gte('created_at', new Date(Date.now() - 30 * 24 * 3600_000).toISOString()).not('user_id', 'is', null).limit(50000),
   ]);
 
   const signupTrend = fillBuckets(newUsers.data ?? [], days);
@@ -129,6 +135,39 @@ async function fetchPlatformAnalytics(period: AnalyticsPeriod): Promise<Platform
   const avgDau      = dauValues.length ? Math.round(dauValues.reduce((a, b) => a + b, 0) / dauValues.length) : 0;
   const peakDau     = dauValues.length ? Math.max(...dauValues) : 0;
 
+  const wau = new Set((wauRes.data ?? []).map(r => r.user_id)).size;
+  const mau = new Set((mauRes.data ?? []).map(r => r.user_id)).size;
+  const dauMauRatio = mau > 0 ? Math.round((avgDau / mau) * 1000) / 10 : 0;
+
+  // Build WAU trend (rolling 7-day unique users, one point per day for last 30 days)
+  const mauEvents = (mauRes.data ?? []) as { user_id: string | null }[];
+  // We need created_at for WAU trend, re-fetch with created_at
+  const { data: mauEventsWithDate } = await supabase
+    .from('analytics_events')
+    .select('created_at, user_id')
+    .gte('created_at', new Date(Date.now() - 37 * 24 * 3600_000).toISOString())
+    .not('user_id', 'is', null)
+    .limit(50000);
+
+  const wauTrend: DailyBucket[] = [];
+  for (let i = 29; i >= 0; i--) {
+    const dayEnd = new Date();
+    dayEnd.setDate(dayEnd.getDate() - i);
+    dayEnd.setHours(23, 59, 59, 999);
+    const dayStart = new Date(dayEnd);
+    dayStart.setDate(dayStart.getDate() - 7);
+
+    const uniqueUsers = new Set<string>();
+    for (const e of mauEventsWithDate ?? []) {
+      if (!e.user_id) continue;
+      const t = new Date(e.created_at).getTime();
+      if (t >= dayStart.getTime() && t <= dayEnd.getTime()) {
+        uniqueUsers.add(e.user_id);
+      }
+    }
+    wauTrend.push({ date: toDateKey(dayEnd.toISOString()), value: uniqueUsers.size });
+  }
+
   return {
     period,
     signupTrend,
@@ -138,6 +177,10 @@ async function fetchPlatformAnalytics(period: AnalyticsPeriod): Promise<Platform
     avgDau,
     peakDau,
     retentionD7:   null,
+    wau,
+    mau,
+    dauMauRatio,
+    wauTrend,
   };
 }
 
@@ -281,12 +324,10 @@ async function fetchEngagementAnalytics(period: AnalyticsPeriod): Promise<Engage
   const userIds = new Set(rows.filter(r => r.user_id).map(r => r.user_id!));
   const uniqueUsers = userIds.size;
 
-  // Avg events per user per day
   const avgEventsPerUserPerDay = uniqueUsers > 0 && days > 0
     ? Math.round((totalEvents / uniqueUsers / days) * 10) / 10
     : 0;
 
-  // Busiest hour
   const hourCounts: Record<number, number> = {};
   for (const r of rows) {
     const h = new Date(r.created_at).getHours();
@@ -296,10 +337,8 @@ async function fetchEngagementAnalytics(period: AnalyticsPeriod): Promise<Engage
     ? parseInt(Object.entries(hourCounts).sort((a, b) => b[1] - a[1])[0][0])
     : 0;
 
-  // Daily trend
   const dailyTrend = fillBuckets(rows, days);
 
-  // Top events
   const eventCounts: Record<string, { count: number; users: Set<string> }> = {};
   for (const r of rows) {
     if (!eventCounts[r.name]) eventCounts[r.name] = { count: 0, users: new Set() };
@@ -343,7 +382,6 @@ async function fetchNavigationAnalytics(period: AnalyticsPeriod): Promise<Naviga
   const totalPageViews = pvRows.length;
   const dailyPageViews = fillBuckets(pvRows, days);
 
-  // Page breakdown
   const pathData: Record<string, { views: number; users: Set<string>; durations: number[] }> = {};
   for (const r of pvRows) {
     const path = (r.props as any)?.path ?? 'unknown';
@@ -352,7 +390,6 @@ async function fetchNavigationAnalytics(period: AnalyticsPeriod): Promise<Naviga
     if (r.user_id) pathData[path].users.add(r.user_id);
   }
 
-  // Add duration data from page_exit
   const durationByPath: Record<string, number[]> = {};
   for (const r of peRows) {
     const p = (r.props as any)?.path ?? 'unknown';
@@ -377,13 +414,11 @@ async function fetchNavigationAnalytics(period: AnalyticsPeriod): Promise<Naviga
 
   const mostVisitedPage = pageBreakdown[0]?.path ?? '—';
 
-  // Avg session duration
   const allDurations = Object.values(durationByPath).flat();
   const avgSessionDuration = allDurations.length
     ? Math.round(allDurations.reduce((a, b) => a + b, 0) / allDurations.length)
     : 0;
 
-  // Nav tab breakdown
   const tabCounts: Record<string, number> = {};
   for (const r of ntRows) {
     const tab = (r.props as any)?.tab ?? 'unknown';
@@ -427,7 +462,6 @@ async function fetchEchoAnalytics(period: AnalyticsPeriod): Promise<EchoAnalytic
   const avgPerUser = uniqueUsers > 0 ? Math.round((totalQueries / uniqueUsers) * 10) / 10 : 0;
   const dailyTrend = fillBuckets(rows, days);
 
-  // Get usernames for recent queries
   const recentUserIds = [...new Set(rows.slice(0, 200).filter(r => r.user_id).map(r => r.user_id!))];
   let usernameMap = new Map<string, string>();
   if (recentUserIds.length > 0) {
@@ -476,7 +510,6 @@ async function fetchSocialAnalytics(period: AnalyticsPeriod): Promise<SocialAnal
   const friendRequests = friendRes.data?.length ?? 0;
   const dailyMessages = fillBuckets(msgRes.data ?? [], days);
 
-  // Top followed users
   const followCounts: Record<string, number> = {};
   for (const r of (topFollowedRes.data ?? []) as any[]) {
     const fid = r.followed_id;

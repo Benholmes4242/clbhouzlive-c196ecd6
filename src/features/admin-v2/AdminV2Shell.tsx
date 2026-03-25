@@ -32,6 +32,7 @@ const EngagementAnalytics  = lazy(() => import('./pages/analytics/EngagementAnal
 const NavigationAnalytics  = lazy(() => import('./pages/analytics/NavigationAnalyticsPage'));
 const EchoAnalytics        = lazy(() => import('./pages/analytics/EchoAnalyticsPage'));
 const SocialAnalytics      = lazy(() => import('./pages/analytics/SocialAnalyticsPage'));
+const RetentionAnalytics   = lazy(() => import('./pages/analytics/RetentionPage'));
 const LeaderboardsPage     = lazy(() => import('./pages/LeaderboardsPage'));
 const GeocodingPage        = lazy(() => import('./pages/tools/GeocodingPage'));
 const TestLabPage          = lazy(() => import('./pages/tools/TestLabPage'));
@@ -153,6 +154,7 @@ export default function AdminV2Shell() {
             <Route path="analytics/social" element={can.manageAdmins ? <SocialAnalytics /> : <AdminV2AccessDenied role={role} />} />
             <Route path="analytics/content" element={can.manageAdmins ? <ContentAnalytics /> : <AdminV2AccessDenied role={role} />} />
             <Route path="analytics/auth" element={can.manageAdmins ? <AuthAnalytics /> : <AdminV2AccessDenied role={role} />} />
+            <Route path="analytics/retention" element={can.manageAdmins ? <RetentionAnalytics /> : <AdminV2AccessDenied role={role} />} />
             <Route path="users" element={can.manageAdmins ? <UsersPage /> : <AdminV2AccessDenied role={role} />} />
             <Route path="verifications" element={can.manageAdmins ? <VerificationsPage /> : <AdminV2AccessDenied role={role} />} />
             <Route path="team" element={can.manageAdmins ? <TeamPage /> : <AdminV2AccessDenied role={role} />} />

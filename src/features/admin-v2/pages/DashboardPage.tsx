@@ -212,6 +212,7 @@ export default function DashboardPage() {
             iconColor="#F5A623"
             trend={kpis.data?.totalUsers.trend}
             isLoading={kpis.isLoading}
+            onClick={() => navigate('/admin-v2/users')}
           />
           <AdminKpiCard
             title="New Users Today"
@@ -221,6 +222,7 @@ export default function DashboardPage() {
             icon={UserPlus}
             iconColor="#1D6FF5"
             isLoading={kpis.isLoading}
+            onClick={() => navigate('/admin-v2/users?filter=new_today')}
           />
           <AdminKpiCard
             title="Active Users (24h)"
@@ -230,6 +232,7 @@ export default function DashboardPage() {
             icon={Activity}
             iconColor="#17C964"
             isLoading={kpis.isLoading}
+            onClick={() => navigate('/admin-v2/users?filter=active_24h')}
           />
           <AdminKpiCard
             title="Posts Today"
@@ -239,6 +242,7 @@ export default function DashboardPage() {
             icon={FileText}
             iconColor="#7C3AED"
             isLoading={kpis.isLoading}
+            onClick={() => navigate('/admin-v2/analytics/content')}
           />
         </div>
       </section>
