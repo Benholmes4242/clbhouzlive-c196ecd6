@@ -173,7 +173,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                     toggleReaction(type);
                   }
                 }}
-                className={`relative flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5
+                className={`relative flex-1 flex flex-col items-center justify-center py-2.5 min-h-[52px]
                   transition-all active:scale-95
                   ${isActive ? 'bg-amber-500/25' : 'bg-black/45'}
                   ${!isLast ? 'border-r border-white/[0.08]' : ''}
@@ -191,11 +191,12 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                 >
                   {config.emoji}
                 </motion.span>
-                {count > 0 && (
-                  <span className={`text-[10px] font-bold leading-none ${isActive ? 'text-amber-400' : 'text-white/60'}`}>
-                    {count > 99 ? '99+' : count}
-                  </span>
-                )}
+                <span className={`text-[10px] font-bold leading-none mt-0.5 transition-opacity duration-200
+                  ${count > 0 ? 'opacity-100' : 'opacity-0'}
+                  ${isActive ? 'text-amber-400' : 'text-white/60'}
+                `}>
+                  {count > 99 ? '99+' : count || '0'}
+                </span>
                 {tappedReaction === type && (
                   <AnimatePresence>
                     {[...Array(4)].map((_, i) => {
