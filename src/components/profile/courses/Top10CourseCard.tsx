@@ -138,7 +138,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
               }}
             >
               <span 
-                className="font-bold text-lg"
+                className="font-bold text-xs"
                 style={{ color: '#f59e0b' }}
               >
                 {rating === 10 ? '10' : rating.toFixed(1)}
