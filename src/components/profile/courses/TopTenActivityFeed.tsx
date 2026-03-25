@@ -22,9 +22,9 @@ export const TopTenActivityFeed: React.FC<TopTenActivityFeedProps> = ({ targetUs
         {items.slice(0, 8).map(item => (
           <div key={item.id} className="flex items-start gap-2.5">
             {item.actor_avatar ? (
-              <img src={item.actor_avatar} alt={item.actor_name} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+              <img src={item.actor_avatar} alt={item.actor_name} className="w-7 h-7 object-cover flex-shrink-0" style={{ borderRadius: '34%' }} />
             ) : (
-              <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground flex-shrink-0">
+              <div className="w-7 h-7 bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground flex-shrink-0" style={{ borderRadius: '34%' }}>
                 {item.actor_name.charAt(0).toUpperCase()}
               </div>
             )}
