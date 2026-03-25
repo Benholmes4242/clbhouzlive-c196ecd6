@@ -19,6 +19,7 @@ import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { MentionText } from '@/components/comments/MentionText';
 import { relativeTime } from '@/utils/relativeTime';
 import { usePostLikes } from '@/hooks/usePostLikes';
+import { supabase } from '@/integrations/supabase/client';
 import {
   AlertDialog,
   AlertDialogAction,
