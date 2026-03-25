@@ -175,6 +175,14 @@ export interface TournamentLiveFeedPost extends Omit<FeedPost, 'mediaItems' | 'r
 
 export type PGACardState = 'live' | 'result' | 'upcoming';
 
+export interface PGACardScoringStats {
+  eagles:       number;
+  birdies:      number;
+  pars:         number;
+  bogeys:       number;
+  doubleBogeys: number;
+}
+
 export interface PGACardLeader {
   playerId:      string;
   playerName:    string;
@@ -183,6 +191,7 @@ export interface PGACardLeader {
   score:         number;
   thru:          string | null;
   today:         string | null;
+  scoringStats?: PGACardScoringStats | null;
 }
 
 export interface PGACardChaser {
@@ -191,6 +200,7 @@ export interface PGACardChaser {
   photoUrl:      string | null;
   scoreDisplay?: string;
   isTied?:       boolean;
+  scoringStats?: PGACardScoringStats | null;
 }
 
 export interface PGACardStats {
