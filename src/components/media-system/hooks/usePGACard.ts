@@ -114,7 +114,7 @@ export function usePGACard(userId?: string): {
       const { data } = await supabase
         .from('sr_tournaments')
         .select('id, name, purse, start_date, end_date, venue_name, venue_city, venue_par, venue_yardage, status, season_id')
-        .eq('status', 'scheduled')
+        .in('status', ['scheduled', 'created'])
         .in('season_id', seasonIds)
         .gte('start_date', now)
         .order('start_date', { ascending: true })
