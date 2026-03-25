@@ -191,7 +191,7 @@ export function usePGACard(userId?: string): {
         .map(p => ({
           position: p!.position,
           playerName: p!.player.fullName,
-          photoUrl: getPlayerHeadshotUrl(p!.player.fullName, PGA, p!.player.headshotOverride) ?? null,
+          photoUrl: getPlayerHeadshotUrl(p!.player.fullName, PGA_TOUR_SLUG, p!.player.headshotOverride) ?? null,
           scoreDisplay: p!.scoreDisplay,
           isTied: lb.filter(x => x?.position === p?.position).length > 1,
         }));
