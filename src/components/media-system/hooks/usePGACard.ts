@@ -91,6 +91,28 @@ export function usePGACard(userId?: string): {
     staleTime: 30 * 60_000,
   });
 
+  // ── Result leaderboard (final standings) ──
+  const { data: resultLeaderboard } = useQuery({
+    queryKey: ['pga-card-result-lb', (recentResult as any)?.id],
+    queryFn: async () => {
+      if (!recentResult) return [];
+      const { data } = await (supabase
+        .from('sr_leaderboards') as any)
+        .select(`
+          position, score, money,
+          player:sr_players!sr_leaderboards_player_id_fkey (
+            id, full_name, photo_url, headshot_override
+          )
+        `)
+        .eq('tournament_id', (recentResult as any).id)
+        .order('position', { ascending: true })
+        .limit(10);
+      return data ?? [];
+    },
+    enabled: !!recentResult,
+    staleTime: 10 * 60_000,
+  });
+
   // ── Determine active tournament for post ID / counts ──
   const activeTournamentId = topLive?.id ?? recentResult?.id ?? nextUpcoming?.id ?? null;
   const activeTournamentName = topLive?.name ?? (recentResult as any)?.name ?? (nextUpcoming as any)?.name ?? '';
