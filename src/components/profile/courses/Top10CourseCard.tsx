@@ -11,6 +11,7 @@
  * - Layered shadow with press state
  */
 import React, { useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { MapPin, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
