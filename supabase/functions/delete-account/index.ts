@@ -486,9 +486,6 @@ Deno.serve(async (req) => {
 
     console.log(`[delete-account] Successfully deleted user ${user.id}`, deletionResults)
 
-    // Sign out the user
-    await userClient.auth.signOut()
-
     return new Response(
       JSON.stringify({ success: true, message: 'Account deleted successfully' }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
