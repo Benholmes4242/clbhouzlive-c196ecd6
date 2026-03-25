@@ -22,8 +22,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useTopTenReactions, REACTION_CONFIG, ReactionType } from '@/hooks/useTopTenReactions';
-import { useTopTenComments } from '@/hooks/useTopTenComments';
 import { TopTenCardComments } from './TopTenCardComments';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface Top10CourseCardProps {
   course: TopTenCourse;
@@ -48,9 +48,9 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   const [isReviewSheetOpen, setIsReviewSheetOpen] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   
+  const { user } = useSupabaseSession();
   const targetUserId = userId ?? '';
   const { counts, myReaction, toggleReaction } = useTopTenReactions(targetUserId, course.course_id);
-  const { comments } = useTopTenComments(targetUserId, course.course_id);
   
   // Fetch the review text for the bottom sheet
   const { data: reviewData } = useQuery({
@@ -208,16 +208,16 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                 key={type}
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (!isOwnProfile) toggleReaction(type);
+                  if (!isOwnProfile && !!user) toggleReaction(type);
                 }}
                 className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5
                   transition-all active:scale-95
                   ${isActive ? 'bg-amber-500/25' : 'bg-black/45'}
                   ${!isLast ? 'border-r border-white/[0.08]' : ''}
-                  ${isOwnProfile ? 'cursor-default' : 'cursor-pointer'}
+                  ${isOwnProfile || !user ? 'cursor-default' : 'cursor-pointer'}
                 `}
                 style={{ backdropFilter: 'blur(12px)' }}
-                disabled={isOwnProfile}
+                disabled={isOwnProfile || !user}
               >
                 <span className="text-sm">{config.emoji}</span>
                 <span className={`text-[10px] font-medium ${isActive ? 'text-amber-400' : 'text-white/60'}`}>

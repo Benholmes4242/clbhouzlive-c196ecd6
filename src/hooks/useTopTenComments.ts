@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { toast } from 'sonner';
 
 export interface TopTenComment {
   id: string;
@@ -78,15 +79,22 @@ export function useTopTenComments(targetUserId: string, courseId: string) {
         });
       }
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: qk }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: qk });
+      queryClient.invalidateQueries({ queryKey: ['top-ten-activity', targetUserId] });
+    },
+    onError: () => {
+      toast.error('Failed to post comment. Please try again.');
+    },
   });
 
   const deleteComment = useMutation({
     mutationFn: async (commentId: string) => {
+      if (!user) throw new Error('Not authenticated');
       await supabase.from('top_ten_comments')
         .update({ is_deleted: true })
         .eq('id', commentId)
-        .eq('commenter_id', user!.id);
+        .eq('commenter_id', user.id);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: qk }),
   });

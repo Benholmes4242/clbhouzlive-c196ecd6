@@ -8,6 +8,7 @@ import { usePrivacySettings } from '@/hooks/usePrivacySettings';
 import { useDeleteAccount } from '@/hooks/useDeleteAccount';
 import { useSettingsSheets } from '@/hooks/useSettingsSheets';
 import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   SettingsSection,
   SettingsChevronRow,
@@ -76,6 +77,7 @@ export function SettingsPageV2() {
 
   const deleteAccount = useDeleteAccount(user?.id);
   const { sheets, open, close } = useSettingsSheets();
+  const queryClient = useQueryClient();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -245,6 +247,8 @@ export function SettingsPageV2() {
                   .from('user_profiles')
                   .update({ top_ten_comments_privacy: e.target.value })
                   .eq('id', user.id);
+                queryClient.invalidateQueries({ queryKey: ['profile'] });
+                queryClient.invalidateQueries({ queryKey: ['top-ten-privacy'] });
               }}
               className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
             >

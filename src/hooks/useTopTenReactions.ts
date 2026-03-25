@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { toast } from 'sonner';
 
 export type ReactionType = 'agree' | 'interesting' | 'want_to_play';
 
@@ -57,6 +58,9 @@ export function useTopTenReactions(targetUserId: string, courseId: string) {
       }
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: qk }),
+    onError: () => {
+      toast.error('Failed to save reaction. Please try again.');
+    },
   });
 
   return { counts, myReaction, toggleReaction: toggleReaction.mutate, isLoading };
