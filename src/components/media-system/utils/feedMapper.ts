@@ -1,5 +1,5 @@
 import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/media/constants';
-import type { FeedPost, FeedRpcRow, MediaItem, ReviewData, CreatorRelation, TournamentResultFeedPost, FeedPostTag } from '../types/media';
+import type { FeedPost, FeedRpcRow, MediaItem, ReviewData, CreatorRelation, FeedPostTag } from '../types/media';
 
 const UID_RE = /([0-9a-f]{32})/i;
 
