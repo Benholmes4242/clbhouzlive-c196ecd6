@@ -82,8 +82,9 @@ export const MomentFullscreenViewer: React.FC<MomentFullscreenViewerProps> = ({
           {/* Close Button */}
           <button
             onClick={() => onOpenChange(false)}
-            className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full flex items-center justify-center"
+            className="absolute right-4 z-50 w-10 h-10 rounded-full flex items-center justify-center"
             style={{
+              top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
               background: 'var(--dgp-glass-surface)',
               backdropFilter: 'blur(12px)',
             }}

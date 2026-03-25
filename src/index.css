@@ -2723,12 +2723,12 @@ html[data-immersive="true"] .app-shell--topSpacer {
   .btn-safe-top-left {
     position: absolute;
     left: 16px;
-    top: calc(env(safe-area-inset-top, 20px) + 12px);
+    top: calc(max(env(safe-area-inset-top, 0px), 47px) + 12px);
   }
   .btn-safe-top-right {
     position: absolute;
     right: 16px;
-    top: calc(env(safe-area-inset-top, 20px) + 12px);
+    top: calc(max(env(safe-area-inset-top, 0px), 47px) + 12px);
   }
     display: none;
   }
