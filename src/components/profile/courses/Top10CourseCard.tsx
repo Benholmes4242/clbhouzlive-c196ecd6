@@ -128,7 +128,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           {/* Rating chip - frosted glass */}
           {rating !== undefined && tierData && (
             <div 
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-full"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full"
               style={{
                 background: 'rgba(245, 158, 11, 0.12)',
                 backdropFilter: 'blur(20px)',
