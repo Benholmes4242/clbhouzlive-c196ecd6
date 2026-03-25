@@ -117,7 +117,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           
           {/* Location */}
           <p 
-            className="text-white/70 text-base mb-3"
+            className="text-white/70 text-sm mb-2.5 line-clamp-1"
             style={{
               textShadow: '0 1px 4px rgba(0,0,0,0.2)',
             }}
