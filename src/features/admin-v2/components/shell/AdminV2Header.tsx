@@ -119,12 +119,20 @@ export default function AdminV2Header({ onOpenPalette, onToggleSidebar, sidebarO
           onClick={onOpenPalette}
           className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-[10px] text-[12px] transition-all"
           style={{ border: '1px solid #E2E8F0', background: '#FFFFFF', color: '#64748B' }}
-          onMouseEnter={e => { e.currentTarget.style.background = '#F8FAFC'; e.currentTarget.style.color = '#334155'; }}
-          onMouseLeave={e => { e.currentTarget.style.background = '#FFFFFF'; e.currentTarget.style.color = '#64748B'; }}
+          onMouseEnter={e => { e.currentTarget.style.background = '#F8FAFC'; e.currentTarget.style.color = '#334155'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(245,158,11,0.15)'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = '#FFFFFF'; e.currentTarget.style.color = '#64748B'; e.currentTarget.style.boxShadow = 'none'; }}
+          onFocus={e => { e.currentTarget.style.boxShadow = '0 0 0 3px rgba(245,158,11,0.15)'; }}
+          onBlur={e => { e.currentTarget.style.boxShadow = 'none'; }}
           aria-label="Open command palette"
         >
           <Search className="w-3.5 h-3.5" />
-          Search...
+          {(() => {
+            const path = window.location.pathname;
+            if (path.includes('/users')) return 'Search in Users…';
+            if (path.includes('/courses')) return 'Search in Courses…';
+            if (path.includes('/businesses')) return 'Search in Businesses…';
+            return 'Search anything…';
+          })()}
           <kbd className="ml-2 px-1.5 py-0.5 rounded text-[10px] font-mono" style={{ background: '#F1F5F9', border: '1px solid #E2E8F0', color: '#64748B' }}>
             ⌘K
           </kbd>

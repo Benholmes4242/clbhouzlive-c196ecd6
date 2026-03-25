@@ -264,6 +264,7 @@ export default function AdminV2Sidebar({ role, can, onNavigate }: SidebarProps) 
           paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
           height: 'calc(52px + max(env(safe-area-inset-top, 0px), 47px))',
           borderBottom: '1px solid #E2E8F0',
+          background: 'linear-gradient(135deg, rgba(245,158,11,0.06) 0%, transparent 60%)',
         }}
       >
         <div style={{

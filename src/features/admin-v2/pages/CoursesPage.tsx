@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
@@ -16,6 +16,7 @@ import {
   AdminFilterBar, AdminKpiCard, AdminDrawer,
   AdminButton, AdminSectionHeader, AdminBulkActionBar,
 } from '../components/ui';
+import { AdminMiniCard } from '../components/shared/AdminMiniCard';
 
 // ─── Column helper ────────────────────────────────────────────────────────────
 
@@ -418,19 +419,42 @@ export default function CoursesPage() {
     isUploadingPhoto,
   } = useAdminV2Courses();
 
+  const [countryFilter, setCountryFilter] = useState('all');
+
+  // Derive unique countries from data
+  const countries = useMemo(() => {
+    const set = new Set<string>();
+    courses.forEach(c => { if (c.country) set.add(c.country); });
+    return Array.from(set).sort();
+  }, [courses]);
+
+  // Derive extra KPI stats
+  const extraStats = useMemo(() => {
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1); startOfMonth.setHours(0, 0, 0, 0);
+    return {
+      top100: courses.filter(c => c.global_rank || c.regional_rank || c.usa_rank).length,
+      withImages: courses.filter(c => !!c.thumbnail_image).length,
+      newMonth: courses.filter(c => new Date(c.created_at) >= startOfMonth).length,
+    };
+  }, [courses]);
+
+  // Apply country filter on top of hook filtering
+  const displayCourses = countryFilter === 'all'
+    ? courses
+    : courses.filter(c => c.country === countryFilter);
+
   const columns = React.useMemo(() => [
     col.display({
       id: 'thumbnail',
       header: '',
       size: 64,
       cell: ({ row }) => (
-        <div className="h-10 w-14 rounded-lg overflow-hidden bg-muted border border-border/40 flex-shrink-0">
+        <div style={{ width: 48, height: 48, borderRadius: 10, overflow: 'hidden', flexShrink: 0, background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #E2E8F0' }}>
           {row.original.thumbnail_image ? (
-            <img src={row.original.thumbnail_image} alt="" className="w-full h-full object-cover" />
+            <img src={row.original.thumbnail_image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Image className="h-4 w-4 text-muted-foreground/30" />
-            </div>
+            <MapPin className="h-5 w-5" style={{ color: '#94A3B8' }} />
           )}
         </div>
       ),
@@ -440,9 +464,16 @@ export default function CoursesPage() {
       enableSorting: true,
       cell: ({ row }) => (
         <div className="flex flex-col gap-0.5 min-w-0">
-          <span className="text-[13px] font-medium text-foreground truncate">
-            {row.original.name}
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[13px] font-medium text-foreground truncate">
+              {row.original.name}
+            </span>
+            {row.original.global_rank && (
+              <span style={{ background: '#FEF3C7', color: '#D97706', fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 20 }}>
+                #{row.original.global_rank}
+              </span>
+            )}
+          </div>
           <span className="text-[11.5px] text-muted-foreground truncate">
             {row.original.country}{row.original.sub_country ? ` · ${row.original.sub_country}` : ''}
           </span>
@@ -548,24 +579,36 @@ export default function CoursesPage() {
         }
       />
 
-      {/* KPI strip */}
+      {/* KPI strip with mini cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <AdminKpiCard title="Total Courses" value={stats.total} icon={MapPin} format="number" isLoading={isLoading} />
-        <AdminKpiCard title="Geocoded" value={stats.geocoded} icon={Globe} format="number" isLoading={isLoading} />
-        <AdminKpiCard title="With Images" value={stats.withImages} icon={Image} format="number" isLoading={isLoading} />
-        <AdminKpiCard title="In Top 100" value={stats.inTop100} icon={Star} format="number" isLoading={isLoading} />
+        <AdminMiniCard label="Total Courses" value={stats.total} borderColor="#F5A623" isLoading={isLoading} />
+        <AdminMiniCard label="Top 100 Listed" value={extraStats.top100} borderColor="#D97706" isLoading={isLoading} />
+        <AdminMiniCard label="With Images" value={extraStats.withImages} borderColor="#17C964" isLoading={isLoading} />
+        <AdminMiniCard label="Added This Month" value={extraStats.newMonth} borderColor="#1D6FF5" isLoading={isLoading} />
       </div>
 
-      {/* Search + filters */}
+      {/* Search + country filter + filters */}
       <div className="space-y-3">
-        <AdminSearchBar value={search} onChange={setSearch} placeholder="Search courses…" resultCount={filteredCount} />
+        <div className="flex items-center gap-3">
+          <div className="flex-1">
+            <AdminSearchBar value={search} onChange={setSearch} placeholder="Search courses…" resultCount={filteredCount} />
+          </div>
+          <select
+            value={countryFilter}
+            onChange={e => { setCountryFilter(e.target.value); setPage(1); }}
+            style={{ border: '1px solid #E2E8F0', borderRadius: 10, fontSize: 13, padding: '6px 10px', background: '#FFFFFF', color: '#334155' }}
+          >
+            <option value="all">All Countries</option>
+            {countries.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
         <AdminFilterBar filters={filterOptions} active={listFilter} onChange={setListFilter} />
       </div>
 
       {/* Table */}
       <AdminTable
         columns={columns}
-        data={courses}
+        data={displayCourses}
         isLoading={isLoading}
         getRowId={(c) => c.id}
         onRowClick={(c) => setDrawerCourseId(c.id)}

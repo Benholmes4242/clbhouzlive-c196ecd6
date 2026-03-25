@@ -1,14 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { format, formatDistanceToNow, isPast } from 'date-fns';
-import { Mail, Send, X, RefreshCw, Clock, CheckCircle, Search, User } from 'lucide-react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { format, formatDistanceToNow, isPast, differenceInHours } from 'date-fns';
+import { Mail, Send, X, RefreshCw, Clock, CheckCircle, Search, User, Clipboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useAdminV2Invites, type InviteRow } from '../hooks/useAdminV2Access';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
+import { toast } from 'sonner';
 import {
   AdminPageHeader, AdminFilterBar, AdminStatusPill,
   AdminButton, AdminKpiCard,
 } from '../components/ui';
+import { AdminMiniCard } from '../components/shared/AdminMiniCard';
 
 // ─── User search hook ─────────────────────────────────────────────────────────
 
@@ -49,6 +51,23 @@ function useUserSearch(query: string) {
   }, [query]);
 
   return { results, isSearching };
+}
+
+// ─── Expiry status pill ───────────────────────────────────────────────────────
+
+function ExpiryStatusPill({ invite }: { invite: InviteRow }) {
+  if (invite.acceptedAt) {
+    return <span style={{ background: '#F1F5F9', color: '#94A3B8', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20 }}>Accepted</span>;
+  }
+  const expDate = new Date(invite.expiresAt);
+  if (isPast(expDate)) {
+    return <span style={{ background: '#FEE2E2', color: '#DC2626', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20 }}>Expired</span>;
+  }
+  const hoursLeft = differenceInHours(expDate, new Date());
+  if (hoursLeft < 24) {
+    return <span style={{ background: '#FEF3C7', color: '#D97706', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20 }}>Expiring soon</span>;
+  }
+  return <span style={{ background: '#DCFCE7', color: '#16A34A', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20 }}>Active</span>;
 }
 
 // ─── New invite form ──────────────────────────────────────────────────────────
@@ -239,10 +258,16 @@ function InviteCard({
         ? <AdminStatusPill status="inactive" label="Cancelled" />
         : <AdminStatusPill status="pending" label="Pending" />;
 
-  // Display name: use hydrated profile for user invites, fall back to email for legacy
   const displayLabel = invite.displayName || invite.username
     ? (invite.displayName || `@${invite.username}`)
     : invite.email || 'Unknown user';
+
+  const copyInviteLink = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const url = `${window.location.origin}/admin-invite/${invite.id}`;
+    navigator.clipboard.writeText(url);
+    toast.success('Invite link copied');
+  };
 
   return (
     <div className="flex items-center gap-4 px-4 py-3.5">
@@ -271,6 +296,7 @@ function InviteCard({
         <div className="flex items-center gap-2 flex-wrap">
           <p className="text-[13.5px] font-semibold text-foreground truncate">{displayLabel}</p>
           {statusEl}
+          <ExpiryStatusPill invite={invite} />
           {invite.role && (
             <span className="text-[11px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
               {invite.role === 'full' ? 'Full' : 'Limited'}
@@ -288,14 +314,25 @@ function InviteCard({
         </p>
       </div>
 
-      {isPendingInvite && (
-        <div className="flex items-center gap-1.5 flex-shrink-0">
-          <AdminButton variant="ghost" size="sm" icon={RefreshCw} loading={isPending} onClick={() => onResend(invite.id)}>
-            Resend
-          </AdminButton>
-          <AdminButton variant="ghost" size="sm" icon={X} loading={isPending} onClick={() => onCancel(invite.id)} />
-        </div>
-      )}
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        {/* Copy link button */}
+        <button
+          onClick={copyInviteLink}
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg hover:bg-muted transition-colors"
+          title="Copy invite link"
+        >
+          <Clipboard className="h-4 w-4 text-muted-foreground" />
+        </button>
+
+        {isPendingInvite && (
+          <>
+            <AdminButton variant="ghost" size="sm" icon={RefreshCw} loading={isPending} onClick={() => onResend(invite.id)}>
+              Resend
+            </AdminButton>
+            <AdminButton variant="ghost" size="sm" icon={X} loading={isPending} onClick={() => onCancel(invite.id)} />
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -334,12 +371,12 @@ export default function InvitesPage() {
         isPending={createMutation.isPending}
       />
 
-      {/* KPI strip */}
+      {/* KPI strip with mini cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <AdminKpiCard title="All"       value={counts.all}       icon={Mail}        isLoading={isLoading} />
-        <AdminKpiCard title="Pending"   value={counts.pending}   icon={Clock}       iconColor="#f59e0b" isLoading={isLoading} />
-        <AdminKpiCard title="Accepted"  value={counts.accepted}  icon={CheckCircle} iconColor="#22c55e" isLoading={isLoading} />
-        <AdminKpiCard title="Expired"   value={counts.expired}   icon={Clock}       iconColor="hsl(var(--destructive))" isLoading={isLoading} />
+        <AdminMiniCard label="Total Sent" value={counts.all} borderColor="#F5A623" isLoading={isLoading} />
+        <AdminMiniCard label="Pending" value={counts.pending} borderColor="#D97706" isLoading={isLoading} />
+        <AdminMiniCard label="Accepted" value={counts.accepted} borderColor="#17C964" isLoading={isLoading} />
+        <AdminMiniCard label="Expired" value={counts.expired} borderColor="#DC2626" isLoading={isLoading} />
       </div>
 
       {/* Filters */}

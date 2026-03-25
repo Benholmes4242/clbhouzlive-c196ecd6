@@ -1,5 +1,6 @@
 import React, { lazy, Suspense, useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 import AdminV2Sidebar from './components/shell/AdminV2Sidebar';
@@ -58,6 +59,7 @@ const PageSkeleton = () => (
 );
 
 export default function AdminV2Shell() {
+  const location = useLocation();
   const { role, loading } = usePanelRole();
   const can = panelCan(role);
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -149,45 +151,55 @@ export default function AdminV2Shell() {
 
       {/* Main content */}
       <main className="overflow-y-auto">
-        <Suspense fallback={<PageSkeleton />}>
-          <Routes>
-            <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="analytics/platform" element={can.manageAdmins ? <PlatformAnalytics /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="analytics/engagement" element={can.manageAdmins ? <EngagementAnalytics /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="analytics/navigation" element={can.manageAdmins ? <NavigationAnalytics /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="analytics/echo" element={can.manageAdmins ? <EchoAnalytics /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="analytics/social" element={can.manageAdmins ? <SocialAnalytics /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="analytics/content" element={can.manageAdmins ? <ContentAnalytics /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="analytics/auth" element={can.manageAdmins ? <AuthAnalytics /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="analytics/retention" element={can.manageAdmins ? <RetentionAnalytics /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="analytics/content-performance" element={can.manageAdmins ? <ContentPerformance /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="analytics/creator-leaderboard" element={can.manageAdmins ? <CreatorLeaderboard /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="analytics/growth" element={can.manageAdmins ? <GrowthAnalytics /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="analytics/feature-adoption" element={can.manageAdmins ? <FeatureAdoption /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="live" element={can.manageAdmins ? <LiveActivityPage /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="alerts" element={can.manageAdmins ? <AnomalyAlertsPage /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="users" element={can.manageAdmins ? <UsersPage /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="verifications" element={can.manageAdmins ? <VerificationsPage /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="team" element={can.manageAdmins ? <TeamPage /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="invites" element={can.manageAdmins ? <InvitesPage /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="courses" element={<CoursesPage />} />
-            <Route path="courses/import" element={<CourseImportPage />} />
-            <Route path="tour" element={can.manageAdmins ? <TourPage /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="tour/players" element={can.manageAdmins ? <TourPlayersPage /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="leaderboards" element={can.manageAdmins ? <LeaderboardsPage /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="businesses" element={can.manageAdmins ? <BusinessesPage /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="assets" element={can.manageAdmins ? <AssetsPage /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="assets/logos" element={can.manageAdmins ? <LogosPage /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="assets/college-logos" element={can.manageAdmins ? <CollegeLogosPage /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="assets/flags" element={can.manageAdmins ? <FlagsPage /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="audit" element={can.manageAdmins ? <AuditPage /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="settings" element={<SettingsPage />} />
-            <Route path="tools/geocoding" element={can.manageAdmins ? <GeocodingPage /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="tools/testlab" element={can.manageAdmins ? <TestLabPage /> : <AdminV2AccessDenied role={role} />} />
-            <Route path="*" element={<Navigate to="dashboard" replace />} />
-          </Routes>
-        </Suspense>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.15 }}
+          >
+            <Suspense fallback={<PageSkeleton />}>
+              <Routes>
+                <Route index element={<Navigate to="dashboard" replace />} />
+                <Route path="dashboard" element={<DashboardPage />} />
+                <Route path="analytics/platform" element={can.manageAdmins ? <PlatformAnalytics /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="analytics/engagement" element={can.manageAdmins ? <EngagementAnalytics /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="analytics/navigation" element={can.manageAdmins ? <NavigationAnalytics /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="analytics/echo" element={can.manageAdmins ? <EchoAnalytics /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="analytics/social" element={can.manageAdmins ? <SocialAnalytics /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="analytics/content" element={can.manageAdmins ? <ContentAnalytics /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="analytics/auth" element={can.manageAdmins ? <AuthAnalytics /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="analytics/retention" element={can.manageAdmins ? <RetentionAnalytics /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="analytics/content-performance" element={can.manageAdmins ? <ContentPerformance /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="analytics/creator-leaderboard" element={can.manageAdmins ? <CreatorLeaderboard /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="analytics/growth" element={can.manageAdmins ? <GrowthAnalytics /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="analytics/feature-adoption" element={can.manageAdmins ? <FeatureAdoption /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="live" element={can.manageAdmins ? <LiveActivityPage /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="alerts" element={can.manageAdmins ? <AnomalyAlertsPage /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="users" element={can.manageAdmins ? <UsersPage /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="verifications" element={can.manageAdmins ? <VerificationsPage /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="team" element={can.manageAdmins ? <TeamPage /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="invites" element={can.manageAdmins ? <InvitesPage /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="courses" element={<CoursesPage />} />
+                <Route path="courses/import" element={<CourseImportPage />} />
+                <Route path="tour" element={can.manageAdmins ? <TourPage /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="tour/players" element={can.manageAdmins ? <TourPlayersPage /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="leaderboards" element={can.manageAdmins ? <LeaderboardsPage /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="businesses" element={can.manageAdmins ? <BusinessesPage /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="assets" element={can.manageAdmins ? <AssetsPage /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="assets/logos" element={can.manageAdmins ? <LogosPage /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="assets/college-logos" element={can.manageAdmins ? <CollegeLogosPage /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="assets/flags" element={can.manageAdmins ? <FlagsPage /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="audit" element={can.manageAdmins ? <AuditPage /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="settings" element={<SettingsPage />} />
+                <Route path="tools/geocoding" element={can.manageAdmins ? <GeocodingPage /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="tools/testlab" element={can.manageAdmins ? <TestLabPage /> : <AdminV2AccessDenied role={role} />} />
+                <Route path="*" element={<Navigate to="dashboard" replace />} />
+              </Routes>
+            </Suspense>
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       <AdminCommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
