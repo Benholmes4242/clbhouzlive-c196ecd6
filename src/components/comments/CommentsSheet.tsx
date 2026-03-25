@@ -192,6 +192,28 @@ function CommentsSheet({
     }
   }, [inputText]);
 
+  // Mention autocomplete search
+  useEffect(() => {
+    if (!mentionQuery || mentionQuery.length < 1) {
+      setMentionResults([]);
+      return;
+    }
+    const search = async () => {
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('id, username, display_name, profile_photo_url')
+        .ilike('username', `${mentionQuery}%`)
+        .limit(5);
+      setMentionResults((data ?? []).map((u: any) => ({
+        id: u.id,
+        username: u.username,
+        display_name: u.display_name,
+        avatar: u.profile_photo_url,
+      })));
+    };
+    search();
+  }, [mentionQuery]);
+
   // Infinite scroll sentinel
   useEffect(() => {
     const sentinel = sentinelRef.current;
