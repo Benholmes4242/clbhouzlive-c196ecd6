@@ -162,8 +162,15 @@ export default function AdminV2Sidebar({ role, can, onNavigate }: SidebarProps) 
       ],
     },
     ...(can.manageAdmins ? [{
-      id: 'analytics',
-      label: 'Analytics',
+      id: 'realtime',
+      label: 'Real-Time',
+      requiresFull: true,
+      items: [
+        { to: '/admin-v2/live',   label: 'Live Activity', icon: Radio },
+        { to: '/admin-v2/alerts', label: 'Alerts',        icon: AlertTriangle, badge: alertBadgeCount },
+      ],
+    }] : []),
+    ...(can.manageAdmins ? [{
       requiresFull: true,
       items: [
         { to: '/admin-v2/analytics/platform',   label: 'Platform',           icon: BarChart3 },
