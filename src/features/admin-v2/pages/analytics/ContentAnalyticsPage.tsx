@@ -4,19 +4,79 @@ import { useContentAnalytics, type AnalyticsPeriod } from '../../hooks/useAdminV
 import {
   AdminPageHeader, AdminKpiCard, AdminSectionHeader, AdminPeriodPicker,
 } from '../../components/ui';
-import {
-  DualAreaChart, ChartSkeleton,
-} from '../../components/shared/AdminAreaChart';
+import { ChartSkeleton } from '../../components/shared/AdminAreaChart';
+import { AdminBarChart } from '../../components/shared/AdminBarChart';
+import { AdminDonutChart } from '../../components/shared/AdminDonutChart';
+import { AdminStatRow } from '../../components/shared/AdminStatRow';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
+
+// Fetch content mix (posts by type)
+async function fetchContentMix() {
+  const { data: posts } = await supabase
+    .from('posts')
+    .select('id, source_review_id')
+    .limit(5000);
+
+  const { data: media } = await supabase
+    .from('post_media')
+    .select('post_id, media_type')
+    .limit(5000);
+
+  const allPosts = posts ?? [];
+  const mediaMap = new Map<string, string>();
+  for (const m of media ?? []) {
+    if (!mediaMap.has(m.post_id)) {
+      mediaMap.set(m.post_id, m.media_type);
+    }
+  }
+
+  let videoCount = 0;
+  let imageCount = 0;
+  let reviewCount = 0;
+  let textCount = 0;
+
+  for (const p of allPosts) {
+    if (p.source_review_id) {
+      reviewCount++;
+    } else {
+      const mType = mediaMap.get(p.id);
+      if (mType === 'video') videoCount++;
+      else if (mType === 'image') imageCount++;
+      else textCount++;
+    }
+  }
+
+  return { videoCount, imageCount, reviewCount, textCount, total: allPosts.length };
+}
 
 export default function ContentAnalyticsPage() {
   const [period, setPeriod] = useState<AnalyticsPeriod>('14d');
   const { data, isLoading } = useContentAnalytics(period);
+  const { data: contentMix, isLoading: mixLoading } = useQuery({
+    queryKey: ['admin-v2', 'content-mix'],
+    queryFn: fetchContentMix,
+    staleTime: 10 * 60_000,
+  });
 
-  const combined = (data?.postsTrend ?? []).map((p, i) => ({
-    date:    p.date,
-    posts:   p.value,
-    reviews: data?.reviewsTrend?.[i]?.value ?? 0,
+  // Side-by-side bar data
+  const barData = (data?.postsTrend ?? []).map((p, i) => ({
+    label: p.date,
+    value: p.value,
+    color: '#1D6FF5',
   }));
+
+  // Top course's max count for bar %
+  const maxCourseCount = (data?.topReviewedCourses ?? [])[0]?.count ?? 1;
+
+  // Content mix donut
+  const mixColors = { video: '#F5A623', image: '#1D6FF5', review: '#17C964', text: '#94A3B8' };
+  const donutData = contentMix ? [
+    { label: 'Video', value: contentMix.videoCount, color: mixColors.video },
+    { label: 'Image', value: contentMix.imageCount, color: mixColors.image },
+    { label: 'Review', value: contentMix.reviewCount, color: mixColors.review },
+    { label: 'Text', value: contentMix.textCount, color: mixColors.text },
+  ].filter(d => d.value > 0) : [];
 
   return (
     <div style={{ padding: 24, background: '#F8FAFC', minHeight: '100%' }} className="max-w-5xl mx-auto space-y-6">
@@ -35,68 +95,71 @@ export default function ContentAnalyticsPage() {
         <AdminKpiCard title="Reviews This Period" value={data?.reviewsThisPeriod ?? 0} icon={MessageSquare} iconColor="#22c55e" isLoading={isLoading} />
       </div>
 
-      {/* Posts + Reviews trend */}
-      <div className="rounded-xl border border-border/60 bg-card p-5 space-y-4">
-        <AdminSectionHeader title="Posts vs Reviews" />
+      {/* Posts bar chart */}
+      <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }} className="space-y-4">
+        <AdminSectionHeader title="Daily Posts" />
         <div className="min-h-[200px]">
           {isLoading
             ? <ChartSkeleton height={200} />
-            : <DualAreaChart
-                data={combined}
-                series={[
-                  { key: 'posts',   name: 'Posts',   color: '#3b82f6' },
-                  { key: 'reviews', name: 'Reviews', color: 'hsl(var(--accent-amber))' },
-                ]}
-              />
+            : <AdminBarChart data={barData} color="#1D6FF5" height={200} />
           }
         </div>
       </div>
 
-      {/* Top reviewed courses */}
-      <div className="rounded-xl border border-border/60 bg-card p-5 space-y-4">
+      {/* Content Mix donut */}
+      <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }} className="space-y-4">
+        <AdminSectionHeader title="Content Mix" />
+        {mixLoading ? (
+          <ChartSkeleton height={160} />
+        ) : !donutData.length ? (
+          <p style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', padding: '32px 0' }}>No content data</p>
+        ) : (
+          <div className="flex items-center gap-8 flex-wrap">
+            <AdminDonutChart
+              data={donutData}
+              size={160}
+              innerRadius={48}
+              centerValue={contentMix?.total ?? 0}
+              centerLabel="Total"
+            />
+            <div className="flex-1 min-w-[140px] space-y-2">
+              {donutData.map(d => (
+                <div key={d.label} className="flex items-center gap-2.5">
+                  <span className="w-3 h-3 rounded-sm flex-shrink-0" style={{ background: d.color }} />
+                  <span style={{ fontSize: 13, color: '#334155', flex: 1 }}>{d.label}</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#0F172A' }}>{d.value.toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Top reviewed courses with stat rows */}
+      <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }} className="space-y-4">
         <AdminSectionHeader title="Top Reviewed Courses" />
-        <div>
-          {isLoading ? (
-            <div className="space-y-3">
-              {[1,2,3,4,5].map(i => (
-                <div key={i} className="flex items-center gap-3 animate-pulse">
-                  <div className="w-7 h-7 rounded-lg bg-muted flex-shrink-0" />
-                  <div className="flex-1 space-y-1">
-                    <div className="h-4 w-40 bg-muted rounded-md" />
-                    <div className="h-3 w-24 bg-muted rounded-md" />
-                  </div>
-                  <div className="h-4 w-12 bg-muted rounded-md" />
-                </div>
-              ))}
-            </div>
-          ) : !data?.topReviewedCourses?.length ? (
-            <p className="text-sm text-muted-foreground text-center py-8">
-              No review data yet
-            </p>
-          ) : (
-            <div className="space-y-2">
-              {data.topReviewedCourses.map((course, i) => (
-                <div key={i} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted/40 transition-colors">
-                  <span className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center text-[12px] font-bold text-muted-foreground flex-shrink-0">
-                    {i + 1}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-semibold text-foreground truncate">{course.name}</p>
-                    <p className="text-[11px] text-muted-foreground">{course.country}</p>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="text-[13px] font-semibold text-foreground">{course.count}</p>
-                    {course.avgRating > 0 && (
-                      <p className="text-[11px] text-muted-foreground">
-                        ★ {course.avgRating.toFixed(1)}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        {isLoading ? (
+          <div className="space-y-3 animate-pulse">
+            {[1,2,3,4,5].map(i => <div key={i} className="h-10 rounded" style={{ background: '#F1F5F9' }} />)}
+          </div>
+        ) : !data?.topReviewedCourses?.length ? (
+          <p style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', padding: '32px 0' }}>
+            No review data yet
+          </p>
+        ) : (
+          <div>
+            {data.topReviewedCourses.map((course, i) => (
+              <AdminStatRow
+                key={i}
+                label={`${course.name}${course.country ? ` · ${course.country}` : ''}`}
+                value={course.count}
+                subValue={course.avgRating > 0 ? `★ ${course.avgRating.toFixed(1)}` : undefined}
+                barPct={(course.count / maxCourseCount) * 100}
+                color="#F5A623"
+              />
+            ))}
+          </div>
+        )}
       </div>
 
     </div>
