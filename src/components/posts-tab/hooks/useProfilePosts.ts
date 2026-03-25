@@ -65,7 +65,7 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as string | undefined,
-    enabled: !!actorId,
+    enabled: !!actorId && !!userId,
     placeholderData: keepPreviousData,
     staleTime: 2 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
