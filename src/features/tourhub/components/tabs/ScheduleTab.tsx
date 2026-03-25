@@ -22,6 +22,7 @@ import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { getContextLabel } from '../../utils/tournamentClassification';
+import { getTournamentDisplayState } from '@/utils/tournamentState';
 
 import {
   ScheduleFilterPills,
