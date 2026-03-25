@@ -65,7 +65,6 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
           align="end"
           position="popper"
           onPointerDownOutside={(e) => e.preventDefault()}
-          onInteractOutside={(e) => e.preventDefault()}
           className="min-w-[200px] bg-white border-slate-200 z-[200] rounded-sq-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
         >
           {VISIBILITY_OPTIONS.map((option) => {
