@@ -21,14 +21,19 @@ const Toaster = ({ ...props }: ToasterProps) => {
   }, []);
 
   return (
-    <Sonner
-      theme="dark"
-      position="bottom-center"
-      duration={3000}
-      visibleToasts={2}
-      expand={false}
-      offset="97px"
-      toastOptions={{
+    <>
+      <style>{`
+        [data-sonner-toaster][data-position="bottom-center"] {
+          bottom: 97px !important;
+        }
+      `}</style>
+      <Sonner
+        theme="dark"
+        position="bottom-center"
+        duration={3000}
+        visibleToasts={2}
+        expand={false}
+        toastOptions={{
         className: 'clbhouz-toast',
         style: {
           background: 'rgba(28, 28, 30, 0.92)',
@@ -50,6 +55,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }}
       {...props}
     />
+    </>
   )
 }
 
