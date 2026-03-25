@@ -75,19 +75,20 @@ export function useTourOverviewData() {
   // Featured tournament (spotlight)
   const featuredTournament = useMemo((): FeaturedTournament | null => {
     if (!tournaments || tournaments.length === 0) return null;
+    const now = new Date();
 
-    // Priority 1: Live
-    const live = tournaments.find(t => t.status === 'inprogress');
+    const live = tournaments.find(t =>
+      getTournamentDisplayState(t.status, t.end_date, now) === 'live'
+    );
     if (live) return { tournament: live, type: 'live' };
 
-    // Priority 2: Most recent completed
-    const completed = tournaments
-      .filter(t => t.status === 'closed')
+    const inResultWindow = tournaments
+      .filter(t => getTournamentDisplayState(t.status, t.end_date, now) === 'result')
       .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime());
-    if (completed.length > 0) return { tournament: completed[0], type: 'recent' };
+    if (inResultWindow.length > 0) return { tournament: inResultWindow[0], type: 'recent' };
 
-    // Priority 3: Next upcoming
     const upcoming = tournaments
+      .filter(t => getTournamentDisplayState(t.status, t.end_date, now) === 'upcoming')
       .filter(t => t.status === 'scheduled' || t.status === 'created')
       .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
     if (upcoming.length > 0) return { tournament: upcoming[0], type: 'upcoming' };

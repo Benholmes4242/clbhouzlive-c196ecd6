@@ -71,23 +71,30 @@ export function usePGACard(userId?: string): {
   const { data: recentResult, isLoading: resultLoading } = useQuery({
     queryKey: ['pga-card-result'],
     queryFn: async () => {
-      const cutoff = new Date(Date.now() - RESULT_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString();
       const { data: seasons } = await supabase
         .from('sr_seasons')
         .select('id')
         .eq('tour_id', PGA_TOUR_ID);
       const seasonIds = (seasons ?? []).map(s => s.id);
       if (!seasonIds.length) return null;
+
+      // Fetch most recent closed tournament — wider DB window, filter client-side
+      const cutoff = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
       const { data } = await supabase
         .from('sr_tournaments')
         .select('id, name, purse, start_date, end_date, venue_name, venue_city, venue_par, venue_yardage, status, season_id')
-        .eq('status', 'closed')
+        .in('status', ['closed', 'complete'])
         .in('season_id', seasonIds)
         .gte('end_date', cutoff)
         .order('end_date', { ascending: false })
         .limit(1)
         .maybeSingle();
-      return data ?? null;
+
+      if (!data) return null;
+
+      // Only treat as result if within the 2-day window
+      const state = getTournamentDisplayState(data.status, data.end_date);
+      return state === 'result' ? data : null;
     },
     staleTime: 5 * 60_000,
     enabled: !topLive,
