@@ -291,6 +291,7 @@ export function usePGACard(userId?: string): {
         venueCity: topLive.venueCity,
         venuePar: topLive.venuePar,
         venueYardage: topLive.venueYardage,
+        courseImageUrl: null,
         currentRound: round,
         totalRounds: topLive.totalRounds,
         roundLabel: getRoundLabel(round, topLive.totalRounds),
