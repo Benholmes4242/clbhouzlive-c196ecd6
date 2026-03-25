@@ -164,7 +164,22 @@ export function usePGACard(userId?: string): {
     staleTime: 60_000,
   });
 
-  // ── Scorecards for result tournament ──
+  // ── Tournament result meta (authoritative stats from inject-tournament-post) ──
+  const { data: resultMeta } = useQuery({
+    queryKey: ['pga-card-result-meta', (recentResult as any)?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('tournament_result_meta')
+        .select('stat_birdies, stat_eagles, stat_pars, stat_bogeys')
+        .eq('tournament_id', (recentResult as any).id)
+        .maybeSingle();
+      return data ?? null;
+    },
+    enabled: !!recentResult && !topLive,
+    staleTime: 10 * 60_000,
+  });
+
+  // ── Scorecards for result tournament (fallback) ──
   const { data: resultScorecards = [] } = useQuery({
     queryKey: ['pga-card-scorecards-result', (recentResult as any)?.id],
     queryFn: async () => {
@@ -174,7 +189,7 @@ export function usePGACard(userId?: string): {
         .eq('tournament_id', (recentResult as any).id);
       return data ?? [];
     },
-    enabled: !!recentResult && !topLive,
+    enabled: !!recentResult && !topLive && !resultMeta,
     staleTime: 10 * 60_000,
   });
 
@@ -325,7 +340,9 @@ export function usePGACard(userId?: string): {
         score: lp.score ?? 0,
         thru: null,
         today: null,
-        scoringStats: resultScorecards.length ? aggregateScoringStats(resultScorecards, lp.player?.id ?? '') : null,
+        scoringStats: resultMeta?.stat_birdies != null
+          ? { eagles: resultMeta.stat_eagles ?? 0, birdies: resultMeta.stat_birdies ?? 0, pars: resultMeta.stat_pars ?? 0, bogeys: resultMeta.stat_bogeys ?? 0, doubleBogeys: 0 }
+          : resultScorecards.length ? aggregateScoringStats(resultScorecards, lp.player?.id ?? '') : null,
       } : null;
 
       const chasers: PGACardChaser[] = lb
@@ -417,7 +434,7 @@ export function usePGACard(userId?: string): {
     return null;
   }, [topLive, recentResult, nextUpcoming, resultLeaderboard, postId,
       engagementData?.likeCount, engagementData?.commentCount, engagementData?.isLikedByMe,
-      liveScorecards, resultScorecards, championSeasonStats]);
+      liveScorecards, resultScorecards, resultMeta, championSeasonStats]);
 
   const pgaCard: PGACardFeedPost | null = cardData ? {
     id: postId || 'pga-card',
