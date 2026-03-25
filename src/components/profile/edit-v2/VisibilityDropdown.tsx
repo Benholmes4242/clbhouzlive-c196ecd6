@@ -48,7 +48,7 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
   return (
     <div className={cn("flex items-center gap-1.5", className)}>
       {isPrivate && <Lock className="h-3.5 w-3.5 text-muted-foreground" />}
-      <Select value={value} onValueChange={onChange} disabled={disabled} modal={false}>
+      <Select value={value} onValueChange={onChange} disabled={disabled}>
         <SelectTrigger 
           className={cn(
             "gap-1.5 border border-border/60 bg-muted/60 hover:bg-muted transition-colors rounded-full",
