@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, User, Mail, Lock, Bell, Shield, EyeOff, UserX, HelpCircle, Flag, MessageSquare, FileText, Trash2, LogOut, Eye, BarChart2, Map, Star } from 'lucide-react';
 import { useProfileData } from '@/hooks/useProfileData';
-import { useState } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useCreatorSettings } from '@/hooks/useCreatorSettings';
 import { usePrivacySettings } from '@/hooks/usePrivacySettings';
