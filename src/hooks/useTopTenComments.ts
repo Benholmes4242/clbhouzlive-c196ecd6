@@ -26,7 +26,7 @@ export function useTopTenComments(targetUserId: string, courseId: string) {
         .from('top_ten_comments')
         .select(`
           id, commenter_id, body, created_at,
-          user_profiles!commenter_id (display_name, username, profile_photo_url)
+          user_profiles!top_ten_comments_commenter_id_profiles_fkey (display_name, username, profile_photo_url)
         `)
         .eq('target_user_id', targetUserId)
         .eq('course_id', courseId)

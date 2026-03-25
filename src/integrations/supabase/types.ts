@@ -10217,10 +10217,52 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "top_ten_comments_commenter_id_profiles_fkey"
+            columns: ["commenter_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "top_ten_comments_commenter_id_profiles_fkey"
+            columns: ["commenter_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_comments_commenter_id_profiles_fkey"
+            columns: ["commenter_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "top_ten_comments_course_id_fkey"
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_comments_target_user_id_profiles_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "top_ten_comments_target_user_id_profiles_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_comments_target_user_id_profiles_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -10256,6 +10298,48 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_reactions_reactor_id_profiles_fkey"
+            columns: ["reactor_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "top_ten_reactions_reactor_id_profiles_fkey"
+            columns: ["reactor_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_reactions_reactor_id_profiles_fkey"
+            columns: ["reactor_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_reactions_target_user_id_profiles_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_golfer_blurbs"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "top_ten_reactions_target_user_id_profiles_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "top_ten_reactions_target_user_id_profiles_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
         ]
