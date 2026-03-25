@@ -5,7 +5,9 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
 } from '@/components/ui/dialog';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 
 interface CreateBusinessProfileIntroModalProps {
   open: boolean;
