@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { AdminPageHeader } from '../components/ui';
 import { useAnomalyAlerts } from '../hooks/useAdminV2Analytics';
-import { RefreshCw, AlertTriangle, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { RefreshCw, AlertTriangle, AlertCircle, CheckCircle2, ArrowDown, ArrowUp } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -28,16 +28,28 @@ export default function AnomalyAlertsPage() {
   const countdownMin = Math.floor(countdown / 60);
   const countdownSec = countdown % 60;
 
-  const severityStyles = {
-    critical: { border: 'border-l-4 border-red-500', bg: 'bg-red-50', pill: { background: '#FEE2E2', color: '#DC2626' } },
-    warning:  { border: 'border-l-4 border-amber-400', bg: 'bg-amber-50', pill: { background: '#FEF3C7', color: '#D97706' } },
-    info:     { border: 'border-l-4 border-green-500', bg: 'bg-green-50', pill: { background: '#DCFCE7', color: '#16A34A' } },
+  const cardBg = {
+    critical: '#FFF1F2',
+    warning:  '#FFFBEB',
+    info:     '#F0FDF4',
+  };
+
+  const iconBg = {
+    critical: '#FEE2E2',
+    warning:  '#FEF3C7',
+    info:     '#DCFCE7',
+  };
+
+  const pillStyles = {
+    critical: { background: '#FEE2E2', color: '#DC2626' },
+    warning:  { background: '#FEF3C7', color: '#D97706' },
+    info:     { background: '#DCFCE7', color: '#16A34A' },
   };
 
   const severityIcon = {
-    critical: <AlertTriangle className="w-4 h-4" style={{ color: '#DC2626' }} />,
-    warning:  <AlertCircle className="w-4 h-4" style={{ color: '#D97706' }} />,
-    info:     <CheckCircle2 className="w-4 h-4" style={{ color: '#16A34A' }} />,
+    critical: <AlertTriangle className="w-5 h-5" style={{ color: '#DC2626' }} />,
+    warning:  <AlertCircle className="w-5 h-5" style={{ color: '#D97706' }} />,
+    info:     <CheckCircle2 className="w-5 h-5" style={{ color: '#16A34A' }} />,
   };
 
   return (
@@ -77,39 +89,92 @@ export default function AnomalyAlertsPage() {
           ))
         ) : (
           alerts.map(alert => {
-            const styles = severityStyles[alert.severity];
+            const isAllClear = alert.id === 'all-clear';
+            const isNegative = alert.changePct < 0;
+
             return (
               <div
                 key={alert.id}
-                className={`${styles.border} ${styles.bg} rounded-xl overflow-hidden`}
-                style={{ borderRadius: 14 }}
+                style={{
+                  background: cardBg[alert.severity],
+                  borderRadius: 14,
+                  overflow: 'hidden',
+                }}
               >
                 <div className="p-5">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2.5">
+                  <div className="flex items-start gap-4 mb-3">
+                    {/* Severity icon */}
+                    <div style={{
+                      width: 36, height: 36, borderRadius: 10,
+                      background: iconBg[alert.severity],
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      flexShrink: 0,
+                    }}>
                       {severityIcon[alert.severity]}
-                      <span
-                        className="inline-flex items-center px-2 py-0.5 rounded-full"
-                        style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', ...styles.pill }}
-                      >
-                        {alert.severity}
-                      </span>
-                      <span style={{ fontSize: 15, fontWeight: 600, color: '#1E293B' }}>{alert.title}</span>
                     </div>
-                  </div>
-                  <p style={{ fontSize: 13, color: '#475569', marginBottom: 12 }}>{alert.description}</p>
 
-                  {alert.id !== 'all-clear' && (
-                    <div className="flex items-center gap-4 flex-wrap" style={{ fontSize: 12, color: '#64748B' }}>
-                      <span>Current: <strong style={{ color: '#1E293B' }}>{alert.currentValue.toLocaleString()}</strong></span>
-                      <span style={{ color: '#CBD5E1' }}>|</span>
-                      <span>Baseline: <strong style={{ color: '#1E293B' }}>{alert.baselineValue.toLocaleString()}</strong></span>
-                      <span style={{ color: '#CBD5E1' }}>|</span>
-                      <span>Change: <strong style={{ color: alert.changePct >= 0 ? '#16A34A' : '#DC2626' }}>{alert.changePct >= 0 ? '+' : ''}{alert.changePct}%</strong></span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span
+                          className="inline-flex items-center px-2 py-0.5 rounded-full"
+                          style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', ...pillStyles[alert.severity] }}
+                        >
+                          {alert.severity}
+                        </span>
+                      </div>
+                      <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1E293B', marginBottom: 4 }}>{alert.title}</h3>
+                      <p style={{ fontSize: 13, color: '#475569' }}>{alert.description}</p>
+                    </div>
+
+                    {/* Change indicator */}
+                    {!isAllClear && (
+                      <div className="flex flex-col items-center flex-shrink-0">
+                        {isNegative ? (
+                          <ArrowDown className="w-5 h-5 text-red-500" />
+                        ) : (
+                          <ArrowUp className="w-5 h-5 text-green-500" />
+                        )}
+                        <span style={{
+                          fontSize: 20, fontWeight: 900,
+                          color: isNegative ? '#EF4444' : '#16A34A',
+                          lineHeight: 1,
+                        }}>
+                          {alert.changePct >= 0 ? '+' : ''}{alert.changePct}%
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Metrics pills */}
+                  {!isAllClear && (
+                    <div className="flex items-center gap-2 flex-wrap mt-3">
+                      <span style={{
+                        background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 20,
+                        padding: '4px 12px', fontSize: 12, fontWeight: 600, color: '#334155',
+                      }}>
+                        Current: {alert.currentValue.toLocaleString()}
+                      </span>
+                      <span style={{
+                        background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 20,
+                        padding: '4px 12px', fontSize: 12, fontWeight: 600, color: '#334155',
+                      }}>
+                        Baseline: {alert.baselineValue.toLocaleString()}
+                      </span>
+                      <span style={{
+                        background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 20,
+                        padding: '4px 12px', fontSize: 12, fontWeight: 600,
+                        color: isNegative ? '#DC2626' : '#16A34A',
+                      }}>
+                        {alert.changePct >= 0 ? '+' : ''}{alert.changePct}% change
+                      </span>
                     </div>
                   )}
 
-                  <div className="mt-3 text-right">
+                  {/* Last checked + detected */}
+                  <div className="mt-3 flex items-center justify-between">
+                    <span style={{ fontSize: 11, color: '#94A3B8' }}>
+                      Last checked: {dataUpdatedAt ? formatDistanceToNow(new Date(dataUpdatedAt), { addSuffix: true }) : '—'}
+                    </span>
                     <span style={{ fontSize: 11, color: '#94A3B8' }}>
                       Detected {formatDistanceToNow(new Date(alert.detectedAt), { addSuffix: true })}
                     </span>
