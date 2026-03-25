@@ -9,8 +9,9 @@ import {
   Mail, MapPin, Upload, Trophy, Building2, Image, BookOpen,
   Flag, ClipboardList, Settings, Wrench, Map, FlaskConical,
   ArrowLeft, ChevronDown, ChevronRight, Activity, Sparkles, MessageCircle,
-  Medal, TrendingUp, Layers,
+  Medal, TrendingUp, Layers, Radio, AlertTriangle,
 } from 'lucide-react';
+import { useAnomalyAlerts } from '../../hooks/useAdminV2Analytics';
 
 interface SidebarProps {
   role: PanelRole;
@@ -148,6 +149,10 @@ export default function AdminV2Sidebar({ role, can, onNavigate }: SidebarProps) 
     refetchInterval: 60_000,
   });
 
+  // Anomaly alert badge count
+  const { data: anomalyAlerts = [] } = useAnomalyAlerts();
+  const alertBadgeCount = anomalyAlerts.filter(a => a.severity === 'critical' || a.severity === 'warning').length;
+
   const groups: NavGroup[] = [
     {
       id: 'overview',
@@ -156,6 +161,15 @@ export default function AdminV2Sidebar({ role, can, onNavigate }: SidebarProps) 
         { to: '/admin-v2/dashboard', label: 'Dashboard', icon: LayoutDashboard },
       ],
     },
+    ...(can.manageAdmins ? [{
+      id: 'realtime',
+      label: 'Real-Time',
+      requiresFull: true,
+      items: [
+        { to: '/admin-v2/live',   label: 'Live Activity', icon: Radio },
+        { to: '/admin-v2/alerts', label: 'Alerts',        icon: AlertTriangle, badge: alertBadgeCount },
+      ],
+    }] : []),
     ...(can.manageAdmins ? [{
       id: 'analytics',
       label: 'Analytics',
