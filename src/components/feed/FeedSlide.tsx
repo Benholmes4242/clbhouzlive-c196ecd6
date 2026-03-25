@@ -40,6 +40,20 @@ export const FeedSlide = memo(function FeedSlide({
 
   // ── Content routing ──
   const renderContent = () => {
+    // PGA tournament card
+    if (post.postType === 'pga_card') {
+      return (
+        <PGACard
+          post={post as unknown as PGACardFeedPost}
+          isActive={isActive}
+          onComment={() => onComment?.()}
+          onLike={() => onLike?.(post)}
+          getLikeState={getLikeState}
+          getCommentCount={getCommentCount}
+        />
+      );
+    }
+
     // Tournament result card
     if (post.postType === 'tournament_result') {
       const likeState = getLikeState?.(post) ?? { isLiked: false, count: 0 };
