@@ -104,10 +104,10 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         </div>
 
         {/* Content overlay - bottom (above reaction strip) */}
-        <div className="absolute bottom-[46px] left-0 right-0 p-5 pb-2">
+        <div className="absolute bottom-[46px] left-0 right-0 p-5 pb-3.5">
           {/* Course name */}
           <h3 
-            className="text-white font-semibold text-lg leading-tight mb-1 line-clamp-2"
+            className="text-white font-semibold text-xl leading-tight mb-1 line-clamp-2"
             style={{
               textShadow: '0 1px 8px rgba(0,0,0,0.3)',
             }}
@@ -117,7 +117,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           
           {/* Location */}
           <p 
-            className="text-white/70 text-sm mb-3"
+            className="text-white/70 text-base mb-3"
             style={{
               textShadow: '0 1px 4px rgba(0,0,0,0.2)',
             }}
@@ -128,7 +128,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           {/* Rating chip - frosted glass */}
           {rating !== undefined && tierData && (
             <div 
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full"
               style={{
                 background: 'rgba(245, 158, 11, 0.12)',
                 backdropFilter: 'blur(20px)',
@@ -138,13 +138,13 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
               }}
             >
               <span 
-                className="font-bold text-xs"
+                className="font-bold text-sm"
                 style={{ color: '#f59e0b' }}
               >
                 {rating === 10 ? '10' : rating.toFixed(1)}
               </span>
               <span 
-                className="text-[10px] font-medium tracking-wide uppercase"
+                className="text-[11px] font-medium tracking-wide uppercase"
                 style={{ color: 'rgba(245, 158, 11, 0.75)' }}
               >
                 {tierData.label}
