@@ -74,6 +74,7 @@ export const useSuggestedUsersDiscover = () => {
         .neq('id', currentUser.id)
         .eq('is_public', true)
         .is('deleted_at', null)
+        .not('profile_photo_url', 'is', null)
         .limit(100); // Fetch more to account for filtering
 
       if (usersError) {
