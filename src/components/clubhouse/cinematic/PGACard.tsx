@@ -594,42 +594,7 @@ export const PGACard: React.FC<PGACardProps> = ({
               );
             })}
 
-            {/* Stats line — compact single row */}
-            {leaderStats && (
-              <div style={{
-                display: 'flex', gap: 'clamp(6px, 2vw, 10px)',
-                padding: '6px 10px',
-                borderTop: '1px solid rgba(255,255,255,0.05)',
-                justifyContent: 'space-around',
-                animation: 'trc-fadeIn 0.5s ease-out both',
-                animationDelay: '0.9s',
-              }}>
-                {[
-                  { v: leaderStats.eagles, label: 'Eagles', color: '#F59E0B', show: leaderStats.eagles > 0 },
-                  { v: leaderStats.birdies, label: 'Birdies', color: '#22C55E', show: true },
-                  { v: leaderStats.pars, label: 'Pars', color: '#94A3B8', show: true },
-                  { v: leaderStats.bogeys, label: 'Bogeys', color: '#EF4444', show: true },
-                  ...(seasonStats?.drivingDistance ? [{ v: Math.round(seasonStats.drivingDistance), label: 'Driver', color: 'rgba(255,255,255,0.55)', show: true, suffix: 'y' }] : []),
-                ].filter(s => s.show).map(stat => (
-                  <div key={stat.label} style={{ textAlign: 'center' }}>
-                    <div style={{
-                      fontSize: 'clamp(14px, 3.5vw, 16px)', fontWeight: 700,
-                      color: stat.color, lineHeight: 1,
-                    }}>
-                      {stat.v}{'suffix' in stat ? (stat as any).suffix : ''}
-                    </div>
-                    <div style={{
-                      fontSize: 'clamp(8px, 2vw, 10px)', fontWeight: 600,
-                      color: 'rgba(255,255,255,0.35)',
-                      letterSpacing: 0.5, marginTop: 2,
-                      textTransform: 'uppercase',
-                    }}>
-                      {stat.label}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            {/* Stats moved to hero zone */}
           </div>
         </div>
 
