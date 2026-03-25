@@ -354,6 +354,12 @@ export function useCommentsWithReplies(postId: string | null, onCommentDeleted?:
 
       // Handle reply notifications client-side (edge function doesn't do this yet)
       if (parentId) {
+        const { data: replierProfile } = await supabase
+          .from('user_profiles')
+          .select('display_name')
+          .eq('id', currentUserId)
+          .single();
+        const commenterName = replierProfile?.display_name ?? 'Someone';
         const { data: parentComment } = await supabase
           .from('post_comments')
           .select('user_id, actor_type, actor_id')
@@ -383,8 +389,8 @@ export function useCommentsWithReplies(postId: string | null, onCommentDeleted?:
               recipient_actor_id: parentActorId,
               actor_id: actorId,
               type: 'comment_reply',
-              title: 'New reply',
-              message: 'replied to your comment',
+              title: `${commenterName} replied to your comment`,
+              message: content.length > 60 ? content.slice(0, 60) + '…' : content,
               entity_type: 'comment',
               entity_id: newCommentId,
               data: {
