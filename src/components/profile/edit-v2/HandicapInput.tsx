@@ -59,7 +59,7 @@ export function HandicapInput({ value, onChange }: Props) {
           className={cn(
             'flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border-2 transition-all min-h-[44px] active:scale-[0.98]',
             !isPlusHandicap
-              ? 'border-foreground bg-foreground/5 text-foreground'
+              ? 'border-amber-500 bg-amber-500/5 text-foreground'
               : 'border-border text-muted-foreground'
           )}
         >
