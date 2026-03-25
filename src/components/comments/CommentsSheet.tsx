@@ -861,27 +861,79 @@ function CommentsSheet({
                     fallback={activeActor?.name?.charAt(0) || '?'}
                     hideRing
                   />
-                  <div className={cn(
-                    'flex-1 min-w-0 flex items-end rounded-[22px] px-4 py-2',
-                    isDark
-                      ? 'bg-white/10 border border-white/15'
-                      : 'bg-muted border border-border/50'
-                  )}>
-                    <textarea
-                      ref={textareaRef}
-                      value={inputText}
-                      onChange={(e) => setInputText(e.target.value)}
-                      onKeyDown={handleInputKeyDown}
-                      placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : 'Add a comment...'}
-                      rows={1}
-                      className={cn(
-                        'flex-1 min-w-0 bg-transparent text-sm outline-none resize-none leading-snug',
-                        isDark
-                          ? 'text-white placeholder:text-white/40'
-                          : 'text-foreground placeholder:text-muted-foreground'
-                      )}
-                      style={{ maxHeight: '120px' }}
-                    />
+                  <div className="flex-1 min-w-0 relative">
+                    {/* Mention autocomplete dropdown */}
+                    {mentionResults.length > 0 && (
+                      <div className={cn(
+                        'absolute bottom-full left-0 right-0 mb-1 rounded-xl shadow-lg border overflow-hidden z-[215]',
+                        isDark ? 'bg-[#1a1a1a] border-white/10' : 'bg-background border-border'
+                      )}>
+                        {mentionResults.map(u => (
+                          <button
+                            key={u.id}
+                            type="button"
+                            onClick={() => {
+                              setInputText(prev => prev.replace(/@\w*$/, `@${u.username} `));
+                              setMentionQuery(null);
+                              setMentionResults([]);
+                              textareaRef.current?.focus();
+                            }}
+                            className={cn(
+                              'w-full flex items-center gap-3 px-3 py-2 text-left transition-colors',
+                              isDark ? 'hover:bg-white/10' : 'hover:bg-muted/50'
+                            )}
+                          >
+                            <SquircleAvatar
+                              size={28}
+                              src={u.avatar}
+                              alt={u.display_name || u.username}
+                              fallback={u.display_name?.charAt(0)?.toUpperCase() || '?'}
+                              hideRing
+                            />
+                            <div className="flex flex-col min-w-0">
+                              <span className={cn('text-sm font-medium truncate', isDark ? 'text-white' : 'text-foreground')}>
+                                {u.display_name}
+                              </span>
+                              <span className={cn('text-xs truncate', isDark ? 'text-white/50' : 'text-muted-foreground')}>
+                                @{u.username}
+                              </span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <div className={cn(
+                      'flex items-end rounded-[22px] px-4 py-2',
+                      isDark
+                        ? 'bg-white/10 border border-white/15'
+                        : 'bg-muted border border-border/50'
+                    )}>
+                      <textarea
+                        ref={textareaRef}
+                        value={inputText}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setInputText(val);
+                          const atMatch = val.match(/@(\w*)$/);
+                          if (atMatch) {
+                            setMentionQuery(atMatch[1]);
+                          } else {
+                            setMentionQuery(null);
+                            setMentionResults([]);
+                          }
+                        }}
+                        onKeyDown={handleInputKeyDown}
+                        placeholder={replyingTo ? `Reply to ${replyingTo.displayName}...` : 'Add a comment...'}
+                        rows={1}
+                        className={cn(
+                          'flex-1 min-w-0 bg-transparent text-sm outline-none resize-none leading-snug',
+                          isDark
+                            ? 'text-white placeholder:text-white/40'
+                            : 'text-foreground placeholder:text-muted-foreground'
+                        )}
+                        style={{ maxHeight: '120px' }}
+                      />
+                    </div>
                   </div>
                   <button
                     type="button"
