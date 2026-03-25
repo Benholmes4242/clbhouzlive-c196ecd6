@@ -100,7 +100,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
             border: '1px solid rgba(255,255,255,0.2)',
           }}
         >
-          <span className="text-white font-semibold text-sm">#{position}</span>
+          <span className="text-white font-bold text-[13px]">#{position}</span>
         </div>
 
         {/* Content overlay - bottom (above reaction strip) */}
