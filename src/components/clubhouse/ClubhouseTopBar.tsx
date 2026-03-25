@@ -23,6 +23,8 @@ interface ClubhouseTopBarProps {
   user: User | null;
   carouselCount?: number;
   carouselIndex?: number;
+  /** When true, hides the entire top bar (PGA card active) */
+  hidden?: boolean;
 }
 
 export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
@@ -32,6 +34,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
   user,
   carouselCount,
   carouselIndex,
+  hidden = false,
 }) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -45,6 +48,9 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
         className="fixed left-3 right-3 z-40 pointer-events-auto flex items-center justify-between gap-1 min-w-0"
         style={{
           top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
+          opacity: hidden ? 0 : 1,
+          pointerEvents: hidden ? 'none' : 'auto',
+          transition: 'opacity 0.2s ease',
         }}
       >
         {/* Left: Tab Toggle */}
