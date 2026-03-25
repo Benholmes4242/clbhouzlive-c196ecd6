@@ -152,6 +152,10 @@ export function getNotificationBadgeIcon(type: string) {
       return <MessageCircle className={cn(iconClass, "text-[#334E3D]")} />;
     case 'top_ten_comment':
       return <MessageCircle className={cn(iconClass, "text-amber-500")} />;
+    case 'top_ten_reply':
+      return <MessageCircle className={cn(iconClass, "text-amber-500")} />;
+    case 'top_ten_mention':
+      return <AtSign className={cn(iconClass, "text-amber-500")} />;
     default:
       return <Bell className={cn(iconClass, "text-muted-foreground")} />;
   }
