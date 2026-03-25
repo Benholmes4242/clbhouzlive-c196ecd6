@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { toast } from 'sonner';
 
 export type ReactionType = 'agree' | 'interesting' | 'want_to_play';
 
