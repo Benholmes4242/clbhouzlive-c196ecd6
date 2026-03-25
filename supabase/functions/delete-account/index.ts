@@ -461,6 +461,13 @@ Deno.serve(async (req) => {
       )
     }
 
+    // Hard delete from auth.users so the account is fully gone
+    const { error: authDeleteError } = await adminClient.auth.admin.deleteUser(user.id);
+    if (authDeleteError) {
+      console.error('[delete-account] Failed to delete auth user:', authDeleteError.message);
+      // Non-fatal — profile is already anonymised, continue
+    }
+
     // Log the deletion in admin_audit_log
     await adminClient
       .from('admin_audit_log')
