@@ -51,7 +51,8 @@ export function MediaMessage({ type, url, className }: MediaMessageProps) {
         </div>
 
         <Dialog open={fullscreen} onOpenChange={setFullscreen}>
-          <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 border-none bg-transparent">
+          <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 border-none bg-transparent" aria-describedby={undefined}>
+            <VisuallyHidden.Root><DialogTitle>Media Preview</DialogTitle></VisuallyHidden.Root>
             <button
               onClick={() => setFullscreen(false)}
               className="absolute top-2 right-2 z-10 p-2 rounded-full bg-foreground/50 text-background hover:bg-foreground/70"

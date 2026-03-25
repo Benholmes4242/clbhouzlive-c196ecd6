@@ -134,7 +134,8 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
 
         return (
           <Dialog open={!!selectedReviewPost} onOpenChange={() => setSelectedReviewPost(null)}>
-            <DialogContent className="max-w-none w-screen h-screen p-0 border-0 bg-black [&>button]:hidden">
+            <DialogContent className="max-w-none w-screen h-screen p-0 border-0 bg-black [&>button]:hidden" aria-describedby={undefined}>
+              <VisuallyHidden.Root><DialogTitle>Review Post</DialogTitle></VisuallyHidden.Root>
               <ReviewPostViewer
                 mode="live"
                 courseId={reviewData?.courseId || ''}

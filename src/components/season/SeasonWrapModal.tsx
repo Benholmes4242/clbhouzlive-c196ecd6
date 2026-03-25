@@ -48,7 +48,8 @@ export const SeasonWrapModal: React.FC = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="max-w-2xl p-0 overflow-hidden bg-gradient-to-br from-primary/5 via-background to-accent/5">
+      <DialogContent className="max-w-2xl p-0 overflow-hidden bg-gradient-to-br from-primary/5 via-background to-accent/5" aria-describedby={undefined}>
+        <VisuallyHidden.Root><DialogTitle>Season Wrap</DialogTitle></VisuallyHidden.Root>
         <div className="p-8">
           {/* Header */}
           <div className="text-center mb-8">

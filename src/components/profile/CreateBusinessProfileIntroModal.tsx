@@ -44,7 +44,8 @@ export const CreateBusinessProfileIntroModal: React.FC<CreateBusinessProfileIntr
 }) => {
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md rounded-none sm:rounded-2xl bg-background">
+      <DialogContent className="max-w-md rounded-none sm:rounded-2xl bg-background" aria-describedby={undefined}>
+        <VisuallyHidden.Root><DialogTitle>Create Business Profile</DialogTitle></VisuallyHidden.Root>
         <DialogHeader className="text-center sm:text-center">
           {/* Icon */}
           <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
