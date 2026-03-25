@@ -168,7 +168,7 @@ export default function EchoPage() {
               onChipSelect={handlePromptClick}
             />
           ) : (
-            <div className="h-full overflow-y-auto">
+            <div className="h-full flex flex-col">
               <EchoPageMessageList
                 messages={messages}
                 isStreaming={isStreaming}
