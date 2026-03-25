@@ -127,6 +127,18 @@ export const PGACard: React.FC<PGACardProps> = ({
   const likeState = getLikeState?.(post) ?? { isLiked: cd.isLikedByMe, count: cd.likeCount };
   const commentCount = getCommentCount?.(post) ?? cd.commentCount;
 
+  // Countdown for upcoming (must be before early return)
+  const countdown = useMemo(() => {
+    if (cd.state !== 'upcoming' || !cd.startDate) return null;
+    const diff = new Date(cd.startDate).getTime() - Date.now();
+    if (diff <= 0) return { days: 0, hours: 0, minutes: 0 };
+    return {
+      days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+      minutes: Math.floor((diff / (1000 * 60)) % 60),
+    };
+  }, [cd.state, cd.startDate]);
+
   // ── Skeleton state ──
   const showSkeleton = isLoading ||
     (cd.state === 'live' && !cd.leader) ||
@@ -161,17 +173,6 @@ export const PGACard: React.FC<PGACardProps> = ({
       ? 'rgba(148,163,184,0.07)'
       : 'rgba(99,102,241,0.09)';
 
-  // Countdown for upcoming
-  const countdown = useMemo(() => {
-    if (cd.state !== 'upcoming' || !cd.startDate) return null;
-    const diff = new Date(cd.startDate).getTime() - Date.now();
-    if (diff <= 0) return { days: 0, hours: 0, minutes: 0 };
-    return {
-      days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-      hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
-      minutes: Math.floor((diff / (1000 * 60)) % 60),
-    };
-  }, [cd.state, cd.startDate]);
 
   const ctaLabel = cd.state === 'live'
     ? 'Who wins this?'
