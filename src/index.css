@@ -4508,3 +4508,9 @@ em-emoji-picker input:focus {
   background-color: transparent;
   transition: none !important;
 }
+
+/* Sonner toast bottom positioning — sits above nav bar */
+[data-sonner-toaster] {
+  bottom: 97px !important;
+  top: auto !important;
+}
