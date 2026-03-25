@@ -177,9 +177,11 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                 disabled={isOwnProfile || !user}
               >
                 <span className="text-sm">{config.emoji}</span>
-                <span className={`text-[10px] font-medium ${isActive ? 'text-amber-400' : 'text-white/60'}`}>
-                  {count > 0 ? (count > 99 ? '99+' : count) : '·'}
-                </span>
+                {count > 0 && (
+                  <span className={`text-[10px] font-bold leading-none ${isActive ? 'text-amber-400' : 'text-white/60'}`}>
+                    {count > 99 ? '99+' : count}
+                  </span>
+                )}
               </button>
             );
           })}
