@@ -104,7 +104,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         </div>
 
         {/* Content overlay - bottom (above reaction strip) */}
-        <div className="absolute bottom-[40px] left-0 right-0 p-5 pb-2">
+        <div className="absolute bottom-[46px] left-0 right-0 p-5 pb-2">
           {/* Course name */}
           <h3 
             className="text-white font-semibold text-lg leading-tight mb-1 line-clamp-2"
@@ -128,7 +128,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           {/* Rating chip - frosted glass */}
           {rating !== undefined && tierData && (
             <div 
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-full"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full"
               style={{
                 background: 'rgba(245, 158, 11, 0.12)',
                 backdropFilter: 'blur(20px)',
@@ -138,13 +138,13 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
               }}
             >
               <span 
-                className="font-bold text-lg"
+                className="font-bold text-xs"
                 style={{ color: '#f59e0b' }}
               >
                 {rating === 10 ? '10' : rating.toFixed(1)}
               </span>
               <span 
-                className="text-xs font-medium tracking-wide uppercase"
+                className="text-[10px] font-medium tracking-wide uppercase"
                 style={{ color: 'rgba(245, 158, 11, 0.75)' }}
               >
                 {tierData.label}
@@ -155,7 +155,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
 
         {/* Reaction strip — overlaid at bottom of card image */}
         <div
-          className="absolute bottom-0 left-0 right-0 flex"
+          className="absolute bottom-0 left-0 right-0 flex h-[46px]"
           style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}
         >
           {(Object.entries(REACTION_CONFIG) as [ReactionType, typeof REACTION_CONFIG[ReactionType]][]).map(([type, config], idx) => {
@@ -223,7 +223,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         </div>
 
         {/* Subtle tap indicator - bottom right */}
-        <div className="absolute bottom-[44px] right-5">
+        <div className="absolute bottom-[50px] right-5">
           <ChevronRight className="w-5 h-5 text-white/40" />
         </div>
       </motion.div>
