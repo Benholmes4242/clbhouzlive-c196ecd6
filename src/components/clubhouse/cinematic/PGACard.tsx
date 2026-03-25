@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { Heart, MessageCircle, Trophy, Calendar } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Heart, MessageCircle, Trophy, Calendar, ChevronRight } from 'lucide-react';
 import type { PGACardFeedPost, PGACardChaser } from '@/components/media-system/types/media';
 
 interface PGACardProps {
@@ -206,6 +207,7 @@ export const PGACard: React.FC<PGACardProps> = ({
 }) => {
   const cd = post.cardData;
   const isLoading = post.isLoading ?? false;
+  const navigate = useNavigate();
   const likeState = getLikeState?.(post) ?? { isLiked: cd.isLikedByMe, count: cd.likeCount };
   const commentCount = getCommentCount?.(post) ?? cd.commentCount;
 
@@ -478,6 +480,13 @@ export const PGACard: React.FC<PGACardProps> = ({
             }}>
               Final Standings
             </span>
+            <button
+              onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/tournament/${cd.tournamentId}`); }}
+              className="flex items-center gap-1 text-amber-500 text-xs font-semibold active:opacity-70 transition-opacity"
+            >
+              Full Results
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
           </div>
 
           {/* Rows — fills remaining space evenly */}
