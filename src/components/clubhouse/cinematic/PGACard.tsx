@@ -173,7 +173,7 @@ const RowAvatar: React.FC<{ src?: string | null; name: string; size: number }> =
     display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
   }}>
     {src ? (
-      <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }} />
     ) : (
       <span style={{ fontSize: size * 0.35, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>{getInitials(name)}</span>
     )}
@@ -435,7 +435,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                     { v: seasonStats.drivingDistance ? `${Math.round(seasonStats.drivingDistance)}y` : null, label: 'Driver' },
                     { v: seasonStats.drivingAccuracy ? `${Math.round(seasonStats.drivingAccuracy)}%` : null, label: 'Accuracy' },
                     { v: seasonStats.greensInReg ? `${Math.round(seasonStats.greensInReg)}%` : null, label: 'GIR' },
-                    { v: seasonStats.puttingAverage ?? null, label: 'Putting' },
+                    { v: seasonStats.puttingAverage != null ? Number(seasonStats.puttingAverage).toFixed(1) : null, label: 'Putting' },
                   ].map(stat => (
                     <div key={stat.label} style={{
                       flex: 1, textAlign: 'center',
