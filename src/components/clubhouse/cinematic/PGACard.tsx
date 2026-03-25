@@ -953,7 +953,7 @@ export const PGACard: React.FC<PGACardProps> = ({
               }}>
                 {cd.defendingChampionPhotoUrl
                   ? <img src={cd.defendingChampionPhotoUrl} alt={defendingChampion} style={{
-                      width: '130%', height: '130%', objectFit: 'cover', objectPosition: 'center -50%',
+                      width: '120%', height: '120%', objectFit: 'cover', objectPosition: 'center 5%',
                     }}
                       onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
