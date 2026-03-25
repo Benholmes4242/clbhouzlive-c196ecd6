@@ -37,6 +37,8 @@ const ContentPerformance   = lazy(() => import('./pages/analytics/ContentPerform
 const CreatorLeaderboard   = lazy(() => import('./pages/analytics/CreatorLeaderboardPage'));
 const GrowthAnalytics      = lazy(() => import('./pages/analytics/GrowthPage'));
 const FeatureAdoption      = lazy(() => import('./pages/analytics/FeatureAdoptionPage'));
+const LiveActivityPage     = lazy(() => import('./pages/LiveActivityPage'));
+const AnomalyAlertsPage    = lazy(() => import('./pages/AnomalyAlertsPage'));
 const LeaderboardsPage     = lazy(() => import('./pages/LeaderboardsPage'));
 const GeocodingPage        = lazy(() => import('./pages/tools/GeocodingPage'));
 const TestLabPage          = lazy(() => import('./pages/tools/TestLabPage'));
