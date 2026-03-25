@@ -11,7 +11,7 @@ const VideoSlide: React.FC<{ item: MediaViewerItem }> = ({ item }) => {
   const ref = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
   const hlsRef = useRef<Hls | null>(null);
-  const { ref: zoomRef, style: zoomStyle, isZoomed, reset: resetZoom } = usePinchZoomPointer();
+  const { ref: zoomRef, style: zoomStyle, scale: videoZoomScale, reset: resetZoom } = usePinchZoomPointer();
 
   const videoSrc = item.hlsUrl || item.mp4Url || item.src || '';
   const audioId = `media-viewer-${item.id}`;
