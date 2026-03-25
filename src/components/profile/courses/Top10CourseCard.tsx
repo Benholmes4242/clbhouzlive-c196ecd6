@@ -167,9 +167,13 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                 key={type}
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (!isOwnProfile && !!user) toggleReaction(type);
+                  if (!isOwnProfile && !!user) {
+                    setTappedReaction(type);
+                    setTimeout(() => setTappedReaction(null), 400);
+                    toggleReaction(type);
+                  }
                 }}
-                className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5
+                className={`relative flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5
                   transition-all active:scale-95
                   ${isActive ? 'bg-amber-500/25' : 'bg-black/45'}
                   ${!isLast ? 'border-r border-white/[0.08]' : ''}
@@ -178,11 +182,40 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                 style={{ backdropFilter: 'blur(12px)' }}
                 disabled={isOwnProfile || !user}
               >
-                <span className="text-sm">{config.emoji}</span>
+                <motion.span
+                  key={isActive ? 'active' : 'inactive'}
+                  initial={{ scale: 1 }}
+                  animate={tappedReaction === type ? { scale: [1, 1.5, 1] } : { scale: 1 }}
+                  transition={{ duration: 0.3, ease: 'easeOut' }}
+                  className="text-sm leading-none"
+                >
+                  {config.emoji}
+                </motion.span>
                 {count > 0 && (
                   <span className={`text-[10px] font-bold leading-none ${isActive ? 'text-amber-400' : 'text-white/60'}`}>
                     {count > 99 ? '99+' : count}
                   </span>
+                )}
+                {tappedReaction === type && (
+                  <AnimatePresence>
+                    {[...Array(4)].map((_, i) => {
+                      const angle = (i / 4) * 360;
+                      const rad = (angle * Math.PI) / 180;
+                      const x = Math.cos(rad) * 12;
+                      const y = Math.sin(rad) * 12;
+                      return (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+                          animate={{ opacity: 0, x, y, scale: 0.3 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.35, ease: 'easeOut' }}
+                          className="absolute w-1 h-1 rounded-full bg-amber-400 pointer-events-none"
+                          style={{ top: '50%', left: '50%', marginTop: -2, marginLeft: -2 }}
+                        />
+                      );
+                    })}
+                  </AnimatePresence>
                 )}
               </button>
             );
