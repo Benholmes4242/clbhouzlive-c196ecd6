@@ -8,7 +8,8 @@ import BadgeCarousel from '../badges/BadgeCarousel';
 import { ReviewMediaItem } from '@/components/posts/FullscreenReviewPost';
 import { ReviewPostViewer } from '@/components/posts/ReviewPostViewer';
 import { ReviewBottomPanel } from '@/components/posts/ReviewBottomPanel';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { isReviewPost as checkIsReviewPost, extractReviewData, extractUserData } from '@/lib/postHelpers';
 import { useMediaViewer } from '@/hooks/useMediaViewer';
 
