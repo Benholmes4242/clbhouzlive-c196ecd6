@@ -267,7 +267,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
       {/* Carousel - snap scroll with gap */}
       <div 
         ref={scrollContainerRef}
-        className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-4 pb-2"
+        className="flex gap-5 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-4 pb-2"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {topTen.map((course) => {
