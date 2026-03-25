@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useState, useRef, memo } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapVideoPlayer } from './SnapVideoPlayer';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
+import { preloadHlsManifest } from '@/utils/hlsPreload';
+import { registerInPool } from '@/utils/hlsPoolPreloader';
 import type { MediaItem } from '@/components/media-system/types/media';
 
 interface FeedImageCarouselProps {
