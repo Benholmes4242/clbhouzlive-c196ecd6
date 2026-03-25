@@ -210,22 +210,12 @@ export function ScheduleTab() {
 
     const completedList = tourFiltered
       .filter(t => getTournamentDisplayState(t.status, t.end_date, now) === 'result')
-      .sort((a, b) => {
-        const pa = getTournamentPriority(a);
-        const pb = getTournamentPriority(b);
-        if (pa !== pb) return pa - pb;
-        return new Date(b.end_date).getTime() - new Date(a.end_date).getTime();
-      });
+      .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime());
 
     const upcomingList = tourFiltered
       .filter(t => getTournamentDisplayState(t.status, t.end_date, now) === 'upcoming'
         && (t.status === 'scheduled' || t.status === 'created'))
-      .sort((a, b) => {
-        const pa = getTournamentPriority(a);
-        const pb = getTournamentPriority(b);
-        if (pa !== pb) return pa - pb;
-        return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
-      });
+      .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
 
     if (filter === 'live') {
       if (liveList.length > 0) {
