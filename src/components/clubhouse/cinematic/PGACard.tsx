@@ -82,7 +82,6 @@ const CountdownTile: React.FC<{ value: number; label: string }> = ({ value, labe
 
 export const PGACard: React.FC<PGACardProps> = ({
   post,
-  isActive,
   onComment,
   onLike,
   getLikeState,
