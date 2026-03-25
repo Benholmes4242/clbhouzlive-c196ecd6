@@ -146,7 +146,7 @@ async function fetchUserActivityTimeline(userId: string): Promise<UserActivityEv
   }
 
   for (const r of reviews.data ?? []) {
-    events.push({ id: `review-${r.id}`, type: 'review', label: 'Submitted a review', detail: r.overall_score ? `Score: ${r.overall_score}` : null, timestamp: r.created_at });
+    events.push({ id: `review-${r.id}`, type: 'review', label: 'Submitted a review', detail: r.rating ? `Rating: ${r.rating}` : null, timestamp: r.created_at });
   }
 
   for (const f of follows.data ?? []) {
