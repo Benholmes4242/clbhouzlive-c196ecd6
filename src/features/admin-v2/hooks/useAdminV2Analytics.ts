@@ -650,8 +650,8 @@ async function fetchContentPerformance(period: AnalyticsPeriod): Promise<Content
 
   return posts.map(p => {
     const profile = profileMap.get(p.user_id);
-    const likes = (p.post_likes as any[])?.length ?? 0;
-    const comments = (p.post_comments as any[])?.length ?? 0;
+    const likes = (p.post_likes as unknown as any[])?.length ?? 0;
+    const comments = (p.post_comments as unknown as any[])?.length ?? 0;
     const shares = shareCountMap.get(p.id) ?? 0;
     const mediaItems = (p.post_media as any[]) ?? [];
     const hasVideo = mediaItems.some((m: any) => m.media_type === 'video');
