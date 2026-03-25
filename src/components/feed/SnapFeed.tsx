@@ -225,9 +225,9 @@ export function SnapFeed({
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        setIsTournamentCardActive(entry.isIntersecting && entry.intersectionRatio >= 1.0);
+        setIsTournamentCardActive(entry.isIntersecting && entry.intersectionRatio >= 0.95);
       },
-      { threshold: [0, 1.0] }
+      { threshold: [0, 0.95] }
     );
 
     observer.observe(sentinel);

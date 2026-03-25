@@ -48,7 +48,21 @@ const ChaserRow: React.FC<{ chaser: PGACardChaser; isResult?: boolean }> = ({ ch
       {chaser.isTied ? 'T' : ''}{chaser.position}
     </div>
     {chaser.photoUrl ? (
-      <img src={chaser.photoUrl} alt="" className="w-8 h-8 rounded-lg object-cover" />
+      <div className="relative">
+        <img
+          src={chaser.photoUrl}
+          alt=""
+          className="w-8 h-8 rounded-lg object-cover"
+          onError={(e) => {
+            (e.target as HTMLImageElement).style.display = 'none';
+            const fb = (e.target as HTMLImageElement).parentElement?.querySelector('[data-fallback]') as HTMLElement;
+            if (fb) fb.style.display = 'flex';
+          }}
+        />
+        <div data-fallback className="w-8 h-8 rounded-lg bg-white/10 items-center justify-center" style={{ display: 'none' }}>
+          <span className="text-[11px] text-white/40">⛳</span>
+        </div>
+      </div>
     ) : (
       <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
         <span className="text-[11px] text-white/40">⛳</span>
