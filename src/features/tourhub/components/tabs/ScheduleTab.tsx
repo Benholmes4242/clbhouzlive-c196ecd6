@@ -249,13 +249,13 @@ export function ScheduleTab() {
       return onePerTour(upcomingList, 'upcoming');
     }
 
-    // 'all' tab: live first, then upcoming (priority-sorted), then recent results, capped at 8
+    // 'all' tab: live + one completed per tour + one upcoming per tour, capped at 8
     const items: ScheduleHeroItem[] = [
       ...[...liveList]
         .sort((a, b) => getTournamentPriority(a) - getTournamentPriority(b))
         .map(t => ({ tournament: t, type: 'live' as const })),
-      ...onePerTour(upcomingList, 'upcoming'),
       ...onePerTour(completedList, 'recent'),
+      ...onePerTour(upcomingList, 'upcoming'),
     ];
     return items.slice(0, 8);
   }, [tournaments, filter, activeTour]);
