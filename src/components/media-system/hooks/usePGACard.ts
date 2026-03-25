@@ -6,7 +6,8 @@ import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import type { PGACardFeedPost, PGACardData, PGACardLeader, PGACardChaser, PGACardStats } from '../types/media';
 
 const SYSTEM_USER_ID = 'b8437384-291a-4d85-b81f-24c1068235dd';
-const PGA = 'pga';
+const PGA_TOUR_ID = 'b52068af-28e4-4e91-bdbb-037591b0ff84';
+const PGA_TOUR_SLUG = 'pga';
 const RESULT_WINDOW_DAYS = 3;
 
 // ── Insight helper ──
