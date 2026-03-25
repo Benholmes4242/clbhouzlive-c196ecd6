@@ -289,7 +289,7 @@ export interface FeedRpcRow {
   is_followed_by_me: boolean;
   engagement_score: number;
   post_type?: string | null;
-  tournament_meta?: TournamentResultMeta | null;
+  post_tags?: FeedPostTag[] | null;
   post_tags?: FeedPostTag[] | null;
   course_id?: string | null;
   course_name?: string | null;

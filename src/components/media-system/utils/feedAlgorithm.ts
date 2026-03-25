@@ -13,7 +13,7 @@ const MAX_REVIEWS_PER_CREATOR = 4;
 
 // ── Type Guards ────────────────────────────────────────────────────────────────
 function isTournamentPost(p: FeedPost): boolean {
-  return p.postType === 'tournament_result' || p.postType === 'tournament_live';
+  return p.postType === 'tournament_live';
 }
 
 function isReviewPost(p: FeedPost): boolean {
