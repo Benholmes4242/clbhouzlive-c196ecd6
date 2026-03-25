@@ -163,6 +163,13 @@ export interface PGACardStats {
   puttingAverage:   number | null;
 }
 
+export interface PGACardPastWinner {
+  year: number;
+  playerName: string;
+  photoUrl: string | null;
+  scoreDisplay: string | null;
+}
+
 export interface PGACardData {
   tournamentId:    string;
   tournamentName:  string;
@@ -187,6 +194,8 @@ export interface PGACardData {
   commentCount:    number;
   isLikedByMe:     boolean;
   winnerBy?:       string | null;
+  defendingChampion?: string | null;
+  pastWinners?:    PGACardPastWinner[] | null;
   championSeasonStats?: {
     drivingDistance:  number | null;
     drivingAccuracy: number | null;
