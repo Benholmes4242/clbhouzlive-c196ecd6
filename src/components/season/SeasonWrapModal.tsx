@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from '@/components/ui/dialog';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
 import { useSeasonWrap } from '@/hooks/useSeasonWrap';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
