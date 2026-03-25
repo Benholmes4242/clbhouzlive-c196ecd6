@@ -234,6 +234,7 @@ export interface PGACardFeedPost extends Omit<FeedPost, 'mediaItems' | 'review' 
   mediaItems:   MediaItem[];
   review:       null;
   isReview:     false;
+  isLoading?:   boolean;
 }
 
 export interface VideoSessionState {

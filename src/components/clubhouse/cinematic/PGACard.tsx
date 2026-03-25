@@ -5,7 +5,6 @@ import { Squircle } from '@/components/ui/squircle';
 
 interface PGACardProps {
   post: PGACardFeedPost;
-  isActive: boolean;
   onComment: () => void;
   onLike: () => void;
   getLikeState?: (post: any) => { isLiked: boolean; count: number };
@@ -83,14 +82,13 @@ const CountdownTile: React.FC<{ value: number; label: string }> = ({ value, labe
 
 export const PGACard: React.FC<PGACardProps> = ({
   post,
-  isActive,
   onComment,
   onLike,
   getLikeState,
   getCommentCount,
 }) => {
   const cd = post.cardData;
-  const isLoading = (post as any).isLoading ?? false;
+  const isLoading = post.isLoading ?? false;
   const likeState = getLikeState?.(post) ?? { isLiked: cd.isLikedByMe, count: cd.likeCount };
   const commentCount = getCommentCount?.(post) ?? cd.commentCount;
 
