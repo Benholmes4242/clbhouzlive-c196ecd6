@@ -23,6 +23,8 @@ interface ClubhouseTopBarProps {
   user: User | null;
   carouselCount?: number;
   carouselIndex?: number;
+  /** When true, hides the entire top bar (PGA card active) */
+  hidden?: boolean;
 }
 
 export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
