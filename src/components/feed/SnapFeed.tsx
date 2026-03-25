@@ -212,6 +212,28 @@ export function SnapFeed({
     });
   }, [activeIndex, posts]);
 
+  // ── PGA card sentinel observer ──
+  const setIsTournamentCardActive = useClubhouseStore(s => s.setIsTournamentCardActive);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const sentinel = container.querySelector("[data-pga-sentinel='true']") as HTMLElement | null;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        setIsTournamentCardActive(entry.isIntersecting && entry.intersectionRatio >= 1.0);
+      },
+      { threshold: [0, 1.0] }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [setIsTournamentCardActive, posts]);
+
   return (
     <div
       ref={containerRef}

@@ -171,6 +171,71 @@ export interface TournamentLiveFeedPost extends Omit<FeedPost, 'mediaItems' | 'r
   isReview:    false;
 }
 
+// ── PGA Tournament Card Types ──
+
+export type PGACardState = 'live' | 'result' | 'upcoming';
+
+export interface PGACardLeader {
+  playerId:      string;
+  playerName:    string;
+  photoUrl:      string | null;
+  scoreDisplay:  string;
+  score:         number;
+  thru:          string | null;
+  today:         string | null;
+}
+
+export interface PGACardChaser {
+  position:      number;
+  playerName:    string;
+  photoUrl:      string | null;
+  scoreDisplay?: string;
+  isTied?:       boolean;
+}
+
+export interface PGACardStats {
+  totalEagles:      number;
+  totalBirdies:     number;
+  totalPars:        number;
+  totalBogeys:      number;
+  drivingDistance:   number | null;
+  drivingAccuracy:  number | null;
+  greensInReg:      number | null;
+  puttingAverage:   number | null;
+}
+
+export interface PGACardData {
+  tournamentId:    string;
+  tournamentName:  string;
+  purse:           number | null;
+  state:           PGACardState;
+  venueName:       string | null;
+  venueCity:       string | null;
+  venuePar:        number | null;
+  venueYardage:    number | null;
+  currentRound:    number;
+  totalRounds:     number;
+  roundLabel:      string;
+  leader:          PGACardLeader | null;
+  chasers:         PGACardChaser[];
+  leaderStats:     PGACardStats | null;
+  insight:         string | null;
+  startDate:       string | null;
+  endDate:         string | null;
+  postId:          string;
+  likeCount:       number;
+  commentCount:    number;
+  isLikedByMe:     boolean;
+}
+
+export interface PGACardFeedPost extends Omit<FeedPost, 'mediaItems' | 'review' | 'isReview'> {
+  postType:     'pga_card';
+  cardData:     PGACardData;
+  mediaItems:   MediaItem[];
+  review:       null;
+  isReview:     false;
+}
+
 export interface VideoSessionState {
   currentTime: number;
   wasMuted: boolean;

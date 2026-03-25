@@ -30,7 +30,9 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 // ── Data hooks ──
 import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFeed';
 import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
-import type { FeedPost, TournamentResultFeedPost } from '@/components/media-system/types/media';
+import { usePGACard } from '@/components/media-system/hooks/usePGACard';
+import { injectPGACard } from '@/components/media-system/utils/feedAlgorithm';
+import type { FeedPost, TournamentResultFeedPost, PGACardFeedPost } from '@/components/media-system/types/media';
 import { TournamentResultCard } from '@/components/clubhouse/cinematic/TournamentResultCard';
 // buildSuggestedFeed/buildFriendsFeed are called inside the feed hooks — not here
 
@@ -44,6 +46,7 @@ import { ReviewBottomSheet } from '@/components/posts/ReviewBottomSheet';
 
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { getProfilePathById } from '@/lib/profileRoutes';
+import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
 // ── Decomposed hooks ──
 import { useClubhouseLifecycle } from '@/components/clubhouse/hooks/useClubhouseLifecycle';
@@ -147,6 +150,7 @@ const ClubhouseContent = () => {
   const toggleMute = useClubhouseStore(s => s.toggleMute);
   const carouselPositions = useClubhouseStore(s => s.carouselPositions);
   const currentMediaIndex = carouselPositions.get(activeIndex) ?? 0;
+  const isTournamentCardActive = useClubhouseStore(s => s.isTournamentCardActive);
 
 
   // ── GlobalAudio bridge ──
@@ -159,16 +163,25 @@ const ClubhouseContent = () => {
     setGlobalMute(isMuted);
   }, [isMuted, setGlobalMute]);
 
+  // ── Hide chrome when PGA card is active ──
+  const { setVisible: setBottomNavVisible } = useBottomNavigation();
+  useEffect(() => {
+    setBottomNavVisible(!isTournamentCardActive);
+    return () => { setBottomNavVisible(true); };
+  }, [isTournamentCardActive, setBottomNavVisible]);
+
   // ── Feed hooks ──
   const suggestedFeed = useSuggestedFeed(user?.id);
   const friendsFeed = useFriendsFeed(user?.id);
+  const { pgaCard } = usePGACard(user?.id);
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
   
   const posts = useMemo(() => {
-    // Feed hooks already apply buildSuggestedFeed/buildFriendsFeed internally.
-    // Do NOT re-apply here — double-processing shifts review positions.
+    if (activeTab === 'foryou') {
+      return injectPGACard(activeFeed.posts, pgaCard as unknown as FeedPost);
+    }
     return activeFeed.posts;
-  }, [activeFeed.posts]);
+  }, [activeFeed.posts, activeTab, pgaCard]);
 
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? false;
@@ -258,23 +271,25 @@ const ClubhouseContent = () => {
         isStatic={skeletonMode === 'static'} 
       />
 
-      {/* Floating top bar */}
-      <div style={{ position: 'relative', zIndex: 50 }}>
-        <ClubhouseTopBar
-          activeTab={activeTab}
-          onTabChange={(tab) => {
-            setActiveTab(tab);
-            const targetFeed = tab === 'friends' ? friendsFeed : suggestedFeed;
-            if (targetFeed.isLoading) {
-              resetSkeleton();
-            }
-          }}
-          isBusinessActor={isBusinessActor}
-          user={user}
-          carouselCount={posts[activeIndex]?.mediaItems?.length ?? 0}
-          carouselIndex={currentMediaIndex}
-        />
-      </div>
+      {/* Floating top bar — hidden when PGA card active */}
+      {!isTournamentCardActive && (
+        <div style={{ position: 'relative', zIndex: 50 }}>
+          <ClubhouseTopBar
+            activeTab={activeTab}
+            onTabChange={(tab) => {
+              setActiveTab(tab);
+              const targetFeed = tab === 'friends' ? friendsFeed : suggestedFeed;
+              if (targetFeed.isLoading) {
+                resetSkeleton();
+              }
+            }}
+            isBusinessActor={isBusinessActor}
+            user={user}
+            carouselCount={posts[activeIndex]?.mediaItems?.length ?? 0}
+            carouselIndex={currentMediaIndex}
+          />
+        </div>
+      )}
 
       {/* Offline indicator */}
       {!isOnline && (
@@ -385,10 +400,14 @@ const ClubhouseContent = () => {
           <CommentsSheet
             isOpen={commentsOpen}
             onClose={closeComments}
-            postId={activePost.id}
+            postId={
+              activePost.postType === 'pga_card'
+                ? (activePost as unknown as PGACardFeedPost).cardData.postId
+                : activePost.id
+            }
             currentUserId={user?.id}
             creatorUserId={activePost.userId}
-            creatorName={activePost.displayName}
+            creatorName={activePost.postType === 'pga_card' ? 'clbhouz' : activePost.displayName}
             creatorAvatar={activePost.avatarUrl}
             caption={activePost.caption}
             theme="dark"
