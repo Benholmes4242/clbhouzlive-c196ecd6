@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useLiveArena } from '@/features/tourhub/hooks/useLiveArena';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { useSingleCourseImage } from '@/features/tourhub/hooks/useCourseImageResolver';
+import type { VenueInput } from '@/features/tourhub/hooks/useCourseImageResolver';
 import type { PGACardFeedPost, PGACardData, PGACardLeader, PGACardChaser, PGACardStats } from '../types/media';
 import { getTournamentDisplayState } from '@/utils/tournamentState';
 
@@ -78,11 +80,10 @@ export function usePGACard(userId?: string): {
       const seasonIds = (seasons ?? []).map(s => s.id);
       if (!seasonIds.length) return null;
 
-      // Fetch most recent closed tournament — wider DB window, filter client-side
       const cutoff = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
       const { data } = await supabase
         .from('sr_tournaments')
-        .select('id, name, purse, start_date, end_date, venue_name, venue_city, venue_par, venue_yardage, status, season_id')
+        .select('id, name, purse, start_date, end_date, venue_name, venue_city, venue_par, venue_yardage, venue_course_name, defending_champion, status, season_id')
         .in('status', ['closed', 'complete'])
         .in('season_id', seasonIds)
         .gte('end_date', cutoff)
@@ -92,7 +93,6 @@ export function usePGACard(userId?: string): {
 
       if (!data) return null;
 
-      // Only treat as result if within the 2-day window
       const state = getTournamentDisplayState(data.status, data.end_date);
       return state === 'result' ? data : null;
     },
@@ -113,7 +113,7 @@ export function usePGACard(userId?: string): {
       if (!seasonIds.length) return null;
       const { data } = await supabase
         .from('sr_tournaments')
-        .select('id, name, purse, start_date, end_date, venue_name, venue_city, venue_par, venue_yardage, status, season_id')
+        .select('id, name, purse, start_date, end_date, venue_name, venue_city, venue_par, venue_yardage, venue_course_name, defending_champion, status, season_id')
         .in('status', ['scheduled', 'created'])
         .in('season_id', seasonIds)
         .gte('start_date', now)
@@ -124,6 +124,88 @@ export function usePGACard(userId?: string): {
     },
     staleTime: 30 * 60_000,
     enabled: !topLive && !recentResult,
+  });
+
+  // ── Course image resolver ──
+  const activeVenue = useMemo((): VenueInput | null => {
+    const t = topLive ?? (recentResult as any) ?? (nextUpcoming as any);
+    if (!t?.venue_name && !t?.venueName) return null;
+    return {
+      venueName: t.venue_name ?? t.venueName,
+      venueCourseName: t.venue_course_name ?? t.venueCourseName ?? null,
+      city: t.venue_city ?? t.venueCity ?? null,
+    };
+  }, [topLive, recentResult, nextUpcoming]);
+
+  const { courseImage } = useSingleCourseImage(activeVenue);
+  const courseImageUrl = courseImage?.imageUrl ?? null;
+
+  // ── Past winners at this venue (upcoming state only) ──
+  const { data: pastWinnersRaw = [] } = useQuery({
+    queryKey: ['pga-card-past-winners', (nextUpcoming as any)?.venue_name],
+    queryFn: async () => {
+      const venueName = (nextUpcoming as any)?.venue_name;
+      if (!venueName) return [];
+
+      const { data: seasons } = await supabase
+        .from('sr_seasons')
+        .select('id')
+        .eq('tour_id', PGA_TOUR_ID);
+      const seasonIds = (seasons ?? []).map(s => s.id);
+      if (!seasonIds.length) return [];
+
+      const venueWords = venueName.split(' ').slice(0, 3).join(' ');
+      const { data: tournaments } = await supabase
+        .from('sr_tournaments')
+        .select('id, name, start_date, end_date')
+        .in('status', ['closed', 'complete'])
+        .in('season_id', seasonIds)
+        .ilike('venue_name', `%${venueWords}%`)
+        .order('end_date', { ascending: false })
+        .limit(3);
+
+      if (!tournaments?.length) return [];
+
+      const results = await Promise.all(
+        tournaments.map(async (t) => {
+          const { data: lb } = await (supabase
+            .from('sr_leaderboards') as any)
+            .select(`
+              score,
+              player:sr_players!sr_leaderboards_player_id_fkey (
+                full_name, photo_url, headshot_override
+              )
+            `)
+            .eq('tournament_id', t.id)
+            .eq('position', 1)
+            .limit(1)
+            .maybeSingle();
+
+          if (!lb?.player) return null;
+          const year = new Date(t.end_date + 'T12:00:00').getFullYear();
+          return {
+            year,
+            playerName: lb.player.full_name as string,
+            photoUrl: (lb.player.headshot_override
+              ?? getPlayerHeadshotUrl(lb.player.full_name, PGA_TOUR_SLUG)
+              ?? lb.player.photo_url
+              ?? null) as string | null,
+            scoreDisplay: lb.score != null
+              ? lb.score === 0 ? 'E' : lb.score > 0 ? `+${lb.score}` : `${lb.score}`
+              : null,
+          };
+        })
+      );
+
+      return results.filter(Boolean) as Array<{
+        year: number;
+        playerName: string;
+        photoUrl: string | null;
+        scoreDisplay: string | null;
+      }>;
+    },
+    enabled: !!nextUpcoming && !topLive && !recentResult,
+    staleTime: 30 * 60_000,
   });
 
   // ── Result leaderboard (final standings) ──
@@ -313,7 +395,7 @@ export function usePGACard(userId?: string): {
         venueCity: topLive.venueCity,
         venuePar: topLive.venuePar,
         venueYardage: topLive.venueYardage,
-        courseImageUrl: null,
+        courseImageUrl,
         currentRound: round,
         totalRounds: topLive.totalRounds,
         roundLabel: getRoundLabel(round, topLive.totalRounds),
@@ -325,6 +407,8 @@ export function usePGACard(userId?: string): {
         endDate: topLive.endDate,
         postId,
         ...eng,
+        defendingChampion: null,
+        pastWinners: null,
       };
     }
 
@@ -388,7 +472,7 @@ export function usePGACard(userId?: string): {
         venueName: r.venue_name,
         venueCity: r.venue_city,
         venuePar: r.venue_par,
-        courseImageUrl: null,
+        courseImageUrl,
         venueYardage: r.venue_yardage,
         currentRound: 4,
         totalRounds: 4,
@@ -402,6 +486,8 @@ export function usePGACard(userId?: string): {
         endDate: r.end_date,
         postId,
         ...eng,
+        defendingChampion: null,
+        pastWinners: null,
         championSeasonStats: championSeasonStats ? {
           drivingDistance: championSeasonStats.driving_distance,
           drivingAccuracy: championSeasonStats.driving_accuracy,
@@ -423,7 +509,7 @@ export function usePGACard(userId?: string): {
         venueCity: u.venue_city,
         venuePar: u.venue_par,
         venueYardage: u.venue_yardage,
-        courseImageUrl: null,
+        courseImageUrl,
         currentRound: 0,
         totalRounds: 4,
         roundLabel: '',
@@ -435,13 +521,15 @@ export function usePGACard(userId?: string): {
         endDate: u.end_date,
         postId,
         ...eng,
+        defendingChampion: u.defending_champion ?? null,
+        pastWinners: pastWinnersRaw.length > 0 ? pastWinnersRaw : null,
       };
     }
 
     return null;
   }, [topLive, recentResult, nextUpcoming, resultLeaderboard, postId,
       engagementData?.likeCount, engagementData?.commentCount, engagementData?.isLikedByMe,
-      liveScorecards, resultScorecards, resultMeta, championSeasonStats]);
+      liveScorecards, resultScorecards, resultMeta, championSeasonStats, courseImageUrl, pastWinnersRaw]);
 
   const pgaCard: PGACardFeedPost | null = cardData ? {
     id: postId || 'pga-card',
