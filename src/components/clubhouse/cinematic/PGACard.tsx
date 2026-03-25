@@ -941,16 +941,18 @@ export const PGACard: React.FC<PGACardProps> = ({
               animation: 'slideUp 0.5s ease-out both',
               animationDelay: '0.35s',
             }}>
-              {/* Avatar */}
+              {/* Avatar — squircle */}
               <div style={{
-                width: 52, height: 52, borderRadius: '50%', flexShrink: 0,
+                width: 52, height: 52, borderRadius: SQUIRCLE_RADIUS, flexShrink: 0,
                 overflow: 'hidden',
                 border: `2px solid ${ACCENT}44`,
                 background: 'rgba(255,255,255,0.06)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 {cd.defendingChampionPhotoUrl
-                  ? <img src={cd.defendingChampionPhotoUrl} alt={defendingChampion} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ? <img src={cd.defendingChampionPhotoUrl} alt={defendingChampion} style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                    />
                   : <span style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>
                       {getInitials(defendingChampion)}
                     </span>
