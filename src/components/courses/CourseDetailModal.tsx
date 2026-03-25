@@ -6,7 +6,9 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from '@/components/ui/dialog';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import CourseDetailHeader from './CourseDetailHeader';
 import CourseDetailImage from './CourseDetailImage';
 import CourseDetailInfo from './CourseDetailInfo';
@@ -136,7 +138,8 @@ const CourseDetailModal = ({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
+          <VisuallyHidden.Root><DialogTitle>Course Details</DialogTitle></VisuallyHidden.Root>
           <CourseDetailHeader course={course} />
 
           <div className="space-y-6">

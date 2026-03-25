@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Loader2, Play, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 
 interface MediaMessageProps {
   type: 'image' | 'video';
@@ -50,7 +51,8 @@ export function MediaMessage({ type, url, className }: MediaMessageProps) {
         </div>
 
         <Dialog open={fullscreen} onOpenChange={setFullscreen}>
-          <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 border-none bg-transparent">
+          <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 border-none bg-transparent" aria-describedby={undefined}>
+            <VisuallyHidden.Root><DialogTitle>Media Preview</DialogTitle></VisuallyHidden.Root>
             <button
               onClick={() => setFullscreen(false)}
               className="absolute top-2 right-2 z-10 p-2 rounded-full bg-foreground/50 text-background hover:bg-foreground/70"

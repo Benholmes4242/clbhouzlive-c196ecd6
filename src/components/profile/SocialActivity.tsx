@@ -8,7 +8,8 @@ import BadgeCarousel from '../badges/BadgeCarousel';
 import { ReviewMediaItem } from '@/components/posts/FullscreenReviewPost';
 import { ReviewPostViewer } from '@/components/posts/ReviewPostViewer';
 import { ReviewBottomPanel } from '@/components/posts/ReviewBottomPanel';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { isReviewPost as checkIsReviewPost, extractReviewData, extractUserData } from '@/lib/postHelpers';
 import { useMediaViewer } from '@/hooks/useMediaViewer';
 
@@ -133,7 +134,8 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
 
         return (
           <Dialog open={!!selectedReviewPost} onOpenChange={() => setSelectedReviewPost(null)}>
-            <DialogContent className="max-w-none w-screen h-screen p-0 border-0 bg-black [&>button]:hidden">
+            <DialogContent className="max-w-none w-screen h-screen p-0 border-0 bg-black [&>button]:hidden" aria-describedby={undefined}>
+              <VisuallyHidden.Root><DialogTitle>Review Post</DialogTitle></VisuallyHidden.Root>
               <ReviewPostViewer
                 mode="live"
                 courseId={reviewData?.courseId || ''}
