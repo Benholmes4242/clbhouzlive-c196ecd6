@@ -567,7 +567,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                           borderRadius: SQUIRCLE_RADIUS, background: 'rgba(255,255,255,0.08)',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.5)',
-                          border: '1.5px solid rgba(0,0,0,0.9)',
+                          border: '1.5px solid rgba(8,10,14,0.8)',
                         }}>
                           +{group.chasers.length - 3}
                         </div>
