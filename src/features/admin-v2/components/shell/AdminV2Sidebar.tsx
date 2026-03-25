@@ -9,7 +9,7 @@ import {
   Mail, MapPin, Upload, Trophy, Building2, Image, BookOpen,
   Flag, ClipboardList, Settings, Wrench, Map, FlaskConical,
   ArrowLeft, ChevronDown, ChevronRight, Activity, Sparkles, MessageCircle,
-  Medal,
+  Medal, TrendingUp, Layers,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -171,6 +171,8 @@ export default function AdminV2Sidebar({ role, can, onNavigate }: SidebarProps) 
         { to: '/admin-v2/analytics/retention',             label: 'Retention',              icon: Activity },
         { to: '/admin-v2/analytics/content-performance',   label: 'Content Performance',    icon: BarChart3 },
         { to: '/admin-v2/analytics/creator-leaderboard',   label: 'Creator Leaderboard',    icon: Trophy },
+        { to: '/admin-v2/analytics/growth',                label: 'Growth',                 icon: TrendingUp },
+        { to: '/admin-v2/analytics/feature-adoption',      label: 'Feature Adoption',       icon: Layers },
       ],
     }] : []),
     ...(can.manageAdmins ? [{

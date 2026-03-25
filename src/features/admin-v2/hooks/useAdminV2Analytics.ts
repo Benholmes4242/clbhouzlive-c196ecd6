@@ -798,3 +798,227 @@ export function useCreatorLeaderboard(period: AnalyticsPeriod) {
     staleTime: 5 * 60_000,
   });
 }
+
+// ─── Signup Funnel types & fetcher ────────────────────────────────────────────
+
+export interface FunnelStep {
+  label: string;
+  count: number;
+  pct: number;
+  dropPct: number;
+}
+
+export interface SignupFunnelData {
+  steps: FunnelStep[];
+  period: AnalyticsPeriod;
+}
+
+async function fetchSignupFunnel(period: AnalyticsPeriod): Promise<SignupFunnelData> {
+  const since = startOf(period).toISOString();
+
+  const [
+    signupAttempts,
+    signupSuccess,
+    onboardingStarted,
+    onboardingComplete,
+    addedPhoto,
+    firstPost,
+    activeDay7,
+  ] = await Promise.all([
+    supabase.from('analytics_events').select('id', { count: 'exact', head: true })
+      .in('name', ['signup_success', 'signup_failed']).gte('created_at', since),
+    supabase.from('analytics_events').select('id', { count: 'exact', head: true })
+      .eq('name', 'signup_success').gte('created_at', since),
+    supabase.from('user_profiles').select('id', { count: 'exact', head: true })
+      .gte('created_at', since).is('deleted_at', null),
+    supabase.from('user_profiles').select('id', { count: 'exact', head: true })
+      .gte('created_at', since).is('deleted_at', null).eq('has_completed_onboarding', true),
+    supabase.from('user_profiles').select('id', { count: 'exact', head: true })
+      .gte('created_at', since).is('deleted_at', null).not('profile_photo_url', 'is', null),
+    supabase.from('analytics_events').select('user_id', { count: 'exact', head: true })
+      .eq('name', 'post_published').gte('created_at', since),
+    supabase.from('analytics_events').select('user_id').eq('name', 'signup_success')
+      .gte('created_at', since).lte('created_at', new Date(Date.now() - 7 * 86400_000).toISOString()),
+  ]);
+
+  const day7SignupIds = new Set((activeDay7.data ?? []).map((r: any) => r.user_id).filter(Boolean));
+  let day7ActiveCount = 0;
+  if (day7SignupIds.size > 0) {
+    const { data: recentActive } = await supabase
+      .from('analytics_events').select('user_id')
+      .in('user_id', [...day7SignupIds])
+      .gte('created_at', new Date(Date.now() - 7 * 86400_000).toISOString())
+      .not('user_id', 'is', null);
+    day7ActiveCount = new Set((recentActive ?? []).map((r: any) => r.user_id)).size;
+  }
+
+  const rawCounts = [
+    signupAttempts.count ?? 0,
+    signupSuccess.count ?? 0,
+    onboardingStarted.count ?? 0,
+    onboardingComplete.count ?? 0,
+    addedPhoto.count ?? 0,
+    firstPost.count ?? 0,
+    day7ActiveCount,
+  ];
+
+  const labels = [
+    'Signup Attempted',
+    'Account Created',
+    'Profile Started',
+    'Onboarding Complete',
+    'Photo Added',
+    'First Post',
+    'Active at Day 7',
+  ];
+
+  const top = rawCounts[0] || 1;
+  const steps: FunnelStep[] = rawCounts.map((count, i) => ({
+    label: labels[i],
+    count,
+    pct: Math.round((count / top) * 100),
+    dropPct: i === 0 ? 0 : rawCounts[i - 1] > 0
+      ? Math.round(((rawCounts[i - 1] - count) / rawCounts[i - 1]) * 100)
+      : 0,
+  }));
+
+  return { steps, period };
+}
+
+export function useSignupFunnel(period: AnalyticsPeriod) {
+  return useQuery({
+    queryKey: ['admin-v2', 'analytics', 'funnel', period],
+    queryFn: () => fetchSignupFunnel(period),
+    staleTime: 5 * 60_000,
+  });
+}
+
+// ─── Geographic Breakdown types & fetcher ─────────────────────────────────────
+
+export interface GeoBreakdownRow {
+  country: string;
+  userCount: number;
+  newThisPeriod: number;
+  pctOfTotal: number;
+}
+
+async function fetchGeoBreakdown(period: AnalyticsPeriod): Promise<GeoBreakdownRow[]> {
+  const since = startOf(period).toISOString();
+
+  const [allRes, newRes] = await Promise.all([
+    supabase.from('user_profiles').select('country').is('deleted_at', null).not('country', 'is', null),
+    supabase.from('user_profiles').select('country').is('deleted_at', null).not('country', 'is', null).gte('created_at', since),
+  ]);
+
+  const allRows = allRes.data ?? [];
+  const newRows = newRes.data ?? [];
+  const total = allRows.length || 1;
+
+  const countryTotals = new Map<string, number>();
+  const countryNew = new Map<string, number>();
+
+  for (const r of allRows) {
+    if (!r.country) continue;
+    countryTotals.set(r.country, (countryTotals.get(r.country) ?? 0) + 1);
+  }
+  for (const r of newRows) {
+    if (!r.country) continue;
+    countryNew.set(r.country, (countryNew.get(r.country) ?? 0) + 1);
+  }
+
+  return Array.from(countryTotals.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 30)
+    .map(([country, userCount]) => ({
+      country,
+      userCount,
+      newThisPeriod: countryNew.get(country) ?? 0,
+      pctOfTotal: Math.round((userCount / total) * 100 * 10) / 10,
+    }));
+}
+
+export function useGeoBreakdown(period: AnalyticsPeriod) {
+  return useQuery({
+    queryKey: ['admin-v2', 'analytics', 'geo', period],
+    queryFn: () => fetchGeoBreakdown(period),
+    staleTime: 10 * 60_000,
+  });
+}
+
+// ─── Feature Adoption types & fetcher ─────────────────────────────────────────
+
+export interface FeatureAdoptionRow {
+  feature: string;
+  description: string;
+  usersWhoUsed: number;
+  totalUsers: number;
+  adoptionPct: number;
+  trend: 'up' | 'down' | 'flat';
+  trendPct: number;
+}
+
+async function fetchFeatureAdoption(period: AnalyticsPeriod): Promise<FeatureAdoptionRow[]> {
+  const since = startOf(period).toISOString();
+  const days = periodToDays(period);
+  const prevSince = new Date(startOf(period).getTime() - (days * 86400_000)).toISOString();
+
+  const [totalUsersRes, currentEvents, prevEvents] = await Promise.all([
+    supabase.from('user_profiles').select('id', { count: 'exact', head: true }).is('deleted_at', null),
+    supabase.from('analytics_events').select('name, user_id').gte('created_at', since).not('user_id', 'is', null).limit(50000),
+    supabase.from('analytics_events').select('name, user_id').gte('created_at', prevSince).lt('created_at', since).not('user_id', 'is', null).limit(50000),
+  ]);
+
+  const totalUsers = totalUsersRes.count ?? 1;
+  const current = currentEvents.data ?? [];
+  const prev = prevEvents.data ?? [];
+
+  const currentSets = new Map<string, Set<string>>();
+  const prevSets = new Map<string, Set<string>>();
+
+  for (const e of current) {
+    if (!currentSets.has(e.name)) currentSets.set(e.name, new Set());
+    currentSets.get(e.name)!.add(e.user_id!);
+  }
+  for (const e of prev) {
+    if (!prevSets.has(e.name)) prevSets.set(e.name, new Set());
+    prevSets.get(e.name)!.add(e.user_id!);
+  }
+
+  const FEATURES = [
+    { feature: 'Clubhouse Feed', description: 'Watched videos in the feed', events: ['page_view'] },
+    { feature: 'Post Studio', description: 'Created a post or moment', events: ['post_published'] },
+    { feature: 'Review Wizard', description: 'Submitted a course review', events: ['review_submitted'] },
+    { feature: 'Echo AI', description: 'Asked Echo a question', events: ['echo_query'] },
+    { feature: 'Tour Hub', description: 'Visited tournament data', events: ['nav_tab_tap'] },
+    { feature: 'Messaging', description: 'Sent a direct message', events: ['message_sent'] },
+    { feature: 'Course Discovery', description: 'Browsed or searched courses', events: ['nav_tab_tap'] },
+    { feature: 'Top 100', description: 'Viewed Top 100 courses', events: ['page_view'] },
+    { feature: 'Friend System', description: 'Sent a friend request', events: ['social_friend_request_sent'] },
+    { feature: 'Follow System', description: 'Followed another user', events: ['social_follow_toggled'] },
+  ];
+
+  return FEATURES.map(f => {
+    const usersSet = new Set<string>();
+    const prevUsersSet = new Set<string>();
+    for (const eventName of f.events) {
+      for (const uid of currentSets.get(eventName) ?? []) usersSet.add(uid);
+      for (const uid of prevSets.get(eventName) ?? []) prevUsersSet.add(uid);
+    }
+    const usersWhoUsed = usersSet.size;
+    const prevUsersWhoUsed = prevUsersSet.size;
+    const adoptionPct = Math.round((usersWhoUsed / totalUsers) * 100 * 10) / 10;
+    const trendPct = prevUsersWhoUsed > 0
+      ? Math.round(((usersWhoUsed - prevUsersWhoUsed) / prevUsersWhoUsed) * 100)
+      : 0;
+    const trend: FeatureAdoptionRow['trend'] = trendPct > 2 ? 'up' : trendPct < -2 ? 'down' : 'flat';
+    return { feature: f.feature, description: f.description, usersWhoUsed, totalUsers, adoptionPct, trend, trendPct };
+  }).sort((a, b) => b.adoptionPct - a.adoptionPct);
+}
+
+export function useFeatureAdoption(period: AnalyticsPeriod) {
+  return useQuery({
+    queryKey: ['admin-v2', 'analytics', 'feature-adoption', period],
+    queryFn: () => fetchFeatureAdoption(period),
+    staleTime: 5 * 60_000,
+  });
+}
