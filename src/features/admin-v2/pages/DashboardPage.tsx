@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  AreaChart, Area, XAxis, YAxis,
+  ComposedChart, Bar, Line, XAxis, YAxis,
   CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
 import {
@@ -19,6 +19,8 @@ import {
   AdminButton,
   AdminSectionHeader,
 } from '../components/ui';
+import { AdminBarChart } from '../components/shared/AdminBarChart';
+import { AdminStatRow } from '../components/shared/AdminStatRow';
 
 // ─── Action colour pill for audit log ────────────────────────────────────────
 
@@ -41,6 +43,14 @@ function AuditActionPill({ action }: { action: string }) {
       {isCreate ? 'CREATE' : isDelete ? 'DELETE' : isUpdate ? 'UPDATE' : 'SYS'}
     </span>
   );
+}
+
+function getAuditBorderColor(action: string): string {
+  const lower = action.toLowerCase();
+  if (lower.includes('creat') || lower.includes('add') || lower.includes('invit')) return '#17C964';
+  if (lower.includes('delet') || lower.includes('remov') || lower.includes('ban') || lower.includes('revok')) return '#F31260';
+  if (lower.includes('updat') || lower.includes('edit') || lower.includes('chang') || lower.includes('approv') || lower.includes('reject')) return '#1D6FF5';
+  return '#E2E8F0';
 }
 
 // ─── Queue card ───────────────────────────────────────────────────────────────
@@ -165,10 +175,27 @@ const ChartTooltip = ({ active, payload, label }: any) => {
   );
 };
 
+// ─── Health status dot ────────────────────────────────────────────────────────
+
+function HealthIndicator({ label, status, value }: { label: string; status: 'good' | 'warn'; value: string }) {
+  return (
+    <div className="flex items-center gap-2.5">
+      <div
+        className="w-2 h-2 rounded-full flex-shrink-0"
+        style={{ background: status === 'good' ? '#17C964' : '#F5A623' }}
+      />
+      <div>
+        <p style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>{label}</p>
+        <p style={{ fontSize: 11, color: '#94A3B8' }}>{value}</p>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
-  const { kpis, queue, trend, audit, isAnyLoading, refetchAll } = useAdminV2Dashboard();
+  const { kpis, queue, trend, audit, glance, isAnyLoading, refetchAll } = useAdminV2Dashboard();
   const navigate = useNavigate();
   const [seriesVisible, setSeriesVisible] = useState({
     users: true, posts: true, reviews: true,
@@ -177,6 +204,14 @@ export default function DashboardPage() {
   const toggleSeries = (key: keyof typeof seriesVisible) => {
     setSeriesVisible(v => ({ ...v, [key]: !v[key] }));
   };
+
+  // Derive health indicators
+  const health = [
+    { label: 'Signups', status: ((kpis.data?.newUsersToday.delta ?? 0) >= 0 ? 'good' : 'warn') as 'good' | 'warn', value: `${kpis.data?.newUsersToday.value ?? 0} today` },
+    { label: 'Active Users', status: ((kpis.data?.activeUsers24h.delta ?? 0) >= -10 ? 'good' : 'warn') as 'good' | 'warn', value: `${kpis.data?.activeUsers24h.value ?? 0} (24h)` },
+    { label: 'Content', status: ((kpis.data?.postsToday.delta ?? 0) >= -20 ? 'good' : 'warn') as 'good' | 'warn', value: `${kpis.data?.postsToday.value ?? 0} posts` },
+    { label: 'Action Queue', status: ((queue.data?.pendingVerifications ?? 0) > 5 ? 'warn' : 'good') as 'good' | 'warn', value: `${(queue.data?.pendingVerifications ?? 0) + (queue.data?.pendingInvites ?? 0)} pending` },
+  ];
 
   return (
     <div style={{ padding: '24px 24px 40px', background: '#F8FAFC', minHeight: '100%' }}>
@@ -198,6 +233,34 @@ export default function DashboardPage() {
           </AdminButton>
         }
       />
+
+      {/* ── Platform Health Banner ─────────────────────────────────────────── */}
+      <div
+        style={{
+          background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14,
+          padding: '16px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+        }}
+      >
+        {kpis.isLoading ? (
+          <div className="flex items-center gap-8 animate-pulse">
+            {[1,2,3,4].map(i => (
+              <div key={i} className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full" style={{ background: '#F1F5F9' }} />
+                <div className="h-4 w-20 rounded" style={{ background: '#F1F5F9' }} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex items-center gap-8 flex-wrap" style={{ rowGap: 12 }}>
+            {health.map((h, i) => (
+              <React.Fragment key={h.label}>
+                {i > 0 && <div style={{ width: 1, height: 28, background: '#F1F5F9', flexShrink: 0 }} />}
+                <HealthIndicator {...h} />
+              </React.Fragment>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* ── Section 1: KPI Row ──────────────────────────────────────────────── */}
       <section className="space-y-3">
@@ -247,6 +310,60 @@ export default function DashboardPage() {
         </div>
       </section>
 
+      {/* ── Today at a Glance ──────────────────────────────────────────────── */}
+      <section className="space-y-3">
+        <AdminSectionHeader title="Today at a Glance" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Posts by Hour */}
+          <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#64748B', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>
+              Posts by Hour
+            </p>
+            {glance.isLoading ? (
+              <div className="h-[140px] animate-pulse rounded-lg" style={{ background: '#F1F5F9' }} />
+            ) : (
+              <AdminBarChart
+                data={(glance.data?.postsByHour ?? []).map(h => ({
+                  label: `${h.hour}:00`,
+                  value: h.count,
+                }))}
+                color="#F5A623"
+                height={140}
+              />
+            )}
+          </div>
+
+          {/* Top Active Users */}
+          <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#64748B', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>
+              Most Active Users Today
+            </p>
+            {glance.isLoading ? (
+              <div className="space-y-3 animate-pulse">
+                {[1,2,3].map(i => <div key={i} className="h-10 rounded" style={{ background: '#F1F5F9' }} />)}
+              </div>
+            ) : !glance.data?.topActiveUsers?.length ? (
+              <p style={{ fontSize: 13, color: '#94A3B8', textAlign: 'center', padding: '24px 0' }}>No activity yet today</p>
+            ) : (
+              <div>
+                {glance.data.topActiveUsers.map((u, i) => (
+                  <AdminStatRow
+                    key={u.userId}
+                    label={`${i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'} ${u.displayName}`}
+                    value={u.eventCount}
+                    subValue="events"
+                    barPct={glance.data!.topActiveUsers[0]?.eventCount
+                      ? (u.eventCount / glance.data!.topActiveUsers[0].eventCount) * 100
+                      : 0}
+                    color={i === 0 ? '#F5A623' : i === 1 ? '#1D6FF5' : '#17C964'}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
       {/* ── Section 2: Action Queues ─────────────────────────────────────────── */}
       <section className="space-y-3">
         <AdminSectionHeader title="Action Queue" description="Items requiring your attention" />
@@ -277,7 +394,7 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      {/* ── Section 3: Activity Trend Chart ─────────────────────────────────── */}
+      {/* ── Section 3: Activity Trend Chart (ComposedChart) ─────────────────── */}
       <section className="space-y-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <AdminSectionHeader title="14-Day Activity" />
@@ -309,35 +426,21 @@ export default function DashboardPage() {
             <div className="h-[260px] animate-pulse rounded-lg" style={{ background: '#F1F5F9' }} />
           ) : (
             <ResponsiveContainer width="100%" height={260}>
-              <AreaChart data={trend.data ?? []}>
-                <defs>
-                  <linearGradient id="grad-users" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#F5A623" stopOpacity={0.15} />
-                    <stop offset="95%" stopColor="#F5A623" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="grad-posts" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#1D6FF5" stopOpacity={0.15} />
-                    <stop offset="95%" stopColor="#1D6FF5" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="grad-reviews" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#17C964" stopOpacity={0.15} />
-                    <stop offset="95%" stopColor="#17C964" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
+              <ComposedChart data={trend.data ?? []}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
                 <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#94A3B8' }} tickLine={false} axisLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: '#94A3B8' }} tickLine={false} axisLine={false} width={32} />
                 <Tooltip content={<ChartTooltip />} />
                 {seriesVisible.users && (
-                  <Area type="monotone" dataKey="users" name="Signups" stroke="#F5A623" fill="url(#grad-users)" strokeWidth={2} dot={false} />
+                  <Bar dataKey="users" name="Signups" fill="#F5A623" radius={[3, 3, 0, 0]} maxBarSize={20} opacity={0.85} />
                 )}
                 {seriesVisible.posts && (
-                  <Area type="monotone" dataKey="posts" name="Posts" stroke="#1D6FF5" fill="url(#grad-posts)" strokeWidth={2} dot={false} />
+                  <Bar dataKey="posts" name="Posts" fill="#1D6FF5" radius={[3, 3, 0, 0]} maxBarSize={20} opacity={0.85} />
                 )}
                 {seriesVisible.reviews && (
-                  <Area type="monotone" dataKey="reviews" name="Reviews" stroke="#17C964" fill="url(#grad-reviews)" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="reviews" name="Reviews" stroke="#17C964" strokeWidth={2} dot={false} />
                 )}
-              </AreaChart>
+              </ComposedChart>
             </ResponsiveContainer>
           )}
         </div>
@@ -380,7 +483,15 @@ export default function DashboardPage() {
           ) : (
             <div>
               {audit.data.map(entry => (
-                <div key={entry.id} className="flex items-center gap-4 px-5 py-3.5" style={{ borderBottom: '1px solid #F1F5F9' }}>
+                <div
+                  key={entry.id}
+                  className="flex items-center gap-4 px-5 py-3.5"
+                  style={{
+                    borderBottom: '1px solid #F1F5F9',
+                    borderLeft: `3px solid ${getAuditBorderColor(entry.action)}`,
+                    minHeight: 52,
+                  }}
+                >
                   <AuditActionPill action={entry.action} />
                   <div className="flex-1 min-w-0">
                     <span style={{ fontSize: 13, fontWeight: 500, color: '#334155' }}>

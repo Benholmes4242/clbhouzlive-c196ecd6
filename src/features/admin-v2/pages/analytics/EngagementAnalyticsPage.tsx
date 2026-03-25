@@ -4,13 +4,28 @@ import { useEngagementAnalytics, type AnalyticsPeriod } from '../../hooks/useAdm
 import {
   AdminPageHeader, AdminKpiCard, AdminSectionHeader, AdminPeriodPicker,
 } from '../../components/ui';
-import {
-  SingleAreaChart, ChartSkeleton,
-} from '../../components/shared/AdminAreaChart';
+import { ChartSkeleton } from '../../components/shared/AdminAreaChart';
+import { AdminBarChart } from '../../components/shared/AdminBarChart';
+import { AdminStatRow } from '../../components/shared/AdminStatRow';
+
+// Event category colour mapping
+function getEventColor(name: string): string {
+  const n = name.toLowerCase();
+  if (n.includes('like') || n.includes('comment') || n.includes('share') || n.includes('follow') || n.includes('react')) return '#F5A623';
+  if (n.includes('page') || n.includes('nav') || n.includes('tab') || n.includes('session')) return '#1D6FF5';
+  if (n.includes('post') || n.includes('review') || n.includes('upload') || n.includes('echo')) return '#17C964';
+  return '#94A3B8';
+}
 
 export default function EngagementAnalyticsPage() {
   const [period, setPeriod] = useState<AnalyticsPeriod>('14d');
   const { data, isLoading } = useEngagementAnalytics(period);
+
+  const maxEventCount = (data?.topEvents ?? [])[0]?.count ?? 1;
+
+  // Peak hours heatmap data
+  const hourly = data?.hourlyBreakdown ?? [];
+  const maxHourCount = Math.max(...hourly.map(h => h.count), 1);
 
   return (
     <div style={{ padding: 24, background: '#F8FAFC', minHeight: '100%' }} className="max-w-5xl mx-auto space-y-6">
@@ -28,44 +43,70 @@ export default function EngagementAnalyticsPage() {
         <AdminKpiCard title="Busiest Hour" value={data?.busiestHour !== undefined ? `${data.busiestHour}:00` : '—'} icon={Clock} iconColor="hsl(var(--accent-amber))" isLoading={isLoading} />
       </div>
 
-      {/* Daily event volume */}
-      <div className="rounded-xl border border-border/60 bg-card p-5 space-y-4">
+      {/* Daily event volume — bar chart */}
+      <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }} className="space-y-4">
         <AdminSectionHeader title="Daily Event Volume" />
-        <div className="min-h-[180px]">
+        <div className="min-h-[200px]">
           {isLoading
-            ? <ChartSkeleton height={180} />
-            : <SingleAreaChart data={data?.dailyTrend ?? []} color="#3b82f6" name="Events" />
+            ? <ChartSkeleton height={200} />
+            : <AdminBarChart
+                data={(data?.dailyTrend ?? []).map(d => ({ label: d.date, value: d.value }))}
+                color="#3b82f6"
+                height={200}
+              />
           }
         </div>
       </div>
 
-      {/* Top events table */}
-      <div className="rounded-xl border border-border/60 bg-card p-5 space-y-4">
+      {/* Peak Hours heatmap */}
+      <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }} className="space-y-4">
+        <AdminSectionHeader title="Peak Hours" />
+        {isLoading ? (
+          <ChartSkeleton height={80} />
+        ) : (
+          <div className="flex flex-wrap gap-1.5">
+            {hourly.map(h => {
+              const intensity = maxHourCount > 0 ? h.count / maxHourCount : 0;
+              return (
+                <div
+                  key={h.hour}
+                  title={`${h.hour}:00 — ${h.count.toLocaleString()} events`}
+                  style={{
+                    width: 32, height: 32, borderRadius: 6,
+                    background: `rgba(245,158,11,${Math.max(0.05, intensity * 0.85)})`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 10, fontWeight: 600,
+                    color: intensity > 0.5 ? '#FFFFFF' : '#94A3B8',
+                    cursor: 'default',
+                  }}
+                >
+                  {h.hour}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Top events as stat rows */}
+      <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: 14, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }} className="space-y-4">
         <AdminSectionHeader title="Top 20 Events by Frequency" />
         {isLoading ? (
           <div className="animate-pulse space-y-2">
-            {Array.from({ length: 8 }).map((_, i) => <div key={i} className="h-8 rounded bg-muted" />)}
+            {Array.from({ length: 8 }).map((_, i) => <div key={i} className="h-10 rounded" style={{ background: '#F1F5F9' }} />)}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b text-left text-muted-foreground">
-                  <th className="py-2 pr-4">Event Name</th>
-                  <th className="py-2 pr-4 text-right">Count</th>
-                  <th className="py-2 text-right">Unique Users</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(data?.topEvents ?? []).map((e, i) => (
-                  <tr key={i} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
-                    <td className="py-2 pr-4 font-mono text-xs">{e.name}</td>
-                    <td className="py-2 pr-4 text-right tabular-nums">{e.count.toLocaleString()}</td>
-                    <td className="py-2 text-right tabular-nums">{e.uniqueUsers.toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div>
+            {(data?.topEvents ?? []).map((e, i) => (
+              <AdminStatRow
+                key={i}
+                label={e.name}
+                value={e.count.toLocaleString()}
+                subValue={`${e.uniqueUsers} users`}
+                barPct={(e.count / maxEventCount) * 100}
+                color={getEventColor(e.name)}
+              />
+            ))}
           </div>
         )}
       </div>

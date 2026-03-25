@@ -307,6 +307,7 @@ export interface EngagementAnalyticsData {
   busiestHour: number;
   dailyTrend: DailyBucket[];
   topEvents: { name: string; count: number; uniqueUsers: number }[];
+  hourlyBreakdown: { hour: number; count: number }[];
 }
 
 async function fetchEngagementAnalytics(period: AnalyticsPeriod): Promise<EngagementAnalyticsData> {
@@ -350,7 +351,12 @@ async function fetchEngagementAnalytics(period: AnalyticsPeriod): Promise<Engage
     .slice(0, 20)
     .map(([name, d]) => ({ name, count: d.count, uniqueUsers: d.users.size }));
 
-  return { totalEvents, avgEventsPerUserPerDay, uniqueUsers, busiestHour, dailyTrend, topEvents };
+  const hourlyBreakdown: { hour: number; count: number }[] = [];
+  for (let h = 0; h < 24; h++) {
+    hourlyBreakdown.push({ hour: h, count: hourCounts[h] || 0 });
+  }
+
+  return { totalEvents, avgEventsPerUserPerDay, uniqueUsers, busiestHour, dailyTrend, topEvents, hourlyBreakdown };
 }
 
 // ─── Navigation analytics types & fetcher ─────────────────────────────────────
