@@ -100,7 +100,7 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
                     </span>
                   </div>
                   <p className="text-sm text-foreground/90 mt-0.5">{comment.body}</p>
-                  {user?.id === comment.commenter_id && (
+                  {(user?.id === comment.commenter_id || isOwnProfile) && (
                     <button
                       onClick={() => deleteComment(comment.id)}
                       className="text-xs text-muted-foreground/60 hover:text-destructive mt-1"
