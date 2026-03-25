@@ -22,12 +22,13 @@ const Toaster = ({ ...props }: ToasterProps) => {
 
   return (
     <Sonner
+      {...props}
       theme="dark"
       position="bottom-center"
       duration={3000}
       visibleToasts={2}
       expand={false}
-      offset="50%"
+      offset="350px"
       toastOptions={{
         className: 'clbhouz-toast',
         style: {
@@ -48,7 +49,6 @@ const Toaster = ({ ...props }: ToasterProps) => {
           cancelButton: "bg-slate-700/50 text-slate-300",
         },
       }}
-      {...props}
     />
   )
 }
