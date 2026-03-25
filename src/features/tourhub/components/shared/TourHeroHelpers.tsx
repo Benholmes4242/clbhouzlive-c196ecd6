@@ -56,7 +56,8 @@ export function UpcomingCountdown({ startDate }: { startDate: string }) {
   const [timeLeft, setTimeLeft] = useState('');
   useEffect(() => {
     function update() {
-      const diff = new Date(startDate).getTime() - Date.now();
+      const normalized = startDate.includes('T') ? startDate : `${startDate}T12:00:00`;
+      const diff = new Date(normalized).getTime() - Date.now();
       if (diff <= 0) { setTimeLeft('Starting now'); return; }
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
       const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
