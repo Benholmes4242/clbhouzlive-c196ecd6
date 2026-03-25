@@ -42,6 +42,7 @@ export function useDeleteAccount(userId: string | undefined) {
       });
       if (error) throw error;
       await supabase.auth.signOut();
+      window.location.href = '/auth';
     } catch (err) {
       console.error('[deleteAccount] Error:', err);
       toast.error('Could not delete account.', {
