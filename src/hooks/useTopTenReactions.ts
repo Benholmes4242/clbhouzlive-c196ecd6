@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 export type ReactionType = 'agree' | 'interesting' | 'want_to_play';
 
 export const REACTION_CONFIG: Record<ReactionType, { emoji: string; label: string }> = {
-  agree: { emoji: '🔥', label: 'Great pick' },
+  agree: { emoji: '🔥', label: 'Top pick' },
   interesting: { emoji: '👀', label: 'Really?' },
   want_to_play: { emoji: '⭐', label: 'On my list' },
 };
