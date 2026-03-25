@@ -70,6 +70,7 @@ export function usePGACard(userId?: string): {
       return data ?? null;
     },
     staleTime: 5 * 60_000,
+    enabled: !topLive,
   });
 
   // ── Next upcoming PGA event ──
