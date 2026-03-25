@@ -64,7 +64,7 @@ export interface FeedPost {
   courseName?: string;
   courseId?: string;
   postType?: string;
-  tournamentMeta?: TournamentResultMeta | null;
+  postType?: string;
 }
 
 /** Tournament result metadata snapshot */
