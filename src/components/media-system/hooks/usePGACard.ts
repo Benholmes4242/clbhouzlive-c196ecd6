@@ -58,8 +58,8 @@ export function usePGACard(userId?: string): {
     queryKey: ['pga-card-result'],
     queryFn: async () => {
       const cutoff = new Date(Date.now() - RESULT_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString();
-      const { data } = await supabase
-        .from('sr_tournaments')
+      const { data } = await (supabase
+        .from('sr_tournaments') as any)
         .select('id,name,purse,start_date,end_date,venue_name,venue_city,venue_par,venue_yardage,status')
         .eq('tour_slug', PGA)
         .eq('status', 'closed')
