@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, ShieldOff, Clock, CalendarDays, MapPin, CheckCircle2, UserCheck, Star } from 'lucide-react';
+import { Heart, MessageCircle, UserPlus, Users, Bell, Mail, Trophy, Building2, X, ShieldOff, Clock, CalendarDays, MapPin, CheckCircle2, UserCheck, Star, AtSign } from 'lucide-react';
 import { FiMapPin } from 'react-icons/fi';
 import { cn } from '@/lib/utils';
 import { ActivityNotification } from '@/hooks/useActivityFeed';
