@@ -1022,3 +1022,148 @@ export function useFeatureAdoption(period: AnalyticsPeriod) {
     staleTime: 5 * 60_000,
   });
 }
+
+// ─── Anomaly Alerts types & fetcher ───────────────────────────────────────────
+
+export interface AnomalyAlert {
+  id: string;
+  severity: 'critical' | 'warning' | 'info';
+  title: string;
+  description: string;
+  currentValue: number;
+  baselineValue: number;
+  changePct: number;
+  detectedAt: string;
+}
+
+async function fetchAnomalyAlerts(): Promise<AnomalyAlert[]> {
+  const now = Date.now();
+  const oneDayAgo    = new Date(now - 86400_000).toISOString();
+  const twoDaysAgo   = new Date(now - 2 * 86400_000).toISOString();
+  const sevenDaysAgo = new Date(now - 7 * 86400_000).toISOString();
+
+  const [
+    dauToday, dauYesterday,
+    signupsToday, signupsLast7,
+    failToday, failYesterday,
+    postsToday, postsLast7,
+    incompleteOnboarding,
+  ] = await Promise.all([
+    supabase.from('analytics_events').select('user_id').gte('created_at', oneDayAgo).not('user_id', 'is', null),
+    supabase.from('analytics_events').select('user_id').gte('created_at', twoDaysAgo).lt('created_at', oneDayAgo).not('user_id', 'is', null),
+    supabase.from('user_profiles').select('id', { count: 'exact', head: true }).gte('created_at', oneDayAgo).is('deleted_at', null),
+    supabase.from('user_profiles').select('id', { count: 'exact', head: true }).gte('created_at', sevenDaysAgo).is('deleted_at', null),
+    supabase.from('analytics_events').select('id', { count: 'exact', head: true }).in('name', ['login_failed', 'auth_failed']).gte('created_at', oneDayAgo),
+    supabase.from('analytics_events').select('id', { count: 'exact', head: true }).in('name', ['login_failed', 'auth_failed']).gte('created_at', twoDaysAgo).lt('created_at', oneDayAgo),
+    supabase.from('posts').select('id', { count: 'exact', head: true }).gte('created_at', oneDayAgo),
+    supabase.from('posts').select('id', { count: 'exact', head: true }).gte('created_at', sevenDaysAgo),
+    supabase.from('user_profiles').select('id', { count: 'exact', head: true }).gte('created_at', oneDayAgo).is('deleted_at', null).eq('has_completed_onboarding', false),
+  ]);
+
+  const alerts: AnomalyAlert[] = [];
+  const detectedAt = new Date().toISOString();
+
+  // DAU drop
+  const dauTodayCount = new Set((dauToday.data ?? []).map((r: any) => r.user_id)).size;
+  const dauYestCount  = new Set((dauYesterday.data ?? []).map((r: any) => r.user_id)).size;
+  if (dauYestCount > 0) {
+    const changePct = Math.round(((dauTodayCount - dauYestCount) / dauYestCount) * 100);
+    if (changePct <= -20) {
+      alerts.push({
+        id: 'dau-drop', severity: changePct <= -40 ? 'critical' : 'warning',
+        title: 'DAU Drop Detected',
+        description: `Daily active users dropped ${Math.abs(changePct)}% vs yesterday`,
+        currentValue: dauTodayCount, baselineValue: dauYestCount, changePct, detectedAt,
+      });
+    }
+  }
+
+  // Signup spike or drop
+  const signupsTodayCount = signupsToday.count ?? 0;
+  const signupsAvg7 = Math.round((signupsLast7.count ?? 0) / 7);
+  if (signupsAvg7 > 0) {
+    const changePct = Math.round(((signupsTodayCount - signupsAvg7) / signupsAvg7) * 100);
+    if (changePct >= 100) {
+      alerts.push({
+        id: 'signup-spike', severity: 'info',
+        title: 'Signup Spike',
+        description: `Signups today are ${changePct}% above 7-day average`,
+        currentValue: signupsTodayCount, baselineValue: signupsAvg7, changePct, detectedAt,
+      });
+    } else if (changePct <= -50) {
+      alerts.push({
+        id: 'signup-drop', severity: 'warning',
+        title: 'Signup Drop',
+        description: `Signups today are ${Math.abs(changePct)}% below 7-day average`,
+        currentValue: signupsTodayCount, baselineValue: signupsAvg7, changePct, detectedAt,
+      });
+    }
+  }
+
+  // Login failure spike
+  const failTodayCount = failToday.count ?? 0;
+  const failYestCount  = failYesterday.count ?? 0;
+  if (failYestCount > 0) {
+    const changePct = Math.round(((failTodayCount - failYestCount) / failYestCount) * 100);
+    if (changePct >= 50 && failTodayCount > 10) {
+      alerts.push({
+        id: 'login-failures', severity: failTodayCount > 100 ? 'critical' : 'warning',
+        title: 'Login Failure Spike',
+        description: `Login failures up ${changePct}% vs yesterday (${failTodayCount} total)`,
+        currentValue: failTodayCount, baselineValue: failYestCount, changePct, detectedAt,
+      });
+    }
+  }
+
+  // Post volume drop
+  const postsTodayCount = postsToday.count ?? 0;
+  const postsAvg7 = Math.round((postsLast7.count ?? 0) / 7);
+  if (postsAvg7 > 0) {
+    const changePct = Math.round(((postsTodayCount - postsAvg7) / postsAvg7) * 100);
+    if (changePct <= -60) {
+      alerts.push({
+        id: 'posts-drop', severity: 'warning',
+        title: 'Post Volume Drop',
+        description: `Posts today are ${Math.abs(changePct)}% below 7-day average`,
+        currentValue: postsTodayCount, baselineValue: postsAvg7, changePct, detectedAt,
+      });
+    }
+  }
+
+  // High incomplete onboarding
+  const incompleteCount = incompleteOnboarding.count ?? 0;
+  const totalNewToday = signupsTodayCount || 1;
+  const incompletePct = Math.round((incompleteCount / totalNewToday) * 100);
+  if (incompletePct >= 40 && incompleteCount > 5) {
+    alerts.push({
+      id: 'onboarding-drop', severity: 'warning',
+      title: 'Onboarding Completion Drop',
+      description: `${incompletePct}% of today's new users haven't completed onboarding (${incompleteCount} users)`,
+      currentValue: incompleteCount, baselineValue: totalNewToday, changePct: -incompletePct, detectedAt,
+    });
+  }
+
+  // All clear
+  if (alerts.length === 0) {
+    alerts.push({
+      id: 'all-clear', severity: 'info',
+      title: 'All Systems Normal',
+      description: 'No anomalies detected in the last 24 hours',
+      currentValue: 0, baselineValue: 0, changePct: 0, detectedAt,
+    });
+  }
+
+  return alerts.sort((a, b) => {
+    const order = { critical: 0, warning: 1, info: 2 };
+    return order[a.severity] - order[b.severity];
+  });
+}
+
+export function useAnomalyAlerts() {
+  return useQuery({
+    queryKey: ['admin-v2', 'anomaly-alerts'],
+    queryFn: fetchAnomalyAlerts,
+    staleTime: 5 * 60_000,
+    refetchInterval: 10 * 60_000,
+  });
+}
