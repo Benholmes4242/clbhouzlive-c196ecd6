@@ -94,7 +94,17 @@ export const FeedImageCarousel = memo(function FeedImageCarousel({
   useEffect(() => {
     setCarouselPosition(feedIndex, 0);
     setCurrentSlide(0);
-  }, [feedIndex, setCarouselPosition]);
+    // Pre-warm slide 1 on mount so first horizontal swipe is instant
+    const firstAdjacent = mediaItems[1];
+    if (firstAdjacent?.type === 'video') {
+      const hlsUrl = firstAdjacent.hlsUrl || '';
+      if (hlsUrl && !hlsUrl.startsWith('blob:')) {
+        preloadHlsManifest(hlsUrl)
+          .then(() => registerInPool(hlsUrl))
+          .catch(() => {});
+      }
+    }
+  }, [feedIndex, setCarouselPosition, mediaItems]);
 
   const goTo = useCallback((idx: number) => {
     const clamped = Math.max(0, Math.min(idx, mediaItems.length - 1));
