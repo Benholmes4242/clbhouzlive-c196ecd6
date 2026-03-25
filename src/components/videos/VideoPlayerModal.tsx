@@ -601,7 +601,7 @@ export const VideoPlayerModal: React.FC = () => {
           {/* Left column: Video player + info */}
           <div className="flex-1 flex flex-col">
             {/* Top bar */}
-            <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/80 to-transparent" style={{ paddingTop: "calc(env(safe-area-inset-top, 20px) + 8px)" }}>
+            <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/80 to-transparent" style={{ paddingTop: "calc(max(env(safe-area-inset-top, 0px), 47px) + 8px)" }}>
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleClose}
