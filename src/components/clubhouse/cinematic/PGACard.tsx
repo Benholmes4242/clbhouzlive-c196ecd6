@@ -268,10 +268,10 @@ export const PGACard: React.FC<PGACardProps> = ({
   ensureKeyframes();
 
   // Force re-render every second for upcoming countdown
-  const [, forceUpdate] = useState(0);
+  const [countdownTick, setCountdownTick] = useState(0);
   useEffect(() => {
     if (cd.state !== 'upcoming') return;
-    const id = setInterval(() => forceUpdate(n => n + 1), 1000);
+    const id = setInterval(() => setCountdownTick(n => n + 1), 1000);
     return () => clearInterval(id);
   }, [cd.state]);
 
@@ -287,8 +287,7 @@ export const PGACard: React.FC<PGACardProps> = ({
       minutes: Math.floor((diff % 3600000) / 60000),
       seconds: Math.floor((diff % 60000) / 1000),
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cd.state, cd.startDate, forceUpdate]);
+  }, [cd.state, cd.startDate, countdownTick]);
 
   // Group tied chasers for result state
   const chaserGroups = useMemo(() => {
