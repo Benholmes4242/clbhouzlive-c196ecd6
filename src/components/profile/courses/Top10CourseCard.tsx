@@ -41,6 +41,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   privacySetting,
 }) => {
   const [commentsOpen, setCommentsOpen] = useState(false);
+  const [tappedReaction, setTappedReaction] = useState<string | null>(null);
   
   const { user } = useSupabaseSession();
   const targetUserId = userId ?? '';
