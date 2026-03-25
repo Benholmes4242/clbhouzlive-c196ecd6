@@ -1,7 +1,6 @@
 import React, { lazy, Suspense, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLocation } from 'react-router-dom';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { usePanelRole } from '@/hooks/usePanelRole';
 import { panelCan } from '@/lib/panelCan';
 import AdminV2Sidebar from './components/shell/AdminV2Sidebar';
