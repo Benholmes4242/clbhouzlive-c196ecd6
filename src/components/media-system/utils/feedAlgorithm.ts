@@ -13,7 +13,7 @@ const MAX_REVIEWS_PER_CREATOR = 4;
 
 // ── Type Guards ────────────────────────────────────────────────────────────────
 function isTournamentPost(p: FeedPost): boolean {
-  return p.postType === 'tournament_result' || p.postType === 'tournament_live';
+  return p.postType === 'tournament_live';
 }
 
 function isReviewPost(p: FeedPost): boolean {
@@ -191,7 +191,7 @@ export function weightByMediaType(posts: FeedPost[]): FeedPost[] {
  * Tournament injection happens in Clubhouse.tsx (needs live data from hook).
  */
 export function buildSuggestedFeed(posts: FeedPost[]): FeedPost[] {
-  const noLive = posts.filter(p => p.postType !== 'tournament_live' && p.postType !== 'tournament_result');
+  const noLive = posts.filter(p => p.postType !== 'tournament_live');
   const filtered = filterForSuggested(noLive);
   const capped = capPerCreator(filtered);
 

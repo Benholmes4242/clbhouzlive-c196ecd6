@@ -64,59 +64,8 @@ export interface FeedPost {
   courseName?: string;
   courseId?: string;
   postType?: string;
-  tournamentMeta?: TournamentResultMeta | null;
 }
 
-/** Tournament result metadata snapshot */
-export interface TournamentResultMeta {
-  id: string;
-  post_id: string;
-  tournament_id: string;
-  tournament_name: string;
-  venue_name: string | null;
-  venue_city: string | null;
-  venue_country: string | null;
-  tour_slug: string;
-  tour_name: string;
-  tour_priority: number;
-  winner_id: string | null;
-  winner_name: string;
-  winner_score: number;
-  winner_score_display: string;
-  winner_photo_url: string | null;
-  winner_by: string | null;
-  stat_eagles: number;
-  stat_birdies: number;
-  stat_pars: number;
-  stat_bogeys: number;
-  stat_driving_distance: number | null;
-  stat_fairways_pct: number | null;
-  stat_gir_pct: number | null;
-  stat_putts: number | null;
-  podium_rows: PodiumRow[];
-  course_image_url: string | null;
-  injected_at: string;
-}
-
-export interface PodiumRow {
-  position: number;
-  label: string;
-  players: Array<{
-    name: string;
-    photoUrl: string | null;
-    score: string;
-  }>;
-  isTied: boolean;
-}
-
-/** Tournament result feed post variant */
-export interface TournamentResultFeedPost extends Omit<FeedPost, 'mediaItems' | 'review' | 'isReview'> {
-  postType: 'tournament_result';
-  tournamentMeta: TournamentResultMeta;
-  mediaItems: MediaItem[];
-  review: null;
-  isReview: false;
-}
 
 /** Live tournament player row for feed card */
 export interface LiveLeaderboardEntry {
@@ -223,6 +172,7 @@ export interface PGACardData {
   venueCity:       string | null;
   venuePar:        number | null;
   venueYardage:    number | null;
+  courseImageUrl:   string | null;
   currentRound:    number;
   totalRounds:     number;
   roundLabel:      string;
@@ -236,6 +186,7 @@ export interface PGACardData {
   likeCount:       number;
   commentCount:    number;
   isLikedByMe:     boolean;
+  winnerBy?:       string | null;
   championSeasonStats?: {
     drivingDistance:  number | null;
     drivingAccuracy: number | null;
@@ -337,7 +288,6 @@ export interface FeedRpcRow {
   is_followed_by_me: boolean;
   engagement_score: number;
   post_type?: string | null;
-  tournament_meta?: TournamentResultMeta | null;
   post_tags?: FeedPostTag[] | null;
   course_id?: string | null;
   course_name?: string | null;

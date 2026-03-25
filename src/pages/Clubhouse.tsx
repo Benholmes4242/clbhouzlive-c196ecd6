@@ -32,8 +32,7 @@ import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFe
 import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
 import { usePGACard } from '@/components/media-system/hooks/usePGACard';
 import { injectPGACard } from '@/components/media-system/utils/feedAlgorithm';
-import type { FeedPost, TournamentResultFeedPost, PGACardFeedPost } from '@/components/media-system/types/media';
-import { TournamentResultCard } from '@/components/clubhouse/cinematic/TournamentResultCard';
+import type { FeedPost, PGACardFeedPost } from '@/components/media-system/types/media';
 // buildSuggestedFeed/buildFriendsFeed are called inside the feed hooks — not here
 
 // ── Clubhouse UI overlays ──

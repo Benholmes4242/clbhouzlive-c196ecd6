@@ -1,5 +1,5 @@
 import { CLOUDFLARE_STREAM_SUBDOMAIN } from '@/media/constants';
-import type { FeedPost, FeedRpcRow, MediaItem, ReviewData, CreatorRelation, TournamentResultFeedPost, FeedPostTag } from '../types/media';
+import type { FeedPost, FeedRpcRow, MediaItem, ReviewData, CreatorRelation, FeedPostTag } from '../types/media';
 
 const UID_RE = /([0-9a-f]{32})/i;
 
@@ -25,35 +25,6 @@ function extractStreamId(mediaUrl: string): string | null {
  * This is the ONLY place where DB column names are referenced.
  */
 export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
-  // Tournament result synthetic post
-  if (row.post_type === 'tournament_result' && row.tournament_meta) {
-    return {
-      id: row.post_id,
-      userId: row.post_user_id,
-      actorType: 'system',
-      actorId: row.post_user_id,
-      username: 'clbhouz',
-      displayName: 'clbhouz',
-      avatarUrl: '',
-      isVerified: true,
-      creatorRelation: 'system',
-      caption: '',
-      mediaItems: [],
-      createdAt: row.post_created_at,
-      likeCount: Number(row.like_count) || 0,
-      commentCount: Number(row.comment_count) || 0,
-      shareCount: Number(row.share_count) || 0,
-      review: null,
-      isReview: false,
-      isLikedByMe: row.is_liked_by_me ?? false,
-      isFollowedByMe: !!row.is_followed_by_me,
-      courseName: row.tournament_meta.venue_name ?? undefined,
-      courseId: undefined,
-      postType: 'tournament_result',
-      tournamentMeta: row.tournament_meta,
-    } as TournamentResultFeedPost;
-  }
-
   const streamId = row.stream_id || extractStreamId(row.media_url || '');
   const isReview = !!row.source_review_id;
   const isBusiness = row.post_actor_type === 'business';
