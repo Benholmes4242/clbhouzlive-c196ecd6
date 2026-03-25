@@ -22,6 +22,7 @@ import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { getContextLabel } from '../../utils/tournamentClassification';
+import { getTournamentDisplayState } from '@/utils/tournamentState';
 
 import {
   ScheduleFilterPills,
@@ -201,15 +202,19 @@ export function ScheduleTab() {
       }).map(t => ({ tournament: t, type }));
     };
 
-    const liveList = tourFiltered.filter(t => t.status === 'inprogress');
-    // B45 FIX 1: use isCompleted
-    const completedList = tourFiltered
-      .filter(isCompleted)
-      .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime());
     const now = new Date();
+
+    const liveList = tourFiltered.filter(t =>
+      getTournamentDisplayState(t.status, t.end_date, now) === 'live'
+    );
+
+    const completedList = tourFiltered
+      .filter(t => getTournamentDisplayState(t.status, t.end_date, now) === 'result')
+      .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime());
+
     const upcomingList = tourFiltered
-      .filter(t => t.status === 'scheduled' || t.status === 'created')
-      .filter(t => new Date(t.start_date) > now)
+      .filter(t => getTournamentDisplayState(t.status, t.end_date, now) === 'upcoming'
+        && (t.status === 'scheduled' || t.status === 'created'))
       .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
 
     if (filter === 'live') {

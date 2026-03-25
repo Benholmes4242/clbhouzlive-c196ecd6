@@ -6,6 +6,7 @@
 import { useMemo } from 'react';
 import { useTourSeason, useTourTournaments, useTourPlayerStatistics, useTourHubDataStatus } from './useTourHubData';
 import type { TourTournament, TourPlayerStatistics } from './useTourHubData';
+import { getTournamentDisplayState } from '@/utils/tournamentState';
 
 export interface FeaturedTournament {
   tournament: TourTournament;
@@ -64,29 +65,30 @@ export function useTourOverviewData() {
   // Derive season status
   const seasonStatus = useMemo(() => {
     if (!tournaments || tournaments.length === 0) return 'upcoming';
-    const hasLive = tournaments.some(t => t.status === 'inprogress');
-    if (hasLive) return 'live';
-    const allClosed = tournaments.every(t => t.status === 'closed');
-    if (allClosed) return 'completed';
+    const now = new Date();
+    if (tournaments.some(t => getTournamentDisplayState(t.status, t.end_date, now) === 'live')) return 'live';
+    const allDone = tournaments.every(t => t.status === 'closed' || t.status === 'complete');
+    if (allDone) return 'completed';
     return 'active';
   }, [tournaments]);
 
   // Featured tournament (spotlight)
   const featuredTournament = useMemo((): FeaturedTournament | null => {
     if (!tournaments || tournaments.length === 0) return null;
+    const now = new Date();
 
-    // Priority 1: Live
-    const live = tournaments.find(t => t.status === 'inprogress');
+    const live = tournaments.find(t =>
+      getTournamentDisplayState(t.status, t.end_date, now) === 'live'
+    );
     if (live) return { tournament: live, type: 'live' };
 
-    // Priority 2: Most recent completed
-    const completed = tournaments
-      .filter(t => t.status === 'closed')
+    const inResultWindow = tournaments
+      .filter(t => getTournamentDisplayState(t.status, t.end_date, now) === 'result')
       .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime());
-    if (completed.length > 0) return { tournament: completed[0], type: 'recent' };
+    if (inResultWindow.length > 0) return { tournament: inResultWindow[0], type: 'recent' };
 
-    // Priority 3: Next upcoming
     const upcoming = tournaments
+      .filter(t => getTournamentDisplayState(t.status, t.end_date, now) === 'upcoming')
       .filter(t => t.status === 'scheduled' || t.status === 'created')
       .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
     if (upcoming.length > 0) return { tournament: upcoming[0], type: 'upcoming' };
