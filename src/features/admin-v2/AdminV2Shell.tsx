@@ -59,6 +59,7 @@ const PageSkeleton = () => (
 );
 
 export default function AdminV2Shell() {
+  const location = useLocation();
   const { role, loading } = usePanelRole();
   const can = panelCan(role);
   const [paletteOpen, setPaletteOpen] = useState(false);
