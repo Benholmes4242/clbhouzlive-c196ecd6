@@ -167,7 +167,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                   e.stopPropagation();
                   if (!isOwnProfile && !!user) toggleReaction(type);
                 }}
-                className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5
+                className={`flex-1 flex flex-row items-center justify-center gap-0 py-1
                   transition-all active:scale-95
                   ${isActive ? 'bg-amber-500/25' : 'bg-black/45'}
                   ${!isLast ? 'border-r border-white/[0.08]' : ''}
@@ -176,10 +176,12 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                 style={{ backdropFilter: 'blur(12px)' }}
                 disabled={isOwnProfile || !user}
               >
-                <span className="text-sm">{config.emoji}</span>
-                <span className={`text-[10px] font-medium ${isActive ? 'text-amber-400' : 'text-white/60'}`}>
-                  {count > 0 ? (count > 99 ? '99+' : count) : '·'}
-                </span>
+                <span className="text-sm leading-none">{config.emoji}</span>
+                {count > 0 && (
+                  <span className={`text-[10px] font-bold leading-none ml-0.5 ${isActive ? 'text-amber-400' : 'text-white/60'}`}>
+                    {count > 99 ? '99+' : count}
+                  </span>
+                )}
               </button>
             );
           })}
