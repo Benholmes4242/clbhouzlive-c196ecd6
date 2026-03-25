@@ -30,7 +30,9 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 // ── Data hooks ──
 import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFeed';
 import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
-import type { FeedPost, TournamentResultFeedPost } from '@/components/media-system/types/media';
+import { usePGACard } from '@/components/media-system/hooks/usePGACard';
+import { injectPGACard } from '@/components/media-system/utils/feedAlgorithm';
+import type { FeedPost, TournamentResultFeedPost, PGACardFeedPost } from '@/components/media-system/types/media';
 import { TournamentResultCard } from '@/components/clubhouse/cinematic/TournamentResultCard';
 // buildSuggestedFeed/buildFriendsFeed are called inside the feed hooks — not here
 
