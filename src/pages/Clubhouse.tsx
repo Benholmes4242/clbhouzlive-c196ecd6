@@ -271,23 +271,25 @@ const ClubhouseContent = () => {
         isStatic={skeletonMode === 'static'} 
       />
 
-      {/* Floating top bar */}
-      <div style={{ position: 'relative', zIndex: 50 }}>
-        <ClubhouseTopBar
-          activeTab={activeTab}
-          onTabChange={(tab) => {
-            setActiveTab(tab);
-            const targetFeed = tab === 'friends' ? friendsFeed : suggestedFeed;
-            if (targetFeed.isLoading) {
-              resetSkeleton();
-            }
-          }}
-          isBusinessActor={isBusinessActor}
-          user={user}
-          carouselCount={posts[activeIndex]?.mediaItems?.length ?? 0}
-          carouselIndex={currentMediaIndex}
-        />
-      </div>
+      {/* Floating top bar — hidden when PGA card active */}
+      {!isTournamentCardActive && (
+        <div style={{ position: 'relative', zIndex: 50 }}>
+          <ClubhouseTopBar
+            activeTab={activeTab}
+            onTabChange={(tab) => {
+              setActiveTab(tab);
+              const targetFeed = tab === 'friends' ? friendsFeed : suggestedFeed;
+              if (targetFeed.isLoading) {
+                resetSkeleton();
+              }
+            }}
+            isBusinessActor={isBusinessActor}
+            user={user}
+            carouselCount={posts[activeIndex]?.mediaItems?.length ?? 0}
+            carouselIndex={currentMediaIndex}
+          />
+        </div>
+      )}
 
       {/* Offline indicator */}
       {!isOnline && (
