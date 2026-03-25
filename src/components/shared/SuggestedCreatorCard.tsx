@@ -139,11 +139,11 @@ export const SuggestedCreatorCard: React.FC<SuggestedCreatorCardProps> = ({
         )}
       </div>
 
-      {/* Name — two lines */}
+      {/* Name — two lines, fixed height so buttons align */}
       <div
         onClick={handleProfileTap}
         className="text-center cursor-pointer"
-        style={{ maxWidth: 108, marginTop: 8 }}
+        style={{ maxWidth: 108, marginTop: 8, height: 33, overflow: 'hidden' }}
       >
         <p
           className="truncate"
