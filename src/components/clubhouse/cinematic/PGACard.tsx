@@ -254,8 +254,22 @@ export const PGACard: React.FC<PGACardProps> = ({
               }}
             >
               <div className="flex items-center gap-3">
-                {cd.leader.photoUrl ? (
-                  <img src={cd.leader.photoUrl} alt="" className="w-[50px] h-[50px] rounded-xl object-cover" />
+            {cd.leader.photoUrl ? (
+                  <div className="relative">
+                    <img
+                      src={cd.leader.photoUrl}
+                      alt=""
+                      className="w-[50px] h-[50px] rounded-xl object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                        const fb = (e.target as HTMLImageElement).parentElement?.querySelector('[data-fallback]') as HTMLElement;
+                        if (fb) fb.style.display = 'flex';
+                      }}
+                    />
+                    <div data-fallback className="w-[50px] h-[50px] rounded-xl bg-slate-800 items-center justify-center" style={{ display: 'none' }}>
+                      <Trophy className="w-5 h-5 text-slate-400" />
+                    </div>
+                  </div>
                 ) : (
                   <div className="w-[50px] h-[50px] rounded-xl bg-slate-800 flex items-center justify-center">
                     <Trophy className="w-5 h-5 text-slate-400" />
