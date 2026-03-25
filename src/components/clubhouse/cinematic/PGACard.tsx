@@ -723,7 +723,6 @@ export const PGACard: React.FC<PGACardProps> = ({
   // ██ UPCOMING STATE — Cinematic 3-zone layout
   // ═══════════════════════════════════════════
   if (cd.state === 'upcoming') {
-    const pastWinners = cd.pastWinners;
     const defendingChampion = cd.defendingChampion;
     const dateRange = cd.startDate && cd.endDate
       ? `${new Date(cd.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${new Date(cd.endDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
