@@ -79,7 +79,13 @@ export function useTopTenComments(targetUserId: string, courseId: string) {
         });
       }
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: qk }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: qk });
+      queryClient.invalidateQueries({ queryKey: ['top-ten-activity', targetUserId] });
+    },
+    onError: () => {
+      toast.error('Failed to post comment. Please try again.');
+    },
   });
 
   const deleteComment = useMutation({
