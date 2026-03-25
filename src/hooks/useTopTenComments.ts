@@ -83,10 +83,11 @@ export function useTopTenComments(targetUserId: string, courseId: string) {
 
   const deleteComment = useMutation({
     mutationFn: async (commentId: string) => {
+      if (!user) throw new Error('Not authenticated');
       await supabase.from('top_ten_comments')
         .update({ is_deleted: true })
         .eq('id', commentId)
-        .eq('commenter_id', user!.id);
+        .eq('commenter_id', user.id);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: qk }),
   });
