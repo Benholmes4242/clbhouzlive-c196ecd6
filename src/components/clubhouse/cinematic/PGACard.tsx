@@ -435,7 +435,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                     { v: seasonStats.drivingDistance ? `${Math.round(seasonStats.drivingDistance)}y` : null, label: 'Driver' },
                     { v: seasonStats.drivingAccuracy ? `${Math.round(seasonStats.drivingAccuracy)}%` : null, label: 'Accuracy' },
                     { v: seasonStats.greensInReg ? `${Math.round(seasonStats.greensInReg)}%` : null, label: 'GIR' },
-                    { v: seasonStats.puttingAverage ?? null, label: 'Putting' },
+                    { v: seasonStats.puttingAverage != null ? Number(seasonStats.puttingAverage).toFixed(1) : null, label: 'Putting' },
                   ].map(stat => (
                     <div key={stat.label} style={{
                       flex: 1, textAlign: 'center',
