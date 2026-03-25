@@ -284,6 +284,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
                 rating={displayRating}
                 isOwnProfile={isOwnProfile}
                 userId={userId}
+                privacySetting={privacyData ?? 'followers'}
               />
             </div>
           );

@@ -24,7 +24,7 @@ const FRIEND_TYPES = new Set([
 ]);
 
 const SOCIAL_TYPES = new Set([
-  'like', 'comment', 'mention', 'tag', 'follow', 'new_post',
+  'like', 'comment', 'mention', 'tag', 'follow', 'new_post', 'top_ten_comment',
 ]);
 
 const FILTER_CHIPS = ['All', 'Social', 'Friends'] as const;

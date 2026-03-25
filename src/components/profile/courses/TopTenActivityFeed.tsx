@@ -14,7 +14,10 @@ export const TopTenActivityFeed: React.FC<TopTenActivityFeedProps> = ({ targetUs
 
   return (
     <div className="px-4 py-3">
-      <h3 className="text-sm font-semibold text-foreground mb-3">Top 10 Activity</h3>
+      <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+        <MessageCircle className="h-4 w-4 text-amber-500" />
+        Top 10 Activity
+      </h3>
       <div className="space-y-3">
         {items.slice(0, 8).map(item => (
           <div key={item.id} className="flex items-start gap-2.5">

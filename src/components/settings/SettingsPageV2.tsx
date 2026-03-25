@@ -247,6 +247,8 @@ export function SettingsPageV2() {
                   .from('user_profiles')
                   .update({ top_ten_comments_privacy: e.target.value })
                   .eq('id', user.id);
+                queryClient.invalidateQueries({ queryKey: ['profile'] });
+                queryClient.invalidateQueries({ queryKey: ['top-ten-privacy'] });
               }}
               className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
             >

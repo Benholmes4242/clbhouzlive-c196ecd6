@@ -208,16 +208,16 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                 key={type}
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (!isOwnProfile) toggleReaction(type);
+                  if (!isOwnProfile && !!user) toggleReaction(type);
                 }}
                 className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5
                   transition-all active:scale-95
                   ${isActive ? 'bg-amber-500/25' : 'bg-black/45'}
                   ${!isLast ? 'border-r border-white/[0.08]' : ''}
-                  ${isOwnProfile ? 'cursor-default' : 'cursor-pointer'}
+                  ${isOwnProfile || !user ? 'cursor-default' : 'cursor-pointer'}
                 `}
                 style={{ backdropFilter: 'blur(12px)' }}
-                disabled={isOwnProfile}
+                disabled={isOwnProfile || !user}
               >
                 <span className="text-sm">{config.emoji}</span>
                 <span className={`text-[10px] font-medium ${isActive ? 'text-amber-400' : 'text-white/60'}`}>

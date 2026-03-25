@@ -58,6 +58,9 @@ export function useTopTenReactions(targetUserId: string, courseId: string) {
       }
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: qk }),
+    onError: () => {
+      toast.error('Failed to save reaction. Please try again.');
+    },
   });
 
   return { counts, myReaction, toggleReaction: toggleReaction.mutate, isLoading };

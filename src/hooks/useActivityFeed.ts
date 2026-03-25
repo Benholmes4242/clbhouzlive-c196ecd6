@@ -240,6 +240,9 @@ function getContextUrl(notification: any): string {
   if (entity_type === 'club' && entity_id) {
     return `/clubs/${entity_id}`;
   }
+  if (entity_type === 'top_ten') {
+    return `/profile/${actor_id}?tab=courses`;
+  }
   // Business member/access navigation
   if (type === 'business_member_added' || type === 'business_access_approved') {
     const dataObj = (typeof data === 'object' && data !== null && !Array.isArray(data)) 
