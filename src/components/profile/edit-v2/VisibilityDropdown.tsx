@@ -45,11 +45,31 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
   const Icon = selectedOption.icon;
   const isPrivate = value === 'private';
 
+  const logEvent = (source: string) => (event: React.SyntheticEvent) => {
+    const target = event.target as HTMLElement | null;
+    console.log('[VisibilityDropdown]', {
+      source,
+      eventType: event.type,
+      value,
+      disabled,
+      targetTag: target?.tagName,
+      targetText: target?.textContent?.slice(0, 60) || '',
+    });
+  };
+
   return (
-    <div className={cn("flex items-center gap-1.5", className)}>
+    <div
+      className={cn("flex items-center gap-1.5", className)}
+      onTouchStart={logEvent('wrapper')}
+      onPointerDown={logEvent('wrapper')}
+      onClick={logEvent('wrapper')}
+    >
       {isPrivate && <Lock className="h-3.5 w-3.5 text-muted-foreground" />}
       <Select value={value} onValueChange={onChange} disabled={disabled}>
         <SelectTrigger 
+          onTouchStart={logEvent('trigger')}
+          onPointerDown={logEvent('trigger')}
+          onClick={logEvent('trigger')}
           className={cn(
             "gap-1.5 border border-border/60 bg-muted/60 hover:bg-muted transition-colors rounded-full",
             size === 'sm' ? "h-7 px-2.5 text-[11px]" : "h-9 px-4 text-sm"
