@@ -593,3 +593,208 @@ export function useSocialAnalytics(period: AnalyticsPeriod) {
     staleTime: 5 * 60_000,
   });
 }
+
+// ─── Content Performance types & fetcher ──────────────────────────────────────
+
+export interface ContentPerformancePost {
+  postId: string;
+  userId: string;
+  displayName: string;
+  username: string | null;
+  avatarUrl: string | null;
+  content: string | null;
+  mediaType: 'video' | 'image' | 'mixed' | 'none';
+  mediaCount: number;
+  likeCount: number;
+  commentCount: number;
+  shareCount: number;
+  engagementScore: number;
+  createdAt: string;
+  isReview: boolean;
+}
+
+async function fetchContentPerformance(period: AnalyticsPeriod): Promise<ContentPerformancePost[]> {
+  const since = startOf(period).toISOString();
+
+  const { data: posts } = await supabase
+    .from('posts')
+    .select(`
+      id,
+      user_id,
+      content,
+      created_at,
+      source_review_id,
+      post_media ( id, media_type ),
+      post_likes ( id ),
+      post_comments ( id )
+    `)
+    .gte('created_at', since)
+    .eq('status', 'published')
+    .order('created_at', { ascending: false })
+    .limit(500);
+
+  if (!posts?.length) return [];
+
+  const userIds = [...new Set(posts.map(p => p.user_id).filter(Boolean))];
+
+  const [profilesRes, sharesRes] = await Promise.all([
+    supabase.from('user_profiles').select('id, display_name, username, profile_photo_url').in('id', userIds),
+    supabase.from('post_shares').select('post_id').in('post_id', posts.map(p => p.id)),
+  ]);
+
+  const profileMap = new Map((profilesRes.data ?? []).map(p => [p.id, p]));
+  const shareCountMap = new Map<string, number>();
+  for (const s of sharesRes.data ?? []) {
+    shareCountMap.set(s.post_id, (shareCountMap.get(s.post_id) ?? 0) + 1);
+  }
+
+  return posts.map(p => {
+    const profile = profileMap.get(p.user_id);
+    const likes = (p.post_likes as unknown as any[])?.length ?? 0;
+    const comments = (p.post_comments as unknown as any[])?.length ?? 0;
+    const shares = shareCountMap.get(p.id) ?? 0;
+    const mediaItems = (p.post_media as any[]) ?? [];
+    const hasVideo = mediaItems.some((m: any) => m.media_type === 'video');
+    const hasImage = mediaItems.some((m: any) => m.media_type === 'image');
+    const mediaType: ContentPerformancePost['mediaType'] = mediaItems.length === 0 ? 'none'
+      : hasVideo && hasImage ? 'mixed'
+      : hasVideo ? 'video'
+      : 'image';
+
+    return {
+      postId: p.id,
+      userId: p.user_id,
+      displayName: profile?.display_name ?? 'Unknown',
+      username: profile?.username ?? null,
+      avatarUrl: profile?.profile_photo_url ?? null,
+      content: p.content,
+      mediaType,
+      mediaCount: mediaItems.length,
+      likeCount: likes,
+      commentCount: comments,
+      shareCount: shares,
+      engagementScore: Math.round(likes + comments * 2.5 + shares * 3),
+      createdAt: p.created_at,
+      isReview: !!p.source_review_id,
+    };
+  }).sort((a, b) => b.engagementScore - a.engagementScore);
+}
+
+export function useContentPerformance(period: AnalyticsPeriod) {
+  return useQuery({
+    queryKey: ['admin-v2', 'analytics', 'content-performance', period],
+    queryFn: () => fetchContentPerformance(period),
+    staleTime: 5 * 60_000,
+  });
+}
+
+// ─── Creator Leaderboard types & fetcher ──────────────────────────────────────
+
+export interface CreatorLeaderboardRow {
+  userId: string;
+  displayName: string;
+  username: string | null;
+  avatarUrl: string | null;
+  country: string | null;
+  totalPosts: number;
+  totalLikes: number;
+  totalComments: number;
+  totalShares: number;
+  totalEngagement: number;
+  followerCount: number;
+  engagementRate: number;
+  avgEngagementPerPost: number;
+  joinedAt: string;
+}
+
+async function fetchCreatorLeaderboard(period: AnalyticsPeriod): Promise<CreatorLeaderboardRow[]> {
+  const since = startOf(period).toISOString();
+
+  const { data: posts } = await supabase
+    .from('posts')
+    .select(`
+      id,
+      user_id,
+      post_likes ( id ),
+      post_comments ( id )
+    `)
+    .gte('created_at', since)
+    .eq('status', 'published')
+    .limit(2000);
+
+  if (!posts?.length) return [];
+
+  const userStats = new Map<string, { posts: number; likes: number; comments: number; shares: number }>();
+  for (const p of posts) {
+    const uid = p.user_id;
+    if (!uid) continue;
+    const existing = userStats.get(uid) ?? { posts: 0, likes: 0, comments: 0, shares: 0 };
+    existing.posts++;
+    existing.likes += (p.post_likes as unknown as any[])?.length ?? 0;
+    existing.comments += (p.post_comments as unknown as any[])?.length ?? 0;
+    userStats.set(uid, existing);
+  }
+
+  const { data: shares } = await supabase
+    .from('post_shares')
+    .select('post_id')
+    .in('post_id', posts.map(p => p.id));
+
+  const postUserMap = new Map(posts.map(p => [p.id, p.user_id]));
+  for (const s of shares ?? []) {
+    const uid = postUserMap.get(s.post_id);
+    if (!uid) continue;
+    const existing = userStats.get(uid);
+    if (existing) existing.shares++;
+  }
+
+  const userIds = [...userStats.keys()];
+
+  const [profilesRes, followersRes] = await Promise.all([
+    supabase.from('user_profiles').select('id, display_name, username, profile_photo_url, country, created_at').in('id', userIds),
+    supabase.from('user_follows').select('following_id').in('following_id', userIds),
+  ]);
+
+  const profileMap = new Map((profilesRes.data ?? []).map(p => [p.id, p]));
+  const followerCountMap = new Map<string, number>();
+  for (const f of followersRes.data ?? []) {
+    followerCountMap.set(f.following_id, (followerCountMap.get(f.following_id) ?? 0) + 1);
+  }
+
+  return userIds.map(uid => {
+    const stats = userStats.get(uid)!;
+    const profile = profileMap.get(uid);
+    const followers = followerCountMap.get(uid) ?? 0;
+    const totalEngagement = Math.round(stats.likes + stats.comments * 2.5 + stats.shares * 3);
+    const engagementRate = followers > 0 ? Math.min(100, Math.round((totalEngagement / followers) * 1000) / 10) : 0;
+    const avgEngagementPerPost = stats.posts > 0 ? Math.round(totalEngagement / stats.posts) : 0;
+
+    return {
+      userId: uid,
+      displayName: profile?.display_name ?? 'Unknown',
+      username: profile?.username ?? null,
+      avatarUrl: profile?.profile_photo_url ?? null,
+      country: profile?.country ?? null,
+      totalPosts: stats.posts,
+      totalLikes: stats.likes,
+      totalComments: stats.comments,
+      totalShares: stats.shares,
+      totalEngagement,
+      followerCount: followers,
+      engagementRate,
+      avgEngagementPerPost,
+      joinedAt: profile?.created_at ?? '',
+    };
+  })
+  .filter(r => r.totalPosts > 0)
+  .sort((a, b) => b.totalEngagement - a.totalEngagement)
+  .slice(0, 50);
+}
+
+export function useCreatorLeaderboard(period: AnalyticsPeriod) {
+  return useQuery({
+    queryKey: ['admin-v2', 'analytics', 'creator-leaderboard', period],
+    queryFn: () => fetchCreatorLeaderboard(period),
+    staleTime: 5 * 60_000,
+  });
+}
