@@ -264,7 +264,7 @@ function InviteCard({
 
   const copyInviteLink = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const url = `${window.location.origin}/admin-invite/${invite.token}`;
+    const url = `${window.location.origin}/admin-invite/${invite.id}`;
     navigator.clipboard.writeText(url);
     toast.success('Invite link copied');
   };
