@@ -91,10 +91,11 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
         <img
           src={comment.commenter_avatar}
           alt={comment.commenter_name}
-          className={`${isReply ? 'w-6 h-6' : 'w-8 h-8'} rounded-full object-cover flex-shrink-0`}
+          className={`${isReply ? 'w-6 h-6' : 'w-8 h-8'} object-cover flex-shrink-0`}
+          style={{ borderRadius: '34%' }}
         />
       ) : (
-        <div className={`${isReply ? 'w-6 h-6 text-[10px]' : 'w-8 h-8 text-xs'} rounded-full bg-muted flex items-center justify-center font-semibold text-muted-foreground flex-shrink-0`}>
+        <div className={`${isReply ? 'w-6 h-6 text-[10px]' : 'w-8 h-8 text-xs'} bg-muted flex items-center justify-center font-semibold text-muted-foreground flex-shrink-0`} style={{ borderRadius: '34%' }}>
           {comment.commenter_name.charAt(0).toUpperCase()}
         </div>
       )}
