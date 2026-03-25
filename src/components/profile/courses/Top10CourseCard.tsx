@@ -12,7 +12,7 @@
  */
 import React, { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { MapPin, ChevronRight } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { TopTenCourse } from '@/hooks/useUserTopTenCourses';
@@ -64,7 +64,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.2 }}
         className={cn(
-          "relative w-[227px] h-[292px] rounded-[22px] overflow-hidden flex-shrink-0 cursor-pointer",
+          "relative w-[245px] h-[315px] rounded-[24px] overflow-hidden flex-shrink-0 cursor-pointer",
           className
         )}
         style={{}}
@@ -100,11 +100,11 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
             border: '1px solid rgba(255,255,255,0.2)',
           }}
         >
-          <span className="text-white font-semibold text-sm">#{position}</span>
+          <span className="text-white font-bold text-[13px]">#{position}</span>
         </div>
 
         {/* Content overlay - bottom (above reaction strip) */}
-        <div className="absolute bottom-[46px] left-0 right-0 p-5 pb-3.5">
+        <div className="absolute bottom-[52px] left-0 right-0 px-4 pb-3 pt-8">
           {/* Course name */}
           <h3 
             className="text-white font-semibold text-xl leading-tight mb-1 line-clamp-2"
@@ -117,7 +117,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           
           {/* Location */}
           <p 
-            className="text-white/70 text-base mb-3"
+            className="text-white/70 text-sm mb-2.5 line-clamp-1"
             style={{
               textShadow: '0 1px 4px rgba(0,0,0,0.2)',
             }}
@@ -155,7 +155,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
 
         {/* Reaction strip — overlaid at bottom of card image */}
         <div
-          className="absolute bottom-0 left-0 right-0 flex h-[46px] glass-dark !rounded-none !rounded-b-[24px] !border-t-[1px] !border-t-white/[0.06] !border-b-0 !border-x-0"
+          className="absolute bottom-0 left-0 right-0 flex h-[52px] glass-dark !rounded-none !rounded-b-[24px] !border-t-[1px] !border-t-white/[0.06] !border-b-0 !border-x-0"
         >
           {(Object.entries(REACTION_CONFIG) as [ReactionType, typeof REACTION_CONFIG[ReactionType]][]).map(([type, config], idx) => {
             const count = counts[type] ?? 0;
@@ -220,10 +220,6 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
           })}
         </div>
 
-        {/* Subtle tap indicator - bottom right */}
-        <div className="absolute bottom-[50px] right-5">
-          <ChevronRight className="w-5 h-5 text-white/40" />
-        </div>
       </motion.div>
       
       {/* Comments sheet */}

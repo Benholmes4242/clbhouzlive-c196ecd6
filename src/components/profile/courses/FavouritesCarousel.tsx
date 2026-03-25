@@ -156,7 +156,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
           {[1, 2].map((i) => (
              <div 
               key={i} 
-              className="flex-shrink-0 w-[227px] h-[292px] bg-muted rounded-[22px] animate-pulse" 
+              className="flex-shrink-0 w-[245px] h-[315px] bg-muted rounded-[24px] animate-pulse" 
             />
           ))}
         </div>
@@ -267,7 +267,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
       {/* Carousel - snap scroll with gap */}
       <div 
         ref={scrollContainerRef}
-        className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-4 pb-2"
+        className="flex gap-5 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-4 pb-2"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {topTen.map((course) => {
@@ -296,7 +296,7 @@ export const FavouritesCarousel: React.FC<FavouritesCarouselProps> = ({
               <div 
                 key={`empty-${index}`}
                 onClick={onManage}
-                className="relative w-[227px] h-[292px] rounded-[22px] flex-shrink-0 snap-center flex items-center justify-center cursor-pointer transition-transform duration-200 hover:scale-[0.99] active:scale-[0.97] bg-muted border-2 border-dashed border-border"
+                className="relative w-[245px] h-[315px] rounded-[24px] flex-shrink-0 snap-center flex items-center justify-center cursor-pointer transition-transform duration-200 hover:scale-[0.99] active:scale-[0.97] bg-muted border-2 border-dashed border-border"
               >
                 <div className="text-center p-6">
                   <Plus className="w-8 h-8 text-muted-foreground/40 mx-auto mb-3" />
