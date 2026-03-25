@@ -9,8 +9,9 @@ import {
   Mail, MapPin, Upload, Trophy, Building2, Image, BookOpen,
   Flag, ClipboardList, Settings, Wrench, Map, FlaskConical,
   ArrowLeft, ChevronDown, ChevronRight, Activity, Sparkles, MessageCircle,
-  Medal, TrendingUp, Layers,
+  Medal, TrendingUp, Layers, Radio, AlertTriangle,
 } from 'lucide-react';
+import { useAnomalyAlerts } from '../../hooks/useAdminV2Analytics';
 
 interface SidebarProps {
   role: PanelRole;

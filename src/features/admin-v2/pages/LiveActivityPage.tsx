@@ -139,18 +139,18 @@ export default function LiveActivityPage() {
 
   return (
     <div className="p-6 space-y-6 max-w-[1200px] mx-auto">
-      <AdminPageHeader
-        title={
-          <span className="flex items-center gap-2">
-            Live Activity
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 style={{ fontSize: 20, fontWeight: 700, color: '#0F172A' }}>Live Activity</h1>
             <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full" style={{ background: '#F0FDF4', fontSize: 11, fontWeight: 600, color: '#16A34A' }}>
               <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#16A34A' }} />
               Live
             </span>
-          </span>
-        }
-        description={`${lastHourCount} events in last hour`}
-      />
+          </div>
+          <p style={{ fontSize: 13, color: '#94A3B8', marginTop: 2 }}>{lastHourCount} events in last hour</p>
+        </div>
+      </div>
 
       {/* Controls */}
       <div className="flex items-center gap-3">
