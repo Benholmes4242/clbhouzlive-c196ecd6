@@ -48,9 +48,9 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   const [isReviewSheetOpen, setIsReviewSheetOpen] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   
+  const { user } = useSupabaseSession();
   const targetUserId = userId ?? '';
   const { counts, myReaction, toggleReaction } = useTopTenReactions(targetUserId, course.course_id);
-  const { comments } = useTopTenComments(targetUserId, course.course_id);
   
   // Fetch the review text for the bottom sheet
   const { data: reviewData } = useQuery({
