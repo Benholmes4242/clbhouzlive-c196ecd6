@@ -49,7 +49,7 @@ export function usePGACard(userId?: string): {
   // ── Live tournaments from useLiveArena ──
   const { data: arenaData, isLoading: arenaLoading } = useLiveArena();
   const pgaLive = useMemo(
-    () => (arenaData ?? []).filter(t => t.tourSlug === PGA).sort((a, b) => (b.purse ?? 0) - (a.purse ?? 0)),
+    () => (arenaData ?? []).filter(t => t.tourSlug === PGA_TOUR_SLUG).sort((a, b) => (b.purse ?? 0) - (a.purse ?? 0)),
     [arenaData]
   );
   const topLive = pgaLive[0] ?? null;
