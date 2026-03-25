@@ -400,10 +400,14 @@ const ClubhouseContent = () => {
           <CommentsSheet
             isOpen={commentsOpen}
             onClose={closeComments}
-            postId={activePost.id}
+            postId={
+              activePost.postType === 'pga_card'
+                ? (activePost as unknown as PGACardFeedPost).cardData.postId
+                : activePost.id
+            }
             currentUserId={user?.id}
             creatorUserId={activePost.userId}
-            creatorName={activePost.displayName}
+            creatorName={activePost.postType === 'pga_card' ? 'clbhouz' : activePost.displayName}
             creatorAvatar={activePost.avatarUrl}
             caption={activePost.caption}
             theme="dark"
