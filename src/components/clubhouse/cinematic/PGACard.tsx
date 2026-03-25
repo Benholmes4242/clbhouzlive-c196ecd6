@@ -322,7 +322,7 @@ export const PGACard: React.FC<PGACardProps> = ({
 
           {/* Tour badge — top left */}
           <div style={{
-            position: 'absolute', top: 'clamp(12px, 3vw, 18px)', left: 'clamp(14px, 3.5vw, 20px)',
+            position: 'absolute', top: 'calc(env(safe-area-inset-top, 44px) + 16px)', left: 'clamp(14px, 3.5vw, 20px)',
             display: 'flex', alignItems: 'center', gap: 6,
           }}>
             <span style={{
@@ -408,8 +408,10 @@ export const PGACard: React.FC<PGACardProps> = ({
                     flex: 1, textAlign: 'center',
                     padding: '7px 2px 5px',
                     borderRadius: 8,
-                    background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.06)',
+                    background: 'rgba(0,0,0,0.45)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(255,255,255,0.12)',
                   }}>
                     <div style={{ fontSize: 'clamp(16px, 4vw, 20px)', fontWeight: 800, color: stat.color, lineHeight: 1 }}>
                       {stat.v}
@@ -443,8 +445,10 @@ export const PGACard: React.FC<PGACardProps> = ({
                       flex: 1, textAlign: 'center',
                       padding: '5px 2px 4px',
                       borderRadius: 8,
-                      background: 'rgba(255,255,255,0.025)',
-                      border: '1px solid rgba(255,255,255,0.04)',
+                      background: 'rgba(0,0,0,0.45)',
+                      backdropFilter: 'blur(12px)',
+                      WebkitBackdropFilter: 'blur(12px)',
+                      border: '1px solid rgba(255,255,255,0.10)',
                     }}>
                       <div style={{ fontSize: 'clamp(12px, 3vw, 14px)', fontWeight: 700, color: 'rgba(255,255,255,0.7)', lineHeight: 1 }}>
                         {stat.v ?? '—'}
@@ -555,7 +559,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                         <div key={i} style={{
                           marginLeft: i === 0 ? 0 : -8,
                           zIndex: stackedAvatars.length - i,
-                          border: '1.5px solid rgba(0,0,0,0.9)',
+                          border: '1.5px solid rgba(8,10,14,0.8)',
                           borderRadius: SQUIRCLE_RADIUS, overflow: 'hidden',
                         }}>
                           <RowAvatar src={p.photoUrl} name={p.playerName} size={28} />
@@ -567,7 +571,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                           borderRadius: SQUIRCLE_RADIUS, background: 'rgba(255,255,255,0.08)',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.5)',
-                          border: '1.5px solid rgba(0,0,0,0.9)',
+                          border: '1.5px solid rgba(8,10,14,0.8)',
                         }}>
                           +{group.chasers.length - 3}
                         </div>
