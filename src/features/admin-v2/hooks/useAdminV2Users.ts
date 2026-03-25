@@ -19,6 +19,7 @@ export interface AdminUserRow {
   is_verified:     boolean;
   created_at:      string;
   role:            string | null;
+  last_seen_at:    string | null;
 }
 
 export interface AdminUserDetail extends AdminUserRow {
@@ -71,6 +72,22 @@ async function fetchAllUsers(): Promise<AdminUserRow[]> {
 
   const roleMap = new Map((roles ?? []).map(r => [r.user_id, r.role]));
 
+  // Fetch last seen data from analytics_events (last 30 days)
+  const { data: lastSeenData } = await supabase
+    .from('analytics_events')
+    .select('user_id, created_at')
+    .not('user_id', 'is', null)
+    .gte('created_at', new Date(Date.now() - 30 * 86400_000).toISOString())
+    .order('created_at', { ascending: false })
+    .limit(5000);
+
+  const lastSeenMap = new Map<string, string>();
+  for (const e of lastSeenData ?? []) {
+    if (e.user_id && !lastSeenMap.has(e.user_id)) {
+      lastSeenMap.set(e.user_id, e.created_at);
+    }
+  }
+
   return (profiles ?? []).map(p => ({
     id:             p.id,
     display_name:   p.display_name,
@@ -82,6 +99,7 @@ async function fetchAllUsers(): Promise<AdminUserRow[]> {
     is_verified:    p.is_verified_golfer ?? false,
     created_at:     p.created_at,
     role:           roleMap.get(p.id) ?? null,
+    last_seen_at:   lastSeenMap.get(p.id) ?? null,
   }));
 }
 
@@ -116,6 +134,7 @@ async function fetchUserDetail(userId: string): Promise<AdminUserDetail> {
     followers:      followers.count ?? 0,
     following:      following.count ?? 0,
     top100_played:  top100.count ?? 0,
+    last_seen_at:   null,
   };
 }
 

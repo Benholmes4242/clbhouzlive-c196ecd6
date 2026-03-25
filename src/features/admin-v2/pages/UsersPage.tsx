@@ -30,6 +30,30 @@ import {
   AdminSectionHeader,
   AdminKpiCard,
 } from '../components/ui';
+import { AdminMiniCard } from '../components/shared/AdminMiniCard';
+
+// ─── Activity dot helper ──────────────────────────────────────────────────────
+
+function ActivityDot({ lastSeenAt }: { lastSeenAt: string | null }) {
+  if (!lastSeenAt) {
+    return <div className="w-2 h-2 rounded-full bg-slate-200 flex-shrink-0" />;
+  }
+  const age = Date.now() - new Date(lastSeenAt).getTime();
+  if (age < 24 * 3600_000) {
+    return <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse flex-shrink-0" />;
+  }
+  if (age < 7 * 24 * 3600_000) {
+    return <div className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />;
+  }
+  return <div className="w-2 h-2 rounded-full bg-slate-200 flex-shrink-0" />;
+}
+
+function formatLastSeen(lastSeenAt: string | null): string {
+  if (!lastSeenAt) return '30d+ ago';
+  const age = Date.now() - new Date(lastSeenAt).getTime();
+  if (age > 30 * 24 * 3600_000) return '30d+ ago';
+  return formatDistanceToNow(new Date(lastSeenAt), { addSuffix: true });
+}
 
 // ─── Column helper ────────────────────────────────────────────────────────────
 
@@ -409,7 +433,10 @@ export default function UsersPage() {
       header: '',
       size: 48,
       cell: ({ row }) => (
-        <SquircleAvatar size={32} src={row.original.avatar_url} alt={row.original.display_name ?? ''} />
+        <div className="flex items-center gap-2">
+          <ActivityDot lastSeenAt={row.original.last_seen_at} />
+          <SquircleAvatar size={32} src={row.original.avatar_url} alt={row.original.display_name ?? ''} />
+        </div>
       ),
     }),
     col.accessor('display_name', {
@@ -448,6 +475,15 @@ export default function UsersPage() {
       enableSorting: true,
       cell: ({ getValue }) => (
         <AdminStatusPill status={getValue() ? 'verified' : 'inactive'} label={getValue() ? 'Verified' : 'Unverified'} />
+      ),
+    }),
+    col.display({
+      id: 'last_seen',
+      header: 'Last Seen',
+      cell: ({ row }) => (
+        <span className="text-[12px] text-slate-400 whitespace-nowrap">
+          {formatLastSeen(row.original.last_seen_at)}
+        </span>
       ),
     }),
     col.accessor('created_at', {
@@ -495,12 +531,15 @@ export default function UsersPage() {
         }
       />
 
-      {/* KPI strip */}
+      {/* KPI strip with mini cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <AdminKpiCard title="Total Users" value={counts.all} icon={Users} isLoading={isLoading} />
-        <AdminKpiCard title="Verified" value={counts.verified} icon={CheckCircle} isLoading={isLoading} />
-        <AdminKpiCard title="Unverified" value={counts.unverified} icon={Users} isLoading={isLoading} />
-        <AdminKpiCard title="Admins" value={counts.admin} icon={Shield} isLoading={isLoading} />
+        <AdminMiniCard label="Total Users" value={counts.all} borderColor="#F5A623" isLoading={isLoading} />
+        <AdminMiniCard label="Verified" value={counts.verified} borderColor="#17C964" isLoading={isLoading} />
+        <AdminMiniCard label="Admins" value={counts.admin} borderColor="#7C3AED" isLoading={isLoading} />
+        <AdminMiniCard label="New Today" value={users.filter(u => {
+          const t = new Date(); t.setHours(0,0,0,0);
+          return new Date(u.created_at) >= t;
+        }).length || 0} borderColor="#1D6FF5" isLoading={isLoading} />
       </div>
 
       {/* Search + filters */}
