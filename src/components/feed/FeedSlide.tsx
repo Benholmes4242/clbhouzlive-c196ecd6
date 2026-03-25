@@ -3,7 +3,8 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapVideoPlayer } from './SnapVideoPlayer';
 import { FeedImageCarousel } from './FeedImageCarousel';
 import { TournamentResultCard } from '@/components/clubhouse/cinematic/TournamentResultCard';
-import type { FeedPost, TournamentResultFeedPost } from '@/components/media-system/types/media';
+import { PGACard } from '@/components/clubhouse/cinematic/PGACard';
+import type { FeedPost, TournamentResultFeedPost, PGACardFeedPost } from '@/components/media-system/types/media';
 
 interface FeedSlideProps {
   post: FeedPost;
