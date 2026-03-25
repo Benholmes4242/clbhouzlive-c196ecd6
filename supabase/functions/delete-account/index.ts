@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
     const adminClient = createClient(supabaseUrl, supabaseServiceKey)
 
     // Generate anonymized values
-    const anonymizedUsername = `deleted_user_${user.id}`
+    const anonymizedUsername = `deleted_${user.id.slice(0, 8)}_${Date.now()}`
     const anonymizedDisplayName = 'Deleted User'
     const deletedAt = new Date().toISOString()
 
