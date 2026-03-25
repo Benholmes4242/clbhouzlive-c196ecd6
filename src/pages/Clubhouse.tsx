@@ -46,6 +46,7 @@ import { ReviewBottomSheet } from '@/components/posts/ReviewBottomSheet';
 
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { getProfilePathById } from '@/lib/profileRoutes';
+import { useBottomNavigation } from '@/contexts/BottomNavigationContext';
 
 // ── Decomposed hooks ──
 import { useClubhouseLifecycle } from '@/components/clubhouse/hooks/useClubhouseLifecycle';
