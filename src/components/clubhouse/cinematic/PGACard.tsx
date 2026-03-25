@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
-import { Heart, MessageCircle, Trophy, Calendar, Radio } from 'lucide-react';
-import type { PGACardFeedPost, PGACardData, PGACardChaser } from '@/components/media-system/types/media';
-import { Squircle } from '@/components/ui/squircle';
+import { Heart, MessageCircle, Trophy, Calendar } from 'lucide-react';
+import type { PGACardFeedPost, PGACardChaser } from '@/components/media-system/types/media';
 
 interface PGACardProps {
   post: PGACardFeedPost;
@@ -36,8 +35,10 @@ const getLastName = (name: string) => {
 };
 
 const SQUIRCLE_RADIUS = '34%';
+const ACCENT = '#E8980A';
+const ACCENT_LIGHT = '#F59E0B';
 
-// ── Stat Tile ──
+// ── Stat Tile (live state) ──
 const StatTile: React.FC<{ label: string; value: number; color: string }> = ({ label, value, color }) => (
   <div className="flex-1 text-center">
     <div className="text-[22px] font-black" style={{ color }}>{value}</div>
@@ -53,7 +54,7 @@ const SeasonTile: React.FC<{ label: string; value: string | number | null }> = (
   </div>
 );
 
-// ── Scoring Strip (leader) — no emoji, colored values ──
+// ── Scoring Strip (live leader) ──
 const ScoringStrip: React.FC<{ stats: { eagles: number; birdies: number; pars: number; bogeys: number; doubleBogeys: number } }> = ({ stats }) => (
   <div style={{ display: 'flex', gap: 5, marginBottom: 6, marginTop: 2 }}>
     {([
@@ -71,19 +72,15 @@ const ScoringStrip: React.FC<{ stats: { eagles: number; birdies: number; pars: n
   </div>
 );
 
-// ── Chaser Row ──
-const ChaserRow: React.FC<{ chaser: PGACardChaser; isResult?: boolean }> = ({ chaser, isResult }) => (
+// ── Chaser Row (live state) ──
+const ChaserRow: React.FC<{ chaser: PGACardChaser }> = ({ chaser }) => (
   <div className="flex items-center gap-3 px-4 min-h-[44px] flex-1">
     <div className="text-[13px] font-bold text-white/50 w-5 text-center">
       {chaser.isTied ? 'T' : ''}{chaser.position}
     </div>
     {chaser.photoUrl ? (
       <div className="relative">
-        <img
-          src={chaser.photoUrl}
-          alt=""
-          className="w-8 h-8 object-cover"
-          style={{ borderRadius: SQUIRCLE_RADIUS }}
+        <img src={chaser.photoUrl} alt="" className="w-8 h-8 object-cover" style={{ borderRadius: SQUIRCLE_RADIUS }}
           onError={(e) => {
             (e.target as HTMLImageElement).style.display = 'none';
             const fb = (e.target as HTMLImageElement).parentElement?.querySelector('[data-fallback]') as HTMLElement;
@@ -117,65 +114,6 @@ const ChaserRow: React.FC<{ chaser: PGACardChaser; isResult?: boolean }> = ({ ch
   </div>
 );
 
-// ── Tied Row (overlapping avatars + surnames) ──
-const TiedRow: React.FC<{ position: number; chasers: PGACardChaser[] }> = ({ position, chasers }) => {
-  const shownAvatars = chasers.slice(0, 3);
-  const overflow = chasers.length - 3;
-  const surnames = chasers.map(c => getLastName(c.playerName)).join(' · ');
-  const score = chasers[0]?.scoreDisplay ?? '';
-
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: 10,
-      background: 'rgba(255,255,255,0.03)', borderRadius: 11,
-      padding: '8px 10px', marginBottom: 5, marginLeft: 4, marginRight: 4,
-    }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', width: 22, textAlign: 'center' }}>
-        T{position}
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        {shownAvatars.map((c, i) => (
-          <div key={i} style={{
-            width: 36, height: 36, borderRadius: SQUIRCLE_RADIUS,
-            border: '2px solid #080a0e', marginLeft: i > 0 ? -10 : 0,
-            zIndex: shownAvatars.length - i, position: 'relative',
-            overflow: 'hidden', background: 'rgba(255,255,255,0.08)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            {c.photoUrl ? (
-              <img src={c.photoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>{getInitials(c.playerName)}</span>
-            )}
-          </div>
-        ))}
-        {overflow > 0 && (
-          <div style={{
-            width: 30, height: 30, borderRadius: SQUIRCLE_RADIUS,
-            marginLeft: -8, background: 'rgba(255,255,255,0.08)',
-            border: '2px solid #080a0e', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.45)', position: 'relative', zIndex: 0,
-          }}>
-            +{overflow}
-          </div>
-        )}
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.75)' }}>
-          {chasers.length}-Way Tie
-        </div>
-        <div style={{
-          fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 1,
-          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-        }}>
-          {surnames}
-        </div>
-      </div>
-      <div style={{ fontSize: 17, fontWeight: 700, color: 'rgba(255,255,255,0.65)' }}>{score}</div>
-    </div>
-  );
-};
-
 // ── Countdown Tile ──
 const CountdownTile: React.FC<{ value: number; label: string }> = ({ value, label }) => (
   <div className="flex-1 text-center">
@@ -198,6 +136,67 @@ const GolfFlagIcon: React.FC = () => (
   </div>
 );
 
+// ── Hero Avatar (full-bleed, no squircle) ──
+const HeroAvatar: React.FC<{ src?: string | null; name: string }> = ({ src, name }) => {
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt={name}
+        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        onError={(e) => {
+          (e.target as HTMLImageElement).style.display = 'none';
+          const fb = (e.target as HTMLImageElement).parentElement?.querySelector('[data-fallback]') as HTMLElement;
+          if (fb) fb.style.display = 'flex';
+        }}
+      />
+    );
+  }
+  return (
+    <div style={{
+      width: '100%', height: '100%',
+      background: 'linear-gradient(135deg, #1a1a2e, #16213e)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+    }}>
+      <span style={{ fontSize: 64, fontWeight: 800, color: 'rgba(255,255,255,0.15)' }}>
+        {getInitials(name)}
+      </span>
+    </div>
+  );
+};
+
+// ── Row Avatar (small, for leaderboard) ──
+const RowAvatar: React.FC<{ src?: string | null; name: string; size: number }> = ({ src, name, size }) => (
+  <div style={{
+    width: size, height: size, borderRadius: SQUIRCLE_RADIUS,
+    overflow: 'hidden', background: 'rgba(255,255,255,0.08)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+  }}>
+    {src ? (
+      <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+    ) : (
+      <span style={{ fontSize: size * 0.35, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>{getInitials(name)}</span>
+    )}
+  </div>
+);
+
+// ── Keyframes (injected once) ──
+const ensureKeyframes = (() => {
+  let injected = false;
+  return () => {
+    if (injected || typeof document === 'undefined') return;
+    injected = true;
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes trc-fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes trc-slideIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+      @keyframes trc-fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes ctaPulse { 0%, 100% { box-shadow: 0 2px 14px rgba(232,152,10,0.35); } 50% { box-shadow: 0 4px 24px rgba(232,152,10,0.55); } }
+    `;
+    document.head.appendChild(style);
+  };
+})();
+
 export const PGACard: React.FC<PGACardProps> = ({
   post,
   onComment,
@@ -210,7 +209,10 @@ export const PGACard: React.FC<PGACardProps> = ({
   const likeState = getLikeState?.(post) ?? { isLiked: cd.isLikedByMe, count: cd.likeCount };
   const commentCount = getCommentCount?.(post) ?? cd.commentCount;
 
-  // Countdown for upcoming (must be before early return)
+  // Inject keyframes
+  ensureKeyframes();
+
+  // Countdown for upcoming
   const countdown = useMemo(() => {
     if (cd.state !== 'upcoming' || !cd.startDate) return null;
     const diff = new Date(cd.startDate).getTime() - Date.now();
@@ -264,52 +266,399 @@ export const PGACard: React.FC<PGACardProps> = ({
     );
   }
 
-  // Gradient glow color per state
+  // ═══════════════════════════════════════════
+  // ██ RESULT STATE — Full-bleed 4-zone layout
+  // ═══════════════════════════════════════════
+  if (cd.state === 'result' && cd.leader) {
+    const leaderStats = cd.leader.scoringStats;
+    const seasonStats = cd.championSeasonStats;
+
+    return (
+      <div className="h-full w-full flex flex-col overflow-hidden" style={{ background: '#080a0e', color: '#fff' }}>
+
+        {/* ── ZONE 1: HERO — 55% ── */}
+        <div style={{
+          position: 'relative',
+          flex: '0 0 55%',
+          overflow: 'hidden',
+          minHeight: 0,
+        }}>
+          {/* Full-bleed winner headshot */}
+          <div style={{
+            position: 'absolute', inset: '-10px',
+            background: 'linear-gradient(135deg, #1a1a2e, #0f3460)',
+            willChange: 'transform',
+          }}>
+            <HeroAvatar src={cd.leader.photoUrl} name={cd.leader.playerName} />
+            {/* Fallback for error */}
+            <div data-fallback style={{
+              display: 'none', position: 'absolute', inset: 0,
+              background: 'linear-gradient(135deg, #1a1a2e, #16213e)',
+              alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{ fontSize: 64, fontWeight: 800, color: 'rgba(255,255,255,0.15)' }}>
+                {getInitials(cd.leader.playerName)}
+              </span>
+            </div>
+          </div>
+
+          {/* Bottom gradient */}
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0,
+            height: '70%',
+            background: 'linear-gradient(to top, rgba(0,0,0,0.97) 0%, rgba(0,0,0,0.5) 50%, transparent 100%)',
+            pointerEvents: 'none',
+          }} />
+
+          {/* Top gradient */}
+          <div style={{
+            position: 'absolute', top: 0, left: 0, right: 0,
+            height: '30%',
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, transparent 100%)',
+            pointerEvents: 'none',
+          }} />
+
+          {/* Tour badge — top left */}
+          <div style={{
+            position: 'absolute', top: 'clamp(12px, 3vw, 18px)', left: 'clamp(14px, 3.5vw, 20px)',
+            display: 'flex', alignItems: 'center', gap: 6,
+          }}>
+            <span style={{
+              fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 700,
+              letterSpacing: '0.12em', textTransform: 'uppercase',
+              color: ACCENT_LIGHT,
+              background: `${ACCENT_LIGHT}18`,
+              border: `1px solid ${ACCENT_LIGHT}40`,
+              borderRadius: 6, padding: '3px 8px',
+            }}>
+              PGA TOUR
+            </span>
+            <span style={{
+              fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 600,
+              color: 'rgba(255,255,255,0.5)',
+            }}>
+              FINAL
+            </span>
+          </div>
+
+          {/* Winner info — bottom */}
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0,
+            padding: 'clamp(12px, 3vw, 18px) clamp(14px, 3.5vw, 20px)',
+            animation: 'trc-fadeUp 0.7s ease-out both',
+            animationDelay: '0.3s',
+          }}>
+            {/* Tournament name */}
+            <div style={{
+              fontSize: 'clamp(11px, 2.5vw, 13px)',
+              color: 'rgba(255,255,255,0.5)',
+              letterSpacing: 0.3, marginBottom: 6,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {cd.tournamentName}
+              {cd.venueName && ` · ${cd.venueName}`}
+            </div>
+
+            {/* Winner name */}
+            <div style={{
+              fontSize: 'clamp(22px, 6vw, 30px)', fontWeight: 800,
+              color: '#fff', lineHeight: 1.05, letterSpacing: -0.5,
+              marginBottom: 6,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {cd.leader.playerName}
+            </div>
+
+            {/* Score + margin */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{
+                fontSize: 'clamp(20px, 5.5vw, 26px)', fontWeight: 800,
+                color: ACCENT, lineHeight: 1,
+              }}>
+                {cd.leader.scoreDisplay || 'E'}
+              </span>
+              {cd.winnerBy && (
+                <span style={{
+                  fontSize: 'clamp(10px, 2.5vw, 12px)', fontWeight: 600,
+                  color: 'rgba(255,255,255,0.65)',
+                  background: `${ACCENT}22`,
+                  border: `1px solid ${ACCENT}44`,
+                  borderRadius: 6, padding: '2px 8px',
+                }}>
+                  {cd.winnerBy}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ── ZONE 2: AI INSIGHT ── */}
+        {cd.insight && (
+          <div style={{
+            flex: '0 0 auto',
+            padding: 'clamp(8px, 2vw, 12px) clamp(14px, 3.5vw, 20px)',
+            background: 'rgba(255,255,255,0.025)',
+            borderTop: `1px solid ${ACCENT}22`,
+            borderBottom: '1px solid rgba(255,255,255,0.04)',
+            display: 'flex', alignItems: 'flex-start', gap: 8,
+          }}>
+            <span style={{ fontSize: 13, lineHeight: 1, flexShrink: 0, marginTop: 1 }}>⚡</span>
+            <div style={{
+              fontSize: 'clamp(11px, 2.8vw, 13px)',
+              lineHeight: 1.4,
+              color: 'rgba(255,255,255,0.65)',
+              fontStyle: 'italic',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}>
+              {cd.insight}
+            </div>
+          </div>
+        )}
+
+        {/* ── ZONE 3: LEADERBOARD ── */}
+        <div style={{
+          flex: '1 1 auto',
+          display: 'flex', flexDirection: 'column',
+          overflow: 'hidden',
+          background: 'rgba(0,0,0,0.95)',
+          minHeight: 0,
+        }}>
+          {/* Header */}
+          <div style={{
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            padding: 'clamp(8px, 2vw, 10px) clamp(14px, 3.5vw, 20px) 4px',
+          }}>
+            <span style={{
+              fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 700,
+              letterSpacing: '1.2px', color: 'rgba(255,255,255,0.35)',
+              textTransform: 'uppercase',
+            }}>
+              Final Standings
+            </span>
+          </div>
+
+          {/* Rows — fills remaining space evenly */}
+          <div style={{
+            flex: '1 1 auto',
+            overflow: 'hidden',
+            padding: '0 clamp(14px, 3.5vw, 20px)',
+            display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly',
+          }}>
+            {/* Winner row — highlighted, small avatar */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 10,
+              padding: '8px 10px',
+              borderRadius: 10,
+              background: `${ACCENT}10`,
+              border: `1px solid ${ACCENT}22`,
+              animation: 'trc-slideIn 0.5s ease-out both',
+              animationDelay: '0.5s',
+            }}>
+              <span style={{
+                width: 22, textAlign: 'center',
+                fontSize: 'clamp(12px, 3vw, 14px)', fontWeight: 700,
+                color: ACCENT,
+              }}>1</span>
+              <RowAvatar src={cd.leader.photoUrl} name={cd.leader.playerName} size={30} />
+              <span style={{
+                flex: 1, fontSize: 'clamp(13px, 3.2vw, 15px)', fontWeight: 700,
+                color: '#fff',
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              }}>
+                {cd.leader.playerName}
+              </span>
+              <span style={{
+                fontSize: 'clamp(13px, 3.2vw, 15px)', fontWeight: 800,
+                color: ACCENT,
+              }}>
+                {cd.leader.scoreDisplay || 'E'}
+              </span>
+            </div>
+
+            {/* Positions 2+ */}
+            {chaserGroups?.map((group, gi) => {
+              const isTied = group.isTied && group.chasers.length > 1;
+              const primary = group.chasers[0];
+              const stackedAvatars = group.chasers.slice(0, 3);
+
+              return (
+                <div key={`${group.position}-${gi}`} style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '6px 10px',
+                  borderRadius: 8,
+                  animation: 'trc-slideIn 0.5s ease-out both',
+                  animationDelay: `${0.55 + gi * 0.07}s`,
+                }}>
+                  <span style={{
+                    width: 22, textAlign: 'center',
+                    fontSize: 'clamp(11px, 2.8vw, 13px)', fontWeight: 600,
+                    color: 'rgba(255,255,255,0.4)',
+                  }}>
+                    {group.isTied ? `T${group.position}` : group.position}
+                  </span>
+
+                  {isTied ? (
+                    <div style={{ display: 'flex' }}>
+                      {stackedAvatars.map((p, i) => (
+                        <div key={i} style={{
+                          marginLeft: i === 0 ? 0 : -8,
+                          zIndex: stackedAvatars.length - i,
+                          border: '1.5px solid rgba(0,0,0,0.9)',
+                          borderRadius: SQUIRCLE_RADIUS, overflow: 'hidden',
+                        }}>
+                          <RowAvatar src={p.photoUrl} name={p.playerName} size={28} />
+                        </div>
+                      ))}
+                      {group.chasers.length > 3 && (
+                        <div style={{
+                          marginLeft: -6, zIndex: 0, width: 26, height: 26,
+                          borderRadius: SQUIRCLE_RADIUS, background: 'rgba(255,255,255,0.08)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.5)',
+                          border: '1.5px solid rgba(0,0,0,0.9)',
+                        }}>
+                          +{group.chasers.length - 3}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <RowAvatar src={primary.photoUrl} name={primary.playerName} size={30} />
+                  )}
+
+                  <span style={{
+                    flex: 1,
+                    fontSize: 'clamp(12px, 3vw, 14px)', fontWeight: 500,
+                    color: 'rgba(255,255,255,0.75)',
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>
+                    {isTied ? (
+                      <>
+                        {group.chasers.length}-Way Tie
+                        <span style={{ display: 'block', fontSize: 'clamp(9px, 2.2vw, 11px)', color: 'rgba(255,255,255,0.35)', marginTop: 1 }}>
+                          {group.chasers.map(c => getLastName(c.playerName)).join(' · ')}
+                        </span>
+                      </>
+                    ) : primary.playerName}
+                  </span>
+
+                  <span style={{
+                    fontSize: 'clamp(12px, 3vw, 14px)', fontWeight: 600,
+                    color: 'rgba(255,255,255,0.55)',
+                  }}>
+                    {primary.scoreDisplay || 'E'}
+                  </span>
+                </div>
+              );
+            })}
+
+            {/* Stats line — compact single row */}
+            {leaderStats && (
+              <div style={{
+                display: 'flex', gap: 'clamp(6px, 2vw, 10px)',
+                padding: '6px 10px',
+                borderTop: '1px solid rgba(255,255,255,0.05)',
+                justifyContent: 'space-around',
+                animation: 'trc-fadeIn 0.5s ease-out both',
+                animationDelay: '0.9s',
+              }}>
+                {[
+                  { v: leaderStats.eagles, label: 'Eagles', color: '#F59E0B', show: leaderStats.eagles > 0 },
+                  { v: leaderStats.birdies, label: 'Birdies', color: '#22C55E', show: true },
+                  { v: leaderStats.pars, label: 'Pars', color: '#94A3B8', show: true },
+                  { v: leaderStats.bogeys, label: 'Bogeys', color: '#EF4444', show: true },
+                  ...(seasonStats?.drivingDistance ? [{ v: Math.round(seasonStats.drivingDistance), label: 'Driver', color: 'rgba(255,255,255,0.55)', show: true, suffix: 'y' }] : []),
+                ].filter(s => s.show).map(stat => (
+                  <div key={stat.label} style={{ textAlign: 'center' }}>
+                    <div style={{
+                      fontSize: 'clamp(14px, 3.5vw, 16px)', fontWeight: 700,
+                      color: stat.color, lineHeight: 1,
+                    }}>
+                      {stat.v}{'suffix' in stat ? (stat as any).suffix : ''}
+                    </div>
+                    <div style={{
+                      fontSize: 'clamp(8px, 2vw, 10px)', fontWeight: 600,
+                      color: 'rgba(255,255,255,0.35)',
+                      letterSpacing: 0.5, marginTop: 2,
+                      textTransform: 'uppercase',
+                    }}>
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ── ZONE 4: CTA BAR ── */}
+        <div
+          className="flex-shrink-0 flex items-center gap-3 px-5 pt-3"
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}
+        >
+          <button
+            onClick={onLike}
+            className="flex items-center gap-1.5 transition-transform active:scale-95"
+            style={{
+              background: likeState.isLiked ? 'rgba(245,158,11,0.14)' : 'rgba(255,255,255,0.07)',
+              border: `1px solid ${likeState.isLiked ? 'rgba(245,158,11,0.4)' : 'rgba(255,255,255,0.10)'}`,
+              borderRadius: 14, padding: '11px 16px',
+            }}
+          >
+            <Heart style={{ width: 17, height: 17, color: likeState.isLiked ? '#f59e0b' : '#6b7280', fill: likeState.isLiked ? '#f59e0b' : 'transparent' }} />
+            {likeState.count > 0 && (
+              <span className="text-[14px] font-bold" style={{ color: likeState.isLiked ? '#f59e0b' : '#6b7280' }}>
+                {formatCount(likeState.count)}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={onComment}
+            className="flex-1 relative flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-[14px] transition-transform active:scale-[0.98]"
+            style={{
+              background: 'linear-gradient(180deg, #E8A012 0%, #C77008 100%)',
+              border: '1px solid rgba(232,152,10,0.55)',
+              borderTopColor: 'rgba(255,210,100,0.4)',
+              boxShadow: '0 2px 14px rgba(232,152,10,0.35), inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.15)',
+              animation: 'ctaPulse 2.5s ease-in-out infinite',
+              color: '#fff',
+            }}
+          >
+            <MessageCircle className="w-4 h-4" />
+            Your reaction?
+            {commentCount > 0 && (
+              <span style={{ background: 'rgba(0,0,0,0.25)', borderRadius: 8, padding: '2px 7px', fontSize: 11, fontWeight: 700 }}>
+                {formatCount(commentCount)}
+              </span>
+            )}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ═══════════════════════════════════════════
+  // ██ LIVE + UPCOMING STATES (existing layout)
+  // ═══════════════════════════════════════════
   const glowColor = cd.state === 'live'
     ? 'rgba(245,158,11,0.13)'
-    : cd.state === 'result'
-      ? 'rgba(148,163,184,0.07)'
-      : 'rgba(99,102,241,0.09)';
+    : 'rgba(99,102,241,0.09)';
 
-
-  const ctaLabel = cd.state === 'live'
-    ? 'Who wins this?'
-    : cd.state === 'result'
-      ? 'Your reaction?'
-      : 'Who takes it?';
+  const ctaLabel = cd.state === 'live' ? 'Who wins this?' : 'Who takes it?';
 
   return (
-    <div
-      className="h-full w-full flex flex-col overflow-hidden"
-      style={{ background: '#080a0e', color: '#fff' }}
-    >
+    <div className="h-full w-full flex flex-col overflow-hidden" style={{ background: '#080a0e', color: '#fff' }}>
       {/* ── Gradient Header ── */}
-      <div
-        className="flex-shrink-0 relative"
-        style={{
-          background: 'linear-gradient(180deg, #141c2e 0%, #0d1525 45%, #080a0e 100%)',
-        }}
-      >
-        {/* Radial glow */}
-        <div
-          className="absolute top-0 right-0 w-48 h-48 pointer-events-none"
-          style={{
-            background: `radial-gradient(circle at top right, ${glowColor}, transparent 70%)`,
-          }}
-        />
-
-        {/* Accent bar */}
-        <div
-          className="w-full"
-          style={{
-            height: '2.5px',
-            background: cd.state === 'live'
-              ? 'linear-gradient(90deg, #f59e0bCC, transparent)'
-              : cd.state === 'result'
-                ? 'linear-gradient(90deg, #94a3b8CC, transparent)'
-                : 'linear-gradient(90deg, #6366f1CC, transparent)',
-          }}
-        />
+      <div className="flex-shrink-0 relative" style={{ background: 'linear-gradient(180deg, #141c2e 0%, #0d1525 45%, #080a0e 100%)' }}>
+        <div className="absolute top-0 right-0 w-48 h-48 pointer-events-none" style={{ background: `radial-gradient(circle at top right, ${glowColor}, transparent 70%)` }} />
+        <div className="w-full" style={{
+          height: '2.5px',
+          background: cd.state === 'live'
+            ? 'linear-gradient(90deg, #f59e0bCC, transparent)'
+            : 'linear-gradient(90deg, #6366f1CC, transparent)',
+        }} />
 
         <div className="px-5 pt-3.5 pb-4">
           {/* Badge row */}
@@ -318,12 +667,6 @@ export const PGACard: React.FC<PGACardProps> = ({
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/15 border border-green-500/20">
                 <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                 <span className="text-[11px] font-bold text-green-400 uppercase tracking-wider">Live</span>
-              </div>
-            )}
-            {cd.state === 'result' && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10">
-                <Trophy className="w-3 h-3 text-white/50" />
-                <span className="text-[11px] font-bold text-white/60 uppercase tracking-wider">Final</span>
               </div>
             )}
             {cd.state === 'upcoming' && (
@@ -337,26 +680,15 @@ export const PGACard: React.FC<PGACardProps> = ({
             </span>
           </div>
 
-          {/* Tournament name */}
           <h2 className="text-[17px] font-extrabold leading-tight mb-3">{cd.tournamentName}</h2>
 
           {/* ── LIVE: Leader card ── */}
           {cd.state === 'live' && cd.leader && (
-            <div
-              className="rounded-2xl p-3.5 mb-3"
-              style={{
-                background: 'rgba(245,158,11,0.06)',
-                border: '1px solid rgba(245,158,11,0.15)',
-              }}
-            >
+            <div className="rounded-2xl p-3.5 mb-3" style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)' }}>
               <div className="flex items-center gap-3">
                 {cd.leader.photoUrl ? (
                   <div className="relative">
-                    <img
-                      src={cd.leader.photoUrl}
-                      alt={cd.leader.playerName}
-                      className="w-[50px] h-[50px] object-cover"
-                      style={{ borderRadius: SQUIRCLE_RADIUS, boxShadow: '0 0 16px rgba(245,158,11,0.25)' }}
+                    <img src={cd.leader.photoUrl} alt={cd.leader.playerName} className="w-[50px] h-[50px] object-cover" style={{ borderRadius: SQUIRCLE_RADIUS, boxShadow: '0 0 16px rgba(245,158,11,0.25)' }}
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = 'none';
                         const fb = (e.target as HTMLImageElement).parentElement?.querySelector('[data-fallback]') as HTMLElement;
@@ -375,103 +707,19 @@ export const PGACard: React.FC<PGACardProps> = ({
                 <div className="flex-1 min-w-0">
                   <div className="text-[14px] font-bold truncate">{cd.leader.playerName}</div>
                   <div className="flex items-center gap-3 mt-0.5">
-                    {cd.leader.thru && (
-                      <span className="text-[11px] text-white/50">Thru {cd.leader.thru}</span>
-                    )}
-                    {cd.leader.today && (
-                      <span className="text-[11px] text-white/50">Today {cd.leader.today}</span>
-                    )}
+                    {cd.leader.thru && <span className="text-[11px] text-white/50">Thru {cd.leader.thru}</span>}
+                    {cd.leader.today && <span className="text-[11px] text-white/50">Today {cd.leader.today}</span>}
                   </div>
                 </div>
-                <div className="text-[34px] font-black text-amber-400 leading-none">
-                  {cd.leader.scoreDisplay}
-                </div>
+                <div className="text-[34px] font-black text-amber-400 leading-none">{cd.leader.scoreDisplay}</div>
               </div>
-
-              {/* Leader scoring stats */}
               {cd.leader.scoringStats && <ScoringStrip stats={cd.leader.scoringStats} />}
-            </div>
-          )}
-
-          {/* ── RESULT: Champion card ── */}
-          {cd.state === 'result' && cd.leader && (
-            <div
-              className="rounded-2xl p-3.5 mb-3"
-              style={{
-                background: 'rgba(148,163,184,0.06)',
-                border: '1px solid rgba(148,163,184,0.15)',
-              }}
-            >
-              <div className="flex items-center gap-3">
-                {cd.leader.photoUrl ? (
-                  <div className="relative">
-                    <img
-                      src={cd.leader.photoUrl}
-                      alt=""
-                      className="object-cover"
-                      style={{
-                        width: 54, height: 54,
-                        borderRadius: SQUIRCLE_RADIUS,
-                        border: '2px solid rgba(232,152,10,0.45)',
-                      }}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                        const fb = (e.target as HTMLImageElement).parentElement?.querySelector('[data-fallback]') as HTMLElement;
-                        if (fb) fb.style.display = 'flex';
-                      }}
-                    />
-                    <div data-fallback className="items-center justify-center" style={{
-                      display: 'none', width: 54, height: 54,
-                      borderRadius: SQUIRCLE_RADIUS, background: 'rgba(30,30,40,0.8)',
-                      border: '2px solid rgba(232,152,10,0.45)',
-                    }}>
-                      <span style={{ fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>{getInitials(cd.leader.playerName)}</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center" style={{
-                    width: 54, height: 54, borderRadius: SQUIRCLE_RADIUS,
-                    background: 'rgba(30,30,40,0.8)', border: '2px solid rgba(232,152,10,0.45)',
-                  }}>
-                    <span style={{ fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>{getInitials(cd.leader.playerName)}</span>
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <div className="text-[14px] font-bold truncate">{cd.leader.playerName}</div>
-                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>Champion</div>
-                  {cd.winnerBy && (
-                    <div style={{ fontSize: 11, fontStyle: 'italic', color: 'rgba(255,255,255,0.55)' }}>{cd.winnerBy}</div>
-                  )}
-                </div>
-                <div style={{ fontSize: 36, fontWeight: 900, color: '#E8980A', letterSpacing: -1.5, lineHeight: 1 }}>
-                  {cd.leader.scoreDisplay}
-                </div>
-              </div>
-
-              {/* Champion scoring stats */}
-              {cd.leader.scoringStats && <ScoringStrip stats={cd.leader.scoringStats} />}
-
-              {/* Champion season stats */}
-              {cd.championSeasonStats && (
-                <div className="flex items-center gap-1 mt-2">
-                  <SeasonTile label="Driver" value={cd.championSeasonStats.drivingDistance ? `${Math.round(cd.championSeasonStats.drivingDistance)}y` : null} />
-                  <SeasonTile label="Accuracy" value={cd.championSeasonStats.drivingAccuracy ? `${Math.round(cd.championSeasonStats.drivingAccuracy)}%` : null} />
-                  <SeasonTile label="GIR" value={cd.championSeasonStats.greensInReg ? `${Math.round(cd.championSeasonStats.greensInReg)}%` : null} />
-                  <SeasonTile label="Putts" value={cd.championSeasonStats.puttingAverage ? cd.championSeasonStats.puttingAverage.toFixed(2) : null} />
-                </div>
-              )}
             </div>
           )}
 
           {/* ── UPCOMING: Countdown ── */}
           {cd.state === 'upcoming' && countdown && (
-            <div
-              className="rounded-2xl p-4 mb-3"
-              style={{
-                background: 'rgba(99,102,241,0.06)',
-                border: '1px solid rgba(99,102,241,0.15)',
-              }}
-            >
+            <div className="rounded-2xl p-4 mb-3" style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)' }}>
               <div className="flex items-center justify-around">
                 <CountdownTile value={countdown.days} label="Days" />
                 <div className="text-indigo-400/30 text-lg font-thin">:</div>
@@ -482,7 +730,7 @@ export const PGACard: React.FC<PGACardProps> = ({
             </div>
           )}
 
-          {/* Stat tiles — live only (leaderStats is null for result) */}
+          {/* Stat tiles — live only */}
           {cd.leaderStats && (
             <>
               <div className="h-px bg-white/5 my-2.5" />
@@ -510,7 +758,6 @@ export const PGACard: React.FC<PGACardProps> = ({
 
       {/* ── Course Strip ── */}
       <div className="flex-shrink-0" style={{ margin: '10px 16px 0', borderRadius: 12, overflow: 'hidden', position: 'relative', height: 72, border: '1px solid rgba(255,255,255,0.08)' }}>
-        {/* Background image or fallback */}
         {cd.courseImageUrl ? (
           <>
             <img src={cd.courseImageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -519,154 +766,70 @@ export const PGACard: React.FC<PGACardProps> = ({
         ) : (
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.04)' }} />
         )}
-        {/* Content */}
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: 12, height: '100%', padding: '0 14px' }}>
           <GolfFlagIcon />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', maxWidth: '55vw', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {cd.venueName ?? 'TBD'}
             </div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginTop: 1 }}>
-              {cd.venueCity ?? ''}
-            </div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginTop: 1 }}>{cd.venueCity ?? ''}</div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
             {cd.venuePar && (
-              <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.07)', borderRadius: 20, padding: '3px 8px' }}>
-                Par {cd.venuePar}
-              </span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.07)', borderRadius: 20, padding: '3px 8px' }}>Par {cd.venuePar}</span>
             )}
             {cd.purse && (
-              <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.07)', borderRadius: 20, padding: '3px 8px' }}>
-                {formatPurse(cd.purse)}
-              </span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.07)', borderRadius: 20, padding: '3px 8px' }}>{formatPurse(cd.purse)}</span>
             )}
           </div>
         </div>
       </div>
 
-      {/* ── Chasers / Standings Section ── */}
+      {/* ── Chasers ── */}
       <div className="flex-1 flex flex-col min-h-0 px-1">
         <div className="flex items-center justify-between px-4 pt-2 pb-1">
           <span className="text-[12px] font-bold text-white/50 uppercase tracking-wider">
-            {cd.state === 'result' ? 'Final Standings' : cd.state === 'upcoming' ? 'Course Info' : 'In Contention'}
+            {cd.state === 'upcoming' ? 'Course Info' : 'In Contention'}
           </span>
           {cd.state === 'live' && (
             <span className="text-[11px] font-semibold text-amber-400/80">Full leaderboard →</span>
           )}
         </div>
         <div className="flex-1 flex flex-col overflow-hidden">
-          {cd.state === 'result' && chaserGroups ? (
-            <>
-              {/* Winner row */}
-              {cd.leader && (
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  background: 'rgba(232,152,10,0.08)', border: '1px solid rgba(232,152,10,0.18)',
-                  borderRadius: 11, padding: '9px 10px', margin: '0 4px 5px',
-                }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', width: 22, textAlign: 'center' }}>1</div>
-                  <div style={{
-                    width: 50, height: 50, borderRadius: SQUIRCLE_RADIUS,
-                    border: '2px solid rgba(232,152,10,0.4)', overflow: 'hidden',
-                    background: 'rgba(30,30,40,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                  }}>
-                    {cd.leader.photoUrl ? (
-                      <img src={cd.leader.photoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      <span style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>{getInitials(cd.leader.playerName)}</span>
-                    )}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{cd.leader.playerName}</div>
-                  </div>
-                  <div style={{ fontSize: 17, fontWeight: 800, color: '#E8980A' }}>{cd.leader.scoreDisplay}</div>
-                </div>
-              )}
-              {/* Chaser groups */}
-              {chaserGroups.map((group, gi) => {
-                if (group.isTied && group.chasers.length > 1) {
-                  return <TiedRow key={gi} position={group.position} chasers={group.chasers} />;
-                }
-                return group.chasers.map((c, ci) => (
-                  <ChaserRow key={`${gi}-${ci}`} chaser={c} isResult />
-                ));
-              })}
-            </>
-          ) : cd.chasers.length > 0 ? (
-            cd.chasers.map((c, i) => (
-              <ChaserRow key={i} chaser={c} isResult={cd.state === 'result'} />
-            ))
+          {cd.chasers.length > 0 ? (
+            cd.chasers.map((c, i) => <ChaserRow key={i} chaser={c} />)
           ) : cd.state === 'upcoming' ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-2 text-white/30">
               <Calendar className="w-8 h-8" />
               <span className="text-[12px]">Tournament starts {cd.startDate ? new Date(cd.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'soon'}</span>
             </div>
           ) : (
-            <div className="flex-1 flex items-center justify-center text-white/20 text-[12px]">
-              No data available
-            </div>
+            <div className="flex-1 flex items-center justify-center text-white/20 text-[12px]">No data available</div>
           )}
         </div>
       </div>
 
       {/* ── CTA Bar ── */}
-      <div
-        className="flex-shrink-0 flex items-center gap-3 px-5 pt-3"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}
-      >
-        {/* Like button — glass pill */}
-        <button
-          onClick={onLike}
-          className="flex items-center gap-1.5 transition-transform active:scale-95"
-          style={{
-            background: likeState.isLiked ? 'rgba(245,158,11,0.14)' : 'rgba(255,255,255,0.07)',
-            border: `1px solid ${likeState.isLiked ? 'rgba(245,158,11,0.4)' : 'rgba(255,255,255,0.10)'}`,
-            borderRadius: 14, padding: '11px 16px',
-          }}
-        >
-          <Heart
-            style={{
-              width: 17, height: 17,
-              color: likeState.isLiked ? '#f59e0b' : '#6b7280',
-              fill: likeState.isLiked ? '#f59e0b' : 'transparent',
-            }}
-          />
+      <div className="flex-shrink-0 flex items-center gap-3 px-5 pt-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}>
+        <button onClick={onLike} className="flex items-center gap-1.5 transition-transform active:scale-95" style={{
+          background: likeState.isLiked ? 'rgba(245,158,11,0.14)' : 'rgba(255,255,255,0.07)',
+          border: `1px solid ${likeState.isLiked ? 'rgba(245,158,11,0.4)' : 'rgba(255,255,255,0.10)'}`,
+          borderRadius: 14, padding: '11px 16px',
+        }}>
+          <Heart style={{ width: 17, height: 17, color: likeState.isLiked ? '#f59e0b' : '#6b7280', fill: likeState.isLiked ? '#f59e0b' : 'transparent' }} />
           {likeState.count > 0 && (
-            <span className="text-[14px] font-bold" style={{ color: likeState.isLiked ? '#f59e0b' : '#6b7280' }}>
-              {formatCount(likeState.count)}
-            </span>
+            <span className="text-[14px] font-bold" style={{ color: likeState.isLiked ? '#f59e0b' : '#6b7280' }}>{formatCount(likeState.count)}</span>
           )}
         </button>
-
-        {/* Comment CTA */}
-        <button
-          onClick={onComment}
-          className="flex-1 relative flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-[14px] transition-transform active:scale-[0.98]"
-          style={{
-            background: cd.state === 'live'
-              ? 'linear-gradient(135deg, #f59e0b, #d97706)'
-              : cd.state === 'result'
-                ? 'linear-gradient(180deg, #E8A012 0%, #C77008 100%)'
-                : 'linear-gradient(135deg, #6366f1, #4f46e5)',
-            border: cd.state === 'result' ? '1px solid rgba(232,152,10,0.55)' : undefined,
-            borderTopColor: cd.state === 'result' ? 'rgba(255,210,100,0.4)' : undefined,
-            boxShadow: cd.state === 'result'
-              ? '0 2px 14px rgba(232,152,10,0.35), inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.15)'
-              : undefined,
-            animation: (cd.state === 'live' || cd.state === 'result') ? 'ctaPulse 2.5s ease-in-out infinite' : undefined,
-            color: '#fff',
-          }}
-        >
+        <button onClick={onComment} className="flex-1 relative flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-[14px] transition-transform active:scale-[0.98]" style={{
+          background: cd.state === 'live' ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'linear-gradient(135deg, #6366f1, #4f46e5)',
+          animation: cd.state === 'live' ? 'ctaPulse 2.5s ease-in-out infinite' : undefined,
+          color: '#fff',
+        }}>
           <MessageCircle className="w-4 h-4" />
           {ctaLabel}
           {commentCount > 0 && (
-            <span style={{
-              background: 'rgba(0,0,0,0.25)', borderRadius: 8, padding: '2px 7px',
-              fontSize: 11, fontWeight: 700,
-            }}>
-              {formatCount(commentCount)}
-            </span>
+            <span style={{ background: 'rgba(0,0,0,0.25)', borderRadius: 8, padding: '2px 7px', fontSize: 11, fontWeight: 700 }}>{formatCount(commentCount)}</span>
           )}
         </button>
       </div>
