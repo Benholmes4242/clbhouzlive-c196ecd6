@@ -77,8 +77,8 @@ export function usePGACard(userId?: string): {
     queryKey: ['pga-card-upcoming'],
     queryFn: async () => {
       const now = new Date().toISOString();
-      const { data } = await supabase
-        .from('sr_tournaments')
+      const { data } = await (supabase
+        .from('sr_tournaments') as any)
         .select('id,name,purse,start_date,end_date,venue_name,venue_city,venue_par,venue_yardage,status')
         .eq('tour_slug', PGA)
         .eq('status', 'scheduled')
