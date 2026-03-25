@@ -373,6 +373,7 @@ export function usePGACard(userId?: string): {
         chasers,
         leaderStats: null,
         insight: wonByText,
+        winnerBy: wonByText,
         startDate: r.start_date,
         endDate: r.end_date,
         postId,
