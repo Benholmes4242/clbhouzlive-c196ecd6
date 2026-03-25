@@ -116,7 +116,8 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
 
         {/* Comment input — only shown when interaction is allowed */}
         {canInteract && privacySetting !== 'off' && (
-          <div className="flex items-center gap-2 px-5 py-3 border-t border-border/50">
+          <div className="flex items-center gap-2 px-5 pt-3 border-t border-border/50"
+            style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))' }}>
             <input
               value={draft}
               onChange={e => setDraft(e.target.value)}

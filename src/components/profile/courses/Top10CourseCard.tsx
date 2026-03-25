@@ -10,17 +10,12 @@
  * - 24px rounded corners
  * - Layered shadow with press state
  */
-import React, { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { MapPin, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { TopTenCourse } from '@/hooks/useUserTopTenCourses';
 import { getScoreTier } from '@/utils/getScoreTier';
-import { BottomSheet } from '@/components/ui/BottomSheet';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useTopTenReactions, REACTION_CONFIG, ReactionType } from '@/hooks/useTopTenReactions';
 import { TopTenCardComments } from './TopTenCardComments';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -44,53 +39,15 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
   userId,
   privacySetting,
 }) => {
-  const navigate = useNavigate();
-  const [isReviewSheetOpen, setIsReviewSheetOpen] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
   
   const { user } = useSupabaseSession();
   const targetUserId = userId ?? '';
   const { counts, myReaction, toggleReaction } = useTopTenReactions(targetUserId, course.course_id);
   
-  // Fetch the review text for the bottom sheet
-  const { data: reviewData } = useQuery({
-    queryKey: ['course-rating-review', course.course_id, userId],
-    enabled: !!userId && !!course.course_id,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('course_ratings')
-        .select('id, review')
-        .eq('course_id', course.course_id)
-        .eq('user_id', userId!)
-        .maybeSingle();
-      
-      if (error) throw error;
-      return data;
-    },
-    staleTime: 60_000,
-  });
-  
   const handleCardClick = () => {
     setCommentsOpen(true);
   };
-  
-  const handleCloseReviewSheet = useCallback(() => {
-    setIsReviewSheetOpen(false);
-  }, []);
-  
-  const handleViewCourse = useCallback(() => {
-    handleCloseReviewSheet();
-    navigate(`/courses/${course.course_id}`);
-  }, [course.course_id, navigate, handleCloseReviewSheet]);
-  
-  const handleReadFullReview = useCallback(() => {
-    handleCloseReviewSheet();
-    if (reviewData?.id) {
-      navigate(`/courses/${course.course_id}?tab=reviews&review=${reviewData.id}`);
-    } else {
-      navigate(`/courses/${course.course_id}?tab=reviews`);
-    }
-  }, [course.course_id, reviewData?.id, navigate, handleCloseReviewSheet]);
   
   // Get tier info for rating display
   const tierData = rating !== undefined ? getScoreTier(rating) : null;
@@ -221,7 +178,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
               >
                 <span className="text-sm">{config.emoji}</span>
                 <span className={`text-[10px] font-medium ${isActive ? 'text-amber-400' : 'text-white/60'}`}>
-                  {count > 0 ? count : '·'}
+                  {count > 0 ? (count > 99 ? '99+' : count) : '·'}
                 </span>
               </button>
             );
@@ -244,111 +201,6 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
         isOwnProfile={isOwnProfile ?? true}
         privacySetting={privacySetting ?? 'followers'}
       />
-
-      {/* Review Bottom Sheet - Liquid Glass with swipe-to-dismiss */}
-      <BottomSheet 
-        open={isReviewSheetOpen} 
-        onClose={handleCloseReviewSheet}
-        className="h-[70vh]"
-        style={{
-          background: 'linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%)',
-          backdropFilter: 'blur(50px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(50px) saturate(180%)',
-          border: '0.5px solid rgba(255,255,255,0.2)',
-          boxShadow: '0 -8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15)',
-        }}
-      >
-        <div className="flex flex-col h-full px-6 pb-6 overflow-hidden">
-          {/* Header: Course info */}
-          <div className="flex flex-col gap-1 mb-5 pt-2">
-            <h2 className="text-xl font-semibold text-white truncate">{course.name}</h2>
-            {heroSubtitle && (
-              <div className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-white/40 flex-shrink-0" />
-                <span className="text-sm text-white/50 truncate">{heroSubtitle}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Rating - large centered number with dynamic color */}
-          {rating !== undefined && tierData && (
-            <div className="flex flex-col items-center justify-center mb-4">
-              <span 
-                className="text-5xl font-bold"
-                style={{ color: '#f59e0b' }}
-              >
-                {rating === 10 ? '10' : rating.toFixed(1)}
-              </span>
-              <span 
-                className="text-sm font-semibold uppercase tracking-wider mt-1"
-                style={{ color: 'rgba(245, 158, 11, 0.75)' }}
-              >
-                {tierData.label}
-              </span>
-            </div>
-          )}
-
-          {/* Review Text - Scrollable with glass card and fade effect */}
-          {reviewData?.review && (
-            <div 
-              className="flex-1 min-h-0 mb-4 overflow-hidden"
-              style={{
-                maskImage: 'linear-gradient(to bottom, black 0%, black 75%, transparent 100%)',
-                WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 75%, transparent 100%)',
-              }}
-            >
-              <ScrollArea className="h-full">
-                <div 
-                  className="rounded-2xl p-4"
-                  style={{
-                    background: 'rgba(0,0,0,0.15)',
-                    border: '0.5px solid rgba(255,255,255,0.1)',
-                  }}
-                >
-                  <p className="text-white/90 text-base leading-relaxed whitespace-pre-wrap">
-                    "{reviewData.review}"
-                  </p>
-                </div>
-                {/* Bottom spacer so text can scroll above the fade */}
-                <div className="h-8" />
-              </ScrollArea>
-            </div>
-          )}
-          
-          {/* No review text placeholder */}
-          {!reviewData?.review && (
-            <div className="flex-1 min-h-0 mb-4 flex items-center justify-center">
-              <p className="text-white/40 text-sm italic">No written review</p>
-            </div>
-          )}
-
-          {/* CTAs - Glass style buttons */}
-          <div className="flex gap-3 mb-4">
-            <button
-              onClick={handleViewCourse}
-              className="flex-1 py-3.5 rounded-xl font-medium text-sm text-white/80 transition-all active:scale-[0.98]"
-              style={{
-                background: 'rgba(255,255,255,0.1)',
-                border: '0.5px solid rgba(255,255,255,0.15)',
-              }}
-            >
-              View Course
-            </button>
-            <button
-              onClick={handleReadFullReview}
-              className="flex-1 py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-1 transition-all active:scale-[0.98]"
-              style={{
-                background: 'linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)',
-                boxShadow: '0 4px 14px rgba(251,191,36,0.25)',
-                color: '#000',
-              }}
-            >
-              Read Full Review
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </BottomSheet>
     </>
   );
 };
