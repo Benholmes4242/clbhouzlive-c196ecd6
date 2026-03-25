@@ -27,7 +27,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       duration={3000}
       visibleToasts={2}
       expand={false}
-      offset="calc(85px + 12px + env(safe-area-inset-bottom, 0px))"
+      offset="97px"
       toastOptions={{
         className: 'clbhouz-toast',
         style: {
