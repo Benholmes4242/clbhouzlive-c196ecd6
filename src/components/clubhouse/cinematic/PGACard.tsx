@@ -24,6 +24,8 @@ const formatCount = (n: number) => {
   return n.toString();
 };
 
+const SQUIRCLE_RADIUS = '34%';
+
 // ── Stat Tile ──
 const StatTile: React.FC<{ label: string; value: number; color: string }> = ({ label, value, color }) => (
   <div className="flex-1 text-center">
@@ -40,6 +42,25 @@ const SeasonTile: React.FC<{ label: string; value: string | number | null }> = (
   </div>
 );
 
+// ── Scoring Strip (leader) ──
+const ScoringStrip: React.FC<{ stats: { eagles: number; birdies: number; pars: number; bogeys: number; doubleBogeys: number } }> = ({ stats }) => (
+  <div style={{ display: 'flex', gap: 5, marginBottom: 6, marginTop: 2 }}>
+    {([
+      { emoji: '🦅', value: stats.eagles, label: 'Eagles' },
+      { emoji: '🐦', value: stats.birdies, label: 'Birdies' },
+      { emoji: '○', value: stats.pars, label: 'Pars' },
+      { emoji: '+1', value: stats.bogeys, label: 'Bogeys' },
+      { emoji: '+2', value: stats.doubleBogeys, label: 'Doubles' },
+    ] as const).map(({ emoji, value, label }) => (
+      <div key={label} style={{ flex: 1, textAlign: 'center', padding: '5px 2px', borderRadius: 9, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div style={{ fontSize: 11, lineHeight: 1 }}>{emoji}</div>
+        <div style={{ fontSize: 14, fontWeight: 800, color: 'rgba(255,255,255,0.80)', lineHeight: 1, marginTop: 2 }}>{value}</div>
+        <div style={{ fontSize: 8, fontWeight: 600, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 1 }}>{label}</div>
+      </div>
+    ))}
+  </div>
+);
+
 // ── Chaser Row ──
 const ChaserRow: React.FC<{ chaser: PGACardChaser; isResult?: boolean }> = ({ chaser, isResult }) => (
   <div className="flex items-center gap-3 px-4 min-h-[44px] flex-1">
@@ -51,23 +72,37 @@ const ChaserRow: React.FC<{ chaser: PGACardChaser; isResult?: boolean }> = ({ ch
         <img
           src={chaser.photoUrl}
           alt=""
-          className="w-8 h-8 rounded-lg object-cover"
+          className="w-8 h-8 object-cover"
+          style={{ borderRadius: SQUIRCLE_RADIUS }}
           onError={(e) => {
             (e.target as HTMLImageElement).style.display = 'none';
             const fb = (e.target as HTMLImageElement).parentElement?.querySelector('[data-fallback]') as HTMLElement;
             if (fb) fb.style.display = 'flex';
           }}
         />
-        <div data-fallback className="w-8 h-8 rounded-lg bg-white/10 items-center justify-center" style={{ display: 'none' }}>
+        <div data-fallback className="w-8 h-8 bg-white/10 items-center justify-center" style={{ display: 'none', borderRadius: SQUIRCLE_RADIUS }}>
           <span className="text-[11px] text-white/40">⛳</span>
         </div>
       </div>
     ) : (
-      <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+      <div className="w-8 h-8 bg-white/10 flex items-center justify-center" style={{ borderRadius: SQUIRCLE_RADIUS }}>
         <span className="text-[11px] text-white/40">⛳</span>
       </div>
     )}
-    <div className="flex-1 text-[13px] font-semibold text-white/80 truncate">{chaser.playerName}</div>
+    <div className="flex-1 min-w-0">
+      <div className="text-[13px] font-semibold text-white/80 truncate">{chaser.playerName}</div>
+      {chaser.scoringStats && (
+        <div style={{ display: 'flex', gap: 6, marginTop: 2 }}>
+          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)' }}>🦅{chaser.scoringStats.eagles}</span>
+          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)' }}>🐦{chaser.scoringStats.birdies}</span>
+          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)' }}>○{chaser.scoringStats.pars}</span>
+          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)' }}>+1×{chaser.scoringStats.bogeys}</span>
+          {chaser.scoringStats.doubleBogeys > 0 && (
+            <span style={{ fontSize: 10, color: 'rgba(239,68,68,0.5)' }}>+2×{chaser.scoringStats.doubleBogeys}</span>
+          )}
+        </div>
+      )}
+    </div>
     <div className="text-[13px] font-bold text-white/60">{chaser.scoreDisplay ?? ''}</div>
   </div>
 );
@@ -91,6 +126,18 @@ export const PGACard: React.FC<PGACardProps> = ({
   const isLoading = post.isLoading ?? false;
   const likeState = getLikeState?.(post) ?? { isLiked: cd.isLikedByMe, count: cd.likeCount };
   const commentCount = getCommentCount?.(post) ?? cd.commentCount;
+
+  // Countdown for upcoming (must be before early return)
+  const countdown = useMemo(() => {
+    if (cd.state !== 'upcoming' || !cd.startDate) return null;
+    const diff = new Date(cd.startDate).getTime() - Date.now();
+    if (diff <= 0) return { days: 0, hours: 0, minutes: 0 };
+    return {
+      days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+      minutes: Math.floor((diff / (1000 * 60)) % 60),
+    };
+  }, [cd.state, cd.startDate]);
 
   // ── Skeleton state ──
   const showSkeleton = isLoading ||
@@ -126,17 +173,6 @@ export const PGACard: React.FC<PGACardProps> = ({
       ? 'rgba(148,163,184,0.07)'
       : 'rgba(99,102,241,0.09)';
 
-  // Countdown for upcoming
-  const countdown = useMemo(() => {
-    if (cd.state !== 'upcoming' || !cd.startDate) return null;
-    const diff = new Date(cd.startDate).getTime() - Date.now();
-    if (diff <= 0) return { days: 0, hours: 0, minutes: 0 };
-    return {
-      days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-      hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
-      minutes: Math.floor((diff / (1000 * 60)) % 60),
-    };
-  }, [cd.state, cd.startDate]);
 
   const ctaLabel = cd.state === 'live'
     ? 'Who wins this?'
@@ -164,7 +200,7 @@ export const PGACard: React.FC<PGACardProps> = ({
           }}
         />
 
-        {/* Amber accent bar */}
+        {/* Accent bar */}
         <div
           className="w-full"
           style={{
@@ -216,25 +252,25 @@ export const PGACard: React.FC<PGACardProps> = ({
               }}
             >
               <div className="flex items-center gap-3">
-            {cd.leader.photoUrl ? (
+                {cd.leader.photoUrl ? (
                   <div className="relative">
                     <img
                       src={cd.leader.photoUrl}
                       alt={cd.leader.playerName}
-                      className="w-[50px] h-[50px] rounded-xl object-cover"
-                      style={{ boxShadow: '0 0 16px rgba(245,158,11,0.25)' }}
+                      className="w-[50px] h-[50px] object-cover"
+                      style={{ borderRadius: SQUIRCLE_RADIUS, boxShadow: '0 0 16px rgba(245,158,11,0.25)' }}
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = 'none';
                         const fb = (e.target as HTMLImageElement).parentElement?.querySelector('[data-fallback]') as HTMLElement;
                         if (fb) fb.style.display = 'flex';
                       }}
                     />
-                    <div data-fallback className="w-[50px] h-[50px] rounded-xl bg-amber-900/30 items-center justify-center" style={{ display: 'none' }}>
+                    <div data-fallback className="w-[50px] h-[50px] bg-amber-900/30 items-center justify-center" style={{ display: 'none', borderRadius: SQUIRCLE_RADIUS }}>
                       <span className="text-amber-400 text-lg">⛳</span>
                     </div>
                   </div>
                 ) : (
-                  <div className="w-[50px] h-[50px] rounded-xl bg-amber-900/30 flex items-center justify-center">
+                  <div className="w-[50px] h-[50px] bg-amber-900/30 flex items-center justify-center" style={{ borderRadius: SQUIRCLE_RADIUS }}>
                     <span className="text-amber-400 text-lg">⛳</span>
                   </div>
                 )}
@@ -253,6 +289,9 @@ export const PGACard: React.FC<PGACardProps> = ({
                   {cd.leader.scoreDisplay}
                 </div>
               </div>
+
+              {/* Leader scoring stats */}
+              {cd.leader.scoringStats && <ScoringStrip stats={cd.leader.scoringStats} />}
             </div>
           )}
 
@@ -266,24 +305,25 @@ export const PGACard: React.FC<PGACardProps> = ({
               }}
             >
               <div className="flex items-center gap-3">
-            {cd.leader.photoUrl ? (
+                {cd.leader.photoUrl ? (
                   <div className="relative">
                     <img
                       src={cd.leader.photoUrl}
                       alt=""
-                      className="w-[50px] h-[50px] rounded-xl object-cover"
+                      className="w-[50px] h-[50px] object-cover"
+                      style={{ borderRadius: SQUIRCLE_RADIUS }}
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = 'none';
                         const fb = (e.target as HTMLImageElement).parentElement?.querySelector('[data-fallback]') as HTMLElement;
                         if (fb) fb.style.display = 'flex';
                       }}
                     />
-                    <div data-fallback className="w-[50px] h-[50px] rounded-xl bg-slate-800 items-center justify-center" style={{ display: 'none' }}>
+                    <div data-fallback className="w-[50px] h-[50px] bg-slate-800 items-center justify-center" style={{ display: 'none', borderRadius: SQUIRCLE_RADIUS }}>
                       <Trophy className="w-5 h-5 text-slate-400" />
                     </div>
                   </div>
                 ) : (
-                  <div className="w-[50px] h-[50px] rounded-xl bg-slate-800 flex items-center justify-center">
+                  <div className="w-[50px] h-[50px] bg-slate-800 flex items-center justify-center" style={{ borderRadius: SQUIRCLE_RADIUS }}>
                     <Trophy className="w-5 h-5 text-slate-400" />
                   </div>
                 )}
@@ -295,6 +335,19 @@ export const PGACard: React.FC<PGACardProps> = ({
                   {cd.leader.scoreDisplay}
                 </div>
               </div>
+
+              {/* Champion scoring stats */}
+              {cd.leader.scoringStats && <ScoringStrip stats={cd.leader.scoringStats} />}
+
+              {/* Champion season stats */}
+              {cd.championSeasonStats && (
+                <div className="flex items-center gap-1 mt-2">
+                  <SeasonTile label="Driver" value={cd.championSeasonStats.drivingDistance ? `${Math.round(cd.championSeasonStats.drivingDistance)}y` : null} />
+                  <SeasonTile label="Accuracy" value={cd.championSeasonStats.drivingAccuracy ? `${Math.round(cd.championSeasonStats.drivingAccuracy)}%` : null} />
+                  <SeasonTile label="GIR" value={cd.championSeasonStats.greensInReg ? `${Math.round(cd.championSeasonStats.greensInReg)}%` : null} />
+                  <SeasonTile label="Putts" value={cd.championSeasonStats.puttingAverage ? cd.championSeasonStats.puttingAverage.toFixed(2) : null} />
+                </div>
+              )}
             </div>
           )}
 
@@ -317,7 +370,7 @@ export const PGACard: React.FC<PGACardProps> = ({
             </div>
           )}
 
-          {/* Stat tiles — live & result */}
+          {/* Stat tiles — live only (leaderStats is null for result) */}
           {cd.leaderStats && (
             <>
               <div className="h-px bg-white/5 my-2.5" />

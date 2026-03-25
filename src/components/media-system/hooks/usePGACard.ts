@@ -42,6 +42,19 @@ async function getOrCreatePost(tournamentId: string, tournamentName: string): Pr
   }
 }
 
+// ── Scoring stats aggregator ──
+function aggregateScoringStats(scorecards: any[], playerId: string) {
+  const rows = scorecards.filter(s => s.player_id === playerId);
+  if (!rows.length) return null;
+  return {
+    eagles:       rows.reduce((sum: number, r: any) => sum + (r.eagles ?? 0), 0),
+    birdies:      rows.reduce((sum: number, r: any) => sum + (r.birdies ?? 0), 0),
+    pars:         rows.reduce((sum: number, r: any) => sum + (r.pars ?? 0), 0),
+    bogeys:       rows.reduce((sum: number, r: any) => sum + (r.bogeys ?? 0), 0),
+    doubleBogeys: rows.reduce((sum: number, r: any) => sum + (r.double_bogeys ?? 0), 0),
+  };
+}
+
 export function usePGACard(userId?: string): {
   pgaCard: PGACardFeedPost | null;
   isLoading: boolean;
@@ -128,6 +141,65 @@ export function usePGACard(userId?: string): {
     staleTime: 10 * 60_000,
   });
 
+  // ── Scorecards for live tournament ──
+  const livePlayerIds = useMemo(() => {
+    if (!topLive) return [];
+    return [topLive.leader, ...topLive.chasePack]
+      .filter(Boolean)
+      .map(p => p!.playerId)
+      .slice(0, 10);
+  }, [topLive]);
+
+  const { data: liveScorecards = [] } = useQuery({
+    queryKey: ['pga-card-scorecards-live', topLive?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('sr_scorecards')
+        .select('player_id, round_number, eagles, birdies, pars, bogeys, double_bogeys')
+        .eq('tournament_id', topLive!.id)
+        .in('player_id', livePlayerIds);
+      return data ?? [];
+    },
+    enabled: !!topLive?.id && livePlayerIds.length > 0,
+    staleTime: 60_000,
+  });
+
+  // ── Scorecards for result tournament ──
+  const { data: resultScorecards = [] } = useQuery({
+    queryKey: ['pga-card-scorecards-result', (recentResult as any)?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('sr_scorecards')
+        .select('player_id, round_number, eagles, birdies, pars, bogeys, double_bogeys')
+        .eq('tournament_id', (recentResult as any).id);
+      return data ?? [];
+    },
+    enabled: !!recentResult && !topLive,
+    staleTime: 10 * 60_000,
+  });
+
+  // ── Champion season stats (result only) ──
+  const resultLeaderId = useMemo(() => {
+    if (!resultLeaderboard || (resultLeaderboard as any[]).length === 0) return null;
+    return (resultLeaderboard as any[])[0]?.player?.id ?? null;
+  }, [resultLeaderboard]);
+
+  const { data: championSeasonStats } = useQuery({
+    queryKey: ['pga-card-champion-stats', resultLeaderId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('sr_player_statistics')
+        .select('driving_distance, driving_accuracy, greens_in_reg, putting_average')
+        .eq('player_id', resultLeaderId!)
+        .order('season_id', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return data ?? null;
+    },
+    enabled: !!resultLeaderId && !topLive,
+    staleTime: 10 * 60_000,
+  });
+
   // ── Determine active tournament for post ID / counts ──
   const activeTournamentId = topLive?.id ?? recentResult?.id ?? nextUpcoming?.id ?? null;
   const activeTournamentName = topLive?.name ?? (recentResult as any)?.name ?? (nextUpcoming as any)?.name ?? '';
@@ -183,6 +255,7 @@ export function usePGACard(userId?: string): {
         score: lp.score,
         thru: lp.thru,
         today: null,
+        scoringStats: liveScorecards.length ? aggregateScoringStats(liveScorecards, lp.playerId) : null,
       } : null;
 
       const chasers: PGACardChaser[] = lb
@@ -194,6 +267,7 @@ export function usePGACard(userId?: string): {
           photoUrl: getPlayerHeadshotUrl(p!.player.fullName, PGA_TOUR_SLUG, p!.player.headshotOverride) ?? null,
           scoreDisplay: p!.scoreDisplay,
           isTied: lb.filter(x => x?.position === p?.position).length > 1,
+          scoringStats: liveScorecards.length ? aggregateScoringStats(liveScorecards, p!.playerId) : null,
         }));
 
       const ls: PGACardStats | null = topLive.leaderStats ? {
@@ -240,13 +314,17 @@ export function usePGACard(userId?: string): {
       const leader: PGACardLeader | null = lp ? {
         playerId: lp.player?.id ?? '',
         playerName: lp.player?.full_name ?? '',
-        photoUrl: lp.player?.photo_url ?? lp.player?.headshot_override ?? null,
+        photoUrl: lp.player?.headshot_override
+          ?? getPlayerHeadshotUrl(lp.player?.full_name ?? '', PGA_TOUR_SLUG)
+          ?? lp.player?.photo_url
+          ?? null,
         scoreDisplay: lp.score != null
           ? lp.score === 0 ? 'E' : lp.score > 0 ? `+${lp.score}` : `${lp.score}`
           : '—',
         score: lp.score ?? 0,
         thru: null,
         today: null,
+        scoringStats: resultScorecards.length ? aggregateScoringStats(resultScorecards, lp.player?.id ?? '') : null,
       } : null;
 
       const chasers: PGACardChaser[] = lb
@@ -255,11 +333,15 @@ export function usePGACard(userId?: string): {
         .map((p: any) => ({
           position: p.position,
           playerName: p.player?.full_name ?? '',
-          photoUrl: p.player?.photo_url ?? p.player?.headshot_override ?? null,
+          photoUrl: p.player?.headshot_override
+            ?? getPlayerHeadshotUrl(p.player?.full_name ?? '', PGA_TOUR_SLUG)
+            ?? p.player?.photo_url
+            ?? null,
           scoreDisplay: p.score != null
             ? p.score === 0 ? 'E' : p.score > 0 ? `+${p.score}` : `${p.score}`
             : '—',
           isTied: lb.filter((x: any) => x.position === p.position).length > 1,
+          scoringStats: resultScorecards.length ? aggregateScoringStats(resultScorecards, p.player?.id ?? '') : null,
         }));
 
       const wonBy = lp && lb[1]
@@ -293,6 +375,12 @@ export function usePGACard(userId?: string): {
         endDate: r.end_date,
         postId,
         ...eng,
+        championSeasonStats: championSeasonStats ? {
+          drivingDistance: championSeasonStats.driving_distance,
+          drivingAccuracy: championSeasonStats.driving_accuracy,
+          greensInReg:     championSeasonStats.greens_in_reg,
+          puttingAverage:  championSeasonStats.putting_average,
+        } : null,
       };
     }
 
@@ -324,7 +412,8 @@ export function usePGACard(userId?: string): {
 
     return null;
   }, [topLive, recentResult, nextUpcoming, resultLeaderboard, postId,
-      engagementData?.likeCount, engagementData?.commentCount, engagementData?.isLikedByMe]);
+      engagementData?.likeCount, engagementData?.commentCount, engagementData?.isLikedByMe,
+      liveScorecards, resultScorecards, championSeasonStats]);
 
   const pgaCard: PGACardFeedPost | null = cardData ? {
     id: postId || 'pga-card',
