@@ -307,6 +307,7 @@ export interface EngagementAnalyticsData {
   busiestHour: number;
   dailyTrend: DailyBucket[];
   topEvents: { name: string; count: number; uniqueUsers: number }[];
+  hourlyBreakdown: { hour: number; count: number }[];
 }
 
 async function fetchEngagementAnalytics(period: AnalyticsPeriod): Promise<EngagementAnalyticsData> {
