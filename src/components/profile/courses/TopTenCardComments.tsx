@@ -222,9 +222,9 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
                     className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-muted/50 text-left transition-colors"
                   >
                     {u.avatar ? (
-                      <img src={u.avatar} alt={u.display_name} className="w-7 h-7 rounded-full object-cover" />
+                      <img src={u.avatar} alt={u.display_name} className="w-7 h-7 object-cover" style={{ borderRadius: '34%' }} />
                     ) : (
-                      <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground">
+                      <div className="w-7 h-7 bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground" style={{ borderRadius: '34%' }}>
                         {u.display_name?.charAt(0).toUpperCase()}
                       </div>
                     )}
