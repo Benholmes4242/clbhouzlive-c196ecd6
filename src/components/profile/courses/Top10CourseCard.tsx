@@ -155,8 +155,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
 
         {/* Reaction strip — overlaid at bottom of card image */}
         <div
-          className="absolute bottom-0 left-0 right-0 flex h-[46px]"
-          style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}
+          className="absolute bottom-0 left-0 right-0 flex h-[46px] glass-dark !rounded-none !rounded-b-[24px] !border-t-[1px] !border-t-white/[0.06] !border-b-0 !border-x-0"
         >
           {(Object.entries(REACTION_CONFIG) as [ReactionType, typeof REACTION_CONFIG[ReactionType]][]).map(([type, config], idx) => {
             const count = counts[type] ?? 0;
@@ -175,11 +174,10 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
                 }}
                 className={`relative flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5
                   transition-all active:scale-95
-                  ${isActive ? 'bg-amber-500/25' : 'bg-black/45'}
+                  ${isActive ? 'bg-amber-500/25' : ''}
                   ${!isLast ? 'border-r border-white/[0.08]' : ''}
                   ${isOwnProfile || !user ? 'cursor-default' : 'cursor-pointer'}
                 `}
-                style={{ backdropFilter: 'blur(12px)' }}
                 disabled={isOwnProfile || !user}
               >
                 <motion.span
