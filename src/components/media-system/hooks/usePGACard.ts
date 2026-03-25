@@ -91,6 +91,28 @@ export function usePGACard(userId?: string): {
     staleTime: 30 * 60_000,
   });
 
+  // ── Result leaderboard (final standings) ──
+  const { data: resultLeaderboard } = useQuery({
+    queryKey: ['pga-card-result-lb', (recentResult as any)?.id],
+    queryFn: async () => {
+      if (!recentResult) return [];
+      const { data } = await (supabase
+        .from('sr_leaderboards') as any)
+        .select(`
+          position, score, money,
+          player:sr_players!sr_leaderboards_player_id_fkey (
+            id, full_name, photo_url, headshot_override
+          )
+        `)
+        .eq('tournament_id', (recentResult as any).id)
+        .order('position', { ascending: true })
+        .limit(10);
+      return data ?? [];
+    },
+    enabled: !!recentResult,
+    staleTime: 10 * 60_000,
+  });
+
   // ── Determine active tournament for post ID / counts ──
   const activeTournamentId = topLive?.id ?? recentResult?.id ?? nextUpcoming?.id ?? null;
   const activeTournamentName = topLive?.name ?? (recentResult as any)?.name ?? (nextUpcoming as any)?.name ?? '';
@@ -197,6 +219,41 @@ export function usePGACard(userId?: string): {
     // RESULT state
     if (recentResult) {
       const r = recentResult as any;
+      const lb = (resultLeaderboard ?? []) as any[];
+      const lp = lb[0] ?? null;
+
+      const leader: PGACardLeader | null = lp ? {
+        playerId: lp.player?.id ?? '',
+        playerName: lp.player?.full_name ?? '',
+        photoUrl: lp.player?.photo_url ?? lp.player?.headshot_override ?? null,
+        scoreDisplay: lp.score != null
+          ? lp.score === 0 ? 'E' : lp.score > 0 ? `+${lp.score}` : `${lp.score}`
+          : '—',
+        score: lp.score ?? 0,
+        thru: null,
+        today: null,
+      } : null;
+
+      const chasers: PGACardChaser[] = lb
+        .filter((p: any) => p.position > 1)
+        .slice(0, 4)
+        .map((p: any) => ({
+          position: p.position,
+          playerName: p.player?.full_name ?? '',
+          photoUrl: p.player?.photo_url ?? p.player?.headshot_override ?? null,
+          scoreDisplay: p.score != null
+            ? p.score === 0 ? 'E' : p.score > 0 ? `+${p.score}` : `${p.score}`
+            : '—',
+          isTied: lb.filter((x: any) => x.position === p.position).length > 1,
+        }));
+
+      const wonBy = lp && lb[1]
+        ? Math.abs((lp.score ?? 0) - (lb[1].score ?? 0))
+        : null;
+      const wonByText = wonBy != null
+        ? wonBy === 1 ? 'Won by 1 shot' : `Won by ${wonBy} shots`
+        : null;
+
       return {
         tournamentId: r.id,
         tournamentName: r.name,
@@ -209,10 +266,10 @@ export function usePGACard(userId?: string): {
         currentRound: 4,
         totalRounds: 4,
         roundLabel: 'Completed',
-        leader: null,
-        chasers: [],
+        leader,
+        chasers,
         leaderStats: null,
-        insight: null,
+        insight: wonByText,
         startDate: r.start_date,
         endDate: r.end_date,
         postId,
@@ -247,7 +304,7 @@ export function usePGACard(userId?: string): {
     }
 
     return null;
-  }, [topLive, recentResult, nextUpcoming, postId, eng]);
+  }, [topLive, recentResult, nextUpcoming, resultLeaderboard, postId, eng]);
 
   const pgaCard: PGACardFeedPost | null = cardData ? {
     id: 'pga-card',
