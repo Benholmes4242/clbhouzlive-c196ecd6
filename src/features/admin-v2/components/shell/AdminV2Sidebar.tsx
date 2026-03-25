@@ -149,6 +149,10 @@ export default function AdminV2Sidebar({ role, can, onNavigate }: SidebarProps) 
     refetchInterval: 60_000,
   });
 
+  // Anomaly alert badge count
+  const { data: anomalyAlerts = [] } = useAnomalyAlerts();
+  const alertBadgeCount = anomalyAlerts.filter(a => a.severity === 'critical' || a.severity === 'warning').length;
+
   const groups: NavGroup[] = [
     {
       id: 'overview',
