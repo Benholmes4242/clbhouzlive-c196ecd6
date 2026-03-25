@@ -161,6 +161,10 @@ export const FeedSlide = memo(function FeedSlide({
         background: '#000',
       }}
     >
+      {/* PGA card sentinel for IntersectionObserver */}
+      {post.postType === 'pga_card' && (
+        <div data-pga-sentinel="true" className="absolute inset-0 pointer-events-none" />
+      )}
       {renderContent()}
     </div>
   );
