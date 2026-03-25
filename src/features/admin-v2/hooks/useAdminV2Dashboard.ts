@@ -194,6 +194,74 @@ async function fetchActivityTrend(days = 14): Promise<ActivityTrendDay[]> {
   return Object.values(buckets);
 }
 
+// ─── Today at a glance fetchers ───────────────────────────────────────────────
+
+export interface HourlyBucket { hour: number; count: number; }
+export interface TopActiveUser { userId: string; displayName: string; eventCount: number; }
+
+export interface TodayGlance {
+  postsByHour: HourlyBucket[];
+  topActiveUsers: TopActiveUser[];
+}
+
+async function fetchTodayGlance(): Promise<TodayGlance> {
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  const since = startOfToday.toISOString();
+
+  const [postsRes, eventsRes] = await Promise.all([
+    supabase.from('analytics_events')
+      .select('created_at')
+      .eq('name', 'post_published')
+      .gte('created_at', since)
+      .limit(2000),
+    supabase.from('analytics_events')
+      .select('user_id')
+      .gte('created_at', since)
+      .not('user_id', 'is', null)
+      .limit(5000),
+  ]);
+
+  // Posts by hour
+  const hourCounts: Record<number, number> = {};
+  for (let h = 0; h < 24; h++) hourCounts[h] = 0;
+  for (const r of postsRes.data ?? []) {
+    const h = new Date(r.created_at).getHours();
+    hourCounts[h]++;
+  }
+  const postsByHour: HourlyBucket[] = Object.entries(hourCounts)
+    .map(([h, count]) => ({ hour: parseInt(h), count }));
+
+  // Top 3 active users
+  const userCounts: Record<string, number> = {};
+  for (const r of (eventsRes.data ?? []) as { user_id: string }[]) {
+    userCounts[r.user_id] = (userCounts[r.user_id] || 0) + 1;
+  }
+  const top3Ids = Object.entries(userCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([userId, eventCount]) => ({ userId, eventCount }));
+
+  let topActiveUsers: TopActiveUser[] = [];
+  if (top3Ids.length > 0) {
+    const { data: profiles } = await supabase
+      .from('user_profiles')
+      .select('id, display_name, username')
+      .in('id', top3Ids.map(t => t.userId));
+
+    const profileMap = new Map((profiles ?? []).map(p => [p.id, p]));
+    topActiveUsers = top3Ids.map(t => ({
+      userId: t.userId,
+      displayName: profileMap.get(t.userId)?.display_name
+        ?? profileMap.get(t.userId)?.username
+        ?? t.userId.slice(0, 8),
+      eventCount: t.eventCount,
+    }));
+  }
+
+  return { postsByHour, topActiveUsers };
+}
+
 async function fetchRecentAudit(): Promise<RecentAuditEntry[]> {
   const { data, error } = await supabase
     .from('admin_audit_log')
