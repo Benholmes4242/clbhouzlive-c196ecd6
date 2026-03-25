@@ -88,7 +88,7 @@ export function FriendsFeed({
     <div ref={feedContainerRef} className="flex flex-col gap-3 pb-4 pt-2">
       <FriendsAutoplay posts={posts} feedRef={feedContainerRef} />
       {posts.map((post, i) => (
-        <React.Fragment key={post.id}>
+        <div key={post.id}>
           <div data-card-index={i}>
             <FriendsCard
               post={post}
@@ -107,7 +107,7 @@ export function FriendsFeed({
               showViewAll={false}
             />
           )}
-        </React.Fragment>
+        </div>
       ))}
       {posts.length > 0 && posts.length < 5 && (
         <SuggestedCreatorsShelf
