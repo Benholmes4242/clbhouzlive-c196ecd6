@@ -76,6 +76,7 @@ export function useTopTenComments(targetUserId: string, courseId: string) {
           entity_type: 'top_ten',
           entity_id: courseId,
           is_read: false,
+          data: { target_user_id: targetUserId },
         });
       }
     },
