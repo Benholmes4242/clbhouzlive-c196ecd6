@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, MessageCircle, Trophy, Calendar, ChevronRight } from 'lucide-react';
+import { Heart, MessageCircle, Trophy, Calendar, ChevronRight, MapPin } from 'lucide-react';
 import type { PGACardFeedPost, PGACardChaser } from '@/components/media-system/types/media';
 
 interface PGACardProps {
@@ -115,14 +115,6 @@ const ChaserRow: React.FC<{ chaser: PGACardChaser }> = ({ chaser }) => (
   </div>
 );
 
-// ── Countdown Tile ──
-const CountdownTile: React.FC<{ value: number; label: string }> = ({ value, label }) => (
-  <div className="flex-1 text-center">
-    <div className="text-[28px] font-black text-indigo-300">{value}</div>
-    <div className="text-[9px] font-bold text-indigo-400/60 uppercase tracking-widest">{label}</div>
-  </div>
-);
-
 // ── Golf Flag SVG Icon ──
 const GolfFlagIcon: React.FC = () => (
   <div style={{
@@ -181,6 +173,62 @@ const RowAvatar: React.FC<{ src?: string | null; name: string; size: number }> =
   </div>
 );
 
+// ── Digit Cell (upcoming countdown) ──
+const DigitCell: React.FC<{ value: number; label: string; isAccent?: boolean }> = ({ value, label, isAccent }) => (
+  <div style={{
+    flex: 1, textAlign: 'center',
+    padding: '10px 4px 8px',
+    borderRadius: 10,
+    background: isAccent ? `${ACCENT_LIGHT}14` : 'rgba(255,255,255,0.05)',
+    border: `1px solid ${isAccent ? `${ACCENT_LIGHT}30` : 'rgba(255,255,255,0.09)'}`,
+    position: 'relative',
+    overflow: 'hidden',
+  }}>
+    {isAccent && (
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)',
+        animation: 'shimmer 2s ease-in-out infinite',
+      }} />
+    )}
+    <div style={{
+      fontSize: 'clamp(22px, 5.5vw, 28px)', fontWeight: 900,
+      color: isAccent ? ACCENT_LIGHT : '#fff',
+      lineHeight: 1, position: 'relative',
+    }}>
+      {String(value).padStart(2, '0')}
+    </div>
+    <div style={{
+      fontSize: 'clamp(8px, 2vw, 9px)', fontWeight: 700,
+      color: isAccent ? `${ACCENT_LIGHT}90` : 'rgba(255,255,255,0.35)',
+      textTransform: 'uppercase', letterSpacing: '0.8px',
+      marginTop: 4, position: 'relative',
+    }}>
+      {label}
+    </div>
+  </div>
+);
+
+// ── Pulsing dot separator ──
+const PulseDot: React.FC = () => (
+  <div style={{
+    display: 'flex', flexDirection: 'column', gap: 4,
+    padding: '0 2px',
+  }}>
+    <div style={{
+      width: 4, height: 4, borderRadius: '50%',
+      background: 'rgba(255,255,255,0.3)',
+      animation: 'tickPulse 1s ease-in-out infinite',
+    }} />
+    <div style={{
+      width: 4, height: 4, borderRadius: '50%',
+      background: 'rgba(255,255,255,0.3)',
+      animation: 'tickPulse 1s ease-in-out infinite',
+      animationDelay: '0.5s',
+    }} />
+  </div>
+);
+
 // ── Keyframes (injected once) ──
 const ensureKeyframes = (() => {
   let injected = false;
@@ -193,6 +241,10 @@ const ensureKeyframes = (() => {
       @keyframes trc-slideIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
       @keyframes trc-fadeIn { from { opacity: 0; } to { opacity: 1; } }
       @keyframes ctaPulse { 0%, 100% { box-shadow: 0 2px 14px rgba(232,152,10,0.35); } 50% { box-shadow: 0 4px 24px rgba(232,152,10,0.55); } }
+      @keyframes courseScan { 0% { transform:scale(1); } 100% { transform:scale(1.04); } }
+      @keyframes shimmer { 0% { transform:translateX(-100%); } 100% { transform:translateX(200%); } }
+      @keyframes tickPulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+      @keyframes slideUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
     `;
     document.head.appendChild(style);
   };
@@ -214,18 +266,28 @@ export const PGACard: React.FC<PGACardProps> = ({
   // Inject keyframes
   ensureKeyframes();
 
-  // Countdown for upcoming
+  // Force re-render every second for upcoming countdown
+  const [, forceUpdate] = useState(0);
+  useEffect(() => {
+    if (cd.state !== 'upcoming') return;
+    const id = setInterval(() => forceUpdate(n => n + 1), 1000);
+    return () => clearInterval(id);
+  }, [cd.state]);
+
+  // Countdown for upcoming (now includes seconds)
   const countdown = useMemo(() => {
     if (cd.state !== 'upcoming' || !cd.startDate) return null;
     const startDateTime = cd.startDate.includes('T') ? cd.startDate : `${cd.startDate}T12:00:00`;
     const diff = new Date(startDateTime).getTime() - Date.now();
-    if (diff <= 0) return { days: 0, hours: 0, minutes: 0 };
+    if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
     return {
-      days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-      hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
-      minutes: Math.floor((diff / (1000 * 60)) % 60),
+      days: Math.floor(diff / 86400000),
+      hours: Math.floor((diff % 86400000) / 3600000),
+      minutes: Math.floor((diff % 3600000) / 60000),
+      seconds: Math.floor((diff % 60000) / 1000),
     };
-  }, [cd.state, cd.startDate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cd.state, cd.startDate, forceUpdate]);
 
   // Group tied chasers for result state
   const chaserGroups = useMemo(() => {
@@ -607,8 +669,6 @@ export const PGACard: React.FC<PGACardProps> = ({
                 </div>
               );
             })}
-
-            {/* Stats moved to hero zone */}
           </div>
         </div>
 
@@ -659,13 +719,381 @@ export const PGACard: React.FC<PGACardProps> = ({
   }
 
   // ═══════════════════════════════════════════
-  // ██ LIVE + UPCOMING STATES (existing layout)
+  // ██ UPCOMING STATE — Cinematic 3-zone layout
   // ═══════════════════════════════════════════
-  const glowColor = cd.state === 'live'
-    ? 'rgba(245,158,11,0.13)'
-    : 'rgba(99,102,241,0.09)';
+  if (cd.state === 'upcoming') {
+    const pastWinners = cd.pastWinners;
+    const defendingChampion = cd.defendingChampion;
+    const dateRange = cd.startDate && cd.endDate
+      ? `${new Date(cd.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – ${new Date(cd.endDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+      : null;
 
-  const ctaLabel = cd.state === 'live' ? 'Who wins this?' : 'Who takes it?';
+    return (
+      <div className="h-full w-full flex flex-col overflow-hidden" style={{ background: '#080a0e', color: '#fff' }}>
+
+        {/* ── ZONE 1: CINEMATIC HERO — 55% ── */}
+        <div style={{
+          position: 'relative',
+          flex: '0 0 55%',
+          overflow: 'hidden',
+          minHeight: 0,
+        }}>
+          {/* Base gradient */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(160deg, #0a1628, #0d2340, #0a1628, #060c16)',
+          }} />
+
+          {/* Topographic pattern */}
+          <div style={{
+            position: 'absolute', inset: 0, opacity: 0.07,
+          }}>
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <pattern id="topo" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
+                  <path d="M20 100 Q60 60, 100 100 T180 100" fill="none" stroke="white" strokeWidth="0.8" />
+                  <path d="M20 60 Q60 20, 100 60 T180 60" fill="none" stroke="white" strokeWidth="0.6" />
+                  <path d="M20 140 Q60 100, 100 140 T180 140" fill="none" stroke="white" strokeWidth="0.6" />
+                  <circle cx="140" cy="80" r="20" fill="none" stroke="white" strokeWidth="0.5" />
+                  <circle cx="140" cy="80" r="35" fill="none" stroke="white" strokeWidth="0.4" />
+                  <circle cx="60" cy="160" r="15" fill="none" stroke="white" strokeWidth="0.5" />
+                  <circle cx="60" cy="160" r="28" fill="none" stroke="white" strokeWidth="0.4" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#topo)" />
+            </svg>
+          </div>
+
+          {/* Amber radial glow */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'radial-gradient(circle at 50% 35%, rgba(232,152,10,0.15) 0%, transparent 70%)',
+          }} />
+
+          {/* Slow scan animation layer */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.015), transparent, rgba(255,255,255,0.015))',
+            animation: 'courseScan 8s ease-in-out alternate infinite',
+          }} />
+
+          {/* Course image if available */}
+          {cd.courseImageUrl && (
+            <img
+              src={cd.courseImageUrl}
+              alt=""
+              style={{
+                position: 'absolute', inset: 0,
+                width: '100%', height: '100%',
+                objectFit: 'cover', opacity: 0.35,
+              }}
+            />
+          )}
+
+          {/* Bottom gradient scrim */}
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0,
+            height: '75%',
+            background: 'linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.5) 55%, transparent 100%)',
+            pointerEvents: 'none',
+          }} />
+
+          {/* Top gradient */}
+          <div style={{
+            position: 'absolute', top: 0, left: 0, right: 0,
+            height: '30%',
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 100%)',
+            pointerEvents: 'none',
+          }} />
+
+          {/* Tour badge — top left */}
+          <div style={{
+            position: 'absolute', top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: 12,
+            display: 'flex', alignItems: 'center', gap: 6,
+          }}>
+            <span style={{
+              fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 700,
+              letterSpacing: '0.12em', textTransform: 'uppercase',
+              color: ACCENT_LIGHT,
+              background: `${ACCENT_LIGHT}18`,
+              border: `1px solid ${ACCENT_LIGHT}40`,
+              borderRadius: 6, padding: '3px 8px',
+            }}>
+              PGA TOUR
+            </span>
+            <span style={{
+              fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 600,
+              color: 'rgba(255,255,255,0.5)',
+            }}>
+              UPCOMING
+            </span>
+          </div>
+
+          {/* Bottom content */}
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0,
+            padding: 'clamp(12px, 3vw, 18px) clamp(14px, 3.5vw, 20px)',
+            animation: 'trc-fadeUp 0.7s ease-out both',
+            animationDelay: '0.3s',
+          }}>
+            {/* Date range */}
+            {dateRange && (
+              <div style={{
+                fontSize: 'clamp(11px, 2.5vw, 13px)',
+                color: 'rgba(255,255,255,0.45)',
+                letterSpacing: 0.3, marginBottom: 6,
+              }}>
+                {dateRange}
+              </div>
+            )}
+
+            {/* Tournament name */}
+            <div style={{
+              fontSize: 'clamp(22px, 6vw, 30px)', fontWeight: 800,
+              color: '#fff', lineHeight: 1.05, letterSpacing: -0.5,
+              marginBottom: 6,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {cd.tournamentName}
+            </div>
+
+            {/* Venue line */}
+            {cd.venueName && (
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 5,
+                color: 'rgba(255,255,255,0.4)',
+                fontSize: 'clamp(11px, 2.5vw, 13px)',
+                marginBottom: 14,
+              }}>
+                <MapPin style={{ width: 13, height: 13, flexShrink: 0 }} />
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {cd.venueName}{cd.venueCity ? `, ${cd.venueCity}` : ''}
+                </span>
+              </div>
+            )}
+
+            {/* Countdown grid */}
+            {countdown && (
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                <DigitCell value={countdown.days} label="Days" />
+                <PulseDot />
+                <DigitCell value={countdown.hours} label="Hrs" />
+                <PulseDot />
+                <DigitCell value={countdown.minutes} label="Min" />
+                <PulseDot />
+                <DigitCell value={countdown.seconds} label="Sec" isAccent />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ── ZONE 2: COURSE FACTS + PAST WINNERS ── */}
+        <div style={{
+          flex: '1 1 auto',
+          display: 'flex', flexDirection: 'column',
+          overflow: 'hidden',
+          background: 'rgba(0,0,0,0.95)',
+          minHeight: 0,
+        }}>
+          {/* Course facts row */}
+          <div style={{
+            display: 'flex', gap: 5,
+            padding: 'clamp(10px, 2.5vw, 14px) clamp(14px, 3.5vw, 20px) 8px',
+          }}>
+            {[
+              { value: cd.venuePar ? `Par ${cd.venuePar}` : null, label: 'Course' },
+              { value: cd.venueYardage ? `${cd.venueYardage.toLocaleString()}y` : null, label: 'Yardage' },
+              { value: formatPurse(cd.purse), label: 'Purse' },
+            ].filter(f => f.value).map(fact => (
+              <div key={fact.label} style={{
+                flex: 1, textAlign: 'center',
+                padding: '8px 10px',
+                borderRadius: 10,
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.08)',
+              }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', lineHeight: 1 }}>
+                  {fact.value}
+                </div>
+                <div style={{
+                  fontSize: 9, fontWeight: 700,
+                  color: 'rgba(255,255,255,0.3)',
+                  textTransform: 'uppercase', letterSpacing: '0.6px',
+                  marginTop: 4,
+                }}>
+                  {fact.label}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Past Winners header */}
+          <div style={{
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            padding: '6px clamp(14px, 3.5vw, 20px) 4px',
+          }}>
+            <span style={{
+              fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 700,
+              letterSpacing: '1.2px', color: 'rgba(255,255,255,0.35)',
+              textTransform: 'uppercase',
+            }}>
+              Past Winners
+            </span>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 4,
+              color: 'rgba(255,255,255,0.25)',
+              fontSize: 'clamp(9px, 2vw, 11px)',
+            }}>
+              <Trophy style={{ width: 11, height: 11 }} />
+              Recent history
+            </div>
+          </div>
+
+          {/* Past winner rows */}
+          <div style={{
+            flex: '1 1 auto',
+            overflow: 'hidden',
+            padding: '0 clamp(14px, 3.5vw, 20px)',
+            display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly',
+          }}>
+            {pastWinners && pastWinners.length > 0 ? (
+              pastWinners.map((pw, i) => (
+                <div key={`${pw.year}-${i}`} style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '8px 10px',
+                  borderRadius: 10,
+                  background: i === 0 ? `${ACCENT}0d` : 'transparent',
+                  border: i === 0 ? `1px solid ${ACCENT}22` : '1px solid transparent',
+                  animation: 'slideUp 0.5s ease-out both',
+                  animationDelay: `${0.4 + i * 0.08}s`,
+                }}>
+                  <span style={{
+                    width: 22, textAlign: 'center',
+                    fontSize: 'clamp(12px, 3vw, 14px)', fontWeight: 700,
+                    color: i === 0 ? ACCENT : 'rgba(255,255,255,0.35)',
+                  }}>
+                    {i + 1}
+                  </span>
+                  <RowAvatar src={pw.photoUrl} name={pw.playerName} size={28} />
+                  <span style={{
+                    flex: 1, fontSize: 'clamp(13px, 3.2vw, 15px)',
+                    fontWeight: i === 0 ? 700 : 500,
+                    color: i === 0 ? '#fff' : 'rgba(255,255,255,0.65)',
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>
+                    {pw.playerName}
+                  </span>
+                  <span style={{
+                    fontSize: 'clamp(11px, 2.5vw, 12px)',
+                    fontWeight: 500, color: 'rgba(255,255,255,0.25)',
+                    marginRight: 6,
+                  }}>
+                    {pw.year}
+                  </span>
+                  {pw.scoreDisplay && (
+                    <span style={{
+                      fontSize: 'clamp(13px, 3.2vw, 15px)', fontWeight: 700,
+                      color: i === 0 ? ACCENT : 'rgba(255,255,255,0.45)',
+                    }}>
+                      {pw.scoreDisplay}
+                    </span>
+                  )}
+                </div>
+              ))
+            ) : defendingChampion ? (
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '8px 10px',
+                borderRadius: 10,
+                background: `${ACCENT}0d`,
+                border: `1px solid ${ACCENT}22`,
+                animation: 'slideUp 0.5s ease-out both',
+                animationDelay: '0.4s',
+              }}>
+                <span style={{
+                  width: 22, textAlign: 'center',
+                  fontSize: 'clamp(12px, 3vw, 14px)', fontWeight: 700,
+                  color: ACCENT,
+                }}>
+                  1
+                </span>
+                <RowAvatar src={null} name={defendingChampion} size={28} />
+                <span style={{
+                  flex: 1, fontSize: 'clamp(13px, 3.2vw, 15px)', fontWeight: 700,
+                  color: '#fff',
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}>
+                  {defendingChampion}
+                </span>
+                <span style={{
+                  fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 600,
+                  color: 'rgba(255,255,255,0.3)',
+                }}>
+                  Defending
+                </span>
+              </div>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center gap-2 text-white/30">
+                <Calendar className="w-8 h-8" />
+                <span className="text-[12px]">
+                  Tournament starts {cd.startDate ? new Date(cd.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'soon'}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ── ZONE 3: CTA BAR ── */}
+        <div
+          className="flex-shrink-0 flex items-center gap-3 px-5 pt-3"
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}
+        >
+          <button
+            onClick={onLike}
+            className="flex items-center gap-1.5 transition-transform active:scale-95"
+            style={{
+              background: likeState.isLiked ? 'rgba(245,158,11,0.14)' : 'rgba(255,255,255,0.07)',
+              border: `1px solid ${likeState.isLiked ? 'rgba(245,158,11,0.4)' : 'rgba(255,255,255,0.10)'}`,
+              borderRadius: 14, padding: '11px 16px',
+            }}
+          >
+            <Heart style={{ width: 17, height: 17, color: likeState.isLiked ? '#f59e0b' : '#6b7280', fill: likeState.isLiked ? '#f59e0b' : 'transparent' }} />
+            {likeState.count > 0 && (
+              <span className="text-[14px] font-bold" style={{ color: likeState.isLiked ? '#f59e0b' : '#6b7280' }}>
+                {formatCount(likeState.count)}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={onComment}
+            className="flex-1 relative flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-[14px] transition-transform active:scale-[0.98]"
+            style={{
+              background: 'linear-gradient(180deg, #E8A012 0%, #C77008 100%)',
+              border: '1px solid rgba(232,152,10,0.55)',
+              borderTopColor: 'rgba(255,210,100,0.4)',
+              boxShadow: '0 2px 14px rgba(232,152,10,0.35), inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.15)',
+              animation: 'ctaPulse 2.5s ease-in-out infinite',
+              color: '#fff',
+            }}
+          >
+            <MessageCircle className="w-4 h-4" />
+            Who takes it?
+            {commentCount > 0 && (
+              <span style={{ background: 'rgba(0,0,0,0.25)', borderRadius: 8, padding: '2px 7px', fontSize: 11, fontWeight: 700 }}>
+                {formatCount(commentCount)}
+              </span>
+            )}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ═══════════════════════════════════════════
+  // ██ LIVE STATE (existing layout)
+  // ═══════════════════════════════════════════
+  const glowColor = 'rgba(245,158,11,0.13)';
+  const ctaLabel = 'Who wins this?';
 
   return (
     <div className="h-full w-full flex flex-col overflow-hidden" style={{ background: '#080a0e', color: '#fff' }}>
@@ -674,26 +1102,16 @@ export const PGACard: React.FC<PGACardProps> = ({
         <div className="absolute top-0 right-0 w-48 h-48 pointer-events-none" style={{ background: `radial-gradient(circle at top right, ${glowColor}, transparent 70%)` }} />
         <div className="w-full" style={{
           height: '2.5px',
-          background: cd.state === 'live'
-            ? 'linear-gradient(90deg, #f59e0bCC, transparent)'
-            : 'linear-gradient(90deg, #6366f1CC, transparent)',
+          background: 'linear-gradient(90deg, #f59e0bCC, transparent)',
         }} />
 
         <div className="px-5 pt-3.5 pb-4">
           {/* Badge row */}
           <div className="flex items-center gap-2 mb-2">
-            {cd.state === 'live' && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/15 border border-green-500/20">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-[11px] font-bold text-green-400 uppercase tracking-wider">Live</span>
-              </div>
-            )}
-            {cd.state === 'upcoming' && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20">
-                <Calendar className="w-3 h-3 text-indigo-400" />
-                <span className="text-[11px] font-bold text-indigo-300 uppercase tracking-wider">Upcoming</span>
-              </div>
-            )}
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/15 border border-green-500/20">
+              <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-[11px] font-bold text-green-400 uppercase tracking-wider">Live</span>
+            </div>
             <span className="text-[11px] font-medium text-white/40">
               PGA TOUR{cd.roundLabel ? ` · ${cd.roundLabel}` : ''}
             </span>
@@ -702,7 +1120,7 @@ export const PGACard: React.FC<PGACardProps> = ({
           <h2 className="text-[17px] font-extrabold leading-tight mb-3">{cd.tournamentName}</h2>
 
           {/* ── LIVE: Leader card ── */}
-          {cd.state === 'live' && cd.leader && (
+          {cd.leader && (
             <div className="rounded-2xl p-3.5 mb-3" style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)' }}>
               <div className="flex items-center gap-3">
                 {cd.leader.photoUrl ? (
@@ -733,19 +1151,6 @@ export const PGACard: React.FC<PGACardProps> = ({
                 <div className="text-[34px] font-black text-amber-400 leading-none">{cd.leader.scoreDisplay}</div>
               </div>
               {cd.leader.scoringStats && <ScoringStrip stats={cd.leader.scoringStats} />}
-            </div>
-          )}
-
-          {/* ── UPCOMING: Countdown ── */}
-          {cd.state === 'upcoming' && countdown && (
-            <div className="rounded-2xl p-4 mb-3" style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)' }}>
-              <div className="flex items-center justify-around">
-                <CountdownTile value={countdown.days} label="Days" />
-                <div className="text-indigo-400/30 text-lg font-thin">:</div>
-                <CountdownTile value={countdown.hours} label="Hrs" />
-                <div className="text-indigo-400/30 text-lg font-thin">:</div>
-                <CountdownTile value={countdown.minutes} label="Min" />
-              </div>
             </div>
           )}
 
@@ -808,20 +1213,13 @@ export const PGACard: React.FC<PGACardProps> = ({
       <div className="flex-1 flex flex-col min-h-0 px-1">
         <div className="flex items-center justify-between px-4 pt-2 pb-1">
           <span className="text-[12px] font-bold text-white/50 uppercase tracking-wider">
-            {cd.state === 'upcoming' ? 'Course Info' : 'In Contention'}
+            In Contention
           </span>
-          {cd.state === 'live' && (
-            <span className="text-[11px] font-semibold text-amber-400/80">Full leaderboard →</span>
-          )}
+          <span className="text-[11px] font-semibold text-amber-400/80">Full leaderboard →</span>
         </div>
         <div className="flex-1 flex flex-col overflow-hidden">
           {cd.chasers.length > 0 ? (
             cd.chasers.map((c, i) => <ChaserRow key={i} chaser={c} />)
-          ) : cd.state === 'upcoming' ? (
-            <div className="flex-1 flex flex-col items-center justify-center gap-2 text-white/30">
-              <Calendar className="w-8 h-8" />
-              <span className="text-[12px]">Tournament starts {cd.startDate ? new Date(cd.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'soon'}</span>
-            </div>
           ) : (
             <div className="flex-1 flex items-center justify-center text-white/20 text-[12px]">No data available</div>
           )}
@@ -841,8 +1239,8 @@ export const PGACard: React.FC<PGACardProps> = ({
           )}
         </button>
         <button onClick={onComment} className="flex-1 relative flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-[14px] transition-transform active:scale-[0.98]" style={{
-          background: cd.state === 'live' ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'linear-gradient(135deg, #6366f1, #4f46e5)',
-          animation: cd.state === 'live' ? 'ctaPulse 2.5s ease-in-out infinite' : undefined,
+          background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+          animation: 'ctaPulse 2.5s ease-in-out infinite',
           color: '#fff',
         }}>
           <MessageCircle className="w-4 h-4" />
