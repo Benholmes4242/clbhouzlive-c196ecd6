@@ -77,10 +77,6 @@ export const VisibilityDropdown: React.FC<VisibilityDropdownProps> = ({
             console.log('[VD] pointerDownOutside target:', (e.target as HTMLElement)?.tagName, (e.target as HTMLElement)?.className, 'prevented:', e.defaultPrevented);
             e.preventDefault();
           }}
-          onInteractOutside={(e) => {
-            console.log('[VD] interactOutside target:', (e.target as HTMLElement)?.tagName, 'type:', e.type);
-            e.preventDefault();
-          }}
           className="min-w-[200px] bg-white border-slate-200 z-[200] rounded-sq-sm shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
         >
           {VISIBILITY_OPTIONS.map((option) => {
