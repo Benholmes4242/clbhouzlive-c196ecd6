@@ -69,11 +69,13 @@ export const useSuggestedUsersDiscover = () => {
           username,
           profile_photo_url,
           home_club,
-          eg_handicap_index
+          eg_handicap_index,
+          created_at
         `)
         .neq('id', currentUser.id)
         .eq('is_public', true)
         .is('deleted_at', null)
+        .not('profile_photo_url', 'is', null)
         .limit(100); // Fetch more to account for filtering
 
       if (usersError) {
@@ -117,9 +119,20 @@ export const useSuggestedUsersDiscover = () => {
             .filter(post => post.user_id === user.id && post.post_media && post.post_media.length > 0)
             .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-          // Skip users with no posts
+          // No posts — still show the user, just no media preview
           if (!userPosts || userPosts.length === 0) {
-            return null;
+            return {
+              id: user.id,
+              displayName: user.display_name || user.username || 'User',
+              handle: user.username ? `@${user.username}` : '@user',
+              isFollowing: false,
+              profilePhotoUrl: user.profile_photo_url || undefined,
+              homeClub: user.home_club || undefined,
+              handicap: user.eg_handicap_index || undefined,
+              latestVideo: undefined,
+              latestPhoto: undefined,
+              latestPostAt: user.created_at || new Date().toISOString(),
+            };
           }
 
           const latestPost = userPosts[0];
