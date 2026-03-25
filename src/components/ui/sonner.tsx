@@ -23,11 +23,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       theme="dark"
-      position="top-center"
+      position="bottom-center"
       duration={3000}
       visibleToasts={2}
       expand={false}
-      offset="calc(var(--sat, 47px) + 12px)"
+      offset="calc(85px + 12px + env(safe-area-inset-bottom, 0px))"
       toastOptions={{
         className: 'clbhouz-toast',
         style: {
