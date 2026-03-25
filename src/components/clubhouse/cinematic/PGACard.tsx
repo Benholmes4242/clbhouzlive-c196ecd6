@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { Heart, MessageCircle, Trophy, Calendar } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Heart, MessageCircle, Trophy, Calendar, ChevronRight } from 'lucide-react';
 import type { PGACardFeedPost, PGACardChaser } from '@/components/media-system/types/media';
 
 interface PGACardProps {
