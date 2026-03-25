@@ -986,10 +986,8 @@ export const PGACard: React.FC<PGACardProps> = ({
                 </div>
               </div>
 
-              {/* Trophy badge */}
-              <div style={{ flexShrink: 0, opacity: 0.18 }}>
-                <Trophy style={{ width: 28, height: 28, color: ACCENT }} />
-              </div>
+              {/* Trophy emoji */}
+              <span style={{ flexShrink: 0, fontSize: 26, opacity: 0.18 }}>🏆</span>
             </div>
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center gap-2 text-white/30" style={{ margin: '8px clamp(14px, 3.5vw, 20px)' }}>
