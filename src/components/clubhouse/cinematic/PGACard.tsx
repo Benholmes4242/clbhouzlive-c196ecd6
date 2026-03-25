@@ -932,28 +932,18 @@ export const PGACard: React.FC<PGACardProps> = ({
             <div style={{
               position: 'relative',
               margin: '8px clamp(14px, 3.5vw, 20px)',
-              padding: '16px 16px 14px',
+              padding: '14px 16px',
               borderRadius: 14,
               background: `linear-gradient(135deg, ${ACCENT}0d, ${ACCENT}05)`,
               border: `1px solid ${ACCENT}22`,
               overflow: 'hidden',
+              display: 'flex', alignItems: 'center', gap: 14,
               animation: 'slideUp 0.5s ease-out both',
               animationDelay: '0.35s',
             }}>
-              {/* Ambient glow — top right */}
-              <div style={{
-                position: 'absolute', top: -20, right: -20,
-                width: 80, height: 80,
-                borderRadius: '50%',
-                background: `radial-gradient(circle, ${ACCENT}18, transparent 70%)`,
-                pointerEvents: 'none',
-                animation: 'shieldGlow 3s ease-in-out infinite',
-              }} />
-
               {/* Avatar */}
               <div style={{
-                width: 52, height: 52, borderRadius: '50%',
-                margin: '0 auto 10px',
+                width: 52, height: 52, borderRadius: '50%', flexShrink: 0,
                 overflow: 'hidden',
                 border: `2px solid ${ACCENT}44`,
                 background: 'rgba(255,255,255,0.06)',
@@ -968,27 +958,26 @@ export const PGACard: React.FC<PGACardProps> = ({
               </div>
 
               {/* Text */}
-              <div style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 5,
+                  display: 'flex', alignItems: 'center', gap: 5,
                   fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 600,
                   color: ACCENT_LIGHT, textTransform: 'uppercase', letterSpacing: '1px',
-                  marginBottom: 4,
+                  marginBottom: 2,
                 }}>
                   <Shield style={{ width: 11, height: 11 }} />
                   Defending Champion
                 </div>
-
                 <div style={{
-                  fontSize: 'clamp(16px, 4.2vw, 20px)', fontWeight: 800,
+                  fontSize: 'clamp(15px, 4vw, 18px)', fontWeight: 800,
                   color: '#fff', lineHeight: 1.2,
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}>
                   {defendingChampion}
                 </div>
-
                 <div style={{
                   fontSize: 'clamp(10px, 2.5vw, 12px)', fontWeight: 500,
-                  color: 'rgba(255,255,255,0.35)', marginTop: 4,
+                  color: 'rgba(255,255,255,0.35)', marginTop: 2,
                   fontStyle: 'italic',
                 }}>
                   Can they go back-to-back?
@@ -996,11 +985,8 @@ export const PGACard: React.FC<PGACardProps> = ({
               </div>
 
               {/* Trophy badge */}
-              <div style={{
-                position: 'absolute', top: 10, right: 12,
-                opacity: 0.12,
-              }}>
-                <Trophy style={{ width: 22, height: 22, color: ACCENT }} />
+              <div style={{ flexShrink: 0, opacity: 0.18 }}>
+                <Trophy style={{ width: 28, height: 28, color: ACCENT }} />
               </div>
             </div>
           ) : (
