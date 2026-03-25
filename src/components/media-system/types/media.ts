@@ -223,6 +223,7 @@ export interface PGACardData {
   venueCity:       string | null;
   venuePar:        number | null;
   venueYardage:    number | null;
+  courseImageUrl:   string | null;
   currentRound:    number;
   totalRounds:     number;
   roundLabel:      string;
@@ -236,6 +237,7 @@ export interface PGACardData {
   likeCount:       number;
   commentCount:    number;
   isLikedByMe:     boolean;
+  winnerBy?:       string | null;
   championSeasonStats?: {
     drivingDistance:  number | null;
     drivingAccuracy: number | null;
