@@ -6,7 +6,9 @@ import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from '@/components/ui/dialog';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import CourseDetailHeader from './CourseDetailHeader';
 import CourseDetailImage from './CourseDetailImage';
 import CourseDetailInfo from './CourseDetailInfo';
