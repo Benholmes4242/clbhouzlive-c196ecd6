@@ -383,8 +383,8 @@ export function useCommentsWithReplies(postId: string | null, onCommentDeleted?:
               recipient_actor_id: parentActorId,
               actor_id: actorId,
               type: 'comment_reply',
-              title: 'New reply',
-              message: 'replied to your comment',
+              title: `${commenterName} replied to your comment`,
+              message: content.length > 60 ? content.slice(0, 60) + '…' : content,
               entity_type: 'comment',
               entity_id: newCommentId,
               data: {
