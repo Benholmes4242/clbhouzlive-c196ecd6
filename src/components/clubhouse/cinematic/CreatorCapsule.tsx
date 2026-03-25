@@ -671,7 +671,9 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
           // Review mode: narrower, floating with more edge spacing
           isReview 
             ? 'left-4 right-[72px]' 
-            : 'left-4 max-w-[75vw] min-w-[160px]'
+            : golfCourse?.id
+              ? 'left-4 right-[72px]'
+              : 'left-4 max-w-[75vw] min-w-[160px]'
         )}
         style={{
           bottom: bottomOffset 
