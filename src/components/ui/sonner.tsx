@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { Toaster as Sonner, toast } from "sonner"
 
 type ToasterProps = React.ComponentProps<typeof Sonner>
@@ -9,6 +10,16 @@ type ToasterProps = React.ComponentProps<typeof Sonner>
  * - 3s default duration, max 2 visible
  */
 const Toaster = ({ ...props }: ToasterProps) => {
+  useEffect(() => {
+    const t = setTimeout(() => {
+      toast("📍 Toast position test", {
+        description: "Checking safe area offset",
+        duration: 10000,
+      });
+    }, 2000);
+    return () => clearTimeout(t);
+  }, []);
+
   return (
     <Sonner
       theme="dark"
