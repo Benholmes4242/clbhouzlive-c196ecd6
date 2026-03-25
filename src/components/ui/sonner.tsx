@@ -1,19 +1,8 @@
-import { useEffect } from "react"
 import { Toaster as Sonner, toast } from "sonner"
 
 type ToasterProps = React.ComponentProps<typeof Sonner>
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  useEffect(() => {
-    const t = setTimeout(() => {
-      toast("📍 Toast position test", {
-        description: "Checking safe area offset",
-        duration: Infinity,
-      });
-    }, 2000);
-    return () => clearTimeout(t);
-  }, []);
-
   return (
     <Sonner
       theme="dark"
@@ -24,7 +13,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       toastOptions={{
         className: 'clbhouz-toast',
         style: {
-          background: 'rgba(28, 28, 30, 0.92)',
+          background: '#0d0d0d',
           backdropFilter: 'blur(20px) saturate(180%)',
           WebkitBackdropFilter: 'blur(20px) saturate(180%)',
           border: '1px solid rgba(255, 255, 255, 0.08)',
