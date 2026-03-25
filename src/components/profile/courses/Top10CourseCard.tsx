@@ -155,7 +155,7 @@ export const Top10CourseCard: React.FC<Top10CourseCardProps> = ({
 
         {/* Reaction strip — overlaid at bottom of card image */}
         <div
-          className="absolute bottom-0 left-0 right-0 flex"
+          className="absolute bottom-0 left-0 right-0 flex h-[46px]"
           style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}
         >
           {(Object.entries(REACTION_CONFIG) as [ReactionType, typeof REACTION_CONFIG[ReactionType]][]).map(([type, config], idx) => {
