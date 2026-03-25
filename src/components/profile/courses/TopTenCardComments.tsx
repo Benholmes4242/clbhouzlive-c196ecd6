@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Send } from 'lucide-react';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTitle, SheetDescription } from '@/components/ui/sheet';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { useTopTenReactions, REACTION_CONFIG, ReactionType } from '@/hooks/useTopTenReactions';
 import { useTopTenComments } from '@/hooks/useTopTenComments';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -36,35 +37,42 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent side="bottom" className="rounded-t-[20px] max-h-[92dvh] p-0 border-0 bg-card">
+      <SheetContent side="bottom" className="rounded-t-[20px] max-h-[92dvh] p-0 border-0 bg-card" hideCloseButton aria-describedby={undefined}>
+        {/* Visually hidden title for accessibility */}
+        <VisuallyHidden.Root>
+          <SheetTitle>{courseName}</SheetTitle>
+          <SheetDescription>Reactions and comments for {courseName}</SheetDescription>
+        </VisuallyHidden.Root>
+
         {/* Drag handle */}
-        <div className="flex justify-center pt-3 pb-2">
-          <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 rounded-full bg-muted-foreground/20" />
         </div>
 
         {/* Header */}
         <div className="px-5 pb-3 border-b border-border/50">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-foreground">{courseName}</h3>
+            <h3 className="text-base font-semibold text-foreground">{courseName}</h3>
             <button onClick={onClose} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
               <X size={16} className="text-muted-foreground" />
             </button>
           </div>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="text-xs text-muted-foreground mt-0.5">
             {totalReactions} reaction{totalReactions !== 1 ? 's' : ''} · {comments.length} comment{comments.length !== 1 ? 's' : ''}
           </p>
         </div>
 
-        {/* Reaction buttons */}
-        <div className="flex gap-2 px-5 py-3 border-b border-border/30">
+        {/* Reaction buttons — horizontally scrollable */}
+        <div className="flex gap-2 px-5 py-3 border-b border-border/30 overflow-x-auto scrollbar-hide">
           {(Object.entries(REACTION_CONFIG) as [ReactionType, typeof REACTION_CONFIG[ReactionType]][]).map(([type, config]) => (
             <button
               key={type}
               onClick={() => canInteract && toggleReaction(type)}
               disabled={!canInteract}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
-                myReaction === type ? 'bg-amber-500/15 border-amber-500/50 text-amber-600'
-                : 'bg-muted/50 border-border/50 text-muted-foreground'
+              className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium border transition-all whitespace-nowrap ${
+                myReaction === type
+                  ? 'bg-amber-500/15 border-amber-500/50 text-amber-600'
+                  : 'bg-muted/50 border-border/50 text-muted-foreground'
               } ${!canInteract ? 'opacity-50 cursor-default' : 'active:scale-95'}`}
             >
               <span>{config.emoji}</span>
@@ -77,11 +85,11 @@ export const TopTenCardComments: React.FC<TopTenCardCommentsProps> = ({
         </div>
 
         {/* Comments list */}
-        <div className="flex-1 overflow-y-auto px-5 py-3 space-y-4 max-h-[50vh]">
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 max-h-[50vh]">
           {privacySetting === 'off' ? (
-            <p className="text-sm text-muted-foreground text-center py-6">Comments are disabled for this top ten</p>
+            <p className="text-sm text-muted-foreground text-center py-12">Comments are disabled for this top ten</p>
           ) : comments.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-6">No comments yet. Be the first!</p>
+            <p className="text-sm text-muted-foreground text-center py-12">No comments yet. Be the first!</p>
           ) : (
             comments.map(comment => (
               <div key={comment.id} className="flex gap-3">
