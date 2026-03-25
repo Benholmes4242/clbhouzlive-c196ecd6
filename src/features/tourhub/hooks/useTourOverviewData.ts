@@ -6,6 +6,7 @@
 import { useMemo } from 'react';
 import { useTourSeason, useTourTournaments, useTourPlayerStatistics, useTourHubDataStatus } from './useTourHubData';
 import type { TourTournament, TourPlayerStatistics } from './useTourHubData';
+import { getTournamentDisplayState } from '@/utils/tournamentState';
 
 export interface FeaturedTournament {
   tournament: TourTournament;
