@@ -87,7 +87,7 @@ const VideoSlide: React.FC<{ item: MediaViewerItem }> = ({ item }) => {
 /* ─── Image slide ─── */
 const ImageSlide: React.FC<{ item: MediaViewerItem }> = ({ item }) => {
   const src = item.imageUrl || item.src || '';
-  const { ref, imgRef, style, isZoomed } = usePinchZoomPointer();
+  const { ref, imgRef, style } = usePinchZoomPointer();
 
   return (
     <div className="w-full h-full flex items-center justify-center">
