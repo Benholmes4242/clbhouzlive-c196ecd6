@@ -304,7 +304,8 @@ export function usePGACard(userId?: string): {
     }
 
     return null;
-  }, [topLive, recentResult, nextUpcoming, resultLeaderboard, postId, eng]);
+  }, [topLive, recentResult, nextUpcoming, resultLeaderboard, postId,
+      engagementData?.likeCount, engagementData?.commentCount, engagementData?.isLikedByMe]);
 
   const pgaCard: PGACardFeedPost | null = cardData ? {
     id: 'pga-card',
