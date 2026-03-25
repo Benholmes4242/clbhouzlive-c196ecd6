@@ -149,6 +149,7 @@ const ClubhouseContent = () => {
   const toggleMute = useClubhouseStore(s => s.toggleMute);
   const carouselPositions = useClubhouseStore(s => s.carouselPositions);
   const currentMediaIndex = carouselPositions.get(activeIndex) ?? 0;
+  const isTournamentCardActive = useClubhouseStore(s => s.isTournamentCardActive);
 
 
   // ── GlobalAudio bridge ──
