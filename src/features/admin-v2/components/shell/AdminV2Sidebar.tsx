@@ -171,6 +171,8 @@ export default function AdminV2Sidebar({ role, can, onNavigate }: SidebarProps) 
       ],
     }] : []),
     ...(can.manageAdmins ? [{
+      id: 'analytics',
+      label: 'Analytics',
       requiresFull: true,
       items: [
         { to: '/admin-v2/analytics/platform',   label: 'Platform',           icon: BarChart3 },
