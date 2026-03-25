@@ -72,25 +72,42 @@ export function useTourOverviewData() {
     return 'active';
   }, [tournaments]);
 
-  // Featured tournament (spotlight)
+  // Featured tournament (spotlight) — PGA prioritised
   const featuredTournament = useMemo((): FeaturedTournament | null => {
     if (!tournaments || tournaments.length === 0) return null;
     const now = new Date();
 
-    const live = tournaments.find(t =>
-      getTournamentDisplayState(t.status, t.end_date, now) === 'live'
-    );
-    if (live) return { tournament: live, type: 'live' };
+    // Tour priority: PGA first
+    const tourPriority = (t: TourTournament) => {
+      const code = (t.tour_code || '').toLowerCase();
+      if (code === 'pga') return 0;
+      if (code === 'liv') return 1;
+      if (code === 'euro' || code === 'dpw') return 2;
+      return 3;
+    };
+
+    const live = [...tournaments]
+      .filter(t => getTournamentDisplayState(t.status, t.end_date, now) === 'live')
+      .sort((a, b) => tourPriority(a) - tourPriority(b));
+    if (live.length > 0) return { tournament: live[0], type: 'live' };
 
     const inResultWindow = tournaments
       .filter(t => getTournamentDisplayState(t.status, t.end_date, now) === 'result')
-      .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime());
+      .sort((a, b) => {
+        const pa = tourPriority(a) - tourPriority(b);
+        if (pa !== 0) return pa;
+        return new Date(b.end_date).getTime() - new Date(a.end_date).getTime();
+      });
     if (inResultWindow.length > 0) return { tournament: inResultWindow[0], type: 'recent' };
 
     const upcoming = tournaments
       .filter(t => getTournamentDisplayState(t.status, t.end_date, now) === 'upcoming')
       .filter(t => t.status === 'scheduled' || t.status === 'created')
-      .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
+      .sort((a, b) => {
+        const pa = tourPriority(a) - tourPriority(b);
+        if (pa !== 0) return pa;
+        return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+      });
     if (upcoming.length > 0) return { tournament: upcoming[0], type: 'upcoming' };
 
     return null;
