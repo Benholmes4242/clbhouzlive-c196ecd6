@@ -10187,6 +10187,79 @@ export type Database = {
           },
         ]
       }
+      top_ten_comments: {
+        Row: {
+          body: string
+          commenter_id: string
+          course_id: string
+          created_at: string | null
+          id: string
+          is_deleted: boolean | null
+          target_user_id: string
+        }
+        Insert: {
+          body: string
+          commenter_id: string
+          course_id: string
+          created_at?: string | null
+          id?: string
+          is_deleted?: boolean | null
+          target_user_id: string
+        }
+        Update: {
+          body?: string
+          commenter_id?: string
+          course_id?: string
+          created_at?: string | null
+          id?: string
+          is_deleted?: boolean | null
+          target_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "top_ten_comments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      top_ten_reactions: {
+        Row: {
+          course_id: string
+          created_at: string | null
+          id: string
+          reaction_type: string
+          reactor_id: string
+          target_user_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string | null
+          id?: string
+          reaction_type: string
+          reactor_id: string
+          target_user_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string | null
+          id?: string
+          reaction_type?: string
+          reactor_id?: string
+          target_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "top_ten_reactions_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       top100_lists: {
         Row: {
           created_at: string | null
@@ -11838,6 +11911,7 @@ export type Database = {
           show_in_handicap_leaderboards: boolean
           social_links: Json | null
           tiktok_handle: string
+          top_ten_comments_privacy: string | null
           top100_visible: boolean | null
           tracker_visible: boolean | null
           twitter_handle: string
@@ -11950,6 +12024,7 @@ export type Database = {
           show_in_handicap_leaderboards?: boolean
           social_links?: Json | null
           tiktok_handle?: string
+          top_ten_comments_privacy?: string | null
           top100_visible?: boolean | null
           tracker_visible?: boolean | null
           twitter_handle?: string
@@ -12062,6 +12137,7 @@ export type Database = {
           show_in_handicap_leaderboards?: boolean
           social_links?: Json | null
           tiktok_handle?: string
+          top_ten_comments_privacy?: string | null
           top100_visible?: boolean | null
           tracker_visible?: boolean | null
           twitter_handle?: string
