@@ -14,7 +14,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
     const t = setTimeout(() => {
       toast("📍 Toast position test", {
         description: "Checking safe area offset",
-        duration: 10000,
+        duration: Infinity,
       });
     }, 2000);
     return () => clearTimeout(t);
