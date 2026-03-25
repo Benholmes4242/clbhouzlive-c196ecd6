@@ -489,6 +489,7 @@ export function usePGACard(userId?: string): {
         postId,
         ...eng,
         defendingChampion: null,
+        defendingChampionPhotoUrl: null,
         pastWinners: null,
         championSeasonStats: championSeasonStats ? {
           drivingDistance: championSeasonStats.driving_distance,
