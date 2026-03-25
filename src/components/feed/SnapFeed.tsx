@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { FeedSlide } from './FeedSlide';
@@ -45,6 +45,7 @@ export function SnapFeed({
   const ptrStartY = useRef(0);
   const ptrActive = useRef(false);
   const hasScrolledToStart = useRef(false);
+  const [anySlideZoomed, setAnySlideZoomed] = useState(false);
 
   // ── Stable refs for observer callback (avoid reconnecting observer) ──
   const postsRef = useRef(posts);
@@ -97,8 +98,6 @@ export function SnapFeed({
       if (bestEntry && bestEntry.intersectionRatio >= ACTIVE_SLIDE_RATIO) {
         const idx = Number((bestEntry.target as HTMLElement).dataset.index);
         if (!isNaN(idx)) {
-          // Debounce: if multiple slides fire within 80ms, use the last one
-          // Prefetch next 2 slides immediately — before debounce, using current posts
           const nextPosts = [
             postsRef.current[idx + 1],
             postsRef.current[idx + 2],
@@ -127,7 +126,6 @@ export function SnapFeed({
       }
     }, { threshold: INTERSECTION_THRESHOLDS });
 
-    // Observe all current slides
     slideRefs.current.forEach((el) => {
       observerRef.current?.observe(el);
     });
@@ -185,6 +183,11 @@ export function SnapFeed({
     }
   }, [onFirstFrameReady]);
 
+  // ── Zoom change handler from child slides ──
+  const handleZoomChange = useCallback((isZoomed: boolean) => {
+    setAnySlideZoomed(isZoomed);
+  }, []);
+
   // ── scrollend safety fallback (fires once after snap settles) ──
   useEffect(() => {
     const el = containerRef.current;
@@ -240,7 +243,7 @@ export function SnapFeed({
       data-snap-feed
       className="absolute inset-0 overflow-y-auto"
       style={{
-        scrollSnapType: 'y mandatory',
+        scrollSnapType: anySlideZoomed ? 'none' : 'y mandatory',
         WebkitOverflowScrolling: 'touch',
         overscrollBehavior: 'none',
         scrollbarWidth: 'none',
@@ -265,6 +268,7 @@ export function SnapFeed({
           onShare={onShare}
           getLikeState={getLikeState}
           getCommentCount={getCommentCount}
+          onZoomChange={handleZoomChange}
         />
       ))}
 

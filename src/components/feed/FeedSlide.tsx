@@ -1,8 +1,9 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapVideoPlayer } from './SnapVideoPlayer';
 import { FeedImageCarousel } from './FeedImageCarousel';
 import { PGACard } from '@/components/clubhouse/cinematic/PGACard';
+import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 import type { FeedPost, PGACardFeedPost } from '@/components/media-system/types/media';
 
 interface FeedSlideProps {
@@ -18,6 +19,7 @@ interface FeedSlideProps {
   onShare?: (post: FeedPost) => void;
   getLikeState?: (post: FeedPost) => { isLiked: boolean; count: number };
   getCommentCount?: (post: FeedPost) => number;
+  onZoomChange?: (isZoomed: boolean) => void;
 }
 
 export const FeedSlide = memo(function FeedSlide({
@@ -31,11 +33,25 @@ export const FeedSlide = memo(function FeedSlide({
   onShare,
   getLikeState,
   getCommentCount,
+  onZoomChange,
 }: FeedSlideProps) {
   const activeIndex = useClubhouseStore(s => s.activeIndex);
   const isActive = activeIndex === index;
   const isSuggestedFeed = activeTab === 'foryou';
   const media = post.mediaItems;
+
+  // Pinch zoom for single images
+  const { ref: zoomRef, imgRef, style: zoomStyle, scale: zoomScale, reset: resetZoom } = usePinchZoomPointer();
+
+  // Notify parent of zoom state changes
+  useEffect(() => {
+    onZoomChange?.(zoomScale > 1);
+  }, [zoomScale, onZoomChange]);
+
+  // Reset zoom when slide becomes inactive
+  useEffect(() => {
+    if (!isActive) resetZoom();
+  }, [isActive, resetZoom]);
 
   // ── Content routing ──
   const renderContent = () => {
@@ -61,6 +77,7 @@ export const FeedSlide = memo(function FeedSlide({
           isSuggestedFeed={isSuggestedFeed}
           isActive={isActive}
           onDoubleTapLike={() => onLike?.(post)}
+          onZoomChange={onZoomChange}
         />
       );
     }
@@ -86,7 +103,7 @@ export const FeedSlide = memo(function FeedSlide({
       );
     }
 
-    // Single image
+    // Single image — apply pinch zoom
     if (media?.[0]?.type === 'image') {
       const first = media[0];
       const isLandscape = (first.width ?? 0) > (first.height ?? 1);
@@ -104,15 +121,21 @@ export const FeedSlide = memo(function FeedSlide({
             aria-hidden="true"
           />
           <div className="absolute inset-0 bg-black/55" />
-          {/* Main image */}
-          <img
-            src={imgSrc}
-            alt=""
-            className="absolute inset-0 w-full h-full"
-            style={{ objectFit, position: 'relative', zIndex: 1 }}
-            loading="eager"
-            draggable={false}
-          />
+          {/* Main image with pinch zoom */}
+          <div
+            ref={zoomRef}
+            style={{ ...zoomStyle, position: 'absolute', inset: 0, zIndex: 1 }}
+          >
+            <img
+              ref={imgRef}
+              src={imgSrc}
+              alt=""
+              className="w-full h-full"
+              style={{ objectFit }}
+              loading="eager"
+              draggable={false}
+            />
+          </div>
         </div>
       );
     }

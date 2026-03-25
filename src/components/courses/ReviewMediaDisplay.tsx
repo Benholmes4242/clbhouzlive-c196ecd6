@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { HLSPlayer, HLSPlayerRef } from '@/media';
 import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
+import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
 
 interface ReviewMedia {
   id: string;
@@ -19,6 +20,12 @@ interface ReviewMediaDisplayProps {
 const ReviewMediaDisplay = ({ media }: ReviewMediaDisplayProps) => {
   const [selectedMedia, setSelectedMedia] = useState<ReviewMedia | null>(null);
   const playerRef = useRef<HLSPlayerRef>(null);
+  const { ref: zoomRef, imgRef, style: zoomStyle, reset: resetZoom } = usePinchZoomPointer();
+
+  // Reset zoom when changing media or closing
+  useEffect(() => {
+    resetZoom();
+  }, [selectedMedia, resetZoom]);
 
   if (!media || media.length === 0) return null;
 
@@ -30,7 +37,6 @@ const ReviewMediaDisplay = ({ media }: ReviewMediaDisplayProps) => {
     setSelectedMedia(null);
   };
 
-  // Get HLS URL for video
   const getVideoProps = (mediaItem: ReviewMedia) => {
     const uid = uidFromNode({ src: mediaItem.media_url });
     if (uid) {
@@ -40,7 +46,6 @@ const ReviewMediaDisplay = ({ media }: ReviewMediaDisplayProps) => {
         mp4Fallback: mediaItem.media_url
       };
     }
-    // Fallback for non-Cloudflare videos
     return {
       hlsUrl: null,
       poster: undefined,
@@ -118,7 +123,6 @@ const ReviewMediaDisplay = ({ media }: ReviewMediaDisplayProps) => {
                     );
                   }
                   
-                  // Fallback for non-HLS videos
                   return (
                     <video
                       src={selectedMedia.media_url}
@@ -129,11 +133,15 @@ const ReviewMediaDisplay = ({ media }: ReviewMediaDisplayProps) => {
                   );
                 })()
               ) : (
-                <img
-                  src={selectedMedia.media_url}
-                  alt={selectedMedia.file_name || 'Review media'}
-                  className="w-full h-full max-h-[80vh] object-contain"
-                />
+                <div ref={zoomRef} style={zoomStyle} className="w-full h-full flex items-center justify-center">
+                  <img
+                    ref={imgRef}
+                    src={selectedMedia.media_url}
+                    alt={selectedMedia.file_name || 'Review media'}
+                    className="w-full h-full max-h-[80vh] object-contain"
+                    draggable={false}
+                  />
+                </div>
               )}
             </div>
           )}
