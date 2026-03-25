@@ -147,20 +147,21 @@ export function usePGACard(userId?: string): {
       const venueName = (nextUpcoming as any)?.venue_name;
       if (!venueName) return [];
 
-      const { data: seasons } = await supabase
-        .from('sr_seasons')
-        .select('id')
-        .eq('tour_id', PGA_TOUR_ID);
-      const seasonIds = (seasons ?? []).map(s => s.id);
-      if (!seasonIds.length) return [];
+      // Extract first 2 distinctive words for a loose match
+      // e.g. "Memorial Park Golf Course" → "Memorial Park"
+      const keyword = venueName
+        .split(' ')
+        .filter((w: string) => w.length > 3)
+        .slice(0, 2)
+        .join(' ');
+      if (!keyword) return [];
 
-      const venueWords = venueName.split(' ').slice(0, 3).join(' ');
+      // No season filter — past winners can be from any year
       const { data: tournaments } = await supabase
         .from('sr_tournaments')
-        .select('id, name, start_date, end_date')
+        .select('id, end_date')
         .in('status', ['closed', 'complete'])
-        .in('season_id', seasonIds)
-        .ilike('venue_name', `%${venueWords}%`)
+        .ilike('venue_name', `%${keyword}%`)
         .order('end_date', { ascending: false })
         .limit(3);
 
