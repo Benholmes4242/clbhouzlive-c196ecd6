@@ -927,33 +927,37 @@ export const PGACard: React.FC<PGACardProps> = ({
             ))}
           </div>
 
-          {/* Defending Champion Block */}
+          {/* Defending Champion Block — centered between course facts and CTA */}
+          <div style={{ flex: '1 1 auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {defendingChampion ? (
             <div style={{
               position: 'relative',
-              margin: '8px clamp(14px, 3.5vw, 20px)',
-              padding: '14px 16px',
+              margin: '0 clamp(14px, 3.5vw, 20px)',
+              padding: '16px 18px',
               borderRadius: 14,
               background: `linear-gradient(135deg, ${ACCENT}0d, ${ACCENT}05)`,
               border: `1px solid ${ACCENT}22`,
               overflow: 'hidden',
-              display: 'flex', alignItems: 'center', gap: 14,
+              display: 'flex', alignItems: 'center', gap: 16,
+              width: '100%',
               animation: 'slideUp 0.5s ease-out both',
               animationDelay: '0.35s',
             }}>
               {/* Avatar — squircle */}
               <div style={{
-                width: 52, height: 52, borderRadius: SQUIRCLE_RADIUS, flexShrink: 0,
+                width: 58, height: 58, borderRadius: SQUIRCLE_RADIUS, flexShrink: 0,
                 overflow: 'hidden',
                 border: `2px solid ${ACCENT}44`,
                 background: 'rgba(255,255,255,0.06)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
               }}>
                 {cd.defendingChampionPhotoUrl
-                  ? <img src={cd.defendingChampionPhotoUrl} alt={defendingChampion} style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  ? <img src={cd.defendingChampionPhotoUrl} alt={defendingChampion} style={{
+                      width: '115%', height: '115%', objectFit: 'cover', objectPosition: 'center 20%',
+                    }}
                       onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
-                  : <span style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>
+                  : <span style={{ fontSize: 20, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>
                       {getInitials(defendingChampion)}
                     </span>
                 }
@@ -963,23 +967,23 @@ export const PGACard: React.FC<PGACardProps> = ({
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: 5,
-                  fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 600,
+                  fontSize: 'clamp(10px, 2.4vw, 12px)', fontWeight: 600,
                   color: ACCENT_LIGHT, textTransform: 'uppercase', letterSpacing: '1px',
-                  marginBottom: 2,
+                  marginBottom: 3,
                 }}>
-                  <Shield style={{ width: 11, height: 11 }} />
+                  <Shield style={{ width: 12, height: 12 }} />
                   Defending Champion
                 </div>
                 <div style={{
-                  fontSize: 'clamp(15px, 4vw, 18px)', fontWeight: 800,
+                  fontSize: 'clamp(17px, 4.5vw, 20px)', fontWeight: 800,
                   color: '#fff', lineHeight: 1.2,
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}>
                   {defendingChampion}
                 </div>
                 <div style={{
-                  fontSize: 'clamp(10px, 2.5vw, 12px)', fontWeight: 500,
-                  color: 'rgba(255,255,255,0.35)', marginTop: 2,
+                  fontSize: 'clamp(11px, 2.8vw, 13px)', fontWeight: 500,
+                  color: 'rgba(255,255,255,0.35)', marginTop: 3,
                   fontStyle: 'italic',
                 }}>
                   Can they go back-to-back?
@@ -987,16 +991,17 @@ export const PGACard: React.FC<PGACardProps> = ({
               </div>
 
               {/* Trophy emoji */}
-              <span style={{ flexShrink: 0, fontSize: 26, opacity: 0.18 }}>🏆</span>
+              <span style={{ flexShrink: 0, fontSize: 30, position: 'relative', zIndex: 1 }}>🏆</span>
             </div>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center gap-2 text-white/30" style={{ margin: '8px clamp(14px, 3.5vw, 20px)' }}>
+            <div className="flex flex-col items-center justify-center gap-2 text-white/30">
               <Calendar className="w-8 h-8" />
               <span className="text-[12px]">
                 Tournament starts {cd.startDate ? new Date(cd.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'soon'}
               </span>
             </div>
           )}
+          </div>
         </div>
 
         {/* ── ZONE 3: CTA BAR ── */}
