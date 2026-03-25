@@ -5,7 +5,6 @@ import { Squircle } from '@/components/ui/squircle';
 
 interface PGACardProps {
   post: PGACardFeedPost;
-  isActive: boolean;
   onComment: () => void;
   onLike: () => void;
   getLikeState?: (post: any) => { isLiked: boolean; count: number };
