@@ -555,7 +555,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                         <div key={i} style={{
                           marginLeft: i === 0 ? 0 : -8,
                           zIndex: stackedAvatars.length - i,
-                          border: '1.5px solid rgba(0,0,0,0.9)',
+                          border: '1.5px solid rgba(8,10,14,0.8)',
                           borderRadius: SQUIRCLE_RADIUS, overflow: 'hidden',
                         }}>
                           <RowAvatar src={p.photoUrl} name={p.playerName} size={28} />
