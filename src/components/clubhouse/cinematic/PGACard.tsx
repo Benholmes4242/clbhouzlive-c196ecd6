@@ -204,14 +204,22 @@ export const PGACard: React.FC<PGACardProps> = ({
               }}
             >
               <div className="flex items-center gap-3">
-                {cd.leader.photoUrl ? (
+            {cd.leader.photoUrl ? (
                   <div className="relative">
                     <img
                       src={cd.leader.photoUrl}
                       alt={cd.leader.playerName}
                       className="w-[50px] h-[50px] rounded-xl object-cover"
                       style={{ boxShadow: '0 0 16px rgba(245,158,11,0.25)' }}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                        const fb = (e.target as HTMLImageElement).parentElement?.querySelector('[data-fallback]') as HTMLElement;
+                        if (fb) fb.style.display = 'flex';
+                      }}
                     />
+                    <div data-fallback className="w-[50px] h-[50px] rounded-xl bg-amber-900/30 items-center justify-center" style={{ display: 'none' }}>
+                      <span className="text-amber-400 text-lg">⛳</span>
+                    </div>
                   </div>
                 ) : (
                   <div className="w-[50px] h-[50px] rounded-xl bg-amber-900/30 flex items-center justify-center">
