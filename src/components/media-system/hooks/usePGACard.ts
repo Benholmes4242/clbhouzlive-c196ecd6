@@ -398,6 +398,7 @@ export function usePGACard(userId?: string): {
         venueCity: u.venue_city,
         venuePar: u.venue_par,
         venueYardage: u.venue_yardage,
+        courseImageUrl: null,
         currentRound: 0,
         totalRounds: 4,
         roundLabel: '',
