@@ -314,7 +314,7 @@ export function usePGACard(userId?: string): {
       engagementData?.likeCount, engagementData?.commentCount, engagementData?.isLikedByMe]);
 
   const pgaCard: PGACardFeedPost | null = cardData ? {
-    id: 'pga-card',
+    id: postId || 'pga-card',
     userId: SYSTEM_USER_ID,
     actorType: 'system',
     actorId: SYSTEM_USER_ID,
@@ -335,7 +335,8 @@ export function usePGACard(userId?: string): {
     isFollowedByMe: false,
     postType: 'pga_card',
     cardData,
-  } : null;
+    isLoading: arenaLoading || resultLoading || upcomingLoading,
+  } as PGACardFeedPost : null;
 
   return {
     pgaCard,
