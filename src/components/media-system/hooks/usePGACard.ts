@@ -111,7 +111,7 @@ export function usePGACard(userId?: string): {
         .limit(10);
       return data ?? [];
     },
-    enabled: !!recentResult,
+    enabled: !!recentResult && !topLive,
     staleTime: 10 * 60_000,
   });
 

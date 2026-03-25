@@ -113,7 +113,7 @@ const ClubhouseContent = () => {
 
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ['media-feed', 'suggested'] });
-  }, []);
+  }, [queryClient]);
   const { pathname } = useLocation();
   
   useEffect(() => {
