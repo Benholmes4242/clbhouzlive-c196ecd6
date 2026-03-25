@@ -168,7 +168,9 @@ export default function AdminV2Sidebar({ role, can, onNavigate }: SidebarProps) 
         { to: '/admin-v2/analytics/social',      label: 'Social & Messaging', icon: MessageCircle },
         { to: '/admin-v2/analytics/content',     label: 'Content',            icon: BookOpen },
         { to: '/admin-v2/analytics/auth',        label: 'Auth & Security',    icon: Shield },
-        { to: '/admin-v2/analytics/retention',   label: 'Retention',          icon: Activity },
+        { to: '/admin-v2/analytics/retention',             label: 'Retention',              icon: Activity },
+        { to: '/admin-v2/analytics/content-performance',   label: 'Content Performance',    icon: BarChart3 },
+        { to: '/admin-v2/analytics/creator-leaderboard',   label: 'Creator Leaderboard',    icon: Trophy },
       ],
     }] : []),
     ...(can.manageAdmins ? [{
