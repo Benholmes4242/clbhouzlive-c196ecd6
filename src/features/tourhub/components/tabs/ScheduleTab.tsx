@@ -33,8 +33,6 @@ import {
   ScheduleEmptyMessage,
   ScheduleTourFilter,
   type TourFilterCode,
-  ScheduleHeroCarousel,
-  type ScheduleHeroItem,
 } from '../schedule';
 
 const TOUR_LABELS: Record<string, string> = {
