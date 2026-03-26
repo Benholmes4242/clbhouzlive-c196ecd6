@@ -32,7 +32,8 @@ import { PlayerScorecardCard } from '@/components/tourhub/PlayerScorecardCard';
 
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { GolfSilhouette } from '@/components/ui/GolfSilhouette';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
 import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, WinnerStatsPanel, getCurrentRoundLabel as getCurrentRoundLabelShared, UpcomingCountdown } from '../shared/TourHeroHelpers';
@@ -165,11 +166,12 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
                 src={photoUrl}
                 alt={abbreviatedName}
                 className="w-full h-full object-cover object-top"
-                onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden'); }}
               />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-[10px] font-semibold" style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.80)' }}>{initials}</div>
-            )}
+            ) : null}
+            <div className={`w-full h-full flex items-center justify-center ${photoUrl ? 'hidden' : ''}`} style={{ background: 'rgba(255,255,255,0.05)' }}>
+              <GolfSilhouette size={Math.round(32 * 0.72)} />
+            </div>
           </div>
           <span className={cn("leaderboard-name truncate", isFirst && "font-bold")}>
             {abbreviatedName}
@@ -232,10 +234,11 @@ function CondensedTieRow({ row, index, isActive, tournamentTourSlug }: { row: Li
                 }}
               >
                 {photoUrl ? (
-                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
-                ) : (
-                  <div style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.80)' }}>{initials}</div>
-                )}
+                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden'); }} />
+                ) : null}
+                <div className={`w-full h-full flex items-center justify-center ${photoUrl ? 'hidden' : ''}`} style={{ background: 'rgba(255,255,255,0.05)' }}>
+                  <GolfSilhouette size={Math.round(28 * 0.72)} />
+                </div>
               </div>
             );
           })}
