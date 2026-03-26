@@ -333,7 +333,7 @@ export function PublishScreen() {
           whileTap={{ scale: 0.97 }}
           onClick={async () => {
             const ok = await saveDraft();
-            if (ok) { reset(); }
+            if (ok) { reset(); closePostStudio(); }
           }}
           disabled={isSavingDraft || isPublishing}
           className="w-full flex items-center justify-center gap-2 mt-3 min-h-[44px] disabled:opacity-40"
