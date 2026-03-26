@@ -860,6 +860,12 @@ export function useWorldRankingsFull(tourCode: string = 'pga') {
   return useQuery({
     queryKey: ['world-rankings-full', tourCode],
     queryFn: async (): Promise<WorldRankingEntry[]> => {
+      // Non-PGA tours: use tour_season_rankings (Race to Dubai, Rolex Rankings, LIV standings, KFT)
+      if (tourCode !== 'pga') {
+        return await fetchTourSeasonRankingsAsWorldEntries(tourCode);
+      }
+
+      // PGA: use sr_world_rankings (OWGR)
       const { data, error } = await supabase
         .from('sr_world_rankings')
         .select(`
@@ -895,39 +901,26 @@ export function useWorldRankingsFull(tourCode: string = 'pga') {
       const latestDate = data?.[0]?.ranking_date ?? null;
       const latestRows = latestDate ? (data ?? []).filter(r => r.ranking_date === latestDate) : (data ?? []);
 
-      // Client-side tour filter
-      const tourFiltered = latestRows.filter((entry: any) => {
-        const codes: string[] = entry.player?.tour_codes ?? [];
-        if (codes.length > 0) {
-          return codes.some(c => c.toLowerCase() === tourCode.toLowerCase());
-        }
-        return tourCode === 'pga';
-      });
+      // Client-side tour filter (PGA = all OWGR players)
+      const tourFiltered = latestRows;
       
       // Process data to extract all stats from raw_data.statistics
       return tourFiltered.map((entry: any): WorldRankingEntry => {
-        // Calculate rank change (positive = moved up, negative = moved down)
         const rankChange = entry.prior_rank ? entry.prior_rank - entry.rank : 0;
-        
-        // Extract statistics from raw_data.statistics JSONB field
         const rawStats = entry.raw_data?.statistics;
         
-        // Avg points: column > raw_data.statistics.avg_points > raw_data.avg_points > points column
         const avgPoints = entry.avg_points ?? 
           (rawStats?.avg_points ? parseFloat(rawStats.avg_points) : null) ?? 
           (entry.raw_data?.avg_points ? parseFloat(entry.raw_data.avg_points) : null) ??
           null;
         
-        // Total points: raw_data.statistics.points > points column
         const totalPoints = rawStats?.points 
           ? parseFloat(rawStats.points) 
           : (entry.points ? parseFloat(entry.points) : null);
         
-        // Events played: column > raw_data.statistics.events_played
         const eventsPlayed = entry.events_played ?? 
           (rawStats?.events_played ? parseInt(rawStats.events_played) : null);
         
-        // Points gained/lost this week
         const pointsGained = rawStats?.points_gained 
           ? parseFloat(rawStats.points_gained) 
           : null;
@@ -951,6 +944,72 @@ export function useWorldRankingsFull(tourCode: string = 'pga') {
       });
     },
     staleTime: 5 * 60 * 1000,
+  });
+}
+
+/**
+ * Fetch tour_season_rankings and map to WorldRankingEntry shape
+ * Used for DPWT, LPGA, LIV, Korn Ferry
+ */
+async function fetchTourSeasonRankingsAsWorldEntries(tourCode: string): Promise<WorldRankingEntry[]> {
+  const { data, error } = await supabase
+    .from('tour_season_rankings' as any)
+    .select('*')
+    .eq('tour_code', tourCode.toLowerCase() === 'euro' ? 'euro' : tourCode.toLowerCase())
+    .eq('season_year', new Date().getFullYear())
+    .order('position', { ascending: true })
+    .limit(200);
+
+  if (error) {
+    console.error('[WorldRankings] tour_season_rankings error:', error);
+    throw error;
+  }
+
+  const rows = (data || []) as any[];
+  if (rows.length === 0) return [];
+
+  // Batch-fetch player details for rows with player_id
+  const playerIds = rows.map(r => r.player_id).filter(Boolean) as string[];
+  let playerMap: Record<string, any> = {};
+
+  if (playerIds.length > 0) {
+    const { data: players } = await supabase
+      .from('sr_players')
+      .select('id, first_name, last_name, photo_url, country, pga_tour_id, tour_codes')
+      .in('id', playerIds);
+
+    for (const p of players || []) {
+      playerMap[p.id] = p;
+    }
+  }
+
+  return rows.map((row: any): WorldRankingEntry => {
+    const player = row.player_id ? playerMap[row.player_id] : null;
+    const nameParts = (row.player_name || '').split(' ');
+    const firstName = player?.first_name || nameParts[0] || '';
+    const lastName = player?.last_name || nameParts.slice(1).join(' ') || '';
+
+    return {
+      rank: row.position,
+      prior_rank: null,
+      rank_change: 0,
+      tied: false,
+      avg_points: row.points ?? null,
+      total_points: row.points ?? null,
+      events_played: row.tournaments_played ?? null,
+      points_gained: null,
+      points_lost: null,
+      ranking_date: row.scraped_at?.split('T')[0] ?? null,
+      player: {
+        id: player?.id || row.player_id || row.id,
+        first_name: firstName,
+        last_name: lastName,
+        photo_url: player?.photo_url ?? null,
+        country: player?.country || row.country || null,
+        pga_tour_id: player?.pga_tour_id ?? null,
+        tour_codes: player?.tour_codes ?? [tourCode],
+      },
+    };
   });
 }
 
