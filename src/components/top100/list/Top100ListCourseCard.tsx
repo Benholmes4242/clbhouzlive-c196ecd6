@@ -57,6 +57,7 @@ export const Top100ListCourseCard: React.FC<Top100ListCourseCardProps> = ({
       showRankBadges={true}
       showRating={true}
       showPlayedStatus={true}
+      activeListSlug={listSlug ?? null}
       onClick={onClick}
     />
   );

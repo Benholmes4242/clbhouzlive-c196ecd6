@@ -35,6 +35,7 @@ interface UnifiedCourseCardProps {
   hideLocation?: boolean;
   loggedDate?: string | Date | null;
   contextTag?: string;
+  activeListSlug?: string | null;
   onClick?: () => void;
   className?: string;
 }
@@ -75,6 +76,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
   hideLocation = false,
   loggedDate,
   contextTag,
+  activeListSlug = null,
   onClick,
   className = '',
 }) => {
@@ -235,10 +237,10 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
         {/* Rank badges - top-left */}
         {showRankBadges && (
           <div className="absolute top-3 left-3 flex items-center gap-2">
-            {course.ranks?.global && (
+            {(!activeListSlug || activeListSlug === 'global') && course.ranks?.global && (
               <Top100RankBadge listSlug="global" rank={course.ranks.global} />
             )}
-            {regionalRank && regionalBadgeSlug && (
+            {(!activeListSlug || activeListSlug === regionalBadgeSlug) && regionalRank && regionalBadgeSlug && (
               <Top100RankBadge listSlug={regionalBadgeSlug} rank={regionalRank} />
             )}
           </div>
