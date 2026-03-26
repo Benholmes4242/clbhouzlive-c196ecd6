@@ -1,7 +1,7 @@
 /**
  * StickyFilterBar - Two primary tabs (All / Top 100) with inline country filter pills and sort dropdown
  */
-import React, { useMemo } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronDown } from 'lucide-react';
 import {
@@ -10,18 +10,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { CourseRegionPills, type QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
 
 export type CoursePrimaryTab = 'all' | 'top100';
 export type CourseSortOption = 'recently-played' | 'rating-high-low' | 'rating-low-high';
-export type CourseCountryFilter = 'all' | 'gb-i' | 'usa' | 'europe' | 'global';
 
 interface StickyFilterBarProps {
   activeTab: CoursePrimaryTab;
   onTabChange: (tab: CoursePrimaryTab) => void;
   activeSort: CourseSortOption;
   onSortChange: (sort: CourseSortOption) => void;
-  activeCountry: CourseCountryFilter;
-  onCountryChange: (country: CourseCountryFilter) => void;
+  activeCountry: QuickRegion;
+  onCountryChange: (country: QuickRegion) => void;
   allCount: number;
   top100Count: number;
 }
@@ -30,21 +30,6 @@ const SORT_OPTIONS: { value: CourseSortOption; label: string }[] = [
   { value: 'recently-played', label: 'Recently Played' },
   { value: 'rating-high-low', label: 'Rating: High to Low' },
   { value: 'rating-low-high', label: 'Rating: Low to High' },
-];
-
-const ALL_COUNTRY_OPTIONS: { value: CourseCountryFilter; label: string }[] = [
-  { value: 'all', label: 'All Countries' },
-  { value: 'gb-i', label: 'GB&I' },
-  { value: 'usa', label: 'USA' },
-  { value: 'europe', label: 'Europe' },
-  { value: 'global', label: 'Global' },
-];
-
-const TOP100_COUNTRY_OPTIONS: { value: CourseCountryFilter; label: string }[] = [
-  { value: 'gb-i', label: 'GB&I' },
-  { value: 'usa', label: 'USA' },
-  { value: 'europe', label: 'Europe' },
-  { value: 'global', label: 'Global' },
 ];
 
 export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
