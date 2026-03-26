@@ -290,9 +290,9 @@ export const PGACard: React.FC<PGACardProps> = ({
     };
   }, [cd.state, cd.startDate, countdownTick]);
 
-  // Group tied chasers for result state
+  // Group tied chasers for result and live states
   const chaserGroups = useMemo(() => {
-    if (cd.state !== 'result') return null;
+    if (cd.state !== 'result' && cd.state !== 'live') return null;
     const groups: Array<{ position: number; isTied: boolean; chasers: PGACardChaser[] }> = [];
     for (const c of cd.chasers) {
       const last = groups[groups.length - 1];
