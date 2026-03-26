@@ -253,7 +253,7 @@ export function UnifiedWorldRankings() {
     );
   }
 
-  if (!rankings?.length) return null;
+  const isEmpty = !rankings?.length && !isLoading;
 
   const hasMovers = upwardMovers.length > 0;
 
