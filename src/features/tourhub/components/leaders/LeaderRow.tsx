@@ -3,11 +3,13 @@
  * 44×44 avatars, 13px border-radius, JetBrains Mono stat values.
  */
 
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import CountryFlag from '@/components/ui/country-flag';
+import { GolfSilhouette } from '@/components/ui/GolfSilhouette';
 import type { LeaderCategory } from './constants';
 
 interface LeaderRowProps {
@@ -43,6 +45,7 @@ export function LeaderRow({
 }: LeaderRowProps) {
   const displayRank = overrideRank ?? rank;
   const photoUrl = getPlayerHeadshotUrl(player.fullName, player.tourCodes?.[0] ?? 'pga');
+  const [imgError, setImgError] = useState(false);
   const fmt = formatOverride ?? category.format;
   const unit = unitOverride ?? category.unit;
   const formattedStat = fmt(value);
@@ -82,11 +85,11 @@ export function LeaderRow({
 
         {/* Avatar — 44×44 */}
         <div className="shrink-0" style={{ width: 44, height: 44 }}>
-          {photoUrl ? (
+          {photoUrl && !imgError ? (
             <img
               src={photoUrl}
               alt={player.fullName}
-              onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+              onError={() => setImgError(true)}
               style={{
                 width: 44,
                 height: 44,
@@ -97,17 +100,16 @@ export function LeaderRow({
             />
           ) : (
             <div
-              className="flex items-center justify-center bg-muted"
+              className="flex items-center justify-center"
               style={{
                 width: 44,
                 height: 44,
                 borderRadius: '34%',
                 border: '1px solid hsl(var(--border) / 0.5)',
+                background: 'rgba(255,255,255,0.05)',
               }}
             >
-              <span className="text-muted-foreground text-xs font-semibold">
-                {player.fullName.split(' ').map(n => n[0]).join('').slice(0, 2)}
-              </span>
+              <GolfSilhouette size={Math.round(44 * 0.72)} />
             </div>
           )}
         </div>

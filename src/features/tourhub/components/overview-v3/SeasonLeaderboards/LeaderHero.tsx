@@ -11,7 +11,8 @@ import CountryFlag from '@/components/ui/country-flag';
 import type { LeaderboardPlayer } from './types';
 import type { CategoryId } from './StatCategoryIcons';
 import { CATEGORY_ACCENT_COLORS } from './constants';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { GolfSilhouette } from '@/components/ui/GolfSilhouette';
 
 interface LeaderHeroProps {
   player: LeaderboardPlayer;
@@ -64,12 +65,12 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
                 onError={() => setImgError(true)}
               />
             ) : (
-              <img
-                src={PLAYER_SILHOUETTE_URL}
-                alt={player.playerName}
-                className="w-full h-full object-cover"
-                style={{ backgroundColor: 'hsl(var(--muted))' }}
-              />
+              <div
+                className="w-full h-full flex items-center justify-center"
+                style={{ background: 'rgba(255,255,255,0.05)' }}
+              >
+                <GolfSilhouette size={Math.round(140 * 0.70)} />
+              </div>
             )}
           </div>
         </div>
