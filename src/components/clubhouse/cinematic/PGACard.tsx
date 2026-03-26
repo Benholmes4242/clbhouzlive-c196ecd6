@@ -1184,7 +1184,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                 {/* Name + Thru/Today */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{
-                    fontSize: 'clamp(15px, 4vw, 18px)', fontWeight: 800,
+                    fontSize: 'clamp(17px, 4.5vw, 22px)', fontWeight: 800,
                     color: '#fff', lineHeight: 1.1,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
