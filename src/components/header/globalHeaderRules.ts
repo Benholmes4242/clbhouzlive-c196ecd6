@@ -17,6 +17,7 @@ export const GLOBAL_HEADER_EXCLUDED_ROUTES = [
   '/business/success',
   '/messages',
   '/profile',
+  '/achievements',
 ] as const;
 
 export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
