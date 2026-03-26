@@ -151,9 +151,7 @@ const HeroAvatar: React.FC<{ src?: string | null; name: string }> = ({ src, name
       background: 'linear-gradient(135deg, #1a1a2e, #16213e)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
-      <span style={{ fontSize: 64, fontWeight: 800, color: 'rgba(255,255,255,0.15)' }}>
-        {getInitials(name)}
-      </span>
+      <GolfSilhouette size={72} />
     </div>
   );
 };
@@ -162,13 +160,13 @@ const HeroAvatar: React.FC<{ src?: string | null; name: string }> = ({ src, name
 const RowAvatar: React.FC<{ src?: string | null; name: string; size: number }> = ({ src, name, size }) => (
   <div style={{
     width: size, height: size, borderRadius: SQUIRCLE_RADIUS,
-    overflow: 'hidden', background: 'rgba(255,255,255,0.08)',
+    overflow: 'hidden', background: 'rgba(255,255,255,0.05)',
     display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
   }}>
     {src ? (
       <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }} />
     ) : (
-      <span style={{ fontSize: size * 0.35, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>{getInitials(name)}</span>
+      <GolfSilhouette size={Math.round(size * 0.72)} />
     )}
   </div>
 );
