@@ -9,6 +9,7 @@ import type { WinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import { SCORE_COLORS } from '../../utils/scoreColors';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 import type { TournamentFinisher } from '../../hooks/useTournamentLeadersWinners';
 
 /** Score color — live state: pure white (#FFFFFF) matching scrubber fill, regardless of par */
