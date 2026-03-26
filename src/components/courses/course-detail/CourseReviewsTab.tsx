@@ -27,7 +27,7 @@ import {
 } from '@/features/courses/config';
 import { getScoreTier } from '@/utils/getScoreTier';
 // REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
-import type { ExploreContentItem } from '@/components/explore/types';
+import type { FeedPost, MediaItem as MediaItemType } from '@/components/media-system/types/media';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
 import { AlertCircle } from 'lucide-react';
