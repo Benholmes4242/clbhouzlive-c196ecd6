@@ -1228,7 +1228,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                   ].map(stat => (
                     <div key={stat.label} style={{
                       flex: 1, textAlign: 'center',
-                      padding: '7px 2px 5px',
+                      padding: '9px 2px 7px',
                       borderRadius: 8,
                       background: 'rgba(0,0,0,0.45)',
                       backdropFilter: 'blur(12px)',
