@@ -1,11 +1,11 @@
 // StudioHeader — Apple-minimal nav bar, consistent across every screen
-// Heavy title weight. Thicker progress bar. Clean tap targets.
+// Light mode. Heavy title weight. Thicker progress bar. Clean tap targets.
 
 import React from 'react';
 import { ChevronLeft, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { MIN_TAP_TARGET } from '../constants';
-import { BG_GLASS, AMBER, AMBER_DEEP, AMBER_GRADIENT, TEXT_PRIMARY } from '../tokens';
+import { BG_GLASS, TEXT_PRIMARY } from '../tokens';
 import type { StudioStep } from '../types';
 
 interface HeaderAction {
@@ -39,7 +39,7 @@ export function StudioHeader({
   leftAction,
   rightAction,
   step,
-  darkMode = true,
+  darkMode = false,
 }: StudioHeaderProps) {
   const progress = step ? STEP_PROGRESS[step] ?? 0 : 0;
   const showProgress = step && progress > 0 && step !== 'SUCCESS';
@@ -52,7 +52,8 @@ export function StudioHeader({
         background: BG_GLASS,
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(255,255,255,0.04)',
+        borderBottom: '1px solid rgba(0,0,0,0.06)',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
       }}
     >
       <div className="flex items-center justify-between px-4" style={{ minHeight: '52px' }}>
@@ -64,9 +65,8 @@ export function StudioHeader({
                 whileTap={{ scale: 0.90 }}
                 onClick={leftAction.onClick}
                 className="flex items-center justify-center"
-                style={{ minWidth: 44, minHeight: 44, color: 'rgba(255,255,255,0.70)' }}
+                style={{ minWidth: 44, minHeight: 44, color: 'rgba(15,23,42,0.55)' }}
               >
-                {/* Thicker X — strokeWidth 2.5 */}
                 <X className="w-5 h-5" strokeWidth={2.5} />
               </motion.button>
             ) : (
@@ -74,9 +74,8 @@ export function StudioHeader({
                 onClick={leftAction.onClick}
                 disabled={leftAction.disabled}
                 className="flex items-center gap-0.5 disabled:opacity-30 transition-opacity"
-                style={{ minWidth: 44, minHeight: 44, color: 'rgba(255,255,255,0.70)' }}
+                style={{ minWidth: 44, minHeight: 44, color: 'rgba(15,23,42,0.55)' }}
               >
-                {/* Thicker chevron — strokeWidth 3 */}
                 <ChevronLeft className="w-5 h-5" strokeWidth={3} />
                 <span className="text-[15px] font-semibold">{leftAction.label}</span>
               </button>
@@ -118,10 +117,10 @@ export function StudioHeader({
                   paddingLeft: 16,
                   paddingRight: 16,
                   background: rightAction.disabled
-                    ? 'rgba(255,255,255,0.15)'
-                    : 'rgba(255,255,255,0.96)',
-                  color: '#0D0D0D',
-                  boxShadow: rightAction.disabled ? 'none' : '0 2px 12px rgba(0,0,0,0.30)',
+                    ? 'rgba(15,23,42,0.10)'
+                    : 'rgba(15,23,42,0.90)',
+                  color: '#FFFFFF',
+                  boxShadow: rightAction.disabled ? 'none' : '0 2px 12px rgba(0,0,0,0.12)',
                 }}
               >
                 {rightAction.label}
@@ -131,7 +130,7 @@ export function StudioHeader({
                 onClick={rightAction.onClick}
                 disabled={rightAction.disabled}
                 className="text-[15px] font-semibold disabled:opacity-30"
-                style={{ minHeight: MIN_TAP_TARGET, color: 'rgba(255,255,255,0.70)' }}
+                style={{ minHeight: MIN_TAP_TARGET, color: 'rgba(15,23,42,0.55)' }}
               >
                 {rightAction.label}
               </button>
@@ -142,16 +141,16 @@ export function StudioHeader({
 
       {/* Progress bar */}
       {showProgress && (
-        <div style={{ height: '2.5px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)' }}>
+        <div style={{ height: '2.5px', background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.06)' }}>
           <motion.div
             className="h-full"
             initial={false}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             style={{
-              background: 'rgba(255,255,255,0.95)',
+              background: 'rgba(15,23,42,0.85)',
               borderRadius: '0 2px 2px 0',
-              boxShadow: '0 0 6px rgba(255,255,255,0.30)',
+              boxShadow: '0 0 6px rgba(15,23,42,0.15)',
             }}
           />
         </div>

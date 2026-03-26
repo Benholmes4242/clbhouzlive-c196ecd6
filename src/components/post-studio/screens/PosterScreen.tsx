@@ -1,9 +1,9 @@
-// PosterScreen — Step 4: Cover frame selection, dark immersive
+// PosterScreen — Step 4: Cover frame selection
 import React, { useRef, useEffect } from 'react';
 import { StudioHeader } from '../components/StudioHeader';
 import { PosterPicker } from '../components/PosterPicker';
 import { usePostStudioContext } from '../usePostStudio';
-import { BG_BASE, BG_GLASS, TEXT_SECONDARY } from '../tokens';
+import { BG_BASE } from '../tokens';
 
 export function PosterScreen() {
   const { state, setStep, updatePoster } = usePostStudioContext();
@@ -26,7 +26,6 @@ export function PosterScreen() {
     if (videoRef.current) videoRef.current.currentTime = timestamp;
   };
 
-  // Use native video dimensions if available, fallback to 16/9
   const aspectRatio = activeItem.width && activeItem.height
     ? activeItem.width / activeItem.height
     : 16 / 9;
@@ -37,18 +36,16 @@ export function PosterScreen() {
       <StudioHeader
         title="Cover"
         step="POSTER"
-        darkMode
         leftAction={{ label: 'Cancel', onClick: () => setStep('COMPOSE') }}
         rightAction={{ label: 'Done', onClick: () => setStep('COMPOSE'), variant: 'primary' }}
       />
 
-      {/* Video preview */}
       <div className="flex-1 flex items-center justify-center px-5 py-4">
         <div
           className="relative overflow-hidden"
           style={{
             borderRadius: 20,
-            boxShadow: '0 16px 48px rgba(0,0,0,0.60)',
+            boxShadow: '0 16px 48px rgba(0,0,0,0.12)',
             aspectRatio: isPortrait ? '4/5' : String(aspectRatio),
             width: isPortrait ? 'auto' : '100%',
             height: isPortrait ? '48vh' : 'auto',
@@ -65,23 +62,22 @@ export function PosterScreen() {
         </div>
       </div>
 
-      {/* Scrubber card */}
       <div
         className="mx-4 mb-4 px-5 py-4"
         style={{
           borderRadius: 24,
-          background: 'rgba(18,18,18,0.97)',
-          border: '1px solid rgba(255,255,255,0.07)',
-          boxShadow: '0 -4px 24px rgba(0,0,0,0.40)',
+          background: 'rgba(255,255,255,0.97)',
+          border: '1px solid rgba(0,0,0,0.08)',
+          boxShadow: '0 -4px 24px rgba(0,0,0,0.06)',
         }}
       >
         <p
           className="text-[12px] font-medium mb-3 text-center uppercase tracking-wide"
-          style={{ color: 'rgba(255,255,255,0.35)', letterSpacing: '0.08em' }}
+          style={{ color: 'rgba(15,23,42,0.35)', letterSpacing: '0.08em' }}
         >
           Drag to choose cover frame
         </p>
-        <PosterPicker item={activeItem} onPosterChange={handlePosterChange} darkMode />
+        <PosterPicker item={activeItem} onPosterChange={handlePosterChange} />
       </div>
     </div>
   );

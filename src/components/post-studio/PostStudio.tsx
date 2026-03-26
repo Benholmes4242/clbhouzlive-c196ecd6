@@ -1,5 +1,5 @@
 // PostStudio — Cinematic Root Shell
-// Full-screen immersive studio. Dark-first. Golf-native. Better than Instagram.
+// Full-screen immersive studio. Light-first. Golf-native. Better than Instagram.
 
 import React, { useCallback, useEffect, useRef } from 'react';
 import {
@@ -20,7 +20,7 @@ import { AudiencePanel } from './panels/AudiencePanel';
 import { SchedulePanel } from './panels/SchedulePanel';
 import { DraftsPanel } from './panels/DraftsPanel';
 import { SPRING, DURATION } from './constants';
-import { BG_BASE, AMBER_LINE, AMBER_DIM, TEXT_PRIMARY, TEXT_SECONDARY } from './tokens';
+import { BG_BASE, TEXT_PRIMARY, TEXT_SECONDARY } from './tokens';
 import type { PostStudioProps, StudioStep, StudioMediaItem } from './types';
 
 // ─── Screen order for directional transitions ───────────────────────────────
@@ -98,7 +98,7 @@ function DiscardConfirmation({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="absolute inset-0 z-50 flex items-center justify-center px-6"
-      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(12px)' }}
+      style={{ background: 'rgba(15,23,42,0.40)', backdropFilter: 'blur(12px)' }}
     >
       <motion.div
         initial={{ scale: 0.92, opacity: 0, y: 20 }}
@@ -107,9 +107,9 @@ function DiscardConfirmation({
         transition={{ type: 'spring', damping: 28, stiffness: 360 }}
         className="w-full max-w-[300px] rounded-3xl overflow-hidden"
         style={{
-          background: 'rgba(22, 22, 22, 0.95)',
-          border: '1px solid rgba(255,255,255,0.10)',
-          boxShadow: '0 24px 64px rgba(0,0,0,0.6)',
+          background: 'rgba(255,255,255,0.97)',
+          border: '1px solid rgba(0,0,0,0.08)',
+          boxShadow: '0 24px 64px rgba(0,0,0,0.15)',
         }}
       >
         {/* Amber top glow */}
@@ -129,7 +129,7 @@ function DiscardConfirmation({
               whileTap={{ scale: 0.97 }}
               onClick={onDiscard}
               className="w-full py-3.5 rounded-2xl font-semibold text-sm text-white min-h-[52px]"
-              style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.35)' }}
+              style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.30)', color: '#DC2626' }}
             >
               Discard
             </motion.button>
@@ -137,7 +137,7 @@ function DiscardConfirmation({
               whileTap={{ scale: 0.97 }}
               onClick={onCancel}
               className="w-full py-3.5 rounded-2xl font-semibold text-sm min-h-[52px]"
-              style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.10)', color: 'rgba(255,255,255,0.85)' }}
+              style={{ background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.08)', color: TEXT_PRIMARY }}
             >
               Keep editing
             </motion.button>
@@ -223,22 +223,21 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
 
   // Status bar — PostStudio is a portal, not a route, so App.tsx's
   // route-change useLayoutEffect never fires when it opens.
-  // We manually apply transparent on open and restore on close.
+  // We manually apply light style on open and restore on close.
   useEffect(() => {
-    // Save whatever the underlying page set before we opened
     const prevShieldColor = currentShieldColor;
 
-    // Apply dark transparent status bar for the dark studio surface
-    applyShieldColor('transparent');
-    document.documentElement.style.backgroundColor = 'transparent';
-    document.body.style.backgroundColor = 'transparent';
+    // Apply light status bar for the light studio surface
+    applyShieldColor('#F8FAFC');
+    document.documentElement.style.backgroundColor = '#F8FAFC';
+    document.body.style.backgroundColor = '#F8FAFC';
 
     // Also update Median native status bar if available
     try {
       if (typeof window !== 'undefined' && window.median?.statusbar?.set) {
         window.median.statusbar.set({
-          style: 'dark',
-          color: '00000000',
+          style: 'light',
+          color: 'F8FAFC',
           overlay: true,
           blur: false,
         });
@@ -246,13 +245,11 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
     } catch { /* Median bridge not ready — fail silently */ }
 
     return () => {
-      // Restore the underlying page's shield color when PostStudio closes.
-      // This covers both Clubhouse (keep-alive) and standard route pages.
       applyShieldColor(prevShieldColor);
       document.documentElement.style.backgroundColor = prevShieldColor === 'transparent' ? 'transparent' : prevShieldColor;
       document.body.style.backgroundColor = prevShieldColor === 'transparent' ? 'transparent' : prevShieldColor;
     };
-  }, []); // intentionally empty — run once on mount, cleanup on unmount
+  }, []);
 
   return (
     <>
@@ -263,7 +260,7 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
         exit={{ opacity: 0 }}
         transition={{ duration: DURATION.backdrop }}
         className="fixed inset-0 z-[9998]"
-        style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(24px)' }}
+        style={{ background: 'rgba(15,23,42,0.30)', backdropFilter: 'blur(24px)' }}
         onClick={handleClose}
       />
 
