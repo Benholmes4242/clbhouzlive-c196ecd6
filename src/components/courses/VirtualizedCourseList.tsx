@@ -47,6 +47,7 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
   courses,
   onCourseClick,
   footer,
+  activeListSlug = null,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
