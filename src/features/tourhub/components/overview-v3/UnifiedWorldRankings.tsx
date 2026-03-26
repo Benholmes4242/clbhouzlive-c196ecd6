@@ -451,7 +451,22 @@ export function UnifiedWorldRankings() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
           >
-            {currentPagePlayers.map((entry, index) => {
+            {currentPagePlayers.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 gap-2 text-center">
+                <p className="text-[14px] font-medium text-foreground">
+                  No ranking data available
+                </p>
+                <p className="text-[12px] text-muted-foreground">
+                  {RANKING_TOUR_OPTIONS.find(t => t.code === activeTour)?.label} rankings haven't been synced yet
+                </p>
+                <button
+                  onClick={() => handleTourChange('pga')}
+                  className="mt-2 text-[12px] font-semibold text-primary active:opacity-70"
+                >
+                  Switch to PGA Tour
+                </button>
+              </div>
+            ) : currentPagePlayers.map((entry, index) => {
               const fullName = `${entry.player.first_name} ${entry.player.last_name}`;
               const isHighlighted = highlightedPlayerId === entry.player.id;
               const isMover = moverPlayerIds.has(entry.player.id);
