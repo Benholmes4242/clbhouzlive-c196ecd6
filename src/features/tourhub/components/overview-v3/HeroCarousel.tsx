@@ -234,10 +234,11 @@ function CondensedTieRow({ row, index, isActive, tournamentTourSlug }: { row: Li
                 }}
               >
                 {photoUrl ? (
-                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
-                ) : (
-                  <div style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.80)' }}>{initials}</div>
-                )}
+                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden'); }} />
+                ) : null}
+                <div className={`w-full h-full flex items-center justify-center ${photoUrl ? 'hidden' : ''}`} style={{ background: 'rgba(255,255,255,0.05)' }}>
+                  <GolfSilhouette size={Math.round(28 * 0.72)} />
+                </div>
               </div>
             );
           })}
