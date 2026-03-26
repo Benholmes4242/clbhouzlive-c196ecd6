@@ -1,1 +1,0 @@
-DELETE FROM tour_season_rankings WHERE tour_code IN ('lpga', 'liv');
