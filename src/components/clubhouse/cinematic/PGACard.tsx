@@ -1348,8 +1348,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                       {stackedAvatars.map((p, i) => (
                         <div key={i} style={{
                           marginLeft: i === 0 ? 0 : -10,
-
-                          marginLeft: i === 0 ? 0 : -12,
+                          zIndex: stackedAvatars.length - i,
                           zIndex: stackedAvatars.length - i,
                           border: '1.5px solid rgba(8,10,14,0.8)',
                           borderRadius: SQUIRCLE_RADIUS, overflow: 'hidden',
