@@ -195,6 +195,12 @@ export function UnifiedWorldRankings() {
   const goToPrevPage = () => { if (currentPage > 0) setCurrentPage(currentPage - 1); };
   const goToNextPage = () => { if (currentPage < totalPages - 1) setCurrentPage(currentPage + 1); };
 
+  const handleTourChange = (code: string) => {
+    setActiveTour(code);
+    setCurrentPage(0);
+    setSheetOpen(false);
+  };
+
   const setRowRef = useCallback((playerId: string, element: HTMLDivElement | null) => {
     if (element) rowRefs.current.set(playerId, element);
     else rowRefs.current.delete(playerId);
