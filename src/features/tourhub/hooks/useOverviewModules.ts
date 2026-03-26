@@ -239,7 +239,10 @@ export function useRankingMovers(tourCode: string = 'pga') {
       // Client-side tour filter
       const tourFiltered = latestRows.filter((row: any) => {
         const codes: string[] = row.player?.tour_codes ?? [];
-        return codes.some(c => c.toLowerCase() === tourCode.toLowerCase());
+        if (codes.length > 0) {
+          return codes.some(c => c.toLowerCase() === tourCode.toLowerCase());
+        }
+        return tourCode === 'pga';
       });
 
     if (error) throw error;
@@ -895,7 +898,10 @@ export function useWorldRankingsFull(tourCode: string = 'pga') {
       // Client-side tour filter
       const tourFiltered = latestRows.filter((entry: any) => {
         const codes: string[] = entry.player?.tour_codes ?? [];
-        return codes.some(c => c.toLowerCase() === tourCode.toLowerCase());
+        if (codes.length > 0) {
+          return codes.some(c => c.toLowerCase() === tourCode.toLowerCase());
+        }
+        return tourCode === 'pga';
       });
       
       // Process data to extract all stats from raw_data.statistics
