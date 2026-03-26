@@ -28,6 +28,7 @@ function getRoundLabel(round: number, total: number): string {
   if (round === total) return 'Final Round';
   if (round === 3) return 'Moving Day';
   if (round === 2) return 'Cut Day';
+  if (round === 1) return 'Opening Round';
   return `Round ${round}`;
 }
 
