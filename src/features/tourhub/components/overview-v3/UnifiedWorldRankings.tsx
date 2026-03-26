@@ -279,6 +279,7 @@ export function UnifiedWorldRankings() {
           View All
           <ChevronRight className="w-3.5 h-3.5 opacity-60" />
         </button>
+      </div>
       {/* Tour selector trigger */}
       <div className="flex items-center gap-2.5 mt-1 mb-2.5">
         <button
