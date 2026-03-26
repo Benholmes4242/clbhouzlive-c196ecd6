@@ -32,7 +32,8 @@ import { PlayerScorecardCard } from '@/components/tourhub/PlayerScorecardCard';
 
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
 import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, WinnerStatsPanel, getCurrentRoundLabel as getCurrentRoundLabelShared, UpcomingCountdown } from '../shared/TourHeroHelpers';
@@ -122,7 +123,24 @@ function buildLiveLeaderboardRows(
   return rows;
 }
 
-// Mini leaderboard row for live tournaments
+/** Tiny stateful avatar — renders inline PlayerSilhouette on 404 */
+function MiniAvatar({ src, alt, size = 32 }: { src: string; alt: string; size?: number }) {
+  const [err, setErr] = useState(false);
+  const h = Math.round(size * 1.03);
+  return (
+    <div
+      className="overflow-hidden flex-shrink-0"
+      style={{ width: size, height: h, borderRadius: '34%', border: '1.5px solid rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.06)' }}
+    >
+      {err ? (
+        <PlayerSilhouette size={size} />
+      ) : (
+        <img src={src} alt={alt} className="w-full h-full object-cover object-top" onError={() => setErr(true)} />
+      )}
+    </div>
+  );
+}
+
 interface LeaderboardRowProps {
   leader: LeaderEntry;
   isFirst: boolean;
@@ -138,7 +156,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
   const effectiveTourCode = leader.player.tourCode ?? tournamentTourSlug ?? 'pga';
   const photoUrl = getPlayerHeadshotUrl(leader.player.fullName, effectiveTourCode, leader.player.headshotOverride);
-  const initials = `${leader.player.firstName[0]}${leader.player.lastName[0]}`.toUpperCase();
+  
   const thruDisplay = formatThruDisplay(leader.thru, leader.round_1, leader.round_2, leader.round_3, leader.round_4, leader.status, leader.thruUpdatedAt, leader.tournamentTimezone);
   
   return (
@@ -156,21 +174,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
           {leader.position}
         </span>
         <div className="flex items-center gap-2 min-w-0">
-          <div
-            className="overflow-hidden flex-shrink-0"
-            style={{ width: '32px', height: '33px', borderRadius: '34%', border: '1.5px solid rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.12)' }}
-          >
-            {photoUrl ? (
-              <img
-                src={photoUrl}
-                alt={abbreviatedName}
-                className="w-full h-full object-cover object-top"
-                onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-[10px] font-semibold" style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.80)' }}>{initials}</div>
-            )}
-          </div>
+          <MiniAvatar src={photoUrl} alt={abbreviatedName} size={32} />
           <span className={cn("leaderboard-name truncate", isFirst && "font-bold")}>
             {abbreviatedName}
             {thruDisplay && (
@@ -219,23 +223,14 @@ function CondensedTieRow({ row, index, isActive, tournamentTourSlug }: { row: Li
             return (
               <div
                 key={player.player.id}
-                className="overflow-hidden flex-shrink-0"
                 style={{
-                  width: 28,
-                  height: 29,
-                  borderRadius: '34%',
-                  border: '1.5px solid rgba(255,255,255,0.18)',
-                  background: 'rgba(255,255,255,0.12)',
                   marginLeft: i > 0 ? -8 : 0,
                   zIndex: 4 - i,
                   position: 'relative',
+                  flexShrink: 0,
                 }}
               >
-                {photoUrl ? (
-                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
-                ) : (
-                  <div style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.80)' }}>{initials}</div>
-                )}
+                <MiniAvatar src={photoUrl} alt="" size={28} />
               </div>
             );
           })}
