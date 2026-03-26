@@ -245,7 +245,7 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
       {/* Read-only header when viewing another user's quest */}
       {!isOwnProfile && (
         <header className="sticky top-0 z-50 flex items-center gap-3 px-4 h-14 bg-background/80 backdrop-blur-lg border-b border-border/60"
-          style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+          style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
         >
           <button
             onClick={() => navigate(-1)}
