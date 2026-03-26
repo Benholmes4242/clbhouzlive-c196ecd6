@@ -236,10 +236,16 @@ export function useRankingMovers(tourCode: string = 'pga') {
       const latestDate = data?.[0]?.ranking_date ?? null;
       const latestRows = latestDate ? (data ?? []).filter(r => r.ranking_date === latestDate) : (data ?? []);
 
+      // Client-side tour filter
+      const tourFiltered = latestRows.filter((row: any) => {
+        const codes: string[] = row.player?.tour_codes ?? [];
+        return codes.some(c => c.toLowerCase() === tourCode.toLowerCase());
+      });
+
     if (error) throw error;
 
     // Calculate movers with rank change >= 3
-    const allMovers = (latestRows)
+    const allMovers = (tourFiltered)
       .map((row: any) => {
         const rankChange = (row.prior_rank || row.rank) - row.rank; // Positive = moved up
         return {
