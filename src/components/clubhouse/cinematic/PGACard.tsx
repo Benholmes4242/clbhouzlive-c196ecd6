@@ -304,10 +304,8 @@ export const PGACard: React.FC<PGACardProps> = ({
     return groups;
   }, [cd.state, cd.chasers]);
 
-  // ── Skeleton state ──
-  const showSkeleton = isLoading ||
-    (cd.state === 'live' && !cd.leader) ||
-    (cd.state === 'result' && !cd.leader);
+  // ── Skeleton state — only while cardData hasn't resolved ──
+  const showSkeleton = isLoading && !post.cardData;
 
   if (showSkeleton) {
     return (
@@ -1080,7 +1078,7 @@ export const PGACard: React.FC<PGACardProps> = ({
           <h2 className="text-[17px] font-extrabold leading-tight mb-3">{cd.tournamentName}</h2>
 
           {/* ── LIVE: Leader card ── */}
-          {cd.leader && (
+          {cd.leader ? (
             <div className="rounded-2xl p-3.5 mb-3" style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)' }}>
               <div className="flex items-center gap-3">
                 {cd.leader.photoUrl ? (
@@ -1112,7 +1110,12 @@ export const PGACard: React.FC<PGACardProps> = ({
               </div>
               {cd.leader.scoringStats && <ScoringStrip stats={cd.leader.scoringStats} />}
             </div>
-          )}
+          ) : cd.state === 'live' ? (
+            <div className="rounded-2xl p-3.5 mb-3 flex items-center justify-center"
+              style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.15)', minHeight: 72 }}>
+              <p className="text-[12px] text-white/40 italic">Leaderboard updating shortly...</p>
+            </div>
+          ) : null}
 
           {/* Stat tiles — live only */}
           {cd.leaderStats && (
