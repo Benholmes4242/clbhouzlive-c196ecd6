@@ -241,12 +241,6 @@ export function ScheduleTab() {
         t.tour_full_name?.toLowerCase().includes(searchLower)
       );
     }
-    // Remove hero items from the list (they're shown in the carousel above)
-    // but never on the completed tab — users expect the full completed list
-    if (!search && heroItems.length > 0 && filter !== 'all' && filter !== 'live' && filter !== 'completed') {
-      const heroIds = new Set(heroItems.map(h => h.tournament.id));
-      filtered = filtered.filter(t => !heroIds.has(t.id));
-    }
 
     // B42 FIX 2: "all" tab sort — live first, then upcoming by date, then completed
     if (filter === 'all') {
