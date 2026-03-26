@@ -123,7 +123,24 @@ function buildLiveLeaderboardRows(
   return rows;
 }
 
-// Mini leaderboard row for live tournaments
+/** Tiny stateful avatar — renders inline PlayerSilhouette on 404 */
+function MiniAvatar({ src, alt, size = 32 }: { src: string; alt: string; size?: number }) {
+  const [err, setErr] = useState(false);
+  const h = Math.round(size * 1.03);
+  return (
+    <div
+      className="overflow-hidden flex-shrink-0"
+      style={{ width: size, height: h, borderRadius: '34%', border: '1.5px solid rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.06)' }}
+    >
+      {err ? (
+        <PlayerSilhouette size={size} />
+      ) : (
+        <img src={src} alt={alt} className="w-full h-full object-cover object-top" onError={() => setErr(true)} />
+      )}
+    </div>
+  );
+}
+
 interface LeaderboardRowProps {
   leader: LeaderEntry;
   isFirst: boolean;
