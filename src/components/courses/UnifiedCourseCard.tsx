@@ -76,6 +76,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
   hideLocation = false,
   loggedDate,
   contextTag,
+  activeListSlug = null,
   onClick,
   className = '',
 }) => {
