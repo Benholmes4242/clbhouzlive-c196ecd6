@@ -79,7 +79,12 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
   
   // Scroll to top on mount - immediate, no animation
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    const shell = document.querySelector('.app-shell');
+    if (shell) {
+      shell.scrollTop = 0;
+    } else {
+      window.scrollTo(0, 0);
+    }
   }, []);
   
   // Use the SAME hook as Top 100 list page for ALL progress data (single source of truth)
@@ -240,7 +245,7 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
       {/* Read-only header when viewing another user's quest */}
       {!isOwnProfile && (
         <header className="sticky top-0 z-50 flex items-center gap-3 px-4 h-14 bg-background/80 backdrop-blur-lg border-b border-border/60"
-          style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+          style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
         >
           <button
             onClick={() => navigate(-1)}
@@ -250,7 +255,7 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
           <h1 className="text-[17px] font-semibold text-foreground truncate">
-            {profileDisplayName ? `${profileDisplayName}'s Journey` : 'Journey'}
+            {profileDisplayName ? `${profileDisplayName}\u2019s Journey` : 'Journey'}
           </h1>
         </header>
       )}
