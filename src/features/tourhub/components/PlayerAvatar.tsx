@@ -1,17 +1,15 @@
 /**
- * PlayerAvatar - Displays player headshot from R2 CDN with silhouette fallback
- * 
- * Uses getPlayerHeadshotUrl which always returns a valid URL
- * (silhouette placeholder when tour code unknown).
+ * PlayerAvatar - Displays player headshot from R2 CDN with inline SVG silhouette fallback
  */
 
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 
 interface PlayerAvatarProps {
   playerId: string;
   playerName: string;
-  /** Tour code for R2 folder lookup. Falls back to silhouette if omitted. */
   tourCode?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   className?: string;
@@ -25,6 +23,8 @@ const SIZE_CLASSES = {
   '2xl': 'w-32 h-32 text-4xl',
 };
 
+const SIZE_PX = { sm: 24, md: 32, lg: 48, xl: 72, '2xl': 96 };
+
 export function PlayerAvatar({ 
   playerId, 
   playerName, 
@@ -33,6 +33,7 @@ export function PlayerAvatar({
   className 
 }: PlayerAvatarProps) {
   const headshotUrl = getPlayerHeadshotUrl(playerName, tourCode);
+  const [imgError, setImgError] = useState(false);
   
   return (
     <div 
@@ -43,13 +44,17 @@ export function PlayerAvatar({
       )}
       style={{ borderRadius: '34%', aspectRatio: '1 / 1.05' }}
     >
-      <img 
-        src={headshotUrl} 
-        alt={playerName}
-        className="w-full h-full object-cover object-top"
-        loading="lazy"
-        onError={(e) => { console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-      />
+      {imgError ? (
+        <PlayerSilhouette size={SIZE_PX[size]} />
+      ) : (
+        <img 
+          src={headshotUrl} 
+          alt={playerName}
+          className="w-full h-full object-cover object-top"
+          loading="lazy"
+          onError={() => setImgError(true)}
+        />
+      )}
     </div>
   );
 }
@@ -57,22 +62,15 @@ export function PlayerAvatar({
 /**
  * Batch avatar display for leaderboards - uses R2 CDN
  */
-interface BatchPlayerAvatarProps {
-  playerId: string;
-  playerName: string;
-  tourCode?: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
-  className?: string;
-}
-
 export function BatchPlayerAvatar({ 
   playerId, 
   playerName, 
   tourCode = 'pga',
   size = 'md',
   className 
-}: BatchPlayerAvatarProps) {
+}: PlayerAvatarProps) {
   const headshotUrl = getPlayerHeadshotUrl(playerName, tourCode);
+  const [imgError, setImgError] = useState(false);
   
   return (
     <div 
@@ -83,13 +81,17 @@ export function BatchPlayerAvatar({
       )}
       style={{ borderRadius: '34%', aspectRatio: '1 / 1.05' }}
     >
-      <img 
-        src={headshotUrl} 
-        alt={playerName}
-        className="w-full h-full object-cover object-top"
-        loading="lazy"
-        onError={(e) => { console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-      />
+      {imgError ? (
+        <PlayerSilhouette size={SIZE_PX[size]} />
+      ) : (
+        <img 
+          src={headshotUrl} 
+          alt={playerName}
+          className="w-full h-full object-cover object-top"
+          loading="lazy"
+          onError={() => setImgError(true)}
+        />
+      )}
     </div>
   );
 }
