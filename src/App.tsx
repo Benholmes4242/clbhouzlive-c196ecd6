@@ -641,6 +641,7 @@ const AppInner: React.FC = () => {
                                             </Suspense>
                                             {/* Fullscreen Feed Overlay - portal-based, renders above everything */}
                                             <FullscreenFeedOverlay />
+                                            <CourseMediaViewer />
                                             <MediaViewerOverlay />
                                           </UploadResilienceProvider>
                                           </MessagingProvider>
