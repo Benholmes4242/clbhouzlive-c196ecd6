@@ -246,6 +246,7 @@ const ensureKeyframes = (() => {
       @keyframes tickPulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
       @keyframes slideUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
       @keyframes shieldGlow { 0%,100% { opacity:0.5; } 50% { opacity:1; } }
+      @keyframes dotPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
     `;
     document.head.appendChild(style);
   };
