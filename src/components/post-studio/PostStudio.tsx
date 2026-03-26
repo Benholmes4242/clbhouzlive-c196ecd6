@@ -182,6 +182,12 @@ function StudioExitSheet({ onSaveDraft, onDiscard, onKeepEditing, isSaving }: St
 // ─── Studio Inner ─────────────────────────────────────────────────────────────
 function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMedia?: File[] }) {
   const { state, setDiscarding, reset, addMedia, setStep } = usePostStudioContext();
+  const { saveDraft, isSaving: isSavingDraft } = useSaveDraft(state);
+
+  const handleSaveDraft = useCallback(async () => {
+    const ok = await saveDraft();
+    if (ok) { reset(); onClose(); }
+  }, [saveDraft, reset, onClose]);
   const initialMediaProcessed = useRef(false);
 
   // Process initialMedia on mount
