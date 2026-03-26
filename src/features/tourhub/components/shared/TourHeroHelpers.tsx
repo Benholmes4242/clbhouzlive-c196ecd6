@@ -273,6 +273,7 @@ export function PodiumRunnerRow({
                 pgaTourId={p.pgaTourId}
                 displayName={p.displayName}
                 fullName={p.fullName}
+                headshotOverride={p.headshotOverride}
                 tourCode={p.tourCode ?? tourCode}
                 size={26}
                 frosted
