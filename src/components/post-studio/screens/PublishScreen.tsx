@@ -15,6 +15,7 @@ import type { UploadJobInput } from '@/uploads/types';
 
 export function PublishScreen() {
   const { state, setStep, openPanel, onSuccess, reset } = usePostStudioContext();
+  const closePostStudio = usePostStudioStore((s) => s.closePostStudio);
   const [isPublishing, setIsPublishing] = useState(false);
   const { saveDraft, isSaving: isSavingDraft } = useSaveDraft(state);
 
