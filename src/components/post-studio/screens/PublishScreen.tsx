@@ -325,6 +325,27 @@ export function PublishScreen() {
             </>
           )}
         </motion.button>
+
+        {/* Save as Draft — secondary action */}
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={async () => {
+            const ok = await saveDraft();
+            if (ok) { reset(); }
+          }}
+          disabled={isSavingDraft || isPublishing}
+          className="w-full flex items-center justify-center gap-2 mt-3 min-h-[44px] disabled:opacity-40"
+          style={{ fontSize: 14, fontWeight: 500, color: TEXT_TERTIARY, background: 'transparent', border: 'none' }}
+        >
+          {isSavingDraft ? (
+            <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(0,0,0,0.12)', borderTopColor: 'transparent' }} />
+          ) : (
+            <>
+              <BookOpen className="w-4 h-4" strokeWidth={1.75} />
+              Save as Draft
+            </>
+          )}
+        </motion.button>
       </div>
     </div>
   );

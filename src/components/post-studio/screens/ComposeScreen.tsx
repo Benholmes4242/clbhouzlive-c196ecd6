@@ -672,7 +672,9 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
         rightAction={
           isValid
             ? { label: 'Next', onClick: () => setStep('PUBLISH'), variant: 'primary' as const }
-            : undefined
+            : state.isDirty
+              ? { label: 'Save', onClick: handleSaveDraft, disabled: isSavingDraft }
+              : undefined
         }
       />
 

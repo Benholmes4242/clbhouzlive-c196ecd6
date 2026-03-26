@@ -315,12 +315,14 @@ function StudioInner({ onClose, initialMedia }: { onClose: () => void; initialMe
       >
 
 
-        {/* Discard confirmation overlay */}
+        {/* Exit action sheet */}
         <AnimatePresence>
           {state.isDiscarding && (
-            <DiscardConfirmation
+            <StudioExitSheet
+              onSaveDraft={handleSaveDraft}
               onDiscard={() => { reset(); onClose(); }}
-              onCancel={() => setDiscarding(false)}
+              onKeepEditing={() => setDiscarding(false)}
+              isSaving={isSavingDraft}
             />
           )}
         </AnimatePresence>
