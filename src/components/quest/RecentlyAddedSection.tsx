@@ -86,7 +86,7 @@ export const RecentlyAddedSection: React.FC<RecentlyAddedSectionProps> = ({
             {index < courses.length - 1 && (
               <div className="h-px bg-border" />
             )}
-          </React.Fragment>
+          </div>
         ))}
       </div>
     </section>
