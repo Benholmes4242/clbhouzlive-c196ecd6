@@ -1318,7 +1318,7 @@ export const PGACard: React.FC<PGACardProps> = ({
           flex: '1 1 auto',
           overflow: 'hidden',
           padding: '0 clamp(14px, 3.5vw, 20px)',
-          display: 'flex', flexDirection: 'column', justifyContent: 'space-evenly',
+          display: 'flex', flexDirection: 'column', gap: 6, justifyContent: 'flex-start', paddingBottom: 8,
         }}>
           {chaserGroups && chaserGroups.length > 0 ? (
             chaserGroups.map((group, gi) => {
