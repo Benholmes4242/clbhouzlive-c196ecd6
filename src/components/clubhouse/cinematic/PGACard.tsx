@@ -1321,7 +1321,8 @@ export const PGACard: React.FC<PGACardProps> = ({
           display: 'flex', flexDirection: 'column', gap: 6, justifyContent: 'flex-start', paddingBottom: 8,
         }}>
           {chaserGroups && chaserGroups.length > 0 ? (
-            chaserGroups.map((group, gi) => {
+            <>
+            {chaserGroups.slice(0, 3).map((group, gi) => {
               const isTied = group.isTied && group.chasers.length > 1;
               const primary = group.chasers[0];
               const stackedAvatars = group.chasers.slice(0, 3);
@@ -1394,7 +1395,14 @@ export const PGACard: React.FC<PGACardProps> = ({
                   </span>
                 </div>
               );
-            })
+            })}
+            {chaserGroups.length > 3 && (
+              <div style={{ padding: '4px 10px', fontSize: 11,
+                color: 'rgba(255,255,255,0.25)', fontStyle: 'italic' }}>
+                +{chaserGroups.length - 3} more positions in contention
+              </div>
+            )}
+            </>
           ) : (
             <div style={{
               flex: 1, display: 'flex', flexDirection: 'column',
