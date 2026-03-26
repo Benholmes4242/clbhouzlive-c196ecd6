@@ -146,7 +146,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     if (activeTab === 'top100') {
       return `${subject} played any Top 100 courses yet.`;
     }
-    if (activeCountry !== 'all') {
+    if (activeCountry !== 'global') {
       return 'No courses found for the selected country.';
     }
     return `${subject} logged any courses yet.`;
