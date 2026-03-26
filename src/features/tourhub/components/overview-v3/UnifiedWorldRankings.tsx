@@ -11,7 +11,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRankingMovers, useWorldRankingsFull } from '../../hooks/useOverviewModules';
 import { SectionErrorState } from '../SectionErrorState';
@@ -19,11 +19,21 @@ import CountryFlag from '@/components/ui/country-flag';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { toTitleCase } from '../../hooks/useWorldRankings';
 import { TOUR_COLORS } from '../../constants/colors';
+import { getTourLogo } from '../../utils/tourLogos';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 
 const PLAYERS_PER_PAGE = 10;
 
 // No.1 rank crown accent — amber-orange, distinct from live green
 const CROWN_COLOR = '#EA580C';
+
+const RANKING_TOUR_OPTIONS = [
+  { code: 'pga',  label: 'PGA Tour',       description: 'Official World Golf Ranking' },
+  { code: 'euro', label: 'DP World Tour',   description: 'DP World Tour ranking' },
+  { code: 'liv',  label: 'LIV Golf',        description: 'LIV Golf Series ranking' },
+  { code: 'lpga', label: 'LPGA Tour',       description: "Rolex Women's World Ranking" },
+  { code: 'pgad', label: 'Korn Ferry',      description: 'Korn Ferry Tour ranking' },
+];
 
 // ============================================================================
 // SKELETON
@@ -146,8 +156,11 @@ function MomentumPill({ entry, index, direction }: MomentumPillProps) {
 
 export function UnifiedWorldRankings() {
   const navigate = useNavigate();
-  const { data: movers, isLoading: moversLoading, error: moversError, refetch: refetchMovers } = useRankingMovers();
-  const { data: rankings, isLoading: rankingsLoading, error: rankingsError, refetch: refetchRankings } = useWorldRankingsFull();
+  const [activeTour, setActiveTour] = useState('pga');
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  const { data: movers, isLoading: moversLoading, error: moversError, refetch: refetchMovers } = useRankingMovers(activeTour);
+  const { data: rankings, isLoading: rankingsLoading, error: rankingsError, refetch: refetchRankings } = useWorldRankingsFull(activeTour);
 
   const [currentPage, setCurrentPage] = useState(0);
   const [highlightedPlayerId, setHighlightedPlayerId] = useState<string | null>(null);
@@ -181,6 +194,12 @@ export function UnifiedWorldRankings() {
 
   const goToPrevPage = () => { if (currentPage > 0) setCurrentPage(currentPage - 1); };
   const goToNextPage = () => { if (currentPage < totalPages - 1) setCurrentPage(currentPage + 1); };
+
+  const handleTourChange = (code: string) => {
+    setActiveTour(code);
+    setCurrentPage(0);
+    setSheetOpen(false);
+  };
 
   const setRowRef = useCallback((playerId: string, element: HTMLDivElement | null) => {
     if (element) rowRefs.current.set(playerId, element);
@@ -261,19 +280,109 @@ export function UnifiedWorldRankings() {
           <ChevronRight className="w-3.5 h-3.5 opacity-60" />
         </button>
       </div>
-      <p className="text-muted-foreground/60 leading-tight mt-1 mb-2.5" style={{ fontSize: '13px', fontWeight: 500 }}>
-        {(() => {
-          const rankingDate = (rankings as any)?.[0]?.ranking_date;
-          if (!rankingDate) return 'Updated weekly · Official OWGR data';
-          const date = new Date(rankingDate + 'T00:00:00');
-          const now = new Date();
-          const diffDays = Math.floor((now.getTime() - date.getTime()) / 86400000);
-          if (diffDays === 0) return 'Updated today · Official OWGR data';
-          if (diffDays === 1) return 'Updated yesterday · Official OWGR data';
-          if (diffDays <= 7) return `Updated ${diffDays} days ago · Official OWGR data`;
-          return `Updated ${rankingDate} · Official OWGR data`;
-        })()}
-      </p>
+      {/* Tour selector trigger */}
+      <div className="flex items-center gap-2.5 mt-1 mb-2.5">
+        <button
+          onClick={() => setSheetOpen(true)}
+          className="flex items-center gap-2 active:scale-[0.98] transition-transform"
+          style={{
+            background: 'hsl(var(--card))',
+            border: '1px solid hsl(var(--border) / 0.5)',
+            borderRadius: 10,
+            padding: '7px 12px',
+            minHeight: 36,
+          }}
+        >
+          <img
+            src={getTourLogo(activeTour)}
+            alt={RANKING_TOUR_OPTIONS.find(t => t.code === activeTour)?.label}
+            style={{ width: 28, height: 20, objectFit: 'contain', flexShrink: 0 }}
+          />
+          <span className="text-[0.8125rem] font-semibold text-foreground">
+            {RANKING_TOUR_OPTIONS.find(t => t.code === activeTour)?.label}
+          </span>
+          <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+        </button>
+
+        <span className="text-muted-foreground/60 leading-tight" style={{ fontSize: '12px', fontWeight: 500 }}>
+          {(() => {
+            const rankingDate = (rankings as any)?.[0]?.ranking_date;
+            if (!rankingDate) return 'Updated weekly';
+            const diffDays = Math.floor(
+              (new Date().getTime() - new Date(rankingDate + 'T00:00:00').getTime()) / 86400000
+            );
+            if (diffDays === 0) return 'Updated today';
+            if (diffDays === 1) return 'Updated yesterday';
+            if (diffDays <= 7) return `Updated ${diffDays} days ago`;
+            return `Updated ${rankingDate}`;
+          })()}
+        </span>
+      </div>
+
+      {/* Bottom sheet */}
+      <BottomSheet
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        ariaLabelledBy="rankings-tour-sheet-title"
+      >
+        <div className="px-5 pb-6 pt-2">
+          <h3
+            id="rankings-tour-sheet-title"
+            className="text-[1.125rem] font-bold text-foreground mb-4"
+          >
+            Rankings by tour
+          </h3>
+          <div className="flex flex-col gap-2">
+            {RANKING_TOUR_OPTIONS.map(tour => {
+              const isActive = activeTour === tour.code;
+              return (
+                <button
+                  key={tour.code}
+                  onClick={() => handleTourChange(tour.code)}
+                  aria-pressed={isActive}
+                  className="w-full flex items-center gap-3 text-left transition-all duration-150"
+                  style={{
+                    borderRadius: 12,
+                    padding: '14px 16px',
+                    border: isActive
+                      ? '1px solid hsl(var(--foreground))'
+                      : '1px solid hsl(var(--border) / 0.5)',
+                    background: isActive
+                      ? 'hsl(var(--foreground))'
+                      : 'hsl(var(--card))',
+                  }}
+                >
+                  <img
+                    src={getTourLogo(tour.code)}
+                    alt={tour.label}
+                    style={{ width: 32, height: 22, objectFit: 'contain', flexShrink: 0 }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div
+                      className="text-[0.875rem] font-semibold"
+                      style={{ color: isActive ? 'hsl(var(--background))' : 'hsl(var(--foreground))' }}
+                    >
+                      {tour.label}
+                    </div>
+                    <div
+                      className="text-[0.75rem]"
+                      style={{ color: isActive ? 'hsl(var(--background) / 0.7)' : 'hsl(var(--muted-foreground))' }}
+                    >
+                      {tour.description}
+                    </div>
+                  </div>
+                  {isActive && (
+                    <div className="flex-shrink-0">
+                      <Check className="w-4 h-4" style={{ color: 'hsl(var(--background))' }} />
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </BottomSheet>
+
       <div className="border-b mb-4" style={{ borderColor: 'hsl(var(--border) / 0.3)' }} />
 
 

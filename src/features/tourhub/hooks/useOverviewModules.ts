@@ -211,9 +211,9 @@ export function useLiveRightNow() {
 // MODULE 3: Movers This Week (World Rankings)
 // ============================================================================
 
-export function useRankingMovers() {
+export function useRankingMovers(tourCode: string = 'pga') {
   return useQuery({
-    queryKey: ['overview-ranking-movers'],
+    queryKey: ['overview-ranking-movers', tourCode],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('sr_world_rankings')
@@ -236,10 +236,16 @@ export function useRankingMovers() {
       const latestDate = data?.[0]?.ranking_date ?? null;
       const latestRows = latestDate ? (data ?? []).filter(r => r.ranking_date === latestDate) : (data ?? []);
 
+      // Client-side tour filter
+      const tourFiltered = latestRows.filter((row: any) => {
+        const codes: string[] = row.player?.tour_codes ?? [];
+        return codes.some(c => c.toLowerCase() === tourCode.toLowerCase());
+      });
+
     if (error) throw error;
 
     // Calculate movers with rank change >= 3
-    const allMovers = (latestRows)
+    const allMovers = (tourFiltered)
       .map((row: any) => {
         const rankChange = (row.prior_rank || row.rank) - row.rank; // Positive = moved up
         return {
@@ -847,9 +853,9 @@ export interface WorldRankingEntry {
   };
 }
 
-export function useWorldRankingsFull() {
+export function useWorldRankingsFull(tourCode: string = 'pga') {
   return useQuery({
-    queryKey: ['world-rankings-full'],
+    queryKey: ['world-rankings-full', tourCode],
     queryFn: async (): Promise<WorldRankingEntry[]> => {
       const { data, error } = await supabase
         .from('sr_world_rankings')
@@ -885,9 +891,15 @@ export function useWorldRankingsFull() {
       // Post-filter to latest date
       const latestDate = data?.[0]?.ranking_date ?? null;
       const latestRows = latestDate ? (data ?? []).filter(r => r.ranking_date === latestDate) : (data ?? []);
+
+      // Client-side tour filter
+      const tourFiltered = latestRows.filter((entry: any) => {
+        const codes: string[] = entry.player?.tour_codes ?? [];
+        return codes.some(c => c.toLowerCase() === tourCode.toLowerCase());
+      });
       
       // Process data to extract all stats from raw_data.statistics
-      return latestRows.map((entry: any): WorldRankingEntry => {
+      return tourFiltered.map((entry: any): WorldRankingEntry => {
         // Calculate rank change (positive = moved up, negative = moved down)
         const rankChange = entry.prior_rank ? entry.prior_rank - entry.rank : 0;
         
