@@ -223,23 +223,14 @@ function CondensedTieRow({ row, index, isActive, tournamentTourSlug }: { row: Li
             return (
               <div
                 key={player.player.id}
-                className="overflow-hidden flex-shrink-0"
                 style={{
-                  width: 28,
-                  height: 29,
-                  borderRadius: '34%',
-                  border: '1.5px solid rgba(255,255,255,0.18)',
-                  background: 'rgba(255,255,255,0.12)',
                   marginLeft: i > 0 ? -8 : 0,
                   zIndex: 4 - i,
                   position: 'relative',
+                  flexShrink: 0,
                 }}
               >
-                {photoUrl ? (
-                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
-                ) : (
-                  <div style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.80)' }}>{initials}</div>
-                )}
+                <MiniAvatar src={photoUrl} alt="" size={28} />
               </div>
             );
           })}
