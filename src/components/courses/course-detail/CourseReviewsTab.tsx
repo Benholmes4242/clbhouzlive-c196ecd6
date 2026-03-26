@@ -590,7 +590,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
               onToggleHelpful={handleToggleHelpful}
               onMediaClick={(index) => {
                 if (filteredMyReview.media) {
-                  handleReviewMediaClick(filteredMyReview.media, index);
+                  handleReviewMediaClick(filteredMyReview.media, index, filteredMyReview);
                 }
               }}
               onUserClick={() => navigate(getProfilePathById(filteredMyReview.user_id))}
@@ -619,7 +619,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                     onToggleHelpful={handleToggleHelpful}
                     onMediaClick={(index) => {
                       if (review.media) {
-                        handleReviewMediaClick(review.media, index);
+                        handleReviewMediaClick(review.media, index, review);
                       }
                     }}
                     onUserClick={() => navigate(getProfilePathById(review.user_id))}
