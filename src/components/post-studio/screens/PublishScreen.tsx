@@ -13,8 +13,9 @@ import { useSocialCounts } from '@/hooks/useSocialCounts';
 import type { UploadJobInput } from '@/uploads/types';
 
 export function PublishScreen() {
-  const { state, setStep, openPanel, onSuccess } = usePostStudioContext();
+  const { state, setStep, openPanel, onSuccess, reset } = usePostStudioContext();
   const [isPublishing, setIsPublishing] = useState(false);
+  const { saveDraft, isSaving: isSavingDraft } = useSaveDraft(state);
 
   const [currentUserId, setCurrentUserId] = useState<string | undefined>(undefined);
   useEffect(() => {
