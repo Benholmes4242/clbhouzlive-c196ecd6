@@ -13,7 +13,8 @@ const PGA_TOUR_ID = 'b52068af-28e4-4e91-bdbb-037591b0ff84';
 const PGA_TOUR_SLUG = 'pga';
 
 // ── Insight helper ──
-function getInsight(idx: number, leaderName: string | null, isTied: boolean, tiedCount: number): string {
+function getInsight(idx: number, leaderName: string | null, isTied: boolean, tiedCount: number): string | null {
+  if (!leaderName && !isTied) return null;
   const last = leaderName?.split(' ').pop() ?? 'The leader';
   if (isTied && tiedCount >= 3) return `${tiedCount}-way tie at the top.`;
   if (isTied) return 'All square at the top.';

@@ -1290,17 +1290,22 @@ export const PGACard: React.FC<PGACardProps> = ({
           </button>
         </div>
 
-        {/* Insight line */}
-        {cd.insight && (
-          <div style={{
-            padding: '0 clamp(14px, 3.5vw, 20px) 6px',
-            fontSize: 'clamp(11px, 2.8vw, 12px)',
-            fontStyle: 'italic',
-            color: 'rgba(255,255,255,0.35)',
+        {/* Insight — or defending champion context if no play yet */}
+        {cd.insight ? (
+          <p style={{
+            fontSize: 11, fontStyle: 'italic',
+            color: 'rgba(255,255,255,0.3)',
+            margin: '0 0 4px',
+            padding: '0 clamp(14px, 3.5vw, 20px)',
           }}>
             {cd.insight}
+          </p>
+        ) : cd.defendingChampion ? (
+          <div style={{ padding: '0 clamp(14px, 3.5vw, 20px) 6px', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>Defending:</span>
+            <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.55)' }}>{cd.defendingChampion}</span>
           </div>
-        )}
+        ) : null}
 
         {/* Chaser rows — fills remaining space evenly */}
         <div style={{
