@@ -42,7 +42,6 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
   allCount,
   top100Count,
 }) => {
-  const countryOptions = activeTab === 'top100' ? TOP100_COUNTRY_OPTIONS : ALL_COUNTRY_OPTIONS;
   const currentSortLabel = SORT_OPTIONS.find(s => s.value === activeSort)?.label || 'Sort';
 
   return (
