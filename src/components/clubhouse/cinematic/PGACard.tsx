@@ -594,7 +594,7 @@ export const PGACard: React.FC<PGACardProps> = ({
             </div>
 
             {/* Positions 2+ */}
-            {chaserGroups?.map((group, gi) => {
+            {chaserGroups?.slice(0, 3).map((group, gi) => {
               const isTied = group.isTied && group.chasers.length > 1;
               const primary = group.chasers[0];
               const stackedAvatars = group.chasers.slice(0, 3);
@@ -668,6 +668,12 @@ export const PGACard: React.FC<PGACardProps> = ({
                 </div>
               );
             })}
+            {chaserGroups && chaserGroups.length > 3 && (
+              <div style={{ padding: '4px 10px', fontSize: 11,
+                color: 'rgba(255,255,255,0.25)', fontStyle: 'italic' }}>
+                +{chaserGroups.length - 3} more positions in contention
+              </div>
+            )}
           </div>
         </div>
 
