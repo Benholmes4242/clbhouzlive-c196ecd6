@@ -120,9 +120,26 @@ export default function TourPage() {
         }
       />
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        <AdminKpiCard title="Total Rankings" value={data.length} icon={Trophy} isLoading={isLoading} />
+        <AdminKpiCard title={activeTour === 'all' ? 'Total Rankings' : `${activeTour} Rankings`} value={activeTour === 'all' ? data.length : data.filter(r => r.tourCode === activeTour).length} icon={Trophy} isLoading={isLoading} />
         <AdminKpiCard title="Tours" value={new Set(data.map(r => r.tourCode)).size} icon={Trophy} iconColor="#3b82f6" isLoading={isLoading} />
         <AdminKpiCard title="Seasons" value={new Set(data.map(r => r.seasonYear)).size} icon={Trophy} iconColor="#22c55e" isLoading={isLoading} />
+      </div>
+      {/* Tour filter tabs */}
+      <div className="flex gap-2 flex-wrap">
+        {tours.map(tour => (
+          <button
+            key={tour}
+            onClick={() => { setActiveTour(tour); setPage(1); }}
+            className="px-3 py-1.5 rounded-lg text-[12px] font-semibold uppercase tracking-wide transition-all"
+            style={{
+              background: activeTour === tour ? 'hsl(var(--foreground))' : 'hsl(var(--card))',
+              color: activeTour === tour ? 'hsl(var(--background))' : 'hsl(var(--muted-foreground))',
+              border: '1px solid hsl(var(--border) / 0.5)',
+            }}
+          >
+            {tour === 'all' ? `All Tours (${data.length})` : `${tour} (${data.filter(r => r.tourCode === tour).length})`}
+          </button>
+        ))}
       </div>
       <AdminSearchBar value={search} onChange={v => { setSearch(v); setPage(1); }} placeholder="Search player name…" resultCount={filtered.length} />
       <AdminTable
