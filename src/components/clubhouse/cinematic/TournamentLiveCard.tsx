@@ -5,7 +5,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { TournamentLiveFeedPost, LiveLeaderboardEntry } from '@/components/media-system/types/media';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
 /* ── Colour tokens ── */
 const AMBER        = '#f59e0b';
@@ -96,7 +96,8 @@ function LiveBadge() {
 function PlayerAvatar({ name, photoUrl, tourSlug, size }: {
   name: string; photoUrl: string | null; tourSlug: string; size: number;
 }) {
-  const src = photoUrl || getPlayerHeadshotUrl(name, tourSlug) || null;
+  const resolvedPhotoUrl = photoUrl || getPlayerHeadshotUrl(name, tourSlug) || null;
+  const src = resolvedPhotoUrl === PLAYER_SILHOUETTE_URL ? null : resolvedPhotoUrl;
   const initials = name.split(/[\s.]/).filter(Boolean)
     .map(w => w[0]?.toUpperCase() ?? '').slice(0, 2).join('');
   return <SquircleAvatar src={src} alt={name} size={size} fallback={initials} hideRing />;
