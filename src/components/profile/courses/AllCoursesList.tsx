@@ -4,7 +4,8 @@ import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TieredCourseCard, CourseCardData } from './TieredCourseCard';
-import { StickyFilterBar, CoursePrimaryTab, CourseSortOption, CourseCountryFilter } from './StickyFilterBar';
+import { StickyFilterBar, CoursePrimaryTab, CourseSortOption } from './StickyFilterBar';
+import { type QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ClipboardList } from 'lucide-react';
 
@@ -25,7 +26,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   const sectionRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<CoursePrimaryTab>('all');
   const [activeSort, setActiveSort] = useState<CourseSortOption>('recently-played');
-  const [activeCountry, setActiveCountry] = useState<CourseCountryFilter>('all');
+  const [activeCountry, setActiveCountry] = useState<QuickRegion>('global');
   const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
@@ -87,7 +88,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     }
 
     // Step 2: Country filter
-    if (activeCountry !== 'all') {
+    if (activeCountry !== 'global') {
       result = result.filter(c => {
         switch (activeCountry) {
           case 'gb-i':
@@ -96,10 +97,8 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
             return c.country === 'USA';
           case 'europe':
             return c.country === 'Continental Europe';
-          case 'global':
-            // On All tab, global = top100 courses from all countries
-            // On Top 100 tab, global = all top100 (already filtered), so show all
-            return activeTab === 'all' ? c.is_top100 : true;
+          case 'row':
+            return !['Britain & Ireland', 'USA', 'Continental Europe'].includes(c.country || '');
           default:
             return true;
         }
@@ -147,7 +146,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     if (activeTab === 'top100') {
       return `${subject} played any Top 100 courses yet.`;
     }
-    if (activeCountry !== 'all') {
+    if (activeCountry !== 'global') {
       return 'No courses found for the selected country.';
     }
     return `${subject} logged any courses yet.`;
@@ -186,7 +185,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
         activeTab={activeTab}
         onTabChange={(tab) => {
           setActiveTab(tab);
-          if (tab === 'top100' && activeCountry === 'all') {
+          if (tab === 'top100' && activeCountry === 'global') {
             setActiveCountry('gb-i');
           }
           setDisplayCount(PAGE_SIZE);

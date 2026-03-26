@@ -1,7 +1,7 @@
 /**
  * StickyFilterBar - Two primary tabs (All / Top 100) with inline country filter pills and sort dropdown
  */
-import React, { useMemo } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronDown } from 'lucide-react';
 import {
@@ -10,18 +10,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { CourseRegionPills, type QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
 
 export type CoursePrimaryTab = 'all' | 'top100';
 export type CourseSortOption = 'recently-played' | 'rating-high-low' | 'rating-low-high';
-export type CourseCountryFilter = 'all' | 'gb-i' | 'usa' | 'europe' | 'global';
 
 interface StickyFilterBarProps {
   activeTab: CoursePrimaryTab;
   onTabChange: (tab: CoursePrimaryTab) => void;
   activeSort: CourseSortOption;
   onSortChange: (sort: CourseSortOption) => void;
-  activeCountry: CourseCountryFilter;
-  onCountryChange: (country: CourseCountryFilter) => void;
+  activeCountry: QuickRegion;
+  onCountryChange: (country: QuickRegion) => void;
   allCount: number;
   top100Count: number;
 }
@@ -30,21 +30,6 @@ const SORT_OPTIONS: { value: CourseSortOption; label: string }[] = [
   { value: 'recently-played', label: 'Recently Played' },
   { value: 'rating-high-low', label: 'Rating: High to Low' },
   { value: 'rating-low-high', label: 'Rating: Low to High' },
-];
-
-const ALL_COUNTRY_OPTIONS: { value: CourseCountryFilter; label: string }[] = [
-  { value: 'all', label: 'All Countries' },
-  { value: 'gb-i', label: 'GB&I' },
-  { value: 'usa', label: 'USA' },
-  { value: 'europe', label: 'Europe' },
-  { value: 'global', label: 'Global' },
-];
-
-const TOP100_COUNTRY_OPTIONS: { value: CourseCountryFilter; label: string }[] = [
-  { value: 'gb-i', label: 'GB&I' },
-  { value: 'usa', label: 'USA' },
-  { value: 'europe', label: 'Europe' },
-  { value: 'global', label: 'Global' },
 ];
 
 export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
@@ -57,7 +42,6 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
   allCount,
   top100Count,
 }) => {
-  const countryOptions = activeTab === 'top100' ? TOP100_COUNTRY_OPTIONS : ALL_COUNTRY_OPTIONS;
   const currentSortLabel = SORT_OPTIONS.find(s => s.value === activeSort)?.label || 'Sort';
 
   return (
@@ -96,23 +80,8 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
 
       {/* Controls: country pills + sort dropdown */}
       <div className="space-y-2 pt-2">
-        {/* Country pills — full width scrollable */}
-        <div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-1">
-          {countryOptions.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => onCountryChange(opt.value)}
-              className={cn(
-                "rounded-full min-h-[36px] text-sm font-medium px-3 whitespace-nowrap transition-colors duration-150 shrink-0",
-                activeCountry === opt.value
-                  ? "bg-amber-500/10 text-amber-700 border border-amber-500/30"
-                  : "bg-muted text-muted-foreground"
-              )}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
+        {/* Country pills */}
+        <CourseRegionPills value={activeCountry} onChange={onCountryChange} />
         {/* Sort — right aligned */}
         <div className="flex justify-end">
           <DropdownMenu>
