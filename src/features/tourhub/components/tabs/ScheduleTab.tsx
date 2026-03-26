@@ -443,7 +443,7 @@ export function ScheduleTab() {
             nextTournamentName={nextUpcoming?.name}
             nextTournamentDate={nextUpcoming?.start_date}
             // B44 FIX 2: suppress CTA when hero already shows upcoming
-            onSwitchFilter={heroItems.length === 0 ? setFilter : undefined}
+            onSwitchFilter={setFilter}
           />
         )}
         
