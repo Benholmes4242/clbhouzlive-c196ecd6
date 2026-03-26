@@ -304,10 +304,8 @@ export const PGACard: React.FC<PGACardProps> = ({
     return groups;
   }, [cd.state, cd.chasers]);
 
-  // ── Skeleton state ──
-  const showSkeleton = isLoading ||
-    (cd.state === 'live' && !cd.leader) ||
-    (cd.state === 'result' && !cd.leader);
+  // ── Skeleton state — only while cardData hasn't resolved ──
+  const showSkeleton = isLoading && !post.cardData;
 
   if (showSkeleton) {
     return (
