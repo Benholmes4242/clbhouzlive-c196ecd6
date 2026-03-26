@@ -79,7 +79,12 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
   
   // Scroll to top on mount - immediate, no animation
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    const shell = document.querySelector('.app-shell');
+    if (shell) {
+      shell.scrollTop = 0;
+    } else {
+      window.scrollTo(0, 0);
+    }
   }, []);
   
   // Use the SAME hook as Top 100 list page for ALL progress data (single source of truth)
