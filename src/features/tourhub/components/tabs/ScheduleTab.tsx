@@ -16,12 +16,13 @@ import { Search, X, AlertCircle, RefreshCw, ChevronLeft } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTourSeason, useTourTournaments, type TourTournament } from '../../hooks/useTourHubData';
 import { useTournamentLeadersWinners } from '../../hooks/useTournamentLeadersWinners';
-import { HeroCarousel } from '../overview-v3/HeroCarousel';
 import { TourHubEmptyState } from '../TourHubEmptyState';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
+import { getContextLabel } from '../../utils/tournamentClassification';
+import { getTournamentDisplayState } from '@/utils/tournamentState';
 
 import {
   ScheduleFilterPills,
@@ -31,12 +32,23 @@ import {
   ScheduleEmptyMessage,
   ScheduleTourFilter,
   type TourFilterCode,
+  ScheduleHeroCarousel,
+  type ScheduleHeroItem,
 } from '../schedule';
 
 const TOUR_LABELS: Record<string, string> = {
   pga: 'PGA Tour', EURO: 'DP World Tour', LPGA: 'LPGA', CHAMP: 'Champions Tour', PGAD: 'Korn Ferry', LIV: 'LIV Golf',
 };
 
+const SCHEDULE_TOUR_PRIORITY: Record<string, number> = {
+  pga: 0, LIV: 1, EURO: 2, LPGA: 3, PGAD: 4, CHAMP: 5,
+};
+
+function getTournamentPriority(t: TourTournament): number {
+  const label = getContextLabel({ name: t.name, tourName: t.tour_full_name ?? undefined });
+  if (label === 'MAJOR CHAMPIONSHIP') return -1;
+  return SCHEDULE_TOUR_PRIORITY[t.tour_code || ''] ?? 99;
+}
 
 // B45 FIX 1: Helper for completed status check
 const isCompleted = (t: TourTournament) => t.status === 'closed' || t.status === 'complete';
@@ -173,6 +185,70 @@ export function ScheduleTab() {
 
   const { data: leadersWinnersMap } = useTournamentLeadersWinners([...liveIds, ...completedIds]);
 
+  // Unified hero items for all tabs
+  const heroItems = useMemo((): ScheduleHeroItem[] => {
+    if (!tournaments) return [];
+    const tourFiltered = activeTour === 'all' ? tournaments : tournaments.filter(t => t.tour_code === activeTour);
+
+    // onePerTour: dedup by tour, preserving input list order (chronological)
+    // No major-priority hoisting — soonest event per tour wins
+    const onePerTour = (list: TourTournament[], type: ScheduleHeroItem['type']): ScheduleHeroItem[] => {
+      const seenTours = new Set<string>();
+      return list.filter(t => {
+        const tour = t.tour_code || 'unknown';
+        if (seenTours.has(tour)) return false;
+        seenTours.add(tour);
+        return true;
+      }).map(t => ({ tournament: t, type }));
+    };
+
+    const now = new Date();
+
+    const liveList = tourFiltered.filter(t =>
+      getTournamentDisplayState(t.status, t.end_date, now) === 'live'
+    );
+
+    const completedList = tourFiltered
+      .filter(t => getTournamentDisplayState(t.status, t.end_date, now) === 'result')
+      .sort((a, b) => new Date(b.end_date).getTime() - new Date(a.end_date).getTime());
+
+    const upcomingList = tourFiltered
+      .filter(t => getTournamentDisplayState(t.status, t.end_date, now) === 'upcoming'
+        && (t.status === 'scheduled' || t.status === 'created'))
+      .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
+
+    if (filter === 'live') {
+      if (liveList.length > 0) {
+        return [...liveList]
+          .sort((a, b) => getTournamentPriority(a) - getTournamentPriority(b))
+          .map(t => ({ tournament: t, type: 'live' as const }));
+      }
+      // No live tournaments — show next upcoming as hero
+      if (upcomingList.length > 0) {
+        return [{ tournament: upcomingList[0], type: 'upcoming' as const }];
+      }
+      return [];
+    }
+
+    if (filter === 'completed') {
+      return onePerTour(completedList, 'recent');
+    }
+
+    // B43 FIX 2: upcoming tab always shows upcoming heroes
+    if (filter === 'upcoming') {
+      return onePerTour(upcomingList, 'upcoming');
+    }
+
+    // 'all' tab: live + one completed per tour + one upcoming per tour, capped at 8
+    const items: ScheduleHeroItem[] = [
+      ...[...liveList]
+        .sort((a, b) => getTournamentPriority(a) - getTournamentPriority(b))
+        .map(t => ({ tournament: t, type: 'live' as const })),
+      ...onePerTour(completedList, 'recent'),
+      ...onePerTour(upcomingList, 'upcoming'),
+    ];
+    return items.slice(0, 8);
+  }, [tournaments, filter, activeTour]);
 
   const filterStats = useMemo(() => {
     if (!tournaments) return { all: 0, live: 0, upcoming: 0, completed: 0 };
@@ -230,6 +306,12 @@ export function ScheduleTab() {
         t.tour_full_name?.toLowerCase().includes(searchLower)
       );
     }
+    // Remove hero items from the list (they're shown in the carousel above)
+    // but never on the completed tab — users expect the full completed list
+    if (!search && heroItems.length > 0 && filter !== 'all' && filter !== 'live' && filter !== 'completed') {
+      const heroIds = new Set(heroItems.map(h => h.tournament.id));
+      filtered = filtered.filter(t => !heroIds.has(t.id));
+    }
 
     // B42 FIX 2: "all" tab sort — live first, then upcoming by date, then completed
     if (filter === 'all') {
@@ -243,7 +325,7 @@ export function ScheduleTab() {
     }
 
     return filtered;
-  }, [tournaments, filter, activeTour, search]);
+  }, [tournaments, filter, activeTour, search, heroItems]);
 
   const monthGroups = useMemo((): MonthGroup[] => {
     if (!filteredResults.length) return [];
@@ -342,9 +424,20 @@ export function ScheduleTab() {
         )}
       </AnimatePresence>
       
-      {/* Hero Carousel — identical to Overview */}
-      {!search && (
-        <HeroCarousel hasHeader={false} />
+      {/* Unified Hero Carousel — all tabs */}
+      {!search && heroItems.length > 0 && (
+        <div className="relative">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <ScheduleHeroCarousel
+              items={heroItems}
+              leadersMap={leadersWinnersMap}
+            />
+          </motion.div>
+        </div>
       )}
 
       {/* Content below hero */}
@@ -432,7 +525,7 @@ export function ScheduleTab() {
             nextTournamentName={nextUpcoming?.name}
             nextTournamentDate={nextUpcoming?.start_date}
             // B44 FIX 2: suppress CTA when hero already shows upcoming
-            onSwitchFilter={setFilter}
+            onSwitchFilter={heroItems.length === 0 ? setFilter : undefined}
           />
         )}
         
