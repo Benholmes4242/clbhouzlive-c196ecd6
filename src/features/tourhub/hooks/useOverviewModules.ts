@@ -215,6 +215,12 @@ export function useRankingMovers(tourCode: string = 'pga') {
   return useQuery({
     queryKey: ['overview-ranking-movers', tourCode],
     queryFn: async () => {
+      // Non-PGA tours use tour_season_rankings which lacks prior_rank data
+      // so movers are not available — return empty
+      if (tourCode !== 'pga') {
+        return [] as RankingMover[];
+      }
+
       const { data, error } = await supabase
         .from('sr_world_rankings')
         .select(`
@@ -236,19 +242,8 @@ export function useRankingMovers(tourCode: string = 'pga') {
       const latestDate = data?.[0]?.ranking_date ?? null;
       const latestRows = latestDate ? (data ?? []).filter(r => r.ranking_date === latestDate) : (data ?? []);
 
-      // Client-side tour filter
-      const tourFiltered = latestRows.filter((row: any) => {
-        const codes: string[] = row.player?.tour_codes ?? [];
-        if (codes.length > 0) {
-          return codes.some(c => c.toLowerCase() === tourCode.toLowerCase());
-        }
-        return tourCode === 'pga';
-      });
-
-    if (error) throw error;
-
     // Calculate movers with rank change >= 3
-    const allMovers = (tourFiltered)
+    const allMovers = (latestRows)
       .map((row: any) => {
         const rankChange = (row.prior_rank || row.rank) - row.rank; // Positive = moved up
         return {
