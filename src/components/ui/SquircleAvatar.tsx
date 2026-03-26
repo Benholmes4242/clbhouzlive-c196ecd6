@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { getDirectImageUrl } from '@/utils/r2ImageUtils';
+import { GolfSilhouette } from '@/components/ui/GolfSilhouette';
 import { 
   getRingColorForTotalPlayed,
   THEME_COLORS,
