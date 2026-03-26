@@ -255,7 +255,7 @@ const ProfileQuestView: React.FC<ProfileQuestViewProps> = ({
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
           <h1 className="text-[17px] font-semibold text-foreground truncate">
-            {profileDisplayName ? `${profileDisplayName}'s Journey` : 'Journey'}
+            {profileDisplayName ? `${profileDisplayName}\u2019s Journey` : 'Journey'}
           </h1>
         </header>
       )}

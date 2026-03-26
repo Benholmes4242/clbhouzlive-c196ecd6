@@ -31,6 +31,7 @@ export const GLOBAL_HEADER_EXCLUDED_PREFIXES = [
   '/tourhub', // Tour Hub - all tabs & sub-pages are fully immersive
   '/tour', // Tour Hub alias
   '/discover/explore/region/', // Individual region pages - immersive hero
+  '/achievements/', // Other user's quest page - has own back nav
 ] as const;
 
 /**
