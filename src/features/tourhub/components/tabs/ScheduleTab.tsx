@@ -254,7 +254,7 @@ export function ScheduleTab() {
     }
 
     return filtered;
-  }, [tournaments, filter, activeTour, search, heroItems]);
+  }, [tournaments, filter, activeTour, search]);
 
   const monthGroups = useMemo((): MonthGroup[] => {
     if (!filteredResults.length) return [];
