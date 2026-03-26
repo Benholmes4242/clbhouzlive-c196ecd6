@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import CountryFlag from '@/components/ui/country-flag';
 import { GolfSilhouette } from '@/components/ui/GolfSilhouette';
 import type { LeaderCategory } from './constants';
