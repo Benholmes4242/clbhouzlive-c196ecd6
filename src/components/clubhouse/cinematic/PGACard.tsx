@@ -1330,7 +1330,7 @@ export const PGACard: React.FC<PGACardProps> = ({
               return (
                 <div key={`${group.position}-${gi}`} style={{
                   display: 'flex', alignItems: 'center', gap: 10,
-                  padding: '6px 10px',
+                  padding: 'clamp(8px, 2vw, 12px) 10px',
                   borderRadius: 8,
                   animation: 'trc-slideIn 0.5s ease-out both',
                   animationDelay: `${0.3 + gi * 0.07}s`,
