@@ -217,7 +217,8 @@ function CondensedTieRow({ row, index, isActive, tournamentTourSlug }: { row: Li
         <div className="flex items-center flex-shrink-0">
           {row.players.slice(0, 4).map((player, i) => {
             const effectiveTourCode = player.player.tourCode ?? tournamentTourSlug ?? 'pga';
-            const photoUrl = getPlayerHeadshotUrl(player.player.fullName, effectiveTourCode, player.player.headshotOverride);
+            const rawPhotoUrl = getPlayerHeadshotUrl(player.player.fullName, effectiveTourCode, player.player.headshotOverride);
+            const photoUrl = rawPhotoUrl === PLAYER_SILHOUETTE_URL ? null : rawPhotoUrl;
             const initials = `${player.player.firstName[0]}${player.player.lastName[0]}`.toUpperCase();
             return (
               <div
