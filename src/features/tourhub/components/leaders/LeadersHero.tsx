@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { openTourNav } from '../../contexts/TourNavContext';
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
 import { GolfSilhouette } from '@/components/ui/GolfSilhouette';
@@ -37,7 +37,8 @@ interface LeadersHeroProps {
 export function LeadersHero({ leader, category, formatOverride, unitOverride }: LeadersHeroProps) {
   
   const { player, value } = leader;
-  const photoUrl = getPlayerHeadshotUrl(player.full_name, player.tour_codes?.[0] ?? 'pga');
+  const rawPhotoUrl = getPlayerHeadshotUrl(player.full_name, player.tour_codes?.[0] ?? 'pga');
+  const photoUrl = rawPhotoUrl === PLAYER_SILHOUETTE_URL ? null : rawPhotoUrl;
   const [imgError, setImgError] = useState(false);
   const flag = countryCodeToFlag(player.country_code);
   const countryName = titleCaseCountry(player.country);

@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import CountryFlag from '@/components/ui/country-flag';
 import { GolfSilhouette } from '@/components/ui/GolfSilhouette';
 import type { LeaderCategory } from './constants';
@@ -44,7 +44,8 @@ export function LeaderRow({
   index,
 }: LeaderRowProps) {
   const displayRank = overrideRank ?? rank;
-  const photoUrl = getPlayerHeadshotUrl(player.fullName, player.tourCodes?.[0] ?? 'pga');
+  const rawPhotoUrl = getPlayerHeadshotUrl(player.fullName, player.tourCodes?.[0] ?? 'pga');
+  const photoUrl = rawPhotoUrl === PLAYER_SILHOUETTE_URL ? null : rawPhotoUrl;
   const [imgError, setImgError] = useState(false);
   const fmt = formatOverride ?? category.format;
   const unit = unitOverride ?? category.unit;

@@ -6,7 +6,7 @@
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import CountryFlag from '@/components/ui/country-flag';
 import { GolfSilhouette } from '@/components/ui/GolfSilhouette';
 import type { LeaderCategory } from './constants';
@@ -47,7 +47,8 @@ function RunnerCard({
   index: number;
 }) {
   const { player, value, rank } = runner;
-  const photoUrl = getPlayerHeadshotUrl(player.full_name, player.tour_codes?.[0] ?? 'pga');
+  const rawPhotoUrl = getPlayerHeadshotUrl(player.full_name, player.tour_codes?.[0] ?? 'pga');
+  const photoUrl = rawPhotoUrl === PLAYER_SILHOUETTE_URL ? null : rawPhotoUrl;
   const lastName = player.full_name.split(' ').slice(-1)[0];
   const fmt = formatOverride ?? category.format;
   const unit = unitOverride ?? category.unit;
