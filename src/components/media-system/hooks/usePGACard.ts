@@ -357,7 +357,7 @@ export function usePGACard(userId?: string): {
       const leader: PGACardLeader | null = lp ? {
         playerId: lp.playerId,
         playerName: lp.player.fullName,
-        photoUrl: getPlayerHeadshotUrl(lp.player.fullName, PGA_TOUR_SLUG, lp.player.headshotOverride) ?? null,
+        photoUrl: getPlayerHeadshotUrl(lp.player.fullName, lp.player.tourCode ?? PGA_TOUR_SLUG, lp.player.headshotOverride) ?? null,
         scoreDisplay: lp.scoreDisplay,
         score: lp.score,
         thru: lp.thru,
@@ -371,7 +371,7 @@ export function usePGACard(userId?: string): {
         .map(p => ({
           position: p!.position,
           playerName: p!.player.fullName,
-          photoUrl: getPlayerHeadshotUrl(p!.player.fullName, PGA_TOUR_SLUG, p!.player.headshotOverride) ?? null,
+          photoUrl: getPlayerHeadshotUrl(p!.player.fullName, p!.player.tourCode ?? PGA_TOUR_SLUG, p!.player.headshotOverride) ?? null,
           scoreDisplay: p!.scoreDisplay,
           isTied: lb.filter(x => x?.position === p?.position).length > 1,
           scoringStats: liveScorecards.length ? aggregateScoringStats(liveScorecards, p!.playerId) : null,
@@ -426,7 +426,7 @@ export function usePGACard(userId?: string): {
         playerId: lp.player?.id ?? '',
         playerName: lp.player?.full_name ?? '',
         photoUrl: lp.player?.headshot_override
-          ?? getPlayerHeadshotUrl(lp.player?.full_name ?? '', PGA_TOUR_SLUG)
+          ?? getPlayerHeadshotUrl(lp.player?.full_name ?? '', lp.player?.tour_code ?? PGA_TOUR_SLUG)
           ?? lp.player?.photo_url
           ?? null,
         scoreDisplay: lp.score != null
@@ -447,7 +447,7 @@ export function usePGACard(userId?: string): {
           position: p.position,
           playerName: p.player?.full_name ?? '',
           photoUrl: p.player?.headshot_override
-            ?? getPlayerHeadshotUrl(p.player?.full_name ?? '', PGA_TOUR_SLUG)
+            ?? getPlayerHeadshotUrl(p.player?.full_name ?? '', p.player?.tour_code ?? PGA_TOUR_SLUG)
             ?? p.player?.photo_url
             ?? null,
           scoreDisplay: p.score != null
