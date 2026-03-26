@@ -88,7 +88,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
     }
 
     // Step 2: Country filter
-    if (activeCountry !== 'all') {
+    if (activeCountry !== 'global') {
       result = result.filter(c => {
         switch (activeCountry) {
           case 'gb-i':
@@ -97,10 +97,8 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
             return c.country === 'USA';
           case 'europe':
             return c.country === 'Continental Europe';
-          case 'global':
-            // On All tab, global = top100 courses from all countries
-            // On Top 100 tab, global = all top100 (already filtered), so show all
-            return activeTab === 'all' ? c.is_top100 : true;
+          case 'row':
+            return !['Britain & Ireland', 'USA', 'Continental Europe'].includes(c.country || '');
           default:
             return true;
         }
