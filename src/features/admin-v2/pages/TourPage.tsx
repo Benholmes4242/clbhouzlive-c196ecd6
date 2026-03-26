@@ -25,6 +25,7 @@ const col = createColumnHelper<TourRankingRow>();
 export default function TourPage() {
   const [search, setSearch] = useState('');
   const [page, setPage]     = useState(1);
+  const [activeTour, setActiveTour] = useState<string>('all');
   const PAGE_SIZE = 25;
 
   const { data = [], isLoading, refetch } = useQuery({
@@ -50,9 +51,16 @@ export default function TourPage() {
     staleTime: 5 * 60_000,
   });
 
-  const filtered = data.filter(r =>
-    !search.trim() || (r.playerName ?? '').toLowerCase().includes(search.toLowerCase())
-  );
+  const tours = React.useMemo(() => {
+    const codes = [...new Set(data.map(r => r.tourCode))].sort();
+    return ['all', ...codes];
+  }, [data]);
+
+  const filtered = data.filter(r => {
+    const matchesTour = activeTour === 'all' || r.tourCode === activeTour;
+    const matchesSearch = !search.trim() || (r.playerName ?? '').toLowerCase().includes(search.toLowerCase());
+    return matchesTour && matchesSearch;
+  });
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const columns = React.useMemo(() => [
