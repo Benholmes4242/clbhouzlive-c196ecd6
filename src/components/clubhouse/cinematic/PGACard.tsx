@@ -1165,7 +1165,7 @@ export const PGACard: React.FC<PGACardProps> = ({
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                 {/* 46px squircle avatar with amber border */}
                 <div style={{
-                  width: 46, height: 46, borderRadius: SQUIRCLE_RADIUS, flexShrink: 0,
+                  width: 'clamp(46px, 12vw, 58px)', height: 'clamp(46px, 12vw, 58px)', borderRadius: SQUIRCLE_RADIUS, flexShrink: 0,
                   overflow: 'hidden',
                   border: '2px solid rgba(232,152,10,0.4)',
                   background: 'rgba(232,152,10,0.08)',
