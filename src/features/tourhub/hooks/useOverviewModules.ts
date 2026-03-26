@@ -211,9 +211,9 @@ export function useLiveRightNow() {
 // MODULE 3: Movers This Week (World Rankings)
 // ============================================================================
 
-export function useRankingMovers() {
+export function useRankingMovers(tourCode: string = 'pga') {
   return useQuery({
-    queryKey: ['overview-ranking-movers'],
+    queryKey: ['overview-ranking-movers', tourCode],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('sr_world_rankings')
