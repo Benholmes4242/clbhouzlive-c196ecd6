@@ -426,7 +426,7 @@ export function usePGACard(userId?: string): {
         playerId: lp.player?.id ?? '',
         playerName: lp.player?.full_name ?? '',
         photoUrl: lp.player?.headshot_override
-          ?? getPlayerHeadshotUrl(lp.player?.full_name ?? '', PGA_TOUR_SLUG)
+          ?? getPlayerHeadshotUrl(lp.player?.full_name ?? '', lp.player?.tour_code ?? PGA_TOUR_SLUG)
           ?? lp.player?.photo_url
           ?? null,
         scoreDisplay: lp.score != null
