@@ -1368,7 +1368,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                       )}
                     </div>
                   ) : (
-                    <RowAvatar src={primary.photoUrl} name={primary.playerName} size={30} />
+                    <RowAvatar src={primary.photoUrl} name={primary.playerName} size={36} />
                   )}
 
                   <span style={{
