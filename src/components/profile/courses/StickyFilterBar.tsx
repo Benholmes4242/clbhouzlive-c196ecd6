@@ -80,23 +80,8 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
 
       {/* Controls: country pills + sort dropdown */}
       <div className="space-y-2 pt-2">
-        {/* Country pills — full width scrollable */}
-        <div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-1">
-          {countryOptions.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => onCountryChange(opt.value)}
-              className={cn(
-                "rounded-full min-h-[36px] text-sm font-medium px-3 whitespace-nowrap transition-colors duration-150 shrink-0",
-                activeCountry === opt.value
-                  ? "bg-amber-500/10 text-amber-700 border border-amber-500/30"
-                  : "bg-muted text-muted-foreground"
-              )}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
+        {/* Country pills */}
+        <CourseRegionPills value={activeCountry} onChange={onCountryChange} />
         {/* Sort — right aligned */}
         <div className="flex justify-end">
           <DropdownMenu>
