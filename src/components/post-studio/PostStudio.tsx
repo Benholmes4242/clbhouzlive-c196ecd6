@@ -86,67 +86,96 @@ function PanelRouter() {
   );
 }
 
-// ─── Discard Confirmation ─────────────────────────────────────────────────────
-function DiscardConfirmation({
-  onDiscard,
-  onCancel,
-}: {
+// ─── Studio Exit Sheet — iOS-style action sheet with Save Draft option ────────
+interface StudioExitSheetProps {
+  onSaveDraft: () => void;
   onDiscard: () => void;
-  onCancel: () => void;
-}) {
+  onKeepEditing: () => void;
+  isSaving?: boolean;
+}
+
+function StudioExitSheet({ onSaveDraft, onDiscard, onKeepEditing, isSaving }: StudioExitSheetProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="absolute inset-0 z-50 flex items-center justify-center px-6"
-      style={{ background: 'rgba(15,23,42,0.40)', backdropFilter: 'blur(12px)' }}
-    >
+    <>
+      {/* Backdrop */}
       <motion.div
-        initial={{ scale: 0.92, opacity: 0, y: 20 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.92, opacity: 0, y: 20 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 z-50"
+        style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)' }}
+        onClick={onKeepEditing}
+      />
+
+      {/* Main card */}
+      <motion.div
+        initial={{ y: 60, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 60, opacity: 0 }}
         transition={{ type: 'spring', damping: 28, stiffness: 360 }}
-        className="w-full max-w-[300px] rounded-3xl overflow-hidden"
-        style={{
-          background: 'rgba(255,255,255,0.97)',
-          border: '1px solid rgba(0,0,0,0.08)',
-          boxShadow: '0 24px 64px rgba(0,0,0,0.15)',
-        }}
+        className="absolute bottom-0 inset-x-0 z-50 px-3"
+        style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)' }}
       >
-        {/* Amber top glow */}
+        {/* Action card */}
         <div
-          className="h-1 w-full"
-          style={{ background: 'linear-gradient(90deg, transparent, rgba(245,158,11,0.8), transparent)' }}
-        />
-        <div className="p-6 text-center space-y-5">
-          <div className="space-y-1.5">
-            <h3 className="font-semibold text-base tracking-tight" style={{ color: TEXT_PRIMARY }}>Discard post?</h3>
-            <p className="text-sm leading-relaxed" style={{ color: TEXT_SECONDARY }}>
-              Your content will be lost and cannot be recovered.
-            </p>
+          className="rounded-2xl overflow-hidden mb-2"
+          style={{
+            background: 'rgba(255,255,255,0.97)',
+            backdropFilter: 'blur(20px)',
+            boxShadow: '0 12px 48px rgba(0,0,0,0.15)',
+          }}
+        >
+          <div className="text-center pt-5 pb-3 px-4">
+            <h3 className="font-semibold text-[15px]" style={{ color: TEXT_PRIMARY }}>Discard post?</h3>
+            <p className="text-[13px] mt-1" style={{ color: TEXT_SECONDARY }}>Unsaved changes will be lost</p>
           </div>
-          <div className="flex flex-col gap-2.5">
+
+          <div className="px-3 pb-3 space-y-2">
+            {/* Save Draft — primary */}
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              onClick={onSaveDraft}
+              disabled={isSaving}
+              className="w-full py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 min-h-[48px] disabled:opacity-50"
+              style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.30)', color: '#D97706' }}
+            >
+              {isSaving ? (
+                <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(217,119,6,0.3)', borderTopColor: 'transparent' }} />
+              ) : (
+                <BookOpen className="w-4 h-4" strokeWidth={1.75} />
+              )}
+              {isSaving ? 'Saving…' : 'Save Draft'}
+            </motion.button>
+
+            {/* Discard — destructive */}
             <motion.button
               whileTap={{ scale: 0.97 }}
               onClick={onDiscard}
-              className="w-full py-3.5 rounded-2xl font-semibold text-sm text-white min-h-[52px]"
-              style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.30)', color: '#DC2626' }}
+              disabled={isSaving}
+              className="w-full py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 min-h-[48px] disabled:opacity-30"
+              style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.20)', color: '#DC2626' }}
             >
+              <Trash2 className="w-4 h-4" strokeWidth={1.75} />
               Discard
-            </motion.button>
-            <motion.button
-              whileTap={{ scale: 0.97 }}
-              onClick={onCancel}
-              className="w-full py-3.5 rounded-2xl font-semibold text-sm min-h-[52px]"
-              style={{ background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.08)', color: TEXT_PRIMARY }}
-            >
-              Keep editing
             </motion.button>
           </div>
         </div>
+
+        {/* Cancel card */}
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={onKeepEditing}
+          className="w-full py-3.5 rounded-2xl font-semibold text-[15px] min-h-[48px]"
+          style={{
+            background: 'rgba(255,255,255,0.97)',
+            backdropFilter: 'blur(20px)',
+            color: TEXT_PRIMARY,
+          }}
+        >
+          Keep Editing
+        </motion.button>
       </motion.div>
-    </motion.div>
+    </>
   );
 }
 
