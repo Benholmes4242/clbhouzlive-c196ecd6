@@ -1235,7 +1235,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                       WebkitBackdropFilter: 'blur(12px)',
                       border: '1px solid rgba(255,255,255,0.12)',
                     }}>
-                      <div style={{ fontSize: 'clamp(16px, 4vw, 20px)', fontWeight: 800, color: stat.color, lineHeight: 1 }}>
+                      <div style={{ fontSize: 'clamp(18px, 4.5vw, 24px)', fontWeight: 800, color: stat.color, lineHeight: 1 }}>
                         {stat.v}
                       </div>
                       <div style={{ fontSize: 'clamp(7px, 1.8vw, 9px)', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 3 }}>
