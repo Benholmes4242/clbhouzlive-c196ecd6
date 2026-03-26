@@ -234,7 +234,7 @@ export function ScheduleHeroCard({ tournament, type, leaderWinner, currentIndex 
                   <PodiumRunnerRow
                     key={row.position}
                     row={row}
-                    tourCode={tournament.tour_code}
+                    tourCode={row.tourCode ?? tournament.tour_code}
                     onPlayerTap={handlePlayerTap}
                   />
                 ))}
