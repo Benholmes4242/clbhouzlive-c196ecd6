@@ -1162,7 +1162,7 @@ export const PGACard: React.FC<PGACardProps> = ({
           {/* Leader row */}
           {cd.leader ? (
             <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 'clamp(8px, 2vw, 12px)' }}>
                 {/* 46px squircle avatar with amber border */}
                 <div style={{
                   width: 'clamp(46px, 12vw, 58px)', height: 'clamp(46px, 12vw, 58px)', borderRadius: SQUIRCLE_RADIUS, flexShrink: 0,
@@ -1218,7 +1218,7 @@ export const PGACard: React.FC<PGACardProps> = ({
 
               {/* Scoring stats chips */}
               {cd.leader.scoringStats && (
-                <div style={{ display: 'flex', gap: 4 }}>
+                <div style={{ display: 'flex', gap: 'clamp(3px, 1vw, 5px)' }}>
                   {[
                     { v: cd.leader.scoringStats.eagles, label: 'Eagles', color: '#F59E0B' },
                     { v: cd.leader.scoringStats.birdies, label: 'Birdies', color: '#22C55E' },
@@ -1228,17 +1228,17 @@ export const PGACard: React.FC<PGACardProps> = ({
                   ].map(stat => (
                     <div key={stat.label} style={{
                       flex: 1, textAlign: 'center',
-                      padding: '9px 2px 7px',
+                      padding: 'clamp(9px, 2.5vw, 12px) 2px clamp(7px, 2vw, 10px)',
                       borderRadius: 8,
                       background: 'rgba(0,0,0,0.45)',
                       backdropFilter: 'blur(12px)',
                       WebkitBackdropFilter: 'blur(12px)',
                       border: '1px solid rgba(255,255,255,0.12)',
                     }}>
-                      <div style={{ fontSize: 'clamp(18px, 4.5vw, 24px)', fontWeight: 800, color: stat.color, lineHeight: 1 }}>
+                      <div style={{ fontSize: 'clamp(20px, 5vw, 26px)', fontWeight: 800, color: stat.color, lineHeight: 1 }}>
                         {stat.v}
                       </div>
-                      <div style={{ fontSize: 'clamp(7px, 1.8vw, 9px)', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 3 }}>
+                      <div style={{ fontSize: 'clamp(8px, 2vw, 10px)', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 3 }}>
                         {stat.label}
                       </div>
                     </div>
