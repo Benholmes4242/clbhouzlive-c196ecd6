@@ -15637,42 +15637,34 @@ export type Database = {
           p_user_id: string
         }
         Returns: {
+          actor_id: string
+          actor_type: string
           business_is_verified: boolean
           business_logo_url: string
           business_name: string
           business_slug: string
-          comment_count: number
           course_club_name: string
           course_id: string
           course_name: string
-          creator_avatar_url: string
-          creator_display_name: string
-          creator_handicap: number
-          creator_home_club: string
-          creator_is_verified: boolean
-          creator_relation: string
-          creator_username: string
-          display_order: number
-          duration_ms: number
-          height: number
-          is_followed_by_me: boolean
-          is_liked_by_me: boolean
-          like_count: number
+          media_display_order: number
+          media_duration_ms: number
+          media_height: number
           media_id: string
+          media_thumbnail_url: string
           media_type: string
           media_url: string
-          post_actor_id: string
-          post_actor_type: string
-          post_content: string
+          media_width: number
+          post_caption: string
+          post_comment_count: number
           post_created_at: string
           post_hashtags: string[]
           post_id: string
           post_is_pinned: boolean
+          post_like_count: number
           post_location: string
+          post_share_count: number
           post_tags: Json
           post_type: string
-          post_user_id: string
-          poster_url: string
           review_course_country: string
           review_course_id: string
           review_course_image: string
@@ -15682,10 +15674,14 @@ export type Database = {
           review_rating: number
           review_text: string
           score: number
-          share_count: number
           source_review_id: string
-          stream_id: string
-          width: number
+          user_avatar_url: string
+          user_handicap: number
+          user_home_club: string
+          user_id: string
+          user_is_verified: boolean
+          user_name: string
+          user_username: string
         }[]
       }
       get_top_video_reviews: {
