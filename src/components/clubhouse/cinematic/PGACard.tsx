@@ -1386,10 +1386,22 @@ export const PGACard: React.FC<PGACardProps> = ({
             })
           ) : (
             <div style={{
-              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flex: 1, display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center', gap: 10,
             }}>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', fontStyle: 'italic' }}>
-                Leaderboard updating...
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 28 }}>
+                {[0.5, 0.8, 0.6, 1, 0.7, 0.9, 0.55].map((h, i) => (
+                  <div key={i} style={{
+                    width: 4, borderRadius: 2,
+                    height: `${h * 100}%`,
+                    background: 'rgba(255,255,255,0.12)',
+                    animation: `dotPulse ${0.8 + i * 0.15}s ease-in-out infinite`,
+                    animationDelay: `${i * 0.1}s`,
+                  }} />
+                ))}
+              </div>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', fontStyle: 'italic', margin: 0 }}>
+                Leaderboard updates as play begins
               </p>
             </div>
           )}
