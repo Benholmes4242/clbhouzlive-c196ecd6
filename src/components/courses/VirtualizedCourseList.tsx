@@ -163,6 +163,7 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
                 course={fromGolfCourse(course)}
                 showRankBadges={true}
                 showRating={true}
+                activeListSlug={activeListSlug}
                 onClick={() => {
                   onCourseClick?.();
                   navigate(`/courses/${course.id}`);
