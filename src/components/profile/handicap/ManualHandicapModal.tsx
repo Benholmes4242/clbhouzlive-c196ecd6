@@ -300,7 +300,7 @@ const ManualHandicapModal: React.FC<ManualHandicapModalProps> = (props) => {
                     }}
                     placeholder={isPlusHandicap ? "e.g. 4.0" : "e.g. 12.4"}
                     className={cn(
-                      "w-full h-[44px] text-lg font-semibold rounded-xl border border-border bg-background px-4 outline-none transition-all",
+                      "w-full h-[44px] text-lg font-semibold text-foreground rounded-xl border border-border bg-background px-4 outline-none transition-all",
                       "focus:border-[hsl(38,92%,50%)] focus:ring-[3px] focus:ring-[hsla(38,92%,50%,0.10)]",
                       isPlusHandicap && "pl-8"
                     )}
