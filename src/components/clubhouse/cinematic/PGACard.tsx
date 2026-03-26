@@ -1167,7 +1167,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                 <div style={{
                   width: 'clamp(46px, 12vw, 58px)', height: 'clamp(46px, 12vw, 58px)', borderRadius: SQUIRCLE_RADIUS, flexShrink: 0,
                   overflow: 'hidden',
-                  border: '2px solid rgba(232,152,10,0.4)',
+                  border: '2px solid rgba(232,152,10,0.55)',
                   background: 'rgba(232,152,10,0.08)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
@@ -1184,7 +1184,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                 {/* Name + Thru/Today */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{
-                    fontSize: 'clamp(17px, 4.5vw, 22px)', fontWeight: 800,
+                    fontSize: 'clamp(18px, 5vw, 24px)', fontWeight: 800,
                     color: '#fff', lineHeight: 1.1,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
@@ -1192,11 +1192,11 @@ export const PGACard: React.FC<PGACardProps> = ({
                   </div>
                   <div style={{ display: 'flex', gap: 8, marginTop: 3 }}>
                     {cd.leader.thru && (
-                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>Thru {cd.leader.thru}</span>
+                      <span style={{ fontSize: 'clamp(12px, 3vw, 14px)', color: 'rgba(255,255,255,0.45)' }}>Thru {cd.leader.thru}</span>
                     )}
                     {cd.leader.today && (
                       <span style={{
-                        fontSize: 11,
+                        fontSize: 'clamp(12px, 3vw, 14px)',
                         color: cd.leader.today.startsWith('-') ? '#22C55E'
                           : cd.leader.today === 'E' ? 'rgba(255,255,255,0.45)'
                           : '#EF4444',
@@ -1209,7 +1209,7 @@ export const PGACard: React.FC<PGACardProps> = ({
 
                 {/* Score — right-aligned */}
                 <div style={{
-                  fontSize: 'clamp(32px, 9vw, 44px)', fontWeight: 900,
+                  fontSize: 'clamp(36px, 10vw, 48px)', fontWeight: 900,
                   color: ACCENT_LIGHT, lineHeight: 1,
                 }}>
                   {cd.leader.scoreDisplay || 'E'}
