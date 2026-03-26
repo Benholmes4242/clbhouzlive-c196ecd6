@@ -8,7 +8,8 @@ import { useClubMedia } from '@/hooks/useClubMedia';
 import { ChevronRight } from 'lucide-react';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { SectionHeading } from './SectionHeading';
-import { useMediaViewer } from '@/hooks/useMediaViewer';
+import { useCourseMediaViewerStore } from '@/components/course-media-tab/CourseMediaViewer';
+import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
 
 // LocalMediaItem interface
 interface LocalMediaItem {
@@ -38,7 +39,6 @@ interface AboutMediaStripProps {
 const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick }) => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-  const { openViewer } = useMediaViewer();
   
   const maxItems = isMobile ? 3 : 9;
   const fetchLimit = isMobile ? 10 : 20;
@@ -49,6 +49,46 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
     if (!rawMedia) return [];
     const sliced = rawMedia.slice(0, maxItems);
     return adaptClubMediaArrayToExploreItems(sliced);
+  }, [rawMedia, maxItems]);
+
+  // Build FeedPost[] for CourseMediaViewer
+  const feedPosts = useMemo((): FeedPost[] => {
+    if (!rawMedia) return [];
+    return rawMedia.slice(0, maxItems).map((item: any) => {
+      const isVideo = item.type === 'video';
+      const mediaItem: MediaItem = {
+        id: item.id,
+        type: isVideo ? 'video' : 'image',
+        hlsUrl: isVideo ? item.url : undefined,
+        imageUrl: !isVideo ? item.url : undefined,
+        thumbnailUrl: item.thumbnailUrl || undefined,
+        width: item.width || 1080,
+        height: item.height || 1920,
+        duration: item.duration || undefined,
+      };
+      return {
+        id: item.id,
+        userId: item.author?.id || '',
+        actorType: 'personal' as const,
+        actorId: item.author?.id || '',
+        username: item.author?.username || '',
+        displayName: item.author?.displayName || 'Golfer',
+        avatarUrl: item.author?.avatarUrl || '',
+        isVerified: false,
+        creatorRelation: 'none' as const,
+        caption: '',
+        mediaItems: [mediaItem],
+        createdAt: item.createdAt || new Date().toISOString(),
+        likeCount: 0,
+        commentCount: 0,
+        shareCount: 0,
+        review: null,
+        isReview: false,
+        isLikedByMe: false,
+        isFollowedByMe: false,
+        tags: [],
+      };
+    });
   }, [rawMedia, maxItems]);
 
   const extractStreamUidFromHls = (hls: string) => {
@@ -184,7 +224,7 @@ const AboutMediaStrip: React.FC<AboutMediaStripProps> = ({ clubId, onSeeAllClick
                 if (showOverflow) {
                   onSeeAllClick();
                 } else {
-                  openViewer(mediaTiles, index);
+                  useCourseMediaViewerStore.getState().open(feedPosts, index);
                 }
               }}
               className="relative overflow-hidden w-full aspect-square focus:outline-none focus:ring-2 focus:ring-primary/50 transition-shadow hover:shadow-md border border-border/60 sm:border-border/40 active:scale-[0.98]"

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useMediaViewer } from '@/hooks/useMediaViewer';
+import { useCourseMediaViewerStore } from '@/components/course-media-tab/CourseMediaViewer';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -27,7 +27,7 @@ import {
 } from '@/features/courses/config';
 import { getScoreTier } from '@/utils/getScoreTier';
 // REMOVED: useUnifiedFullscreen — Phase 5 fullscreen system deleted
-import type { ExploreContentItem } from '@/components/explore/types';
+import type { FeedPost, MediaItem as MediaItemType } from '@/components/media-system/types/media';
 import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { PullToRefreshContainer } from '@/components/ui/pull-to-refresh';
 import { AlertCircle } from 'lucide-react';
@@ -240,32 +240,49 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
     setSearchQuery('');
   };
 
-  const { openViewer } = useMediaViewer();
-
-  // Convert review media to ExploreContentItem format and open fullscreen
-  const handleReviewMediaClick = useCallback((media: ReviewMediaItem[], startIndex: number) => {
+  // Convert review media to FeedPost format and open CourseMediaViewer
+  const handleReviewMediaClick = useCallback((media: ReviewMediaItem[], startIndex: number, review: CourseReview) => {
     if (!media || media.length === 0) return;
     
-    const exploreItems: ExploreContentItem[] = media.map((item) => ({
-      id: item.id,
-      type: item.media_type === 'video' ? 'video' : 'image',
-      src: item.media_url,
-      url: item.media_url,
-      posterUrl: item.poster_url || undefined,
-      thumbnailSrc: item.poster_url || item.media_url,
-      title: '',
-      likes: 0,
-      aspectRatio: 1,
-      user: (item as any).user_profiles ? {
-        id: (item as any).user_profiles.id || (item as any).user_id,
-        name: (item as any).user_profiles.display_name || (item as any).user_profiles.username || 'Golfer',
-        username: (item as any).user_profiles.username || '',
-        avatar: (item as any).user_profiles.profile_photo_url || '',
-      } : undefined,
-    }));
-    
-    openViewer(exploreItems, startIndex);
-  }, [openViewer]);
+    const userProfile = review.user_profiles;
+
+    const posts: FeedPost[] = media.map((item) => {
+      const isVideo = item.media_type === 'video';
+      const mediaItem: MediaItemType = {
+        id: item.id,
+        type: isVideo ? 'video' : 'image',
+        hlsUrl: isVideo ? item.media_url : undefined,
+        imageUrl: !isVideo ? item.media_url : undefined,
+        thumbnailUrl: item.poster_url || undefined,
+        width: 1080,
+        height: 1920,
+      };
+      return {
+        id: item.id,
+        userId: review.user_id,
+        actorType: 'personal' as const,
+        actorId: review.user_id,
+        username: userProfile?.username || '',
+        displayName: userProfile?.display_name || 'Golfer',
+        avatarUrl: userProfile?.profile_photo_url || '',
+        isVerified: false,
+        creatorRelation: 'none' as const,
+        caption: review.review || '',
+        mediaItems: [mediaItem],
+        createdAt: review.review_date || new Date().toISOString(),
+        likeCount: 0,
+        commentCount: 0,
+        shareCount: 0,
+        review: null,
+        isReview: false,
+        isLikedByMe: false,
+        isFollowedByMe: false,
+        tags: [],
+      };
+    });
+
+    useCourseMediaViewerStore.getState().open(posts, startIndex);
+  }, []);
 
   const reviews = reviewsData || [];
   const myReview = reviews.find((r) => r.user_id === user?.id);
@@ -573,7 +590,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
               onToggleHelpful={handleToggleHelpful}
               onMediaClick={(index) => {
                 if (filteredMyReview.media) {
-                  handleReviewMediaClick(filteredMyReview.media, index);
+                  handleReviewMediaClick(filteredMyReview.media, index, filteredMyReview);
                 }
               }}
               onUserClick={() => navigate(getProfilePathById(filteredMyReview.user_id))}
@@ -602,7 +619,7 @@ const CourseReviewsTab: React.FC<CourseReviewsTabProps> = ({
                     onToggleHelpful={handleToggleHelpful}
                     onMediaClick={(index) => {
                       if (review.media) {
-                        handleReviewMediaClick(review.media, index);
+                        handleReviewMediaClick(review.media, index, review);
                       }
                     }}
                     onUserClick={() => navigate(getProfilePathById(review.user_id))}

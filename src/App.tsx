@@ -43,6 +43,7 @@ import UploadProgressBanner from '@/components/uploads/UploadProgressBanner';
 import GlobalBottomNavigation from '@/components/GlobalBottomNavigation';
 import { GlobalPostStudio } from '@/components/post-studio/GlobalPostStudio';
 import { FullscreenFeedOverlay } from '@/components/fullscreen-feed/FullscreenFeedOverlay';
+import { CourseMediaViewer } from '@/components/course-media-tab/CourseMediaViewer';
 import { MediaViewerOverlay } from '@/components/shared/MediaViewerOverlay';
 import { UploadResilienceProvider } from '@/contexts/UploadResilienceContext';
 import { useUploadGuard } from '@/hooks/useUploadGuard';
@@ -641,6 +642,7 @@ const AppInner: React.FC = () => {
                                             </Suspense>
                                             {/* Fullscreen Feed Overlay - portal-based, renders above everything */}
                                             <FullscreenFeedOverlay />
+                                            <CourseMediaViewer />
                                             <MediaViewerOverlay />
                                           </UploadResilienceProvider>
                                           </MessagingProvider>
