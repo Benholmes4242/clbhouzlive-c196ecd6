@@ -237,10 +237,10 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
         {/* Rank badges - top-left */}
         {showRankBadges && (
           <div className="absolute top-3 left-3 flex items-center gap-2">
-            {course.ranks?.global && (
+            {(!activeListSlug || activeListSlug === 'global') && course.ranks?.global && (
               <Top100RankBadge listSlug="global" rank={course.ranks.global} />
             )}
-            {regionalRank && regionalBadgeSlug && (
+            {(!activeListSlug || activeListSlug === regionalBadgeSlug) && regionalRank && regionalBadgeSlug && (
               <Top100RankBadge listSlug={regionalBadgeSlug} rank={regionalRank} />
             )}
           </div>
