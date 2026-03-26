@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, MessageCircle, Trophy, Calendar, ChevronRight, MapPin, Shield } from 'lucide-react';
 import type { PGACardFeedPost, PGACardChaser } from '@/components/media-system/types/media';
+import { GolfSilhouette } from '@/components/ui/GolfSilhouette';
 
 interface PGACardProps {
   post: PGACardFeedPost;

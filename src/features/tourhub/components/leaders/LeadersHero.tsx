@@ -72,7 +72,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
       >
         {/* Hero — 50dvh */}
         <div className="relative w-full overflow-hidden" style={{ height: '45dvh' }}>
-          {photoUrl ? (
+          {photoUrl && !imgError ? (
             <motion.img
               src={photoUrl}
               alt={player.full_name}
@@ -81,13 +81,11 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
               initial={{ scale: 1.06 }}
               animate={{ scale: 1 }}
               transition={{ duration: 12, ease: 'linear' }}
-              onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
+              onError={() => setImgError(true)}
             />
           ) : (
             <div className="absolute inset-0 w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${category.accentColor}22, ${category.accentColor}44)` }}>
-              <span className="text-6xl font-bold text-foreground/20 select-none">
-                {player.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
-              </span>
+              <GolfSilhouette size={120} />
             </div>
           )}
 

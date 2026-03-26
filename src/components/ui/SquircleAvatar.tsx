@@ -167,10 +167,10 @@ export const SquircleAvatar: React.FC<SquircleAvatarProps> = ({
       {/* Fallback always visible until image has fully loaded */}
       {(!imageLoaded || showFallback) && (
         <div
-          className="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground font-semibold select-none"
-          style={{ fontSize: `${fallbackFontSize}px` }}
+          className="absolute inset-0 flex items-center justify-center select-none"
+          style={{ background: 'rgba(255,255,255,0.05)' }}
         >
-          {fallbackContent}
+          <GolfSilhouette size={Math.round(pixelSize * 0.70)} />
         </div>
       )}
       {imageSrc && !showFallback && (

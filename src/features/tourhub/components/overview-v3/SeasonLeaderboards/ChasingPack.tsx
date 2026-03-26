@@ -87,12 +87,12 @@ const ChaserCard = memo(function ChaserCard({
                 onError={() => setImgError(true)}
               />
             ) : (
-              <img
-                src={PLAYER_SILHOUETTE_URL}
-                alt={player.playerName}
-                className="w-full h-full object-cover"
-                style={{ backgroundColor: 'hsl(var(--muted))' }}
-              />
+              <div
+                className="w-full h-full flex items-center justify-center"
+                style={{ background: 'rgba(255,255,255,0.05)' }}
+              >
+                <GolfSilhouette size={Math.round(80 * 0.72)} />
+              </div>
             )}
           </div>
         </div>
