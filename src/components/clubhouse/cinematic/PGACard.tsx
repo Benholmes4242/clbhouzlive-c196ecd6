@@ -1242,15 +1242,20 @@ export const PGACard: React.FC<PGACardProps> = ({
             </>
           ) : (
             <div style={{
-              padding: '14px 16px',
-              borderRadius: 12,
-              background: 'rgba(245,158,11,0.06)',
-              border: '1px solid rgba(245,158,11,0.15)',
-              textAlign: 'center',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              gap: 8, marginBottom: 10,
+              padding: '12px 16px', borderRadius: 12,
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
             }}>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', fontStyle: 'italic' }}>
-                Leaderboard updating shortly...
-              </p>
+              <div style={{
+                width: 6, height: 6, borderRadius: '50%',
+                background: '#22c55e',
+                animation: 'dotPulse 1.4s ease-in-out infinite',
+              }} />
+              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', fontStyle: 'italic' }}>
+                Scores updating shortly...
+              </span>
             </div>
           )}
         </div>
