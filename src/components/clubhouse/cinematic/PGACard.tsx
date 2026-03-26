@@ -1317,8 +1317,8 @@ export const PGACard: React.FC<PGACardProps> = ({
         <div style={{
           flex: '1 1 auto',
           overflow: 'hidden',
-          padding: '0 clamp(14px, 3.5vw, 20px)',
-          display: 'flex', flexDirection: 'column', gap: 'clamp(4px, 1.5vw, 8px)', justifyContent: 'flex-start', paddingTop: 4, paddingBottom: 8,
+          padding: 'clamp(4px, 1vw, 8px) clamp(14px, 3.5vw, 20px) clamp(4px, 1vw, 8px)',
+          display: 'flex', flexDirection: 'column', gap: 'clamp(4px, 1.5vw, 8px)', justifyContent: 'space-evenly',
         }}>
           {chaserGroups && chaserGroups.length > 0 ? (
             <>
@@ -1329,15 +1329,15 @@ export const PGACard: React.FC<PGACardProps> = ({
 
               return (
                 <div key={`${group.position}-${gi}`} style={{
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  padding: 'clamp(8px, 2vw, 12px) 10px',
-                  borderRadius: 8,
+                  display: 'flex', alignItems: 'center', gap: 'clamp(10px, 2.5vw, 14px)',
+                  padding: 'clamp(8px, 2.5vw, 14px) 10px',
+                  borderRadius: 10,
                   animation: 'trc-slideIn 0.5s ease-out both',
                   animationDelay: `${0.3 + gi * 0.07}s`,
                 }}>
                   <span style={{
-                    width: 22, textAlign: 'center',
-                    fontSize: 'clamp(11px, 2.8vw, 13px)', fontWeight: 600,
+                    width: 'clamp(22px, 5vw, 28px)', textAlign: 'center',
+                    fontSize: 'clamp(12px, 3vw, 15px)', fontWeight: 600,
                     color: 'rgba(255,255,255,0.4)',
                   }}>
                     {group.isTied ? `T${group.position}` : group.position}
@@ -1348,19 +1348,21 @@ export const PGACard: React.FC<PGACardProps> = ({
                       {stackedAvatars.map((p, i) => (
                         <div key={i} style={{
                           marginLeft: i === 0 ? 0 : -10,
+
+                          marginLeft: i === 0 ? 0 : -12,
                           zIndex: stackedAvatars.length - i,
                           border: '1.5px solid rgba(8,10,14,0.8)',
                           borderRadius: SQUIRCLE_RADIUS, overflow: 'hidden',
                         }}>
-                          <RowAvatar src={p.photoUrl} name={p.playerName} size={34} />
+                          <RowAvatar src={p.photoUrl} name={p.playerName} size={38} />
                         </div>
                       ))}
                       {group.chasers.length > 3 && (
                         <div style={{
-                          marginLeft: -8, zIndex: 0, width: 32, height: 32,
+                          marginLeft: -8, zIndex: 0, width: 34, height: 34,
                           borderRadius: SQUIRCLE_RADIUS, background: 'rgba(255,255,255,0.08)',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.5)',
+                          fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)',
                           border: '1.5px solid rgba(8,10,14,0.8)',
                         }}>
                           +{group.chasers.length - 3}
@@ -1368,19 +1370,19 @@ export const PGACard: React.FC<PGACardProps> = ({
                       )}
                     </div>
                   ) : (
-                    <RowAvatar src={primary.photoUrl} name={primary.playerName} size={36} />
+                    <RowAvatar src={primary.photoUrl} name={primary.playerName} size={42} />
                   )}
 
                   <span style={{
                     flex: 1,
-                    fontSize: 'clamp(13px, 3.2vw, 16px)', fontWeight: 500,
+                    fontSize: 'clamp(14px, 3.5vw, 17px)', fontWeight: 500,
                     color: 'rgba(255,255,255,0.75)',
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
                     {isTied ? (
                       <>
                         {group.chasers.length}-Way Tie
-                        <span style={{ display: 'block', fontSize: 'clamp(9px, 2.2vw, 11px)', color: 'rgba(255,255,255,0.35)', marginTop: 1 }}>
+                        <span style={{ display: 'block', fontSize: 'clamp(10px, 2.5vw, 13px)', color: 'rgba(255,255,255,0.35)', marginTop: 1 }}>
                           {group.chasers.map(c => getLastName(c.playerName)).join(' · ')}
                         </span>
                       </>
@@ -1388,7 +1390,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                   </span>
 
                   <span style={{
-                    fontSize: 'clamp(13px, 3.2vw, 16px)', fontWeight: 600,
+                    fontSize: 'clamp(14px, 3.5vw, 17px)', fontWeight: 700,
                     color: 'rgba(255,255,255,0.55)',
                   }}>
                     {primary.scoreDisplay || 'E'}
