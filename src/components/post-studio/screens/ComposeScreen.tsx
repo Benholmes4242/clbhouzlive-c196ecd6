@@ -502,8 +502,15 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
   const {
     state, setStep, setActiveMedia, removeMedia, addMedia,
     setCaption, openPanel, updateMediaEdits,
-    setMentions, setTaggedCourses, setMentionTriggerIndex,
+    setMentions, setTaggedCourses, setMentionTriggerIndex, reset,
   } = usePostStudioContext();
+
+  const { saveDraft, isSaving: isSavingDraft } = useSaveDraft(state);
+
+  const handleSaveDraft = useCallback(async () => {
+    const ok = await saveDraft();
+    if (ok && onClose) { reset(); onClose(); }
+  }, [saveDraft, reset, onClose]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const rearCameraInputRef = useRef<HTMLInputElement>(null);
