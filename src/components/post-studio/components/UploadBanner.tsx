@@ -1,10 +1,8 @@
-// UploadBanner — Live upload progress, dark glass spec
+// UploadBanner — Live upload progress, light mode
 import React, { useState, useEffect, useRef } from 'react';
 import { Upload } from 'lucide-react';
 import { useUploadProgress } from '@/hooks/useUploadProgress';
-
-const WHITE_90 = 'rgba(255,255,255,0.90)';
-const WHITE_70 = 'rgba(255,255,255,0.70)';
+import { TEXT_PRIMARY, TEXT_SECONDARY, ICON_BG, ICON_COLOR } from '../tokens';
 
 export function UploadBanner() {
   const { isUploading, uploadedCount, totalCount } = useUploadProgress();
@@ -24,8 +22,8 @@ export function UploadBanner() {
   }, [isComplete]);
 
   const cardStyle: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.07)',
-    border: '1px solid rgba(255,255,255,0.10)',
+    background: 'rgba(0,0,0,0.03)',
+    border: '1px solid rgba(0,0,0,0.06)',
     borderRadius: 20,
     padding: 16,
     display: 'flex',
@@ -36,8 +34,8 @@ export function UploadBanner() {
 
   const iconWrapStyle: React.CSSProperties = {
     width: 40, height: 40, borderRadius: 12, flexShrink: 0,
-    background: 'rgba(255,255,255,0.08)',
-    border: '1px solid rgba(255,255,255,0.12)',
+    background: ICON_BG,
+    border: '1px solid rgba(0,0,0,0.06)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
   };
 
@@ -45,11 +43,11 @@ export function UploadBanner() {
     return (
       <div style={cardStyle}>
         <div style={iconWrapStyle}>
-          <Upload className="w-5 h-5" style={{ color: WHITE_90 }} />
+          <Upload className="w-5 h-5" style={{ color: ICON_COLOR }} />
         </div>
         <div style={{ flex: 1 }}>
-          <p style={{ color: 'rgba(255,255,255,0.92)', fontSize: 14, fontWeight: 500 }}>Queued</p>
-          <p style={{ color: 'rgba(255,255,255,0.50)', fontSize: 12 }}>Upload will start shortly…</p>
+          <p style={{ color: TEXT_PRIMARY, fontSize: 14, fontWeight: 500 }}>Queued</p>
+          <p style={{ color: TEXT_SECONDARY, fontSize: 12 }}>Upload will start shortly…</p>
         </div>
       </div>
     );
@@ -59,22 +57,22 @@ export function UploadBanner() {
     <div style={cardStyle}>
       <div style={iconWrapStyle}>
         {isComplete
-          ? <span style={{ fontSize: 18, color: WHITE_90 }}>✓</span>
-          : <Upload className="w-5 h-5" style={{ color: WHITE_90 }} />}
+          ? <span style={{ fontSize: 18, color: TEXT_PRIMARY }}>✓</span>
+          : <Upload className="w-5 h-5" style={{ color: ICON_COLOR }} />}
       </div>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <p style={{ color: 'rgba(255,255,255,0.92)', fontSize: 14, fontWeight: 500 }}>
+          <p style={{ color: TEXT_PRIMARY, fontSize: 14, fontWeight: 500 }}>
             {isComplete ? 'Uploaded' : 'Uploading…'}
           </p>
-          <p style={{ color: 'rgba(255,255,255,0.50)', fontSize: 12 }}>{uploadedCount}/{totalCount}</p>
+          <p style={{ color: TEXT_SECONDARY, fontSize: 12 }}>{uploadedCount}/{totalCount}</p>
         </div>
-        <div style={{ width: '100%', height: 6, borderRadius: 999, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+        <div style={{ width: '100%', height: 6, borderRadius: 999, background: 'rgba(0,0,0,0.06)', overflow: 'hidden' }}>
           <div style={{
             height: '100%', borderRadius: 999,
             transition: 'all 500ms',
             width: `${progress}%`,
-            background: showGreen ? 'rgba(255,255,255,0.90)' : `linear-gradient(90deg, ${WHITE_90}, ${WHITE_70})`,
+            background: showGreen ? 'rgba(15,23,42,0.85)' : 'linear-gradient(90deg, rgba(15,23,42,0.75), rgba(15,23,42,0.55))',
           }} />
         </div>
       </div>

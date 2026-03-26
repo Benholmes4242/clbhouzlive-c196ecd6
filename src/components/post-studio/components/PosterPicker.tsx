@@ -1,7 +1,7 @@
-// PosterPicker — Horizontal filmstrip scrubber for poster frame selection
-// Generates 8 evenly-spaced video frame thumbnails via canvas
+// PosterPicker — Horizontal filmstrip scrubber for poster frame selection, light mode
 
 import React, { useRef, useState, useCallback, useEffect } from 'react';
+import { TEXT_PRIMARY, TEXT_SECONDARY } from '../tokens';
 import type { StudioMediaItem } from '../types';
 
 interface PosterPickerProps {
@@ -106,7 +106,6 @@ export function PosterPicker({ item, onPosterChange, darkMode }: PosterPickerPro
   }, [isDragging, currentTimestamp, onPosterChange]);
 
   const scrubPercent = duration > 0 ? (currentTimestamp / duration) * 100 : 0;
-  const textColor = darkMode ? 'text-white/70' : 'text-muted-foreground';
 
   return (
     <div className="w-full space-y-3">
@@ -115,7 +114,7 @@ export function PosterPicker({ item, onPosterChange, darkMode }: PosterPickerPro
       <div
         ref={containerRef}
         className="relative h-[56px] rounded-xl overflow-hidden touch-none select-none cursor-pointer"
-        style={{ background: 'rgba(255,255,255,0.04)' }}
+        style={{ background: 'rgba(0,0,0,0.04)' }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -123,7 +122,7 @@ export function PosterPicker({ item, onPosterChange, darkMode }: PosterPickerPro
         <div className="flex h-full">
           {isGenerating
             ? Array.from({ length: FRAME_COUNT }).map((_, i) => (
-                <div key={i} className="flex-1 h-full bg-muted clb-shimmer-dark" style={{ animationDelay: `${i * 0.1}s` }} />
+                <div key={i} className="flex-1 h-full animate-pulse" style={{ background: 'rgba(0,0,0,0.04)', animationDelay: `${i * 0.1}s` }} />
               ))
             : frames.map((frame, i) => (
                 <img key={i} src={frame} alt="" className="flex-1 h-full object-cover rounded-lg" draggable={false} />
@@ -135,22 +134,22 @@ export function PosterPicker({ item, onPosterChange, darkMode }: PosterPickerPro
           style={{
             left: `${scrubPercent}%`,
             transform: 'translateX(-50%)',
-            background: 'rgba(255,255,255,0.90)',
-            boxShadow: '0 0 6px rgba(255,255,255,0.30)',
+            background: 'rgba(15,23,42,0.85)',
+            boxShadow: '0 0 6px rgba(15,23,42,0.15)',
           }}
         >
           <div
             className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full"
             style={{
-              background: 'rgba(255,255,255,0.92)',
-              boxShadow: '0 2px 8px rgba(255,255,255,0.20)',
-              border: '2px solid rgba(0,0,0,0.25)',
+              background: 'rgba(15,23,42,0.90)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+              border: '2px solid rgba(255,255,255,0.70)',
             }}
           />
         </div>
       </div>
 
-      <p className={`text-center text-xs ${textColor}`}>{formatTimestamp(currentTimestamp)}</p>
+      <p className="text-center text-xs" style={{ color: TEXT_SECONDARY }}>{formatTimestamp(currentTimestamp)}</p>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 // ComposeScreen — The single creative step
 // Keyboard up on open. Text first. Media additive. Everything in one place.
-// Dark. Minimal. Golf-native.
+// Light. Minimal. Golf-native.
 
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
@@ -14,7 +14,7 @@ import { CharacterRing } from '../components/CharacterRing';
 import { ActorSelector } from '../components/ActorSelector';
 import { usePostStudioContext } from '../usePostStudio';
 import { validateMediaFile, POST_LIMITS, ALLOWED_VIDEO_TYPES, ALLOWED_IMAGE_TYPES } from '../constants';
-import { BG_BASE } from '../tokens';
+import { BG_BASE, ICON_BG, ICON_COLOR, ICON_DIM, RAIL_BG, RAIL_HAIRLINE, TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY } from '../tokens';
 import type { StudioMediaItem } from '../types';
 import type { StudioEdits, StudioTool } from '@/types/studio';
 import StudioShelf from '@/components/studio/StudioShelf';
@@ -162,7 +162,7 @@ function VideoToolSheet({ item, onEdit, onTrim, onCover, onClose }: VideoToolShe
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[10000]"
-        style={{ background: 'rgba(0,0,0,0.70)' }}
+        style={{ background: 'rgba(0,0,0,0.35)' }}
         onClick={onClose}
       />
       <motion.div
@@ -173,14 +173,15 @@ function VideoToolSheet({ item, onEdit, onTrim, onCover, onClose }: VideoToolShe
         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
         className="fixed bottom-0 inset-x-0 z-[10001] w-full max-w-[480px] mx-auto rounded-t-[24px]"
         style={{
-          background: 'rgba(10,10,10,0.99)',
+          background: 'rgba(255,255,255,0.98)',
           backdropFilter: 'blur(24px)',
-          borderTop: '1px solid rgba(255,255,255,0.08)',
+          borderTop: '1px solid rgba(0,0,0,0.06)',
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
+          boxShadow: '0 -8px 40px rgba(0,0,0,0.10)',
         }}
       >
         <div className="flex justify-center pt-3 pb-4">
-          <div className="w-9 h-[3px] rounded-full" style={{ background: 'rgba(255,255,255,0.18)' }} />
+          <div className="w-9 h-[3px] rounded-full" style={{ background: 'rgba(0,0,0,0.12)' }} />
         </div>
 
         <div className="mx-4 mb-5 overflow-hidden" style={{ borderRadius: 14, aspectRatio: item.height && item.width && item.height > item.width ? '4/5' : '16/9' }}>
@@ -201,33 +202,33 @@ function VideoToolSheet({ item, onEdit, onTrim, onCover, onClose }: VideoToolShe
             whileTap={{ scale: 0.95 }}
             onClick={onEdit}
             className="flex-1 flex flex-col items-center gap-2 py-4 rounded-2xl"
-            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}
+            style={{ background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.06)' }}
           >
-            <Pencil className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.80)' }} strokeWidth={2} />
-            <span className="text-[13px] font-semibold" style={{ color: 'rgba(255,255,255,0.80)' }}>Edit</span>
-            <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>Music, filters, text</span>
+            <Pencil className="w-5 h-5" style={{ color: ICON_COLOR }} strokeWidth={2} />
+            <span className="text-[13px] font-semibold" style={{ color: TEXT_PRIMARY }}>Edit</span>
+            <span className="text-[10px]" style={{ color: TEXT_TERTIARY }}>Music, filters, text</span>
           </motion.button>
 
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={onTrim}
             className="flex-1 flex flex-col items-center gap-2 py-4 rounded-2xl"
-            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}
+            style={{ background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.06)' }}
           >
-            <Scissors className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.80)' }} strokeWidth={2} />
-            <span className="text-[13px] font-semibold" style={{ color: 'rgba(255,255,255,0.80)' }}>Trim</span>
-            <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>Cut start & end</span>
+            <Scissors className="w-5 h-5" style={{ color: ICON_COLOR }} strokeWidth={2} />
+            <span className="text-[13px] font-semibold" style={{ color: TEXT_PRIMARY }}>Trim</span>
+            <span className="text-[10px]" style={{ color: TEXT_TERTIARY }}>Cut start & end</span>
           </motion.button>
 
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={onCover}
             className="flex-1 flex flex-col items-center gap-2 py-4 rounded-2xl"
-            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}
+            style={{ background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.06)' }}
           >
-            <ImageIcon className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.80)' }} strokeWidth={2} />
-            <span className="text-[13px] font-semibold" style={{ color: 'rgba(255,255,255,0.80)' }}>Cover</span>
-            <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>Choose thumbnail</span>
+            <ImageIcon className="w-5 h-5" style={{ color: ICON_COLOR }} strokeWidth={2} />
+            <span className="text-[13px] font-semibold" style={{ color: TEXT_PRIMARY }}>Cover</span>
+            <span className="text-[10px]" style={{ color: TEXT_TERTIARY }}>Choose thumbnail</span>
           </motion.button>
         </div>
       </motion.div>
@@ -253,7 +254,7 @@ function OverflowSheet({ items, startIndex, onEdit, onClose }: OverflowSheetProp
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[10000]"
-        style={{ background: 'rgba(0,0,0,0.70)' }}
+        style={{ background: 'rgba(0,0,0,0.35)' }}
         onClick={onClose}
       />
       <motion.div
@@ -264,18 +265,19 @@ function OverflowSheet({ items, startIndex, onEdit, onClose }: OverflowSheetProp
         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
         className="fixed bottom-0 inset-x-0 z-[10001] w-full max-w-[480px] mx-auto rounded-t-[24px]"
         style={{
-          background: 'rgba(10,10,10,0.99)',
+          background: 'rgba(255,255,255,0.98)',
           backdropFilter: 'blur(24px)',
-          borderTop: '1px solid rgba(255,255,255,0.08)',
+          borderTop: '1px solid rgba(0,0,0,0.06)',
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 24px)',
+          boxShadow: '0 -8px 40px rgba(0,0,0,0.10)',
         }}
       >
         <div className="flex justify-center pt-3 pb-2">
-          <div className="w-9 h-[3px] rounded-full" style={{ background: 'rgba(255,255,255,0.18)' }} />
+          <div className="w-9 h-[3px] rounded-full" style={{ background: 'rgba(0,0,0,0.12)' }} />
         </div>
 
         <div className="px-5 pb-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: 'rgba(255,255,255,0.30)' }}>
+          <p className="text-[11px] font-semibold uppercase tracking-[1.5px]" style={{ color: TEXT_TERTIARY }}>
             More media
           </p>
         </div>
@@ -621,11 +623,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     let partIndex = 0;
     const sorted = [...state.mentions].sort((a, b) => a.start - b.start);
     for (const m of sorted) {
-      if (m.start > last) parts.push(<span key={`t-${partIndex++}`} style={{ color: 'rgba(255,255,255,0.85)' }}>{state.caption.slice(last, m.start)}</span>);
-      parts.push(<span key={`m-${partIndex++}`} style={{ color: 'rgba(255,255,255,0.90)', fontWeight: 600 }}>{state.caption.slice(m.start, m.end)}</span>);
+      if (m.start > last) parts.push(<span key={`t-${partIndex++}`} style={{ color: TEXT_PRIMARY }}>{state.caption.slice(last, m.start)}</span>);
+      parts.push(<span key={`m-${partIndex++}`} style={{ color: TEXT_PRIMARY, fontWeight: 600 }}>{state.caption.slice(m.start, m.end)}</span>);
       last = m.end;
     }
-    if (last < state.caption.length) parts.push(<span key={`t-${partIndex++}`} style={{ color: 'rgba(255,255,255,0.85)' }}>{state.caption.slice(last)}</span>);
+    if (last < state.caption.length) parts.push(<span key={`t-${partIndex++}`} style={{ color: TEXT_PRIMARY }}>{state.caption.slice(last)}</span>);
     return parts;
   }, [state.caption, state.mentions]);
 
@@ -689,7 +691,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               width: 320,
               height: 320,
               borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.025) 50%, transparent 75%)',
+              background: 'radial-gradient(circle, rgba(0,0,0,0.03) 0%, rgba(0,0,0,0.01) 50%, transparent 75%)',
               animation: 'studio-orb-breathe 5s ease-in-out infinite',
             }} />
             <div style={{
@@ -699,7 +701,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               width: 140,
               height: 140,
               borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(245,166,35,0.04) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(232,152,10,0.04) 0%, transparent 70%)',
               animation: 'studio-orb-breathe 6s ease-in-out infinite reverse',
             }} />
             <div style={{
@@ -709,14 +711,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               width: 180,
               height: 180,
               borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(255,255,255,0.025) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(0,0,0,0.015) 0%, transparent 70%)',
               animation: 'studio-orb-breathe 7s ease-in-out infinite reverse',
-            }} />
-            <div style={{
-              position: 'absolute', inset: 0,
-              opacity: 0.35,
-              backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'0.05\'/%3E%3C/svg%3E")',
-              backgroundSize: '120px 120px',
             }} />
           </div>
         )}
@@ -748,7 +744,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               fontWeight: 700,
               letterSpacing: 2.5,
               textTransform: 'uppercase' as const,
-              color: 'rgba(255,255,255,0.28)',
+              color: TEXT_TERTIARY,
               marginBottom: 12,
             }}>
               What's on your mind?
@@ -756,7 +752,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             <p style={{
               fontSize: 22,
               fontWeight: 600,
-              color: 'rgba(255,255,255,0.70)',
+              color: TEXT_SECONDARY,
               lineHeight: 1.4,
               letterSpacing: '-0.025em',
             }}>
@@ -765,7 +761,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             <div style={{
               width: 28,
               height: 1,
-              background: 'rgba(255,255,255,0.15)',
+              background: 'rgba(0,0,0,0.08)',
               margin: '18px auto 0',
             }} />
           </div>
@@ -781,7 +777,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               left: 16,
               width: 2,
               height: 22,
-              background: 'rgba(255,255,255,0.80)',
+              background: 'rgba(15,23,42,0.60)',
               borderRadius: 1,
               animation: 'studio-cursor-blink 1s step-end infinite',
               zIndex: 2,
@@ -808,8 +804,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               background: 'transparent',
               fontSize: 17,
               fontWeight: 400,
-              color: state.mentions.length > 0 ? 'transparent' : 'rgba(255,255,255,0.90)',
-              caretColor: 'rgba(255,255,255,0.80)',
+              color: state.mentions.length > 0 ? 'transparent' : TEXT_PRIMARY,
+              caretColor: 'rgba(15,23,42,0.70)',
               WebkitTextFillColor: state.mentions.length > 0 ? 'transparent' : undefined,
               height: hasMedia ? 80 : 120,
               overflowY: 'auto',
@@ -834,8 +830,8 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               <div
                 style={{
                   borderRadius: 18,
-                  border: '1.5px dashed rgba(255,255,255,0.13)',
-                  background: 'rgba(255,255,255,0.025)',
+                  border: '1.5px dashed rgba(0,0,0,0.10)',
+                  background: 'rgba(0,0,0,0.015)',
                   overflow: 'hidden',
                 }}
               >
@@ -856,22 +852,22 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                       background: 'transparent',
                       border: 'none',
                       cursor: 'pointer',
-                      borderRight: '1px solid rgba(255,255,255,0.07)',
+                      borderRight: '1px solid rgba(0,0,0,0.05)',
                     }}
                   >
                     <div style={{
                       width: 52, height: 52, borderRadius: 16,
-                      background: 'rgba(255,255,255,0.10)',
-                      border: '1px solid rgba(255,255,255,0.15)',
+                      background: ICON_BG,
+                      border: '1px solid rgba(0,0,0,0.08)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
-                      <ImageIcon className="w-[22px] h-[22px]" style={{ color: 'rgba(255,255,255,0.88)' }} strokeWidth={1.75} />
+                      <ImageIcon className="w-[22px] h-[22px]" style={{ color: ICON_COLOR }} strokeWidth={1.75} />
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.88)', marginBottom: 2 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: TEXT_PRIMARY, marginBottom: 2 }}>
                         Add from Library
                       </div>
-                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+                      <div style={{ fontSize: 11, color: TEXT_TERTIARY }}>
                         Photos & videos
                       </div>
                     </div>
@@ -890,24 +886,24 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                       justifyContent: 'center',
                       gap: 8,
                       padding: '20px 12px',
-                      background: 'rgba(0,0,0,0.15)',
+                      background: 'transparent',
                       border: 'none',
                       cursor: 'pointer',
                     }}
                   >
                     <div style={{
                       width: 44, height: 44, borderRadius: 14,
-                      background: 'rgba(255,255,255,0.06)',
-                      border: '1px solid rgba(255,255,255,0.09)',
+                      background: ICON_BG,
+                      border: '1px solid rgba(0,0,0,0.06)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
-                      <Camera className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.75)' }} strokeWidth={1.75} />
+                      <Camera className="w-5 h-5" style={{ color: ICON_DIM }} strokeWidth={1.75} />
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.55)', marginBottom: 2 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: TEXT_SECONDARY, marginBottom: 2 }}>
                         Take a Photo
                       </div>
-                      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>
+                      <div style={{ fontSize: 11, color: TEXT_TERTIARY }}>
                         Camera
                       </div>
                     </div>
@@ -943,19 +939,19 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               style={{
                 padding: '6px 12px 6px 8px',
                 borderRadius: 10,
-                border: '1.5px dashed rgba(255,255,255,0.13)',
-                background: 'rgba(255,255,255,0.02)',
+                border: '1.5px dashed rgba(0,0,0,0.10)',
+                background: 'rgba(0,0,0,0.015)',
               }}
             >
               <div style={{
                 width: 22, height: 22, borderRadius: 6,
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.10)',
+                background: ICON_BG,
+                border: '1px solid rgba(0,0,0,0.06)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <Plus className="w-3 h-3" style={{ color: 'rgba(255,255,255,0.40)' }} strokeWidth={2} />
+                <Plus className="w-3 h-3" style={{ color: ICON_DIM }} strokeWidth={2} />
               </div>
-              <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.30)' }}>Add more</span>
+              <span className="text-[12px]" style={{ color: TEXT_TERTIARY }}>Add more</span>
             </motion.button>
           </div>
         )}
@@ -987,7 +983,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                 >
                   <span className="text-base">⛳</span>
                 </div>
-                <span className="flex-1 text-left text-[14px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                <span className="flex-1 text-left text-[14px]" style={{ color: TEXT_TERTIARY }}>
                   Where did you play?
                 </span>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ color: 'rgba(34,197,94,0.35)', flexShrink: 0 }}>
@@ -1025,11 +1021,11 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                       fontSize: 14,
                     }}>⛳</div>
                     <div className="text-left">
-                      <p className="text-[13px] font-semibold leading-none" style={{ color: 'rgba(255,255,255,0.90)' }}>
+                      <p className="text-[13px] font-semibold leading-none" style={{ color: TEXT_PRIMARY }}>
                         {course.courseName}
                       </p>
                       {course.country && (
-                        <p className="text-[10px] mt-0.5 leading-none" style={{ color: 'rgba(255,255,255,0.40)' }}>
+                        <p className="text-[10px] mt-0.5 leading-none" style={{ color: TEXT_TERTIARY }}>
                           {course.region ? `${course.region}, ${course.country}` : course.country}
                         </p>
                       )}
@@ -1043,9 +1039,9 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
                       }}
                       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); setTaggedCourses(state.taggedCourses.filter(c => c.courseId !== course.courseId)); } }}
                       className="ml-1 w-4 h-4 rounded-full flex items-center justify-center cursor-pointer"
-                      style={{ background: 'rgba(255,255,255,0.12)' }}
+                      style={{ background: 'rgba(0,0,0,0.08)' }}
                     >
-                      <X className="w-2.5 h-2.5" style={{ color: 'rgba(255,255,255,0.55)' }} strokeWidth={2.5} />
+                      <X className="w-2.5 h-2.5" style={{ color: ICON_DIM }} strokeWidth={2.5} />
                     </div>
                   </motion.button>
                 ))}
@@ -1092,9 +1088,9 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="flex items-center gap-2 px-4 py-2 text-sm"
-              style={{ color: 'rgba(255,255,255,0.35)' }}
+              style={{ color: TEXT_TERTIARY }}
             >
-              <div className="w-3.5 h-3.5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(255,255,255,0.20)', borderTopColor: 'transparent' }} />
+              <div className="w-3.5 h-3.5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(0,0,0,0.12)', borderTopColor: 'transparent' }} />
               Processing…
             </motion.div>
           )}
@@ -1107,23 +1103,23 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       <div
         className="shrink-0"
         style={{
-          background: 'rgba(8,8,8,0.98)',
+          background: RAIL_BG,
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 8px)',
         }}
       >
-        {/* White hairline at top */}
+        {/* Hairline at top */}
         <div style={{
           height: 1,
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.10) 20%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.10) 80%, transparent 100%)',
+          background: `linear-gradient(90deg, transparent 0%, ${RAIL_HAIRLINE} 20%, rgba(0,0,0,0.12) 50%, ${RAIL_HAIRLINE} 80%, transparent 100%)`,
         }} />
 
         <div className="flex items-center px-4" style={{ minHeight: 60, gap: 0 }}>
 
           {/* Zone A — Capture */}
           <div className="flex items-center" style={{ gap: 4 }}>
-            {/* Rear — solid white, primary */}
+            {/* Rear — solid dark, primary */}
             <motion.button
               whileTap={{ scale: 0.88 }}
               onClick={() => rearCameraInputRef.current?.click()}
@@ -1133,13 +1129,13 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             >
               <div style={{
                 width: 40, height: 40, borderRadius: 13,
-                background: 'rgba(255,255,255,0.96)',
-                boxShadow: '0 2px 14px rgba(0,0,0,0.35)',
+                background: 'rgba(15,23,42,0.90)',
+                boxShadow: '0 2px 14px rgba(0,0,0,0.12)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <Camera className="w-[18px] h-[18px]" style={{ color: '#0D0D0D' }} strokeWidth={2} />
+                <Camera className="w-[18px] h-[18px]" style={{ color: '#FFFFFF' }} strokeWidth={2} />
               </div>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: 'rgba(255,255,255,0.50)', textTransform: 'uppercase' }}>Rear</span>
+              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Rear</span>
             </motion.button>
 
             {/* Front */}
@@ -1152,13 +1148,13 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             >
               <div style={{
                 width: 40, height: 40, borderRadius: 13,
-                background: 'rgba(255,255,255,0.07)',
-                border: '1px solid rgba(255,255,255,0.10)',
+                background: ICON_BG,
+                border: '1px solid rgba(0,0,0,0.06)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <SwitchCamera className="w-[18px] h-[18px]" style={{ color: 'rgba(255,255,255,0.60)' }} strokeWidth={2} />
+                <SwitchCamera className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
               </div>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' }}>Front</span>
+              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Front</span>
             </motion.button>
 
             {/* Library */}
@@ -1171,18 +1167,18 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             >
               <div style={{
                 width: 40, height: 40, borderRadius: 13,
-                background: 'rgba(255,255,255,0.07)',
-                border: '1px solid rgba(255,255,255,0.10)',
+                background: ICON_BG,
+                border: '1px solid rgba(0,0,0,0.06)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <Layers className="w-[18px] h-[18px]" style={{ color: 'rgba(255,255,255,0.60)' }} strokeWidth={2} />
+                <Layers className="w-[18px] h-[18px]" style={{ color: ICON_DIM }} strokeWidth={2} />
               </div>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase' }}>Library</span>
+              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.6, color: TEXT_TERTIARY, textTransform: 'uppercase' }}>Library</span>
             </motion.button>
           </div>
 
           {/* Divider */}
-          <div style={{ width: 1, height: 28, background: 'rgba(255,255,255,0.08)', margin: '0 10px' }} />
+          <div style={{ width: 1, height: 28, background: RAIL_HAIRLINE, margin: '0 10px' }} />
 
           {/* Zone B — Text tools */}
           <div className="flex items-center" style={{ gap: 0 }}>
@@ -1197,7 +1193,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               }}
               style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              <AtSign className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
+              <AtSign className="w-5 h-5" style={{ color: ICON_DIM }} strokeWidth={2} />
             </motion.button>
 
             <motion.button
@@ -1205,7 +1201,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               onClick={() => openPanel('drafts')}
               style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              <BookOpen className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
+              <BookOpen className="w-5 h-5" style={{ color: ICON_DIM }} strokeWidth={2} />
             </motion.button>
           </div>
 
@@ -1277,7 +1273,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           activeMediaId={activeItem.id}
           activeMediaType={activeItem.mediaType}
           activeMediaPreviewUrl={activeItem.previewUrl}
-          activeMediaThumbnailUrl={activeItem.thumbnailUrl ?? null}
+          activeMediaThumbnailUrl={activeItem.thumbnailUrl}
           edits={activeItem.edits ?? {}}
           updateEdits={handleUpdateEdits}
           clearEdits={handleClearEdits}

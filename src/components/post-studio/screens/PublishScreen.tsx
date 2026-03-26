@@ -7,7 +7,7 @@ import { usePostStudioContext } from '../usePostStudio';
 import { enqueuePostUpload } from '@/uploads/uploadPipeline';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { BG_BASE, BG_CARD, BORDER_CARD, TEXT_PRIMARY, TEXT_TERTIARY } from '../tokens';
+import { BG_BASE, BG_CARD, BORDER_CARD, TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY, ICON_BG, ICON_COLOR, RAIL_BG, RAIL_HAIRLINE } from '../tokens';
 import { useSocialCounts } from '@/hooks/useSocialCounts';
 import type { UploadJobInput } from '@/uploads/types';
 
@@ -15,7 +15,6 @@ export function PublishScreen() {
   const { state, setStep, openPanel, onSuccess } = usePostStudioContext();
   const [isPublishing, setIsPublishing] = useState(false);
 
-  // Fetch follower count for social context line
   const [currentUserId, setCurrentUserId] = useState<string | undefined>(undefined);
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -31,7 +30,6 @@ export function PublishScreen() {
       if (n === 1) return 'Visible to 1 follower';
       return `Visible to ${n.toLocaleString()} followers`;
     }
-    // public
     if (n === 0) return 'Visible to everyone on clbhouz';
     return `Visible to your ${n.toLocaleString()} followers and beyond`;
   })();
@@ -111,59 +109,33 @@ export function PublishScreen() {
 
       <div className="flex-1 overflow-y-auto flex flex-col" style={{ scrollbarWidth: 'none' }}>
 
-        {/* ── Media preview — clean, minimal scrim ── */}
+        {/* ── Media preview ── */}
         {firstItem && (
           <div
             className="mx-4 mt-4 overflow-hidden"
             style={{
               borderRadius: 18,
-              border: '1px solid rgba(255,255,255,0.08)',
-              boxShadow: '0 4px 32px rgba(0,0,0,0.50)',
+              border: '1px solid rgba(0,0,0,0.08)',
+              boxShadow: '0 4px 32px rgba(0,0,0,0.08)',
             }}
           >
-            {/* Thumbnail — clean, no caption overlay */}
             <div className="relative" style={{ aspectRatio: '4/3' }}>
               {firstItem.mediaType === 'video' ? (
                 firstItem.posterPreviewUrl ? (
-                  <img
-                    src={firstItem.posterPreviewUrl}
-                    alt="Cover"
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={firstItem.posterPreviewUrl} alt="Cover" className="w-full h-full object-cover" />
                 ) : (
-                  <video
-                    src={firstItem.previewUrl}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    preload="auto"
-                    className="w-full h-full object-cover"
-                    style={{ pointerEvents: 'none' }}
-                  />
+                  <video src={firstItem.previewUrl} autoPlay muted loop playsInline preload="auto" className="w-full h-full object-cover" style={{ pointerEvents: 'none' }} />
                 )
               ) : (
-                <img
-                  src={firstItem.thumbnailUrl || firstItem.previewUrl}
-                  alt=""
-                  className="w-full h-full object-cover"
-                />
+                <img src={firstItem.thumbnailUrl || firstItem.previewUrl} alt="" className="w-full h-full object-cover" />
               )}
-              {/* Cover pill — top left */}
               {firstItem.posterPreviewUrl && (
-                <div
-                  className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-semibold"
-                  style={{ background: 'rgba(0,0,0,0.50)', backdropFilter: 'blur(12px)', color: 'rgba(255,255,255,0.80)', border: '1px solid rgba(255,255,255,0.12)' }}
-                >
+                <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-semibold" style={{ background: 'rgba(0,0,0,0.50)', backdropFilter: 'blur(12px)', color: 'rgba(255,255,255,0.80)', border: '1px solid rgba(255,255,255,0.12)' }}>
                   Cover
                 </div>
               )}
-              {/* Media count — top right */}
               {itemCount > 1 && (
-                <div
-                  className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[11px] font-semibold"
-                  style={{ background: 'rgba(0,0,0,0.50)', backdropFilter: 'blur(12px)', color: 'rgba(255,255,255,0.80)', border: '1px solid rgba(255,255,255,0.12)' }}
-                >
+                <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[11px] font-semibold" style={{ background: 'rgba(0,0,0,0.50)', backdropFilter: 'blur(12px)', color: 'rgba(255,255,255,0.80)', border: '1px solid rgba(255,255,255,0.12)' }}>
                   {itemCount} Media
                 </div>
               )}
@@ -171,104 +143,38 @@ export function PublishScreen() {
 
             {/* Caption strip */}
             {hasCaption && (
-              <div
-                style={{
-                  padding: '12px 14px 10px',
-                  background: 'rgba(255,255,255,0.025)',
-                  borderTop: '1px solid rgba(255,255,255,0.06)',
-                }}
-              >
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: 14,
-                    lineHeight: 1.6,
-                    color: 'rgba(255,255,255,0.88)',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
-                  }}
-                >
+              <div style={{ padding: '12px 14px 10px', background: 'rgba(0,0,0,0.015)', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+                <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: TEXT_PRIMARY, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                   {state.caption}
                 </p>
               </div>
             )}
 
-            {/* Metadata — course pills + individual tagged user pills */}
+            {/* Metadata pills */}
             {(state.taggedCourses.length > 0 || state.mentions.length > 0) && (
-              <div
-                style={{
-                  padding: '10px 14px 12px',
-                  background: 'rgba(255,255,255,0.015)',
-                  borderTop: '1px solid rgba(255,255,255,0.05)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 8,
-                }}
-              >
-                {/* Course pills row */}
+              <div style={{ padding: '10px 14px 12px', background: 'rgba(0,0,0,0.01)', borderTop: '1px solid rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {state.taggedCourses.length > 0 && (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                     {state.taggedCourses.map((course) => (
-                      <div
-                        key={course.courseId}
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: 5,
-                          padding: '4px 10px 4px 6px', borderRadius: 10,
-                          background: 'rgba(34,197,94,0.08)',
-                          border: '1px solid rgba(34,197,94,0.18)',
-                          fontSize: 12, fontWeight: 500,
-                          color: 'rgba(255,255,255,0.80)',
-                        }}
-                      >
+                      <div key={course.courseId} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px 4px 6px', borderRadius: 10, background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', fontSize: 12, fontWeight: 500, color: TEXT_PRIMARY }}>
                         <span style={{ fontSize: 12 }}>⛳</span>
                         <span>{course.courseName}</span>
                       </div>
                     ))}
                   </div>
                 )}
-
-                {/* Tagged users — individual pills */}
                 {state.mentions.length > 0 && (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                     {state.mentions.map((mention) => (
-                      <div
-                        key={mention.entityId ?? mention.start}
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: 7,
-                          padding: '4px 10px 4px 5px', borderRadius: 10,
-                          background: 'rgba(255,255,255,0.06)',
-                          border: '1px solid rgba(255,255,255,0.10)',
-                        }}
-                      >
+                      <div key={mention.entityId ?? mention.start} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '4px 10px 4px 5px', borderRadius: 10, background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.06)' }}>
                         {mention.avatarUrl ? (
-                          <img
-                            src={mention.avatarUrl}
-                            alt={mention.displayName}
-                            style={{
-                              width: 20, height: 20, borderRadius: '50%',
-                              objectFit: 'cover', flexShrink: 0,
-                            }}
-                          />
+                          <img src={mention.avatarUrl} alt={mention.displayName} style={{ width: 20, height: 20, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                         ) : (
-                          <div
-                            style={{
-                              width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
-                              background: 'rgba(255,255,255,0.15)',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.70)',
-                            }}
-                          >
+                          <div style={{ width: 20, height: 20, borderRadius: '50%', flexShrink: 0, background: 'rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 700, color: TEXT_SECONDARY }}>
                             {mention.displayName?.charAt(0)?.toUpperCase() ?? '?'}
                           </div>
                         )}
-                        <span
-                          style={{
-                            fontSize: 12, fontWeight: 600,
-                            color: 'rgba(255,255,255,0.80)',
-                          }}
-                        >
+                        <span style={{ fontSize: 12, fontWeight: 600, color: TEXT_PRIMARY }}>
                           @{mention.username ?? mention.displayName}
                         </span>
                       </div>
@@ -282,53 +188,29 @@ export function PublishScreen() {
 
         {/* ── No media — caption only ── */}
         {!firstItem && hasCaption && (
-          <div
-            className="mx-4 mt-4 px-4 py-4 rounded-2xl"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
-          >
-            <p
-              style={{
-                margin: 0,
-                fontSize: 14,
-                lineHeight: 1.6,
-                color: 'rgba(255,255,255,0.75)',
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-              }}
-            >
+          <div className="mx-4 mt-4 px-4 py-4 rounded-2xl" style={{ background: BG_CARD, border: '1px solid rgba(0,0,0,0.06)' }}>
+            <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: TEXT_PRIMARY, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
               {state.caption}
             </p>
           </div>
         )}
 
         {/* ── Settings card ── */}
-        <div className="mx-4 mt-3 mb-2 overflow-hidden" style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.07)' }}>
-
-          {/* Section label */}
-          <div className="px-4 pt-3 pb-2" style={{ background: 'rgba(255,255,255,0.02)' }}>
-            <p className="text-[11px] font-bold uppercase tracking-[0.1em]" style={{ color: 'rgba(255,255,255,0.28)' }}>
+        <div className="mx-4 mt-3 mb-2 overflow-hidden" style={{ borderRadius: 16, border: '1px solid rgba(0,0,0,0.06)' }}>
+          <div className="px-4 pt-3 pb-2" style={{ background: 'rgba(0,0,0,0.015)' }}>
+            <p className="text-[11px] font-bold uppercase tracking-[0.1em]" style={{ color: TEXT_TERTIARY }}>
               Before you post
             </p>
           </div>
 
           {/* Audience row */}
           <motion.button
-            whileTap={{ backgroundColor: 'rgba(255,255,255,0.04)' }}
+            whileTap={{ backgroundColor: 'rgba(0,0,0,0.02)' }}
             onClick={() => openPanel('audience')}
             className="w-full flex items-center gap-3 px-4 py-4 min-h-[56px]"
-            style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.06)' }}
+            style={{ background: 'rgba(0,0,0,0.01)', borderTop: '1px solid rgba(0,0,0,0.05)' }}
           >
-            <div
-              style={{
-                width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'rgba(255,255,255,0.50)',
-              }}
-            >
+            <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: ICON_BG, border: '1px solid rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: ICON_COLOR }}>
               <visibilityConfig.Icon className="w-[18px] h-[18px]" strokeWidth={1.75} />
             </div>
             <div className="flex-1 text-left">
@@ -336,27 +218,19 @@ export function PublishScreen() {
               <p className="text-[11px] mt-0.5" style={{ color: TEXT_TERTIARY }}>{visibilityConfig.desc}</p>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-[13px] font-semibold" style={{ color: 'rgba(255,255,255,0.65)' }}>{visibilityConfig.label}</span>
-              <ChevronRight className="w-3.5 h-3.5" style={{ color: 'rgba(255,255,255,0.22)' }} />
+              <span className="text-[13px] font-semibold" style={{ color: TEXT_SECONDARY }}>{visibilityConfig.label}</span>
+              <ChevronRight className="w-3.5 h-3.5" style={{ color: TEXT_TERTIARY }} />
             </div>
           </motion.button>
 
           {/* Schedule row */}
           <motion.button
-            whileTap={{ backgroundColor: 'rgba(255,255,255,0.04)' }}
+            whileTap={{ backgroundColor: 'rgba(0,0,0,0.02)' }}
             onClick={() => openPanel('schedule')}
             className="w-full flex items-center gap-3 px-4 py-4 min-h-[56px]"
-            style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.06)' }}
+            style={{ background: 'rgba(0,0,0,0.01)', borderTop: '1px solid rgba(0,0,0,0.05)' }}
           >
-            <div
-              style={{
-                width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: 'rgba(255,255,255,0.50)',
-              }}
-            >
+            <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: ICON_BG, border: '1px solid rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: ICON_COLOR }}>
               <Clock className="w-[18px] h-[18px]" strokeWidth={1.75} />
             </div>
             <div className="flex-1 text-left">
@@ -366,12 +240,12 @@ export function PublishScreen() {
               </p>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-[12px] font-medium" style={{ color: 'rgba(255,255,255,0.50)' }}>
+              <span className="text-[12px] font-medium" style={{ color: TEXT_SECONDARY }}>
                 {state.scheduledAt
                   ? state.scheduledAt.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
                   : 'Now'}
               </span>
-              <ChevronRight className="w-3.5 h-3.5" style={{ color: 'rgba(255,255,255,0.22)' }} />
+              <ChevronRight className="w-3.5 h-3.5" style={{ color: TEXT_TERTIARY }} />
             </div>
           </motion.button>
         </div>
@@ -384,32 +258,20 @@ export function PublishScreen() {
         className="shrink-0 px-4 pt-3"
         style={{
           paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 20px)',
-          background: 'rgba(8,8,8,0.98)',
-          borderTop: '1px solid rgba(255,255,255,0.06)',
+          background: RAIL_BG,
+          borderTop: `1px solid ${RAIL_HAIRLINE}`,
         }}
       >
         {/* Social context line */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 6,
-          paddingBottom: 10,
-        }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, paddingBottom: 10 }}>
           <div style={{
             width: 5, height: 5, borderRadius: '50%',
-            background: state.visibility === 'private'
-              ? 'rgba(255,255,255,0.20)'
-              : 'rgba(255,255,255,0.55)',
+            background: state.visibility === 'private' ? 'rgba(15,23,42,0.15)' : 'rgba(15,23,42,0.40)',
             flexShrink: 0,
           }} />
           <span style={{
-            fontSize: 12,
-            fontWeight: 500,
-            letterSpacing: 0.1,
-            color: state.visibility === 'private'
-              ? 'rgba(255,255,255,0.30)'
-              : 'rgba(255,255,255,0.45)',
+            fontSize: 12, fontWeight: 500, letterSpacing: 0.1,
+            color: state.visibility === 'private' ? TEXT_TERTIARY : TEXT_SECONDARY,
           }}>
             {contextLine}
           </span>
@@ -422,7 +284,7 @@ export function PublishScreen() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
               className="text-center text-[11px] mb-2"
-              style={{ color: 'rgba(255,255,255,0.35)' }}
+              style={{ color: TEXT_TERTIARY }}
             >
               Will post {state.scheduledAt.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' })}
             </motion.p>
@@ -440,16 +302,16 @@ export function PublishScreen() {
             fontWeight: 700,
             letterSpacing: '-0.015em',
             borderRadius: 18,
-            background: isPublishing ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.97)',
-            color: '#0D0D0D',
+            background: isPublishing ? 'rgba(15,23,42,0.25)' : 'rgba(15,23,42,0.90)',
+            color: '#FFFFFF',
             boxShadow: isPublishing
               ? 'none'
-              : '0 6px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.20), inset 0 1px 0 rgba(255,255,255,1)',
+              : '0 6px 28px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)',
           }}
         >
           {isPublishing ? (
             <>
-              <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(0,0,0,0.25)', borderTopColor: 'transparent' }} />
+              <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(255,255,255,0.25)', borderTopColor: 'transparent' }} />
               Starting upload…
             </>
           ) : (

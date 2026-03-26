@@ -1,4 +1,4 @@
-// MediaPreview — Full-bleed dark media display with cinematic controls
+// MediaPreview — Full-bleed media display with cinematic controls
 
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { Play, Pause } from 'lucide-react';
@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { StudioMediaItem } from '../types';
 
 const VIDEO_ASPECT = 16 / 9;
-const MAX_ASPECT = 4 / 5; // cap at 4:5 — no taller than this for any media
+const MAX_ASPECT = 4 / 5;
 
 interface MediaPreviewProps {
   item: StudioMediaItem;
@@ -25,7 +25,7 @@ export function MediaPreview({ item, onSwipeLeft, onSwipeRight }: MediaPreviewPr
 
   const isVideo = item.mediaType === 'video';
   const rawAspect = isVideo ? VIDEO_ASPECT : (item.width ?? 1) / (item.height ?? 1);
-  const aspect = Math.max(rawAspect, MAX_ASPECT); // max() because higher ratio = wider/shorter
+  const aspect = Math.max(rawAspect, MAX_ASPECT);
 
   const fadeOutControls = useCallback(() => {
     clearTimeout(controlsTimerRef.current);
@@ -60,11 +60,11 @@ export function MediaPreview({ item, onSwipeLeft, onSwipeRight }: MediaPreviewPr
   }, [onSwipeLeft, onSwipeRight]);
 
   if (hasError) {
-    return <div className="w-full flex items-center justify-center" style={{ aspectRatio: VIDEO_ASPECT, background: '#111' }}><p style={{ color: 'rgba(255,255,255,0.30)', fontSize: 13 }}>Failed to load</p></div>;
+    return <div className="w-full flex items-center justify-center" style={{ aspectRatio: VIDEO_ASPECT, background: '#F1F5F9' }}><p style={{ color: 'rgba(15,23,42,0.30)', fontSize: 13 }}>Failed to load</p></div>;
   }
 
   return (
-    <div className="w-full relative" style={{ aspectRatio: aspect, background: '#000', cursor: isVideo ? 'pointer' : 'default' }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} onClick={isVideo ? togglePlay : undefined}>
+    <div className="w-full relative" style={{ aspectRatio: aspect, background: '#F1F5F9', cursor: isVideo ? 'pointer' : 'default' }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} onClick={isVideo ? togglePlay : undefined}>
       {isVideo ? (
         <>
           <video ref={videoRef} src={item.previewUrl} preload="auto" muted playsInline loop className="w-full h-full object-contain" onError={() => setHasError(true)} />
