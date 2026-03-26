@@ -72,7 +72,7 @@ export const RecentlyAddedSection: React.FC<RecentlyAddedSectionProps> = ({
       {/* Rows - py-3 each, border-b dividers, no divider after last */}
       <div>
         {courses.map((course, index) => (
-          <React.Fragment key={course.id}>
+          <div key={course.id}>
             <RecentCourseRow
               course={course}
               onClick={() => {
