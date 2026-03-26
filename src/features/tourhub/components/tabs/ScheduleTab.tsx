@@ -359,20 +359,9 @@ export function ScheduleTab() {
         )}
       </AnimatePresence>
       
-      {/* Unified Hero Carousel — all tabs */}
-      {!search && heroItems.length > 0 && (
-        <div className="relative">
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <ScheduleHeroCarousel
-              items={heroItems}
-              leadersMap={leadersWinnersMap}
-            />
-          </motion.div>
-        </div>
+      {/* Hero Carousel — identical to Overview */}
+      {!search && (
+        <HeroCarousel hasHeader={false} />
       )}
 
       {/* Content below hero */}
