@@ -1373,7 +1373,7 @@ export const PGACard: React.FC<PGACardProps> = ({
 
                   <span style={{
                     flex: 1,
-                    fontSize: 'clamp(12px, 3vw, 14px)', fontWeight: 500,
+                    fontSize: 'clamp(13px, 3.2vw, 16px)', fontWeight: 500,
                     color: 'rgba(255,255,255,0.75)',
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
