@@ -174,21 +174,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
           {leader.position}
         </span>
         <div className="flex items-center gap-2 min-w-0">
-          <div
-            className="overflow-hidden flex-shrink-0"
-            style={{ width: '32px', height: '33px', borderRadius: '34%', border: '1.5px solid rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.12)' }}
-          >
-            {photoUrl ? (
-              <img
-                src={photoUrl}
-                alt={abbreviatedName}
-                className="w-full h-full object-cover object-top"
-                onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-[10px] font-semibold" style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.80)' }}>{initials}</div>
-            )}
-          </div>
+          <MiniAvatar src={photoUrl} alt={abbreviatedName} size={32} />
           <span className={cn("leaderboard-name truncate", isFirst && "font-bold")}>
             {abbreviatedName}
             {thruDisplay && (
