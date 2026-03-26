@@ -11,7 +11,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRankingMovers, useWorldRankingsFull } from '../../hooks/useOverviewModules';
 import { SectionErrorState } from '../SectionErrorState';
@@ -19,6 +19,8 @@ import CountryFlag from '@/components/ui/country-flag';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { toTitleCase } from '../../hooks/useWorldRankings';
 import { TOUR_COLORS } from '../../constants/colors';
+import { getTourLogo } from '../../utils/tourLogos';
+import { BottomSheet } from '@/components/ui/BottomSheet';
 
 const PLAYERS_PER_PAGE = 10;
 
