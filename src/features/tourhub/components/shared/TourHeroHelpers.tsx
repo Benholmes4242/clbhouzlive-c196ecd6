@@ -104,13 +104,8 @@ function FrostedAvatar({ src, displayName, size }: { src: string | null; display
 
   const handleError = () => {
     if (loaded) return; // Image already loaded successfully — ignore false error
-    if (currentSrc && currentSrc !== PLAYER_SILHOUETTE_URL) {
-      // First failure: try silhouette
-      setCurrentSrc(PLAYER_SILHOUETTE_URL);
-    } else {
-      // Silhouette also failed: show initials as absolute last resort
-      setImgError(true);
-    }
+    // Image failed — show inline PlayerSilhouette immediately
+    setImgError(true);
   };
 
   return (
