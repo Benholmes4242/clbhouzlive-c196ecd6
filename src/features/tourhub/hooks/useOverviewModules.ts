@@ -853,9 +853,9 @@ export interface WorldRankingEntry {
   };
 }
 
-export function useWorldRankingsFull() {
+export function useWorldRankingsFull(tourCode: string = 'pga') {
   return useQuery({
-    queryKey: ['world-rankings-full'],
+    queryKey: ['world-rankings-full', tourCode],
     queryFn: async (): Promise<WorldRankingEntry[]> => {
       const { data, error } = await supabase
         .from('sr_world_rankings')
