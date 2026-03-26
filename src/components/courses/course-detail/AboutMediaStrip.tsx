@@ -8,7 +8,8 @@ import { useClubMedia } from '@/hooks/useClubMedia';
 import { ChevronRight } from 'lucide-react';
 import { generateStreamThumbnailUrl } from '@/config/cloudflareStream';
 import { SectionHeading } from './SectionHeading';
-import { useMediaViewer } from '@/hooks/useMediaViewer';
+import { useCourseMediaViewerStore } from '@/components/course-media-tab/CourseMediaViewer';
+import type { FeedPost, MediaItem } from '@/components/media-system/types/media';
 
 // LocalMediaItem interface
 interface LocalMediaItem {
