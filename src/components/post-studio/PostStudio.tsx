@@ -8,6 +8,7 @@ import {
 } from '@/hooks/useMedianStatusBar';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { BookOpen, Trash2 } from 'lucide-react';
 import { PostStudioProvider, usePostStudioContext } from './usePostStudio';
 import { ComposeScreen } from './screens/ComposeScreen';
 import { TrimScreen } from './screens/TrimScreen';
@@ -19,6 +20,7 @@ import { CourseTagPanel } from './panels/CourseTagPanel';
 import { AudiencePanel } from './panels/AudiencePanel';
 import { SchedulePanel } from './panels/SchedulePanel';
 import { DraftsPanel } from './panels/DraftsPanel';
+import { useSaveDraft } from './hooks/useSaveDraft';
 import { SPRING, DURATION } from './constants';
 import { BG_BASE, TEXT_PRIMARY, TEXT_SECONDARY } from './tokens';
 import type { PostStudioProps, StudioStep, StudioMediaItem } from './types';
