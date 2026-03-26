@@ -19,7 +19,7 @@ export const TopTenActivityFeed: React.FC<TopTenActivityFeedProps> = ({ targetUs
         Top 10 Activity
       </h3>
       <div className="space-y-3">
-        {items.slice(0, 8).map(item => (
+        {items.slice(0, 5).map(item => (
           <div key={item.id} className="flex items-start gap-2.5">
             {item.actor_avatar ? (
               <img src={item.actor_avatar} alt={item.actor_name} className="w-7 h-7 object-cover flex-shrink-0" style={{ borderRadius: '34%' }} />
