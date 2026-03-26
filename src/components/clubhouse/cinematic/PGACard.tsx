@@ -1064,7 +1064,7 @@ export const PGACard: React.FC<PGACardProps> = ({
       {/* ── ZONE 1: CINEMATIC HERO — 55% ── */}
       <div style={{
         position: 'relative',
-        flex: '0 0 55%',
+        flex: '0 0 62%',
         overflow: 'hidden',
         minHeight: 0,
       }}>
@@ -1165,7 +1165,7 @@ export const PGACard: React.FC<PGACardProps> = ({
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                 {/* 46px squircle avatar with amber border */}
                 <div style={{
-                  width: 46, height: 46, borderRadius: SQUIRCLE_RADIUS, flexShrink: 0,
+                  width: 'clamp(46px, 12vw, 58px)', height: 'clamp(46px, 12vw, 58px)', borderRadius: SQUIRCLE_RADIUS, flexShrink: 0,
                   overflow: 'hidden',
                   border: '2px solid rgba(232,152,10,0.4)',
                   background: 'rgba(232,152,10,0.08)',
@@ -1184,7 +1184,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                 {/* Name + Thru/Today */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{
-                    fontSize: 'clamp(15px, 4vw, 18px)', fontWeight: 800,
+                    fontSize: 'clamp(17px, 4.5vw, 22px)', fontWeight: 800,
                     color: '#fff', lineHeight: 1.1,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
@@ -1209,7 +1209,7 @@ export const PGACard: React.FC<PGACardProps> = ({
 
                 {/* Score — right-aligned */}
                 <div style={{
-                  fontSize: 'clamp(28px, 8vw, 36px)', fontWeight: 900,
+                  fontSize: 'clamp(32px, 9vw, 44px)', fontWeight: 900,
                   color: ACCENT_LIGHT, lineHeight: 1,
                 }}>
                   {cd.leader.scoreDisplay || 'E'}
@@ -1228,14 +1228,14 @@ export const PGACard: React.FC<PGACardProps> = ({
                   ].map(stat => (
                     <div key={stat.label} style={{
                       flex: 1, textAlign: 'center',
-                      padding: '7px 2px 5px',
+                      padding: '9px 2px 7px',
                       borderRadius: 8,
                       background: 'rgba(0,0,0,0.45)',
                       backdropFilter: 'blur(12px)',
                       WebkitBackdropFilter: 'blur(12px)',
                       border: '1px solid rgba(255,255,255,0.12)',
                     }}>
-                      <div style={{ fontSize: 'clamp(16px, 4vw, 20px)', fontWeight: 800, color: stat.color, lineHeight: 1 }}>
+                      <div style={{ fontSize: 'clamp(18px, 4.5vw, 24px)', fontWeight: 800, color: stat.color, lineHeight: 1 }}>
                         {stat.v}
                       </div>
                       <div style={{ fontSize: 'clamp(7px, 1.8vw, 9px)', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 3 }}>
@@ -1318,7 +1318,7 @@ export const PGACard: React.FC<PGACardProps> = ({
           flex: '1 1 auto',
           overflow: 'hidden',
           padding: '0 clamp(14px, 3.5vw, 20px)',
-          display: 'flex', flexDirection: 'column', gap: 6, justifyContent: 'flex-start', paddingBottom: 8,
+          display: 'flex', flexDirection: 'column', gap: 'clamp(4px, 1.5vw, 8px)', justifyContent: 'flex-start', paddingTop: 4, paddingBottom: 8,
         }}>
           {chaserGroups && chaserGroups.length > 0 ? (
             <>
@@ -1330,7 +1330,7 @@ export const PGACard: React.FC<PGACardProps> = ({
               return (
                 <div key={`${group.position}-${gi}`} style={{
                   display: 'flex', alignItems: 'center', gap: 10,
-                  padding: '6px 10px',
+                  padding: 'clamp(8px, 2vw, 12px) 10px',
                   borderRadius: 8,
                   animation: 'trc-slideIn 0.5s ease-out both',
                   animationDelay: `${0.3 + gi * 0.07}s`,
@@ -1347,17 +1347,17 @@ export const PGACard: React.FC<PGACardProps> = ({
                     <div style={{ display: 'flex' }}>
                       {stackedAvatars.map((p, i) => (
                         <div key={i} style={{
-                          marginLeft: i === 0 ? 0 : -8,
+                          marginLeft: i === 0 ? 0 : -10,
                           zIndex: stackedAvatars.length - i,
                           border: '1.5px solid rgba(8,10,14,0.8)',
                           borderRadius: SQUIRCLE_RADIUS, overflow: 'hidden',
                         }}>
-                          <RowAvatar src={p.photoUrl} name={p.playerName} size={28} />
+                          <RowAvatar src={p.photoUrl} name={p.playerName} size={34} />
                         </div>
                       ))}
                       {group.chasers.length > 3 && (
                         <div style={{
-                          marginLeft: -6, zIndex: 0, width: 26, height: 26,
+                          marginLeft: -8, zIndex: 0, width: 32, height: 32,
                           borderRadius: SQUIRCLE_RADIUS, background: 'rgba(255,255,255,0.08)',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.5)',
@@ -1368,12 +1368,12 @@ export const PGACard: React.FC<PGACardProps> = ({
                       )}
                     </div>
                   ) : (
-                    <RowAvatar src={primary.photoUrl} name={primary.playerName} size={30} />
+                    <RowAvatar src={primary.photoUrl} name={primary.playerName} size={36} />
                   )}
 
                   <span style={{
                     flex: 1,
-                    fontSize: 'clamp(12px, 3vw, 14px)', fontWeight: 500,
+                    fontSize: 'clamp(13px, 3.2vw, 16px)', fontWeight: 500,
                     color: 'rgba(255,255,255,0.75)',
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
@@ -1388,7 +1388,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                   </span>
 
                   <span style={{
-                    fontSize: 'clamp(12px, 3vw, 14px)', fontWeight: 600,
+                    fontSize: 'clamp(13px, 3.2vw, 16px)', fontWeight: 600,
                     color: 'rgba(255,255,255,0.55)',
                   }}>
                     {primary.scoreDisplay || 'E'}
