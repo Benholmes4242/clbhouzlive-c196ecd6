@@ -156,6 +156,63 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
       aria-label={`View ${course.name}`}
       className={`group w-full rounded-none sm:rounded-sq-md overflow-hidden bg-card sm:border sm:border-border/50 text-left shadow-none sm:shadow-sm active:scale-[0.98] sm:active:scale-[0.995] transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 ${className}`}
     >
+      {/* Name + location block — above image, with amber left accent bar */}
+      <div className="flex items-stretch">
+        {/* Amber left accent bar */}
+        <div className="w-[3px] bg-amber-500 shrink-0" />
+
+        {/* Text block */}
+        <div className="flex-1 px-4 pt-3 pb-3 bg-card">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0 space-y-1">
+              {/* Course name */}
+              <h3 className="text-[15px] font-semibold text-foreground truncate" style={{ letterSpacing: '-0.2px' }} title={course.name}>
+                {course.name}
+              </h3>
+
+              {/* Logged date pill */}
+              {loggedDate && (
+                <div className="inline-block text-[9px] font-medium text-muted-foreground bg-muted/60 px-2.5 py-1 rounded-lg">
+                  Logged: {format(new Date(loggedDate), 'd MMM yyyy')}
+                </div>
+              )}
+
+              {/* Location */}
+              {!hideLocation && (
+                <p className="text-xs text-muted-foreground/60 truncate">
+                  {course.locationText}
+                </p>
+              )}
+
+              {/* Rating count / members */}
+              {course.ratingCount && course.ratingCount > 0 && (
+                <p className="text-[11px] text-muted-foreground">
+                  Rated by {course.ratingCount} member{course.ratingCount === 1 ? '' : 's'}
+                </p>
+              )}
+
+              {/* Friends context */}
+              {showFriendsContext && course.context?.friendsPlayedCount != null && (
+                <p className="text-xs text-muted-foreground">
+                  {course.context.friendsPlayedCount > 0 ? (
+                    <>Played by {course.context.friendsPlayedCount} friend{course.context.friendsPlayedCount === 1 ? '' : 's'}</>
+                  ) : (
+                    <span className="text-muted-foreground/60">No friends have played yet</span>
+                  )}
+                </p>
+              )}
+            </div>
+
+            {/* Community rating */}
+            {showRating && course.communityRating != null && (
+              <div className="flex-shrink-0 min-w-[56px] flex items-center justify-end self-center">
+                <CourseCommunityRating rating={course.communityRating} size="lg" showLogo forceNeutral />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Hero image with badges */}
       <div className={`relative w-full ${IMAGE_ASPECT} overflow-hidden`}>
         {course.imageUrl ? (
@@ -217,56 +274,8 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
         )}
       </div>
 
-      {/* Meta area - standardized padding */}
-      <div className={`${META_PADDING} bg-card`}>
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0 space-y-1">
-            {/* Course name */}
-            <h3 className="text-[15px] font-semibold text-foreground truncate" style={{ letterSpacing: '-0.2px' }} title={course.name}>
-              {course.name}
-            </h3>
-
-            {/* Logged date pill - aligned with course name */}
-            {loggedDate && (
-              <div className="inline-block text-[9px] font-medium text-muted-foreground bg-muted/60 px-2.5 py-1 rounded-lg">
-                Logged: {format(new Date(loggedDate), 'd MMM yyyy')}
-              </div>
-            )}
-
-            {/* Location - increased spacing from title */}
-            {!hideLocation && (
-              <p className="text-xs text-muted-foreground/60 truncate">
-                {course.locationText}
-              </p>
-            )}
-
-            {/* Rating count / members */}
-            {course.ratingCount && course.ratingCount > 0 && (
-              <p className="text-[11px] text-muted-foreground">
-                Rated by {course.ratingCount} member{course.ratingCount === 1 ? '' : 's'}
-              </p>
-            )}
-
-            {/* Friends context */}
-            {showFriendsContext && course.context?.friendsPlayedCount != null && (
-              <p className="text-xs text-muted-foreground">
-                {course.context.friendsPlayedCount > 0 ? (
-                  <>Played by {course.context.friendsPlayedCount} friend{course.context.friendsPlayedCount === 1 ? '' : 's'}</>
-                ) : (
-                  <span className="text-muted-foreground/60">No friends have played yet</span>
-                )}
-              </p>
-            )}
-          </div>
-
-          {/* Community rating - fixed width container for alignment lock */}
-          {showRating && course.communityRating != null && (
-            <div className="flex-shrink-0 min-w-[56px] flex items-center justify-end self-center">
-              <CourseCommunityRating rating={course.communityRating} size="lg" showLogo forceNeutral />
-            </div>
-          )}
-        </div>
-      </div>
+      {/* Grey spacer row — visual separation between courses */}
+      <div className="h-5 bg-background" />
     </button>
   );
 };
