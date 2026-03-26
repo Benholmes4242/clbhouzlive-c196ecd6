@@ -2,7 +2,6 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, MessageCircle, Trophy, Calendar, ChevronRight, MapPin, Shield } from 'lucide-react';
 import type { PGACardFeedPost, PGACardChaser } from '@/components/media-system/types/media';
-import { GolfSilhouette } from '@/components/ui/GolfSilhouette';
 
 interface PGACardProps {
   post: PGACardFeedPost;
@@ -152,7 +151,9 @@ const HeroAvatar: React.FC<{ src?: string | null; name: string }> = ({ src, name
       background: 'linear-gradient(135deg, #1a1a2e, #16213e)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
     }}>
-      <GolfSilhouette size={72} />
+      <span style={{ fontSize: 64, fontWeight: 800, color: 'rgba(255,255,255,0.15)' }}>
+        {getInitials(name)}
+      </span>
     </div>
   );
 };
@@ -161,13 +162,13 @@ const HeroAvatar: React.FC<{ src?: string | null; name: string }> = ({ src, name
 const RowAvatar: React.FC<{ src?: string | null; name: string; size: number }> = ({ src, name, size }) => (
   <div style={{
     width: size, height: size, borderRadius: SQUIRCLE_RADIUS,
-    overflow: 'hidden', background: 'rgba(255,255,255,0.05)',
+    overflow: 'hidden', background: 'rgba(255,255,255,0.08)',
     display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
   }}>
     {src ? (
       <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }} />
     ) : (
-      <GolfSilhouette size={Math.round(size * 0.72)} />
+      <span style={{ fontSize: size * 0.35, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>{getInitials(name)}</span>
     )}
   </div>
 );

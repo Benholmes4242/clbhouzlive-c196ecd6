@@ -12,7 +12,6 @@ import type { LeaderboardPlayer } from './types';
 import type { CategoryId } from './StatCategoryIcons';
 import { CATEGORY_ACCENT_COLORS } from './constants';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
-import { GolfSilhouette } from '@/components/ui/GolfSilhouette';
 
 interface ChasingPackProps {
   players: LeaderboardPlayer[];
@@ -40,8 +39,7 @@ const ChaserCard = memo(function ChaserCard({
   accentColor: CategoryId;
 }) {
   const navigate = useNavigate();
-  const rawPhotoUrl = getPlayerHeadshotUrl(player.playerName, player.tourCode ?? 'pga');
-  const photoUrl = rawPhotoUrl === PLAYER_SILHOUETTE_URL ? null : rawPhotoUrl;
+  const photoUrl = getPlayerHeadshotUrl(player.playerName, player.tourCode ?? 'pga');
   const delta = formatDelta(player.statValue, leaderValue, higherIsBetter);
   const accent = CATEGORY_ACCENT_COLORS[accentColor];
   const [imgError, setImgError] = useState(false);
@@ -88,12 +86,12 @@ const ChaserCard = memo(function ChaserCard({
                 onError={() => setImgError(true)}
               />
             ) : (
-              <div
-                className="w-full h-full flex items-center justify-center"
-                style={{ background: 'rgba(255,255,255,0.05)' }}
-              >
-                <GolfSilhouette size={Math.round(80 * 0.72)} />
-              </div>
+              <img
+                src={PLAYER_SILHOUETTE_URL}
+                alt={player.playerName}
+                className="w-full h-full object-cover"
+                style={{ backgroundColor: 'hsl(var(--muted))' }}
+              />
             )}
           </div>
         </div>

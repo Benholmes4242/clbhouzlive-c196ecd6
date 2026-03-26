@@ -3,7 +3,6 @@
  * Straight-edge, Ken Burns, gradient scrim, stat pill.
  */
 
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -11,7 +10,6 @@ import { openTourNav } from '../../contexts/TourNavContext';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
-import { GolfSilhouette } from '@/components/ui/GolfSilhouette';
 import type { LeaderCategory } from './constants';
 
 interface LeadersHeroProps {
@@ -37,9 +35,7 @@ interface LeadersHeroProps {
 export function LeadersHero({ leader, category, formatOverride, unitOverride }: LeadersHeroProps) {
   
   const { player, value } = leader;
-  const rawPhotoUrl = getPlayerHeadshotUrl(player.full_name, player.tour_codes?.[0] ?? 'pga');
-  const photoUrl = rawPhotoUrl === PLAYER_SILHOUETTE_URL ? null : rawPhotoUrl;
-  const [imgError, setImgError] = useState(false);
+  const photoUrl = getPlayerHeadshotUrl(player.full_name, player.tour_codes?.[0] ?? 'pga');
   const flag = countryCodeToFlag(player.country_code);
   const countryName = titleCaseCountry(player.country);
   const fmt = formatOverride ?? category.format;
@@ -73,7 +69,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
       >
         {/* Hero — 50dvh */}
         <div className="relative w-full overflow-hidden" style={{ height: '45dvh' }}>
-          {photoUrl && !imgError ? (
+          {photoUrl ? (
             <motion.img
               src={photoUrl}
               alt={player.full_name}
@@ -82,11 +78,13 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
               initial={{ scale: 1.06 }}
               animate={{ scale: 1 }}
               transition={{ duration: 12, ease: 'linear' }}
-              onError={() => setImgError(true)}
+              onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
             />
           ) : (
             <div className="absolute inset-0 w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${category.accentColor}22, ${category.accentColor}44)` }}>
-              <GolfSilhouette size={120} />
+              <span className="text-6xl font-bold text-foreground/20 select-none">
+                {player.full_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+              </span>
             </div>
           )}
 

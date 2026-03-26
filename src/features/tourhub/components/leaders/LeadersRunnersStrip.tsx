@@ -8,7 +8,6 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import CountryFlag from '@/components/ui/country-flag';
-import { GolfSilhouette } from '@/components/ui/GolfSilhouette';
 import type { LeaderCategory } from './constants';
 
 interface RunnerItem {
@@ -47,8 +46,7 @@ function RunnerCard({
   index: number;
 }) {
   const { player, value, rank } = runner;
-  const rawPhotoUrl = getPlayerHeadshotUrl(player.full_name, player.tour_codes?.[0] ?? 'pga');
-  const photoUrl = rawPhotoUrl === PLAYER_SILHOUETTE_URL ? null : rawPhotoUrl;
+  const photoUrl = getPlayerHeadshotUrl(player.full_name, player.tour_codes?.[0] ?? 'pga');
   const lastName = player.full_name.split(' ').slice(-1)[0];
   const fmt = formatOverride ?? category.format;
   const unit = unitOverride ?? category.unit;
@@ -81,8 +79,10 @@ function RunnerCard({
         {photoUrl ? (
           <img src={photoUrl} alt={player.full_name} style={{ width: 36, height: 36, objectFit: 'cover' }} />
         ) : (
-          <div className="w-full h-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
-            <GolfSilhouette size={Math.round(36 * 0.72)} />
+          <div className="w-full h-full bg-muted flex items-center justify-center">
+            <span className="text-muted-foreground text-xs font-semibold">
+              {player.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+            </span>
           </div>
         )}
       </div>

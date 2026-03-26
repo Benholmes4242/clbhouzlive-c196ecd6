@@ -33,7 +33,6 @@ import { PlayerScorecardCard } from '@/components/tourhub/PlayerScorecardCard';
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
 import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
-import { GolfSilhouette } from '@/components/ui/GolfSilhouette';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
 import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, WinnerStatsPanel, getCurrentRoundLabel as getCurrentRoundLabelShared, UpcomingCountdown } from '../shared/TourHeroHelpers';
@@ -138,8 +137,7 @@ interface LeaderboardRowProps {
 function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreFlash, positionDelta = 0, tournamentTourSlug }: LeaderboardRowProps) {
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
   const effectiveTourCode = leader.player.tourCode ?? tournamentTourSlug ?? 'pga';
-  const rawPhotoUrl = getPlayerHeadshotUrl(leader.player.fullName, effectiveTourCode, leader.player.headshotOverride);
-  const photoUrl = rawPhotoUrl === PLAYER_SILHOUETTE_URL ? null : rawPhotoUrl;
+  const photoUrl = getPlayerHeadshotUrl(leader.player.fullName, effectiveTourCode, leader.player.headshotOverride);
   const initials = `${leader.player.firstName[0]}${leader.player.lastName[0]}`.toUpperCase();
   const thruDisplay = formatThruDisplay(leader.thru, leader.round_1, leader.round_2, leader.round_3, leader.round_4, leader.status, leader.thruUpdatedAt, leader.tournamentTimezone);
   
@@ -167,12 +165,11 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
                 src={photoUrl}
                 alt={abbreviatedName}
                 className="w-full h-full object-cover object-top"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden'); }}
+                onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }}
               />
-            ) : null}
-            <div className={`w-full h-full flex items-center justify-center ${photoUrl ? 'hidden' : ''}`} style={{ background: 'rgba(255,255,255,0.05)' }}>
-              <GolfSilhouette size={Math.round(32 * 0.72)} />
-            </div>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-[10px] font-semibold" style={{ background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.80)' }}>{initials}</div>
+            )}
           </div>
           <span className={cn("leaderboard-name truncate", isFirst && "font-bold")}>
             {abbreviatedName}
@@ -217,8 +214,7 @@ function CondensedTieRow({ row, index, isActive, tournamentTourSlug }: { row: Li
         <div className="flex items-center flex-shrink-0">
           {row.players.slice(0, 4).map((player, i) => {
             const effectiveTourCode = player.player.tourCode ?? tournamentTourSlug ?? 'pga';
-            const rawPhotoUrl = getPlayerHeadshotUrl(player.player.fullName, effectiveTourCode, player.player.headshotOverride);
-            const photoUrl = rawPhotoUrl === PLAYER_SILHOUETTE_URL ? null : rawPhotoUrl;
+            const photoUrl = getPlayerHeadshotUrl(player.player.fullName, effectiveTourCode, player.player.headshotOverride);
             const initials = `${player.player.firstName[0]}${player.player.lastName[0]}`.toUpperCase();
             return (
               <div
@@ -236,11 +232,10 @@ function CondensedTieRow({ row, index, isActive, tournamentTourSlug }: { row: Li
                 }}
               >
                 {photoUrl ? (
-                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden'); }} />
-                ) : null}
-                <div className={`w-full h-full flex items-center justify-center ${photoUrl ? 'hidden' : ''}`} style={{ background: 'rgba(255,255,255,0.05)' }}>
-                  <GolfSilhouette size={Math.round(28 * 0.72)} />
-                </div>
+                  <img src={photoUrl} alt="" className="w-full h-full object-cover object-top" onError={(e) => { if (import.meta.env.DEV) console.warn('[Headshot 404]', (e.target as HTMLImageElement).src); (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
+                ) : (
+                  <div style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.80)' }}>{initials}</div>
+                )}
               </div>
             );
           })}
