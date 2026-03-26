@@ -891,9 +891,15 @@ export function useWorldRankingsFull(tourCode: string = 'pga') {
       // Post-filter to latest date
       const latestDate = data?.[0]?.ranking_date ?? null;
       const latestRows = latestDate ? (data ?? []).filter(r => r.ranking_date === latestDate) : (data ?? []);
+
+      // Client-side tour filter
+      const tourFiltered = latestRows.filter((entry: any) => {
+        const codes: string[] = entry.player?.tour_codes ?? [];
+        return codes.some(c => c.toLowerCase() === tourCode.toLowerCase());
+      });
       
       // Process data to extract all stats from raw_data.statistics
-      return latestRows.map((entry: any): WorldRankingEntry => {
+      return tourFiltered.map((entry: any): WorldRankingEntry => {
         // Calculate rank change (positive = moved up, negative = moved down)
         const rankChange = entry.prior_rank ? entry.prior_rank - entry.rank : 0;
         
