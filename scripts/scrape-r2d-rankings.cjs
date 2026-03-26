@@ -161,7 +161,7 @@ async function scrape() {
 
 async function scrapeLPGA(browser, supabase) {
   const LPGA_URL = 'https://www.rolexrankings.com/rankings';
-  const LPGA_TOUR_CODE = 'lpga';
+  const LPGA_TOUR_CODE = 'LPGA';
   const now = new Date();
   const LPGA_SEASON_YEAR = now.getMonth() >= 10 ? now.getFullYear() + 1 : now.getFullYear();
 
