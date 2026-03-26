@@ -126,6 +126,8 @@ function buildLiveLeaderboardRows(
 /** Tiny stateful avatar — renders inline PlayerSilhouette on 404 */
 function MiniAvatar({ src, alt, size = 32 }: { src: string; alt: string; size?: number }) {
   const [err, setErr] = useState(false);
+  // Reset error state when src changes (e.g. slide transition or data update)
+  useEffect(() => { setErr(false); }, [src]);
   const h = Math.round(size * 1.03);
   return (
     <div
