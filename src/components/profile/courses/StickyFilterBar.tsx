@@ -94,51 +94,50 @@ export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
         </button>
       </div>
 
-      {/* Controls row: country pills + sort dropdown */}
-      <div className="flex items-center gap-2">
-        {/* Country filter pills — scrollable */}
-        <div className="flex-1 overflow-x-auto no-scrollbar">
-          <div className="flex gap-1.5">
-            {countryOptions.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => onCountryChange(opt.value)}
-                className={cn(
-                  "rounded-full min-h-[36px] text-sm font-medium px-3 whitespace-nowrap transition-colors duration-150 shrink-0",
-                  activeCountry === opt.value
-                    ? "bg-amber-500/10 text-amber-700 border border-amber-500/30"
-                    : "bg-muted text-muted-foreground"
-                )}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Sort dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1.5 text-sm font-medium text-foreground min-h-[36px] whitespace-nowrap shrink-0">
-              {currentSortLabel}
-              <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+      {/* Controls: country pills + sort dropdown */}
+      <div className="space-y-2 pt-2">
+        {/* Country pills — full width scrollable */}
+        <div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-1">
+          {countryOptions.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => onCountryChange(opt.value)}
+              className={cn(
+                "rounded-full min-h-[36px] text-sm font-medium px-3 whitespace-nowrap transition-colors duration-150 shrink-0",
+                activeCountry === opt.value
+                  ? "bg-amber-500/10 text-amber-700 border border-amber-500/30"
+                  : "bg-muted text-muted-foreground"
+              )}
+            >
+              {opt.label}
             </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-[180px]">
-            {SORT_OPTIONS.map((opt) => (
-              <DropdownMenuItem
-                key={opt.value}
-                onClick={() => onSortChange(opt.value)}
-                className={cn(
-                  "text-sm",
-                  activeSort === opt.value && "font-semibold"
-                )}
-              >
-                {opt.label}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          ))}
+        </div>
+        {/* Sort — right aligned */}
+        <div className="flex justify-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1.5 text-sm font-medium text-foreground min-h-[36px] whitespace-nowrap shrink-0">
+                {currentSortLabel}
+                <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[180px]">
+              {SORT_OPTIONS.map((opt) => (
+                <DropdownMenuItem
+                  key={opt.value}
+                  onClick={() => onSortChange(opt.value)}
+                  className={cn(
+                    "text-sm",
+                    activeSort === opt.value && "font-semibold"
+                  )}
+                >
+                  {opt.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </div>
   );
