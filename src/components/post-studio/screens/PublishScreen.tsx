@@ -1,9 +1,11 @@
 // PublishScreen — Step 2: Clean review before posting
 import React, { useCallback, useState, useEffect } from 'react';
-import { Globe, Users, Lock, Clock, ChevronRight, Zap, MapPin } from 'lucide-react';
+import { Globe, Users, Lock, Clock, ChevronRight, Zap, MapPin, BookOpen } from 'lucide-react';
+import { usePostStudioStore } from '@/stores/usePostStudioStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { StudioHeader } from '../components/StudioHeader';
 import { usePostStudioContext } from '../usePostStudio';
+import { useSaveDraft } from '../hooks/useSaveDraft';
 import { enqueuePostUpload } from '@/uploads/uploadPipeline';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -12,8 +14,10 @@ import { useSocialCounts } from '@/hooks/useSocialCounts';
 import type { UploadJobInput } from '@/uploads/types';
 
 export function PublishScreen() {
-  const { state, setStep, openPanel, onSuccess } = usePostStudioContext();
+  const { state, setStep, openPanel, onSuccess, reset } = usePostStudioContext();
+  const closePostStudio = usePostStudioStore((s) => s.closePostStudio);
   const [isPublishing, setIsPublishing] = useState(false);
+  const { saveDraft, isSaving: isSavingDraft } = useSaveDraft(state);
 
   const [currentUserId, setCurrentUserId] = useState<string | undefined>(undefined);
   useEffect(() => {
@@ -320,6 +324,27 @@ export function PublishScreen() {
                 ? <Clock className="w-5 h-5" strokeWidth={2.5} />
                 : <Zap className="w-5 h-5" strokeWidth={2.5} fill="currentColor" />}
               {state.scheduledAt ? 'Schedule Moment' : 'Post Moment'}
+            </>
+          )}
+        </motion.button>
+
+        {/* Save as Draft — secondary action */}
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={async () => {
+            const ok = await saveDraft();
+            if (ok) { reset(); closePostStudio(); }
+          }}
+          disabled={isSavingDraft || isPublishing}
+          className="w-full flex items-center justify-center gap-2 mt-3 min-h-[44px] disabled:opacity-40"
+          style={{ fontSize: 14, fontWeight: 500, color: TEXT_TERTIARY, background: 'transparent', border: 'none' }}
+        >
+          {isSavingDraft ? (
+            <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'rgba(0,0,0,0.12)', borderTopColor: 'transparent' }} />
+          ) : (
+            <>
+              <BookOpen className="w-4 h-4" strokeWidth={1.75} />
+              Save as Draft
             </>
           )}
         </motion.button>

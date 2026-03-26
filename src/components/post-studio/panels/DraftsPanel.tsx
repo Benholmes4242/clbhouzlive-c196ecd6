@@ -28,6 +28,32 @@ export function DraftsPanel() {
         country: draft.courseCountry ?? undefined,
       }];
     }
+
+    // Restore media from storage
+    if (draft.media && draft.media.length > 0) {
+      partialState.mediaItems = draft.media.map((m) => {
+        const isVideo = m.mediaType === 'video';
+        return {
+          id: m.id,
+          file: null as any,
+          mediaType: m.mediaType,
+          previewUrl: isVideo ? (m.posterUrl || m.mediaUrl) : m.mediaUrl,
+          thumbnailUrl: isVideo ? m.posterUrl || undefined : undefined,
+          duration: m.durationSeconds ?? null,
+          trimStart: 0,
+          trimEnd: m.durationSeconds ?? null,
+          posterTimestamp: 0,
+          posterPreviewUrl: isVideo ? (m.posterUrl ?? null) : null,
+          width: m.width ?? null,
+          height: m.height ?? null,
+          validationError: null,
+          isRestored: true,
+          restoredMediaUrl: m.mediaUrl,
+          restoredStreamId: isVideo ? (m.streamId ?? undefined) : undefined,
+        } as any;
+      });
+    }
+
     dispatch({ type: 'LOAD_DRAFT', payload: { draftId: draft.id, state: partialState } });
     closePanel();
   }, [dispatch, closePanel]);
