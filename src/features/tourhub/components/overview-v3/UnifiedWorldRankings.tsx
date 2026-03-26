@@ -27,6 +27,14 @@ const PLAYERS_PER_PAGE = 10;
 // No.1 rank crown accent — amber-orange, distinct from live green
 const CROWN_COLOR = '#EA580C';
 
+const RANKING_TOUR_OPTIONS = [
+  { code: 'pga',  label: 'PGA Tour',       description: 'Official World Golf Ranking' },
+  { code: 'euro', label: 'DP World Tour',   description: 'DP World Tour ranking' },
+  { code: 'liv',  label: 'LIV Golf',        description: 'LIV Golf Series ranking' },
+  { code: 'lpga', label: 'LPGA Tour',       description: "Rolex Women's World Ranking" },
+  { code: 'pgad', label: 'Korn Ferry',      description: 'Korn Ferry Tour ranking' },
+];
+
 // ============================================================================
 // SKELETON
 // ============================================================================
