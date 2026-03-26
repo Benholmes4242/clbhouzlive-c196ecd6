@@ -316,6 +316,7 @@ const Top100CoursesHubPanel = () => {
         <VirtualizedCourseList 
           courses={allCourses}
           onCourseClick={handleCourseClick}
+          activeListSlug={selectedList}
         />
       )}
       </div>

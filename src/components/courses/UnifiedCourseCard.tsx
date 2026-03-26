@@ -35,6 +35,7 @@ interface UnifiedCourseCardProps {
   hideLocation?: boolean;
   loggedDate?: string | Date | null;
   contextTag?: string;
+  activeListSlug?: string | null;
   onClick?: () => void;
   className?: string;
 }

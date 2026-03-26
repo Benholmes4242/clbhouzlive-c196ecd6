@@ -35,6 +35,7 @@ interface VirtualizedCourseListProps {
   courses: Course[];
   onCourseClick?: () => void;
   footer?: React.ReactNode;
+  activeListSlug?: string | null;
 }
 
 // Row height for scroll calculations (per grid row, not per item)
