@@ -250,7 +250,7 @@ export function PodiumRunnerRow({
             pgaTourId={player.pgaTourId}
             displayName={player.displayName}
             fullName={player.fullName}
-            tourCode={tourCode}
+            tourCode={player.tourCode ?? tourCode}
             size={30}
             frosted
           />
