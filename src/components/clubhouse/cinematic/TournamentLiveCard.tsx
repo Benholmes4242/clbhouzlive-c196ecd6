@@ -96,7 +96,8 @@ function LiveBadge() {
 function PlayerAvatar({ name, photoUrl, tourSlug, size }: {
   name: string; photoUrl: string | null; tourSlug: string; size: number;
 }) {
-  const src = photoUrl || getPlayerHeadshotUrl(name, tourSlug) || null;
+  const resolvedPhotoUrl = photoUrl || getPlayerHeadshotUrl(name, tourSlug) || null;
+  const src = resolvedPhotoUrl === PLAYER_SILHOUETTE_URL ? null : resolvedPhotoUrl;
   const initials = name.split(/[\s.]/).filter(Boolean)
     .map(w => w[0]?.toUpperCase() ?? '').slice(0, 2).join('');
   return <SquircleAvatar src={src} alt={name} size={size} fallback={initials} hideRing />;
