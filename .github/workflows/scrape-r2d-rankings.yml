@@ -1,4 +1,4 @@
-name: Scrape Race to Dubai Rankings
+name: Scrape Tour Rankings (DP World, LPGA, LIV, Korn Ferry)
 
 on:
   schedule:
