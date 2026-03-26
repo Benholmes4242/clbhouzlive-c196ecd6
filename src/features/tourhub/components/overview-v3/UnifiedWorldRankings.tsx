@@ -434,8 +434,8 @@ export function UnifiedWorldRankings() {
           <div className="flex-1 min-w-0 uppercase text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em' }}>
             Player
           </div>
-          <div className="w-16 flex-shrink-0 text-right uppercase text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em' }}>
-            Avg Pts
+           <div className="w-16 flex-shrink-0 text-right uppercase text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em' }}>
+             {activeTour === 'pga' ? 'Avg Pts' : 'Points'}
           </div>
           <div className="w-16 flex-shrink-0 text-right uppercase text-muted-foreground/60" style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em' }}>
             Total
