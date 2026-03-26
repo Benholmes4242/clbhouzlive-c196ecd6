@@ -38,6 +38,7 @@ export function LeadersHero({ leader, category, formatOverride, unitOverride }: 
   
   const { player, value } = leader;
   const photoUrl = getPlayerHeadshotUrl(player.full_name, player.tour_codes?.[0] ?? 'pga');
+  const [imgError, setImgError] = useState(false);
   const flag = countryCodeToFlag(player.country_code);
   const countryName = titleCaseCountry(player.country);
   const fmt = formatOverride ?? category.format;
