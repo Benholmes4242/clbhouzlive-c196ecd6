@@ -37,15 +37,6 @@ const TOUR_LABELS: Record<string, string> = {
   pga: 'PGA Tour', EURO: 'DP World Tour', LPGA: 'LPGA', CHAMP: 'Champions Tour', PGAD: 'Korn Ferry', LIV: 'LIV Golf',
 };
 
-const SCHEDULE_TOUR_PRIORITY: Record<string, number> = {
-  pga: 0, LIV: 1, EURO: 2, LPGA: 3, PGAD: 4, CHAMP: 5,
-};
-
-function getTournamentPriority(t: TourTournament): number {
-  const label = getContextLabel({ name: t.name, tourName: t.tour_full_name ?? undefined });
-  if (label === 'MAJOR CHAMPIONSHIP') return -1;
-  return SCHEDULE_TOUR_PRIORITY[t.tour_code || ''] ?? 99;
-}
 
 // B45 FIX 1: Helper for completed status check
 const isCompleted = (t: TourTournament) => t.status === 'closed' || t.status === 'complete';
