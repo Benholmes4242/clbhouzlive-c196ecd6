@@ -26,7 +26,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
   const sectionRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<CoursePrimaryTab>('all');
   const [activeSort, setActiveSort] = useState<CourseSortOption>('recently-played');
-  const [activeCountry, setActiveCountry] = useState<CourseCountryFilter>('all');
+  const [activeCountry, setActiveCountry] = useState<QuickRegion>('global');
   const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
