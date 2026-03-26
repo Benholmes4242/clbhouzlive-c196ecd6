@@ -185,7 +185,7 @@ export const AllCoursesList: React.FC<AllCoursesListProps> = ({
         activeTab={activeTab}
         onTabChange={(tab) => {
           setActiveTab(tab);
-          if (tab === 'top100' && activeCountry === 'all') {
+          if (tab === 'top100' && activeCountry === 'global') {
             setActiveCountry('gb-i');
           }
           setDisplayCount(PAGE_SIZE);
