@@ -1242,15 +1242,20 @@ export const PGACard: React.FC<PGACardProps> = ({
             </>
           ) : (
             <div style={{
-              padding: '14px 16px',
-              borderRadius: 12,
-              background: 'rgba(245,158,11,0.06)',
-              border: '1px solid rgba(245,158,11,0.15)',
-              textAlign: 'center',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              gap: 8, marginBottom: 10,
+              padding: '12px 16px', borderRadius: 12,
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
             }}>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', fontStyle: 'italic' }}>
-                Leaderboard updating shortly...
-              </p>
+              <div style={{
+                width: 6, height: 6, borderRadius: '50%',
+                background: '#22c55e',
+                animation: 'dotPulse 1.4s ease-in-out infinite',
+              }} />
+              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', fontStyle: 'italic' }}>
+                Scores updating shortly...
+              </span>
             </div>
           )}
         </div>
@@ -1381,10 +1386,22 @@ export const PGACard: React.FC<PGACardProps> = ({
             })
           ) : (
             <div style={{
-              flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flex: 1, display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center', gap: 10,
             }}>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', fontStyle: 'italic' }}>
-                Leaderboard updating...
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 28 }}>
+                {[0.5, 0.8, 0.6, 1, 0.7, 0.9, 0.55].map((h, i) => (
+                  <div key={i} style={{
+                    width: 4, borderRadius: 2,
+                    height: `${h * 100}%`,
+                    background: 'rgba(255,255,255,0.12)',
+                    animation: `dotPulse ${0.8 + i * 0.15}s ease-in-out infinite`,
+                    animationDelay: `${i * 0.1}s`,
+                  }} />
+                ))}
+              </div>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', fontStyle: 'italic', margin: 0 }}>
+                Leaderboard updates as play begins
               </p>
             </div>
           )}

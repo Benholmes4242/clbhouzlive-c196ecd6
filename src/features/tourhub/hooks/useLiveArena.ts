@@ -251,8 +251,7 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
       eventType.includes('champions')                                                   ? 'champ' :
       'pga';
     
-    const estimatedRound = (tournament as any).current_round
-      ?? (tournament.cut_round ? Math.min(tournament.cut_round, 4) : 1);
+    const estimatedRound = (tournament as any).current_round ?? 1;
     
     const momentumTags = generateMomentumTags(
       { ...tournament, current_round: estimatedRound }, 
