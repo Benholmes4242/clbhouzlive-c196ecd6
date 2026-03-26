@@ -1209,7 +1209,7 @@ export const PGACard: React.FC<PGACardProps> = ({
 
                 {/* Score — right-aligned */}
                 <div style={{
-                  fontSize: 'clamp(28px, 8vw, 36px)', fontWeight: 900,
+                  fontSize: 'clamp(32px, 9vw, 44px)', fontWeight: 900,
                   color: ACCENT_LIGHT, lineHeight: 1,
                 }}>
                   {cd.leader.scoreDisplay || 'E'}
