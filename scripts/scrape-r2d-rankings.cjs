@@ -160,12 +160,12 @@ async function scrape() {
 }
 
 async function scrapeLPGA(browser, supabase) {
-  const LPGA_URL = 'https://www.lpga.com/stats-and-rankings/race-to-cme-globe/rankings';
+  const LPGA_URL = 'https://www.rolexrankings.com/rankings';
   const LPGA_TOUR_CODE = 'lpga';
   const now = new Date();
   const LPGA_SEASON_YEAR = now.getMonth() >= 10 ? now.getFullYear() + 1 : now.getFullYear();
 
-  console.log(`[LPGA Scraper] Starting for season ${LPGA_SEASON_YEAR}...`);
+  console.log(`[LPGA Scraper] Starting Rolex Women's World Rankings for season ${LPGA_SEASON_YEAR}...`);
 
   const page = await browser.newPage();
   await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36');
@@ -173,9 +173,9 @@ async function scrapeLPGA(browser, supabase) {
   try {
     await page.goto(LPGA_URL, { waitUntil: 'networkidle2', timeout: 30000 });
 
-    // Wait for player links to appear (JS-rendered table)
+    // Wait for the rankings table to render
     await page.waitForFunction(() => {
-      return document.querySelectorAll('a[href*="/athletes/"]').length > 5;
+      return document.querySelectorAll('table tbody tr').length > 10;
     }, { timeout: 20000 });
     await new Promise(r => setTimeout(r, 3000));
 
@@ -183,46 +183,48 @@ async function scrapeLPGA(browser, supabase) {
       const data = [];
       const seen = new Set();
 
-      // The rankings page renders rows with: rank, photo, name (as link), country, fav star, CME points, total points, events, wins, top10, points rank
-      const rows = document.querySelectorAll('tr, [class*="row"], [class*="item"]');
-
+      const rows = document.querySelectorAll('table tbody tr');
       rows.forEach(row => {
-        const link = row.querySelector('a[href*="/athletes/"]');
-        if (!link) return;
+        const cells = Array.from(row.querySelectorAll('td'));
+        if (cells.length < 5) return;
 
-        const name = link.textContent.trim().replace(/\s+/g, ' ');
+        // Col 0: rank number
+        const rankText = cells[0]?.textContent?.trim();
+        const rank = parseInt(rankText);
+        if (isNaN(rank) || rank <= 0 || rank > 500) return;
+
+        // Col 2: player name (col 1 is movement arrow)
+        const name = cells[2]?.textContent?.trim().replace(/\s+/g, ' ');
         if (!name || name.length < 3 || seen.has(name)) return;
 
-        const cells = row.querySelectorAll('td, [class*="cell"], [class*="col"], span, div');
-        const values = Array.from(cells).map(c => c.textContent.trim()).filter(Boolean);
+        // Col 3: country code (3-letter)
+        const country = cells[3]?.textContent?.trim() ?? '';
 
-        // Find rank: first small number (1-200)
-        let rank = null;
-        for (const v of values) {
-          const n = parseInt(v);
-          if (!isNaN(n) && n > 0 && n < 300 && v === String(n)) { rank = n; break; }
-        }
+        // Col 4: average points (e.g. "8.45")
+        const avgText = cells[4]?.textContent?.trim().replace(/,/g, '');
+        const avgPoints = parseFloat(avgText);
 
-        // Find points: number with exactly 3 decimal places (CME format: 500.000, 67.833)
-        let points = null;
-        for (const v of values) {
-          const match = v.match(/^([\d,]+\.\d{3})$/);
-          if (match) { points = parseFloat(match[1].replace(/,/g, '')); break; }
-        }
+        // Col 5: total points
+        const totalText = cells[5]?.textContent?.trim().replace(/,/g, '');
+        const totalPoints = parseFloat(totalText);
 
-        // Find country: 3-letter uppercase code
-        let country = '';
-        for (const v of values) {
-          if (/^[A-Z]{3}$/.test(v)) { country = v; break; }
-        }
+        // Col 6: events played
+        const eventsText = cells[6]?.textContent?.trim();
+        const events = parseInt(eventsText);
 
-        if (rank && name && points !== null) {
+        if (rank && name && !isNaN(avgPoints)) {
           seen.add(name);
-          data.push({ position: rank, name, country, points });
+          data.push({
+            position: rank,
+            name,
+            country,
+            points: !isNaN(totalPoints) ? totalPoints : avgPoints,
+            tournaments_played: !isNaN(events) ? events : null,
+          });
         }
       });
 
-      data.sort((a, b) => a.position - b.position || b.points - a.points);
+      data.sort((a, b) => a.position - b.position);
       return data;
     });
 
@@ -233,13 +235,20 @@ async function scrapeLPGA(browser, supabase) {
       return;
     }
 
+    // Clear old LPGA rows before inserting fresh Rolex data
+    await supabase
+      .from('tour_season_rankings')
+      .delete()
+      .eq('tour_code', LPGA_TOUR_CODE)
+      .eq('season_year', LPGA_SEASON_YEAR);
+
     const rows = players.map(p => ({
       player_name: p.name,
       tour_code: LPGA_TOUR_CODE,
       season_year: LPGA_SEASON_YEAR,
       position: p.position,
       points: p.points,
-      tournaments_played: null,
+      tournaments_played: p.tournaments_played ?? null,
       country: p.country || null,
       wins: 0,
       scraped_at: new Date().toISOString(),
