@@ -4,7 +4,8 @@ import { useUserCourseActivity } from '@/hooks/useUserCourseActivity';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { TieredCourseCard, CourseCardData } from './TieredCourseCard';
-import { StickyFilterBar, CoursePrimaryTab, CourseSortOption, CourseCountryFilter } from './StickyFilterBar';
+import { StickyFilterBar, CoursePrimaryTab, CourseSortOption } from './StickyFilterBar';
+import { type QuickRegion } from '@/components/leaderboard/courses/CourseRegionPills';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ClipboardList } from 'lucide-react';
 
