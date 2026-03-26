@@ -342,7 +342,7 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
  */
 export function useLiveArena() {
   return useQuery({
-    queryKey: ['live-arena'],
+    queryKey: ['live-arena', 'v2'],
     queryFn: fetchLiveArenaData,
     staleTime: 30_000,             // 30s — matches sync interval
     refetchInterval: false,        // No polling — Realtime pushes updates
