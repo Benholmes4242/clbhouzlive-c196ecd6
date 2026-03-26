@@ -156,7 +156,7 @@ function MiniLeaderboardRow({ leader, isFirst, index, isActive, isLeader, scoreF
   const abbreviatedName = `${leader.player.firstName[0]}. ${leader.player.lastName}`;
   const effectiveTourCode = leader.player.tourCode ?? tournamentTourSlug ?? 'pga';
   const photoUrl = getPlayerHeadshotUrl(leader.player.fullName, effectiveTourCode, leader.player.headshotOverride);
-  const initials = `${leader.player.firstName[0]}${leader.player.lastName[0]}`.toUpperCase();
+  
   const thruDisplay = formatThruDisplay(leader.thru, leader.round_1, leader.round_2, leader.round_3, leader.round_4, leader.status, leader.thruUpdatedAt, leader.tournamentTimezone);
   
   return (
