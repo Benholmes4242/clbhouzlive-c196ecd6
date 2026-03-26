@@ -328,7 +328,7 @@ const ManualHandicapModal: React.FC<ManualHandicapModalProps> = (props) => {
                     value={homeClub}
                     onChange={(e) => setHomeClub(e.target.value)}
                     placeholder="Enter your home club"
-                    className="w-full h-[44px] text-sm rounded-xl border border-border bg-background px-4 outline-none transition-all focus:border-[hsl(38,92%,50%)] focus:ring-[3px] focus:ring-[hsla(38,92%,50%,0.10)]"
+                    className="w-full h-[44px] text-sm text-foreground rounded-xl border border-border bg-background px-4 outline-none transition-all focus:border-[hsl(38,92%,50%)] focus:ring-[3px] focus:ring-[hsla(38,92%,50%,0.10)]"
                   />
                 </div>
               )}
