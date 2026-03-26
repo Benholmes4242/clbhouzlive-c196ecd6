@@ -159,7 +159,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
       {/* Name + location block — above image, with amber left accent bar */}
       <div className="flex items-stretch">
         {/* Amber left accent bar */}
-        <div className="w-[1.5px] bg-amber-500 shrink-0" />
+        <div className="w-px bg-amber-500 shrink-0" />
 
         {/* Text block */}
         <div className="flex-1 px-4 pt-3 pb-3 bg-card">
