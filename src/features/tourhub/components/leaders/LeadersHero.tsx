@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { openTourNav } from '../../contexts/TourNavContext';
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { countryCodeToFlag, titleCaseCountry } from '../../utils/countryFlags';
 import CountryFlag from '@/components/ui/country-flag';
 import { GolfSilhouette } from '@/components/ui/GolfSilhouette';
