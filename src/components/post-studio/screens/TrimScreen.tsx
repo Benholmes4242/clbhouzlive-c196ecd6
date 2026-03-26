@@ -1,4 +1,4 @@
-// TrimScreen — Step 3: Video trimmer, full dark cinematic immersion
+// TrimScreen — Step 3: Video trimmer
 import React, { useRef, useEffect } from 'react';
 import { StudioHeader } from '../components/StudioHeader';
 import { VideoTrimmer } from '../components/VideoTrimmer';
@@ -42,7 +42,6 @@ export function TrimScreen() {
       <StudioHeader
         title="Trim"
         step="TRIM"
-        darkMode
         leftAction={{ label: 'Cancel', onClick: () => setStep('COMPOSE') }}
         rightAction={{ label: 'Done', onClick: () => setStep('COMPOSE'), variant: 'primary' }}
       />
@@ -52,7 +51,7 @@ export function TrimScreen() {
           className="relative overflow-hidden"
           style={{
             borderRadius: 20,
-            boxShadow: '0 16px 48px rgba(0,0,0,0.60)',
+            boxShadow: '0 16px 48px rgba(0,0,0,0.12)',
             aspectRatio: isPortrait ? '4/5' : String(aspectRatio),
             width: isPortrait ? 'auto' : '100%',
             height: isPortrait ? '48vh' : 'auto',
@@ -75,18 +74,18 @@ export function TrimScreen() {
         className="mx-4 mb-4 px-5 py-4"
         style={{
           borderRadius: 24,
-          background: 'rgba(18,18,18,0.97)',
-          border: '1px solid rgba(255,255,255,0.07)',
-          boxShadow: '0 -4px 24px rgba(0,0,0,0.40)',
+          background: 'rgba(255,255,255,0.97)',
+          border: '1px solid rgba(0,0,0,0.08)',
+          boxShadow: '0 -4px 24px rgba(0,0,0,0.06)',
         }}
       >
         <p
           className="text-[12px] font-medium mb-3 text-center uppercase tracking-wide"
-          style={{ color: 'rgba(255,255,255,0.35)', letterSpacing: '0.08em' }}
+          style={{ color: 'rgba(15,23,42,0.35)', letterSpacing: '0.08em' }}
         >
           Drag handles to trim
         </p>
-        <VideoTrimmer item={activeItem} onTrimChange={handleTrimChange} darkMode />
+        <VideoTrimmer item={activeItem} onTrimChange={handleTrimChange} />
       </div>
     </div>
   );
