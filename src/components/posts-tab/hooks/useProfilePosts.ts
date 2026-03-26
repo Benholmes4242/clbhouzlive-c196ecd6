@@ -23,13 +23,13 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
   const seenPostIds = useRef<string[]>([]);
 
   const query = useInfiniteQuery({
-    queryKey: ['profile-posts', actorType, actorId, userId],
+    queryKey: ['profile-posts', actorType, actorId],
     queryFn: async ({ pageParam }) => {
 
       const cursor = typeof pageParam === 'string' ? pageParam : undefined;
 
       const params: Record<string, any> = {
-        p_user_id: userId!,
+        p_user_id: userId ?? null,
         p_actor_type: actorType,
         p_actor_id: actorId,
         p_page_size: PAGE_SIZE,
@@ -65,9 +65,9 @@ export function useProfilePosts({ userId, actorType, actorId }: UseProfilePostsP
     },
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined as string | undefined,
-    enabled: !!actorId && !!userId,
+    enabled: !!actorId,
     placeholderData: keepPreviousData,
-    staleTime: 2 * 60 * 1000,
+    staleTime: 30 * 1000,
     gcTime: 10 * 60 * 1000,
   });
 

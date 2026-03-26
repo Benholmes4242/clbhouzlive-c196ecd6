@@ -15,9 +15,26 @@ type FeedSegment =
   | { kind: 'compact-group'; posts: FeedPost[]; startIndex: number; globalIndices: number[] };
 
 function classifyPost(post: FeedPost): PostKind {
+  // Reviews always render full-width
   if (post.isReview && post.review) return 'review';
-  const firstVideo = post.mediaItems.find(m => m.type === 'video');
-  if (firstVideo && (firstVideo.duration ?? 0) > 180) return 'longform';
+
+  const firstMedia = post.mediaItems[0];
+  if (!firstMedia) return 'compact';
+
+  // Long videos (> 3 min) render full-width
+  if (firstMedia.type === 'video' && (firstMedia.duration ?? 0) > 180) {
+    return 'longform';
+  }
+
+  // Landscape images render full-width
+  // Only treat as landscape if width and height are explicitly stored
+  // and clearly wider than tall (ratio > 1.2 avoids near-square posts)
+  const w = firstMedia.width ?? 0;
+  const h = firstMedia.height ?? 0;
+  if (firstMedia.type === 'image' && w > 0 && h > 0 && w / h > 1.2) {
+    return 'longform';
+  }
+
   return 'compact';
 }
 
