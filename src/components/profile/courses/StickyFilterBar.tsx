@@ -1,75 +1,144 @@
 /**
- * StickyFilterBar - Filter tabs for All Courses Played
- * 
- * Updated to Hub toggle bar style (rounded pill container with active white pill)
+ * StickyFilterBar - Two primary tabs (All / Top 100) with inline country filter pills and sort dropdown
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import { cn } from '@/lib/utils';
+import { ChevronDown } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
-export type CourseFilterType = 
-  | 'all' 
-  | 'rated' 
-  | 'unrated' 
-  | 'regulars' 
-  | 'travel' 
-  | 'top100' 
-  | 'highest-rated' 
-  | 'recently-played';
+export type CoursePrimaryTab = 'all' | 'top100';
+export type CourseSortOption = 'recently-played' | 'rating-high-low' | 'rating-low-high';
+export type CourseCountryFilter = 'all' | 'gb-i' | 'usa' | 'europe' | 'global';
 
 interface StickyFilterBarProps {
-  activeFilter: CourseFilterType;
-  onFilterChange: (filter: CourseFilterType) => void;
-  counts?: Partial<Record<CourseFilterType, number>>;
-  onOpenFilters?: () => void;
-  isSticky?: boolean;
+  activeTab: CoursePrimaryTab;
+  onTabChange: (tab: CoursePrimaryTab) => void;
+  activeSort: CourseSortOption;
+  onSortChange: (sort: CourseSortOption) => void;
+  activeCountry: CourseCountryFilter;
+  onCountryChange: (country: CourseCountryFilter) => void;
+  allCount: number;
+  top100Count: number;
 }
 
-const filters: { id: CourseFilterType; label: string; showCount?: boolean }[] = [
-  { id: 'all', label: 'All' },
-  { id: 'top100', label: 'Top 100', showCount: true },
-  { id: 'highest-rated', label: 'Review' },
-  { id: 'recently-played', label: 'Recent' },
+const SORT_OPTIONS: { value: CourseSortOption; label: string }[] = [
+  { value: 'recently-played', label: 'Recently Played' },
+  { value: 'rating-high-low', label: 'Rating: High to Low' },
+  { value: 'rating-low-high', label: 'Rating: Low to High' },
+];
+
+const ALL_COUNTRY_OPTIONS: { value: CourseCountryFilter; label: string }[] = [
+  { value: 'all', label: 'All Countries' },
+  { value: 'gb-i', label: 'GB&I' },
+  { value: 'usa', label: 'USA' },
+  { value: 'europe', label: 'Europe' },
+  { value: 'global', label: 'Global' },
+];
+
+const TOP100_COUNTRY_OPTIONS: { value: CourseCountryFilter; label: string }[] = [
+  { value: 'gb-i', label: 'GB&I' },
+  { value: 'usa', label: 'USA' },
+  { value: 'europe', label: 'Europe' },
+  { value: 'global', label: 'Global' },
 ];
 
 export const StickyFilterBar: React.FC<StickyFilterBarProps> = ({
-  activeFilter,
-  onFilterChange,
-  counts = {},
-  onOpenFilters,
-  isSticky = false,
+  activeTab,
+  onTabChange,
+  activeSort,
+  onSortChange,
+  activeCountry,
+  onCountryChange,
+  allCount,
+  top100Count,
 }) => {
-  const top100Count = counts.top100;
+  const countryOptions = activeTab === 'top100' ? TOP100_COUNTRY_OPTIONS : ALL_COUNTRY_OPTIONS;
+  const currentSortLabel = SORT_OPTIONS.find(s => s.value === activeSort)?.label || 'Sort';
 
   return (
-    <div className="py-2">
-      <div 
-        className="inline-flex p-1 w-full"
-      >
-        {filters.map((filter) => {
-          const isActive = activeFilter === filter.id;
-          return (
-            <button
-              key={filter.id}
-              onClick={() => onFilterChange(filter.id)}
-              className={cn(
-                "relative flex-1 py-1.5 px-4 text-sm transition-all duration-200 whitespace-nowrap min-h-[44px] active:scale-[0.98] rounded-lg",
-                isActive
-                  ? "bg-foreground text-background font-semibold shadow-sm"
-                  : "text-muted-foreground font-medium hover:text-foreground"
-              )}
-            >
-              {filter.label}
-              {filter.showCount && top100Count !== undefined && top100Count > 0 && (
-                <span className={cn(
-                  "ml-1 text-[11px]",
-                  isActive ? "text-muted-foreground" : "text-muted-foreground/60"
-                )}>
-                  {top100Count}
-                </span>
-              )}
+    <div className="space-y-3">
+      {/* Primary tab row */}
+      <div className="flex border-b border-border">
+        <button
+          onClick={() => onTabChange('all')}
+          className={cn(
+            "flex-1 pb-2 text-sm transition-colors duration-150 min-h-[44px]",
+            activeTab === 'all'
+              ? "text-foreground font-semibold border-b-2 border-[#F59E0B]"
+              : "text-muted-foreground font-medium border-b-2 border-transparent"
+          )}
+        >
+          All
+          {allCount > 0 && (
+            <span className="ml-1 text-xs text-muted-foreground">{allCount}</span>
+          )}
+        </button>
+        <button
+          onClick={() => onTabChange('top100')}
+          className={cn(
+            "flex-1 pb-2 text-sm transition-colors duration-150 min-h-[44px]",
+            activeTab === 'top100'
+              ? "text-foreground font-semibold border-b-2 border-[#F59E0B]"
+              : "text-muted-foreground font-medium border-b-2 border-transparent"
+          )}
+        >
+          Top 100
+          {top100Count > 0 && (
+            <span className="ml-1 text-xs text-muted-foreground">{top100Count}</span>
+          )}
+        </button>
+      </div>
+
+      {/* Controls row: country pills + sort dropdown */}
+      <div className="flex items-center gap-2">
+        {/* Country filter pills — scrollable */}
+        <div className="flex-1 overflow-x-auto no-scrollbar">
+          <div className="flex gap-1.5">
+            {countryOptions.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => onCountryChange(opt.value)}
+                className={cn(
+                  "rounded-full min-h-[36px] text-sm font-medium px-3 whitespace-nowrap transition-colors duration-150 shrink-0",
+                  activeCountry === opt.value
+                    ? "bg-amber-500/10 text-amber-700 border border-amber-500/30"
+                    : "bg-muted text-muted-foreground"
+                )}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Sort dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1.5 text-sm font-medium text-foreground min-h-[36px] whitespace-nowrap shrink-0">
+              {currentSortLabel}
+              <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
             </button>
-          );
-        })}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-[180px]">
+            {SORT_OPTIONS.map((opt) => (
+              <DropdownMenuItem
+                key={opt.value}
+                onClick={() => onSortChange(opt.value)}
+                className={cn(
+                  "text-sm",
+                  activeSort === opt.value && "font-semibold"
+                )}
+              >
+                {opt.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
