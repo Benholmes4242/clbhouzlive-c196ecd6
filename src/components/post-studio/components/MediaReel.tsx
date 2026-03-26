@@ -1,7 +1,8 @@
-// MediaReel — Minimal horizontal thumbnail strip
+// MediaReel — Minimal horizontal thumbnail strip, light mode
 import React, { useRef } from 'react';
 import { Plus, X, Play } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ICON_BG, ICON_DIM, TEXT_PRIMARY } from '../tokens';
 import type { StudioMediaItem } from '../types';
 
 const THUMB = 72;
@@ -28,11 +29,11 @@ export function MediaReel({ items, activeIndex, onSelect, onRemove, onAddMore }:
               className="relative shrink-0 rounded-xl overflow-hidden cursor-pointer"
               style={{
                 width: THUMB, height: THUMB,
-                border: isActive ? '2px solid rgba(255,255,255,0.80)' : '1px solid rgba(255,255,255,0.10)',
-                boxShadow: isActive ? '0 0 0 1px rgba(255,255,255,0.10)' : 'none',
+                border: isActive ? '2px solid rgba(15,23,42,0.80)' : '1px solid rgba(0,0,0,0.08)',
+                boxShadow: isActive ? '0 0 0 1px rgba(15,23,42,0.10)' : 'none',
                 transform: isActive ? 'scale(1.06)' : 'scale(1)',
                 transition: 'transform 0.2s, border 0.2s, box-shadow 0.2s',
-                background: 'rgba(255,255,255,0.05)',
+                background: 'rgba(0,0,0,0.03)',
               }}
             >
               <img src={item.thumbnailUrl || item.previewUrl} alt="" className="w-full h-full object-cover" />
@@ -43,7 +44,7 @@ export function MediaReel({ items, activeIndex, onSelect, onRemove, onAddMore }:
               )}
               <button onClick={(e) => { e.stopPropagation(); onRemove(item.id); }}
                 className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center"
-                style={{ background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.15)' }}
+                style={{ background: 'rgba(0,0,0,0.55)', border: '1px solid rgba(255,255,255,0.15)' }}
               >
                 <X className="w-3 h-3 text-white" strokeWidth={2.5} />
               </button>
@@ -53,8 +54,8 @@ export function MediaReel({ items, activeIndex, onSelect, onRemove, onAddMore }:
       </AnimatePresence>
 
       {items.length < 10 && (
-        <motion.button whileTap={{ scale: 0.93 }} onClick={onAddMore} className="shrink-0 rounded-xl flex items-center justify-center" style={{ width: THUMB, height: THUMB, border: '1.5px dashed rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.04)' }}>
-          <Plus className="w-5 h-5" style={{ color: 'rgba(255,255,255,0.45)' }} strokeWidth={2} />
+        <motion.button whileTap={{ scale: 0.93 }} onClick={onAddMore} className="shrink-0 rounded-xl flex items-center justify-center" style={{ width: THUMB, height: THUMB, border: '1.5px dashed rgba(0,0,0,0.10)', background: 'rgba(0,0,0,0.02)' }}>
+          <Plus className="w-5 h-5" style={{ color: ICON_DIM }} strokeWidth={2} />
         </motion.button>
       )}
     </div>
