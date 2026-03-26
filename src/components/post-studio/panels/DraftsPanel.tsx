@@ -133,10 +133,13 @@ export function DraftsPanel() {
                 const thumbnailUrl = firstMedia?.posterUrl || firstMedia?.mediaUrl;
                 const date = new Date(draft.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
                 return (
-                  <button
+                  <div
                     key={draft.id}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => handleLoadDraft(draft)}
-                    className="relative aspect-square overflow-hidden text-left"
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleLoadDraft(draft); } }}
+                    className="relative aspect-square overflow-hidden text-left cursor-pointer"
                     style={{ borderRadius: 18, border: '1px solid rgba(0,0,0,0.06)', background: 'rgba(0,0,0,0.02)' }}
                   >
                     {thumbnailUrl ? (
@@ -161,7 +164,7 @@ export function DraftsPanel() {
                     >
                       <Trash2 className="w-3 h-3 text-white" />
                     </button>
-                  </button>
+                  </div>
                 );
               })}
             </div>
