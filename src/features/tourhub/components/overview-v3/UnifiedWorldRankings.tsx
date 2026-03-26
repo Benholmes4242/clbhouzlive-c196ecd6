@@ -156,8 +156,11 @@ function MomentumPill({ entry, index, direction }: MomentumPillProps) {
 
 export function UnifiedWorldRankings() {
   const navigate = useNavigate();
-  const { data: movers, isLoading: moversLoading, error: moversError, refetch: refetchMovers } = useRankingMovers();
-  const { data: rankings, isLoading: rankingsLoading, error: rankingsError, refetch: refetchRankings } = useWorldRankingsFull();
+  const [activeTour, setActiveTour] = useState('pga');
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  const { data: movers, isLoading: moversLoading, error: moversError, refetch: refetchMovers } = useRankingMovers(activeTour);
+  const { data: rankings, isLoading: rankingsLoading, error: rankingsError, refetch: refetchRankings } = useWorldRankingsFull(activeTour);
 
   const [currentPage, setCurrentPage] = useState(0);
   const [highlightedPlayerId, setHighlightedPlayerId] = useState<string | null>(null);
