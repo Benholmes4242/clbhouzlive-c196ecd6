@@ -40,7 +40,8 @@ const ChaserCard = memo(function ChaserCard({
   accentColor: CategoryId;
 }) {
   const navigate = useNavigate();
-  const photoUrl = getPlayerHeadshotUrl(player.playerName, player.tourCode ?? 'pga');
+  const rawPhotoUrl = getPlayerHeadshotUrl(player.playerName, player.tourCode ?? 'pga');
+  const photoUrl = rawPhotoUrl === PLAYER_SILHOUETTE_URL ? null : rawPhotoUrl;
   const delta = formatDelta(player.statValue, leaderValue, higherIsBetter);
   const accent = CATEGORY_ACCENT_COLORS[accentColor];
   const [imgError, setImgError] = useState(false);

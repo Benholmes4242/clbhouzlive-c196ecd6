@@ -21,7 +21,8 @@ interface LeaderHeroProps {
 
 export const LeaderHero = memo(function LeaderHero({ player, accentColor }: LeaderHeroProps) {
   const navigate = useNavigate();
-  const photoUrl = getPlayerHeadshotUrl(player.playerName, player.tourCode ?? 'pga');
+  const rawPhotoUrl = getPlayerHeadshotUrl(player.playerName, player.tourCode ?? 'pga');
+  const photoUrl = rawPhotoUrl === PLAYER_SILHOUETTE_URL ? null : rawPhotoUrl;
   const accent = CATEGORY_ACCENT_COLORS[accentColor];
   const [imgError, setImgError] = useState(false);
 

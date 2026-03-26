@@ -44,7 +44,8 @@ export function LeaderRow({
   index,
 }: LeaderRowProps) {
   const displayRank = overrideRank ?? rank;
-  const photoUrl = getPlayerHeadshotUrl(player.fullName, player.tourCodes?.[0] ?? 'pga');
+  const rawPhotoUrl = getPlayerHeadshotUrl(player.fullName, player.tourCodes?.[0] ?? 'pga');
+  const photoUrl = rawPhotoUrl === PLAYER_SILHOUETTE_URL ? null : rawPhotoUrl;
   const [imgError, setImgError] = useState(false);
   const fmt = formatOverride ?? category.format;
   const unit = unitOverride ?? category.unit;
