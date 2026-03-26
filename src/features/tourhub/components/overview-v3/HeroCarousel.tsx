@@ -32,7 +32,7 @@ import { PlayerScorecardCard } from '@/components/tourhub/PlayerScorecardCard';
 
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import { getTourLogo } from '../../utils/tourLogos';
-import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 import { GolfSilhouette } from '@/components/ui/GolfSilhouette';
 import { formatThruDisplay } from '../../utils/formatThruDisplay';
 import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
