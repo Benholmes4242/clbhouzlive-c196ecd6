@@ -20,6 +20,7 @@ interface FeedSlideProps {
   getLikeState?: (post: FeedPost) => { isLiked: boolean; count: number };
   getCommentCount?: (post: FeedPost) => number;
   onZoomChange?: (isZoomed: boolean) => void;
+  activeIndexOverride?: number;
 }
 
 export const FeedSlide = memo(function FeedSlide({
