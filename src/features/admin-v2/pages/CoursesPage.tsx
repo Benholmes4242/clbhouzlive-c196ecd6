@@ -312,7 +312,7 @@ function CourseDrawer({
               variant="danger"
               icon={Trash2}
               onClick={() => {
-                if (window.confirm(`Permanently delete "${course.name}"? This cannot be undone.`)) {
+                if (window.confirm(`Delete "${course.name}"?\n\nThis will be blocked if any users have rated this course or posted about it. Only safe to delete if this is a duplicate or test entry with no user data.`)) {
                   onDelete(course.id);
                   onClose();
                 }
