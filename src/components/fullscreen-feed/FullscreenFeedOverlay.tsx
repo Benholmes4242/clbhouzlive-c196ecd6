@@ -38,6 +38,7 @@ export function FullscreenFeedOverlay() {
   // Body scroll lock
   useEffect(() => {
     if (isOpen) {
+      pauseAllAudio();
       document.body.style.overflow = "hidden";
 
       // ── Safe area bleed (mirrors Clubhouse) ──
