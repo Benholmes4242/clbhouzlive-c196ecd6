@@ -715,12 +715,10 @@ export const TournamentInsights = memo(function TournamentInsights() {
           className="mt-0 pt-6"
         >
           {activeMainTab === 'live' && !isWaitingForPlay && data.winners.length > 0 && (
-            <LikelyWinnersCarousel
+            <NextUpPickCard
               featured={data.winners[0]}
               cards={data.contenderCards}
               withdrawnPlayerIds={withdrawnPlayerIds}
-              courseName={data.tournament.courseName}
-              tournamentName={data.tournament.name}
             />
           )}
           {activeMainTab === 'nextup' && nextTournamentInsights?.winners && nextTournamentInsights.winners.length > 0 && (
