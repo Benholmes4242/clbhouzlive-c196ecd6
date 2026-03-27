@@ -282,6 +282,7 @@ export function SnapFeed({
           getLikeState={getLikeState}
           getCommentCount={getCommentCount}
           onZoomChange={handleZoomChange}
+          activeIndexOverride={activeIndexOverride}
         />
       ))}
 
