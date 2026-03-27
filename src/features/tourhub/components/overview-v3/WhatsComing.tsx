@@ -42,10 +42,7 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
   const isMajor = contextLabel === 'MAJOR CHAMPIONSHIP';
   const isRolexOrSignature = contextLabel === 'ROLEX SERIES' || contextLabel === 'SIGNATURE EVENT';
   const venue = getVenueString(tournament);
-  const rawTourSlug = TOUR_NAME_TO_SLUG[tournament.tourName || ''] || '';
-  // Cross-tour majors (Masters, US Open, Open Championship, PGA Championship) are
-  // co-sanctioned and may be stored under DP World in Sportradar — show PGA logo here.
-  const tourSlug = (isMajor && rawTourSlug !== 'pga') ? 'pga' : rawTourSlug;
+  const tourSlug = TOUR_NAME_TO_SLUG[tournament.tourName || ''] || '';
   const tourLogoSrc = tourSlug ? getTourLogo(tourSlug) : null;
 
   // Left border accent: amber for majors, emerald for signature/rolex

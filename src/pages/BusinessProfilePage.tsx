@@ -719,7 +719,6 @@ const BusinessProfilePage: React.FC = () => {
           title={cropMode === 'cover' ? 'Crop Cover Photo' : 'Crop Logo'}
         />
       )}
-      <ScrollToTopGlass />
     </PageRoot>
   );
 };

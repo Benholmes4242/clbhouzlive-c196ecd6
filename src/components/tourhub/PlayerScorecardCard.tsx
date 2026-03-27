@@ -2,7 +2,7 @@
  * PlayerScorecardCard — Scorecard content rendered inside the expanded glass card.
  * No own background — the parent HeroSlide glass card provides blur/overlay.
  */
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronLeft, X, Trophy } from 'lucide-react';
@@ -66,6 +66,32 @@ function EmptyHoleCell({ holeNumber, par }: { holeNumber: number; par: number })
       <span className="text-[10px] text-white/30">{par}</span>
       <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/[0.03]">
         <span className="text-sm text-white/20">—</span>
+      </div>
+    </div>
+  );
+}
+
+// ── Round Summary Bar ──────────────────────────────────────────────────────────
+
+function RoundSummary({ round }: { round: RoundScorecard }) {
+  const stats = [
+    { label: 'Eagles', value: round.eagles, color: SCORE_COLORS.eagle.tailwindText },
+    { label: 'Birdies', value: round.birdies, color: SCORE_COLORS.birdie.tailwindText },
+    { label: 'Pars', value: round.pars, color: SCORE_COLORS.par.tailwindText },
+    { label: 'Bogeys', value: round.bogeys, color: SCORE_COLORS.bogey.tailwindText },
+  ].filter((s) => s.value > 0);
+
+  return (
+    <div className="flex items-center justify-center gap-4 py-3">
+      {stats.map((stat) => (
+        <div key={stat.label} className="flex flex-col items-center gap-0.5">
+          <span className={`text-lg font-bold ${stat.color}`}>{stat.value}</span>
+          <span className="text-[10px] font-semibold text-white/40 uppercase tracking-[1.5px]">{stat.label}</span>
+        </div>
+      ))}
+      <div className="flex flex-col items-center gap-0.5 ml-2 pl-4 border-l border-white/10">
+        <span className="text-lg font-bold text-white">{round.totalStrokes}</span>
+        <span className="text-[10px] font-semibold text-white/40 uppercase tracking-[1.5px]">{formatScoreToPar(round.totalToPar)}</span>
       </div>
     </div>
   );
@@ -159,75 +185,25 @@ function RoundTabs({
 
 function ScorecardSkeleton() {
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-
-      {/* Hero skeleton — horizontal */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px 10px' }}>
-        <div style={{ width: 52, height: 55, borderRadius: '34%', background: 'rgba(255,255,255,0.08)', flexShrink: 0, animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
-        <div style={{ flex: 1 }}>
-          <div style={{ height: 14, width: '65%', borderRadius: 5, background: 'rgba(255,255,255,0.08)', marginBottom: 7, animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
-          <div style={{ height: 9, width: '40%', borderRadius: 4, background: 'rgba(255,255,255,0.05)' }} />
-        </div>
-        <div style={{ width: 44, height: 26, borderRadius: 6, background: 'rgba(255,255,255,0.08)', flexShrink: 0 }} />
+    <div className="space-y-4 px-4 py-6 animate-pulse">
+      <div className="flex justify-center gap-2">
+        {[1, 2, 3].map((i) => <div key={i} className="w-10 h-7 rounded-full bg-white/10" />)}
       </div>
-
-      {/* Round chips skeleton */}
-      <div style={{ display: 'flex', gap: 5, padding: '0 16px 8px' }}>
-        {[1,2,3,4].map(i => (
-          <div key={i} style={{ flex: 1, height: 46, borderRadius: 8, background: i === 1 ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }} />
+      <div className="grid grid-cols-9 gap-1">
+        {Array.from({ length: 9 }, (_, i) => (
+          <div key={i} className="flex flex-col items-center gap-1">
+            <div className="w-4 h-3 rounded bg-white/10" />
+            <div className="w-8 h-8 rounded-lg bg-white/5" />
+          </div>
         ))}
       </div>
-
-      <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '0 16px 6px' }} />
-
-      {/* Round tabs skeleton */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 6, padding: '4px 0 8px' }}>
-        {[1,2].map(i => (
-          <div key={i} style={{ width: 40, height: 26, borderRadius: 20, background: i === 1 ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.07)' }} />
+      <div className="grid grid-cols-9 gap-1">
+        {Array.from({ length: 9 }, (_, i) => (
+          <div key={i} className="flex flex-col items-center gap-1">
+            <div className="w-4 h-3 rounded bg-white/10" />
+            <div className="w-8 h-8 rounded-lg bg-white/5" />
+          </div>
         ))}
-      </div>
-
-      {/* Stat chips skeleton */}
-      <div style={{ display: 'flex', gap: 4, padding: '0 16px 10px' }}>
-        {[1,2,3,4,5].map(i => (
-          <div key={i} style={{ flex: 1, height: 38, borderRadius: 7, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%)' }} />
-        ))}
-      </div>
-
-      {/* Front 9 skeleton */}
-      <div style={{ padding: '0 12px 8px' }}>
-        <div style={{ height: 9, width: 60, borderRadius: 4, background: 'rgba(255,255,255,0.06)', marginBottom: 6 }} />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: 2 }}>
-          {Array.from({ length: 9 }, (_, i) => (
-            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-              <div style={{ width: 14, height: 8, borderRadius: 2, background: 'rgba(255,255,255,0.06)' }} />
-              <div style={{ width: 26, height: 26, borderRadius: 6, background: 'rgba(255,255,255,0.05)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%)' }} />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Back 9 skeleton */}
-      <div style={{ padding: '0 12px 8px' }}>
-        <div style={{ height: 9, width: 55, borderRadius: 4, background: 'rgba(255,255,255,0.06)', marginBottom: 6 }} />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: 2 }}>
-          {Array.from({ length: 9 }, (_, i) => (
-            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-              <div style={{ width: 14, height: 8, borderRadius: 2, background: 'rgba(255,255,255,0.06)' }} />
-              <div style={{ width: 26, height: 26, borderRadius: 6, background: 'rgba(255,255,255,0.05)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%)' }} />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Total row skeleton */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', borderTop: '1px solid rgba(255,255,255,0.07)', marginTop: 4 }}>
-        <div style={{ width: 40, height: 8, borderRadius: 3, background: 'rgba(255,255,255,0.06)' }} />
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <div style={{ width: 50, height: 9, borderRadius: 3, background: 'rgba(255,255,255,0.05)' }} />
-          <div style={{ width: 30, height: 13, borderRadius: 4, background: 'rgba(255,255,255,0.08)' }} />
-          <div style={{ width: 24, height: 11, borderRadius: 4, background: 'rgba(74,222,128,0.15)' }} />
-        </div>
       </div>
     </div>
   );
@@ -238,23 +214,14 @@ function ScorecardSkeleton() {
 export function PlayerScorecardCard({
   player,
   tournamentId,
-  tournamentName,
   onBack,
   onClose,
 }: PlayerScorecardCardProps) {
   const navigate = useNavigate();
   const { data: scorecard, isLoading } = usePlayerScorecard(tournamentId, player.id);
   const [activeRound, setActiveRound] = useState<number>(
-    player.currentRound || 1
+    player.currentRound || scorecard?.currentRound || 1
   );
-  const hasInitialisedRound = useRef(false);
-
-  useEffect(() => {
-    if (scorecard?.currentRound && !hasInitialisedRound.current) {
-      hasInitialisedRound.current = true;
-      setActiveRound(scorecard.currentRound);
-    }
-  }, [scorecard?.currentRound]);
 
   const activeRoundData = useMemo(
     () => scorecard?.rounds.find((r) => r.roundNumber === activeRound),
@@ -296,271 +263,147 @@ export function PlayerScorecardCard({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 60 }}
       transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-      className="flex flex-col h-full"
-      style={{ overflow: 'hidden' }}
+      className="flex flex-col h-full overflow-y-auto"
     >
-
-      {/* ── TOP BAR — back + condensed live badge ── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '12px 16px 8px',
-        flexShrink: 0,
-      }}>
+      {/* ── Top bar: Back + Close ─────────────────────────────────────── */}
+      <div className="flex items-center px-4 pt-4 pb-2">
         <button
           onClick={onBack}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 4,
-            background: 'none', border: 'none', cursor: 'pointer',
-          }}
+          className="flex items-center gap-1 text-white/70 hover:text-white transition-colors"
         >
-          <ChevronLeft style={{ width: 16, height: 16, color: 'rgba(255,255,255,0.55)' }} />
-          <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.55)' }}>
-            Leaderboard
-          </span>
+          <ChevronLeft className="w-5 h-5" />
+          <span className="text-sm font-medium">Leaderboard</span>
         </button>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-          <div style={{
-            width: 6, height: 6, borderRadius: '50%', background: '#22C55E',
-            boxShadow: '0 0 5px 2px rgba(34,197,94,0.4)',
-          }} />
-          <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '1.4px', color: '#22C55E' }}>
-            LIVE
-          </span>
-          <span style={{ fontSize: 9, fontWeight: 500, color: 'rgba(255,255,255,0.38)', marginLeft: 2 }}>
-            {tournamentName && tournamentName.length < 20 ? tournamentName : 'PGA TOUR'}
-            {player.currentRound ? ` · R${player.currentRound}` : ''}
-          </span>
-        </div>
       </div>
 
-      {/* ── PLAYER HERO — horizontal layout ── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 12,
-        padding: '0 16px 10px',
-        flexShrink: 0,
-      }}>
-        {/* Avatar */}
+      {/* ── Player Hero Section ───────────────────────────────────────── */}
+      <div className="flex flex-col items-center px-4 pt-2 pb-4">
         <button
           onClick={() => navigate(`/tourhub/player/${player.id}`)}
-          style={{ flexShrink: 0, position: 'relative', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-          className="active:scale-95 transition-transform"
+          className="relative mb-3 active:scale-95 transition-transform"
         >
-          <div style={{
-            width: 52, height: 55, borderRadius: '34%',
-            border: '2px solid rgba(255,255,255,0.22)',
-            background: 'rgba(255,255,255,0.08)',
-            overflow: 'hidden',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            {player.photoUrl ? (
-              <img src={player.photoUrl} alt={player.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
-            ) : (
-              <span style={{ fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>
+          {player.photoUrl ? (
+            <div
+              className="overflow-hidden flex-shrink-0"
+              style={{ width: 80, height: 84, borderRadius: '34%', border: '1.5px solid #F8FAFC', background: '#F8FAFC' }}
+            >
+              <img
+                src={player.photoUrl}
+                alt={player.name}
+                className="w-full h-full object-cover object-top"
+              />
+            </div>
+          ) : (
+            <div
+              className="flex items-center justify-center flex-shrink-0"
+              style={{ width: 80, height: 84, borderRadius: '34%', border: '1.5px solid #F8FAFC', background: '#F8FAFC' }}
+            >
+              <span className="text-2xl font-bold" style={{ color: '#64748B' }}>
                 {player.firstName?.[0]}{player.lastName?.[0]}
               </span>
-            )}
-          </div>
-          <div style={{
-            position: 'absolute', bottom: -2, right: -2,
-            background: 'white', borderRadius: '50%',
-            width: 16, height: 16,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 8, fontWeight: 800, color: 'black',
-          }}>
-            {player.position}
+            </div>
+          )}
+          <div className="absolute -bottom-1 -right-1 bg-white rounded-full px-2 py-0.5 shadow-lg">
+            <span className="text-xs font-bold text-black">{player.position}</span>
           </div>
         </button>
 
-        {/* Name + status */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <span style={{
-            fontSize: 16, fontWeight: 800, color: '#fff',
-            display: 'block', lineHeight: 1.2,
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          }}>
-            {player.name}
-          </span>
-          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', display: 'block', marginTop: 2 }}>
-            {player.thru === 'F' ? 'Finished' : player.thru ? `Thru ${player.thru}` : 'Round 1'}
-            {player.currentRound ? ` · Round ${player.currentRound}` : ''}
-          </span>
+        <h2 className="text-xl font-bold text-white text-center">{player.name}</h2>
+        {player.countryFlag && <span className="text-base mt-0.5">{player.countryFlag}</span>}
+
+        <div className="flex items-center gap-3 mt-2">
+          <span className="text-3xl font-bold text-white">{formatScoreToPar(player.totalScore)}</span>
+          {player.thru && player.thru !== 'F' && (
+            <span className="text-sm text-white/50 font-medium">thru {player.thru}</span>
+          )}
         </div>
 
-        {/* Total score */}
-        <span style={{
-          fontSize: 28, fontWeight: 900,
-          color: player.totalScore < 0 ? '#4ade80' : player.totalScore === 0 ? 'rgba(255,255,255,0.75)' : '#f87171',
-          fontFamily: "'JetBrains Mono','SF Mono',monospace",
-          letterSpacing: -1, flexShrink: 0,
-        }}>
-          {formatScoreToPar(player.totalScore)}
-        </span>
+        {roundScores.length > 0 && (
+          <div className="flex items-center gap-3 mt-3">
+            {roundScores.map((rs) => (
+              <div
+                key={rs.round}
+                className={`flex flex-col items-center px-2.5 py-1 rounded-lg ${rs.round === activeRound ? 'bg-white/10' : 'bg-transparent'}`}
+              >
+                <span className="text-[10px] font-semibold text-white/40 uppercase tracking-wider">R{rs.round}</span>
+                <span className="text-sm font-bold text-white">{rs.holesCompleted > 0 ? rs.strokes : '—'}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* ── ROUND SCORE CHIPS — all 4 rounds ── */}
-      {roundScores.length > 0 && (
-        <div style={{
-          display: 'flex', gap: 5,
-          padding: '0 16px 8px',
-          flexShrink: 0,
-        }}>
-          {Array.from({ length: Math.max(currentRound, 4) }, (_, i) => {
-            const roundNum = i + 1;
-            const rs = roundScores.find(r => r.round === roundNum);
-            const isActive = roundNum === activeRound;
-            const hasData = rs && rs.holesCompleted > 0;
-            return (
-              <button
-                key={roundNum}
-                onClick={() => hasData && setActiveRound(roundNum)}
-                disabled={!hasData}
-                style={{
-                  flex: 1,
-                  display: 'flex', flexDirection: 'column', alignItems: 'center',
-                  padding: '5px 4px',
-                  borderRadius: 8,
-                  background: isActive ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${isActive ? 'rgba(255,255,255,0.20)' : 'rgba(255,255,255,0.07)'}`,
-                  cursor: hasData ? 'pointer' : 'default',
-                }}
-              >
-                <span style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.38)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  R{roundNum}
-                </span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: hasData ? '#fff' : 'rgba(255,255,255,0.2)' }}>
-                  {hasData ? rs.strokes : '—'}
-                </span>
-                {hasData && (
-                  <span style={{
-                    fontSize: 9, fontWeight: 600,
-                    color: rs.toPar < 0 ? '#4ade80' : rs.toPar === 0 ? 'rgba(255,255,255,0.5)' : '#f87171',
-                  }}>
-                    {formatScoreToPar(rs.toPar)}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      )}
+      {/* ── Divider ──────────────────────────────────────────────────── */}
+      <div className="mx-4 h-px bg-white/10" />
 
-      {/* Separator */}
-      <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '0 16px 6px', flexShrink: 0 }} />
-
-      {/* ── SCORECARD CONTENT — scrollable ── */}
+      {/* ── Scorecard Section ─────────────────────────────────────────── */}
       {isLoading ? (
         <ScorecardSkeleton />
       ) : scorecard && scorecard.rounds.length > 0 ? (
-        <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' as any }}>
-
-          {/* Round tabs */}
+        <div className="flex-1 pb-6">
           <RoundTabs
             rounds={scorecard.rounds}
             activeRound={activeRound}
             currentRound={currentRound}
             onSelect={setActiveRound}
           />
-
-          {/* Stat chips — same language as leader strip */}
           {activeRoundData && activeRoundData.holesCompleted > 0 && (
-            <div style={{ display: 'flex', gap: 4, padding: '0 16px 8px' }}>
-              {[
-                { v: activeRoundData.eagles,       label: 'Eagles',  color: '#F59E0B' },
-                { v: activeRoundData.birdies,      label: 'Birdies', color: '#4ade80' },
-                { v: activeRoundData.pars,         label: 'Pars',    color: 'rgba(255,255,255,0.65)' },
-                { v: activeRoundData.bogeys,       label: 'Bogeys',  color: '#F97316' },
-                { v: activeRoundData.doubleBogeys, label: 'Doubles', color: '#f87171' },
-              ].map(stat => (
-                <div key={stat.label} style={{
-                  flex: 1, textAlign: 'center',
-                  padding: '5px 2px 4px',
-                  borderRadius: 7,
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                }}>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: stat.color, lineHeight: 1 }}>{stat.v}</div>
-                  <div style={{ fontSize: 7, fontWeight: 700, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase', letterSpacing: '0.4px', marginTop: 2 }}>{stat.label}</div>
-                </div>
-              ))}
-            </div>
+            <RoundSummary round={activeRoundData} />
           )}
-
-          {/* Front 9 */}
-          <div style={{ marginTop: 4 }}>
+          <div className="mx-4 h-px bg-white/10 my-2" />
+          <div className="mt-3">
             <NineHoleRow
               label="Front 9"
-              holes={activeRoundData?.holes.filter(h => h.holeNumber <= 9) || []}
+              holes={activeRoundData?.holes.filter((h) => h.holeNumber <= 9) || []}
               startHole={1}
               completedHoles={completedHoles}
               defaultPars={defaultPars}
             />
           </div>
-
-          {/* Back 9 */}
-          <div style={{ marginTop: 8 }}>
+          <div className="mt-4">
             <NineHoleRow
               label="Back 9"
-              holes={activeRoundData?.holes.filter(h => h.holeNumber > 9) || []}
+              holes={activeRoundData?.holes.filter((h) => h.holeNumber > 9) || []}
               startHole={10}
               completedHoles={completedHoles}
               defaultPars={defaultPars}
             />
           </div>
-
-          {/* Total row */}
           {activeRoundData && activeRoundData.holesCompleted > 0 && (
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '8px 16px 4px',
-              marginTop: 6,
-              borderTop: '1px solid rgba(255,255,255,0.08)',
-            }}>
-              <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                Total
-              </span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)' }}>
-                  {activeRoundData.holesCompleted} holes
-                </span>
-                <span style={{ fontSize: 15, fontWeight: 800, color: '#fff' }}>
-                  {activeRoundData.totalStrokes}
-                </span>
-                <span style={{
-                  fontSize: 13, fontWeight: 700,
-                  color: activeRoundData.totalToPar < 0 ? '#4ade80'
-                    : activeRoundData.totalToPar > 0 ? '#f87171'
-                    : 'rgba(255,255,255,0.6)',
-                }}>
+            <div className="flex items-center justify-between px-4 mt-4 pt-3 border-t border-white/10">
+              <span className="text-xs font-semibold text-white/40 uppercase tracking-[1.5px]">Total</span>
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-white/50">{activeRoundData.holesCompleted} holes</span>
+                <span className="text-lg font-bold text-white">{activeRoundData.totalStrokes}</span>
+                <span className={`text-sm font-bold ${activeRoundData.totalToPar < 0 ? SCORE_COLORS.birdie.tailwindText : activeRoundData.totalToPar > 0 ? SCORE_COLORS.bogey.tailwindText : 'text-white/70'}`}>
                   {formatScoreToPar(activeRoundData.totalToPar)}
                 </span>
               </div>
             </div>
           )}
-
-          {/* Legend */}
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            gap: 10, padding: '6px 16px 10px',
-          }}>
+          <div className="flex items-center justify-center gap-3 mt-4 px-4">
             {[
-              { label: 'Eagle',   color: SCORE_COLORS.eagle.tailwindBg },
-              { label: 'Birdie',  color: SCORE_COLORS.birdie.tailwindBg },
-              { label: 'Par',     color: SCORE_COLORS.par.tailwindBg },
-              { label: 'Bogey',   color: SCORE_COLORS.bogey.tailwindBg },
+              { label: 'Eagle', color: SCORE_COLORS.eagle.tailwindBg },
+              { label: 'Birdie', color: SCORE_COLORS.birdie.tailwindBg },
+              { label: 'Par', color: SCORE_COLORS.par.tailwindBg },
+              { label: 'Bogey', color: SCORE_COLORS.bogey.tailwindBg },
               { label: 'Double+', color: SCORE_COLORS.doublePlus.tailwindBg },
             ].map(({ label, color }) => (
-              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                <div className={`w-2.5 h-2.5 rounded ${color}`} />
-                <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)' }}>{label}</span>
+              <div key={label} className="flex items-center gap-1">
+                <div className={`w-3 h-3 rounded ${color}`} />
+                <span className="text-[10px] text-white/40">{label}</span>
               </div>
             ))}
           </div>
         </div>
       ) : (
-        /* Empty state */
         <div className="flex-1 flex flex-col items-center justify-center py-12">
           <div className="w-14 h-14 rounded-full flex items-center justify-center mb-3"
-            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)' }}>
+            style={{ 
+              background: 'rgba(255, 255, 255, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+            }}
+          >
             <Trophy className="w-6 h-6 text-white/40" />
           </div>
           <p className="text-sm text-white/40 text-center">Scorecard data updating...</p>

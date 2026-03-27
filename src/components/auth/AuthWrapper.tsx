@@ -7,7 +7,7 @@ import { useOnboardingStatus } from '@/hooks/useOnboardingStatus';
 import { isMedianApp } from '@/utils/median/isMedianApp';
 import BetaGatePage from '@/pages/BetaGatePage';
 
-const PUBLIC_PATHS = ['/auth', '/auth/verified', '/verified', '/auth/callback', '/auth/check-email', '/auth/reset-password', '/post'];
+const PUBLIC_PATHS = ['/auth', '/auth/verified', '/verified', '/auth/callback', '/auth/check-email', '/auth/reset-password'];
 
 interface AuthWrapperProps {
   children: React.ReactNode;
@@ -71,8 +71,7 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
       || location.pathname === '/verified'
       || location.pathname === '/auth/callback'
       || location.pathname === '/auth/check-email'
-      || location.pathname === '/auth/reset-password'
-      || location.pathname.startsWith('/post');
+      || location.pathname === '/auth/reset-password';
 
     // If user is not authenticated and not on an auth page, redirect to auth
     if (!user && !isAuthPage) {

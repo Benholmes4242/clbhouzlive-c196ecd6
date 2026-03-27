@@ -662,9 +662,3 @@
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
-
-/* ── Countdown tick pulse — for upcoming state separator dots ── */
-@keyframes tickPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.25; }
-}

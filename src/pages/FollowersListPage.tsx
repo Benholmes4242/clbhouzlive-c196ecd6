@@ -6,7 +6,6 @@ import { usePaginatedFollowers, usePaginatedFollowing } from '@/hooks/useSocialL
 import { useUserByUsername } from '@/hooks/useUserByUsername';
 import { UserListPage } from '@/components/social/UserListPage';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 const FollowersListPage = () => {
   const { username } = useParams<{ username: string }>();
@@ -98,36 +97,33 @@ const FollowersListPage = () => {
   }
 
   return (
-    <>
-      <UserListPage
-        mode="followers"
-        title="Followers"
-        subtitle={`People who follow @${profileUser.username}`}
-        searchPlaceholder="Search followers by name or club"
-        
-        users={followers}
-        totalCount={totalCount}
-        isLoading={followersLoading}
-        error={error}
-        hasNextPage={hasNextPage}
-        isFetchingNextPage={isFetchingNextPage}
-        onLoadMore={() => fetchNextPage()}
-        onRefetch={() => refetch()}
-        backPath={`/profile/${profileUser.username}`}
-        isOwnProfile={isOwnProfile}
-        profileUsername={profileUser.username}
-        // Following tab data
-        followingUsers={following}
-        followingTotalCount={followingTotalCount}
-        followingIsLoading={followingLoading}
-        followingError={followingError}
-        followingHasNextPage={followingHasNextPage}
-        followingIsFetchingNextPage={followingIsFetchingNextPage}
-        onFollowingLoadMore={() => followingFetchNextPage()}
-        onFollowingRefetch={() => followingRefetch()}
-      />
-      <ScrollToTopGlass />
-    </>
+    <UserListPage
+      mode="followers"
+      title="Followers"
+      subtitle={`People who follow @${profileUser.username}`}
+      searchPlaceholder="Search followers by name or club"
+      
+      users={followers}
+      totalCount={totalCount}
+      isLoading={followersLoading}
+      error={error}
+      hasNextPage={hasNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      onLoadMore={() => fetchNextPage()}
+      onRefetch={() => refetch()}
+      backPath={`/profile/${profileUser.username}`}
+      isOwnProfile={isOwnProfile}
+      profileUsername={profileUser.username}
+      // Following tab data
+      followingUsers={following}
+      followingTotalCount={followingTotalCount}
+      followingIsLoading={followingLoading}
+      followingError={followingError}
+      followingHasNextPage={followingHasNextPage}
+      followingIsFetchingNextPage={followingIsFetchingNextPage}
+      onFollowingLoadMore={() => followingFetchNextPage()}
+      onFollowingRefetch={() => followingRefetch()}
+    />
   );
 };
 

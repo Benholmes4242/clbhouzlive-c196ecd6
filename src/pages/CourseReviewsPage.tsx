@@ -8,7 +8,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 const CourseReviewsPage: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -313,7 +312,6 @@ const CourseReviewsPage: React.FC = () => {
           </div>
         )}
       </div>
-      <ScrollToTopGlass />
     </div>
   );
 };

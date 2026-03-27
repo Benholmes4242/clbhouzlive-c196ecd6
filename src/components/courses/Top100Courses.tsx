@@ -4,8 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
-import { UnifiedCourseCard } from './UnifiedCourseCard';
-import { fromGolfCourse, GolfCourseRaw } from '@/lib/mappers/toCourseCardModel';
+import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Trophy, Globe, Map as MapIcon, Upload } from 'lucide-react';
 
@@ -144,15 +143,12 @@ const Top100Courses = () => {
               <LoadingSkeleton />
             ) : globalTop100 && globalTop100.length > 0 ? (
               <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
-                <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
                   {globalTop100.map((course) => (
                     <div key={course.id} className="mb-0">
-                      <UnifiedCourseCard
-                        course={fromGolfCourse(course as unknown as GolfCourseRaw)}
-                        showRankBadges={true}
-                        showRating={true}
-                        showPlayedStatus={false}
-                        activeListSlug="global"
+                      <CourseCard 
+                        course={course} 
+                        viewContext="global" 
                       />
                     </div>
                   ))}
@@ -220,15 +216,12 @@ const Top100Courses = () => {
                   </div>
                 )}
                 <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
-                  <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
                     {regionalTop100.map((course) => (
                       <div key={course.id} className="mb-0">
-                        <UnifiedCourseCard
-                          course={fromGolfCourse(course as unknown as GolfCourseRaw)}
-                          showRankBadges={true}
-                          showRating={true}
-                          showPlayedStatus={false}
-                          activeListSlug={selectedRegion === 'USA' ? 'usa' : selectedRegion === 'Britain & Ireland' ? 'gb-i' : 'europe'}
+                        <CourseCard 
+                          course={course} 
+                          viewContext="regional" 
                         />
                       </div>
                     ))}

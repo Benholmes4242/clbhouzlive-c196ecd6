@@ -13,7 +13,6 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { getRingColorForTotalPlayed } from '@/lib/globalAchievementMilestoneSystem';
 import { Button } from '@/components/ui/button';
-import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
@@ -506,7 +505,6 @@ const GolfersToFollowPage = () => {
         )}
         </div>
       </div>
-      <ScrollToTopGlass />
     </PageRoot>
   );
 };

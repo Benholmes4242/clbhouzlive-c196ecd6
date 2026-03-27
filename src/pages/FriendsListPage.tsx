@@ -6,7 +6,6 @@ import { usePaginatedFriends } from '@/hooks/useSocialLists';
 import { useUserByUsername } from '@/hooks/useUserByUsername';
 import { UserListPage } from '@/components/social/UserListPage';
 import { analyticsEvents } from '@/utils/analyticsEvents';
-import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 const FriendsListPage = () => {
   const { username } = useParams<{ username: string }>();
@@ -84,27 +83,24 @@ const FriendsListPage = () => {
   }
 
   return (
-    <>
-      <UserListPage
-        mode="friends"
-        title="Friends"
-        subtitle={`Friends of @${profileUser.username}`}
-        searchPlaceholder="Search friends by name or club"
-        
-        users={friends}
-        totalCount={totalCount}
-        isLoading={friendsLoading}
-        error={error}
-        hasNextPage={hasNextPage}
-        isFetchingNextPage={isFetchingNextPage}
-        onLoadMore={() => fetchNextPage()}
-        onRefetch={() => refetch()}
-        backPath={`/profile/${profileUser.username}`}
-        isOwnProfile={isOwnProfile}
-        profileUsername={profileUser.username}
-      />
-      <ScrollToTopGlass />
-    </>
+    <UserListPage
+      mode="friends"
+      title="Friends"
+      subtitle={`Friends of @${profileUser.username}`}
+      searchPlaceholder="Search friends by name or club"
+      
+      users={friends}
+      totalCount={totalCount}
+      isLoading={friendsLoading}
+      error={error}
+      hasNextPage={hasNextPage}
+      isFetchingNextPage={isFetchingNextPage}
+      onLoadMore={() => fetchNextPage()}
+      onRefetch={() => refetch()}
+      backPath={`/profile/${profileUser.username}`}
+      isOwnProfile={isOwnProfile}
+      profileUsername={profileUser.username}
+    />
   );
 };
 

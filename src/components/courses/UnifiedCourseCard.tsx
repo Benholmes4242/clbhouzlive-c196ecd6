@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Calendar, Star } from 'lucide-react';
+import { Check, Calendar } from 'lucide-react';
 import { CourseCardModel } from '@/types/courseCard';
 import { Top100RankBadge } from '@/components/top100/Top100RankBadge';
 import { CourseCommunityRating } from './CourseCommunityRating';
@@ -30,7 +30,6 @@ interface UnifiedCourseCardProps {
   showRankBadges?: boolean;
   showRating?: boolean;
   showPlayedStatus?: boolean;
-  showRateChip?: boolean;
   showFriendsContext?: boolean;
   showLastPlayed?: boolean;
   hideLocation?: boolean;
@@ -72,7 +71,6 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
   showRankBadges = true,
   showRating = true,
   showPlayedStatus = false,
-  showRateChip = false,
   showFriendsContext = false,
   showLastPlayed = false,
   hideLocation = false,
@@ -158,34 +156,87 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
       type="button"
       onClick={handleClick}
       aria-label={`View ${course.name}`}
-      className={`group w-full overflow-hidden text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 ${className}`}
-      style={{ display: 'block', background: 'transparent' }}
+      className={`group w-full rounded-none sm:rounded-sq-md overflow-hidden bg-card sm:border sm:border-border/50 text-left shadow-none sm:shadow-sm active:scale-[0.98] sm:active:scale-[0.995] transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 ${className}`}
     >
-      {/* Full-bleed image — name/location/rating all overlaid inside */}
+      {/* Name + location block — above image, with amber left accent bar */}
+      <div className="flex items-stretch">
+        {/* Amber left accent bar */}
+        <div className="w-px bg-amber-500 shrink-0" />
+
+        {/* Text block */}
+        <div className="flex-1 px-4 pt-3 pb-3 bg-card">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0 space-y-1">
+              {/* Course name */}
+              <h3 className="text-[15px] font-semibold text-foreground truncate" style={{ letterSpacing: '-0.2px' }} title={course.name}>
+                {course.name}
+              </h3>
+
+              {/* Logged date pill */}
+              {loggedDate && (
+                <div className="inline-block text-[9px] font-medium text-muted-foreground bg-muted/60 px-2.5 py-1 rounded-lg">
+                  Logged: {format(new Date(loggedDate), 'd MMM yyyy')}
+                </div>
+              )}
+
+              {/* Location */}
+              {!hideLocation && (
+                <p className="text-xs text-muted-foreground/60 truncate">
+                  {course.locationText}
+                </p>
+              )}
+
+              {/* Rating count / members */}
+              {course.ratingCount && course.ratingCount > 0 && (
+                <p className="text-[11px] text-muted-foreground">
+                  Rated by {course.ratingCount} member{course.ratingCount === 1 ? '' : 's'}
+                </p>
+              )}
+
+              {/* Friends context */}
+              {showFriendsContext && course.context?.friendsPlayedCount != null && (
+                <p className="text-xs text-muted-foreground">
+                  {course.context.friendsPlayedCount > 0 ? (
+                    <>Played by {course.context.friendsPlayedCount} friend{course.context.friendsPlayedCount === 1 ? '' : 's'}</>
+                  ) : (
+                    <span className="text-muted-foreground/60">No friends have played yet</span>
+                  )}
+                </p>
+              )}
+            </div>
+
+            {/* Community rating */}
+            {showRating && course.communityRating != null && (
+              <div className="flex-shrink-0 min-w-[56px] flex items-center justify-end self-center">
+                <CourseCommunityRating rating={course.communityRating} size="lg" showLogo forceNeutral />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Hero image with badges */}
       <div className={`relative w-full ${IMAGE_ASPECT} overflow-hidden`}>
         {course.imageUrl ? (
           <img
             src={course.imageUrl}
             alt={course.name}
             loading="lazy"
-            className="w-full h-full object-cover transition-transform duration-500 group-active:scale-[1.02]"
-            onError={(e) => { e.currentTarget.src = '/placeholder.svg'; }}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.src = '/placeholder.svg';
+            }}
           />
         ) : (
           <div className="w-full h-full bg-muted" />
         )}
 
-        {/* Gradient scrim — strong at bottom for text legibility */}
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background: 'linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.28) 45%, rgba(0,0,0,0.04) 100%)',
-          }}
-        />
+        {/* Gradient overlay */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
 
-        {/* Rank badges — top-left, stacked vertically */}
+        {/* Rank badges - top-left */}
         {showRankBadges && (
-          <div className="absolute top-3 left-3 flex flex-col items-start gap-1.5">
+          <div className="absolute top-3 left-3 flex items-center gap-2">
             {(!activeListSlug || activeListSlug === 'global') && course.ranks?.global && (
               <Top100RankBadge listSlug="global" rank={course.ranks.global} />
             )}
@@ -195,22 +246,8 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
           </div>
         )}
 
-        {/* Played / Rate chip — top-right */}
-        {showRateChip ? (
-          <button
-            onClick={(e) => { e.stopPropagation(); navigate(`/courses/${course.id}/rate`); }}
-            style={{
-              position: 'absolute', top: 10, right: 10,
-              display: 'flex', alignItems: 'center', gap: 4,
-              background: '#F59E0B',
-              borderRadius: 7, padding: '4px 9px', border: 'none', cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(245,158,11,0.40)',
-            }}
-          >
-            <Star size={10} fill="white" color="white" />
-            <span style={{ fontSize: 10, fontWeight: 700, color: 'white' }}>Rate</span>
-          </button>
-        ) : showPlayedStatus && isPlayed !== undefined ? (
+        {/* Played status - top-right */}
+        {showPlayedStatus && isPlayed !== undefined && (
           <div
             className={`absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-sq-pill text-[9px] font-medium shadow-sm ${
               isPlayed
@@ -227,9 +264,9 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
               <span>Unplayed</span>
             )}
           </div>
-        ) : null}
+        )}
 
-        {/* Context tag — top-right when no played status */}
+        {/* Context tag - top-right (when no played status) */}
         {contextTag && !showPlayedStatus && (
           <div className="absolute top-3 right-3">
             <span className="text-[10px] font-medium bg-black/60 text-white px-2 py-1 rounded-sq-xs backdrop-blur-sm">
@@ -237,72 +274,10 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
             </span>
           </div>
         )}
-
-        {/* Bottom row — name/location left, rating right — all inside image */}
-        <div className="absolute bottom-0 left-0 right-0 px-3 pb-2.5 pt-2 flex items-end justify-between gap-3">
-
-          {/* Left: name + location */}
-          <div className="flex-1 min-w-0">
-            <h3
-              className="text-[13px] font-bold text-white truncate leading-tight"
-              style={{ textShadow: '0 1px 5px rgba(0,0,0,0.55)' }}
-              title={course.name}
-            >
-              {course.name}
-            </h3>
-            {!hideLocation && (
-              <p
-                className="text-[10px] truncate mt-0.5"
-                style={{ color: 'rgba(255,255,255,0.68)', textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}
-              >
-                {course.locationText}
-              </p>
-            )}
-            {/* Logged date if present */}
-            {loggedDate && (
-              <div className="inline-block text-[9px] font-medium text-white/60 mt-0.5">
-                Logged: {format(new Date(loggedDate), 'd MMM yyyy')}
-              </div>
-            )}
-            {/* Friends context */}
-            {showFriendsContext && course.context?.friendsPlayedCount != null && (
-              <p className="text-[10px] mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                {course.context.friendsPlayedCount > 0
-                  ? `${course.context.friendsPlayedCount} friend${course.context.friendsPlayedCount === 1 ? '' : 's'} played`
-                  : 'No friends played yet'}
-              </p>
-            )}
-          </div>
-
-          {/* Right: community rating pill — only when data exists */}
-          {showRating && course.communityRating != null && (
-            <div
-              className="flex items-center gap-1.5 flex-shrink-0"
-              style={{
-                background: 'rgba(255,255,255,0.12)',
-                border: '0.5px solid rgba(255,255,255,0.20)',
-                borderRadius: 6,
-                padding: '3px 7px',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-              }}
-            >
-              <img
-                src="/assets/logomark-orange.png"
-                alt=""
-                className="w-3 h-3 object-contain"
-                aria-hidden="true"
-              />
-              <span className="text-[11px] font-bold text-white" style={{ lineHeight: 1 }}>
-                {course.communityRating.toFixed(1)}
-              </span>
-            </div>
-          )}
-        </div>
       </div>
 
-      {/* Hairline separator — replaces the grey spacer block */}
-      <div style={{ height: '0.5px', background: 'rgba(0,0,0,0.08)' }} />
+      {/* Grey spacer row — visual separation between courses */}
+      <div className="h-5 bg-background" />
     </button>
   );
 };

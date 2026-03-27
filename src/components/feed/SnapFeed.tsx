@@ -30,15 +30,13 @@ interface SnapFeedProps {
   getLikeState?: (post: FeedPost) => { isLiked: boolean; count: number };
   getCommentCount?: (post: FeedPost) => number;
   startIndex?: number;
-  onActiveIndexChange?: (idx: number) => void;
-  activeIndexOverride?: number;
 }
 
 export function SnapFeed({
   posts, activeTab, onNearEnd, onRefresh, isRefreshing, hasNextPage,
   followOverrides, onFollowChange, onFirstFrameReady,
   onLike, onComment, onShare, getLikeState, getCommentCount,
-  startIndex, onActiveIndexChange, activeIndexOverride,
+  startIndex,
 }: SnapFeedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<Map<number, HTMLDivElement>>(new Map());
@@ -56,13 +54,11 @@ export function SnapFeed({
   const onNearEndRef = useRef(onNearEnd);
   const pendingIndexRef = useRef<number | null>(null);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const onActiveIndexChangeRef = useRef(onActiveIndexChange);
 
   useEffect(() => { postsRef.current = posts; }, [posts]);
   useEffect(() => { postsLengthRef.current = posts.length; }, [posts.length]);
   useEffect(() => { hasNextPageRef.current = hasNextPage; }, [hasNextPage]);
   useEffect(() => { onNearEndRef.current = onNearEnd; }, [onNearEnd]);
-  useEffect(() => { onActiveIndexChangeRef.current = onActiveIndexChange; }, [onActiveIndexChange]);
 
   // Scroll to startIndex on first mount only
   useEffect(() => {
@@ -119,13 +115,8 @@ export function SnapFeed({
           if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
           debounceTimerRef.current = setTimeout(() => {
             if (pendingIndexRef.current !== null) {
-              const changeIdx = pendingIndexRef.current;
-              if (onActiveIndexChangeRef.current) {
-                onActiveIndexChangeRef.current(changeIdx);
-              } else {
-                setActiveIndex(changeIdx);
-              }
-              if (hasNextPageRef.current && changeIdx >= postsLengthRef.current - NEAR_END_THRESHOLD) {
+              setActiveIndex(pendingIndexRef.current);
+              if (hasNextPageRef.current && pendingIndexRef.current >= postsLengthRef.current - NEAR_END_THRESHOLD) {
                 onNearEndRef.current();
               }
               pendingIndexRef.current = null;
@@ -206,11 +197,7 @@ export function SnapFeed({
       const slideHeight = el.clientHeight;
       if (slideHeight === 0) return;
       const idx = Math.round(el.scrollTop / slideHeight);
-      if (onActiveIndexChangeRef.current) {
-        onActiveIndexChangeRef.current(idx);
-      } else {
-        setActiveIndex(idx);
-      }
+      setActiveIndex(idx);
     };
 
     el.addEventListener('scrollend', onScrollEnd, { passive: true });
@@ -282,7 +269,6 @@ export function SnapFeed({
           getLikeState={getLikeState}
           getCommentCount={getCommentCount}
           onZoomChange={handleZoomChange}
-          activeIndexOverride={activeIndexOverride}
         />
       ))}
 

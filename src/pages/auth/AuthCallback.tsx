@@ -70,17 +70,9 @@ export default function AuthCallback() {
   useEffect(() => {
     if (isInMedianApp) return;
 
-    const handleCallback = async () => {
+    const passSessionToWebView = async () => {
       await new Promise(r => setTimeout(r, 300));
 
-      // Check for password recovery before anything else
-      const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      if (hashParams.get('type') === 'recovery') {
-        navigate('/auth/reset-password', { replace: true });
-        return;
-      }
-
-      // Existing session passthrough logic unchanged
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
@@ -94,8 +86,8 @@ export default function AuthCallback() {
       } catch {}
     };
 
-    handleCallback();
-  }, [isInMedianApp, navigate]);
+    passSessionToWebView();
+  }, [isInMedianApp]);
 
   if (!isInMedianApp) {
     return (

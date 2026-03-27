@@ -34,7 +34,6 @@ interface FeedOverlayLayerProps {
     reviewText?: string | null;
   } | null;
   isActiveReview?: boolean;
-  activeIndexOverride?: number;
 }
 
 export const FeedOverlayLayer = memo(function FeedOverlayLayer({
@@ -55,10 +54,8 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   onBeforeNavigate,
   activeReview,
   isActiveReview,
-  activeIndexOverride,
 }: FeedOverlayLayerProps) {
-  const storeActiveIndex = useClubhouseStore(s => s.activeIndex);
-  const activeIndex = activeIndexOverride ?? storeActiveIndex;
+  const activeIndex = useClubhouseStore(s => s.activeIndex);
   const isMuted = useClubhouseStore(s => s.isMuted);
   const toggleMute = useClubhouseStore(s => s.toggleMute);
   const carouselPositions = useClubhouseStore(s => s.carouselPositions);

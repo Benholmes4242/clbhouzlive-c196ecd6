@@ -17,11 +17,9 @@ export interface LeaderboardEntryWithPlayer extends SrLeaderboardRow {
   player: SrPlayerRow | null;
 }
 
-function getScoreColor(toPar: number | null): string {
-  if (toPar === null || toPar === undefined) return 'rgba(255,255,255,0.7)';
-  if (toPar < 0) return '#4ade80';   // under par — green
-  if (toPar === 0) return 'rgba(255,255,255,0.75)'; // even — soft white
-  return '#f87171';                   // over par — red
+// Match mini leaderboard: all scores are white
+function getScoreColor(_toPar: number | null): string {
+  return '#FFFFFF';
 }
 
 function formatScore(toPar: number | null): string {
@@ -43,46 +41,20 @@ function formatThru(entry: LeaderboardEntryWithPlayer): string {
 // Skeleton for loading state
 export function ExpandedLeaderboardSkeleton() {
   return (
-    <div style={{ flex: 1, padding: '0 16px' }}>
-      {/* Leader strip skeleton */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: '10px 12px', marginBottom: 8 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 18, height: 12, borderRadius: 4, background: 'rgba(255,255,255,0.08)' }} />
-          <div style={{ width: 36, height: 38, borderRadius: '34%', background: 'rgba(255,255,255,0.08)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
-          <div>
-            <div style={{ height: 13, width: 100, borderRadius: 5, background: 'rgba(255,255,255,0.08)', marginBottom: 6 }} />
-            <div style={{ height: 9, width: 50, borderRadius: 4, background: 'rgba(255,255,255,0.05)' }} />
+    <div className="expanded-lb-scroll" style={{ flex: 1, padding: '0 16px' }}>
+      {Array.from({ length: 7 }).map((_, i) => (
+        <div key={i} className="flex items-center justify-between" style={{ padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-3 rounded" style={{ background: 'rgba(255,255,255,0.08)', animation: 'shimmer 1.8s infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
+            <div className="w-6 h-6 rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }} />
+            <div className="w-24 h-3 rounded" style={{ background: 'rgba(255,255,255,0.08)', animation: 'shimmer 1.8s infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="w-8 h-3 rounded" style={{ background: 'rgba(255,255,255,0.08)' }} />
+            <div className="w-5 h-3 rounded" style={{ background: 'rgba(255,255,255,0.08)' }} />
           </div>
         </div>
-        <div style={{ height: 24, width: 36, borderRadius: 6, background: 'rgba(255,255,255,0.08)' }} />
-      </div>
-
-      {/* Stat strip skeleton */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 10 }}>
-        {[1,2,3,4,5].map(i => (
-          <div key={i} style={{ flex: 1, height: 38, borderRadius: 8, background: 'rgba(255,255,255,0.03)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%)' }} />
-        ))}
-      </div>
-
-      {/* Separator skeleton */}
-      <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', marginBottom: 8 }} />
-
-      {/* Row skeletons */}
-      <div>
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="flex items-center justify-between" style={{ padding: '9px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-            <div className="flex items-center gap-2">
-              <div style={{ width: 22, height: 10, borderRadius: 4, background: 'rgba(255,255,255,0.06)' }} />
-              <div style={{ width: 32, height: 33, borderRadius: '34%', background: 'rgba(255,255,255,0.07)' }} />
-              <div style={{ width: 96, height: 11, borderRadius: 5, background: 'rgba(255,255,255,0.06)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%)' }} />
-            </div>
-            <div className="flex items-center gap-4">
-              <div style={{ width: 32, height: 11, borderRadius: 5, background: 'rgba(255,255,255,0.08)' }} />
-              <div style={{ width: 20, height: 11, borderRadius: 5, background: 'rgba(255,255,255,0.06)' }} />
-            </div>
-          </div>
-        ))}
-      </div>
+      ))}
     </div>
   );
 }
@@ -170,9 +142,12 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
   const fullName = player.full_name || `${firstName} ${lastName}`.trim();
   const effectiveTourCode = player.tour_codes?.[0] ?? tourCode;
   const photoUrl = getPlayerHeadshotUrl(fullName, effectiveTourCode, player.headshot_override);
+  const initials = `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase();
   const posDisplay = entry.position_tied ? `T${entry.position}` : `${entry.position ?? '-'}`;
   const thruDisplay = formatThru(entry);
   const isCut = entry.status === 'cut' || entry.status === 'wd' || entry.status === 'dq';
+  const isLeader = entry.position === 1;
+  const isChaser = !isLeader;
 
   // Derive current round from round columns
   const currentRound = entry.round_4 != null ? 4 : entry.round_3 != null ? 3 : entry.round_2 != null ? 2 : 1;
@@ -206,11 +181,11 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
       onClick={handleTap}
       className="flex items-center w-full text-left"
       style={{
-        padding: '9px 16px',
-        borderBottom: '1px solid rgba(255,255,255,0.05)',
+        padding: '10px 16px',
+        borderBottom: isLeader ? 'none' : '1px solid rgba(255,255,255,0.06)',
         opacity: isCut ? 0.4 : 1,
-        background: 'none',
-        borderRadius: 0,
+        background: isLeader ? 'rgba(255, 255, 255, 0.08)' : 'none',
+        borderRadius: isLeader ? 10 : 0,
         border: 'none',
         cursor: onPlayerTap ? 'pointer' : 'default',
       }}
@@ -222,7 +197,7 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
         flexShrink: 0,
         fontSize: 12,
         fontWeight: 600,
-        color: 'rgba(255,255,255,0.35)',
+        color: isChaser ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.5)',
         fontVariantNumeric: 'tabular-nums',
       }}>
         {posDisplay}
@@ -249,8 +224,8 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
         </div>
         <span className="truncate" style={{
           fontSize: 14,
-          fontWeight: 500,
-          color: 'rgba(255,255,255,0.85)',
+          fontWeight: isLeader ? 700 : 500,
+          color: isChaser ? 'rgba(255,255,255,0.85)' : '#FFFFFF',
         }}>
           {displayName}
         </span>
@@ -263,7 +238,7 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
         flexShrink: 0,
         fontSize: 16,
         fontWeight: 700,
-        color: getScoreColor(entry.score ?? null),
+        color: '#FFFFFF',
         fontVariantNumeric: 'tabular-nums',
       }}>
         {formatScore(entry.score ?? null)}
@@ -305,48 +280,33 @@ export function ExpandedLeaderboardList({ entries, tourCode, onTouchStart, onTou
   }, [entries.length]);
 
   return (
-    <>
-      <div
-        role="list"
-        aria-label="Tournament leaderboard"
-        className="expanded-lb-scroll"
-        style={{
-          flex: 1,
-          minHeight: 0,
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          WebkitOverflowScrolling: 'touch',
-          overscrollBehavior: 'contain',
-          touchAction: 'pan-y',
-          paddingTop: 8,
-        }}
-        onScroll={handleScroll}
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
-      >
-        {entries.slice(0, visibleCount).map((entry) => (
-          <ExpandedLeaderboardRow
-            key={entry.id}
-            entry={entry}
-            tourCode={tourCode}
-            onPlayerTap={onPlayerTap}
-          />
-        ))}
-      </div>
-
-      {/* Tap hint — discoverability for scorecard */}
-      {onPlayerTap && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px 16px 6px', opacity: 0.45 }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-            <polyline points="10 17 15 12 10 7" />
-          </svg>
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>
-            Tap any player to see their scorecard
-          </span>
-        </div>
-      )}
-    </>
+    <div
+      role="list"
+      aria-label="Tournament leaderboard"
+      className="expanded-lb-scroll"
+      style={{
+        flex: 1,
+        minHeight: 0,
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        WebkitOverflowScrolling: 'touch',
+        overscrollBehavior: 'contain',
+        touchAction: 'pan-y',
+        paddingTop: 8,
+      }}
+      onScroll={handleScroll}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
+      {entries.slice(0, visibleCount).map((entry) => (
+        <ExpandedLeaderboardRow
+          key={entry.id}
+          entry={entry}
+          tourCode={tourCode}
+          onPlayerTap={onPlayerTap}
+        />
+      ))}
+    </div>
   );
 }

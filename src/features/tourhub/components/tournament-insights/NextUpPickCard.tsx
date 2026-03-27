@@ -217,11 +217,7 @@ function PickSlide({ pick, index, totalPicks, onNav }: { pick: PickItem; index: 
             color: 'hsl(var(--muted-foreground))',
             lineHeight: 1,
           }}>
-            {index === 0
-              ? 'Our Top Pick'
-              : index === 1
-              ? 'Strong Contender'
-              : 'In Contention'}
+            {index === 0 ? 'Top Pick' : `Pick ${index + 1}`}
           </div>
 
           {/* Player name */}
@@ -385,7 +381,7 @@ export function NextUpPickCard({
     },
     ...cards
       .filter(c => c.type === 'contender')
-      .slice(0, 2)
+      .slice(0, 4)
       .map(c => ({
         id: c.id,
         name: c.name,
