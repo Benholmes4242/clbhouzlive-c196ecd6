@@ -11,8 +11,16 @@ const ALLOWED_ORIGINS = new Set([
   'http://localhost:5173',
 ]);
 
+const isAllowedOrigin = (origin: string | null): boolean => {
+  if (!origin) return false;
+  if (ALLOWED_ORIGINS.has(origin)) return true;
+  if (origin.endsWith('.lovableproject.com')) return true;
+  if (origin.endsWith('.lovable.app')) return true;
+  return false;
+};
+
 const corsHeaders = (origin: string | null): HeadersInit => {
-  const allowOrigin = origin && ALLOWED_ORIGINS.has(origin) ? origin : '';
+  const allowOrigin = isAllowedOrigin(origin) ? origin! : '';
   return {
     'Access-Control-Allow-Origin': allowOrigin,
     'Access-Control-Allow-Credentials': 'true',
