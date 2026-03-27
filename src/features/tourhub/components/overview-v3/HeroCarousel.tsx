@@ -678,17 +678,29 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: tournament.isMajor ? '#FACC15' : '#22C55E' }}>LIVE</span>
                         </div>
                       ) : isUpcoming ? (
-                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' as const }}>
-                          {getStartLabel(tournament.startDate)}
-                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.25)' }} />
+                          <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' as const }}>
+                            Upcoming
+                          </span>
+                        </div>
                       ) : (
                         <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'white' }}>COMPLETED</span>
                       )}
                       <div className="flex items-center gap-2">
-                        <div className="tour-badge">
-                          <span>
-                            {getTourDisplayName(tournament.tourSlug)}
-                          </span>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
+                          <div className="tour-badge">
+                            <span>
+                              {getTourDisplayName(tournament.tourSlug)}
+                            </span>
+                          </div>
+                          {isUpcoming && tournament.startDate && tournament.endDate && (
+                            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.40)', fontWeight: 500 }}>
+                              {new Date(tournament.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              {' – '}
+                              {new Date(tournament.endDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -1103,33 +1115,96 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                   style={{ overflow: 'hidden' }}
                 >
-                  <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '8px', marginTop: '6px', letterSpacing: '0.3px' }}>
+                  {/* ── COURSE FACT CHIPS ── */}
+                  <div style={{ display: 'flex', gap: 6, marginTop: 6, marginBottom: 10 }}>
                     {[
-                      tournament.purse && formatPurse(tournament.purse),
-                      tournament.venuePar && `PAR ${tournament.venuePar}`,
-                      tournament.venueYardage && `${tournament.venueYardage.toLocaleString()} YDS`
-                    ].filter(Boolean).join(' · ')}
-                  </p>
+                      tournament.purse      && { value: formatPurse(tournament.purse),                          label: 'Purse'  },
+                      tournament.venuePar   && { value: `Par ${tournament.venuePar}`,                           label: 'Course' },
+                      tournament.venueYardage && { value: `${tournament.venueYardage.toLocaleString()}y`,        label: 'Yards'  },
+                    ].filter(Boolean).map((chip: any) => (
+                      <div key={chip.label} style={{
+                        flex: 1, textAlign: 'center',
+                        padding: '8px 4px 6px',
+                        borderRadius: 10,
+                        background: 'rgba(255,255,255,0.06)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                      }}>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF', lineHeight: 1 }}>
+                          {chip.value}
+                        </div>
+                        <div style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 4 }}>
+                          {chip.label}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
 
+                  {/* ── LIVE COUNTDOWN ── */}
+                  <UpcomingCountdown startDate={tournament.startDate} />
+
+                  {/* ── DEFENDING CHAMPION PANEL ── */}
                   {tournament.defendingChampion && (
                     <motion.div
                       initial={{ opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1], delay: 0.05 }}
-                      className="flex items-center gap-2"
-                      style={{ marginBottom: '10px' }}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        background: 'rgba(255,255,255,0.06)',
+                        border: '1px solid rgba(255,255,255,0.09)',
+                        borderRadius: 12,
+                        padding: '10px 12px',
+                        marginTop: 8, marginBottom: 10,
+                      }}
                     >
-                      <Trophy className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(250,204,21,0.7)' }} />
-                      <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.45)' }}>
-                        Defending: <span style={{ fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>{tournament.defendingChampion}</span>
-                      </span>
+                      {/* Avatar */}
+                      <PlayerAvatar displayName={tournament.defendingChampion} tourCode={tournament.tourSlug} size={40} frosted />
+                      {/* Text */}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'rgba(250,204,21,0.65)', display: 'block' }}>
+                          🏆 Defending Champion
+                        </span>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF', display: 'block', marginTop: 1 }}>
+                          {tournament.defendingChampion}
+                        </span>
+                        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', display: 'block', marginTop: 1 }}>
+                          Can they go back-to-back?
+                        </span>
+                      </div>
                     </motion.div>
                   )}
 
-                  <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta w-full" style={{ justifyContent: 'center' }}>
-                    <span>View Tournament</span>
-                    <ChevronRight className="w-4 h-4 cta-chevron" />
-                  </Link>
+                  {/* ── FOOTER — View Tournament pill ── */}
+                  <div style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    marginTop: 4, paddingTop: 8,
+                    borderTop: '1px solid rgba(255,255,255,0.06)',
+                  }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <span style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+                        Tournament info
+                      </span>
+                      <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)' }}>
+                        {tournament.venueName || 'Stroke play · 72 holes'}
+                      </span>
+                    </div>
+                    <Link
+                      to={`/tourhub/tournament/${tournament.id}`}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 4,
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.13)',
+                        borderRadius: 20,
+                        padding: '5px 11px',
+                        fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.85)',
+                        textDecoration: 'none',
+                      }}
+                      className="active:opacity-70 transition-opacity"
+                    >
+                      View Tournament
+                      <ChevronRight style={{ width: 12, height: 12, color: 'rgba(255,255,255,0.6)' }} />
+                    </Link>
+                  </div>
                 </motion.div>
               )}
 

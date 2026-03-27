@@ -3,7 +3,7 @@
  * Used by: HeroCarousel (overview) + ScheduleHeroCard (schedule tab)
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import type { WinnerStats } from '../../hooks/useWinnerScorecardStats';
 import type { WinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import { SCORE_COLORS } from '../../utils/scoreColors';
@@ -54,32 +54,83 @@ export function getCurrentRoundLabel(
  * UpcomingCountdown — live countdown to tournament start
  */
 export function UpcomingCountdown({ startDate }: { startDate: string }) {
-  const [timeLeft, setTimeLeft] = useState('');
+  const [tick, setTick] = useState(0);
+
   useEffect(() => {
-    function update() {
-      const normalized = startDate.includes('T') ? startDate : `${startDate}T12:00:00`;
-      const diff = new Date(normalized).getTime() - Date.now();
-      if (diff <= 0) { setTimeLeft('Starting now'); return; }
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      if (days > 0) setTimeLeft(`${days}d ${hours}h`);
-      else if (hours > 0) setTimeLeft(`${hours}h ${mins}m`);
-      else setTimeLeft(`${mins}m`);
-    }
-    update();
-    const t = setInterval(update, 60_000);
-    return () => clearInterval(t);
-  }, [startDate]);
+    const id = setInterval(() => setTick(n => n + 1), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const countdown = useMemo(() => {
+    const normalized = startDate.includes('T') ? startDate : `${startDate}T12:00:00`;
+    const diff = new Date(normalized).getTime() - Date.now();
+    if (diff <= 0) return null;
+    return {
+      days:    Math.floor(diff / (1000 * 60 * 60 * 24)),
+      hours:   Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+      minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+      seconds: Math.floor((diff % (1000 * 60)) / 1000),
+    };
+  }, [startDate, tick]);
+
+  if (!countdown) {
+    return (
+      <div style={{ textAlign: 'center', padding: '12px 0' }}>
+        <span style={{ fontSize: 14, fontWeight: 700, color: '#4ade80' }}>Starting now</span>
+      </div>
+    );
+  }
+
+  const cells = [
+    { value: countdown.days,    label: 'Days' },
+    { value: countdown.hours,   label: 'Hrs'  },
+    { value: countdown.minutes, label: 'Min'  },
+    { value: countdown.seconds, label: 'Sec', isAccent: true },
+  ];
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-      <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.8px', textTransform: 'uppercase' as const }}>
-        Starts in
-      </span>
-      <span style={{ fontSize: '15px', fontWeight: 800, color: '#FFFFFF', fontVariantNumeric: 'tabular-nums' }}>
-        {timeLeft}
-      </span>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, margin: '8px 0' }}>
+      {cells.map((cell, i) => (
+        <React.Fragment key={cell.label}>
+          {/* Cell */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 44, padding: '8px 4px' }}>
+            <span style={{
+              fontFamily: "'JetBrains Mono','SF Mono',monospace",
+              fontSize: 24, fontWeight: 800,
+              color: cell.isAccent ? '#4ade80' : '#FFFFFF',
+              lineHeight: 1,
+              fontVariantNumeric: 'tabular-nums',
+            }}>
+              {String(cell.value).padStart(2, '0')}
+            </span>
+            <span style={{
+              fontSize: 8, fontWeight: 700,
+              color: 'rgba(255,255,255,0.30)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.8px',
+              marginTop: 4,
+            }}>
+              {cell.label}
+            </span>
+          </div>
+
+          {/* Pulsing dot separator — between cells only */}
+          {i < cells.length - 1 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: '0 2px' }}>
+              <div style={{
+                width: 3, height: 3, borderRadius: '50%',
+                background: 'rgba(255,255,255,0.25)',
+                animation: 'tickPulse 1s ease-in-out infinite',
+              }} />
+              <div style={{
+                width: 3, height: 3, borderRadius: '50%',
+                background: 'rgba(255,255,255,0.25)',
+                animation: 'tickPulse 1s ease-in-out infinite',
+              }} />
+            </div>
+          )}
+        </React.Fragment>
+      ))}
     </div>
   );
 }
