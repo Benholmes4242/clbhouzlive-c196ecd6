@@ -81,10 +81,8 @@ function PickRecordRail() {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', padding: '0 16px 10px' }}>
           <div>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.8, textTransform: 'uppercase' as const, color: 'hsl(var(--muted-foreground))' }}>
-              Tournament Intelligence
-            </div>
-            <div style={{ fontSize: 17, fontWeight: 800, color: 'hsl(var(--foreground))' }}>Pick Record</div>
+            <div style={{ fontSize: 15, fontWeight: 800, color: 'hsl(var(--foreground))' }}>Our pick record</div>
+            <div style={{ fontSize: 11, fontWeight: 500, color: 'hsl(var(--muted-foreground))', marginTop: 2 }}>Season 2024–25</div>
           </div>
           <div style={{ display: 'flex', gap: 6 }}>
             {wins > 0 && (
