@@ -688,10 +688,19 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'white' }}>COMPLETED</span>
                       )}
                       <div className="flex items-center gap-2">
-                        <div className="tour-badge">
-                          <span>
-                            {getTourDisplayName(tournament.tourSlug)}
-                          </span>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
+                          <div className="tour-badge">
+                            <span>
+                              {getTourDisplayName(tournament.tourSlug)}
+                            </span>
+                          </div>
+                          {isUpcoming && tournament.startDate && tournament.endDate && (
+                            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.40)', fontWeight: 500 }}>
+                              {new Date(tournament.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              {' – '}
+                              {new Date(tournament.endDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
