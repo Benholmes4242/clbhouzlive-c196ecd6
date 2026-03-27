@@ -522,6 +522,8 @@ export default function CoursesPage() {
     updateCourse,
     uploadPhoto,
     isUploadingPhoto,
+    deleteCourse,
+    isDeleting,
   } = useAdminV2Courses();
 
   const [countryFilter, setCountryFilter] = useState('all');
