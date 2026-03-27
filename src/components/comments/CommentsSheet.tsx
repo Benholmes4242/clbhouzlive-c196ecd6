@@ -545,6 +545,14 @@ function CommentsSheet({
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.4 }}
+            onDragEnd={(_, info) => {
+              if (info.offset.y > 80 || info.velocity.y > 400) {
+                onClose();
+              }
+            }}
             className={cn(
               'fixed inset-x-0 bottom-0 z-[211] w-full rounded-t-[20px]',
               'md:inset-x-auto md:left-1/2 md:-translate-x-1/2 md:max-w-[560px]',
@@ -683,6 +691,7 @@ function CommentsSheet({
             {/* Scroll area */}
             <div
               ref={scrollRef}
+              onPointerDownCapture={(e) => e.stopPropagation()}
               className="flex-1 overflow-y-auto overscroll-contain"
               style={{ WebkitOverflowScrolling: 'touch' }}
             >
