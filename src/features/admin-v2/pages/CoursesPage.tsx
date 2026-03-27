@@ -24,7 +24,7 @@ import { AdminMiniCard } from '../components/shared/AdminMiniCard';
 
 const col = createColumnHelper<AdminCourseRow>();
 
-// ─── Rank badge pill ──────────────────────────────────────────────────────────
+// ─── Rank badge pill (legacy — kept for reference) ────────────────────────────
 
 function RankPill({ label, rank, color }: { label: string; rank: number | null; color: string }) {
   if (!rank) return null;
@@ -35,6 +35,109 @@ function RankPill({ label, rank, color }: { label: string; rank: number | null; 
     >
       {label} #{rank}
     </span>
+  );
+}
+
+// ─── Inline editable rank cell ────────────────────────────────────────────────
+
+function RankEditCell({
+  courseId,
+  rankKey,
+  currentRank,
+  label,
+  color,
+  bg,
+  onSave,
+}: {
+  courseId: string;
+  rankKey: 'global_rank' | 'regional_rank' | 'usa_rank';
+  currentRank: number | null;
+  label: string;
+  color: string;
+  bg: string;
+  onSave: (rank: number | null) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState('');
+  const qc = useQueryClient();
+
+  const commit = async () => {
+    setEditing(false);
+    const num = draft.trim() ? Number(draft.trim()) : null;
+    if (num === currentRank) return;
+
+    if (num !== null && num >= 1 && num <= 100) {
+      await supabase
+        .from('golf_courses')
+        .update({ [rankKey]: null } as any)
+        .eq(rankKey, num)
+        .neq('id', courseId);
+    }
+
+    onSave(num && num >= 1 && num <= 100 ? num : null);
+    qc.invalidateQueries({ queryKey: ['admin-v2', 'courses'] });
+  };
+
+  if (!currentRank && !editing) {
+    return (
+      <button
+        onClick={() => { setDraft(''); setEditing(true); }}
+        style={{
+          fontSize: 10, color: '#CBD5E1', background: 'transparent',
+          border: '1px dashed #E2E8F0', borderRadius: 4,
+          padding: '1px 6px', cursor: 'pointer', fontWeight: 600,
+        }}
+      >
+        + {label}
+      </button>
+    );
+  }
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-1">
+        <span style={{ fontSize: 10, fontWeight: 600, color }}>{label}</span>
+        <input
+          autoFocus
+          value={draft}
+          onChange={e => setDraft(e.target.value)}
+          onBlur={commit}
+          onKeyDown={e => { if (e.key === 'Enter') commit(); if (e.key === 'Escape') setEditing(false); }}
+          style={{
+            width: 48, fontSize: 11, padding: '2px 4px',
+            border: `1px solid ${color}`, borderRadius: 4, outline: 'none',
+          }}
+          placeholder="1–100"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="inline-flex items-center gap-0.5">
+      <span style={{ fontSize: 10, fontWeight: 600, color }}>{label}</span>
+      <button
+        onClick={() => { setDraft(String(currentRank)); setEditing(true); }}
+        style={{
+          fontSize: 11, fontWeight: 700, color,
+          background: bg, border: 'none', borderRadius: 4,
+          padding: '1px 6px', cursor: 'pointer',
+        }}
+      >
+        #{currentRank}
+      </button>
+      <button
+        onClick={() => onSave(null)}
+        style={{
+          fontSize: 9, color: '#94A3B8', background: 'none',
+          border: 'none', cursor: 'pointer', padding: '0 2px',
+          lineHeight: 1,
+        }}
+        title="Remove rank"
+      >
+        ✕
+      </button>
+    </div>
   );
 }
 
