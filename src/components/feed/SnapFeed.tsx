@@ -282,8 +282,9 @@ export function SnapFeed({
           onShare={onShare}
           getLikeState={getLikeState}
           getCommentCount={getCommentCount}
-          onZoomChange={handleZoomChange}
-        />
+           onZoomChange={handleZoomChange}
+           activeIndexOverride={activeIndexOverride}
+         />
       ))}
 
       {!hasNextPage && posts.length > 0 && (
