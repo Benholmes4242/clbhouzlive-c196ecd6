@@ -2,7 +2,7 @@
  * PlayerScorecardCard — Scorecard content rendered inside the expanded glass card.
  * No own background — the parent HeroSlide glass card provides blur/overlay.
  */
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronLeft, X, Trophy } from 'lucide-react';
@@ -245,8 +245,16 @@ export function PlayerScorecardCard({
   const navigate = useNavigate();
   const { data: scorecard, isLoading } = usePlayerScorecard(tournamentId, player.id);
   const [activeRound, setActiveRound] = useState<number>(
-    player.currentRound || scorecard?.currentRound || 1
+    player.currentRound || 1
   );
+  const hasInitialisedRound = useRef(false);
+
+  useEffect(() => {
+    if (scorecard?.currentRound && !hasInitialisedRound.current) {
+      hasInitialisedRound.current = true;
+      setActiveRound(scorecard.currentRound);
+    }
+  }, [scorecard?.currentRound]);
 
   const activeRoundData = useMemo(
     () => scorecard?.rounds.find((r) => r.roundNumber === activeRound),
