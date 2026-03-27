@@ -693,6 +693,7 @@ function CommentsSheet({
               ref={scrollRef}
               className="flex-1 overflow-y-auto overscroll-contain"
               style={{ WebkitOverflowScrolling: 'touch' }}
+              onPointerDownCapture={(e) => e.stopPropagation()}
             >
               {activeTab === 'likes' ? (
                 /* ── LIKES TAB ── */
