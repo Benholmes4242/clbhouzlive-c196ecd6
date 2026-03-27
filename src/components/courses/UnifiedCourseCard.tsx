@@ -282,7 +282,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
                 background: 'rgba(255,255,255,0.12)',
                 border: '0.5px solid rgba(255,255,255,0.20)',
                 borderRadius: 6,
-                padding: '3px 7px',
+                padding: '4px 8px',
                 backdropFilter: 'blur(8px)',
                 WebkitBackdropFilter: 'blur(8px)',
               }}
@@ -290,10 +290,10 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
               <img
                 src="/assets/logomark-orange.png"
                 alt=""
-                className="w-3 h-3 object-contain"
+                className="w-3.5 h-3.5 object-contain"
                 aria-hidden="true"
               />
-              <span className="text-[11px] font-bold text-white" style={{ lineHeight: 1 }}>
+              <span className="text-xs font-bold text-white" style={{ lineHeight: 1 }}>
                 {course.communityRating.toFixed(1)}
               </span>
             </div>

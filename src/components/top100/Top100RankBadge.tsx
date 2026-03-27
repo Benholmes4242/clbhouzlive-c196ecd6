@@ -16,7 +16,7 @@ export const Top100RankBadge: React.FC<Top100RankBadgeProps> = ({ listSlug, rank
   const renderIcon = () => {
     switch (listSlug) {
       case 'global':
-        return <Earth className="h-3 w-3 text-white" />;
+        return <Earth className="h-3.5 w-3.5 text-white" />;
       case 'gb-i':
         return <CountryFlag country="Britain & Ireland" size="sm" />;
       case 'usa':
@@ -24,7 +24,7 @@ export const Top100RankBadge: React.FC<Top100RankBadgeProps> = ({ listSlug, rank
       case 'europe':
         return <CountryFlag country="Continental Europe" size="sm" />;
       default:
-        return <Earth className="h-3 w-3 text-white" />;
+        return <Earth className="h-3.5 w-3.5 text-white" />;
     }
   };
 
@@ -35,13 +35,13 @@ export const Top100RankBadge: React.FC<Top100RankBadgeProps> = ({ listSlug, rank
         background: 'rgba(255,255,255,0.12)',
         border: '0.5px solid rgba(255,255,255,0.20)',
         borderRadius: 6,
-        padding: '3px 7px',
+        padding: '4px 8px',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
       }}
     >
       {renderIcon()}
-      <span className="text-[11px] font-bold text-white" style={{ lineHeight: 1 }}>
+      <span className="text-xs font-bold text-white" style={{ lineHeight: 1 }}>
         #{rank}
       </span>
     </div>
