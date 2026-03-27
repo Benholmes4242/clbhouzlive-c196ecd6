@@ -149,18 +149,24 @@ async function fetchFilterCounts(search: string) {
     return applySearch(q, search);
   };
 
-  const [all, global, usa, europe, unranked] = await Promise.all([
+  const [all, global, usa, gbi, europe, unranked] = await Promise.all([
     buildQuery(),
-    buildQuery().then(async _ => {
-      // Promise.all doesn't chain .not() on a promise — build inline
+    (() => {
       let q = supabase.from('golf_courses').select('*', { count: 'exact', head: true });
       q = applySearch(q, search);
       return q.not('global_rank', 'is', null);
-    }),
+    })(),
     (() => {
       let q = supabase.from('golf_courses').select('*', { count: 'exact', head: true });
       q = applySearch(q, search);
       return q.not('usa_rank', 'is', null);
+    })(),
+    (() => {
+      let q = supabase.from('golf_courses').select('*', { count: 'exact', head: true });
+      q = applySearch(q, search);
+      return q
+        .not('regional_rank', 'is', null)
+        .in('country', ['England', 'Scotland', 'Wales', 'Ireland', 'Northern Ireland']);
     })(),
     (() => {
       let q = supabase.from('golf_courses').select('*', { count: 'exact', head: true });
@@ -177,7 +183,7 @@ async function fetchFilterCounts(search: string) {
   return {
     all:      all.count ?? 0,
     global:   global.count ?? 0,
-    gbi:      0, // not shown in filter bar
+    gbi:      gbi.count ?? 0,
     usa:      usa.count ?? 0,
     europe:   europe.count ?? 0,
     unranked: unranked.count ?? 0,
