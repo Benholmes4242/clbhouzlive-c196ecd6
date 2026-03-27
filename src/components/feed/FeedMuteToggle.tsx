@@ -1,7 +1,7 @@
 import React from 'react';
 import { VolumeX, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 
 interface FeedMuteToggleProps {
   isVideoPost?: boolean;
@@ -23,7 +23,9 @@ const FeedMuteToggle: React.FC<FeedMuteToggleProps> = ({
   isVideoPost = false,
   postHasMusic = false 
 }) => {
-  const { isGloballyMuted, toggleGlobalMute, markUserGestureUnmute } = useGlobalAudio();
+  const isMuted = useClubhouseStore(s => s.isMuted);
+  const toggleMute = useClubhouseStore(s => s.toggleMute);
+  const markUserGestureUnmute = useClubhouseStore(s => s.markUserGestureUnmute);
 
   // Only show for video posts
   if (!isVideoPost) {
@@ -31,8 +33,8 @@ const FeedMuteToggle: React.FC<FeedMuteToggleProps> = ({
   }
 
   const handleToggle = () => {
-    if (isGloballyMuted) markUserGestureUnmute();
-    toggleGlobalMute();
+    if (isMuted) markUserGestureUnmute();
+    toggleMute();
   };
 
   // When post has music, show music-specific labeling
@@ -43,10 +45,10 @@ const FeedMuteToggle: React.FC<FeedMuteToggleProps> = ({
         size="sm" 
         className="text-muted-foreground hover:text-primary flex items-center gap-1"
         onClick={handleToggle}
-        title={isGloballyMuted ? "Turn music on" : "Turn music off"}
+        title={isMuted ? "Turn music on" : "Turn music off"}
       >
-        {isGloballyMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-        {isGloballyMuted ? 'Music Off' : 'Music On'}
+        {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+        {isMuted ? 'Music Off' : 'Music On'}
       </Button>
     );
   }
@@ -57,14 +59,14 @@ const FeedMuteToggle: React.FC<FeedMuteToggleProps> = ({
       size="sm" 
       className="text-muted-foreground hover:text-primary"
       onClick={handleToggle}
-      title={isGloballyMuted ? "Unmute all videos" : "Mute all videos"}
+      title={isMuted ? "Unmute all videos" : "Mute all videos"}
     >
-      {isGloballyMuted ? (
+      {isMuted ? (
         <VolumeX className="h-3 w-3 mr-1" fill="currentColor" />
       ) : (
         <Volume2 className="h-3 w-3 mr-1" fill="currentColor" />
       )}
-      {isGloballyMuted ? 'Unmute' : 'Mute'}
+      {isMuted ? 'Unmute' : 'Mute'}
     </Button>
   );
 };

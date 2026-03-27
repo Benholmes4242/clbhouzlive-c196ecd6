@@ -10,7 +10,7 @@ import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { toast } from 'sonner';
 
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 
 interface UserPostMediaProps {
   media: PostMedia[];
@@ -38,7 +38,7 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
   badges
 }) => {
   
-  const { isGloballyMuted } = useGlobalAudio();
+  const isMuted = useClubhouseStore(s => s.isMuted);
   
   // Track active slide index for per-slide autoplay control
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
@@ -89,7 +89,7 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
   if (!media || media.length === 0) return null;
 
   // Determine effective mute state: muted if globally muted OR if post has music track
-  const effectiveMuted = isGloballyMuted || postHasMusic;
+  const effectiveMuted = isMuted || postHasMusic;
 
   const carouselItems = media.map((mediaItem, index) => {
     // Use filter_id first (new column), fallback to studio_edits.filter (old data)
@@ -112,7 +112,7 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
       isActiveSlide,
       slideAutoplay,
       effectiveMuted,
-      isGloballyMuted,
+      isMuted,
       postHasMusic,
     });
     

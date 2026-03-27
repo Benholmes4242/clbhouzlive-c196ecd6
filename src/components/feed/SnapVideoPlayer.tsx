@@ -123,10 +123,10 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
         try {
           await video.play();
         } catch {
-          // Autoplay blocked — mute this element only to recover playback.
-          // Do NOT reset the global store preference; the user's unmute choice must persist.
-          video.muted = true;
-          video.play().catch(() => {});
+        // Autoplay blocked — mute this element only to recover playback.
+        video.muted = true;
+        useClubhouseStore.getState().setIsMuted(true);
+        video.play().catch(() => {});
         }
         useClubhouseStore.getState().setActiveVideoElement(video, videoRef);
         return;
@@ -178,9 +178,9 @@ export const SnapVideoPlayer = memo(function SnapVideoPlayer({
       try {
         await video.play();
       } catch {
-        // Autoplay blocked — mute this element only to recover playback.
-        // Do NOT reset the global store preference; the user's unmute choice must persist.
+        // Autoplay blocked — mute this element and sync store so UI matches.
         video.muted = true;
+        useClubhouseStore.getState().setIsMuted(true);
         video.play().catch(() => {});
       }
 

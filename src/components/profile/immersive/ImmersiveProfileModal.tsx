@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useId } from 'react';
 import { VolumeX, Volume2, ChevronDown, Check, Upload, Edit, Trash2 } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { supabase } from '@/integrations/supabase/client';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Progress } from '@/components/ui/progress';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
@@ -70,7 +70,8 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
   const startTimeRef = useRef<number>(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaId = useId();
-  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+  const isMuted = useClubhouseStore(s => s.isMuted);
+  const toggleMute = useClubhouseStore(s => s.toggleMute);
   
   // Video progress sync hook
   const { progress: syncedProgress, segmentProgress } = useVideoProgressSync(
@@ -468,11 +469,11 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
 
       {/* Mute Button - Top Right */}
       <button
-        onClick={toggleGlobalMute}
+        onClick={toggleMute}
         className="absolute top-8 right-4 z-20 w-8 h-8 rounded-full transition-all duration-300 hover:scale-105 flex items-center justify-center p-1"
         style={liquidGlassStyle}
       >
-        {isGloballyMuted ? (
+        {isMuted ? (
           <VolumeX className="w-4 h-4 text-white" />
         ) : (
           <Volume2 className="w-4 h-4 text-white" />
@@ -488,7 +489,7 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
             ref={videoRef}
             src={currentItem.media_url}
             autoplay={true}
-            muted={isGloballyMuted}
+            muted={isMuted}
             loop={false} // Disable loop so video can end and trigger onEnded
             enableHLS={true}
             className="w-full h-full"

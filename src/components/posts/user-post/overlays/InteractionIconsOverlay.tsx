@@ -1,6 +1,6 @@
 import React from 'react';
 import { Heart, MessageCircle, Share, VolumeX, Volume2 } from 'lucide-react';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 
 interface InteractionIconsOverlayProps {
   onInteractionClick: (e: React.MouseEvent, type: string) => void;
@@ -18,12 +18,14 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
   onInteractionClick,
   currentMediaType = 'image'
 }) => {
-  const { isGloballyMuted, toggleGlobalMute, markUserGestureUnmute } = useGlobalAudio();
+  const isMuted = useClubhouseStore(s => s.isMuted);
+  const toggleMute = useClubhouseStore(s => s.toggleMute);
+  const markUserGestureUnmute = useClubhouseStore(s => s.markUserGestureUnmute);
 
   const handleMuteToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isGloballyMuted) markUserGestureUnmute();
-    toggleGlobalMute();
+    if (isMuted) markUserGestureUnmute();
+    toggleMute();
   };
 
   return (
@@ -44,7 +46,7 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
                        flex items-center justify-center hover:bg-white/20 hover:scale-110 active:scale-95 
                        transition-all duration-200 overflow-hidden"
               onClick={handleMuteToggle}
-              title={isGloballyMuted ? "Unmute all videos" : "Mute all videos"}
+              title={isMuted ? "Unmute all videos" : "Mute all videos"}
             >
               {/* Pulse animation on hover */}
               <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-hover:scale-150 
@@ -54,7 +56,7 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
               <div className="absolute inset-0 bg-white/30 rounded-full scale-0 group-active:scale-150 
                            opacity-0 group-active:opacity-50 transition-all duration-200" />
               
-              {isGloballyMuted ? (
+              {isMuted ? (
                 <VolumeX className="relative w-5 h-5 z-10" />
               ) : (
                 <Volume2 className="relative w-5 h-5 z-10" />

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Heart, MessageCircle, Share, Volume2, VolumeX, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Squircle } from '@/components/ui/squircle';
 import '@/styles/engagement-rail.css';
@@ -124,12 +124,14 @@ const EngagementRail = ({
 }: EngagementRailProps) => {
   const isMobile = useIsMobile();
   const gap = isMobile ? 'gap-4' : 'gap-5'; // 16px mobile, 20px desktop
-  const { isGloballyMuted, toggleGlobalMute, markUserGestureUnmute } = useGlobalAudio();
+  const isMuted = useClubhouseStore(s => s.isMuted);
+  const toggleMute = useClubhouseStore(s => s.toggleMute);
+  const markUserGestureUnmute = useClubhouseStore(s => s.markUserGestureUnmute);
   const [railVisible, setRailVisible] = useState(false);
 
   const handleAudioToggle = () => {
-    if (isGloballyMuted) markUserGestureUnmute();
-    toggleGlobalMute();
+    if (isMuted) markUserGestureUnmute();
+    toggleMute();
   };
 
   // Stagger entrance when post becomes active with debounce
@@ -221,10 +223,10 @@ const EngagementRail = ({
       {/* Only show audio control for video posts */}
       {isVideo && (
         <EngagementButton
-          icon={isGloballyMuted ? VolumeX : Volume2}
+          icon={isMuted ? VolumeX : Volume2}
           count={0}
           onClick={handleAudioToggle}
-          ariaLabel={isGloballyMuted ? 'Unmute' : 'Mute'}
+          ariaLabel={isMuted ? 'Unmute' : 'Mute'}
         />
       )}
 

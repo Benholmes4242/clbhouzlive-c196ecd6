@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useRef, useState } from "react";
-import { useGlobalAudio } from "@/contexts/GlobalAudioContext";
+import { useClubhouseStore } from "@/store/clubhouseStore";
 
 type PlayerEl = HTMLVideoElement | (HTMLElement & { 
   play?: () => Promise<void>; 
@@ -36,25 +36,27 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
   // CHANGE 4: Use GlobalAudioContext as single source of truth for mute state.
   // Removed isolated carouselAudioPreference + sessionStorage — they caused drift
   // between the highlights carousel and the rest of the app.
-  const { isGloballyMuted, setGlobalMute, markUserGestureUnmute } = useGlobalAudio();
+  const isMuted = useClubhouseStore(s => s.isMuted);
+  const setIsMuted = useClubhouseStore(s => s.setIsMuted);
+  const markUserGestureUnmute = useClubhouseStore(s => s.markUserGestureUnmute);
   
   // Track if user has made a gesture for autoplay policies
   const [hasUserGesture, setHasUserGesture] = useState(false);
 
   // Derive carousel preference from global state for API compatibility
-  const carouselAudioPreference: 'muted' | 'unmuted' = isGloballyMuted ? 'muted' : 'unmuted';
+  const carouselAudioPreference: 'muted' | 'unmuted' = isMuted ? 'muted' : 'unmuted';
 
   // Sync global mute state to carousel preference
   const updateCarouselAudioPreference = useCallback((preference: 'muted' | 'unmuted') => {
     const newMuted = preference === 'muted';
     if (!newMuted) markUserGestureUnmute();
-    setGlobalMute(newMuted);
+    setIsMuted(newMuted);
     
     // Mark that user has made a gesture
     if (preference === 'unmuted') {
       setHasUserGesture(true);
     }
-  }, [setGlobalMute, markUserGestureUnmute]);
+  }, [setIsMuted, markUserGestureUnmute]);
 
   const register = useCallback((id: string, el: PlayerEl | null) => {
     console.log('🎥 Registering video element:', id, el ? 'with element' : 'null');
@@ -99,7 +101,7 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
       // Fallback to muted play and sync global state
       try {
         setMuted(el, true);
-        setGlobalMute(true); // Keep global state in sync with actual audio state
+        setIsMuted(true); // Keep global state in sync with actual audio state
         await el.play?.();
         console.log('🎥 Fell back to muted playback:', id);
         return false;
@@ -108,10 +110,10 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
         return false;
       }
     }
-  }, [setGlobalMute]);
+  }, [setIsMuted]);
 
   const play = useCallback(async (id: string) => {
-    console.log('🎥 Play called for:', id, 'currentActive:', activeId, 'globalMuted:', isGloballyMuted);
+    console.log('🎥 Play called for:', id, 'currentActive:', activeId, 'globalMuted:', isMuted);
     
     // RULE: only one video at a time - pause the previous one
     if (activeId && activeId !== id) {
@@ -144,7 +146,7 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
     if (!el) return;
     
     // Apply global mute state (single source of truth)
-    if (isGloballyMuted) {
+    if (isMuted) {
       // Always start muted when global state is muted
       setMuted(el, true);
       try {
@@ -160,7 +162,7 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
         console.log('🎥 Card needs user gesture for sound:', id);
       }
     }
-  }, [activeId, pause, isGloballyMuted, attemptUnmutedPlay]);
+  }, [activeId, pause, isMuted, attemptUnmutedPlay]);
 
   return (
     <HighlightsVideoContext.Provider 

@@ -9,7 +9,7 @@ import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloud
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
 import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 
 interface HighlightVideo {
   id: string;
@@ -237,7 +237,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
   const hasPreloadedFirst = useRef(false);
-  const { isGloballyMuted } = useGlobalAudio();
+  const isMuted = useClubhouseStore(s => s.isMuted);
   
   const carouselItems = highlights;
 
@@ -452,7 +452,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                   isOwnProfile={isOwnProfile}
                   isVideoReady={item.videoUrl ? isReady(uidFromNode({ src: item.videoUrl }) || item.id) : true}
                   onReady={(id) => markReadyRef.current(id)}
-                  globalMuted={isGloballyMuted}
+                  globalMuted={isMuted}
                 />
               </div>
             );

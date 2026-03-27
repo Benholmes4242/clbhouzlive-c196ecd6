@@ -21,7 +21,7 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
 import { useHlsUrlCache, warmHlsJs } from '@/hooks/useHlsUrlCache';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -209,7 +209,9 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
 
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
-  const { isGloballyMuted, setGlobalMute, markUserGestureUnmute } = useGlobalAudio();
+  const isMuted = useClubhouseStore(s => s.isMuted);
+  const setIsMuted = useClubhouseStore(s => s.setIsMuted);
+  const markUserGestureUnmute = useClubhouseStore(s => s.markUserGestureUnmute);
   const { deletePost } = usePostDeletion();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
@@ -488,9 +490,9 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   });
 
   const toggleGlobalMute = useCallback(() => {
-    if (isGloballyMuted) markUserGestureUnmute();
-    setGlobalMute(!isGloballyMuted);
-  }, [isGloballyMuted, setGlobalMute, markUserGestureUnmute]);
+    if (isMuted) markUserGestureUnmute();
+    setIsMuted(!isMuted);
+  }, [isMuted, setIsMuted, markUserGestureUnmute]);
 
   const handleLike = useCallback((postId: string) => {
     if (!user?.id) return;
@@ -808,7 +810,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                   Math.abs(index - currentIndex) <= VIDEO_WINDOW_RADIUS ? (
                     <VideoWithAutoplay
                       src={currentMedia.media_url}
-                      muted={isGloballyMuted}
+                      muted={isMuted}
                       className="w-full h-full"
                       objectFit="contain"
                       shouldAttach={!!shouldAttach[item.id]}

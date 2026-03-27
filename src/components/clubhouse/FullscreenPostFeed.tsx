@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 import { ChevronUp, ChevronDown, Volume2, VolumeX, MessageCircle, Send, MoreHorizontal } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { ExploreContentItem } from '@/components/explore/types';
@@ -26,7 +27,8 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
   onLoadMore
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isMuted, setIsMuted] = useState(true);
+  const isMuted = useClubhouseStore(s => s.isMuted);
+  const toggleMute = useClubhouseStore(s => s.toggleMute);
   const [commentText, setCommentText] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -163,7 +165,7 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
       {/* Mute/Unmute Toggle */}
       {(currentPost.type === 'video' || hasVideoMedia) && (
         <button
-          onClick={() => setIsMuted(!isMuted)}
+          onClick={toggleMute}
           className="w-11 h-11 flex items-center justify-center rounded-full backdrop-blur-md bg-black/35 border border-white/10 text-white hover:bg-black/50 transition-colors"
         >
           {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}

@@ -9,7 +9,7 @@ import { uidFromNode, generateHlsUrl, generateThumbnailUrl } from "@/utils/cloud
 import UnifiedVideoPlayer, { UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import { trackVideoCloseMini } from "@/lib/analytics/videoAnalytics";
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 
 type MiniVideo = {
   id: string;
@@ -32,7 +32,9 @@ const PROGRESS_THROTTLE_MS = 5000;
  */
 export const MiniPlayer: React.FC = () => {
   const context = useVideoPlaybackSafe();
-  const { isGloballyMuted, toggleGlobalMute, markUserGestureUnmute } = useGlobalAudio();
+  const isMuted = useClubhouseStore(s => s.isMuted);
+  const toggleMute = useClubhouseStore(s => s.toggleMute);
+  const markUserGestureUnmute = useClubhouseStore(s => s.markUserGestureUnmute);
   
   const videoElRef = useRef<UnifiedVideoPlayerRef>(null);
   const pendingSeekRef = useRef<number | null>(null);
@@ -292,9 +294,9 @@ export const MiniPlayer: React.FC = () => {
 
   const handleMuteToggle = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isGloballyMuted) markUserGestureUnmute();
-    toggleGlobalMute();
-  }, [toggleGlobalMute, isGloballyMuted, markUserGestureUnmute]);
+    if (isMuted) markUserGestureUnmute();
+    toggleMute();
+  }, [toggleMute, isMuted, markUserGestureUnmute]);
 
   // Handle video ended - advance to next in queue
   const handleEnded = useCallback(() => {
@@ -401,7 +403,7 @@ export const MiniPlayer: React.FC = () => {
                     src={videoData.hlsUrl}
                     posterUrl={videoData.posterUrl}
                     autoplay
-                    muted={isGloballyMuted}
+                    muted={isMuted}
                     loop={false}
                     className="w-full h-full"
                     objectFit="cover"
@@ -479,10 +481,10 @@ export const MiniPlayer: React.FC = () => {
                 "bg-background/10 hover:bg-background/20",
                 "text-foreground flex items-center justify-center transition"
               )}
-              aria-label={isGloballyMuted ? "Unmute" : "Mute"}
+              aria-label={isMuted ? "Unmute" : "Mute"}
               type="button"
             >
-              {isGloballyMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+              {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
             </button>
 
             <button

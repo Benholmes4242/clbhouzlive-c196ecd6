@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Heart, MessageCircle, Share, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 import { Squircle } from '@/components/ui/squircle';
 
 interface EngagementRailOverlayProps {
@@ -106,7 +106,8 @@ export const EngagementRailOverlay: React.FC<EngagementRailOverlayProps> = ({
 }) => {
   const isMobile = useIsMobile();
   const gap = isMobile ? 'gap-4' : 'gap-5';
-  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+  const isMuted = useClubhouseStore(s => s.isMuted);
+  const toggleMute = useClubhouseStore(s => s.toggleMute);
 
   if (!activePost) return null;
 
@@ -126,10 +127,10 @@ export const EngagementRailOverlay: React.FC<EngagementRailOverlayProps> = ({
       {/* Only show audio control for video posts */}
       {activePost.isVideo && (
         <EngagementButton
-          icon={isGloballyMuted ? VolumeX : Volume2}
+          icon={isMuted ? VolumeX : Volume2}
           count={0}
-          onClick={toggleGlobalMute}
-          ariaLabel={isGloballyMuted ? 'Unmute' : 'Mute'}
+          onClick={toggleMute}
+          ariaLabel={isMuted ? 'Unmute' : 'Mute'}
         />
       )}
 

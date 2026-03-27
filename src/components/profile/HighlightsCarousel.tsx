@@ -11,7 +11,7 @@ import { useTop100Highlights } from '@/hooks/useTop100Highlights';
 import { warmHls, getHlsUrl } from '@/utils/videoPreload';
 import HighlightVideo from './HighlightVideo';
 import HighlightOverlays from './HighlightOverlays';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useMediaViewer } from '@/hooks/useMediaViewer';
 
 interface HighlightsCarouselProps {
@@ -24,7 +24,9 @@ const MOBILE_QUERY = '(pointer: coarse), (hover: none)';
 const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, className = '' }) => {
   const { highlights, isLoading, error } = useTop100Highlights(userId);
   const railRef = useRef<HTMLDivElement>(null);
-  const { isGloballyMuted, toggleGlobalMute, markUserGestureUnmute } = useGlobalAudio();
+  const isMuted = useClubhouseStore(s => s.isMuted);
+  const toggleMute = useClubhouseStore(s => s.toggleMute);
+  const markUserGestureUnmute = useClubhouseStore(s => s.markUserGestureUnmute);
   const [activeIndex, setActiveIndex] = useState(0);
   const { openViewer } = useMediaViewer();
 
@@ -189,16 +191,16 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
                   index={index}
                   onEnded={() => tryAutoAdvance(index)}
                   isActive={isActive}
-                  muted={isGloballyMuted}
+                  muted={isMuted}
                   onTap={() => handleHighlightTap(index)}
                 />
                 <button
                   className="unmute-btn"
-                  aria-label={isGloballyMuted ? 'Unmute' : 'Mute'}
-                  onClick={(e) => { e.stopPropagation(); if (isGloballyMuted) markUserGestureUnmute(); toggleGlobalMute(); }}
-                  title={isGloballyMuted ? 'Unmute' : 'Mute'}
+                  aria-label={isMuted ? 'Unmute' : 'Mute'}
+                  onClick={(e) => { e.stopPropagation(); if (isMuted) markUserGestureUnmute(); toggleMute(); }}
+                  title={isMuted ? 'Unmute' : 'Mute'}
                 >
-                  {isGloballyMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                  {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
                 </button>
                 {highlight.golf_course && (
                   <div className="club-badge">

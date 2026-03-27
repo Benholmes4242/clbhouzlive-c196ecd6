@@ -7,8 +7,13 @@ function getInitialMuted(): boolean {
     const saved = sessionStorage.getItem(SESSION_MUTE_KEY);
     if (saved !== null) return JSON.parse(saved);
   } catch {}
+  // One-time cleanup of orphaned key from removed GlobalAudioContext mute state
+  try { sessionStorage.removeItem('globalAudioState'); } catch {}
   return true; // default muted on fresh session
 }
+
+// Tracks recent user gesture for autoplay policy compliance
+let _userGestureUnmuteTs = 0;
 
 interface ClubhouseState {
   activeIndex: number;
@@ -26,6 +31,8 @@ interface ClubhouseState {
   setActiveVideoElement: (el: HTMLVideoElement | null, ref: React.RefObject<HTMLVideoElement> | null) => void;
   setCarouselPosition: (feedIdx: number, mediaIdx: number) => void;
   setIsTournamentCardActive: (v: boolean) => void;
+  markUserGestureUnmute: () => void;
+  isRecentUserGesture: () => boolean;
 }
 
 export const useClubhouseStore = create<ClubhouseState>()((set) => ({
@@ -58,4 +65,6 @@ export const useClubhouseStore = create<ClubhouseState>()((set) => ({
       return { carouselPositions: next };
     }),
   setIsTournamentCardActive: (v) => set({ isTournamentCardActive: v }),
+  markUserGestureUnmute: () => { _userGestureUnmuteTs = Date.now(); },
+  isRecentUserGesture: () => Date.now() - _userGestureUnmuteTs < 2000,
 }));
