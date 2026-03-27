@@ -156,7 +156,7 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
   if (courses.length < 25) {
     return (
       <div className="w-[100vw] relative left-[50%] right-[50%] ml-[-50vw] mr-[-50vw] sm:w-full sm:left-auto sm:right-auto sm:ml-0 sm:mr-0">
-        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-6">
           {courses.map((course) => (
             <div key={course.id} className="mb-0">
               <UnifiedCourseCard 
@@ -187,7 +187,7 @@ const VirtualizedCourseList: React.FC<VirtualizedCourseListProps> = ({
     >
       <div style={{ height: totalHeight, position: 'relative', zIndex: 0 }}>
         <div
-          className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6 will-change-transform"
+          className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-6 will-change-transform"
           style={{ transform: `translateY(${offsetY}px)` }}
         >
           {visibleCourses.map((course) => (

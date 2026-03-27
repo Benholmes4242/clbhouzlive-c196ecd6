@@ -357,13 +357,15 @@ interface HeroSlideProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
   onInteraction: () => void;
+  onScorecardOpen?: () => void;
+  onScorecardClose?: () => void;
   onCardTouchStart: (e: React.TouchEvent) => void;
   onCardTouchMove: (e: React.TouchEvent) => void;
   onCardTouchEnd: (e: React.TouchEvent) => void;
 }
 
 
-function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction, onCardTouchStart, onCardTouchMove, onCardTouchEnd }: HeroSlideProps) {
+function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction, onScorecardOpen, onScorecardClose, onCardTouchStart, onCardTouchMove, onCardTouchEnd }: HeroSlideProps) {
   const { tournament, type } = slide;
   const navigate = useNavigate();
   
@@ -400,8 +402,14 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
 
   // Scorecard state — player tapped in expanded leaderboard
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerInfo | null>(null);
-  const handleScorecardTap = useCallback((player: PlayerInfo) => setSelectedPlayer(player), []);
-  const handleBackToLeaderboard = useCallback(() => setSelectedPlayer(null), []);
+  const handleScorecardTap = useCallback((player: PlayerInfo) => {
+    setSelectedPlayer(player);
+    onScorecardOpen?.();
+  }, [onScorecardOpen]);
+  const handleBackToLeaderboard = useCallback(() => {
+    setSelectedPlayer(null);
+    onScorecardClose?.();
+  }, [onScorecardClose]);
 
   // Fetch top 5 leaders for live tournaments only
   const { data: leaders = [], isLoading: leadersLoading } = useTournamentTopLeaders(
@@ -625,65 +633,93 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             exit={{ opacity: 0, y: 20 }}
           >
 
-            {/* ─── COMPLETED: tournament name goes straight to top ─── */}
-            {isCompleted ? (
-              <>
-                <div style={{ padding: isExpanded ? '0 20px' : undefined }}>
-                  <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
-                    <h2 className="hero-tournament-name">{tournament.name}</h2>
-                  </Link>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`);
-                    }}
-                    className="hero-venue block active:opacity-70 transition-opacity cursor-pointer"
-                  >
-                    {tournament.venueName}
-                    {tournament.venueCity && ` · ${tournament.venueCity}`}
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-              <div style={{ padding: isExpanded ? '0 20px' : undefined }}>
-                  {/* Row 1: Status | Tour Badge (right-aligned) — live + upcoming only */}
-                  <div className="flex items-center justify-between" style={{ marginBottom: '6px' }}>
-                    {isLive ? (
-                      <div className="flex items-center gap-1.5">
-                        <span className="live-dot" />
-                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: tournament.isMajor ? '#FACC15' : '#22C55E' }}>LIVE</span>
+            {/* ─── Tournament header — hidden when scorecard is open ─── */}
+            {!selectedPlayer && (
+              isCompleted ? (
+                <>
+                  <div style={{ padding: isExpanded ? '0 20px' : undefined }}>
+                    {/* Tournament name + FINAL badge + tour badge — right-aligned column */}
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
+                          <h2 className="hero-tournament-name" style={{ fontSize: '18px' }}>{tournament.name}</h2>
+                        </Link>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`); }}
+                          className="hero-venue block active:opacity-70 transition-opacity cursor-pointer"
+                        >
+                          {tournament.venueName}{tournament.venueCity && ` · ${tournament.venueCity}`}
+                        </button>
                       </div>
-                    ) : isUpcoming ? (
-                      <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' as const }}>
-                        {getStartLabel(tournament.startDate)}
-                      </span>
-                    ) : (
-                      <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'white' }}>COMPLETED</span>
-                    )}
-                    <div className="flex items-center gap-2">
-                      <div className="tour-badge">
-                        <span>
-                          {getTourDisplayName(tournament.tourSlug)}
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
+                        <span style={{
+                          fontSize: 9, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase',
+                          color: 'rgba(255,255,255,0.55)',
+                          background: 'rgba(255,255,255,0.10)',
+                          border: '1px solid rgba(255,255,255,0.14)',
+                          borderRadius: 20, padding: '2px 9px',
+                        }}>
+                          FINAL
                         </span>
+                        <div className="tour-badge" style={{ fontSize: 9, padding: '2px 8px' }}>
+                          <span>{getTourDisplayName(tournament.tourSlug)}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
-                    <h2 className="hero-tournament-name">{tournament.name}</h2>
-                  </Link>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`);
-                    }}
-                    className="hero-venue block active:opacity-70 transition-opacity cursor-pointer"
-                  >
-                    {tournament.venueName}
-                    {tournament.venueCity && ` · ${tournament.venueCity}`}
-                  </button>
-                </div>
-              </>
+                </>
+              ) : (
+                <>
+                <div style={{ padding: isExpanded ? '0 20px' : undefined }}>
+                    <div className="flex items-center justify-between" style={{ marginBottom: '6px' }}>
+                      {isLive ? (
+                        <div className="flex items-center gap-1.5">
+                          <span className="live-dot" />
+                          <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: tournament.isMajor ? '#FACC15' : '#22C55E' }}>LIVE</span>
+                        </div>
+                      ) : isUpcoming ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'rgba(255,255,255,0.25)' }} />
+                          <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' as const }}>
+                            Upcoming
+                          </span>
+                        </div>
+                      ) : (
+                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'white' }}>COMPLETED</span>
+                      )}
+                      <div className="flex items-center gap-2">
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
+                          <div className="tour-badge">
+                            <span>
+                              {getTourDisplayName(tournament.tourSlug)}
+                            </span>
+                          </div>
+                          {isUpcoming && tournament.startDate && tournament.endDate && (
+                            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.40)', fontWeight: 500 }}>
+                              {new Date(tournament.startDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              {' – '}
+                              {new Date(tournament.endDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
+                      <h2 className="hero-tournament-name">{tournament.name}</h2>
+                    </Link>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`);
+                      }}
+                      className="hero-venue block active:opacity-70 transition-opacity cursor-pointer"
+                    >
+                      {tournament.venueName}
+                      {tournament.venueCity && ` · ${tournament.venueCity}`}
+                    </button>
+                  </div>
+                </>
+              )
             )}
 
             {/* ─── State-specific content — each section uses Capsule spring easing ─── */}
@@ -699,10 +735,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                   style={{ overflow: isExpanded ? 'visible' : 'hidden', flex: isExpanded ? 1 : undefined, minHeight: isExpanded ? 0 : undefined, display: isExpanded ? 'flex' : undefined, flexDirection: isExpanded ? 'column' as const : undefined }}
                 >
-                  {/* Round progress */}
-                  <p className="hero-meta" style={{ padding: isExpanded ? '0 20px' : undefined, marginTop: 4, marginBottom: isExpanded ? 4 : 0 }}>
-                    {getCurrentRoundLabel(leaders, tournament.startDate)}
-                  </p>
+                  {/* Round progress — hidden when scorecard is open */}
+                  {!selectedPlayer && (
+                    <p className="hero-meta" style={{ padding: isExpanded ? '0 20px' : undefined, marginTop: 4, marginBottom: isExpanded ? 4 : 0 }}>
+                      {getCurrentRoundLabel(leaders, tournament.startDate)}
+                    </p>
+                  )}
 
                   {/* Expanded: Full Leaderboard or Scorecard */}
                   {isExpanded ? (
@@ -866,8 +904,9 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                   style={{ overflow: 'hidden' }}
                 >
-                  {/* Winner section */}
-                  <div style={{ marginTop: 14, minHeight: 52 }}>
+
+                  {/* ── WINNER GLASS PANEL ── */}
+                  <div style={{ marginTop: 6 }}>
                     <AnimatePresence mode="wait">
                       {podiumWinner ? (
                         <motion.div
@@ -876,29 +915,57 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0 }}
                           transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
-                          style={{ display: 'flex', alignItems: 'center', gap: 10 }}
+                          style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            background: 'rgba(255,255,255,0.06)',
+                            border: '1px solid rgba(255,255,255,0.09)',
+                            borderRadius: 12,
+                            padding: '10px 12px',
+                            marginBottom: 8,
+                          }}
                         >
-                          {/* 60px photo */}
-                          <button onClick={handlePlayerTapNav(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ flexShrink: 0 }}>
-                            <PlayerAvatar displayName={podiumWinner.displayName} fullName={podiumWinner.fullName} headshotOverride={podiumWinner.headshotOverride} tourCode={tournament.tourSlug} size={60} frosted />
-                          </button>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            {/* Name + score */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' }}>
-                              <button onClick={handlePlayerTapNav(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ fontSize: '17px', fontWeight: 700, color: '#FFFFFF' }}>
-                                {podiumWinner.displayName}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            {/* Avatar with trophy crown */}
+                            <div style={{ position: 'relative', flexShrink: 0 }}>
+                              <button onClick={handlePlayerTapNav(podiumWinner.playerId)} className="transition-opacity active:opacity-70">
+                                <PlayerAvatar
+                                  displayName={podiumWinner.displayName}
+                                  fullName={podiumWinner.fullName}
+                                  headshotOverride={podiumWinner.headshotOverride}
+                                  tourCode={tournament.tourSlug}
+                                  size={44}
+                                  frosted
+                                />
                               </button>
-                              <span style={{ fontFamily: "'JetBrains Mono','SF Mono',monospace", fontSize: '17px', fontWeight: 700, color: getFinishedScoreColor(podiumWinner.score), flexShrink: 0 }}>
-                                {podiumWinner.displayScore}
+                              <span style={{ position: 'absolute', top: -8, left: '50%', transform: 'translateX(-50%)', fontSize: 11 }}>
+                                🏆
                               </span>
                             </div>
-                            {/* Winning margin */}
-                            {winningMargin && (
-                              <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.50)', marginTop: 2, display: 'block' }}>
-                                {winningMargin}
-                              </span>
-                            )}
+                            {/* Name + margin */}
+                            <div>
+                              <button
+                                onClick={handlePlayerTapNav(podiumWinner.playerId)}
+                                className="transition-opacity active:opacity-70"
+                                style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF', display: 'block', textAlign: 'left' }}
+                              >
+                                {podiumWinner.displayName}
+                              </button>
+                              {winningMargin && (
+                                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.40)', marginTop: 2, display: 'block' }}>
+                                  {winningMargin}
+                                </span>
+                              )}
+                            </div>
                           </div>
+                          {/* Score — colour coded */}
+                          <span style={{
+                            fontFamily: "'JetBrains Mono','SF Mono',monospace",
+                            fontSize: 26, fontWeight: 900,
+                            color: podiumWinner.score < 0 ? '#4ade80' : podiumWinner.score === 0 ? 'rgba(255,255,255,0.75)' : '#f87171',
+                            letterSpacing: -1, flexShrink: 0,
+                          }}>
+                            {podiumWinner.displayScore}
+                          </span>
                         </motion.div>
                       ) : winnerInfo?.winnerName ? (
                         <motion.div
@@ -907,17 +974,22 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0 }}
                           transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
-                          style={{ display: 'flex', alignItems: 'center', gap: 10 }}
+                          style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            background: 'rgba(255,255,255,0.06)',
+                            border: '1px solid rgba(255,255,255,0.09)',
+                            borderRadius: 12, padding: '10px 12px', marginBottom: 8,
+                          }}
                         >
-                          <PlayerAvatar displayName={winnerInfo.winnerName} tourCode={winnerInfo.tourSlug || 'pga'} size={60} frosted />
-                          <div>
-                            <span style={{ fontSize: '17px', fontWeight: 700, color: '#FFFFFF', display: 'block' }}>{winnerInfo.winnerName}</span>
-                            {winnerInfo.winnerScore && (
-                              <span style={{ fontFamily: "'JetBrains Mono','SF Mono',monospace", fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>
-                                {winnerInfo.winnerScore}
-                              </span>
-                            )}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <PlayerAvatar displayName={winnerInfo.winnerName} tourCode={winnerInfo.tourSlug || 'pga'} size={44} frosted />
+                            <span style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF' }}>{winnerInfo.winnerName}</span>
                           </div>
+                          {winnerInfo.winnerScore && (
+                            <span style={{ fontFamily: "'JetBrains Mono','SF Mono',monospace", fontSize: 22, fontWeight: 800, color: '#4ade80' }}>
+                              {winnerInfo.winnerScore}
+                            </span>
+                          )}
                         </motion.div>
                       ) : (
                         <motion.div
@@ -926,19 +998,42 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
                           transition={{ duration: 0.15 }}
-                          style={{ height: 60, borderRadius: 10, background: 'rgba(255,255,255,0.04)', width: 200 }}
+                          style={{ height: 64, borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)', marginBottom: 8, animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%)' }}
                         />
                       )}
                     </AnimatePresence>
                   </div>
 
-                  {/* Stats panel — tournament chips + season averages chips */}
-                  <WinnerStatsPanel
-                    tournamentStats={winnerStats}
-                    seasonStats={winnerSeasonStats}
-                  />
+                  {/* ── STAT CHIPS — consistent with live leader strip ── */}
+                  {winnerStats && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2, delay: 0.08 }}
+                      style={{ display: 'flex', gap: 4, marginBottom: 8 }}
+                    >
+                      {[
+                        { v: winnerStats.eagles,       label: 'Eagles',  color: '#F59E0B' },
+                        { v: winnerStats.birdies,      label: 'Birdies', color: '#4ade80' },
+                        { v: winnerStats.pars,         label: 'Pars',    color: 'rgba(255,255,255,0.65)' },
+                        { v: winnerStats.bogeys,       label: 'Bogeys',  color: '#F97316' },
+                        winnerStats.doubleBogeys > 0 && { v: winnerStats.doubleBogeys, label: 'Doubles', color: '#f87171' },
+                      ].filter(Boolean).map((stat: any) => (
+                        <div key={stat.label} style={{
+                          flex: 1, textAlign: 'center',
+                          padding: '6px 2px 4px',
+                          borderRadius: 7,
+                          background: 'rgba(255,255,255,0.04)',
+                          border: '1px solid rgba(255,255,255,0.06)',
+                        }}>
+                          <div style={{ fontSize: 13, fontWeight: 800, color: stat.color, lineHeight: 1 }}>{stat.v}</div>
+                          <div style={{ fontSize: 7, fontWeight: 700, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase', letterSpacing: '0.4px', marginTop: 2 }}>{stat.label}</div>
+                        </div>
+                      ))}
+                    </motion.div>
+                  )}
 
-                  {/* Runners-up */}
+                  {/* ── PODIUM SECTION ── */}
                   <AnimatePresence mode="wait">
                     {runnerRows.length > 0 ? (
                       <motion.div
@@ -947,11 +1042,18 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1], delay: 0.06 }}
-                        style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: 6 }}
                       >
-                        {runnerRows.map(row => (
-                          <PodiumRunnerRow key={row.position} row={row} tourCode={tournament.tourSlug} onPlayerTap={handlePlayerTapNav} />
-                        ))}
+                        {/* Podium divider */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
+                          <div style={{ width: 4, height: 4, borderRadius: '50%', background: 'rgba(255,255,255,0.22)', flexShrink: 0 }} />
+                          <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.28)' }}>Podium</span>
+                          <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                          {runnerRows.map(row => (
+                            <PodiumRunnerRow key={row.position} row={row} tourCode={tournament.tourSlug} onPlayerTap={handlePlayerTapNav} />
+                          ))}
+                        </div>
                       </motion.div>
                     ) : (
                       <motion.div
@@ -960,26 +1062,46 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.15 }}
-                        style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: 6 }}
+                        style={{ display: 'flex', flexDirection: 'column', gap: 6 }}
                       >
-                        <div style={{ height: 26, borderRadius: 8, background: 'rgba(255,255,255,0.04)' }} />
+                        <div style={{ height: 26, borderRadius: 8, background: 'rgba(255,255,255,0.04)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%)' }} />
                         <div style={{ height: 26, borderRadius: 8, background: 'rgba(255,255,255,0.04)' }} />
                       </motion.div>
                     )}
                   </AnimatePresence>
 
-                  {/* Footer: tour badge left, View Results right */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
-                    <div className="tour-badge">
-                      <span>
-                        {getTourDisplayName(tournament.tourSlug)}
+                  {/* ── FOOTER — meta + View Results pill ── */}
+                  <div style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    marginTop: 10, paddingTop: 8,
+                    borderTop: '1px solid rgba(255,255,255,0.06)',
+                  }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <span style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+                        Final leaderboard
+                      </span>
+                      <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)' }}>
+                        {tournament.venueName || 'Tournament complete'}
                       </span>
                     </div>
-                    <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta" style={{ fontSize: 13, textDecoration: 'none' }}>
-                      <span>View Results</span>
-                      <ChevronRight className="w-4 h-4 cta-chevron" style={{ color: 'rgba(255,255,255,0.5)' }} />
+                    <Link
+                      to={`/tourhub/tournament/${tournament.id}`}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 4,
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.13)',
+                        borderRadius: 20,
+                        padding: '5px 11px',
+                        fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.85)',
+                        textDecoration: 'none',
+                      }}
+                      className="active:opacity-70 transition-opacity"
+                    >
+                      View Results
+                      <ChevronRight style={{ width: 12, height: 12, color: 'rgba(255,255,255,0.6)' }} />
                     </Link>
                   </div>
+
                 </motion.div>
               )}
 
@@ -993,33 +1115,96 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                   style={{ overflow: 'hidden' }}
                 >
-                  <p style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '8px', marginTop: '6px', letterSpacing: '0.3px' }}>
+                  {/* ── COURSE FACT CHIPS ── */}
+                  <div style={{ display: 'flex', gap: 6, marginTop: 6, marginBottom: 10 }}>
                     {[
-                      tournament.purse && formatPurse(tournament.purse),
-                      tournament.venuePar && `PAR ${tournament.venuePar}`,
-                      tournament.venueYardage && `${tournament.venueYardage.toLocaleString()} YDS`
-                    ].filter(Boolean).join(' · ')}
-                  </p>
+                      tournament.purse      && { value: formatPurse(tournament.purse),                          label: 'Purse'  },
+                      tournament.venuePar   && { value: `Par ${tournament.venuePar}`,                           label: 'Course' },
+                      tournament.venueYardage && { value: `${tournament.venueYardage.toLocaleString()}y`,        label: 'Yards'  },
+                    ].filter(Boolean).map((chip: any) => (
+                      <div key={chip.label} style={{
+                        flex: 1, textAlign: 'center',
+                        padding: '8px 4px 6px',
+                        borderRadius: 10,
+                        background: 'rgba(255,255,255,0.06)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                      }}>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF', lineHeight: 1 }}>
+                          {chip.value}
+                        </div>
+                        <div style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 4 }}>
+                          {chip.label}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
 
+                  {/* ── LIVE COUNTDOWN ── */}
+                  <UpcomingCountdown startDate={tournament.startDate} />
+
+                  {/* ── DEFENDING CHAMPION PANEL ── */}
                   {tournament.defendingChampion && (
                     <motion.div
                       initial={{ opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1], delay: 0.05 }}
-                      className="flex items-center gap-2"
-                      style={{ marginBottom: '10px' }}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        background: 'rgba(255,255,255,0.06)',
+                        border: '1px solid rgba(255,255,255,0.09)',
+                        borderRadius: 12,
+                        padding: '10px 12px',
+                        marginTop: 8, marginBottom: 10,
+                      }}
                     >
-                      <Trophy className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(250,204,21,0.7)' }} />
-                      <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgba(255,255,255,0.45)' }}>
-                        Defending: <span style={{ fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>{tournament.defendingChampion}</span>
-                      </span>
+                      {/* Avatar */}
+                      <PlayerAvatar displayName={tournament.defendingChampion} tourCode={tournament.tourSlug} size={40} frosted />
+                      {/* Text */}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'rgba(250,204,21,0.65)', display: 'block' }}>
+                          🏆 Defending Champion
+                        </span>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF', display: 'block', marginTop: 1 }}>
+                          {tournament.defendingChampion}
+                        </span>
+                        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', display: 'block', marginTop: 1 }}>
+                          Can they go back-to-back?
+                        </span>
+                      </div>
                     </motion.div>
                   )}
 
-                  <Link to={`/tourhub/tournament/${tournament.id}`} className="hero-text-cta w-full" style={{ justifyContent: 'center' }}>
-                    <span>View Tournament</span>
-                    <ChevronRight className="w-4 h-4 cta-chevron" />
-                  </Link>
+                  {/* ── FOOTER — View Tournament pill ── */}
+                  <div style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    marginTop: 4, paddingTop: 8,
+                    borderTop: '1px solid rgba(255,255,255,0.06)',
+                  }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                      <span style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+                        Tournament info
+                      </span>
+                      <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)' }}>
+                        {tournament.venueName || 'Stroke play · 72 holes'}
+                      </span>
+                    </div>
+                    <Link
+                      to={`/tourhub/tournament/${tournament.id}`}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 4,
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1px solid rgba(255,255,255,0.13)',
+                        borderRadius: 20,
+                        padding: '5px 11px',
+                        fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.85)',
+                        textDecoration: 'none',
+                      }}
+                      className="active:opacity-70 transition-opacity"
+                    >
+                      View Tournament
+                      <ChevronRight style={{ width: 12, height: 12, color: 'rgba(255,255,255,0.6)' }} />
+                    </Link>
+                  </div>
                 </motion.div>
               )}
 
@@ -1084,12 +1269,13 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   const touchStartRef = React.useRef<{ x: number; y: number; time: number } | null>(null);
   const touchMoveRef = React.useRef<number>(0);
   const resumeTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isScorecardOpenRef = React.useRef(false);
 
   const scheduleResume = useCallback(() => {
     if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
     resumeTimerRef.current = setTimeout(() => {
       setIsPaused(false);
-    }, 3500);
+    }, 6000);
   }, []);
 
   // Clean up resume timer on unmount
@@ -1104,6 +1290,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     if (safeSlides.length <= 1 || isPaused || isExpanded) return;
     
     const interval = setInterval(() => {
+      if (isScorecardOpenRef.current) return;
       setCurrentIndex(prev => (prev + 1) % safeSlides.length);
     }, 8000);
 
@@ -1241,6 +1428,15 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
             onToggleExpand={handleToggleExpand}
             onInteraction={() => {
               setIsPaused(true);
+              scheduleResume();
+            }}
+            onScorecardOpen={() => {
+              isScorecardOpenRef.current = true;
+              setIsPaused(true);
+              if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+            }}
+            onScorecardClose={() => {
+              isScorecardOpenRef.current = false;
               scheduleResume();
             }}
             onCardTouchStart={handleTouchStart}

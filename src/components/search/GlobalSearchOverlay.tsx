@@ -1,6 +1,6 @@
 import { memo, useRef, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Clock, BadgeCheck, Briefcase, ChevronRight } from 'lucide-react';
+import { Search, X, Clock, BadgeCheck, Briefcase, ChevronRight, Star } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShelf';
 import { useNavigate } from 'react-router-dom';
@@ -212,6 +212,12 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
     handleSaveRecent(course.name);
     navigate(`/courses/${course.id}`);
     onClose();
+  }, [navigate, onClose, handleSaveRecent]);
+
+  const selectCourseRate = useCallback((course: ClubResult) => {
+    handleSaveRecent(course.name);
+    onClose();
+    navigate(`/courses/${course.id}/rate`);
   }, [navigate, onClose, handleSaveRecent]);
 
   const selectPerson = useCallback((person: PersonResult) => {
@@ -446,10 +452,11 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                       <WhiteCard>
                         {clubs.map((course, idx) => (
                           <div key={course.id}>
+                            {/* Main row — navigate to course */}
                             <button
                               type="button"
                               onClick={() => selectCourse(course)}
-                              className="w-full flex items-center gap-3 px-4 min-h-[60px] active:bg-black/[0.02]"
+                              className="w-full flex items-center gap-3 px-4 min-h-[56px] active:bg-black/[0.02]"
                             >
                               <div className="w-[42px] h-[42px] rounded-[12px] bg-muted overflow-hidden shrink-0">
                                 {course.logo_url && (
@@ -463,8 +470,40 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                                   {course.global_rank && ` · #${course.global_rank} World`}
                                 </p>
                               </div>
-                              <ChevronRight className="w-[14px] h-[14px] shrink-0" style={{ color: '#d1d5db' }} />
                             </button>
+                            {/* Secondary actions row */}
+                            <div style={{ display: 'flex', gap: 6, padding: '0 16px 10px 59px' }}>
+                              <button
+                                type="button"
+                                onClick={() => selectCourse(course)}
+                                style={{
+                                  padding: '5px 12px', borderRadius: 7,
+                                  background: 'hsl(var(--muted) / 0.6)',
+                                  border: '0.5px solid hsl(var(--border))',
+                                  fontSize: 11, fontWeight: 500,
+                                  color: 'hsl(var(--foreground) / 0.7)',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                View course
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => selectCourseRate(course)}
+                                style={{
+                                  display: 'flex', alignItems: 'center', gap: 4,
+                                  padding: '5px 12px', borderRadius: 7,
+                                  background: 'rgba(245,158,11,0.10)',
+                                  border: '1px solid rgba(245,158,11,0.28)',
+                                  fontSize: 11, fontWeight: 700,
+                                  color: '#92400E',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                <Star size={10} />
+                                Rate this course
+                              </button>
+                            </div>
                             {idx < clubs.length - 1 && <CardDivider />}
                           </div>
                         ))}

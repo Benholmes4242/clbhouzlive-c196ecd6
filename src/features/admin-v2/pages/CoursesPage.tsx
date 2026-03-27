@@ -1,14 +1,16 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import {
   MapPin, Upload, Star, Globe,
   MoreHorizontal, ExternalLink, Copy, CheckCircle,
-  XCircle, RefreshCw, Image,
+  XCircle, RefreshCw, Image, Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 import { useAdminV2Courses, type AdminCourseRow } from '../hooks/useAdminV2Courses';
 import {
@@ -22,7 +24,7 @@ import { AdminMiniCard } from '../components/shared/AdminMiniCard';
 
 const col = createColumnHelper<AdminCourseRow>();
 
-// ─── Rank badge pill ──────────────────────────────────────────────────────────
+// ─── Rank badge pill (legacy — kept for reference) ────────────────────────────
 
 function RankPill({ label, rank, color }: { label: string; rank: number | null; color: string }) {
   if (!rank) return null;
@@ -36,20 +38,110 @@ function RankPill({ label, rank, color }: { label: string; rank: number | null; 
   );
 }
 
-// ─── Geocode status ───────────────────────────────────────────────────────────
+// ─── Inline editable rank cell ────────────────────────────────────────────────
 
-function GeocodeStatus({ lat, lng }: { lat: number | null; lng: number | null }) {
-  const hasCoords = lat != null && lng != null;
+function RankEditCell({
+  courseId,
+  rankKey,
+  currentRank,
+  label,
+  color,
+  bg,
+  onSave,
+}: {
+  courseId: string;
+  rankKey: 'global_rank' | 'regional_rank' | 'usa_rank';
+  currentRank: number | null;
+  label: string;
+  color: string;
+  bg: string;
+  onSave: (rank: number | null) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState('');
+  const qc = useQueryClient();
+
+  const commit = async () => {
+    setEditing(false);
+    const num = draft.trim() ? Number(draft.trim()) : null;
+    if (num === currentRank) return;
+
+    if (num !== null && num >= 1 && num <= 100) {
+      await supabase
+        .from('golf_courses')
+        .update({ [rankKey]: null } as any)
+        .eq(rankKey, num)
+        .neq('id', courseId);
+    }
+
+    onSave(num && num >= 1 && num <= 100 ? num : null);
+    qc.invalidateQueries({ queryKey: ['admin-v2', 'courses'] });
+  };
+
+  if (!currentRank && !editing) {
+    return (
+      <button
+        onClick={() => { setDraft(''); setEditing(true); }}
+        style={{
+          fontSize: 10, color: '#CBD5E1', background: 'transparent',
+          border: '1px dashed #E2E8F0', borderRadius: 4,
+          padding: '1px 6px', cursor: 'pointer', fontWeight: 600,
+        }}
+      >
+        + {label}
+      </button>
+    );
+  }
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-1">
+        <span style={{ fontSize: 10, fontWeight: 600, color }}>{label}</span>
+        <input
+          autoFocus
+          value={draft}
+          onChange={e => setDraft(e.target.value)}
+          onBlur={commit}
+          onKeyDown={e => { if (e.key === 'Enter') commit(); if (e.key === 'Escape') setEditing(false); }}
+          style={{
+            width: 48, fontSize: 11, padding: '2px 4px',
+            border: `1px solid ${color}`, borderRadius: 4, outline: 'none',
+          }}
+          placeholder="1–100"
+        />
+      </div>
+    );
+  }
+
   return (
-    <span className={cn('inline-flex items-center gap-1 text-[12px]', hasCoords ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground/60')}>
-      {hasCoords
-        ? <CheckCircle className="h-3.5 w-3.5" />
-        : <XCircle className="h-3.5 w-3.5" />
-      }
-      {hasCoords ? 'Geocoded' : 'Missing'}
-    </span>
+    <div className="inline-flex items-center gap-0.5">
+      <span style={{ fontSize: 10, fontWeight: 600, color }}>{label}</span>
+      <button
+        onClick={() => { setDraft(String(currentRank)); setEditing(true); }}
+        style={{
+          fontSize: 11, fontWeight: 700, color,
+          background: bg, border: 'none', borderRadius: 4,
+          padding: '1px 6px', cursor: 'pointer',
+        }}
+      >
+        #{currentRank}
+      </button>
+      <button
+        onClick={() => onSave(null)}
+        style={{
+          fontSize: 9, color: '#94A3B8', background: 'none',
+          border: 'none', cursor: 'pointer', padding: '0 2px',
+          lineHeight: 1,
+        }}
+        title="Remove rank"
+      >
+        ✕
+      </button>
+    </div>
   );
 }
+
+// GeocodeStatus removed — now rendered inline in the course name cell
 
 // ─── Row action menu ──────────────────────────────────────────────────────────
 
@@ -175,14 +267,20 @@ function CourseDrawer({
   course,
   onClose,
   onUpdate,
+  onSyncRank,
   onUploadPhoto,
   isUploadingPhoto,
+  onDelete,
+  isDeleting,
 }: {
   course: AdminCourseRow | null;
   onClose: () => void;
   onUpdate: (id: string, updates: any) => void;
+  onSyncRank: (courseId: string, rankKey: 'global_rank' | 'usa_rank' | 'regional_rank', newRank: number | null, listSlug: string) => void;
   onUploadPhoto: (courseId: string, file: File) => void;
   isUploadingPhoto: boolean;
+  onDelete: (id: string) => void;
+  isDeleting: boolean;
 }) {
   const navigate = useNavigate();
 
@@ -211,6 +309,20 @@ function CourseDrawer({
                 Website
               </AdminButton>
             )}
+            <div className="flex-1" />
+            <AdminButton
+              variant="danger"
+              icon={Trash2}
+              onClick={() => {
+                if (window.confirm(`Delete "${course.name}"?\n\nThis will be blocked if any users have rated this course or posted about it. Only safe to delete if this is a duplicate or test entry with no user data.`)) {
+                  onDelete(course.id);
+                  onClose();
+                }
+              }}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting…' : 'Delete'}
+            </AdminButton>
           </div>
         ) : undefined
       }
@@ -255,10 +367,10 @@ function CourseDrawer({
           <div className="space-y-3">
             <AdminSectionHeader title="Top 100 Lists" />
             {([
-              { label: 'Global Top 100',   rankKey: 'global_rank' as const,   color: 'hsl(var(--accent-amber))' },
-              { label: 'Regional Top 100', rankKey: 'regional_rank' as const, color: '#3b82f6' },
-              { label: 'USA Top 100',      rankKey: 'usa_rank' as const,      color: '#dc2626' },
-            ]).map(({ label, rankKey, color }) => (
+              { label: 'Global Top 100',   rankKey: 'global_rank' as const,   color: 'hsl(var(--accent-amber))', slug: 'global' },
+              { label: 'Regional Top 100', rankKey: 'regional_rank' as const, color: '#3b82f6', slug: course.country && ['England','Scotland','Wales','Ireland','Northern Ireland'].includes(course.country) ? 'gb-i' : 'europe' },
+              { label: 'USA Top 100',      rankKey: 'usa_rank' as const,      color: '#dc2626', slug: 'usa' },
+            ]).map(({ label, rankKey, color, slug }) => (
               <div key={rankKey} className="flex items-center gap-3 p-3 rounded-xl border border-border/60 bg-muted/30">
                 <div className="flex-1">
                   <p className="text-[13px] font-medium text-foreground">{label}</p>
@@ -274,12 +386,12 @@ function CourseDrawer({
                       value={course[rankKey]}
                       type="number"
                       placeholder="Rank"
-                      onSave={(v) => onUpdate(course.id, { [rankKey]: v ? Number(v) : null })}
+                      onSave={(v) => onSyncRank(course.id, rankKey, v ? Number(v) : null, slug)}
                     />
                     <AdminButton
                       variant="ghost"
                       size="sm"
-                      onClick={() => onUpdate(course.id, { [rankKey]: null })}
+                      onClick={() => onSyncRank(course.id, rankKey, null, slug)}
                     >
                       Remove
                     </AdminButton>
@@ -288,7 +400,7 @@ function CourseDrawer({
                   <AdminButton
                     variant="outline"
                     size="sm"
-                    onClick={() => onUpdate(course.id, { [rankKey]: 999 })}
+                    onClick={() => onSyncRank(course.id, rankKey, 999, slug)}
                   >
                     Add to list
                   </AdminButton>
@@ -417,9 +529,71 @@ export default function CoursesPage() {
     updateCourse,
     uploadPhoto,
     isUploadingPhoto,
+    deleteCourse,
+    isDeleting,
   } = useAdminV2Courses();
 
+  const queryClient = useQueryClient();
   const [countryFilter, setCountryFilter] = useState('all');
+
+  // Fetch top100 list IDs for membership sync
+  const { data: top100Lists } = useQuery({
+    queryKey: ['top100-lists-meta'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('top100_lists')
+        .select('id, slug');
+      return data ?? [];
+    },
+    staleTime: 60 * 60 * 1000,
+  });
+
+  const listIdMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    (top100Lists ?? []).forEach((l: any) => { map[l.slug] = l.id; });
+    return map;
+  }, [top100Lists]);
+
+  const syncRank = useCallback(async (
+    courseId: string,
+    rankKey: 'global_rank' | 'usa_rank' | 'regional_rank',
+    newRank: number | null,
+    listSlug: string,
+  ) => {
+    const listId = listIdMap[listSlug];
+
+    // 1. Update the golf_courses column
+    updateCourse(courseId, { [rankKey]: newRank });
+
+    if (!listId) return;
+
+    if (newRank === null) {
+      await supabase
+        .from('course_top100_memberships')
+        .delete()
+        .eq('course_id', courseId)
+        .eq('list_id', listId);
+    } else {
+      // Clear any other course holding this rank on this list
+      await supabase
+        .from('course_top100_memberships')
+        .delete()
+        .eq('list_id', listId)
+        .eq('rank', newRank)
+        .neq('course_id', courseId);
+
+      // Upsert this course's membership
+      await supabase
+        .from('course_top100_memberships')
+        .upsert(
+          { course_id: courseId, list_id: listId, rank: newRank },
+          { onConflict: 'course_id,list_id' }
+        );
+    }
+
+    queryClient.invalidateQueries({ queryKey: ['top100-list-courses'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-v2', 'courses'] });
+  }, [listIdMap, updateCourse, queryClient]);
 
   // Derive unique countries from data
   const countries = useMemo(() => {
@@ -445,92 +619,94 @@ export default function CoursesPage() {
     : courses.filter(c => c.country === countryFilter);
 
   const columns = React.useMemo(() => [
-    col.display({
-      id: 'thumbnail',
-      header: '',
-      size: 64,
-      cell: ({ row }) => (
-        <div style={{ width: 48, height: 48, borderRadius: 10, overflow: 'hidden', flexShrink: 0, background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #E2E8F0' }}>
-          {row.original.thumbnail_image ? (
-            <img src={row.original.thumbnail_image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          ) : (
-            <MapPin className="h-5 w-5" style={{ color: '#94A3B8' }} />
-          )}
-        </div>
-      ),
-    }),
     col.accessor('name', {
       header: 'Course',
       enableSorting: true,
-      cell: ({ row }) => (
-        <div className="flex flex-col gap-0.5 min-w-0">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[13px] font-medium text-foreground truncate">
-              {row.original.name}
-            </span>
-            {row.original.global_rank && (
-              <span style={{ background: '#FEF3C7', color: '#D97706', fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 20 }}>
-                #{row.original.global_rank}
+      cell: ({ row }) => {
+        const c = row.original;
+        const geocoded = c.latitude != null && c.longitude != null;
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 220 }}>
+                {c.name}
               </span>
-            )}
+            </div>
+            <span style={{ fontSize: 11, color: '#94A3B8' }}>
+              {c.country}{c.sub_country ? ` · ${c.sub_country}` : ''}
+            </span>
+            <div style={{ display: 'flex', gap: 6, marginTop: 1 }}>
+              <span style={{
+                fontSize: 10, fontWeight: 500,
+                color: geocoded ? '#16A34A' : '#94A3B8',
+                display: 'flex', alignItems: 'center', gap: 2,
+              }}>
+                {geocoded
+                  ? <><CheckCircle style={{ width: 10, height: 10 }} /> Geocoded</>
+                  : <><XCircle style={{ width: 10, height: 10 }} /> No coords</>}
+              </span>
+              <span style={{ fontSize: 10, color: '#CBD5E1' }}>
+                · {format(new Date(c.created_at), 'd MMM yyyy')}
+              </span>
+            </div>
           </div>
-          <span className="text-[11.5px] text-muted-foreground truncate">
-            {row.original.country}{row.original.sub_country ? ` · ${row.original.sub_country}` : ''}
-          </span>
-        </div>
-      ),
+        );
+      },
     }),
+
     col.display({
       id: 'ranks',
       header: 'Rankings',
-      cell: ({ row }) => (
-        <div className="flex flex-wrap gap-1">
-          <RankPill label="G" rank={row.original.global_rank} color="hsl(var(--accent-amber))" />
-          <RankPill label="R" rank={row.original.regional_rank} color="#3b82f6" />
-          <RankPill label="US" rank={row.original.usa_rank} color="#dc2626" />
-          {!row.original.global_rank && !row.original.regional_rank && !row.original.usa_rank && (
-            <span className="text-[11px] text-muted-foreground/50">Unranked</span>
-          )}
-        </div>
-      ),
+      size: 200,
+      cell: ({ row }) => {
+        const c = row.original;
+        const isGBI = c.country && ['England','Scotland','Wales','Ireland','Northern Ireland'].includes(c.country);
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <RankEditCell
+              courseId={c.id} rankKey="global_rank"
+              currentRank={c.global_rank} label="Global"
+              color="#D97706" bg="#FEF3C7"
+              onSave={(v) => syncRank(c.id, 'global_rank', v, 'global')}
+            />
+            <RankEditCell
+              courseId={c.id} rankKey="usa_rank"
+              currentRank={c.usa_rank} label="USA"
+              color="#DC2626" bg="#FEE2E2"
+              onSave={(v) => syncRank(c.id, 'usa_rank', v, 'usa')}
+            />
+            <RankEditCell
+              courseId={c.id} rankKey="regional_rank"
+              currentRank={c.regional_rank} label={isGBI ? 'GB&I' : 'Europe'}
+              color="#2563EB" bg="#DBEAFE"
+              onSave={(v) => syncRank(c.id, 'regional_rank', v, isGBI ? 'gb-i' : 'europe')}
+            />
+          </div>
+        );
+      },
     }),
+
     col.accessor('avg_rating', {
       header: 'Rating',
       enableSorting: true,
+      size: 80,
       cell: ({ getValue, row }) => {
         const rating = getValue();
-        if (!rating) return <span className="text-[12px] text-muted-foreground/40">—</span>;
+        if (!rating) return <span style={{ fontSize: 12, color: '#CBD5E1' }}>—</span>;
         return (
-          <div className="flex items-center gap-1.5">
-            <Star className="h-3.5 w-3.5 text-amber-500 fill-amber-500" />
-            <span className="text-[13px] font-medium text-foreground">
-              {rating.toFixed(1)}
-            </span>
-            {row.original.review_count != null && (
-              <span className="text-[11px] text-muted-foreground">
-                ({row.original.review_count})
-              </span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <Star style={{ width: 12, height: 12, color: '#F59E0B', fill: '#F59E0B' }} />
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#0F172A' }}>{rating.toFixed(1)}</span>
+            </div>
+            {row.original.review_count != null && row.original.review_count > 0 && (
+              <span style={{ fontSize: 10, color: '#94A3B8' }}>{row.original.review_count} review{row.original.review_count !== 1 ? 's' : ''}</span>
             )}
           </div>
         );
       },
     }),
-    col.display({
-      id: 'geocoded',
-      header: 'Geocode',
-      cell: ({ row }) => (
-        <GeocodeStatus lat={row.original.latitude} lng={row.original.longitude} />
-      ),
-    }),
-    col.accessor('created_at', {
-      header: 'Added',
-      enableSorting: true,
-      cell: ({ getValue }) => (
-        <span className="text-[12.5px] text-muted-foreground">
-          {format(new Date(getValue()), 'd MMM yyyy')}
-        </span>
-      ),
-    }),
+
     col.display({
       id: 'actions',
       header: '',
@@ -542,14 +718,36 @@ export default function CoursesPage() {
         />
       ),
     }),
-  ], [setDrawerCourseId]);
+  ], [setDrawerCourseId, syncRank]);
 
   const filterOptions = [
-    { id: 'all',      label: 'All',             count: counts.all },
-    { id: 'global',   label: 'Global Top 100',  count: counts.global,   variant: 'warning' as const },
-    { id: 'usa',      label: 'USA Top 100',     count: counts.usa },
-    { id: 'europe',   label: 'Europe Top 100',  count: counts.europe },
-    { id: 'unranked', label: 'Unranked',         count: counts.unranked },
+    { id: 'all',      label: 'All',       count: counts.all },
+    {
+      id: 'global',
+      label: 'Global',
+      count: counts.global,
+      variant: 'warning' as const,
+      icon: <span>🌍</span>,
+    },
+    {
+      id: 'usa',
+      label: 'USA',
+      count: counts.usa,
+      icon: <span>🇺🇸</span>,
+    },
+    {
+      id: 'gbi',
+      label: 'GB&I',
+      count: counts.gbi,
+      icon: <span>🇬🇧</span>,
+    },
+    {
+      id: 'europe',
+      label: 'Europe',
+      count: counts.europe,
+      icon: <span>🇪🇺</span>,
+    },
+    { id: 'unranked', label: 'Unranked', count: counts.unranked },
   ];
 
   return (
@@ -664,8 +862,11 @@ export default function CoursesPage() {
         course={drawerCourse}
         onClose={() => setDrawerCourseId(null)}
         onUpdate={updateCourse}
+        onSyncRank={syncRank}
         onUploadPhoto={uploadPhoto}
         isUploadingPhoto={isUploadingPhoto}
+        onDelete={deleteCourse}
+        isDeleting={isDeleting}
       />
 
     </div>

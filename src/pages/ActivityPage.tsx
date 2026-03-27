@@ -13,8 +13,10 @@ import { SuggestedCreatorsShelf } from '@/components/shared/SuggestedCreatorsShe
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useRehydrationSafe } from '@/contexts/RehydrationContext';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { ActivityPageSkeleton } from '@/components/skeletons/ActivityPageSkeleton';
 import { AlertCircle } from 'lucide-react';
+import { RateCourseNudge } from '@/components/activity/RateCourseNudge';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 
@@ -299,6 +301,7 @@ const ActivityPage: React.FC = () => {
               </div>
             ) : showEmptyState ? (
               <>
+                <RateCourseNudge />
                 <SuggestedCreatorsShelf
                   userId={user?.id}
                   title="Golfers you might know"
@@ -312,6 +315,9 @@ const ActivityPage: React.FC = () => {
               </>
             ) : (
               <div className="w-full space-y-0">
+                {/* Rate course nudge — shown to users with few ratings */}
+                <RateCourseNudge />
+
                 {/* Tier 1 — Featured cards for new/unread */}
                 {filteredNewItems.length > 0 && (
                   <div className="px-4 space-y-3 pb-4">
@@ -384,6 +390,7 @@ const ActivityPage: React.FC = () => {
         onToggleRead={handleToggleRead}
         onDelete={handleDeleteNotification}
       />
+      <ScrollToTopGlass />
     </PageRoot>
   );
 };
