@@ -447,7 +447,7 @@ const Top100List = () => {
         {/* 6. Course List with Journey Insights */}
         {/* Spacing: Filter → Divider = 24px (L), Divider → List = 16px (M) */}
         {/* Combined: Filter → List = 16px (M) since no explicit divider component */}
-        <section className="mt-4 pb-6 space-y-3">
+        <section className="mt-4 pb-6 space-y-2">
           {filteredAndSortedCourses.map((course, index) => {
             // Insert insight card every N courses
             const shouldInsertInsight = 
