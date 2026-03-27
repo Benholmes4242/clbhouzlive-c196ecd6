@@ -1,14 +1,16 @@
 import React, { useState, useMemo } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import {
   MapPin, Upload, Star, Globe,
   MoreHorizontal, ExternalLink, Copy, CheckCircle,
-  XCircle, RefreshCw, Image,
+  XCircle, RefreshCw, Image, Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 import { useAdminV2Courses, type AdminCourseRow } from '../hooks/useAdminV2Courses';
 import {
