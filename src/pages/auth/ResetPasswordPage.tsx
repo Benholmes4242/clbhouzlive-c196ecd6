@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
@@ -18,6 +18,11 @@ const ResetPasswordPage: React.FC = () => {
 
   useHideBottomNav();
   useHideHeader();
+
+  useLayoutEffect(() => {
+    document.body.classList.add('route-auth');
+    return () => { document.body.classList.remove('route-auth'); };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +45,10 @@ const ResetPasswordPage: React.FC = () => {
       setSubmitting(false);
     } else {
       setSuccess(true);
-      setTimeout(() => navigate('/auth', { replace: true }), 1500);
+      setTimeout(async () => {
+        await supabase.auth.signOut();
+        navigate('/auth', { replace: true });
+      }, 1500);
     }
   };
 
