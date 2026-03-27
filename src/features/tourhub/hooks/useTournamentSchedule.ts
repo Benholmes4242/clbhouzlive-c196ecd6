@@ -147,7 +147,7 @@ export function useTournamentSchedule(options: UseTournamentScheduleOptions = {}
           purse: purseRaw,
           purseFormatted,
           status: tournament.status,
-          tourName: seasonData?.tour_name ?? 'PGA Tour',
+          tourName: effectiveTourName,
           year: seasonData?.year ?? new Date().getFullYear(),
           par: courseData.par ?? null,
           yardage: courseData.yardage ?? null,
