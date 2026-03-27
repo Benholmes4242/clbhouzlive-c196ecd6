@@ -1363,8 +1363,8 @@ export const PGACard: React.FC<PGACardProps> = ({
                     ))}
                   </div>
                 </div>
-              )}
-            </>
+                );
+              })()}
           ) : (
             /* Empty state */
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
