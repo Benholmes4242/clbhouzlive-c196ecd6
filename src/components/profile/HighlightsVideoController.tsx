@@ -162,7 +162,7 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
         console.log('🎥 Card needs user gesture for sound:', id);
       }
     }
-  }, [activeId, pause, isGloballyMuted, attemptUnmutedPlay]);
+  }, [activeId, pause, isMuted, attemptUnmutedPlay]);
 
   return (
     <HighlightsVideoContext.Provider 

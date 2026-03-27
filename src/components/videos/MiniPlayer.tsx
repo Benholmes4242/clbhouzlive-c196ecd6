@@ -481,10 +481,10 @@ export const MiniPlayer: React.FC = () => {
                 "bg-background/10 hover:bg-background/20",
                 "text-foreground flex items-center justify-center transition"
               )}
-              aria-label={isGloballyMuted ? "Unmute" : "Mute"}
+              aria-label={isMuted ? "Unmute" : "Mute"}
               type="button"
             >
-              {isGloballyMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+              {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
             </button>
 
             <button

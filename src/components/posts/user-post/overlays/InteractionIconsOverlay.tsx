@@ -56,7 +56,7 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
               <div className="absolute inset-0 bg-white/30 rounded-full scale-0 group-active:scale-150 
                            opacity-0 group-active:opacity-50 transition-all duration-200" />
               
-              {isGloballyMuted ? (
+              {isMuted ? (
                 <VolumeX className="relative w-5 h-5 z-10" />
               ) : (
                 <Volume2 className="relative w-5 h-5 z-10" />

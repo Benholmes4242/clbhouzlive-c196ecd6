@@ -112,7 +112,7 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
       isActiveSlide,
       slideAutoplay,
       effectiveMuted,
-      isGloballyMuted,
+      isMuted,
       postHasMusic,
     });
     
