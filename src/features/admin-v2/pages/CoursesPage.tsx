@@ -827,6 +827,8 @@ export default function CoursesPage() {
         onUpdate={updateCourse}
         onUploadPhoto={uploadPhoto}
         isUploadingPhoto={isUploadingPhoto}
+        onDelete={deleteCourse}
+        isDeleting={isDeleting}
       />
 
     </div>
