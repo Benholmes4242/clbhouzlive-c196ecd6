@@ -65,4 +65,6 @@ export const useClubhouseStore = create<ClubhouseState>()((set) => ({
       return { carouselPositions: next };
     }),
   setIsTournamentCardActive: (v) => set({ isTournamentCardActive: v }),
+  markUserGestureUnmute: () => { _userGestureUnmuteTs = Date.now(); },
+  isRecentUserGesture: () => Date.now() - _userGestureUnmuteTs < 2000,
 }));
