@@ -141,20 +141,7 @@ function RankEditCell({
   );
 }
 
-// ─── Geocode status ───────────────────────────────────────────────────────────
-
-function GeocodeStatus({ lat, lng }: { lat: number | null; lng: number | null }) {
-  const hasCoords = lat != null && lng != null;
-  return (
-    <span className={cn('inline-flex items-center gap-1 text-[12px]', hasCoords ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground/60')}>
-      {hasCoords
-        ? <CheckCircle className="h-3.5 w-3.5" />
-        : <XCircle className="h-3.5 w-3.5" />
-      }
-      {hasCoords ? 'Geocoded' : 'Missing'}
-    </span>
-  );
-}
+// GeocodeStatus removed — now rendered inline in the course name cell
 
 // ─── Row action menu ──────────────────────────────────────────────────────────
 
