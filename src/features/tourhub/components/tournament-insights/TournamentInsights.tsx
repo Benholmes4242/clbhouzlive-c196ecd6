@@ -323,16 +323,31 @@ function PickRecordBadge() {
   const top5 = pickHistory.filter(e => e.actualPosition !== null && e.actualPosition <= 5).length;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
       {wins > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '3px 8px', borderRadius: 8, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.35)' }}>
-          <span style={{ fontSize: 10 }}>🏆</span>
-          <span style={{ fontSize: 11, fontWeight: 800, color: 'hsl(var(--accent-amber))' }}>{wins} win{wins !== 1 ? 's' : ''}</span>
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: 5,
+          padding: '5px 10px', borderRadius: 8,
+          background: '#F59E0B',
+          transform: 'rotate(-2deg)',
+        }}>
+          <span style={{ fontSize: 12 }}>🏆</span>
+          <span style={{ fontSize: 11, fontWeight: 800, color: '#451A03', letterSpacing: '0.02em' }}>
+            {wins} win{wins !== 1 ? 's' : ''}
+          </span>
         </div>
       )}
       {top5 > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '3px 8px', borderRadius: 8, background: 'rgba(22,163,74,0.08)', border: '1px solid rgba(22,163,74,0.25)' }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#16A34A' }}>{top5} top‑5{top5 !== 1 ? 's' : ''}</span>
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: 5,
+          padding: '5px 10px', borderRadius: 8,
+          background: '#16A34A',
+          transform: 'rotate(-2deg)',
+        }}>
+          <span style={{ fontSize: 12 }}>✓</span>
+          <span style={{ fontSize: 11, fontWeight: 800, color: '#F0FDF4', letterSpacing: '0.02em' }}>
+            {top5} top‑5{top5 !== 1 ? 's' : ''}
+          </span>
         </div>
       )}
     </div>
