@@ -32,11 +32,12 @@ const corsHeaders = (origin: string | null): HeadersInit => {
 };
 
 interface AdminOperationRequest {
-  action: 'delete_user' | 'reset_password' | 'suspend_user';
-  targetUserId: string;
-  targetEmail: string;
+  action: 'delete_user' | 'reset_password' | 'suspend_user' | 'delete_course';
+  targetUserId?: string;
+  targetEmail?: string;
+  courseId?: string;
   reason?: string;
-  suspended?: boolean; // For suspend_user action: true = suspend, false = unsuspend
+  suspended?: boolean;
 }
 
 serve(async (req) => {
