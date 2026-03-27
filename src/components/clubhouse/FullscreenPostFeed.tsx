@@ -27,7 +27,8 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
   onLoadMore
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isMuted, setIsMuted] = useState(true);
+  const isMuted = useClubhouseStore(s => s.isMuted);
+  const toggleMute = useClubhouseStore(s => s.toggleMute);
   const [commentText, setCommentText] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
 
