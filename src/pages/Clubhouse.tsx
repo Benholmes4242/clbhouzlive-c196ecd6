@@ -20,7 +20,7 @@ import { useRehydrationSafe } from '@/contexts/RehydrationContext';
 import { ClubhouseTabProvider, useClubhouseTab } from '@/contexts/ClubhouseTabContext';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+
 
 // ── New feed components ──
 import { SnapFeed } from '@/components/feed/SnapFeed';
