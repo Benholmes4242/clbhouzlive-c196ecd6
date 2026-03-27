@@ -101,7 +101,7 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
       // Fallback to muted play and sync global state
       try {
         setMuted(el, true);
-        setGlobalMute(true); // Keep global state in sync with actual audio state
+        setIsMuted(true); // Keep global state in sync with actual audio state
         await el.play?.();
         console.log('🎥 Fell back to muted playback:', id);
         return false;
