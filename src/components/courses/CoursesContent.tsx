@@ -304,7 +304,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
               style={{
                 width: '100%',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '11px 16px', marginTop: 8, marginBottom: 4,
+                padding: '11px 16px', marginTop: 12, marginBottom: 12,
                 background: 'linear-gradient(135deg, #F59E0B, #F97316)',
                 border: 'none', cursor: 'pointer', borderRadius: 12,
               }}
@@ -323,15 +323,15 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
             </button>
           )}
 
-          <TabsContent value="explore" className="mt-2">
+          <TabsContent value="explore" className="mt-3">
             <CourseExplorer />
           </TabsContent>
 
-          <TabsContent value="top100" className="mt-2">
+          <TabsContent value="top100" className="mt-3">
             <Top100CoursesHubPanel />
           </TabsContent>
 
-          <TabsContent value="leaderboards" className="mt-2">
+          <TabsContent value="leaderboards" className="mt-3">
             {user ? (
               <Top100LeaderboardPanel />
             ) : (
