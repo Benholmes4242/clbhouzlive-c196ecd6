@@ -331,7 +331,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
             <Top100CoursesHubPanel />
           </TabsContent>
 
-          <TabsContent value="leaderboards" className="mt-2">
+          <TabsContent value="leaderboards" className="mt-3">
             {user ? (
               <Top100LeaderboardPanel />
             ) : (
