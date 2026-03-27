@@ -113,7 +113,7 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
   }, [setIsMuted]);
 
   const play = useCallback(async (id: string) => {
-    console.log('🎥 Play called for:', id, 'currentActive:', activeId, 'globalMuted:', isGloballyMuted);
+    console.log('🎥 Play called for:', id, 'currentActive:', activeId, 'globalMuted:', isMuted);
     
     // RULE: only one video at a time - pause the previous one
     if (activeId && activeId !== id) {
