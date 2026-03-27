@@ -40,7 +40,6 @@ import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, Podium
 import { useWinnerScorecardStats } from '../../hooks/useWinnerScorecardStats';
 import { useWinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import { useLeaderScorecardStats, type LeaderStats } from '../../hooks/useLeaderScorecardStats';
-import { useWinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import '@/styles/hero-glass.css';
 
 function getTourDisplayName(tourSlug: string): string {
