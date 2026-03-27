@@ -30,6 +30,7 @@ interface UnifiedCourseCardProps {
   showRankBadges?: boolean;
   showRating?: boolean;
   showPlayedStatus?: boolean;
+  showRateChip?: boolean;
   showFriendsContext?: boolean;
   showLastPlayed?: boolean;
   hideLocation?: boolean;
