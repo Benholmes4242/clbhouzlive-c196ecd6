@@ -28,7 +28,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
     <div 
       className="fixed inset-0 overflow-hidden"
       style={{ 
-        backgroundColor: 'var(--bg-page)',
+        backgroundColor: '#0D0D0D',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
