@@ -149,6 +149,8 @@ export function CourseMediaViewer() {
               followOverrides={new Map()}
               onFollowChange={() => {}}
               startIndex={startIndex}
+              onActiveIndexChange={setActiveIndex}
+              activeIndexOverride={activeIndex}
             />
 
             {/* Creator Capsule — no social actions */}
