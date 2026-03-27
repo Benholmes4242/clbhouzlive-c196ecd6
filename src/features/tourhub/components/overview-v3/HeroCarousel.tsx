@@ -1092,7 +1092,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
     resumeTimerRef.current = setTimeout(() => {
       setIsPaused(false);
-    }, 3500);
+    }, 6000);
   }, []);
 
   // Clean up resume timer on unmount
