@@ -810,7 +810,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                   Math.abs(index - currentIndex) <= VIDEO_WINDOW_RADIUS ? (
                     <VideoWithAutoplay
                       src={currentMedia.media_url}
-                      muted={isGloballyMuted}
+                      muted={isMuted}
                       className="w-full h-full"
                       objectFit="contain"
                       shouldAttach={!!shouldAttach[item.id]}
