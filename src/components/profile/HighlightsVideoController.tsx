@@ -110,7 +110,7 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
         return false;
       }
     }
-  }, [setGlobalMute]);
+  }, [setIsMuted]);
 
   const play = useCallback(async (id: string) => {
     console.log('🎥 Play called for:', id, 'currentActive:', activeId, 'globalMuted:', isGloballyMuted);
