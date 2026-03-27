@@ -531,7 +531,67 @@ export default function CoursesPage() {
     isDeleting,
   } = useAdminV2Courses();
 
+  const queryClient = useQueryClient();
   const [countryFilter, setCountryFilter] = useState('all');
+
+  // Fetch top100 list IDs for membership sync
+  const { data: top100Lists } = useQuery({
+    queryKey: ['top100-lists-meta'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('top100_lists')
+        .select('id, slug');
+      return data ?? [];
+    },
+    staleTime: 60 * 60 * 1000,
+  });
+
+  const listIdMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    (top100Lists ?? []).forEach((l: any) => { map[l.slug] = l.id; });
+    return map;
+  }, [top100Lists]);
+
+  const syncRank = useCallback(async (
+    courseId: string,
+    rankKey: 'global_rank' | 'usa_rank' | 'regional_rank',
+    newRank: number | null,
+    listSlug: string,
+  ) => {
+    const listId = listIdMap[listSlug];
+
+    // 1. Update the golf_courses column
+    updateCourse(courseId, { [rankKey]: newRank });
+
+    if (!listId) return;
+
+    if (newRank === null) {
+      await supabase
+        .from('course_top100_memberships')
+        .delete()
+        .eq('course_id', courseId)
+        .eq('list_id', listId);
+    } else {
+      // Clear any other course holding this rank on this list
+      await supabase
+        .from('course_top100_memberships')
+        .delete()
+        .eq('list_id', listId)
+        .eq('rank', newRank)
+        .neq('course_id', courseId);
+
+      // Upsert this course's membership
+      await supabase
+        .from('course_top100_memberships')
+        .upsert(
+          { course_id: courseId, list_id: listId, rank: newRank },
+          { onConflict: 'course_id,list_id' }
+        );
+    }
+
+    queryClient.invalidateQueries({ queryKey: ['top100-list-courses'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-v2', 'courses'] });
+  }, [listIdMap, updateCourse, queryClient]);
 
   // Derive unique countries from data
   const countries = useMemo(() => {
