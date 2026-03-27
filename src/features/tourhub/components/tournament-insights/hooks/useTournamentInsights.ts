@@ -188,9 +188,9 @@ function buildContenderCards(
 }
 
 function getConfidenceTier(rank: number): ConfidenceTier {
-  if (rank === 0) return 'elite';
-  if (rank <= 2) return 'high';
-  return 'medium';
+  if (rank === 0) return 'elite';   // Pick 1 — strongest conviction
+  if (rank === 1) return 'high';    // Pick 2
+  return 'medium';                  // Pick 3
 }
 
 /**

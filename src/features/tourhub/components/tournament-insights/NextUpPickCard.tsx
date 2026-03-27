@@ -217,7 +217,11 @@ function PickSlide({ pick, index, totalPicks, onNav }: { pick: PickItem; index: 
             color: 'hsl(var(--muted-foreground))',
             lineHeight: 1,
           }}>
-            {index === 0 ? 'Top Pick' : `Pick ${index + 1}`}
+            {index === 0
+              ? 'Our Top Pick'
+              : index === 1
+              ? 'Strong Contender'
+              : 'In Contention'}
           </div>
 
           {/* Player name */}
