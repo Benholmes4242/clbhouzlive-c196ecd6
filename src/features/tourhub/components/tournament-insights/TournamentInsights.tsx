@@ -441,247 +441,144 @@ export const TournamentInsights = memo(function TournamentInsights() {
 
   // ═══ CONTENT RENDERERS ═══
 
-  const renderUpcomingContent = (insightsData: typeof nextTournamentInsights | typeof data, picksFirst: boolean = true) => {
-    if (!insightsData) {
-      if (nextTournamentPredictionsLoading) return <GeneratingPredictionsSkeleton />;
-      if (nextTournamentPreview) return <GeneratingPredictionsSkeleton label="Generating predictions…" />;
-      return (
-        <p className="text-sm text-muted-foreground text-center py-8">
-          No upcoming tournament data available yet.
-        </p>
-      );
-    }
-
-    return (
-      <>
-        <IntelligenceTabSwitcher activeTab={activeSubTab} onTabChange={setActiveSubTab} picksFirst={picksFirst} />
-
-        {activeSubTab === 'courseDNA' && (
-          <motion.div
-            key="courseDNA"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-            className="pb-6"
-          >
-            <div>
-              {insightsData.courseDNA.length > 0 && (
-                <CourseDNACard
-                  items={insightsData.courseDNA}
-                  courseName={insightsData.tournament.courseName}
-                  inline
-                />
-              )}
-              <ClubhouseIntelligence insight={insightsData.clubhouseIntelligence} inline />
-            </div>
-          </motion.div>
-        )}
-
-        {activeSubTab === 'predictions' && (
-          <motion.div
-            key="predictions"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-            className="pb-6 space-y-3"
-          >
-            {isStale && <StaleBadge />}
-            {insightsData.winners.length > 0 && (
-              <NextUpPickCard
-                featured={insightsData.winners[0]}
-                cards={insightsData.contenderCards}
-                withdrawnPlayerIds={withdrawnPlayerIds}
-              />
-            )}
-          </motion.div>
-        )}
-      </>
-    );
-  };
-
-  const renderLiveContent = () => {
-    if (isWaitingForPlay) {
-      return (
-        <div className="space-y-4 pb-6">
-          {/* Amber waiting banner */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              padding: '10px 16px',
-              borderRadius: '12px',
-              background: 'rgba(245, 158, 11, 0.08)',
-              border: '1px solid rgba(245, 158, 11, 0.15)',
-            }}
-          >
-            <div
-              style={{
-                width: '7px',
-                height: '7px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(245, 158, 11, 0.8)',
-                animation: 'pulse 2s ease-in-out infinite',
-                flexShrink: 0,
-              }}
-            />
-            <span
-              style={{
-                fontSize: '12.5px',
-                fontWeight: 600,
-                color: 'hsl(var(--foreground) / 0.6)',
-              }}
-            >
-              Play begins shortly — tracking starts when scores are in
-            </span>
-          </div>
-
-          {data.winners.length > 0 && (
-            <LikelyWinnersCarousel
-              featured={data.winners[0]}
-              cards={data.contenderCards}
-              withdrawnPlayerIds={withdrawnPlayerIds}
-              courseName={data.tournament.courseName}
-              tournamentName={data.tournament.name}
-            />
-          )}
-
-          <AnimatePresence>
-            {showCourseDNA && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                className="overflow-hidden"
-              >
-                <div>
-                  {data.courseDNA.length > 0 && (
-                    <CourseDNACard items={data.courseDNA} courseName={data.tournament.courseName} inline />
-                  )}
-                  <ClubhouseIntelligence insight={data.clubhouseIntelligence} inline />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      );
-    }
-
-    if (tracker) {
-      return (
-        <div className="space-y-4">
-          <PredictionLeaderboard allPicks={tracker.allPicks} isCompleted={false} tournamentLeaderScore={tracker.tournamentLeaderScore} />
-
-          {/* Course DNA toggle */}
-          <div
-            onClick={() => setShowCourseDNA(!showCourseDNA)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '14px 16px',
-              margin: '12px 0',
-              borderRadius: '12px',
-              cursor: 'pointer',
-            }}
-            className="active:scale-[0.98] transition-transform bg-muted/50 border border-border/40"
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '14px' }}>🧬</span>
-              <span className="text-foreground/70" style={{ fontSize: '13.5px', fontWeight: 600 }}>
-                {showCourseDNA ? 'Hide Course DNA' : 'View Course DNA'}
-              </span>
-            </div>
-            <span
-              className="text-muted-foreground"
-              style={{
-                fontSize: '16px',
-                transform: showCourseDNA ? 'rotate(90deg)' : 'rotate(0deg)',
-                transition: 'transform 0.2s ease',
-                display: 'inline-block',
-              }}
-            >
-              ›
-            </span>
-          </div>
-
-          <AnimatePresence>
-            {showCourseDNA && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                className="overflow-hidden"
-              >
-                <div>
-                  {data.courseDNA.length > 0 && (
-                    <CourseDNACard items={data.courseDNA} courseName={data.tournament.courseName} inline />
-                  )}
-                  <ClubhouseIntelligence insight={data.clubhouseIntelligence} inline />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      );
-    }
-
-    if (trackerLoading) {
-      return (
-        <div className="space-y-3 animate-pulse">
-          <div className="h-24 bg-black/[0.04] rounded-2xl" />
-          <div className="h-64 bg-black/[0.04] rounded-2xl" />
-        </div>
-      );
-    }
-
-    // Fallback: show predictions carousel
-    return (
-      <div className="pb-6">
-        {data.winners.length > 0 && (
-          <LikelyWinnersCarousel
-            featured={data.winners[0]}
-            cards={data.contenderCards}
-            withdrawnPlayerIds={withdrawnPlayerIds}
-            courseName={data.tournament.courseName}
-            tournamentName={data.tournament.name}
-          />
-        )}
-      </div>
-    );
-  };
-
-  const renderResultsContent = () => {
-    if (!data?.tournament) return null;
-
-    return (
-      <>
-        <TournamentResultsCard
-          tournamentId={data.tournament.id}
-          tournamentName={data.tournament.name}
-          courseName={data.tournament.courseName}
-          location={data.tournament.location}
-          allPicks={tracker?.allPicks}
-          tourSlug="pga"
-        />
-        <PickRecordRail />
-      </>
-    );
-  };
-
-  const renderContent = () => {
+  const renderSecondaryContent = () => {
     switch (activeMainTab) {
       case 'live':
-        return renderLiveContent();
+        if (isWaitingForPlay) {
+          return (
+            <div className="space-y-4 pb-6">
+              {/* Amber waiting banner */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '10px 16px',
+                  borderRadius: '12px',
+                  background: 'rgba(245, 158, 11, 0.08)',
+                  border: '1px solid rgba(245, 158, 11, 0.15)',
+                }}
+              >
+                <div
+                  style={{
+                    width: '7px',
+                    height: '7px',
+                    borderRadius: '50%',
+                    backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                    animation: 'pulse 2s ease-in-out infinite',
+                    flexShrink: 0,
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: '12.5px',
+                    fontWeight: 600,
+                    color: 'hsl(var(--foreground) / 0.6)',
+                  }}
+                >
+                  Play begins shortly — tracking starts when scores are in
+                </span>
+              </div>
+              {data.courseDNA.length > 0 && <CourseDNACard items={data.courseDNA} courseName={data.tournament.courseName} inline />}
+              <ClubhouseIntelligence insight={data.clubhouseIntelligence} inline />
+            </div>
+          );
+        }
+        if (tracker) {
+          return (
+            <div className="space-y-4">
+              <PredictionLeaderboard allPicks={tracker.allPicks} isCompleted={false} tournamentLeaderScore={tracker.tournamentLeaderScore} />
+
+              {/* Course DNA toggle */}
+              <div
+                onClick={() => setShowCourseDNA(!showCourseDNA)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '14px 16px',
+                  margin: '12px 0',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                }}
+                className="active:scale-[0.98] transition-transform bg-muted/50 border border-border/40"
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '14px' }}>🧬</span>
+                  <span className="text-foreground/70" style={{ fontSize: '13.5px', fontWeight: 600 }}>
+                    {showCourseDNA ? 'Hide Course DNA' : 'View Course DNA'}
+                  </span>
+                </div>
+                <span
+                  className="text-muted-foreground"
+                  style={{
+                    fontSize: '16px',
+                    transform: showCourseDNA ? 'rotate(90deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s ease',
+                    display: 'inline-block',
+                  }}
+                >
+                  ›
+                </span>
+              </div>
+
+              <AnimatePresence>
+                {showCourseDNA && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                    className="overflow-hidden"
+                  >
+                    <div>
+                      {data.courseDNA.length > 0 && (
+                        <CourseDNACard items={data.courseDNA} courseName={data.tournament.courseName} inline />
+                      )}
+                      <ClubhouseIntelligence insight={data.clubhouseIntelligence} inline />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          );
+        }
+        if (trackerLoading) {
+          return (
+            <div className="space-y-3 animate-pulse">
+              <div className="h-24 bg-black/[0.04] rounded-2xl" />
+              <div className="h-64 bg-black/[0.04] rounded-2xl" />
+            </div>
+          );
+        }
+        return null;
+
       case 'nextup':
-        return renderUpcomingContent(nextTournamentInsights, true);
+      case 'current': {
+        const insightsData = activeMainTab === 'nextup' ? nextTournamentInsights : data;
+        if (!insightsData) {
+          if (nextTournamentPredictionsLoading) return <GeneratingPredictionsSkeleton />;
+          if (nextTournamentPreview) return <GeneratingPredictionsSkeleton label="Generating predictions…" />;
+          return null;
+        }
+        return (
+          <div className="pb-6">
+            {insightsData.courseDNA.length > 0 && (
+              <CourseDNACard
+                items={insightsData.courseDNA}
+                courseName={insightsData.tournament.courseName}
+                inline
+              />
+            )}
+            <ClubhouseIntelligence insight={insightsData.clubhouseIntelligence} inline />
+          </div>
+        );
+      }
+
       case 'results':
-        return renderResultsContent();
-      case 'current':
-        return renderUpcomingContent(data, false);
+        return null;
+
       default:
         return null;
     }
