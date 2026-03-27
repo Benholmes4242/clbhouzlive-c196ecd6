@@ -152,15 +152,8 @@ const ClubhouseContent = () => {
   const isTournamentCardActive = useClubhouseStore(s => s.isTournamentCardActive);
 
 
-  // ── GlobalAudio bridge ──
-  const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
-  useEffect(() => {
-    useClubhouseStore.getState().setIsMuted(isGloballyMuted);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  useEffect(() => {
-    setGlobalMute(isMuted);
-  }, [isMuted, setGlobalMute]);
+
+
 
   // ── Hide chrome when PGA card is active ──
   const { setVisible: setBottomNavVisible } = useBottomNavigation();
