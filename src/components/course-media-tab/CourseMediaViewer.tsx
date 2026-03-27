@@ -59,14 +59,10 @@ export function CourseMediaViewer() {
   const mediaCount = activePost?.mediaItems?.length ?? 0;
   const currentMediaIdx = carouselPositions.get(activeIndex) ?? 0;
 
-  // Sync start index when opening
-  useEffect(() => {
-    if (isOpen) setActiveIndex(startIndex);
-  }, [isOpen, startIndex, setActiveIndex]);
-
   // Body scroll lock + status bar
   useEffect(() => {
     if (!isOpen) return;
+    pauseAllAudio();
     document.body.style.overflow = 'hidden';
 
     document.body.classList.add('route-fullscreen-overlay');
