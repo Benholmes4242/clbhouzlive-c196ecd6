@@ -7,6 +7,7 @@ import { PageRoot } from '@/components/layout/PageRoot';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { usePreventOverscroll } from '@/hooks/usePreventOverscroll';
 import { analyticsEvents } from '@/utils/analyticsEvents';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 const CourseDetailPage = () => {
   const params = useParams();
