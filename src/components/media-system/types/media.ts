@@ -210,6 +210,7 @@ export interface PGACardData {
     greensInReg:     number | null;
     puttingAverage:  number | null;
   } | null;
+  bestToday?: PGACardBestToday[] | null;
 }
 
 export interface PGACardFeedPost extends Omit<FeedPost, 'mediaItems' | 'review' | 'isReview'> {

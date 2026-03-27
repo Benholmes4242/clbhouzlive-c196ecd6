@@ -389,6 +389,24 @@ export function usePGACard(userId?: string): {
       } : null;
 
       const round = topLive.currentRound ?? 1;
+
+      // Best today — top 2 players by current round score
+      const roundKey = `round_${round}` as 'round_1' | 'round_2' | 'round_3' | 'round_4';
+      const allPlayersForToday = [topLive.leader, ...topLive.chasePack]
+        .filter((p): p is NonNullable<typeof p> => !!p && p[roundKey] != null)
+        .sort((a, b) => (a[roundKey] as number) - (b[roundKey] as number))
+        .slice(0, 2);
+
+      const bestToday: PGACardBestToday[] = allPlayersForToday.map(p => {
+        const score = p[roundKey] as number;
+        return {
+          playerName: p.player.fullName,
+          photoUrl: getPlayerHeadshotUrl(p.player.fullName, p.player.tourCode ?? PGA_TOUR_SLUG, p.player.headshotOverride) ?? null,
+          todayScore: score,
+          todayDisplay: score === 0 ? 'E' : score > 0 ? `+${score}` : `${score}`,
+        };
+      });
+
       return {
         tournamentId: topLive.id,
         tournamentName: topLive.name,
@@ -413,6 +431,7 @@ export function usePGACard(userId?: string): {
         defendingChampion: null,
         defendingChampionPhotoUrl: null,
         pastWinners: null,
+        bestToday: bestToday.length > 0 ? bestToday : null,
       };
     }
 
