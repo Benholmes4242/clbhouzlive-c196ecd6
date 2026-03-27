@@ -301,6 +301,7 @@ const ActivityPage: React.FC = () => {
               </div>
             ) : showEmptyState ? (
               <>
+                <RateCourseNudge />
                 <SuggestedCreatorsShelf
                   userId={user?.id}
                   title="Golfers you might know"
