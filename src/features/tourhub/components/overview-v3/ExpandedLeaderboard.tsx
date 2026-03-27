@@ -209,10 +209,17 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
           className="overflow-hidden flex-shrink-0"
           style={{ width: 32, height: 33, borderRadius: '34%', border: '1.5px solid rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.12)' }}
         >
-          {photoUrl ? (
-            <img src={photoUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
+          {photoUrl && !imgError ? (
+            <img
+              src={photoUrl}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover object-top"
+              onError={() => setImgError(true)}
+            />
           ) : (
-            <div className="w-full h-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.12)', fontSize: 8, fontWeight: 600, color: 'rgba(255,255,255,0.80)' }}>{initials}</div>
+            <PlayerSilhouette size={20} />
           )}
         </div>
         <span className="truncate" style={{
