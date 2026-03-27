@@ -127,10 +127,10 @@ export const EngagementRailOverlay: React.FC<EngagementRailOverlayProps> = ({
       {/* Only show audio control for video posts */}
       {activePost.isVideo && (
         <EngagementButton
-          icon={isGloballyMuted ? VolumeX : Volume2}
+          icon={isMuted ? VolumeX : Volume2}
           count={0}
-          onClick={toggleGlobalMute}
-          ariaLabel={isGloballyMuted ? 'Unmute' : 'Mute'}
+          onClick={toggleMute}
+          ariaLabel={isMuted ? 'Unmute' : 'Mute'}
         />
       )}
 

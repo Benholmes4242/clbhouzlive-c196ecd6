@@ -223,10 +223,10 @@ const EngagementRail = ({
       {/* Only show audio control for video posts */}
       {isVideo && (
         <EngagementButton
-          icon={isGloballyMuted ? VolumeX : Volume2}
+          icon={isMuted ? VolumeX : Volume2}
           count={0}
           onClick={handleAudioToggle}
-          ariaLabel={isGloballyMuted ? 'Unmute' : 'Mute'}
+          ariaLabel={isMuted ? 'Unmute' : 'Mute'}
         />
       )}
 
