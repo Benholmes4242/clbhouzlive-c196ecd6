@@ -594,30 +594,63 @@ export const TournamentInsights = memo(function TournamentInsights() {
         viewport={{ once: true }}
         style={{ marginBottom: '24px' }}
       >
-        <div className="mb-1">
-          <h2
-            className="text-foreground"
-            style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.3px' }}
-          >
-            Tournament Intelligence
-          </h2>
-          {!isLive && (
-            <p className="mt-1 text-muted-foreground/60" style={{ fontSize: '13px', fontWeight: 500 }}>
-              AI analysis of course fit, form, and field strength
+        {/* Top row: identity + social proof */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            {/* AI eyebrow pill */}
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', borderRadius: 8, background: 'hsl(var(--muted) / 0.5)', marginBottom: 6 }}>
+              <div style={{ width: 6, height: 6, borderRadius: 3, background: 'hsl(var(--foreground) / 0.35)' }} />
+              <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase' as const, color: 'hsl(var(--muted-foreground))' }}>AI Predictions</span>
+            </div>
+            <h2 className="text-foreground" style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.3px' }}>
+              Tournament Intelligence
+            </h2>
+            <p className="text-muted-foreground/60" style={{ fontSize: 13, fontWeight: 500, marginTop: 2 }}>
+              Predicts winners using course DNA, form &amp; field strength
             </p>
-          )}
+          </div>
+          {/* Social proof badge */}
+          <PickRecordBadge />
         </div>
 
         {/* Tab bar — only when multiple tabs */}
         {tabs.length > 1 && (
-          <div style={{ paddingTop: '12px' }} className="flex justify-center">
-            <LiveUpcomingToggle
-              tabs={tabs}
-              activeTab={activeMainTab}
-              onTabChange={setActiveMainTab}
-            />
+          <div style={{ display: 'flex', gap: 4, paddingTop: 14 }}>
+            {tabs.map(tab => {
+              const isActive = tab.id === activeMainTab;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveMainTab(tab.id)}
+                  style={{
+                    flex: 1,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                    padding: '10px 12px',
+                    borderRadius: 10,
+                    fontSize: 13, fontWeight: 600,
+                    color: isActive ? 'hsl(var(--background))' : 'hsl(var(--muted-foreground))',
+                    background: isActive ? 'hsl(var(--foreground))' : 'transparent',
+                    border: isActive ? 'none' : '1.5px solid hsl(var(--border))',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  {tab.hasLiveDot && (
+                    <span style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: 'var(--th-accent-live)', animation: 'ti-pulse 2s infinite', flexShrink: 0 }} />
+                  )}
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
         )}
+
+        <style>{`
+          @keyframes ti-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.35; }
+          }
+        `}</style>
       </motion.div>
 
       {/* Hero Card — full bleed */}
@@ -637,18 +670,67 @@ export const TournamentInsights = memo(function TournamentInsights() {
         </div>
       )}
 
-      {/* ═══ Content area ═══ */}
+      {/* ── Pick card — always first after hero ── */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={activeMainTab}
+          key={`picks-${activeMainTab}`}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-0 pt-6 bg-background"
+          className="mt-0 pt-6"
+        >
+          {activeMainTab === 'live' && !isWaitingForPlay && data.winners.length > 0 && (
+            <LikelyWinnersCarousel
+              featured={data.winners[0]}
+              cards={data.contenderCards}
+              withdrawnPlayerIds={withdrawnPlayerIds}
+              courseName={data.tournament.courseName}
+              tournamentName={data.tournament.name}
+            />
+          )}
+          {activeMainTab === 'nextup' && nextTournamentInsights?.winners && nextTournamentInsights.winners.length > 0 && (
+            <NextUpPickCard
+              featured={nextTournamentInsights.winners[0]}
+              cards={nextTournamentInsights.contenderCards}
+              withdrawnPlayerIds={withdrawnPlayerIds}
+            />
+          )}
+          {activeMainTab === 'results' && (
+            <TournamentResultsCard
+              tournamentId={data.tournament.id}
+              tournamentName={data.tournament.name}
+              courseName={data.tournament.courseName}
+              location={data.tournament.location}
+              allPicks={tracker?.allPicks}
+              tourSlug="pga"
+            />
+          )}
+          {activeMainTab === 'current' && data.winners.length > 0 && (
+            <NextUpPickCard
+              featured={data.winners[0]}
+              cards={data.contenderCards}
+              withdrawnPlayerIds={withdrawnPlayerIds}
+            />
+          )}
+        </motion.div>
+      </AnimatePresence>
+
+      {/* ── Pick Record Rail — always visible ── */}
+      <PickRecordRail />
+
+      {/* ── Remaining tab content ── */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={`secondary-${activeMainTab}`}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          className="bg-background"
           style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}
         >
-          {renderContent()}
+          {renderSecondaryContent()}
         </motion.div>
       </AnimatePresence>
     </section>
