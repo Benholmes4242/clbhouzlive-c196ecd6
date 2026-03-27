@@ -98,34 +98,35 @@ const FollowersListPage = () => {
   }
 
   return (
-    <UserListPage
-      mode="followers"
-      title="Followers"
-      subtitle={`People who follow @${profileUser.username}`}
-      searchPlaceholder="Search followers by name or club"
-      
-      users={followers}
-      totalCount={totalCount}
-      isLoading={followersLoading}
-      error={error}
-      hasNextPage={hasNextPage}
-      isFetchingNextPage={isFetchingNextPage}
-      onLoadMore={() => fetchNextPage()}
-      onRefetch={() => refetch()}
-      backPath={`/profile/${profileUser.username}`}
-      isOwnProfile={isOwnProfile}
-      profileUsername={profileUser.username}
-      // Following tab data
-      followingUsers={following}
-      followingTotalCount={followingTotalCount}
-      followingIsLoading={followingLoading}
-      followingError={followingError}
-      followingHasNextPage={followingHasNextPage}
-      followingIsFetchingNextPage={followingIsFetchingNextPage}
-      onFollowingLoadMore={() => followingFetchNextPage()}
-      onFollowingRefetch={() => followingRefetch()}
-    />
-    <ScrollToTopGlass />
+    <>
+      <UserListPage
+        mode="followers"
+        title="Followers"
+        subtitle={`People who follow @${profileUser.username}`}
+        searchPlaceholder="Search followers by name or club"
+        
+        users={followers}
+        totalCount={totalCount}
+        isLoading={followersLoading}
+        error={error}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        onLoadMore={() => fetchNextPage()}
+        onRefetch={() => refetch()}
+        backPath={`/profile/${profileUser.username}`}
+        isOwnProfile={isOwnProfile}
+        profileUsername={profileUser.username}
+        // Following tab data
+        followingUsers={following}
+        followingTotalCount={followingTotalCount}
+        followingIsLoading={followingLoading}
+        followingError={followingError}
+        followingHasNextPage={followingHasNextPage}
+        followingIsFetchingNextPage={followingIsFetchingNextPage}
+        onFollowingLoadMore={() => followingFetchNextPage()}
+        onFollowingRefetch={() => followingRefetch()}
+      />
+      <ScrollToTopGlass />
     </>
   );
 };

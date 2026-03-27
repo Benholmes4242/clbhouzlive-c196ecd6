@@ -84,25 +84,26 @@ const FriendsListPage = () => {
   }
 
   return (
-    <UserListPage
-      mode="friends"
-      title="Friends"
-      subtitle={`Friends of @${profileUser.username}`}
-      searchPlaceholder="Search friends by name or club"
-      
-      users={friends}
-      totalCount={totalCount}
-      isLoading={friendsLoading}
-      error={error}
-      hasNextPage={hasNextPage}
-      isFetchingNextPage={isFetchingNextPage}
-      onLoadMore={() => fetchNextPage()}
-      onRefetch={() => refetch()}
-      backPath={`/profile/${profileUser.username}`}
-      isOwnProfile={isOwnProfile}
-      profileUsername={profileUser.username}
-    />
-    <ScrollToTopGlass />
+    <>
+      <UserListPage
+        mode="friends"
+        title="Friends"
+        subtitle={`Friends of @${profileUser.username}`}
+        searchPlaceholder="Search friends by name or club"
+        
+        users={friends}
+        totalCount={totalCount}
+        isLoading={friendsLoading}
+        error={error}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        onLoadMore={() => fetchNextPage()}
+        onRefetch={() => refetch()}
+        backPath={`/profile/${profileUser.username}`}
+        isOwnProfile={isOwnProfile}
+        profileUsername={profileUser.username}
+      />
+      <ScrollToTopGlass />
     </>
   );
 };
