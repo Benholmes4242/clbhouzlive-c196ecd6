@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useRef, useState } from "react";
-import { useGlobalAudio } from "@/contexts/GlobalAudioContext";
+import { useClubhouseStore } from "@/store/clubhouseStore";
 
 type PlayerEl = HTMLVideoElement | (HTMLElement & { 
   play?: () => Promise<void>; 
