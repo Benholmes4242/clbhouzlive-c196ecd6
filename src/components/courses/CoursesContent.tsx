@@ -155,6 +155,7 @@ interface CoursesContentProps {
 const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
+  const [rateSheetOpen, setRateSheetOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   
