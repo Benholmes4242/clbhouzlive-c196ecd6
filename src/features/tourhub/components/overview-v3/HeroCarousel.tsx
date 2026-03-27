@@ -599,7 +599,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               bottom: isExpanded ? 16 : 20,
               left: isExpanded ? 12 : 16,
               ...(isExpanded
-                ? { right: 12, top: 'max(env(safe-area-inset-top, 20px) + 120px, 160px)' }
+                ? { right: 12, top: 'calc(env(safe-area-inset-top, 20px) + 120px)' }
                 : { maxWidth: 'min(350px, calc(100% - 32px))' }
               ),
               minWidth: isExpanded ? undefined : '280px',
