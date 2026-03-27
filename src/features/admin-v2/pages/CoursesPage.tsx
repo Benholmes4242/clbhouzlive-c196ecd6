@@ -320,6 +320,20 @@ function CourseDrawer({
                 Website
               </AdminButton>
             )}
+            <div className="flex-1" />
+            <AdminButton
+              variant="danger"
+              icon={Trash2}
+              onClick={() => {
+                if (window.confirm(`Permanently delete "${course.name}"? This cannot be undone.`)) {
+                  onDelete(course.id);
+                  onClose();
+                }
+              }}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting…' : 'Delete'}
+            </AdminButton>
           </div>
         ) : undefined
       }
