@@ -51,7 +51,19 @@ export const ReviewRow: React.FC<RowProps> = ({
     <FlatRow notification={notification} onClick={onClick} onOpenActionsSheet={onOpenActionsSheet}
       avatar={<AvatarWithBadge notification={notification} badgeIcon={statusIcon} />}
       title={<><span className={cn(showOrange ? "font-semibold" : "font-medium")}>{actorName}</span>{' '}<span className="font-normal text-muted-foreground">{reviewText}</span></>}
-      meta={notification.time_ago} isSessionNew={isSessionNew}
+      meta={notification.time_ago}
+      isSessionNew={isSessionNew}
+      actions={
+        data?.course_id ? (
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onClick(); }}
+            className={getNotificationButtonClass('primary')}
+          >
+            View review
+          </button>
+        ) : undefined
+      }
     />
   );
 };
