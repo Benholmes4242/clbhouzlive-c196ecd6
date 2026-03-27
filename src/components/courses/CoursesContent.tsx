@@ -304,7 +304,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
               style={{
                 width: '100%',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '11px 16px', marginTop: 8, marginBottom: 4,
+                padding: '11px 16px', marginTop: 12, marginBottom: 12,
                 background: 'linear-gradient(135deg, #F59E0B, #F97316)',
                 border: 'none', cursor: 'pointer', borderRadius: 12,
               }}
