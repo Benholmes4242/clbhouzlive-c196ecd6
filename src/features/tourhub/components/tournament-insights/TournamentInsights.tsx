@@ -323,7 +323,7 @@ function PickRecordBadge() {
   const top5 = pickHistory.filter(e => e.actualPosition !== null && e.actualPosition <= 5).length;
 
   return (
-    <div style={{ display: 'flex', gap: 5, flexShrink: 0, marginTop: 4 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
       {wins > 0 && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '3px 8px', borderRadius: 8, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.35)' }}>
           <span style={{ fontSize: 10 }}>🏆</span>
