@@ -357,13 +357,15 @@ interface HeroSlideProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
   onInteraction: () => void;
+  onScorecardOpen?: () => void;
+  onScorecardClose?: () => void;
   onCardTouchStart: (e: React.TouchEvent) => void;
   onCardTouchMove: (e: React.TouchEvent) => void;
   onCardTouchEnd: (e: React.TouchEvent) => void;
 }
 
 
-function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction, onCardTouchStart, onCardTouchMove, onCardTouchEnd }: HeroSlideProps) {
+function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction, onScorecardOpen, onScorecardClose, onCardTouchStart, onCardTouchMove, onCardTouchEnd }: HeroSlideProps) {
   const { tournament, type } = slide;
   const navigate = useNavigate();
   
@@ -400,8 +402,14 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
 
   // Scorecard state — player tapped in expanded leaderboard
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerInfo | null>(null);
-  const handleScorecardTap = useCallback((player: PlayerInfo) => setSelectedPlayer(player), []);
-  const handleBackToLeaderboard = useCallback(() => setSelectedPlayer(null), []);
+  const handleScorecardTap = useCallback((player: PlayerInfo) => {
+    setSelectedPlayer(player);
+    onScorecardOpen?.();
+  }, [onScorecardOpen]);
+  const handleBackToLeaderboard = useCallback(() => {
+    setSelectedPlayer(null);
+    onScorecardClose?.();
+  }, [onScorecardClose]);
 
   // Fetch top 5 leaders for live tournaments only
   const { data: leaders = [], isLoading: leadersLoading } = useTournamentTopLeaders(
@@ -1087,12 +1095,13 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   const touchStartRef = React.useRef<{ x: number; y: number; time: number } | null>(null);
   const touchMoveRef = React.useRef<number>(0);
   const resumeTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isScorecardOpenRef = React.useRef(false);
 
   const scheduleResume = useCallback(() => {
     if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
     resumeTimerRef.current = setTimeout(() => {
       setIsPaused(false);
-    }, 3500);
+    }, 6000);
   }, []);
 
   // Clean up resume timer on unmount
@@ -1107,6 +1116,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     if (safeSlides.length <= 1 || isPaused || isExpanded) return;
     
     const interval = setInterval(() => {
+      if (isScorecardOpenRef.current) return;
       setCurrentIndex(prev => (prev + 1) % safeSlides.length);
     }, 8000);
 
@@ -1244,6 +1254,15 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
             onToggleExpand={handleToggleExpand}
             onInteraction={() => {
               setIsPaused(true);
+              scheduleResume();
+            }}
+            onScorecardOpen={() => {
+              isScorecardOpenRef.current = true;
+              setIsPaused(true);
+              if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+            }}
+            onScorecardClose={() => {
+              isScorecardOpenRef.current = false;
               scheduleResume();
             }}
             onCardTouchStart={handleTouchStart}
