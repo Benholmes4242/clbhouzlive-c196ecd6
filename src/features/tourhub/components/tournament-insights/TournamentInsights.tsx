@@ -618,22 +618,18 @@ export const TournamentInsights = memo(function TournamentInsights() {
         {/* Top row: identity + social proof */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            {/* AI eyebrow pill */}
+            {/* AI eyebrow pill — stamp style */}
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 5,
-              padding: '3px 9px', borderRadius: 20, marginBottom: 6,
-              background: 'linear-gradient(135deg, rgba(245,158,11,0.12), rgba(234,179,8,0.08))',
-              border: '1px solid rgba(245,158,11,0.25)',
+              padding: '5px 10px', borderRadius: 8, marginBottom: 6,
+              background: '#F59E0B',
+              transform: 'rotate(-2deg)',
             }}>
-              <div style={{
-                width: 5, height: 5, borderRadius: '50%',
-                background: '#f59e0b',
-                animation: 'ti-pulse 2s ease-in-out infinite',
-                flexShrink: 0,
-              }} />
+              <span style={{ fontSize: 12 }}>⚡</span>
               <span style={{
-                fontSize: 10, fontWeight: 700, letterSpacing: '0.8px',
-                textTransform: 'uppercase' as const, color: '#b45309',
+                fontSize: 11, fontWeight: 800,
+                color: '#451A03',
+                letterSpacing: '0.02em',
               }}>AI Predictions</span>
             </div>
             <h2 className="text-foreground" style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.3px' }}>
