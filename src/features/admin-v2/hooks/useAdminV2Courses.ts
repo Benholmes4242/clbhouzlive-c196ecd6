@@ -331,20 +331,34 @@ export function useAdminV2Courses() {
     onError: () => toast.error('Failed to upload photo'),
   });
 
-  // ── Delete mutation ──
+  // ── Delete mutation (via edge function with safety checks) ──
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('golf_courses')
-        .delete()
-        .eq('id', id);
+      const { data, error } = await supabase.functions.invoke('delete-golf-course', {
+        body: { courseId: id },
+      });
       if (error) throw error;
+      if (data?.error) {
+        const err = new Error(data.reason ?? data.error) as any;
+        err.counts = data.counts;
+        throw err;
+      }
+      return data;
     },
     onSuccess: () => {
       toast.success('Course deleted');
       qc.invalidateQueries({ queryKey: ['admin-v2', 'courses'] });
     },
-    onError: () => toast.error('Failed to delete course'),
+    onError: (err: any) => {
+      if (err.counts) {
+        toast.error('Cannot delete this course', {
+          description: err.message,
+          duration: 8000,
+        });
+      } else {
+        toast.error('Failed to delete course');
+      }
+    },
   });
 
   // ── Handlers ──
