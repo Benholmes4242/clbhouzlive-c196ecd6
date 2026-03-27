@@ -294,9 +294,9 @@ export const MiniPlayer: React.FC = () => {
 
   const handleMuteToggle = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isGloballyMuted) markUserGestureUnmute();
-    toggleGlobalMute();
-  }, [toggleGlobalMute, isGloballyMuted, markUserGestureUnmute]);
+    if (isMuted) markUserGestureUnmute();
+    toggleMute();
+  }, [toggleMute, isMuted, markUserGestureUnmute]);
 
   // Handle video ended - advance to next in queue
   const handleEnded = useCallback(() => {
