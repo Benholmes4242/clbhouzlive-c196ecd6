@@ -665,19 +665,19 @@ export default function CoursesPage() {
               courseId={c.id} rankKey="global_rank"
               currentRank={c.global_rank} label="Global"
               color="#D97706" bg="#FEF3C7"
-              onSave={(v) => updateCourse(c.id, { global_rank: v })}
+              onSave={(v) => syncRank(c.id, 'global_rank', v, 'global')}
             />
             <RankEditCell
               courseId={c.id} rankKey="usa_rank"
               currentRank={c.usa_rank} label="USA"
               color="#DC2626" bg="#FEE2E2"
-              onSave={(v) => updateCourse(c.id, { usa_rank: v })}
+              onSave={(v) => syncRank(c.id, 'usa_rank', v, 'usa')}
             />
             <RankEditCell
               courseId={c.id} rankKey="regional_rank"
               currentRank={c.regional_rank} label={isGBI ? 'GB&I' : 'Europe'}
               color="#2563EB" bg="#DBEAFE"
-              onSave={(v) => updateCourse(c.id, { regional_rank: v })}
+              onSave={(v) => syncRank(c.id, 'regional_rank', v, isGBI ? 'gb-i' : 'europe')}
             />
           </div>
         );
