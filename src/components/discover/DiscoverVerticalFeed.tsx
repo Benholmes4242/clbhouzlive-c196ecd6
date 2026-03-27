@@ -209,7 +209,9 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
 
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
-  const { isGloballyMuted, setGlobalMute, markUserGestureUnmute } = useGlobalAudio();
+  const isMuted = useClubhouseStore(s => s.isMuted);
+  const setIsMuted = useClubhouseStore(s => s.setIsMuted);
+  const markUserGestureUnmute = useClubhouseStore(s => s.markUserGestureUnmute);
   const { deletePost } = usePostDeletion();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
