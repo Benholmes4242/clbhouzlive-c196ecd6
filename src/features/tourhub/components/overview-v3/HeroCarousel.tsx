@@ -1116,6 +1116,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
     if (safeSlides.length <= 1 || isPaused || isExpanded) return;
     
     const interval = setInterval(() => {
+      if (isScorecardOpenRef.current) return;
       setCurrentIndex(prev => (prev + 1) % safeSlides.length);
     }, 8000);
 
