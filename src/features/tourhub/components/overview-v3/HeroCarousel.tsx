@@ -39,6 +39,8 @@ import { format, differenceInDays, isToday, isTomorrow } from 'date-fns';
 import { getScoreColor, getFinishedScoreColor, formatPurse, PlayerAvatar, PodiumRunnerRow, buildPodiumRows, WinnerStatsPanel, getCurrentRoundLabel as getCurrentRoundLabelShared, UpcomingCountdown } from '../shared/TourHeroHelpers';
 import { useWinnerScorecardStats } from '../../hooks/useWinnerScorecardStats';
 import { useWinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
+import { useLeaderScorecardStats, type LeaderStats } from '../../hooks/useLeaderScorecardStats';
+import { useWinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import '@/styles/hero-glass.css';
 
 function getTourDisplayName(tourSlug: string): string {
