@@ -1256,6 +1256,15 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
               setIsPaused(true);
               scheduleResume();
             }}
+            onScorecardOpen={() => {
+              isScorecardOpenRef.current = true;
+              setIsPaused(true);
+              if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+            }}
+            onScorecardClose={() => {
+              isScorecardOpenRef.current = false;
+              scheduleResume();
+            }}
             onCardTouchStart={handleTouchStart}
             onCardTouchMove={handleTouchMove}
             onCardTouchEnd={handleTouchEnd}
