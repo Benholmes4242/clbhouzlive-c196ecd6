@@ -323,7 +323,7 @@ function PickRecordBadge() {
   const top5 = pickHistory.filter(e => e.actualPosition !== null && e.actualPosition <= 5).length;
 
   return (
-    <div style={{ display: 'flex', gap: 5, flexShrink: 0, marginTop: 4 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
       {wins > 0 && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '3px 8px', borderRadius: 8, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.35)' }}>
           <span style={{ fontSize: 10 }}>🏆</span>
@@ -619,9 +619,22 @@ export const TournamentInsights = memo(function TournamentInsights() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             {/* AI eyebrow pill */}
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', borderRadius: 8, background: 'hsl(var(--muted) / 0.5)', marginBottom: 6 }}>
-              <div style={{ width: 6, height: 6, borderRadius: 3, background: 'hsl(var(--foreground) / 0.35)' }} />
-              <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase' as const, color: 'hsl(var(--muted-foreground))' }}>AI Predictions</span>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 5,
+              padding: '3px 9px', borderRadius: 20, marginBottom: 6,
+              background: 'linear-gradient(135deg, rgba(245,158,11,0.12), rgba(234,179,8,0.08))',
+              border: '1px solid rgba(245,158,11,0.25)',
+            }}>
+              <div style={{
+                width: 5, height: 5, borderRadius: '50%',
+                background: '#f59e0b',
+                animation: 'ti-pulse 2s ease-in-out infinite',
+                flexShrink: 0,
+              }} />
+              <span style={{
+                fontSize: 10, fontWeight: 700, letterSpacing: '0.8px',
+                textTransform: 'uppercase' as const, color: '#b45309',
+              }}>AI Predictions</span>
             </div>
             <h2 className="text-foreground" style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.3px' }}>
               Tournament Intelligence
@@ -702,12 +715,10 @@ export const TournamentInsights = memo(function TournamentInsights() {
           className="mt-0 pt-6"
         >
           {activeMainTab === 'live' && !isWaitingForPlay && data.winners.length > 0 && (
-            <LikelyWinnersCarousel
+            <NextUpPickCard
               featured={data.winners[0]}
               cards={data.contenderCards}
               withdrawnPlayerIds={withdrawnPlayerIds}
-              courseName={data.tournament.courseName}
-              tournamentName={data.tournament.name}
             />
           )}
           {activeMainTab === 'nextup' && nextTournamentInsights?.winners && nextTournamentInsights.winners.length > 0 && (
