@@ -327,7 +327,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
             <CourseExplorer />
           </TabsContent>
 
-          <TabsContent value="top100" className="mt-2">
+          <TabsContent value="top100" className="mt-3">
             <Top100CoursesHubPanel />
           </TabsContent>
 
