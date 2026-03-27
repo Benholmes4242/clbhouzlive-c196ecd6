@@ -402,8 +402,14 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
 
   // Scorecard state — player tapped in expanded leaderboard
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerInfo | null>(null);
-  const handleScorecardTap = useCallback((player: PlayerInfo) => setSelectedPlayer(player), []);
-  const handleBackToLeaderboard = useCallback(() => setSelectedPlayer(null), []);
+  const handleScorecardTap = useCallback((player: PlayerInfo) => {
+    setSelectedPlayer(player);
+    onScorecardOpen?.();
+  }, [onScorecardOpen]);
+  const handleBackToLeaderboard = useCallback(() => {
+    setSelectedPlayer(null);
+    onScorecardClose?.();
+  }, [onScorecardClose]);
 
   // Fetch top 5 leaders for live tournaments only
   const { data: leaders = [], isLoading: leadersLoading } = useTournamentTopLeaders(
