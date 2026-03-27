@@ -289,38 +289,7 @@ export function useHeroCarouselData() {
       const cappedCompleted = completedSlides.slice(0, 4);
       const cappedUpcoming = upcomingSlides.slice(0, 3);
 
-      // ── DEV PREVIEW: Hardcoded upcoming slide for UI review — REMOVE BEFORE RELEASE ──
-      const devUpcomingSlide: HeroSlide = {
-        type: 'upcoming',
-        tournament: {
-          id: 'dev-valero-2025',
-          name: 'Valero Texas Open',
-          status: 'scheduled',
-          startDate: '2025-03-27',
-          endDate: '2025-03-30',
-          venueName: 'TPC San Antonio',
-          venueCity: 'San Antonio',
-          venueCountry: 'USA',
-          venuePar: 72,
-          venueYardage: 7494,
-          purse: 9200000,
-          currency: 'USD',
-          tourSlug: 'pga',
-          tourName: 'PGA Tour',
-          defendingChampion: 'Akshay Bhatia',
-          defendingChampionPhotoUrl: null,
-          defendingChampionPgaTourId: null,
-          isMajor: false,
-          isSignature: false,
-          winnerId: null,
-          winnerName: null,
-          winnerPhotoUrl: null,
-          winnerPgaTourId: null,
-          winnerScore: null,
-        },
-      };
-
-      return [devUpcomingSlide, ...cappedLive, ...cappedCompleted, ...cappedUpcoming];
+      return [...cappedLive, ...cappedCompleted, ...cappedUpcoming];
     },
     enabled: !!cache,
     staleTime: 30_000,
