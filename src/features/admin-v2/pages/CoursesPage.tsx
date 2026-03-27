@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import {
@@ -267,6 +267,7 @@ function CourseDrawer({
   course,
   onClose,
   onUpdate,
+  onSyncRank,
   onUploadPhoto,
   isUploadingPhoto,
   onDelete,
@@ -275,6 +276,7 @@ function CourseDrawer({
   course: AdminCourseRow | null;
   onClose: () => void;
   onUpdate: (id: string, updates: any) => void;
+  onSyncRank: (courseId: string, rankKey: 'global_rank' | 'usa_rank' | 'regional_rank', newRank: number | null, listSlug: string) => void;
   onUploadPhoto: (courseId: string, file: File) => void;
   isUploadingPhoto: boolean;
   onDelete: (id: string) => void;
@@ -365,10 +367,10 @@ function CourseDrawer({
           <div className="space-y-3">
             <AdminSectionHeader title="Top 100 Lists" />
             {([
-              { label: 'Global Top 100',   rankKey: 'global_rank' as const,   color: 'hsl(var(--accent-amber))' },
-              { label: 'Regional Top 100', rankKey: 'regional_rank' as const, color: '#3b82f6' },
-              { label: 'USA Top 100',      rankKey: 'usa_rank' as const,      color: '#dc2626' },
-            ]).map(({ label, rankKey, color }) => (
+              { label: 'Global Top 100',   rankKey: 'global_rank' as const,   color: 'hsl(var(--accent-amber))', slug: 'global' },
+              { label: 'Regional Top 100', rankKey: 'regional_rank' as const, color: '#3b82f6', slug: course.country && ['England','Scotland','Wales','Ireland','Northern Ireland'].includes(course.country) ? 'gb-i' : 'europe' },
+              { label: 'USA Top 100',      rankKey: 'usa_rank' as const,      color: '#dc2626', slug: 'usa' },
+            ]).map(({ label, rankKey, color, slug }) => (
               <div key={rankKey} className="flex items-center gap-3 p-3 rounded-xl border border-border/60 bg-muted/30">
                 <div className="flex-1">
                   <p className="text-[13px] font-medium text-foreground">{label}</p>
@@ -384,12 +386,12 @@ function CourseDrawer({
                       value={course[rankKey]}
                       type="number"
                       placeholder="Rank"
-                      onSave={(v) => onUpdate(course.id, { [rankKey]: v ? Number(v) : null })}
+                      onSave={(v) => onSyncRank(course.id, rankKey, v ? Number(v) : null, slug)}
                     />
                     <AdminButton
                       variant="ghost"
                       size="sm"
-                      onClick={() => onUpdate(course.id, { [rankKey]: null })}
+                      onClick={() => onSyncRank(course.id, rankKey, null, slug)}
                     >
                       Remove
                     </AdminButton>
@@ -398,7 +400,7 @@ function CourseDrawer({
                   <AdminButton
                     variant="outline"
                     size="sm"
-                    onClick={() => onUpdate(course.id, { [rankKey]: 999 })}
+                    onClick={() => onSyncRank(course.id, rankKey, 999, slug)}
                   >
                     Add to list
                   </AdminButton>
@@ -531,7 +533,67 @@ export default function CoursesPage() {
     isDeleting,
   } = useAdminV2Courses();
 
+  const queryClient = useQueryClient();
   const [countryFilter, setCountryFilter] = useState('all');
+
+  // Fetch top100 list IDs for membership sync
+  const { data: top100Lists } = useQuery({
+    queryKey: ['top100-lists-meta'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('top100_lists')
+        .select('id, slug');
+      return data ?? [];
+    },
+    staleTime: 60 * 60 * 1000,
+  });
+
+  const listIdMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    (top100Lists ?? []).forEach((l: any) => { map[l.slug] = l.id; });
+    return map;
+  }, [top100Lists]);
+
+  const syncRank = useCallback(async (
+    courseId: string,
+    rankKey: 'global_rank' | 'usa_rank' | 'regional_rank',
+    newRank: number | null,
+    listSlug: string,
+  ) => {
+    const listId = listIdMap[listSlug];
+
+    // 1. Update the golf_courses column
+    updateCourse(courseId, { [rankKey]: newRank });
+
+    if (!listId) return;
+
+    if (newRank === null) {
+      await supabase
+        .from('course_top100_memberships')
+        .delete()
+        .eq('course_id', courseId)
+        .eq('list_id', listId);
+    } else {
+      // Clear any other course holding this rank on this list
+      await supabase
+        .from('course_top100_memberships')
+        .delete()
+        .eq('list_id', listId)
+        .eq('rank', newRank)
+        .neq('course_id', courseId);
+
+      // Upsert this course's membership
+      await supabase
+        .from('course_top100_memberships')
+        .upsert(
+          { course_id: courseId, list_id: listId, rank: newRank },
+          { onConflict: 'course_id,list_id' }
+        );
+    }
+
+    queryClient.invalidateQueries({ queryKey: ['top100-list-courses'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-v2', 'courses'] });
+  }, [listIdMap, updateCourse, queryClient]);
 
   // Derive unique countries from data
   const countries = useMemo(() => {
@@ -605,19 +667,19 @@ export default function CoursesPage() {
               courseId={c.id} rankKey="global_rank"
               currentRank={c.global_rank} label="Global"
               color="#D97706" bg="#FEF3C7"
-              onSave={(v) => updateCourse(c.id, { global_rank: v })}
+              onSave={(v) => syncRank(c.id, 'global_rank', v, 'global')}
             />
             <RankEditCell
               courseId={c.id} rankKey="usa_rank"
               currentRank={c.usa_rank} label="USA"
               color="#DC2626" bg="#FEE2E2"
-              onSave={(v) => updateCourse(c.id, { usa_rank: v })}
+              onSave={(v) => syncRank(c.id, 'usa_rank', v, 'usa')}
             />
             <RankEditCell
               courseId={c.id} rankKey="regional_rank"
               currentRank={c.regional_rank} label={isGBI ? 'GB&I' : 'Europe'}
               color="#2563EB" bg="#DBEAFE"
-              onSave={(v) => updateCourse(c.id, { regional_rank: v })}
+              onSave={(v) => syncRank(c.id, 'regional_rank', v, isGBI ? 'gb-i' : 'europe')}
             />
           </div>
         );
@@ -656,7 +718,7 @@ export default function CoursesPage() {
         />
       ),
     }),
-  ], [setDrawerCourseId, updateCourse]);
+  ], [setDrawerCourseId, syncRank]);
 
   const filterOptions = [
     { id: 'all',      label: 'All',       count: counts.all },
@@ -800,6 +862,7 @@ export default function CoursesPage() {
         course={drawerCourse}
         onClose={() => setDrawerCourseId(null)}
         onUpdate={updateCourse}
+        onSyncRank={syncRank}
         onUploadPhoto={uploadPhoto}
         isUploadingPhoto={isUploadingPhoto}
         onDelete={deleteCourse}
