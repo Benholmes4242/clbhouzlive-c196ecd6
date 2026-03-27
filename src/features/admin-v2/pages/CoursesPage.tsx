@@ -664,11 +664,33 @@ export default function CoursesPage() {
   ], [setDrawerCourseId, updateCourse]);
 
   const filterOptions = [
-    { id: 'all',      label: 'All',             count: counts.all },
-    { id: 'global',   label: 'Global Top 100',  count: counts.global,   variant: 'warning' as const },
-    { id: 'usa',      label: 'USA Top 100',     count: counts.usa },
-    { id: 'europe',   label: 'Europe Top 100',  count: counts.europe },
-    { id: 'unranked', label: 'Unranked',         count: counts.unranked },
+    { id: 'all',      label: 'All',       count: counts.all },
+    {
+      id: 'global',
+      label: 'Global',
+      count: counts.global,
+      variant: 'warning' as const,
+      icon: <span>🌍</span>,
+    },
+    {
+      id: 'usa',
+      label: 'USA',
+      count: counts.usa,
+      icon: <span>🇺🇸</span>,
+    },
+    {
+      id: 'gbi',
+      label: 'GB&I',
+      count: counts.gbi,
+      icon: <span>🇬🇧</span>,
+    },
+    {
+      id: 'europe',
+      label: 'Europe',
+      count: counts.europe,
+      icon: <span>🇪🇺</span>,
+    },
+    { id: 'unranked', label: 'Unranked', count: counts.unranked },
   ];
 
   return (
