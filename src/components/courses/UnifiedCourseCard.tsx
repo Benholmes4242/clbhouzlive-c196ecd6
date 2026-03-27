@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Calendar } from 'lucide-react';
+import { Check, Calendar, Star } from 'lucide-react';
 import { CourseCardModel } from '@/types/courseCard';
 import { Top100RankBadge } from '@/components/top100/Top100RankBadge';
 import { CourseCommunityRating } from './CourseCommunityRating';
@@ -30,6 +30,7 @@ interface UnifiedCourseCardProps {
   showRankBadges?: boolean;
   showRating?: boolean;
   showPlayedStatus?: boolean;
+  showRateChip?: boolean;
   showFriendsContext?: boolean;
   showLastPlayed?: boolean;
   hideLocation?: boolean;
@@ -71,6 +72,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
   showRankBadges = true,
   showRating = true,
   showPlayedStatus = false,
+  showRateChip = false,
   showFriendsContext = false,
   showLastPlayed = false,
   hideLocation = false,
@@ -193,8 +195,22 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
           </div>
         )}
 
-        {/* Played chip — top-right */}
-        {showPlayedStatus && isPlayed !== undefined && (
+        {/* Played / Rate chip — top-right */}
+        {showRateChip ? (
+          <button
+            onClick={(e) => { e.stopPropagation(); navigate(`/courses/${course.id}/rate`); }}
+            style={{
+              position: 'absolute', top: 10, right: 10,
+              display: 'flex', alignItems: 'center', gap: 4,
+              background: '#F59E0B',
+              borderRadius: 7, padding: '4px 9px', border: 'none', cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(245,158,11,0.40)',
+            }}
+          >
+            <Star size={10} fill="white" color="white" />
+            <span style={{ fontSize: 10, fontWeight: 700, color: 'white' }}>Rate</span>
+          </button>
+        ) : showPlayedStatus && isPlayed !== undefined ? (
           <div
             className={`absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-sq-pill text-[9px] font-medium shadow-sm ${
               isPlayed
@@ -211,7 +227,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
               <span>Unplayed</span>
             )}
           </div>
-        )}
+        ) : null}
 
         {/* Context tag — top-right when no played status */}
         {contextTag && !showPlayedStatus && (
