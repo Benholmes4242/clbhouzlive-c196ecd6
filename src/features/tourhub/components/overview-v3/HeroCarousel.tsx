@@ -171,10 +171,10 @@ function LeaderHeroStrip({
     : `${thruRaw}`;
 
   const statsToShow = leaderStats ? [
-    leaderStats.eagles > 0 && { v: leaderStats.eagles, label: 'Eagles', color: '#F59E0B' },
-    { v: leaderStats.birdies, label: 'Birdies', color: '#4ade80' },
-    { v: leaderStats.pars, label: 'Pars', color: 'rgba(255,255,255,0.65)' },
-    { v: leaderStats.bogeys, label: 'Bogeys', color: '#F97316' },
+    { v: leaderStats.eagles,       label: 'Eagles',  color: '#F59E0B' },
+    { v: leaderStats.birdies,      label: 'Birdies', color: '#4ade80' },
+    { v: leaderStats.pars,         label: 'Pars',    color: 'rgba(255,255,255,0.65)' },
+    { v: leaderStats.bogeys,       label: 'Bogeys',  color: '#F97316' },
     leaderStats.doubleBogeys > 0 && { v: leaderStats.doubleBogeys, label: 'Doubles', color: '#f87171' },
   ].filter(Boolean) as Array<{ v: number; label: string; color: string }> : [];
 
@@ -599,7 +599,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               bottom: isExpanded ? 16 : 20,
               left: isExpanded ? 12 : 16,
               ...(isExpanded
-                ? { right: 12, top: 'max(env(safe-area-inset-top, 20px) + 120px, 160px)' }
+                ? { right: 12, top: 'calc(env(safe-area-inset-top, 20px) + 120px)' }
                 : { maxWidth: 'min(350px, calc(100% - 32px))' }
               ),
               minWidth: isExpanded ? undefined : '280px',
