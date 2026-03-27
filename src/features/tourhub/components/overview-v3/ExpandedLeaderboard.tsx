@@ -131,6 +131,7 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
   onPlayerTap?: (player: PlayerInfo) => void;
 }) {
   const player = entry.player;
+  const [imgError, setImgError] = useState(false);
   if (!player) return null;
 
   const firstName = player.first_name || '';
@@ -139,7 +140,8 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
     ? `${firstName[0]}. ${lastName}`
     : lastName || 'Unknown';
   const fullName = player.full_name || `${firstName} ${lastName}`.trim();
-  const photoUrl = getPlayerHeadshotUrl(fullName, tourCode);
+  const effectiveTourCode = player.tour_codes?.[0] ?? tourCode;
+  const photoUrl = getPlayerHeadshotUrl(fullName, effectiveTourCode, player.headshot_override);
   const initials = `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase();
   const posDisplay = entry.position_tied ? `T${entry.position}` : `${entry.position ?? '-'}`;
   const thruDisplay = formatThru(entry);
