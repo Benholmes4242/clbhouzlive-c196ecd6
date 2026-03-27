@@ -5,7 +5,7 @@ import { useLiveArena } from '@/features/tourhub/hooks/useLiveArena';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { useSingleCourseImage } from '@/features/tourhub/hooks/useCourseImageResolver';
 import type { VenueInput } from '@/features/tourhub/hooks/useCourseImageResolver';
-import type { PGACardFeedPost, PGACardData, PGACardLeader, PGACardChaser, PGACardStats } from '../types/media';
+import type { PGACardFeedPost, PGACardData, PGACardLeader, PGACardChaser, PGACardStats, PGACardBestToday } from '../types/media';
 import { getTournamentDisplayState } from '@/utils/tournamentState';
 
 const SYSTEM_USER_ID = 'b8437384-291a-4d85-b81f-24c1068235dd';
@@ -389,6 +389,24 @@ export function usePGACard(userId?: string): {
       } : null;
 
       const round = topLive.currentRound ?? 1;
+
+      // Best today — top 2 players by current round score
+      const roundKey = `round_${round}` as 'round_1' | 'round_2' | 'round_3' | 'round_4';
+      const allPlayersForToday = [topLive.leader, ...topLive.chasePack]
+        .filter((p): p is NonNullable<typeof p> => !!p && p[roundKey] != null)
+        .sort((a, b) => (a[roundKey] as number) - (b[roundKey] as number))
+        .slice(0, 2);
+
+      const bestToday: PGACardBestToday[] = allPlayersForToday.map(p => {
+        const score = p[roundKey] as number;
+        return {
+          playerName: p.player.fullName,
+          photoUrl: getPlayerHeadshotUrl(p.player.fullName, p.player.tourCode ?? PGA_TOUR_SLUG, p.player.headshotOverride) ?? null,
+          todayScore: score,
+          todayDisplay: score === 0 ? 'E' : score > 0 ? `+${score}` : `${score}`,
+        };
+      });
+
       return {
         tournamentId: topLive.id,
         tournamentName: topLive.name,
@@ -413,6 +431,7 @@ export function usePGACard(userId?: string): {
         defendingChampion: null,
         defendingChampionPhotoUrl: null,
         pastWinners: null,
+        bestToday: bestToday.length > 0 ? bestToday : null,
       };
     }
 

@@ -311,20 +311,75 @@ export const PGACard: React.FC<PGACardProps> = ({
   if (showSkeleton) {
     return (
       <div className="h-full w-full flex flex-col" style={{ background: '#080a0e' }}>
+        {/* Amber accent line */}
         <div style={{ height: 2.5, background: 'linear-gradient(90deg, rgba(245,158,11,0.8), transparent)', flexShrink: 0 }} />
-        <div className="flex-1 flex flex-col gap-4 p-5 pt-14">
-          <div className="rounded-lg animate-pulse" style={{ height: 24, width: '70%', background: 'rgba(255,255,255,0.08)' }} />
-          <div className="rounded-2xl animate-pulse" style={{ height: 180, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }} />
-          <div className="rounded-xl animate-pulse" style={{ height: 62, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }} />
-          <div className="flex flex-col gap-3 flex-1">
-            {[0, 1, 2].map(i => (
-              <div key={i} className="rounded-xl animate-pulse flex-1" style={{ minHeight: 44, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }} />
+
+        {/* Hero zone skeleton — 58% */}
+        <div style={{ flex: '0 0 58%', position: 'relative', overflow: 'hidden', background: 'linear-gradient(160deg, #0a1628, #060c16)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: 'clamp(12px,3vw,16px) clamp(14px,3.5vw,18px)' }}>
+          {/* Tournament name skeleton */}
+          <div style={{ height: 'clamp(20px,5vw,26px)', width: '75%', borderRadius: 6, background: 'rgba(255,255,255,0.08)', marginBottom: 'clamp(8px,2vw,10px)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
+
+          {/* Leader glass panel skeleton */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: 'clamp(9px,2.5vw,11px) clamp(10px,2.5vw,13px)', marginBottom: 'clamp(6px,1.5vw,8px)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 'clamp(40px,11vw,50px)', height: 'clamp(42px,11.5vw,53px)', borderRadius: '34%', background: 'rgba(255,255,255,0.08)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
+              <div>
+                <div style={{ height: 14, width: 'clamp(90px,25vw,120px)', borderRadius: 5, background: 'rgba(255,255,255,0.08)', marginBottom: 7, animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
+                <div style={{ height: 9, width: 60, borderRadius: 4, background: 'rgba(255,255,255,0.05)' }} />
+              </div>
+            </div>
+            <div style={{ height: 'clamp(26px,7vw,34px)', width: 44, borderRadius: 6, background: 'rgba(255,255,255,0.08)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
+          </div>
+
+          {/* Stat strip skeleton — 5 chips */}
+          <div style={{ display: 'flex', gap: 'clamp(3px,1vw,5px)' }}>
+            {[1,2,3,4,5].map(i => (
+              <div key={i} style={{ flex: 1, height: 'clamp(38px,10vw,46px)', borderRadius: 8, background: 'rgba(255,255,255,0.04)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%)' }} />
             ))}
           </div>
         </div>
-        <div className="flex gap-3 px-5 pt-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)', borderTop: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
-          <div className="rounded-2xl animate-pulse" style={{ width: 64, height: 44, background: 'rgba(255,255,255,0.06)' }} />
-          <div className="rounded-2xl animate-pulse flex-1" style={{ height: 44, background: 'rgba(245,158,11,0.15)' }} />
+
+        {/* Leaderboard zone skeleton */}
+        <div style={{ flex: '1 1 auto', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'rgba(0,0,0,0.95)', padding: 'clamp(8px,2vw,12px) clamp(14px,3.5vw,18px)' }}>
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'rgba(249,115,22,0.3)' }} />
+              <div style={{ height: 8, width: 80, borderRadius: 4, background: 'rgba(249,115,22,0.15)' }} />
+            </div>
+            <div style={{ height: 8, width: 90, borderRadius: 4, background: 'rgba(255,255,255,0.06)' }} />
+          </div>
+
+          {/* Insight line */}
+          <div style={{ height: 9, width: '55%', borderRadius: 4, background: 'rgba(255,255,255,0.04)', marginBottom: 8 }} />
+
+          {/* Separator */}
+          <div style={{ height: 1, background: 'rgba(255,255,255,0.05)', marginBottom: 8 }} />
+
+          {/* 3 chaser row skeletons */}
+          {[1,2,3].map(i => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 'clamp(5px,1.5vw,8px) 8px', marginBottom: 4 }}>
+              <div style={{ width: 22, height: 10, borderRadius: 4, background: 'rgba(255,255,255,0.06)', flexShrink: 0 }} />
+              <div style={{ width: 36, height: 36, borderRadius: '34%', background: 'rgba(255,255,255,0.07)', flexShrink: 0 }} />
+              <div style={{ flex: 1, height: 11, borderRadius: 5, background: 'rgba(255,255,255,0.06)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%)' }} />
+              <div style={{ width: 30, height: 11, borderRadius: 5, background: 'rgba(255,255,255,0.08)', flexShrink: 0 }} />
+            </div>
+          ))}
+
+          {/* Best today strip skeleton */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4, padding: 'clamp(6px,1.8vw,8px) clamp(10px,2.5vw,12px)', borderRadius: 9, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+            <div style={{ height: 8, width: 60, borderRadius: 4, background: 'rgba(255,255,255,0.05)' }} />
+            <div style={{ display: 'flex', gap: 12 }}>
+              <div style={{ height: 10, width: 70, borderRadius: 4, background: 'rgba(255,255,255,0.06)' }} />
+              <div style={{ height: 10, width: 70, borderRadius: 4, background: 'rgba(255,255,255,0.06)' }} />
+            </div>
+          </div>
+        </div>
+
+        {/* CTA bar skeleton */}
+        <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 10, padding: '10px clamp(14px,3.5vw,18px)', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ width: 64, height: 44, borderRadius: 14, background: 'rgba(255,255,255,0.06)' }} />
+          <div style={{ flex: 1, height: 44, borderRadius: 12, background: 'rgba(245,158,11,0.15)' }} />
         </div>
       </div>
     );
@@ -1061,373 +1116,258 @@ export const PGACard: React.FC<PGACardProps> = ({
   return (
     <div className="h-full w-full flex flex-col overflow-hidden" style={{ background: '#080a0e', color: '#fff' }}>
 
-      {/* ── ZONE 1: CINEMATIC HERO — 55% ── */}
+      {/* ── ZONE 1: CINEMATIC HERO — 58% ── */}
       <div style={{
         position: 'relative',
-        flex: '0 0 62%',
+        flex: '0 0 58%',
         overflow: 'hidden',
         minHeight: 0,
       }}>
         {/* Background: course image or gradient fallback */}
         {cd.courseImageUrl ? (
-          <img
-            src={cd.courseImageUrl}
-            alt=""
-            style={{
-              position: 'absolute', inset: 0,
-              width: '100%', height: '100%',
-              objectFit: 'cover', opacity: 1,
-              animation: 'courseScan 10s ease-in-out infinite alternate',
-            }}
-          />
+          <img src={cd.courseImageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 1, animation: 'courseScan 10s ease-in-out infinite alternate' }} />
         ) : (
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(160deg, #0a1628, #0d2340, #060c16)',
-          }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(160deg, #0a1628, #0d2340, #060c16)' }} />
         )}
 
         {/* Amber radial overlay */}
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'radial-gradient(ellipse at 60% 20%, rgba(232,152,10,0.18) 0%, transparent 65%)',
-          pointerEvents: 'none',
-        }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 60% 20%, rgba(232,152,10,0.18) 0%, transparent 65%)', pointerEvents: 'none' }} />
 
         {/* Bottom gradient */}
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0,
-          height: '70%',
-          background: 'linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.6) 50%, transparent 100%)',
-          pointerEvents: 'none',
-        }} />
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '70%', background: 'linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.6) 50%, transparent 100%)', pointerEvents: 'none' }} />
 
         {/* Top gradient */}
-        <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0,
-          height: '30%',
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, transparent 100%)',
-          pointerEvents: 'none',
-        }} />
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '30%', background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, transparent 100%)', pointerEvents: 'none' }} />
 
-        {/* Top-left badge — Live pill */}
-        <div style={{
-          position: 'absolute',
-          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
-          left: 12,
-          display: 'flex', alignItems: 'center', gap: 6,
-        }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 5,
-            background: 'rgba(34,197,94,0.12)',
-            border: '1px solid rgba(34,197,94,0.3)',
-            borderRadius: 6, padding: '3px 8px',
-          }}>
-            <div style={{
-              width: 6, height: 6, borderRadius: '50%',
-              background: '#22C55E',
-              animation: 'dotPulse 1.5s ease-in-out infinite',
-            }} />
-            <span style={{
-              fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 700,
-              letterSpacing: '0.12em', textTransform: 'uppercase',
-              color: '#22C55E',
-            }}>Live</span>
+        {/* Live badge — top left */}
+        <div style={{ position: 'absolute', top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)', left: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 6, padding: '3px 8px' }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22C55E', animation: 'dotPulse 1.5s ease-in-out infinite' }} />
+            <span style={{ fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#22C55E' }}>Live</span>
           </div>
-          <span style={{
-            fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 600,
-            color: 'rgba(255,255,255,0.5)',
-          }}>
+          <span style={{ fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>
             PGA TOUR{cd.roundLabel ? ` · ${cd.roundLabel}` : ''}
           </span>
         </div>
 
         {/* Bottom content */}
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0,
-          padding: 'clamp(12px, 3vw, 18px) clamp(14px, 3.5vw, 20px)',
-          animation: 'trc-fadeUp 0.7s ease-out both',
-          animationDelay: '0.3s',
-        }}>
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 'clamp(12px, 3vw, 16px) clamp(14px, 3.5vw, 18px)', animation: 'trc-fadeUp 0.7s ease-out both', animationDelay: '0.3s' }}>
+
           {/* Tournament name */}
-          <div style={{
-            fontSize: 'clamp(22px, 6vw, 30px)', fontWeight: 800,
-            color: '#fff', lineHeight: 1.05, letterSpacing: -0.5,
-            marginBottom: 10,
-            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          }}>
+          <div style={{ fontSize: 'clamp(18px, 5vw, 24px)', fontWeight: 800, color: '#fff', lineHeight: 1.05, letterSpacing: -0.5, marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {cd.tournamentName}
           </div>
 
-          {/* Leader row */}
           {cd.leader ? (
             <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 'clamp(8px, 2vw, 12px)' }}>
-                {/* 46px squircle avatar with amber border */}
-                <div style={{
-                  width: 'clamp(46px, 12vw, 58px)', height: 'clamp(46px, 12vw, 58px)', borderRadius: SQUIRCLE_RADIUS, flexShrink: 0,
-                  overflow: 'hidden',
-                  border: '2px solid rgba(232,152,10,0.55)',
-                  background: 'rgba(232,152,10,0.08)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  {cd.leader.photoUrl ? (
-                    <img src={cd.leader.photoUrl} alt={cd.leader.playerName}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }}
-                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                    />
-                  ) : (
-                    <span style={{ fontSize: 16, fontWeight: 700, color: ACCENT_LIGHT }}>{getInitials(cd.leader.playerName)}</span>
-                  )}
-                </div>
-
-                {/* Name + Thru/Today */}
-                <div style={{ flex: 1, minWidth: 0 }}>
+              {/* ── LEADER GLASS PANEL ── */}
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                background: 'rgba(255,255,255,0.07)',
+                border: '1px solid rgba(255,255,255,0.11)',
+                borderRadius: 'clamp(10px, 2.5vw, 14px)',
+                padding: 'clamp(9px, 2.5vw, 11px) clamp(10px, 2.5vw, 13px)',
+                marginBottom: 'clamp(6px, 1.5vw, 8px)',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 10px)' }}>
+                  {/* Avatar */}
                   <div style={{
-                    fontSize: 'clamp(18px, 5vw, 24px)', fontWeight: 800,
-                    color: '#fff', lineHeight: 1.1,
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    width: 'clamp(40px, 11vw, 50px)',
+                    height: 'clamp(42px, 11.5vw, 53px)',
+                    borderRadius: SQUIRCLE_RADIUS,
+                    border: '1.5px solid rgba(255,255,255,0.20)',
+                    background: 'rgba(255,255,255,0.07)',
+                    overflow: 'hidden', flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
-                    {cd.leader.playerName}
+                    {cd.leader.photoUrl ? (
+                      <img src={cd.leader.photoUrl} alt={cd.leader.playerName} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                    ) : (
+                      <span style={{ fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>{getInitials(cd.leader.playerName)}</span>
+                    )}
                   </div>
-                  <div style={{ display: 'flex', gap: 8, marginTop: 3 }}>
-                    {cd.leader.thru && (
-                      <span style={{ fontSize: 'clamp(12px, 3vw, 14px)', color: 'rgba(255,255,255,0.45)' }}>Thru {cd.leader.thru}</span>
-                    )}
-                    {cd.leader.today && (
-                      <span style={{
-                        fontSize: 'clamp(12px, 3vw, 14px)',
-                        color: cd.leader.today.startsWith('-') ? '#22C55E'
-                          : cd.leader.today === 'E' ? 'rgba(255,255,255,0.45)'
-                          : '#EF4444',
-                      }}>
-                        Today {cd.leader.today}
-                      </span>
-                    )}
+                  {/* Name + thru */}
+                  <div>
+                    <div style={{ fontSize: 'clamp(14px, 3.8vw, 16px)', fontWeight: 700, color: '#fff', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 'clamp(110px, 30vw, 150px)' }}>
+                      {cd.leader.playerName}
+                    </div>
+                    <div style={{ display: 'flex', gap: 6, marginTop: 2 }}>
+                      {cd.leader.thru && (
+                        <span style={{ fontSize: 'clamp(10px, 2.5vw, 12px)', color: 'rgba(255,255,255,0.4)' }}>Thru {cd.leader.thru}</span>
+                      )}
+                      {cd.leader.today && (
+                        <span style={{ fontSize: 'clamp(10px, 2.5vw, 12px)', color: cd.leader.today.startsWith('-') ? '#22C55E' : cd.leader.today === 'E' ? 'rgba(255,255,255,0.4)' : '#EF4444' }}>
+                          Today {cd.leader.today}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-
-                {/* Score — right-aligned */}
-                <div style={{
-                  fontSize: 'clamp(36px, 10vw, 48px)', fontWeight: 900,
-                  color: ACCENT_LIGHT, lineHeight: 1,
-                }}>
+                {/* Score — right side */}
+                <div style={{ fontSize: 'clamp(28px, 8vw, 36px)', fontWeight: 900, color: '#fff', lineHeight: 1, letterSpacing: -1, flexShrink: 0 }}>
                   {cd.leader.scoreDisplay || 'E'}
                 </div>
               </div>
 
-              {/* Scoring stats chips */}
+              {/* ── STAT CHIPS — scaled down ── */}
               {cd.leader.scoringStats && (
                 <div style={{ display: 'flex', gap: 'clamp(3px, 1vw, 5px)' }}>
                   {[
-                    { v: cd.leader.scoringStats.eagles, label: 'Eagles', color: '#F59E0B' },
-                    { v: cd.leader.scoringStats.birdies, label: 'Birdies', color: '#22C55E' },
-                    { v: cd.leader.scoringStats.pars, label: 'Pars', color: 'rgba(255,255,255,0.75)' },
-                    { v: cd.leader.scoringStats.bogeys, label: 'Bogeys', color: '#F97316' },
+                    { v: cd.leader.scoringStats.eagles,       label: 'Eagles',  color: '#F59E0B' },
+                    { v: cd.leader.scoringStats.birdies,      label: 'Birdies', color: '#22C55E' },
+                    { v: cd.leader.scoringStats.pars,         label: 'Pars',    color: 'rgba(255,255,255,0.75)' },
+                    { v: cd.leader.scoringStats.bogeys,       label: 'Bogeys',  color: '#F97316' },
                     { v: cd.leader.scoringStats.doubleBogeys, label: 'Doubles', color: '#EF4444' },
                   ].map(stat => (
-                    <div key={stat.label} style={{
-                      flex: 1, textAlign: 'center',
-                      padding: 'clamp(9px, 2.5vw, 12px) 2px clamp(7px, 2vw, 10px)',
-                      borderRadius: 8,
-                      background: 'rgba(0,0,0,0.45)',
-                      backdropFilter: 'blur(12px)',
-                      WebkitBackdropFilter: 'blur(12px)',
-                      border: '1px solid rgba(255,255,255,0.12)',
-                    }}>
-                      <div style={{ fontSize: 'clamp(20px, 5vw, 26px)', fontWeight: 800, color: stat.color, lineHeight: 1 }}>
-                        {stat.v}
-                      </div>
-                      <div style={{ fontSize: 'clamp(8px, 2vw, 10px)', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 3 }}>
-                        {stat.label}
-                      </div>
+                    <div key={stat.label} style={{ flex: 1, textAlign: 'center', padding: 'clamp(6px, 1.8vw, 9px) 2px clamp(5px, 1.5vw, 7px)', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                      <div style={{ fontSize: 'clamp(14px, 4vw, 17px)', fontWeight: 800, color: stat.color, lineHeight: 1 }}>{stat.v}</div>
+                      <div style={{ fontSize: 'clamp(7px, 1.8vw, 8px)', fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 3 }}>{stat.label}</div>
                     </div>
                   ))}
                 </div>
               )}
             </>
           ) : (
-            <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              gap: 8, marginBottom: 10,
-              padding: '12px 16px', borderRadius: 12,
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
-            }}>
-              <div style={{
-                width: 6, height: 6, borderRadius: '50%',
-                background: '#22c55e',
-                animation: 'dotPulse 1.4s ease-in-out infinite',
-              }} />
-              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', fontStyle: 'italic' }}>
-                Scores updating shortly...
-              </span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 16px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', animation: 'dotPulse 1.4s ease-in-out infinite' }} />
+              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', fontStyle: 'italic' }}>Scores updating shortly...</span>
             </div>
           )}
         </div>
       </div>
 
       {/* ── ZONE 2: LEADERBOARD ── */}
-      <div style={{
-        flex: '1 1 auto',
-        display: 'flex', flexDirection: 'column',
-        overflow: 'hidden',
-        background: 'rgba(0,0,0,0.95)',
-        minHeight: 0,
-      }}>
-        {/* Header */}
-        <div style={{
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          padding: 'clamp(8px, 2vw, 10px) clamp(14px, 3.5vw, 20px) 4px',
-        }}>
-          <span style={{
-            fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 700,
-            letterSpacing: '1.2px', color: 'rgba(255,255,255,0.35)',
-            textTransform: 'uppercase',
-          }}>
-            In Contention
-          </span>
+      <div style={{ flex: '1 1 auto', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'rgba(0,0,0,0.95)', minHeight: 0 }}>
+
+        {/* Header — orange dot + In Contention label + Full Leaderboard link */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'clamp(7px, 2vw, 10px) clamp(14px, 3.5vw, 18px) 3px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {/* Orange pulse dot */}
+            <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#f97316', animation: 'dotPulse 2s ease-in-out infinite' }} />
+            <span style={{ fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 700, letterSpacing: '1.2px', color: '#f97316', textTransform: 'uppercase' }}>
+              In Contention
+            </span>
+          </div>
           <button
             onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/tournament/${cd.tournamentId}`); }}
-            className="flex items-center gap-1 text-amber-500 text-xs font-semibold active:opacity-70 transition-opacity"
+            style={{ fontSize: 'clamp(10px, 2.5vw, 12px)', fontWeight: 600, color: 'rgba(255,255,255,0.4)', display: 'flex', alignItems: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer' }}
           >
-            Full Leaderboard
-            <ChevronRight className="h-3.5 w-3.5" />
+            Full Leaderboard <ChevronRight style={{ width: 12, height: 12 }} />
           </button>
         </div>
 
-        {/* Insight — or defending champion context if no play yet */}
-        {cd.insight ? (
-          <p style={{
-            fontSize: 11, fontStyle: 'italic',
-            color: 'rgba(255,255,255,0.3)',
-            margin: '0 0 4px',
-            padding: '0 clamp(14px, 3.5vw, 20px)',
-          }}>
+        {/* Insight line */}
+        {cd.insight && (
+          <p style={{ fontSize: 'clamp(10px, 2.5vw, 11px)', fontStyle: 'italic', color: 'rgba(255,255,255,0.3)', margin: '0 0 3px', padding: '0 clamp(14px, 3.5vw, 18px)' }}>
             {cd.insight}
           </p>
-        ) : cd.defendingChampion ? (
-          <div style={{ padding: '0 clamp(14px, 3.5vw, 20px) 6px', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>Defending:</span>
-            <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.55)' }}>{cd.defendingChampion}</span>
-          </div>
-        ) : null}
+        )}
 
-        {/* Chaser rows — fills remaining space evenly */}
-        <div style={{
-          flex: '1 1 auto',
-          overflow: 'hidden',
-          padding: 'clamp(4px, 1vw, 8px) clamp(14px, 3.5vw, 20px) clamp(4px, 1vw, 8px)',
-          display: 'flex', flexDirection: 'column', gap: 'clamp(4px, 1.5vw, 8px)', justifyContent: 'space-evenly',
-        }}>
+        {/* Thin separator */}
+        <div style={{ height: 1, background: 'rgba(255,255,255,0.05)', margin: '2px clamp(14px, 3.5vw, 18px)' }} />
+
+        {/* Chaser rows — with movement badges */}
+        <div style={{ flex: '1 1 auto', overflow: 'hidden', padding: 'clamp(3px, 1vw, 6px) clamp(14px, 3.5vw, 18px) clamp(3px, 1vw, 6px)', display: 'flex', flexDirection: 'column', gap: 'clamp(3px, 1vw, 6px)', justifyContent: 'space-evenly' }}>
           {chaserGroups && chaserGroups.length > 0 ? (
             <>
-            {chaserGroups.slice(0, 3).map((group, gi) => {
-              const isTied = group.isTied && group.chasers.length > 1;
-              const primary = group.chasers[0];
-              const stackedAvatars = group.chasers.slice(0, 3);
+              {chaserGroups.slice(0, 3).map((group, gi) => {
+                const isTied = group.isTied && group.chasers.length > 1;
+                const primary = group.chasers[0];
+                const stackedAvatars = group.chasers.slice(0, 3);
 
-              return (
-                <div key={`${group.position}-${gi}`} style={{
-                  display: 'flex', alignItems: 'center', gap: 'clamp(10px, 2.5vw, 14px)',
-                  padding: 'clamp(8px, 2.5vw, 14px) 10px',
-                  borderRadius: 10,
-                  animation: 'trc-slideIn 0.5s ease-out both',
-                  animationDelay: `${0.3 + gi * 0.07}s`,
-                }}>
-                  <span style={{
-                    width: 'clamp(22px, 5vw, 28px)', textAlign: 'center',
-                    fontSize: 'clamp(12px, 3vw, 15px)', fontWeight: 600,
-                    color: 'rgba(255,255,255,0.4)',
-                  }}>
-                    {group.isTied ? `T${group.position}` : group.position}
-                  </span>
+                return (
+                  <div key={`${group.position}-${gi}`} style={{ display: 'flex', alignItems: 'center', gap: 'clamp(8px, 2vw, 12px)', padding: 'clamp(6px, 2vw, 10px) 8px', borderRadius: 9, animation: 'trc-slideIn 0.5s ease-out both', animationDelay: `${0.3 + gi * 0.07}s` }}>
+                    <span style={{ width: 'clamp(20px, 4.5vw, 26px)', textAlign: 'center', fontSize: 'clamp(11px, 2.8vw, 13px)', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}>
+                      {group.isTied ? `T${group.position}` : group.position}
+                    </span>
 
-                  {isTied ? (
-                    <div style={{ display: 'flex' }}>
-                      {stackedAvatars.map((p, i) => (
-                        <div key={i} style={{
-                          marginLeft: i === 0 ? 0 : -12,
-                          zIndex: stackedAvatars.length - i,
-                          border: '1.5px solid rgba(8,10,14,0.8)',
-                          borderRadius: SQUIRCLE_RADIUS, overflow: 'hidden',
-                        }}>
-                          <RowAvatar src={p.photoUrl} name={p.playerName} size={38} />
-                        </div>
-                      ))}
-                      {group.chasers.length > 3 && (
-                        <div style={{
-                          marginLeft: -8, zIndex: 0, width: 34, height: 34,
-                          borderRadius: SQUIRCLE_RADIUS, background: 'rgba(255,255,255,0.08)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)',
-                          border: '1.5px solid rgba(8,10,14,0.8)',
-                        }}>
-                          +{group.chasers.length - 3}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <RowAvatar src={primary.photoUrl} name={primary.playerName} size={42} />
-                  )}
-
-                  <span style={{
-                    flex: 1,
-                    fontSize: 'clamp(14px, 3.5vw, 17px)', fontWeight: 500,
-                    color: 'rgba(255,255,255,0.75)',
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                  }}>
                     {isTied ? (
-                      <>
-                        {group.chasers.length}-Way Tie
-                        <span style={{ display: 'block', fontSize: 'clamp(10px, 2.5vw, 13px)', color: 'rgba(255,255,255,0.35)', marginTop: 1 }}>
-                          {group.chasers.map(c => getLastName(c.playerName)).join(' · ')}
-                        </span>
-                      </>
-                    ) : primary.playerName}
-                  </span>
+                      <div style={{ display: 'flex' }}>
+                        {stackedAvatars.map((p, i) => (
+                          <div key={i} style={{ marginLeft: i === 0 ? 0 : -10, zIndex: stackedAvatars.length - i, border: '1.5px solid rgba(8,10,14,0.8)', borderRadius: SQUIRCLE_RADIUS, overflow: 'hidden' }}>
+                            <RowAvatar src={p.photoUrl} name={p.playerName} size={32} />
+                          </div>
+                        ))}
+                        {group.chasers.length > 3 && (
+                          <div style={{ marginLeft: -8, zIndex: 0, width: 32, height: 32, borderRadius: SQUIRCLE_RADIUS, background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.5)', border: '1.5px solid rgba(8,10,14,0.8)' }}>
+                            +{group.chasers.length - 3}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <RowAvatar src={primary.photoUrl} name={primary.playerName} size={36} />
+                    )}
 
-                  <span style={{
-                    fontSize: 'clamp(14px, 3.5vw, 17px)', fontWeight: 700,
-                    color: 'rgba(255,255,255,0.55)',
-                  }}>
-                    {primary.scoreDisplay || 'E'}
+                    <span style={{ flex: 1, fontSize: 'clamp(13px, 3.2vw, 15px)', fontWeight: 500, color: 'rgba(255,255,255,0.80)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {isTied ? (
+                        <>
+                          {group.chasers.length}-Way Tie
+                          <span style={{ display: 'block', fontSize: 'clamp(9px, 2.2vw, 11px)', color: 'rgba(255,255,255,0.35)', marginTop: 1 }}>
+                            {group.chasers.map(c => getLastName(c.playerName)).join(' · ')}
+                          </span>
+                        </>
+                      ) : (
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                          {primary.playerName}
+                          {/* Movement badge — rendered when positionDelta available */}
+                          {(primary as any).positionDelta > 0 && (
+                            <span style={{ fontSize: 'clamp(8px, 2vw, 9px)', fontWeight: 700, color: '#4ade80', background: 'rgba(74,222,128,0.12)', borderRadius: 4, padding: '1px 4px' }}>
+                              ▲{(primary as any).positionDelta}
+                            </span>
+                          )}
+                          {(primary as any).positionDelta < 0 && (
+                            <span style={{ fontSize: 'clamp(8px, 2vw, 9px)', fontWeight: 700, color: '#f87171', background: 'rgba(248,113,113,0.12)', borderRadius: 4, padding: '1px 4px' }}>
+                              ▼{Math.abs((primary as any).positionDelta)}
+                            </span>
+                          )}
+                        </span>
+                      )}
+                    </span>
+
+                    <span style={{ fontSize: 'clamp(13px, 3.2vw, 15px)', fontWeight: 700, color: 'rgba(255,255,255,0.55)' }}>
+                      {primary.scoreDisplay || 'E'}
+                    </span>
+                  </div>
+                );
+              })}
+
+              {/* Best today strip */}
+              {cd.bestToday && cd.bestToday.length > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '2px 0 0', padding: 'clamp(6px, 1.8vw, 8px) clamp(10px, 2.5vw, 12px)', borderRadius: 9, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <span style={{ fontSize: 'clamp(8px, 2vw, 9px)', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)', flexShrink: 0 }}>
+                    Best today
                   </span>
+                  <div style={{ display: 'flex', gap: 'clamp(8px, 2.5vw, 12px)', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                    {cd.bestToday.map((p, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                        <RowAvatar src={p.photoUrl} name={p.playerName} size={22} />
+                        <span style={{ fontSize: 'clamp(11px, 2.8vw, 12px)', fontWeight: 600, color: 'rgba(255,255,255,0.65)' }}>
+                          {p.playerName.split(' ').pop()}
+                        </span>
+                        <span style={{ fontSize: 'clamp(11px, 2.8vw, 12px)', fontWeight: 700, color: '#4ade80' }}>
+                          {p.todayDisplay}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              );
-            })}
-            {chaserGroups.length > 3 && (
-              <div style={{ padding: '4px 10px', fontSize: 11,
-                color: 'rgba(255,255,255,0.25)', fontStyle: 'italic' }}>
-                +{chaserGroups.length - 3} more positions in contention
-              </div>
-            )}
+              )}
             </>
           ) : (
-            <div style={{
-              flex: 1, display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center', gap: 10,
-            }}>
+            /* Empty state */
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
               <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 28 }}>
                 {[0.5, 0.8, 0.6, 1, 0.7, 0.9, 0.55].map((h, i) => (
-                  <div key={i} style={{
-                    width: 4, borderRadius: 2,
-                    height: `${h * 100}%`,
-                    background: 'rgba(255,255,255,0.12)',
-                    animation: `dotPulse ${0.8 + i * 0.15}s ease-in-out infinite`,
-                    animationDelay: `${i * 0.1}s`,
-                  }} />
+                  <div key={i} style={{ width: 4, borderRadius: 2, height: `${h * 100}%`, background: 'rgba(255,255,255,0.12)', animation: `dotPulse ${0.8 + i * 0.15}s ease-in-out infinite`, animationDelay: `${i * 0.1}s` }} />
                 ))}
               </div>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', fontStyle: 'italic', margin: 0 }}>
-                Leaderboard updates as play begins
-              </p>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', fontStyle: 'italic', margin: 0 }}>Leaderboard updates as play begins</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* ── ZONE 3: CTA BAR ── */}
+      {/* ── ZONE 3: CTA BAR — unchanged ── */}
       <div
         className="flex-shrink-0 flex items-center gap-3 px-5 pt-3"
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}

@@ -20,6 +20,10 @@ export interface LiveArenaPlayer {
   thru: string | null;
   thruUpdatedAt: string | null;
   money: number | null;
+  round_1: number | null;
+  round_2: number | null;
+  round_3: number | null;
+  round_4: number | null;
   player: {
     id: string;
     firstName: string;
@@ -171,6 +175,10 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
       money,
       thru,
       thru_updated_at,
+      round_1,
+      round_2,
+      round_3,
+      round_4,
       player:sr_players!sr_leaderboards_player_id_fkey (
         id,
         first_name,
@@ -213,6 +221,10 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
       thru: entry.thru,
       thruUpdatedAt: entry.thru_updated_at ?? null,
       money: entry.money,
+      round_1: entry.round_1 ?? null,
+      round_2: entry.round_2 ?? null,
+      round_3: entry.round_3 ?? null,
+      round_4: entry.round_4 ?? null,
       player: {
         id: entry.player?.id || '',
         firstName: entry.player?.first_name || '',
