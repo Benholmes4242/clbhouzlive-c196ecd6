@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapFeed } from '@/components/feed/SnapFeed';
+import { pauseAllAudio } from '@/utils/globalVideoMute';
 import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
