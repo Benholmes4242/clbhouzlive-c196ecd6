@@ -33,8 +33,8 @@ const FeedMuteToggle: React.FC<FeedMuteToggleProps> = ({
   }
 
   const handleToggle = () => {
-    if (isGloballyMuted) markUserGestureUnmute();
-    toggleGlobalMute();
+    if (isMuted) markUserGestureUnmute();
+    toggleMute();
   };
 
   // When post has music, show music-specific labeling
