@@ -115,7 +115,7 @@ function transformPredictions(aiData: AIPredictionData): TournamentInsightsData 
       expandedText: (courseAnalysis as any)?.skillsAnalysis || generateSkillsAnalysis(courseAnalysis?.keyStats),
     },
 
-    winners: topContenders.slice(0, 5).map((p, i) => ({
+    winners: topContenders.slice(0, 3).map((p, i) => ({
       id: p.playerId,
       name: p.playerName,
       countryCode: p.country,
