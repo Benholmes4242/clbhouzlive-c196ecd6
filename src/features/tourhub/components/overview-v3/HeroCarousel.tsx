@@ -736,14 +736,22 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           ) : fullLeaderboard.length === 0 ? (
                             <ExpandedLeaderboardEmpty />
                           ) : (
-                            <ExpandedLeaderboardList
-                              entries={fullLeaderboard}
-                              tourCode={tournament.tourSlug}
-                              onTouchStart={handleExpandedTouch}
-                              onTouchMove={handleExpandedTouch}
-                              onTouchEnd={handleExpandedTouch}
-                              onPlayerTap={handleScorecardTap}
-                            />
+                            <>
+                              {/* Leader hero strip — sticky above scrollable list */}
+                              {(() => {
+                                const leaderEntry = (fullLeaderboard as any[]).find(e => e.position === 1);
+                                if (!leaderEntry) return null;
+                                return <LeaderHeroStrip leaderEntry={leaderEntry} tourSlug={tournament.tourSlug} leaderStats={leaderStats} />;
+                              })()}
+                              <ExpandedLeaderboardList
+                                entries={fullLeaderboard}
+                                tourCode={tournament.tourSlug}
+                                onTouchStart={handleExpandedTouch}
+                                onTouchMove={handleExpandedTouch}
+                                onTouchEnd={handleExpandedTouch}
+                                onPlayerTap={handleScorecardTap}
+                              />
+                            </>
                           )}
                         </motion.div>
                       )}
