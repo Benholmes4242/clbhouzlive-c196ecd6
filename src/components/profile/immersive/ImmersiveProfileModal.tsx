@@ -469,11 +469,11 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
 
       {/* Mute Button - Top Right */}
       <button
-        onClick={toggleGlobalMute}
+        onClick={toggleMute}
         className="absolute top-8 right-4 z-20 w-8 h-8 rounded-full transition-all duration-300 hover:scale-105 flex items-center justify-center p-1"
         style={liquidGlassStyle}
       >
-        {isGloballyMuted ? (
+        {isMuted ? (
           <VolumeX className="w-4 h-4 text-white" />
         ) : (
           <Volume2 className="w-4 h-4 text-white" />
