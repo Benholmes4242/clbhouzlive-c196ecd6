@@ -164,7 +164,12 @@ export function useHeroCarouselData() {
 
       // Helper to transform tournament data
       const transformTournament = (row: CachedTournament, includeWinner: boolean = false): HeroTournament => {
-        const tourSlug = mapTourSlug(row.season?.tour_name || '');
+        const rawTourSlug = mapTourSlug(row.season?.tour_name || '');
+        // Major override — Sportradar stores Grand Slams under EURO season
+        const MAJOR_NAMES = ['masters tournament', 'pga championship', 'u.s. open', 'the open championship'];
+        const nameLower = row.name.toLowerCase();
+        const isMiscodedMajor = rawTourSlug !== 'pga' && MAJOR_NAMES.some(m => nameLower.includes(m)) && !nameLower.includes('senior') && !nameLower.includes('women');
+        const tourSlug = isMiscodedMajor ? 'pga' : rawTourSlug;
         const tourConfig = TOUR_CONFIG[tourSlug];
         const contextLabel = getContextLabel({ name: row.name, tourName: row.season?.tour_name });
 
