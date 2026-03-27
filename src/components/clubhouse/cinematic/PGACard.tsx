@@ -3,7 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { Heart, MessageCircle, Trophy, Calendar, ChevronRight, MapPin, Shield } from 'lucide-react';
 import type { PGACardFeedPost, PGACardChaser } from '@/components/media-system/types/media';
 
-interface PGACardProps {
+function getBestRoundLabel(leaderThru?: string | null): string | null {
+  const roundFinished = leaderThru != null && String(leaderThru).toUpperCase() === 'F';
+  if (!roundFinished) return null;
+  const now = new Date();
+  const midnight = new Date(now);
+  midnight.setHours(23, 59, 59, 999);
+  return now <= midnight ? 'BEST TODAY' : null;
+}
+
   post: PGACardFeedPost;
   onComment: () => void;
   onLike: () => void;
