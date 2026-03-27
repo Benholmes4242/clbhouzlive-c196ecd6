@@ -305,7 +305,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
                 width: '100%',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 padding: '11px 16px', marginTop: 12, marginBottom: 12,
-                background: 'linear-gradient(135deg, #C9A94A, #C1A84C)',
+                background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
                 border: 'none', cursor: 'pointer', borderRadius: 12,
               }}
               className="active:opacity-90 transition-opacity"
