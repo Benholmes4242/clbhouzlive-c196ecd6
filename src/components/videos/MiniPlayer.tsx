@@ -403,7 +403,7 @@ export const MiniPlayer: React.FC = () => {
                     src={videoData.hlsUrl}
                     posterUrl={videoData.posterUrl}
                     autoplay
-                    muted={isGloballyMuted}
+                    muted={isMuted}
                     loop={false}
                     className="w-full h-full"
                     objectFit="cover"
