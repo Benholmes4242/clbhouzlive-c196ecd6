@@ -2,7 +2,7 @@
  * PlayerScorecardCard — Scorecard content rendered inside the expanded glass card.
  * No own background — the parent HeroSlide glass card provides blur/overlay.
  */
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronLeft, X, Trophy } from 'lucide-react';
