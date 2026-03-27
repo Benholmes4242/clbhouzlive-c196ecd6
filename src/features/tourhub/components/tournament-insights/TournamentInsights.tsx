@@ -14,7 +14,6 @@ import { CourseDNACard } from './CourseDNACard';
 import { ClubhouseIntelligence } from './ClubhouseIntelligence';
 import { LikelyWinnersCarousel } from './LikelyWinnersCarousel';
 import { PredictionLeaderboard } from './PredictionLeaderboard';
-import { LiveUpcomingToggle } from './LiveUpcomingToggle';
 import { BestPickSpotlight } from './BestPickSpotlight';
 import { StaleBadge } from './StaleBadge';
 import IntelligenceTabSwitcher from './components/IntelligenceTabSwitcher';
