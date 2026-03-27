@@ -1095,6 +1095,7 @@ export function HeroCarousel({ hasHeader = false }: HeroCarouselProps) {
   const touchStartRef = React.useRef<{ x: number; y: number; time: number } | null>(null);
   const touchMoveRef = React.useRef<number>(0);
   const resumeTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isScorecardOpenRef = React.useRef(false);
 
   const scheduleResume = useCallback(() => {
     if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
