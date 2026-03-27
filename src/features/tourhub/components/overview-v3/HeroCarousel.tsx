@@ -508,6 +508,15 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     isCompleted ? podiumWinner?.playerId : undefined
   );
 
+  // Leader scorecard stats — for the sticky leader strip in expanded live state
+  const leaderId = isLive && fullLeaderboard.length > 0
+    ? (fullLeaderboard[0] as any)?.player_id ?? null
+    : null;
+  const { data: leaderStats } = useLeaderScorecardStats(
+    isLive ? tournament.id : null,
+    leaderId
+  );
+
   return (
     <motion.div
       className="absolute inset-0"
