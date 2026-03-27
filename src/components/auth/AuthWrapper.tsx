@@ -7,7 +7,7 @@ import { useOnboardingStatus } from '@/hooks/useOnboardingStatus';
 import { isMedianApp } from '@/utils/median/isMedianApp';
 import BetaGatePage from '@/pages/BetaGatePage';
 
-const PUBLIC_PATHS = ['/auth', '/auth/verified', '/verified', '/auth/callback', '/auth/check-email', '/auth/reset-password'];
+const PUBLIC_PATHS = ['/auth', '/auth/verified', '/verified', '/auth/callback', '/auth/check-email', '/auth/reset-password', '/post'];
 
 interface AuthWrapperProps {
   children: React.ReactNode;
