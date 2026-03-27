@@ -72,6 +72,7 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
   showRankBadges = true,
   showRating = true,
   showPlayedStatus = false,
+  showRateChip = false,
   showFriendsContext = false,
   showLastPlayed = false,
   hideLocation = false,
