@@ -267,6 +267,7 @@ function CourseDrawer({
   course,
   onClose,
   onUpdate,
+  onSyncRank,
   onUploadPhoto,
   isUploadingPhoto,
   onDelete,
@@ -275,6 +276,7 @@ function CourseDrawer({
   course: AdminCourseRow | null;
   onClose: () => void;
   onUpdate: (id: string, updates: any) => void;
+  onSyncRank: (courseId: string, rankKey: 'global_rank' | 'usa_rank' | 'regional_rank', newRank: number | null, listSlug: string) => void;
   onUploadPhoto: (courseId: string, file: File) => void;
   isUploadingPhoto: boolean;
   onDelete: (id: string) => void;
