@@ -38,7 +38,7 @@ export function SnapFeed({
   posts, activeTab, onNearEnd, onRefresh, isRefreshing, hasNextPage,
   followOverrides, onFollowChange, onFirstFrameReady,
   onLike, onComment, onShare, getLikeState, getCommentCount,
-  startIndex,
+  startIndex, onActiveIndexChange, activeIndexOverride,
 }: SnapFeedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<Map<number, HTMLDivElement>>(new Map());
