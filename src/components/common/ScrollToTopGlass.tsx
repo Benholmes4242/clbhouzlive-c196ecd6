@@ -1,21 +1,39 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronUp } from 'lucide-react';
-import { scrollToTop } from '@/utils/scrollToTop';
 
 const ScrollToTopGlass = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    const rootEl = document.getElementById('root');
+
     const onScroll = () => {
-      setVisible(window.scrollY > 400);
+      const windowScrolled = window.scrollY > 400;
+      const rootScrolled = rootEl ? rootEl.scrollTop > 400 : false;
+      setVisible(windowScrolled || rootScrolled);
     };
 
     onScroll();
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    rootEl?.addEventListener('scroll', onScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      rootEl?.removeEventListener('scroll', onScroll);
+    };
   }, []);
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const rootEl = document.getElementById('root');
+    if (rootEl && rootEl.scrollTop > 0) {
+      rootEl.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    }
+  };
 
   return createPortal(
     <div 
@@ -32,10 +50,7 @@ const ScrollToTopGlass = () => {
     >
       <button
         type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          scrollToTop();
-        }}
+        onClick={handleClick}
         aria-label="Back to top"
         className="
           pointer-events-auto
