@@ -20,6 +20,7 @@ interface FeedSlideProps {
   getLikeState?: (post: FeedPost) => { isLiked: boolean; count: number };
   getCommentCount?: (post: FeedPost) => number;
   onZoomChange?: (isZoomed: boolean) => void;
+  activeIndexOverride?: number;
 }
 
 export const FeedSlide = memo(function FeedSlide({
@@ -34,8 +35,10 @@ export const FeedSlide = memo(function FeedSlide({
   getLikeState,
   getCommentCount,
   onZoomChange,
+  activeIndexOverride,
 }: FeedSlideProps) {
-  const activeIndex = useClubhouseStore(s => s.activeIndex);
+  const storeActiveIndex = useClubhouseStore(s => s.activeIndex);
+  const activeIndex = activeIndexOverride ?? storeActiveIndex;
   const isActive = activeIndex === index;
   const isSuggestedFeed = activeTab === 'foryou';
   const media = post.mediaItems;
