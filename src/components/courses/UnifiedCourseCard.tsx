@@ -263,10 +263,12 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
             <div
               className="flex items-center gap-1.5 flex-shrink-0"
               style={{
-                background: 'rgba(245,158,11,0.18)',
-                border: '0.5px solid rgba(245,158,11,0.40)',
+                background: 'rgba(255,255,255,0.12)',
+                border: '0.5px solid rgba(255,255,255,0.20)',
                 borderRadius: 6,
                 padding: '3px 7px',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
               }}
             >
               <img
