@@ -10,7 +10,7 @@ import SoundtrackStrip from '@/components/studio/SoundtrackStrip';
 import TextOverlayRenderer from '@/components/studio/TextOverlayRenderer';
 import { toast } from 'sonner';
 
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 
 interface UserPostMediaProps {
   media: PostMedia[];
