@@ -45,7 +45,10 @@ const ResetPasswordPage: React.FC = () => {
       setSubmitting(false);
     } else {
       setSuccess(true);
-      setTimeout(() => navigate('/auth', { replace: true }), 1500);
+      setTimeout(async () => {
+        await supabase.auth.signOut();
+        navigate('/auth', { replace: true });
+      }, 1500);
     }
   };
 
