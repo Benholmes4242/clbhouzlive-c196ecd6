@@ -357,6 +357,8 @@ interface HeroSlideProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
   onInteraction: () => void;
+  onScorecardOpen?: () => void;
+  onScorecardClose?: () => void;
   onCardTouchStart: (e: React.TouchEvent) => void;
   onCardTouchMove: (e: React.TouchEvent) => void;
   onCardTouchEnd: (e: React.TouchEvent) => void;
