@@ -394,6 +394,21 @@ export function useReviewWizard({
         });
       }
 
+      // Notify friends about this review — fire and forget, never blocks UI
+      if (!isEditMode) {
+        supabase.functions.invoke('notify-friend-review', {
+          body: {
+            review_id: ratingId,
+            course_id: course?.id,
+            reviewer_id: currentUserId,
+            course_name: course?.name,
+            rating: state.rating,
+          },
+        }).catch(err => {
+          console.warn('[ReviewWizard] Failed to send friend review notifications:', err);
+        });
+      }
+
       // For edit mode, go directly to success
       // For new reviews, go to preview step first
       if (isEditMode) {
