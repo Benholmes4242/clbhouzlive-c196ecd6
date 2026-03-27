@@ -13,6 +13,7 @@ import { useUserJourneyCourses, JourneyCourse, JourneyTab } from '@/hooks/useUse
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 
 const tabTriggerClass = cn(
   "min-h-[36px] px-4 rounded-full text-sm font-semibold transition-all active:scale-[0.97] border-0 shadow-none",
