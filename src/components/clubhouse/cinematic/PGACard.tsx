@@ -39,6 +39,14 @@ const SQUIRCLE_RADIUS = '34%';
 const ACCENT = '#E8980A';
 const ACCENT_LIGHT = '#F59E0B';
 
+function getBestRoundLabel(chasers: PGACardChaser[], leaderThru?: string | null): string {
+  const thruValues = [leaderThru, ...chasers.slice(0, 4).map(c => c.thru)].filter(Boolean);
+  const roundFinished = thruValues.length > 0 &&
+    thruValues.every(t => String(t).toUpperCase() === 'F');
+  if (!roundFinished) return 'BEST TODAY';
+  return 'BEST YESTERDAY';
+}
+
 // ── Stat Tile (live state) ──
 const StatTile: React.FC<{ label: string; value: number; color: string }> = ({ label, value, color }) => (
   <div className="flex-1 text-center">
