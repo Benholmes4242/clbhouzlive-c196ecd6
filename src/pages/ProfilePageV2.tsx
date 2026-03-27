@@ -1190,6 +1190,7 @@ const ProfilePageV2Content: React.FC = () => {
           title={cropMode === 'hero' ? 'Crop Cover Photo' : 'Crop Profile Photo'}
         />
       )}
+      <ScrollToTopGlass />
     </PageRoot>
   );
 };
