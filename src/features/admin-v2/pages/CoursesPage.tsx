@@ -661,7 +661,7 @@ export default function CoursesPage() {
         />
       ),
     }),
-  ], [setDrawerCourseId]);
+  ], [setDrawerCourseId, updateCourse]);
 
   const filterOptions = [
     { id: 'all',      label: 'All',             count: counts.all },
