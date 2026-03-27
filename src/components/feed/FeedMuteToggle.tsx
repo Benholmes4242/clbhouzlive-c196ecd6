@@ -23,7 +23,9 @@ const FeedMuteToggle: React.FC<FeedMuteToggleProps> = ({
   isVideoPost = false,
   postHasMusic = false 
 }) => {
-  const { isGloballyMuted, toggleGlobalMute, markUserGestureUnmute } = useGlobalAudio();
+  const isMuted = useClubhouseStore(s => s.isMuted);
+  const toggleMute = useClubhouseStore(s => s.toggleMute);
+  const markUserGestureUnmute = useClubhouseStore(s => s.markUserGestureUnmute);
 
   // Only show for video posts
   if (!isVideoPost) {
