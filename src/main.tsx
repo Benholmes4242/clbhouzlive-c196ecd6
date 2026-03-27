@@ -27,6 +27,32 @@ import './utils/echoDocNavHeight'
 // Capacitor plugin verification removed - using Median.co bridge instead
 // Chunk recovery moved to index.html for earlier error handling
 
+// Deploy cache-buster: detect new builds and force fresh assets
+declare const __BUILD_TIMESTAMP__: string;
+const BUILD_VERSION = typeof __BUILD_TIMESTAMP__ !== 'undefined' ? __BUILD_TIMESTAMP__ : '0';
+
+try {
+  const prevVersion = localStorage.getItem('clbhouz_build_version');
+  if (prevVersion && prevVersion !== BUILD_VERSION) {
+    console.log('[CacheBust] New build detected, clearing caches...');
+    localStorage.setItem('clbhouz_build_version', BUILD_VERSION);
+    // Clear all caches and force reload
+    (async () => {
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r => r.unregister()));
+      }
+      if (window.caches) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
+      window.location.reload();
+    })();
+  } else {
+    localStorage.setItem('clbhouz_build_version', BUILD_VERSION);
+  }
+} catch {}
+
 const container = document.getElementById("root");
 if (!container) {
   throw new Error("Root element not found");
