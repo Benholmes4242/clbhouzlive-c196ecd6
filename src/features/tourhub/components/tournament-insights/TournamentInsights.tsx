@@ -318,6 +318,30 @@ function PickRecordRail() {
   );
 }
 
+function PickRecordBadge() {
+  const { data: pickHistory = [], isLoading } = usePickHistory();
+  if (isLoading || !pickHistory.length) return null;
+
+  const wins = pickHistory.filter(e => e.isWinner).length;
+  const top5 = pickHistory.filter(e => e.actualPosition !== null && e.actualPosition <= 5).length;
+
+  return (
+    <div style={{ display: 'flex', gap: 5, flexShrink: 0, marginTop: 4 }}>
+      {wins > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '3px 8px', borderRadius: 8, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.35)' }}>
+          <span style={{ fontSize: 10 }}>🏆</span>
+          <span style={{ fontSize: 11, fontWeight: 800, color: 'hsl(var(--accent-amber))' }}>{wins} win{wins !== 1 ? 's' : ''}</span>
+        </div>
+      )}
+      {top5 > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '3px 8px', borderRadius: 8, background: 'rgba(22,163,74,0.08)', border: '1px solid rgba(22,163,74,0.25)' }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#16A34A' }}>{top5} top‑5{top5 !== 1 ? 's' : ''}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export const TournamentInsights = memo(function TournamentInsights() {
   const {
     data,
