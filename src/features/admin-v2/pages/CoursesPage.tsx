@@ -588,16 +588,30 @@ export default function CoursesPage() {
     col.display({
       id: 'ranks',
       header: 'Rankings',
-      cell: ({ row }) => (
-        <div className="flex flex-wrap gap-1">
-          <RankPill label="G" rank={row.original.global_rank} color="hsl(var(--accent-amber))" />
-          <RankPill label="R" rank={row.original.regional_rank} color="#3b82f6" />
-          <RankPill label="US" rank={row.original.usa_rank} color="#dc2626" />
-          {!row.original.global_rank && !row.original.regional_rank && !row.original.usa_rank && (
-            <span className="text-[11px] text-muted-foreground/50">Unranked</span>
-          )}
-        </div>
-      ),
+      size: 180,
+      cell: ({ row }) => {
+        const c = row.original;
+        return (
+          <div className="flex flex-wrap gap-1.5">
+            {[
+              { key: 'global_rank' as const, label: 'G', color: '#D97706', bg: '#FEF3C7' },
+              { key: 'usa_rank' as const, label: 'US', color: '#DC2626', bg: '#FEE2E2' },
+              { key: 'regional_rank' as const, label: c.country && ['England','Scotland','Wales','Ireland','Northern Ireland'].includes(c.country) ? 'GB&I' : 'EUR', color: '#2563EB', bg: '#DBEAFE' },
+            ].map(({ key, label, color, bg }) => (
+              <RankEditCell
+                key={key}
+                courseId={c.id}
+                rankKey={key}
+                currentRank={c[key]}
+                label={label}
+                color={color}
+                bg={bg}
+                onSave={(newRank) => updateCourse(c.id, { [key]: newRank })}
+              />
+            ))}
+          </div>
+        );
+      },
     }),
     col.accessor('avg_rating', {
       header: 'Rating',
