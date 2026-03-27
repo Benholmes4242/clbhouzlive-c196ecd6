@@ -117,6 +117,7 @@ export function FullscreenFeedOverlay() {
               overlayVisible={true}
               isOwnPost={isOwnPost}
               golfCourse={golfCourse}
+              activeIndexOverride={activeIndex}
             />
           </motion.div>
         )}
