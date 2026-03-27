@@ -56,6 +56,7 @@ export function SnapFeed({
   const postsLengthRef = useRef(posts.length);
   const hasNextPageRef = useRef(hasNextPage);
   const onNearEndRef = useRef(onNearEnd);
+  const onActiveIndexChangeRef = useRef(onActiveIndexChange);
   const pendingIndexRef = useRef<number | null>(null);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -63,6 +64,7 @@ export function SnapFeed({
   useEffect(() => { postsLengthRef.current = posts.length; }, [posts.length]);
   useEffect(() => { hasNextPageRef.current = hasNextPage; }, [hasNextPage]);
   useEffect(() => { onNearEndRef.current = onNearEnd; }, [onNearEnd]);
+  useEffect(() => { onActiveIndexChangeRef.current = onActiveIndexChange; }, [onActiveIndexChange]);
 
   // Scroll to startIndex on first mount only
   useEffect(() => {
