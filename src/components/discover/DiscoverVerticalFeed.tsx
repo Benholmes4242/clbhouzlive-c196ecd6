@@ -21,7 +21,7 @@ import { uidFromNode } from '@/utils/cloudflareStreamTransform';
 import { getCloudflareStreamPoster } from '@/utils/cloudflareStreamAPI';
 import { useHlsUrlCache, warmHlsJs } from '@/hooks/useHlsUrlCache';
 import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloudflareStream';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
