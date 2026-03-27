@@ -9,7 +9,7 @@ import { uidFromNode, generateHlsUrl, generateThumbnailUrl } from "@/utils/cloud
 import UnifiedVideoPlayer, { UnifiedVideoPlayerRef } from '@/media/components/UnifiedVideoPlayer';
 import { trackVideoCloseMini } from "@/lib/analytics/videoAnalytics";
 import { MediaRuntime } from '@/media/runtime/MediaRuntime';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 
 type MiniVideo = {
   id: string;
