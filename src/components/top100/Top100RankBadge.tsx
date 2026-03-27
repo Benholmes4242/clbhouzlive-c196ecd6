@@ -35,7 +35,7 @@ export const Top100RankBadge: React.FC<Top100RankBadgeProps> = ({ listSlug, rank
         background: 'rgba(255,255,255,0.12)',
         border: '0.5px solid rgba(255,255,255,0.20)',
         borderRadius: 6,
-        padding: '3px 7px',
+        padding: '4px 8px',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
       }}
