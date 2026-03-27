@@ -122,6 +122,11 @@ export function useTournamentSchedule(options: UseTournamentScheduleOptions = {}
         const isPlayersChampionship = nameLower.includes('players');
         const isSignature = SIGNATURE_EVENTS.some(s => nameLower.includes(s)) && purseNum >= 20000000;
 
+        // Major override — Sportradar stores Grand Slams under EURO season
+        const rawTourName = seasonData?.tour_name ?? 'PGA Tour';
+        const isMiscodedMajor = isMajor && rawTourName.toLowerCase() !== 'pga' && !nameLower.includes('senior') && !nameLower.includes('women');
+        const effectiveTourName = isMiscodedMajor ? 'pga' : rawTourName;
+
         // Course details from raw_data
         const rawData = tournament.raw_data as Record<string, any> | null;
         const courseData = rawData?.venue?.courses?.[0] ?? {};
