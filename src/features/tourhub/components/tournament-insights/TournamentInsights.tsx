@@ -59,10 +59,7 @@ function PickRecordRail() {
     return (
       <div style={{ padding: '16px 0 8px' }}>
         <div style={{ padding: '0 16px 10px' }}>
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.8, textTransform: 'uppercase' as const, color: 'hsl(var(--muted-foreground))' }}>
-            Tournament Intelligence
-          </div>
-          <div style={{ fontSize: 17, fontWeight: 800, color: 'hsl(var(--foreground))' }}>Pick Record</div>
+         <div style={{ fontSize: 15, fontWeight: 800, color: 'hsl(var(--foreground))' }}>Our pick record</div>
         </div>
         <div style={{ display: 'flex', gap: 8, padding: '0 16px 16px', overflow: 'hidden' }}>
           {[1,2,3,4].map(i => (
