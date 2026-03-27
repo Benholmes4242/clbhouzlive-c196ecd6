@@ -24,7 +24,9 @@ const MOBILE_QUERY = '(pointer: coarse), (hover: none)';
 const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, className = '' }) => {
   const { highlights, isLoading, error } = useTop100Highlights(userId);
   const railRef = useRef<HTMLDivElement>(null);
-  const { isGloballyMuted, toggleGlobalMute, markUserGestureUnmute } = useGlobalAudio();
+  const isMuted = useClubhouseStore(s => s.isMuted);
+  const toggleMute = useClubhouseStore(s => s.toggleMute);
+  const markUserGestureUnmute = useClubhouseStore(s => s.markUserGestureUnmute);
   const [activeIndex, setActiveIndex] = useState(0);
   const { openViewer } = useMediaViewer();
 
