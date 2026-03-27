@@ -13,6 +13,7 @@ import { ChevronLeft, Search, Users, Check, X } from 'lucide-react';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
 import { VerifiedBadge } from '@/components/ui/VerifiedBadge';
 import { Input } from '@/components/ui/input';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { GenericPageSkeleton } from '@/components/skeletons/GenericPageSkeleton';
 import { useHideBottomNav } from '@/hooks/useBottomNavVisibility';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
