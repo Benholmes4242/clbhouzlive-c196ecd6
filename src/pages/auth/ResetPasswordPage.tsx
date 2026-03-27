@@ -19,6 +19,11 @@ const ResetPasswordPage: React.FC = () => {
   useHideBottomNav();
   useHideHeader();
 
+  useLayoutEffect(() => {
+    document.body.classList.add('route-auth');
+    return () => { document.body.classList.remove('route-auth'); };
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
