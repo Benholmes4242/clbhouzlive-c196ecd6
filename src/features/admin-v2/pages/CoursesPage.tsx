@@ -1,14 +1,16 @@
 import React, { useState, useMemo } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import {
   MapPin, Upload, Star, Globe,
   MoreHorizontal, ExternalLink, Copy, CheckCircle,
-  XCircle, RefreshCw, Image,
+  XCircle, RefreshCw, Image, Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 import { useAdminV2Courses, type AdminCourseRow } from '../hooks/useAdminV2Courses';
 import {
@@ -22,7 +24,7 @@ import { AdminMiniCard } from '../components/shared/AdminMiniCard';
 
 const col = createColumnHelper<AdminCourseRow>();
 
-// ─── Rank badge pill ──────────────────────────────────────────────────────────
+// ─── Rank badge pill (legacy — kept for reference) ────────────────────────────
 
 function RankPill({ label, rank, color }: { label: string; rank: number | null; color: string }) {
   if (!rank) return null;
@@ -33,6 +35,109 @@ function RankPill({ label, rank, color }: { label: string; rank: number | null; 
     >
       {label} #{rank}
     </span>
+  );
+}
+
+// ─── Inline editable rank cell ────────────────────────────────────────────────
+
+function RankEditCell({
+  courseId,
+  rankKey,
+  currentRank,
+  label,
+  color,
+  bg,
+  onSave,
+}: {
+  courseId: string;
+  rankKey: 'global_rank' | 'regional_rank' | 'usa_rank';
+  currentRank: number | null;
+  label: string;
+  color: string;
+  bg: string;
+  onSave: (rank: number | null) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState('');
+  const qc = useQueryClient();
+
+  const commit = async () => {
+    setEditing(false);
+    const num = draft.trim() ? Number(draft.trim()) : null;
+    if (num === currentRank) return;
+
+    if (num !== null && num >= 1 && num <= 100) {
+      await supabase
+        .from('golf_courses')
+        .update({ [rankKey]: null } as any)
+        .eq(rankKey, num)
+        .neq('id', courseId);
+    }
+
+    onSave(num && num >= 1 && num <= 100 ? num : null);
+    qc.invalidateQueries({ queryKey: ['admin-v2', 'courses'] });
+  };
+
+  if (!currentRank && !editing) {
+    return (
+      <button
+        onClick={() => { setDraft(''); setEditing(true); }}
+        style={{
+          fontSize: 10, color: '#CBD5E1', background: 'transparent',
+          border: '1px dashed #E2E8F0', borderRadius: 4,
+          padding: '1px 6px', cursor: 'pointer', fontWeight: 600,
+        }}
+      >
+        + {label}
+      </button>
+    );
+  }
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-1">
+        <span style={{ fontSize: 10, fontWeight: 600, color }}>{label}</span>
+        <input
+          autoFocus
+          value={draft}
+          onChange={e => setDraft(e.target.value)}
+          onBlur={commit}
+          onKeyDown={e => { if (e.key === 'Enter') commit(); if (e.key === 'Escape') setEditing(false); }}
+          style={{
+            width: 48, fontSize: 11, padding: '2px 4px',
+            border: `1px solid ${color}`, borderRadius: 4, outline: 'none',
+          }}
+          placeholder="1–100"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="inline-flex items-center gap-0.5">
+      <span style={{ fontSize: 10, fontWeight: 600, color }}>{label}</span>
+      <button
+        onClick={() => { setDraft(String(currentRank)); setEditing(true); }}
+        style={{
+          fontSize: 11, fontWeight: 700, color,
+          background: bg, border: 'none', borderRadius: 4,
+          padding: '1px 6px', cursor: 'pointer',
+        }}
+      >
+        #{currentRank}
+      </button>
+      <button
+        onClick={() => onSave(null)}
+        style={{
+          fontSize: 9, color: '#94A3B8', background: 'none',
+          border: 'none', cursor: 'pointer', padding: '0 2px',
+          lineHeight: 1,
+        }}
+        title="Remove rank"
+      >
+        ✕
+      </button>
+    </div>
   );
 }
 
@@ -177,12 +282,16 @@ function CourseDrawer({
   onUpdate,
   onUploadPhoto,
   isUploadingPhoto,
+  onDelete,
+  isDeleting,
 }: {
   course: AdminCourseRow | null;
   onClose: () => void;
   onUpdate: (id: string, updates: any) => void;
   onUploadPhoto: (courseId: string, file: File) => void;
   isUploadingPhoto: boolean;
+  onDelete: (id: string) => void;
+  isDeleting: boolean;
 }) {
   const navigate = useNavigate();
 
@@ -211,6 +320,20 @@ function CourseDrawer({
                 Website
               </AdminButton>
             )}
+            <div className="flex-1" />
+            <AdminButton
+              variant="danger"
+              icon={Trash2}
+              onClick={() => {
+                if (window.confirm(`Permanently delete "${course.name}"? This cannot be undone.`)) {
+                  onDelete(course.id);
+                  onClose();
+                }
+              }}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting…' : 'Delete'}
+            </AdminButton>
           </div>
         ) : undefined
       }
@@ -417,6 +540,8 @@ export default function CoursesPage() {
     updateCourse,
     uploadPhoto,
     isUploadingPhoto,
+    deleteCourse,
+    isDeleting,
   } = useAdminV2Courses();
 
   const [countryFilter, setCountryFilter] = useState('all');
@@ -483,16 +608,30 @@ export default function CoursesPage() {
     col.display({
       id: 'ranks',
       header: 'Rankings',
-      cell: ({ row }) => (
-        <div className="flex flex-wrap gap-1">
-          <RankPill label="G" rank={row.original.global_rank} color="hsl(var(--accent-amber))" />
-          <RankPill label="R" rank={row.original.regional_rank} color="#3b82f6" />
-          <RankPill label="US" rank={row.original.usa_rank} color="#dc2626" />
-          {!row.original.global_rank && !row.original.regional_rank && !row.original.usa_rank && (
-            <span className="text-[11px] text-muted-foreground/50">Unranked</span>
-          )}
-        </div>
-      ),
+      size: 180,
+      cell: ({ row }) => {
+        const c = row.original;
+        return (
+          <div className="flex flex-wrap gap-1.5">
+            {[
+              { key: 'global_rank' as const, label: 'G', color: '#D97706', bg: '#FEF3C7' },
+              { key: 'usa_rank' as const, label: 'US', color: '#DC2626', bg: '#FEE2E2' },
+              { key: 'regional_rank' as const, label: c.country && ['England','Scotland','Wales','Ireland','Northern Ireland'].includes(c.country) ? 'GB&I' : 'EUR', color: '#2563EB', bg: '#DBEAFE' },
+            ].map(({ key, label, color, bg }) => (
+              <RankEditCell
+                key={key}
+                courseId={c.id}
+                rankKey={key}
+                currentRank={c[key]}
+                label={label}
+                color={color}
+                bg={bg}
+                onSave={(newRank) => updateCourse(c.id, { [key]: newRank })}
+              />
+            ))}
+          </div>
+        );
+      },
     }),
     col.accessor('avg_rating', {
       header: 'Rating',
@@ -542,14 +681,36 @@ export default function CoursesPage() {
         />
       ),
     }),
-  ], [setDrawerCourseId]);
+  ], [setDrawerCourseId, updateCourse]);
 
   const filterOptions = [
-    { id: 'all',      label: 'All',             count: counts.all },
-    { id: 'global',   label: 'Global Top 100',  count: counts.global,   variant: 'warning' as const },
-    { id: 'usa',      label: 'USA Top 100',     count: counts.usa },
-    { id: 'europe',   label: 'Europe Top 100',  count: counts.europe },
-    { id: 'unranked', label: 'Unranked',         count: counts.unranked },
+    { id: 'all',      label: 'All',       count: counts.all },
+    {
+      id: 'global',
+      label: 'Global',
+      count: counts.global,
+      variant: 'warning' as const,
+      icon: <span>🌍</span>,
+    },
+    {
+      id: 'usa',
+      label: 'USA',
+      count: counts.usa,
+      icon: <span>🇺🇸</span>,
+    },
+    {
+      id: 'gbi',
+      label: 'GB&I',
+      count: counts.gbi,
+      icon: <span>🇬🇧</span>,
+    },
+    {
+      id: 'europe',
+      label: 'Europe',
+      count: counts.europe,
+      icon: <span>🇪🇺</span>,
+    },
+    { id: 'unranked', label: 'Unranked', count: counts.unranked },
   ];
 
   return (
@@ -666,6 +827,8 @@ export default function CoursesPage() {
         onUpdate={updateCourse}
         onUploadPhoto={uploadPhoto}
         isUploadingPhoto={isUploadingPhoto}
+        onDelete={deleteCourse}
+        isDeleting={isDeleting}
       />
 
     </div>
