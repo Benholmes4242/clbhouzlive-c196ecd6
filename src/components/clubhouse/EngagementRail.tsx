@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Heart, MessageCircle, Share, Volume2, VolumeX, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Squircle } from '@/components/ui/squircle';
 import '@/styles/engagement-rail.css';
