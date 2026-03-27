@@ -4,7 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
-import CourseCard from './CourseCard';
+import { UnifiedCourseCard } from './UnifiedCourseCard';
+import { fromGolfCourse, GolfCourseRaw } from '@/lib/mappers/toCourseCardModel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Trophy, Globe, Map as MapIcon, Upload } from 'lucide-react';
 
