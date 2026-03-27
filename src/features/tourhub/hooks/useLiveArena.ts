@@ -20,6 +20,10 @@ export interface LiveArenaPlayer {
   thru: string | null;
   thruUpdatedAt: string | null;
   money: number | null;
+  round_1: number | null;
+  round_2: number | null;
+  round_3: number | null;
+  round_4: number | null;
   player: {
     id: string;
     firstName: string;
