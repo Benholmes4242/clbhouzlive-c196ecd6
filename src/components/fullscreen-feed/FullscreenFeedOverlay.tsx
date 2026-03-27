@@ -19,12 +19,6 @@ export function FullscreenFeedOverlay() {
   const userId = session?.user?.id;
   const { isOpen, posts, startIndex, activeIndex, close, setActiveIndex } = useFullscreenFeedStore();
 
-  // Sync clubhouseStore activeIndex -> fullscreenFeedStore
-  const clubhouseActiveIndex = useClubhouseStore(s => s.activeIndex);
-  useEffect(() => {
-    if (isOpen) setActiveIndex(clubhouseActiveIndex);
-  }, [clubhouseActiveIndex, isOpen, setActiveIndex]);
-
   const activeActor = { type: "personal" as const, id: userId ?? "" };
   const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId, activeActor });
   const { followOverrides, handleFollowChange, getFollowState } = useClubhouseFollows({ userId });
