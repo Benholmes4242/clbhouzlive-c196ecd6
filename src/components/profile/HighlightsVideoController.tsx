@@ -146,7 +146,7 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
     if (!el) return;
     
     // Apply global mute state (single source of truth)
-    if (isGloballyMuted) {
+    if (isMuted) {
       // Always start muted when global state is muted
       setMuted(el, true);
       try {
