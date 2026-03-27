@@ -98,6 +98,8 @@ export function FullscreenFeedOverlay() {
               followOverrides={followOverrides}
               onFollowChange={handleFollowChange}
               startIndex={startIndex}
+              onActiveIndexChange={setActiveIndex}
+              activeIndexOverride={activeIndex}
             />
 
             <FeedOverlayLayer
