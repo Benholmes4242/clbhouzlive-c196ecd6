@@ -12,10 +12,8 @@ export function PlayerSilhouette({ size = 44, className }: PlayerSilhouetteProps
   return (
     <svg
       viewBox="0 0 100 100"
-      width={size}
-      height={size}
       className={className}
-      style={{ display: 'block' }}
+      style={{ display: 'block', width: '100%', height: '100%' }}
     >
       <defs>
         {/* Glass background gradient — light at top, darker at bottom */}
