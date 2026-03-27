@@ -11,7 +11,7 @@ import { useTop100Highlights } from '@/hooks/useTop100Highlights';
 import { warmHls, getHlsUrl } from '@/utils/videoPreload';
 import HighlightVideo from './HighlightVideo';
 import HighlightOverlays from './HighlightOverlays';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useMediaViewer } from '@/hooks/useMediaViewer';
 
 interface HighlightsCarouselProps {
