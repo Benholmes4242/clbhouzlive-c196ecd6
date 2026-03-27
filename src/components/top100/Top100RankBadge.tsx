@@ -24,7 +24,7 @@ export const Top100RankBadge: React.FC<Top100RankBadgeProps> = ({ listSlug, rank
       case 'europe':
         return <CountryFlag country="Continental Europe" size="sm" />;
       default:
-        return <Earth className="h-3 w-3 text-white" />;
+        return <Earth className="h-3.5 w-3.5 text-white" />;
     }
   };
 
