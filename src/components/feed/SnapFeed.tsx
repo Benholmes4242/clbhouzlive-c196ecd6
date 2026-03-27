@@ -121,7 +121,11 @@ export function SnapFeed({
           if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
           debounceTimerRef.current = setTimeout(() => {
             if (pendingIndexRef.current !== null) {
-              setActiveIndex(pendingIndexRef.current);
+              if (onActiveIndexChangeRef.current) {
+                onActiveIndexChangeRef.current(pendingIndexRef.current);
+              } else {
+                setActiveIndex(pendingIndexRef.current);
+              }
               if (hasNextPageRef.current && pendingIndexRef.current >= postsLengthRef.current - NEAR_END_THRESHOLD) {
                 onNearEndRef.current();
               }
