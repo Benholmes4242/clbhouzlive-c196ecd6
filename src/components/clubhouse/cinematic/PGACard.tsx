@@ -311,20 +311,75 @@ export const PGACard: React.FC<PGACardProps> = ({
   if (showSkeleton) {
     return (
       <div className="h-full w-full flex flex-col" style={{ background: '#080a0e' }}>
+        {/* Amber accent line */}
         <div style={{ height: 2.5, background: 'linear-gradient(90deg, rgba(245,158,11,0.8), transparent)', flexShrink: 0 }} />
-        <div className="flex-1 flex flex-col gap-4 p-5 pt-14">
-          <div className="rounded-lg animate-pulse" style={{ height: 24, width: '70%', background: 'rgba(255,255,255,0.08)' }} />
-          <div className="rounded-2xl animate-pulse" style={{ height: 180, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }} />
-          <div className="rounded-xl animate-pulse" style={{ height: 62, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }} />
-          <div className="flex flex-col gap-3 flex-1">
-            {[0, 1, 2].map(i => (
-              <div key={i} className="rounded-xl animate-pulse flex-1" style={{ minHeight: 44, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }} />
+
+        {/* Hero zone skeleton — 58% */}
+        <div style={{ flex: '0 0 58%', position: 'relative', overflow: 'hidden', background: 'linear-gradient(160deg, #0a1628, #060c16)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: 'clamp(12px,3vw,16px) clamp(14px,3.5vw,18px)' }}>
+          {/* Tournament name skeleton */}
+          <div style={{ height: 'clamp(20px,5vw,26px)', width: '75%', borderRadius: 6, background: 'rgba(255,255,255,0.08)', marginBottom: 'clamp(8px,2vw,10px)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
+
+          {/* Leader glass panel skeleton */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 12, padding: 'clamp(9px,2.5vw,11px) clamp(10px,2.5vw,13px)', marginBottom: 'clamp(6px,1.5vw,8px)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 'clamp(40px,11vw,50px)', height: 'clamp(42px,11.5vw,53px)', borderRadius: '34%', background: 'rgba(255,255,255,0.08)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
+              <div>
+                <div style={{ height: 14, width: 'clamp(90px,25vw,120px)', borderRadius: 5, background: 'rgba(255,255,255,0.08)', marginBottom: 7, animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
+                <div style={{ height: 9, width: 60, borderRadius: 4, background: 'rgba(255,255,255,0.05)' }} />
+              </div>
+            </div>
+            <div style={{ height: 'clamp(26px,7vw,34px)', width: 44, borderRadius: 6, background: 'rgba(255,255,255,0.08)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%)' }} />
+          </div>
+
+          {/* Stat strip skeleton — 5 chips */}
+          <div style={{ display: 'flex', gap: 'clamp(3px,1vw,5px)' }}>
+            {[1,2,3,4,5].map(i => (
+              <div key={i} style={{ flex: 1, height: 'clamp(38px,10vw,46px)', borderRadius: 8, background: 'rgba(255,255,255,0.04)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 75%)' }} />
             ))}
           </div>
         </div>
-        <div className="flex gap-3 px-5 pt-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)', borderTop: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
-          <div className="rounded-2xl animate-pulse" style={{ width: 64, height: 44, background: 'rgba(255,255,255,0.06)' }} />
-          <div className="rounded-2xl animate-pulse flex-1" style={{ height: 44, background: 'rgba(245,158,11,0.15)' }} />
+
+        {/* Leaderboard zone skeleton */}
+        <div style={{ flex: '1 1 auto', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: 'rgba(0,0,0,0.95)', padding: 'clamp(8px,2vw,12px) clamp(14px,3.5vw,18px)' }}>
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'rgba(249,115,22,0.3)' }} />
+              <div style={{ height: 8, width: 80, borderRadius: 4, background: 'rgba(249,115,22,0.15)' }} />
+            </div>
+            <div style={{ height: 8, width: 90, borderRadius: 4, background: 'rgba(255,255,255,0.06)' }} />
+          </div>
+
+          {/* Insight line */}
+          <div style={{ height: 9, width: '55%', borderRadius: 4, background: 'rgba(255,255,255,0.04)', marginBottom: 8 }} />
+
+          {/* Separator */}
+          <div style={{ height: 1, background: 'rgba(255,255,255,0.05)', marginBottom: 8 }} />
+
+          {/* 3 chaser row skeletons */}
+          {[1,2,3].map(i => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 'clamp(5px,1.5vw,8px) 8px', marginBottom: 4 }}>
+              <div style={{ width: 22, height: 10, borderRadius: 4, background: 'rgba(255,255,255,0.06)', flexShrink: 0 }} />
+              <div style={{ width: 36, height: 36, borderRadius: '34%', background: 'rgba(255,255,255,0.07)', flexShrink: 0 }} />
+              <div style={{ flex: 1, height: 11, borderRadius: 5, background: 'rgba(255,255,255,0.06)', animation: 'clb-shimmer 1.8s ease-in-out infinite', backgroundSize: '200% 100%', backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%)' }} />
+              <div style={{ width: 30, height: 11, borderRadius: 5, background: 'rgba(255,255,255,0.08)', flexShrink: 0 }} />
+            </div>
+          ))}
+
+          {/* Best today strip skeleton */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4, padding: 'clamp(6px,1.8vw,8px) clamp(10px,2.5vw,12px)', borderRadius: 9, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+            <div style={{ height: 8, width: 60, borderRadius: 4, background: 'rgba(255,255,255,0.05)' }} />
+            <div style={{ display: 'flex', gap: 12 }}>
+              <div style={{ height: 10, width: 70, borderRadius: 4, background: 'rgba(255,255,255,0.06)' }} />
+              <div style={{ height: 10, width: 70, borderRadius: 4, background: 'rgba(255,255,255,0.06)' }} />
+            </div>
+          </div>
+        </div>
+
+        {/* CTA bar skeleton */}
+        <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 10, padding: '10px clamp(14px,3.5vw,18px)', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ width: 64, height: 44, borderRadius: 14, background: 'rgba(255,255,255,0.06)' }} />
+          <div style={{ flex: 1, height: 44, borderRadius: 12, background: 'rgba(245,158,11,0.15)' }} />
         </div>
       </div>
     );
