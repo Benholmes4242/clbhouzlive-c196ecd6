@@ -175,6 +175,10 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
       money,
       thru,
       thru_updated_at,
+      round_1,
+      round_2,
+      round_3,
+      round_4,
       player:sr_players!sr_leaderboards_player_id_fkey (
         id,
         first_name,
