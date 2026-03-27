@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 import { ChevronUp, ChevronDown, Volume2, VolumeX, MessageCircle, Send, MoreHorizontal } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { ExploreContentItem } from '@/components/explore/types';
