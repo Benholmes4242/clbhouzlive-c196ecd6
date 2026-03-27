@@ -34,20 +34,13 @@ export const SeasonToggle = memo(function SeasonToggle({
             key={season.id}
             onClick={() => onYearChange(season.year)}
             className="flex-shrink-0 active:scale-95 transition-transform"
+            className={`flex-shrink-0 active:scale-[0.97] transition-all min-h-[36px] px-4 text-xs sm:text-sm font-semibold ${
+              isSelected
+                ? 'bg-foreground text-white shadow-none border-0'
+                : 'bg-transparent text-muted-foreground border-[1.5px] border-border'
+            }`}
             style={{
-              padding: '8px 14px',
-              fontSize: '12px',
-              fontWeight: isSelected ? 600 : 500,
-              borderRadius: '10px',
-              background: isSelected ? 'hsl(var(--foreground))' : 'hsl(var(--card))',
-              border: isSelected
-                ? '1px solid hsl(var(--foreground))'
-                : '1px solid hsl(var(--border))',
-              color: isSelected ? 'hsl(var(--background))' : 'hsl(var(--muted-foreground))',
-              boxShadow: isSelected
-                ? '0 2px 8px hsl(var(--foreground) / 0.15)'
-                : 'none',
-              transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+              borderRadius: 8,
               cursor: 'pointer',
             }}
           >
