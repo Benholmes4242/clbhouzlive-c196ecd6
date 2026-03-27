@@ -9,7 +9,7 @@ import { generateStreamHlsUrl, generateStreamThumbnailUrl } from '@/config/cloud
 import { getFilterClass } from '@/utils/studioFilters';
 import { cn } from '@/lib/utils';
 import { useVideoReadyQueue } from '@/hooks/useVideoReadyQueue';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 
 interface HighlightVideo {
   id: string;
