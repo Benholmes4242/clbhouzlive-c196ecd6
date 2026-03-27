@@ -638,58 +638,34 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               isCompleted ? (
                 <>
                   <div style={{ padding: isExpanded ? '0 20px' : undefined }}>
-                    <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
-                      <h2 className="hero-tournament-name">{tournament.name}</h2>
-                    </Link>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`);
-                      }}
-                      className="hero-venue block active:opacity-70 transition-opacity cursor-pointer"
-                    >
-                      {tournament.venueName}
-                      {tournament.venueCity && ` · ${tournament.venueCity}`}
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                <div style={{ padding: isExpanded ? '0 20px' : undefined }}>
-                    <div className="flex items-center justify-between" style={{ marginBottom: '6px' }}>
-                      {isLive ? (
-                        <div className="flex items-center gap-1.5">
-                          <span className="live-dot" />
-                          <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: tournament.isMajor ? '#FACC15' : '#22C55E' }}>LIVE</span>
-                        </div>
-                      ) : isUpcoming ? (
-                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' as const }}>
-                          {getStartLabel(tournament.startDate)}
+                    {/* Tournament name + FINAL badge + tour badge — right-aligned column */}
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
+                          <h2 className="hero-tournament-name" style={{ fontSize: '18px' }}>{tournament.name}</h2>
+                        </Link>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`); }}
+                          className="hero-venue block active:opacity-70 transition-opacity cursor-pointer"
+                        >
+                          {tournament.venueName}{tournament.venueCity && ` · ${tournament.venueCity}`}
+                        </button>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
+                        <span style={{
+                          fontSize: 9, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase',
+                          color: 'rgba(255,255,255,0.55)',
+                          background: 'rgba(255,255,255,0.10)',
+                          border: '1px solid rgba(255,255,255,0.14)',
+                          borderRadius: 20, padding: '2px 9px',
+                        }}>
+                          FINAL
                         </span>
-                      ) : (
-                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'white' }}>COMPLETED</span>
-                      )}
-                      <div className="flex items-center gap-2">
-                        <div className="tour-badge">
-                          <span>
-                            {getTourDisplayName(tournament.tourSlug)}
-                          </span>
+                        <div className="tour-badge" style={{ fontSize: 9, padding: '2px 8px' }}>
+                          <span>{getTourDisplayName(tournament.tourSlug)}</span>
                         </div>
                       </div>
                     </div>
-                    <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
-                      <h2 className="hero-tournament-name">{tournament.name}</h2>
-                    </Link>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`);
-                      }}
-                      className="hero-venue block active:opacity-70 transition-opacity cursor-pointer"
-                    >
-                      {tournament.venueName}
-                      {tournament.venueCity && ` · ${tournament.venueCity}`}
-                    </button>
                   </div>
                 </>
               )
