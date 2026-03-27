@@ -691,6 +691,7 @@ function CommentsSheet({
             {/* Scroll area */}
             <div
               ref={scrollRef}
+              onPointerDownCapture={(e) => e.stopPropagation()}
               className="flex-1 overflow-y-auto overscroll-contain"
               style={{ WebkitOverflowScrolling: 'touch' }}
             >
