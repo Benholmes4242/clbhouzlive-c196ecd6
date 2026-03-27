@@ -237,7 +237,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
   const hasPreloadedFirst = useRef(false);
-  const { isGloballyMuted } = useGlobalAudio();
+  const isMuted = useClubhouseStore(s => s.isMuted);
   
   const carouselItems = highlights;
 
