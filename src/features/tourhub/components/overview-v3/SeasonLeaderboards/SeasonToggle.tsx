@@ -33,7 +33,7 @@ export const SeasonToggle = memo(function SeasonToggle({
           <button
             key={season.id}
             onClick={() => onYearChange(season.year)}
-            className="flex-shrink-0 active:scale-95 transition-transform"
+            
             className={`flex-shrink-0 active:scale-[0.97] transition-all min-h-[36px] px-4 text-xs sm:text-sm font-semibold ${
               isSelected
                 ? 'bg-foreground text-white shadow-none border-0'
