@@ -111,11 +111,21 @@ interface FetchParams {
 async function fetchCourses({ search, listFilter, page, pageSize }: FetchParams) {
   let query = supabase
     .from('golf_courses')
-    .select(COURSE_COLUMNS, { count: 'exact' })
-    .order('name', { ascending: true });
+    .select(COURSE_COLUMNS, { count: 'exact' });
 
   query = applySearch(query, search);
   query = applyFilter(query, listFilter);
+
+  // Sort by relevant rank column when a list filter is active
+  const sortCol =
+    listFilter === 'global'  ? 'global_rank' :
+    listFilter === 'usa'     ? 'usa_rank' :
+    listFilter === 'europe'  ? 'regional_rank' :
+    listFilter === 'gbi'     ? 'regional_rank' :
+    'name';
+
+  query = query.order(sortCol, { ascending: true, nullsFirst: false });
+  if (sortCol !== 'name') query = query.order('name', { ascending: true });
 
   const from = (page - 1) * pageSize;
   query = query.range(from, from + pageSize - 1);
