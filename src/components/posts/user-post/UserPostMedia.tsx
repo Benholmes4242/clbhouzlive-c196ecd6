@@ -89,7 +89,7 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
   if (!media || media.length === 0) return null;
 
   // Determine effective mute state: muted if globally muted OR if post has music track
-  const effectiveMuted = isGloballyMuted || postHasMusic;
+  const effectiveMuted = isMuted || postHasMusic;
 
   const carouselItems = media.map((mediaItem, index) => {
     // Use filter_id first (new column), fallback to studio_edits.filter (old data)
