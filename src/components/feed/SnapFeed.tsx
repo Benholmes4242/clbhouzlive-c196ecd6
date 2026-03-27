@@ -207,7 +207,11 @@ export function SnapFeed({
       const slideHeight = el.clientHeight;
       if (slideHeight === 0) return;
       const idx = Math.round(el.scrollTop / slideHeight);
-      setActiveIndex(idx);
+      if (onActiveIndexChangeRef.current) {
+        onActiveIndexChangeRef.current(idx);
+      } else {
+        setActiveIndex(idx);
+      }
     };
 
     el.addEventListener('scrollend', onScrollEnd, { passive: true });
