@@ -46,7 +46,7 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
                        flex items-center justify-center hover:bg-white/20 hover:scale-110 active:scale-95 
                        transition-all duration-200 overflow-hidden"
               onClick={handleMuteToggle}
-              title={isGloballyMuted ? "Unmute all videos" : "Mute all videos"}
+              title={isMuted ? "Unmute all videos" : "Mute all videos"}
             >
               {/* Pulse animation on hover */}
               <div className="absolute inset-0 bg-white/20 rounded-full scale-0 group-hover:scale-150 
