@@ -700,10 +700,12 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                   transition={{ duration: 0.22, ease: [0.19, 1, 0.22, 1] }}
                   style={{ overflow: isExpanded ? 'visible' : 'hidden', flex: isExpanded ? 1 : undefined, minHeight: isExpanded ? 0 : undefined, display: isExpanded ? 'flex' : undefined, flexDirection: isExpanded ? 'column' as const : undefined }}
                 >
-                  {/* Round progress */}
-                  <p className="hero-meta" style={{ padding: isExpanded ? '0 20px' : undefined, marginTop: 4, marginBottom: isExpanded ? 4 : 0 }}>
-                    {getCurrentRoundLabel(leaders, tournament.startDate)}
-                  </p>
+                  {/* Round progress — hidden when scorecard is open */}
+                  {!selectedPlayer && (
+                    <p className="hero-meta" style={{ padding: isExpanded ? '0 20px' : undefined, marginTop: 4, marginBottom: isExpanded ? 4 : 0 }}>
+                      {getCurrentRoundLabel(leaders, tournament.startDate)}
+                    </p>
+                  )}
 
                   {/* Expanded: Full Leaderboard or Scorecard */}
                   {isExpanded ? (
