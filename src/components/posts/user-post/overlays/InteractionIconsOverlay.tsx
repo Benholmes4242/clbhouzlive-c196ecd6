@@ -1,6 +1,6 @@
 import React from 'react';
 import { Heart, MessageCircle, Share, VolumeX, Volume2 } from 'lucide-react';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 
 interface InteractionIconsOverlayProps {
   onInteractionClick: (e: React.MouseEvent, type: string) => void;
