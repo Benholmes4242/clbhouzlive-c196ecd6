@@ -8,6 +8,7 @@ export interface FilterOption {
   label: string;
   count?: number;
   variant?: FilterVariant;
+  icon?: React.ReactNode;
 }
 
 interface AdminFilterBarProps {
