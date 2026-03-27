@@ -12,7 +12,7 @@ import { useTournamentInsights } from './hooks/useTournamentInsights';
 import { TournamentHeroCard } from './TournamentHeroCard';
 import { CourseDNACard } from './CourseDNACard';
 import { ClubhouseIntelligence } from './ClubhouseIntelligence';
-import { LikelyWinnersCarousel } from './LikelyWinnersCarousel';
+
 import { PredictionLeaderboard } from './PredictionLeaderboard';
 import { TournamentResultsCard } from './TournamentResultsCard';
 import { NextUpPickCard } from './NextUpPickCard';
