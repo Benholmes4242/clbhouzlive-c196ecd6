@@ -45,10 +45,10 @@ const FeedMuteToggle: React.FC<FeedMuteToggleProps> = ({
         size="sm" 
         className="text-muted-foreground hover:text-primary flex items-center gap-1"
         onClick={handleToggle}
-        title={isGloballyMuted ? "Turn music on" : "Turn music off"}
+        title={isMuted ? "Turn music on" : "Turn music off"}
       >
-        {isGloballyMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-        {isGloballyMuted ? 'Music Off' : 'Music On'}
+        {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+        {isMuted ? 'Music Off' : 'Music On'}
       </Button>
     );
   }
