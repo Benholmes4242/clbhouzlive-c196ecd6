@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useId } from 'react';
 import { VolumeX, Volume2, ChevronDown, Check, Upload, Edit, Trash2 } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { supabase } from '@/integrations/supabase/client';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Progress } from '@/components/ui/progress';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
