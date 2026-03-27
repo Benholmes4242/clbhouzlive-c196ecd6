@@ -8,7 +8,6 @@ export interface FilterOption {
   label: string;
   count?: number;
   variant?: FilterVariant;
-  icon?: React.ReactNode;
 }
 
 interface AdminFilterBarProps {
@@ -43,11 +42,6 @@ export function AdminFilterBar({ filters, active, onChange, className }: AdminFi
               : { background: '#F1F5F9', border: '1px solid #E2E8F0', borderRadius: 20, color: '#64748B' }
             }
           >
-            {filter.icon && (
-              <span className="inline-flex items-center" style={{ fontSize: 14, lineHeight: 1 }}>
-                {filter.icon}
-              </span>
-            )}
             {filter.label}
             {filter.count !== undefined && (
               <span

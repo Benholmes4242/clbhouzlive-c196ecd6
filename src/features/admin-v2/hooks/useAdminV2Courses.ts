@@ -111,21 +111,11 @@ interface FetchParams {
 async function fetchCourses({ search, listFilter, page, pageSize }: FetchParams) {
   let query = supabase
     .from('golf_courses')
-    .select(COURSE_COLUMNS, { count: 'exact' });
+    .select(COURSE_COLUMNS, { count: 'exact' })
+    .order('name', { ascending: true });
 
   query = applySearch(query, search);
   query = applyFilter(query, listFilter);
-
-  // Sort by relevant rank column when a list filter is active
-  const sortCol =
-    listFilter === 'global'  ? 'global_rank' :
-    listFilter === 'usa'     ? 'usa_rank' :
-    listFilter === 'europe'  ? 'regional_rank' :
-    listFilter === 'gbi'     ? 'regional_rank' :
-    'name';
-
-  query = query.order(sortCol, { ascending: true, nullsFirst: false });
-  if (sortCol !== 'name') query = query.order('name', { ascending: true });
 
   const from = (page - 1) * pageSize;
   query = query.range(from, from + pageSize - 1);
@@ -159,24 +149,18 @@ async function fetchFilterCounts(search: string) {
     return applySearch(q, search);
   };
 
-  const [all, global, usa, gbi, europe, unranked] = await Promise.all([
+  const [all, global, usa, europe, unranked] = await Promise.all([
     buildQuery(),
-    (() => {
+    buildQuery().then(async _ => {
+      // Promise.all doesn't chain .not() on a promise — build inline
       let q = supabase.from('golf_courses').select('*', { count: 'exact', head: true });
       q = applySearch(q, search);
       return q.not('global_rank', 'is', null);
-    })(),
+    }),
     (() => {
       let q = supabase.from('golf_courses').select('*', { count: 'exact', head: true });
       q = applySearch(q, search);
       return q.not('usa_rank', 'is', null);
-    })(),
-    (() => {
-      let q = supabase.from('golf_courses').select('*', { count: 'exact', head: true });
-      q = applySearch(q, search);
-      return q
-        .not('regional_rank', 'is', null)
-        .in('country', ['England', 'Scotland', 'Wales', 'Ireland', 'Northern Ireland']);
     })(),
     (() => {
       let q = supabase.from('golf_courses').select('*', { count: 'exact', head: true });
@@ -193,7 +177,7 @@ async function fetchFilterCounts(search: string) {
   return {
     all:      all.count ?? 0,
     global:   global.count ?? 0,
-    gbi:      gbi.count ?? 0,
+    gbi:      0, // not shown in filter bar
     usa:      usa.count ?? 0,
     europe:   europe.count ?? 0,
     unranked: unranked.count ?? 0,
@@ -331,36 +315,6 @@ export function useAdminV2Courses() {
     onError: () => toast.error('Failed to upload photo'),
   });
 
-  // ── Delete mutation (via edge function with safety checks) ──
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { data, error } = await supabase.functions.invoke('secure-admin-operations', {
-        body: { action: 'delete_course', courseId: id },
-      });
-      if (error) throw error;
-      if (data?.error) {
-        const err = new Error(data.reason ?? data.error) as any;
-        err.counts = data.counts;
-        throw err;
-      }
-      return data;
-    },
-    onSuccess: () => {
-      toast.success('Course deleted');
-      qc.invalidateQueries({ queryKey: ['admin-v2', 'courses'] });
-    },
-    onError: (err: any) => {
-      if (err.counts) {
-        toast.error('Cannot delete this course', {
-          description: err.message,
-          duration: 8000,
-        });
-      } else {
-        toast.error('Failed to delete course');
-      }
-    },
-  });
-
   // ── Handlers ──
   const handleSearch = (v: string) => { setSearch(v); setPage(1); };
   const handleFilter = (v: string) => { setListFilter(v as CourseFilterList); setPage(1); };
@@ -386,7 +340,5 @@ export function useAdminV2Courses() {
     uploadPhoto: (courseId: string, file: File) =>
       photoMutation.mutate({ courseId, file }),
     isUploadingPhoto: photoMutation.isPending,
-    deleteCourse: (id: string) => deleteMutation.mutate(id),
-    isDeleting: deleteMutation.isPending,
   };
 }

@@ -30,7 +30,6 @@ const VENUE_IMAGE_OVERRIDES: Record<string, string> = {
   'Prince of Wales Country Club': princeOfWalesCC,
   'Mission Hills Resort Haikou': missionHillsHaikou,
   'The Landings Club': theLandingsClub,
-  'TPC San Antonio': '/images/venues/tpc-san-antonio.webp',
 };
 
 interface VenueImageResult {

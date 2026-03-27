@@ -13,7 +13,6 @@ import { EliteGameCard, EliteCardTier } from '@/components/achievements/EliteGam
 import { AchievementsSkeleton } from '@/components/skeletons/AchievementsSkeleton';
 import NudgeBanner from '@/components/achievements/NudgeBanner';
 import { getNextBadgeNudge } from '@/lib/achievements/nextBadgeNudge';
-import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { DEBUG_UNLOCK_ALL_ACHIEVEMENTS, DEBUG_ACHIEVEMENTS_USER_EMAIL } from '@/utils/featureFlags';
 
 // Map milestone threshold to EliteCardTier
@@ -250,7 +249,6 @@ const AchievementsHubPage: React.FC = () => {
           </section>
         </>
       )}
-      <ScrollToTopGlass />
     </div>
   );
 };

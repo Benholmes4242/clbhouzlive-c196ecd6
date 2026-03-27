@@ -121,7 +121,6 @@ export function usePickHistory() {
           const playerId: string = String(pick.playerId || pick.pgaTourId || '');
           const predictedRank: number = pick.rank || pick.predictedRank || 99;
           if (!playerName) continue;
-          if (predictedRank > 3) continue;  // Only count top 3 picks
 
           const lbEntry = maps.bySrId.get(playerId)
             ?? maps.byName.get(playerName.toLowerCase());

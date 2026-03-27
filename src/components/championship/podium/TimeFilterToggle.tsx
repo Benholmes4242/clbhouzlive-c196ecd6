@@ -17,28 +17,30 @@ export const TimeFilterToggle: React.FC<TimeFilterToggleProps> = ({
 }) => {
   const yearLabel = String(seasonYear ?? new Date().getFullYear());
 
-  const tabs = [
-    { key: 'season' as const, label: yearLabel },
-    { key: 'all_time' as const, label: 'All-Time' },
-  ];
-
   return (
-    <div className={cn('inline-flex items-center gap-2', className)}>
-      {tabs.map((tab) => (
-        <button
-          key={tab.key}
-          onClick={() => onChange(tab.key)}
-          className={cn(
-            'min-h-[36px] px-4 text-xs sm:text-sm font-semibold transition-all active:scale-[0.97]',
-            value === tab.key
-              ? 'bg-foreground text-white'
-              : 'bg-transparent text-muted-foreground border-[1.5px] border-border'
-          )}
-          style={{ borderRadius: 8 }}
-        >
-          {tab.label}
-        </button>
-      ))}
+    <div className={cn('inline-flex rounded-[14px] p-[3px]', className)} style={{ background: 'rgba(0, 0, 0, 0.03)' }}>
+      <button
+        onClick={() => onChange('season')}
+        className={cn(
+          'px-3 py-1 text-xs font-medium rounded-xl transition-all duration-150',
+          value === 'season'
+            ? 'bg-card text-foreground font-semibold'
+            : 'text-muted-foreground'
+        )}
+      >
+        {yearLabel}
+      </button>
+      <button
+        onClick={() => onChange('all_time')}
+        className={cn(
+          'px-3 py-1 text-xs font-medium rounded-xl transition-all duration-150',
+          value === 'all_time'
+            ? 'bg-card text-foreground font-semibold'
+            : 'text-muted-foreground'
+        )}
+      >
+        All-Time
+      </button>
     </div>
   );
 };

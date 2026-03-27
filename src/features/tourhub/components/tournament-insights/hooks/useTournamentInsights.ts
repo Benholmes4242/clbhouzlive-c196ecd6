@@ -115,7 +115,7 @@ function transformPredictions(aiData: AIPredictionData): TournamentInsightsData 
       expandedText: (courseAnalysis as any)?.skillsAnalysis || generateSkillsAnalysis(courseAnalysis?.keyStats),
     },
 
-    winners: topContenders.slice(0, 3).map((p, i) => ({
+    winners: topContenders.slice(0, 5).map((p, i) => ({
       id: p.playerId,
       name: p.playerName,
       countryCode: p.country,
@@ -173,7 +173,7 @@ function buildContenderCards(
   topContenders: any[]
 ): ContenderCard[] {
   // All 5 picks as contender cards (skip #1, that's the featured card in carousel)
-  return topContenders.slice(1, 3).map((p, i) => ({
+  return topContenders.slice(1, 5).map((p, i) => ({
     id: p.playerId,
     name: p.playerName,
     countryCode: p.country,
@@ -188,9 +188,9 @@ function buildContenderCards(
 }
 
 function getConfidenceTier(rank: number): ConfidenceTier {
-  if (rank === 0) return 'elite';   // Pick 1 — strongest conviction
-  if (rank === 1) return 'high';    // Pick 2
-  return 'medium';                  // Pick 3
+  if (rank === 0) return 'elite';
+  if (rank <= 2) return 'high';
+  return 'medium';
 }
 
 /**

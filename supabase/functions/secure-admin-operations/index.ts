@@ -11,16 +11,8 @@ const ALLOWED_ORIGINS = new Set([
   'http://localhost:5173',
 ]);
 
-const isAllowedOrigin = (origin: string | null): boolean => {
-  if (!origin) return false;
-  if (ALLOWED_ORIGINS.has(origin)) return true;
-  if (origin.endsWith('.lovableproject.com')) return true;
-  if (origin.endsWith('.lovable.app')) return true;
-  return false;
-};
-
 const corsHeaders = (origin: string | null): HeadersInit => {
-  const allowOrigin = isAllowedOrigin(origin) ? origin! : '';
+  const allowOrigin = origin && ALLOWED_ORIGINS.has(origin) ? origin : '';
   return {
     'Access-Control-Allow-Origin': allowOrigin,
     'Access-Control-Allow-Credentials': 'true',
@@ -32,12 +24,11 @@ const corsHeaders = (origin: string | null): HeadersInit => {
 };
 
 interface AdminOperationRequest {
-  action: 'delete_user' | 'reset_password' | 'suspend_user' | 'delete_course';
-  targetUserId?: string;
-  targetEmail?: string;
-  courseId?: string;
+  action: 'delete_user' | 'reset_password' | 'suspend_user';
+  targetUserId: string;
+  targetEmail: string;
   reason?: string;
-  suspended?: boolean;
+  suspended?: boolean; // For suspend_user action: true = suspend, false = unsuspend
 }
 
 serve(async (req) => {
@@ -114,30 +105,28 @@ serve(async (req) => {
       });
     }
 
-    const { action, targetUserId, targetEmail, courseId, reason, suspended }: AdminOperationRequest = await req.json();
+    const { action, targetUserId, targetEmail, reason, suspended }: AdminOperationRequest = await req.json();
 
-    // Block operations on admin accounts (only for user-targeted actions)
-    if (targetUserId && action !== 'delete_course') {
-      const { data: targetMem } = await supabase
-        .from('admin_memberships')
-        .select('role')
-        .eq('user_id', targetUserId)
-        .maybeSingle();
+    // Block operations on admin accounts
+    const { data: targetMem } = await supabase
+      .from('admin_memberships')
+      .select('role')
+      .eq('user_id', targetUserId)
+      .maybeSingle();
 
-      if (targetMem?.role) {
-        console.log(`Blocked: Cannot operate on admin account ${targetEmail}`);
-        return new Response(JSON.stringify({ error: 'Cannot operate on admin accounts' }), {
-          status: 403,
-          headers: { ...headers, 'Content-Type': 'application/json' },
-        });
-      }
+    if (targetMem?.role) {
+      console.log(`Blocked: Cannot operate on admin account ${targetEmail}`);
+      return new Response(JSON.stringify({ error: 'Cannot operate on admin accounts' }), {
+        status: 403,
+        headers: { ...headers, 'Content-Type': 'application/json' },
+      });
     }
 
     // Get client info for audit logging
     const userAgent = req.headers.get('User-Agent') || 'Unknown';
     const clientInfo = req.headers.get('X-Forwarded-For') || 'Unknown';
 
-    console.log(`Admin ${user.email} performing ${action}${targetEmail ? ` on user ${targetEmail}` : ''}${courseId ? ` on course ${courseId}` : ''}`);
+    console.log(`Admin ${user.email} performing ${action} on user ${targetEmail}`);
 
     let result: any = {};
     let auditDetails: any = { reason };
@@ -177,7 +166,7 @@ serve(async (req) => {
         // Send password reset email
         const { error: resetError } = await supabase.auth.admin.generateLink({
           type: 'recovery',
-          email: targetEmail!,
+          email: targetEmail,
         });
         
         if (resetError) {
@@ -191,7 +180,7 @@ serve(async (req) => {
         break;
 
       case 'suspend_user': {
-        const isSuspending = suspended !== false;
+        const isSuspending = suspended !== false; // default to suspend if not specified
         
         const { error: suspendError } = await supabase
           .from('user_profiles')
@@ -204,6 +193,7 @@ serve(async (req) => {
           auditDetails.suspended = isSuspending;
           result = { error: suspendError.message };
         } else {
+          // If suspending, also fail any pending scheduled posts immediately
           if (isSuspending) {
             const { error: postsError } = await supabase
               .from('posts')
@@ -225,71 +215,6 @@ serve(async (req) => {
         break;
       }
 
-      case 'delete_course': {
-        if (!courseId) {
-          return new Response(JSON.stringify({ error: 'courseId required' }), {
-            status: 400,
-            headers: { ...headers, 'Content-Type': 'application/json' },
-          });
-        }
-
-        // Safety check — block if real user ratings or posts exist
-        const [ratingsRes, postsRes] = await Promise.all([
-          supabase
-            .from('course_ratings')
-            .select('id', { count: 'exact', head: true })
-            .eq('course_id', courseId),
-          supabase
-            .from('posts')
-            .select('id', { count: 'exact', head: true })
-            .eq('course_id', courseId),
-        ]);
-
-        const ratingCount = ratingsRes.count ?? 0;
-        const postCount = postsRes.count ?? 0;
-
-        if (ratingCount > 0 || postCount > 0) {
-          result = {
-            error: `Cannot delete: this course has ${ratingCount} user rating${ratingCount !== 1 ? 's' : ''} and ${postCount} post${postCount !== 1 ? 's' : ''}. Only delete courses with no user data.`,
-            counts: { ratings: ratingCount, posts: postCount },
-          };
-          break;
-        }
-
-        // Cascade delete in dependency order using service role
-        const tables: Array<{ table: string; column: string }> = [
-          { table: 'sr_course_map',              column: 'golf_course_id' },
-          { table: 'course_top100_memberships',  column: 'course_id' },
-          { table: 'business_claimed_courses',   column: 'course_id' },
-          { table: 'user_top10_exclusions',      column: 'course_id' },
-          { table: 'course_shortlists',          column: 'course_id' },
-          { table: 'user_courses',               column: 'course_id' },
-          { table: 'course_ratings',             column: 'course_id' },
-        ];
-
-        for (const { table, column } of tables) {
-          const { error: delErr } = await supabase
-            .from(table as any)
-            .delete()
-            .eq(column, courseId);
-          if (delErr) console.warn(`delete_course: cleanup of ${table} failed:`, delErr.message);
-        }
-
-        const { error: finalErr } = await supabase
-          .from('golf_courses')
-          .delete()
-          .eq('id', courseId);
-
-        if (finalErr) {
-          result = { error: `Failed to delete course: ${finalErr.message}` };
-        } else {
-          result = { success: true, message: 'Course deleted successfully' };
-        }
-
-        auditDetails = { courseId, reason };
-        break;
-      }
-
       default:
         return new Response(JSON.stringify({ error: 'Invalid action' }), {
           status: 400,
@@ -303,8 +228,8 @@ serve(async (req) => {
       .insert({
         admin_user_id: user.id,
         action,
-        ...(targetUserId ? { target_user_id: targetUserId } : {}),
-        ...(targetEmail ? { target_email: targetEmail } : {}),
+        target_user_id: targetUserId,
+        target_email: targetEmail,
         details: auditDetails,
         ip_address: clientInfo,
         user_agent: userAgent,
