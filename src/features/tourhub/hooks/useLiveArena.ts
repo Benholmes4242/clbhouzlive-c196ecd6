@@ -221,6 +221,10 @@ async function fetchLiveArenaData(): Promise<LiveArenaTournament[]> {
       thru: entry.thru,
       thruUpdatedAt: entry.thru_updated_at ?? null,
       money: entry.money,
+      round_1: entry.round_1 ?? null,
+      round_2: entry.round_2 ?? null,
+      round_3: entry.round_3 ?? null,
+      round_4: entry.round_4 ?? null,
       player: {
         id: entry.player?.id || '',
         firstName: entry.player?.first_name || '',
