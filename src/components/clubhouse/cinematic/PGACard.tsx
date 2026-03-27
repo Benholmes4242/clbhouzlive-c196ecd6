@@ -1341,7 +1341,7 @@ export const PGACard: React.FC<PGACardProps> = ({
               {cd.bestToday && cd.bestToday.length > 0 && (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '2px 0 0', padding: 'clamp(6px, 1.8vw, 8px) clamp(10px, 2.5vw, 12px)', borderRadius: 9, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
                   <span style={{ fontSize: 'clamp(8px, 2vw, 9px)', fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)', flexShrink: 0 }}>
-                    Best today
+                    {getBestRoundLabel(cd.leader?.thru)}
                   </span>
                   <div style={{ display: 'flex', gap: 'clamp(8px, 2.5vw, 12px)', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                     {cd.bestToday.map((p, i) => (
