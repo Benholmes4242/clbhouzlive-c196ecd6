@@ -38,7 +38,7 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
   badges
 }) => {
   
-  const { isGloballyMuted } = useGlobalAudio();
+  const isMuted = useClubhouseStore(s => s.isMuted);
   
   // Track active slide index for per-slide autoplay control
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);

@@ -70,7 +70,8 @@ const ImmersiveProfileModal: React.FC<ImmersiveProfileModalProps> = ({
   const startTimeRef = useRef<number>(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaId = useId();
-  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+  const isMuted = useClubhouseStore(s => s.isMuted);
+  const toggleMute = useClubhouseStore(s => s.toggleMute);
   
   // Video progress sync hook
   const { progress: syncedProgress, segmentProgress } = useVideoProgressSync(

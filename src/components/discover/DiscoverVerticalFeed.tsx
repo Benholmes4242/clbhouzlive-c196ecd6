@@ -490,9 +490,9 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   });
 
   const toggleGlobalMute = useCallback(() => {
-    if (isGloballyMuted) markUserGestureUnmute();
-    setGlobalMute(!isGloballyMuted);
-  }, [isGloballyMuted, setGlobalMute, markUserGestureUnmute]);
+    if (isMuted) markUserGestureUnmute();
+    setIsMuted(!isMuted);
+  }, [isMuted, setIsMuted, markUserGestureUnmute]);
 
   const handleLike = useCallback((postId: string) => {
     if (!user?.id) return;

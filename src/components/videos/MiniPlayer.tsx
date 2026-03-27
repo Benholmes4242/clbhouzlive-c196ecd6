@@ -32,7 +32,9 @@ const PROGRESS_THROTTLE_MS = 5000;
  */
 export const MiniPlayer: React.FC = () => {
   const context = useVideoPlaybackSafe();
-  const { isGloballyMuted, toggleGlobalMute, markUserGestureUnmute } = useGlobalAudio();
+  const isMuted = useClubhouseStore(s => s.isMuted);
+  const toggleMute = useClubhouseStore(s => s.toggleMute);
+  const markUserGestureUnmute = useClubhouseStore(s => s.markUserGestureUnmute);
   
   const videoElRef = useRef<UnifiedVideoPlayerRef>(null);
   const pendingSeekRef = useRef<number | null>(null);

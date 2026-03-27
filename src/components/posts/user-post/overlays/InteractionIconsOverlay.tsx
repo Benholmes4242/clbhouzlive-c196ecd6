@@ -18,12 +18,14 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
   onInteractionClick,
   currentMediaType = 'image'
 }) => {
-  const { isGloballyMuted, toggleGlobalMute, markUserGestureUnmute } = useGlobalAudio();
+  const isMuted = useClubhouseStore(s => s.isMuted);
+  const toggleMute = useClubhouseStore(s => s.toggleMute);
+  const markUserGestureUnmute = useClubhouseStore(s => s.markUserGestureUnmute);
 
   const handleMuteToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isGloballyMuted) markUserGestureUnmute();
-    toggleGlobalMute();
+    if (isMuted) markUserGestureUnmute();
+    toggleMute();
   };
 
   return (

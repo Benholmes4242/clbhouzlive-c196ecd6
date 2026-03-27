@@ -452,7 +452,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                   isOwnProfile={isOwnProfile}
                   isVideoReady={item.videoUrl ? isReady(uidFromNode({ src: item.videoUrl }) || item.id) : true}
                   onReady={(id) => markReadyRef.current(id)}
-                  globalMuted={isGloballyMuted}
+                  globalMuted={isMuted}
                 />
               </div>
             );

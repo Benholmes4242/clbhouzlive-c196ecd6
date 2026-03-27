@@ -191,16 +191,16 @@ const HighlightsCarousel: React.FC<HighlightsCarouselProps> = ({ userId, classNa
                   index={index}
                   onEnded={() => tryAutoAdvance(index)}
                   isActive={isActive}
-                  muted={isGloballyMuted}
+                  muted={isMuted}
                   onTap={() => handleHighlightTap(index)}
                 />
                 <button
                   className="unmute-btn"
-                  aria-label={isGloballyMuted ? 'Unmute' : 'Mute'}
-                  onClick={(e) => { e.stopPropagation(); if (isGloballyMuted) markUserGestureUnmute(); toggleGlobalMute(); }}
-                  title={isGloballyMuted ? 'Unmute' : 'Mute'}
+                  aria-label={isMuted ? 'Unmute' : 'Mute'}
+                  onClick={(e) => { e.stopPropagation(); if (isMuted) markUserGestureUnmute(); toggleMute(); }}
+                  title={isMuted ? 'Unmute' : 'Mute'}
                 >
-                  {isGloballyMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                  {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
                 </button>
                 {highlight.golf_course && (
                   <div className="club-badge">

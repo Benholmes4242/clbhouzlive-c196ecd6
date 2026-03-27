@@ -50,13 +50,13 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
   const updateCarouselAudioPreference = useCallback((preference: 'muted' | 'unmuted') => {
     const newMuted = preference === 'muted';
     if (!newMuted) markUserGestureUnmute();
-    setGlobalMute(newMuted);
+    setIsMuted(newMuted);
     
     // Mark that user has made a gesture
     if (preference === 'unmuted') {
       setHasUserGesture(true);
     }
-  }, [setGlobalMute, markUserGestureUnmute]);
+  }, [setIsMuted, markUserGestureUnmute]);
 
   const register = useCallback((id: string, el: PlayerEl | null) => {
     console.log('🎥 Registering video element:', id, el ? 'with element' : 'null');
