@@ -5,7 +5,7 @@ import { useLiveArena } from '@/features/tourhub/hooks/useLiveArena';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { useSingleCourseImage } from '@/features/tourhub/hooks/useCourseImageResolver';
 import type { VenueInput } from '@/features/tourhub/hooks/useCourseImageResolver';
-import type { PGACardFeedPost, PGACardData, PGACardLeader, PGACardChaser, PGACardStats } from '../types/media';
+import type { PGACardFeedPost, PGACardData, PGACardLeader, PGACardChaser, PGACardStats, PGACardBestToday } from '../types/media';
 import { getTournamentDisplayState } from '@/utils/tournamentState';
 
 const SYSTEM_USER_ID = 'b8437384-291a-4d85-b81f-24c1068235dd';
