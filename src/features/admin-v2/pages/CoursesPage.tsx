@@ -141,20 +141,7 @@ function RankEditCell({
   );
 }
 
-// ─── Geocode status ───────────────────────────────────────────────────────────
-
-function GeocodeStatus({ lat, lng }: { lat: number | null; lng: number | null }) {
-  const hasCoords = lat != null && lng != null;
-  return (
-    <span className={cn('inline-flex items-center gap-1 text-[12px]', hasCoords ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground/60')}>
-      {hasCoords
-        ? <CheckCircle className="h-3.5 w-3.5" />
-        : <XCircle className="h-3.5 w-3.5" />
-      }
-      {hasCoords ? 'Geocoded' : 'Missing'}
-    </span>
-  );
-}
+// GeocodeStatus removed — now rendered inline in the course name cell
 
 // ─── Row action menu ──────────────────────────────────────────────────────────
 
@@ -570,106 +557,94 @@ export default function CoursesPage() {
     : courses.filter(c => c.country === countryFilter);
 
   const columns = React.useMemo(() => [
-    col.display({
-      id: 'thumbnail',
-      header: '',
-      size: 64,
-      cell: ({ row }) => (
-        <div style={{ width: 48, height: 48, borderRadius: 10, overflow: 'hidden', flexShrink: 0, background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #E2E8F0' }}>
-          {row.original.thumbnail_image ? (
-            <img src={row.original.thumbnail_image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          ) : (
-            <MapPin className="h-5 w-5" style={{ color: '#94A3B8' }} />
-          )}
-        </div>
-      ),
-    }),
     col.accessor('name', {
       header: 'Course',
       enableSorting: true,
-      cell: ({ row }) => (
-        <div className="flex flex-col gap-0.5 min-w-0">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[13px] font-medium text-foreground truncate">
-              {row.original.name}
-            </span>
-            {row.original.global_rank && (
-              <span style={{ background: '#FEF3C7', color: '#D97706', fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 20 }}>
-                #{row.original.global_rank}
+      cell: ({ row }) => {
+        const c = row.original;
+        const geocoded = c.latitude != null && c.longitude != null;
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#0F172A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 220 }}>
+                {c.name}
               </span>
-            )}
+            </div>
+            <span style={{ fontSize: 11, color: '#94A3B8' }}>
+              {c.country}{c.sub_country ? ` · ${c.sub_country}` : ''}
+            </span>
+            <div style={{ display: 'flex', gap: 6, marginTop: 1 }}>
+              <span style={{
+                fontSize: 10, fontWeight: 500,
+                color: geocoded ? '#16A34A' : '#94A3B8',
+                display: 'flex', alignItems: 'center', gap: 2,
+              }}>
+                {geocoded
+                  ? <><CheckCircle style={{ width: 10, height: 10 }} /> Geocoded</>
+                  : <><XCircle style={{ width: 10, height: 10 }} /> No coords</>}
+              </span>
+              <span style={{ fontSize: 10, color: '#CBD5E1' }}>
+                · {format(new Date(c.created_at), 'd MMM yyyy')}
+              </span>
+            </div>
           </div>
-          <span className="text-[11.5px] text-muted-foreground truncate">
-            {row.original.country}{row.original.sub_country ? ` · ${row.original.sub_country}` : ''}
-          </span>
-        </div>
-      ),
+        );
+      },
     }),
+
     col.display({
       id: 'ranks',
       header: 'Rankings',
-      size: 180,
+      size: 200,
       cell: ({ row }) => {
         const c = row.original;
+        const isGBI = c.country && ['England','Scotland','Wales','Ireland','Northern Ireland'].includes(c.country);
         return (
-          <div className="flex flex-wrap gap-1.5">
-            {[
-              { key: 'global_rank' as const, label: 'G', color: '#D97706', bg: '#FEF3C7' },
-              { key: 'usa_rank' as const, label: 'US', color: '#DC2626', bg: '#FEE2E2' },
-              { key: 'regional_rank' as const, label: c.country && ['England','Scotland','Wales','Ireland','Northern Ireland'].includes(c.country) ? 'GB&I' : 'EUR', color: '#2563EB', bg: '#DBEAFE' },
-            ].map(({ key, label, color, bg }) => (
-              <RankEditCell
-                key={key}
-                courseId={c.id}
-                rankKey={key}
-                currentRank={c[key]}
-                label={label}
-                color={color}
-                bg={bg}
-                onSave={(newRank) => updateCourse(c.id, { [key]: newRank })}
-              />
-            ))}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <RankEditCell
+              courseId={c.id} rankKey="global_rank"
+              currentRank={c.global_rank} label="Global"
+              color="#D97706" bg="#FEF3C7"
+              onSave={(v) => updateCourse(c.id, { global_rank: v })}
+            />
+            <RankEditCell
+              courseId={c.id} rankKey="usa_rank"
+              currentRank={c.usa_rank} label="USA"
+              color="#DC2626" bg="#FEE2E2"
+              onSave={(v) => updateCourse(c.id, { usa_rank: v })}
+            />
+            <RankEditCell
+              courseId={c.id} rankKey="regional_rank"
+              currentRank={c.regional_rank} label={isGBI ? 'GB&I' : 'Europe'}
+              color="#2563EB" bg="#DBEAFE"
+              onSave={(v) => updateCourse(c.id, { regional_rank: v })}
+            />
           </div>
         );
       },
     }),
+
     col.accessor('avg_rating', {
       header: 'Rating',
       enableSorting: true,
+      size: 80,
       cell: ({ getValue, row }) => {
         const rating = getValue();
-        if (!rating) return <span className="text-[12px] text-muted-foreground/40">—</span>;
+        if (!rating) return <span style={{ fontSize: 12, color: '#CBD5E1' }}>—</span>;
         return (
-          <div className="flex items-center gap-1.5">
-            <Star className="h-3.5 w-3.5 text-amber-500 fill-amber-500" />
-            <span className="text-[13px] font-medium text-foreground">
-              {rating.toFixed(1)}
-            </span>
-            {row.original.review_count != null && (
-              <span className="text-[11px] text-muted-foreground">
-                ({row.original.review_count})
-              </span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <Star style={{ width: 12, height: 12, color: '#F59E0B', fill: '#F59E0B' }} />
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#0F172A' }}>{rating.toFixed(1)}</span>
+            </div>
+            {row.original.review_count != null && row.original.review_count > 0 && (
+              <span style={{ fontSize: 10, color: '#94A3B8' }}>{row.original.review_count} review{row.original.review_count !== 1 ? 's' : ''}</span>
             )}
           </div>
         );
       },
     }),
-    col.display({
-      id: 'geocoded',
-      header: 'Geocode',
-      cell: ({ row }) => (
-        <GeocodeStatus lat={row.original.latitude} lng={row.original.longitude} />
-      ),
-    }),
-    col.accessor('created_at', {
-      header: 'Added',
-      enableSorting: true,
-      cell: ({ getValue }) => (
-        <span className="text-[12.5px] text-muted-foreground">
-          {format(new Date(getValue()), 'd MMM yyyy')}
-        </span>
-      ),
-    }),
+
     col.display({
       id: 'actions',
       header: '',
