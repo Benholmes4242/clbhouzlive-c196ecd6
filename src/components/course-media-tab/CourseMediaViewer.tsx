@@ -12,6 +12,7 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapFeed } from '@/components/feed/SnapFeed';
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
+import { pauseAllAudio } from '@/utils/globalVideoMute';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 // ── Dedicated Zustand store ──
@@ -20,42 +21,48 @@ interface CourseMediaViewerState {
   isOpen: boolean;
   posts: FeedPost[];
   startIndex: number;
+  activeIndex: number;
+  carouselPositions: Map<number, number>;
   open: (posts: FeedPost[], startIndex?: number) => void;
   close: () => void;
+  setActiveIndex: (idx: number) => void;
+  setCarouselPosition: (feedIdx: number, mediaIdx: number) => void;
 }
 
 export const useCourseMediaViewerStore = create<CourseMediaViewerState>((set) => ({
   isOpen: false,
   posts: [],
   startIndex: 0,
-  open: (posts, startIndex = 0) => set({ isOpen: true, posts, startIndex }),
-  close: () => set({ isOpen: false, posts: [], startIndex: 0 }),
+  activeIndex: 0,
+  carouselPositions: new Map(),
+  open: (posts, startIndex = 0) => set({ isOpen: true, posts, startIndex, activeIndex: startIndex }),
+  close: () => set({ isOpen: false, posts: [], startIndex: 0, activeIndex: 0, carouselPositions: new Map() }),
+  setActiveIndex: (idx) => set({ activeIndex: idx }),
+  setCarouselPosition: (feedIdx, mediaIdx) =>
+    set((s) => {
+      const next = new Map(s.carouselPositions);
+      next.set(feedIdx, mediaIdx);
+      return { carouselPositions: next };
+    }),
 }));
 
 // ── Component ──
 
 export function CourseMediaViewer() {
-  const { isOpen, posts, startIndex, close } = useCourseMediaViewerStore();
+  const { isOpen, posts, startIndex, close, activeIndex, setActiveIndex, carouselPositions } = useCourseMediaViewerStore();
   const isMuted = useClubhouseStore(s => s.isMuted);
   const toggleMute = useClubhouseStore(s => s.toggleMute);
-  const activeIndex = useClubhouseStore(s => s.activeIndex);
   const activeVideoElement = useClubhouseStore(s => s.activeVideoElement);
-  const setActiveIndex = useClubhouseStore(s => s.setActiveIndex);
-  const carouselPositions = useClubhouseStore(s => s.carouselPositions);
 
   const activePost = posts[activeIndex] ?? null;
   const isVideo = activePost?.mediaItems?.[0]?.type === 'video';
   const mediaCount = activePost?.mediaItems?.length ?? 0;
   const currentMediaIdx = carouselPositions.get(activeIndex) ?? 0;
 
-  // Sync start index when opening
-  useEffect(() => {
-    if (isOpen) setActiveIndex(startIndex);
-  }, [isOpen, startIndex, setActiveIndex]);
-
   // Body scroll lock + status bar
   useEffect(() => {
     if (!isOpen) return;
+    pauseAllAudio();
     document.body.style.overflow = 'hidden';
 
     document.body.classList.add('route-fullscreen-overlay');
@@ -142,6 +149,8 @@ export function CourseMediaViewer() {
               followOverrides={new Map()}
               onFollowChange={() => {}}
               startIndex={startIndex}
+              onActiveIndexChange={setActiveIndex}
+              activeIndexOverride={activeIndex}
             />
 
             {/* Creator Capsule — no social actions */}

@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapFeed } from '@/components/feed/SnapFeed';
+import { pauseAllAudio } from '@/utils/globalVideoMute';
 import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
 import CommentsSheet from '@/components/comments/CommentsSheet';
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
@@ -17,12 +18,6 @@ export function FullscreenFeedOverlay() {
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
   const { isOpen, posts, startIndex, activeIndex, close, setActiveIndex } = useFullscreenFeedStore();
-
-  // Sync clubhouseStore activeIndex -> fullscreenFeedStore
-  const clubhouseActiveIndex = useClubhouseStore(s => s.activeIndex);
-  useEffect(() => {
-    if (isOpen) setActiveIndex(clubhouseActiveIndex);
-  }, [clubhouseActiveIndex, isOpen, setActiveIndex]);
 
   const activeActor = { type: "personal" as const, id: userId ?? "" };
   const { handleLike, getActiveLikeState } = useClubhouseLikes({ userId, activeActor });
@@ -43,6 +38,7 @@ export function FullscreenFeedOverlay() {
   // Body scroll lock
   useEffect(() => {
     if (isOpen) {
+      pauseAllAudio();
       document.body.style.overflow = "hidden";
 
       // ── Safe area bleed (mirrors Clubhouse) ──
@@ -102,6 +98,8 @@ export function FullscreenFeedOverlay() {
               followOverrides={followOverrides}
               onFollowChange={handleFollowChange}
               startIndex={startIndex}
+              onActiveIndexChange={setActiveIndex}
+              activeIndexOverride={activeIndex}
             />
 
             <FeedOverlayLayer
