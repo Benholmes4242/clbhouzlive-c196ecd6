@@ -282,12 +282,16 @@ function CourseDrawer({
   onUpdate,
   onUploadPhoto,
   isUploadingPhoto,
+  onDelete,
+  isDeleting,
 }: {
   course: AdminCourseRow | null;
   onClose: () => void;
   onUpdate: (id: string, updates: any) => void;
   onUploadPhoto: (courseId: string, file: File) => void;
   isUploadingPhoto: boolean;
+  onDelete: (id: string) => void;
+  isDeleting: boolean;
 }) {
   const navigate = useNavigate();
 
