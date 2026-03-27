@@ -276,14 +276,24 @@ export const UnifiedCourseCard: React.FC<UnifiedCourseCardProps> = ({
 
           {/* Right: community rating pill — only when data exists */}
           {showRating && course.communityRating != null && (
-            <div className="glass-badge-tight [--badge-w:auto]">
+            <div
+              className="flex items-center gap-1.5 flex-shrink-0"
+              style={{
+                background: 'rgba(255,255,255,0.12)',
+                border: '0.5px solid rgba(255,255,255,0.20)',
+                borderRadius: 6,
+                padding: '3px 7px',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+              }}
+            >
               <img
                 src="/assets/logomark-orange.png"
                 alt=""
-                className="w-4 h-4 object-contain"
+                className="w-3 h-3 object-contain"
                 aria-hidden="true"
               />
-              <span className="text-white">
+              <span className="text-[11px] font-bold text-white" style={{ lineHeight: 1 }}>
                 {course.communityRating.toFixed(1)}
               </span>
             </div>
