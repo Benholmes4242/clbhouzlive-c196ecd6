@@ -223,9 +223,12 @@ const Top100Courses = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
                     {regionalTop100.map((course) => (
                       <div key={course.id} className="mb-0">
-                        <CourseCard 
-                          course={course} 
-                          viewContext="regional" 
+                        <UnifiedCourseCard
+                          course={fromGolfCourse(course as unknown as GolfCourseRaw)}
+                          showRankBadges={true}
+                          showRating={true}
+                          showPlayedStatus={false}
+                          activeListSlug={selectedRegion === 'USA' ? 'usa' : selectedRegion === 'Britain & Ireland' ? 'gb-i' : 'europe'}
                         />
                       </div>
                     ))}
