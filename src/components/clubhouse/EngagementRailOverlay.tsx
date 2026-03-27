@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Heart, MessageCircle, Share, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 import { Squircle } from '@/components/ui/squircle';
 
 interface EngagementRailOverlayProps {
