@@ -35,13 +35,6 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         padding: '16px',
       }}
     >
-      {/* Subtle gradient glow behind card */}
-      <div 
-        className="absolute inset-0 flex items-center justify-center pointer-events-none"
-        style={{
-          background: 'linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.4) 100%)',
-        }}
-      />
       
       {/* Container with fade-in animation */}
       <div 
