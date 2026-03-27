@@ -388,9 +388,12 @@ export const TournamentInsights = memo(function TournamentInsights() {
     return result;
   }, [isLive, hasUpcoming, isCompleted]);
 
-  // DEV PREVIEW — REMOVE BEFORE RELEASE: Force results tab for UI review
+  // Compute default tab: Live > Next Up > Results
   const getDefaultTab = useMemo(() => {
-    return 'results';
+    if (isLive) return 'live';
+    if (hasUpcoming) return 'nextup';
+    if (isCompleted) return 'results';
+    return 'current';
   }, [isLive, hasUpcoming, isCompleted]);
 
   const [activeMainTab, setActiveMainTab] = useState(getDefaultTab);
