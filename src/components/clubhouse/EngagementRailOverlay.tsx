@@ -106,7 +106,8 @@ export const EngagementRailOverlay: React.FC<EngagementRailOverlayProps> = ({
 }) => {
   const isMobile = useIsMobile();
   const gap = isMobile ? 'gap-4' : 'gap-5';
-  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+  const isMuted = useClubhouseStore(s => s.isMuted);
+  const toggleMute = useClubhouseStore(s => s.toggleMute);
 
   if (!activePost) return null;
 
