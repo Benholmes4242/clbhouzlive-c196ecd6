@@ -44,7 +44,7 @@ export function HighlightsVideoProvider({ children }: { children: React.ReactNod
   const [hasUserGesture, setHasUserGesture] = useState(false);
 
   // Derive carousel preference from global state for API compatibility
-  const carouselAudioPreference: 'muted' | 'unmuted' = isGloballyMuted ? 'muted' : 'unmuted';
+  const carouselAudioPreference: 'muted' | 'unmuted' = isMuted ? 'muted' : 'unmuted';
 
   // Sync global mute state to carousel preference
   const updateCarouselAudioPreference = useCallback((preference: 'muted' | 'unmuted') => {
