@@ -716,7 +716,7 @@ export default function CoursesPage() {
         />
       ),
     }),
-  ], [setDrawerCourseId, updateCourse]);
+  ], [setDrawerCourseId, syncRank]);
 
   const filterOptions = [
     { id: 'all',      label: 'All',       count: counts.all },
