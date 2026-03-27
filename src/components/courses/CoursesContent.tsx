@@ -297,6 +297,32 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
             onTabChange={handleTabChange}
           />
 
+          {/* Rate a Course CTA — below tab bar, always visible on main courses page */}
+          {user && (
+            <button
+              onClick={() => setRateSheetOpen(true)}
+              style={{
+                width: '100%',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '11px 16px', marginTop: 8, marginBottom: 4,
+                background: 'linear-gradient(135deg, #F59E0B, #F97316)',
+                border: 'none', cursor: 'pointer', borderRadius: 12,
+              }}
+              className="active:opacity-90 transition-opacity"
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 30, height: 30, borderRadius: 8, background: 'rgba(255,255,255,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Star size={15} fill="white" color="white" />
+                </div>
+                <div style={{ textAlign: 'left' }}>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: 'white', margin: 0 }}>Rate a Course</p>
+                  <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.75)', margin: 0 }}>Search any course you've played</p>
+                </div>
+              </div>
+              <ChevronRight size={16} color="rgba(255,255,255,0.7)" />
+            </button>
+          )}
+
           <TabsContent value="explore" className="mt-2">
             <CourseExplorer />
           </TabsContent>
