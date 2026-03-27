@@ -39,10 +39,13 @@ const SQUIRCLE_RADIUS = '34%';
 const ACCENT = '#E8980A';
 const ACCENT_LIGHT = '#F59E0B';
 
-function getBestRoundLabel(leaderThru?: string | null): string {
+function getBestRoundLabel(leaderThru?: string | null): string | null {
   const roundFinished = leaderThru != null && String(leaderThru).toUpperCase() === 'F';
-  if (!roundFinished) return 'BEST TODAY';
-  return 'BEST YESTERDAY';
+  if (!roundFinished) return null;
+  const now = new Date();
+  const midnight = new Date(now);
+  midnight.setHours(23, 59, 59, 999);
+  return now <= midnight ? 'BEST TODAY' : null;
 }
 
 // ── Stat Tile (live state) ──
