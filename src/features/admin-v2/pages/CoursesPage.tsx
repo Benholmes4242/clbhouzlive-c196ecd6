@@ -367,10 +367,10 @@ function CourseDrawer({
           <div className="space-y-3">
             <AdminSectionHeader title="Top 100 Lists" />
             {([
-              { label: 'Global Top 100',   rankKey: 'global_rank' as const,   color: 'hsl(var(--accent-amber))' },
-              { label: 'Regional Top 100', rankKey: 'regional_rank' as const, color: '#3b82f6' },
-              { label: 'USA Top 100',      rankKey: 'usa_rank' as const,      color: '#dc2626' },
-            ]).map(({ label, rankKey, color }) => (
+              { label: 'Global Top 100',   rankKey: 'global_rank' as const,   color: 'hsl(var(--accent-amber))', slug: 'global' },
+              { label: 'Regional Top 100', rankKey: 'regional_rank' as const, color: '#3b82f6', slug: course.country && ['England','Scotland','Wales','Ireland','Northern Ireland'].includes(course.country) ? 'gb-i' : 'europe' },
+              { label: 'USA Top 100',      rankKey: 'usa_rank' as const,      color: '#dc2626', slug: 'usa' },
+            ]).map(({ label, rankKey, color, slug }) => (
               <div key={rankKey} className="flex items-center gap-3 p-3 rounded-xl border border-border/60 bg-muted/30">
                 <div className="flex-1">
                   <p className="text-[13px] font-medium text-foreground">{label}</p>
@@ -386,12 +386,12 @@ function CourseDrawer({
                       value={course[rankKey]}
                       type="number"
                       placeholder="Rank"
-                      onSave={(v) => onUpdate(course.id, { [rankKey]: v ? Number(v) : null })}
+                      onSave={(v) => onSyncRank(course.id, rankKey, v ? Number(v) : null, slug)}
                     />
                     <AdminButton
                       variant="ghost"
                       size="sm"
-                      onClick={() => onUpdate(course.id, { [rankKey]: null })}
+                      onClick={() => onSyncRank(course.id, rankKey, null, slug)}
                     >
                       Remove
                     </AdminButton>
@@ -400,7 +400,7 @@ function CourseDrawer({
                   <AdminButton
                     variant="outline"
                     size="sm"
-                    onClick={() => onUpdate(course.id, { [rankKey]: 999 })}
+                    onClick={() => onSyncRank(course.id, rankKey, 999, slug)}
                   >
                     Add to list
                   </AdminButton>
