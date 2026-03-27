@@ -1,7 +1,7 @@
 import React from 'react';
 import { VolumeX, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useClubhouseStore } from '@/store/clubhouseStore';
 
 interface FeedMuteToggleProps {
   isVideoPost?: boolean;
