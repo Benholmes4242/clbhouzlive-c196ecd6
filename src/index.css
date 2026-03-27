@@ -61,6 +61,7 @@ html {
 
 body {
   @apply font-sans;
+  background-color: #0d0d0d;
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
