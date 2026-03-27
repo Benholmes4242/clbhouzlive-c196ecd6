@@ -862,6 +862,7 @@ export default function CoursesPage() {
         course={drawerCourse}
         onClose={() => setDrawerCourseId(null)}
         onUpdate={updateCourse}
+        onSyncRank={syncRank}
         onUploadPhoto={uploadPhoto}
         isUploadingPhoto={isUploadingPhoto}
         onDelete={deleteCourse}
