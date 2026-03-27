@@ -4,7 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
-import CourseCard from './CourseCard';
+import { UnifiedCourseCard } from './UnifiedCourseCard';
+import { fromGolfCourse, GolfCourseRaw } from '@/lib/mappers/toCourseCardModel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Trophy, Globe, Map as MapIcon, Upload } from 'lucide-react';
 
@@ -146,9 +147,12 @@ const Top100Courses = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
                   {globalTop100.map((course) => (
                     <div key={course.id} className="mb-0">
-                      <CourseCard 
-                        course={course} 
-                        viewContext="global" 
+                      <UnifiedCourseCard
+                        course={fromGolfCourse(course as unknown as GolfCourseRaw)}
+                        showRankBadges={true}
+                        showRating={true}
+                        showPlayedStatus={false}
+                        activeListSlug="global"
                       />
                     </div>
                   ))}
@@ -219,9 +223,12 @@ const Top100Courses = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
                     {regionalTop100.map((course) => (
                       <div key={course.id} className="mb-0">
-                        <CourseCard 
-                          course={course} 
-                          viewContext="regional" 
+                        <UnifiedCourseCard
+                          course={fromGolfCourse(course as unknown as GolfCourseRaw)}
+                          showRankBadges={true}
+                          showRating={true}
+                          showPlayedStatus={false}
+                          activeListSlug={selectedRegion === 'USA' ? 'usa' : selectedRegion === 'Britain & Ireland' ? 'gb-i' : 'europe'}
                         />
                       </div>
                     ))}
