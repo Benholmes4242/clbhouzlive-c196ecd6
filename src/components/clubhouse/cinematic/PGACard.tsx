@@ -12,6 +12,7 @@ function getBestRoundLabel(leaderThru?: string | null): string | null {
   return now <= midnight ? 'BEST TODAY' : null;
 }
 
+interface PGACardProps {
   post: PGACardFeedPost;
   onComment: () => void;
   onLike: () => void;
