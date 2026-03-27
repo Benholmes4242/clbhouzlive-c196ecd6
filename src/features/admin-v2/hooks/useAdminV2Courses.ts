@@ -334,8 +334,8 @@ export function useAdminV2Courses() {
   // ── Delete mutation (via edge function with safety checks) ──
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { data, error } = await supabase.functions.invoke('delete-golf-course', {
-        body: { courseId: id },
+      const { data, error } = await supabase.functions.invoke('secure-admin-operations', {
+        body: { action: 'delete_course', courseId: id },
       });
       if (error) throw error;
       if (data?.error) {
