@@ -129,11 +129,6 @@ export function useTournamentSchedule(options: UseTournamentScheduleOptions = {}
         // Handle season data (can be array or object depending on query)
         const seasonData = Array.isArray(tournament.season) ? tournament.season[0] : tournament.season;
 
-        // Major override — Sportradar stores Grand Slams under EURO season
-        const rawTourName = seasonData?.tour_name ?? 'PGA Tour';
-        const isMiscodedMajor = isMajor && rawTourName.toLowerCase() !== 'pga' && !nameLower.includes('senior') && !nameLower.includes('women');
-        const effectiveTourName = isMiscodedMajor ? 'pga' : rawTourName;
-
         return {
           id: tournament.id,
           name: tournament.name,
@@ -147,7 +142,7 @@ export function useTournamentSchedule(options: UseTournamentScheduleOptions = {}
           purse: purseRaw,
           purseFormatted,
           status: tournament.status,
-          tourName: effectiveTourName,
+          tourName: seasonData?.tour_name ?? 'PGA Tour',
           year: seasonData?.year ?? new Date().getFullYear(),
           par: courseData.par ?? null,
           yardage: courseData.yardage ?? null,
