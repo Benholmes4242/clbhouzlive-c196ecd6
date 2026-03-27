@@ -331,6 +331,22 @@ export function useAdminV2Courses() {
     onError: () => toast.error('Failed to upload photo'),
   });
 
+  // ── Delete mutation ──
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('golf_courses')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Course deleted');
+      qc.invalidateQueries({ queryKey: ['admin-v2', 'courses'] });
+    },
+    onError: () => toast.error('Failed to delete course'),
+  });
+
   // ── Handlers ──
   const handleSearch = (v: string) => { setSearch(v); setPage(1); };
   const handleFilter = (v: string) => { setListFilter(v as CourseFilterList); setPage(1); };
@@ -356,5 +372,7 @@ export function useAdminV2Courses() {
     uploadPhoto: (courseId: string, file: File) =>
       photoMutation.mutate({ courseId, file }),
     isUploadingPhoto: photoMutation.isPending,
+    deleteCourse: (id: string) => deleteMutation.mutate(id),
+    isDeleting: deleteMutation.isPending,
   };
 }
