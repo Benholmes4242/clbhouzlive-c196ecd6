@@ -144,6 +144,95 @@ function MiniAvatar({ src, alt, size = 32 }: { src: string; alt: string; size?: 
   );
 }
 
+/** Leader hero strip — sticky above scrollable leaderboard in expanded live state */
+function LeaderHeroStrip({ 
+  leaderEntry, 
+  tourSlug, 
+  leaderStats 
+}: { 
+  leaderEntry: any; 
+  tourSlug: string; 
+  leaderStats: LeaderStats | null | undefined;
+}) {
+  const [imgErr, setImgErr] = useState(false);
+  const p = leaderEntry.player;
+  if (!p) return null;
+
+  const fullName = p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim();
+  const effectiveTourCode = p.tour_codes?.[0] ?? tourSlug ?? 'pga';
+  const photoUrl = getPlayerHeadshotUrl(fullName, effectiveTourCode, p.headshot_override);
+  const score = leaderEntry.score ?? 0;
+  const scoreDisplay = score === 0 ? 'E' : score > 0 ? `+${score}` : `${score}`;
+  const thruRaw = leaderEntry.thru;
+  const thruDisplay = leaderEntry.status === 'cut' ? 'CUT'
+    : leaderEntry.status === 'wd' ? 'WD'
+    : thruRaw === 18 ? 'F'
+    : thruRaw === 0 || thruRaw == null ? '-'
+    : `${thruRaw}`;
+
+  const statsToShow = leaderStats ? [
+    leaderStats.eagles > 0 && { v: leaderStats.eagles, label: 'Eagles', color: '#F59E0B' },
+    { v: leaderStats.birdies, label: 'Birdies', color: '#4ade80' },
+    { v: leaderStats.pars, label: 'Pars', color: 'rgba(255,255,255,0.65)' },
+    { v: leaderStats.bogeys, label: 'Bogeys', color: '#F97316' },
+    leaderStats.doubleBogeys > 0 && { v: leaderStats.doubleBogeys, label: 'Doubles', color: '#f87171' },
+  ].filter(Boolean) as Array<{ v: number; label: string; color: string }> : [];
+
+  return (
+    <div style={{ padding: '0 16px', flexShrink: 0 }}>
+      {/* Leader pill */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        background: 'rgba(255,255,255,0.07)',
+        border: '1px solid rgba(255,255,255,0.11)',
+        borderRadius: 12,
+        padding: '10px 12px',
+        marginBottom: 6,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', width: 18, textAlign: 'center', flexShrink: 0 }}>1</span>
+          <div style={{ width: 36, height: 38, borderRadius: '34%', border: '1.5px solid rgba(255,255,255,0.20)', background: 'rgba(255,255,255,0.07)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {photoUrl && !imgErr ? (
+              <img src={photoUrl} alt="" onError={() => setImgErr(true)} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
+            ) : (
+              <PlayerSilhouette size={24} />
+            )}
+          </div>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', lineHeight: 1.2 }}>{fullName}</div>
+            <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>
+              {thruDisplay === 'F' ? 'Finished' : thruDisplay === '-' ? 'Not started' : `Thru ${thruDisplay}`}
+            </span>
+          </div>
+        </div>
+        <span style={{ fontSize: 22, fontWeight: 800, color: score < 0 ? '#4ade80' : score === 0 ? 'rgba(255,255,255,0.75)' : '#f87171', lineHeight: 1, flexShrink: 0 }}>
+          {scoreDisplay}
+        </span>
+      </div>
+
+      {/* Stat strip */}
+      {statsToShow.length > 0 && (
+        <div style={{ display: 'flex', gap: 4, marginBottom: 8 }}>
+          {statsToShow.map(stat => (
+            <div key={stat.label} style={{ flex: 1, textAlign: 'center', padding: '6px 2px 5px', borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div style={{ fontSize: 14, fontWeight: 800, color: stat.color, lineHeight: 1 }}>{stat.v}</div>
+              <div style={{ fontSize: 7, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 3 }}>{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* In Contention separator */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+        <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
+        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', flexShrink: 0 }}>In Contention</span>
+        <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
+      </div>
+    </div>
+  );
+}
+
+
 interface LeaderboardRowProps {
   leader: LeaderEntry;
   isFirst: boolean;
