@@ -9,6 +9,11 @@ const ScrollToTopGlass = () => {
     const rootEl = document.getElementById('root');
 
     const onScroll = () => {
+      // Hide when a fullscreen overlay is active
+      if (document.body.classList.contains('route-fullscreen-overlay')) {
+        setVisible(false);
+        return;
+      }
       const windowScrolled = window.scrollY > 400;
       const rootScrolled = rootEl ? rootEl.scrollTop > 400 : false;
       setVisible(windowScrolled || rootScrolled);
