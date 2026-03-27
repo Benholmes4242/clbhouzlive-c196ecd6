@@ -8,7 +8,6 @@ export const GLOBAL_HEADER_EXCLUDED_ROUTES = [
   '/auth/callback',
   '/auth/check-email',
   '/auth/verified',
-  '/auth/reset-password',
   '/verified',
   '/signup',
   '/onboarding',
