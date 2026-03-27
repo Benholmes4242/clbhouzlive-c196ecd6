@@ -52,6 +52,7 @@ img[src*="Silhouette"] {
  * Now using standard body scroll with overscroll prevention.
  */
 html {
+  background-color: #0d0d0d;
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
