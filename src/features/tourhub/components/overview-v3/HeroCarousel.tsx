@@ -625,65 +625,66 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
             exit={{ opacity: 0, y: 20 }}
           >
 
-            {/* ─── COMPLETED: tournament name goes straight to top ─── */}
-            {isCompleted ? (
-              <>
+            {/* ─── Tournament header — hidden when scorecard is open ─── */}
+            {!selectedPlayer && (
+              isCompleted ? (
+                <>
+                  <div style={{ padding: isExpanded ? '0 20px' : undefined }}>
+                    <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
+                      <h2 className="hero-tournament-name">{tournament.name}</h2>
+                    </Link>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`);
+                      }}
+                      className="hero-venue block active:opacity-70 transition-opacity cursor-pointer"
+                    >
+                      {tournament.venueName}
+                      {tournament.venueCity && ` · ${tournament.venueCity}`}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
                 <div style={{ padding: isExpanded ? '0 20px' : undefined }}>
-                  <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
-                    <h2 className="hero-tournament-name">{tournament.name}</h2>
-                  </Link>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`);
-                    }}
-                    className="hero-venue block active:opacity-70 transition-opacity cursor-pointer"
-                  >
-                    {tournament.venueName}
-                    {tournament.venueCity && ` · ${tournament.venueCity}`}
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-              <div style={{ padding: isExpanded ? '0 20px' : undefined }}>
-                  {/* Row 1: Status | Tour Badge (right-aligned) — live + upcoming only */}
-                  <div className="flex items-center justify-between" style={{ marginBottom: '6px' }}>
-                    {isLive ? (
-                      <div className="flex items-center gap-1.5">
-                        <span className="live-dot" />
-                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: tournament.isMajor ? '#FACC15' : '#22C55E' }}>LIVE</span>
-                      </div>
-                    ) : isUpcoming ? (
-                      <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' as const }}>
-                        {getStartLabel(tournament.startDate)}
-                      </span>
-                    ) : (
-                      <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'white' }}>COMPLETED</span>
-                    )}
-                    <div className="flex items-center gap-2">
-                      <div className="tour-badge">
-                        <span>
-                          {getTourDisplayName(tournament.tourSlug)}
+                    <div className="flex items-center justify-between" style={{ marginBottom: '6px' }}>
+                      {isLive ? (
+                        <div className="flex items-center gap-1.5">
+                          <span className="live-dot" />
+                          <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: tournament.isMajor ? '#FACC15' : '#22C55E' }}>LIVE</span>
+                        </div>
+                      ) : isUpcoming ? (
+                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' as const }}>
+                          {getStartLabel(tournament.startDate)}
                         </span>
+                      ) : (
+                        <span style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '1.5px', color: 'white' }}>COMPLETED</span>
+                      )}
+                      <div className="flex items-center gap-2">
+                        <div className="tour-badge">
+                          <span>
+                            {getTourDisplayName(tournament.tourSlug)}
+                          </span>
+                        </div>
                       </div>
                     </div>
+                    <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
+                      <h2 className="hero-tournament-name">{tournament.name}</h2>
+                    </Link>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`);
+                      }}
+                      className="hero-venue block active:opacity-70 transition-opacity cursor-pointer"
+                    >
+                      {tournament.venueName}
+                      {tournament.venueCity && ` · ${tournament.venueCity}`}
+                    </button>
                   </div>
-                  <Link to={`/tourhub/tournament/${tournament.id}`} className="block active:opacity-70 transition-opacity">
-                    <h2 className="hero-tournament-name">{tournament.name}</h2>
-                  </Link>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/tourhub/courses?q=${encodeURIComponent(tournament.venueName || '')}`);
-                    }}
-                    className="hero-venue block active:opacity-70 transition-opacity cursor-pointer"
-                  >
-                    {tournament.venueName}
-                    {tournament.venueCity && ` · ${tournament.venueCity}`}
-                  </button>
-                </div>
-              </>
+                </>
+              )
             )}
 
             {/* ─── State-specific content — each section uses Capsule spring easing ─── */}
