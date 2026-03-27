@@ -250,6 +250,7 @@ const AchievementsHubPage: React.FC = () => {
           </section>
         </>
       )}
+      <ScrollToTopGlass />
     </div>
   );
 };

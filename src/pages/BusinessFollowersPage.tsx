@@ -371,6 +371,7 @@ export default function BusinessFollowersPage() {
           )}
         </>
       )}
+      <ScrollToTopGlass />
     </div>
   );
 }

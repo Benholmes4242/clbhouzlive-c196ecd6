@@ -313,6 +313,7 @@ const CourseReviewsPage: React.FC = () => {
           </div>
         )}
       </div>
+      <ScrollToTopGlass />
     </div>
   );
 };

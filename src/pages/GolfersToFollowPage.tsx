@@ -506,6 +506,7 @@ const GolfersToFollowPage = () => {
         )}
         </div>
       </div>
+      <ScrollToTopGlass />
     </PageRoot>
   );
 };

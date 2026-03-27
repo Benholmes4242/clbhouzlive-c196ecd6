@@ -28,6 +28,7 @@ import { Trophy, ChevronRight, ChevronDown, MoreHorizontal, Send, UserPlus, User
 import { EliteGameCard, type EliteCardTier } from '@/components/achievements/EliteGameCard';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { ProfileSkeleton } from '@/components/skeletons/ProfileSkeleton';
+import ScrollToTopGlass from '@/components/common/ScrollToTopGlass';
 import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { safeGoBack } from '@/utils/navigation';

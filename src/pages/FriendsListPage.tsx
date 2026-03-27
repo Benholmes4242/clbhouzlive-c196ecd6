@@ -102,6 +102,8 @@ const FriendsListPage = () => {
       isOwnProfile={isOwnProfile}
       profileUsername={profileUser.username}
     />
+    <ScrollToTopGlass />
+    </>
   );
 };
 

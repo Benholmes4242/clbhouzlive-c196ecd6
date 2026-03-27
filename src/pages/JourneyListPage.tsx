@@ -273,6 +273,7 @@ const JourneyListPage: React.FC = () => {
           ))
         )}
       </div>
+      <ScrollToTopGlass />
     </div>
   );
 };

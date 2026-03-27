@@ -385,6 +385,7 @@ const ActivityPage: React.FC = () => {
         onToggleRead={handleToggleRead}
         onDelete={handleDeleteNotification}
       />
+      <ScrollToTopGlass />
     </PageRoot>
   );
 };

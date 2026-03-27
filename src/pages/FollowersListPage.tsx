@@ -125,6 +125,8 @@ const FollowersListPage = () => {
       onFollowingLoadMore={() => followingFetchNextPage()}
       onFollowingRefetch={() => followingRefetch()}
     />
+    <ScrollToTopGlass />
+    </>
   );
 };
 

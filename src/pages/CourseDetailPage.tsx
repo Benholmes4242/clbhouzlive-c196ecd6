@@ -51,6 +51,7 @@ const CourseDetailPage = () => {
       <FadeInContent>
         <GolfClubView courseId={courseId} isInModal={false} />
       </FadeInContent>
+      <ScrollToTopGlass />
     </PageRoot>
   );
 };

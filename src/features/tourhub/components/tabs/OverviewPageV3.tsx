@@ -123,6 +123,7 @@ export function OverviewPageV3() {
             </LazySection>
           </div>
         </div>
+        <ScrollToTopGlass />
       </motion.div>
     </>
   );
