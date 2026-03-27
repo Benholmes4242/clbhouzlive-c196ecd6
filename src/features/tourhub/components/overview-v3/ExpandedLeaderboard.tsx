@@ -4,7 +4,8 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
+import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
+import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
 import type { Database } from '@/integrations/supabase/types';
 import type { PlayerInfo } from '@/components/tourhub/PlayerScorecardCard';
 
@@ -130,6 +131,7 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
   onPlayerTap?: (player: PlayerInfo) => void;
 }) {
   const player = entry.player;
+  const [imgError, setImgError] = useState(false);
   if (!player) return null;
 
   const firstName = player.first_name || '';
@@ -138,7 +140,8 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
     ? `${firstName[0]}. ${lastName}`
     : lastName || 'Unknown';
   const fullName = player.full_name || `${firstName} ${lastName}`.trim();
-  const photoUrl = getPlayerHeadshotUrl(fullName, tourCode);
+  const effectiveTourCode = player.tour_codes?.[0] ?? tourCode;
+  const photoUrl = getPlayerHeadshotUrl(fullName, effectiveTourCode, player.headshot_override);
   const initials = `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase();
   const posDisplay = entry.position_tied ? `T${entry.position}` : `${entry.position ?? '-'}`;
   const thruDisplay = formatThru(entry);
@@ -159,8 +162,9 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
           lastName,
           photoUrl: getPlayerHeadshotUrl(
             player.full_name || `${player.first_name || ''} ${player.last_name || ''}`.trim(),
-            tourCode
-          ) || player.photo_url || player.headshot_override || undefined,
+            effectiveTourCode,
+            player.headshot_override
+          ) || player.photo_url || undefined,
           countryCode: player.country_code || player.country || undefined,
           position: posDisplay,
           totalScore: entry.score ?? 0,
@@ -205,10 +209,17 @@ const ExpandedLeaderboardRow = React.memo(function ExpandedLeaderboardRow({
           className="overflow-hidden flex-shrink-0"
           style={{ width: 32, height: 33, borderRadius: '34%', border: '1.5px solid rgba(255,255,255,0.18)', background: 'rgba(255,255,255,0.12)' }}
         >
-          {photoUrl ? (
-            <img src={photoUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover object-top" onError={(e) => { (e.target as HTMLImageElement).src = PLAYER_SILHOUETTE_URL; }} />
+          {photoUrl && !imgError ? (
+            <img
+              src={photoUrl}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover object-top"
+              onError={() => setImgError(true)}
+            />
           ) : (
-            <div className="w-full h-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.12)', fontSize: 8, fontWeight: 600, color: 'rgba(255,255,255,0.80)' }}>{initials}</div>
+            <PlayerSilhouette size={20} />
           )}
         </div>
         <span className="truncate" style={{
