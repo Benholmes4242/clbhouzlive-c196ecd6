@@ -214,6 +214,12 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
     onClose();
   }, [navigate, onClose, handleSaveRecent]);
 
+  const selectCourseRate = useCallback((course: ClubResult) => {
+    handleSaveRecent(course.name);
+    onClose();
+    navigate(`/courses/${course.id}/rate`);
+  }, [navigate, onClose, handleSaveRecent]);
+
   const selectPerson = useCallback((person: PersonResult) => {
     handleSaveRecent(person.display_name);
     navigate(`/profile/${person.username}`);

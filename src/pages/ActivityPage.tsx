@@ -314,6 +314,9 @@ const ActivityPage: React.FC = () => {
               </>
             ) : (
               <div className="w-full space-y-0">
+                {/* Rate course nudge — shown to users with few ratings */}
+                <RateCourseNudge />
+
                 {/* Tier 1 — Featured cards for new/unread */}
                 {filteredNewItems.length > 0 && (
                   <div className="px-4 space-y-3 pb-4">

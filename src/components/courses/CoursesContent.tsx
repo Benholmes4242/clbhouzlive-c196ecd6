@@ -343,6 +343,8 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
 
         {/* Global scroll-to-top button */}
         <ScrollToTopGlass />
+        {/* Rate sheet portal */}
+        <RateCourseSheet open={rateSheetOpen} onClose={() => setRateSheetOpen(false)} />
       </div>
     </CoursesErrorBoundary>
   );
