@@ -323,7 +323,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
             </button>
           )}
 
-          <TabsContent value="explore" className="mt-2">
+          <TabsContent value="explore" className="mt-3">
             <CourseExplorer />
           </TabsContent>
 
