@@ -55,8 +55,10 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   onBeforeNavigate,
   activeReview,
   isActiveReview,
+  activeIndexOverride,
 }: FeedOverlayLayerProps) {
-  const activeIndex = useClubhouseStore(s => s.activeIndex);
+  const clubhouseActiveIndex = useClubhouseStore(s => s.activeIndex);
+  const activeIndex = activeIndexOverride ?? clubhouseActiveIndex;
   const isMuted = useClubhouseStore(s => s.isMuted);
   const toggleMute = useClubhouseStore(s => s.toggleMute);
   const carouselPositions = useClubhouseStore(s => s.carouselPositions);
