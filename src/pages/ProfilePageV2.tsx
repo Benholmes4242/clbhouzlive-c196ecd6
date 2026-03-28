@@ -33,6 +33,8 @@ import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { safeGoBack } from '@/utils/navigation';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
+import { FavouritesCarousel } from '@/components/profile/courses/FavouritesCarousel';
+import { AddCourseModal } from '@/components/profile/courses/AddCourseModal';
 
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
