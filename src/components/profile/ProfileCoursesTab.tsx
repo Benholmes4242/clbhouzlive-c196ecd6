@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useUserCourseSummary } from '@/hooks/useUserCourseSummary';
 import { useUserTopTenCourses } from '@/hooks/useUserTopTenCourses';
 import { JourneySummaryCard } from './courses/JourneySummaryCard';
-import { FavouritesCarousel } from './courses/FavouritesCarousel';
+
 import { WantToPlaySection } from './courses/WantToPlaySection';
 import { AllCoursesList } from './courses/AllCoursesList';
 import { AddCourseModal } from './courses/AddCourseModal';
