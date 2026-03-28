@@ -53,17 +53,18 @@ function TourLogo({ tourSlug, isMajor }: { tourSlug: string; isMajor: boolean })
 function DateGroupHeader({ label, count }: { label: string; count: number }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-      <span
-        style={{
-          fontSize: '13px',
-          fontWeight: 700,
-          color: 'hsl(var(--foreground))',
-          letterSpacing: '0.02em',
-          whiteSpace: 'nowrap',
-        }}
-      >
+      <div style={{
+        background: 'hsl(var(--foreground))',
+        color: 'hsl(var(--background))',
+        borderRadius: '8px',
+        padding: '4px 10px',
+        fontSize: '11px',
+        fontWeight: 800,
+        letterSpacing: '0.3px',
+        flexShrink: 0,
+      }}>
         {label}
-      </span>
+      </div>
       <div style={{ flex: 1, height: '1px', background: 'hsl(var(--border) / 0.5)' }} />
       <span
         style={{ fontSize: '11px', fontWeight: 500, color: 'hsl(var(--muted-foreground))', whiteSpace: 'nowrap' }}
