@@ -27,17 +27,17 @@ export const CATEGORY_ACCENT_COLORS: Record<CategoryId, typeof AMBER_ACCENT> = {
   sand_saves: AMBER_ACCENT,
 };
 
-/** Pill order: overall → tee-to-green → short game → career/season */
+/** Pill order: power → money → efficiency → short game */
 export const CATEGORY_CONFIG: { id: CategoryId; name: string }[] = [
-  { id: 'sg_total',    name: '⚡ Strokes Gained' },
-  { id: 'scoring_avg', name: '🎯 Scoring Avg' },
-  { id: 'earnings',    name: '💰 Bag Man' },
-  { id: 'distance',    name: '💥 Big Hitter' },
-  { id: 'accuracy',    name: '🏹 Sniper' },
-  { id: 'gir_pct',     name: '🟢 Green Machine' },
-  { id: 'putting',     name: '🕳️ Silky Stroke' },
-  { id: 'scrambling',  name: '🔥 Escape Artist' },
-  { id: 'sand_saves',  name: '🏖️ Sand Wizard' },
+  { id: 'distance',    name: '💥 Big Hitter'      },
+  { id: 'earnings',    name: '💰 Bag Man'          },
+  { id: 'sg_total',    name: '⚡ Strokes Gained'   },
+  { id: 'scoring_avg', name: '🎯 Scoring Avg'      },
+  { id: 'gir_pct',     name: '🟢 Green Machine'    },
+  { id: 'putting',     name: '🕳️ Silky Stroke'     },
+  { id: 'accuracy',    name: '🎯 Sniper Par'       },
+  { id: 'scrambling',  name: '🔥 Escape Artist'    },
+  { id: 'sand_saves',  name: '🏖️ Sand Wizard'      },
 ];
 
 export const SPRING_CONFIG = {
