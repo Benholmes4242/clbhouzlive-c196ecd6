@@ -177,7 +177,7 @@ function EventRow({ tournament, index }: { tournament: SeasonTournament; index: 
           </div>
         )}
       </div>
-      <ChevronRight style={{ width: 16, height: 16, color: 'hsl(var(--muted-foreground))', flexShrink: 0, opacity: 0.5 }} />
+      <TourLogo tourSlug={tourSlug} isMajor={false} />
     </motion.button>
   );
 }
