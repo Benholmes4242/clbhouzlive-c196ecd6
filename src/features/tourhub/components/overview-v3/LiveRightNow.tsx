@@ -180,7 +180,7 @@ export function LiveRightNow() {
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              style={{ width: 168, height: 160, borderRadius: 16, background: 'hsl(var(--muted))', flexShrink: 0 }}
+              style={{ width: 200, height: 170, borderRadius: 14, background: 'hsl(var(--muted))', flexShrink: 0 }}
             />
           ))}
         </div>
