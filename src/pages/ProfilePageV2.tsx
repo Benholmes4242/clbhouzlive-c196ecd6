@@ -33,6 +33,8 @@ import { useHideHeader } from '@/hooks/useHeaderVisibility';
 import { useMedianStatusBar } from '@/hooks/useMedianStatusBar';
 import { safeGoBack } from '@/utils/navigation';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
+import { FavouritesCarousel } from '@/components/profile/courses/FavouritesCarousel';
+import { AddCourseModal } from '@/components/profile/courses/AddCourseModal';
 
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
@@ -193,6 +195,7 @@ const ProfilePageV2Content: React.FC = () => {
   const [isAvatarLightboxOpen, setIsAvatarLightboxOpen] = useState(false);
   const [showBlockDialog, setShowBlockDialog] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
+  const [showTopTenModal, setShowTopTenModal] = useState(false);
 
   // Inline photo upload state
   const avatarFileInputRef = useRef<HTMLInputElement>(null);
@@ -1045,13 +1048,32 @@ const ProfilePageV2Content: React.FC = () => {
           </section>
         ) : null}
 
+        {/* Personal Top 10 Carousel */}
+        {isPersonal && profile?.id && (
+          <div className="mt-4 mb-2">
+            <FavouritesCarousel
+              userId={profile.id}
+              isOwnProfile={isSelf}
+              onManage={isSelf ? () => setShowTopTenModal(true) : undefined}
+              displayName={profile.display_name ?? profile.username ?? undefined}
+            />
+            {showTopTenModal && isSelf && (
+              <AddCourseModal
+                userId={profile.id}
+                onClose={() => setShowTopTenModal(false)}
+                existingCourseIds={[]}
+              />
+            )}
+          </div>
+        )}
+
         {/* Divider above Clubs section */}
         <div className="px-5 mb-3">
           <div className="border-t border-border" />
         </div>
 
         {/* Clubs section - directly on page background without card */}
-        <ClubsSectionWrapper 
+        <ClubsSectionWrapper
           profileId={profile?.id}
           viewerId={user?.id}
           isPersonal={isPersonal}
