@@ -24,24 +24,21 @@ function ScoreChip({ score, display }: { score: number; display: string }) {
     : score > 0
     ? TOUR_COLORS.movementDown
     : 'hsl(var(--muted-foreground))';
-
   return (
     <div
       style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        padding: '3px 8px',
+        background: `${color}15`,
         borderRadius: '8px',
-        background: 'hsl(var(--muted) / 0.6)',
+        padding: '2px 8px',
       }}
     >
       <span
         style={{
-          fontSize: '15px',
-          fontWeight: 800,
-          fontVariantNumeric: 'tabular-nums',
           color,
-          letterSpacing: '-0.5px',
+          fontSize: '22px',
+          fontWeight: 700,
+          lineHeight: 1.1,
+          letterSpacing: '-0.02em',
         }}
       >
         {display}
@@ -58,7 +55,6 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
 
   return (
     <button
-      type="button"
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
       className="flex-shrink-0 text-left active:scale-[0.98] transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
       style={{
@@ -74,48 +70,30 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
       {/* Green top strip */}
       <div
         style={{
-          height: '4px',
-          background: TOUR_COLORS.liveGreen,
-          position: 'relative',
+          background: 'linear-gradient(90deg, #16a34a, #15803d)',
+          padding: '6px 10px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <span
-          style={{
-            position: 'absolute',
-            top: '6px',
-            left: '12px',
-            fontSize: '8px',
-            fontWeight: 800,
-            letterSpacing: '1.5px',
-            color: TOUR_COLORS.liveGreen,
-          }}
-        >
+        <span style={{ color: '#fff', fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em' }}>
           LIVE
         </span>
-        <div style={{ position: 'absolute', top: '6px', right: '12px' }}>
-          {tourLogoSrc && (
-            <img
-              src={tourLogoSrc}
-              alt={tourSlug}
-              style={{
-                width: logoSize,
-                height: logoSize,
-                objectFit: 'contain',
-                opacity: 0.5,
-              }}
-            />
-          )}
-        </div>
+        <div
+          className="animate-live-pulse"
+          style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }}
+        />
       </div>
 
-      <div style={{ padding: '20px 12px 12px' }}>
-        {/* Tournament name */}
+      <div style={{ padding: '10px 12px 12px' }}>
+        {/* Tournament name — 2 line clamp */}
         <div
           style={{
             fontSize: '13px',
-            fontWeight: 700,
+            fontWeight: 600,
             color: 'hsl(var(--foreground))',
-            lineHeight: 1.3,
+            lineHeight: 1.25,
             marginBottom: '10px',
             display: '-webkit-box',
             WebkitLineClamp: 2,
@@ -127,15 +105,15 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
         </div>
 
         {/* Leader + score chip */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '6px' }}>
           <div style={{ minWidth: 0 }}>
             <div
               style={{
                 fontSize: '9px',
-                fontWeight: 700,
-                letterSpacing: '1px',
-                textTransform: 'uppercase',
-                color: 'hsl(var(--muted-foreground) / 0.5)',
+                fontWeight: 600,
+                color: 'hsl(var(--muted-foreground))',
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase' as const,
                 marginBottom: '2px',
               }}
             >
@@ -143,7 +121,7 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
             </div>
             <div
               style={{
-                fontSize: '12px',
+                fontSize: '13px',
                 fontWeight: 600,
                 color: 'hsl(var(--foreground))',
                 whiteSpace: 'nowrap',
@@ -151,31 +129,24 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
                 textOverflow: 'ellipsis',
               }}
             >
-              {tournament.leader
-                ? abbreviateName(tournament.leader.name)
-                : 'Starting soon'}
+              {tournament.leader ? abbreviateName(tournament.leader.name) : 'Starting soon'}
             </div>
           </div>
-
           {tournament.leader && (
-            <ScoreChip score={tournament.leader.score} display={tournament.leader.scoreDisplay} />
+            <ScoreChip
+              score={tournament.leader.score}
+              display={tournament.leader.scoreDisplay}
+            />
           )}
         </div>
 
-        {/* Tour logo */}
+        {/* Tour logo — bottom of card */}
         {tourLogoSrc && (
-          <div
-            style={{
-              marginTop: '10px',
-              display: 'flex',
-              justifyContent: 'flex-end',
-              opacity: 0.4,
-            }}
-          >
+          <div style={{ marginTop: '10px', opacity: 0.5 }}>
             <img
               src={tourLogoSrc}
-              alt={tourSlug}
-              style={{ width: logoSize, height: logoSize, objectFit: 'contain' }}
+              alt=""
+              style={{ height: logoSize, width: 'auto', objectFit: 'contain' }}
             />
           </div>
         )}
@@ -189,66 +160,53 @@ export function LiveRightNow() {
 
   if (error) {
     return (
-      <section aria-label="Live tournaments">
-        <SectionErrorState sectionName="live tournaments" onRetry={() => refetch()} />
-      </section>
+      <div style={{ padding: '0 16px' }}>
+        <SectionErrorState title="Live Right Now" onRetry={() => refetch()} />
+      </div>
     );
   }
 
   if (isLoading) {
     return (
-      <section className="bg-background" aria-label="Live tournaments">
-        <div className="flex items-center gap-2 mb-4 px-4">
-          <span className="w-2 h-2 rounded-full bg-green-500 opacity-50" />
-          <h2 className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
+      <div style={{ padding: '0 16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+          <div className="animate-live-pulse" style={{ width: 8, height: 8, borderRadius: '50%', background: TOUR_COLORS.liveGreen }} />
+          <span style={{ fontSize: '17px', fontWeight: 700, color: 'hsl(var(--foreground))' }}>
             Live Right Now
-          </h2>
+          </span>
         </div>
-        <div
-          className="[&::-webkit-scrollbar]:hidden"
-          style={{
-            display: 'flex',
-            gap: '10px',
-            overflowX: 'auto',
-            scrollbarWidth: 'none',
-            padding: '0 16px',
-          }}
-        >
+        <div style={{ display: 'flex', gap: '10px', overflowX: 'auto' }}>
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="flex-shrink-0 rounded-2xl bg-card border border-border/50 animate-pulse"
-              style={{ width: '180px', height: '140px' }}
+              style={{ width: 180, height: 160, borderRadius: 16, background: 'hsl(var(--muted))', flexShrink: 0 }}
             />
           ))}
         </div>
-      </section>
+      </div>
     );
   }
 
   if (!liveTournaments || liveTournaments.length === 0) return null;
 
   return (
-    <section className="bg-background" aria-label="Live tournaments">
+    <div style={{ paddingLeft: '16px' }}>
       {/* Header */}
-      <div className="flex items-center gap-2 mb-4 px-4">
-        <span
-          className="w-2 h-2 rounded-full animate-live-pulse"
-          style={{
-            background: '#22C55E',
-            boxShadow: '0 0 10px rgba(34, 197, 94, 0.45)',
-          }}
-        />
-        <h2 className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', paddingRight: '16px' }}>
+        <div className="animate-live-pulse" style={{ width: 8, height: 8, borderRadius: '50%', background: TOUR_COLORS.liveGreen }} />
+        <span style={{ fontSize: '17px', fontWeight: 700, color: 'hsl(var(--foreground))' }}>
           Live Right Now
-        </h2>
+        </span>
         <span
           style={{
             marginLeft: 'auto',
-            fontSize: '10px',
+            fontSize: '11px',
             fontWeight: 700,
-            letterSpacing: '1px',
+            letterSpacing: '0.04em',
             color: TOUR_COLORS.liveGreen,
+            background: `${TOUR_COLORS.liveGreen}15`,
+            borderRadius: '6px',
+            padding: '3px 8px',
           }}
         >
           {liveTournaments.length} LIVE
@@ -262,8 +220,9 @@ export function LiveRightNow() {
           display: 'flex',
           gap: '10px',
           overflowX: 'auto',
+          paddingRight: '16px',
+          paddingBottom: '4px',
           scrollbarWidth: 'none',
-          padding: '0 16px',
           WebkitOverflowScrolling: 'touch',
         }}
       >
@@ -271,6 +230,6 @@ export function LiveRightNow() {
           <LiveBroadcastCard key={tournament.id} tournament={tournament} />
         ))}
       </div>
-    </section>
+    </div>
   );
 }
