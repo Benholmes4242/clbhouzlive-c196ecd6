@@ -47,7 +47,7 @@ const ChaserCard = memo(function ChaserCard({
   return (
     <button
       onClick={() => navigate(`/tourhub/player/${player.playerId}`)}
-      className="flex-shrink-0 text-left active:scale-[0.97] transition-transform duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+      className="flex-shrink-0 active:scale-[0.97] transition-transform duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
       style={{
         width: 108,
         padding: '12px 12px 10px',
@@ -55,6 +55,7 @@ const ChaserCard = memo(function ChaserCard({
         borderRadius: 14,
         border: '1px solid hsl(var(--border) / 0.5)',
         outlineColor: accent.primary,
+        textAlign: 'center',
       }}
       aria-label={`Rank ${player.rank}: ${player.playerName}, ${player.statDisplayValue} ${unit}`}
     >
@@ -80,6 +81,7 @@ const ChaserCard = memo(function ChaserCard({
           borderRadius: '34%',
           overflow: 'hidden',
           marginBottom: 8,
+          margin: '0 auto 8px',
           background: 'hsl(var(--muted))',
         }}
       >
