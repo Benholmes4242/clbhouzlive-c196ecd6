@@ -352,18 +352,6 @@ export function ScheduleTab() {
         className="sticky top-0 z-30 -mx-4 px-4 bg-background/95 backdrop-blur-xl border-b border-border/10"
         style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
       >
-        {/* ← Tour Overview back link */}
-        <div className="pt-1 pb-1">
-          <button
-            type="button"
-            onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
-            className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
-          >
-            <ChevronLeft size={14} />
-            Tour Overview
-          </button>
-        </div>
-
         {/* Search Bar */}
         <div className="pb-3">
           <div className="relative">
@@ -414,6 +402,17 @@ export function ScheduleTab() {
             onTourChange={setActiveTour}
             tourCounts={tourCounts}
           />
+        </div>
+        {/* ← Tour Overview back link */}
+        <div className="pt-2 pb-2">
+          <button
+            type="button"
+            onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
+            className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
+          >
+            <ChevronLeft size={14} />
+            Tour Overview
+          </button>
         </div>
       </div>
 
