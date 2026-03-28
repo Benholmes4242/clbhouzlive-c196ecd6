@@ -1,6 +1,7 @@
 /**
- * WhatsComing - Upcoming tournament list for the Overview tab
- * Clean list layout matching reference: date block | context + name + venue | date
+ * WhatsComing - Upcoming tournament list grouped by date
+ * Majors get a featured amber card. Signature/Rolex events keep emerald left bar.
+ * Events on the same start date are grouped under a single date header.
  */
 
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +15,7 @@ import { TOUR_COLORS } from '../../constants/colors';
 import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 import { getContextLabel, TOUR_NAME_TO_SLUG } from '../../utils/tournamentClassification';
 
-// ============ Date formatting helpers ============
+// ── Date helpers ──────────────────────────────────────────────────────────
 
 function getMonthAbbr(dateStr: string): string {
   const d = new Date(dateStr + 'T12:00:00Z');
@@ -26,6 +27,10 @@ function getDayNum(dateStr: string): string {
   return new Intl.DateTimeFormat('en-US', { day: 'numeric' }).format(d);
 }
 
+function getDateKey(dateStr: string): string {
+  return `${getMonthAbbr(dateStr)} ${getDayNum(dateStr)}`;
+}
+
 function getVenueString(tournament: SeasonTournament): string {
   const parts: string[] = [];
   if (tournament.venueName) parts.push(tournament.venueName);
@@ -33,124 +38,277 @@ function getVenueString(tournament: SeasonTournament): string {
   return parts.join(' · ') || '';
 }
 
-// ============ Single Event Row ============
+// ── Tour badge ────────────────────────────────────────────────────────────
 
-function EventRow({ tournament, index }: { tournament: SeasonTournament; index: number }) {
+function TourLogo({ tourSlug, isMajor }: { tourSlug: string; isMajor: boolean }) {
+  const WIDE = ['pga', 'lpga'];
+  const src = tourSlug ? getTourLogo(tourSlug) : null;
+  if (!src) return null;
+  const size = WIDE.includes(tourSlug) ? 32 : 38;
+  return (
+    <div style={{ flexShrink: 0, opacity: isMajor ? 0.7 : 0.5 }}>
+      <img
+        src={src}
+        alt={tourSlug}
+        style={{ width: size, height: size, objectFit: 'contain' }}
+      />
+    </div>
+  );
+}
+
+// ── Major featured card ───────────────────────────────────────────────────
+
+function MajorCard({
+  tournament,
+  index,
+}: {
+  tournament: SeasonTournament;
+  index: number;
+}) {
   const navigate = useNavigate();
-  const contextLabel = getContextLabel(tournament);
-  const isSpecialEvent = ['MAJOR CHAMPIONSHIP', 'SIGNATURE EVENT', 'ROLEX SERIES', 'PLAYOFF EVENT'].includes(contextLabel);
-  const isMajor = contextLabel === 'MAJOR CHAMPIONSHIP';
-  const isRolexOrSignature = contextLabel === 'ROLEX SERIES' || contextLabel === 'SIGNATURE EVENT';
-  const venue = getVenueString(tournament);
   const rawTourSlug = TOUR_NAME_TO_SLUG[tournament.tourName || ''] || '';
-  // Cross-tour majors (Masters, US Open, Open Championship, PGA Championship) are
-  // co-sanctioned and may be stored under DP World in Sportradar — show PGA logo here.
-  const tourSlug = (isMajor && rawTourSlug !== 'pga') ? 'pga' : rawTourSlug;
-  const tourLogoSrc = tourSlug ? getTourLogo(tourSlug) : null;
-
-  // Left border accent: amber for majors, emerald for signature/rolex
-  const leftBorderStyle = isMajor
-    ? `3px solid ${TOUR_COLORS.liveAmber}`
-    : isRolexOrSignature
-      ? '3px solid rgba(16, 185, 129, 0.8)'
-      : '3px solid transparent';
-
-  // Label colour — only used when isSpecialEvent is true
-  const labelColor = isMajor
-    ? 'rgba(245, 158, 11, 0.9)'
-    : contextLabel === 'PLAYOFF EVENT'
-      ? 'rgba(99, 102, 241, 0.8)'
-      : 'rgba(16, 185, 129, 0.9)'; // emerald for SIGNATURE EVENT + ROLEX SERIES
+  const tourSlug = rawTourSlug !== 'pga' ? 'pga' : rawTourSlug;
+  const venue = getVenueString(tournament);
 
   return (
     <motion.button
-      type="button"
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className="w-full flex items-center gap-3 px-3.5 py-2.5 bg-card rounded-2xl border border-border/50 text-left transition-all active:scale-[0.98]"
-      style={{ borderLeft: leftBorderStyle }}
+      className="w-full text-left active:scale-[0.99] transition-transform"
+      style={{
+        background: `linear-gradient(135deg, rgba(245,158,11,0.08) 0%, rgba(255,255,255,0.9) 100%)`,
+        borderRadius: '16px',
+        border: `1.5px solid rgba(245,158,11,0.35)`,
+        padding: '14px 16px',
+        boxShadow: `0 2px 12px rgba(245,158,11,0.12)`,
+      }}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: 0.05 * index, ease: [0.16, 1, 0.3, 1] }}
-      aria-label={`${tournament.name}, ${getMonthAbbr(tournament.startDate)} ${getDayNum(tournament.startDate)}${venue ? `, at ${venue}` : ''}`}
+      aria-label={`${tournament.name}, Major Championship`}
     >
-      {/* Date block */}
-      <div className="flex-shrink-0 w-11 text-center">
-        <p className="uppercase leading-none text-[0.625rem] font-medium tracking-wide text-muted-foreground/70">
-          {getMonthAbbr(tournament.startDate)}
-        </p>
-        <p className="leading-none mt-0.5 text-[1.125rem] font-bold text-foreground">
-          {getDayNum(tournament.startDate)}
-        </p>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        {isSpecialEvent && (
-          <span style={{
-            fontSize: '10px',
-            fontWeight: 700,
-            letterSpacing: '1.2px',
-            textTransform: 'uppercase',
-            color: labelColor,
-            display: 'block',
-            lineHeight: 1,
-            marginBottom: '3px',
-          }}>
-            {contextLabel}
-          </span>
-        )}
-        <p className="text-[0.9375rem] font-semibold text-foreground line-clamp-2" style={{ letterSpacing: '-0.2px' }}>
-          {tournament.name}
-        </p>
-        {venue && (
-          <p className="text-[0.75rem] text-muted-foreground/60 truncate mt-0.5 leading-none">
-            {venue}
-          </p>
-        )}
-        {tournament.defendingChampion && (
-          <p className="text-[0.6875rem] text-muted-foreground/50 truncate mt-0.5 leading-none">
-            Defending: <span className="font-medium">{tournament.defendingChampion}</span>
-          </p>
-        )}
-      </div>
-
-      {/* Tour logo */}
-      {tourLogoSrc && (
-        <div
-          className="flex-shrink-0 flex items-center justify-center opacity-60"
-          // PGA/LPGA logos are wider and appear oversized at 42px — use 36px for visual balance
-          style={{ width: (['pga', 'lpga'].includes(tourSlug) ? 36 : 42), height: (['pga', 'lpga'].includes(tourSlug) ? 36 : 42) }}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+        <span
+          style={{
+            fontSize: '9px',
+            fontWeight: 800,
+            letterSpacing: '1.5px',
+            color: TOUR_COLORS.intelligenceGold,
+          }}
         >
-          <img
-            src={tourLogoSrc}
-            alt={tournament.tourName || 'Tour'}
-            className="max-w-full max-h-full object-contain"
-          />
+          MAJOR CHAMPIONSHIP
+        </span>
+        <TourLogo tourSlug={tourSlug} isMajor />
+      </div>
+      <div
+        style={{
+          fontSize: '15px',
+          fontWeight: 800,
+          color: 'hsl(var(--foreground))',
+          lineHeight: 1.3,
+          marginBottom: '4px',
+        }}
+      >
+        {tournament.name}
+      </div>
+      {venue && (
+        <div
+          style={{
+            fontSize: '11px',
+            color: 'hsl(var(--muted-foreground))',
+            fontWeight: 500,
+            marginBottom: '2px',
+          }}
+        >
+          {venue}
+        </div>
+      )}
+      {tournament.defendingChampion && (
+        <div
+          style={{
+            fontSize: '10px',
+            color: 'hsl(var(--muted-foreground) / 0.7)',
+            fontWeight: 600,
+            marginTop: '4px',
+          }}
+        >
+          Defending: {tournament.defendingChampion}
         </div>
       )}
     </motion.button>
   );
 }
 
-// ============ Skeleton ============
+// ── Standard event row ────────────────────────────────────────────────────
+
+function EventRow({
+  tournament,
+  index,
+}: {
+  tournament: SeasonTournament;
+  index: number;
+}) {
+  const navigate = useNavigate();
+  const contextLabel = getContextLabel(tournament);
+  const isSignature = contextLabel === 'SIGNATURE EVENT' || contextLabel === 'ROLEX SERIES';
+  const isPlayoff = contextLabel === 'PLAYOFF EVENT';
+  const venue = getVenueString(tournament);
+  const tourSlug = TOUR_NAME_TO_SLUG[tournament.tourName || ''] || '';
+
+  const leftBorderColor = isSignature
+    ? 'rgba(16,185,129,0.8)'
+    : isPlayoff
+    ? 'rgba(99,102,241,0.8)'
+    : 'transparent';
+
+  const labelColor = isSignature
+    ? 'rgba(16,185,129,0.9)'
+    : isPlayoff
+    ? 'rgba(99,102,241,0.8)'
+    : 'transparent';
+
+  return (
+    <motion.button
+      onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
+      className="w-full text-left active:scale-[0.98] transition-transform"
+      style={{
+        background: 'hsl(var(--card))',
+        borderRadius: '14px',
+        border: `1px solid hsl(var(--border) / 0.5)`,
+        borderLeft: isSignature || isPlayoff
+          ? `3px solid ${leftBorderColor}`
+          : `1px solid hsl(var(--border) / 0.5)`,
+        padding: '11px 14px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+      }}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: 0.04 * index, ease: [0.16, 1, 0.3, 1] }}
+      aria-label={`${tournament.name}`}
+    >
+      <div style={{ flex: 1, minWidth: 0 }}>
+        {(isSignature || isPlayoff) && (
+          <span
+            style={{
+              fontSize: '8px',
+              fontWeight: 800,
+              letterSpacing: '1.2px',
+              color: labelColor,
+              display: 'block',
+              marginBottom: '3px',
+            }}
+          >
+            {contextLabel}
+          </span>
+        )}
+        <div
+          style={{
+            fontSize: '13.5px',
+            fontWeight: 700,
+            color: 'hsl(var(--foreground))',
+            lineHeight: 1.3,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {tournament.name}
+        </div>
+        {venue && (
+          <div
+            style={{
+              fontSize: '11px',
+              color: 'hsl(var(--muted-foreground))',
+              fontWeight: 500,
+              marginTop: '2px',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {venue}
+          </div>
+        )}
+        {tournament.defendingChampion && (
+          <div
+            style={{
+              fontSize: '10px',
+              color: 'hsl(var(--muted-foreground) / 0.6)',
+              fontWeight: 600,
+              marginTop: '3px',
+            }}
+          >
+            Defending: {tournament.defendingChampion}
+          </div>
+        )}
+      </div>
+      <TourLogo tourSlug={tourSlug} isMajor={false} />
+    </motion.button>
+  );
+}
+
+// ── Date group header ─────────────────────────────────────────────────────
+
+function DateGroupHeader({ label, count }: { label: string; count: number }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+        padding: '4px 0',
+      }}
+    >
+      <span
+        style={{
+          fontSize: '13px',
+          fontWeight: 800,
+          color: 'hsl(var(--foreground))',
+          letterSpacing: '-0.2px',
+        }}
+      >
+        {label}
+      </span>
+      <div
+        style={{
+          flex: 1,
+          height: '1px',
+          background: 'hsl(var(--border) / 0.4)',
+        }}
+      />
+      <span
+        style={{
+          fontSize: '10px',
+          fontWeight: 600,
+          color: 'hsl(var(--muted-foreground) / 0.5)',
+          letterSpacing: '0.5px',
+        }}
+      >
+        {count} {count === 1 ? 'event' : 'events'}
+      </span>
+    </div>
+  );
+}
+
+// ── Skeleton ──────────────────────────────────────────────────────────────
 
 function EventRowSkeleton() {
   return (
-    <div className="w-full flex items-center gap-3 px-3.5 py-2.5 bg-card rounded-2xl border border-border/50">
-      <div className="flex-shrink-0 w-12 flex flex-col items-center gap-1">
-        <Skeleton className="h-3 w-8" />
-        <Skeleton className="h-6 w-7" />
-      </div>
-      <div className="flex-1 space-y-1.5">
-        <Skeleton className="h-2.5 w-20" />
-        <Skeleton className="h-4 w-3/4" />
-        <Skeleton className="h-3 w-1/2" />
+    <div
+      className="rounded-[14px] bg-card border border-border/50"
+      style={{ padding: '11px 14px' }}
+    >
+      <div className="space-y-2">
+        <Skeleton className="h-3 w-36" />
+        <Skeleton className="h-2.5 w-24" />
       </div>
     </div>
   );
 }
 
-// ============ Main Component ============
+// ── Main component ────────────────────────────────────────────────────────
 
 export function WhatsComing() {
   const navigate = useNavigate();
@@ -158,11 +316,11 @@ export function WhatsComing() {
 
   if (isLoading) {
     return (
-      <section aria-label="Upcoming tournaments">
-        <div className="px-4 mb-3">
-          <Skeleton className="h-5 w-32" />
+      <section className="px-4" aria-label="Upcoming tournaments">
+        <div className="mb-4">
+          <Skeleton className="h-5 w-40" />
         </div>
-        <div className="flex flex-col gap-2 px-4">
+        <div className="space-y-2">
           {[1, 2, 3, 4].map((i) => (
             <EventRowSkeleton key={i} />
           ))}
@@ -171,10 +329,9 @@ export function WhatsComing() {
     );
   }
 
-  // FIX 08: Show error state instead of silently hiding
   if (error) {
     return (
-      <section aria-label="Upcoming tournaments">
+      <section className="px-4" aria-label="Upcoming tournaments">
         <SectionErrorState sectionName="upcoming tournaments" onRetry={() => refetch()} />
       </section>
     );
@@ -182,36 +339,62 @@ export function WhatsComing() {
 
   if (!tournaments?.length) return null;
 
+  // Group by start date
+  const groups: { key: string; events: SeasonTournament[] }[] = [];
+  const seen = new Map<string, number>();
+  for (const t of tournaments) {
+    const key = getDateKey(t.startDate);
+    if (seen.has(key)) {
+      groups[seen.get(key)!].events.push(t);
+    } else {
+      seen.set(key, groups.length);
+      groups.push({ key, events: [t] });
+    }
+  }
+
+  let globalIndex = 0;
+
   return (
-    <motion.section
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      aria-label="Upcoming tournaments"
-    >
+    <section className="px-4" aria-label="Upcoming tournaments">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 mb-4">
-        <h2 className="text-foreground text-[1.375rem] font-bold" style={{ letterSpacing: '-0.3px' }}>
+      <div className="flex items-center justify-between mb-4">
+        <h2
+          className="text-[15px] font-extrabold tracking-tight"
+          style={{ color: 'hsl(var(--foreground))' }}
+        >
           What's Coming Up
         </h2>
-
         <button
           onClick={() => navigate('/tourhub?tab=schedule')}
           className="flex items-center gap-0.5 transition-all active:scale-95 text-muted-foreground text-[0.8125rem] font-medium"
           style={{ minHeight: '44px' }}
           aria-label="View full tournament schedule"
         >
-          <span>View Full Schedule</span>
-          <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+          View Full Schedule
+          <ChevronRight size={14} />
         </button>
       </div>
 
-      {/* Event list */}
-      <div className="flex flex-col gap-2 px-4">
-        {(tournaments ?? []).map((tournament, index) => (
-          <EventRow key={tournament.id} tournament={tournament} index={index} />
+      {/* Date groups */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        {groups.map((group) => (
+          <div key={group.key}>
+            <DateGroupHeader label={group.key} count={group.events.length} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '8px' }}>
+              {group.events.map((tournament) => {
+                const contextLabel = getContextLabel(tournament);
+                const isMajor = contextLabel === 'MAJOR CHAMPIONSHIP';
+                const idx = globalIndex++;
+                return isMajor ? (
+                  <MajorCard key={tournament.id} tournament={tournament} index={idx} />
+                ) : (
+                  <EventRow key={tournament.id} tournament={tournament} index={idx} />
+                );
+              })}
+            </div>
+          </div>
         ))}
       </div>
-    </motion.section>
+    </section>
   );
 }
