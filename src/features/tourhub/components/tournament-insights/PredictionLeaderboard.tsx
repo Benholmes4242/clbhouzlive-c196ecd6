@@ -26,7 +26,7 @@ export const PredictionLeaderboard: React.FC<PredictionLeaderboardProps> = ({
   if (allPicks.length === 0) return null;
 
   // Sort by actual position (best first) for both live and completed
-  const sorted = [...allPicks].slice(0, 5).sort((a, b) => {
+  const sorted = [...allPicks].slice(0, 3).sort((a, b) => {
     const aPos = a.actualPosition ?? 999;
     const bPos = b.actualPosition ?? 999;
     return aPos - bPos;
