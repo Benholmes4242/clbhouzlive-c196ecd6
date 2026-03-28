@@ -1,6 +1,6 @@
 /**
- * LiveRightNow - Compact Live Ticker Strip
- * Single-line-per-tournament vertical stack for scannable at-a-glance live view.
+ * LiveRightNow - Broadcast card strip
+ * Horizontal scroll of mini broadcast cards, one per live tournament.
  */
 
 import React from 'react';
@@ -16,95 +16,169 @@ function abbreviateName(fullName: string): string {
   return `${parts[0][0]}. ${parts.slice(1).join(' ')}`;
 }
 
-// PGA/LPGA logos have more horizontal width so appear larger at 42px — use 36px for visual balance
 const WIDE_LOGO_TOURS = ['pga', 'lpga'];
 
-const LiveTickerRow: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tournament }) => {
+function ScoreChip({ score, display }: { score: number; display: string }) {
+  const color = score < 0
+    ? TOUR_COLORS.movementUp
+    : score > 0
+    ? TOUR_COLORS.movementDown
+    : 'hsl(var(--muted-foreground))';
+
+  return (
+    <div
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        padding: '3px 8px',
+        borderRadius: '8px',
+        background: 'hsl(var(--muted) / 0.6)',
+      }}
+    >
+      <span
+        style={{
+          fontSize: '15px',
+          fontWeight: 800,
+          fontVariantNumeric: 'tabular-nums',
+          color,
+          letterSpacing: '-0.5px',
+        }}
+      >
+        {display}
+      </span>
+    </div>
+  );
+}
+
+const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tournament }) => {
   const navigate = useNavigate();
-  const tourLogoSrc = getTourLogo(tournament.tourSlug?.toLowerCase() ?? '');
-  const logoSize = WIDE_LOGO_TOURS.includes(tournament.tourSlug?.toLowerCase() ?? '') ? 36 : 42;
+  const tourSlug = tournament.tourSlug?.toLowerCase() ?? '';
+  const tourLogoSrc = getTourLogo(tourSlug);
+  const logoSize = WIDE_LOGO_TOURS.includes(tourSlug) ? 32 : 38;
 
   return (
     <button
       type="button"
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className="w-full flex items-center gap-3 px-3.5 py-2.5 bg-card rounded-2xl border border-border/50 text-left transition-all active:scale-[0.98]"
+      className="flex-shrink-0 text-left active:scale-[0.98] transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+      style={{
+        width: '180px',
+        background: 'hsl(var(--card))',
+        borderRadius: '16px',
+        border: '1px solid hsl(var(--border) / 0.5)',
+        overflow: 'hidden',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+      }}
       aria-label={`${tournament.name} — live now`}
     >
-      {/* Green live dot */}
-      <div style={{
-        width: '7px',
-        height: '7px',
-        borderRadius: '50%',
-        backgroundColor: 'rgba(22,163,74,0.8)',
-        flexShrink: 0,
-        animation: 'live-pulse 2s ease-in-out infinite',
-      }} />
-
-      {/* Content: two lines */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-
-        {/* Line 1: Tournament name */}
-        <div style={{
-          fontSize: '13.5px',
-          fontWeight: 600,
-          color: 'hsl(var(--foreground))',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}>
-          {tournament.name}
-        </div>
-
-        {/* Line 2: Leader name · score */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          marginTop: '1px',
-        }}>
-          <span style={{
-            fontSize: '12px',
-            fontWeight: 500,
-            color: 'hsl(var(--muted-foreground) / 0.6)',
-          }}>
-            {tournament.leader ? abbreviateName(tournament.leader.name) : 'Starting soon'}
-          </span>
-
-          <span style={{
-            fontSize: '14px',
-            fontWeight: 700,
-            fontVariantNumeric: 'tabular-nums',
-            color: tournament.leader
-              ? tournament.leader.score < 0
-                ? TOUR_COLORS.movementUp
-                : tournament.leader.score > 0
-                  ? TOUR_COLORS.movementDown
-                  : 'hsl(var(--muted-foreground))'
-              : 'hsl(var(--muted-foreground) / 0.5)',
-          }}>
-            {tournament.leader?.scoreDisplay ?? '—'}
-          </span>
+      {/* Green top strip */}
+      <div
+        style={{
+          height: '4px',
+          background: TOUR_COLORS.liveGreen,
+          position: 'relative',
+        }}
+      >
+        <span
+          style={{
+            position: 'absolute',
+            top: '6px',
+            left: '12px',
+            fontSize: '8px',
+            fontWeight: 800,
+            letterSpacing: '1.5px',
+            color: TOUR_COLORS.liveGreen,
+          }}
+        >
+          LIVE
+        </span>
+        <div style={{ position: 'absolute', top: '6px', right: '12px' }}>
+          {tourLogoSrc && (
+            <img
+              src={tourLogoSrc}
+              alt={tourSlug}
+              style={{
+                width: logoSize,
+                height: logoSize,
+                objectFit: 'contain',
+                opacity: 0.5,
+              }}
+            />
+          )}
         </div>
       </div>
 
-      {/* Tour logo */}
-      <div
-        style={{
-          flexShrink: 0,
-          width: logoSize,
-          height: logoSize,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          opacity: 0.6,
-        }}
-      >
-        <img
-          src={tourLogoSrc}
-          alt={tournament.tourSlug ?? 'Tour'}
-          style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-        />
+      <div style={{ padding: '20px 12px 12px' }}>
+        {/* Tournament name */}
+        <div
+          style={{
+            fontSize: '13px',
+            fontWeight: 700,
+            color: 'hsl(var(--foreground))',
+            lineHeight: 1.3,
+            marginBottom: '10px',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical' as const,
+            overflow: 'hidden',
+          }}
+        >
+          {tournament.name}
+        </div>
+
+        {/* Leader + score chip */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
+          <div style={{ minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: '9px',
+                fontWeight: 700,
+                letterSpacing: '1px',
+                textTransform: 'uppercase',
+                color: 'hsl(var(--muted-foreground) / 0.5)',
+                marginBottom: '2px',
+              }}
+            >
+              Leader
+            </div>
+            <div
+              style={{
+                fontSize: '12px',
+                fontWeight: 600,
+                color: 'hsl(var(--foreground))',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {tournament.leader
+                ? abbreviateName(tournament.leader.name)
+                : 'Starting soon'}
+            </div>
+          </div>
+
+          {tournament.leader && (
+            <ScoreChip score={tournament.leader.score} display={tournament.leader.scoreDisplay} />
+          )}
+        </div>
+
+        {/* Tour logo */}
+        {tourLogoSrc && (
+          <div
+            style={{
+              marginTop: '10px',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              opacity: 0.4,
+            }}
+          >
+            <img
+              src={tourLogoSrc}
+              alt={tourSlug}
+              style={{ width: logoSize, height: logoSize, objectFit: 'contain' }}
+            />
+          </div>
+        )}
       </div>
     </button>
   );
@@ -130,25 +204,29 @@ export function LiveRightNow() {
             Live Right Now
           </h2>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', padding: '0 16px' }}>
-          {[0, 1].map(i => (
-            <div key={i} className="w-full flex items-center gap-3 px-3.5 py-2.5 bg-card rounded-2xl border border-border/50">
-              <div className="w-[7px] h-[7px] rounded-full bg-muted flex-shrink-0" />
-              <div className="flex-1 min-w-0 space-y-1.5">
-                <div className="h-3 w-36 rounded bg-muted animate-pulse" />
-                <div className="h-2.5 w-20 rounded bg-muted animate-pulse" />
-              </div>
-              <div className="w-9 h-9 rounded-lg bg-muted animate-pulse flex-shrink-0" />
-            </div>
+        <div
+          className="[&::-webkit-scrollbar]:hidden"
+          style={{
+            display: 'flex',
+            gap: '10px',
+            overflowX: 'auto',
+            scrollbarWidth: 'none',
+            padding: '0 16px',
+          }}
+        >
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="flex-shrink-0 rounded-2xl bg-card border border-border/50 animate-pulse"
+              style={{ width: '180px', height: '140px' }}
+            />
           ))}
         </div>
       </section>
     );
   }
 
-  if (!liveTournaments || liveTournaments.length === 0) {
-    return null;
-  }
+  if (!liveTournaments || liveTournaments.length === 0) return null;
 
   return (
     <section className="bg-background" aria-label="Live tournaments">
@@ -164,17 +242,33 @@ export function LiveRightNow() {
         <h2 className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
           Live Right Now
         </h2>
+        <span
+          style={{
+            marginLeft: 'auto',
+            fontSize: '10px',
+            fontWeight: 700,
+            letterSpacing: '1px',
+            color: TOUR_COLORS.liveGreen,
+          }}
+        >
+          {liveTournaments.length} LIVE
+        </span>
       </div>
 
-      {/* Ticker rows */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '6px',
-        padding: '0 16px',
-      }}>
+      {/* Horizontal scroll strip */}
+      <div
+        className="[&::-webkit-scrollbar]:hidden"
+        style={{
+          display: 'flex',
+          gap: '10px',
+          overflowX: 'auto',
+          scrollbarWidth: 'none',
+          padding: '0 16px',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
         {liveTournaments.map((tournament) => (
-          <LiveTickerRow key={tournament.id} tournament={tournament} />
+          <LiveBroadcastCard key={tournament.id} tournament={tournament} />
         ))}
       </div>
     </section>
