@@ -7,7 +7,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveRightNow, type LiveTournamentWithLeader } from '../../hooks/useOverviewModules';
 import { SectionErrorState } from '../SectionErrorState';
-import { getTourLogo } from '../../utils/tourLogos';
+
 import { TOUR_COLORS } from '../../constants/colors';
 
 function abbreviateName(fullName: string): string {
