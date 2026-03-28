@@ -94,12 +94,10 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
         <span style={{ color: '#fff', fontSize: '10px', fontWeight: 800, letterSpacing: '0.1em' }}>
           LIVE
         </span>
-        {tourLogoSrc && (
-          <img
-            src={tourLogoSrc}
-            alt=""
-            style={{ height: 16, width: 'auto', objectFit: 'contain', marginLeft: 'auto', opacity: 0.9, filter: 'brightness(10)' }}
-          />
+        {tourLabel && (
+          <span style={{ marginLeft: 'auto', color: 'rgba(255,255,255,0.7)', fontSize: '9px', fontWeight: 700, letterSpacing: '0.06em' }}>
+            {tourLabel}
+          </span>
         )}
       </div>
 
