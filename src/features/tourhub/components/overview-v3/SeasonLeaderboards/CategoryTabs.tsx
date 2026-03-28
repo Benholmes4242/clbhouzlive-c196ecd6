@@ -114,12 +114,12 @@ export const CategoryTabs = memo(function CategoryTabs({
                 fontSize: '12px',
                 fontWeight: isActive ? 600 : 500,
                 borderRadius: 8,
-                background: isActive ? 'linear-gradient(90deg, #F59E0B, #F7931E)' : 'transparent',
+                background: isActive ? 'hsl(var(--foreground))' : 'transparent',
                 border: isActive 
                   ? 'none' 
                   : '1px solid hsl(var(--border))',
                 color: isActive ? '#fff' : 'hsl(var(--muted-foreground))',
-                boxShadow: isActive ? '0 2px 8px rgba(247,147,30,0.20)' : 'none',
+                boxShadow: 'none',
                 transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
                 outlineColor: 'hsl(var(--ring))',
               }}
