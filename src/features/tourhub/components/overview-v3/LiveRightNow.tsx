@@ -58,7 +58,7 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
       className="flex-shrink-0 text-left active:scale-[0.98] transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
       style={{
-        width: '180px',
+        width: '168px',
         background: 'hsl(var(--card))',
         borderRadius: '16px',
         border: '1px solid hsl(var(--border) / 0.5)',
