@@ -403,6 +403,17 @@ export function ScheduleTab() {
             tourCounts={tourCounts}
           />
         </div>
+        {/* ← Tour Overview back link */}
+        <div className="pt-2 pb-2">
+          <button
+            type="button"
+            onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
+            className="flex items-center gap-0.5 text-[13px] font-medium text-muted-foreground active:opacity-70 transition-opacity"
+          >
+            <ChevronLeft size={14} />
+            Tour Overview
+          </button>
+        </div>
       </div>
 
       <div className="bg-background">
