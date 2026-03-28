@@ -348,9 +348,12 @@ export function ScheduleTab() {
       )}
 
       {/* Content below hero */}
-      <div className="bg-background pt-3">
+      <div
+        className="sticky top-0 z-30 -mx-4 px-4 bg-background/95 backdrop-blur-xl border-b border-border/10"
+        style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)' }}
+      >
         {/* ← Tour Overview back link */}
-        <div className="px-4 pt-3">
+        <div className="pt-1 pb-1">
           <button
             type="button"
             onClick={() => navigate('/tourhub?tab=overview', { replace: true })}
@@ -362,7 +365,7 @@ export function ScheduleTab() {
         </div>
 
         {/* Search Bar */}
-        <div className="px-4" style={{ marginTop: '16px' }}>
+        <div className="pb-3">
           <div className="relative">
             <Search 
               className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-muted-foreground w-[18px] h-[18px]"
@@ -397,32 +400,24 @@ export function ScheduleTab() {
           </div>
         </div>
 
-        {/* Sticky Filter Toolbar */}
-        <div
-          className="sticky top-0 z-20 -mx-4 px-4 mt-6"
-          style={{
-            background: 'hsl(var(--background) / 0.95)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            borderBottom: '1px solid hsl(var(--border) / 0.15)',
-            paddingTop: 'max(env(safe-area-inset-top, 0px), 47px)',
-          }}
-        >
-          <div className="pb-1">
-            <ScheduleFilterPills
-              activeFilter={filter}
-              onFilterChange={setFilter}
-              counts={filterStats}
-            />
-          </div>
-          <div className="pb-2">
-            <ScheduleTourFilter
-              activeTour={activeTour}
-              onTourChange={setActiveTour}
-              tourCounts={tourCounts}
-            />
-          </div>
+        {/* Filter Pills */}
+        <div className="pb-1">
+          <ScheduleFilterPills
+            activeFilter={filter}
+            onFilterChange={setFilter}
+            counts={filterStats}
+          />
         </div>
+        <div className="pb-2">
+          <ScheduleTourFilter
+            activeTour={activeTour}
+            onTourChange={setActiveTour}
+            tourCounts={tourCounts}
+          />
+        </div>
+      </div>
+
+      <div className="bg-background">
 
         {/* No Live Message — premium empty state SC-02 */}
         {filter === 'live' && filterStats.live === 0 && (
