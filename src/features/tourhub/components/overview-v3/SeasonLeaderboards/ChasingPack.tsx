@@ -1,17 +1,16 @@
 /**
- * ChasingPack - #2 and #3 as side-by-side cards
+ * ChasingPack - Horizontal scrolling chaser cards
  * 
- * Horizontal split per card: avatar left, stats right.
- * Creates pressure without clutter.
+ * Compact cards showing rank, flag, avatar, last name, and stat value.
  */
 
 import { memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CountryFlag from '@/components/ui/country-flag';
+import { PlayerAvatar } from '@/features/tourhub/components/PlayerAvatar';
 import type { LeaderboardPlayer } from './types';
 import type { CategoryId } from './StatCategoryIcons';
 import { CATEGORY_ACCENT_COLORS } from './constants';
-import { getPlayerHeadshotUrl, PLAYER_SILHOUETTE_URL } from '@/utils/playerHeadshot';
 
 interface ChasingPackProps {
   players: LeaderboardPlayer[];
@@ -21,151 +20,108 @@ interface ChasingPackProps {
   accentColor: CategoryId;
 }
 
-function formatDelta(playerValue: number, leaderValue: number, higherIsBetter: boolean): string {
-  const delta = playerValue - leaderValue;
-  const displayDelta = higherIsBetter ? delta : -delta;
-  const absValue = Math.abs(displayDelta);
-  if (absValue < 0.2 && absValue > 0) return displayDelta.toFixed(2);
-  return displayDelta.toFixed(1);
-}
-
-const ChaserCard = memo(function ChaserCard({
-  player, leaderValue, higherIsBetter, unit, accentColor,
-}: {
-  player: LeaderboardPlayer;
-  leaderValue: number;
-  higherIsBetter: boolean;
-  unit: string;
-  accentColor: CategoryId;
-}) {
-  const navigate = useNavigate();
-  const photoUrl = getPlayerHeadshotUrl(player.playerName, player.tourCode ?? 'pga');
-  const delta = formatDelta(player.statValue, leaderValue, higherIsBetter);
-  const accent = CATEGORY_ACCENT_COLORS[accentColor];
-  const [imgError, setImgError] = useState(false);
-
-  const showPhoto = photoUrl && !imgError;
-
-  return (
-    <button
-      onClick={() => navigate(`/tourhub/player/${player.playerId}`)}
-      className="flex-shrink-0 text-left active:scale-[0.97] transition-transform duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-      style={{
-        width: 'calc(50% - 6px)',
-        minWidth: '160px',
-        padding: '12px',
-        background: 'hsl(var(--card))',
-        borderRadius: '14px',
-        border: '1px solid hsl(var(--border) / 0.5)',
-        outlineColor: accent.primary,
-      }}
-      aria-label={`Rank ${player.rank}: ${player.playerName}, ${player.statDisplayValue} ${unit}`}
-    >
-      {/* Horizontal split: Avatar left, info right */}
-      <div className="flex" style={{ gap: '10px' }}>
-        {/* LEFT: Avatar - edge-to-edge */}
-        <div className="flex-shrink-0 -ml-3 -my-3">
-          <div
-            className="overflow-hidden"
-            style={{
-              width: '80px',
-              height: '100%',
-              minHeight: '88px',
-              borderRadius: '0',
-              borderTopLeftRadius: '14px',
-              borderBottomLeftRadius: '14px',
-              backgroundColor: 'hsl(var(--muted))',
-            }}
-          >
-            {showPhoto ? (
-              <img
-                src={photoUrl}
-                alt={player.playerName}
-                className="w-full h-full object-cover"
-                loading="lazy"
-                onError={() => setImgError(true)}
-              />
-            ) : (
-              <img
-                src={PLAYER_SILHOUETTE_URL}
-                alt={player.playerName}
-                className="w-full h-full object-cover"
-                style={{ backgroundColor: 'hsl(var(--muted))' }}
-              />
-            )}
-          </div>
-        </div>
-
-        {/* RIGHT: Rank, name, country, stat, gap */}
-        <div className="flex-1 min-w-0 flex flex-col justify-center items-center text-center">
-          {/* Rank + Name */}
-          <div className="flex items-center" style={{ gap: '4px' }}>
-            <span className="text-muted-foreground" style={{ fontSize: '11px', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
-              #{player.rank}
-            </span>
-            <span className="text-muted-foreground" style={{ fontSize: '11px' }}>·</span>
-            <span className="truncate text-foreground" style={{ fontSize: '13px', fontWeight: 600 }}>
-              {player.lastName}
-            </span>
-          </div>
-
-          {/* Country — flag only */}
-          <div className="flex items-center mt-0.5">
-            <CountryFlag country={player.countryCode} size="sm" />
-          </div>
-
-          {/* Stat value */}
-          <div className="flex items-baseline justify-center mt-1.5" style={{ gap: '2px' }}>
-            <span
-              className="text-foreground"
-              style={{
-                fontSize: '18px',
-                fontWeight: 700,
-                lineHeight: 1,
-              }}
-            >
-              {player.statDisplayValue}
-            </span>
-            {unit && (
-              <span className="text-muted-foreground" style={{ fontSize: '10px', fontWeight: 500 }}>
-                {unit}
-              </span>
-            )}
-          </div>
-
-          {/* Gap to leader */}
-          <p className="m-0 text-muted-foreground" style={{ fontSize: '10px', fontWeight: 500, marginTop: '2px', fontVariantNumeric: 'tabular-nums' }}>
-            {delta} to lead
-          </p>
-        </div>
-      </div>
-    </button>
-  );
-});
-
 export const ChasingPack = memo(function ChasingPack({
   players, leaderValue, higherIsBetter, unit, accentColor,
 }: ChasingPackProps) {
+  const navigate = useNavigate();
+  const accent = CATEGORY_ACCENT_COLORS[accentColor];
+
   if (players.length === 0) return null;
 
   return (
-    <div style={{ marginTop: '16px' }}>
-      {/* Section label */}
-      <p className="m-0 text-muted-foreground" style={{ marginBottom: '8px', fontSize: '11px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+    <div>
+      <p
+        style={{
+          margin: '0 0 10px',
+          fontSize: 10,
+          fontWeight: 700,
+          letterSpacing: '1.5px',
+          textTransform: 'uppercase',
+          color: 'hsl(var(--muted-foreground))',
+        }}
+      >
         The Chasers
       </p>
-
-      {/* Side-by-side cards */}
-      <div className="flex" style={{ gap: '12px' }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 8,
+          overflowX: 'auto',
+          scrollbarWidth: 'none',
+          paddingBottom: 2,
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
         {players.map((player) => (
-          <ChaserCard
+          <button
             key={player.playerId}
-            player={player}
-            leaderValue={leaderValue}
-            higherIsBetter={higherIsBetter}
-            unit={unit}
-            accentColor={accentColor}
-          />
+            onClick={() => navigate(`/tourhub/player/${player.playerId}`)}
+            style={{
+              flexShrink: 0,
+              width: 112,
+              background: 'hsl(var(--card))',
+              borderRadius: 14,
+              border: '1px solid hsl(var(--border) / 0.5)',
+              padding: '12px 12px 10px',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+              cursor: 'pointer',
+              textAlign: 'left',
+              transition: 'transform 0.15s',
+            }}
+            className="active:scale-[0.97]"
+          >
+            {/* Rank + flag row */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 800,
+                  color: 'hsl(var(--muted-foreground))',
+                }}
+              >
+                #{player.rank}
+              </span>
+              <CountryFlag country={player.countryCode} size="sm" />
+            </div>
+
+            {/* Avatar */}
+            <div style={{ marginBottom: 8 }}>
+              <PlayerAvatar
+                playerId={player.playerId}
+                playerName={player.playerName}
+                tourCode={player.tourCode ?? 'pga'}
+                size="md"
+              />
+            </div>
+
+            {/* Last name */}
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: 'hsl(var(--foreground))',
+                lineHeight: 1.3,
+                marginBottom: 4,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {player.playerName.split(' ').slice(-1)[0]}
+            </div>
+
+            {/* Stat value */}
+            <div
+              style={{
+                fontSize: 15,
+                fontWeight: 900,
+                color: accent.primary,
+                letterSpacing: '-0.5px',
+              }}
+            >
+              {player.statDisplayValue}
+            </div>
+          </button>
         ))}
       </div>
     </div>

@@ -1,16 +1,16 @@
 /**
- * CategoryTabs - Redesigned Category Filter Pills
+ * CategoryTabs - Category Filter Pills with emoji labels
  * 
  * Features:
  * - Category accent colors for active state
  * - Edge fade gradients to prevent clipping
- * - SVG icons (no emojis)
+ * - Emoji + gamified names (no SVG icons)
  * - Focus-visible outlines
  * - Horizontal scroll with snap
  */
 
 import { useRef, useEffect, useState, memo } from 'react';
-import { CATEGORY_ICONS, type CategoryId } from './StatCategoryIcons';
+import type { CategoryId } from './StatCategoryIcons';
 import { CATEGORY_ACCENT_COLORS } from './constants';
 
 interface CategoryConfig {
@@ -98,7 +98,6 @@ export const CategoryTabs = memo(function CategoryTabs({
       >
         {categories.map((category) => {
           const isActive = category.id === activeCategory;
-          const IconComponent = CATEGORY_ICONS[category.id];
 
           return (
             <button
@@ -125,7 +124,6 @@ export const CategoryTabs = memo(function CategoryTabs({
                 outlineColor: 'hsl(var(--ring))',
               }}
             >
-              <IconComponent size={14} />
               <span>{category.name}</span>
             </button>
           );
