@@ -34,6 +34,7 @@ interface FeedOverlayLayerProps {
     reviewText?: string | null;
   } | null;
   isActiveReview?: boolean;
+  activeIndexOverride?: number;
 }
 
 export const FeedOverlayLayer = memo(function FeedOverlayLayer({
