@@ -51,51 +51,59 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
   const navigate = useNavigate();
   const tourSlug = tournament.tourSlug?.toLowerCase() ?? '';
   const tourLogoSrc = getTourLogo(tourSlug);
-  const logoSize = WIDE_LOGO_TOURS.includes(tourSlug) ? 32 : 38;
 
   return (
     <button
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
-      className="flex-shrink-0 text-left active:scale-[0.98] transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+      className="flex-shrink-0 text-left active:scale-[0.97] transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
       style={{
-        width: '168px',
+        width: '200px',
         padding: 0,
         background: 'hsl(var(--card))',
-        borderRadius: '16px',
-        border: '1px solid hsl(var(--border) / 0.5)',
+        borderRadius: '14px',
+        border: '1px solid hsl(var(--border) / 0.4)',
         overflow: 'hidden',
-        boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
       }}
       aria-label={`${tournament.name} — live now`}
     >
-      {/* Green top strip */}
+      {/* Live badge bar */}
       <div
         style={{
-          background: 'linear-gradient(90deg, #16a34a, #15803d)',
-          padding: '6px 10px',
+          background: 'linear-gradient(135deg, #16a34a 0%, #15803d 60%, #166534 100%)',
+          padding: '7px 12px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          gap: '6px',
         }}
       >
-        <span style={{ color: '#fff', fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em' }}>
-          LIVE
-        </span>
         <div
           className="animate-live-pulse"
-          style={{ width: 6, height: 6, borderRadius: '50%', background: '#fff' }}
+          style={{ width: 7, height: 7, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 6px #4ade80' }}
         />
+        <span style={{ color: '#fff', fontSize: '10px', fontWeight: 800, letterSpacing: '0.1em' }}>
+          LIVE
+        </span>
+        {tourLogoSrc && (
+          <img
+            src={tourLogoSrc}
+            alt=""
+            style={{ height: 16, width: 'auto', objectFit: 'contain', marginLeft: 'auto', opacity: 0.9, filter: 'brightness(10)' }}
+          />
+        )}
       </div>
 
-      <div style={{ padding: '10px 12px 12px' }}>
-        {/* Tournament name — 2 line clamp */}
+      {/* Card body */}
+      <div style={{ padding: '12px 12px 14px' }}>
+        {/* Tournament name */}
         <div
           style={{
-            fontSize: '13px',
-            fontWeight: 600,
+            fontSize: '14px',
+            fontWeight: 700,
             color: 'hsl(var(--foreground))',
-            lineHeight: 1.25,
-            marginBottom: '10px',
+            lineHeight: 1.3,
+            marginBottom: '12px',
+            minHeight: '36px',
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical' as const,
@@ -105,25 +113,28 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
           {tournament.name}
         </div>
 
-        {/* Leader + score chip */}
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '6px' }}>
-          <div style={{ minWidth: 0 }}>
+        {/* Divider */}
+        <div style={{ height: '1px', background: 'hsl(var(--border) / 0.5)', marginBottom: '10px' }} />
+
+        {/* Leader row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
             <div
               style={{
                 fontSize: '9px',
-                fontWeight: 600,
+                fontWeight: 700,
                 color: 'hsl(var(--muted-foreground))',
-                letterSpacing: '0.06em',
+                letterSpacing: '0.08em',
                 textTransform: 'uppercase' as const,
-                marginBottom: '2px',
+                marginBottom: '3px',
               }}
             >
-              Leader
+              LEADER
             </div>
             <div
               style={{
-                fontSize: '13px',
-                fontWeight: 600,
+                fontSize: '14px',
+                fontWeight: 700,
                 color: 'hsl(var(--foreground))',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
@@ -140,17 +151,6 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
             />
           )}
         </div>
-
-        {/* Tour logo — bottom of card */}
-        {tourLogoSrc && (
-          <div style={{ marginTop: '10px', opacity: 0.5 }}>
-            <img
-              src={tourLogoSrc}
-              alt=""
-              style={{ height: logoSize, width: 'auto', objectFit: 'contain' }}
-            />
-          </div>
-        )}
       </div>
     </button>
   );
