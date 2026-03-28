@@ -103,6 +103,7 @@ export function FullscreenFeedOverlay() {
             />
 
             <FeedOverlayLayer
+              posts={posts}
               activeIndexOverride={activeIndex}
               onLike={handleLike}
               onComment={openComments}
