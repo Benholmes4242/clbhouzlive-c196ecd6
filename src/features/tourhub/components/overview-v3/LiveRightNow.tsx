@@ -50,8 +50,18 @@ function ScoreChip({ score, display }: { score: number; display: string }) {
 const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tournament }) => {
   const navigate = useNavigate();
   const tourSlug = tournament.tourSlug?.toLowerCase() ?? '';
-  const tourLogoSrc = getTourLogo(tourSlug);
 
+  const tourLabel = (() => {
+    switch (tourSlug) {
+      case 'pga': return 'PGA TOUR';
+      case 'euro': return 'DP WORLD';
+      case 'lpga': return 'LPGA';
+      case 'liv': return 'LIV';
+      case 'champ': return 'CHAMPIONS';
+      case 'pgad': return 'KORN FERRY';
+      default: return tourSlug.toUpperCase();
+    }
+  })();
   return (
     <button
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
