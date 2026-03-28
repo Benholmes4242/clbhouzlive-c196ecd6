@@ -35,7 +35,7 @@ export const CATEGORY_CONFIG: { id: CategoryId; name: string }[] = [
   { id: 'scoring_avg', name: '🎯 Scoring Avg'      },
   { id: 'gir_pct',     name: '🟢 Green Machine'    },
   { id: 'putting',     name: '🕳️ Silky Stroke'     },
-  { id: 'accuracy',    name: '🎯 Sniper Par'       },
+  { id: 'accuracy',    name: '🎯 Sniper'            },
   { id: 'scrambling',  name: '🔥 Escape Artist'    },
   { id: 'sand_saves',  name: '🏖️ Sand Wizard'      },
 ];
