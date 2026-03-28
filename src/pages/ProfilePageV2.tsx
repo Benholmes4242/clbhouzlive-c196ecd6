@@ -1048,13 +1048,32 @@ const ProfilePageV2Content: React.FC = () => {
           </section>
         ) : null}
 
+        {/* Personal Top 10 Carousel */}
+        {isPersonal && profile?.id && (
+          <div className="mt-4 mb-2">
+            <FavouritesCarousel
+              userId={profile.id}
+              isOwnProfile={isSelf}
+              onManage={isSelf ? () => setShowTopTenModal(true) : undefined}
+              displayName={profile.display_name ?? profile.username ?? undefined}
+            />
+            {showTopTenModal && isSelf && (
+              <AddCourseModal
+                userId={profile.id}
+                onClose={() => setShowTopTenModal(false)}
+                existingCourseIds={[]}
+              />
+            )}
+          </div>
+        )}
+
         {/* Divider above Clubs section */}
         <div className="px-5 mb-3">
           <div className="border-t border-border" />
         </div>
 
         {/* Clubs section - directly on page background without card */}
-        <ClubsSectionWrapper 
+        <ClubsSectionWrapper
           profileId={profile?.id}
           viewerId={user?.id}
           isPersonal={isPersonal}

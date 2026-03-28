@@ -110,19 +110,8 @@ export const ProfileCoursesTab: React.FC<ProfileCoursesTabProps> = ({
         displayName={displayName}
       />
 
-      {/* Section 2: Personal Top 10 Carousel (Crown Jewel) */}
-      {/* Generous 28px spacing from Legacy to Top 10 */}
-      <div className="mt-7">
-        <FavouritesCarousel 
-          userId={userId} 
-          isOwnProfile={isOwnProfile}
-          onManage={() => setShowAddModal(true)}
-          displayName={displayName}
-        />
-      </div>
-
       {/* Top 10 Activity Feed */}
-      <div className="mt-4">
+      <div className="mt-7">
         <TopTenActivityFeed targetUserId={userId} />
       </div>
 
