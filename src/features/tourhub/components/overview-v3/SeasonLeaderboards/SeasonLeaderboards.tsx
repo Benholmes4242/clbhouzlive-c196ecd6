@@ -141,7 +141,7 @@ export function SeasonLeaderboards() {
 
   const activeCategoryData = data?.categories.find((c) => c.id === activeCategory);
   const leader = activeCategoryData?.players[0];
-  const chasers = activeCategoryData?.players.slice(1, 3) || [];
+  const chasers = activeCategoryData?.players.slice(1, 6) || [];
   const categoryConfig = CATEGORY_DATA_CONFIG[activeCategory];
   const accent = CATEGORY_ACCENT_COLORS[activeCategory];
   const contextLine = DISCIPLINE_CONTEXT[activeCategory];
