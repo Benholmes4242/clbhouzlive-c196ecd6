@@ -161,7 +161,7 @@ export function LiveRightNow() {
   if (error) {
     return (
       <div style={{ padding: '0 16px' }}>
-        <SectionErrorState title="Live Right Now" onRetry={() => refetch()} />
+        <SectionErrorState sectionName="Live Right Now" onRetry={() => refetch()} />
       </div>
     );
   }

@@ -210,7 +210,7 @@ export function WhatsComing() {
   if (error) {
     return (
       <div style={{ padding: '0 16px' }}>
-        <SectionErrorState title="What's Coming Up" onRetry={() => refetch()} />
+        <SectionErrorState sectionName="What's Coming Up" onRetry={() => refetch()} />
       </div>
     );
   }
