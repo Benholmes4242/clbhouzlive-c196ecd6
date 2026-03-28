@@ -1,8 +1,7 @@
 /**
- * LeaderHero - Cinematic Champion Spotlight Card
+ * LeaderHero - Broadcast Strip Leader Card
  * 
- * Horizontal split: large avatar left, stats right.
- * Think PGA Tour app / Sky Sports broadcast cards.
+ * Horizontal layout: amber accent bar → avatar → player info → big stat value.
  */
 
 import { memo, useState } from 'react';
@@ -29,102 +28,129 @@ export const LeaderHero = memo(function LeaderHero({ player, accentColor }: Lead
   return (
     <button
       onClick={() => navigate(`/tourhub/player/${player.playerId}`)}
-      className="w-full text-left relative overflow-hidden active:scale-[0.99] transition-transform duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-      style={{
-        padding: '20px',
-        background: 'hsl(var(--card))',
-        borderRadius: '20px',
-        border: '1px solid hsl(var(--border) / 0.5)',
-        outlineColor: accent.primary,
-      }}
+      className="w-full text-left active:scale-[0.99] transition-transform duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+      style={{ outlineColor: accent.primary }}
       aria-label={`Season leader: ${player.playerName}, ${player.statDisplayValue} ${player.statUnit}`}
     >
-      {/* Horizontal split: Avatar left, Info right */}
-      <div className="relative flex" style={{ gap: '18px' }}>
-        {/* LEFT: Large cinematic avatar - edge-to-edge */}
-        <div className="flex-shrink-0 -ml-5 -my-5">
-          <div
-            className="overflow-hidden"
-            style={{
-              width: '140px',
-              height: '100%',
-              minHeight: '152px',
-              borderRadius: '0',
-              borderTopLeftRadius: '20px',
-              borderBottomLeftRadius: '20px',
-              backgroundColor: 'hsl(var(--muted))',
-            }}
-          >
-            {showPhoto ? (
-              <img
-                src={photoUrl}
-                alt={player.playerName}
-                className="w-full h-full object-cover object-[center_20%]"
-                loading="eager"
-                onError={() => setImgError(true)}
-              />
-            ) : (
-              <img
-                src={PLAYER_SILHOUETTE_URL}
-                alt={player.playerName}
-                className="w-full h-full object-cover"
-                style={{ backgroundColor: 'hsl(var(--muted))' }}
-              />
-            )}
-          </div>
+      <div
+        style={{
+          background: 'hsl(var(--card))',
+          borderRadius: 16,
+          border: '1px solid hsl(var(--border) / 0.5)',
+          overflow: 'hidden',
+          display: 'flex',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+        }}
+      >
+        {/* Amber left accent bar */}
+        <div style={{ width: 5, flexShrink: 0, background: accent.primary }} />
+
+        {/* Avatar block */}
+        <div
+          style={{
+            width: 88,
+            flexShrink: 0,
+            overflow: 'hidden',
+            background: 'hsl(var(--muted))',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {showPhoto ? (
+            <img
+              src={photoUrl}
+              alt={player.playerName}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }}
+              loading="eager"
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <img
+              src={PLAYER_SILHOUETTE_URL}
+              alt={player.playerName}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', background: 'hsl(var(--muted))' }}
+            />
+          )}
         </div>
 
-        {/* RIGHT: Name, country, stat, label */}
-        <div className="flex-1 min-w-0 flex flex-col justify-center items-center text-center">
-          {/* Player name */}
-          <span
-            className="block truncate text-foreground"
-            style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.2 }}
-          >
-            {player.playerName}
-          </span>
-
-          {/* Country — flag only */}
-          <div className="flex items-center mt-1">
-            <CountryFlag country={player.countryCode} size="sm" />
-          </div>
-
-          {/* Stat value */}
-          <div className="flex items-baseline justify-center" style={{ marginTop: '12px', gap: '4px' }}>
-            <span
-              className="text-foreground"
-              style={{
-                fontSize: '36px',
-                fontWeight: 800,
-                letterSpacing: '-1.5px',
-                lineHeight: 1,
-              }}
-            >
-              {player.statDisplayValue}
-            </span>
-            {player.statUnit && (
-              <span
-                className="text-muted-foreground"
-                style={{ fontSize: '15px', fontWeight: 500, marginLeft: '2px' }}
-              >
-                {player.statUnit}
-              </span>
-            )}
-          </div>
-
-          {/* "SEASON LEADER" label */}
-          <p
-            className="m-0 text-muted-foreground"
+        {/* Player info */}
+        <div
+          style={{
+            flex: 1,
+            padding: '14px 12px 14px 12px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            gap: 2,
+            minWidth: 0,
+          }}
+        >
+          <div
             style={{
-              marginTop: '6px',
-              fontSize: '10px',
-              fontWeight: 600,
-              letterSpacing: '1.2px',
-              textTransform: 'uppercase' as const,
+              fontSize: 9,
+              fontWeight: 700,
+              letterSpacing: '1.5px',
+              textTransform: 'uppercase',
+              color: accent.primary,
+              marginBottom: 2,
             }}
           >
             Season Leader
-          </p>
+          </div>
+          <div
+            style={{
+              fontSize: 16,
+              fontWeight: 800,
+              color: 'hsl(var(--foreground))',
+              letterSpacing: '-0.3px',
+              lineHeight: 1.2,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {player.playerName}
+          </div>
+          <div style={{ marginTop: 2 }}>
+            <CountryFlag country={player.countryCode} size="sm" />
+          </div>
+        </div>
+
+        {/* Big stat value */}
+        <div
+          style={{
+            padding: '14px 18px 14px 0',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 32,
+              fontWeight: 900,
+              color: 'hsl(var(--foreground))',
+              letterSpacing: '-1.5px',
+              lineHeight: 1,
+            }}
+          >
+            {player.statDisplayValue}
+          </div>
+          {player.statUnit && (
+            <div
+              style={{
+                fontSize: 10,
+                color: 'hsl(var(--muted-foreground))',
+                fontWeight: 600,
+                marginTop: 3,
+              }}
+            >
+              {player.statUnit}
+            </div>
+          )}
         </div>
       </div>
     </button>
