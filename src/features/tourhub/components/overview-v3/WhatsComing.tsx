@@ -1,7 +1,6 @@
 /**
- * WhatsComing - Upcoming tournament list grouped by date
- * Majors get a featured amber card. Signature/Rolex events keep emerald left bar.
- * Events on the same start date are grouped under a single date header.
+ * WhatsComing - Upcoming tournaments grouped by date.
+ * Majors get a featured amber card. Signature events keep emerald left border.
  */
 
 import { useNavigate } from 'react-router-dom';
@@ -14,8 +13,6 @@ import { getTourLogo } from '../../utils/tourLogos';
 import { TOUR_COLORS } from '../../constants/colors';
 import type { SeasonTournament } from '../../hooks/useSeasonTournaments';
 import { getContextLabel, TOUR_NAME_TO_SLUG } from '../../utils/tournamentClassification';
-
-// ── Date helpers ──────────────────────────────────────────────────────────
 
 function getMonthAbbr(dateStr: string): string {
   const d = new Date(dateStr + 'T12:00:00Z');
@@ -31,40 +28,53 @@ function getDateKey(dateStr: string): string {
   return `${getMonthAbbr(dateStr)} ${getDayNum(dateStr)}`;
 }
 
-function getVenueString(tournament: SeasonTournament): string {
+function getVenueString(t: SeasonTournament): string {
   const parts: string[] = [];
-  if (tournament.venueName) parts.push(tournament.venueName);
-  if (tournament.venueCity) parts.push(tournament.venueCity);
+  if (t.venueName) parts.push(t.venueName);
+  if (t.venueCity) parts.push(t.venueCity);
   return parts.join(' · ') || '';
 }
 
-// ── Tour badge ────────────────────────────────────────────────────────────
-
 function TourLogo({ tourSlug, isMajor }: { tourSlug: string; isMajor: boolean }) {
-  const WIDE = ['pga', 'lpga'];
   const src = tourSlug ? getTourLogo(tourSlug) : null;
   if (!src) return null;
-  const size = WIDE.includes(tourSlug) ? 32 : 38;
+  const size = ['pga', 'lpga'].includes(tourSlug) ? 32 : 38;
   return (
-    <div style={{ flexShrink: 0, opacity: isMajor ? 0.7 : 0.5 }}>
+    <div style={{ opacity: isMajor ? 0.6 : 0.4 }}>
       <img
         src={src}
-        alt={tourSlug}
-        style={{ width: size, height: size, objectFit: 'contain' }}
+        alt=""
+        style={{ height: size, width: 'auto', objectFit: 'contain' }}
       />
     </div>
   );
 }
 
-// ── Major featured card ───────────────────────────────────────────────────
+function DateGroupHeader({ label, count }: { label: string; count: number }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <span
+        style={{
+          fontSize: '13px',
+          fontWeight: 700,
+          color: 'hsl(var(--foreground))',
+          letterSpacing: '0.02em',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {label}
+      </span>
+      <div style={{ flex: 1, height: '1px', background: 'hsl(var(--border) / 0.5)' }} />
+      <span
+        style={{ fontSize: '11px', fontWeight: 500, color: 'hsl(var(--muted-foreground))', whiteSpace: 'nowrap' }}
+      >
+        {count} {count === 1 ? 'event' : 'events'}
+      </span>
+    </div>
+  );
+}
 
-function MajorCard({
-  tournament,
-  index,
-}: {
-  tournament: SeasonTournament;
-  index: number;
-}) {
+function MajorCard({ tournament, index }: { tournament: SeasonTournament; index: number }) {
   const navigate = useNavigate();
   const rawTourSlug = TOUR_NAME_TO_SLUG[tournament.tourName || ''] || '';
   const tourSlug = rawTourSlug !== 'pga' ? 'pga' : rawTourSlug;
@@ -86,73 +96,33 @@ function MajorCard({
       transition={{ duration: 0.35, delay: 0.05 * index, ease: [0.16, 1, 0.3, 1] }}
       aria-label={`${tournament.name}, Major Championship`}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-        <span
-          style={{
-            fontSize: '9px',
-            fontWeight: 800,
-            letterSpacing: '1.5px',
-            color: TOUR_COLORS.intelligenceGold,
-          }}
-        >
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+        <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.1em', color: TOUR_COLORS.intelligenceGold }}>
           MAJOR CHAMPIONSHIP
         </span>
-        <TourLogo tourSlug={tourSlug} isMajor />
+        <TourLogo tourSlug={tourSlug} isMajor={true} />
       </div>
-      <div
-        style={{
-          fontSize: '15px',
-          fontWeight: 800,
-          color: 'hsl(var(--foreground))',
-          lineHeight: 1.3,
-          marginBottom: '4px',
-        }}
-      >
+      <div style={{ fontSize: '16px', fontWeight: 700, color: 'hsl(var(--foreground))', lineHeight: 1.25, marginBottom: '4px' }}>
         {tournament.name}
       </div>
-      {venue && (
-        <div
-          style={{
-            fontSize: '11px',
-            color: 'hsl(var(--muted-foreground))',
-            fontWeight: 500,
-            marginBottom: '2px',
-          }}
-        >
-          {venue}
-        </div>
-      )}
+      {venue && <p style={{ fontSize: '12px', color: 'hsl(var(--muted-foreground))', margin: 0 }}>{venue}</p>}
       {tournament.defendingChampion && (
-        <div
-          style={{
-            fontSize: '10px',
-            color: 'hsl(var(--muted-foreground) / 0.7)',
-            fontWeight: 600,
-            marginTop: '4px',
-          }}
-        >
+        <p style={{ fontSize: '11px', color: 'hsl(var(--muted-foreground))', marginTop: '4px', margin: '4px 0 0' }}>
           Defending: {tournament.defendingChampion}
-        </div>
+        </p>
       )}
     </motion.button>
   );
 }
 
-// ── Standard event row ────────────────────────────────────────────────────
-
-function EventRow({
-  tournament,
-  index,
-}: {
-  tournament: SeasonTournament;
-  index: number;
-}) {
+function EventRow({ tournament, index }: { tournament: SeasonTournament; index: number }) {
   const navigate = useNavigate();
   const contextLabel = getContextLabel(tournament);
   const isSignature = contextLabel === 'SIGNATURE EVENT' || contextLabel === 'ROLEX SERIES';
   const isPlayoff = contextLabel === 'PLAYOFF EVENT';
   const venue = getVenueString(tournament);
-  const tourSlug = TOUR_NAME_TO_SLUG[tournament.tourName || ''] || '';
+  const rawTourSlug = TOUR_NAME_TO_SLUG[tournament.tourName || ''] || '';
+  const tourSlug = rawTourSlug;
 
   const leftBorderColor = isSignature
     ? 'rgba(16,185,129,0.8)'
@@ -162,9 +132,7 @@ function EventRow({
 
   const labelColor = isSignature
     ? 'rgba(16,185,129,0.9)'
-    : isPlayoff
-    ? 'rgba(99,102,241,0.8)'
-    : 'transparent';
+    : 'rgba(99,102,241,0.8)';
 
   return (
     <motion.button
@@ -174,7 +142,7 @@ function EventRow({
         background: 'hsl(var(--card))',
         borderRadius: '14px',
         border: `1px solid hsl(var(--border) / 0.5)`,
-        borderLeft: isSignature || isPlayoff
+        borderLeft: (isSignature || isPlayoff)
           ? `3px solid ${leftBorderColor}`
           : `1px solid hsl(var(--border) / 0.5)`,
         padding: '11px 14px',
@@ -186,129 +154,43 @@ function EventRow({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.04 * index, ease: [0.16, 1, 0.3, 1] }}
-      aria-label={`${tournament.name}`}
+      aria-label={tournament.name}
     >
       <div style={{ flex: 1, minWidth: 0 }}>
         {(isSignature || isPlayoff) && (
-          <span
-            style={{
-              fontSize: '8px',
-              fontWeight: 800,
-              letterSpacing: '1.2px',
-              color: labelColor,
-              display: 'block',
-              marginBottom: '3px',
-            }}
-          >
+          <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em', color: labelColor, display: 'block', marginBottom: '2px' }}>
             {contextLabel}
           </span>
         )}
-        <div
-          style={{
-            fontSize: '13.5px',
-            fontWeight: 700,
-            color: 'hsl(var(--foreground))',
-            lineHeight: 1.3,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
+        <div style={{ fontSize: '14px', fontWeight: 600, color: 'hsl(var(--foreground))', lineHeight: 1.3, marginBottom: '2px' }}>
           {tournament.name}
         </div>
         {venue && (
-          <div
-            style={{
-              fontSize: '11px',
-              color: 'hsl(var(--muted-foreground))',
-              fontWeight: 500,
-              marginTop: '2px',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
+          <div style={{ fontSize: '12px', color: 'hsl(var(--muted-foreground))', lineHeight: 1.3 }}>
             {venue}
           </div>
         )}
         {tournament.defendingChampion && (
-          <div
-            style={{
-              fontSize: '10px',
-              color: 'hsl(var(--muted-foreground) / 0.6)',
-              fontWeight: 600,
-              marginTop: '3px',
-            }}
-          >
+          <div style={{ fontSize: '11px', color: 'hsl(var(--muted-foreground))', marginTop: '2px' }}>
             Defending: {tournament.defendingChampion}
           </div>
         )}
       </div>
-      <TourLogo tourSlug={tourSlug} isMajor={false} />
+      <ChevronRight style={{ width: 16, height: 16, color: 'hsl(var(--muted-foreground))', flexShrink: 0, opacity: 0.5 }} />
     </motion.button>
   );
 }
 
-// ── Date group header ─────────────────────────────────────────────────────
-
-function DateGroupHeader({ label, count }: { label: string; count: number }) {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '10px',
-        padding: '4px 0',
-      }}
-    >
-      <span
-        style={{
-          fontSize: '13px',
-          fontWeight: 800,
-          color: 'hsl(var(--foreground))',
-          letterSpacing: '-0.2px',
-        }}
-      >
-        {label}
-      </span>
-      <div
-        style={{
-          flex: 1,
-          height: '1px',
-          background: 'hsl(var(--border) / 0.4)',
-        }}
-      />
-      <span
-        style={{
-          fontSize: '10px',
-          fontWeight: 600,
-          color: 'hsl(var(--muted-foreground) / 0.5)',
-          letterSpacing: '0.5px',
-        }}
-      >
-        {count} {count === 1 ? 'event' : 'events'}
-      </span>
-    </div>
-  );
-}
-
-// ── Skeleton ──────────────────────────────────────────────────────────────
-
 function EventRowSkeleton() {
   return (
-    <div
-      className="rounded-[14px] bg-card border border-border/50"
-      style={{ padding: '11px 14px' }}
-    >
-      <div className="space-y-2">
-        <Skeleton className="h-3 w-36" />
-        <Skeleton className="h-2.5 w-24" />
+    <div style={{ background: 'hsl(var(--card))', borderRadius: '14px', border: '1px solid hsl(var(--border) / 0.5)', padding: '12px 14px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-3 w-1/2" />
       </div>
     </div>
   );
 }
-
-// ── Main component ────────────────────────────────────────────────────────
 
 export function WhatsComing() {
   const navigate = useNavigate();
@@ -316,30 +198,26 @@ export function WhatsComing() {
 
   if (isLoading) {
     return (
-      <section className="px-4" aria-label="Upcoming tournaments">
-        <div className="mb-4">
-          <Skeleton className="h-5 w-40" />
+      <div style={{ padding: '0 16px' }}>
+        <Skeleton className="h-5 w-40 mb-3" />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {[1, 2, 3, 4].map((i) => <EventRowSkeleton key={i} />)}
         </div>
-        <div className="space-y-2">
-          {[1, 2, 3, 4].map((i) => (
-            <EventRowSkeleton key={i} />
-          ))}
-        </div>
-      </section>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <section className="px-4" aria-label="Upcoming tournaments">
-        <SectionErrorState sectionName="upcoming tournaments" onRetry={() => refetch()} />
-      </section>
+      <div style={{ padding: '0 16px' }}>
+        <SectionErrorState sectionName="What's Coming Up" onRetry={() => refetch()} />
+      </div>
     );
   }
 
   if (!tournaments?.length) return null;
 
-  // Group by start date
+  // Group tournaments by start date
   const groups: { key: string; events: SeasonTournament[] }[] = [];
   const seen = new Map<string, number>();
   for (const t of tournaments) {
@@ -355,15 +233,11 @@ export function WhatsComing() {
   let globalIndex = 0;
 
   return (
-    <section className="px-4" aria-label="Upcoming tournaments">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h2
-          className="text-[15px] font-extrabold tracking-tight"
-          style={{ color: 'hsl(var(--foreground))' }}
-        >
+    <div style={{ padding: '0 16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+        <span style={{ fontSize: '17px', fontWeight: 700, color: 'hsl(var(--foreground))' }}>
           What's Coming Up
-        </h2>
+        </span>
         <button
           onClick={() => navigate('/tourhub?tab=schedule')}
           className="flex items-center gap-0.5 transition-all active:scale-95 text-muted-foreground text-[0.8125rem] font-medium"
@@ -371,12 +245,11 @@ export function WhatsComing() {
           aria-label="View full tournament schedule"
         >
           View Full Schedule
-          <ChevronRight size={14} />
+          <ChevronRight style={{ width: 14, height: 14 }} />
         </button>
       </div>
 
-      {/* Date groups */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         {groups.map((group) => (
           <div key={group.key}>
             <DateGroupHeader label={group.key} count={group.events.length} />
@@ -385,16 +258,14 @@ export function WhatsComing() {
                 const contextLabel = getContextLabel(tournament);
                 const isMajor = contextLabel === 'MAJOR CHAMPIONSHIP';
                 const idx = globalIndex++;
-                return isMajor ? (
-                  <MajorCard key={tournament.id} tournament={tournament} index={idx} />
-                ) : (
-                  <EventRow key={tournament.id} tournament={tournament} index={idx} />
-                );
+                return isMajor
+                  ? <MajorCard key={tournament.id} tournament={tournament} index={idx} />
+                  : <EventRow key={tournament.id} tournament={tournament} index={idx} />;
               })}
             </div>
           </div>
         ))}
       </div>
-    </section>
+    </div>
   );
 }
