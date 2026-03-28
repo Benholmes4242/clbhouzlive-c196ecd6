@@ -58,7 +58,7 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
       className="flex-shrink-0 text-left active:scale-[0.98] transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
       style={{
-        width: '180px',
+        width: '168px',
         background: 'hsl(var(--card))',
         borderRadius: '16px',
         border: '1px solid hsl(var(--border) / 0.5)',
@@ -171,7 +171,7 @@ export function LiveRightNow() {
       <div style={{ padding: '0 16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
           <div className="animate-live-pulse" style={{ width: 8, height: 8, borderRadius: '50%', background: TOUR_COLORS.liveGreen }} />
-          <span style={{ fontSize: '17px', fontWeight: 700, color: 'hsl(var(--foreground))' }}>
+          <span style={{ fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'hsl(var(--muted-foreground))' }}>
             Live Right Now
           </span>
         </div>
@@ -179,7 +179,7 @@ export function LiveRightNow() {
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              style={{ width: 180, height: 160, borderRadius: 16, background: 'hsl(var(--muted))', flexShrink: 0 }}
+              style={{ width: 168, height: 160, borderRadius: 16, background: 'hsl(var(--muted))', flexShrink: 0 }}
             />
           ))}
         </div>
@@ -194,7 +194,7 @@ export function LiveRightNow() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', paddingRight: '16px' }}>
         <div className="animate-live-pulse" style={{ width: 8, height: 8, borderRadius: '50%', background: TOUR_COLORS.liveGreen }} />
-        <span style={{ fontSize: '17px', fontWeight: 700, color: 'hsl(var(--foreground))' }}>
+        <span style={{ fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'hsl(var(--muted-foreground))' }}>
           Live Right Now
         </span>
         <span
