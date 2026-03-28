@@ -106,7 +106,7 @@ export function OverviewPageV3() {
           id="content-below-hero"
           className="relative z-10"
         >
-          <div className="bg-background pt-4 space-y-section" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)', '--space-section': '32px' } as React.CSSProperties}>
+          <div className="bg-background pt-4 space-y-section" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
             <LiveRightNow />
             <WhatsComing />
             <LazySection minHeight={250}>
