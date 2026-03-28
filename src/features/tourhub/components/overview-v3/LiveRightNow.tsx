@@ -7,7 +7,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveRightNow, type LiveTournamentWithLeader } from '../../hooks/useOverviewModules';
 import { SectionErrorState } from '../SectionErrorState';
-import { getTourLogo } from '../../utils/tourLogos';
+
 import { TOUR_COLORS } from '../../constants/colors';
 
 function abbreviateName(fullName: string): string {
@@ -50,8 +50,18 @@ function ScoreChip({ score, display }: { score: number; display: string }) {
 const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({ tournament }) => {
   const navigate = useNavigate();
   const tourSlug = tournament.tourSlug?.toLowerCase() ?? '';
-  const tourLogoSrc = getTourLogo(tourSlug);
 
+  const tourLabel = (() => {
+    switch (tourSlug) {
+      case 'pga': return 'PGA TOUR';
+      case 'euro': return 'DP WORLD';
+      case 'lpga': return 'LPGA';
+      case 'liv': return 'LIV';
+      case 'champ': return 'CHAMPIONS';
+      case 'pgad': return 'KORN FERRY';
+      default: return tourSlug.toUpperCase();
+    }
+  })();
   return (
     <button
       onClick={() => navigate(`/tourhub/tournament/${tournament.id}`)}
@@ -84,12 +94,10 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
         <span style={{ color: '#fff', fontSize: '10px', fontWeight: 800, letterSpacing: '0.1em' }}>
           LIVE
         </span>
-        {tourLogoSrc && (
-          <img
-            src={tourLogoSrc}
-            alt=""
-            style={{ height: 16, width: 'auto', objectFit: 'contain', marginLeft: 'auto', opacity: 0.9, filter: 'brightness(10)' }}
-          />
+        {tourLabel && (
+          <span style={{ marginLeft: 'auto', color: 'rgba(255,255,255,0.7)', fontSize: '9px', fontWeight: 700, letterSpacing: '0.06em' }}>
+            {tourLabel}
+          </span>
         )}
       </div>
 
