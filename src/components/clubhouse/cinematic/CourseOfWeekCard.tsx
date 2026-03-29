@@ -1,44 +1,51 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { MessageCircle, Share2, Bookmark, BookmarkCheck } from 'lucide-react';
+import { Heart, MessageCircle, Bookmark, BookmarkCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import type { CourseOfWeekCardFeedPost } from '@/components/media-system/types/media';
+import type { CourseOfWeekCardFeedPost, FeedPost } from '@/components/media-system/types/media';
 
 interface CourseOfWeekCardProps {
   post: CourseOfWeekCardFeedPost;
-  onComment?: () => void;
+  onComment: () => void;
+  onLike: () => void;
+  getLikeState?: (post: any) => { isLiked: boolean; count: number };
+  getCommentCount?: (post: any) => number;
   currentUserId?: string;
 }
 
-export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({ post, onComment, currentUserId }) => {
+export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
+  post,
+  onComment,
+  onLike,
+  getLikeState,
+  getCommentCount,
+  currentUserId,
+}) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const card = post.cardData;
   const course = card.course;
   const [wantToPlay, setWantToPlay] = useState(course.isOnMyWantToPlay);
 
+  const likeState = getLikeState?.(post) ?? { isLiked: false, count: 0 };
+  const commentCount = getCommentCount?.(post) ?? card.commentCount ?? 0;
+
   const handleWantToPlay = async () => {
     if (!currentUserId) {
       toast.error('Sign in to save courses');
       return;
     }
-
     const prev = wantToPlay;
     setWantToPlay(!prev);
-
     try {
       if (prev) {
         const q = supabase.from('user_courses').delete() as any;
         await q.eq('user_id', currentUserId).eq('course_id', course.id).eq('status', 'want_to_play');
       } else {
         const q = supabase.from('user_courses') as any;
-        await q.upsert({
-          user_id: currentUserId,
-          course_id: course.id,
-          status: 'want_to_play',
-        }, { onConflict: 'user_id,course_id' });
+        await q.upsert({ user_id: currentUserId, course_id: course.id, status: 'want_to_play' }, { onConflict: 'user_id,course_id' });
       }
       queryClient.invalidateQueries({ queryKey: ['editorial-cards'] });
     } catch {
@@ -47,85 +54,188 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({ post, onComm
     }
   };
 
-  const handleShare = async () => {
-    try {
-      await navigator.share?.({ title: course.name, url: `${window.location.origin}/courses/${course.id}` });
-    } catch {}
-  };
+  const heroSrc = course.thumbnailImage;
 
   return (
     <div
-      className="absolute inset-0 flex flex-col"
-      style={{ background: 'linear-gradient(145deg, #001a10, #0d0d0d)' }}
+      style={{
+        width: '100%',
+        height: '100dvh',
+        position: 'relative',
+        overflow: 'hidden',
+        background: '#000',
+      }}
     >
-      {/* Atmospheric overlay */}
+      {/* Hero image */}
+      {heroSrc ? (
+        <img
+          src={heroSrc}
+          alt={course.name}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+          draggable={false}
+        />
+      ) : (
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(145deg, #0a1f0a, #0d0d0d)' }} />
+      )}
+
+      {/* Top gradient */}
       <div
-        className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at 50% 0%, rgba(34,197,94,0.08), transparent 60%)',
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 40%)',
+          pointerEvents: 'none',
+        }}
+      />
+      {/* Bottom gradient */}
+      <div
+        style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.6) 40%, transparent 70%)',
+          pointerEvents: 'none',
         }}
       />
 
-      {/* Hero image section */}
+      {/* Top left badge */}
       <div
-        className="relative w-full flex-shrink-0"
         style={{
-          height: 200,
-          background: course.thumbnailImage
-            ? `url(${course.thumbnailImage}) center/cover`
-            : 'linear-gradient(135deg, rgba(34,197,94,0.2), transparent)',
+          position: 'absolute',
+          top: 'calc(env(safe-area-inset-top, 0px) + 52px)',
+          left: 16,
+          zIndex: 2,
         }}
       >
-        {/* Gradient overlay */}
-        <div
-          className="absolute inset-0"
+        <span
           style={{
-            background: 'linear-gradient(to bottom, rgba(0,26,16,0.3) 0%, rgba(0,26,16,0.95) 100%)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '5px 12px',
+            borderRadius: 999,
+            background: 'rgba(34,197,94,0.15)',
+            border: '1px solid rgba(34,197,94,0.4)',
+            fontSize: 10,
+            fontWeight: 800,
+            letterSpacing: '0.12em',
+            color: '#22C55E',
+            textTransform: 'uppercase' as const,
           }}
-        />
-        {/* Top left badge */}
-        <div className="absolute top-4 left-4 z-10">
+        >
           <span
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide"
             style={{
-              background: 'rgba(34,197,94,0.2)',
-              color: '#22C55E',
-              border: '1px solid rgba(34,197,94,0.3)',
+              width: 6, height: 6, borderRadius: '50%',
+              background: '#22C55E',
+              animation: 'pulse 2s infinite',
             }}
-          >
-            ● COURSE OF THE WEEK
-          </span>
-        </div>
-        {/* Top right rank */}
-        {course.globalRank && (
-          <div className="absolute top-4 right-4 z-10">
-            <span
-              className="px-2.5 py-1 rounded-full text-[11px] font-bold"
-              style={{
-                background: 'rgba(0,0,0,0.6)',
-                color: 'rgba(255,255,255,0.8)',
-                backdropFilter: 'blur(8px)',
-              }}
-            >
-              🌍 #{course.globalRank}
-            </span>
-          </div>
-        )}
-        {/* Bottom left: name + location */}
-        <div className="absolute bottom-4 left-4 right-4 z-10">
-          <h2 style={{ fontSize: 22, fontWeight: 900, color: '#fff', lineHeight: 1.2 }}>
-            {course.name}
-          </h2>
-          <p className="mt-1 text-[13px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
-            {[course.country, course.subCountry].filter(Boolean).join(' · ')}
-          </p>
-        </div>
+          />
+          COURSE OF THE WEEK
+        </span>
       </div>
 
-      {/* Content area */}
-      <div className="relative z-10 flex-1 overflow-y-auto px-5 py-4 space-y-4">
+      {/* Top right rank */}
+      {course.globalRank && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 'calc(env(safe-area-inset-top, 0px) + 52px)',
+            right: 16,
+            zIndex: 2,
+          }}
+        >
+          <span
+            style={{
+              padding: '5px 10px',
+              borderRadius: 999,
+              background: 'rgba(0,0,0,0.5)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255,255,255,0.15)',
+              fontSize: 12,
+              fontWeight: 800,
+              color: '#fff',
+            }}
+          >
+            🌍 #{course.globalRank}
+          </span>
+        </div>
+      )}
+
+      {/* Bottom content */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0, left: 0, right: 0,
+          padding: `0 20px calc(env(safe-area-inset-bottom, 0px) + 90px) 20px`,
+          zIndex: 2,
+        }}
+      >
+        {/* Course name & location */}
+        <h2
+          style={{
+            fontSize: 28, fontWeight: 900, color: '#fff',
+            letterSpacing: '-0.02em', lineHeight: 1.1,
+            textShadow: '0 2px 12px rgba(0,0,0,0.5)',
+            margin: 0,
+          }}
+        >
+          {course.name}
+        </h2>
+        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', marginTop: 4 }}>
+          {[course.country, course.subCountry].filter(Boolean).join(' · ')}
+        </p>
+
+        {/* Friends strip */}
+        {course.friendsWhoPlayed.length > 0 && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
+            <div style={{ display: 'flex' }}>
+              {course.friendsWhoPlayed.slice(0, 3).map((f, i) => (
+                <div
+                  key={f.userId}
+                  style={{
+                    width: 28, height: 28, borderRadius: '50%',
+                    border: '2px solid #000', overflow: 'hidden',
+                    background: 'rgba(255,255,255,0.1)',
+                    marginLeft: i > 0 ? -8 : 0,
+                  }}
+                >
+                  {f.avatarUrl ? (
+                    <img src={f.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>
+                      {f.displayName?.[0]}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)' }}>
+                {course.friendsWhoPlayed.map(f => f.displayName.split(' ')[0]).slice(0, 2).join(', ')}
+                {course.friendsWhoPlayed.length > 2 && ` & ${course.friendsWhoPlayed.length - 2} others`} have played here
+              </span>
+              {(() => {
+                const ratings = course.friendsWhoPlayed.filter(f => f.rating != null).map(f => f.rating!);
+                if (ratings.length === 0) return null;
+                const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+                return <span style={{ fontSize: 13, fontWeight: 700, color: '#F7931E' }}>{avg.toFixed(1)}</span>;
+              })()}
+            </div>
+          </div>
+        )}
+
+        {/* Editorial blurb */}
+        {(card.editorialBlurb || card.body) && (
+          <p
+            style={{
+              fontSize: 14, color: 'rgba(255,255,255,0.75)', lineHeight: 1.6,
+              marginTop: 14,
+              display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' as any, overflow: 'hidden',
+            }}
+          >
+            {card.editorialBlurb || card.body}
+          </p>
+        )}
+
         {/* Stats row */}
-        <div className="grid grid-cols-3 gap-2">
+        <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
           {[
             { label: 'Rating', value: course.communityRating?.toFixed(1) ?? '—' },
             { label: 'Reviews', value: String(course.reviewCount) },
@@ -133,96 +243,102 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({ post, onComm
           ].map((stat) => (
             <div
               key={stat.label}
-              className="text-center rounded-[10px] py-2.5"
-              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
+              style={{
+                flex: 1, padding: '10px 8px', borderRadius: 12, textAlign: 'center' as const,
+                background: 'rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                backdropFilter: 'blur(12px)',
+              }}
             >
-              <div className="text-[16px] font-bold text-white">{stat.value}</div>
-              <div className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              <div style={{ fontSize: 17, fontWeight: 800, color: '#fff' }}>{stat.value}</div>
+              <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>
                 {stat.label}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Editorial blurb */}
-        {(card.editorialBlurb || card.body) && (
-          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6 }}>
-            {card.editorialBlurb || card.body}
-          </p>
-        )}
-
-        {/* Friends strip */}
-        {course.friendsWhoPlayed.length > 0 && (
-          <div className="flex items-center gap-3">
-            <div className="flex -space-x-2">
-              {course.friendsWhoPlayed.slice(0, 3).map((f) => (
-                <div
-                  key={f.userId}
-                  className="w-7 h-7 rounded-full border-2 overflow-hidden"
-                  style={{ borderColor: '#0d0d0d', background: 'rgba(255,255,255,0.1)' }}
-                >
-                  {f.avatarUrl ? (
-                    <img src={f.avatarUrl} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-[10px] font-bold text-white/50">
-                      {f.displayName?.[0]}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-            <span className="text-[12px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              {course.friendsWhoPlayed.map(f => f.displayName.split(' ')[0]).slice(0, 2).join(', ')}
-              {course.friendsWhoPlayed.length > 2 && ` & ${course.friendsWhoPlayed.length - 2} others`} have played here
-            </span>
-          </div>
-        )}
-
         {/* CTAs */}
-        <div className="flex gap-3">
+        <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
           <button
             onClick={() => navigate(`/courses/${course.id}`)}
-            className="flex-1 py-3 rounded-xl text-[14px] font-bold text-white active:scale-[0.97] transition-transform"
+            className="active:scale-[0.97] transition-transform"
             style={{
-              background: 'linear-gradient(135deg, #F7931E, #e67e00)',
+              flex: 1, height: 48, borderRadius: 14, border: 'none',
+              background: 'linear-gradient(135deg, #F7931E, #e07010)',
+              color: '#fff', fontSize: 15, fontWeight: 800, cursor: 'pointer',
+              boxShadow: '0 4px 20px rgba(247,147,30,0.35)',
             }}
           >
             View Course
           </button>
           <button
             onClick={handleWantToPlay}
-            className="flex items-center justify-center gap-2 flex-1 py-3 rounded-xl text-[14px] font-semibold active:scale-[0.97] transition-transform"
+            className="active:scale-[0.97] transition-transform"
             style={{
-              background: wantToPlay ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.06)',
-              border: `1px solid ${wantToPlay ? 'rgba(34,197,94,0.4)' : 'rgba(255,255,255,0.1)'}`,
-              color: wantToPlay ? '#22C55E' : 'rgba(255,255,255,0.7)',
+              flex: 1, height: 48, borderRadius: 14, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              fontSize: 14, fontWeight: 700,
+              background: wantToPlay ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.08)',
+              border: `1px solid ${wantToPlay ? 'rgba(34,197,94,0.4)' : 'rgba(255,255,255,0.2)'}`,
+              color: wantToPlay ? '#22C55E' : '#fff',
             }}
           >
-            {wantToPlay ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+            {wantToPlay ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
             {wantToPlay ? 'Saved' : 'Want to Play'}
           </button>
         </div>
 
         {/* Engagement row */}
-        <div className="flex items-center gap-5 pt-1">
+        <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
           <button
-            onClick={onComment}
-            className="flex items-center gap-1.5 active:scale-[0.95] transition-transform"
+            onClick={onLike}
+            className="active:scale-[0.95] transition-transform"
+            style={{
+              flex: 1, height: 48, borderRadius: 14, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              background: likeState.isLiked ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.08)',
+              border: `1px solid ${likeState.isLiked ? 'rgba(247,147,30,0.4)' : 'rgba(255,255,255,0.12)'}`,
+            }}
           >
-            <MessageCircle className="w-[18px] h-[18px]" style={{ color: 'rgba(255,255,255,0.5)' }} />
-            <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              {card.commentCount || 0}
-            </span>
+            <Heart
+              size={17}
+              fill={likeState.isLiked ? '#F7931E' : 'none'}
+              style={{ color: likeState.isLiked ? '#F7931E' : 'rgba(255,255,255,0.5)' }}
+            />
+            {likeState.count > 0 && (
+              <span style={{ fontSize: 13, fontWeight: 700, color: likeState.isLiked ? '#F7931E' : 'rgba(255,255,255,0.5)' }}>
+                {likeState.count}
+              </span>
+            )}
           </button>
           <button
-            onClick={handleShare}
-            className="flex items-center gap-1.5 active:scale-[0.95] transition-transform"
+            onClick={onComment}
+            className="active:scale-[0.95] transition-transform"
+            style={{
+              flex: 1, height: 48, borderRadius: 14, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              background: 'rgba(255,255,255,0.08)',
+              border: '1px solid rgba(255,255,255,0.12)',
+            }}
           >
-            <Share2 className="w-[18px] h-[18px]" style={{ color: 'rgba(255,255,255,0.5)' }} />
-            <span className="text-[13px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Share</span>
+            <MessageCircle size={17} style={{ color: 'rgba(255,255,255,0.6)' }} />
+            {commentCount > 0 && (
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>
+                {commentCount}
+              </span>
+            )}
           </button>
         </div>
       </div>
+
+      {/* Pulse animation */}
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.4; }
+        }
+      `}</style>
     </div>
   );
 };

@@ -90,6 +90,9 @@ export const FeedSlide = memo(function FeedSlide({
         <CourseOfWeekCard
           post={post as unknown as CourseOfWeekCardFeedPost}
           onComment={() => onComment?.()}
+          onLike={() => onLike?.(post)}
+          getLikeState={getLikeState}
+          getCommentCount={getCommentCount}
         />
       );
     }
