@@ -132,7 +132,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
       <div
         className="absolute"
         style={{
-          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 5px)',
+          top: 'calc(env(safe-area-inset-top, 0px) + 52px)',
           left: 16,
           zIndex: 10,
         }}
