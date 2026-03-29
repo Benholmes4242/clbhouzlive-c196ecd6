@@ -246,6 +246,7 @@ export interface HistoryCardData extends EditorialCardBase {
     country: string;
     reviewCount: number;
     communityRating: number | null;
+    thumbnailImage: string | null;
   } | null;
 }
 

@@ -90,6 +90,7 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
                 country: course.country ?? '',
                 reviewCount: reviewCount ?? 0,
                 communityRating: avgRating,
+                thumbnailImage: (course as any).thumbnail_image ?? null,
               };
             }
           }
