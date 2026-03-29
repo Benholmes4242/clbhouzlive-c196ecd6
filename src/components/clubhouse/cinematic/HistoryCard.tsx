@@ -377,8 +377,9 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               gap: 6,
-              background: 'rgba(255,255,255,0.08)',
-              border: '1px solid rgba(255,255,255,0.12)',
+              background: 'rgba(0,0,0,0.45)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              backdropFilter: 'blur(20px)',
               cursor: 'pointer',
             }}
           >
