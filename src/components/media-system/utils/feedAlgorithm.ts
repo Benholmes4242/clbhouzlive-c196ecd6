@@ -246,7 +246,7 @@ export function injectHistoryCard(
   if (!card) return feedPosts;
   const without = feedPosts.filter(p => (p as any).postType !== 'history_card');
   const result = [...without];
-  result.splice(Math.min(9, result.length), 0, card);
+  result.splice(Math.min(10, result.length), 0, card);
   return result;
 }
 
