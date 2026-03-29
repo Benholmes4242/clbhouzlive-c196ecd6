@@ -428,6 +428,11 @@ const ClubhouseContent = () => {
                 ? 'editorial'
                 : 'post'
             }
+            editorialCardId={
+              ['course_of_week_card', 'history_card', 'debate_card'].includes(activePost.postType ?? '')
+                ? (activePost as any).cardData.cardId
+                : undefined
+            }
             onCommentPosted={() => handleCommentPosted(activePost)}
             onCommentDeleted={() => activePost && handleCommentDeleted(activePost.id, activePost.commentCount)}
           />
