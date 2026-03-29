@@ -150,7 +150,10 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   carouselActiveIndex = 0,
 }) => {
   
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(!!golfCourse?.id);
+  useEffect(() => {
+    setIsExpanded(!!golfCourse?.id);
+  }, [postId]);
   const navigate = useNavigate();
   const capsuleRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef<number | null>(null);
