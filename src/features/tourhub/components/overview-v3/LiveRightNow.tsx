@@ -89,7 +89,7 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
       >
         <div
           className="animate-live-pulse"
-          style={{ width: 7, height: 7, borderRadius: '50%', background: '#86efac', boxShadow: '0 0 6px #86efac' }}
+          style={{ width: 7, height: 7, borderRadius: '50%', background: '#ffffff', boxShadow: '0 0 6px rgba(255,255,255,0.7)' }}
         />
         <span style={{ color: '#fff', fontSize: '10px', fontWeight: 800, letterSpacing: '0.1em' }}>
           LIVE
