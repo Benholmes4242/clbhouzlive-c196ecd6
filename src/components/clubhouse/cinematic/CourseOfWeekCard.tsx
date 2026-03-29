@@ -199,7 +199,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
                   key={f.userId}
                   style={{
                     width: 28, height: 28, borderRadius: '34%',
-                    border: '2px solid #000', overflow: 'hidden',
+                    border: '0.5px solid #000', overflow: 'hidden',
                     background: 'rgba(255,255,255,0.1)',
                     marginLeft: i > 0 ? -8 : 0,
                   }}
