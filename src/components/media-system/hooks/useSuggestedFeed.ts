@@ -22,7 +22,7 @@ export function useSuggestedFeed(userId: string | undefined) {
           p_user_id: userId,
           p_page_size: PAGE_SIZE,
           ...(cursor ? { p_cursor: cursor } : {}),
-          p_seen_post_ids: Array.from(seenPostIds.current),
+          ...(cursor ? { p_seen_post_ids: Array.from(seenPostIds.current) } : {}),
         } as any);
 
         if (error) {
