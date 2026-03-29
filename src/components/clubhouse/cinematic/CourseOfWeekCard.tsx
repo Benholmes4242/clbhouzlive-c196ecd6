@@ -297,7 +297,10 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
                 backdropFilter: 'blur(12px)',
               }}
             >
-              <div style={{ fontSize: 17, fontWeight: 800, color: '#fff' }}>{stat.value}</div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                {stat.label === 'Rating' && <ClubhouseLogo size="sm" />}
+                {stat.value}
+              </div>
               <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>
                 {stat.label}
               </div>
