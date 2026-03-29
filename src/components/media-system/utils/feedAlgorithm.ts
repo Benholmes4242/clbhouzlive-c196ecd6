@@ -233,7 +233,7 @@ export function injectPGACard(feedPosts: FeedPost[], pgaCard: FeedPost | null): 
   if (!pgaCard) return feedPosts;
   const without = feedPosts.filter(p => (p as any).postType !== 'pga_card');
   const result = [...without];
-  result.splice(Math.min(5, result.length), 0, pgaCard);
+  result.splice(Math.min(6, result.length), 0, pgaCard);
   return result;
 }
 
