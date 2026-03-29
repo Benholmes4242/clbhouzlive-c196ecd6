@@ -44,6 +44,19 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
       });
   }, [card.cardId, currentUserId]);
 
+  useEffect(() => {
+    if (!currentUserId || !course.id) return;
+    supabase
+      .from('course_ratings')
+      .select('id')
+      .eq('user_id', currentUserId)
+      .eq('course_id', course.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) setHasPlayed(true);
+      });
+  }, [currentUserId, course.id]);
+
   const { data: likeCountData } = useQuery({
     queryKey: ['editorial-card-likes-count', card.cardId],
     queryFn: async () => {
