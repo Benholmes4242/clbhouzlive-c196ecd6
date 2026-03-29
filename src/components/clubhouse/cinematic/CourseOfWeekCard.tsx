@@ -296,9 +296,9 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             }}
           >
             <MessageCircle size={17} style={{ color: 'rgba(255,255,255,0.6)' }} />
-            {commentCount > 0 && (
+            {(getCommentCount?.(post) ?? card.commentCount ?? 0) > 0 && (
               <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>
-                {commentCount}
+                {getCommentCount?.(post) ?? card.commentCount ?? 0}
               </span>
             )}
           </button>
