@@ -29,6 +29,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
 
   const [localLiked, setLocalLiked] = useState(false);
   const [localCount, setLocalCount] = useState(card.reactionCount ?? 0);
+  const [hasPlayed, setHasPlayed] = useState(false);
 
   useEffect(() => {
     if (!currentUserId) return;
@@ -42,6 +43,19 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
         if (data) setLocalLiked(true);
       });
   }, [card.cardId, currentUserId]);
+
+  useEffect(() => {
+    if (!currentUserId || !course.id) return;
+    supabase
+      .from('course_ratings')
+      .select('id')
+      .eq('user_id', currentUserId)
+      .eq('course_id', course.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) setHasPlayed(true);
+      });
+  }, [currentUserId, course.id]);
 
   const { data: likeCountData } = useQuery({
     queryKey: ['editorial-card-likes-count', card.cardId],
@@ -309,19 +323,21 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             View Course
           </button>
           <button
-            onClick={() => navigate(`/courses/${course.id}/rate`)}
+            onClick={() => hasPlayed
+              ? navigate(`/courses/${course.id}`)
+              : navigate(`/courses/${course.id}/rate`)
+            }
             className="active:scale-[0.97] transition-transform"
             style={{
               flex: 1, height: 48, borderRadius: 14, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
               fontSize: 14, fontWeight: 700,
-              background: 'rgba(255,255,255,0.08)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              color: '#fff',
+              background: hasPlayed ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.08)',
+              border: hasPlayed ? '1px solid rgba(34,197,94,0.4)' : '1px solid rgba(255,255,255,0.2)',
+              color: hasPlayed ? '#22C55E' : '#fff',
             }}
           >
-            <Flag size={16} />
-            Mark as Played
+            {hasPlayed ? '✓ Played' : '⛳ Mark as Played'}
           </button>
         </div>
 
