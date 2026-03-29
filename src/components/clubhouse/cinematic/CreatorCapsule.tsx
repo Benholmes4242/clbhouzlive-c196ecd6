@@ -155,6 +155,11 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   const capsuleRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef<number | null>(null);
 
+  // Reset expanded state when the active post changes
+  useEffect(() => {
+    setIsExpanded(!!golfCourse?.id);
+  }, [postId]);
+
 
 
   const handleToggle = useCallback(() => {
