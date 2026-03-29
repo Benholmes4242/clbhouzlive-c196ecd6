@@ -162,29 +162,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
           zIndex: 2,
         }}
       >
-        <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '5px 12px',
-            borderRadius: 999,
-            background: 'rgba(34,197,94,0.15)',
-            border: '1px solid rgba(34,197,94,0.4)',
-            fontSize: 10,
-            fontWeight: 800,
-            letterSpacing: '0.12em',
-            color: '#22C55E',
-            textTransform: 'uppercase' as const,
-          }}
-        >
-          <span
-            style={{
-              width: 6, height: 6, borderRadius: '50%',
-              background: '#22C55E',
-              animation: 'pulse 2s infinite',
-            }}
-          />
+        <span className="glass-badge-tight" style={{ width: 'auto', minWidth: 'auto', padding: '3px 10px', fontSize: 10, fontWeight: 800, letterSpacing: '0.1em', color: '#fff' }}>
           COURSE OF THE WEEK
         </span>
       </div>
