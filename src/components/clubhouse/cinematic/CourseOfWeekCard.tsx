@@ -4,6 +4,7 @@ import { Heart, MessageCircle, Flag } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { CourseOfWeekCardFeedPost } from '@/components/media-system/types/media';
+import CourseRankBadges from '@/components/courses/CourseRankBadges';
 
 interface CourseOfWeekCardProps {
   post: CourseOfWeekCardFeedPost;
@@ -197,20 +198,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             zIndex: 2,
           }}
         >
-          <span
-            style={{
-              padding: '5px 10px',
-              borderRadius: 999,
-              background: 'rgba(0,0,0,0.5)',
-              backdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255,255,255,0.15)',
-              fontSize: 12,
-              fontWeight: 800,
-              color: '#fff',
-            }}
-          >
-            🌍 #{course.globalRank}
-          </span>
+          <CourseRankBadges globalRank={course.globalRank} regionalRank={null} usaRank={null} country={course.country ?? ''} />
         </div>
       )}
 
