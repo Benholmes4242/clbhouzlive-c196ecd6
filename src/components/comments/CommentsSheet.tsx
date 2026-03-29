@@ -63,6 +63,7 @@ interface CommentsSheetProps {
   caddiePickCommentId?: string | null;
   likesCount?: number | null;
   likeSource?: 'post' | 'editorial';
+  editorialCardId?: string;
   onCommentPosted?: () => void;
   onCommentDeleted?: () => void;
 }
