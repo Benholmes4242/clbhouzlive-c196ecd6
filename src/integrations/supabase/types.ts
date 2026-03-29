@@ -3787,6 +3787,54 @@ export type Database = {
         }
         Relationships: []
       }
+      editorial_card_comments: {
+        Row: {
+          card_id: string
+          content: string
+          created_at: string
+          deleted_at: string | null
+          id: string
+          parent_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          card_id: string
+          content: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          parent_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          card_id?: string
+          content?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          parent_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "editorial_card_comments_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "editorial_feed_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "editorial_card_comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "editorial_card_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       editorial_card_likes: {
         Row: {
           card_id: string
