@@ -33,6 +33,19 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
   const [localCount, setLocalCount] = useState(card.reactionCount ?? 0);
   const [hasPlayed, setHasPlayed] = useState(false);
 
+  const { data: commentCount } = useQuery({
+    queryKey: ['editorial-card-comments-count', card.cardId],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('editorial_card_comments')
+        .select('*', { count: 'exact', head: true })
+        .eq('card_id', card.cardId)
+        .is('deleted_at', null);
+      return count ?? 0;
+    },
+    staleTime: 30_000,
+  });
+
   useEffect(() => {
     if (!currentUserId) return;
     supabase
@@ -369,9 +382,9 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             }}
           >
             <MessageCircle size={17} style={{ color: 'rgba(255,255,255,0.6)' }} />
-            {(getCommentCount?.(post) ?? card.commentCount ?? 0) > 0 && (
-              <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>
-                {getCommentCount?.(post) ?? card.commentCount ?? 0}
+            {(commentCount ?? 0) > 0 && (
+              <span style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>
+                {commentCount}
               </span>
             )}
           </button>
