@@ -202,6 +202,25 @@ const ClubhouseContent = () => {
   // ── Optimistic like state ──
   const { handleLike, getActiveLikeState, resetLikes } = useClubhouseLikes({ userId: user?.id, activeActor });
   const activeLikeState = getActiveLikeState(activePost);
+
+  // ── Editorial card like count for CommentsSheet ──
+  const editorialCardId = ['course_of_week_card', 'history_card', 'debate_card'].includes(activePost?.postType ?? '')
+    ? (activePost as any)?.cardData?.cardId
+    : null;
+
+  const { data: editorialLikeCount } = useQuery({
+    queryKey: ['editorial-card-likes-count', editorialCardId],
+    queryFn: async () => {
+      if (!editorialCardId) return 0;
+      const { count } = await supabase
+        .from('editorial_card_likes')
+        .select('*', { count: 'exact', head: true })
+        .eq('card_id', editorialCardId);
+      return count ?? 0;
+    },
+    enabled: !!editorialCardId,
+    staleTime: 30_000,
+  });
   
   // ── Optimistic follow state ──
   const { followOverrides, handleFollow, handleFollowChange, getFollowState, resetFollows } = useClubhouseFollows({ userId: user?.id });
