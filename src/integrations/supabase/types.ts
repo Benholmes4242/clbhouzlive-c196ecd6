@@ -3787,6 +3787,35 @@ export type Database = {
         }
         Relationships: []
       }
+      editorial_card_likes: {
+        Row: {
+          card_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          card_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          card_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "editorial_card_likes_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "editorial_feed_cards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       editorial_debate_votes: {
         Row: {
           card_id: string

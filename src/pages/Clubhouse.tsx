@@ -416,7 +416,13 @@ const ClubhouseContent = () => {
             creatorAvatar={activePost.avatarUrl}
             caption={activePost.caption}
             theme="dark"
-            likesCount={activeLikeState?.count ?? null}
+            likesCount={
+              activePost.postType === 'course_of_week_card' ||
+              activePost.postType === 'history_card' ||
+              activePost.postType === 'debate_card'
+                ? null
+                : activeLikeState?.count ?? null
+            }
             onCommentPosted={() => handleCommentPosted(activePost)}
             onCommentDeleted={() => activePost && handleCommentDeleted(activePost.id, activePost.commentCount)}
           />
