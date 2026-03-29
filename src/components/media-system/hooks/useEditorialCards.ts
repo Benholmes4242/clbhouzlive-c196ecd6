@@ -178,7 +178,7 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
                 country: course.country ?? '',
                 subCountry: (course as any).sub_country ?? null,
                 globalRank: (course as any).global_rank ?? null,
-                thumbnailImage: null,
+                thumbnailImage: (course as any).thumbnail_image ?? null,
                 reviewCount: reviewCount ?? 0,
                 communityRating: avgRating,
                 friendsWhoPlayed,
