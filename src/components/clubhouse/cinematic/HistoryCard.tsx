@@ -344,8 +344,9 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               gap: 6,
-              background: isLiked ? 'rgba(255,215,0,0.15)' : 'rgba(255,255,255,0.08)',
-              border: isLiked ? '1px solid rgba(255,215,0,0.4)' : '1px solid rgba(255,255,255,0.12)',
+              background: isLiked ? 'rgba(255,215,0,0.15)' : 'rgba(0,0,0,0.45)',
+              border: isLiked ? '1px solid rgba(255,215,0,0.4)' : '1px solid rgba(255,255,255,0.2)',
+              backdropFilter: 'blur(20px)',
               cursor: 'pointer',
             }}
           >
