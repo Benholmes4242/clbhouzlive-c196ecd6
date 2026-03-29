@@ -95,6 +95,7 @@ export const FeedSlide = memo(function FeedSlide({
           onLike={() => onLike?.(post)}
           getLikeState={getLikeState}
           getCommentCount={getCommentCount}
+          currentUserId={user?.id}
         />
       );
     }
