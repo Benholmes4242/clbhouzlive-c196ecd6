@@ -332,12 +332,12 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
               flex: 1, height: 48, borderRadius: 14, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
               fontSize: 14, fontWeight: 700,
-              background: hasPlayed ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.08)',
-              border: hasPlayed ? '1px solid rgba(34,197,94,0.4)' : '1px solid rgba(255,255,255,0.2)',
-              color: hasPlayed ? '#22C55E' : '#fff',
+              background: 'rgba(255,255,255,0.08)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              color: '#fff',
             }}
           >
-            {hasPlayed ? '✓ Played' : <><span>⛳</span><span>Mark as Played</span></>}
+            {hasPlayed ? <><span>⛳</span><span>Played</span></> : <><span>⛳</span><span>Mark as Played</span></>}
           </button>
         </div>
 
