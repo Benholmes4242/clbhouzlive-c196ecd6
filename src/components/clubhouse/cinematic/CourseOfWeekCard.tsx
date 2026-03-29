@@ -247,19 +247,19 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             View Course
           </button>
           <button
-            onClick={handleWantToPlay}
+            onClick={() => navigate(`/courses/${course.id}/rate`)}
             className="active:scale-[0.97] transition-transform"
             style={{
               flex: 1, height: 48, borderRadius: 14, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
               fontSize: 14, fontWeight: 700,
-              background: wantToPlay ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.08)',
-              border: `1px solid ${wantToPlay ? 'rgba(34,197,94,0.4)' : 'rgba(255,255,255,0.2)'}`,
-              color: wantToPlay ? '#22C55E' : '#fff',
+              background: 'rgba(255,255,255,0.08)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              color: '#fff',
             }}
           >
-            {wantToPlay ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
-            {wantToPlay ? 'Saved' : 'Want to Play'}
+            <Flag size={16} />
+            Mark as Played
           </button>
         </div>
 
