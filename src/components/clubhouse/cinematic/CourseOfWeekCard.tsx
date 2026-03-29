@@ -33,6 +33,19 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
   const [localCount, setLocalCount] = useState(card.reactionCount ?? 0);
   const [hasPlayed, setHasPlayed] = useState(false);
 
+  const { data: commentCount } = useQuery({
+    queryKey: ['editorial-card-comments-count', card.cardId],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('editorial_card_comments')
+        .select('*', { count: 'exact', head: true })
+        .eq('card_id', card.cardId)
+        .is('deleted_at', null);
+      return count ?? 0;
+    },
+    staleTime: 30_000,
+  });
+
   useEffect(() => {
     if (!currentUserId) return;
     supabase
