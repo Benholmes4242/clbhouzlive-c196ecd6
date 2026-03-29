@@ -267,8 +267,6 @@ export interface CourseOfWeekCardData extends EditorialCardBase {
     country: string;
     subCountry: string | null;
     globalRank: number | null;
-    regionalRank: number | null;
-    usaRank: number | null;
     thumbnailImage: string | null;
     reviewCount: number;
     communityRating: number | null;
