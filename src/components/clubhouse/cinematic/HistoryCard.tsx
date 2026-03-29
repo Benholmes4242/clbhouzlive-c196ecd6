@@ -172,6 +172,27 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
         </div>
       )}
 
+      {/* Year watermark — centred in the hero area above content */}
+      {!hasHeroImage && card.historyYear > 0 && (
+        <div
+          className="select-none pointer-events-none"
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: 20,
+            transform: 'translateY(-120%)',
+            fontSize: 120,
+            fontWeight: 900,
+            color: 'rgba(255,215,0,0.10)',
+            letterSpacing: '-0.04em',
+            lineHeight: 1,
+            zIndex: 1,
+          }}
+        >
+          {card.historyYear}
+        </div>
+      )}
+
       {/* ── Bottom content stack ── */}
       <div
         className="absolute left-0 right-0"
@@ -187,22 +208,6 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
           justifyContent: 'flex-end',
         }}
       >
-        {/* Year watermark */}
-        {card.historyYear > 0 && (
-          <div
-            className="select-none"
-            style={{
-              fontSize: 52,
-              fontWeight: 900,
-              color: 'rgba(255,215,0,0.12)',
-              letterSpacing: '-0.04em',
-              lineHeight: 1,
-              marginBottom: -4,
-            }}
-          >
-            {card.historyYear}
-          </div>
-        )}
 
         {/* Headline */}
         <h2
