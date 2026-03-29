@@ -257,7 +257,7 @@ export function injectCourseOfWeekCard(
   if (!card) return feedPosts;
   const without = feedPosts.filter(p => (p as any).postType !== 'course_of_week_card');
   const result = [...without];
-  result.splice(Math.min(7, result.length), 0, card);
+  result.splice(Math.min(1, result.length), 0, card);
   return result;
 }
 
