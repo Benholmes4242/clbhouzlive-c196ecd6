@@ -64,7 +64,7 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
           if (card.course_id) {
             const { data: course } = await supabase
               .from('golf_courses')
-              .select('id, name, country, global_rank')
+              .select('id, name, country, global_rank, thumbnail_image')
               .eq('id', card.course_id)
               .single();
 
@@ -90,6 +90,7 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
                 country: course.country ?? '',
                 reviewCount: reviewCount ?? 0,
                 communityRating: avgRating,
+                thumbnailImage: (course as any).thumbnail_image ?? null,
               };
             }
           }

@@ -82,6 +82,10 @@ export const FeedSlide = memo(function FeedSlide({
         <HistoryCard
           post={post as unknown as HistoryCardFeedPost}
           onComment={() => onComment?.()}
+          onLike={() => onLike?.(post)}
+          getLikeState={getLikeState}
+          getCommentCount={getCommentCount}
+          currentUserId={user?.id}
         />
       );
     }
