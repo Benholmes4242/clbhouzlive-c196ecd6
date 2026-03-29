@@ -219,7 +219,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
         style={{
           position: 'absolute',
           bottom: 0, left: 0, right: 0,
-          padding: `0 20px calc(env(safe-area-inset-bottom, 0px) + 90px) 20px`,
+          padding: `0 16px calc(env(safe-area-inset-bottom, 0px) + 24px) 16px`,
           zIndex: 2,
         }}
       >
