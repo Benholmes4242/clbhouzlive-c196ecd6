@@ -3836,6 +3836,7 @@ export type Database = {
           debate_option_b_course_id: string | null
           debate_votes_a: number
           debate_votes_b: number
+          generation_metadata: Json | null
           history_date: string | null
           history_year: number | null
           id: string
@@ -3860,6 +3861,7 @@ export type Database = {
           debate_option_b_course_id?: string | null
           debate_votes_a?: number
           debate_votes_b?: number
+          generation_metadata?: Json | null
           history_date?: string | null
           history_year?: number | null
           id?: string
@@ -3884,6 +3886,7 @@ export type Database = {
           debate_option_b_course_id?: string | null
           debate_votes_a?: number
           debate_votes_b?: number
+          generation_metadata?: Json | null
           history_date?: string | null
           history_year?: number | null
           id?: string
