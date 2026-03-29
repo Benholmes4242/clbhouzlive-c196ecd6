@@ -222,6 +222,92 @@ export interface PGACardFeedPost extends Omit<FeedPost, 'mediaItems' | 'review' 
   isLoading?:   boolean;
 }
 
+// ── Editorial Card Shared ──
+export interface EditorialCardBase {
+  cardId: string;
+  cardType: 'history' | 'course_of_week' | 'debate';
+  title: string;
+  body: string | null;
+  bodyExtended: string | null;
+  reactionCount: number;
+  commentCount: number;
+  activeUntil: string;
+}
+
+// ── History Card ──
+export interface HistoryCardData extends EditorialCardBase {
+  cardType: 'history';
+  historyYear: number;
+  historyDate: string;
+  linkedCourse: {
+    id: string;
+    name: string;
+    globalRank: number | null;
+    country: string;
+    reviewCount: number;
+    communityRating: number | null;
+  } | null;
+}
+
+export interface HistoryCardFeedPost extends Omit<FeedPost, 'mediaItems' | 'review' | 'isReview'> {
+  postType: 'history_card';
+  cardData: HistoryCardData;
+  mediaItems: [];
+  review: null;
+  isReview: false;
+}
+
+// ── Course of the Week ──
+export interface CourseOfWeekCardData extends EditorialCardBase {
+  cardType: 'course_of_week';
+  editorialBlurb: string | null;
+  course: {
+    id: string;
+    name: string;
+    country: string;
+    subCountry: string | null;
+    globalRank: number | null;
+    thumbnailImage: string | null;
+    reviewCount: number;
+    communityRating: number | null;
+    friendsWhoPlayed: Array<{
+      userId: string;
+      displayName: string;
+      avatarUrl: string | null;
+      rating: number | null;
+    }>;
+    isOnMyWantToPlay: boolean;
+  };
+}
+
+export interface CourseOfWeekCardFeedPost extends Omit<FeedPost, 'mediaItems' | 'review' | 'isReview'> {
+  postType: 'course_of_week_card';
+  cardData: CourseOfWeekCardData;
+  mediaItems: [];
+  review: null;
+  isReview: false;
+}
+
+// ── Weekly Debate ──
+export interface DebateCardData extends EditorialCardBase {
+  cardType: 'debate';
+  optionA: string;
+  optionB: string;
+  votesA: number;
+  votesB: number;
+  myVote: 'a' | 'b' | null;
+  linkedCourseA: { id: string; name: string; communityRating: number | null } | null;
+  linkedCourseB: { id: string; name: string; communityRating: number | null } | null;
+}
+
+export interface DebateCardFeedPost extends Omit<FeedPost, 'mediaItems' | 'review' | 'isReview'> {
+  postType: 'debate_card';
+  cardData: DebateCardData;
+  mediaItems: [];
+  review: null;
+  isReview: false;
+}
+
 export interface VideoSessionState {
   currentTime: number;
   wasMuted: boolean;

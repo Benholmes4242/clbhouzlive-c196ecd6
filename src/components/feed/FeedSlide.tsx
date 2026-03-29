@@ -3,8 +3,11 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapVideoPlayer } from './SnapVideoPlayer';
 import { FeedImageCarousel } from './FeedImageCarousel';
 import { PGACard } from '@/components/clubhouse/cinematic/PGACard';
+import { HistoryCard } from '@/components/clubhouse/cinematic/HistoryCard';
+import { CourseOfWeekCard } from '@/components/clubhouse/cinematic/CourseOfWeekCard';
+import { WeeklyDebateCard } from '@/components/clubhouse/cinematic/WeeklyDebateCard';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
-import type { FeedPost, PGACardFeedPost } from '@/components/media-system/types/media';
+import type { FeedPost, PGACardFeedPost, HistoryCardFeedPost, CourseOfWeekCardFeedPost, DebateCardFeedPost } from '@/components/media-system/types/media';
 
 interface FeedSlideProps {
   post: FeedPost;
@@ -67,6 +70,36 @@ export const FeedSlide = memo(function FeedSlide({
           onLike={() => onLike?.(post)}
           getLikeState={getLikeState}
           getCommentCount={getCommentCount}
+        />
+      );
+    }
+
+    // History editorial card
+    if (post.postType === 'history_card') {
+      return (
+        <HistoryCard
+          post={post as unknown as HistoryCardFeedPost}
+          onComment={() => onComment?.()}
+        />
+      );
+    }
+
+    // Course of the week editorial card
+    if (post.postType === 'course_of_week_card') {
+      return (
+        <CourseOfWeekCard
+          post={post as unknown as CourseOfWeekCardFeedPost}
+          onComment={() => onComment?.()}
+        />
+      );
+    }
+
+    // Weekly debate editorial card
+    if (post.postType === 'debate_card') {
+      return (
+        <WeeklyDebateCard
+          post={post as unknown as DebateCardFeedPost}
+          onComment={() => onComment?.()}
         />
       );
     }
@@ -169,7 +202,10 @@ export const FeedSlide = memo(function FeedSlide({
       }}
     >
       {/* PGA card sentinel for IntersectionObserver */}
-      {post.postType === 'pga_card' && (
+      {(post.postType === 'pga_card' ||
+        post.postType === 'history_card' ||
+        post.postType === 'course_of_week_card' ||
+        post.postType === 'debate_card') && (
         <div data-pga-sentinel="true" className="absolute inset-0 pointer-events-none" />
       )}
       {renderContent()}

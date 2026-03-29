@@ -31,8 +31,9 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFeed';
 import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
 import { usePGACard } from '@/components/media-system/hooks/usePGACard';
-import { injectPGACard } from '@/components/media-system/utils/feedAlgorithm';
-import type { FeedPost, PGACardFeedPost } from '@/components/media-system/types/media';
+import { useEditorialCards } from '@/components/media-system/hooks/useEditorialCards';
+import { injectPGACard, injectHistoryCard, injectCourseOfWeekCard, injectDebateCard } from '@/components/media-system/utils/feedAlgorithm';
+import type { FeedPost, PGACardFeedPost, HistoryCardFeedPost, CourseOfWeekCardFeedPost, DebateCardFeedPost } from '@/components/media-system/types/media';
 // buildSuggestedFeed/buildFriendsFeed are called inside the feed hooks — not here
 
 // ── Clubhouse UI overlays ──
@@ -166,14 +167,19 @@ const ClubhouseContent = () => {
   const suggestedFeed = useSuggestedFeed(user?.id);
   const friendsFeed = useFriendsFeed(user?.id);
   const { pgaCard } = usePGACard(user?.id);
+  const { historyCard, courseOfWeekCard, debateCard } = useEditorialCards(user?.id);
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
   
   const posts = useMemo(() => {
     if (activeTab === 'foryou') {
-      return injectPGACard(activeFeed.posts, pgaCard as unknown as FeedPost);
+      let feed = injectPGACard(activeFeed.posts, pgaCard as unknown as FeedPost);
+      feed = injectHistoryCard(feed, historyCard as unknown as FeedPost);
+      feed = injectCourseOfWeekCard(feed, courseOfWeekCard as unknown as FeedPost);
+      feed = injectDebateCard(feed, debateCard as unknown as FeedPost);
+      return feed;
     }
     return activeFeed.posts;
-  }, [activeFeed.posts, activeTab, pgaCard]);
+  }, [activeFeed.posts, activeTab, pgaCard, historyCard, courseOfWeekCard, debateCard]);
 
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? false;
@@ -392,11 +398,21 @@ const ClubhouseContent = () => {
             postId={
               activePost.postType === 'pga_card'
                 ? (activePost as unknown as PGACardFeedPost).cardData.postId
+                : activePost.postType === 'history_card'
+                ? (activePost as any).cardData.cardId
+                : activePost.postType === 'course_of_week_card'
+                ? (activePost as any).cardData.cardId
+                : activePost.postType === 'debate_card'
+                ? (activePost as any).cardData.cardId
                 : activePost.id
             }
             currentUserId={user?.id}
             creatorUserId={activePost.userId}
-            creatorName={activePost.postType === 'pga_card' ? 'clbhouz' : activePost.displayName}
+            creatorName={
+              ['pga_card', 'history_card', 'course_of_week_card', 'debate_card'].includes(activePost.postType ?? '')
+                ? 'Clbhouz'
+                : activePost.displayName
+            }
             creatorAvatar={activePost.avatarUrl}
             caption={activePost.caption}
             theme="dark"
