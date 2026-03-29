@@ -74,6 +74,36 @@ export const FeedSlide = memo(function FeedSlide({
       );
     }
 
+    // History editorial card
+    if (post.postType === 'history_card') {
+      return (
+        <HistoryCard
+          post={post as unknown as HistoryCardFeedPost}
+          onComment={() => onComment?.()}
+        />
+      );
+    }
+
+    // Course of the week editorial card
+    if (post.postType === 'course_of_week_card') {
+      return (
+        <CourseOfWeekCard
+          post={post as unknown as CourseOfWeekCardFeedPost}
+          onComment={() => onComment?.()}
+        />
+      );
+    }
+
+    // Weekly debate editorial card
+    if (post.postType === 'debate_card') {
+      return (
+        <WeeklyDebateCard
+          post={post as unknown as DebateCardFeedPost}
+          onComment={() => onComment?.()}
+        />
+      );
+    }
+
     // Multi-media (any mix of video + image) → FeedImageCarousel
     if (media && media.length > 1) {
       return (
