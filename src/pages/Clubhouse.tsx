@@ -173,9 +173,9 @@ const ClubhouseContent = () => {
   
   const posts = useMemo(() => {
     if (activeTab === 'foryou') {
-      let feed = injectCourseOfWeekCard(activeFeed.posts, courseOfWeekCard as unknown as FeedPost);
-      feed = injectPGACard(feed, pgaCard as unknown as FeedPost);
-      feed = injectHistoryCard(feed, historyCard as unknown as FeedPost);
+      let feed = injectHistoryCard(activeFeed.posts, historyCard as unknown as FeedPost);   // slot 11
+      feed = injectPGACard(feed, pgaCard as unknown as FeedPost);                           // slot 7
+      feed = injectCourseOfWeekCard(feed, courseOfWeekCard as unknown as FeedPost);         // slot 3
       // feed = injectDebateCard(feed, debateCard as unknown as FeedPost); // temporarily disabled
       return feed;
     }
