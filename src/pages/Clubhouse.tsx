@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ClubhouseTopBar } from '@/components/clubhouse/ClubhouseTopBar';
 import { PageRoot } from '@/components/layout/PageRoot';
 import { useHeaderVariant } from '@/hooks/useHeaderVisibility';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 
@@ -201,6 +202,25 @@ const ClubhouseContent = () => {
   // ── Optimistic like state ──
   const { handleLike, getActiveLikeState, resetLikes } = useClubhouseLikes({ userId: user?.id, activeActor });
   const activeLikeState = getActiveLikeState(activePost);
+
+  // ── Editorial card like count for CommentsSheet ──
+  const editorialCardId = ['course_of_week_card', 'history_card', 'debate_card'].includes(activePost?.postType ?? '')
+    ? (activePost as any)?.cardData?.cardId
+    : null;
+
+  const { data: editorialLikeCount } = useQuery({
+    queryKey: ['editorial-card-likes-count', editorialCardId],
+    queryFn: async () => {
+      if (!editorialCardId) return 0;
+      const { count } = await supabase
+        .from('editorial_card_likes')
+        .select('*', { count: 'exact', head: true })
+        .eq('card_id', editorialCardId);
+      return count ?? 0;
+    },
+    enabled: !!editorialCardId,
+    staleTime: 30_000,
+  });
   
   // ── Optimistic follow state ──
   const { followOverrides, handleFollow, handleFollowChange, getFollowState, resetFollows } = useClubhouseFollows({ userId: user?.id });
@@ -417,10 +437,8 @@ const ClubhouseContent = () => {
             caption={activePost.caption}
             theme="dark"
             likesCount={
-              activePost.postType === 'course_of_week_card' ||
-              activePost.postType === 'history_card' ||
-              activePost.postType === 'debate_card'
-                ? null
+              ['course_of_week_card', 'history_card', 'debate_card'].includes(activePost.postType ?? '')
+                ? (editorialLikeCount ?? 0)
                 : activeLikeState?.count ?? null
             }
             likeSource={
