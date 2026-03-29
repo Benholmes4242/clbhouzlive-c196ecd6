@@ -423,6 +423,11 @@ const ClubhouseContent = () => {
                 ? null
                 : activeLikeState?.count ?? null
             }
+            likeSource={
+              ['course_of_week_card', 'history_card', 'debate_card'].includes(activePost.postType ?? '')
+                ? 'editorial'
+                : 'post'
+            }
             onCommentPosted={() => handleCommentPosted(activePost)}
             onCommentDeleted={() => activePost && handleCommentDeleted(activePost.id, activePost.commentCount)}
           />
