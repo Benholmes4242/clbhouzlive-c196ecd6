@@ -233,7 +233,7 @@ export function injectPGACard(feedPosts: FeedPost[], pgaCard: FeedPost | null): 
   if (!pgaCard) return feedPosts;
   const without = feedPosts.filter(p => (p as any).postType !== 'pga_card');
   const result = [...without];
-  result.splice(2, 0, pgaCard);
+  result.splice(Math.min(5, result.length), 0, pgaCard);
   return result;
 }
 
@@ -246,7 +246,7 @@ export function injectHistoryCard(
   if (!card) return feedPosts;
   const without = feedPosts.filter(p => (p as any).postType !== 'history_card');
   const result = [...without];
-  result.splice(Math.min(4, result.length), 0, card);
+  result.splice(Math.min(9, result.length), 0, card);
   return result;
 }
 
@@ -257,7 +257,7 @@ export function injectCourseOfWeekCard(
   if (!card) return feedPosts;
   const without = feedPosts.filter(p => (p as any).postType !== 'course_of_week_card');
   const result = [...without];
-  result.splice(Math.min(7, result.length), 0, card);
+  result.splice(Math.min(1, result.length), 0, card);
   return result;
 }
 
@@ -268,6 +268,6 @@ export function injectDebateCard(
   if (!card) return feedPosts;
   const without = feedPosts.filter(p => (p as any).postType !== 'debate_card');
   const result = [...without];
-  result.splice(Math.min(11, result.length), 0, card);
+  result.splice(Math.min(13, result.length), 0, card);
   return result;
 }
