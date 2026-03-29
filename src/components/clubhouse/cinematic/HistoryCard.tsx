@@ -178,9 +178,9 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
           className="select-none pointer-events-none"
           style={{
             position: 'absolute',
-            top: '50%',
+            top: '38%',
             left: 20,
-            transform: 'translateY(-120%)',
+            transform: 'translateY(-50%)',
             fontSize: 120,
             fontWeight: 900,
             color: 'rgba(255,215,0,0.10)',
@@ -200,8 +200,8 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
           bottom: 0,
           maxHeight: expanded ? 'none' : '55vh',
           overflow: expanded ? 'visible' : 'hidden',
-          padding: '0 20px',
-          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 90px)',
+          padding: '0 16px',
+          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)',
           zIndex: 10,
           display: 'flex',
           flexDirection: 'column',
@@ -234,7 +234,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
                 lineHeight: 1.6,
                 ...(!expanded ? {
                   display: '-webkit-box',
-                  WebkitLineClamp: 4,
+                  WebkitLineClamp: 5,
                   WebkitBoxOrient: 'vertical' as const,
                   overflow: 'hidden',
                 } : {}),
@@ -344,8 +344,9 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               gap: 6,
-              background: isLiked ? 'rgba(255,215,0,0.15)' : 'rgba(255,255,255,0.08)',
-              border: isLiked ? '1px solid rgba(255,215,0,0.4)' : '1px solid rgba(255,255,255,0.12)',
+              background: isLiked ? 'rgba(255,215,0,0.15)' : 'rgba(0,0,0,0.45)',
+              border: isLiked ? '1px solid rgba(255,215,0,0.4)' : '1px solid rgba(255,255,255,0.2)',
+              backdropFilter: 'blur(20px)',
               cursor: 'pointer',
             }}
           >
@@ -376,8 +377,9 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               gap: 6,
-              background: 'rgba(255,255,255,0.08)',
-              border: '1px solid rgba(255,255,255,0.12)',
+              background: 'rgba(0,0,0,0.45)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              backdropFilter: 'blur(20px)',
               cursor: 'pointer',
             }}
           >
