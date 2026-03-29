@@ -155,11 +155,6 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   const capsuleRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef<number | null>(null);
 
-  // Reset expansion state on post change — always start collapsed
-  useEffect(() => {
-    setIsExpanded(false);
-  }, [postId]);
-
 
 
   const handleToggle = useCallback(() => {
