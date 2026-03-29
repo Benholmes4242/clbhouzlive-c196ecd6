@@ -61,6 +61,7 @@ interface CommentsSheetProps {
   reviewRating?: number | null;
   caddiePickCommentId?: string | null;
   likesCount?: number | null;
+  likeSource?: 'post' | 'editorial';
   onCommentPosted?: () => void;
   onCommentDeleted?: () => void;
 }
