@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { CourseOfWeekCardFeedPost } from '@/components/media-system/types/media';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 
 interface CourseOfWeekCardProps {
   post: CourseOfWeekCardFeedPost;
