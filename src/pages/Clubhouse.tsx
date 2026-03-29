@@ -167,14 +167,19 @@ const ClubhouseContent = () => {
   const suggestedFeed = useSuggestedFeed(user?.id);
   const friendsFeed = useFriendsFeed(user?.id);
   const { pgaCard } = usePGACard(user?.id);
+  const { historyCard, courseOfWeekCard, debateCard } = useEditorialCards(user?.id);
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
   
   const posts = useMemo(() => {
     if (activeTab === 'foryou') {
-      return injectPGACard(activeFeed.posts, pgaCard as unknown as FeedPost);
+      let feed = injectPGACard(activeFeed.posts, pgaCard as unknown as FeedPost);
+      feed = injectHistoryCard(feed, historyCard as unknown as FeedPost);
+      feed = injectCourseOfWeekCard(feed, courseOfWeekCard as unknown as FeedPost);
+      feed = injectDebateCard(feed, debateCard as unknown as FeedPost);
+      return feed;
     }
     return activeFeed.posts;
-  }, [activeFeed.posts, activeTab, pgaCard]);
+  }, [activeFeed.posts, activeTab, pgaCard, historyCard, courseOfWeekCard, debateCard]);
 
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? false;
