@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useCommentsWithReplies, type CommentWithReplies, type CommentReply } from '@/hooks/useCommentsWithReplies';
+import { useEditorialComments } from '@/hooks/useEditorialComments';
 import { useCommentsRealtime } from '@/hooks/useCommentsRealtime';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -62,6 +63,7 @@ interface CommentsSheetProps {
   caddiePickCommentId?: string | null;
   likesCount?: number | null;
   likeSource?: 'post' | 'editorial';
+  editorialCardId?: string;
   onCommentPosted?: () => void;
   onCommentDeleted?: () => void;
 }
@@ -88,6 +90,7 @@ function CommentsSheet({
   isReview,
   likesCount,
   likeSource = 'post',
+  editorialCardId,
   onCommentPosted,
   onCommentDeleted,
 }: CommentsSheetProps) {
@@ -96,7 +99,11 @@ function CommentsSheet({
   const { activeActor } = useActiveActor();
   const currentUserId = currentUserIdProp ?? user?.id ?? null;
 
-  // ── Hook ──
+  // ── Hook — use editorial comments hook when editorialCardId is provided ──
+  const standardHook = useCommentsWithReplies(editorialCardId ? '' : postId, onCommentDeleted);
+  const editorialHook = useEditorialComments(editorialCardId ?? '', onCommentDeleted);
+  const activeHook = editorialCardId ? editorialHook : standardHook;
+
   const {
     comments,
     commentsLoading,
@@ -110,9 +117,9 @@ function CommentsSheet({
     hasNextPage,
     isFetchingNextPage,
     loadAllReplies,
-  } = useCommentsWithReplies(postId, onCommentDeleted);
+  } = activeHook;
 
-  useCommentsRealtime(postId, isOpen);
+  useCommentsRealtime(editorialCardId ? '' : postId, isOpen);
 
   // ── State ──
   const [activeTab, setActiveTab] = useState<SheetTab>('comments');
