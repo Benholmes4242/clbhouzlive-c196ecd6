@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, MessageCircle, Flag } from 'lucide-react';
-import type { CourseOfWeekCardFeedPost, FeedPost } from '@/components/media-system/types/media';
+import { supabase } from '@/integrations/supabase/client';
+import type { CourseOfWeekCardFeedPost } from '@/components/media-system/types/media';
 
 interface CourseOfWeekCardProps {
   post: CourseOfWeekCardFeedPost;
   onComment: () => void;
-  onLike: () => void;
+  onLike?: () => void;
   getLikeState?: (post: any) => { isLiked: boolean; count: number };
   getCommentCount?: (post: any) => number;
   currentUserId?: string;
@@ -25,7 +26,41 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
   const card = post.cardData;
   const course = card.course;
 
-  const likeState = getLikeState?.(post) ?? { isLiked: false, count: 0 };
+  const [localLiked, setLocalLiked] = useState(false);
+  const [localCount, setLocalCount] = useState(card.reactionCount ?? 0);
+
+  const handleLike = async () => {
+    if (!currentUserId) return;
+
+    const newIsLiked = !localLiked;
+
+    // Optimistic update
+    setLocalLiked(newIsLiked);
+    setLocalCount(c => newIsLiked ? c + 1 : c - 1);
+
+    try {
+      if (newIsLiked) {
+        await supabase
+          .from('post_likes')
+          .upsert({
+            post_id: card.cardId,
+            actor_type: 'personal',
+            actor_id: currentUserId,
+            user_id: currentUserId,
+          }, { onConflict: 'post_id,actor_type,actor_id' });
+      } else {
+        await supabase
+          .from('post_likes')
+          .delete()
+          .eq('post_id', card.cardId)
+          .eq('actor_id', currentUserId);
+      }
+    } catch {
+      // Revert on error
+      setLocalLiked(!newIsLiked);
+      setLocalCount(c => newIsLiked ? c - 1 : c + 1);
+    }
+  };
 
   const heroSrc = course.thumbnailImage;
 
@@ -265,23 +300,23 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
         {/* Engagement row */}
         <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
           <button
-            onClick={onLike}
+            onClick={handleLike}
             className="active:scale-[0.95] transition-transform"
             style={{
               flex: 1, height: 48, borderRadius: 14, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-              background: likeState.isLiked ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.08)',
-              border: `1px solid ${likeState.isLiked ? 'rgba(247,147,30,0.4)' : 'rgba(255,255,255,0.12)'}`,
+              background: localLiked ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.08)',
+              border: `1px solid ${localLiked ? 'rgba(247,147,30,0.4)' : 'rgba(255,255,255,0.12)'}`,
             }}
           >
             <Heart
               size={17}
-              fill={likeState.isLiked ? '#F7931E' : 'none'}
-              style={{ color: likeState.isLiked ? '#F7931E' : 'rgba(255,255,255,0.5)' }}
+              fill={localLiked ? '#F7931E' : 'none'}
+              style={{ color: localLiked ? '#F7931E' : 'rgba(255,255,255,0.5)' }}
             />
-            {likeState.count > 0 && (
-              <span style={{ fontSize: 13, fontWeight: 700, color: likeState.isLiked ? '#F7931E' : 'rgba(255,255,255,0.5)' }}>
-                {likeState.count}
+            {localCount > 0 && (
+              <span style={{ fontSize: 13, fontWeight: 700, color: localLiked ? '#F7931E' : 'rgba(255,255,255,0.5)' }}>
+                {localCount}
               </span>
             )}
           </button>
