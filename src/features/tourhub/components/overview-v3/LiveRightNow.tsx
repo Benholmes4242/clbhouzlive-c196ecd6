@@ -80,8 +80,8 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
       {/* Live badge bar */}
       <div
         style={{
-          background: 'linear-gradient(135deg, #16a34a 0%, #15803d 60%, #166534 100%)',
-          padding: '7px 12px',
+          background: 'linear-gradient(135deg, #22C55E 0%, #16a34a 60%, #15803d 100%)',
+          padding: '5px 12px',
           display: 'flex',
           alignItems: 'center',
           gap: '6px',
@@ -89,7 +89,7 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
       >
         <div
           className="animate-live-pulse"
-          style={{ width: 7, height: 7, borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 6px #4ade80' }}
+          style={{ width: 7, height: 7, borderRadius: '50%', background: '#86efac', boxShadow: '0 0 6px #86efac' }}
         />
         <span style={{ color: '#fff', fontSize: '10px', fontWeight: 800, letterSpacing: '0.1em' }}>
           LIVE
