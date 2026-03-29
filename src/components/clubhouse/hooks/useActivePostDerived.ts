@@ -36,12 +36,14 @@ export function useActivePostDerived(posts: FeedPost[], activeIndex: number) {
       };
     }
 
-    // Priority 3: golf_club tag — has real course UUID as entity_id
-    const courseTag = activePost.tags?.find(t => t.entity_type === 'golf_club');
+    // Priority 3: golf_club tag — support both normalized and raw RPC tag shapes
+    const courseTag = activePost.tags?.find((t: any) =>
+      (t.entity_type || t.tagged_entity_type) === 'golf_club'
+    ) as any;
     if (courseTag) {
       return {
-        id: courseTag.entity_id,
-        name: courseTag.name,
+        id: courseTag.entity_id || courseTag.tagged_entity_id || null,
+        name: courseTag.name || courseTag.display_name || null,
         courseCountry: null,
       };
     }
