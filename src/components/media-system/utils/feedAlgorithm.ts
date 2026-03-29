@@ -236,3 +236,38 @@ export function injectPGACard(feedPosts: FeedPost[], pgaCard: FeedPost | null): 
   result.splice(2, 0, pgaCard);
   return result;
 }
+
+// ── Editorial Card Injection ──────────────────────────────────────────────────
+
+export function injectHistoryCard(
+  feedPosts: FeedPost[],
+  card: FeedPost | null
+): FeedPost[] {
+  if (!card) return feedPosts;
+  const without = feedPosts.filter(p => (p as any).postType !== 'history_card');
+  const result = [...without];
+  result.splice(Math.min(4, result.length), 0, card);
+  return result;
+}
+
+export function injectCourseOfWeekCard(
+  feedPosts: FeedPost[],
+  card: FeedPost | null
+): FeedPost[] {
+  if (!card) return feedPosts;
+  const without = feedPosts.filter(p => (p as any).postType !== 'course_of_week_card');
+  const result = [...without];
+  result.splice(Math.min(7, result.length), 0, card);
+  return result;
+}
+
+export function injectDebateCard(
+  feedPosts: FeedPost[],
+  card: FeedPost | null
+): FeedPost[] {
+  if (!card) return feedPosts;
+  const without = feedPosts.filter(p => (p as any).postType !== 'debate_card');
+  const result = [...without];
+  result.splice(Math.min(11, result.length), 0, card);
+  return result;
+}
