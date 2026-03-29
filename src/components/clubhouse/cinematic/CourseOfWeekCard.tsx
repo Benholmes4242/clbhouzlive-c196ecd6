@@ -198,7 +198,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             zIndex: 2,
           }}
         >
-          <CourseRankBadges globalRank={course.globalRank} />
+          <CourseRankBadges globalRank={course.globalRank} regionalRank={null} usaRank={null} country={course.country ?? ''} />
         </div>
       )}
 
