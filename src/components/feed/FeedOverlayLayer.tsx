@@ -20,7 +20,7 @@ interface FeedOverlayLayerProps {
   onReviewTap: () => void;
   overlayVisible: boolean;
   isOwnPost: boolean;
-  golfCourse?: { id?: string | null; name?: string | null; courseCountry?: string | null; slug?: string | null; globalRank?: number | null } | null;
+  golfCourse?: { id: string; name: string; country?: string } | null;
   onBeforeNavigate?: () => void;
   activeReview?: {
     reviewId: string;
@@ -126,7 +126,11 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
           }}
           caption={activePost.caption}
           tags={activePost.tags}
-          golfCourse={golfCourse ?? null}
+          golfCourse={golfCourse ? { 
+            id: golfCourse.id, 
+            name: golfCourse.name, 
+            country: (golfCourse as any).courseCountry ?? (golfCourse as any).country ?? null
+          } : null}
           isFollowing={isFollowed}
           isOwnPost={isOwnPost}
           isVisible={overlayVisible}
