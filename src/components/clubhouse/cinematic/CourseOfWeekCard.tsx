@@ -337,7 +337,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
               color: hasPlayed ? '#22C55E' : '#fff',
             }}
           >
-            {hasPlayed ? '✓ Played' : '⛳ Mark as Played'}
+            {hasPlayed ? '✓ Played' : <><span>⛳</span><span>Mark as Played</span></>}
           </button>
         </div>
 
