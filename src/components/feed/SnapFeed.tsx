@@ -236,18 +236,27 @@ export function SnapFeed({
     const container = containerRef.current;
     if (!container) return;
 
-    const sentinel = container.querySelector("[data-pga-sentinel='true']") as HTMLElement | null;
-    if (!sentinel) return;
+    const sentinels = container.querySelectorAll("[data-pga-sentinel='true']");
+    if (sentinels.length === 0) return;
+
+    // Track intersection state per sentinel so we activate when ANY is visible
+    const visibleSet = new Set<Element>();
 
     const observer = new IntersectionObserver(
       (entries) => {
-        const entry = entries[0];
-        setIsTournamentCardActive(entry.isIntersecting && entry.intersectionRatio >= 0.85);
+        for (const entry of entries) {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.85) {
+            visibleSet.add(entry.target);
+          } else {
+            visibleSet.delete(entry.target);
+          }
+        }
+        setIsTournamentCardActive(visibleSet.size > 0);
       },
       { root: container, threshold: [0, 0.85] }
     );
 
-    observer.observe(sentinel);
+    sentinels.forEach(sentinel => observer.observe(sentinel));
     return () => observer.disconnect();
   }, [setIsTournamentCardActive, posts]);
 
