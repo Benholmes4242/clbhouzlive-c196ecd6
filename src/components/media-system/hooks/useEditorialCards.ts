@@ -158,53 +158,34 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
             }
 
             // Get friends who played this course
-            console.log('[useEditorialCards] userId for friends query:', userId);
             let friendsWhoPlayed: CourseOfWeekCardData['course']['friendsWhoPlayed'] = [];
             if (userId) {
               try {
-                // Step 1: get friend IDs (bidirectional)
-                const { data: friendships } = await supabase
+                const { data: friendRows } = await supabase
                   .from('user_friends')
-                  .select('user_id, friend_id')
-                  .eq('status', 'accepted')
-                  .or(`user_id.eq.${userId},friend_id.eq.${userId}`);
+                  .select('friend_id')
+                  .eq('user_id', userId)
+                  .eq('status', 'accepted');
 
-                const friendIds = (friendships || [])
-                  .map((row: any) => (row.user_id === userId ? row.friend_id : row.user_id))
-                  .filter(Boolean);
+                const friendIds = (friendRows || []).map((f: any) => f.friend_id);
 
                 if (friendIds.length > 0) {
-                  // Step 2: find friends who played this course
-                  const { data: plays } = await supabase
-                    .from('user_courses')
-                    .select('user_id, rating')
+                  const { data: friendRatings } = await supabase
+                    .from('course_ratings')
+                    .select('user_id, rating, user_profiles!inner(display_name, profile_photo_url)')
                     .eq('course_id', course.id)
-                    .eq('played', true)
                     .in('user_id', friendIds)
                     .limit(5);
 
-                  if (plays && plays.length > 0) {
-                    const playUserIds = plays.map((p: any) => p.user_id);
-                    // Step 3: get profiles
-                    const { data: profiles } = await supabase
-                      .from('user_profiles')
-                      .select('id, display_name, profile_photo_url')
-                      .in('id', playUserIds);
-
-                    const profileMap = new Map((profiles || []).map((p: any) => [p.id, p]));
-                    friendsWhoPlayed = plays.map((p: any) => {
-                      const prof = profileMap.get(p.user_id);
-                      return {
-                        userId: p.user_id,
-                        displayName: prof?.display_name ?? 'Golfer',
-                        avatarUrl: prof?.profile_photo_url ?? null,
-                        rating: p.rating ?? null,
-                      };
-                    });
-                  }
+                  friendsWhoPlayed = (friendRatings || []).map((r: any) => ({
+                    userId: r.user_id,
+                    displayName: r.user_profiles.display_name || 'Golfer',
+                    avatarUrl: r.user_profiles.profile_photo_url || null,
+                    rating: r.rating || null,
+                  }));
                 }
-              } catch {
-                // fail silently — friendsWhoPlayed stays []
+              } catch (err) {
+                console.warn('[useEditorialCards] Friends query failed:', err);
               }
             }
 
