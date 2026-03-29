@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useCommentsWithReplies, type CommentWithReplies, type CommentReply } from '@/hooks/useCommentsWithReplies';
+import { useEditorialComments } from '@/hooks/useEditorialComments';
 import { useCommentsRealtime } from '@/hooks/useCommentsRealtime';
 import { useActiveActor } from '@/context/ActiveActorContext';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
