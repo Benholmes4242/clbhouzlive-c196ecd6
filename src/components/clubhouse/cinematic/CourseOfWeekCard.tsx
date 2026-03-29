@@ -253,12 +253,6 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
                 {course.friendsWhoPlayed.map(f => f.displayName.split(' ')[0]).slice(0, 2).join(', ')}
                 {course.friendsWhoPlayed.length > 2 && ` & ${course.friendsWhoPlayed.length - 2} others`} have played here
               </span>
-              {(() => {
-                const ratings = course.friendsWhoPlayed.filter(f => f.rating != null).map(f => f.rating!);
-                if (ratings.length === 0) return null;
-                const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
-                return <span style={{ fontSize: 13, fontWeight: 700, color: '#F7931E' }}>{avg.toFixed(1)}</span>;
-              })()}
             </div>
           </div>
         )}
