@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, MessageCircle, Flag } from 'lucide-react';
 import type { CourseOfWeekCardFeedPost, FeedPost } from '@/components/media-system/types/media';
-import type { CourseOfWeekCardFeedPost, FeedPost } from '@/components/media-system/types/media';
 
 interface CourseOfWeekCardProps {
   post: CourseOfWeekCardFeedPost;
