@@ -1,5 +1,6 @@
 import React, { memo, useEffect } from 'react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { SnapVideoPlayer } from './SnapVideoPlayer';
 import { FeedImageCarousel } from './FeedImageCarousel';
 import { PGACard } from '@/components/clubhouse/cinematic/PGACard';
@@ -40,6 +41,7 @@ export const FeedSlide = memo(function FeedSlide({
   onZoomChange,
   activeIndexOverride,
 }: FeedSlideProps) {
+  const { user } = useSupabaseSession();
   const storeActiveIndex = useClubhouseStore(s => s.activeIndex);
   const activeIndex = activeIndexOverride ?? storeActiveIndex;
   const isActive = activeIndex === index;
@@ -93,6 +95,7 @@ export const FeedSlide = memo(function FeedSlide({
           onLike={() => onLike?.(post)}
           getLikeState={getLikeState}
           getCommentCount={getCommentCount}
+          currentUserId={user?.id}
         />
       );
     }
