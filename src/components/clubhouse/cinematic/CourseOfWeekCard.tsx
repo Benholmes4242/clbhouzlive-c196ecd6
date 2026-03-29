@@ -164,7 +164,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-              gap: 8,
+            gap: 6,
             padding: '5px 12px',
             borderRadius: 999,
             background: 'rgba(34,197,94,0.15)',
