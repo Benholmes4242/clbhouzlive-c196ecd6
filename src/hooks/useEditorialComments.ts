@@ -127,11 +127,12 @@ export function useEditorialComments(cardId: string, onCommentDeleted?: () => vo
 
   const deleteCommentMutation = useMutation({
     mutationFn: async (commentId: string) => {
+      if (!user?.id) throw new Error('Not authenticated');
       const { error } = await supabase
         .from('editorial_card_comments')
         .update({ deleted_at: new Date().toISOString() })
         .eq('id', commentId)
-        .eq('user_id', user?.id ?? '');
+        .eq('user_id', user.id);
       if (error) throw error;
     },
     onSuccess: () => {
