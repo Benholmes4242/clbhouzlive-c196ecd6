@@ -367,8 +367,9 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             style={{
               flex: 1, height: 48, borderRadius: 14, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-              background: localLiked ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.08)',
-              border: `1px solid ${localLiked ? 'rgba(247,147,30,0.4)' : 'rgba(255,255,255,0.12)'}`,
+              background: localLiked ? 'rgba(247,147,30,0.15)' : 'rgba(0,0,0,0.45)',
+              border: `1px solid ${localLiked ? 'rgba(247,147,30,0.4)' : 'rgba(255,255,255,0.2)'}`,
+              backdropFilter: 'blur(20px)',
             }}
           >
             <Heart
