@@ -67,12 +67,12 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
   })();
 
   const tags: FeedPostTag[] = rawTags
-    .filter((tag: any) => tag && tag.entity_type && tag.entity_id)
+    .filter((tag: any) => tag && (tag.entity_type || tag.tagged_entity_type) && (tag.entity_id || tag.tagged_entity_id))
     .map((tag: any) => ({
-      id: tag.id ?? '',
-      entity_type: tag.entity_type,
-      entity_id: tag.entity_id,
-      name: tag.name ?? '',
+      id: tag.id ?? tag.tagged_entity_id ?? '',
+      entity_type: tag.entity_type || tag.tagged_entity_type,
+      entity_id: tag.entity_id || tag.tagged_entity_id,
+      name: tag.name || tag.display_name || '',
       username: tag.username ?? null,
       start_index: tag.start_index ?? 0,
       end_index: tag.end_index ?? 0,
