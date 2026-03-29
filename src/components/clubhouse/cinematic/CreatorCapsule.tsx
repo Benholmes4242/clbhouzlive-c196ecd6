@@ -150,15 +150,10 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   carouselActiveIndex = 0,
 }) => {
   
-  const [isExpanded, setIsExpanded] = useState(!!golfCourse?.id);
+  const [isExpanded, setIsExpanded] = useState(false);
   const navigate = useNavigate();
   const capsuleRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef<number | null>(null);
-
-  // Reset expanded state when the active post changes
-  useEffect(() => {
-    setIsExpanded(!!golfCourse?.id);
-  }, [postId]);
 
 
 
