@@ -1155,7 +1155,7 @@ export const PGACard: React.FC<PGACardProps> = ({
             <span style={{ fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#22C55E' }}>Live</span>
           </div>
           <span style={{ fontSize: 'clamp(9px, 2.2vw, 11px)', fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>
-            PGA TOUR{cd.roundLabel ? ` · ${cd.roundLabel}` : ''}
+            PGA TOUR
           </span>
         </div>
 
