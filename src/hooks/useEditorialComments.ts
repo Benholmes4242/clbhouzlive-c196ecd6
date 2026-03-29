@@ -138,6 +138,7 @@ export function useEditorialComments(cardId: string, onCommentDeleted?: () => vo
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey });
       queryClient.invalidateQueries({ queryKey: ['editorial-card-comments-count', cardId] });
+      queryClient.refetchQueries({ queryKey });
       onCommentDeleted?.();
     },
     onError: () => {
