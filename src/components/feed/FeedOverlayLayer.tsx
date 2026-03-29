@@ -20,7 +20,7 @@ interface FeedOverlayLayerProps {
   onReviewTap: () => void;
   overlayVisible: boolean;
   isOwnPost: boolean;
-  golfCourse?: { id: string; name: string; country?: string } | null;
+  golfCourse?: { id?: string | null; name?: string | null; courseCountry?: string | null; slug?: string | null; globalRank?: number | null } | null;
   onBeforeNavigate?: () => void;
   activeReview?: {
     reviewId: string;
