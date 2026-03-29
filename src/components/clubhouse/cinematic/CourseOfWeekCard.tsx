@@ -21,7 +21,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
   currentUserId,
 }) => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  
   const card = post.cardData;
   const course = card.course;
 
