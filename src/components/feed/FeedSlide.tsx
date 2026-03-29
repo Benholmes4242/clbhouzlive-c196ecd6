@@ -3,8 +3,11 @@ import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapVideoPlayer } from './SnapVideoPlayer';
 import { FeedImageCarousel } from './FeedImageCarousel';
 import { PGACard } from '@/components/clubhouse/cinematic/PGACard';
+import { HistoryCard } from '@/components/clubhouse/cinematic/HistoryCard';
+import { CourseOfWeekCard } from '@/components/clubhouse/cinematic/CourseOfWeekCard';
+import { WeeklyDebateCard } from '@/components/clubhouse/cinematic/WeeklyDebateCard';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
-import type { FeedPost, PGACardFeedPost } from '@/components/media-system/types/media';
+import type { FeedPost, PGACardFeedPost, HistoryCardFeedPost, CourseOfWeekCardFeedPost, DebateCardFeedPost } from '@/components/media-system/types/media';
 
 interface FeedSlideProps {
   post: FeedPost;
