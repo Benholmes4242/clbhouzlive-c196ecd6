@@ -81,7 +81,7 @@ const LiveBroadcastCard: React.FC<{ tournament: LiveTournamentWithLeader }> = ({
       <div
         style={{
           background: 'linear-gradient(135deg, #22C55E 0%, #16a34a 60%, #15803d 100%)',
-          padding: '4px 12px',
+          padding: '3px 12px',
           display: 'flex',
           alignItems: 'center',
           gap: '6px',
