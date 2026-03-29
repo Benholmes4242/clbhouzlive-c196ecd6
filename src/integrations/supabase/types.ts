@@ -3787,6 +3787,135 @@ export type Database = {
         }
         Relationships: []
       }
+      editorial_debate_votes: {
+        Row: {
+          card_id: string
+          created_at: string
+          id: string
+          option: string
+          user_id: string
+        }
+        Insert: {
+          card_id: string
+          created_at?: string
+          id?: string
+          option: string
+          user_id: string
+        }
+        Update: {
+          card_id?: string
+          created_at?: string
+          id?: string
+          option?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "editorial_debate_votes_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "editorial_feed_cards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      editorial_feed_cards: {
+        Row: {
+          active_from: string
+          active_until: string
+          body: string | null
+          body_extended: string | null
+          card_type: string
+          comment_count: number
+          course_editorial_blurb: string | null
+          course_id: string | null
+          created_at: string
+          debate_option_a: string | null
+          debate_option_a_course_id: string | null
+          debate_option_b: string | null
+          debate_option_b_course_id: string | null
+          debate_votes_a: number
+          debate_votes_b: number
+          history_date: string | null
+          history_year: number | null
+          id: string
+          is_active: boolean
+          reaction_count: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active_from: string
+          active_until: string
+          body?: string | null
+          body_extended?: string | null
+          card_type: string
+          comment_count?: number
+          course_editorial_blurb?: string | null
+          course_id?: string | null
+          created_at?: string
+          debate_option_a?: string | null
+          debate_option_a_course_id?: string | null
+          debate_option_b?: string | null
+          debate_option_b_course_id?: string | null
+          debate_votes_a?: number
+          debate_votes_b?: number
+          history_date?: string | null
+          history_year?: number | null
+          id?: string
+          is_active?: boolean
+          reaction_count?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active_from?: string
+          active_until?: string
+          body?: string | null
+          body_extended?: string | null
+          card_type?: string
+          comment_count?: number
+          course_editorial_blurb?: string | null
+          course_id?: string | null
+          created_at?: string
+          debate_option_a?: string | null
+          debate_option_a_course_id?: string | null
+          debate_option_b?: string | null
+          debate_option_b_course_id?: string | null
+          debate_votes_a?: number
+          debate_votes_b?: number
+          history_date?: string | null
+          history_year?: number | null
+          id?: string
+          is_active?: boolean
+          reaction_count?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "editorial_feed_cards_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "editorial_feed_cards_debate_option_a_course_id_fkey"
+            columns: ["debate_option_a_course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "editorial_feed_cards_debate_option_b_course_id_fkey"
+            columns: ["debate_option_b_course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_leaderboard: {
         Row: {
           event_id: string
