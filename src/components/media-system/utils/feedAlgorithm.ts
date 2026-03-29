@@ -268,6 +268,6 @@ export function injectDebateCard(
   if (!card) return feedPosts;
   const without = feedPosts.filter(p => (p as any).postType !== 'debate_card');
   const result = [...without];
-  result.splice(Math.min(11, result.length), 0, card);
+  result.splice(Math.min(13, result.length), 0, card);
   return result;
 }
