@@ -300,23 +300,23 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
         {/* Engagement row */}
         <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
           <button
-            onClick={onLike}
+            onClick={handleLike}
             className="active:scale-[0.95] transition-transform"
             style={{
               flex: 1, height: 48, borderRadius: 14, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-              background: likeState.isLiked ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.08)',
-              border: `1px solid ${likeState.isLiked ? 'rgba(247,147,30,0.4)' : 'rgba(255,255,255,0.12)'}`,
+              background: localLiked ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.08)',
+              border: `1px solid ${localLiked ? 'rgba(247,147,30,0.4)' : 'rgba(255,255,255,0.12)'}`,
             }}
           >
             <Heart
               size={17}
-              fill={likeState.isLiked ? '#F7931E' : 'none'}
-              style={{ color: likeState.isLiked ? '#F7931E' : 'rgba(255,255,255,0.5)' }}
+              fill={localLiked ? '#F7931E' : 'none'}
+              style={{ color: localLiked ? '#F7931E' : 'rgba(255,255,255,0.5)' }}
             />
-            {likeState.count > 0 && (
-              <span style={{ fontSize: 13, fontWeight: 700, color: likeState.isLiked ? '#F7931E' : 'rgba(255,255,255,0.5)' }}>
-                {likeState.count}
+            {localCount > 0 && (
+              <span style={{ fontSize: 13, fontWeight: 700, color: localLiked ? '#F7931E' : 'rgba(255,255,255,0.5)' }}>
+                {localCount}
               </span>
             )}
           </button>
