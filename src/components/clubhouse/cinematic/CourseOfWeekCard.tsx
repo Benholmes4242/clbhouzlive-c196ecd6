@@ -288,7 +288,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             style={{
               fontSize: 14, color: 'rgba(255,255,255,0.75)', lineHeight: 1.6,
               marginTop: 14,
-              display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' as any, overflow: 'hidden',
+              display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical' as any, overflow: 'hidden',
             }}
           >
             {card.editorialBlurb || card.body}
