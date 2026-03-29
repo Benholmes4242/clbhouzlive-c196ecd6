@@ -150,10 +150,19 @@ export const CreatorCapsule: React.FC<CreatorCapsuleProps> = ({
   carouselActiveIndex = 0,
 }) => {
   
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(!isReview && !!golfCourse?.id);
   const navigate = useNavigate();
   const capsuleRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef<number | null>(null);
+
+  // Reset expansion state on post change — auto-expand when a course is tagged (non-review)
+  useEffect(() => {
+    if (isReview) {
+      setIsExpanded(false);
+    } else {
+      setIsExpanded(!!golfCourse?.id);
+    }
+  }, [postId]);
 
 
 
