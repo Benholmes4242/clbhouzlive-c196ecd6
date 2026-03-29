@@ -158,6 +158,7 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
             }
 
             // Get friends who played this course
+            console.log('[useEditorialCards] userId for friends query:', userId);
             let friendsWhoPlayed: CourseOfWeekCardData['course']['friendsWhoPlayed'] = [];
             if (userId) {
               try {
