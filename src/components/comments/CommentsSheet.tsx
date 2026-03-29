@@ -577,7 +577,7 @@ function CommentsSheet({
               <div className="flex items-end gap-6">
                 {(['comments', 'likes'] as const).map((tab) => {
                   const isActive = activeTab === tab;
-                  const count = tab === 'comments' ? totalCount : (likesCount ?? 0);
+                  const count = tab === 'comments' ? totalCount : (likesCount ?? likers?.length ?? 0);
                   const label = tab === 'comments' ? 'Comments' : 'Likes';
                   return (
                     <button
