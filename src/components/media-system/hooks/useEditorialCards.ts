@@ -132,6 +132,12 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
               .select('*', { count: 'exact', head: true })
               .eq('course_id', course.id);
 
+            // Do not show Course of the Week if it has no reviews on Clbhouz
+            if (!reviewCount || reviewCount === 0) {
+              console.log('[useEditorialCards] Course of week has no reviews — skipping card');
+              continue;
+            }
+
             const { data: avgData } = await supabase
               .from('course_ratings')
               .select('rating')
