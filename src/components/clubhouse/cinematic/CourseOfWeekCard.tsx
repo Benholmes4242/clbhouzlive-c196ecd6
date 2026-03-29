@@ -190,7 +190,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
       </div>
 
       {/* Top right rank */}
-      {course.globalRank && (
+      {(course.globalRank || course.regionalRank || course.usaRank) && (
         <div
           style={{
             position: 'absolute',
@@ -199,7 +199,15 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             zIndex: 2,
           }}
         >
-          <CourseRankBadges globalRank={course.globalRank} regionalRank={null} usaRank={null} country={course.country ?? ''} positioning="inline" />
+          <CourseRankBadges
+            globalRank={course.globalRank ?? null}
+            regionalRank={course.regionalRank ?? null}
+            usaRank={course.usaRank ?? null}
+            country={course.country ?? ''}
+            positioning="inline"
+            showAverageRating={false}
+            showUserRating={false}
+          />
         </div>
       )}
 
