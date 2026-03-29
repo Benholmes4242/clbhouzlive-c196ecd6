@@ -1,9 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
-import { Heart, MessageCircle, Bookmark, BookmarkCheck } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { Heart, MessageCircle, Flag } from 'lucide-react';
 import type { CourseOfWeekCardFeedPost, FeedPost } from '@/components/media-system/types/media';
 
 interface CourseOfWeekCardProps {
@@ -24,35 +21,11 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
   currentUserId,
 }) => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  
   const card = post.cardData;
   const course = card.course;
-  const [wantToPlay, setWantToPlay] = useState(course.isOnMyWantToPlay);
 
   const likeState = getLikeState?.(post) ?? { isLiked: false, count: 0 };
-  const commentCount = getCommentCount?.(post) ?? card.commentCount ?? 0;
-
-  const handleWantToPlay = async () => {
-    if (!currentUserId) {
-      toast.error('Sign in to save courses');
-      return;
-    }
-    const prev = wantToPlay;
-    setWantToPlay(!prev);
-    try {
-      if (prev) {
-        const q = supabase.from('user_courses').delete() as any;
-        await q.eq('user_id', currentUserId).eq('course_id', course.id).eq('status', 'want_to_play');
-      } else {
-        const q = supabase.from('user_courses') as any;
-        await q.upsert({ user_id: currentUserId, course_id: course.id, status: 'want_to_play' }, { onConflict: 'user_id,course_id' });
-      }
-      queryClient.invalidateQueries({ queryKey: ['editorial-cards'] });
-    } catch {
-      setWantToPlay(prev);
-      toast.error("Couldn't save — try again");
-    }
-  };
 
   const heroSrc = course.thumbnailImage;
 
@@ -273,19 +246,19 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             View Course
           </button>
           <button
-            onClick={handleWantToPlay}
+            onClick={() => navigate(`/courses/${course.id}/rate`)}
             className="active:scale-[0.97] transition-transform"
             style={{
               flex: 1, height: 48, borderRadius: 14, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
               fontSize: 14, fontWeight: 700,
-              background: wantToPlay ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.08)',
-              border: `1px solid ${wantToPlay ? 'rgba(34,197,94,0.4)' : 'rgba(255,255,255,0.2)'}`,
-              color: wantToPlay ? '#22C55E' : '#fff',
+              background: 'rgba(255,255,255,0.08)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              color: '#fff',
             }}
           >
-            {wantToPlay ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
-            {wantToPlay ? 'Saved' : 'Want to Play'}
+            <Flag size={16} />
+            Mark as Played
           </button>
         </div>
 
@@ -323,9 +296,9 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             }}
           >
             <MessageCircle size={17} style={{ color: 'rgba(255,255,255,0.6)' }} />
-            {commentCount > 0 && (
+            {(getCommentCount?.(post) ?? card.commentCount ?? 0) > 0 && (
               <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.6)' }}>
-                {commentCount}
+                {getCommentCount?.(post) ?? card.commentCount ?? 0}
               </span>
             )}
           </button>

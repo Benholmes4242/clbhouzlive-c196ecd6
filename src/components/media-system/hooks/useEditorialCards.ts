@@ -147,16 +147,14 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
               ? avgData.reduce((sum, r) => sum + (r.rating ?? 0), 0) / avgData.length
               : null;
 
-            // Check want-to-play status
+            // Want-to-play status — hardcoded for now until a dedicated table exists
             let isOnMyWantToPlay = false;
-            if (userId) {
-              const wtpQuery = supabase.from('user_courses').select('id') as any;
-              const { data: wtp } = await wtpQuery
-                .eq('user_id', userId)
-                .eq('course_id', course.id)
-                .eq('status', 'want_to_play')
-                .maybeSingle();
-              isOnMyWantToPlay = !!wtp;
+            try {
+              // No dedicated want-to-play column exists in user_courses
+              // This will be wired once a proper wishlist/bucket-list table is available
+              isOnMyWantToPlay = false;
+            } catch {
+              // fail silently — card still shows
             }
 
             // Get friends who played (simplified — up to 5)
