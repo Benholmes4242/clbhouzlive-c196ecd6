@@ -139,7 +139,7 @@ function CommentsSheet({
 
   // ── Likes hook ──
   const { data: likers, isLoading: likersLoading } =
-    usePostLikes(postId, isOpen && activeTab === 'likes');
+    usePostLikes(postId, isOpen && activeTab === 'likes', likeSource);
 
   // ── Sorted comments ──
   const sortedComments = useMemo(() => {
