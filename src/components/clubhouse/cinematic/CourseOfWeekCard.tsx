@@ -4,6 +4,7 @@ import { Heart, MessageCircle, Flag } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { CourseOfWeekCardFeedPost } from '@/components/media-system/types/media';
+import CourseRankBadges from '@/components/courses/CourseRankBadges';
 
 interface CourseOfWeekCardProps {
   post: CourseOfWeekCardFeedPost;
