@@ -226,6 +226,12 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
                 fontSize: 14,
                 color: 'rgba(255,255,255,0.75)',
                 lineHeight: 1.6,
+                ...(!expanded ? {
+                  display: '-webkit-box',
+                  WebkitLineClamp: 4,
+                  WebkitBoxOrient: 'vertical' as const,
+                  overflow: 'hidden',
+                } : {}),
               }}
             >
               {expanded && card.bodyExtended ? card.bodyExtended : card.body}
