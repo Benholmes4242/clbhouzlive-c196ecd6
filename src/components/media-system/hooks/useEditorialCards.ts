@@ -157,8 +157,55 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
               // fail silently — card still shows
             }
 
-            // Get friends who played (simplified — up to 5)
-            const friendsWhoPlayed: CourseOfWeekCardData['course']['friendsWhoPlayed'] = [];
+            // Get friends who played this course
+            let friendsWhoPlayed: CourseOfWeekCardData['course']['friendsWhoPlayed'] = [];
+            if (userId) {
+              try {
+                // Step 1: get friend IDs (bidirectional)
+                const { data: friendships } = await supabase
+                  .from('user_friends')
+                  .select('user_id, friend_id')
+                  .eq('status', 'accepted')
+                  .or(`user_id.eq.${userId},friend_id.eq.${userId}`);
+
+                const friendIds = (friendships || [])
+                  .map((row: any) => (row.user_id === userId ? row.friend_id : row.user_id))
+                  .filter(Boolean);
+
+                if (friendIds.length > 0) {
+                  // Step 2: find friends who played this course
+                  const { data: plays } = await supabase
+                    .from('user_courses')
+                    .select('user_id, rating')
+                    .eq('course_id', course.id)
+                    .eq('played', true)
+                    .in('user_id', friendIds)
+                    .limit(5);
+
+                  if (plays && plays.length > 0) {
+                    const playUserIds = plays.map((p: any) => p.user_id);
+                    // Step 3: get profiles
+                    const { data: profiles } = await supabase
+                      .from('user_profiles')
+                      .select('id, display_name, profile_photo_url')
+                      .in('id', playUserIds);
+
+                    const profileMap = new Map((profiles || []).map((p: any) => [p.id, p]));
+                    friendsWhoPlayed = plays.map((p: any) => {
+                      const prof = profileMap.get(p.user_id);
+                      return {
+                        userId: p.user_id,
+                        displayName: prof?.display_name ?? 'Golfer',
+                        avatarUrl: prof?.profile_photo_url ?? null,
+                        rating: p.rating ?? null,
+                      };
+                    });
+                  }
+                }
+              } catch {
+                // fail silently — friendsWhoPlayed stays []
+              }
+            }
 
             const cardData: CourseOfWeekCardData = {
               cardId: card.id,
