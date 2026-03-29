@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { CourseOfWeekCardFeedPost } from '@/components/media-system/types/media';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 
 interface CourseOfWeekCardProps {
   post: CourseOfWeekCardFeedPost;
@@ -189,7 +190,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
       </div>
 
       {/* Top right rank */}
-      {course.globalRank && (
+      {(course.globalRank || course.regionalRank || course.usaRank) && (
         <div
           style={{
             position: 'absolute',
@@ -198,7 +199,15 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             zIndex: 2,
           }}
         >
-          <CourseRankBadges globalRank={course.globalRank} regionalRank={null} usaRank={null} country={course.country ?? ''} positioning="inline" />
+          <CourseRankBadges
+            globalRank={course.globalRank ?? null}
+            regionalRank={course.regionalRank ?? null}
+            usaRank={course.usaRank ?? null}
+            country={course.country ?? ''}
+            positioning="inline"
+            showAverageRating={false}
+            showUserRating={false}
+          />
         </div>
       )}
 
@@ -288,7 +297,10 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
                 backdropFilter: 'blur(12px)',
               }}
             >
-              <div style={{ fontSize: 17, fontWeight: 800, color: '#fff' }}>{stat.value}</div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                {stat.label === 'Rating' && <ClubhouseLogo size="sm" />}
+                {stat.value}
+              </div>
               <div style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>
                 {stat.label}
               </div>
