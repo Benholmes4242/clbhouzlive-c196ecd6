@@ -174,11 +174,16 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
 
       {/* ── Bottom content stack ── */}
       <div
-        className="absolute left-0 right-0 bottom-0"
+        className="absolute left-0 right-0"
         style={{
+          top: '45%',
+          bottom: 0,
           padding: '0 20px',
           paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 90px)',
           zIndex: 10,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
         }}
       >
         {/* Year watermark */}
@@ -188,7 +193,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
             style={{
               fontSize: 52,
               fontWeight: 900,
-              color: 'rgba(255,215,0,0.18)',
+              color: 'rgba(255,215,0,0.12)',
               letterSpacing: '-0.04em',
               lineHeight: 1,
               marginBottom: -4,
@@ -221,6 +226,12 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
                 fontSize: 14,
                 color: 'rgba(255,255,255,0.75)',
                 lineHeight: 1.6,
+                ...(!expanded ? {
+                  display: '-webkit-box',
+                  WebkitLineClamp: 4,
+                  WebkitBoxOrient: 'vertical' as const,
+                  overflow: 'hidden',
+                } : {}),
               }}
             >
               {expanded && card.bodyExtended ? card.bodyExtended : card.body}
