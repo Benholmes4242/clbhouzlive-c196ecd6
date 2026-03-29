@@ -144,13 +144,13 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
             // Check want-to-play status
             let isOnMyWantToPlay = false;
             if (userId) {
-              const { data: wtp } = await supabase
+              const { data: wtp } = await (supabase
                 .from('user_courses')
                 .select('id')
                 .eq('user_id', userId)
                 .eq('course_id', course.id)
                 .eq('status', 'want_to_play')
-                .maybeSingle();
+                .maybeSingle() as any);
               isOnMyWantToPlay = !!wtp;
             }
 
