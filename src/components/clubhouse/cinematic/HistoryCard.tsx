@@ -178,9 +178,9 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
           className="select-none pointer-events-none"
           style={{
             position: 'absolute',
-            top: '50%',
+            top: '38%',
             left: 20,
-            transform: 'translateY(-120%)',
+            transform: 'translateY(-50%)',
             fontSize: 120,
             fontWeight: 900,
             color: 'rgba(255,215,0,0.10)',
