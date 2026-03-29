@@ -30,20 +30,20 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({ post, onComm
 
     try {
       if (prev) {
-        await supabase
+        await (supabase
           .from('user_courses')
           .delete()
           .eq('user_id', currentUserId)
           .eq('course_id', course.id)
-          .eq('status', 'want_to_play');
+          .eq('status', 'want_to_play') as any);
       } else {
-        await supabase
+        await (supabase
           .from('user_courses')
           .upsert({
             user_id: currentUserId,
             course_id: course.id,
             status: 'want_to_play',
-          }, { onConflict: 'user_id,course_id' });
+          } as any, { onConflict: 'user_id,course_id' }) as any);
       }
       queryClient.invalidateQueries({ queryKey: ['editorial-cards'] });
     } catch {
