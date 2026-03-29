@@ -234,7 +234,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
                 lineHeight: 1.6,
                 ...(!expanded ? {
                   display: '-webkit-box',
-                  WebkitLineClamp: 4,
+                  WebkitLineClamp: 5,
                   WebkitBoxOrient: 'vertical' as const,
                   overflow: 'hidden',
                 } : {}),
