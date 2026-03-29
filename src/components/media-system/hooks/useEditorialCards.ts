@@ -205,6 +205,8 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
                 country: course.country ?? '',
                 subCountry: (course as any).sub_country ?? null,
                 globalRank: (course as any).global_rank ?? null,
+                regionalRank: (course as any).regional_rank ?? null,
+                usaRank: (course as any).usa_rank ?? null,
                 thumbnailImage: (course as any).thumbnail_image ?? null,
                 reviewCount: reviewCount ?? 0,
                 communityRating: avgRating,
