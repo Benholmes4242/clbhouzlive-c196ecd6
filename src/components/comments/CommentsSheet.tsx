@@ -87,6 +87,7 @@ function CommentsSheet({
   courseName,
   isReview,
   likesCount,
+  likeSource = 'post',
   onCommentPosted,
   onCommentDeleted,
 }: CommentsSheetProps) {
