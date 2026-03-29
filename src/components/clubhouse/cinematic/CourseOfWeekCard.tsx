@@ -55,7 +55,17 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
     staleTime: 30_000,
   });
 
-  const displayCount = likeCountData ?? localCount;
+  const queryClient = useQueryClient();
+
+  // Use likeCountData only to seed the initial count on mount
+  // After that, localCount is the source of truth for optimistic updates
+  useEffect(() => {
+    if (likeCountData !== undefined && likeCountData !== null) {
+      setLocalCount(likeCountData);
+    }
+  }, [likeCountData]);
+
+  const displayCount = localCount;
 
   const handleLike = async () => {
     if (!currentUserId) return;
@@ -77,6 +87,9 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
           .eq('card_id', card.cardId)
           .eq('user_id', currentUserId);
       }
+      // Invalidate both query keys so CommentsSheet and count stay in sync
+      queryClient.invalidateQueries({ queryKey: ['editorial-card-likes-count', card.cardId] });
+      queryClient.invalidateQueries({ queryKey: ['post-likes', card.cardId, 'editorial'] });
     } catch {
       setLocalLiked(!newIsLiked);
       setLocalCount(c => newIsLiked ? c - 1 : c + 1);
