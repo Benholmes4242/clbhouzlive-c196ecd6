@@ -174,11 +174,16 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
 
       {/* ── Bottom content stack ── */}
       <div
-        className="absolute left-0 right-0 bottom-0"
+        className="absolute left-0 right-0"
         style={{
+          top: '45%',
+          bottom: 0,
           padding: '0 20px',
           paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 90px)',
           zIndex: 10,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
         }}
       >
         {/* Year watermark */}
