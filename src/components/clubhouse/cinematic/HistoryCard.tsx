@@ -176,8 +176,9 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
       <div
         className="absolute left-0 right-0"
         style={{
-          top: '45%',
           bottom: 0,
+          maxHeight: '55vh',
+          overflow: 'hidden',
           padding: '0 20px',
           paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 90px)',
           zIndex: 10,
