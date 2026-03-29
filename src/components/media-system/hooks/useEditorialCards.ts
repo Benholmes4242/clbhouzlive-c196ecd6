@@ -122,7 +122,7 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
         if (cardType === 'course_of_week' && !courseOfWeekCard && card.course_id) {
           const { data: course } = await supabase
             .from('golf_courses')
-            .select('id, name, country, sub_country, global_rank')
+            .select('id, name, country, sub_country, global_rank, thumbnail_image, description')
             .eq('id', card.course_id)
             .single();
 

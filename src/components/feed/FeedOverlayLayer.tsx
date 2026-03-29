@@ -70,7 +70,11 @@ export const FeedOverlayLayer = memo(function FeedOverlayLayer({
   if (!activePost) return null;
 
   // Hide overlays on tournament result and PGA cards (they have their own chrome)
-  if (activePost.postType === 'tournament_result' || activePost.postType === 'pga_card') return null;
+  if (
+    activePost.postType === 'tournament_result' ||
+    activePost.postType === 'pga_card' ||
+    activePost.postType === 'course_of_week_card'
+  ) return null;
 
   const likeState = getLikeState(activePost);
   const commentCount = getCommentCount(activePost);
