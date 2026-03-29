@@ -193,7 +193,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
             style={{
               fontSize: 52,
               fontWeight: 900,
-              color: 'rgba(255,215,0,0.18)',
+              color: 'rgba(255,215,0,0.12)',
               letterSpacing: '-0.04em',
               lineHeight: 1,
               marginBottom: -4,
