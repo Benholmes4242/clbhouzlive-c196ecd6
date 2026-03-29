@@ -398,11 +398,21 @@ const ClubhouseContent = () => {
             postId={
               activePost.postType === 'pga_card'
                 ? (activePost as unknown as PGACardFeedPost).cardData.postId
+                : activePost.postType === 'history_card'
+                ? (activePost as any).cardData.cardId
+                : activePost.postType === 'course_of_week_card'
+                ? (activePost as any).cardData.cardId
+                : activePost.postType === 'debate_card'
+                ? (activePost as any).cardData.cardId
                 : activePost.id
             }
             currentUserId={user?.id}
             creatorUserId={activePost.userId}
-            creatorName={activePost.postType === 'pga_card' ? 'clbhouz' : activePost.displayName}
+            creatorName={
+              ['pga_card', 'history_card', 'course_of_week_card', 'debate_card'].includes(activePost.postType ?? '')
+                ? 'Clbhouz'
+                : activePost.displayName
+            }
             creatorAvatar={activePost.avatarUrl}
             caption={activePost.caption}
             theme="dark"
