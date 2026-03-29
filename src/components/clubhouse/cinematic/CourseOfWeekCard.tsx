@@ -29,6 +29,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
 
   const [localLiked, setLocalLiked] = useState(false);
   const [localCount, setLocalCount] = useState(card.reactionCount ?? 0);
+  const [hasPlayed, setHasPlayed] = useState(false);
 
   useEffect(() => {
     if (!currentUserId) return;
