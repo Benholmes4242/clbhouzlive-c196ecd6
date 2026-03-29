@@ -301,10 +301,14 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             View Course
           </button>
           <button
-            onClick={() => hasPlayed
-              ? navigate(`/courses/${course.id}`)
-              : navigate(`/courses/${course.id}/rate`)
-            }
+            onClick={() => {
+              if (hasPlayed) {
+                navigate(`/courses/${course.id}`);
+              } else {
+                setHasPlayed(true);
+                navigate(`/courses/${course.id}/rate`);
+              }
+            }}
             className="active:scale-[0.97] transition-transform"
             style={{
               flex: 1, height: 48, borderRadius: 14, cursor: 'pointer',
