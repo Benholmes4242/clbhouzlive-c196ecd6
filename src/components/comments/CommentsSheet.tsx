@@ -61,6 +61,7 @@ interface CommentsSheetProps {
   reviewRating?: number | null;
   caddiePickCommentId?: string | null;
   likesCount?: number | null;
+  likeSource?: 'post' | 'editorial';
   onCommentPosted?: () => void;
   onCommentDeleted?: () => void;
 }
@@ -86,6 +87,7 @@ function CommentsSheet({
   courseName,
   isReview,
   likesCount,
+  likeSource = 'post',
   onCommentPosted,
   onCommentDeleted,
 }: CommentsSheetProps) {
@@ -137,7 +139,7 @@ function CommentsSheet({
 
   // ── Likes hook ──
   const { data: likers, isLoading: likersLoading } =
-    usePostLikes(postId, isOpen && activeTab === 'likes');
+    usePostLikes(postId, isOpen && activeTab === 'likes', likeSource);
 
   // ── Sorted comments ──
   const sortedComments = useMemo(() => {
