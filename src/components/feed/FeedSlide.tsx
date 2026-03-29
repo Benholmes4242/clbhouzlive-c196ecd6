@@ -41,6 +41,7 @@ export const FeedSlide = memo(function FeedSlide({
   onZoomChange,
   activeIndexOverride,
 }: FeedSlideProps) {
+  const { user } = useSupabaseSession();
   const storeActiveIndex = useClubhouseStore(s => s.activeIndex);
   const activeIndex = activeIndexOverride ?? storeActiveIndex;
   const isActive = activeIndex === index;
