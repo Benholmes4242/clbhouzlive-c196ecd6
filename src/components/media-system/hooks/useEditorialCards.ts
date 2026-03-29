@@ -122,7 +122,7 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
         if (cardType === 'course_of_week' && !courseOfWeekCard && card.course_id) {
           const { data: course } = await supabase
             .from('golf_courses')
-            .select('id, name, country, sub_country, global_rank, thumbnail_image, description')
+            .select('id, name, country, sub_country, global_rank, regional_rank, usa_rank, thumbnail_image, description')
             .eq('id', card.course_id)
             .single();
 
@@ -176,6 +176,8 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
                 country: course.country ?? '',
                 subCountry: (course as any).sub_country ?? null,
                 globalRank: (course as any).global_rank ?? null,
+                regionalRank: (course as any).regional_rank ?? null,
+                usaRank: (course as any).usa_rank ?? null,
                 thumbnailImage: (course as any).thumbnail_image ?? null,
                 reviewCount: reviewCount ?? 0,
                 communityRating: avgRating,
