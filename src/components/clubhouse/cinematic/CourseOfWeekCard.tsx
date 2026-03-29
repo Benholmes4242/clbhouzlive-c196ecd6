@@ -27,32 +27,8 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
   const queryClient = useQueryClient();
   const card = post.cardData;
   const course = card.course;
-  const [wantToPlay, setWantToPlay] = useState(course.isOnMyWantToPlay);
 
   const likeState = getLikeState?.(post) ?? { isLiked: false, count: 0 };
-  const commentCount = getCommentCount?.(post) ?? card.commentCount ?? 0;
-
-  const handleWantToPlay = async () => {
-    if (!currentUserId) {
-      toast.error('Sign in to save courses');
-      return;
-    }
-    const prev = wantToPlay;
-    setWantToPlay(!prev);
-    try {
-      if (prev) {
-        const q = supabase.from('user_courses').delete() as any;
-        await q.eq('user_id', currentUserId).eq('course_id', course.id).eq('status', 'want_to_play');
-      } else {
-        const q = supabase.from('user_courses') as any;
-        await q.upsert({ user_id: currentUserId, course_id: course.id, status: 'want_to_play' }, { onConflict: 'user_id,course_id' });
-      }
-      queryClient.invalidateQueries({ queryKey: ['editorial-cards'] });
-    } catch {
-      setWantToPlay(prev);
-      toast.error("Couldn't save — try again");
-    }
-  };
 
   const heroSrc = course.thumbnailImage;
 
