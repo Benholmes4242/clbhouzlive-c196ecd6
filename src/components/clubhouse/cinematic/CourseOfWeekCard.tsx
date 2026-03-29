@@ -46,18 +46,30 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
       });
   }, [card.cardId, currentUserId]);
 
-  useEffect(() => {
+  const checkHasPlayed = useCallback(async () => {
     if (!currentUserId || !course.id) return;
-    supabase
+    const { data } = await supabase
       .from('course_ratings')
       .select('id')
       .eq('user_id', currentUserId)
       .eq('course_id', course.id)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data) setHasPlayed(true);
-      });
+      .maybeSingle();
+    setHasPlayed(!!data);
   }, [currentUserId, course.id]);
+
+  useEffect(() => {
+    checkHasPlayed();
+  }, [checkHasPlayed]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkHasPlayed();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [checkHasPlayed]);
 
   const { data: likeCountData } = useQuery({
     queryKey: ['editorial-card-likes-count', card.cardId],
