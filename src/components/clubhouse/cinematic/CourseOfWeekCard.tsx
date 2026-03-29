@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, MessageCircle, Flag } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { CourseOfWeekCardFeedPost } from '@/components/media-system/types/media';
 
@@ -29,34 +30,54 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
   const [localLiked, setLocalLiked] = useState(false);
   const [localCount, setLocalCount] = useState(card.reactionCount ?? 0);
 
+  useEffect(() => {
+    if (!currentUserId) return;
+    supabase
+      .from('editorial_card_likes')
+      .select('id')
+      .eq('card_id', card.cardId)
+      .eq('user_id', currentUserId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) setLocalLiked(true);
+      });
+  }, [card.cardId, currentUserId]);
+
+  const { data: likeCountData } = useQuery({
+    queryKey: ['editorial-card-likes-count', card.cardId],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from('editorial_card_likes')
+        .select('*', { count: 'exact', head: true })
+        .eq('card_id', card.cardId);
+      return count ?? 0;
+    },
+    staleTime: 30_000,
+  });
+
+  const displayCount = likeCountData ?? localCount;
+
   const handleLike = async () => {
     if (!currentUserId) return;
-
     const newIsLiked = !localLiked;
-
-    // Optimistic update
     setLocalLiked(newIsLiked);
     setLocalCount(c => newIsLiked ? c + 1 : c - 1);
-
     try {
       if (newIsLiked) {
         await supabase
-          .from('post_likes')
-          .upsert({
-            post_id: card.cardId,
-            actor_type: 'personal',
-            actor_id: currentUserId,
-            user_id: currentUserId,
-          }, { onConflict: 'post_id,actor_type,actor_id' });
+          .from('editorial_card_likes')
+          .upsert(
+            { card_id: card.cardId, user_id: currentUserId },
+            { onConflict: 'card_id,user_id' }
+          );
       } else {
         await supabase
-          .from('post_likes')
+          .from('editorial_card_likes')
           .delete()
-          .eq('post_id', card.cardId)
-          .eq('actor_id', currentUserId);
+          .eq('card_id', card.cardId)
+          .eq('user_id', currentUserId);
       }
     } catch {
-      // Revert on error
       setLocalLiked(!newIsLiked);
       setLocalCount(c => newIsLiked ? c - 1 : c + 1);
     }
