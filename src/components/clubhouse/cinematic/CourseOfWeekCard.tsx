@@ -219,7 +219,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
         style={{
           position: 'absolute',
           bottom: 0, left: 0, right: 0,
-          padding: `0 20px calc(env(safe-area-inset-bottom, 0px) + 90px) 20px`,
+          padding: `0 16px calc(env(safe-area-inset-bottom, 0px) + 24px) 16px`,
           zIndex: 2,
         }}
       >
@@ -239,37 +239,48 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
         </p>
 
         {/* Friends strip */}
-        {course.friendsWhoPlayed.length > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
-            <div style={{ display: 'flex' }}>
-              {course.friendsWhoPlayed.slice(0, 3).map((f, i) => (
-                <div
-                  key={f.userId}
-                  style={{
-                    width: 28, height: 28, borderRadius: '34%',
-                    border: '0.5px solid #000', overflow: 'hidden',
-                    background: 'rgba(255,255,255,0.1)',
-                    marginLeft: i > 0 ? -8 : 0,
-                  }}
-                >
-                  {f.avatarUrl ? (
-                    <img src={f.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>
-                      {f.displayName?.[0]}
-                    </div>
-                  )}
-                </div>
-              ))}
+        {course.friendsWhoPlayed.length > 0 && (() => {
+          const ratedFriends = course.friendsWhoPlayed.filter(f => f.rating);
+          const avgRating = ratedFriends.length > 0
+            ? (ratedFriends.reduce((sum, f) => sum + (f.rating ?? 0), 0) / ratedFriends.length).toFixed(1)
+            : null;
+          return (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
+              <div style={{ display: 'flex' }}>
+                {course.friendsWhoPlayed.slice(0, 3).map((f, i) => (
+                  <div
+                    key={f.userId}
+                    style={{
+                      width: 28, height: 28, borderRadius: '34%',
+                      border: '0.5px solid #000', overflow: 'hidden',
+                      background: 'rgba(255,255,255,0.1)',
+                      marginLeft: i > 0 ? -8 : 0,
+                    }}
+                  >
+                    {f.avatarUrl ? (
+                      <img src={f.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>
+                        {f.displayName?.[0]}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)' }}>
+                  {course.friendsWhoPlayed.map(f => f.displayName.split(' ')[0]).slice(0, 2).join(', ')}
+                  {course.friendsWhoPlayed.length > 2 && ` & ${course.friendsWhoPlayed.length - 2} others`} have played here
+                </span>
+                {avgRating && (
+                  <span style={{ fontSize: 14, fontWeight: 800, color: '#F7931E' }}>
+                    {avgRating}
+                  </span>
+                )}
+              </div>
             </div>
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)' }}>
-                {course.friendsWhoPlayed.map(f => f.displayName.split(' ')[0]).slice(0, 2).join(', ')}
-                {course.friendsWhoPlayed.length > 2 && ` & ${course.friendsWhoPlayed.length - 2} others`} have played here
-              </span>
-            </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Editorial blurb */}
         {(card.editorialBlurb || card.body) && (
@@ -277,7 +288,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             style={{
               fontSize: 14, color: 'rgba(255,255,255,0.75)', lineHeight: 1.6,
               marginTop: 14,
-              display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' as any, overflow: 'hidden',
+              display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical' as any, overflow: 'hidden',
             }}
           >
             {card.editorialBlurb || card.body}
@@ -356,8 +367,9 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             style={{
               flex: 1, height: 48, borderRadius: 14, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-              background: localLiked ? 'rgba(247,147,30,0.15)' : 'rgba(255,255,255,0.08)',
-              border: `1px solid ${localLiked ? 'rgba(247,147,30,0.4)' : 'rgba(255,255,255,0.12)'}`,
+              background: localLiked ? 'rgba(247,147,30,0.15)' : 'rgba(0,0,0,0.45)',
+              border: `1px solid ${localLiked ? 'rgba(247,147,30,0.4)' : 'rgba(255,255,255,0.2)'}`,
+              backdropFilter: 'blur(20px)',
             }}
           >
             <Heart
@@ -377,8 +389,9 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             style={{
               flex: 1, height: 48, borderRadius: 14, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-              background: 'rgba(255,255,255,0.08)',
-              border: '1px solid rgba(255,255,255,0.12)',
+              background: 'rgba(0,0,0,0.45)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              backdropFilter: 'blur(20px)',
             }}
           >
             <MessageCircle size={17} style={{ color: 'rgba(255,255,255,0.6)' }} />
