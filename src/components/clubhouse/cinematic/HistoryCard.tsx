@@ -132,7 +132,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
       <div
         className="absolute"
         style={{
-          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 5px)',
+          top: 'calc(env(safe-area-inset-top, 0px) + 52px)',
           left: 16,
           zIndex: 10,
         }}
@@ -160,7 +160,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
         <div
           className="absolute"
           style={{
-            top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 10px)',
+            top: 'calc(env(safe-area-inset-top, 0px) + 52px)',
             right: 16,
             zIndex: 10,
             fontSize: 13,
@@ -176,8 +176,9 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
       <div
         className="absolute left-0 right-0"
         style={{
-          top: '45%',
           bottom: 0,
+          maxHeight: '55vh',
+          overflow: 'hidden',
           padding: '0 20px',
           paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 90px)',
           zIndex: 10,
