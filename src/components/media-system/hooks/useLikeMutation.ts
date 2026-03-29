@@ -36,11 +36,14 @@ export function useLikeMutation() {
       console.error('[Like] Mutation failed:', error);
     },
     onSettled: () => {
-      // Do NOT invalidate media-feed — the feed uses optimistic local state
-      // for likes (useClubhouseLikes). Invalidating the feed causes a full
-      // refetch which empties the feed because seen post IDs exclude everything
-      // already shown.
       queryClient.invalidateQueries({ queryKey: ['user-post-likes'] });
+      // Mark feed caches as stale so isLikedByMe refreshes on next access
+      // (e.g. tab switch). refetchType 'none' avoids immediate refetch which
+      // would break scroll position via seen-post-IDs exclusion.
+      queryClient.invalidateQueries({
+        queryKey: ['media-feed'],
+        refetchType: 'none',
+      });
     },
   });
 }

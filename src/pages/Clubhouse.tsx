@@ -237,7 +237,7 @@ const ClubhouseContent = () => {
   const { handleNearEnd, handleRefresh } = useClubhouseFeedNav({
     activeTab,
     activeFeed,
-    onTabSwitch: () => { resetLikes(); resetFollows(); resetComments(); },
+    onTabSwitch: () => { resetFollows(); resetComments(); },
   });
   
   // ── Carousel media index ──
