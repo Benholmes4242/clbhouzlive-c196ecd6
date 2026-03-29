@@ -335,9 +335,9 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
               fill={localLiked ? '#F7931E' : 'none'}
               style={{ color: localLiked ? '#F7931E' : 'rgba(255,255,255,0.5)' }}
             />
-            {localCount > 0 && (
+            {displayCount > 0 && (
               <span style={{ fontSize: 13, fontWeight: 700, color: localLiked ? '#F7931E' : 'rgba(255,255,255,0.5)' }}>
-                {localCount}
+                {displayCount}
               </span>
             )}
           </button>
