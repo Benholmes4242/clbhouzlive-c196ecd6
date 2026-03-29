@@ -38,7 +38,7 @@ export function PlayerHero({ player, playerStats }: PlayerHeroProps) {
           src={heroPhotoUrl}
           alt={player.full_name}
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ objectPosition: 'center 35%' }}
+          style={{ objectPosition: 'center 60%' }}
           loading="eager"
           fetchPriority="high"
           initial={{ scale: 1.06 }}
