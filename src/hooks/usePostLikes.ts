@@ -42,8 +42,6 @@ export function usePostLikes(postId: string | null, enabled: boolean, source: 'p
         userIds = [...new Set(likes.map(l => l.user_id))];
       }
 
-      const userIds = [...new Set(likes.map(l => l.user_id))];
-
       // Step 2: fetch profiles for those user_ids
       const { data: profiles, error: profilesError } = await supabase
         .from('user_profiles')
