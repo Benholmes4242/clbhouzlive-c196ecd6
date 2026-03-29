@@ -239,37 +239,48 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
         </p>
 
         {/* Friends strip */}
-        {course.friendsWhoPlayed.length > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
-            <div style={{ display: 'flex' }}>
-              {course.friendsWhoPlayed.slice(0, 3).map((f, i) => (
-                <div
-                  key={f.userId}
-                  style={{
-                    width: 28, height: 28, borderRadius: '34%',
-                    border: '0.5px solid #000', overflow: 'hidden',
-                    background: 'rgba(255,255,255,0.1)',
-                    marginLeft: i > 0 ? -8 : 0,
-                  }}
-                >
-                  {f.avatarUrl ? (
-                    <img src={f.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>
-                      {f.displayName?.[0]}
-                    </div>
-                  )}
-                </div>
-              ))}
+        {course.friendsWhoPlayed.length > 0 && (() => {
+          const ratedFriends = course.friendsWhoPlayed.filter(f => f.rating);
+          const avgRating = ratedFriends.length > 0
+            ? (ratedFriends.reduce((sum, f) => sum + (f.rating ?? 0), 0) / ratedFriends.length).toFixed(1)
+            : null;
+          return (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
+              <div style={{ display: 'flex' }}>
+                {course.friendsWhoPlayed.slice(0, 3).map((f, i) => (
+                  <div
+                    key={f.userId}
+                    style={{
+                      width: 28, height: 28, borderRadius: '34%',
+                      border: '0.5px solid #000', overflow: 'hidden',
+                      background: 'rgba(255,255,255,0.1)',
+                      marginLeft: i > 0 ? -8 : 0,
+                    }}
+                  >
+                    {f.avatarUrl ? (
+                      <img src={f.avatarUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.5)' }}>
+                        {f.displayName?.[0]}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)' }}>
+                  {course.friendsWhoPlayed.map(f => f.displayName.split(' ')[0]).slice(0, 2).join(', ')}
+                  {course.friendsWhoPlayed.length > 2 && ` & ${course.friendsWhoPlayed.length - 2} others`} have played here
+                </span>
+                {avgRating && (
+                  <span style={{ fontSize: 14, fontWeight: 800, color: '#F7931E' }}>
+                    {avgRating}
+                  </span>
+                )}
+              </div>
             </div>
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)' }}>
-                {course.friendsWhoPlayed.map(f => f.displayName.split(' ')[0]).slice(0, 2).join(', ')}
-                {course.friendsWhoPlayed.length > 2 && ` & ${course.friendsWhoPlayed.length - 2} others`} have played here
-              </span>
-            </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Editorial blurb */}
         {(card.editorialBlurb || card.body) && (
