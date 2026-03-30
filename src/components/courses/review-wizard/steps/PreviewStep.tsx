@@ -1,16 +1,13 @@
 /**
- * Preview Step - Shows review preview with share prompt after submission
- * Amber-themed CTA buttons matching Post Wizard
+ * Preview Step — Dark editorial design after review submission
+ * Two paths: with media (hero from user media) and without (course thumbnail or gradient)
  */
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Share2, X, Globe, Users, Lock } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { ReviewPostViewer } from '@/components/posts/ReviewPostViewer';
+import { Globe, Users, Lock } from 'lucide-react';
 import { formatCourseLocation } from '@/utils/courseLocation';
 import type { ReviewWizardCourse, ReviewBreakdowns, ReviewMediaItem } from '../types';
-import type { ReviewMediaItem as ViewerMediaItem } from '@/components/posts/FullscreenReviewPost';
 import type { ReviewVisibility } from '../ReviewPostingOptionsSheet';
 
 interface PreviewStepProps {
@@ -51,90 +48,178 @@ export function PreviewStep({
   onClose,
   isSharing,
 }: PreviewStepProps) {
-  const viewerMedia: ViewerMediaItem[] = useMemo(() => {
+  const displayableMedia = useMemo(() => {
     if (!media || media.length === 0) return [];
     return media
       .filter(m => m.previewUrl || m.uploadedUrl)
       .map((m, index) => ({
         id: m.id || `media-${index}`,
-        media_type: m.type,
-        media_url: m.previewUrl || m.uploadedUrl || '',
-        poster_url: m.posterUrl || null,
-        stream_id: m.streamId || null,
+        type: m.type,
+        url: m.previewUrl || m.uploadedUrl || '',
       }))
-      .filter(m => m.media_url);
+      .filter(m => m.url);
   }, [media]);
 
-  const courseLocation = course 
+  const hasMedia = displayableMedia.length > 0;
+  const [heroLoaded, setHeroLoaded] = useState(false);
+
+  const courseLocation = course
     ? formatCourseLocation({ country: course.country || null, sub_country: course.sub_country || null, region: course.region || null })
     : '';
 
-  const hasMedia = viewerMedia.length > 0;
-
-  if (!hasMedia && media.length > 0) {
-    console.warn('[PreviewStep] Local media exists but no displayable URLs found:', media);
-  }
-
-  const visibilityConfig = {
-    anyone: { label: 'Visible to everyone', icon: Globe },
-    followers: { label: 'Followers only', icon: Users },
-    private: { label: 'Private', icon: Lock },
-  };
-  const visInfo = visibilityConfig[visibility];
-  const VisIcon = visInfo.icon;
+  // Hero image source
+  const heroSrc = hasMedia
+    ? displayableMedia[0].url
+    : course?.thumbnail_image || null;
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex-1 flex flex-col min-h-0"
+      className="flex-1 flex flex-col min-h-0 bg-black"
     >
-      {hasMedia ? (
-        <div className="flex-1 relative bg-black min-h-0">
-          <ReviewPostViewer
-            mode="preview"
-            courseId={course?.id || ''}
-            courseName={course?.name || ''}
-            heroSubtitle={courseLocation}
-            rating={rating || 0}
-            reviewText={review}
-            media={viewerMedia}
-            initialIndex={0}
-            sourceReviewId={reviewId}
-            creator={creator}
-            showReviewCapsule={false}
-          >
-            {/* Close button removed — Skip CTA handles exit */}
+      {/* Hero — 45dvh */}
+      <div
+        className="relative w-full shrink-0 overflow-hidden"
+        style={{ height: '45dvh', minHeight: 180, maxHeight: 320 }}
+      >
+        {/* Shimmer while loading */}
+        {!heroLoaded && (
+          <div className="absolute inset-0 clb-shimmer-dark" />
+        )}
 
-            {viewerMedia.length > 1 && (
-              <PhotoCounterBadge current={1} total={viewerMedia.length} />
-            )}
+        {/* Hero image */}
+        {heroSrc ? (
+          <img
+            src={heroSrc}
+            alt={course?.name || 'Review'}
+            className="absolute inset-0 w-full h-full object-cover"
+            onLoad={() => setHeroLoaded(true)}
+            draggable={false}
+          />
+        ) : (
+          <div
+            className="absolute inset-0"
+            style={{ background: 'linear-gradient(135deg, #0f0a00, #1a1000)' }}
+            ref={() => setHeroLoaded(true)}
+          />
+        )}
 
-            <PreviewCTA 
-              onSkip={onSkip} 
-              onShare={onShare} 
-              isSharing={isSharing}
-              title={title}
-              visibility={visibility}
-            />
-          </ReviewPostViewer>
+        {/* Gradient overlays */}
+        <div className="absolute inset-0 pointer-events-none" style={{
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, transparent 30%)',
+        }} />
+        <div className="absolute inset-0 pointer-events-none" style={{
+          background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 50%)',
+        }} />
+
+        {/* Top-left: Review saved badge */}
+        <div
+          className="absolute flex items-center gap-1.5"
+          style={{
+            top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
+            left: 16,
+            background: '#22c55e',
+            borderRadius: 99,
+            padding: '5px 12px',
+          }}
+        >
+          <span style={{ fontSize: 10, color: '#fff' }}>✓</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#fff' }}>Review saved</span>
         </div>
-      ) : (
-        <div className="flex-1 flex flex-col px-4 pb-4 relative">
-          <button
-            onClick={onClose}
-            className="absolute top-0 right-0 z-50 w-11 h-11 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-muted/80 transition-colors active:scale-[0.97]"
-            aria-label="Close"
+
+        {/* Top-right: Page counter (only with media) */}
+        {hasMedia && displayableMedia.length > 1 && (
+          <div
+            className="absolute"
+            style={{
+              top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
+              right: 16,
+              background: 'rgba(0,0,0,0.55)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: 99,
+              padding: '4px 10px',
+              color: 'rgba(255,255,255,0.75)',
+              fontSize: 11,
+            }}
           >
-            <X className="h-5 w-5" />
-          </button>
-          <div className="flex-1 flex flex-col items-center justify-center">
-            <div 
-              className="w-full max-w-sm rounded-2xl overflow-hidden"
+            1/{displayableMedia.length}
+          </div>
+        )}
+
+        {/* Bottom-left: Headline */}
+        <div className="absolute bottom-0 left-0 right-0" style={{ padding: '0 20px 18px' }}>
+          <div style={{
+            fontSize: 10, fontWeight: 700, color: '#F7931E',
+            letterSpacing: '0.18em', textTransform: 'uppercase' as const,
+            marginBottom: 6,
+          }}>
+            Want others to see this?
+          </div>
+          <div style={{
+            fontSize: 'clamp(20px, 6vw, 28px)',
+            fontWeight: 900,
+            color: '#fff',
+            lineHeight: 1.1,
+            letterSpacing: '-0.02em',
+          }}>
+            Post it to<br />your feed
+          </div>
+        </div>
+      </div>
+
+      {/* Scrollable content below hero */}
+      <div
+        className="flex-1 overflow-y-auto"
+        style={{
+          WebkitOverflowScrolling: 'touch',
+          maxWidth: 480,
+          margin: '0 auto',
+          width: '100%',
+        }}
+      >
+        {/* SECTION 2 — Amber explanation strip */}
+        {isSharing ? (
+          <div style={{ margin: '16px 16px 0', borderRadius: 12, overflow: 'hidden' }}>
+            <div className="clb-shimmer-dark" style={{ height: 72, borderRadius: 12 }} />
+          </div>
+        ) : (
+          <div style={{
+            margin: '16px 16px 0',
+            background: 'rgba(247,147,30,0.08)',
+            border: '1px solid rgba(247,147,30,0.18)',
+            borderRadius: 12,
+            padding: '12px 14px',
+            display: 'flex',
+            gap: 12,
+            alignItems: 'flex-start',
+          }}>
+            <span style={{ fontSize: 20, flexShrink: 0 }}>📣</span>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 3 }}>
+                Share with the Clbhouz community
+              </div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>
+                Your review will appear in the Clubhouse feed for other golfers to discover. Visible to everyone.
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* SECTION 3 — Review capsule */}
+        {!course ? (
+          <div style={{ margin: '14px 16px 0', borderRadius: 16, overflow: 'hidden' }}>
+            <div className="clb-shimmer-dark" style={{ height: 140, borderRadius: 16 }} />
+          </div>
+        ) : (
+          <div style={{ margin: '14px 16px 0' }}>
+            <div
+              className="w-full overflow-hidden"
               style={{
                 background: 'rgba(20, 13, 4, 0.95)',
                 border: '1px solid rgba(245, 158, 11, 0.22)',
+                borderRadius: 16,
                 position: 'relative',
               }}
             >
@@ -175,7 +260,7 @@ export function PreviewStep({
                       fontWeight: 800,
                       color: '#f59e0b',
                       letterSpacing: '0.14em',
-                      textTransform: 'uppercase',
+                      textTransform: 'uppercase' as const,
                     }}>
                       ★ Course Review
                     </span>
@@ -196,19 +281,17 @@ export function PreviewStep({
                 </div>
 
                 {/* Row 2: Course name */}
-                {course && (
-                  <div style={{
-                    fontSize: 18,
-                    fontWeight: 900,
-                    color: '#ffffff',
-                    lineHeight: 1.15,
-                    letterSpacing: '-0.03em',
-                    fontFamily: 'Georgia, serif',
-                    marginBottom: 4,
-                  }}>
-                    {course.name}
-                  </div>
-                )}
+                <div style={{
+                  fontSize: 18,
+                  fontWeight: 900,
+                  color: '#ffffff',
+                  lineHeight: 1.15,
+                  letterSpacing: '-0.03em',
+                  fontFamily: 'Georgia, serif',
+                  marginBottom: 4,
+                }}>
+                  {course.name}
+                </div>
 
                 {/* Row 3: Location */}
                 {courseLocation && (
@@ -253,102 +336,76 @@ export function PreviewStep({
               </div>
             </div>
           </div>
-          
-          <div className="mt-6 text-center space-y-3">
-            <div>
-              <h3 className="text-lg font-semibold text-foreground">Share this review to your Clubhouse feed?</h3>
-              <p className="text-sm text-muted-foreground mt-1">Your review has been saved. Share it as a post for others to see.</p>
-            </div>
-            <div className="flex flex-col gap-3 pt-2 max-w-xs mx-auto w-full">
-              <button
-                className="w-full h-12 rounded-full gap-2 text-white font-semibold active:scale-[0.97] transition-all duration-200 flex items-center justify-center disabled:opacity-50"
-                style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
-                onClick={onShare}
-                disabled={isSharing}
-              >
-                <Share2 className="h-5 w-5" />
-                {isSharing ? 'Sharing...' : 'Share to Clubhouse'}
-              </button>
-              <div className="flex items-center justify-center gap-1.5 text-muted-foreground">
-                <VisIcon className="w-3 h-3" />
-                <span className="text-[11px]">{visInfo.label}</span>
-              </div>
-              <Button variant="ghost" className="w-full text-muted-foreground hover:text-foreground" onClick={onSkip} disabled={isSharing}>
-                Skip for Now
-              </Button>
-            </div>
+        )}
+
+        {/* SECTION 4 — Actions */}
+        <div style={{
+          padding: '16px 16px',
+          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 10,
+        }}>
+          {/* Primary CTA */}
+          <button
+            onClick={onShare}
+            disabled={isSharing}
+            className="active:scale-[0.97] transition-transform"
+            style={{
+              width: '100%',
+              height: 54,
+              minHeight: 44,
+              borderRadius: 16,
+              border: 'none',
+              background: isSharing
+                ? 'rgba(247,147,30,0.5)'
+                : 'linear-gradient(135deg, #F7931E, #e8820a)',
+              color: '#000',
+              fontSize: 15,
+              fontWeight: 800,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              cursor: isSharing ? 'not-allowed' : 'pointer',
+              boxShadow: '0 4px 20px rgba(247,147,30,0.3)',
+            }}
+          >
+            {isSharing ? (
+              <span style={{ color: '#000' }}>Posting...</span>
+            ) : (
+              <>
+                <span>📤</span>
+                <span>Post to Clubhouse Feed</span>
+              </>
+            )}
+          </button>
+
+          {/* Visibility note */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+            <span style={{ fontSize: 12 }}>🌐</span>
+            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', fontWeight: 500 }}>Visible to everyone</span>
           </div>
+
+          {/* Skip */}
+          <button
+            onClick={onSkip}
+            disabled={isSharing}
+            className="active:scale-[0.97] transition-transform"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'rgba(255,255,255,0.3)',
+              fontSize: 13,
+              cursor: 'pointer',
+              padding: '4px 0',
+              minHeight: 44,
+            }}
+          >
+            Skip for now
+          </button>
         </div>
-      )}
+      </div>
     </motion.div>
-  );
-}
-
-function PhotoCounterBadge({ current, total }: { current: number; total: number }) {
-  return (
-    <div 
-      className="absolute z-40 bg-black/60 backdrop-blur-xl text-white text-xs font-medium rounded-full px-2.5 py-1"
-      style={{ top: 'calc(max(var(--sat, env(safe-area-inset-top, 0px)), 47px) + 14px)', right: '16px' }}
-    >
-      {current}/{total}
-    </div>
-  );
-}
-
-function PreviewCTA({ onSkip, onShare, isSharing, title, visibility = 'anyone' }: { 
-  onSkip: () => void; onShare: () => void; isSharing: boolean; title?: string; visibility?: ReviewVisibility;
-}) {
-  const visibilityConfig = {
-    anyone: { label: 'Visible to everyone', icon: Globe },
-    followers: { label: 'Followers only', icon: Users },
-    private: { label: 'Private', icon: Lock },
-  };
-  const visInfo = visibilityConfig[visibility];
-  const VisIcon = visInfo.icon;
-
-  return (
-    <>
-      {/* Top: Share prompt + button */}
-      <div 
-        className="absolute inset-x-0 px-4 pointer-events-auto z-30"
-        style={{ 
-          top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 42px)',
-        }}
-      >
-        <div className="space-y-3">
-          <div className="text-center text-white">
-            <h3 className="text-lg font-semibold drop-shadow-md">Share this review to your Clubhouse feed?</h3>
-            <p className="text-sm text-white/70 mt-1 drop-shadow-sm">Your review has been saved. Share it as a post for others to see.</p>
-          </div>
-          <div className="flex flex-col gap-2 max-w-xs mx-auto w-full">
-            <button
-              className="w-full h-12 rounded-full text-white font-semibold gap-2 active:scale-[0.97] transition-all duration-200 flex items-center justify-center shadow-md disabled:opacity-50"
-              style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}
-              onClick={onShare}
-              disabled={isSharing}
-            >
-              <Share2 className="h-5 w-5" />
-              {isSharing ? 'Sharing...' : 'Share to Clubhouse'}
-            </button>
-            <div className="flex items-center justify-center gap-1.5 text-white/50">
-              <VisIcon className="w-3 h-3" />
-              <span className="text-[11px]">{visInfo.label}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom: Skip for Now */}
-      <div 
-        className="absolute inset-x-0 px-4 pointer-events-auto z-30 flex justify-center"
-        style={{ 
-          bottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
-        }}
-      >
-        <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10" onClick={onSkip} disabled={isSharing}>
-          Skip for Now
-        </Button>
-      </div>
-    </>
   );
 }
