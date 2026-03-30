@@ -168,19 +168,23 @@ const HeroAvatar: React.FC<{ src?: string | null; name: string }> = ({ src, name
 };
 
 // ── Row Avatar (small, for leaderboard) ──
-const RowAvatar: React.FC<{ src?: string | null; name: string; size: number }> = ({ src, name, size }) => (
-  <div style={{
-    width: size, height: size, borderRadius: SQUIRCLE_RADIUS,
-    overflow: 'hidden', background: 'rgba(255,255,255,0.08)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-  }}>
-    {src ? (
-      <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5%' }} />
-    ) : (
-      <span style={{ fontSize: size * 0.35, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>{getInitials(name)}</span>
-    )}
-  </div>
-);
+const RowAvatar: React.FC<{ src?: string | null; name: string; size?: number; fluid?: string }> = ({ src, name, size, fluid }) => {
+  const dim = fluid || `${size ?? 30}px`;
+  return (
+    <div style={{
+      width: dim, height: dim, borderRadius: SQUIRCLE_RADIUS,
+      overflow: 'hidden', background: 'rgba(255,255,255,0.08)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+      aspectRatio: '1',
+    }}>
+      {src ? (
+        <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5%' }} />
+      ) : (
+        <span style={{ fontSize: `calc(${dim} * 0.35)`, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>{getInitials(name)}</span>
+      )}
+    </div>
+  );
+};
 
 // ── Digit Cell (upcoming countdown) ──
 const DigitCell: React.FC<{ value: number; label: string; isAccent?: boolean }> = ({ value, label, isAccent }) => (
@@ -619,17 +623,18 @@ export const PGACard: React.FC<PGACardProps> = ({
             </button>
           </div>
 
-          {/* Rows — fills remaining space evenly */}
+          {/* Rows — each row grows to fill available space */}
           <div style={{
             flex: '1 1 auto',
             overflow: 'hidden',
             padding: '0 clamp(14px, 3.5vw, 20px)',
-            display: 'flex', flexDirection: 'column', gap: 'clamp(4px, 1vh, 8px)', justifyContent: 'center', paddingBottom: 'clamp(4px, 1vh, 10px)',
+            display: 'flex', flexDirection: 'column', gap: 'clamp(3px, 0.6vh, 6px)', paddingBottom: 'clamp(4px, 1vh, 10px)',
           }}>
             {/* Winner row — highlighted, small avatar */}
             <div style={{
+              flex: '1 1 0', minHeight: 0,
               display: 'flex', alignItems: 'center', gap: 10,
-              padding: '8px 10px',
+              padding: '0 10px',
               borderRadius: 10,
               background: `${ACCENT}10`,
               border: `1px solid ${ACCENT}22`,
@@ -641,16 +646,16 @@ export const PGACard: React.FC<PGACardProps> = ({
                 fontSize: 'clamp(12px, 3vw, 14px)', fontWeight: 700,
                 color: ACCENT,
               }}>1</span>
-              <RowAvatar src={cd.leader.photoUrl} name={cd.leader.playerName} size={30} />
+              <RowAvatar src={cd.leader.photoUrl} name={cd.leader.playerName} fluid="clamp(30px, 5vh, 44px)" />
               <span style={{
-                flex: 1, fontSize: 'clamp(13px, 3.2vw, 15px)', fontWeight: 700,
+                flex: 1, fontSize: 'clamp(13px, 2vh, 18px)', fontWeight: 700,
                 color: '#fff',
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               }}>
                 {cd.leader.playerName}
               </span>
               <span style={{
-                fontSize: 'clamp(13px, 3.2vw, 15px)', fontWeight: 800,
+                fontSize: 'clamp(13px, 2vh, 18px)', fontWeight: 800,
                 color: ACCENT,
               }}>
                 {cd.leader.scoreDisplay || 'E'}
@@ -665,8 +670,9 @@ export const PGACard: React.FC<PGACardProps> = ({
 
               return (
                 <div key={`${group.position}-${gi}`} style={{
+                  flex: '1 1 0', minHeight: 0,
                   display: 'flex', alignItems: 'center', gap: 10,
-                  padding: '6px 10px',
+                  padding: '0 10px',
                   borderRadius: 8,
                   animation: 'trc-slideIn 0.5s ease-out both',
                   animationDelay: `${0.55 + gi * 0.07}s`,
@@ -688,7 +694,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                           border: '1.5px solid rgba(8,10,14,0.8)',
                           borderRadius: SQUIRCLE_RADIUS, overflow: 'hidden',
                         }}>
-                          <RowAvatar src={p.photoUrl} name={p.playerName} size={28} />
+                          <RowAvatar src={p.photoUrl} name={p.playerName} fluid="clamp(26px, 4.5vh, 40px)" />
                         </div>
                       ))}
                       {group.chasers.length > 3 && (
@@ -704,12 +710,12 @@ export const PGACard: React.FC<PGACardProps> = ({
                       )}
                     </div>
                   ) : (
-                    <RowAvatar src={primary.photoUrl} name={primary.playerName} size={30} />
+                    <RowAvatar src={primary.photoUrl} name={primary.playerName} fluid="clamp(28px, 5vh, 44px)" />
                   )}
 
                   <span style={{
                     flex: 1,
-                    fontSize: 'clamp(12px, 3vw, 14px)', fontWeight: 500,
+                    fontSize: 'clamp(12px, 1.8vh, 17px)', fontWeight: 500,
                     color: 'rgba(255,255,255,0.75)',
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
@@ -724,7 +730,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                   </span>
 
                   <span style={{
-                    fontSize: 'clamp(12px, 3vw, 14px)', fontWeight: 600,
+                    fontSize: 'clamp(12px, 1.8vh, 17px)', fontWeight: 600,
                     color: 'rgba(255,255,255,0.55)',
                   }}>
                     {primary.scoreDisplay || 'E'}
