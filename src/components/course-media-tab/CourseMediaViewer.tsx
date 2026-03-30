@@ -6,6 +6,7 @@
 
 import React, { useEffect } from 'react';
 import { create } from 'zustand';
+import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Volume2, VolumeX } from 'lucide-react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
