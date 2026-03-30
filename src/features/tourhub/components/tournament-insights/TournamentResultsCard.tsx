@@ -160,7 +160,7 @@ export function TournamentResultsCard({
 
   // Leaderboard: winner row (from event_winners) + rows 2–5 (from sr_leaderboards)
   // top5[0] is position 1 (confirmed winner), top5[1..4] are positions 2–5
-  const podiumRows = top5.slice(1, 5); // positions 2–5 max
+  const podiumRows = top5.slice(1, 3); // positions 2–3 max (3 total rows)
 
   // ── Loading skeleton ──────────────────────────────────────────────────────
   if (winnerLoading && top5.length === 0) {
