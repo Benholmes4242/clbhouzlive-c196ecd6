@@ -168,19 +168,23 @@ const HeroAvatar: React.FC<{ src?: string | null; name: string }> = ({ src, name
 };
 
 // ── Row Avatar (small, for leaderboard) ──
-const RowAvatar: React.FC<{ src?: string | null; name: string; size: number }> = ({ src, name, size }) => (
-  <div style={{
-    width: size, height: size, borderRadius: SQUIRCLE_RADIUS,
-    overflow: 'hidden', background: 'rgba(255,255,255,0.08)',
-    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-  }}>
-    {src ? (
-      <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5%' }} />
-    ) : (
-      <span style={{ fontSize: size * 0.35, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>{getInitials(name)}</span>
-    )}
-  </div>
-);
+const RowAvatar: React.FC<{ src?: string | null; name: string; size?: number; fluid?: string }> = ({ src, name, size, fluid }) => {
+  const dim = fluid || `${size ?? 30}px`;
+  return (
+    <div style={{
+      width: dim, height: dim, borderRadius: SQUIRCLE_RADIUS,
+      overflow: 'hidden', background: 'rgba(255,255,255,0.08)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+      aspectRatio: '1',
+    }}>
+      {src ? (
+        <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5%' }} />
+      ) : (
+        <span style={{ fontSize: `calc(${dim} * 0.35)`, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>{getInitials(name)}</span>
+      )}
+    </div>
+  );
+};
 
 // ── Digit Cell (upcoming countdown) ──
 const DigitCell: React.FC<{ value: number; label: string; isAccent?: boolean }> = ({ value, label, isAccent }) => (
