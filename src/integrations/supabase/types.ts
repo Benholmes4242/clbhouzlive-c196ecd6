@@ -15489,6 +15489,8 @@ export type Database = {
           business_name: string
           comment_count: number
           course_country: string
+          course_id: string
+          course_name: string
           course_region: string
           creator_avatar_url: string
           creator_display_name: string
