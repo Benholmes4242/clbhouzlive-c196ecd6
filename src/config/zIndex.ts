@@ -16,7 +16,7 @@ export const Z = {
   toast: 12000,
   
   // Search overlay
-  searchOverlay: 1100,  // Above header/nav, below modals
+  searchOverlay: 10100,  // Above header/nav and ProfileHubSheet
   
   // Modal & overlay layers (ordered by priority)
   hub: 12000,           // Hub modal shell
@@ -38,7 +38,7 @@ export const Z = {
   // Utility classes for inline styles
   asStyle: {
     header: { zIndex: 1000 },
-    searchOverlay: { zIndex: 1100 },
+    searchOverlay: { zIndex: 10100 },
     nav: { zIndex: 999 },
     toast: { zIndex: 12000 },
     hub: { zIndex: 12000 },

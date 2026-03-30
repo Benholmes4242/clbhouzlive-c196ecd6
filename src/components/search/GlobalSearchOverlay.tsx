@@ -245,7 +245,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[1100] bg-[#F8FAFC] flex flex-col md:items-center"
+          className="fixed inset-0 z-[10100] bg-[#F8FAFC] flex flex-col md:items-center"
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
