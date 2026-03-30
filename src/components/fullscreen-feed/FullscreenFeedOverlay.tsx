@@ -122,7 +122,7 @@ export function FullscreenFeedOverlay() {
               getCommentCount={getCommentCount}
               getFollowState={getFollowState}
               onFollow={(post) => handleFollowChange(post.userId, !getFollowState(post))}
-              onViewProfile={close}
+              onViewProfile={handleViewProfile}
               onReviewTap={close}
               onBeforeNavigate={close}
               overlayVisible={true}
