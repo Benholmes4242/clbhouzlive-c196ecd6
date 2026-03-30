@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapFeed } from '@/components/feed/SnapFeed';
@@ -13,8 +14,10 @@ import { useClubhouseComments } from '@/components/clubhouse/hooks/useClubhouseC
 import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShare';
 import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { getProfilePathById } from '@/lib/profileRoutes';
 
 export function FullscreenFeedOverlay() {
+  const navigate = useNavigate();
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
   const { isOpen, posts, startIndex, activeIndex, close, setActiveIndex } = useFullscreenFeedStore();
@@ -26,6 +29,12 @@ export function FullscreenFeedOverlay() {
   const { handleShare } = useClubhouseShare(userId);
   const { activePost, golfCourse, activeReview, isActiveReview } = useActivePostDerived(posts, activeIndex);
   const isOwnPost = !!(userId && activePost?.userId === userId);
+
+  const handleViewProfile = useCallback(() => {
+    if (!activePost) return;
+    close();
+    navigate(getProfilePathById(activePost.userId));
+  }, [activePost, close, navigate]);
 
   // ESC to close
   useEffect(() => {
@@ -113,7 +122,7 @@ export function FullscreenFeedOverlay() {
               getCommentCount={getCommentCount}
               getFollowState={getFollowState}
               onFollow={(post) => handleFollowChange(post.userId, !getFollowState(post))}
-              onViewProfile={close}
+              onViewProfile={handleViewProfile}
               onReviewTap={close}
               onBeforeNavigate={close}
               overlayVisible={true}
