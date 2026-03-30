@@ -628,8 +628,9 @@ export const PGACard: React.FC<PGACardProps> = ({
           }}>
             {/* Winner row — highlighted, small avatar */}
             <div style={{
+              flex: '1 1 0', minHeight: 0,
               display: 'flex', alignItems: 'center', gap: 10,
-              padding: '8px 10px',
+              padding: '0 10px',
               borderRadius: 10,
               background: `${ACCENT}10`,
               border: `1px solid ${ACCENT}22`,
