@@ -15,6 +15,8 @@ import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule'
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
 import { getProfilePathById } from '@/lib/profileRoutes';
+import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
+import { ReviewBottomSheet } from '@/components/posts/ReviewBottomSheet';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 // ── Dedicated Zustand store ──
