@@ -24,9 +24,18 @@ const ScrollToTopGlass = () => {
     window.addEventListener('scroll', onScroll, { passive: true });
     rootEl?.addEventListener('scroll', onScroll, { passive: true });
 
+    // Watch for route-fullscreen-overlay class changes on body
+    const observer = new MutationObserver(() => {
+      if (document.body.classList.contains('route-fullscreen-overlay')) {
+        setVisible(false);
+      }
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
     return () => {
       window.removeEventListener('scroll', onScroll);
       rootEl?.removeEventListener('scroll', onScroll);
+      observer.disconnect();
     };
   }, []);
 
