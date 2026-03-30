@@ -15837,59 +15837,112 @@ export type Database = {
           video_count: number
         }[]
       }
-      get_suggested_feed: {
-        Args: {
-          p_cursor?: string
-          p_mode?: string
-          p_page_size?: number
-          p_seen_post_ids?: string[]
-          p_user_id: string
-        }
-        Returns: {
-          business_is_verified: boolean
-          business_logo_url: string
-          business_name: string
-          comment_count: number
-          creator_avatar_url: string
-          creator_display_name: string
-          creator_is_verified: boolean
-          creator_relation: string
-          creator_username: string
-          display_order: number
-          duration_seconds: number
-          engagement_score: number
-          height: number
-          is_followed_by_me: boolean
-          is_liked_by_me: boolean
-          like_count: number
-          media_id: string
-          media_type: string
-          media_url: string
-          post_actor_id: string
-          post_actor_type: string
-          post_content: string
-          post_created_at: string
-          post_id: string
-          post_status: string
-          post_tags: Json
-          post_type: string
-          post_user_id: string
-          poster_url: string
-          review_course_country: string
-          review_course_id: string
-          review_course_image: string
-          review_course_name: string
-          review_course_region: string
-          review_course_sub_country: string
-          review_rating: number
-          review_text: string
-          share_count: number
-          source_review_id: string
-          stream_id: string
-          tournament_meta: Json
-          width: number
-        }[]
-      }
+      get_suggested_feed:
+        | {
+            Args: {
+              p_cursor?: string
+              p_mode?: string
+              p_page_size?: number
+              p_seen_post_ids?: string[]
+              p_user_id: string
+            }
+            Returns: {
+              business_is_verified: boolean
+              business_logo_url: string
+              business_name: string
+              comment_count: number
+              creator_avatar_url: string
+              creator_display_name: string
+              creator_is_verified: boolean
+              creator_relation: string
+              creator_username: string
+              display_order: number
+              duration_seconds: number
+              engagement_score: number
+              height: number
+              is_followed_by_me: boolean
+              is_liked_by_me: boolean
+              like_count: number
+              media_id: string
+              media_type: string
+              media_url: string
+              post_actor_id: string
+              post_actor_type: string
+              post_content: string
+              post_created_at: string
+              post_id: string
+              post_status: string
+              post_tags: Json
+              post_type: string
+              post_user_id: string
+              poster_url: string
+              review_course_country: string
+              review_course_id: string
+              review_course_image: string
+              review_course_name: string
+              review_course_region: string
+              review_course_sub_country: string
+              review_rating: number
+              review_text: string
+              share_count: number
+              source_review_id: string
+              stream_id: string
+              tournament_meta: Json
+              width: number
+            }[]
+          }
+        | {
+            Args: {
+              p_cursor?: string
+              p_page_size?: number
+              p_seen_post_ids?: string[]
+              p_user_id: string
+            }
+            Returns: {
+              business_is_verified: boolean
+              business_logo_url: string
+              business_name: string
+              comment_count: number
+              creator_avatar_url: string
+              creator_display_name: string
+              creator_is_verified: boolean
+              creator_relation: string
+              creator_username: string
+              display_order: number
+              duration_seconds: number
+              engagement_score: number
+              height: number
+              is_followed_by_me: boolean
+              is_liked_by_me: boolean
+              like_count: number
+              media_id: string
+              media_type: string
+              media_url: string
+              post_actor_id: string
+              post_actor_type: string
+              post_content: string
+              post_created_at: string
+              post_id: string
+              post_status: string
+              post_tags: Json
+              post_type: string
+              post_user_id: string
+              poster_url: string
+              review_course_country: string
+              review_course_id: string
+              review_course_image: string
+              review_course_name: string
+              review_course_region: string
+              review_course_sub_country: string
+              review_rating: number
+              review_text: string
+              share_count: number
+              source_review_id: string
+              stream_id: string
+              tournament_meta: Json
+              width: number
+            }[]
+          }
       get_top_video_reviews: {
         Args: {
           days_back?: number
