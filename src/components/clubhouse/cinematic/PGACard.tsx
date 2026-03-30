@@ -145,7 +145,7 @@ const HeroAvatar: React.FC<{ src?: string | null; name: string }> = ({ src, name
       <img
         src={src}
         alt={name}
-        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 0%' }}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5%' }}
         onError={(e) => {
           (e.target as HTMLImageElement).style.display = 'none';
           const fb = (e.target as HTMLImageElement).parentElement?.querySelector('[data-fallback]') as HTMLElement;
@@ -175,7 +175,7 @@ const RowAvatar: React.FC<{ src?: string | null; name: string; size: number }> =
     display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
   }}>
     {src ? (
-      <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }} />
+      <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5%' }} />
     ) : (
       <span style={{ fontSize: size * 0.35, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>{getInitials(name)}</span>
     )}
