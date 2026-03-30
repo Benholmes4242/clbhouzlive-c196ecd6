@@ -694,7 +694,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                           border: '1.5px solid rgba(8,10,14,0.8)',
                           borderRadius: SQUIRCLE_RADIUS, overflow: 'hidden',
                         }}>
-                          <RowAvatar src={p.photoUrl} name={p.playerName} size={28} />
+                          <RowAvatar src={p.photoUrl} name={p.playerName} fluid="clamp(26px, 4.5vh, 40px)" />
                         </div>
                       ))}
                       {group.chasers.length > 3 && (
