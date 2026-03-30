@@ -624,7 +624,7 @@ export const PGACard: React.FC<PGACardProps> = ({
             flex: '1 1 auto',
             overflow: 'hidden',
             padding: '0 clamp(14px, 3.5vw, 20px)',
-            display: 'flex', flexDirection: 'column', gap: 6, justifyContent: 'flex-start', paddingBottom: 8,
+            display: 'flex', flexDirection: 'column', gap: 'clamp(4px, 1.2vh, 8px)', justifyContent: 'space-evenly', paddingBottom: 'clamp(4px, 1vh, 10px)',
           }}>
             {/* Winner row — highlighted, small avatar */}
             <div style={{
