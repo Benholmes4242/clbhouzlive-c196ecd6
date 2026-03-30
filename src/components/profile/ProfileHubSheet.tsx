@@ -231,6 +231,25 @@ function ProfileHubSheet({
                 </div>
               </div>
 
+              {/* ── Search bar ── */}
+              <button
+                type="button"
+                onClick={() => setSearchOpen(true)}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl active:scale-[0.98] transition-transform"
+                style={{
+                  background: 'rgba(0,0,0,0.05)',
+                  border: '1px solid rgba(0,0,0,0.08)',
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.35)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+                <span className="text-[14px] text-muted-foreground">
+                  Search courses, players, businesses...
+                </span>
+              </button>
+
               {/* ── Switch profile ── */}
               <div className="pb-3">
 
