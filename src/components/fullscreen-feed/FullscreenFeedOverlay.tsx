@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useFullscreenFeedStore } from '@/store/fullscreenFeedStore';
 import { useClubhouseStore } from '@/store/clubhouseStore';
 import { SnapFeed } from '@/components/feed/SnapFeed';
@@ -13,6 +14,7 @@ import { useClubhouseComments } from '@/components/clubhouse/hooks/useClubhouseC
 import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShare';
 import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { getProfilePathById } from '@/utils/profile-utils';
 
 export function FullscreenFeedOverlay() {
   const { session } = useSupabaseSession();
