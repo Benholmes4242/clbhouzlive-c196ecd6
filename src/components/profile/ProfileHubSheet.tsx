@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useUnreadNotifications } from '@/hooks/useUnreadNotifications';
+import GlobalSearchOverlay from '@/components/search/GlobalSearchOverlay';
 import { useMessagingContext } from '@/contexts/MessagingContext';
 import { useNavigate } from 'react-router-dom';
 import { SquircleAvatar } from '@/components/ui/SquircleAvatar';
