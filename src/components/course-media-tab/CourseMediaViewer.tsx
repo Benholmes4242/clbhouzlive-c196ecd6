@@ -58,6 +58,8 @@ export function CourseMediaViewer() {
   const toggleMute = useClubhouseStore(s => s.toggleMute);
   const activeVideoElement = useClubhouseStore(s => s.activeVideoElement);
   const navigate = useNavigate();
+  const { activeReview, isActiveReview, golfCourse: derivedGolfCourse } = useActivePostDerived(posts, activeIndex);
+  const [reviewSheetOpen, setReviewSheetOpen] = useState(false);
 
   const activePost = posts[activeIndex] ?? null;
   const isVideo = activePost?.mediaItems?.[0]?.type === 'video';
