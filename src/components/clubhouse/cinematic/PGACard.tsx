@@ -619,12 +619,12 @@ export const PGACard: React.FC<PGACardProps> = ({
             </button>
           </div>
 
-          {/* Rows — fills remaining space evenly */}
+          {/* Rows — each row grows to fill available space */}
           <div style={{
             flex: '1 1 auto',
             overflow: 'hidden',
             padding: '0 clamp(14px, 3.5vw, 20px)',
-            display: 'flex', flexDirection: 'column', gap: 'clamp(4px, 1vh, 8px)', justifyContent: 'center', paddingBottom: 'clamp(4px, 1vh, 10px)',
+            display: 'flex', flexDirection: 'column', gap: 'clamp(3px, 0.6vh, 6px)', paddingBottom: 'clamp(4px, 1vh, 10px)',
           }}>
             {/* Winner row — highlighted, small avatar */}
             <div style={{
