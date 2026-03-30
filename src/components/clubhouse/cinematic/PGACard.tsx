@@ -730,7 +730,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                   </span>
 
                   <span style={{
-                    fontSize: 'clamp(12px, 3vw, 14px)', fontWeight: 600,
+                    fontSize: 'clamp(12px, 1.8vh, 17px)', fontWeight: 600,
                     color: 'rgba(255,255,255,0.55)',
                   }}>
                     {primary.scoreDisplay || 'E'}
