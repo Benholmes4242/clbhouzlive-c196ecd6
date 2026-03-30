@@ -655,7 +655,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                 {cd.leader.playerName}
               </span>
               <span style={{
-                fontSize: 'clamp(13px, 3.2vw, 15px)', fontWeight: 800,
+                fontSize: 'clamp(13px, 2vh, 18px)', fontWeight: 800,
                 color: ACCENT,
               }}>
                 {cd.leader.scoreDisplay || 'E'}
