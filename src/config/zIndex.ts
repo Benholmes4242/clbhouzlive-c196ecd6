@@ -38,7 +38,7 @@ export const Z = {
   // Utility classes for inline styles
   asStyle: {
     header: { zIndex: 1000 },
-    searchOverlay: { zIndex: 1100 },
+    searchOverlay: { zIndex: 10100 },
     nav: { zIndex: 999 },
     toast: { zIndex: 12000 },
     hub: { zIndex: 12000 },

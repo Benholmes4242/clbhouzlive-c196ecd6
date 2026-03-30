@@ -494,7 +494,13 @@ function ProfileHubSheet({
     </AnimatePresence>
   );
 
-  return typeof window !== 'undefined' ? createPortal(content, document.body) : null;
+  return typeof window !== 'undefined' ? createPortal(
+    <>
+      {content}
+      <GlobalSearchOverlay isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+    </>,
+    document.body
+  ) : null;
 }
 
 export { ProfileHubSheet };
