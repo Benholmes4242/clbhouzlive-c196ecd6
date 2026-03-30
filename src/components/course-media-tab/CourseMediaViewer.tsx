@@ -173,7 +173,13 @@ export function CourseMediaViewer() {
                   isOwnPost={false}
                   isVisible={true}
                   onFollow={() => {}}
-                  onViewProfile={() => {}}
+                  onViewProfile={() => {
+                    const userId = activePost.userId;
+                    if (userId) {
+                      close();
+                      navigate(getProfilePathById(userId));
+                    }
+                  }}
                   onBeforeNavigate={close}
                   isReview={false}
                   postId={activePost.id}
