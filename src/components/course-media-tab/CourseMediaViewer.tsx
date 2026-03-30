@@ -14,6 +14,7 @@ import { SnapFeed } from '@/components/feed/SnapFeed';
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
+import { getProfilePathById } from '@/lib/profileRoutes';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 // ── Dedicated Zustand store ──
