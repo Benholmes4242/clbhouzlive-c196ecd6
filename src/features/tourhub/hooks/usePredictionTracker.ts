@@ -63,7 +63,7 @@ async function fetchTrackerData(
   const fieldCompletionPct = totalInField > 0 ? playersWithScores / totalInField : 0;
 
   // Match top contenders (all 5 picks)
-  const trackedPredictions: TrackedPrediction[] = predictions.topContenders.slice(0, 5).map((p, i) => {
+  const trackedPredictions: TrackedPrediction[] = predictions.topContenders.slice(0, 3).map((p, i) => {
     const lb = leaderboardMap.get(p.playerId)
       ?? leaderboardByName.get(p.playerName?.toLowerCase() ?? '');
     return buildTrackedPrediction(p, i + 1, lb, false, fieldCompletionPct);
