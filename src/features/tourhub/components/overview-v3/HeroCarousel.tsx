@@ -925,22 +925,17 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           }}
                         >
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            {/* Avatar with trophy crown */}
-                            <div style={{ position: 'relative', flexShrink: 0 }}>
-                              <button onClick={handlePlayerTapNav(podiumWinner.playerId)} className="transition-opacity active:opacity-70">
-                                <PlayerAvatar
-                                  displayName={podiumWinner.displayName}
-                                  fullName={podiumWinner.fullName}
-                                  headshotOverride={podiumWinner.headshotOverride}
-                                  tourCode={tournament.tourSlug}
-                                  size={44}
-                                  frosted
-                                />
-                              </button>
-                              <span style={{ position: 'absolute', top: -8, left: '50%', transform: 'translateX(-50%)', fontSize: 11 }}>
-                                🏆
-                              </span>
-                            </div>
+                            {/* Avatar — clean, no overlay */}
+                            <button onClick={handlePlayerTapNav(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ flexShrink: 0 }}>
+                              <PlayerAvatar
+                                displayName={podiumWinner.displayName}
+                                fullName={podiumWinner.fullName}
+                                headshotOverride={podiumWinner.headshotOverride}
+                                tourCode={tournament.tourSlug}
+                                size={44}
+                                frosted
+                              />
+                            </button>
                             {/* Name + margin */}
                             <div>
                               <button
@@ -957,15 +952,18 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                               )}
                             </div>
                           </div>
-                          {/* Score — colour coded */}
-                          <span style={{
-                            fontFamily: "'JetBrains Mono','SF Mono',monospace",
-                            fontSize: 26, fontWeight: 900,
-                            color: podiumWinner.score < 0 ? '#4ade80' : podiumWinner.score === 0 ? 'rgba(255,255,255,0.75)' : '#f87171',
-                            letterSpacing: -1, flexShrink: 0,
-                          }}>
-                            {podiumWinner.displayScore}
-                          </span>
+                          {/* Trophy + Score together */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                            <span style={{ fontSize: 22 }}>🏆</span>
+                            <span style={{
+                              fontFamily: "'JetBrains Mono','SF Mono',monospace",
+                              fontSize: 26, fontWeight: 900,
+                              color: podiumWinner.score < 0 ? '#4ade80' : podiumWinner.score === 0 ? 'rgba(255,255,255,0.75)' : '#f87171',
+                              letterSpacing: '-0.04em',
+                            }}>
+                              {podiumWinner.displayScore}
+                            </span>
+                          </div>
                         </motion.div>
                       ) : winnerInfo?.winnerName ? (
                         <motion.div
