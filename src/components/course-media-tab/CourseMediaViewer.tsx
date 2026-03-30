@@ -4,7 +4,7 @@
  * Powered by its own Zustand store so it never conflicts with FullscreenFeedOverlay.
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { create } from 'zustand';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -15,6 +15,8 @@ import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule'
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
 import { getProfilePathById } from '@/lib/profileRoutes';
+import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
+import { ReviewBottomSheet } from '@/components/posts/ReviewBottomSheet';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 // ── Dedicated Zustand store ──
@@ -56,6 +58,8 @@ export function CourseMediaViewer() {
   const toggleMute = useClubhouseStore(s => s.toggleMute);
   const activeVideoElement = useClubhouseStore(s => s.activeVideoElement);
   const navigate = useNavigate();
+  const { activeReview, isActiveReview, golfCourse: derivedGolfCourse } = useActivePostDerived(posts, activeIndex);
+  const [reviewSheetOpen, setReviewSheetOpen] = useState(false);
 
   const activePost = posts[activeIndex] ?? null;
   const isVideo = activePost?.mediaItems?.[0]?.type === 'video';
@@ -168,26 +172,56 @@ export function CourseMediaViewer() {
                   }}
                   caption={activePost.caption}
                   tags={activePost.tags}
-                  golfCourse={null}
+                  golfCourse={derivedGolfCourse}
                   isFollowing={false}
                   isOwnPost={false}
                   isVisible={true}
                   onFollow={() => {}}
                   onViewProfile={() => {
-                    const userId = activePost.userId;
-                    if (userId) {
-                      close();
-                      navigate(getProfilePathById(userId));
-                    }
+                    close();
+                    navigate(getProfilePathById(activePost.userId));
                   }}
                   onBeforeNavigate={close}
-                  isReview={false}
+                  isReview={isActiveReview}
+                  reviewData={activeReview ? {
+                    courseId: activeReview.courseId,
+                    courseName: activeReview.courseName,
+                    courseLocation: activeReview.courseRegion || '',
+                    rating: activeReview.rating,
+                    tierLabel: '',
+                    sourceReviewId: activeReview.reviewId || '',
+                    courseCountry: activeReview.courseCountry,
+                    courseRegion: activeReview.courseRegion,
+                    courseSubCountry: activeReview.courseSubCountry,
+                    reviewText: activeReview.reviewText,
+                  } : undefined}
+                  onReviewTap={() => setReviewSheetOpen(true)}
                   postId={activePost.id}
                   carouselCount={mediaCount}
                   carouselActiveIndex={currentMediaIdx}
                 />
               </div>
             )}
+
+            {/* Review Bottom Sheet */}
+            <ReviewBottomSheet
+              isOpen={reviewSheetOpen}
+              onClose={() => setReviewSheetOpen(false)}
+              user={{
+                id: activePost?.userId ?? '',
+                name: activePost?.displayName ?? '',
+                username: activePost?.username,
+                avatar: activePost?.avatarUrl,
+              }}
+              courseId={activeReview?.courseId ?? ''}
+              courseName={activeReview?.courseName ?? ''}
+              rating={activeReview?.rating ?? 0}
+              reviewId={activeReview?.reviewId}
+              courseCountry={activeReview?.courseCountry}
+              courseRegion={activeReview?.courseRegion}
+              courseSubCountry={activeReview?.courseSubCountry}
+              reviewText={activeReview?.reviewText}
+            />
 
             {/* Video Scrubber */}
             {isVideo && activeVideoElement && (
