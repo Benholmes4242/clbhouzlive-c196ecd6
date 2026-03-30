@@ -24,9 +24,14 @@ const ScrollToTopGlass = () => {
     window.addEventListener('scroll', onScroll, { passive: true });
     rootEl?.addEventListener('scroll', onScroll, { passive: true });
 
+    // Also watch for body class changes (fullscreen overlay toggle)
+    const observer = new MutationObserver(() => onScroll());
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
     return () => {
       window.removeEventListener('scroll', onScroll);
       rootEl?.removeEventListener('scroll', onScroll);
+      observer.disconnect();
     };
   }, []);
 
