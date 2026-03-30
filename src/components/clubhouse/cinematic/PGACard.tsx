@@ -648,7 +648,7 @@ export const PGACard: React.FC<PGACardProps> = ({
               }}>1</span>
               <RowAvatar src={cd.leader.photoUrl} name={cd.leader.playerName} fluid="clamp(30px, 5vh, 44px)" />
               <span style={{
-                flex: 1, fontSize: 'clamp(13px, 3.2vw, 15px)', fontWeight: 700,
+                flex: 1, fontSize: 'clamp(13px, 2vh, 18px)', fontWeight: 700,
                 color: '#fff',
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               }}>
