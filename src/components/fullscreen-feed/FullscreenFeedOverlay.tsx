@@ -17,6 +17,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { getProfilePathById } from '@/lib/profileRoutes';
 
 export function FullscreenFeedOverlay() {
+  const navigate = useNavigate();
   const { session } = useSupabaseSession();
   const userId = session?.user?.id;
   const { isOpen, posts, startIndex, activeIndex, close, setActiveIndex } = useFullscreenFeedStore();
@@ -28,6 +29,12 @@ export function FullscreenFeedOverlay() {
   const { handleShare } = useClubhouseShare(userId);
   const { activePost, golfCourse, activeReview, isActiveReview } = useActivePostDerived(posts, activeIndex);
   const isOwnPost = !!(userId && activePost?.userId === userId);
+
+  const handleViewProfile = useCallback(() => {
+    if (!activePost) return;
+    close();
+    navigate(getProfilePathById(activePost.userId));
+  }, [activePost, close, navigate]);
 
   // ESC to close
   useEffect(() => {
