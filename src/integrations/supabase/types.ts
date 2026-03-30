@@ -15852,6 +15852,8 @@ export type Database = {
           business_logo_url: string
           business_name: string
           comment_count: number
+          course_id: string
+          course_name: string
           creator_avatar_url: string
           creator_display_name: string
           creator_is_verified: boolean
