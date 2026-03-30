@@ -79,6 +79,7 @@ function ProfileHubSheet({
 
   const [localActiveId, setLocalActiveId] = useState(currentActor.id);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   // Sync localActiveId when currentActor changes externally
   useEffect(() => {
