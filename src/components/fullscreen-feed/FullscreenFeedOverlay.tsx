@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +8,7 @@ import { SnapFeed } from '@/components/feed/SnapFeed';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
 import { FeedOverlayLayer } from '@/components/feed/FeedOverlayLayer';
 import CommentsSheet from '@/components/comments/CommentsSheet';
+import { ReviewBottomSheet } from '@/components/posts/ReviewBottomSheet';
 import { useClubhouseLikes } from '@/components/clubhouse/hooks/useClubhouseLikes';
 import { useClubhouseFollows } from '@/components/clubhouse/hooks/useClubhouseFollows';
 import { useClubhouseComments } from '@/components/clubhouse/hooks/useClubhouseComments';
@@ -29,12 +30,18 @@ export function FullscreenFeedOverlay() {
   const { handleShare } = useClubhouseShare(userId);
   const { activePost, golfCourse, activeReview, isActiveReview } = useActivePostDerived(posts, activeIndex);
   const isOwnPost = !!(userId && activePost?.userId === userId);
+  const [reviewSheetOpen, setReviewSheetOpen] = useState(false);
 
   const handleViewProfile = useCallback(() => {
     if (!activePost) return;
     close();
     navigate(getProfilePathById(activePost.userId));
   }, [activePost, close, navigate]);
+
+  const handleReviewTap = useCallback(() => {
+    if (!activeReview) return;
+    setReviewSheetOpen(true);
+  }, [activeReview]);
 
   // ESC to close
   useEffect(() => {
@@ -123,11 +130,13 @@ export function FullscreenFeedOverlay() {
               getFollowState={getFollowState}
               onFollow={(post) => handleFollowChange(post.userId, !getFollowState(post))}
               onViewProfile={handleViewProfile}
-              onReviewTap={close}
+              onReviewTap={handleReviewTap}
               onBeforeNavigate={close}
               overlayVisible={true}
               isOwnPost={isOwnPost}
               golfCourse={golfCourse}
+              activeReview={activeReview}
+              isActiveReview={isActiveReview}
             />
           </motion.div>
         )}
@@ -144,6 +153,25 @@ export function FullscreenFeedOverlay() {
         caption={activePost?.caption}
         theme="dark"
         likesCount={getActiveLikeState(activePost!)?.count ?? null}
+      />
+
+      <ReviewBottomSheet
+        isOpen={reviewSheetOpen}
+        onClose={() => setReviewSheetOpen(false)}
+        user={{
+          id: activePost?.userId ?? '',
+          name: activePost?.displayName ?? '',
+          username: activePost?.username,
+          avatar: activePost?.avatarUrl,
+        }}
+        courseId={activeReview?.courseId ?? ''}
+        courseName={activeReview?.courseName ?? ''}
+        rating={activeReview?.rating ?? 0}
+        reviewId={activeReview?.reviewId}
+        courseCountry={activeReview?.courseCountry}
+        courseRegion={activeReview?.courseRegion}
+        courseSubCountry={activeReview?.courseSubCountry}
+        reviewText={activeReview?.reviewText}
       />
     </>
   );
