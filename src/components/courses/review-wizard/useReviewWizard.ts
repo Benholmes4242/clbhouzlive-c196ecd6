@@ -817,6 +817,8 @@ export function useReviewWizard({
       queryClient.invalidateQueries({ queryKey: ['clubhouse-posts'] });
       queryClient.invalidateQueries({ queryKey: ['explore-feed'] });
       queryClient.invalidateQueries({ queryKey: ['activity-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['profile-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['actor-posts'] });
       queryClient.invalidateQueries({ queryKey: ['user-exploration-status'] });
       queryClient.invalidateQueries({ queryKey: ['exploration-leaderboard'] });
       // Profile page queries

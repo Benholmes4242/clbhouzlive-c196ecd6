@@ -17,10 +17,13 @@ export function PostEventsBridge({ children }: PostEventsBridgeProps) {
     // Handle post:created events
     const offCreated = postEventBus.on('post:created', (evt) => {
       // Invalidate actor-scoped feed
-
-      // Invalidate actor-scoped feed
       queryClient.invalidateQueries({
         queryKey: postKeys.actorPosts(evt.actorType, evt.actorId),
+      });
+
+      // Invalidate profile page posts query
+      queryClient.invalidateQueries({
+        queryKey: postKeys.profilePosts(evt.actorType, evt.actorId),
       });
 
       // Invalidate actor post count
