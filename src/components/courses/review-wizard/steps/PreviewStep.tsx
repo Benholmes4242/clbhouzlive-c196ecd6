@@ -5,8 +5,8 @@
 
 import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Globe, Users, Lock } from 'lucide-react';
 import { formatCourseLocation } from '@/utils/courseLocation';
+import { Skeleton } from '@/components/ui/skeleton';
 import type { ReviewWizardCourse, ReviewBreakdowns, ReviewMediaItem } from '../types';
 import type { ReviewVisibility } from '../ReviewPostingOptionsSheet';
 
@@ -34,18 +34,12 @@ interface PreviewStepProps {
 
 export function PreviewStep({
   course,
-  reviewId,
   rating,
-  breakdowns,
-  title,
   review,
   media,
-  coverMediaId,
   creator,
-  visibility = 'anyone',
   onSkip,
   onShare,
-  onClose,
   isSharing,
 }: PreviewStepProps) {
   const displayableMedia = useMemo(() => {
@@ -86,7 +80,7 @@ export function PreviewStep({
       >
         {/* Shimmer while loading */}
         {!heroLoaded && (
-          <div className="absolute inset-0 clb-shimmer-dark" />
+          <Skeleton className="clb-shimmer-dark absolute inset-0" style={{ borderRadius: 0 }} />
         )}
 
         {/* Hero image */}
@@ -181,8 +175,8 @@ export function PreviewStep({
       >
         {/* SECTION 2 — Amber explanation strip */}
         {isSharing ? (
-          <div style={{ margin: '16px 16px 0', borderRadius: 12, overflow: 'hidden' }}>
-            <div className="clb-shimmer-dark" style={{ height: 72, borderRadius: 12 }} />
+          <div style={{ margin: '16px 16px 0', overflow: 'hidden' }}>
+            <Skeleton className="clb-shimmer-dark" style={{ height: 72, borderRadius: 12 }} />
           </div>
         ) : (
           <div style={{
@@ -209,8 +203,8 @@ export function PreviewStep({
 
         {/* SECTION 3 — Review capsule */}
         {!course ? (
-          <div style={{ margin: '14px 16px 0', borderRadius: 16, overflow: 'hidden' }}>
-            <div className="clb-shimmer-dark" style={{ height: 140, borderRadius: 16 }} />
+          <div style={{ margin: '14px 16px 0', overflow: 'hidden' }}>
+            <Skeleton className="clb-shimmer-dark" style={{ height: 140, borderRadius: 16 }} />
           </div>
         ) : (
           <div style={{ margin: '14px 16px 0' }}>
