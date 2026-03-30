@@ -172,26 +172,56 @@ export function CourseMediaViewer() {
                   }}
                   caption={activePost.caption}
                   tags={activePost.tags}
-                  golfCourse={null}
+                  golfCourse={derivedGolfCourse}
                   isFollowing={false}
                   isOwnPost={false}
                   isVisible={true}
                   onFollow={() => {}}
                   onViewProfile={() => {
-                    const userId = activePost.userId;
-                    if (userId) {
-                      close();
-                      navigate(getProfilePathById(userId));
-                    }
+                    close();
+                    navigate(getProfilePathById(activePost.userId));
                   }}
                   onBeforeNavigate={close}
-                  isReview={false}
+                  isReview={isActiveReview}
+                  reviewData={activeReview ? {
+                    courseId: activeReview.courseId,
+                    courseName: activeReview.courseName,
+                    courseLocation: activeReview.courseRegion || '',
+                    rating: activeReview.rating,
+                    tierLabel: '',
+                    sourceReviewId: activeReview.reviewId || '',
+                    courseCountry: activeReview.courseCountry,
+                    courseRegion: activeReview.courseRegion,
+                    courseSubCountry: activeReview.courseSubCountry,
+                    reviewText: activeReview.reviewText,
+                  } : undefined}
+                  onReviewTap={() => setReviewSheetOpen(true)}
                   postId={activePost.id}
                   carouselCount={mediaCount}
                   carouselActiveIndex={currentMediaIdx}
                 />
               </div>
             )}
+
+            {/* Review Bottom Sheet */}
+            <ReviewBottomSheet
+              isOpen={reviewSheetOpen}
+              onClose={() => setReviewSheetOpen(false)}
+              user={{
+                id: activePost?.userId ?? '',
+                name: activePost?.displayName ?? '',
+                username: activePost?.username,
+                avatar: activePost?.avatarUrl,
+              }}
+              courseId={activeReview?.courseId ?? ''}
+              courseName={activeReview?.courseName ?? ''}
+              rating={activeReview?.rating ?? 0}
+              reviewId={activeReview?.reviewId}
+              courseCountry={activeReview?.courseCountry}
+              courseRegion={activeReview?.courseRegion}
+              courseSubCountry={activeReview?.courseSubCountry}
+              reviewText={activeReview?.reviewText}
+            />
 
             {/* Video Scrubber */}
             {isVideo && activeVideoElement && (
