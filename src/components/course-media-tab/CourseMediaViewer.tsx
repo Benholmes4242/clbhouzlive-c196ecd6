@@ -55,6 +55,7 @@ export function CourseMediaViewer() {
   const isMuted = useClubhouseStore(s => s.isMuted);
   const toggleMute = useClubhouseStore(s => s.toggleMute);
   const activeVideoElement = useClubhouseStore(s => s.activeVideoElement);
+  const navigate = useNavigate();
 
   const activePost = posts[activeIndex] ?? null;
   const isVideo = activePost?.mediaItems?.[0]?.type === 'video';
