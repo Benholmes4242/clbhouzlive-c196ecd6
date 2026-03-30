@@ -710,7 +710,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                       )}
                     </div>
                   ) : (
-                    <RowAvatar src={primary.photoUrl} name={primary.playerName} size={30} />
+                    <RowAvatar src={primary.photoUrl} name={primary.playerName} fluid="clamp(28px, 5vh, 44px)" />
                   )}
 
                   <span style={{
