@@ -925,22 +925,17 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           }}
                         >
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            {/* Avatar with trophy crown */}
-                            <div style={{ position: 'relative', flexShrink: 0 }}>
-                              <button onClick={handlePlayerTapNav(podiumWinner.playerId)} className="transition-opacity active:opacity-70">
-                                <PlayerAvatar
-                                  displayName={podiumWinner.displayName}
-                                  fullName={podiumWinner.fullName}
-                                  headshotOverride={podiumWinner.headshotOverride}
-                                  tourCode={tournament.tourSlug}
-                                  size={44}
-                                  frosted
-                                />
-                              </button>
-                              <span style={{ position: 'absolute', top: -8, left: '50%', transform: 'translateX(-50%)', fontSize: 11 }}>
-                                🏆
-                              </span>
-                            </div>
+                            {/* Avatar — clean, no overlay */}
+                            <button onClick={handlePlayerTapNav(podiumWinner.playerId)} className="transition-opacity active:opacity-70" style={{ flexShrink: 0 }}>
+                              <PlayerAvatar
+                                displayName={podiumWinner.displayName}
+                                fullName={podiumWinner.fullName}
+                                headshotOverride={podiumWinner.headshotOverride}
+                                tourCode={tournament.tourSlug}
+                                size={44}
+                                frosted
+                              />
+                            </button>
                             {/* Name + margin */}
                             <div>
                               <button
