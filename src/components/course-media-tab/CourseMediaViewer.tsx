@@ -6,6 +6,7 @@
 
 import React, { useEffect } from 'react';
 import { create } from 'zustand';
+import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Volume2, VolumeX } from 'lucide-react';
 import { useClubhouseStore } from '@/store/clubhouseStore';
@@ -13,6 +14,7 @@ import { SnapFeed } from '@/components/feed/SnapFeed';
 import { CreatorCapsule } from '@/components/clubhouse/cinematic/CreatorCapsule';
 import { VideoScrubber } from '@/components/video/VideoScrubber';
 import { pauseAllAudio } from '@/utils/globalVideoMute';
+import { getProfilePathById } from '@/lib/profileRoutes';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 // ── Dedicated Zustand store ──
@@ -53,6 +55,7 @@ export function CourseMediaViewer() {
   const isMuted = useClubhouseStore(s => s.isMuted);
   const toggleMute = useClubhouseStore(s => s.toggleMute);
   const activeVideoElement = useClubhouseStore(s => s.activeVideoElement);
+  const navigate = useNavigate();
 
   const activePost = posts[activeIndex] ?? null;
   const isVideo = activePost?.mediaItems?.[0]?.type === 'video';
@@ -170,7 +173,13 @@ export function CourseMediaViewer() {
                   isOwnPost={false}
                   isVisible={true}
                   onFollow={() => {}}
-                  onViewProfile={() => {}}
+                  onViewProfile={() => {
+                    const userId = activePost.userId;
+                    if (userId) {
+                      close();
+                      navigate(getProfilePathById(userId));
+                    }
+                  }}
                   onBeforeNavigate={close}
                   isReview={false}
                   postId={activePost.id}
