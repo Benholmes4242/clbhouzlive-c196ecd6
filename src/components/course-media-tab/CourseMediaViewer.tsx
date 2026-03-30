@@ -4,7 +4,7 @@
  * Powered by its own Zustand store so it never conflicts with FullscreenFeedOverlay.
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { create } from 'zustand';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
