@@ -14,7 +14,7 @@ import { useClubhouseComments } from '@/components/clubhouse/hooks/useClubhouseC
 import { useClubhouseShare } from '@/components/clubhouse/hooks/useClubhouseShare';
 import { useActivePostDerived } from '@/components/clubhouse/hooks/useActivePostDerived';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { getProfilePathById } from '@/utils/profile-utils';
+import { getProfilePathById } from '@/lib/profileRoutes';
 
 export function FullscreenFeedOverlay() {
   const { session } = useSupabaseSession();
