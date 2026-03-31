@@ -10,6 +10,7 @@ Deno.serve(async (req) => {
 
   try {
     const { email } = await req.json();
+    const safeEmail = (email || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     if (!email) {
       return new Response(JSON.stringify({ error: 'Missing email' }), {
         status: 400,
