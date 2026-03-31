@@ -588,7 +588,10 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
       setIsProcessing(true);
       try {
         const items = await filesToMediaItems(toProcess, (msg) => toast.error(msg));
-        if (items.length > 0) addMedia(items);
+        if (items.length > 0) {
+          addMedia(items);
+          setTimeout(() => textareaRef.current?.focus(), 100);
+        }
       } catch (err) {
         console.error('[ComposeScreen] Failed to process files:', err);
         toast.error('Failed to process some files');
