@@ -92,7 +92,6 @@ export const useSearch = () => {
       .from('user_profiles')
       .select('id, display_name, username, home_club, profile_photo_url')
       .or(`display_name.ilike.%${searchTerm}%,username.ilike.%${searchTerm}%`)
-      .eq('is_public', true)
       .limit(6);
 
     if (error) {
