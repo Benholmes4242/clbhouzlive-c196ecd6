@@ -288,7 +288,7 @@ export function useHeroCarouselData() {
       // Per-category caps to prevent any one category from crowding out others
       const cappedLive = liveSlides.slice(0, 6);
       const cappedCompleted = completedSlides.slice(0, 6);
-      const cappedUpcoming = upcomingSlides.slice(0, 3);
+      const cappedUpcoming = upcomingSlides.slice(0, 6);
 
       return [...cappedLive, ...cappedCompleted, ...cappedUpcoming];
     },
