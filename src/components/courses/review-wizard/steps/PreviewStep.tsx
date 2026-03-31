@@ -183,8 +183,8 @@ export function PreviewStep({
         ) : (
           <div style={{
             margin: '16px 16px 0',
-            background: 'rgba(247,147,30,0.08)',
-            border: '1px solid rgba(247,147,30,0.18)',
+            background: 'rgba(245,158,11,0.08)',
+            border: '1px solid rgba(245,158,11,0.18)',
             borderRadius: 12,
             padding: '12px 14px',
             display: 'flex',
