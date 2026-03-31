@@ -269,7 +269,12 @@ export function useHeroCarouselData() {
         } else if (completed.length > 0) {
           completedSlides.push({ tournament: completed[0], type: 'completed' });
         } else if (upcoming.length > 0) {
-          upcomingSlides.push({ tournament: upcoming[0], type: 'upcoming' });
+          // Skip co-sanctioned majors (e.g. The Masters, PGA Championship) on non-PGA tours
+          // These are stored under EURO in Sportradar but should only appear as PGA upcoming cards
+          const nextTrueEvent = tour === 'pga'
+            ? upcoming[0]
+            : upcoming.find(t => !t.isMajor) ?? upcoming[0];
+          upcomingSlides.push({ tournament: nextTrueEvent, type: 'upcoming' });
         }
       });
 

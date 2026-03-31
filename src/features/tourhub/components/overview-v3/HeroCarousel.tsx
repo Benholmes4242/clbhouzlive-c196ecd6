@@ -992,7 +992,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           }}
                         >
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <PlayerAvatar displayName={winnerInfo.winnerName} tourCode={winnerInfo.tourSlug || 'pga'} size={44} frosted />
+                            <PlayerAvatar displayName={winnerInfo.winnerName} photoUrl={winnerInfo.winnerPhotoUrl} tourCode={winnerInfo.tourSlug || 'pga'} size={44} frosted />
                             <span style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF' }}>{winnerInfo.winnerName}</span>
                           </div>
                           {winnerInfo.winnerScore && (
