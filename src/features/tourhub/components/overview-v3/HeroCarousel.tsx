@@ -492,10 +492,14 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     prevLeadersRef.current = leaders;
   }, [leaders, tournament.id]);
 
-  // LIV upcoming uses a dedicated hero image
-  const livOverride = isUpcoming && tournament.tourSlug === 'liv' ? livUpcomingHero : null;
-  const backgroundImage = livOverride || venueImage?.imageUrl || getFallbackCourseImage(tournament.name);
-  const hasRealImage = !!livOverride || !!venueImage?.imageUrl;
+  // Tour/venue-specific upcoming hero overrides
+  const upcomingOverride = isUpcoming ? (
+    tournament.tourSlug === 'liv' ? livUpcomingHero
+    : tournament.venueName?.toLowerCase().includes('tpc san antonio') ? tpcSanAntonioUpcoming
+    : null
+  ) : null;
+  const backgroundImage = upcomingOverride || venueImage?.imageUrl || getFallbackCourseImage(tournament.name);
+  const hasRealImage = !!upcomingOverride || !!venueImage?.imageUrl;
 
    // Tour-branded gradients for venues without images
   const tourFallbacks: Record<string, string> = {
