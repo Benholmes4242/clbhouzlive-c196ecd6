@@ -118,7 +118,7 @@ export const InviteClubModal: React.FC<InviteClubModalProps> = ({
                 id="note"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                placeholder="e.g., I'm a member and would love to see the club on clbhouz!"
+                placeholder="e.g., I'm a member and would love to see the club on Clbhouz!"
                 className="min-h-[80px] resize-none rounded-sq-sm"
                 maxLength={300}
               />

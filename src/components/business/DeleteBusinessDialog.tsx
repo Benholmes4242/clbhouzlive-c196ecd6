@@ -37,7 +37,7 @@ export function DeleteBusinessDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete business profile?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently remove your business from clbhouz. This action can{"'"}t be undone.
+            This will permanently remove your business from Clbhouz. This action can{"'"}t be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
