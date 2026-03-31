@@ -192,7 +192,7 @@ const ClubhouseHeaderNew = ({ className, activeTab, onTabChange, chromeState = '
               <SearchPill 
                 autoFocus 
                 onClose={() => setSearchOpen(false)}
-                placeholder="Search clbhouz..."
+                placeholder="Search Clbhouz..."
                 variant={isDarkContext ? "glass-dark" : "solid-light"}
                 isClubhousePage={isDarkContext}
               />

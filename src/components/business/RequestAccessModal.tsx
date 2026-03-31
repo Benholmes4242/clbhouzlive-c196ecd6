@@ -153,7 +153,7 @@ export const RequestAccessModal: React.FC<RequestAccessModalProps> = ({
             Request access
           </DialogTitle>
           <DialogDescription>
-            <span className="font-medium text-foreground">{businessName}</span> already has a business profile on clbhouz.
+            <span className="font-medium text-foreground">{businessName}</span> already has a business profile on Clbhouz.
           </DialogDescription>
         </DialogHeader>
 

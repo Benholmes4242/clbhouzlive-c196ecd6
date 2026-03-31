@@ -278,7 +278,7 @@ const CourseAboutTab = ({ course, onTabChange }: CourseAboutTabProps) => {
         <section className="px-4 pt-5 pb-5 md:pt-6" style={{ marginTop: 12 }}>
           <h3 className="text-lg font-semibold text-foreground mb-1">How do you rate this course?</h3>
           <p className="text-base text-muted-foreground mb-3">
-            Add your rating to see how it compares with the clbhouz community.
+            Add your rating to see how it compares with the Clbhouz community.
           </p>
           <Button onClick={handleRateClick} className="w-full h-11 rounded-xl bg-card text-foreground border border-border/60 font-semibold active:scale-[0.98] transition-colors" variant="outline">
             Rate this course
