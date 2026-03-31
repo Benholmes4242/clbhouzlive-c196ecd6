@@ -35,6 +35,7 @@ import livUpcomingHero from '@/assets/liv-upcoming-hero.webp';
 import tpcSanAntonioUpcoming from '@/assets/tpc-san-antonio-upcoming.webp';
 import shadowCreekUpcoming from '@/assets/shadow-creek-upcoming.jpg';
 import lakewoodNationalUpcoming from '@/assets/lakewood-national-upcoming.jpg';
+import volvoChinaOpenUpcoming from '@/assets/tours/volvo-china-open-upcoming.jpg';
 import { getTourLogo } from '../../utils/tourLogos';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
@@ -500,6 +501,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     : tournament.venueName?.toLowerCase().includes('tpc san antonio') ? tpcSanAntonioUpcoming
     : tournament.venueName?.toLowerCase().includes('shadow creek') ? shadowCreekUpcoming
     : tournament.venueName?.toLowerCase().includes('lakewood national') ? lakewoodNationalUpcoming
+    : tournament.name?.toLowerCase().includes('volvo china open') ? volvoChinaOpenUpcoming
     : null
   ) : null;
   const backgroundImage = venueOverride || venueImage?.imageUrl || getFallbackCourseImage(tournament.name);
