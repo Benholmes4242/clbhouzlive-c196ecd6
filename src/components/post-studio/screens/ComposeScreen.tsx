@@ -689,6 +689,18 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     }
   }, [state.mediaItems, setActiveMedia]);
 
+  const handleSetCover = useCallback((index: number) => {
+    setCoverIndex(index);
+    setActiveMedia(index);
+  }, [setActiveMedia]);
+
+  const handleOverflow = useCallback(() => {
+    setOverflowSheetOpen(true);
+  }, []);
+
+  const handleAddMore = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
 
 
   return (
