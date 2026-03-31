@@ -42,11 +42,13 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const navigate = useNavigate();
 
   const handleVisitCourse = useCallback(() => {
+    if (!courseId) return;
     onClose();
     navigate(`/courses/${courseId}`);
   }, [courseId, navigate, onClose]);
 
   const handleGoToReview = useCallback(() => {
+    if (!courseId) return;
     onClose();
     const url = reviewId
       ? `/courses/${courseId}?tab=reviews&review=${reviewId}`
