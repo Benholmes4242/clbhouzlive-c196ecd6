@@ -136,10 +136,11 @@ export function UpcomingCountdown({ startDate }: { startDate: string }) {
 }
 
 /** Frosted glass avatar — for use inside dark/photo glass cards */
-function FrostedAvatar({ src, displayName, size }: { src: string | null; displayName: string; size: number }) {
+function FrostedAvatar({ src, fallbackSrc, displayName, size }: { src: string | null; fallbackSrc?: string | null; displayName: string; size: number }) {
   const [currentSrc, setCurrentSrc] = React.useState(src);
   const [imgError, setImgError] = React.useState(false);
   const [loaded, setLoaded] = React.useState(false);
+  const [triedFallback, setTriedFallback] = React.useState(false);
   const initials = displayName.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() || '').slice(0, 2).join('') || '?';
 
   // Reset state when src prop changes
@@ -147,6 +148,7 @@ function FrostedAvatar({ src, displayName, size }: { src: string | null; display
     setCurrentSrc(src);
     setImgError(false);
     setLoaded(false);
+    setTriedFallback(false);
   }, [src]);
 
   const handleLoad = () => {
@@ -155,6 +157,12 @@ function FrostedAvatar({ src, displayName, size }: { src: string | null; display
 
   const handleError = () => {
     if (loaded) return; // Image already loaded successfully — ignore false error
+    // Try PGA R2 fallback before giving up (many non-PGA players have PGA headshots)
+    if (!triedFallback && fallbackSrc) {
+      setTriedFallback(true);
+      setCurrentSrc(fallbackSrc);
+      return;
+    }
     // Image failed — show inline PlayerSilhouette immediately
     setImgError(true);
   };
