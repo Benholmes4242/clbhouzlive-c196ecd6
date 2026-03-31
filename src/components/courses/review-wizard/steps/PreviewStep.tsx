@@ -114,7 +114,7 @@ export function PreviewStep({
           style={{
             top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
             left: 16,
-            background: '#22c55e',
+            background: '#16A34A',
             borderRadius: 99,
             padding: '5px 12px',
           }}
@@ -145,7 +145,7 @@ export function PreviewStep({
         {/* Bottom-left: Headline */}
         <div className="absolute bottom-0 left-0 right-0" style={{ padding: '0 20px 18px' }}>
           <div style={{
-            fontSize: 10, fontWeight: 700, color: '#F7931E',
+            fontSize: 10, fontWeight: 700, color: '#F59E0B',
             letterSpacing: '0.18em', textTransform: 'uppercase' as const,
             marginBottom: 6,
           }}>
@@ -183,8 +183,8 @@ export function PreviewStep({
         ) : (
           <div style={{
             margin: '16px 16px 0',
-            background: 'rgba(247,147,30,0.08)',
-            border: '1px solid rgba(247,147,30,0.18)',
+            background: 'rgba(245,158,11,0.08)',
+            border: '1px solid rgba(245,158,11,0.18)',
             borderRadius: 12,
             padding: '12px 14px',
             display: 'flex',
@@ -355,8 +355,8 @@ export function PreviewStep({
               borderRadius: 16,
               border: 'none',
               background: isSharing
-                ? 'rgba(247,147,30,0.5)'
-                : 'linear-gradient(135deg, #F7931E, #e8820a)',
+                ? 'rgba(245,158,11,0.5)'
+                : 'linear-gradient(135deg, #F59E0B, #d97706)',
               color: '#000',
               fontSize: 15,
               fontWeight: 800,
@@ -365,14 +365,14 @@ export function PreviewStep({
               justifyContent: 'center',
               gap: 8,
               cursor: isSharing ? 'not-allowed' : 'pointer',
-              boxShadow: '0 4px 20px rgba(247,147,30,0.3)',
+              boxShadow: '0 4px 20px rgba(245,158,11,0.3)',
             }}
           >
             {isSharing ? (
               <span style={{ color: '#000' }}>Posting...</span>
             ) : (
               <>
-                <span>📤</span>
+                <span>🏌️</span>
                 <span>Post to Clubhouse Feed</span>
               </>
             )}
