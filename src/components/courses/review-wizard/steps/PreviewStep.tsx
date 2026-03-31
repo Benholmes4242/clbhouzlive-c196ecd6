@@ -76,7 +76,7 @@ export function PreviewStep({
       {/* Hero — 45dvh */}
       <div
         className="relative w-full shrink-0 overflow-hidden"
-        style={{ height: '45dvh', minHeight: 180, maxHeight: 320 }}
+        style={{ height: '50dvh', minHeight: 200, maxHeight: 360 }}
       >
         {/* Shimmer while loading */}
         {!heroLoaded && (
