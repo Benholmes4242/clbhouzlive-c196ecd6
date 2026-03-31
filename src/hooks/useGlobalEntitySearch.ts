@@ -127,6 +127,7 @@ const searchPeople = async (query: string, limit: number = 6): Promise<PersonRes
     username: user.username,
     avatar_url: user.profile_photo_url,
     home_club_name: user.home_club,
+    is_public: user.is_public,
     type: 'user' as const
   }));
 };

@@ -539,6 +539,7 @@ function GlobalSearchOverlay({ isOpen, onClose }: GlobalSearchOverlayProps) {
                                 <div className="flex items-center gap-1 min-w-0">
                                   <p className="text-[14px] font-medium truncate" style={{ color: '#0f172a' }}>{person.display_name}</p>
                                   {person.verified && <BadgeCheck className="w-3.5 h-3.5 text-primary shrink-0" />}
+                                  {person.is_public === false && <Lock className="w-3 h-3 shrink-0" style={{ color: '#94a3b8' }} />}
                                 </div>
                                 <p className="text-[12px] truncate" style={{ color: '#94a3b8' }}>
                                   {person.username && !person.username.includes('@')
