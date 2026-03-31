@@ -39,7 +39,9 @@ export function RateCourseNudge() {
 
   const countLabel = data === 0
     ? "You haven't rated any courses yet"
-    : `You've only rated ${data} course${data === 1 ? '' : 's'} so far`;
+    : data === 1
+    ? "You've rated 1 course — any more to add?"
+    : `You've rated ${data} courses — keep them coming!`;
 
   return (
     <div
