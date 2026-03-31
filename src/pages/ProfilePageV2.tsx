@@ -1149,6 +1149,8 @@ const ProfilePageV2Content: React.FC = () => {
         <div className={cn("pt-3.5", activeSection === 'activity' ? 'px-0' : activeSection === 'courses' ? 'px-2.5' : 'px-5')}>
           {getCurrentContent()}
         </div>
+        </>
+        )}
       </div>
 
       {/* Bottom Navigation Spacer */}
