@@ -35,6 +35,7 @@ import { safeGoBack } from '@/utils/navigation';
 import { uploadToR2Only } from '@/utils/r2OnlyUpload';
 import { FavouritesCarousel } from '@/components/profile/courses/FavouritesCarousel';
 import { AddCourseModal } from '@/components/profile/courses/AddCourseModal';
+import { PrivateProfileGate } from '@/components/profile/PrivateProfileGate';
 
 
 import { useProfileAchievements } from '@/hooks/useProfileAchievements';
@@ -164,6 +165,12 @@ const ProfilePageV2Content: React.FC = () => {
     declineRequest,
     unfriend,
   } = useFriendship(isSelf ? undefined : profileUserId);
+
+  // Private profile gate: hide content for non-friends viewing a private profile
+  const isPrivateAndLocked =
+    !isSelf &&
+    profile?.is_public === false &&
+    friendshipStatus !== 'friends';
   
   // Initialize follow state
   useEffect(() => {
@@ -960,6 +967,15 @@ const ProfilePageV2Content: React.FC = () => {
       {/* White content sheet */}
       {/* relative z-10 ensures white sheet and all content is above hero overlay */}
       <div className="pt-4 pb-32 min-h-[60vh] relative z-10 pointer-events-auto">
+        {isPrivateAndLocked ? (
+          <PrivateProfileGate
+            friendshipStatus={friendshipStatus}
+            onSendRequest={sendRequest}
+            onCancelRequest={cancelRequest}
+            isUpdating={friendshipUpdating}
+          />
+        ) : (
+        <>
         {/* About section - removed "About" heading, just the bio text */}
         {/* mb-5 → mb-4 (16px from about text to clubs divider) */}
         {/* Fix 1: Bio section — contextual handling */}
@@ -1133,6 +1149,8 @@ const ProfilePageV2Content: React.FC = () => {
         <div className={cn("pt-3.5", activeSection === 'activity' ? 'px-0' : activeSection === 'courses' ? 'px-2.5' : 'px-5')}>
           {getCurrentContent()}
         </div>
+        </>
+        )}
       </div>
 
       {/* Bottom Navigation Spacer */}

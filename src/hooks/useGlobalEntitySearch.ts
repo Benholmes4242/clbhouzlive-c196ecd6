@@ -12,6 +12,7 @@ export interface PersonResult {
   avatar_url: string | null;
   verified?: boolean;
   home_club_name?: string | null;
+  is_public?: boolean | null;
   type: 'user';
 }
 
@@ -112,7 +113,6 @@ const searchPeople = async (query: string, limit: number = 6): Promise<PersonRes
       is_public
     `)
     .or(`display_name.ilike.%${query}%,username.ilike.%${query}%`)
-    .eq('is_public', true)
     .order('display_name')
     .limit(Math.min(limit, 8)); // Performance: cap each section at 8 items
 
@@ -127,6 +127,7 @@ const searchPeople = async (query: string, limit: number = 6): Promise<PersonRes
     username: user.username,
     avatar_url: user.profile_photo_url,
     home_club_name: user.home_club,
+    is_public: user.is_public,
     type: 'user' as const
   }));
 };
