@@ -556,6 +556,14 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
     return () => clearTimeout(timer);
   }, []);
 
+  // Re-focus textarea after media is added (file input steals focus)
+  useEffect(() => {
+    if (state.mediaItems.length > 0) {
+      const timer = setTimeout(() => textareaRef.current?.focus(), 150);
+      return () => clearTimeout(timer);
+    }
+  }, [state.mediaItems.length]);
+
   const charCount = useMemo(() => {
     try {
       const S = (Intl as Record<string, unknown>).Segmenter as
