@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
         from: 'Clbhouz <notifications@clbhouz.co.uk>',
         to: ['support@clbhouz.co.uk'],
         subject: '🏌️ New Waitlist Signup',
-        html: `<h2>New beta waitlist signup:</h2><p><strong>${email}</strong></p><p>Added: ${new Date().toISOString()}</p>`,
+        html: `<p>New beta waitlist signup:</p><p><strong>${safeEmail}</strong></p><p>Added: ${new Date().toISOString()}</p>`,
       }),
     });
 
