@@ -31,6 +31,7 @@ import { ExpandedLeaderboardList, ExpandedLeaderboardSkeleton, ExpandedLeaderboa
 import { PlayerScorecardCard } from '@/components/tourhub/PlayerScorecardCard';
 
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
+import livUpcomingHero from '@/assets/liv-upcoming-hero.webp';
 import { getTourLogo } from '../../utils/tourLogos';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
@@ -490,8 +491,10 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     prevLeadersRef.current = leaders;
   }, [leaders, tournament.id]);
 
-  const backgroundImage = venueImage?.imageUrl || getFallbackCourseImage(tournament.name);
-  const hasRealImage = !!venueImage?.imageUrl;
+  // LIV upcoming uses a dedicated hero image
+  const livOverride = isUpcoming && tournament.tourSlug === 'liv' ? livUpcomingHero : null;
+  const backgroundImage = livOverride || venueImage?.imageUrl || getFallbackCourseImage(tournament.name);
+  const hasRealImage = !!livOverride || !!venueImage?.imageUrl;
 
    // Tour-branded gradients for venues without images
   const tourFallbacks: Record<string, string> = {
