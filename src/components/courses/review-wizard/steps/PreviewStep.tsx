@@ -372,7 +372,7 @@ export function PreviewStep({
               <span style={{ color: '#000' }}>Posting...</span>
             ) : (
               <>
-                <span>🏌️</span>
+                <span>⛳</span>
                 <span>Post to Clubhouse Feed</span>
               </>
             )}
