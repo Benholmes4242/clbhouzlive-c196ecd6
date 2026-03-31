@@ -164,6 +164,12 @@ const ProfilePageV2Content: React.FC = () => {
     declineRequest,
     unfriend,
   } = useFriendship(isSelf ? undefined : profileUserId);
+
+  // Private profile gate: hide content for non-friends viewing a private profile
+  const isPrivateAndLocked =
+    !isSelf &&
+    profile?.is_public === false &&
+    friendshipStatus !== 'friends';
   
   // Initialize follow state
   useEffect(() => {
