@@ -365,7 +365,7 @@ export function PreviewStep({
               justifyContent: 'center',
               gap: 8,
               cursor: isSharing ? 'not-allowed' : 'pointer',
-              boxShadow: '0 4px 20px rgba(247,147,30,0.3)',
+              boxShadow: '0 4px 20px rgba(245,158,11,0.3)',
             }}
           >
             {isSharing ? (
