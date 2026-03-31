@@ -10,6 +10,7 @@ interface ReviewMedia {
   media_type: string;
   poster_url: string | null;
   stream_id: string | null;
+  is_cover?: boolean;
 }
 
 interface ShareReviewParams {
