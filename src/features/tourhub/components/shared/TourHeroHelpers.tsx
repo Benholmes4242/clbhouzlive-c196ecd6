@@ -201,7 +201,9 @@ export function PlayerAvatar({
 }) {
   // PRIMARY: R2 headshot by full name + tour. FALLBACK: silhouette.
   const nameForLookup = fullName || displayName;
-  const resolved = getPlayerHeadshotUrl(nameForLookup, tourCode || 'pga', headshotOverride) || PLAYER_SILHOUETTE_URL;
+  // Use photoUrl directly if provided (Sportradar CDN) — covers non-PGA tours
+  // where R2 headshots may not exist. Fall back to R2 lookup, then silhouette.
+  const resolved = photoUrl || getPlayerHeadshotUrl(nameForLookup, tourCode || 'pga', headshotOverride) || PLAYER_SILHOUETTE_URL;
   const initials = displayName
     .split(/[\s.]/)
     .filter(Boolean)
