@@ -961,9 +961,9 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             onSelect={setActiveMedia}
             onRemove={removeMedia}
             onEdit={handleEdit}
-            onSetCover={(index) => { setCoverIndex(index); setActiveMedia(index); }}
-            onOverflow={() => setOverflowSheetOpen(true)}
-            onAddMore={() => fileInputRef.current?.click()}
+            onSetCover={handleSetCover}
+            onOverflow={handleOverflow}
+            onAddMore={handleAddMore}
           />
         )}
 
