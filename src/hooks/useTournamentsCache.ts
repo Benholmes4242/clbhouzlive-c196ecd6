@@ -37,6 +37,7 @@ export interface CachedTournament {
   venue_yardage: number | null;
   winner_id: string | null;
   defending_champion: string | null;
+  champion_narrative: string | null;
   season_id: string | null;
   season: {
     id: string;
