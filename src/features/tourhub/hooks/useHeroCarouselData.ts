@@ -297,6 +297,10 @@ export function useHeroCarouselData() {
       const cappedCompleted = completedSlides.slice(0, 4);
       const cappedUpcoming = upcomingSlides.slice(0, 3);
 
+      console.log('[HeroCarousel] completedSlides before cap:', completedSlides.map(s => s.tournament.name + ' / ' + s.tournament.tourSlug));
+      console.log('[HeroCarousel] cappedCompleted:', cappedCompleted.map(s => s.tournament.name + ' / ' + s.tournament.tourSlug));
+      console.log('[HeroCarousel] cappedUpcoming:', cappedUpcoming.map(s => s.tournament.name + ' / ' + s.tournament.tourSlug));
+
       return [...cappedLive, ...cappedCompleted, ...cappedUpcoming];
     },
     enabled: !!cache,
