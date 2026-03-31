@@ -249,13 +249,6 @@ export function useHeroCarouselData() {
         if (upcomingByTour[tournament.tourSlug]) upcomingByTour[tournament.tourSlug].push(tournament);
       });
 
-      // TEMP DEBUG — remove after LIV fix confirmed
-      console.log('[HeroCarousel] completedTournaments count:', completedTournaments.length);
-      console.log('[HeroCarousel] LIV completed:', completedTournaments.filter(t => t.season?.tour_name?.toLowerCase() === 'liv'));
-      console.log('[HeroCarousel] LIV upcoming:', upcomingTournaments.filter(t => t.season?.tour_name?.toLowerCase() === 'liv'));
-      console.log('[HeroCarousel] completedByTour.liv:', completedByTour['liv']);
-      console.log('[HeroCarousel] upcomingByTour.liv:', upcomingByTour['liv']);
-      console.log('[HeroCarousel] all season tour_names:', [...completedTournaments, ...upcomingTournaments].map(t => t.season?.tour_name));
 
       // Build slides per tour based on priority logic
       const liveSlides: HeroSlide[] = [];
