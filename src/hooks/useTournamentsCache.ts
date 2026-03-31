@@ -17,7 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 const CACHE_SELECT = `
   id, name, status, start_date, end_date, purse, currency,
   venue_id, venue_name, venue_city, venue_country, venue_par, venue_yardage,
-  winner_id, defending_champion, season_id,
+  winner_id, defending_champion, champion_narrative, season_id,
   season:sr_seasons!inner(id, tour_id, tour_name, year)
 `;
 
@@ -37,6 +37,7 @@ export interface CachedTournament {
   venue_yardage: number | null;
   winner_id: string | null;
   defending_champion: string | null;
+  champion_narrative: string | null;
   season_id: string | null;
   season: {
     id: string;
