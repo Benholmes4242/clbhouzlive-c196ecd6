@@ -114,7 +114,7 @@ export function PreviewStep({
           style={{
             top: 'calc(max(env(safe-area-inset-top, 0px), 47px) + 12px)',
             left: 16,
-            background: '#22c55e',
+            background: '#16A34A',
             borderRadius: 99,
             padding: '5px 12px',
           }}
