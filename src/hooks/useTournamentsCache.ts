@@ -84,7 +84,7 @@ async function fetchTournamentsCache(): Promise<TournamentsCache> {
       .gt('start_date', today)
       .order('start_date', { ascending: true })
       .order('purse', { ascending: false })
-      .limit(30),
+      .limit(100),
   ]);
 
   if (liveRes.error) throw liveRes.error;
