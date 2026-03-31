@@ -1168,7 +1168,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                       }}
                     >
                       {/* Avatar */}
-                      <PlayerAvatar displayName={tournament.defendingChampion} tourCode={tournament.tourSlug} size={40} frosted />
+                      <PlayerAvatar displayName={tournament.defendingChampion} photoUrl={tournament.defendingChampionPhotoUrl} tourCode={tournament.tourSlug} size={40} frosted />
                       {/* Text */}
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'rgba(250,204,21,0.65)', display: 'block' }}>
