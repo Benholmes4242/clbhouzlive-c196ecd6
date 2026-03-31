@@ -40,6 +40,7 @@ export interface HeroTournament {
   defendingChampion: string | null;
   defendingChampionPhotoUrl: string | null;
   defendingChampionPgaTourId: string | null;
+  championNarrative: string | null;
   isMajor: boolean;
   isSignature: boolean;
   // Winner info (for completed)
