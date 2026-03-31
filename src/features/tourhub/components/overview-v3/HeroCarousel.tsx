@@ -501,6 +501,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     : tournament.venueName?.toLowerCase().includes('tpc san antonio') ? tpcSanAntonioUpcoming
     : tournament.venueName?.toLowerCase().includes('shadow creek') ? shadowCreekUpcoming
     : tournament.venueName?.toLowerCase().includes('lakewood national') ? lakewoodNationalUpcoming
+    : tournament.name?.toLowerCase().includes('volvo china open') ? volvoChinaOpenUpcoming
     : null
   ) : null;
   const backgroundImage = venueOverride || venueImage?.imageUrl || getFallbackCourseImage(tournament.name);
