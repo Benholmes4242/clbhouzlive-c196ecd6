@@ -71,7 +71,7 @@ export function PreviewStep({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex-1 flex flex-col min-h-0 bg-black"
+      className="flex-1 flex flex-col min-h-[100dvh] bg-black"
     >
       {/* Hero — 45dvh */}
       <div
