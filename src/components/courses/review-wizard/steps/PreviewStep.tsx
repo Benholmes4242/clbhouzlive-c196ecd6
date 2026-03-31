@@ -341,6 +341,7 @@ export function PreviewStep({
           display: 'flex',
           flexDirection: 'column',
           gap: 10,
+          marginTop: 'auto',
         }}>
           {/* Primary CTA */}
           <button
