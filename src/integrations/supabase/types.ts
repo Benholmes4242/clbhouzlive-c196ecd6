@@ -9684,6 +9684,7 @@ export type Database = {
       }
       sr_tournaments: {
         Row: {
+          champion_narrative: string | null
           course_timezone: string | null
           coverage: string | null
           created_at: string
@@ -9727,6 +9728,7 @@ export type Database = {
           winning_share: number | null
         }
         Insert: {
+          champion_narrative?: string | null
           course_timezone?: string | null
           coverage?: string | null
           created_at?: string
@@ -9770,6 +9772,7 @@ export type Database = {
           winning_share?: number | null
         }
         Update: {
+          champion_narrative?: string | null
           course_timezone?: string | null
           coverage?: string | null
           created_at?: string
