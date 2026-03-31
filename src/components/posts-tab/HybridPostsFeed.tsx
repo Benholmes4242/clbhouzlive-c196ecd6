@@ -166,7 +166,7 @@ export const HybridPostsFeed: React.FC<HybridPostsFeedProps> = ({
         <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
           <Film className="w-5 h-5 text-muted-foreground" />
         </div>
-        <p className="text-sm font-medium text-foreground">No posts yet</p>
+        <p className="text-sm font-medium text-foreground">No posts match this filter</p>
         {isOwnProfile && (
           <p className="text-xs text-muted-foreground">Share your first moment on the course</p>
         )}

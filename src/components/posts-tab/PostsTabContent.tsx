@@ -1,9 +1,22 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfilePosts } from './hooks/useProfilePosts';
+import { ContentFilterPills, FilterOption } from '@/components/common/ContentFilterPills';
 
 import { HybridPostsFeed } from './HybridPostsFeed';
 import { PostsAutoplay } from './PostsAutoplay';
+
+type PostsFilter = 'all' | 'videos' | 'shorts' | 'images' | 'reviews';
+
+const LONGFORM_THRESHOLD = 180; // 3 min — matches classifyPost in HybridPostsFeed
+
+const filterOptions: FilterOption[] = [
+  { key: 'all', label: 'All' },
+  { key: 'videos', label: 'Videos' },
+  { key: 'shorts', label: 'Shorts' },
+  { key: 'images', label: 'Images' },
+  { key: 'reviews', label: 'Reviews' },
+];
 
 interface PostsTabContentProps {
   actorType: 'personal' | 'business';
@@ -22,6 +35,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
 }) => {
   const { user } = useSupabaseSession();
   const gridRef = React.useRef<HTMLDivElement>(null);
+  const [activeFilter, setActiveFilter] = useState<PostsFilter>('all');
 
   const {
     posts,
@@ -38,11 +52,38 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
     actorId,
   });
 
+  const filteredPosts = useMemo(() => {
+    if (activeFilter === 'all') return posts;
+    return posts.filter(post => {
+      const firstMedia = post.mediaItems?.[0];
+      switch (activeFilter) {
+        case 'reviews':
+          return post.isReview && !!post.review;
+        case 'videos':
+          return firstMedia?.type === 'video' && (firstMedia?.duration ?? 0) > LONGFORM_THRESHOLD;
+        case 'shorts':
+          return firstMedia?.type === 'video' && (firstMedia?.duration ?? 0) > 0 && (firstMedia?.duration ?? 0) <= LONGFORM_THRESHOLD;
+        case 'images':
+          return firstMedia?.type === 'image';
+        default:
+          return true;
+      }
+    });
+  }, [posts, activeFilter]);
+
   return (
     <div className="flex flex-col min-h-0">
-      
+      {/* Filter pills */}
+      <div className="px-4 pt-3 pb-1">
+        <ContentFilterPills
+          filters={filterOptions}
+          activeFilter={activeFilter}
+          onFilterChange={(f) => setActiveFilter(f as PostsFilter)}
+        />
+      </div>
+
       <HybridPostsFeed
-        posts={posts}
+        posts={filteredPosts}
         userId={user?.id}
         isLoading={isLoading}
         isError={isError}
@@ -54,7 +95,7 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
         actorName={actorName}
         gridRef={gridRef}
       />
-      <PostsAutoplay posts={posts} gridRef={gridRef} />
+      <PostsAutoplay posts={filteredPosts} gridRef={gridRef} />
     </div>
   );
 };
