@@ -497,6 +497,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
   const upcomingOverride = isUpcoming ? (
     tournament.tourSlug === 'liv' ? livUpcomingHero
     : tournament.venueName?.toLowerCase().includes('tpc san antonio') ? tpcSanAntonioUpcoming
+    : tournament.venueName?.toLowerCase().includes('shadow creek') ? shadowCreekUpcoming
     : null
   ) : null;
   const backgroundImage = upcomingOverride || venueImage?.imageUrl || getFallbackCourseImage(tournament.name);
