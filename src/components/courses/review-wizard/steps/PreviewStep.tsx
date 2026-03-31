@@ -71,12 +71,12 @@ export function PreviewStep({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex-1 flex flex-col min-h-0 bg-black"
+      className="flex-1 flex flex-col min-h-[100dvh] bg-black"
     >
       {/* Hero — 45dvh */}
       <div
         className="relative w-full shrink-0 overflow-hidden"
-        style={{ height: '45dvh', minHeight: 180, maxHeight: 320 }}
+        style={{ height: '50dvh', minHeight: 200, maxHeight: 360 }}
       >
         {/* Shimmer while loading */}
         {!heroLoaded && (
@@ -171,6 +171,8 @@ export function PreviewStep({
           maxWidth: 480,
           margin: '0 auto',
           width: '100%',
+          display: 'flex',
+          flexDirection: 'column' as const,
         }}
       >
         {/* SECTION 2 — Amber explanation strip */}
@@ -339,6 +341,7 @@ export function PreviewStep({
           display: 'flex',
           flexDirection: 'column',
           gap: 10,
+          marginTop: 'auto',
         }}>
           {/* Primary CTA */}
           <button
