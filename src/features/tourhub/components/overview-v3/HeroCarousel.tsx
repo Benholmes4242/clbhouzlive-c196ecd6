@@ -1207,7 +1207,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           {tournament.defendingChampion}
                         </span>
                         <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', display: 'block', marginTop: 1 }}>
-                          Can they go back-to-back?
+                          {getDefendingChampionSubtext(tournament)}
                         </span>
                       </div>
                     </motion.div>
