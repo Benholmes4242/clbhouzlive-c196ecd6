@@ -1,6 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfilePosts } from './hooks/useProfilePosts';
+import { ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 import { HybridPostsFeed } from './HybridPostsFeed';
 import { PostsAutoplay } from './PostsAutoplay';
@@ -8,6 +16,14 @@ import { PostsAutoplay } from './PostsAutoplay';
 type PostsFilter = 'all' | 'videos' | 'shorts' | 'images' | 'reviews';
 
 const LONGFORM_THRESHOLD = 180; // 3 min — matches classifyPost in HybridPostsFeed
+
+const FILTER_OPTIONS: { value: PostsFilter; label: string }[] = [
+  { value: 'all', label: 'All Posts' },
+  { value: 'videos', label: 'Videos' },
+  { value: 'shorts', label: 'Shorts' },
+  { value: 'images', label: 'Images' },
+  { value: 'reviews', label: 'Reviews' },
+];
 
 interface PostsTabContentProps {
   actorType: 'personal' | 'business';
@@ -43,6 +59,8 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
     actorId,
   });
 
+  const currentFilterLabel = FILTER_OPTIONS.find(o => o.value === activeFilter)?.label || 'All Posts';
+
   const filteredPosts = useMemo(() => {
     if (activeFilter === 'all') return posts;
     return posts.filter(post => {
@@ -64,29 +82,31 @@ const PostsTabContent: React.FC<PostsTabContentProps> = ({
 
   return (
     <div className="flex flex-col min-h-0">
-      {/* Filter dropdown — only show if there are posts */}
+      {/* Filter dropdown — right-aligned, matching courses tab sort dropdown */}
       {posts.length > 0 && (
-        <div className="px-4 pt-3 pb-1">
-          <div className="relative w-fit">
-            <select
-              value={activeFilter}
-              onChange={(e) => setActiveFilter(e.target.value as PostsFilter)}
-              className="appearance-none h-9 pl-3 pr-8 text-sm font-semibold rounded-xl border border-border bg-background text-foreground cursor-pointer focus:outline-none"
-              style={{ backgroundImage: 'none' }}
-            >
-              <option value="all">All Posts</option>
-              <option value="videos">Videos</option>
-              <option value="shorts">Shorts</option>
-              <option value="images">Images</option>
-              <option value="reviews">Reviews</option>
-            </select>
-            {/* Chevron icon */}
-            <div className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M6 9l6 6 6-6" />
-              </svg>
-            </div>
-          </div>
+        <div className="flex justify-end px-4 pt-3 pb-1">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1.5 text-sm font-medium text-foreground min-h-[36px] whitespace-nowrap shrink-0">
+                {currentFilterLabel}
+                <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[180px]">
+              {FILTER_OPTIONS.map((opt) => (
+                <DropdownMenuItem
+                  key={opt.value}
+                  onClick={() => setActiveFilter(opt.value)}
+                  className={cn(
+                    "text-sm",
+                    activeFilter === opt.value && "font-semibold"
+                  )}
+                >
+                  {opt.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       )}
 
