@@ -967,6 +967,15 @@ const ProfilePageV2Content: React.FC = () => {
       {/* White content sheet */}
       {/* relative z-10 ensures white sheet and all content is above hero overlay */}
       <div className="pt-4 pb-32 min-h-[60vh] relative z-10 pointer-events-auto">
+        {isPrivateAndLocked ? (
+          <PrivateProfileGate
+            friendshipStatus={friendshipStatus}
+            onSendRequest={sendRequest}
+            onCancelRequest={cancelRequest}
+            isUpdating={friendshipUpdating}
+          />
+        ) : (
+        <>
         {/* About section - removed "About" heading, just the bio text */}
         {/* mb-5 → mb-4 (16px from about text to clubs divider) */}
         {/* Fix 1: Bio section — contextual handling */}
