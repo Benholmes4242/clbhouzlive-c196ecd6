@@ -355,8 +355,8 @@ export function PreviewStep({
               borderRadius: 16,
               border: 'none',
               background: isSharing
-                ? 'rgba(247,147,30,0.5)'
-                : 'linear-gradient(135deg, #F7931E, #e8820a)',
+                ? 'rgba(245,158,11,0.5)'
+                : 'linear-gradient(135deg, #F59E0B, #d97706)',
               color: '#000',
               fontSize: 15,
               fontWeight: 800,
