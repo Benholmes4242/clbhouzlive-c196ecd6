@@ -77,7 +77,7 @@ export const InviteClubModal: React.FC<InviteClubModalProps> = ({
             Invite your club
           </DialogTitle>
           <DialogDescription>
-            Help <span className="font-medium text-foreground">{clubName}</span> get set up on clbhouz.
+            Help <span className="font-medium text-foreground">{clubName}</span> get set up on Clbhouz.
           </DialogDescription>
         </DialogHeader>
 
