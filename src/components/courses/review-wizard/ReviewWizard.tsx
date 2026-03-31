@@ -213,9 +213,9 @@ export function ReviewWizard({
     
     const { data: dbMedia, error: mediaError } = await supabase
       .from('course_review_media')
-      .select('id, media_url, media_type, poster_url, stream_id')
+      .select('id, media_url, media_type, poster_url, stream_id, is_cover')
       .eq('review_id', wizard.submittedRatingId)
-      .eq('status', 'attached')
+      .in('status', ['attached', 'ready'])
       .order('created_at', { ascending: true });
     
     if (mediaError) {
@@ -228,6 +228,7 @@ export function ReviewWizard({
       media_type: m.media_type,
       poster_url: m.poster_url,
       stream_id: m.stream_id,
+      is_cover: m.is_cover ?? false,
     }));
     
     const result = await shareReview({

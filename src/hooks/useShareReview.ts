@@ -10,6 +10,7 @@ interface ReviewMedia {
   media_type: string;
   poster_url: string | null;
   stream_id: string | null;
+  is_cover?: boolean;
 }
 
 interface ShareReviewParams {
@@ -87,17 +88,15 @@ export function useShareReview() {
 
       // 4) Copy media from course_review_media to post_media
       if (media.length > 0) {
-        // Sort: video-first for cover, then by original order
-        const sorted = [...media];
-        const videoIndex = sorted.findIndex(m => m.media_type === 'video');
-        
+        // Sort: cover photo first, then preserve original order
+        const coverIndex = media.findIndex(m => m.is_cover === true);
         let ordered: ReviewMedia[];
-        if (videoIndex > 0) {
-          // Move first video to front
-          const video = sorted[videoIndex];
-          ordered = [video, ...sorted.filter((_, i) => i !== videoIndex)];
+        if (coverIndex > 0) {
+          // Move the cover to display_order: 0
+          const cover = media[coverIndex];
+          ordered = [cover, ...media.filter((_, i) => i !== coverIndex)];
         } else {
-          ordered = sorted;
+          ordered = [...media];
         }
 
         // Insert into post_media with display_order

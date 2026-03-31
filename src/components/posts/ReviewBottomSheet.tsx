@@ -42,11 +42,13 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
   const navigate = useNavigate();
 
   const handleVisitCourse = useCallback(() => {
+    if (!courseId) return;
     onClose();
     navigate(`/courses/${courseId}`);
   }, [courseId, navigate, onClose]);
 
   const handleGoToReview = useCallback(() => {
+    if (!courseId) return;
     onClose();
     const url = reviewId
       ? `/courses/${courseId}?tab=reviews&review=${reviewId}`
@@ -306,6 +308,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               borderTop: '1px solid rgba(245,158,11,0.1)',
               flexShrink: 0,
             }}>
+            {courseId && (
+              <>
               <button
                 onClick={handleVisitCourse}
                 style={{
@@ -339,6 +343,8 @@ export const ReviewBottomSheet: React.FC<ReviewBottomSheetProps> = ({
               >
                 Go to Review
               </button>
+              </>
+            )}
             </div>
           </motion.div>
         </>
