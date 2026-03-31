@@ -36,12 +36,30 @@ export function useLikeMutation() {
       console.error('[Like] Mutation failed:', error);
     },
     onSettled: () => {
+      // Existing invalidations
       queryClient.invalidateQueries({ queryKey: ['user-post-likes'] });
-      // Mark feed caches as stale so isLikedByMe refreshes on next access
-      // (e.g. tab switch). refetchType 'none' avoids immediate refetch which
-      // would break scroll position via seen-post-IDs exclusion.
       queryClient.invalidateQueries({
         queryKey: ['media-feed'],
+        refetchType: 'none',
+      });
+
+      // Mark discover/explore/profile grid caches as stale so like counts
+      // refresh on next view. refetchType 'none' avoids immediate refetch
+      // — prevents re-fetching large grid queries / breaking scroll position.
+      queryClient.invalidateQueries({
+        queryKey: ['profile-posts'],
+        refetchType: 'none',
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['explore-posts'],
+        refetchType: 'none',
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['real-posts'],
+        refetchType: 'none',
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['actor-posts'],
         refetchType: 'none',
       });
     },
