@@ -91,7 +91,7 @@ export function UpcomingCountdown({ startDate }: { startDate: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, margin: '8px 0' }}>
       {cells.map((cell, i) => (
-        <React.Fragment key={cell.label}>
+        <div key={cell.label} style={{ display: 'contents' }}>
           {/* Cell */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 44, padding: '8px 4px' }}>
             <span style={{
