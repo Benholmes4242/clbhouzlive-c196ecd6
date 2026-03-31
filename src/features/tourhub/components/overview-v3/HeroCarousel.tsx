@@ -491,8 +491,10 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
     prevLeadersRef.current = leaders;
   }, [leaders, tournament.id]);
 
-  const backgroundImage = venueImage?.imageUrl || getFallbackCourseImage(tournament.name);
-  const hasRealImage = !!venueImage?.imageUrl;
+  // LIV upcoming uses a dedicated hero image
+  const livOverride = isUpcoming && tournament.tourSlug === 'liv' ? livUpcomingHero : null;
+  const backgroundImage = livOverride || venueImage?.imageUrl || getFallbackCourseImage(tournament.name);
+  const hasRealImage = !!livOverride || !!venueImage?.imageUrl;
 
    // Tour-branded gradients for venues without images
   const tourFallbacks: Record<string, string> = {
