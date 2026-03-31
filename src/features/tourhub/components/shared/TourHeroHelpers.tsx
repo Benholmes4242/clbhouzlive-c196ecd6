@@ -136,10 +136,11 @@ export function UpcomingCountdown({ startDate }: { startDate: string }) {
 }
 
 /** Frosted glass avatar — for use inside dark/photo glass cards */
-function FrostedAvatar({ src, displayName, size }: { src: string | null; displayName: string; size: number }) {
+function FrostedAvatar({ src, fallbackSrc, displayName, size }: { src: string | null; fallbackSrc?: string | null; displayName: string; size: number }) {
   const [currentSrc, setCurrentSrc] = React.useState(src);
   const [imgError, setImgError] = React.useState(false);
   const [loaded, setLoaded] = React.useState(false);
+  const [triedFallback, setTriedFallback] = React.useState(false);
   const initials = displayName.split(/[\s.]/).filter(Boolean).map(w => w[0]?.toUpperCase() || '').slice(0, 2).join('') || '?';
 
   // Reset state when src prop changes
@@ -147,6 +148,7 @@ function FrostedAvatar({ src, displayName, size }: { src: string | null; display
     setCurrentSrc(src);
     setImgError(false);
     setLoaded(false);
+    setTriedFallback(false);
   }, [src]);
 
   const handleLoad = () => {
@@ -155,6 +157,12 @@ function FrostedAvatar({ src, displayName, size }: { src: string | null; display
 
   const handleError = () => {
     if (loaded) return; // Image already loaded successfully — ignore false error
+    // Try PGA R2 fallback before giving up (many non-PGA players have PGA headshots)
+    if (!triedFallback && fallbackSrc) {
+      setTriedFallback(true);
+      setCurrentSrc(fallbackSrc);
+      return;
+    }
     // Image failed — show inline PlayerSilhouette immediately
     setImgError(true);
   };
@@ -202,8 +210,11 @@ export function PlayerAvatar({
   // PRIMARY: R2 headshot by full name + tour. FALLBACK: silhouette.
   const nameForLookup = fullName || displayName;
   // Use photoUrl directly if provided (Sportradar CDN) — covers non-PGA tours
-  // where R2 headshots may not exist. Fall back to R2 lookup, then silhouette.
-  const resolved = photoUrl || getPlayerHeadshotUrl(nameForLookup, tourCode || 'pga', headshotOverride) || PLAYER_SILHOUETTE_URL;
+  // where R2 headshots may not exist. Fall back to R2 lookup by tour, then PGA folder, then silhouette.
+  const tourR2 = getPlayerHeadshotUrl(nameForLookup, tourCode || 'pga', headshotOverride);
+  // For non-PGA tours, also build a PGA fallback URL (many players have PGA headshots)
+  const pgaFallbackR2 = tourCode && tourCode !== 'pga' ? getPlayerHeadshotUrl(nameForLookup, 'pga', headshotOverride) : null;
+  const resolved = photoUrl || tourR2 || PLAYER_SILHOUETTE_URL;
   const initials = displayName
     .split(/[\s.]/)
     .filter(Boolean)
@@ -212,7 +223,7 @@ export function PlayerAvatar({
     .join('') || '?';
 
   if (frosted) {
-    return <FrostedAvatar src={resolved} displayName={displayName} size={size} />;
+    return <FrostedAvatar src={resolved} fallbackSrc={pgaFallbackR2} displayName={displayName} size={size} />;
   }
 
   return (
