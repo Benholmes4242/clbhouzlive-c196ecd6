@@ -112,7 +112,6 @@ const searchPeople = async (query: string, limit: number = 6): Promise<PersonRes
       is_public
     `)
     .or(`display_name.ilike.%${query}%,username.ilike.%${query}%`)
-    .eq('is_public', true)
     .order('display_name')
     .limit(Math.min(limit, 8)); // Performance: cap each section at 8 items
 
