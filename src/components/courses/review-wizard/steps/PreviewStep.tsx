@@ -171,6 +171,8 @@ export function PreviewStep({
           maxWidth: 480,
           margin: '0 auto',
           width: '100%',
+          display: 'flex',
+          flexDirection: 'column' as const,
         }}
       >
         {/* SECTION 2 — Amber explanation strip */}
