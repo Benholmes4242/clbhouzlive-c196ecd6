@@ -129,7 +129,7 @@ export function UpcomingCountdown({ startDate }: { startDate: string }) {
               }} />
             </div>
           )}
-        </React.Fragment>
+        </div>
       ))}
     </div>
   );
