@@ -86,7 +86,7 @@ export function LeaderboardRow({
       {/* Name & Info */}
       <div className="flex-1 min-w-0 text-left">
         {/* Line 1: Name — 16px semibold */}
-        <span className="text-base font-semibold truncate block">
+        <span className="text-base font-semibold truncate block text-foreground">
           {displayName}
         </span>
         
