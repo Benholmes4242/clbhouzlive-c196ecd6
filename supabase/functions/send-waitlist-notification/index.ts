@@ -10,6 +10,7 @@ Deno.serve(async (req) => {
 
   try {
     const { email } = await req.json();
+    const safeEmail = (email || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     if (!email) {
       return new Response(JSON.stringify({ error: 'Missing email' }), {
         status: 400,
@@ -37,7 +38,7 @@ Deno.serve(async (req) => {
         from: 'Clbhouz <notifications@clbhouz.co.uk>',
         to: ['support@clbhouz.co.uk'],
         subject: '🏌️ New Waitlist Signup',
-        html: `<h2>New beta waitlist signup:</h2><p><strong>${email}</strong></p><p>Added: ${new Date().toISOString()}</p>`,
+        html: `<p>New beta waitlist signup:</p><p><strong>${safeEmail}</strong></p><p>Added: ${new Date().toISOString()}</p>`,
       }),
     });
 
