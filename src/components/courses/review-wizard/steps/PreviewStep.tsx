@@ -145,7 +145,7 @@ export function PreviewStep({
         {/* Bottom-left: Headline */}
         <div className="absolute bottom-0 left-0 right-0" style={{ padding: '0 20px 18px' }}>
           <div style={{
-            fontSize: 10, fontWeight: 700, color: '#F7931E',
+            fontSize: 10, fontWeight: 700, color: '#F59E0B',
             letterSpacing: '0.18em', textTransform: 'uppercase' as const,
             marginBottom: 6,
           }}>
