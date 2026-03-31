@@ -32,6 +32,7 @@ import { PlayerScorecardCard } from '@/components/tourhub/PlayerScorecardCard';
 
 import { useVenueImage, getFallbackCourseImage } from '../../hooks/useVenueImage';
 import livUpcomingHero from '@/assets/liv-upcoming-hero.webp';
+import tpcSanAntonioUpcoming from '@/assets/tpc-san-antonio-upcoming.webp';
 import { getTourLogo } from '../../utils/tourLogos';
 import { getPlayerHeadshotUrl } from '@/utils/playerHeadshot';
 import { PlayerSilhouette } from '@/components/ui/PlayerSilhouette';
