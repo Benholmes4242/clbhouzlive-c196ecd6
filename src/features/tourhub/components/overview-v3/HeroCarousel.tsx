@@ -369,6 +369,33 @@ interface HeroSlideProps {
   onCardTouchEnd: (e: React.TouchEvent) => void;
 }
 
+function getDefendingChampionSubtext(tournament: {
+  isMajor: boolean;
+  isSignature: boolean;
+  tourSlug: string;
+  venueName: string | null;
+  venueCity: string | null;
+  venueCountry: string | null;
+  purse: number | null;
+}): string {
+  const { isMajor, isSignature, tourSlug, venueName, venueCity, venueCountry, purse } = tournament;
+  if (isMajor && venueName) return `Last won here at ${venueName}`;
+  if (isSignature && purse) {
+    const purseM = (purse / 1_000_000).toFixed(0);
+    return `Defending a $${purseM}M signature event`;
+  }
+  if (venueCity) return `Last claimed the title in ${venueCity}`;
+  if (venueCountry) return `Last won here in ${venueCountry}`;
+  const tourFallbacks: Record<string, string> = {
+    pga: 'The reigning PGA Tour champion',
+    lpga: 'The reigning LPGA Tour champion',
+    liv: 'The reigning LIV Golf champion',
+    euro: 'The reigning DP World Tour champion',
+    pgad: 'The reigning Korn Ferry champion',
+    champ: 'The reigning Champions Tour champion',
+  };
+  return tourFallbacks[tourSlug] ?? 'The defending champion';
+}
 
 function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, leadersWinnersMap, isExpanded, onToggleExpand, onInteraction, onScorecardOpen, onScorecardClose, onCardTouchStart, onCardTouchMove, onCardTouchEnd }: HeroSlideProps) {
   const { tournament, type } = slide;
@@ -1180,7 +1207,7 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                           {tournament.defendingChampion}
                         </span>
                         <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', display: 'block', marginTop: 1 }}>
-                          Can they go back-to-back?
+                          {getDefendingChampionSubtext(tournament)}
                         </span>
                       </div>
                     </motion.div>
