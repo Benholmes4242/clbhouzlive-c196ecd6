@@ -121,7 +121,7 @@ const ProfilePageV2Content: React.FC = () => {
   
   // If viewing via /profile/:username, fetch that profile; otherwise show own profile
   // Resolve profileUserId — cached query for username routes, synchronous for own profile
-  const { data: resolvedProfileId } = useQuery({
+  const { data: resolvedProfileId, isLoading: isResolvingId } = useQuery({
     queryKey: ['profile-id-by-username', routeUsername],
     enabled: !!routeUsername,
     staleTime: 10 * 60 * 1000,
