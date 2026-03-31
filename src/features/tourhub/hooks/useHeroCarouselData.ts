@@ -58,11 +58,11 @@ export interface HeroSlide {
 function mapTourSlug(tourName: string): TourId {
   const normalized = tourName?.toLowerCase().trim();
   if (normalized === 'pga' || normalized === 'pga tour') return 'pga';
-  if (normalized === 'euro' || normalized === 'dp world' || normalized === 'european tour') return 'euro';
+  if (normalized === 'euro' || normalized === 'eur' || normalized === 'dp world' || normalized === 'dp world tour' || normalized === 'european tour') return 'euro';
   if (normalized === 'lpga' || normalized === 'lpga tour') return 'lpga';
   if (normalized === 'liv' || normalized === 'liv golf') return 'liv';
   if (normalized === 'pgad' || normalized === 'korn ferry') return 'pgad';
-  if (normalized === 'champ' || normalized === 'champions') return 'champ';
+  if (normalized === 'champ' || normalized === 'champions' || normalized === 'champions-tour' || normalized === 'champions tour') return 'champ';
   return 'pga';
 }
 
