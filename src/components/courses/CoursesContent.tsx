@@ -193,6 +193,14 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
     }
   }, [searchParams, username]);
 
+  // Scroll to top on mount — prevents page opening halfway down from previous visit
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+    document.getElementById('root')?.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, []);
+
   const handleTabChange = (value: string) => {
     if (!user && value === 'leaderboards') {
       navigate('/auth');
