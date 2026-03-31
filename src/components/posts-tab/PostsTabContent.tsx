@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfilePosts } from './hooks/useProfilePosts';
-import { ContentFilterPills, FilterOption } from '@/components/common/ContentFilterPills';
 
 import { HybridPostsFeed } from './HybridPostsFeed';
 import { PostsAutoplay } from './PostsAutoplay';
@@ -9,14 +8,6 @@ import { PostsAutoplay } from './PostsAutoplay';
 type PostsFilter = 'all' | 'videos' | 'shorts' | 'images' | 'reviews';
 
 const LONGFORM_THRESHOLD = 180; // 3 min — matches classifyPost in HybridPostsFeed
-
-const filterOptions: FilterOption[] = [
-  { key: 'all', label: 'All' },
-  { key: 'videos', label: 'Videos' },
-  { key: 'shorts', label: 'Shorts' },
-  { key: 'images', label: 'Images' },
-  { key: 'reviews', label: 'Reviews' },
-];
 
 interface PostsTabContentProps {
   actorType: 'personal' | 'business';
