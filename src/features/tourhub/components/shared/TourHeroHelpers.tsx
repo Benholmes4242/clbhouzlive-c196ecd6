@@ -223,7 +223,7 @@ export function PlayerAvatar({
     .join('') || '?';
 
   if (frosted) {
-    return <FrostedAvatar src={resolved} displayName={displayName} size={size} />;
+    return <FrostedAvatar src={resolved} fallbackSrc={pgaFallbackR2} displayName={displayName} size={size} />;
   }
 
   return (
