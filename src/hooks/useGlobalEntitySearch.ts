@@ -12,6 +12,7 @@ export interface PersonResult {
   avatar_url: string | null;
   verified?: boolean;
   home_club_name?: string | null;
+  is_public?: boolean | null;
   type: 'user';
 }
 
