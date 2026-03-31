@@ -352,7 +352,110 @@ interface MediaGridProps {
   onAddMore: () => void;
 }
 
-function MediaGrid({
+interface TileProps {
+  item: StudioMediaItem;
+  index: number;
+  coverIndex: number;
+  maxVisible: number;
+  overflow: number;
+  onSelect: (index: number) => void;
+  onRemove: (id: string) => void;
+  onEdit: (index: number) => void;
+  onSetCover: (index: number) => void;
+  onOverflow: () => void;
+  style?: React.CSSProperties;
+  borderRadius?: string;
+}
+
+function Tile({
+  item, index, coverIndex, maxVisible, overflow,
+  onSelect, onRemove, onEdit, onSetCover, onOverflow,
+  style, borderRadius,
+}: TileProps) {
+  const isCover = index === coverIndex;
+  const isOverflowTile = index === maxVisible - 1 && overflow > 0;
+
+  return (
+    <div
+      className="relative overflow-hidden cursor-pointer"
+      style={{ borderRadius: borderRadius ?? 14, ...style }}
+      onClick={() => onSelect(index)}
+    >
+      {item.mediaType === 'video' ? (
+        <video
+          src={item.previewUrl}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="w-full h-full object-cover"
+          style={{ pointerEvents: 'none' }}
+        />
+      ) : (
+        <img
+          src={item.thumbnailUrl || item.previewUrl}
+          alt=""
+          className="w-full h-full object-cover"
+        />
+      )}
+
+      {isOverflowTile && (
+        <motion.div
+          whileTap={{ scale: 0.97 }}
+          className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer"
+          style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
+          onClick={(e) => { e.stopPropagation(); onOverflow(); }}
+        >
+          <span className="text-[22px] font-bold text-white">+{overflow + 1}</span>
+          <span className="text-[10px] mt-1" style={{ color: 'rgba(255,255,255,0.55)' }}>tap to edit</span>
+        </motion.div>
+      )}
+
+      {!isOverflowTile && (
+        <>
+          <motion.button
+            whileTap={{ scale: 0.92 }}
+            onClick={(e) => { e.stopPropagation(); if (!isCover) onSetCover(index); }}
+            className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full text-[10px] font-semibold"
+            style={isCover ? {
+              background: 'rgba(255,255,255,0.92)',
+              color: '#0D0D0D',
+              border: 'none',
+            } : {
+              background: 'rgba(0,0,0,0.45)',
+              color: 'rgba(255,255,255,0.65)',
+              border: '1px solid rgba(255,255,255,0.30)',
+              backdropFilter: 'blur(8px)',
+            }}
+          >
+            Cover
+          </motion.button>
+
+          <motion.button
+            whileTap={{ scale: 0.85 }}
+            onClick={(e) => { e.stopPropagation(); onRemove(item.id); }}
+            className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center rounded-full z-10"
+            style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}
+          >
+            <X className="w-3 h-3 text-white" strokeWidth={2.5} />
+          </motion.button>
+
+          <motion.button
+            whileTap={{ scale: 0.85 }}
+            onClick={(e) => { e.stopPropagation(); onEdit(index); }}
+            className="absolute bottom-2 right-2 w-7 h-7 flex items-center justify-center rounded-full z-10"
+            style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}
+          >
+            <Pencil className="w-3 h-3 text-white" strokeWidth={2} />
+          </motion.button>
+        </>
+      )}
+    </div>
+  );
+}
+
+const MediaGrid = React.memo(function MediaGrid({
   items, activeIndex, coverIndex,
   onSelect, onRemove, onEdit, onSetCover, onOverflow, onAddMore,
 }: MediaGridProps) {
@@ -363,96 +466,10 @@ function MediaGrid({
   const visible = items.slice(0, MAX_VISIBLE);
   const overflow = items.length - MAX_VISIBLE;
 
-  function Tile({
-    item, index, style, borderRadius,
-  }: {
-    item: StudioMediaItem;
-    index: number;
-    style?: React.CSSProperties;
-    borderRadius?: string;
-  }) {
-    const isCover = index === coverIndex;
-    const isOverflowTile = index === MAX_VISIBLE - 1 && overflow > 0;
-
-    return (
-      <div
-        className="relative overflow-hidden cursor-pointer"
-        style={{ borderRadius: borderRadius ?? 14, ...style }}
-        onClick={() => onSelect(index)}
-      >
-        {item.mediaType === 'video' ? (
-          <video
-            src={item.previewUrl}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            className="w-full h-full object-cover"
-            style={{ pointerEvents: 'none' }}
-          />
-        ) : (
-          <img
-            src={item.thumbnailUrl || item.previewUrl}
-            alt=""
-            className="w-full h-full object-cover"
-          />
-        )}
-
-        {isOverflowTile && (
-          <motion.div
-            whileTap={{ scale: 0.97 }}
-            className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer"
-            style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}
-            onClick={(e) => { e.stopPropagation(); onOverflow(); }}
-          >
-            <span className="text-[22px] font-bold text-white">+{overflow + 1}</span>
-            <span className="text-[10px] mt-1" style={{ color: 'rgba(255,255,255,0.55)' }}>tap to edit</span>
-          </motion.div>
-        )}
-
-        {!isOverflowTile && (
-          <>
-            <motion.button
-              whileTap={{ scale: 0.92 }}
-              onClick={(e) => { e.stopPropagation(); if (!isCover) onSetCover(index); }}
-              className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded-full text-[10px] font-semibold"
-              style={isCover ? {
-                background: 'rgba(255,255,255,0.92)',
-                color: '#0D0D0D',
-                border: 'none',
-              } : {
-                background: 'rgba(0,0,0,0.45)',
-                color: 'rgba(255,255,255,0.65)',
-                border: '1px solid rgba(255,255,255,0.30)',
-                backdropFilter: 'blur(8px)',
-              }}
-            >
-              Cover
-            </motion.button>
-
-            <motion.button
-              whileTap={{ scale: 0.85 }}
-              onClick={(e) => { e.stopPropagation(); onRemove(item.id); }}
-              className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center rounded-full z-10"
-              style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}
-            >
-              <X className="w-3 h-3 text-white" strokeWidth={2.5} />
-            </motion.button>
-
-            <motion.button
-              whileTap={{ scale: 0.85 }}
-              onClick={(e) => { e.stopPropagation(); onEdit(index); }}
-              className="absolute bottom-2 right-2 w-7 h-7 flex items-center justify-center rounded-full z-10"
-              style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.15)' }}
-            >
-              <Pencil className="w-3 h-3 text-white" strokeWidth={2} />
-            </motion.button>
-          </>
-        )}
-      </div>
-    );
-  }
+  const tileProps = {
+    coverIndex, maxVisible: MAX_VISIBLE, overflow,
+    onSelect, onRemove, onEdit, onSetCover, onOverflow,
+  };
 
   if (items.length === 1) {
     const item = items[0];
@@ -461,7 +478,7 @@ function MediaGrid({
       : 4 / 3;
     return (
       <div className="mx-4 mb-2" style={{ borderRadius: 14, overflow: 'hidden', aspectRatio: String(ratio) }}>
-        <Tile item={item} index={0} style={{ width: '100%', height: '100%' }} borderRadius="14px" />
+        <Tile item={item} index={0} style={{ width: '100%', height: '100%' }} borderRadius="14px" {...tileProps} />
       </div>
     );
   }
@@ -469,8 +486,8 @@ function MediaGrid({
   if (items.length === 2) {
     return (
       <div className="mx-4 mb-2 flex" style={{ borderRadius: 14, overflow: 'hidden', gap: GAP, aspectRatio: '16/9' }}>
-        <Tile item={items[0]} index={0} style={{ flex: 1, height: '100%' }} borderRadius="14px 0 0 14px" />
-        <Tile item={items[1]} index={1} style={{ flex: 1, height: '100%' }} borderRadius="0 14px 14px 0" />
+        <Tile item={items[0]} index={0} style={{ flex: 1, height: '100%' }} borderRadius="14px 0 0 14px" {...tileProps} />
+        <Tile item={items[1]} index={1} style={{ flex: 1, height: '100%' }} borderRadius="0 14px 14px 0" {...tileProps} />
       </div>
     );
   }
@@ -478,10 +495,10 @@ function MediaGrid({
   if (items.length === 3) {
     return (
       <div className="mx-4 mb-2 flex" style={{ borderRadius: 14, overflow: 'hidden', gap: GAP, aspectRatio: '4/3' }}>
-        <Tile item={items[0]} index={0} style={{ flex: 1, height: '100%' }} borderRadius="14px 0 0 14px" />
+        <Tile item={items[0]} index={0} style={{ flex: 1, height: '100%' }} borderRadius="14px 0 0 14px" {...tileProps} />
         <div className="flex flex-col flex-1" style={{ gap: GAP }}>
-          <Tile item={items[1]} index={1} style={{ flex: 1 }} borderRadius="0 14px 0 0" />
-          <Tile item={items[2]} index={2} style={{ flex: 1 }} borderRadius="0 0 14px 0" />
+          <Tile item={items[1]} index={1} style={{ flex: 1 }} borderRadius="0 14px 0 0" {...tileProps} />
+          <Tile item={items[2]} index={2} style={{ flex: 1 }} borderRadius="0 0 14px 0" {...tileProps} />
         </div>
       </div>
     );
@@ -491,11 +508,11 @@ function MediaGrid({
   return (
     <div className="mx-4 mb-2 grid grid-cols-2" style={{ borderRadius: 14, overflow: 'hidden', gap: GAP, aspectRatio: '1/1' }}>
       {visible.map((item, i) => (
-        <Tile key={item.id} item={item} index={i} style={{ aspectRatio: '1/1' }} borderRadius={cornerRadii[i]} />
+        <Tile key={item.id} item={item} index={i} style={{ aspectRatio: '1/1' }} borderRadius={cornerRadii[i]} {...tileProps} />
       ))}
     </div>
   );
-}
+});
 
 // ─── ComposeScreen ────────────────────────────────────────────────────────────
 
