@@ -405,7 +405,7 @@ const ProfilePageV2Content: React.FC = () => {
     }
   }, [user, authLoading, navigate]);
 
-  if (authLoading || profileLoading) {
+  if (authLoading || (!!routeUsername && isResolvingId) || profileLoading) {
     return <ProfileSkeleton />;
   }
 
