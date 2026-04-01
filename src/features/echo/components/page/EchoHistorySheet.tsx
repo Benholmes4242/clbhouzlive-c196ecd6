@@ -320,7 +320,7 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
               {isLoading ? (
                 <HistorySkeleton />
               ) : !conversations || conversations.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16">
+                <div className="flex flex-col items-center justify-center py-8">
                   <div
                     className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
                     style={{ background: 'rgba(255,255,255,0.05)' }}
