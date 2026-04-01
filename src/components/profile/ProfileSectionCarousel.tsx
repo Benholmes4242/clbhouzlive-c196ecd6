@@ -15,19 +15,19 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
       id: 'activity',
       title: 'Activity',
       description: 'View your recent golf moments, rounds played, and course discoveries.',
-      className: 'relative overflow-hidden flex flex-col justify-end text-white h-[200px] cursor-pointer group !rounded-lg'
+      className: 'relative overflow-hidden flex flex-col justify-end text-white cursor-pointer group !rounded-lg'
     },
     {
       id: 'top100',
       title: 'The World\'s Greatest Courses',
       description: 'Discover and track the world\'s greatest golf courses.',
-      className: 'relative overflow-hidden flex flex-col justify-end text-white h-[200px] cursor-pointer group !rounded-lg'
+      className: 'relative overflow-hidden flex flex-col justify-end text-white cursor-pointer group !rounded-lg'
     },
     {
       id: 'handicap',
       title: 'Handicap',
       description: 'Track your progress and handicap development over time.',
-      className: 'relative overflow-hidden flex flex-col justify-end text-white h-[200px] cursor-pointer group !rounded-lg'
+      className: 'relative overflow-hidden flex flex-col justify-end text-white cursor-pointer group !rounded-lg'
     }
   ];
 
