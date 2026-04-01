@@ -396,9 +396,29 @@ function ProfileHubSheet({
 
                       <div
                         className="flex items-center justify-center rounded-[10px]"
-                        style={{ width: 36, height: 36, background: 'rgba(0,0,0,0.05)' }}
+                        style={{
+                          width: 36,
+                          height: 36,
+                          background: badge > 0
+                            ? badgeColor === 'emerald'
+                              ? 'rgba(16,185,129,0.10)'
+                              : 'rgba(247,147,30,0.10)'
+                            : 'rgba(0,0,0,0.05)',
+                          transition: 'background 0.2s ease',
+                        }}
                       >
-                        <Icon className="w-[18px] h-[18px]" style={{ color: '#475569' }} strokeWidth={2} />
+                        <Icon
+                          className="w-[18px] h-[18px]"
+                          style={{
+                            color: badge > 0
+                              ? badgeColor === 'emerald'
+                                ? '#10b981'
+                                : '#F7931E'
+                              : '#475569',
+                            transition: 'color 0.2s ease',
+                          }}
+                          strokeWidth={2}
+                        />
                       </div>
 
                       <span
