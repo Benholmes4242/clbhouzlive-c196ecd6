@@ -30,6 +30,13 @@ export function HomeClubCard({
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  // Auto-select if search returns exactly one result
+  useEffect(() => {
+    if (!isSearching && clubs.length === 1 && query.length >= 2 && isOpen) {
+      handleSelect(clubs[0].name, clubs[0].id);
+    }
+  }, [clubs, isSearching, query, isOpen]);
+
   const handleSelect = (name: string, id: string | null) => {
     setQuery(name);
     setIsOpen(false);

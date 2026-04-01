@@ -195,6 +195,7 @@ export function PersonalProfileWizard() {
           isSaving={isSaving}
           isValid={isValid}
           isDirty={isDirty}
+          completionPct={completionPct}
           onNext={handleSave}
           onBack={goBack}
         />
