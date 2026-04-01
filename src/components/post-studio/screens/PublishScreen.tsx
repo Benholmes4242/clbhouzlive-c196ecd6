@@ -91,6 +91,14 @@ export function PublishScreen() {
       };
 
       enqueuePostUpload(input);
+      analyticsEvents.track('post_published', {
+        media_count: state.mediaItems.length,
+        media_type: state.mediaItems[0]?.mediaType ?? 'unknown',
+        has_caption: state.caption.trim().length > 0,
+        has_tagged_course: state.taggedCourses.length > 0,
+        visibility: state.visibility,
+        is_scheduled: !!state.scheduledAt,
+      });
       onSuccess?.('');
       setStep('SUCCESS');
     } catch (err) {

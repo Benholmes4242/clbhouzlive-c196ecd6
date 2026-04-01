@@ -278,6 +278,12 @@ function CommentsSheet({
 
     try {
       const newId = await addComment(content, parentId);
+      analyticsEvents.track('comment_submitted', {
+        post_id: postId,
+        is_reply: !!parentId,
+        content_length: content.length,
+        has_mention: content.includes('@'),
+      });
       if (parentId) setExpandedReplies(prev => new Set(prev).add(parentId));
       setTimeout(() => highlightComment(newId), 150);
       onCommentPosted?.();

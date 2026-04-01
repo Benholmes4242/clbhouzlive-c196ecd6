@@ -993,7 +993,8 @@ async function fetchFeatureAdoption(period: AnalyticsPeriod): Promise<FeatureAdo
   const FEATURES = [
     { feature: 'Clubhouse Feed', description: 'Watched videos in the feed', events: ['page_view'] },
     { feature: 'Post Studio', description: 'Created a post or moment', events: ['post_published'] },
-    { feature: 'Review Wizard', description: 'Submitted a course review', events: ['review_submitted'] },
+    { feature: 'Review Wizard', description: 'Submitted a course review', events: ['review_submitted', 'rating_submitted'] },
+    { feature: 'Commenting', description: 'Posted a comment', events: ['comment_submitted'] },
     { feature: 'Echo AI', description: 'Asked Echo a question', events: ['echo_query'] },
     { feature: 'Tour Hub', description: 'Visited tournament data', events: ['nav_tab_tap'] },
     { feature: 'Messaging', description: 'Sent a direct message', events: ['message_sent'] },
