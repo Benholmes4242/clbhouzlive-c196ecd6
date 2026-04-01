@@ -442,13 +442,27 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
 
         {/* Share */}
         <button
-          onClick={onLike}
+          onClick={() => {
+            haptic('light');
+            if (onShare) {
+              onShare();
+            } else if (navigator.share) {
+              navigator.share({
+                title: `${card.reviewer.displayName}'s review of ${card.course.name}`,
+                text: card.reviewText.slice(0, 120),
+                url: `${window.location.origin}/courses/${card.course.id}`,
+              }).catch(() => {});
+            } else {
+              navigator.clipboard.writeText(`${window.location.origin}/courses/${card.course.id}`);
+            }
+          }}
           className="h-12 rounded-2xl flex items-center justify-center gap-[6px] text-[12px] font-semibold active:scale-[0.97] transition-transform"
           style={{
             background: 'rgba(255,255,255,0.05)',
             border: '1px solid rgba(255,255,255,0.07)',
             color: 'rgba(255,255,255,0.45)',
           }}
+          aria-label="Share this review"
         >
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
             <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"
