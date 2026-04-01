@@ -16,6 +16,8 @@ interface NavigationBarProps {
    * set this to false to avoid a double-thick border.
    */
   showBorder?: boolean;
+  /** Map of tab ID → badge count. Only rendered when count > 0. */
+  tabBadges?: Record<string, number>;
 }
 
 const NavigationBar: React.FC<NavigationBarProps> = ({
@@ -26,6 +28,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   isDimmed = false,
   useAmberActive = false,
   showBorder = true,
+  tabBadges = {},
 }) => {
   const isLightTheme = variant === 'default';
   const isClubhouseTheme = variant === 'clubhouse';
