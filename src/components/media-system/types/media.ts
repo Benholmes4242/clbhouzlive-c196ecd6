@@ -311,6 +311,49 @@ export interface DebateCardFeedPost extends Omit<FeedPost, 'mediaItems' | 'revie
   isReview: false;
 }
 
+// ── Review of the Week ──
+export interface ReviewOfWeekCardData {
+  cardId: string;
+  cardType: 'review_of_week';
+  weekLabel: string;
+  reviewId: string;
+  reviewText: string;
+  rating: number;
+  designScore: number | null;
+  conditionScore: number | null;
+  clubhouseScore: number | null;
+  facilitiesScore: number | null;
+  helpfulCount: number;
+  playedDate: string | null;
+  photoUrls: string[];
+  reviewer: {
+    userId: string;
+    displayName: string;
+    username: string | null;
+    avatarUrl: string | null;
+    handicap: number | null;
+    reviewCount: number;
+    isVerified: boolean;
+  };
+  course: {
+    id: string;
+    name: string;
+    country: string;
+    subCountry: string | null;
+    globalRank: number | null;
+    thumbnailImage: string | null;
+    communityRating: number | null;
+  };
+}
+
+export interface ReviewOfWeekCardFeedPost extends Omit<FeedPost, 'mediaItems' | 'review' | 'isReview'> {
+  postType: 'review_of_week_card';
+  cardData: ReviewOfWeekCardData;
+  mediaItems: [];
+  review: null;
+  isReview: false;
+}
+
 export interface VideoSessionState {
   currentTime: number;
   wasMuted: boolean;
