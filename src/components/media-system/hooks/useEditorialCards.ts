@@ -7,12 +7,15 @@ import type {
   CourseOfWeekCardFeedPost,
   DebateCardData,
   DebateCardFeedPost,
+  ReviewOfWeekCardData,
+  ReviewOfWeekCardFeedPost,
 } from '../types/media';
 
 export interface EditorialCards {
   historyCard: HistoryCardFeedPost | null;
   courseOfWeekCard: CourseOfWeekCardFeedPost | null;
   debateCard: DebateCardFeedPost | null;
+  reviewOfWeekCard: ReviewOfWeekCardFeedPost | null;
 }
 
 const baseFeedPost = {
