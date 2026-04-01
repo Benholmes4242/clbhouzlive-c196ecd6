@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { BG_BASE, BG_CARD, BORDER_CARD, TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY, ICON_BG, ICON_COLOR, RAIL_BG, RAIL_HAIRLINE } from '../tokens';
 import { useSocialCounts } from '@/hooks/useSocialCounts';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { UploadJobInput } from '@/uploads/types';
 
 export function PublishScreen() {
@@ -90,6 +91,14 @@ export function PublishScreen() {
       };
 
       enqueuePostUpload(input);
+      analyticsEvents.track('post_published', {
+        media_count: state.mediaItems.length,
+        media_type: state.mediaItems[0]?.mediaType ?? 'unknown',
+        has_caption: state.caption.trim().length > 0,
+        has_tagged_course: state.taggedCourses.length > 0,
+        visibility: state.visibility,
+        is_scheduled: !!state.scheduledAt,
+      });
       onSuccess?.('');
       setStep('SUCCESS');
     } catch (err) {

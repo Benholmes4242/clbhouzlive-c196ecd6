@@ -11,6 +11,7 @@ import { X, Heart, MoreHorizontal, SendHorizontal, ChevronRight } from 'lucide-r
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { useCommentsWithReplies, type CommentWithReplies, type CommentReply } from '@/hooks/useCommentsWithReplies';
 import { useEditorialComments } from '@/hooks/useEditorialComments';
 import { useCommentsRealtime } from '@/hooks/useCommentsRealtime';
@@ -277,6 +278,12 @@ function CommentsSheet({
 
     try {
       const newId = await addComment(content, parentId);
+      analyticsEvents.track('comment_submitted', {
+        post_id: postId,
+        is_reply: !!parentId,
+        content_length: content.length,
+        has_mention: content.includes('@'),
+      });
       if (parentId) setExpandedReplies(prev => new Set(prev).add(parentId));
       setTimeout(() => highlightComment(newId), 150);
       onCommentPosted?.();
