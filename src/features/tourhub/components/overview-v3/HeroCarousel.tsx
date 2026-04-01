@@ -1219,10 +1219,10 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     <EchoContextualButton
                       prompt={
                         isLive
-                          ? `Give me live intel on ${tournament.name} — who is leading, who is making a move, and what are the key storylines today?`
+                          ? `It's ${new Date().getFullYear()} and ${tournament.name} is live right now at ${tournament.venueName || 'the course'}${tournament.venueCity ? ` in ${tournament.venueCity}` : ''}. Search for the latest live leaderboard and tell me who is leading, who is making a move, and what the key storylines are today.`
                           : isCompleted
-                          ? `Tell me about the result of ${tournament.name} — what happened, how did the winner play, and what were the key moments?`
-                          : `Preview ${tournament.name} for me — who are the favourites, what should I know about the course, and what makes this event special?`
+                          ? `Search for the ${new Date().getFullYear()} ${tournament.name} result${tournament.venueName ? ` at ${tournament.venueName}` : ''}${tournament.winnerName ? `. The winner was ${tournament.winnerName}${tournament.winnerScore ? ` with a score of ${tournament.winnerScore}` : ''}` : ''}. Tell me what happened, how the winner played, what the key moments were, and what this result means for their season.`
+                          : `Preview the ${new Date().getFullYear()} ${tournament.name}${tournament.venueName ? ` at ${tournament.venueName}` : ''}${tournament.venueCity ? ` in ${tournament.venueCity}` : ''}${tournament.purse ? `. Purse is $${((tournament.purse) / 1_000_000).toFixed(1)}M` : ''}${tournament.venuePar ? `. Par ${tournament.venuePar}` : ''}${tournament.defendingChampion ? `. Defending champion is ${tournament.defendingChampion}` : ''}. Search for the latest news, tell me who the favourites are, what type of player wins here, and what to watch this week.`
                       }
                       label={
                         isLive ? 'Ask Echo for live intel'

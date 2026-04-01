@@ -1410,7 +1410,7 @@ export const PGACard: React.FC<PGACardProps> = ({
       {/* Echo — upcoming tournament preview */}
       <div style={{ padding: '6px 16px 2px' }}>
         <EchoContextualButton
-          prompt={`Preview ${cd.tournamentName} for me — who are the favourites, what should I know about the course, and what makes this event special?`}
+          prompt={`Preview the ${new Date().getFullYear()} ${cd.tournamentName}${cd.venueName ? ` at ${cd.venueName}` : ''}${cd.venueCity ? ` in ${cd.venueCity}` : ''}${cd.purse ? `. Purse is $${(cd.purse / 1_000_000).toFixed(1)}M` : ''}${cd.venuePar ? `. The course plays Par ${cd.venuePar} at ${(cd.venueYardage || 0).toLocaleString()} yards` : ''}${cd.defendingChampion ? `. Defending champion is ${cd.defendingChampion}` : ''}. Search for the latest news, tell me who the favourites are, what type of player wins here, and what storylines to follow this week.`}
           label="Ask Echo to preview this event"
           sublabel="Favourites · course intel · storylines"
           source="pga_card_upcoming"
