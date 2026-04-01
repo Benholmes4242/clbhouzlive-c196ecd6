@@ -91,7 +91,7 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
 
   return (
     <div className="h-full flex flex-col items-center px-5 overflow-y-auto" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}>
-      <div className="flex flex-col items-center w-full my-auto py-8">
+      <div className="flex flex-col items-center w-full my-auto py-6">
         {/* Ambient amber glow */}
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 w-[320px] h-[320px] pointer-events-none"
