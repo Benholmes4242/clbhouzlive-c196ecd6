@@ -1092,10 +1092,10 @@ export const PGACard: React.FC<PGACardProps> = ({
         {/* Echo — completed tournament recap */}
         <div style={{ padding: '6px 16px 2px' }}>
           <EchoContextualButton
-            prompt={`Tell me about the result of ${cd.tournamentName} — what happened, how did the winner play, and what were the key moments?`}
+            prompt={`Search for the ${new Date().getFullYear()} ${cd.tournamentName} result${cd.venueName ? ` at ${cd.venueName}` : ''}${cd.leader ? `. The winner appears to be ${cd.leader.playerName} at ${cd.leader.scoreDisplay}${cd.winnerBy ? `, winning by ${cd.winnerBy}` : ''}` : ''}. Tell me what happened, how the winner played across the week, what the key moments were, and what this result means for their season.`}
             label="Ask Echo about the result"
             sublabel="Winner story · key moments"
-            source="pga_card_completed"
+            source="pga_card_result"
           />
         </div>
 
