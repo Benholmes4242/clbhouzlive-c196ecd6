@@ -214,7 +214,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
         {/* Headline */}
         <h2
           style={{
-            fontSize: 22,
+            fontSize: 'clamp(18px, 5.5vw, 22px)',
             fontWeight: 900,
             color: '#fff',
             letterSpacing: '-0.02em',
