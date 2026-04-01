@@ -429,6 +429,8 @@ const ClubhouseContent = () => {
                 ? (activePost as any).cardData.cardId
                 : activePost.postType === 'debate_card'
                 ? (activePost as any).cardData.cardId
+                : activePost.postType === 'review_of_week_card'
+                ? (activePost as any).cardData.cardId
                 : activePost.id
             }
             currentUserId={user?.id}
