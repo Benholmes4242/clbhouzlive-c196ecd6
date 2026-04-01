@@ -54,6 +54,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   
   const { triggerPrefetch } = useAppPrefetch();
   const { activeTab, handleTabClick, handlePrefetch } = useNavigationHandlers();
+  const { unseenCount: unseenFriendReviews } = useUnseenFriendReviews();
   const isDesktop = useIsDesktop();
   const openPostStudio = usePostStudioStore((s) => s.openPostStudio);
   
