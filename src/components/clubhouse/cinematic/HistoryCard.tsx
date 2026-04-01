@@ -199,8 +199,9 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
         className="absolute left-0 right-0"
         style={{
           bottom: 0,
-          maxHeight: expanded ? 'none' : '55vh',
-          overflow: expanded ? 'visible' : 'hidden',
+          maxHeight: expanded ? 'none' : 'min(55vh, calc(100dvh - 120px))',
+          overflow: expanded ? 'visible' : 'auto',
+          WebkitOverflowScrolling: 'touch',
           padding: '0 16px',
           paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)',
           zIndex: 10,
@@ -213,7 +214,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
         {/* Headline */}
         <h2
           style={{
-            fontSize: 22,
+            fontSize: 'clamp(18px, 5.5vw, 22px)',
             fontWeight: 900,
             color: '#fff',
             letterSpacing: '-0.02em',
@@ -349,7 +350,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
             className="active:scale-[0.95] transition-transform"
             style={{
               flex: 1,
-              height: 48,
+              height: 'clamp(42px, 6vh, 48px)',
               borderRadius: 14,
               display: 'flex',
               alignItems: 'center',
@@ -382,7 +383,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
             className="active:scale-[0.95] transition-transform"
             style={{
               flex: 1,
-              height: 48,
+              height: 'clamp(42px, 6vh, 48px)',
               borderRadius: 14,
               display: 'flex',
               alignItems: 'center',

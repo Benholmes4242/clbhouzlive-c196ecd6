@@ -220,6 +220,9 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
         style={{
           position: 'absolute',
           bottom: 0, left: 0, right: 0,
+          maxHeight: '80dvh',
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
           padding: `0 16px calc(env(safe-area-inset-bottom, 0px) + 24px) 16px`,
           zIndex: 2,
         }}
@@ -227,7 +230,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
         {/* Course name & location */}
         <h2
           style={{
-            fontSize: 28, fontWeight: 900, color: '#fff',
+            fontSize: 'clamp(20px, 6vw, 28px)', fontWeight: 900, color: '#fff',
             letterSpacing: '-0.02em', lineHeight: 1.1,
             textShadow: '0 2px 12px rgba(0,0,0,0.5)',
             margin: 0,
@@ -289,7 +292,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             style={{
               fontSize: 14, color: 'rgba(255,255,255,0.75)', lineHeight: 1.6,
               marginTop: 14,
-              display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical' as any, overflow: 'hidden',
+              display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' as any, overflow: 'hidden',
             }}
           >
             {card.editorialBlurb || card.body}
@@ -306,13 +309,13 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             <div
               key={stat.label}
               style={{
-                flex: 1, padding: '10px 8px', borderRadius: 12, textAlign: 'center' as const,
+                flex: 1, padding: 'clamp(6px, 2vw, 10px) 8px', borderRadius: 12, textAlign: 'center' as const,
                 background: 'rgba(255,255,255,0.08)',
                 border: '1px solid rgba(255,255,255,0.12)',
                 backdropFilter: 'blur(12px)',
               }}
             >
-              <div style={{ fontSize: 17, fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+              <div style={{ fontSize: 'clamp(14px, 4vw, 17px)', fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
                 {stat.label === 'Rating' && <ClubhouseLogo size="sm" />}
                 {stat.value}
               </div>
@@ -339,7 +342,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             onClick={() => navigate(`/courses/${course.id}`)}
             className="active:scale-[0.97] transition-transform"
             style={{
-              flex: 1, height: 48, borderRadius: 14, border: 'none',
+              flex: 1, height: 'clamp(42px, 6vh, 48px)', borderRadius: 14, border: 'none',
               background: 'linear-gradient(135deg, #F7931E, #e07010)',
               color: '#fff', fontSize: 15, fontWeight: 800, cursor: 'pointer',
               boxShadow: '0 4px 20px rgba(247,147,30,0.35)',
@@ -358,7 +361,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             }}
             className="active:scale-[0.97] transition-transform"
             style={{
-              flex: 1, height: 48, borderRadius: 14, cursor: 'pointer',
+              flex: 1, height: 'clamp(42px, 6vh, 48px)', borderRadius: 14, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
               fontSize: 14, fontWeight: 700,
               background: 'rgba(255,255,255,0.08)',
@@ -376,7 +379,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             onClick={handleLike}
             className="active:scale-[0.95] transition-transform"
             style={{
-              flex: 1, height: 48, borderRadius: 14, cursor: 'pointer',
+              flex: 1, height: 'clamp(42px, 6vh, 48px)', borderRadius: 14, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
               background: localLiked ? 'rgba(247,147,30,0.15)' : 'rgba(0,0,0,0.45)',
               border: `1px solid ${localLiked ? 'rgba(247,147,30,0.4)' : 'rgba(255,255,255,0.2)'}`,
@@ -398,7 +401,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             onClick={onComment}
             className="active:scale-[0.95] transition-transform"
             style={{
-              flex: 1, height: 48, borderRadius: 14, cursor: 'pointer',
+              flex: 1, height: 'clamp(42px, 6vh, 48px)', borderRadius: 14, cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
               background: 'rgba(0,0,0,0.45)',
               border: '1px solid rgba(255,255,255,0.2)',

@@ -774,7 +774,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             flexDirection: 'column',
             minHeight: '100%',
             justifyContent: hasMedia || state.caption.length > 0 ? 'flex-start' : 'center',
-            paddingBottom: 16,
+            paddingBottom: 'clamp(12px, 3vh, 24px)',
           }}
         >
 
@@ -839,7 +839,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             <div
               aria-hidden="true"
               className="absolute inset-x-4 top-3 text-[17px] leading-relaxed pointer-events-none whitespace-pre-wrap break-words"
-              style={{ wordBreak: 'break-word', height: hasMedia ? 80 : 120, overflowY: 'auto' }}
+              style={{ wordBreak: 'break-word', height: hasMedia ? 'clamp(60px, 10vh, 80px)' : 'clamp(80px, 15vh, 120px)', overflowY: 'auto' }}
             >
               {highlightedCaption}
             </div>
@@ -857,7 +857,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               color: state.mentions.length > 0 ? 'transparent' : TEXT_PRIMARY,
               caretColor: 'rgba(15,23,42,0.70)',
               WebkitTextFillColor: state.mentions.length > 0 ? 'transparent' : undefined,
-              height: hasMedia ? 80 : 120,
+              height: hasMedia ? 'clamp(60px, 10vh, 80px)' : 'clamp(80px, 15vh, 120px)',
               overflowY: 'auto',
               resize: 'none',
               WebkitOverflowScrolling: 'touch',
@@ -1165,7 +1165,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           background: `linear-gradient(90deg, transparent 0%, ${RAIL_HAIRLINE} 20%, rgba(0,0,0,0.12) 50%, ${RAIL_HAIRLINE} 80%, transparent 100%)`,
         }} />
 
-        <div className="flex items-center px-4" style={{ minHeight: 60, gap: 0 }}>
+        <div className="flex items-center px-4" style={{ minHeight: 'clamp(50px, 8vh, 60px)', gap: 0 }}>
 
           {/* Zone A — Capture */}
           <div className="flex items-center" style={{ gap: 4 }}>

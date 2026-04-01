@@ -412,7 +412,7 @@ export const PGACard: React.FC<PGACardProps> = ({
         {/* ── ZONE 1: HERO — 55% ── */}
         <div style={{
           position: 'relative',
-          flex: '0 0 55%',
+          flex: '0 0 clamp(44%, 55%, 58%)',
           overflow: 'hidden',
           minHeight: 0,
         }}>
@@ -633,7 +633,7 @@ export const PGACard: React.FC<PGACardProps> = ({
           }}>
             {/* Winner row — highlighted, small avatar */}
             <div style={{
-              flex: '1 1 0', minHeight: 0,
+              flex: '1 1 0', minHeight: 'clamp(32px, 5vh, 46px)',
               display: 'flex', alignItems: 'center', gap: 10,
               padding: '0 10px',
               borderRadius: 10,
@@ -671,7 +671,7 @@ export const PGACard: React.FC<PGACardProps> = ({
 
               return (
                 <div key={`${group.position}-${gi}`} style={{
-                  flex: '1 1 0', minHeight: 0,
+                  flex: '1 1 0', minHeight: 'clamp(32px, 5vh, 46px)',
                   display: 'flex', alignItems: 'center', gap: 10,
                   padding: '0 10px',
                   borderRadius: 8,
@@ -819,7 +819,7 @@ export const PGACard: React.FC<PGACardProps> = ({
         {/* ── ZONE 1: CINEMATIC HERO — 55% ── */}
         <div style={{
           position: 'relative',
-          flex: '0 0 55%',
+          flex: '0 0 clamp(44%, 55%, 58%)',
           overflow: 'hidden',
           minHeight: 0,
         }}>
@@ -1155,7 +1155,7 @@ export const PGACard: React.FC<PGACardProps> = ({
       {/* ── ZONE 1: CINEMATIC HERO — 58% ── */}
       <div style={{
         position: 'relative',
-        flex: '0 0 58%',
+        flex: '0 0 clamp(46%, 58%, 62%)',
         overflow: 'hidden',
         minHeight: 0,
       }}>
