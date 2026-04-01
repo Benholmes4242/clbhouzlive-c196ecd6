@@ -180,7 +180,7 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       {/* Echo — course detail contextual */}
       <div style={{ padding: '10px 16px 4px' }}>
         <EchoContextualButton
-          prompt={`Tell me everything about ${course.name}${course.location ? ` in ${course.location}` : ''}${course.country ? `, ${course.country}` : ''} — what's the course like to play, what are the best holes, any tips for visiting, and how does it rank among courses in the area?`}
+          prompt={`Tell me everything about ${course.name}${course.country ? ` in ${course.country}` : ''} — what's the course like to play, what are the best holes, any tips for visiting, and how does it rank among courses in the area?`}
           label={`Ask Echo about ${course.name}`}
           sublabel="Playing tips · best holes · local knowledge"
           dark={false}
