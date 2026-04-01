@@ -220,6 +220,9 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
         style={{
           position: 'absolute',
           bottom: 0, left: 0, right: 0,
+          maxHeight: '80dvh',
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
           padding: `0 16px calc(env(safe-area-inset-bottom, 0px) + 24px) 16px`,
           zIndex: 2,
         }}
