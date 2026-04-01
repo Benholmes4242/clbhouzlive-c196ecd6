@@ -1089,6 +1089,16 @@ export const PGACard: React.FC<PGACardProps> = ({
           </div>
         </div>
 
+        {/* Echo — completed tournament recap */}
+        <div style={{ padding: '6px 16px 2px' }}>
+          <EchoContextualButton
+            prompt={`Tell me about the result of ${cd.tournamentName} — what happened, how did the winner play, and what were the key moments?`}
+            label="Ask Echo about the result"
+            sublabel="Winner story · key moments"
+            source="pga_card_completed"
+          />
+        </div>
+
         {/* ── ZONE 3: CTA BAR ── */}
         <div
           className="flex-shrink-0 flex items-center gap-3 px-5 pt-3"

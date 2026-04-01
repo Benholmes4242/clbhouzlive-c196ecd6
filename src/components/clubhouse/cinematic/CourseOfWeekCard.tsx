@@ -326,7 +326,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
         {/* Echo — course contextual */}
         <div style={{ marginTop: 12 }}>
           <EchoContextualButton
-            prompt={`Tell me about ${course.name}${course.city ? ` in ${course.city}` : ''}${course.country ? `, ${course.country}` : ''} — what's it like to play, best holes, and any tips?`}
+            prompt={`Tell me about ${course.name}${course.subCountry ? ` in ${course.subCountry}` : ''}${course.country ? `, ${course.country}` : ''} — what's it like to play, best holes, and any tips?`}
             label={`Ask Echo about ${course.name}`}
             sublabel="Playing tips · best holes · local knowledge"
             source="course_of_week"
