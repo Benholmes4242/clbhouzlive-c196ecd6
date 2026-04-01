@@ -179,7 +179,7 @@ const RowAvatar: React.FC<{ src?: string | null; name: string; size?: number; fl
       aspectRatio: '1',
     }}>
       {src ? (
-        <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5%' }} />
+        <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 0%' }} />
       ) : (
         <span style={{ fontSize: `calc(${dim} * 0.35)`, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>{getInitials(name)}</span>
       )}
