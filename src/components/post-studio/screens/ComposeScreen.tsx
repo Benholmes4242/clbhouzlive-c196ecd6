@@ -857,7 +857,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
               color: state.mentions.length > 0 ? 'transparent' : TEXT_PRIMARY,
               caretColor: 'rgba(15,23,42,0.70)',
               WebkitTextFillColor: state.mentions.length > 0 ? 'transparent' : undefined,
-              height: hasMedia ? 80 : 120,
+              height: hasMedia ? 'clamp(60px, 10vh, 80px)' : 'clamp(80px, 15vh, 120px)',
               overflowY: 'auto',
               resize: 'none',
               WebkitOverflowScrolling: 'touch',
