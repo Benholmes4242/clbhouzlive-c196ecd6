@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { BG_BASE, BG_CARD, BORDER_CARD, TEXT_PRIMARY, TEXT_SECONDARY, TEXT_TERTIARY, ICON_BG, ICON_COLOR, RAIL_BG, RAIL_HAIRLINE } from '../tokens';
 import { useSocialCounts } from '@/hooks/useSocialCounts';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import type { UploadJobInput } from '@/uploads/types';
 
 export function PublishScreen() {
