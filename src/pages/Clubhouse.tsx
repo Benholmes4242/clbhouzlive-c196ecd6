@@ -326,7 +326,10 @@ const ClubhouseContent = () => {
         }}>
           No internet connection
         </div>
-      )}
+       )}
+
+      {/* Profile completeness nudge — new users only, first 7 days */}
+      <ProfileCompleteNudge />
 
       {/* Rehydration skeleton */}
       <ClubhouseSkeletonShimmer isVisible={showRehydrationSkeleton} isStatic={false} />
