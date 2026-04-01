@@ -85,10 +85,14 @@ export default function EchoPage() {
 
   const handleBack = useCallback(() => {
     haptic('light');
-    if (window.history.length > 1) {
+    if (returnToRef.current) {
+      const destination = returnToRef.current;
+      returnToRef.current = null;
+      navigate(destination);
+    } else if (window.history.length > 1) {
       navigate(-1);
     } else {
-      navigate('/clubhouse');
+      navigate('/');
     }
   }, [navigate]);
 

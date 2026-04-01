@@ -15,7 +15,7 @@ export function EchoContextualButton({ prompt, label, sublabel, dark = true, com
 
   const handleTap = () => {
     analyticsEvents.track('echo_contextual_tap', { source, prompt_preview: prompt.slice(0, 80) });
-    navigate(`/echo?prompt=${encodeURIComponent(prompt)}`);
+    navigate(`/echo?prompt=${encodeURIComponent(prompt)}&returnTo=${encodeURIComponent(window.location.pathname)}`);
   };
 
   const bg = dark ? 'rgba(247,147,30,0.1)' : 'rgba(247,147,30,0.08)';
