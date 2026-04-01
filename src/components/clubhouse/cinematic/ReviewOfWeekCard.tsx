@@ -160,7 +160,6 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
   const card = post?.cardData;
   const [expanded, setExpanded] = useState(false);
   const [optimisticLike, setOptimisticLike] = useState<{ isLiked: boolean; count: number } | null>(null);
-  const [helpfulOptimistic, setHelpfulOptimistic] = useState<{ isHelpful: boolean; count: number } | null>(null);
 
   const cardId = card?.cardId ?? '';
   const reviewId = card?.reviewId ?? '';
