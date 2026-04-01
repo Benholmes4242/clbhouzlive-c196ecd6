@@ -225,7 +225,7 @@ export interface PGACardFeedPost extends Omit<FeedPost, 'mediaItems' | 'review' 
 // ── Editorial Card Shared ──
 export interface EditorialCardBase {
   cardId: string;
-  cardType: 'history' | 'course_of_week' | 'debate';
+  cardType: 'history' | 'course_of_week' | 'debate' | 'review_of_week';
   title: string;
   body: string | null;
   bodyExtended: string | null;
