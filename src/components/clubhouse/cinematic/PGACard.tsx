@@ -747,6 +747,16 @@ export const PGACard: React.FC<PGACardProps> = ({
           </div>
         </div>
 
+        {/* Echo — live tournament intel */}
+        <div style={{ padding: '6px 16px 2px' }}>
+          <EchoContextualButton
+            prompt={`Give me live intel on ${cd.tournamentName} — who is leading, what are the key storylines, and who should I watch today?`}
+            label="Ask Echo for live intel"
+            sublabel="Leaderboard insight · who to watch"
+            source="pga_card_live"
+          />
+        </div>
+
         {/* ── ZONE 4: CTA BAR ── */}
         <div
           className="flex-shrink-0 flex items-center gap-3 px-5 pt-3"
