@@ -158,7 +158,7 @@ function ProfileHubSheet({
       label: 'Notifications',
       route: '/notificationmessages',
       badge: unreadNotificationCount,
-      badgeColor: 'bg-destructive',
+      badgeColor: 'amber',
     },
   ];
 
