@@ -147,14 +147,13 @@ interface ReviewOfWeekCardProps {
   post: ReviewOfWeekCardFeedPost;
   onComment: () => void;
   onLike: () => void;
-  getLikeState?: (post: FeedPost) => { isLiked: boolean; count: number };
-  getCommentCount?: (post: FeedPost) => number;
+  onShare?: () => void;
   currentUserId?: string;
   isLoading?: boolean;
 }
 
 export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
-  post, onComment, onLike, getLikeState, getCommentCount, currentUserId, isLoading,
+  post, onComment, onLike, onShare, currentUserId, isLoading,
 }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
