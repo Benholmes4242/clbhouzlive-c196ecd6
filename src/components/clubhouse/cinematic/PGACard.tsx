@@ -146,7 +146,7 @@ const HeroAvatar: React.FC<{ src?: string | null; name: string }> = ({ src, name
       <img
         src={src}
         alt={name}
-        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center -20%' }}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 0%' }}
         onError={(e) => {
           (e.target as HTMLImageElement).style.display = 'none';
           const fb = (e.target as HTMLImageElement).parentElement?.querySelector('[data-fallback]') as HTMLElement;
@@ -179,7 +179,7 @@ const RowAvatar: React.FC<{ src?: string | null; name: string; size?: number; fl
       aspectRatio: '1',
     }}>
       {src ? (
-        <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 5%' }} />
+        <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 0%' }} />
       ) : (
         <span style={{ fontSize: `calc(${dim} * 0.35)`, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>{getInitials(name)}</span>
       )}
@@ -1217,7 +1217,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     {cd.leader.photoUrl ? (
-                      <img src={cd.leader.photoUrl} alt={cd.leader.playerName} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                      <img src={cd.leader.photoUrl} alt={cd.leader.playerName} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 0%' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                     ) : (
                       <span style={{ fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>{getInitials(cd.leader.playerName)}</span>
                     )}
