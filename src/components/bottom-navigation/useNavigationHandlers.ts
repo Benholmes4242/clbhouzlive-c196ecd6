@@ -5,6 +5,7 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { prefetchProfileVideos, resolveUsernameToId } from '@/utils/profileVideoPrefetch';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
 
 export const useNavigationHandlers = () => {
   const navigate = useNavigate();
