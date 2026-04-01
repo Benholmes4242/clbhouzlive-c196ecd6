@@ -317,9 +317,6 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
                   Review of the Week
                 </span>
               </div>
-              <div className="mt-1 pl-1 text-[10px] font-medium text-white/40">
-                {card.weekLabel}
-              </div>
             </div>
           </div>
 
@@ -382,23 +379,13 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
             </div>
 
             {/* Score pill */}
-            <div className="flex flex-col items-center gap-[4px] flex-shrink-0" style={{
+            <div className="flex flex-col items-center flex-shrink-0" style={{
               background: `linear-gradient(135deg, ${AMBER}, #E8820E)`,
               borderRadius: 14,
               padding: '9px 13px',
               boxShadow: '0 4px 16px rgba(247,147,30,0.3)',
             }}>
               <span className="text-[20px] font-bold text-white leading-none">{card.rating.toFixed(1)}</span>
-              <div className="flex items-center gap-[2px]">
-                {[1, 2, 3, 4, 5].map(i => (
-                  <svg key={i} width="9" height="9" viewBox="0 0 10 10">
-                    <polygon
-                      points="5,1 6.2,3.8 9,4.1 7,6 7.6,9 5,7.5 2.4,9 3,6 1,4.1 3.8,3.8"
-                      fill={i <= Math.round(card.rating / 2) ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.3)'}
-                    />
-                  </svg>
-                ))}
-              </div>
             </div>
           </div>
 
