@@ -8,7 +8,8 @@ import { HistoryCard } from '@/components/clubhouse/cinematic/HistoryCard';
 import { CourseOfWeekCard } from '@/components/clubhouse/cinematic/CourseOfWeekCard';
 import { WeeklyDebateCard } from '@/components/clubhouse/cinematic/WeeklyDebateCard';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
-import type { FeedPost, PGACardFeedPost, HistoryCardFeedPost, CourseOfWeekCardFeedPost, DebateCardFeedPost } from '@/components/media-system/types/media';
+import type { FeedPost, PGACardFeedPost, HistoryCardFeedPost, CourseOfWeekCardFeedPost, DebateCardFeedPost, ReviewOfWeekCardFeedPost } from '@/components/media-system/types/media';
+import { ReviewOfWeekCard } from '@/components/clubhouse/cinematic/ReviewOfWeekCard';
 
 interface FeedSlideProps {
   post: FeedPost;
@@ -114,6 +115,20 @@ export const FeedSlide = memo(function FeedSlide({
       );
     }
 
+    // Review of the Week card
+    if (post.postType === 'review_of_week_card') {
+      return (
+        <ReviewOfWeekCard
+          post={post as unknown as ReviewOfWeekCardFeedPost}
+          onComment={() => onComment?.()}
+          onLike={() => onLike?.(post)}
+          getLikeState={getLikeState}
+          getCommentCount={getCommentCount}
+          currentUserId={user?.id}
+        />
+      );
+    }
+
     // Multi-media (any mix of video + image) → FeedImageCarousel
     if (media && media.length > 1) {
       return (
@@ -215,7 +230,8 @@ export const FeedSlide = memo(function FeedSlide({
       {(post.postType === 'pga_card' ||
         post.postType === 'history_card' ||
         post.postType === 'course_of_week_card' ||
-        post.postType === 'debate_card') && (
+        post.postType === 'debate_card' ||
+        post.postType === 'review_of_week_card') && (
         <div data-pga-sentinel="true" className="absolute inset-0 pointer-events-none" />
       )}
       {renderContent()}

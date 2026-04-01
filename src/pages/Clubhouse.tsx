@@ -34,8 +34,8 @@ import { useSuggestedFeed } from '@/components/media-system/hooks/useSuggestedFe
 import { useFriendsFeed } from '@/components/media-system/hooks/useFriendsFeed';
 import { usePGACard } from '@/components/media-system/hooks/usePGACard';
 import { useEditorialCards } from '@/components/media-system/hooks/useEditorialCards';
-import { injectPGACard, injectHistoryCard, injectCourseOfWeekCard, injectDebateCard } from '@/components/media-system/utils/feedAlgorithm';
-import type { FeedPost, PGACardFeedPost, HistoryCardFeedPost, CourseOfWeekCardFeedPost, DebateCardFeedPost } from '@/components/media-system/types/media';
+import { injectPGACard, injectHistoryCard, injectCourseOfWeekCard, injectDebateCard, injectReviewOfWeekCard } from '@/components/media-system/utils/feedAlgorithm';
+import type { FeedPost, PGACardFeedPost, HistoryCardFeedPost, CourseOfWeekCardFeedPost, DebateCardFeedPost, ReviewOfWeekCardFeedPost } from '@/components/media-system/types/media';
 // buildSuggestedFeed/buildFriendsFeed are called inside the feed hooks — not here
 
 // ── Clubhouse UI overlays ──
@@ -169,7 +169,7 @@ const ClubhouseContent = () => {
   const suggestedFeed = useSuggestedFeed(user?.id);
   const friendsFeed = useFriendsFeed(user?.id);
   const { pgaCard } = usePGACard(user?.id);
-  const { historyCard, courseOfWeekCard, debateCard } = useEditorialCards(user?.id);
+  const { historyCard, courseOfWeekCard, debateCard, reviewOfWeekCard } = useEditorialCards(user?.id);
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
   
   const posts = useMemo(() => {
@@ -177,11 +177,12 @@ const ClubhouseContent = () => {
       let feed = injectHistoryCard(activeFeed.posts, historyCard as unknown as FeedPost);   // slot 11
       feed = injectPGACard(feed, pgaCard as unknown as FeedPost);                           // slot 7
       feed = injectCourseOfWeekCard(feed, courseOfWeekCard as unknown as FeedPost);         // slot 3
+      feed = injectReviewOfWeekCard(feed, reviewOfWeekCard as unknown as FeedPost);         // slot 14
       // feed = injectDebateCard(feed, debateCard as unknown as FeedPost); // temporarily disabled
       return feed;
     }
     return activeFeed.posts;
-  }, [activeFeed.posts, activeTab, pgaCard, historyCard, courseOfWeekCard, debateCard]);
+  }, [activeFeed.posts, activeTab, pgaCard, historyCard, courseOfWeekCard, debateCard, reviewOfWeekCard]);
 
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? false;
@@ -205,7 +206,7 @@ const ClubhouseContent = () => {
   const activeLikeState = getActiveLikeState(activePost);
 
   // ── Editorial card like count for CommentsSheet ──
-  const editorialCardId = ['course_of_week_card', 'history_card', 'debate_card'].includes(activePost?.postType ?? '')
+  const editorialCardId = ['course_of_week_card', 'history_card', 'debate_card', 'review_of_week_card'].includes(activePost?.postType ?? '')
     ? (activePost as any)?.cardData?.cardId
     : null;
 
@@ -428,12 +429,14 @@ const ClubhouseContent = () => {
                 ? (activePost as any).cardData.cardId
                 : activePost.postType === 'debate_card'
                 ? (activePost as any).cardData.cardId
+                : activePost.postType === 'review_of_week_card'
+                ? (activePost as any).cardData.cardId
                 : activePost.id
             }
             currentUserId={user?.id}
             creatorUserId={activePost.userId}
             creatorName={
-              ['pga_card', 'history_card', 'course_of_week_card', 'debate_card'].includes(activePost.postType ?? '')
+              ['pga_card', 'history_card', 'course_of_week_card', 'debate_card', 'review_of_week_card'].includes(activePost.postType ?? '')
                 ? 'Clbhouz'
                 : activePost.displayName
             }
@@ -441,17 +444,17 @@ const ClubhouseContent = () => {
             caption={activePost.caption}
             theme="dark"
             likesCount={
-              ['course_of_week_card', 'history_card', 'debate_card'].includes(activePost.postType ?? '')
+              ['course_of_week_card', 'history_card', 'debate_card', 'review_of_week_card'].includes(activePost.postType ?? '')
                 ? (editorialLikeCount ?? 0)
                 : activeLikeState?.count ?? null
             }
             likeSource={
-              ['course_of_week_card', 'history_card', 'debate_card'].includes(activePost.postType ?? '')
+              ['course_of_week_card', 'history_card', 'debate_card', 'review_of_week_card'].includes(activePost.postType ?? '')
                 ? 'editorial'
                 : 'post'
             }
             editorialCardId={
-              ['course_of_week_card', 'history_card', 'debate_card'].includes(activePost.postType ?? '')
+              ['course_of_week_card', 'history_card', 'debate_card', 'review_of_week_card'].includes(activePost.postType ?? '')
                 ? (activePost as any).cardData.cardId
                 : undefined
             }

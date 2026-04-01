@@ -271,3 +271,14 @@ export function injectDebateCard(
   result.splice(Math.min(13, result.length), 0, card);
   return result;
 }
+
+export function injectReviewOfWeekCard(
+  feedPosts: FeedPost[],
+  card: FeedPost | null
+): FeedPost[] {
+  if (!card) return feedPosts;
+  const without = feedPosts.filter(p => (p as any).postType !== 'review_of_week_card');
+  const result = [...without];
+  result.splice(Math.min(14, result.length), 0, card);
+  return result;
+}

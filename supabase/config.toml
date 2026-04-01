@@ -200,3 +200,6 @@ verify_jwt = false
 
 [functions.backfill-scorecards]
 verify_jwt = false
+
+[functions.select-review-of-week]
+verify_jwt = false

@@ -225,7 +225,7 @@ export interface PGACardFeedPost extends Omit<FeedPost, 'mediaItems' | 'review' 
 // ── Editorial Card Shared ──
 export interface EditorialCardBase {
   cardId: string;
-  cardType: 'history' | 'course_of_week' | 'debate';
+  cardType: 'history' | 'course_of_week' | 'debate' | 'review_of_week';
   title: string;
   body: string | null;
   bodyExtended: string | null;
@@ -306,6 +306,49 @@ export interface DebateCardData extends EditorialCardBase {
 export interface DebateCardFeedPost extends Omit<FeedPost, 'mediaItems' | 'review' | 'isReview'> {
   postType: 'debate_card';
   cardData: DebateCardData;
+  mediaItems: [];
+  review: null;
+  isReview: false;
+}
+
+// ── Review of the Week ──
+export interface ReviewOfWeekCardData {
+  cardId: string;
+  cardType: 'review_of_week';
+  weekLabel: string;
+  reviewId: string;
+  reviewText: string;
+  rating: number;
+  designScore: number | null;
+  conditionScore: number | null;
+  clubhouseScore: number | null;
+  facilitiesScore: number | null;
+  helpfulCount: number;
+  playedDate: string | null;
+  photoUrls: string[];
+  reviewer: {
+    userId: string;
+    displayName: string;
+    username: string | null;
+    avatarUrl: string | null;
+    handicap: number | null;
+    reviewCount: number;
+    isVerified: boolean;
+  };
+  course: {
+    id: string;
+    name: string;
+    country: string;
+    subCountry: string | null;
+    globalRank: number | null;
+    thumbnailImage: string | null;
+    communityRating: number | null;
+  };
+}
+
+export interface ReviewOfWeekCardFeedPost extends Omit<FeedPost, 'mediaItems' | 'review' | 'isReview'> {
+  postType: 'review_of_week_card';
+  cardData: ReviewOfWeekCardData;
   mediaItems: [];
   review: null;
   isReview: false;

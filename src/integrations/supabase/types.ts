@@ -3045,9 +3045,11 @@ export type Database = {
           helpful_count: number | null
           id: string
           is_mock: boolean
+          is_review_of_week: boolean | null
           rating: number
           review: string | null
           review_date: string | null
+          review_of_week_week: string | null
           title: string | null
           unhelpful_count: number | null
           updated_at: string
@@ -3063,9 +3065,11 @@ export type Database = {
           helpful_count?: number | null
           id?: string
           is_mock?: boolean
+          is_review_of_week?: boolean | null
           rating: number
           review?: string | null
           review_date?: string | null
+          review_of_week_week?: string | null
           title?: string | null
           unhelpful_count?: number | null
           updated_at?: string
@@ -3081,9 +3085,11 @@ export type Database = {
           helpful_count?: number | null
           id?: string
           is_mock?: boolean
+          is_review_of_week?: boolean | null
           rating?: number
           review?: string | null
           review_date?: string | null
+          review_of_week_week?: string | null
           title?: string | null
           unhelpful_count?: number | null
           updated_at?: string
