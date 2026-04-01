@@ -5,11 +5,13 @@ import { analyticsEvents } from '@/utils/analyticsEvents';
 
 import { prefetchProfileVideos, resolveUsernameToId } from '@/utils/profileVideoPrefetch';
 import { useActiveActor } from '@/context/ActiveActorContext';
+import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
 
 export const useNavigationHandlers = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { activeActor } = useActiveActor();
+  const { markCoursesAsSeen } = useUnseenFriendReviews();
   const [activeTab, setActiveTab] = useState('clubhouse');
 
   useEffect(() => {
@@ -22,6 +24,7 @@ export const useNavigationHandlers = () => {
       setActiveTab('tourhub');
     } else if (location.pathname === '/map' || location.pathname.startsWith('/courses')) {
       setActiveTab('courses');
+      markCoursesAsSeen();
     } else if (location.pathname === '/watch') {
       setActiveTab('watch');
     }
@@ -38,6 +41,11 @@ export const useNavigationHandlers = () => {
 
     if (tab.path) {
       setActiveTab(tab.id);
+
+      // Clear courses badge when visiting courses tab
+      if (tab.id === 'courses') {
+        markCoursesAsSeen();
+      }
 
       if (tab.path === '/profile') {
         // Profile tab: navigate to business profile when acting as business
