@@ -317,7 +317,7 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
                   Review of the Week
                 </span>
               </div>
-          </div>
+            </div>
 
           {/* ── World rank ── */}
           {card.course.globalRank && (
