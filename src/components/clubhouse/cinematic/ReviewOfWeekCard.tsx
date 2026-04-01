@@ -64,40 +64,40 @@ function ReviewOfWeekSkeleton() {
     >
       <div className="max-w-[500px] mx-auto w-full h-full">
         {/* Hero skeleton */}
-        <div className="w-full animate-shimmer rounded-none" style={{ height: 'clamp(180px, 28vw, 240px)', background: 'rgba(255,255,255,0.06)' }} />
+        <div className="w-full animate-pulse rounded-none" style={{ height: 'clamp(180px, 28vw, 240px)', background: 'rgba(255,255,255,0.06)' }} />
 
         {/* Course meta skeleton */}
         <div className="px-4 sm:px-5 mt-4 space-y-2">
-          <div className="h-3 w-24 rounded-full animate-shimmer" style={{ background: 'rgba(255,255,255,0.08)' }} />
-          <div className="h-5 w-48 rounded-full animate-shimmer" style={{ background: 'rgba(255,255,255,0.08)' }} />
-          <div className="h-3 w-32 rounded-full animate-shimmer" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <div className="h-3 w-24 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.08)' }} />
+          <div className="h-5 w-48 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.08)' }} />
+          <div className="h-3 w-32 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
         </div>
 
         {/* Reviewer row skeleton */}
         <div className="px-4 sm:px-5 mt-5 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-[10px] animate-shimmer" style={{ background: 'rgba(255,255,255,0.08)' }} />
+          <div className="w-9 h-9 rounded-[10px] animate-pulse" style={{ background: 'rgba(255,255,255,0.08)' }} />
           <div className="flex-1 space-y-1.5">
-            <div className="h-3 w-28 rounded-full animate-shimmer" style={{ background: 'rgba(255,255,255,0.08)' }} />
-            <div className="h-2.5 w-40 rounded-full animate-shimmer" style={{ background: 'rgba(255,255,255,0.06)' }} />
+            <div className="h-3 w-28 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.08)' }} />
+            <div className="h-2.5 w-40 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
           </div>
-          <div className="w-14 h-9 rounded-xl animate-shimmer" style={{ background: 'rgba(255,255,255,0.08)' }} />
+          <div className="w-14 h-9 rounded-xl animate-pulse" style={{ background: 'rgba(255,255,255,0.08)' }} />
         </div>
 
         {/* Text skeleton */}
         <div className="px-4 sm:px-5 mt-4 space-y-2">
-          <div className="h-3 w-full rounded-full animate-shimmer" style={{ background: 'rgba(255,255,255,0.06)' }} />
-          <div className="h-3 w-[90%] rounded-full animate-shimmer" style={{ background: 'rgba(255,255,255,0.06)' }} />
-          <div className="h-3 w-[70%] rounded-full animate-shimmer" style={{ background: 'rgba(255,255,255,0.06)' }} />
-          <div className="h-3 w-[50%] rounded-full animate-shimmer" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <div className="h-3 w-full rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <div className="h-3 w-[90%] rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <div className="h-3 w-[70%] rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <div className="h-3 w-[50%] rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
         </div>
 
         {/* Breakdown skeleton */}
         <div className="px-4 sm:px-5 mt-4 space-y-2">
           {[75, 85, 90, 90].map((w, i) => (
             <div key={i} className="flex items-center gap-2">
-              <div className="h-2.5 w-[68px] rounded-full animate-shimmer" style={{ background: 'rgba(255,255,255,0.06)' }} />
-              <div className="h-1 flex-1 rounded-full animate-shimmer" style={{ background: 'rgba(255,255,255,0.06)', width: `${w}%` }} />
-              <div className="h-2.5 w-6 rounded-full animate-shimmer" style={{ background: 'rgba(255,255,255,0.06)' }} />
+              <div className="h-2.5 w-[68px] rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
+              <div className="h-1 flex-1 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
+              <div className="h-2.5 w-6 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
             </div>
           ))}
         </div>
@@ -105,19 +105,19 @@ function ReviewOfWeekSkeleton() {
         {/* Photo grid skeleton */}
         <div className="px-4 sm:px-5 mt-4 grid grid-cols-4 gap-1 rounded-xl overflow-hidden">
           {[0, 1, 2, 3].map(i => (
-            <div key={i} className="aspect-square animate-shimmer rounded-sm" style={{ background: 'rgba(255,255,255,0.06)' }} />
+            <div key={i} className="aspect-square animate-pulse rounded-sm" style={{ background: 'rgba(255,255,255,0.06)' }} />
           ))}
         </div>
 
         {/* Course link skeleton */}
         <div className="px-4 sm:px-5 mt-4">
-          <div className="h-12 w-full rounded-xl animate-shimmer" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <div className="h-12 w-full rounded-xl animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
         </div>
 
         {/* Action rail skeleton */}
         <div className="px-4 sm:px-5 mt-4 grid grid-cols-4 gap-2">
           {[0, 1, 2, 3].map(i => (
-            <div key={i} className="h-10 rounded-lg animate-shimmer" style={{ background: 'rgba(255,255,255,0.04)' }} />
+            <div key={i} className="h-10 rounded-lg animate-pulse" style={{ background: 'rgba(255,255,255,0.04)' }} />
           ))}
         </div>
       </div>
@@ -168,20 +168,20 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
   const reviewId = card?.reviewId ?? '';
   const cardHelpfulCount = card?.helpfulCount ?? 0;
 
-  // ── Like state (reuses editorial_card_likes) ──
+  // ── Like state ──
   const { data: likeData } = useQuery({
-    queryKey: ['editorial-card-likes', card.cardId, currentUserId],
+    queryKey: ['editorial-card-likes', cardId, currentUserId],
     queryFn: async () => {
       const { count } = await supabase
         .from('editorial_card_likes')
         .select('*', { count: 'exact', head: true })
-        .eq('card_id', card.cardId);
+        .eq('card_id', cardId);
       let hasLiked = false;
       if (currentUserId) {
         const { data } = await supabase
           .from('editorial_card_likes')
           .select('id')
-          .eq('card_id', card.cardId)
+          .eq('card_id', cardId)
           .eq('user_id', currentUserId)
           .maybeSingle();
         hasLiked = !!data;
@@ -189,68 +189,73 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
       return { count: count ?? 0, hasLiked };
     },
     staleTime: 30_000,
+    enabled: !!cardId,
   });
 
-  const [optimisticLike, setOptimisticLike] = useState<{ isLiked: boolean; count: number } | null>(null);
   const handleLike = useCallback(async () => {
-    if (!currentUserId) return;
+    if (!currentUserId || !cardId) return;
     haptic('light');
     const current = optimisticLike ?? { isLiked: likeData?.hasLiked ?? false, count: likeData?.count ?? 0 };
     const newLiked = !current.isLiked;
     setOptimisticLike({ isLiked: newLiked, count: current.count + (newLiked ? 1 : -1) });
     try {
       if (newLiked) {
-        await supabase.from('editorial_card_likes').insert({ card_id: card.cardId, user_id: currentUserId });
+        await supabase.from('editorial_card_likes').insert({ card_id: cardId, user_id: currentUserId });
       } else {
-        await supabase.from('editorial_card_likes').delete().eq('card_id', card.cardId).eq('user_id', currentUserId);
+        await supabase.from('editorial_card_likes').delete().eq('card_id', cardId).eq('user_id', currentUserId);
       }
-      queryClient.invalidateQueries({ queryKey: ['editorial-card-likes', card.cardId, currentUserId] });
+      queryClient.invalidateQueries({ queryKey: ['editorial-card-likes', cardId, currentUserId] });
     } catch { setOptimisticLike(null); }
-  }, [currentUserId, optimisticLike, likeData, card.cardId, queryClient]);
+  }, [currentUserId, optimisticLike, likeData, cardId, queryClient]);
 
   // ── Helpful vote ──
-  const [helpfulOptimistic, setHelpfulOptimistic] = useState<{ isHelpful: boolean; count: number } | null>(null);
   const { data: helpfulData } = useQuery({
-    queryKey: ['review-helpful', card.reviewId, currentUserId],
+    queryKey: ['review-helpful', reviewId, currentUserId],
     queryFn: async () => {
       const { data: rating } = await supabase
         .from('course_ratings')
         .select('helpful_count')
-        .eq('id', card.reviewId)
+        .eq('id', reviewId)
         .single();
       let isHelpful = false;
       if (currentUserId) {
         const { data: vote } = await supabase
           .from('course_review_votes')
           .select('vote_type')
-          .eq('rating_id', card.reviewId)
+          .eq('rating_id', reviewId)
           .eq('user_id', currentUserId)
           .maybeSingle();
         isHelpful = vote?.vote_type === 'helpful';
       }
-      return { count: rating?.helpful_count ?? card.helpfulCount, isHelpful };
+      return { count: rating?.helpful_count ?? cardHelpfulCount, isHelpful };
     },
     staleTime: 30_000,
+    enabled: !!reviewId,
   });
 
   const handleHelpful = useCallback(async () => {
-    if (!currentUserId) return;
+    if (!currentUserId || !reviewId) return;
     haptic('light');
-    const current = helpfulOptimistic ?? { isHelpful: helpfulData?.isHelpful ?? false, count: helpfulData?.count ?? card.helpfulCount };
+    const current = helpfulOptimistic ?? { isHelpful: helpfulData?.isHelpful ?? false, count: helpfulData?.count ?? cardHelpfulCount };
     const newHelpful = !current.isHelpful;
     setHelpfulOptimistic({ isHelpful: newHelpful, count: current.count + (newHelpful ? 1 : -1) });
     try {
       if (newHelpful) {
         await supabase.from('course_review_votes').upsert(
-          { rating_id: card.reviewId, user_id: currentUserId, vote_type: 'helpful' },
+          { rating_id: reviewId, user_id: currentUserId, vote_type: 'helpful' },
           { onConflict: 'rating_id,user_id' }
         );
       } else {
-        await supabase.from('course_review_votes').delete().eq('rating_id', card.reviewId).eq('user_id', currentUserId);
+        await supabase.from('course_review_votes').delete().eq('rating_id', reviewId).eq('user_id', currentUserId);
       }
-      queryClient.invalidateQueries({ queryKey: ['review-helpful', card.reviewId, currentUserId] });
+      queryClient.invalidateQueries({ queryKey: ['review-helpful', reviewId, currentUserId] });
     } catch { setHelpfulOptimistic(null); }
-  }, [currentUserId, helpfulOptimistic, helpfulData, card.reviewId, card.helpfulCount, queryClient]);
+  }, [currentUserId, helpfulOptimistic, helpfulData, reviewId, cardHelpfulCount, queryClient]);
+
+  // ── Skeleton gate (after all hooks) ──
+  if (isLoading || !card) {
+    return <ReviewOfWeekSkeleton />;
+  }
 
   const isLiked = optimisticLike?.isLiked ?? likeData?.hasLiked ?? false;
   const likeCount = optimisticLike?.count ?? likeData?.count ?? 0;
@@ -434,7 +439,6 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
                   )}
                 </div>
               ))}
-              {/* Empty placeholders if fewer than 4 */}
               {Array.from({ length: Math.max(0, 4 - card.photoUrls.length) }).map((_, i) => (
                 <div key={`empty-${i}`} className="aspect-square" style={{ background: 'rgba(255,255,255,0.04)' }} />
               ))}
