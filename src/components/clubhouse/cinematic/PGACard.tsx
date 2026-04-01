@@ -751,9 +751,9 @@ export const PGACard: React.FC<PGACardProps> = ({
         {/* Echo — live tournament intel */}
         <div style={{ padding: '6px 16px 2px' }}>
           <EchoContextualButton
-            prompt={`Give me live intel on ${cd.tournamentName} — who is leading, what are the key storylines, and who should I watch today?`}
+            prompt={`It's ${new Date().getFullYear()} and ${cd.tournamentName} is happening live right now at ${cd.venueName || 'the course'}${cd.venueCity ? ` in ${cd.venueCity}` : ''}${cd.leader ? `. The current leader is ${cd.leader.playerName} at ${cd.leader.scoreDisplay}` : ''}${cd.chasers?.[0] ? `, with ${cd.chasers[0].playerName} close behind` : ''}. It's ${cd.roundLabel}. Search for the latest live leaderboard, tell me who is likely to win from here, what the key storylines are today, and which players I should be watching.`}
             label="Ask Echo for live intel"
-            sublabel="Leaderboard insight · who to watch"
+            sublabel="Live leaderboard · who to watch"
             source="pga_card_live"
           />
         </div>
