@@ -262,8 +262,8 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
   const isHelpful = helpfulOptimistic?.isHelpful ?? helpfulData?.isHelpful ?? false;
   const helpfulCount = helpfulOptimistic?.count ?? helpfulData?.count ?? card.helpfulCount;
 
-  const truncatedText = card.reviewText.slice(0, 220);
-  const displayText = expanded ? card.reviewText : truncatedText;
+  const fullText = [(card as any).reviewTitle, card.reviewText].filter(Boolean).join(' ');
+  const truncatedText = fullText.length > 220 ? fullText.slice(0, 220) + '…' : fullText;
 
   const breakdowns = [
     { label: 'Design', score: card.designScore },
@@ -274,242 +274,260 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
 
   const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
-  const starsFull = Math.floor(card.rating / 2);
-  const starsHalf = (card.rating / 2 - starsFull) >= 0.5;
-
   return (
     <div
-      className="absolute inset-0 overflow-y-auto overflow-x-hidden scrollbar-hide"
+      className="absolute inset-0 flex flex-col"
       style={{ background: '#0d0f0e', fontFamily: "'DM Sans', -apple-system, sans-serif" }}
     >
-      <div className="max-w-[500px] mx-auto w-full">
+      {/* ── Scrollable content ── */}
+      <div
+        className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide"
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}
+      >
+        <div className="max-w-[500px] mx-auto w-full">
 
-        {/* ── Hero zone ── */}
-        <div className="relative w-full overflow-hidden" style={{ height: 'clamp(180px, 28vw, 240px)' }}>
-          {card.course.thumbnailImage ? (
-            <img
-              src={card.course.thumbnailImage}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-          ) : (
-            <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #1a1d1a 0%, #0d0f0e 100%)' }} />
-          )}
+          {/* ── Hero zone ── */}
+          <div className="relative w-full overflow-hidden" style={{ height: 'clamp(180px, 28vw, 240px)' }}>
+            {card.course.thumbnailImage ? (
+              <img
+                src={card.course.thumbnailImage}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            ) : (
+              <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #1a1d1a 0%, #0d0f0e 100%)' }} />
+            )}
 
-          {/* Dark fade overlay */}
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(13,15,14,0.92) 85%, #0d0f0e 100%)' }} />
+            {/* Dark fade overlay */}
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(13,15,14,0.92) 85%, #0d0f0e 100%)' }} />
 
-          {/* Trophy badge — top-left */}
-          <div className="absolute left-4 sm:left-5" style={{ top: 'max(env(safe-area-inset-top, 47px), 47px)', paddingTop: 12 }}>
-            <div
-              className="flex items-center gap-1.5 backdrop-blur-xl"
-              style={{
-                background: 'rgba(247,147,30,0.12)',
-                border: '1px solid rgba(247,147,30,0.3)',
-                borderRadius: 20,
-                padding: '5px 12px',
-              }}
-            >
-              <TrophyIcon className="w-3.5 h-3.5 text-[#F7931E]" />
-              <span className="text-[11px] font-bold tracking-wider uppercase" style={{ color: AMBER }}>
-                Review of the Week
-              </span>
-            </div>
-            <div className="mt-1 pl-1 text-[10px] font-medium text-white/40">
-              {card.weekLabel}
+            {/* Trophy badge — top-left */}
+            <div className="absolute left-4 sm:left-5" style={{ top: 'max(env(safe-area-inset-top, 47px), 47px)', paddingTop: 12 }}>
+              <div
+                className="flex items-center gap-1.5 backdrop-blur-xl"
+                style={{
+                  background: 'rgba(247,147,30,0.12)',
+                  border: '1px solid rgba(247,147,30,0.3)',
+                  borderRadius: 20,
+                  padding: '5px 12px',
+                }}
+              >
+                <TrophyIcon className="w-3.5 h-3.5 text-[#F7931E]" />
+                <span className="text-[11px] font-bold tracking-wider uppercase" style={{ color: AMBER }}>
+                  Review of the Week
+                </span>
+              </div>
+              <div className="mt-1 pl-1 text-[10px] font-medium text-white/40">
+                {card.weekLabel}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* ── Course meta ── */}
-        <div className="px-4 sm:px-5 -mt-10 relative z-10">
+          {/* ── World rank ── */}
           {card.course.globalRank && (
-            <div className="flex items-center gap-1 mb-1">
-              <span className="text-[10px] font-semibold" style={{ color: AMBER }}>
-                World Rank #{card.course.globalRank}
-              </span>
-            </div>
+            <p className="text-[11px] font-semibold tracking-[0.06em] text-[#F7931E] mb-1 uppercase px-4 pt-4 m-0">
+              World Rank #{card.course.globalRank}
+            </p>
           )}
-          <h2
-            className="font-extrabold text-white m-0 leading-tight"
-            style={{ fontSize: 'clamp(19px, 5vw, 24px)', letterSpacing: '-0.02em' }}
-          >
-            {card.course.name}
-          </h2>
-          <span className="text-[12px] text-white/50 mt-0.5 block">
-            {card.course.subCountry ?? card.course.country}
-          </span>
-        </div>
 
-        {/* ── Reviewer row ── */}
-        <div className="px-4 sm:px-5 mt-4 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            {/* Squircle avatar */}
-            <div className="w-9 h-9 shrink-0 overflow-hidden" style={{ borderRadius: '34%' }}>
-              {card.reviewer.avatarUrl ? (
-                <img src={card.reviewer.avatarUrl} alt="" className="w-full h-full object-cover" />
-              ) : (
-                <div
-                  className="w-full h-full flex items-center justify-center text-[13px] font-bold"
-                  style={{ background: 'rgba(247,147,30,0.15)', color: AMBER }}
-                >
-                  {getInitials(card.reviewer.displayName)}
-                </div>
-              )}
-            </div>
-
-            {/* Name + meta */}
-            <div>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => navigate(`/u/${card.reviewer.username ?? card.reviewer.userId}`)}
-                  className="text-[13px] font-bold text-white/90 bg-transparent border-none p-0 cursor-pointer"
-                  style={{ letterSpacing: '-0.01em' }}
-                >
-                  {card.reviewer.displayName}
-                </button>
-                {card.reviewer.isVerified && <VerifiedIcon className="w-3 h-3" />}
-              </div>
-              <div className="text-[10px] text-white/40 flex gap-1 items-center mt-px">
-                {card.reviewer.handicap != null && <span>HCP {card.reviewer.handicap.toFixed(1)}</span>}
-                {card.reviewer.handicap != null && <span>·</span>}
-                <span>{card.reviewer.reviewCount} reviews</span>
-                {card.playedDate && <><span>·</span><span>{card.playedDate}</span></>}
-              </div>
-            </div>
-          </div>
-
-          {/* Score pill */}
-          <div
-            className="flex items-center gap-1 shrink-0"
-            style={{
-              background: `linear-gradient(135deg, ${AMBER}, #E8820E)`,
-              borderRadius: 12,
-              padding: '6px 12px',
-              boxShadow: '0 4px 16px rgba(247,147,30,0.3)',
-            }}
-          >
-            <span className="text-[20px] font-extrabold text-white leading-none">{card.rating.toFixed(1)}</span>
-            <div className="flex gap-px">
-              {[1, 2, 3, 4, 5].map(i => (
-                <StarIcon key={i} className="w-2.5 h-2.5" filled={i <= starsFull || (i === starsFull + 1 && starsHalf)} />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* ── Review text ── */}
-        <div className="px-4 sm:px-5 mt-4">
-          <p className="text-[14px] leading-relaxed text-white/80 m-0 whitespace-pre-wrap">
-            {displayText}
-            {!expanded && card.reviewText.length > 220 && '…'}
-          </p>
-          {card.reviewText.length > 220 && (
-            <button
-              onClick={() => setExpanded(e => !e)}
-              className="text-[13.5px] font-semibold mt-[5px] active:scale-[0.97] bg-transparent border-none p-0 cursor-pointer"
-              style={{ color: AMBER }}
+          {/* ── Course name + country ── */}
+          <div className={`px-4 sm:px-5 ${card.course.globalRank ? 'pt-0' : 'pt-3'}`}>
+            <h2
+              className="font-extrabold text-white m-0 leading-tight"
+              style={{ fontSize: 'clamp(19px, 5vw, 24px)', letterSpacing: '-0.02em' }}
             >
-              {expanded ? 'Show less' : 'Read more'}
-            </button>
-          )}
-        </div>
-
-        {/* ── Breakdown bars ── */}
-        {breakdowns.length > 0 && (
-          <div
-            className="mx-4 sm:mx-5 mt-4 rounded-xl"
-            style={{ padding: '12px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
-          >
-            {breakdowns.map(b => <BreakdownBar key={b.label} label={b.label} score={b.score} />)}
+              {card.course.name}
+            </h2>
+            <span className="text-[12px] text-white/50 mt-0.5 block">
+              {card.course.subCountry ?? card.course.country}
+            </span>
           </div>
-        )}
 
-        {/* ── Photo grid ── */}
-        {card.photoUrls.length > 0 && (
-          <div className="px-4 sm:px-5 mt-4">
-            <div className="grid grid-cols-4 gap-1 rounded-xl overflow-hidden">
+          {/* ── Reviewer row ── */}
+          <div className="px-4 sm:px-5 mt-4 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              {/* Squircle avatar */}
+              <div className="w-9 h-9 shrink-0 overflow-hidden" style={{ borderRadius: '34%' }}>
+                {card.reviewer.avatarUrl ? (
+                  <img src={card.reviewer.avatarUrl} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <div
+                    className="w-full h-full flex items-center justify-center text-[13px] font-bold"
+                    style={{ background: 'rgba(247,147,30,0.15)', color: AMBER }}
+                  >
+                    {getInitials(card.reviewer.displayName)}
+                  </div>
+                )}
+              </div>
+
+              {/* Name + meta */}
+              <div>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => navigate(`/u/${card.reviewer.username ?? card.reviewer.userId}`)}
+                    className="text-[13px] font-bold text-white/90 bg-transparent border-none p-0 cursor-pointer"
+                    style={{ letterSpacing: '-0.01em' }}
+                  >
+                    {card.reviewer.displayName}
+                  </button>
+                  {card.reviewer.isVerified && <VerifiedIcon className="w-3 h-3" />}
+                </div>
+                <div className="text-[10px] text-white/40 flex gap-1 items-center mt-px">
+                  {card.reviewer.handicap != null && <span>HCP {card.reviewer.handicap.toFixed(1)}</span>}
+                  {card.reviewer.handicap != null && <span>·</span>}
+                  <span>{card.reviewer.reviewCount} reviews</span>
+                  {card.playedDate && <><span>·</span><span>{card.playedDate}</span></>}
+                </div>
+              </div>
+            </div>
+
+            {/* Score pill */}
+            <div className="flex flex-col items-center gap-[4px] flex-shrink-0" style={{
+              background: `linear-gradient(135deg, ${AMBER}, #E8820E)`,
+              borderRadius: 14,
+              padding: '9px 13px',
+              boxShadow: '0 4px 16px rgba(247,147,30,0.3)',
+            }}>
+              <span className="text-[20px] font-bold text-white leading-none">{card.rating.toFixed(1)}</span>
+              <div className="flex items-center gap-[2px]">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <svg key={i} width="9" height="9" viewBox="0 0 10 10">
+                    <polygon
+                      points="5,1 6.2,3.8 9,4.1 7,6 7.6,9 5,7.5 2.4,9 3,6 1,4.1 3.8,3.8"
+                      fill={i <= Math.round(card.rating / 2) ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.3)'}
+                    />
+                  </svg>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* ── Review text ── */}
+          <div className="px-4 sm:px-5 pt-3">
+            <p className="text-[13.5px] text-[rgba(255,255,255,0.78)] leading-[1.65] font-normal m-0">
+              {expanded ? fullText : truncatedText}
+            </p>
+            {fullText.length > 220 && (
+              <button
+                onClick={() => setExpanded(e => !e)}
+                className="text-[13.5px] font-semibold mt-[5px] block active:scale-[0.97] bg-transparent border-none p-0 cursor-pointer"
+                style={{ color: AMBER }}
+              >
+                {expanded ? 'Show less' : 'Read more'}
+              </button>
+            )}
+          </div>
+
+          {/* ── Breakdown bars ── */}
+          {breakdowns.length > 0 && (
+            <div
+              className="mx-4 sm:mx-5 mt-4 rounded-xl"
+              style={{ padding: '12px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+            >
+              {breakdowns.map(b => <BreakdownBar key={b.label} label={b.label} score={b.score} />)}
+            </div>
+          )}
+
+          {/* ── Photo grid ── */}
+          {card.photoUrls.length > 0 && (
+            <div className="mx-4 sm:mx-5 mt-4 grid grid-cols-4 gap-[3px] rounded-xl overflow-hidden">
               {card.photoUrls.slice(0, 4).map((url, i) => (
-                <div key={i} className="relative aspect-square overflow-hidden">
+                <div key={i} className="relative aspect-square overflow-hidden bg-[rgba(255,255,255,0.06)]">
                   <img src={url} alt="" className="w-full h-full object-cover" loading="lazy" />
                   {i === 3 && card.photoUrls.length > 4 && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-[18px] font-bold text-white">
-                      +{card.photoUrls.length - 4}
+                    <div className="absolute inset-0 bg-[rgba(13,15,14,0.6)] flex items-center justify-center">
+                      <span className="text-[15px] font-bold text-white">+{card.photoUrls.length - 4}</span>
                     </div>
                   )}
                 </div>
               ))}
-              {Array.from({ length: Math.max(0, 4 - card.photoUrls.length) }).map((_, i) => (
-                <div key={`empty-${i}`} className="aspect-square" style={{ background: 'rgba(255,255,255,0.04)' }} />
-              ))}
             </div>
+          )}
+
+          {/* ── Course link button ── */}
+          <div className="px-4 sm:px-5 mt-4 mb-4">
+            <button
+              onClick={() => navigate(`/courses/${card.course.id}`)}
+              className="w-full flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform h-12"
+              style={{
+                background: 'rgba(247,147,30,0.08)',
+                border: '1px solid rgba(247,147,30,0.2)',
+                borderRadius: 13,
+                padding: '0 14px',
+              }}
+            >
+              <span className="text-[13px] font-bold text-white truncate">
+                View {card.course.name}
+              </span>
+              <span className="text-[12px] font-semibold shrink-0 ml-2" style={{ color: AMBER }}>
+                View →
+              </span>
+            </button>
           </div>
-        )}
-
-        {/* ── Course link button ── */}
-        <div className="px-4 sm:px-5 mt-4">
-          <button
-            onClick={() => navigate(`/courses/${card.course.id}`)}
-            className="w-full flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform h-12"
-            style={{
-              background: 'rgba(247,147,30,0.08)',
-              border: '1px solid rgba(247,147,30,0.2)',
-              borderRadius: 13,
-              padding: '0 14px',
-            }}
-          >
-            <span className="text-[13px] font-bold text-white truncate">
-              View {card.course.name}
-            </span>
-            <span className="text-[12px] font-semibold shrink-0 ml-2" style={{ color: AMBER }}>
-              View →
-            </span>
-          </button>
         </div>
-
-        {/* Bottom spacer for fixed action rail */}
-        <div style={{ height: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }} />
       </div>
 
-      {/* ── Action rail (fixed) ── */}
+      {/* ── Action rail (sticky bottom, 3 cols) ── */}
       <div
-        className="fixed bottom-0 left-0 right-0 z-20 flex items-center backdrop-blur-2xl max-w-[480px] mx-auto"
+        className="sticky bottom-0 grid grid-cols-3 gap-2 px-3 pt-3"
         style={{
-          padding: '10px 16px',
-          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 10px)',
-          background: 'rgba(13,15,14,0.95)',
-          borderTop: '1px solid rgba(255,255,255,0.06)',
+          background: '#0d0f0e',
+          borderTop: '1px solid rgba(255,255,255,0.07)',
+          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 14px)',
         }}
       >
-        <div className="grid grid-cols-4 w-full">
-          {/* Like */}
-          <button onClick={handleLike} className="flex items-center justify-center gap-1.5 bg-transparent border-none cursor-pointer h-12 px-1">
-            <HeartIcon className="w-5 h-5 text-white/60" filled={isLiked} />
-            <span className="text-[12px] font-semibold" style={{ color: isLiked ? AMBER : 'rgba(255,255,255,0.5)' }}>
-              {likeCount > 0 ? `Like · ${likeCount}` : 'Like'}
-            </span>
-          </button>
+        {/* Like */}
+        <button
+          onClick={handleLike}
+          className="h-12 rounded-2xl flex items-center justify-center gap-[6px] text-[12px] font-semibold active:scale-[0.97] transition-transform"
+          style={{
+            background: 'rgba(255,255,255,0.05)',
+            border: '1px solid rgba(255,255,255,0.07)',
+            color: isLiked ? '#e05555' : 'rgba(255,255,255,0.45)',
+          }}
+        >
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+            <path d="M12 21C12 21 3 14.5 3 8.5C3 5.46 5.46 3 8.5 3C10.24 3 11.8 3.84 12 5C12.2 3.84 13.76 3 15.5 3C18.54 3 21 5.46 21 8.5C21 14.5 12 21 12 21Z"
+              fill={isLiked ? '#e05555' : 'none'}
+              stroke={isLiked ? '#e05555' : 'rgba(255,255,255,0.55)'}
+              strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span>{likeCount > 0 ? `Like · ${likeCount}` : 'Like'}</span>
+        </button>
 
-          {/* Helpful */}
-          <button onClick={handleHelpful} className="flex items-center justify-center gap-1.5 bg-transparent border-none cursor-pointer h-12 px-1">
-            <ThumbsUpIcon className="w-[18px] h-[18px] text-white/60" active={isHelpful} />
-            <span className="text-[12px] font-semibold" style={{ color: isHelpful ? '#10b981' : 'rgba(255,255,255,0.5)' }}>
-              {helpfulCount > 0 ? `${helpfulCount}` : ''}
-            </span>
-          </button>
+        {/* Comment */}
+        <button
+          onClick={onComment}
+          className="h-12 rounded-2xl flex items-center justify-center gap-[6px] text-[12px] font-semibold active:scale-[0.97] transition-transform"
+          style={{
+            background: 'rgba(255,255,255,0.05)',
+            border: '1px solid rgba(255,255,255,0.07)',
+            color: 'rgba(255,255,255,0.45)',
+          }}
+        >
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"
+              stroke="rgba(255,255,255,0.55)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span>Comment</span>
+        </button>
 
-          {/* Comment */}
-          <button onClick={onComment} className="flex items-center justify-center gap-1.5 bg-transparent border-none cursor-pointer h-12 px-1">
-            <CommentIcon className="w-5 h-5 text-white/60" />
-            <span className="text-[12px] font-semibold text-white/50">Comment</span>
-          </button>
-
-          {/* Share */}
-          <button onClick={onLike} className="flex items-center justify-center gap-1.5 bg-transparent border-none cursor-pointer h-12 px-1">
-            <ShareIcon className="w-[18px] h-[18px] text-white/60" />
-            <span className="text-[12px] font-semibold text-white/50">Share</span>
-          </button>
-        </div>
+        {/* Share */}
+        <button
+          onClick={onLike}
+          className="h-12 rounded-2xl flex items-center justify-center gap-[6px] text-[12px] font-semibold active:scale-[0.97] transition-transform"
+          style={{
+            background: 'rgba(255,255,255,0.05)',
+            border: '1px solid rgba(255,255,255,0.07)',
+            color: 'rgba(255,255,255,0.45)',
+          }}
+        >
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+            <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"
+              stroke="rgba(255,255,255,0.55)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span>Share</span>
+        </button>
       </div>
     </div>
   );
