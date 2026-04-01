@@ -30,6 +30,7 @@ export default function EchoPage() {
   const [input, setInput] = useState('');
   const [historyOpen, setHistoryOpen] = useState(false);
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
+  const returnToRef = useRef<string | null>(null);
 
   const {
     conversationId,
@@ -47,13 +48,17 @@ export default function EchoPage() {
 
   // Capture prompt from URL on mount/navigation
   const initialPrompt = searchParams.get('prompt');
+  const initialReturnTo = searchParams.get('returnTo');
   useEffect(() => {
+    if (initialReturnTo) {
+      returnToRef.current = decodeURIComponent(initialReturnTo);
+    }
     if (initialPrompt) {
       const decodedPrompt = decodeURIComponent(initialPrompt);
       setPendingPrompt(decodedPrompt);
       setSearchParams({}, { replace: true });
     }
-  }, [initialPrompt, setSearchParams]);
+  }, [initialPrompt, initialReturnTo, setSearchParams]);
 
   // Process pending prompt once hook is ready
   useEffect(() => {
@@ -80,10 +85,14 @@ export default function EchoPage() {
 
   const handleBack = useCallback(() => {
     haptic('light');
-    if (window.history.length > 1) {
+    if (returnToRef.current) {
+      const destination = returnToRef.current;
+      returnToRef.current = null;
+      navigate(destination);
+    } else if (window.history.length > 1) {
       navigate(-1);
     } else {
-      navigate('/clubhouse');
+      navigate('/');
     }
   }, [navigate]);
 
