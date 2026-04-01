@@ -774,7 +774,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
             flexDirection: 'column',
             minHeight: '100%',
             justifyContent: hasMedia || state.caption.length > 0 ? 'flex-start' : 'center',
-            paddingBottom: 16,
+            paddingBottom: 'clamp(12px, 3vh, 24px)',
           }}
         >
 
