@@ -8,6 +8,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { SeasonRecapModal } from '@/components/achievements/SeasonRecapModal';
+import { ProfileCompleteNudge } from '@/components/clubhouse/ProfileCompleteNudge';
 import { useSeasonRecap } from '@/hooks/useSeasonRecap';
 
 import { Compass, Flag, EyeOff, Link as LinkIcon, Users } from 'lucide-react';
