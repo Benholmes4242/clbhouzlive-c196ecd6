@@ -191,6 +191,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 useAmberActive={isWarmGradientRoute}
                 showBorder={false}
                 tabBadges={{ courses: unseenFriendReviews }}
+                liveTabs={liveTabs}
               />
             </div>
           </motion.div>

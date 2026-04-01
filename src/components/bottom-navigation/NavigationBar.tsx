@@ -159,7 +159,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
           </button>
         );
       })}
-    </nav>
+      </nav>
+    </>
   );
 };
 
