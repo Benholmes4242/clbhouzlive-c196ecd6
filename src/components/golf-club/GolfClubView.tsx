@@ -15,6 +15,7 @@ import { safeGoBack } from '@/utils/navigation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import CourseClaimBadge from '@/components/courses/course-detail/CourseClaimBadge';
+import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
 
 
 interface GolfClubViewProps {
@@ -174,6 +175,17 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
       {/* Claimed By Badge */}
       <div className="px-4 pt-0 pb-0 bg-background">
         <CourseClaimBadge courseId={course.id} />
+      </div>
+
+      {/* Echo — course detail contextual */}
+      <div style={{ padding: '10px 16px 4px' }}>
+        <EchoContextualButton
+          prompt={`Tell me everything about ${course.name}${course.country ? ` in ${course.country}` : ''} — what's the course like to play, what are the best holes, any tips for visiting, and how does it rank among courses in the area?`}
+          label={`Ask Echo about ${course.name}`}
+          sublabel="Playing tips · best holes · local knowledge"
+          dark={false}
+          source="course_detail_page"
+        />
       </div>
 
       {/* Segmented Control Tabs */}

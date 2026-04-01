@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { CourseOfWeekCardFeedPost } from '@/components/media-system/types/media';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
+import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
 
 interface CourseOfWeekCardProps {
   post: CourseOfWeekCardFeedPost;
@@ -322,8 +323,18 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
           ))}
         </div>
 
+        {/* Echo — course contextual */}
+        <div style={{ marginTop: 12 }}>
+          <EchoContextualButton
+            prompt={`Tell me about ${course.name}${course.subCountry ? ` in ${course.subCountry}` : ''}${course.country ? `, ${course.country}` : ''} — what's it like to play, best holes, and any tips?`}
+            label={`Ask Echo about ${course.name}`}
+            sublabel="Playing tips · best holes · local knowledge"
+            source="course_of_week"
+          />
+        </div>
+
         {/* CTAs */}
-        <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+        <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
           <button
             onClick={() => navigate(`/courses/${course.id}`)}
             className="active:scale-[0.97] transition-transform"

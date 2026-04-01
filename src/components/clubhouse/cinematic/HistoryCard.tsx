@@ -4,6 +4,7 @@ import { Heart, MessageCircle } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { HistoryCardFeedPost } from '@/components/media-system/types/media';
+import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
 import type { FeedPost } from '@/components/media-system/types/media';
 
 interface HistoryCardProps {
@@ -329,6 +330,16 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
             </span>
           </button>
         )}
+
+        {/* Echo — history contextual */}
+        <div style={{ marginBottom: 8 }}>
+          <EchoContextualButton
+            prompt={`Tell me about ${card.title || 'this golf history moment'} — what happened, why was it significant, and how did it shape the game?`}
+            label="Ask Echo about this moment"
+            sublabel="The story behind the history"
+            source="history_card"
+          />
+        </div>
 
         {/* Engagement row */}
         <div style={{ display: 'flex', gap: 10 }}>

@@ -140,7 +140,7 @@ function ProfileHubSheet({
             stroke="#F59E0B" strokeWidth="1.6" strokeLinecap="round"/>
         </svg>
       ),
-      label: 'Echo',
+      label: 'Echo AI Caddie',
       route: '/echo',
       badge: 0,
       badgeColor: '',

@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, MessageCircle, Trophy, Calendar, ChevronRight, MapPin, Shield } from 'lucide-react';
 import type { PGACardFeedPost, PGACardChaser } from '@/components/media-system/types/media';
+import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
 
 function getBestRoundLabel(leaderThru?: string | null): string | null {
   const roundFinished = leaderThru != null && String(leaderThru).toUpperCase() === 'F';
@@ -747,6 +748,16 @@ export const PGACard: React.FC<PGACardProps> = ({
           </div>
         </div>
 
+        {/* Echo — live tournament intel */}
+        <div style={{ padding: '6px 16px 2px' }}>
+          <EchoContextualButton
+            prompt={`Give me live intel on ${cd.tournamentName} — who is leading, what are the key storylines, and who should I watch today?`}
+            label="Ask Echo for live intel"
+            sublabel="Leaderboard insight · who to watch"
+            source="pga_card_live"
+          />
+        </div>
+
         {/* ── ZONE 4: CTA BAR ── */}
         <div
           className="flex-shrink-0 flex items-center gap-3 px-5 pt-3"
@@ -1078,6 +1089,16 @@ export const PGACard: React.FC<PGACardProps> = ({
           </div>
         </div>
 
+        {/* Echo — completed tournament recap */}
+        <div style={{ padding: '6px 16px 2px' }}>
+          <EchoContextualButton
+            prompt={`Tell me about the result of ${cd.tournamentName} — what happened, how did the winner play, and what were the key moments?`}
+            label="Ask Echo about the result"
+            sublabel="Winner story · key moments"
+            source="pga_card_completed"
+          />
+        </div>
+
         {/* ── ZONE 3: CTA BAR ── */}
         <div
           className="flex-shrink-0 flex items-center gap-3 px-5 pt-3"
@@ -1384,6 +1405,16 @@ export const PGACard: React.FC<PGACardProps> = ({
             </div>
           )}
         </div>
+      </div>
+
+      {/* Echo — upcoming tournament preview */}
+      <div style={{ padding: '6px 16px 2px' }}>
+        <EchoContextualButton
+          prompt={`Preview ${cd.tournamentName} for me — who are the favourites, what should I know about the course, and what makes this event special?`}
+          label="Ask Echo to preview this event"
+          sublabel="Favourites · course intel · storylines"
+          source="pga_card_upcoming"
+        />
       </div>
 
       {/* ── ZONE 3: CTA BAR — unchanged ── */}
