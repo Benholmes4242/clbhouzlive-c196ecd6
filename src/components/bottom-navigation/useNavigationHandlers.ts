@@ -42,6 +42,11 @@ export const useNavigationHandlers = () => {
     if (tab.path) {
       setActiveTab(tab.id);
 
+      // Clear courses badge when visiting courses tab
+      if (tab.id === 'courses') {
+        markCoursesAsSeen();
+      }
+
       if (tab.path === '/profile') {
         // Profile tab: navigate to business profile when acting as business
         if (activeActor?.type === 'business' && activeActor?.slug) {
@@ -52,10 +57,6 @@ export const useNavigationHandlers = () => {
         setTimeout(() => {
           window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
         }, 50);
-      // Clear courses badge when visiting courses tab
-      if (tab.id === 'courses') {
-        markCoursesAsSeen();
-      }
       } else {
         // Tours tab: if already on a sub-route, navigate back to overview
         if (tab.id === 'tourhub' && location.pathname.startsWith('/tourhub') && location.pathname !== '/tourhub') {
