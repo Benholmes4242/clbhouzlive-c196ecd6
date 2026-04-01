@@ -142,9 +142,10 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
           {cards.map((card, index) => (
             <div
               key={card.id}
-              className={`${card.className.replace('h-[200px]', 'h-[250px]')} flex-shrink-0 ${
+              className={`${card.className} flex-shrink-0 ${
                 index === currentIndex ? 'w-[85%]' : 'w-[85%] opacity-60 scale-95'
               } transition-all duration-300`}
+              style={{ height: 'clamp(180px, 28vw, 250px)' }}
               onClick={() => handleCardClick(card.id)}
             >
               {/* Activity background image */}

@@ -50,7 +50,11 @@ export function RivalPreviewSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-2xl max-h-[85vh] overflow-y-auto">
+      <SheetContent
+        side="bottom"
+        className="rounded-t-2xl overflow-y-auto"
+        style={{ maxHeight: 'min(85vh, 85dvh)', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}
+      >
         <SheetHeader className="pb-4">
           <div className="flex items-start gap-4">
             {/* Avatar */}

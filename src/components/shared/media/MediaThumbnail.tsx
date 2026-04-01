@@ -31,7 +31,10 @@ export function MediaThumbnail({
   const isVideo = item.type === 'video';
 
   return (
-    <div className="relative flex-shrink-0 w-[208px] h-[208px] rounded-2xl overflow-hidden bg-muted">
+    <div
+      className="relative flex-shrink-0 rounded-2xl overflow-hidden bg-muted"
+      style={{ width: 'clamp(160px, 45vw, 208px)', height: 'clamp(160px, 45vw, 208px)' }}
+    >
       <button onClick={onExpand} className="w-full h-full">
         <img src={src} alt="" className="w-full h-full object-cover" draggable={false} />
       </button>

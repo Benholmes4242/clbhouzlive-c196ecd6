@@ -69,7 +69,7 @@ const CinematicVideoCard: React.FC<CinematicVideoCardProps> = ({ item, onMediaCl
   return (
     <div ref={containerRef} className="w-full mb-2">
       {/* Video Container */}
-      <div className="relative w-full overflow-hidden" style={{ height: '280px' }}>
+      <div className="relative w-full overflow-hidden" style={{ height: 'clamp(220px, 45vh, 280px)' }}>
         <video
           ref={videoRef}
           src={videoUrl}
