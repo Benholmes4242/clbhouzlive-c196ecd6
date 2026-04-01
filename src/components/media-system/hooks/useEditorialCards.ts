@@ -52,11 +52,12 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
         .gte('active_until', new Date().toISOString())
         .order('active_from', { ascending: false });
 
-      if (error || !cards) return { history: null, courseOfWeek: null, debate: null };
+      if (error || !cards) return { history: null, courseOfWeek: null, debate: null, reviewOfWeek: null };
 
       let historyCard: HistoryCardFeedPost | null = null;
       let courseOfWeekCard: CourseOfWeekCardFeedPost | null = null;
       let debateCard: DebateCardFeedPost | null = null;
+      let reviewOfWeekCard: ReviewOfWeekCardFeedPost | null = null;
 
       for (const card of cards) {
         const cardType = card.card_type as string;
