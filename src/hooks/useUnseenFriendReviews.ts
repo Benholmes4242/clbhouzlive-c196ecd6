@@ -22,7 +22,8 @@ export function useUnseenFriendReviews() {
 
       // Get last-seen timestamp from localStorage
       const stored = localStorage.getItem(STORAGE_KEY(user.id));
-      const lastSeen = stored ? new Date(stored) : new Date(0);
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      const lastSeen = stored ? new Date(stored) : thirtyDaysAgo;
 
       // Step 1: Get accepted friend IDs
       const { data: friendships } = await supabase
