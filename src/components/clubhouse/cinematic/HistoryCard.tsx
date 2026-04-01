@@ -350,7 +350,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
             className="active:scale-[0.95] transition-transform"
             style={{
               flex: 1,
-              height: 48,
+              height: 'clamp(42px, 6vh, 48px)',
               borderRadius: 14,
               display: 'flex',
               alignItems: 'center',
