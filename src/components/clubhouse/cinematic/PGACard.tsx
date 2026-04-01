@@ -1155,7 +1155,7 @@ export const PGACard: React.FC<PGACardProps> = ({
       {/* ── ZONE 1: CINEMATIC HERO — 58% ── */}
       <div style={{
         position: 'relative',
-        flex: '0 0 58%',
+        flex: '0 0 clamp(46%, 58%, 62%)',
         overflow: 'hidden',
         minHeight: 0,
       }}>
