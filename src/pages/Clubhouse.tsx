@@ -206,7 +206,7 @@ const ClubhouseContent = () => {
   const activeLikeState = getActiveLikeState(activePost);
 
   // ── Editorial card like count for CommentsSheet ──
-  const editorialCardId = ['course_of_week_card', 'history_card', 'debate_card'].includes(activePost?.postType ?? '')
+  const editorialCardId = ['course_of_week_card', 'history_card', 'debate_card', 'review_of_week_card'].includes(activePost?.postType ?? '')
     ? (activePost as any)?.cardData?.cardId
     : null;
 
