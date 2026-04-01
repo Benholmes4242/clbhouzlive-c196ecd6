@@ -124,27 +124,37 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                   </span>
                 </span>
               )}
+
+              {/* Live indicator — green pulse dot, shown when tab has live content */}
+              {isLive && (tabBadges[tab.id] ?? 0) === 0 && (
+                <span
+                  className="absolute -top-1 -right-1.5 h-[8px] w-[8px] rounded-full bg-green-500"
+                  style={{ animation: 'navLivePulse 2s ease-in-out infinite' }}
+                />
+              )}
             </div>
             
             {/* Label */}
             <span 
               className={cn(
                 "text-[9px] min-[375px]:text-[10px] leading-none font-medium whitespace-nowrap overflow-hidden text-ellipsis w-full text-center",
-                isLightTheme
-                  ? isActive 
-                    ? useAmberActive ? "text-amber-700" : "text-slate-800"
-                    : "text-slate-500"
-                  : isDimmed 
-                    ? "text-[hsl(var(--clubhouse-text-dimmed))]" 
-                    : "text-[hsl(var(--clubhouse-text-muted))]"
+                isLive
+                  ? "text-green-500"
+                  : isLightTheme
+                    ? isActive 
+                      ? useAmberActive ? "text-amber-700" : "text-slate-800"
+                      : "text-slate-500"
+                    : isDimmed 
+                      ? "text-[hsl(var(--clubhouse-text-dimmed))]" 
+                      : "text-[hsl(var(--clubhouse-text-muted))]"
               )}
               style={{
                 transition: 'color var(--motion-fast) var(--ease-standard)',
                 // Active Clubhouse labels: amber for warm routes, white for everything else
-                ...(isClubhouseTheme && isActive && { color: useAmberActive ? '#F79E1B' : 'rgba(255,255,255,1.0)' })
+                ...(isClubhouseTheme && isActive && !isLive && { color: useAmberActive ? '#F79E1B' : 'rgba(255,255,255,1.0)' })
               }}
             >
-              {tab.label}
+              {isLive ? 'LIVE' : tab.label}
             </span>
           </button>
         );
