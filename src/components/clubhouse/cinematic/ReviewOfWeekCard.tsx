@@ -203,50 +203,6 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
     } catch { setOptimisticLike(null); }
   }, [currentUserId, optimisticLike, likeData, cardId, queryClient]);
 
-  // ── Helpful vote ──
-  const { data: helpfulData } = useQuery({
-    queryKey: ['review-helpful', reviewId, currentUserId],
-    queryFn: async () => {
-      const { data: rating } = await supabase
-        .from('course_ratings')
-        .select('helpful_count')
-        .eq('id', reviewId)
-        .single();
-      let isHelpful = false;
-      if (currentUserId) {
-        const { data: vote } = await supabase
-          .from('course_review_votes')
-          .select('vote_type')
-          .eq('rating_id', reviewId)
-          .eq('user_id', currentUserId)
-          .maybeSingle();
-        isHelpful = vote?.vote_type === 'helpful';
-      }
-      return { count: rating?.helpful_count ?? cardHelpfulCount, isHelpful };
-    },
-    staleTime: 30_000,
-    enabled: !!reviewId,
-  });
-
-  const handleHelpful = useCallback(async () => {
-    if (!currentUserId || !reviewId) return;
-    haptic('light');
-    const current = helpfulOptimistic ?? { isHelpful: helpfulData?.isHelpful ?? false, count: helpfulData?.count ?? cardHelpfulCount };
-    const newHelpful = !current.isHelpful;
-    setHelpfulOptimistic({ isHelpful: newHelpful, count: current.count + (newHelpful ? 1 : -1) });
-    try {
-      if (newHelpful) {
-        await supabase.from('course_review_votes').upsert(
-          { rating_id: reviewId, user_id: currentUserId, vote_type: 'helpful' },
-          { onConflict: 'rating_id,user_id' }
-        );
-      } else {
-        await supabase.from('course_review_votes').delete().eq('rating_id', reviewId).eq('user_id', currentUserId);
-      }
-      queryClient.invalidateQueries({ queryKey: ['review-helpful', reviewId, currentUserId] });
-    } catch { setHelpfulOptimistic(null); }
-  }, [currentUserId, helpfulOptimistic, helpfulData, reviewId, cardHelpfulCount, queryClient]);
-
   // ── Skeleton gate (after all hooks) ──
   if (isLoading || !card) {
     return <ReviewOfWeekSkeleton />;
@@ -254,8 +210,6 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
 
   const isLiked = optimisticLike?.isLiked ?? likeData?.hasLiked ?? false;
   const likeCount = optimisticLike?.count ?? likeData?.count ?? 0;
-  const isHelpful = helpfulOptimistic?.isHelpful ?? helpfulData?.isHelpful ?? false;
-  const helpfulCount = helpfulOptimistic?.count ?? helpfulData?.count ?? card.helpfulCount;
 
   const fullText = [(card as any).reviewTitle, card.reviewText].filter(Boolean).join(' ');
   const truncatedText = fullText.length > 220 ? fullText.slice(0, 220) + '…' : fullText;
