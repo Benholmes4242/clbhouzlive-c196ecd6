@@ -391,18 +391,10 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
 
           {/* ── Review text ── */}
           <div className="px-4 sm:px-5 pt-3">
-            <p className="text-[13.5px] text-[rgba(255,255,255,0.78)] leading-[1.65] font-normal m-0">
-              {expanded ? fullText : truncatedText}
+            <p className="text-[13.5px] text-[rgba(255,255,255,0.78)] leading-[1.65] font-normal m-0"
+               style={{ display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+              {fullText}
             </p>
-            {fullText.length > 220 && (
-              <button
-                onClick={() => setExpanded(e => !e)}
-                className="text-[13.5px] font-semibold mt-[5px] block active:scale-[0.97] bg-transparent border-none p-0 cursor-pointer"
-                style={{ color: AMBER }}
-              >
-                {expanded ? 'Show less' : 'Read more'}
-              </button>
-            )}
           </div>
 
           {/* ── Breakdown bars ── */}
