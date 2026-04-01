@@ -334,7 +334,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
         {/* Echo — history contextual */}
         <div style={{ marginBottom: 8 }}>
           <EchoContextualButton
-            prompt={`Tell me about ${card.title || 'this golf history moment'} — what happened, why was it significant, and how did it shape the game?`}
+            prompt={`Tell me about ${card.title || 'this golf history moment'}${card.historyYear && card.historyYear > 0 ? ` (${card.historyYear})` : ''} — what made it significant, what was the context at the time, and how did it shape the game of golf?`}
             label="Ask Echo about this moment"
             sublabel="The story behind the history"
             source="history_card"
