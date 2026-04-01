@@ -8,7 +8,8 @@ import { HistoryCard } from '@/components/clubhouse/cinematic/HistoryCard';
 import { CourseOfWeekCard } from '@/components/clubhouse/cinematic/CourseOfWeekCard';
 import { WeeklyDebateCard } from '@/components/clubhouse/cinematic/WeeklyDebateCard';
 import { usePinchZoomPointer } from '@/hooks/usePinchZoomPointer';
-import type { FeedPost, PGACardFeedPost, HistoryCardFeedPost, CourseOfWeekCardFeedPost, DebateCardFeedPost } from '@/components/media-system/types/media';
+import type { FeedPost, PGACardFeedPost, HistoryCardFeedPost, CourseOfWeekCardFeedPost, DebateCardFeedPost, ReviewOfWeekCardFeedPost } from '@/components/media-system/types/media';
+import { ReviewOfWeekCard } from '@/components/clubhouse/cinematic/ReviewOfWeekCard';
 
 interface FeedSlideProps {
   post: FeedPost;
