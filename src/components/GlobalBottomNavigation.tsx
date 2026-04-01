@@ -56,6 +56,9 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const { triggerPrefetch } = useAppPrefetch();
   const { activeTab, handleTabClick, handlePrefetch } = useNavigationHandlers();
   const { unseenCount: unseenFriendReviews } = useUnseenFriendReviews();
+  const { data: tournamentsCache } = useTournamentsCache();
+  const liveTournamentCount = tournamentsCache?.live?.length ?? 0;
+  const liveTabs = liveTournamentCount > 0 ? new Set(['tourhub']) : new Set<string>();
   const isDesktop = useIsDesktop();
   const openPostStudio = usePostStudioStore((s) => s.openPostStudio);
   
