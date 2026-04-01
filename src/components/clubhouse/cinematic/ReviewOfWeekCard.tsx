@@ -22,21 +22,6 @@ const VerifiedIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-
-
-const CommentIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
-  </svg>
-);
-
-const ShareIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
-    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-  </svg>
-);
-
 // ── Skeleton ──
 
 function ReviewOfWeekSkeleton() {
@@ -46,17 +31,12 @@ function ReviewOfWeekSkeleton() {
       style={{ background: '#0d0f0e', fontFamily: "'DM Sans', -apple-system, sans-serif" }}
     >
       <div className="max-w-[500px] mx-auto w-full h-full">
-        {/* Hero skeleton */}
         <div className="w-full animate-pulse rounded-none" style={{ height: 'clamp(180px, 28vw, 240px)', background: 'rgba(255,255,255,0.06)' }} />
-
-        {/* Course meta skeleton */}
         <div className="px-4 sm:px-5 mt-4 space-y-2">
           <div className="h-3 w-24 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.08)' }} />
           <div className="h-5 w-48 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.08)' }} />
           <div className="h-3 w-32 rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
         </div>
-
-        {/* Reviewer row skeleton */}
         <div className="px-4 sm:px-5 mt-5 flex items-center gap-3">
           <div className="w-9 h-9 rounded-[10px] animate-pulse" style={{ background: 'rgba(255,255,255,0.08)' }} />
           <div className="flex-1 space-y-1.5">
@@ -65,16 +45,11 @@ function ReviewOfWeekSkeleton() {
           </div>
           <div className="w-14 h-9 rounded-xl animate-pulse" style={{ background: 'rgba(255,255,255,0.08)' }} />
         </div>
-
-        {/* Text skeleton */}
         <div className="px-4 sm:px-5 mt-4 space-y-2">
           <div className="h-3 w-full rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
           <div className="h-3 w-[90%] rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
           <div className="h-3 w-[70%] rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
-          <div className="h-3 w-[50%] rounded-full animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
         </div>
-
-        {/* Breakdown skeleton */}
         <div className="px-4 sm:px-5 mt-4 space-y-2">
           {[75, 85, 90, 90].map((w, i) => (
             <div key={i} className="flex items-center gap-2">
@@ -84,23 +59,9 @@ function ReviewOfWeekSkeleton() {
             </div>
           ))}
         </div>
-
-        {/* Photo grid skeleton */}
         <div className="px-4 sm:px-5 mt-4 grid grid-cols-4 gap-1 rounded-xl overflow-hidden">
           {[0, 1, 2, 3].map(i => (
             <div key={i} className="aspect-square animate-pulse rounded-sm" style={{ background: 'rgba(255,255,255,0.06)' }} />
-          ))}
-        </div>
-
-        {/* Course link skeleton */}
-        <div className="px-4 sm:px-5 mt-4">
-          <div className="h-12 w-full rounded-xl animate-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
-        </div>
-
-        {/* Action rail skeleton */}
-        <div className="px-4 sm:px-5 mt-4 grid grid-cols-4 gap-2">
-          {[0, 1, 2, 3].map(i => (
-            <div key={i} className="h-10 rounded-lg animate-pulse" style={{ background: 'rgba(255,255,255,0.04)' }} />
           ))}
         </div>
       </div>
@@ -112,15 +73,15 @@ function ReviewOfWeekSkeleton() {
 
 function BreakdownBar({ label, score }: { label: string; score: number }) {
   return (
-    <div className="flex items-center gap-2" style={{ marginBottom: 6 }}>
-      <span className="w-[68px] shrink-0 text-[11px] text-white/50">{label}</span>
-      <div className="flex-1 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }}>
+    <div className="flex items-center gap-2" style={{ marginBottom: 'clamp(2px, 0.6vh, 6px)' }}>
+      <span className="w-[68px] shrink-0 text-white/50" style={{ fontSize: 'clamp(9px, 1.4vh, 11px)' }}>{label}</span>
+      <div className="flex-1 rounded-full" style={{ height: 'clamp(2px, 0.4vh, 4px)', background: 'rgba(255,255,255,0.08)' }}>
         <div
           className="h-full rounded-full"
           style={{ width: `${(score / 10) * 100}%`, background: `linear-gradient(90deg, ${AMBER}, #FFB347)` }}
         />
       </div>
-      <span className="text-[11px] font-bold text-white/70 w-6 text-right">{score.toFixed(1)}</span>
+      <span className="font-bold text-white/70 w-6 text-right" style={{ fontSize: 'clamp(9px, 1.4vh, 11px)' }}>{score.toFixed(1)}</span>
     </div>
   );
 }
@@ -142,7 +103,6 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const card = post?.cardData;
-  const [expanded, setExpanded] = useState(false);
   const [optimisticLike, setOptimisticLike] = useState<{ isLiked: boolean; count: number } | null>(null);
 
   const cardId = card?.cardId ?? '';
@@ -196,7 +156,6 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
   const likeCount = optimisticLike?.count ?? likeData?.count ?? 0;
 
   const fullText = [(card as any).reviewTitle, card.reviewText].filter(Boolean).join(' ');
-  const truncatedText = fullText.length > 220 ? fullText.slice(0, 220) + '…' : fullText;
 
   const breakdowns = [
     { label: 'Design', score: card.designScore },
@@ -207,83 +166,91 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
 
   const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
+  const hasPhotos = card.photoUrls.length > 0;
+
   return (
     <div
-      className="absolute inset-0 flex flex-col"
+      className="absolute inset-0 flex flex-col overflow-hidden"
       style={{ background: '#0d0f0e', fontFamily: "'DM Sans', -apple-system, sans-serif" }}
     >
-      {/* ── Scrollable content ── */}
+      {/* ── Hero zone — fixed proportion ── */}
       <div
-        className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 100px)' }}
+        className="relative w-full shrink-0 overflow-hidden"
+        style={{ flex: '0 0 clamp(140px, 24vh, 240px)' }}
       >
-        <div className="max-w-[500px] mx-auto w-full">
+        <div className="max-w-[500px] mx-auto w-full h-full relative">
+          {card.course.thumbnailImage ? (
+            <img
+              src={card.course.thumbnailImage}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #1a1d1a 0%, #0d0f0e 100%)' }} />
+          )}
 
-          {/* ── Hero zone ── */}
-          <div className="relative w-full overflow-hidden" style={{ height: 'clamp(180px, 28vw, 240px)' }}>
-            {card.course.thumbnailImage ? (
-              <img
-                src={card.course.thumbnailImage}
-                alt=""
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            ) : (
-              <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #1a1d1a 0%, #0d0f0e 100%)' }} />
-            )}
+          {/* Dark fade overlay */}
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(13,15,14,0.92) 85%, #0d0f0e 100%)' }} />
 
-            {/* Dark fade overlay */}
-            <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(13,15,14,0.92) 85%, #0d0f0e 100%)' }} />
-
-            {/* Trophy badge — top-left */}
-            <div className="absolute left-4 sm:left-5" style={{ top: 'max(env(safe-area-inset-top, 47px), 47px)', paddingTop: 12 }}>
-              <div
-                className="flex items-center gap-1.5 backdrop-blur-xl"
-                style={{
-                  background: 'rgba(247,147,30,0.12)',
-                  border: '1px solid rgba(247,147,30,0.3)',
-                  borderRadius: 20,
-                  padding: '5px 12px',
-                }}
-              >
-                <TrophyIcon className="w-3.5 h-3.5 text-[#F7931E]" />
-                <span className="text-[11px] font-bold tracking-wider uppercase" style={{ color: AMBER }}>
-                  Review of the Week
-                </span>
-              </div>
+          {/* Trophy badge — top-left */}
+          <div className="absolute left-4 sm:left-5" style={{ top: 'max(env(safe-area-inset-top, 47px), 47px)', paddingTop: 12 }}>
+            <div
+              className="flex items-center gap-1.5 backdrop-blur-xl"
+              style={{
+                background: 'rgba(247,147,30,0.12)',
+                border: '1px solid rgba(247,147,30,0.3)',
+                borderRadius: 20,
+                padding: '5px 12px',
+              }}
+            >
+              <TrophyIcon className="w-3.5 h-3.5 text-[#F7931E]" />
+              <span className="text-[11px] font-bold tracking-wider uppercase" style={{ color: AMBER }}>
+                Review of the Week
+              </span>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* ── Content zone — fills remaining space ── */}
+      <div className="flex-1 flex flex-col overflow-hidden" style={{ minHeight: 0 }}>
+        <div className="max-w-[500px] mx-auto w-full flex-1 flex flex-col overflow-hidden" style={{ minHeight: 0 }}>
 
           {/* ── World rank ── */}
           {card.course.globalRank && (
-            <p className="text-[11px] font-semibold tracking-[0.06em] text-[#F7931E] mb-1 uppercase px-4 pt-4 m-0">
+            <p className="font-semibold tracking-[0.06em] text-[#F7931E] uppercase px-4 m-0 shrink-0"
+               style={{ fontSize: 'clamp(9px, 1.3vh, 11px)', paddingTop: 'clamp(6px, 1.2vh, 16px)', marginBottom: 'clamp(1px, 0.3vh, 4px)' }}>
               World Rank #{card.course.globalRank}
             </p>
           )}
 
           {/* ── Course name + country ── */}
-          <div className={`px-4 sm:px-5 ${card.course.globalRank ? 'pt-0' : 'pt-3'}`}>
+          <div className={`px-4 sm:px-5 shrink-0 ${card.course.globalRank ? '' : ''}`}
+               style={{ paddingTop: card.course.globalRank ? 0 : 'clamp(6px, 1.2vh, 12px)' }}>
             <h2
-              className="font-extrabold text-white m-0 leading-tight"
-              style={{ fontSize: 'clamp(19px, 5vw, 24px)', letterSpacing: '-0.02em' }}
+              className="font-extrabold text-white m-0 leading-tight truncate"
+              style={{ fontSize: 'clamp(17px, 3vh, 24px)', letterSpacing: '-0.02em' }}
             >
               {card.course.name}
             </h2>
-            <span className="text-[12px] text-white/50 mt-0.5 block">
+            <span className="text-white/50 block truncate" style={{ fontSize: 'clamp(10px, 1.5vh, 12px)', marginTop: 1 }}>
               {card.course.subCountry ?? card.course.country}
             </span>
           </div>
 
           {/* ── Reviewer row ── */}
-          <div className="px-4 sm:px-5 mt-4 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
+          <div className="px-4 sm:px-5 flex items-center justify-between shrink-0"
+               style={{ marginTop: 'clamp(8px, 1.5vh, 16px)' }}>
+            <div className="flex items-center gap-2.5 min-w-0">
               {/* Squircle avatar */}
-              <div className="w-9 h-9 shrink-0 overflow-hidden" style={{ borderRadius: '34%' }}>
+              <div className="shrink-0 overflow-hidden"
+                   style={{ width: 'clamp(28px, 4.5vh, 36px)', height: 'clamp(28px, 4.5vh, 36px)', borderRadius: '34%' }}>
                 {card.reviewer.avatarUrl ? (
                   <img src={card.reviewer.avatarUrl} alt="" className="w-full h-full object-cover" />
                 ) : (
                   <div
-                    className="w-full h-full flex items-center justify-center text-[13px] font-bold"
-                    style={{ background: 'rgba(247,147,30,0.15)', color: AMBER }}
+                    className="w-full h-full flex items-center justify-center font-bold"
+                    style={{ background: 'rgba(247,147,30,0.15)', color: AMBER, fontSize: 'clamp(10px, 1.6vh, 13px)' }}
                   >
                     {getInitials(card.reviewer.displayName)}
                   </div>
@@ -291,18 +258,18 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
               </div>
 
               {/* Name + meta */}
-              <div>
+              <div className="min-w-0">
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => navigate(`/u/${card.reviewer.username ?? card.reviewer.userId}`)}
-                    className="text-[13px] font-bold text-white/90 bg-transparent border-none p-0 cursor-pointer"
-                    style={{ letterSpacing: '-0.01em' }}
+                    className="font-bold text-white/90 bg-transparent border-none p-0 cursor-pointer truncate"
+                    style={{ fontSize: 'clamp(11px, 1.6vh, 13px)', letterSpacing: '-0.01em' }}
                   >
                     {card.reviewer.displayName}
                   </button>
-                  {card.reviewer.isVerified && <VerifiedIcon className="w-3 h-3" />}
+                  {card.reviewer.isVerified && <VerifiedIcon className="w-3 h-3 shrink-0" />}
                 </div>
-                <div className="text-[10px] text-white/40 flex gap-1 items-center mt-px">
+                <div className="text-white/40 flex gap-1 items-center" style={{ fontSize: 'clamp(8px, 1.2vh, 10px)', marginTop: 1 }}>
                   {card.reviewer.handicap != null && <span>HCP {card.reviewer.handicap.toFixed(1)}</span>}
                   {card.reviewer.handicap != null && <span>·</span>}
                   <span>{card.reviewer.reviewCount} reviews</span>
@@ -312,20 +279,29 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
             </div>
 
             {/* Score pill */}
-            <div className="flex flex-col items-center flex-shrink-0" style={{
+            <div className="flex flex-col items-center shrink-0" style={{
               background: `linear-gradient(135deg, ${AMBER}, #E8820E)`,
-              borderRadius: 14,
-              padding: '9px 13px',
+              borderRadius: 'clamp(10px, 1.6vh, 14px)',
+              padding: 'clamp(6px, 1vh, 9px) clamp(10px, 1.5vh, 13px)',
               boxShadow: '0 4px 16px rgba(247,147,30,0.3)',
             }}>
-              <span className="text-[20px] font-bold text-white leading-none">{card.rating.toFixed(1)}</span>
+              <span className="font-bold text-white leading-none" style={{ fontSize: 'clamp(16px, 2.5vh, 20px)' }}>
+                {card.rating.toFixed(1)}
+              </span>
             </div>
           </div>
 
-          {/* ── Review text ── */}
-          <div className="px-4 sm:px-5 pt-3">
-            <p className="text-[13.5px] text-[rgba(255,255,255,0.78)] leading-[1.65] font-normal m-0"
-               style={{ display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+          {/* ── Review text — fluid clamp ── */}
+          <div className="px-4 sm:px-5 shrink-0" style={{ paddingTop: 'clamp(6px, 1vh, 12px)' }}>
+            <p className="text-[rgba(255,255,255,0.78)] font-normal m-0"
+               style={{
+                 fontSize: 'clamp(11px, 1.6vh, 13.5px)',
+                 lineHeight: 1.55,
+                 display: '-webkit-box',
+                 WebkitLineClamp: 3,
+                 WebkitBoxOrient: 'vertical',
+                 overflow: 'hidden',
+               }}>
               {fullText}
             </p>
           </div>
@@ -333,45 +309,60 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
           {/* ── Breakdown bars ── */}
           {breakdowns.length > 0 && (
             <div
-              className="mx-4 sm:mx-5 mt-4 rounded-xl"
-              style={{ padding: '12px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+              className="mx-4 sm:mx-5 shrink-0"
+              style={{
+                marginTop: 'clamp(6px, 1vh, 12px)',
+                padding: 'clamp(6px, 1vh, 12px) clamp(10px, 1.5vh, 14px)',
+                background: 'rgba(255,255,255,0.03)',
+                border: '1px solid rgba(255,255,255,0.06)',
+                borderRadius: 'clamp(8px, 1.2vh, 12px)',
+              }}
             >
               {breakdowns.map(b => <BreakdownBar key={b.label} label={b.label} score={b.score} />)}
             </div>
           )}
 
-          {/* ── Photo grid ── */}
-          {card.photoUrls.length > 0 && (
-            <div className="mx-4 sm:mx-5 mt-4 grid grid-cols-4 gap-[3px] rounded-xl overflow-hidden">
-              {card.photoUrls.slice(0, 4).map((url, i) => (
-                <div key={i} className="relative aspect-square overflow-hidden bg-[rgba(255,255,255,0.06)]">
-                  <img src={url} alt="" className="w-full h-full object-cover" loading="lazy" />
-                  {i === 3 && card.photoUrls.length > 4 && (
-                    <div className="absolute inset-0 bg-[rgba(13,15,14,0.6)] flex items-center justify-center">
-                      <span className="text-[15px] font-bold text-white">+{card.photoUrls.length - 4}</span>
-                    </div>
-                  )}
-                </div>
-              ))}
+          {/* ── Photo grid — takes remaining flex space ── */}
+          {hasPhotos && (
+            <div className="mx-4 sm:mx-5 flex-1 overflow-hidden"
+                 style={{
+                   marginTop: 'clamp(6px, 1vh, 12px)',
+                   minHeight: 'clamp(48px, 8vh, 80px)',
+                   maxHeight: 'clamp(60px, 12vh, 120px)',
+                   borderRadius: 'clamp(8px, 1.2vh, 12px)',
+                 }}>
+              <div className="grid grid-cols-4 gap-[3px] h-full overflow-hidden" style={{ borderRadius: 'inherit' }}>
+                {card.photoUrls.slice(0, 4).map((url, i) => (
+                  <div key={i} className="relative overflow-hidden bg-[rgba(255,255,255,0.06)]">
+                    <img src={url} alt="" className="w-full h-full object-cover" loading="lazy" />
+                    {i === 3 && card.photoUrls.length > 4 && (
+                      <div className="absolute inset-0 bg-[rgba(13,15,14,0.6)] flex items-center justify-center">
+                        <span className="text-[15px] font-bold text-white">+{card.photoUrls.length - 4}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
           {/* ── Course link button ── */}
-          <div className="px-4 sm:px-5 mt-4 mb-4">
+          <div className="px-4 sm:px-5 shrink-0" style={{ marginTop: 'clamp(6px, 1vh, 12px)', marginBottom: 'clamp(4px, 0.8vh, 8px)' }}>
             <button
               onClick={() => navigate(`/courses/${card.course.id}`)}
-              className="w-full flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform h-12"
+              className="w-full flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
               style={{
+                height: 'clamp(36px, 5.5vh, 48px)',
                 background: 'rgba(247,147,30,0.08)',
                 border: '1px solid rgba(247,147,30,0.2)',
-                borderRadius: 13,
+                borderRadius: 'clamp(9px, 1.4vh, 13px)',
                 padding: '0 14px',
               }}
             >
-              <span className="text-[13px] font-bold text-white truncate">
+              <span className="font-bold text-white truncate" style={{ fontSize: 'clamp(11px, 1.6vh, 13px)' }}>
                 View {card.course.name}
               </span>
-              <span className="text-[12px] font-semibold shrink-0 ml-2" style={{ color: AMBER }}>
+              <span className="font-semibold shrink-0 ml-2" style={{ color: AMBER, fontSize: 'clamp(10px, 1.4vh, 12px)' }}>
                 View →
               </span>
             </button>
@@ -379,20 +370,23 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
         </div>
       </div>
 
-      {/* ── Action rail (sticky bottom, 3 cols) ── */}
+      {/* ── Action rail (pinned bottom, 3 cols) ── */}
       <div
-        className="sticky bottom-0 grid grid-cols-3 gap-2 px-3 pt-3"
+        className="shrink-0 grid grid-cols-3 gap-2 px-3"
         style={{
           background: '#0d0f0e',
           borderTop: '1px solid rgba(255,255,255,0.07)',
-          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 14px)',
+          paddingTop: 'clamp(6px, 1vh, 12px)',
+          paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + clamp(6px, 1vh, 14px))',
         }}
       >
         {/* Like */}
         <button
           onClick={handleLike}
-          className="h-12 rounded-2xl flex items-center justify-center gap-[6px] text-[12px] font-semibold active:scale-[0.97] transition-transform"
+          className="rounded-2xl flex items-center justify-center gap-[6px] font-semibold active:scale-[0.97] transition-transform"
           style={{
+            height: 'clamp(36px, 5.5vh, 48px)',
+            fontSize: 'clamp(10px, 1.4vh, 12px)',
             background: 'rgba(255,255,255,0.05)',
             border: '1px solid rgba(255,255,255,0.07)',
             color: isLiked ? '#e05555' : 'rgba(255,255,255,0.45)',
@@ -410,8 +404,10 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
         {/* Comment */}
         <button
           onClick={onComment}
-          className="h-12 rounded-2xl flex items-center justify-center gap-[6px] text-[12px] font-semibold active:scale-[0.97] transition-transform"
+          className="rounded-2xl flex items-center justify-center gap-[6px] font-semibold active:scale-[0.97] transition-transform"
           style={{
+            height: 'clamp(36px, 5.5vh, 48px)',
+            fontSize: 'clamp(10px, 1.4vh, 12px)',
             background: 'rgba(255,255,255,0.05)',
             border: '1px solid rgba(255,255,255,0.07)',
             color: 'rgba(255,255,255,0.45)',
@@ -440,8 +436,10 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
               navigator.clipboard.writeText(`${window.location.origin}/courses/${card.course.id}`);
             }
           }}
-          className="h-12 rounded-2xl flex items-center justify-center gap-[6px] text-[12px] font-semibold active:scale-[0.97] transition-transform"
+          className="rounded-2xl flex items-center justify-center gap-[6px] font-semibold active:scale-[0.97] transition-transform"
           style={{
+            height: 'clamp(36px, 5.5vh, 48px)',
+            fontSize: 'clamp(10px, 1.4vh, 12px)',
             background: 'rgba(255,255,255,0.05)',
             border: '1px solid rgba(255,255,255,0.07)',
             color: 'rgba(255,255,255,0.45)',
