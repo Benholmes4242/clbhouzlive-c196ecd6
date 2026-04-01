@@ -151,7 +151,7 @@ function ProfileHubSheet({
       label: 'Messages',
       route: '/messages',
       badge: unreadMessageCount,
-      badgeColor: 'bg-primary',
+      badgeColor: 'emerald',
     },
     {
       icon: Bell,
