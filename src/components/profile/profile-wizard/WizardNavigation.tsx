@@ -7,14 +7,16 @@ interface Props {
   isSaving: boolean;
   isValid: boolean;
   isDirty: boolean;
+  completionPct: number;
   onNext: () => void;
   onBack: () => void;
 }
 
 export function WizardNavigation({
-  step, isSaving, isValid, isDirty, onNext, onBack,
+  step, isSaving, isValid, isDirty, completionPct, onNext, onBack,
 }: Props) {
   const isFinalStep = step === 3;
+  const showCompletion = !isFinalStep && completionPct > 0;
 
   return (
     <div
@@ -41,6 +43,11 @@ export function WizardNavigation({
             <><Loader2 size={18} className="animate-spin mr-2" /> Saving…</>
           ) : isFinalStep ? (
             isDirty ? 'Save Profile' : 'All Saved'
+          ) : showCompletion ? (
+            <span className="flex flex-col items-center leading-tight">
+              <span>Continue</span>
+              <span className="text-[11px] font-normal opacity-60">Profile {completionPct}% complete</span>
+            </span>
           ) : (
             'Continue'
           )}

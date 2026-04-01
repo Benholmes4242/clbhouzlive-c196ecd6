@@ -124,6 +124,14 @@ export function PersonalProfileWizard() {
     }
   }, [step, form, save, goNext]);
 
+  const completionPct = Math.round(
+    (form.profilePhotoUrl || form.profilePhotoBlob ? 25 : 0) +
+    (form.displayName?.trim() ? 20 : 0) +
+    (form.homeClubName?.trim() ? 25 : 0) +
+    (form.handicapIndex != null && form.handicapIndex !== '' ? 15 : 0) +
+    (form.bio?.trim() ? 15 : 0)
+  );
+
   if (loading) {
     return <ProfileSkeleton />;
   }
@@ -187,6 +195,7 @@ export function PersonalProfileWizard() {
           isSaving={isSaving}
           isValid={isValid}
           isDirty={isDirty}
+          completionPct={completionPct}
           onNext={handleSave}
           onBack={goBack}
         />
