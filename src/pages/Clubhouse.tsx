@@ -177,11 +177,12 @@ const ClubhouseContent = () => {
       let feed = injectHistoryCard(activeFeed.posts, historyCard as unknown as FeedPost);   // slot 11
       feed = injectPGACard(feed, pgaCard as unknown as FeedPost);                           // slot 7
       feed = injectCourseOfWeekCard(feed, courseOfWeekCard as unknown as FeedPost);         // slot 3
+      feed = injectReviewOfWeekCard(feed, reviewOfWeekCard as unknown as FeedPost);         // slot 14
       // feed = injectDebateCard(feed, debateCard as unknown as FeedPost); // temporarily disabled
       return feed;
     }
     return activeFeed.posts;
-  }, [activeFeed.posts, activeTab, pgaCard, historyCard, courseOfWeekCard, debateCard]);
+  }, [activeFeed.posts, activeTab, pgaCard, historyCard, courseOfWeekCard, debateCard, reviewOfWeekCard]);
 
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? false;
