@@ -199,8 +199,9 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
         className="absolute left-0 right-0"
         style={{
           bottom: 0,
-          maxHeight: expanded ? 'none' : '55vh',
-          overflow: expanded ? 'visible' : 'hidden',
+          maxHeight: expanded ? 'none' : 'min(55vh, calc(100dvh - 120px))',
+          overflow: expanded ? 'visible' : 'auto',
+          WebkitOverflowScrolling: 'touch',
           padding: '0 16px',
           paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)',
           zIndex: 10,
