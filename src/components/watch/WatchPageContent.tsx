@@ -6,6 +6,7 @@ import WatchGrid from '@/components/watch/WatchGrid';
 import WatchSearchOverlay from '@/components/watch/WatchSearchOverlay';
 import { useWatchFeed } from '@/components/watch/hooks/useWatchFeed';
 import type { WatchFilter } from '@/components/watch/types';
+import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
 
 interface WatchPageContentProps {
   embedded?: boolean;

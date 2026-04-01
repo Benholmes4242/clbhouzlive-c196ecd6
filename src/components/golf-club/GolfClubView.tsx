@@ -15,6 +15,7 @@ import { safeGoBack } from '@/utils/navigation';
 import { CourseDetailSkeleton } from '@/components/skeletons/CourseDetailSkeleton';
 import { useCourseRatingAggregates } from '@/hooks/useCourseRatingAggregates';
 import CourseClaimBadge from '@/components/courses/course-detail/CourseClaimBadge';
+import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
 
 
 interface GolfClubViewProps {

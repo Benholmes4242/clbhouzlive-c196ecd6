@@ -6,6 +6,7 @@ import { ExploreHeader } from './ExploreHeader';
 import ExploreGrid from './ExploreGrid';
 import ExploreAutoplay from './ExploreAutoplay';
 import { ExploreSearchOverlay } from './ExploreSearchOverlay';
+import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
 
 interface ExploreTabContentProps {
   embedded?: boolean;

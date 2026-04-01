@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { CourseOfWeekCardFeedPost } from '@/components/media-system/types/media';
 import CourseRankBadges from '@/components/courses/CourseRankBadges';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
+import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
 
 interface CourseOfWeekCardProps {
   post: CourseOfWeekCardFeedPost;

@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, MessageCircle, Trophy, Calendar, ChevronRight, MapPin, Shield } from 'lucide-react';
 import type { PGACardFeedPost, PGACardChaser } from '@/components/media-system/types/media';
+import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
 
 function getBestRoundLabel(leaderThru?: string | null): string | null {
   const roundFinished = leaderThru != null && String(leaderThru).toUpperCase() === 'F';

@@ -46,6 +46,7 @@ import { useWinnerScorecardStats } from '../../hooks/useWinnerScorecardStats';
 import { useWinnerSeasonStats } from '../../hooks/useWinnerSeasonStats';
 import { useLeaderScorecardStats, type LeaderStats } from '../../hooks/useLeaderScorecardStats';
 import '@/styles/hero-glass.css';
+import { EchoContextualButton } from '@/components/echo/EchoContextualButton';
 
 function getTourDisplayName(tourSlug: string): string {
   const names: Record<string, string> = {
