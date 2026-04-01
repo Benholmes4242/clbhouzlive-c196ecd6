@@ -169,7 +169,7 @@ const ClubhouseContent = () => {
   const suggestedFeed = useSuggestedFeed(user?.id);
   const friendsFeed = useFriendsFeed(user?.id);
   const { pgaCard } = usePGACard(user?.id);
-  const { historyCard, courseOfWeekCard, debateCard } = useEditorialCards(user?.id);
+  const { historyCard, courseOfWeekCard, debateCard, reviewOfWeekCard } = useEditorialCards(user?.id);
   const activeFeed = activeTab === 'foryou' ? suggestedFeed : friendsFeed;
   
   const posts = useMemo(() => {
