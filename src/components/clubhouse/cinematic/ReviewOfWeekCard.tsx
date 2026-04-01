@@ -4,7 +4,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { haptic } from '@/utils/haptics';
 import type { ReviewOfWeekCardFeedPost } from '@/components/media-system/types/media';
-import type { FeedPost } from '@/components/media-system/types/media';
 
 const AMBER = '#F7931E';
 
