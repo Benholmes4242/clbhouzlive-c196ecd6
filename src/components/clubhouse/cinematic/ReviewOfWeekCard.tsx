@@ -262,7 +262,7 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
   const isHelpful = helpfulOptimistic?.isHelpful ?? helpfulData?.isHelpful ?? false;
   const helpfulCount = helpfulOptimistic?.count ?? helpfulData?.count ?? card.helpfulCount;
 
-  const fullText = [card.reviewTitle, card.reviewText].filter(Boolean).join(' ');
+  const fullText = [(card as any).reviewTitle, card.reviewText].filter(Boolean).join(' ');
   const truncatedText = fullText.length > 220 ? fullText.slice(0, 220) + '…' : fullText;
 
   const breakdowns = [
