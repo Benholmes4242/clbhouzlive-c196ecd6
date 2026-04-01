@@ -162,8 +162,6 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
   const [optimisticLike, setOptimisticLike] = useState<{ isLiked: boolean; count: number } | null>(null);
 
   const cardId = card?.cardId ?? '';
-  const reviewId = card?.reviewId ?? '';
-  const cardHelpfulCount = card?.helpfulCount ?? 0;
 
   // ── Like state ──
   const { data: likeData } = useQuery({
