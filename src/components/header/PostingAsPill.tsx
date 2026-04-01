@@ -9,6 +9,7 @@ interface PostingAsPillProps {
   onClick: () => void;
   isOpen: boolean;
   hasUnreadNotifications?: boolean;
+  notificationCount?: number;
   useLightTheme?: boolean;
   useGlassTheme?: boolean; // Clubhouse frosted-glass treatment
 }
