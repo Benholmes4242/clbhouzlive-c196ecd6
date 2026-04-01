@@ -366,7 +366,6 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
           </div>
         </div>
       </div>
-      </div>
 
       {/* ── Action rail (pinned bottom, 3 cols) ── */}
       <div
