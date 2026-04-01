@@ -330,6 +330,16 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({
           </button>
         )}
 
+        {/* Echo — history contextual */}
+        <div style={{ marginBottom: 8 }}>
+          <EchoContextualButton
+            prompt={`Tell me about ${card.title || 'this golf history moment'} — what happened, why was it significant, and how did it shape the game?`}
+            label="Ask Echo about this moment"
+            sublabel="The story behind the history"
+            source="history_card"
+          />
+        </div>
+
         {/* Engagement row */}
         <div style={{ display: 'flex', gap: 10 }}>
           {/* Like button */}
