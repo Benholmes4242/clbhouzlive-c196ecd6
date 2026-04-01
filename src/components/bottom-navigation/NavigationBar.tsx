@@ -18,6 +18,8 @@ interface NavigationBarProps {
   showBorder?: boolean;
   /** Map of tab ID → badge count. Only rendered when count > 0. */
   tabBadges?: Record<string, number>;
+  /** Set of tab IDs that have live content right now */
+  liveTabs?: Set<string>;
 }
 
 const NavigationBar: React.FC<NavigationBarProps> = ({
@@ -29,6 +31,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   useAmberActive = false,
   showBorder = true,
   tabBadges = {},
+  liveTabs = new Set(),
 }) => {
   const isLightTheme = variant === 'default';
   const isClubhouseTheme = variant === 'clubhouse';
@@ -36,13 +39,21 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
 
   
   return (
-    <nav
-      className="w-full h-[55px] flex items-center justify-around"
-      style={showBorder ? { borderTop: `0.5px solid ${borderColor}` } : undefined}
-    >
+    <>
+      <style>{`
+        @keyframes navLivePulse {
+          0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(34,197,94,0.6); }
+          50% { opacity: 0.75; transform: scale(0.85); box-shadow: 0 0 0 3px rgba(34,197,94,0); }
+        }
+      `}</style>
+      <nav
+        className="w-full h-[55px] flex items-center justify-around"
+        style={showBorder ? { borderTop: `0.5px solid ${borderColor}` } : undefined}
+      >
       {navigationTabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = activeTab === tab.id;
+        const isLive = liveTabs.has(tab.id);
         
         return (
           <button
@@ -113,32 +124,43 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                   </span>
                 </span>
               )}
+
+              {/* Live indicator — green pulse dot, shown when tab has live content */}
+              {isLive && (tabBadges[tab.id] ?? 0) === 0 && (
+                <span
+                  className="absolute -top-1 -right-1.5 h-[8px] w-[8px] rounded-full bg-green-500"
+                  style={{ animation: 'navLivePulse 2s ease-in-out infinite' }}
+                />
+              )}
             </div>
             
             {/* Label */}
             <span 
               className={cn(
                 "text-[9px] min-[375px]:text-[10px] leading-none font-medium whitespace-nowrap overflow-hidden text-ellipsis w-full text-center",
-                isLightTheme
-                  ? isActive 
-                    ? useAmberActive ? "text-amber-700" : "text-slate-800"
-                    : "text-slate-500"
-                  : isDimmed 
-                    ? "text-[hsl(var(--clubhouse-text-dimmed))]" 
-                    : "text-[hsl(var(--clubhouse-text-muted))]"
+                isLive
+                  ? "text-green-500"
+                  : isLightTheme
+                    ? isActive 
+                      ? useAmberActive ? "text-amber-700" : "text-slate-800"
+                      : "text-slate-500"
+                    : isDimmed 
+                      ? "text-[hsl(var(--clubhouse-text-dimmed))]" 
+                      : "text-[hsl(var(--clubhouse-text-muted))]"
               )}
               style={{
                 transition: 'color var(--motion-fast) var(--ease-standard)',
                 // Active Clubhouse labels: amber for warm routes, white for everything else
-                ...(isClubhouseTheme && isActive && { color: useAmberActive ? '#F79E1B' : 'rgba(255,255,255,1.0)' })
+                ...(isClubhouseTheme && isActive && !isLive && { color: useAmberActive ? '#F79E1B' : 'rgba(255,255,255,1.0)' })
               }}
             >
-              {tab.label}
+              {isLive ? 'LIVE' : tab.label}
             </span>
           </button>
         );
       })}
-    </nav>
+      </nav>
+    </>
   );
 };
 

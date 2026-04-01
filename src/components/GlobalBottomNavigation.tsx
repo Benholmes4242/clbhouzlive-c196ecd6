@@ -13,6 +13,7 @@ import { useAppPrefetch } from '@/hooks/useAppPrefetch';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
 import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
+import { useTournamentsCache } from '@/hooks/useTournamentsCache';
 
 import { cn } from '@/lib/utils';
 import { auditComponentMount, markPerformance } from '@/utils/clubhouseAudit';
@@ -55,6 +56,9 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
   const { triggerPrefetch } = useAppPrefetch();
   const { activeTab, handleTabClick, handlePrefetch } = useNavigationHandlers();
   const { unseenCount: unseenFriendReviews } = useUnseenFriendReviews();
+  const { data: tournamentsCache } = useTournamentsCache();
+  const liveTournamentCount = tournamentsCache?.live?.length ?? 0;
+  const liveTabs = liveTournamentCount > 0 ? new Set(['tourhub']) : new Set<string>();
   const isDesktop = useIsDesktop();
   const openPostStudio = usePostStudioStore((s) => s.openPostStudio);
   
@@ -187,6 +191,7 @@ const GlobalBottomNavigation: React.FC<GlobalBottomNavigationProps> = ({ chromeS
                 useAmberActive={isWarmGradientRoute}
                 showBorder={false}
                 tabBadges={{ courses: unseenFriendReviews }}
+                liveTabs={liveTabs}
               />
             </div>
           </motion.div>
