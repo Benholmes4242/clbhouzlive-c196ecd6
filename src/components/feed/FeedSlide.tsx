@@ -230,7 +230,8 @@ export const FeedSlide = memo(function FeedSlide({
       {(post.postType === 'pga_card' ||
         post.postType === 'history_card' ||
         post.postType === 'course_of_week_card' ||
-        post.postType === 'debate_card') && (
+        post.postType === 'debate_card' ||
+        post.postType === 'review_of_week_card') && (
         <div data-pga-sentinel="true" className="absolute inset-0 pointer-events-none" />
       )}
       {renderContent()}

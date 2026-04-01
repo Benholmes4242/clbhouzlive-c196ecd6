@@ -295,7 +295,96 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
         }
       }
 
-      return { history: historyCard, courseOfWeek: courseOfWeekCard, debate: debateCard };
+      // ── Review of the Week (fetched separately, not from editorial_feed_cards) ──
+      if (!reviewOfWeekCard) {
+        try {
+          const { data: rating } = await supabase
+            .from('course_ratings')
+            .select(`
+              id, rating, review, design_score, condition_score, clubhouse_score, facilities_score,
+              helpful_count, review_date, user_id, course_id,
+              user_profiles!inner(id, display_name, username, profile_photo_url, eg_handicap_index, is_verified_golfer)
+            `)
+            .eq('is_review_of_week', true)
+            .maybeSingle();
+
+          if (rating) {
+            const { data: course } = await supabase
+              .from('golf_courses')
+              .select('id, name, country, sub_country, global_rank, thumbnail_image')
+              .eq('id', rating.course_id)
+              .single();
+
+            const { data: media } = await supabase
+              .from('course_review_media')
+              .select('media_url, media_type, poster_url')
+              .eq('review_id', rating.id)
+              .eq('media_type', 'image')
+              .limit(6);
+
+            const { count: reviewCount } = await supabase
+              .from('course_ratings')
+              .select('id', { count: 'exact', head: true })
+              .eq('user_id', rating.user_id)
+              .not('review', 'is', null);
+
+            const now = new Date();
+            const weekLabel = `W${String(getISOWeekNum(now)).padStart(2, '0')} · ${now.toLocaleString('default', { month: 'long', year: 'numeric' })}`;
+
+            const profile = (rating as any).user_profiles;
+
+            const cardData: ReviewOfWeekCardData = {
+              cardId: rating.id,
+              cardType: 'review_of_week',
+              weekLabel,
+              reviewId: rating.id,
+              reviewText: rating.review ?? '',
+              rating: rating.rating ?? 0,
+              designScore: rating.design_score ?? null,
+              conditionScore: rating.condition_score ?? null,
+              clubhouseScore: rating.clubhouse_score ?? null,
+              facilitiesScore: rating.facilities_score ?? null,
+              helpfulCount: rating.helpful_count ?? 0,
+              playedDate: rating.review_date
+                ? new Date(rating.review_date).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
+                : null,
+              photoUrls: (media ?? []).map((m: any) => m.media_url).filter(Boolean),
+              reviewer: {
+                userId: rating.user_id,
+                displayName: profile?.display_name ?? 'Golfer',
+                username: profile?.username ?? null,
+                avatarUrl: profile?.profile_photo_url ?? null,
+                handicap: profile?.eg_handicap_index ?? null,
+                reviewCount: reviewCount ?? 0,
+                isVerified: profile?.is_verified_golfer ?? false,
+              },
+              course: {
+                id: course?.id ?? '',
+                name: course?.name ?? '',
+                country: (course as any)?.country ?? '',
+                subCountry: (course as any)?.sub_country ?? null,
+                globalRank: (course as any)?.global_rank ?? null,
+                thumbnailImage: (course as any)?.thumbnail_image ?? null,
+                communityRating: null,
+              },
+            };
+
+            reviewOfWeekCard = {
+              ...baseFeedPost,
+              id: `editorial-rotw-${rating.id}`,
+              postType: 'review_of_week_card',
+              cardData,
+              mediaItems: [],
+              review: null,
+              isReview: false,
+            };
+          }
+        } catch (err) {
+          console.warn('[useEditorialCards] Review of Week query failed:', err);
+        }
+      }
+
+      return { history: historyCard, courseOfWeek: courseOfWeekCard, debate: debateCard, reviewOfWeek: reviewOfWeekCard };
     },
     staleTime: 10 * 60 * 1000, // 10 minutes
     enabled: true,
@@ -305,5 +394,14 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
     historyCard: data?.history ?? null,
     courseOfWeekCard: data?.courseOfWeek ?? null,
     debateCard: data?.debate ?? null,
+    reviewOfWeekCard: data?.reviewOfWeek ?? null,
   };
+}
+
+function getISOWeekNum(date: Date): number {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
 }
