@@ -1165,7 +1165,7 @@ export function ComposeScreen({ onClose }: { onClose?: () => void }) {
           background: `linear-gradient(90deg, transparent 0%, ${RAIL_HAIRLINE} 20%, rgba(0,0,0,0.12) 50%, ${RAIL_HAIRLINE} 80%, transparent 100%)`,
         }} />
 
-        <div className="flex items-center px-4" style={{ minHeight: 60, gap: 0 }}>
+        <div className="flex items-center px-4" style={{ minHeight: 'clamp(50px, 8vh, 60px)', gap: 0 }}>
 
           {/* Zone A — Capture */}
           <div className="flex items-center" style={{ gap: 4 }}>
