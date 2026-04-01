@@ -9,6 +9,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileForm } from '@/hooks/useProfileForm';
 import { useProfileSave } from '@/hooks/useProfileSave';
 import { supabase } from '@/integrations/supabase/client';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { WizardHeader } from './WizardHeader';
 import { WizardProgress } from './WizardProgress';
 import { WizardNavigation } from './WizardNavigation';
