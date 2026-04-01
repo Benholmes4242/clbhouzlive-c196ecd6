@@ -212,21 +212,23 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
         </div>
       </div>
 
-      {/* ── Content zone — fills remaining space, justify to spread evenly ── */}
+      {/* ── Content zone — fills remaining space, evenly distributed ── */}
       <div className="flex-1 flex flex-col overflow-hidden" style={{ minHeight: 0 }}>
-        <div className="max-w-[500px] mx-auto w-full flex-1 flex flex-col justify-between overflow-hidden" style={{ minHeight: 0 }}>
+        <div
+          className="max-w-[500px] mx-auto w-full flex-1 flex flex-col overflow-hidden"
+          style={{ minHeight: 0, gap: 'clamp(6px, 1.6vh, 16px)', paddingTop: 'clamp(6px, 1.2vh, 14px)', paddingBottom: 'clamp(4px, 0.8vh, 8px)' }}
+        >
 
           {/* ── World rank ── */}
           {card.course.globalRank && (
             <p className="font-semibold tracking-[0.06em] text-[#F7931E] uppercase px-4 m-0 shrink-0"
-               style={{ fontSize: 'clamp(9px, 1.3vh, 11px)', paddingTop: 'clamp(6px, 1.2vh, 16px)', marginBottom: 'clamp(1px, 0.3vh, 4px)' }}>
+               style={{ fontSize: 'clamp(9px, 1.3vh, 11px)' }}>
               World Rank #{card.course.globalRank}
             </p>
           )}
 
           {/* ── Course name + country ── */}
-          <div className={`px-4 sm:px-5 shrink-0 ${card.course.globalRank ? '' : ''}`}
-               style={{ paddingTop: card.course.globalRank ? 0 : 'clamp(6px, 1.2vh, 12px)' }}>
+          <div className="px-4 sm:px-5 shrink-0">
             <h2
               className="font-extrabold text-white m-0 leading-tight truncate"
               style={{ fontSize: 'clamp(17px, 3vh, 24px)', letterSpacing: '-0.02em' }}
@@ -239,10 +241,8 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
           </div>
 
           {/* ── Reviewer row ── */}
-          <div className="px-4 sm:px-5 flex items-center justify-between shrink-0"
-               style={{ marginTop: 'clamp(8px, 1.5vh, 16px)' }}>
+          <div className="px-4 sm:px-5 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2.5 min-w-0">
-              {/* Squircle avatar */}
               <div className="shrink-0 overflow-hidden"
                    style={{ width: 'clamp(28px, 4.5vh, 36px)', height: 'clamp(28px, 4.5vh, 36px)', borderRadius: '34%' }}>
                 {card.reviewer.avatarUrl ? (
@@ -256,8 +256,6 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
                   </div>
                 )}
               </div>
-
-              {/* Name + meta */}
               <div className="min-w-0">
                 <div className="flex items-center gap-1">
                   <button
@@ -277,8 +275,6 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
                 </div>
               </div>
             </div>
-
-            {/* Score pill */}
             <div className="flex flex-col items-center shrink-0" style={{
               background: `linear-gradient(135deg, ${AMBER}, #E8820E)`,
               borderRadius: 'clamp(10px, 1.6vh, 14px)',
@@ -291,8 +287,8 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
             </div>
           </div>
 
-          {/* ── Review text — fluid clamp ── */}
-          <div className="px-4 sm:px-5 shrink-0" style={{ paddingTop: 'clamp(6px, 1vh, 12px)' }}>
+          {/* ── Review text ── */}
+          <div className="px-4 sm:px-5 shrink-0">
             <p className="text-[rgba(255,255,255,0.78)] font-normal m-0"
                style={{
                  fontSize: 'clamp(11px, 1.6vh, 13.5px)',
@@ -311,7 +307,6 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
             <div
               className="mx-4 sm:mx-5 shrink-0"
               style={{
-                marginTop: 'clamp(6px, 1vh, 12px)',
                 padding: 'clamp(6px, 1vh, 12px) clamp(10px, 1.5vh, 14px)',
                 background: 'rgba(255,255,255,0.03)',
                 border: '1px solid rgba(255,255,255,0.06)',
@@ -322,13 +317,12 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
             </div>
           )}
 
-          {/* ── Photo grid — grows to absorb remaining space ── */}
+          {/* ── Photo grid — proportional, not greedy ── */}
           {hasPhotos && (
-            <div className="mx-4 sm:mx-5 overflow-hidden"
+            <div className="mx-4 sm:mx-5 overflow-hidden shrink"
                  style={{
-                   flex: '1 1 0',
-                   marginTop: 'clamp(6px, 1vh, 12px)',
-                   minHeight: 'clamp(48px, 8vh, 64px)',
+                   flex: '1 1 auto',
+                   minHeight: 'clamp(40px, 6vh, 60px)',
                    borderRadius: 'clamp(8px, 1.2vh, 12px)',
                  }}>
               <div className="grid grid-cols-4 gap-[3px] h-full overflow-hidden" style={{ borderRadius: 'inherit' }}>
@@ -346,11 +340,11 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
             </div>
           )}
 
-          {/* When no photos, use a flex spacer to push content down */}
-          {!hasPhotos && <div style={{ flex: '1 1 0' }} />}
+          {/* When no photos, spacer absorbs remaining space */}
+          {!hasPhotos && <div style={{ flex: '1 1 auto' }} />}
 
           {/* ── Course link button ── */}
-          <div className="px-4 sm:px-5 shrink-0" style={{ marginTop: 'clamp(6px, 1vh, 12px)', marginBottom: 'clamp(4px, 0.8vh, 8px)' }}>
+          <div className="px-4 sm:px-5 shrink-0">
             <button
               onClick={() => navigate(`/courses/${card.course.id}`)}
               className="w-full flex items-center justify-between cursor-pointer active:scale-[0.98] transition-transform"
@@ -371,6 +365,7 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
             </button>
           </div>
         </div>
+      </div>
       </div>
 
       {/* ── Action rail (pinned bottom, 3 cols) ── */}
