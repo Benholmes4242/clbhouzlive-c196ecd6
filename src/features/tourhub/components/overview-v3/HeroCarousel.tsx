@@ -1213,6 +1213,30 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
                     </motion.div>
                   )}
 
+                  {/* Echo — tour hub contextual */}
+                  <div style={{ padding: '0 0 10px' }}>
+                    <EchoContextualButton
+                      prompt={
+                        isLive
+                          ? `Give me live intel on ${tournament.name} — who is leading, who is making a move, and what are the key storylines today?`
+                          : isCompleted
+                          ? `Tell me about the result of ${tournament.name} — what happened, how did the winner play, and what were the key moments?`
+                          : `Preview ${tournament.name} for me — who are the favourites, what should I know about the course, and what makes this event special?`
+                      }
+                      label={
+                        isLive ? 'Ask Echo for live intel'
+                        : isCompleted ? 'Ask Echo about the result'
+                        : 'Ask Echo to preview this event'
+                      }
+                      sublabel={
+                        isLive ? 'Leaderboard insight · who to watch'
+                        : isCompleted ? 'Winner story · key moments'
+                        : 'Favourites · course intel · storylines'
+                      }
+                      source={`tour_hub_${isLive ? 'live' : isCompleted ? 'completed' : 'upcoming'}`}
+                    />
+                  </div>
+
                   {/* ── FOOTER — View Tournament pill ── */}
                   <div style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
