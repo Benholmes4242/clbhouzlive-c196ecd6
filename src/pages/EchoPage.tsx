@@ -48,13 +48,17 @@ export default function EchoPage() {
 
   // Capture prompt from URL on mount/navigation
   const initialPrompt = searchParams.get('prompt');
+  const initialReturnTo = searchParams.get('returnTo');
   useEffect(() => {
+    if (initialReturnTo) {
+      returnToRef.current = decodeURIComponent(initialReturnTo);
+    }
     if (initialPrompt) {
       const decodedPrompt = decodeURIComponent(initialPrompt);
       setPendingPrompt(decodedPrompt);
       setSearchParams({}, { replace: true });
     }
-  }, [initialPrompt, setSearchParams]);
+  }, [initialPrompt, initialReturnTo, setSearchParams]);
 
   // Process pending prompt once hook is ready
   useEffect(() => {
