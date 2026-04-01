@@ -212,9 +212,9 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
         </div>
       </div>
 
-      {/* ── Content zone — fills remaining space ── */}
+      {/* ── Content zone — fills remaining space, justify to spread evenly ── */}
       <div className="flex-1 flex flex-col overflow-hidden" style={{ minHeight: 0 }}>
-        <div className="max-w-[500px] mx-auto w-full flex-1 flex flex-col overflow-hidden" style={{ minHeight: 0 }}>
+        <div className="max-w-[500px] mx-auto w-full flex-1 flex flex-col justify-between overflow-hidden" style={{ minHeight: 0 }}>
 
           {/* ── World rank ── */}
           {card.course.globalRank && (
