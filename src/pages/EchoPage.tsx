@@ -30,6 +30,7 @@ export default function EchoPage() {
   const [input, setInput] = useState('');
   const [historyOpen, setHistoryOpen] = useState(false);
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
+  const returnToRef = useRef<string | null>(null);
 
   const {
     conversationId,
