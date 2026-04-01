@@ -40,6 +40,11 @@ export function PhotosIdentityStep({
             }
           }}
         />
+        {!form.profilePhotoBlob && !form.profilePhotoUrl && (
+          <p className="text-[12px] text-[hsl(38,92%,50%)] mt-1.5 ml-1">
+            👋 Golfers with a photo get 3× more friend requests
+          </p>
+        )}
       </div>
 
       <SectionCard noPadding>

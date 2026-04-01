@@ -9,6 +9,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileForm } from '@/hooks/useProfileForm';
 import { useProfileSave } from '@/hooks/useProfileSave';
 import { supabase } from '@/integrations/supabase/client';
+import { analyticsEvents } from '@/utils/analyticsEvents';
 import { WizardHeader } from './WizardHeader';
 import { WizardProgress } from './WizardProgress';
 import { WizardNavigation } from './WizardNavigation';
@@ -101,9 +102,26 @@ export function PersonalProfileWizard() {
   }, [user, navigate, queryClient]);
 
   const handleSave = useCallback(async () => {
-    if (step < 3) { goNext(); return; }
+    if (step < 3) {
+      analyticsEvents.track('onboarding_step_completed', {
+        step,
+        has_photo: !!(form.profilePhotoBlob || form.profilePhotoUrl),
+        has_home_club: !!form.homeClubName,
+        has_display_name: !!form.displayName,
+      });
+      goNext();
+      return;
+    }
     const ok = await save(form);
-    if (ok) setShowSuccess(true);
+    if (ok) {
+      analyticsEvents.track('onboarding_completed', {
+        has_photo: !!(form.profilePhotoBlob || form.profilePhotoUrl),
+        has_home_club: !!form.homeClubName,
+        has_bio: !!form.bio,
+        has_handicap: form.handicapIndex != null,
+      });
+      setShowSuccess(true);
+    }
   }, [step, form, save, goNext]);
 
   if (loading) {

@@ -48,9 +48,9 @@ export function WizardHeader({ step, isFirstStep, onBack, onClose, onSkip }: Pro
       {onSkip ? (
         <button
           onClick={onSkip}
-          className="flex items-center justify-center min-h-[44px] -mr-2 text-muted-foreground text-[13px] font-medium"
+          className="flex items-center justify-center min-h-[44px] -mr-2 text-muted-foreground/40 text-[12px] font-normal"
         >
-          Skip
+          Skip for now
         </button>
       ) : (
         <button
