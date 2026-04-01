@@ -1,5 +1,5 @@
 /**
- * EchoUserBubble - Right-aligned user message bubble
+ * EchoUserBubble - Right-aligned user message bubble (dark theme)
  */
 
 import React from 'react';
@@ -14,12 +14,14 @@ export function EchoUserBubble({ content }: EchoUserBubbleProps) {
       <div
         className="max-w-[82%] px-4 py-3 rounded-[18px_18px_4px_18px]"
         style={{
-          background: 'rgba(245,166,35,0.10)',
-          border: '1px solid rgba(245,166,35,0.18)',
-          boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+          background: 'rgba(247,147,30,0.14)',
+          border: '1px solid rgba(247,147,30,0.26)',
         }}
       >
-        <p className="text-[14px] leading-relaxed whitespace-pre-wrap select-text text-foreground">
+        <p
+          className="text-[14px] leading-relaxed whitespace-pre-wrap select-text"
+          style={{ color: 'rgba(255,255,255,0.90)' }}
+        >
           {content}
         </p>
       </div>
