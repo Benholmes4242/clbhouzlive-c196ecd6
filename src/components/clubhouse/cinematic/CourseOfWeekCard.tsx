@@ -309,7 +309,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             <div
               key={stat.label}
               style={{
-                flex: 1, padding: '10px 8px', borderRadius: 12, textAlign: 'center' as const,
+                flex: 1, padding: 'clamp(6px, 2vw, 10px) 8px', borderRadius: 12, textAlign: 'center' as const,
                 background: 'rgba(255,255,255,0.08)',
                 border: '1px solid rgba(255,255,255,0.12)',
                 backdropFilter: 'blur(12px)',
