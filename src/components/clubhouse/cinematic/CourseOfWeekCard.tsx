@@ -342,7 +342,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
             onClick={() => navigate(`/courses/${course.id}`)}
             className="active:scale-[0.97] transition-transform"
             style={{
-              flex: 1, height: 48, borderRadius: 14, border: 'none',
+              flex: 1, height: 'clamp(42px, 6vh, 48px)', borderRadius: 14, border: 'none',
               background: 'linear-gradient(135deg, #F7931E, #e07010)',
               color: '#fff', fontSize: 15, fontWeight: 800, cursor: 'pointer',
               boxShadow: '0 4px 20px rgba(247,147,30,0.35)',
