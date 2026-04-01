@@ -317,10 +317,6 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
                   Review of the Week
                 </span>
               </div>
-              <div className="mt-1 pl-1 text-[10px] font-medium text-white/40">
-                {card.weekLabel}
-              </div>
-            </div>
           </div>
 
           {/* ── World rank ── */}
