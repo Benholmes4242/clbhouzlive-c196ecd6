@@ -9,6 +9,7 @@ interface PostingAsPillProps {
   onClick: () => void;
   isOpen: boolean;
   hasUnreadNotifications?: boolean;
+  notificationCount?: number;
   useLightTheme?: boolean;
   useGlassTheme?: boolean; // Clubhouse frosted-glass treatment
 }
@@ -18,7 +19,7 @@ interface PostingAsPillProps {
  * Uses forwardRef to allow parent to get anchor position for desktop popover
  */
 export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
-  ({ onClick, isOpen, hasUnreadNotifications = false, useLightTheme = false, useGlassTheme = false }, ref) => {
+  ({ onClick, isOpen, hasUnreadNotifications = false, notificationCount = 0, useLightTheme = false, useGlassTheme = false }, ref) => {
     const { activeActor, isLoading } = useActiveActor();
     
     // Get unread messages count from messaging system
@@ -106,15 +107,26 @@ export const PostingAsPill = forwardRef<HTMLButtonElement, PostingAsPillProps>(
             hideRing
           />
           
-          {/* Orange dot — social notifications (top-right) */}
+          {/* Orange badge — social notifications (top-right) */}
           {hasUnreadNotifications && (
-            <span 
+            <span
               className={cn(
-                "absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-orange-500",
-                useLightTheme ? "ring-[1.5px] ring-background" : "ring-[1.5px] ring-black"
+                "absolute -top-1 -right-1 flex items-center justify-center rounded-full bg-[#F7931E] font-bold text-white",
+                useLightTheme ? "ring-[1.5px] ring-background" : "ring-[1.5px] ring-black",
+                notificationCount > 9
+                  ? "h-[16px] min-w-[16px] px-[3px] text-[8px]"
+                  : notificationCount > 0
+                  ? "h-[14px] w-[14px] text-[8px]"
+                  : "h-2.5 w-2.5"
               )}
-              aria-label="Unread notifications"
-            />
+              aria-label={`${notificationCount} unread notifications`}
+            >
+              {notificationCount > 0 && (
+                <span style={{ lineHeight: 1 }}>
+                  {notificationCount > 99 ? '99+' : notificationCount}
+                </span>
+              )}
+            </span>
           )}
           
           {/* Green dot — unread messages (bottom-right) */}

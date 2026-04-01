@@ -43,7 +43,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { user } = useSupabaseSession();
-  const { hasUnread } = useUnreadNotifications();
+  const { hasUnread, unreadCount } = useUnreadNotifications();
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pillRef = useRef<HTMLButtonElement>(null);
@@ -270,6 +270,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   onClick={handleMenuClick} 
                   isOpen={menuOpen}
                   hasUnreadNotifications={hasUnread}
+                  notificationCount={unreadCount}
                   useLightTheme={useLightTheme}
                 />
               ) : (

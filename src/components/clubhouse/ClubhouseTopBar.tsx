@@ -39,7 +39,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pillRef = useRef<HTMLButtonElement>(null);
-  const { hasUnread } = useUnreadNotifications();
+  const { hasUnread, unreadCount } = useUnreadNotifications();
 
   return (
     <>
@@ -86,6 +86,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                 onClick={() => setMenuOpen((v) => !v)}
                 isOpen={menuOpen}
                 hasUnreadNotifications={hasUnread}
+                notificationCount={unreadCount}
                 useGlassTheme={true}
                 
               />
