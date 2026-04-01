@@ -57,6 +57,18 @@ export default function ExploreTabContent({ embedded = false }: ExploreTabConten
         embedded={embedded}
       />
 
+      {/* Echo — course discovery */}
+      <div style={{ padding: '8px 12px', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+        <EchoContextualButton
+          prompt="Help me find my next golf course to play. Ask me a few questions about my preferences — type of course, location, handicap, budget — and suggest some great options."
+          label="Ask Echo to find you a course"
+          sublabel="Describe your ideal round and Echo will suggest"
+          dark={false}
+          compact
+          source="discover_explore_tab"
+        />
+      </div>
+
       <ExploreGrid
         posts={posts}
         coursePosts={coursePosts}
