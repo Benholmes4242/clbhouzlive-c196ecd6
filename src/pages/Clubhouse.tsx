@@ -444,7 +444,7 @@ const ClubhouseContent = () => {
             caption={activePost.caption}
             theme="dark"
             likesCount={
-              ['course_of_week_card', 'history_card', 'debate_card'].includes(activePost.postType ?? '')
+              ['course_of_week_card', 'history_card', 'debate_card', 'review_of_week_card'].includes(activePost.postType ?? '')
                 ? (editorialLikeCount ?? 0)
                 : activeLikeState?.count ?? null
             }
