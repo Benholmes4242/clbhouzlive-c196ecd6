@@ -18,6 +18,8 @@ interface NavigationBarProps {
   showBorder?: boolean;
   /** Map of tab ID → badge count. Only rendered when count > 0. */
   tabBadges?: Record<string, number>;
+  /** Set of tab IDs that have live content right now */
+  liveTabs?: Set<string>;
 }
 
 const NavigationBar: React.FC<NavigationBarProps> = ({
@@ -29,6 +31,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   useAmberActive = false,
   showBorder = true,
   tabBadges = {},
+  liveTabs = new Set(),
 }) => {
   const isLightTheme = variant === 'default';
   const isClubhouseTheme = variant === 'clubhouse';
@@ -36,13 +39,21 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
 
   
   return (
-    <nav
-      className="w-full h-[55px] flex items-center justify-around"
-      style={showBorder ? { borderTop: `0.5px solid ${borderColor}` } : undefined}
-    >
+    <>
+      <style>{`
+        @keyframes navLivePulse {
+          0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(34,197,94,0.6); }
+          50% { opacity: 0.75; transform: scale(0.85); box-shadow: 0 0 0 3px rgba(34,197,94,0); }
+        }
+      `}</style>
+      <nav
+        className="w-full h-[55px] flex items-center justify-around"
+        style={showBorder ? { borderTop: `0.5px solid ${borderColor}` } : undefined}
+      >
       {navigationTabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = activeTab === tab.id;
+        const isLive = liveTabs.has(tab.id);
         
         return (
           <button
