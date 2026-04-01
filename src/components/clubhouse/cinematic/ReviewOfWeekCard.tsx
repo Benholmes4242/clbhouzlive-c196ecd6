@@ -4,7 +4,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { haptic } from '@/utils/haptics';
 import type { ReviewOfWeekCardFeedPost } from '@/components/media-system/types/media';
-import type { FeedPost } from '@/components/media-system/types/media';
 
 const AMBER = '#F7931E';
 
@@ -23,23 +22,7 @@ const VerifiedIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const StarIcon = ({ className, filled }: { className?: string; filled?: boolean }) => (
-  <svg className={className} viewBox="0 0 12 12" fill={filled ? AMBER : 'none'} stroke={AMBER} strokeWidth="1" xmlns="http://www.w3.org/2000/svg">
-    <path d="M6 1l1.545 3.13L11 4.635 8.5 7.07l.59 3.43L6 8.885 2.91 10.5l.59-3.43L1 4.635l3.455-.505L6 1z" />
-  </svg>
-);
 
-const HeartIcon = ({ className, filled }: { className?: string; filled?: boolean }) => (
-  <svg className={className} viewBox="0 0 24 24" fill={filled ? AMBER : 'none'} stroke={filled ? AMBER : 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-    <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
-  </svg>
-);
-
-const ThumbsUpIcon = ({ className, active }: { className?: string; active?: boolean }) => (
-  <svg className={className} viewBox="0 0 24 24" fill={active ? '#10b981' : 'none'} stroke={active ? '#10b981' : 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-    <path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3" />
-  </svg>
-);
 
 const CommentIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
@@ -148,25 +131,21 @@ interface ReviewOfWeekCardProps {
   post: ReviewOfWeekCardFeedPost;
   onComment: () => void;
   onLike: () => void;
-  getLikeState?: (post: FeedPost) => { isLiked: boolean; count: number };
-  getCommentCount?: (post: FeedPost) => number;
+  onShare?: () => void;
   currentUserId?: string;
   isLoading?: boolean;
 }
 
 export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
-  post, onComment, onLike, getLikeState, getCommentCount, currentUserId, isLoading,
+  post, onComment, onLike, onShare, currentUserId, isLoading,
 }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const card = post?.cardData;
   const [expanded, setExpanded] = useState(false);
   const [optimisticLike, setOptimisticLike] = useState<{ isLiked: boolean; count: number } | null>(null);
-  const [helpfulOptimistic, setHelpfulOptimistic] = useState<{ isHelpful: boolean; count: number } | null>(null);
 
   const cardId = card?.cardId ?? '';
-  const reviewId = card?.reviewId ?? '';
-  const cardHelpfulCount = card?.helpfulCount ?? 0;
 
   // ── Like state ──
   const { data: likeData } = useQuery({
@@ -208,50 +187,6 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
     } catch { setOptimisticLike(null); }
   }, [currentUserId, optimisticLike, likeData, cardId, queryClient]);
 
-  // ── Helpful vote ──
-  const { data: helpfulData } = useQuery({
-    queryKey: ['review-helpful', reviewId, currentUserId],
-    queryFn: async () => {
-      const { data: rating } = await supabase
-        .from('course_ratings')
-        .select('helpful_count')
-        .eq('id', reviewId)
-        .single();
-      let isHelpful = false;
-      if (currentUserId) {
-        const { data: vote } = await supabase
-          .from('course_review_votes')
-          .select('vote_type')
-          .eq('rating_id', reviewId)
-          .eq('user_id', currentUserId)
-          .maybeSingle();
-        isHelpful = vote?.vote_type === 'helpful';
-      }
-      return { count: rating?.helpful_count ?? cardHelpfulCount, isHelpful };
-    },
-    staleTime: 30_000,
-    enabled: !!reviewId,
-  });
-
-  const handleHelpful = useCallback(async () => {
-    if (!currentUserId || !reviewId) return;
-    haptic('light');
-    const current = helpfulOptimistic ?? { isHelpful: helpfulData?.isHelpful ?? false, count: helpfulData?.count ?? cardHelpfulCount };
-    const newHelpful = !current.isHelpful;
-    setHelpfulOptimistic({ isHelpful: newHelpful, count: current.count + (newHelpful ? 1 : -1) });
-    try {
-      if (newHelpful) {
-        await supabase.from('course_review_votes').upsert(
-          { rating_id: reviewId, user_id: currentUserId, vote_type: 'helpful' },
-          { onConflict: 'rating_id,user_id' }
-        );
-      } else {
-        await supabase.from('course_review_votes').delete().eq('rating_id', reviewId).eq('user_id', currentUserId);
-      }
-      queryClient.invalidateQueries({ queryKey: ['review-helpful', reviewId, currentUserId] });
-    } catch { setHelpfulOptimistic(null); }
-  }, [currentUserId, helpfulOptimistic, helpfulData, reviewId, cardHelpfulCount, queryClient]);
-
   // ── Skeleton gate (after all hooks) ──
   if (isLoading || !card) {
     return <ReviewOfWeekSkeleton />;
@@ -259,8 +194,6 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
 
   const isLiked = optimisticLike?.isLiked ?? likeData?.hasLiked ?? false;
   const likeCount = optimisticLike?.count ?? likeData?.count ?? 0;
-  const isHelpful = helpfulOptimistic?.isHelpful ?? helpfulData?.isHelpful ?? false;
-  const helpfulCount = helpfulOptimistic?.count ?? helpfulData?.count ?? card.helpfulCount;
 
   const fullText = [(card as any).reviewTitle, card.reviewText].filter(Boolean).join(' ');
   const truncatedText = fullText.length > 220 ? fullText.slice(0, 220) + '…' : fullText;
@@ -493,13 +426,27 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
 
         {/* Share */}
         <button
-          onClick={onLike}
+          onClick={() => {
+            haptic('light');
+            if (onShare) {
+              onShare();
+            } else if (navigator.share) {
+              navigator.share({
+                title: `${card.reviewer.displayName}'s review of ${card.course.name}`,
+                text: card.reviewText.slice(0, 120),
+                url: `${window.location.origin}/courses/${card.course.id}`,
+              }).catch(() => {});
+            } else {
+              navigator.clipboard.writeText(`${window.location.origin}/courses/${card.course.id}`);
+            }
+          }}
           className="h-12 rounded-2xl flex items-center justify-center gap-[6px] text-[12px] font-semibold active:scale-[0.97] transition-transform"
           style={{
             background: 'rgba(255,255,255,0.05)',
             border: '1px solid rgba(255,255,255,0.07)',
             color: 'rgba(255,255,255,0.45)',
           }}
+          aria-label="Share this review"
         >
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
             <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"

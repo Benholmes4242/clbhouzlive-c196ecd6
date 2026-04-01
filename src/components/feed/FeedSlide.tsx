@@ -122,8 +122,7 @@ export const FeedSlide = memo(function FeedSlide({
           post={post as unknown as ReviewOfWeekCardFeedPost}
           onComment={() => onComment?.()}
           onLike={() => onLike?.(post)}
-          getLikeState={getLikeState}
-          getCommentCount={getCommentCount}
+          onShare={() => onShare?.(post)}
           currentUserId={user?.id}
         />
       );
