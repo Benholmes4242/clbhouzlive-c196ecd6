@@ -22,23 +22,7 @@ const VerifiedIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const StarIcon = ({ className, filled }: { className?: string; filled?: boolean }) => (
-  <svg className={className} viewBox="0 0 12 12" fill={filled ? AMBER : 'none'} stroke={AMBER} strokeWidth="1" xmlns="http://www.w3.org/2000/svg">
-    <path d="M6 1l1.545 3.13L11 4.635 8.5 7.07l.59 3.43L6 8.885 2.91 10.5l.59-3.43L1 4.635l3.455-.505L6 1z" />
-  </svg>
-);
 
-const HeartIcon = ({ className, filled }: { className?: string; filled?: boolean }) => (
-  <svg className={className} viewBox="0 0 24 24" fill={filled ? AMBER : 'none'} stroke={filled ? AMBER : 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-    <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
-  </svg>
-);
-
-const ThumbsUpIcon = ({ className, active }: { className?: string; active?: boolean }) => (
-  <svg className={className} viewBox="0 0 24 24" fill={active ? '#10b981' : 'none'} stroke={active ? '#10b981' : 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-    <path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3" />
-  </svg>
-);
 
 const CommentIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
