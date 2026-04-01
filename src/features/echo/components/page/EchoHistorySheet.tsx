@@ -266,7 +266,8 @@ export function EchoHistorySheet({ isOpen, onClose, onSelectConversation }: Echo
             dragElastic={{ top: 0, bottom: 0.5 }}
             onDragEnd={handleSheetDragEnd}
             style={{ y: sheetY, background: '#0c0c0e' }}
-            className="fixed bottom-0 inset-x-0 mx-auto z-50 w-full max-w-[480px] rounded-t-[22px] h-[75vh] flex flex-col"
+            className="fixed bottom-0 inset-x-0 mx-auto z-50 w-full max-w-[480px] rounded-t-[22px] flex flex-col"
+            style={{ ...{ y: sheetY, background: '#0c0c0e' } as any, height: 'min(75vh, calc(100vh - 120px))', maxHeight: '85vh' }}
             initial={sheetAnimProps.initial}
             animate={{ y: 0 }}
             exit={sheetAnimProps.exit}
