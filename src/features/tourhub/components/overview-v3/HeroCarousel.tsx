@@ -650,7 +650,11 @@ function HeroSlide({ slide, isActive, totalSlides, currentIndex, onDotClick, lea
               left: isExpanded ? 12 : 16,
               ...(isExpanded
                 ? { right: 12, top: 'calc(env(safe-area-inset-top, 20px) + 120px)' }
-                : { maxWidth: 'min(350px, calc(100% - 32px))' }
+                : {
+                    maxWidth: 'min(350px, calc(100% - 32px))',
+                    maxHeight: 'calc(100% - max(env(safe-area-inset-top, 47px), 47px) - 110px)',
+                    overflowY: 'auto' as const,
+                  }
               ),
               minWidth: isExpanded ? undefined : '280px',
               borderRadius: isExpanded ? 16 : 12,
