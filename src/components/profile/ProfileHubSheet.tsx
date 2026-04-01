@@ -151,14 +151,14 @@ function ProfileHubSheet({
       label: 'Messages',
       route: '/messages',
       badge: unreadMessageCount,
-      badgeColor: 'bg-primary',
+      badgeColor: 'emerald',
     },
     {
       icon: Bell,
       label: 'Notifications',
       route: '/notificationmessages',
       badge: unreadNotificationCount,
-      badgeColor: 'bg-destructive',
+      badgeColor: 'amber',
     },
   ];
 
@@ -371,18 +371,54 @@ function ProfileHubSheet({
                     >
                       {badge > 0 && (
                         <span
-                          className="absolute top-2.5 right-2.5 min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold text-white flex items-center justify-center"
-                          style={{ background: badgeColor === 'bg-primary' ? 'hsl(var(--primary))' : 'hsl(var(--destructive))' }}
+                          className="absolute top-2.5 right-2.5 flex items-center justify-center rounded-full text-white font-bold"
+                          style={{
+                            minWidth: badge > 9 ? 16 : 14,
+                            height: badge > 9 ? 16 : 14,
+                            padding: badge > 9 ? '0 4px' : '0',
+                            fontSize: 9,
+                            lineHeight: 1,
+                            background: badgeColor === 'emerald'
+                              ? '#10b981'
+                              : badgeColor === 'amber'
+                              ? '#F7931E'
+                              : '#10b981',
+                            boxShadow: badgeColor === 'emerald'
+                              ? '0 1px 4px rgba(16,185,129,0.4)'
+                              : '0 1px 4px rgba(247,147,30,0.4)',
+                          }}
                         >
-                          {badge > 99 ? '99+' : badge}
+                          <span style={{ lineHeight: 1 }}>
+                            {badge > 99 ? '99+' : badge}
+                          </span>
                         </span>
                       )}
 
                       <div
                         className="flex items-center justify-center rounded-[10px]"
-                        style={{ width: 36, height: 36, background: 'rgba(0,0,0,0.05)' }}
+                        style={{
+                          width: 36,
+                          height: 36,
+                          background: badge > 0
+                            ? badgeColor === 'emerald'
+                              ? 'rgba(16,185,129,0.10)'
+                              : 'rgba(247,147,30,0.10)'
+                            : 'rgba(0,0,0,0.05)',
+                          transition: 'background 0.2s ease',
+                        }}
                       >
-                        <Icon className="w-[18px] h-[18px]" style={{ color: '#475569' }} strokeWidth={2} />
+                        <Icon
+                          className="w-[18px] h-[18px]"
+                          style={{
+                            color: badge > 0
+                              ? badgeColor === 'emerald'
+                                ? '#10b981'
+                                : '#F7931E'
+                              : '#475569',
+                            transition: 'color 0.2s ease',
+                          }}
+                          strokeWidth={2}
+                        />
                       </div>
 
                       <span
