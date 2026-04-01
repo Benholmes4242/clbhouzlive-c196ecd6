@@ -90,81 +90,83 @@ export function EchoPageWelcome({ profile, onChipSelect }: EchoPageWelcomeProps)
   };
 
   return (
-    <div className="h-full flex flex-col items-center justify-center px-5 pb-32 overflow-visible">
-      {/* Ambient amber glow */}
-      <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[320px] h-[320px] pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(247,147,30,0.08) 0%, transparent 70%)' }}
-      />
-
-      {/* Waveform orb */}
-      <motion.div
-        className="flex items-center justify-center my-6"
-        initial={{ scale: 0.85, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.45, ease: [0.22, 0.61, 0.36, 1] }}
-      >
+    <div className="h-full flex flex-col items-center px-5 overflow-y-auto" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}>
+      <div className="flex flex-col items-center w-full my-auto py-8">
+        {/* Ambient amber glow */}
         <div
-          className="w-[88px] h-[88px] rounded-full flex items-center justify-center"
-          style={{
-            background: 'radial-gradient(circle, rgba(247,147,30,0.14) 0%, transparent 70%)',
-          }}
-        >
-          <AnimatedEchoWave size={44} active={true} />
-        </div>
-      </motion.div>
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[320px] h-[320px] pointer-events-none"
+          style={{ background: 'radial-gradient(circle, rgba(247,147,30,0.08) 0%, transparent 70%)' }}
+        />
 
-      {/* Greeting */}
-      <div className="text-center mb-2">
-        <h1
-          className="text-[28px] font-bold tracking-tight"
-          style={{ color: 'rgba(255,255,255,0.90)' }}
+        {/* Waveform orb */}
+        <motion.div
+          className="flex items-center justify-center mb-4 mt-0"
+          initial={{ scale: 0.85, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.45, ease: [0.22, 0.61, 0.36, 1] }}
         >
-          {profile.firstName ? `${greeting}, ${profile.firstName}.` : `${greeting}.`}
-        </h1>
-        <p
-          className="text-[15px] mt-1.5"
-          style={{ color: 'rgba(255,255,255,0.45)' }}
-        >
-          Your caddie is ready.
+          <div
+            className="w-[88px] h-[88px] rounded-full flex items-center justify-center"
+            style={{
+              background: 'radial-gradient(circle, rgba(247,147,30,0.14) 0%, transparent 70%)',
+            }}
+          >
+            <AnimatedEchoWave size={44} active={true} />
+          </div>
+        </motion.div>
+
+        {/* Greeting */}
+        <div className="text-center mb-2">
+          <h1
+            className="text-[28px] font-bold tracking-tight"
+            style={{ color: 'rgba(255,255,255,0.90)' }}
+          >
+            {profile.firstName ? `${greeting}, ${profile.firstName}.` : `${greeting}.`}
+          </h1>
+          <p
+            className="text-[15px] mt-1.5"
+            style={{ color: 'rgba(255,255,255,0.45)' }}
+          >
+            Your caddie is ready.
+          </p>
+        </div>
+
+        {/* Divider */}
+        <div className="flex items-center gap-3 my-6 w-full max-w-[340px]">
+          <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
+          <span
+            className="text-[11px] font-semibold uppercase tracking-[0.12em]"
+            style={{ color: 'rgba(255,255,255,0.22)' }}
+          >
+            Try asking
+          </span>
+          <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
+        </div>
+
+        {/* Prompt chips */}
+        <div className="w-full max-w-[340px] flex flex-col gap-[6px]">
+          {prompts.map((prompt, index) => (
+            <button
+              key={index}
+              onClick={() => handleChipClick(prompt)}
+              className="px-4 py-[11px] rounded-[13px] text-[13px] font-medium text-left active:scale-[0.98] transition-all duration-150 flex items-center justify-between gap-2"
+              style={{
+                background: '#161618',
+                border: '1px solid rgba(255,255,255,0.07)',
+              }}
+              aria-label={`Ask Echo: ${prompt}`}
+            >
+              <span style={{ color: 'rgba(255,255,255,0.72)' }}>{prompt}</span>
+              <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(247,147,30,0.4)' }} />
+            </button>
+          ))}
+        </div>
+
+        {/* Hint */}
+        <p className="mt-4 text-[12px] text-center" style={{ color: 'rgba(255,255,255,0.18)' }}>
+          Ask me anything about golf
         </p>
       </div>
-
-      {/* Divider */}
-      <div className="flex items-center gap-3 my-6 w-full max-w-[340px]">
-        <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
-        <span
-          className="text-[11px] font-semibold uppercase tracking-[0.12em]"
-          style={{ color: 'rgba(255,255,255,0.22)' }}
-        >
-          Try asking
-        </span>
-        <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
-      </div>
-
-      {/* Prompt chips */}
-      <div className="w-full max-w-[340px] flex flex-col gap-2">
-        {prompts.map((prompt, index) => (
-          <button
-            key={index}
-            onClick={() => handleChipClick(prompt)}
-            className="px-4 py-[11px] rounded-[13px] text-[13px] font-medium text-left active:scale-[0.98] transition-all duration-150 flex items-center justify-between gap-2"
-            style={{
-              background: '#161618',
-              border: '1px solid rgba(255,255,255,0.07)',
-            }}
-            aria-label={`Ask Echo: ${prompt}`}
-          >
-            <span style={{ color: 'rgba(255,255,255,0.72)' }}>{prompt}</span>
-            <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" style={{ color: 'rgba(247,147,30,0.4)' }} />
-          </button>
-        ))}
-      </div>
-
-      {/* Hint */}
-      <p className="mt-4 text-[12px] text-center" style={{ color: 'rgba(255,255,255,0.18)' }}>
-        Ask me anything about golf
-      </p>
     </div>
   );
 }
