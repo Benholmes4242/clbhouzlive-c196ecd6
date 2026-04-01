@@ -1217,7 +1217,7 @@ export const PGACard: React.FC<PGACardProps> = ({
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     {cd.leader.photoUrl ? (
-                      <img src={cd.leader.photoUrl} alt={cd.leader.playerName} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                      <img src={cd.leader.photoUrl} alt={cd.leader.playerName} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 0%' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                     ) : (
                       <span style={{ fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>{getInitials(cd.leader.playerName)}</span>
                     )}
