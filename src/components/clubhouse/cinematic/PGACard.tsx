@@ -751,9 +751,9 @@ export const PGACard: React.FC<PGACardProps> = ({
         {/* Echo — live tournament intel */}
         <div style={{ padding: '6px 16px 2px' }}>
           <EchoContextualButton
-            prompt={`Give me live intel on ${cd.tournamentName} — who is leading, what are the key storylines, and who should I watch today?`}
+            prompt={`It's ${new Date().getFullYear()} and ${cd.tournamentName} is happening live right now at ${cd.venueName || 'the course'}${cd.venueCity ? ` in ${cd.venueCity}` : ''}${cd.leader ? `. The current leader is ${cd.leader.playerName} at ${cd.leader.scoreDisplay}` : ''}${cd.chasers?.[0] ? `, with ${cd.chasers[0].playerName} close behind` : ''}. It's ${cd.roundLabel}. Search for the latest live leaderboard, tell me who is likely to win from here, what the key storylines are today, and which players I should be watching.`}
             label="Ask Echo for live intel"
-            sublabel="Leaderboard insight · who to watch"
+            sublabel="Live leaderboard · who to watch"
             source="pga_card_live"
           />
         </div>
@@ -1092,10 +1092,10 @@ export const PGACard: React.FC<PGACardProps> = ({
         {/* Echo — completed tournament recap */}
         <div style={{ padding: '6px 16px 2px' }}>
           <EchoContextualButton
-            prompt={`Tell me about the result of ${cd.tournamentName} — what happened, how did the winner play, and what were the key moments?`}
+            prompt={`Search for the ${new Date().getFullYear()} ${cd.tournamentName} result${cd.venueName ? ` at ${cd.venueName}` : ''}${cd.leader ? `. The winner appears to be ${cd.leader.playerName} at ${cd.leader.scoreDisplay}${cd.winnerBy ? `, winning by ${cd.winnerBy}` : ''}` : ''}. Tell me what happened, how the winner played across the week, what the key moments were, and what this result means for their season.`}
             label="Ask Echo about the result"
             sublabel="Winner story · key moments"
-            source="pga_card_completed"
+            source="pga_card_result"
           />
         </div>
 
@@ -1410,7 +1410,7 @@ export const PGACard: React.FC<PGACardProps> = ({
       {/* Echo — upcoming tournament preview */}
       <div style={{ padding: '6px 16px 2px' }}>
         <EchoContextualButton
-          prompt={`Preview ${cd.tournamentName} for me — who are the favourites, what should I know about the course, and what makes this event special?`}
+          prompt={`Preview the ${new Date().getFullYear()} ${cd.tournamentName}${cd.venueName ? ` at ${cd.venueName}` : ''}${cd.venueCity ? ` in ${cd.venueCity}` : ''}${cd.purse ? `. Purse is $${(cd.purse / 1_000_000).toFixed(1)}M` : ''}${cd.venuePar ? `. The course plays Par ${cd.venuePar} at ${(cd.venueYardage || 0).toLocaleString()} yards` : ''}${cd.defendingChampion ? `. Defending champion is ${cd.defendingChampion}` : ''}. Search for the latest news, tell me who the favourites are, what type of player wins here, and what storylines to follow this week.`}
           label="Ask Echo to preview this event"
           sublabel="Favourites · course intel · storylines"
           source="pga_card_upcoming"
