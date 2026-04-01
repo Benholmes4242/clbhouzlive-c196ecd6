@@ -1396,6 +1396,16 @@ export const PGACard: React.FC<PGACardProps> = ({
         </div>
       </div>
 
+      {/* Echo — upcoming tournament preview */}
+      <div style={{ padding: '6px 16px 2px' }}>
+        <EchoContextualButton
+          prompt={`Preview ${cd.tournamentName} for me — who are the favourites, what should I know about the course, and what makes this event special?`}
+          label="Ask Echo to preview this event"
+          sublabel="Favourites · course intel · storylines"
+          source="pga_card_upcoming"
+        />
+      </div>
+
       {/* ── ZONE 3: CTA BAR — unchanged ── */}
       <div
         className="flex-shrink-0 flex items-center gap-3 px-5 pt-3"
