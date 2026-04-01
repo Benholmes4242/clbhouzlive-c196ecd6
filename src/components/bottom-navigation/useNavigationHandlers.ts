@@ -11,6 +11,7 @@ export const useNavigationHandlers = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { activeActor } = useActiveActor();
+  const { markCoursesAsSeen } = useUnseenFriendReviews();
   const [activeTab, setActiveTab] = useState('clubhouse');
 
   useEffect(() => {
