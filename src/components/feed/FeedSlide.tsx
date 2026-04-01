@@ -115,6 +115,20 @@ export const FeedSlide = memo(function FeedSlide({
       );
     }
 
+    // Review of the Week card
+    if (post.postType === 'review_of_week_card') {
+      return (
+        <ReviewOfWeekCard
+          post={post as unknown as ReviewOfWeekCardFeedPost}
+          onComment={() => onComment?.()}
+          onLike={() => onLike?.(post)}
+          getLikeState={getLikeState}
+          getCommentCount={getCommentCount}
+          currentUserId={user?.id}
+        />
+      );
+    }
+
     // Multi-media (any mix of video + image) → FeedImageCarousel
     if (media && media.length > 1) {
       return (
