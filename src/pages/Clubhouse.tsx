@@ -436,7 +436,7 @@ const ClubhouseContent = () => {
             currentUserId={user?.id}
             creatorUserId={activePost.userId}
             creatorName={
-              ['pga_card', 'history_card', 'course_of_week_card', 'debate_card'].includes(activePost.postType ?? '')
+              ['pga_card', 'history_card', 'course_of_week_card', 'debate_card', 'review_of_week_card'].includes(activePost.postType ?? '')
                 ? 'Clbhouz'
                 : activePost.displayName
             }
