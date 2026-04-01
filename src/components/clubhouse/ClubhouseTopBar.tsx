@@ -86,6 +86,7 @@ export const ClubhouseTopBar: React.FC<ClubhouseTopBarProps> = ({
                 onClick={() => setMenuOpen((v) => !v)}
                 isOpen={menuOpen}
                 hasUnreadNotifications={hasUnread}
+                notificationCount={unreadCount}
                 useGlassTheme={true}
                 
               />

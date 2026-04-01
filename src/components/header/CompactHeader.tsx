@@ -270,6 +270,7 @@ const CompactHeader: React.FC<CompactHeaderProps> = ({ className }) => {
                   onClick={handleMenuClick} 
                   isOpen={menuOpen}
                   hasUnreadNotifications={hasUnread}
+                  notificationCount={unreadCount}
                   useLightTheme={useLightTheme}
                 />
               ) : (
