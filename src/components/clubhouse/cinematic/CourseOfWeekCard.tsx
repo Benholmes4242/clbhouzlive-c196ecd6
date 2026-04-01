@@ -230,7 +230,7 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
         {/* Course name & location */}
         <h2
           style={{
-            fontSize: 28, fontWeight: 900, color: '#fff',
+            fontSize: 'clamp(20px, 6vw, 28px)', fontWeight: 900, color: '#fff',
             letterSpacing: '-0.02em', lineHeight: 1.1,
             textShadow: '0 2px 12px rgba(0,0,0,0.5)',
             margin: 0,
