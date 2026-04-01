@@ -282,7 +282,7 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
       {/* ── Scrollable content ── */}
       <div
         className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 100px)' }}
       >
         <div className="max-w-[500px] mx-auto w-full">
 
