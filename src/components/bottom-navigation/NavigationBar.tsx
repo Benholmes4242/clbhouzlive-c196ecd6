@@ -96,6 +96,23 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                   ...(isClubhouseTheme && isActive && { color: useAmberActive ? '#F79E1B' : 'rgba(255,255,255,1.0)' })
                 }}
               />
+
+              {/* Tab badge */}
+              {(tabBadges[tab.id] ?? 0) > 0 && (
+                <span
+                  className={cn(
+                    "absolute -top-1.5 -right-2.5 flex items-center justify-center rounded-full bg-[#F7931E] font-bold text-white",
+                    isClubhouseTheme ? "ring-[1.5px] ring-[#0d0d0d]" : "ring-[1.5px] ring-[hsl(210_40%_98%)]",
+                    (tabBadges[tab.id] ?? 0) > 9
+                      ? "h-[16px] min-w-[16px] px-[3px] text-[8px]"
+                      : "h-[14px] w-[14px] text-[8px]"
+                  )}
+                >
+                  <span style={{ lineHeight: 1 }}>
+                    {(tabBadges[tab.id] ?? 0) > 99 ? '99+' : tabBadges[tab.id]}
+                  </span>
+                </span>
+              )}
             </div>
             
             {/* Label */}
