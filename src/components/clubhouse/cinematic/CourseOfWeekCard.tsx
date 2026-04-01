@@ -322,8 +322,18 @@ export const CourseOfWeekCard: React.FC<CourseOfWeekCardProps> = ({
           ))}
         </div>
 
+        {/* Echo — course contextual */}
+        <div style={{ marginTop: 12 }}>
+          <EchoContextualButton
+            prompt={`Tell me about ${course.name}${course.city ? ` in ${course.city}` : ''}${course.country ? `, ${course.country}` : ''} — what's it like to play, best holes, and any tips?`}
+            label={`Ask Echo about ${course.name}`}
+            sublabel="Playing tips · best holes · local knowledge"
+            source="course_of_week"
+          />
+        </div>
+
         {/* CTAs */}
-        <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+        <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
           <button
             onClick={() => navigate(`/courses/${course.id}`)}
             className="active:scale-[0.97] transition-transform"
