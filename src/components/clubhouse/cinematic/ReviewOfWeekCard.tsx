@@ -212,9 +212,9 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
         </div>
       </div>
 
-      {/* ── Content zone — fills remaining space ── */}
+      {/* ── Content zone — fills remaining space, justify to spread evenly ── */}
       <div className="flex-1 flex flex-col overflow-hidden" style={{ minHeight: 0 }}>
-        <div className="max-w-[500px] mx-auto w-full flex-1 flex flex-col overflow-hidden" style={{ minHeight: 0 }}>
+        <div className="max-w-[500px] mx-auto w-full flex-1 flex flex-col justify-between overflow-hidden" style={{ minHeight: 0 }}>
 
           {/* ── World rank ── */}
           {card.course.globalRank && (
@@ -322,13 +322,13 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
             </div>
           )}
 
-          {/* ── Photo grid — takes remaining flex space ── */}
+          {/* ── Photo grid — grows to absorb remaining space ── */}
           {hasPhotos && (
-            <div className="mx-4 sm:mx-5 flex-1 overflow-hidden"
+            <div className="mx-4 sm:mx-5 overflow-hidden"
                  style={{
+                   flex: '1 1 0',
                    marginTop: 'clamp(6px, 1vh, 12px)',
-                   minHeight: 'clamp(48px, 8vh, 80px)',
-                   maxHeight: 'clamp(60px, 12vh, 120px)',
+                   minHeight: 'clamp(48px, 8vh, 64px)',
                    borderRadius: 'clamp(8px, 1.2vh, 12px)',
                  }}>
               <div className="grid grid-cols-4 gap-[3px] h-full overflow-hidden" style={{ borderRadius: 'inherit' }}>
@@ -345,6 +345,9 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
               </div>
             </div>
           )}
+
+          {/* When no photos, use a flex spacer to push content down */}
+          {!hasPhotos && <div style={{ flex: '1 1 0' }} />}
 
           {/* ── Course link button ── */}
           <div className="px-4 sm:px-5 shrink-0" style={{ marginTop: 'clamp(6px, 1vh, 12px)', marginBottom: 'clamp(4px, 0.8vh, 8px)' }}>
