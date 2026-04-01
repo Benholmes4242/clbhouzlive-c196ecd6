@@ -161,11 +161,12 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
   const queryClient = useQueryClient();
   const card = post?.cardData;
   const [expanded, setExpanded] = useState(false);
+  const [optimisticLike, setOptimisticLike] = useState<{ isLiked: boolean; count: number } | null>(null);
+  const [helpfulOptimistic, setHelpfulOptimistic] = useState<{ isHelpful: boolean; count: number } | null>(null);
 
-  // Show skeleton if loading or no card data
-  if (isLoading || !card) {
-    return <ReviewOfWeekSkeleton />;
-  }
+  const cardId = card?.cardId ?? '';
+  const reviewId = card?.reviewId ?? '';
+  const cardHelpfulCount = card?.helpfulCount ?? 0;
 
   // ── Like state (reuses editorial_card_likes) ──
   const { data: likeData } = useQuery({
