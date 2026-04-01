@@ -224,7 +224,11 @@ const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia, show
 
       {/* Media Picker Modal */}
       <Sheet open={showPicker} onOpenChange={setShowPicker}>
-        <SheetContent side="bottom" className="rounded-t-3xl">
+        <SheetContent
+          side="bottom"
+          className="rounded-t-3xl"
+          style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}
+        >
           <SheetHeader>
             <SheetTitle>Add Media</SheetTitle>
           </SheetHeader>

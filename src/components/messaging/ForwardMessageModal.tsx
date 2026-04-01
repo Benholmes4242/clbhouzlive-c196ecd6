@@ -102,7 +102,11 @@ export function ForwardMessageModal({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="rounded-t-3xl px-0 pb-8 h-[70vh]">
+<SheetContent
+          side="bottom"
+          className="rounded-t-3xl px-0 pb-8"
+          style={{ height: 'min(70vh, calc(100dvh - 120px))' }}
+        >
         <SheetHeader className="px-4 pb-4">
           <SheetTitle className="text-center text-[17px] font-semibold">
             Forward Message

@@ -327,8 +327,8 @@ export function TourHubNavOverlay({
               style={{
                 right: '-100px',
                 bottom: '-80px',
-                width: '380px',
-                height: '380px',
+                width: 'min(380px, 100vw)',
+                height: 'min(380px, 100vw)',
                 zIndex: 0,
               }}
             >

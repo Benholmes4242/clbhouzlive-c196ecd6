@@ -52,7 +52,12 @@ export function ManageTeamModal({
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="rounded-t-[20px] p-0 max-h-[85vh] flex flex-col" hideCloseButton>
+        <SheetContent
+          side="bottom"
+          className="rounded-t-[20px] p-0 flex flex-col"
+          style={{ maxHeight: 'min(85vh, 85dvh)', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 0px)' }}
+          hideCloseButton
+        >
           {/* Drag handle */}
           <div className="flex justify-center pt-2.5 pb-1">
             <div className="w-9 h-1 rounded-full bg-muted-foreground/30" />

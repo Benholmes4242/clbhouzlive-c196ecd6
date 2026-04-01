@@ -115,7 +115,11 @@ export const NotificationActionsSheet: React.FC<NotificationActionsSheetProps> =
 
   return (
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
-      <SheetContent side="bottom" className="rounded-t-[20px]">
+      <SheetContent
+        side="bottom"
+        className="rounded-t-[20px]"
+        style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}
+      >
         <SheetHeader className="text-left border-b border-border/40 pb-3" aria-label="Notification options">
           <SheetTitle className="text-[1rem] font-semibold">Notification options</SheetTitle>
         </SheetHeader>

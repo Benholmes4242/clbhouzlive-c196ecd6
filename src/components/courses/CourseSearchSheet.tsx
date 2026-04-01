@@ -188,7 +188,7 @@ export function CourseSearchSheet({
               "shadow-[0_-4px_32px_rgba(0,0,0,0.1)]"
             )}
             style={{
-              maxHeight: '85vh',
+              maxHeight: 'min(85vh, calc(100dvh - max(env(safe-area-inset-top, 47px), 47px) - 20px))',
               paddingBottom: isMobile ? 'env(safe-area-inset-bottom)' : 0,
               backgroundColor: '#FFFFFF',
             }}
