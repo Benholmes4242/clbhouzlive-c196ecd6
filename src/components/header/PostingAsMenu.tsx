@@ -408,7 +408,7 @@ export function PostingAsMenu({ isOpen, onClose, useLightTheme = false, anchorRe
             onClick={() => handleNavigate('/notificationmessages')}
             useLightTheme={useLightTheme}
             trailing={hasUnread && unreadNotificationCount > 0 && (
-              <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-orange-500 text-white text-[10px] font-bold flex items-center justify-center">
+              <span className="min-w-[18px] h-[18px] px-1 rounded-full text-white text-[10px] font-bold flex items-center justify-center" style={{ background: '#F7931E' }}>
                 {unreadNotificationCount > 99 ? '99+' : unreadNotificationCount}
               </span>
             )}
