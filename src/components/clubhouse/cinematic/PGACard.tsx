@@ -671,7 +671,7 @@ export const PGACard: React.FC<PGACardProps> = ({
 
               return (
                 <div key={`${group.position}-${gi}`} style={{
-                  flex: '1 1 0', minHeight: 0,
+                  flex: '1 1 0', minHeight: 'clamp(32px, 5vh, 46px)',
                   display: 'flex', alignItems: 'center', gap: 10,
                   padding: '0 10px',
                   borderRadius: 8,
