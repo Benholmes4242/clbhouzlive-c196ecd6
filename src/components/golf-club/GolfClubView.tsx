@@ -176,6 +176,17 @@ const GolfClubView: React.FC<GolfClubViewProps> = ({ courseId, isInModal = false
         <CourseClaimBadge courseId={course.id} />
       </div>
 
+      {/* Echo — course detail contextual */}
+      <div style={{ padding: '10px 16px 4px' }}>
+        <EchoContextualButton
+          prompt={`Tell me everything about ${course.name}${course.city ? ` in ${course.city}` : ''}${course.country ? `, ${course.country}` : ''} — what's the course like to play, what are the best holes, any tips for visiting, and how does it rank among courses in the area?`}
+          label={`Ask Echo about ${course.name}`}
+          sublabel="Playing tips · best holes · local knowledge"
+          dark={false}
+          source="course_detail_page"
+        />
+      </div>
+
       {/* Segmented Control Tabs */}
       <CourseTabs activeTab={activeTab as any} onChange={handleTabChange as any} />
 
