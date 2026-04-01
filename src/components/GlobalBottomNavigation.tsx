@@ -13,6 +13,7 @@ import { useAppPrefetch } from '@/hooks/useAppPrefetch';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
 import { useUnseenFriendReviews } from '@/hooks/useUnseenFriendReviews';
+import { useTournamentsCache } from '@/hooks/useTournamentsCache';
 
 import { cn } from '@/lib/utils';
 import { auditComponentMount, markPerformance } from '@/utils/clubhouseAudit';
