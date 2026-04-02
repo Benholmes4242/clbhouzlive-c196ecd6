@@ -100,6 +100,29 @@ Deno.serve(async (req) => {
     .update({ is_review_of_week: true, review_of_week_week: week })
     .eq('id', winner.id);
 
+  // Get course name for the editorial card title
+  const { data: winnerCourse } = await supabase
+    .from('golf_courses')
+    .select('name')
+    .eq('id', winner.course_id)
+    .single();
+
+  // Auto-register in editorial_feed_cards
+  await supabase
+    .from('editorial_feed_cards')
+    .upsert(
+      {
+        card_type: 'review_of_week',
+        source_rating_id: winner.id,
+        is_active: true,
+        title: `Review of the Week — ${winnerCourse?.name ?? 'Course'}`,
+        active_from: new Date().toISOString(),
+        active_until: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'source_rating_id' }
+    );
+
   return new Response(JSON.stringify({ selected: winner.id, score: winner.score, week }), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -145,22 +145,22 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
   const [expanded, setExpanded] = useState(false);
   const [optimisticLike, setOptimisticLike] = useState<{ isLiked: boolean; count: number } | null>(null);
 
-  const cardId = card?.cardId ?? '';
+  const editorialCardId = card?.editorialCardId ?? card?.cardId ?? '';
 
   // ── Like state ──
   const { data: likeData } = useQuery({
-    queryKey: ['editorial-card-likes', cardId, currentUserId],
+    queryKey: ['editorial-card-likes', editorialCardId, currentUserId],
     queryFn: async () => {
       const { count } = await supabase
         .from('editorial_card_likes')
         .select('*', { count: 'exact', head: true })
-        .eq('card_id', cardId);
+        .eq('card_id', editorialCardId);
       let hasLiked = false;
       if (currentUserId) {
         const { data } = await supabase
           .from('editorial_card_likes')
           .select('id')
-          .eq('card_id', cardId)
+          .eq('card_id', editorialCardId)
           .eq('user_id', currentUserId)
           .maybeSingle();
         hasLiked = !!data;
@@ -168,24 +168,24 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
       return { count: count ?? 0, hasLiked };
     },
     staleTime: 30_000,
-    enabled: !!cardId,
+    enabled: !!editorialCardId,
   });
 
   const handleLike = useCallback(async () => {
-    if (!currentUserId || !cardId) return;
+    if (!currentUserId || !editorialCardId) return;
     haptic('light');
     const current = optimisticLike ?? { isLiked: likeData?.hasLiked ?? false, count: likeData?.count ?? 0 };
     const newLiked = !current.isLiked;
     setOptimisticLike({ isLiked: newLiked, count: current.count + (newLiked ? 1 : -1) });
     try {
       if (newLiked) {
-        await supabase.from('editorial_card_likes').insert({ card_id: cardId, user_id: currentUserId });
+        await supabase.from('editorial_card_likes').insert({ card_id: editorialCardId, user_id: currentUserId });
       } else {
-        await supabase.from('editorial_card_likes').delete().eq('card_id', cardId).eq('user_id', currentUserId);
+        await supabase.from('editorial_card_likes').delete().eq('card_id', editorialCardId).eq('user_id', currentUserId);
       }
-      queryClient.invalidateQueries({ queryKey: ['editorial-card-likes', cardId, currentUserId] });
+      queryClient.invalidateQueries({ queryKey: ['editorial-card-likes', editorialCardId, currentUserId] });
     } catch { setOptimisticLike(null); }
-  }, [currentUserId, optimisticLike, likeData, cardId, queryClient]);
+  }, [currentUserId, optimisticLike, likeData, editorialCardId, queryClient]);
 
   // ── Skeleton gate (after all hooks) ──
   if (isLoading || !card) {
@@ -409,7 +409,7 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
 
         {/* Comment */}
         <button
-          onClick={onComment}
+          onClick={() => onComment?.()}
           className="h-12 rounded-2xl flex items-center justify-center gap-[6px] text-[12px] font-semibold active:scale-[0.97] transition-transform"
           style={{
             background: 'rgba(255,255,255,0.05)',
