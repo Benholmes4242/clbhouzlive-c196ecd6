@@ -18,6 +18,7 @@ export function useSuggestedFeed(userId: string | undefined) {
       // Seed the session entropy for this user+hour combination
       if (userId) initSessionSeed(userId);
 
+      try {
         const cursor = typeof pageParam === 'string' ? pageParam : undefined;
 
         const { data, error } = await supabase.rpc('get_suggested_feed' as any, {
