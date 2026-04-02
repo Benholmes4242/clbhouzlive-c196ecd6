@@ -251,6 +251,27 @@ export function useHeroCarouselData() {
         if (upcomingByTour[tournament.tourSlug]) upcomingByTour[tournament.tourSlug].push(tournament);
       });
 
+      // Cross-tour major promotion:
+      // Co-sanctioned majors (e.g. Masters, The Open) are stored under a non-PGA tour
+      // in Sportradar (typically EURO). The skip logic below prevents them appearing in
+      // the non-PGA slot, but they also never enter the PGA slot. Fix: inject any upcoming
+      // major from a non-PGA tour into upcomingByTour['pga'] so it competes there by date.
+      const crossTourMajors = upcomingTournaments
+        .map(t => transformTournament(t, false))
+        .filter(t => t.isMajor && t.tourSlug !== 'pga');
+
+      crossTourMajors.forEach(major => {
+        const alreadyInPga = upcomingByTour['pga'].some(t => t.id === major.id);
+        if (!alreadyInPga) {
+          upcomingByTour['pga'].push({ ...major, tourSlug: 'pga' });
+        }
+      });
+
+      // Re-sort PGA upcoming by start date so promoted majors appear in correct position
+      upcomingByTour['pga'].sort(
+        (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+      );
+
 
       // Build slides per tour based on priority logic
       const liveSlides: HeroSlide[] = [];
