@@ -3946,6 +3946,7 @@ export type Database = {
           id: string
           is_active: boolean
           reaction_count: number
+          source_rating_id: string | null
           title: string
           updated_at: string
         }
@@ -3971,6 +3972,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           reaction_count?: number
+          source_rating_id?: string | null
           title: string
           updated_at?: string
         }
@@ -3996,6 +3998,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           reaction_count?: number
+          source_rating_id?: string | null
           title?: string
           updated_at?: string
         }
@@ -4019,6 +4022,13 @@ export type Database = {
             columns: ["debate_option_b_course_id"]
             isOneToOne: false
             referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "editorial_feed_cards_source_rating_id_fkey"
+            columns: ["source_rating_id"]
+            isOneToOne: false
+            referencedRelation: "course_ratings"
             referencedColumns: ["id"]
           },
         ]
