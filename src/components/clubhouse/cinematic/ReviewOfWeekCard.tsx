@@ -167,7 +167,7 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
       }
       return { count: count ?? 0, hasLiked };
     },
-    staleTime: 30_000,
+    staleTime: 0,
     enabled: !!editorialCardId,
   });
 
@@ -183,7 +183,10 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
       } else {
         await supabase.from('editorial_card_likes').delete().eq('card_id', editorialCardId).eq('user_id', currentUserId);
       }
-      queryClient.invalidateQueries({ queryKey: ['editorial-card-likes', editorialCardId, currentUserId] });
+      // Invalidate all like-related keys for this card
+      queryClient.invalidateQueries({ queryKey: ['editorial-card-likes', editorialCardId] });
+      queryClient.invalidateQueries({ queryKey: ['editorial-card-likes-count', editorialCardId] });
+      queryClient.invalidateQueries({ queryKey: ['editorial-card-likers', editorialCardId] });
     } catch { setOptimisticLike(null); }
   }, [currentUserId, optimisticLike, likeData, editorialCardId, queryClient]);
 
