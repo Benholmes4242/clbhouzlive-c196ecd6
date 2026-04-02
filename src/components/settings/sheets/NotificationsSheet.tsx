@@ -124,6 +124,19 @@ export function NotificationsSheet({ open, onClose, userId }: Props) {
           <Switch checked={isPushEnabled} onCheckedChange={handleTogglePush} />
         </div>
 
+        {/* Temporary debug button */}
+        <button
+          onClick={async () => {
+            const info: any = await ((window as any).median?.onesignal
+              ? new Promise(resolve => (window as any).median.onesignal.onesignalInfo(resolve))
+              : Promise.resolve({ oneSignalUserId: null, oneSignalSubscribed: false, oneSignalPushPermissionStatus: 'unknown' }));
+            toast.info(`ID: ${info.oneSignalUserId || 'null'} | Sub: ${info.oneSignalSubscribed} | Status: ${info.oneSignalPushPermissionStatus}`);
+          }}
+          className="text-xs text-amber-500 mt-2"
+        >
+          Debug OneSignal
+        </button>
+
         {/* In-app prefs */}
         <p className="text-[11px] font-semibold uppercase tracking-[1.5px] text-muted-foreground mb-3">In-App</p>
         <div className="space-y-1">

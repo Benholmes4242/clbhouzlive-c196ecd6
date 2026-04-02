@@ -114,6 +114,7 @@ export function usePushNotifications(): UsePushNotificationsResult {
 
     try {
       const { id, subscribed, permissionDenied } = await getOneSignalInfo();
+      console.log('[PushDebug] OneSignal info:', { id, subscribed, permissionDenied, medianAvailable: !!window.median?.onesignal, oneSignalAvailable: !!getOneSignal() });
 
       if (permissionDenied) {
         setState('denied');
