@@ -331,9 +331,16 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
           {/* ── Review text ── */}
           <div className="px-4 sm:px-5 pt-3">
             <p className="text-[13.5px] text-[rgba(255,255,255,0.78)] leading-[1.65] font-normal m-0"
-               style={{ display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+               style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
               {fullText}
             </p>
+            <button
+              onClick={() => navigate(`/courses/${card.course.id}?tab=reviews#review-${card.sourceRatingId ?? editorialCardId}`)}
+              className="mt-1.5 bg-transparent border-none p-0 cursor-pointer text-[12.5px] font-semibold active:scale-[0.97] transition-transform"
+              style={{ color: AMBER }}
+            >
+              Read full review →
+            </button>
           </div>
 
           {/* ── Breakdown bars ── */}
