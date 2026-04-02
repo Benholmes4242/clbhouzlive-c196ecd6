@@ -183,10 +183,13 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
       } else {
         await supabase.from('editorial_card_likes').delete().eq('card_id', editorialCardId).eq('user_id', currentUserId);
       }
-      // Invalidate all like-related keys for this card
-      queryClient.invalidateQueries({ queryKey: ['editorial-card-likes', editorialCardId] });
-      queryClient.invalidateQueries({ queryKey: ['editorial-card-likes-count', editorialCardId] });
-      queryClient.invalidateQueries({ queryKey: ['editorial-card-likers', editorialCardId] });
+      // Invalidate all like-related queries simultaneously
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['editorial-card-likes', editorialCardId] }),
+        queryClient.invalidateQueries({ queryKey: ['editorial-card-likes-count', editorialCardId] }),
+        queryClient.invalidateQueries({ queryKey: ['post-likes', editorialCardId, 'editorial'] }),
+        queryClient.refetchQueries({ queryKey: ['post-likes', editorialCardId, 'editorial'] }),
+      ]);
     } catch { setOptimisticLike(null); }
   }, [currentUserId, optimisticLike, likeData, editorialCardId, queryClient]);
 
