@@ -12,13 +12,14 @@ import type { CommentWithReplies } from './useCommentsWithReplies';
 
 export function useEditorialComments(cardId: string, onCommentDeleted?: () => void) {
   const { user } = useSupabaseSession();
+  const currentUserId = user?.id;
   const queryClient = useQueryClient();
   const queryKey = ['editorial-card-comments', cardId];
 
   const { data: comments = [], isLoading: commentsLoading } = useQuery({
     queryKey,
     enabled: !!cardId,
-    staleTime: 15_000,
+    staleTime: 0,
     queryFn: async () => {
       // Fetch top-level comments
       const { data, error } = await supabase
@@ -42,13 +43,37 @@ export function useEditorialComments(cardId: string, onCommentDeleted?: () => vo
         .order('created_at', { ascending: true });
 
       // Fetch profiles for all user_ids
-      const allUserIds = [...new Set([...data, ...(replies || [])].map(c => c.user_id))];
+      const allComments = [...data, ...(replies || [])];
+      const allUserIds = [...new Set(allComments.map(c => c.user_id))];
       const { data: profiles } = await supabase
         .from('user_profiles')
         .select('id, display_name, profile_photo_url')
         .in('id', allUserIds);
 
       const profileMap = new Map((profiles || []).map(p => [p.id, p]));
+
+      // Fetch like counts for all comments
+      const allCommentIds = allComments.map(c => c.id);
+      const { data: likeCounts } = await supabase
+        .from('editorial_card_comment_likes')
+        .select('comment_id')
+        .in('comment_id', allCommentIds);
+
+      const likeCountMap = new Map<string, number>();
+      for (const row of (likeCounts ?? [])) {
+        likeCountMap.set(row.comment_id, (likeCountMap.get(row.comment_id) ?? 0) + 1);
+      }
+
+      // Fetch current user's likes
+      let userLikedIds = new Set<string>();
+      if (currentUserId) {
+        const { data: userLikes } = await supabase
+          .from('editorial_card_comment_likes')
+          .select('comment_id')
+          .in('comment_id', allCommentIds)
+          .eq('user_id', currentUserId);
+        userLikedIds = new Set((userLikes ?? []).map(l => l.comment_id));
+      }
 
       const replyMap = new Map<string, typeof data>();
       for (const r of (replies || [])) {
@@ -71,8 +96,8 @@ export function useEditorialComments(cardId: string, onCommentDeleted?: () => vo
           created_at: c.created_at,
           updated_at: c.updated_at ?? undefined,
           is_edited: false,
-          likes_count: 0,
-          has_liked: false,
+          likes_count: likeCountMap.get(c.id) ?? 0,
+          has_liked: userLikedIds.has(c.id),
           replies_count: childReplies.length,
           total_replies_count: childReplies.length,
           replies: childReplies.map(r => {
@@ -88,8 +113,8 @@ export function useEditorialComments(cardId: string, onCommentDeleted?: () => vo
               created_at: r.created_at,
               updated_at: r.updated_at ?? undefined,
               is_edited: false,
-              likes_count: 0,
-              has_liked: false,
+              likes_count: likeCountMap.get(r.id) ?? 0,
+              has_liked: userLikedIds.has(r.id),
             };
           }),
           media_url: null,
@@ -146,13 +171,77 @@ export function useEditorialComments(cardId: string, onCommentDeleted?: () => vo
     },
   });
 
+  const toggleCommentLike = useCallback(async (commentId: string) => {
+    if (!currentUserId) return;
+
+    // Find current like state from comments data
+    const findComment = (list: CommentWithReplies[]): CommentWithReplies | undefined => {
+      for (const c of list) {
+        if (c.id === commentId) return c;
+        const found = c.replies?.find(r => r.id === commentId);
+        if (found) return found as unknown as CommentWithReplies;
+      }
+      return undefined;
+    };
+    const comment = findComment(comments);
+    const currentlyLiked = comment?.has_liked ?? false;
+
+    // Optimistic update
+    const updateComments = (list: CommentWithReplies[]): CommentWithReplies[] =>
+      list.map(c => {
+        if (c.id === commentId) {
+          return {
+            ...c,
+            has_liked: !currentlyLiked,
+            likes_count: currentlyLiked ? Math.max(0, c.likes_count - 1) : c.likes_count + 1,
+          };
+        }
+        if (c.replies?.length) {
+          return {
+            ...c,
+            replies: c.replies.map(r =>
+              r.id === commentId
+                ? {
+                    ...r,
+                    has_liked: !currentlyLiked,
+                    likes_count: currentlyLiked ? Math.max(0, r.likes_count - 1) : r.likes_count + 1,
+                  }
+                : r
+            ),
+          };
+        }
+        return c;
+      });
+
+    queryClient.setQueryData(queryKey, (old: CommentWithReplies[] | undefined) =>
+      old ? updateComments(old) : []
+    );
+
+    try {
+      if (currentlyLiked) {
+        await supabase
+          .from('editorial_card_comment_likes')
+          .delete()
+          .eq('comment_id', commentId)
+          .eq('user_id', currentUserId);
+      } else {
+        await supabase
+          .from('editorial_card_comment_likes')
+          .insert({ comment_id: commentId, user_id: currentUserId });
+      }
+    } catch {
+      // Revert on failure
+      queryClient.invalidateQueries({ queryKey });
+    }
+  }, [currentUserId, cardId, queryClient, queryKey, comments]);
+
   return {
     comments,
     commentsLoading,
     addComment: (content: string, parentId?: string): Promise<string> =>
       addCommentMutation.mutateAsync({ content, parentId }),
     isAddingComment: addCommentMutation.isPending,
-    toggleCommentLike: () => {},
+    toggleCommentLike,
     deleteComment: (commentId: string) => deleteCommentMutation.mutateAsync(commentId),
     isDeletingComment: deleteCommentMutation.isPending,
     updateComment: async () => {},
