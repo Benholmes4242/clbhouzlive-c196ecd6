@@ -393,15 +393,15 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
           onClick={handleLike}
           className="h-12 rounded-2xl flex items-center justify-center gap-[6px] text-[12px] font-semibold active:scale-[0.97] transition-transform"
           style={{
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.07)',
-            color: isLiked ? '#e05555' : 'rgba(255,255,255,0.45)',
+            background: isLiked ? 'rgba(245,158,11,0.14)' : 'rgba(255,255,255,0.05)',
+            border: `1px solid ${isLiked ? 'rgba(245,158,11,0.4)' : 'rgba(255,255,255,0.07)'}`,
+            color: isLiked ? '#f59e0b' : 'rgba(255,255,255,0.45)',
           }}
         >
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
             <path d="M12 21C12 21 3 14.5 3 8.5C3 5.46 5.46 3 8.5 3C10.24 3 11.8 3.84 12 5C12.2 3.84 13.76 3 15.5 3C18.54 3 21 5.46 21 8.5C21 14.5 12 21 12 21Z"
-              fill={isLiked ? '#e05555' : 'none'}
-              stroke={isLiked ? '#e05555' : 'rgba(255,255,255,0.55)'}
+              fill={isLiked ? '#f59e0b' : 'none'}
+              stroke={isLiked ? '#f59e0b' : 'rgba(255,255,255,0.55)'}
               strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
           <span>{likeCount > 0 ? `Like · ${likeCount}` : 'Like'}</span>
