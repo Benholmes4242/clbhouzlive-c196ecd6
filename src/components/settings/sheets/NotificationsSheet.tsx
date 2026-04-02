@@ -126,13 +126,26 @@ export function NotificationsSheet({ open, onClose, userId }: Props) {
 
         {/* Temporary debug button */}
         <button
-          onClick={async () => {
-            const info: any = await ((window as any).median?.onesignal
-              ? new Promise(resolve => (window as any).median.onesignal.onesignalInfo(resolve))
-              : Promise.resolve({ oneSignalUserId: null, oneSignalSubscribed: false, oneSignalPushPermissionStatus: 'unknown' }));
-            toast.info(`ID: ${info.oneSignalUserId || 'null'} | Sub: ${info.oneSignalSubscribed} | Status: ${info.oneSignalPushPermissionStatus}`);
+          onClick={() => {
+            const median = (window as any).median;
+            const hasMedian = !!median;
+            const hasOneSignal = !!median?.onesignal;
+            const bridgeKeys = hasMedian ? Object.keys(median).join(', ') : 'none';
+            
+            if (!hasOneSignal) {
+              toast.info(`Median: ${hasMedian} | Keys: ${bridgeKeys}`);
+              return;
+            }
+
+            try {
+              median.onesignal.onesignalInfo((info: any) => {
+                toast.info(`ID: ${info?.oneSignalUserId || 'null'} | Sub: ${info?.oneSignalSubscribed} | Status: ${info?.oneSignalPushPermissionStatus}`);
+              });
+            } catch (e: any) {
+              toast.error(`Error: ${e?.message || 'unknown'}`);
+            }
           }}
-          className="text-xs text-amber-500 mt-2"
+          className="text-xs text-amber-500 mt-2 py-1"
         >
           Debug OneSignal
         </button>
