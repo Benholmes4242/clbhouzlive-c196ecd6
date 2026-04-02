@@ -529,34 +529,46 @@ const AppInner: React.FC = () => {
   // One-time push registration on app launch (Median/native only)
   useEffect(() => {
     const registerPushOnLaunch = async () => {
-      const os = (window as any).median?.onesignal;
-      if (!os) return;
+      try {
+        // Retry up to 5 times waiting for Median bridge
+        let os = (window as any).median?.onesignal;
+        let attempts = 0;
+        while (!os && attempts < 5) {
+          await new Promise(r => setTimeout(r, 1000));
+          os = (window as any).median?.onesignal;
+          attempts++;
+        }
+        if (!os) return;
 
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return;
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) return;
 
-      const userId = session.user.id;
-      os.login?.(userId);
-      // Explicitly trigger OneSignal registration after login
-      os.register?.();
+        const userId = session.user.id;
 
-      const { data: existing } = await supabase
-        .from('user_push_devices')
-        .select('id')
-        .eq('user_id', userId)
-        .maybeSingle();
+        // Login with real user UUID — this fixes any previous bad login
+        os.login?.(userId);
+        os.register?.();
 
-      if (!existing) {
+        await new Promise(r => setTimeout(r, 1000));
+
         const platform = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase())
           ? 'ios' : 'android';
-        await supabase.functions.invoke('register-push-device', {
+
+        const { error } = await supabase.functions.invoke('register-push-device', {
           body: { provider_id: userId, platform, enabled: true },
         });
-        console.log('[Push] Device registered on launch');
+
+        if (error) {
+          console.error('[Push] Registration failed:', error);
+        } else {
+          console.log('[Push] Device registered successfully');
+        }
+      } catch (e) {
+        console.error('[Push] Registration error:', e);
       }
     };
 
-    const timer = setTimeout(registerPushOnLaunch, 2000);
+    const timer = setTimeout(registerPushOnLaunch, 1000);
     return () => clearTimeout(timer);
   }, []);
 
