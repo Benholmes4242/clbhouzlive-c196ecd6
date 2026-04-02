@@ -223,7 +223,7 @@ const ClubhouseContent = () => {
       return count ?? 0;
     },
     enabled: !!editorialCardId,
-    staleTime: 30_000,
+    staleTime: 0,
   });
   
   // ── Optimistic follow state ──
