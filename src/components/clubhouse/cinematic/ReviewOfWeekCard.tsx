@@ -334,13 +334,15 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
                style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
               {fullText}
             </p>
-            <button
-              onClick={() => navigate(`/courses/${card.course.id}?tab=reviews#review-${editorialCardId}`)}
-              className="mt-1.5 bg-transparent border-none p-0 cursor-pointer text-[12.5px] font-semibold active:scale-[0.97] transition-transform"
-              style={{ color: AMBER }}
-            >
-              Read full review →
-            </button>
+            <div className="flex justify-end mt-1.5">
+              <button
+                onClick={() => navigate(`/courses/${card.course.id}?tab=reviews#review-${editorialCardId}`)}
+                className="bg-transparent border-none p-0 cursor-pointer text-[12.5px] font-semibold active:scale-[0.97] transition-transform"
+                style={{ color: AMBER }}
+              >
+                Read full review →
+              </button>
+            </div>
           </div>
 
           {/* ── Breakdown bars ── */}
