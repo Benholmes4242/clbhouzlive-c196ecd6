@@ -526,6 +526,38 @@ const AppInner: React.FC = () => {
   // Global focus re-auth hook
   useReauthOnFocus();
 
+  // One-time push registration on app launch (Median/native only)
+  useEffect(() => {
+    const registerPushOnLaunch = async () => {
+      const os = (window as any).median?.onesignal;
+      if (!os) return;
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
+
+      const userId = session.user.id;
+      os.login?.(userId);
+
+      const { data: existing } = await supabase
+        .from('user_push_devices')
+        .select('id')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (!existing) {
+        const platform = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase())
+          ? 'ios' : 'android';
+        await supabase.functions.invoke('register-push-device', {
+          body: { provider_id: userId, platform, enabled: true },
+        });
+        console.log('[Push] Device registered on launch');
+      }
+    };
+
+    const timer = setTimeout(registerPushOnLaunch, 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   // ── Analytics: session start + page tracking ──
   useEffect(() => {
     const sessionId = crypto.randomUUID();
