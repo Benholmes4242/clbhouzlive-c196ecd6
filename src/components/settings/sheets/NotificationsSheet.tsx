@@ -131,25 +131,32 @@ export function NotificationsSheet({ open, onClose, userId }: Props) {
               const el = document.getElementById('push-debug-output');
               if (el) el.textContent = 'touchStart fired...';
             }}
-            onClick={() => {
-              const el = document.getElementById('push-debug-output');
-              if (el) el.textContent = 'click fired, checking bridge...';
-              
-              const os = (window as any).median?.onesignal;
-              if (!os) {
-                if (el) el.textContent = `No onesignal. median=${!!(window as any).median} keys=${Object.keys((window as any).median || {}).join(',')}`;
-                return;
-              }
-              if (el) el.textContent = 'calling os.info...';
-              
-              const cb = (result: any) => {
-                if (el) el.textContent = JSON.stringify(result).slice(0, 200);
-              };
-              
-              if (os.info) os.info(cb);
-              else if (os.onesignalInfo) os.onesignalInfo(cb);
-              else if (el) el.textContent = `methods: ${Object.keys(os).join(',')}`;
-            }}
+    onClick={() => {
+      const el = document.getElementById('push-debug-output');
+      const os = (window as any).median?.onesignal;
+      if (!os) { if (el) el.textContent = 'no bridge'; return; }
+      if (el) el.textContent = 'trying onesignalInfo...';
+
+      // Try legacy onesignalInfo with timeout
+      let called = false;
+      const timeout = setTimeout(() => {
+        if (!called && el) el.textContent = 'onesignalInfo timed out — trying externalUserId login flow';
+        // Try login with user's email as external ID then call info
+        os.login('test-user-123');
+        setTimeout(() => {
+          os.info?.((r: any) => {
+            called = true;
+            if (el) el.textContent = 'After login: ' + JSON.stringify(r).slice(0, 200);
+          });
+        }, 2000);
+      }, 3000);
+
+      os.onesignalInfo?.((result: any) => {
+        called = true;
+        clearTimeout(timeout);
+        if (el) el.textContent = 'onesignalInfo: ' + JSON.stringify(result).slice(0, 200);
+      });
+    }}
             style={{
               background: '#F7931E',
               borderRadius: '8px',
