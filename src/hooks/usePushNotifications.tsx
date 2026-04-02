@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
@@ -20,41 +20,71 @@ export const usePushNotifications = () => {
     isLoading: false,
   });
 
-  useEffect(() => {
-    checkSupport();
-    if (user) {
-      checkSubscriptionStatus();
+  const refresh = useCallback(async () => {
+    // Re-check browser support & permission
+    const isSupported = 'Notification' in window && 'serviceWorker' in navigator;
+    const permission = isSupported ? Notification.permission : null;
+
+    setState(prev => ({ ...prev, isSupported, permission }));
+
+    if (!user || !isSupported) return;
+
+    // If browser permission is granted, auto-register in our DB
+    if (permission === 'granted') {
+      try {
+        const { data } = await supabase
+          .from('user_profiles')
+          .select('notification_preferences')
+          .eq('id', user.id)
+          .single();
+
+        const preferences = (data?.notification_preferences as any) || {};
+        const alreadyEnabled = preferences?.push_enabled || false;
+
+        if (!alreadyEnabled) {
+          // Auto-register: permission granted but not yet stored
+          const updatedPreferences = { ...preferences, push_enabled: true };
+          await supabase
+            .from('user_profiles')
+            .update({ notification_preferences: updatedPreferences })
+            .eq('id', user.id);
+          setState(prev => ({ ...prev, isSubscribed: true }));
+        } else {
+          setState(prev => ({ ...prev, isSubscribed: true }));
+        }
+      } catch (error) {
+        console.error('Error during refresh auto-register:', error);
+      }
+    } else {
+      // Permission not granted — check DB status
+      try {
+        const { data } = await supabase
+          .from('user_profiles')
+          .select('notification_preferences')
+          .eq('id', user.id)
+          .single();
+
+        const preferences = (data?.notification_preferences as any) || {};
+        const isSubscribed = preferences?.push_enabled || false;
+        setState(prev => ({ ...prev, isSubscribed }));
+      } catch (error) {
+        console.error('Error checking subscription status:', error);
+      }
     }
   }, [user]);
 
-  const checkSupport = () => {
-    const isSupported = 'Notification' in window && 'serviceWorker' in navigator;
-    const permission = isSupported ? Notification.permission : null;
-    
-    setState(prev => ({
-      ...prev,
-      isSupported,
-      permission,
-    }));
-  };
+  // Initial check + visibilitychange listener
+  useEffect(() => {
+    refresh();
 
-  const checkSubscriptionStatus = async () => {
-    if (!user || !state.isSupported) return;
-
-    try {
-      const { data } = await supabase
-        .from('user_profiles')
-        .select('notification_preferences')
-        .eq('id', user.id)
-        .single();
-
-      const preferences = data?.notification_preferences as any;
-      const isSubscribed = preferences?.push_enabled || false;
-      setState(prev => ({ ...prev, isSubscribed }));
-    } catch (error) {
-      console.error('Error checking subscription status:', error);
-    }
-  };
+    // Re-check when app comes back into focus
+    // (catches case where iOS granted permission via OS prompt)
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') refresh();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, [refresh]);
 
   const requestPermission = async (): Promise<boolean> => {
     if (!state.isSupported) {
@@ -69,9 +99,7 @@ export const usePushNotifications = () => {
       setState(prev => ({ ...prev, permission }));
 
       if (permission === 'granted') {
-        await registerServiceWorker();
         await updateSubscriptionStatus(true);
-        
         toast.success("Notifications enabled");
         return true;
       } else {
@@ -85,13 +113,6 @@ export const usePushNotifications = () => {
     } finally {
       setState(prev => ({ ...prev, isLoading: false }));
     }
-  };
-
-  const registerServiceWorker = async () => {
-    // Service worker disabled - no sw.js file exists
-    // If push notifications are needed, implement a proper service worker with cache versioning
-    console.log('[Push] Service worker registration disabled - no sw.js file');
-    return;
   };
 
   const updateSubscriptionStatus = async (enabled: boolean) => {
@@ -145,6 +166,14 @@ export const usePushNotifications = () => {
       });
     }
   };
+
+  return {
+    ...state,
+    requestPermission,
+    unsubscribe,
+    showTestNotification,
+  };
+};
 
   return {
     ...state,
