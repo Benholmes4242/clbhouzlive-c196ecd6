@@ -84,7 +84,11 @@ export function SettingsPageV2() {
     navigate('/auth');
   };
 
-  if (loading) return <SettingsSkeleton />;
+  // Gate on profile as well as loading — auth race condition (INITIAL_SESSION firing
+  // with session=null before the real session restores) can briefly set loading=false
+  // while profile is still null, causing the full page to render with undefined data.
+  // Since Settings is route-guarded, !profile is only ever true during the load phase.
+  if (loading || !profile) return <SettingsSkeleton />;
 
   const p = profile as any;
   const handicapSuffix = p?.eg_handicap_index != null
