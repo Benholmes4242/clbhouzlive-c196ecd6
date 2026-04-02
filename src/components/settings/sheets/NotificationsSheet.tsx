@@ -124,39 +124,61 @@ export function NotificationsSheet({ open, onClose, userId }: Props) {
           <Switch checked={isPushEnabled} onCheckedChange={handleTogglePush} />
         </div>
 
-        {/* Temporary debug button */}
-        <div
-          onClick={() => {
-            const os = (window as any).median?.onesignal;
-            if (!os) { 
-              toast.error(`No onesignal. Median: ${!!(window as any).median}`); 
-              return; 
-            }
-            if (os.info) {
-              os.info((result: any) => {
-                toast.info(`${JSON.stringify(result).slice(0, 150)}`);
-              });
-            } else if (os.onesignalInfo) {
-              os.onesignalInfo((result: any) => {
-                toast.info(`${JSON.stringify(result).slice(0, 150)}`);
-              });
-            }
-          }}
-          style={{ 
-            padding: '14px 16px', 
-            background: '#F7931E', 
-            borderRadius: '12px', 
-            color: '#fff',
-            fontSize: '14px',
-            fontWeight: '600',
-            textAlign: 'center',
-            marginBottom: '12px',
-            cursor: 'pointer',
-            WebkitTapHighlightColor: 'transparent',
-            userSelect: 'none',
-          }}
-        >
-          Debug OneSignal
+        {/* On-screen debug panel */}
+        <div style={{ background: '#1a1a1a', borderRadius: '12px', padding: '12px', marginBottom: '12px' }}>
+          <div
+            onTouchStart={() => {
+              const el = document.getElementById('push-debug-output');
+              if (el) el.textContent = 'touchStart fired...';
+            }}
+            onClick={() => {
+              const el = document.getElementById('push-debug-output');
+              if (el) el.textContent = 'click fired, checking bridge...';
+              
+              const os = (window as any).median?.onesignal;
+              if (!os) {
+                if (el) el.textContent = `No onesignal. median=${!!(window as any).median} keys=${Object.keys((window as any).median || {}).join(',')}`;
+                return;
+              }
+              if (el) el.textContent = 'calling os.info...';
+              
+              const cb = (result: any) => {
+                if (el) el.textContent = JSON.stringify(result).slice(0, 200);
+              };
+              
+              if (os.info) os.info(cb);
+              else if (os.onesignalInfo) os.onesignalInfo(cb);
+              else if (el) el.textContent = `methods: ${Object.keys(os).join(',')}`;
+            }}
+            style={{
+              background: '#F7931E',
+              borderRadius: '8px',
+              padding: '16px',
+              color: '#fff',
+              fontSize: '15px',
+              fontWeight: '700',
+              textAlign: 'center',
+              cursor: 'pointer',
+              WebkitTapHighlightColor: 'rgba(255,255,255,0.2)',
+              userSelect: 'none',
+              touchAction: 'manipulation',
+            }}
+          >
+            TAP HERE — Debug OneSignal
+          </div>
+          <div
+            id="push-debug-output"
+            style={{
+              marginTop: '8px',
+              color: '#fff',
+              fontSize: '11px',
+              wordBreak: 'break-all',
+              minHeight: '40px',
+              lineHeight: '1.4',
+            }}
+          >
+            Waiting for tap...
+          </div>
         </div>
 
         {/* In-app prefs */}
