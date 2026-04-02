@@ -174,15 +174,30 @@ const ClubhouseContent = () => {
   
   const posts = useMemo(() => {
     if (activeTab === 'foryou') {
-      let feed = injectHistoryCard(activeFeed.posts, historyCard as unknown as FeedPost);   // slot 11
-      feed = injectPGACard(feed, pgaCard as unknown as FeedPost);                           // slot 7
-      feed = injectCourseOfWeekCard(feed, courseOfWeekCard as unknown as FeedPost);         // slot 3
-      feed = injectReviewOfWeekCard(feed, reviewOfWeekCard as unknown as FeedPost);         // slot 14
-      // feed = injectDebateCard(feed, debateCard as unknown as FeedPost); // temporarily disabled
-      return feed;
+      // Seed session entropy here — userId is available in this scope
+      if (user?.id) initSessionSeed(user.id);
+
+      return buildSuggestedFeedWithEditorials(
+        activeFeed.posts,
+        [
+          pgaCard as FeedPost | null,
+          historyCard as FeedPost | null,
+          courseOfWeekCard as FeedPost | null,
+          reviewOfWeekCard as FeedPost | null,
+          // debateCard as FeedPost | null, // re-enable when ready
+        ]
+      );
     }
     return activeFeed.posts;
-  }, [activeFeed.posts, activeTab, pgaCard, historyCard, courseOfWeekCard, debateCard, reviewOfWeekCard]);
+  }, [
+    activeFeed.posts,
+    activeTab,
+    pgaCard,
+    historyCard,
+    courseOfWeekCard,
+    reviewOfWeekCard,
+    user?.id,
+  ]);
 
   const isLoading = activeFeed.isLoading;
   const hasNextPage = activeFeed.hasNextPage ?? false;

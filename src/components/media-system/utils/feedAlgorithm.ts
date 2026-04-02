@@ -346,6 +346,19 @@ export function injectReviewOfWeekCard(feedPosts: FeedPost[], card: FeedPost | n
   return ensureEditorialCard(feedPosts, card, 'review_of_week_card');
 }
 
+// ── Combined Orbit pipeline — posts + editorial cards scored together ──────
+// Called from Clubhouse.tsx where both data sources are available simultaneously.
+export function buildSuggestedFeedWithEditorials(
+  rawPosts: FeedPost[],
+  editorialCards: (FeedPost | null)[]
+): FeedPost[] {
+  // Merge editorial cards into the pool — filter nulls
+  const validEditorials = editorialCards.filter((c): c is FeedPost => c !== null);
+  const combined = [...rawPosts, ...validEditorials];
+  // Run the full Orbit pipeline on the combined set
+  return buildSuggestedFeed(combined);
+}
+
 // Legacy exports
 export { isReviewPost, isEditorialCard };
 export const interleaveReviews = buildFriendsFeed;

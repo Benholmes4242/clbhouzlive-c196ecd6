@@ -57,11 +57,11 @@ export function useSuggestedFeed(userId: string | undefined) {
         // If rows came back but all were filtered, stop pagination to prevent
         // an infinite fetch loop burning through the entire posts table.
         const nextCursor: string | undefined =
-          rows.length > 0 && interleaved.length > 0
+          rows.length > 0 && posts.length > 0
             ? lastRow.post_created_at
             : undefined;
 
-        return { posts: interleaved, nextCursor };
+        return { posts, nextCursor };
       } catch (err) {
         console.error('[SuggestedFeed] Unexpected error:', err);
         return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
