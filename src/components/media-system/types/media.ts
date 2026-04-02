@@ -315,6 +315,7 @@ export interface DebateCardFeedPost extends Omit<FeedPost, 'mediaItems' | 'revie
 export interface ReviewOfWeekCardData {
   cardId: string;
   cardType: 'review_of_week';
+  editorialCardId: string;
   weekLabel: string;
   reviewId: string;
   reviewText: string;

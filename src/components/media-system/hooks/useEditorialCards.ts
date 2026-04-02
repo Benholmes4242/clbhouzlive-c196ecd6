@@ -328,6 +328,14 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
               .eq('user_id', rating.user_id)
               .not('review', 'is', null);
 
+            // Fetch editorial_feed_cards row for this review
+            const { data: editorialRow } = await supabase
+              .from('editorial_feed_cards')
+              .select('id')
+              .eq('source_rating_id', rating.id)
+              .eq('card_type', 'review_of_week')
+              .maybeSingle();
+
             const now = new Date();
             const weekLabel = `W${String(getISOWeekNum(now)).padStart(2, '0')} · ${now.toLocaleString('default', { month: 'long', year: 'numeric' })}`;
 
@@ -336,6 +344,7 @@ export function useEditorialCards(userId: string | undefined): EditorialCards {
             const cardData: ReviewOfWeekCardData = {
               cardId: rating.id,
               cardType: 'review_of_week',
+              editorialCardId: editorialRow?.id ?? rating.id,
               weekLabel,
               reviewId: rating.id,
               reviewText: rating.review ?? '',

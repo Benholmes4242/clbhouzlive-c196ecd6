@@ -409,7 +409,7 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
 
         {/* Comment */}
         <button
-          onClick={onComment}
+          onClick={() => onComment?.()}
           className="h-12 rounded-2xl flex items-center justify-center gap-[6px] text-[12px] font-semibold active:scale-[0.97] transition-transform"
           style={{
             background: 'rgba(255,255,255,0.05)',
