@@ -109,6 +109,7 @@ export function mapRowToFeedPost(row: FeedRpcRow): FeedPost {
     isReview,
     isLikedByMe: !!row.is_liked_by_me,
     isFollowedByMe: !!row.is_followed_by_me,
+    engagementScore: Number(row.engagement_score) || 0,
   };
 }
 
