@@ -127,14 +127,21 @@ export function NotificationsSheet({ open, onClose, userId }: Props) {
         {/* Temporary debug button */}
         <button
           onClick={() => {
-            const median = (window as any).median;
-            if (!median) { toast.error('No median bridge'); return; }
-            if (!median.onesignal) { 
-              toast.error(`No onesignal. Median keys: ${Object.keys(median).join(', ')}`); 
-              return; 
+            const os = (window as any).median?.onesignal;
+            if (!os) { toast.error('No onesignal bridge'); return; }
+            
+            // Try the newer 'info' method first
+            if (os.info) {
+              os.info((result: any) => {
+                toast.info(`INFO: ${JSON.stringify(result).slice(0, 120)}`);
+              });
+            } else if (os.onesignalInfo) {
+              os.onesignalInfo((result: any) => {
+                toast.info(`OSINFO: ${JSON.stringify(result).slice(0, 120)}`);
+              });
+            } else {
+              toast.error('Neither info nor onesignalInfo available');
             }
-            const methods = Object.keys(median.onesignal).join(', ');
-            toast.info(`OneSignal methods: ${methods}`);
           }}
           className="text-xs text-amber-500 mt-2 py-1"
         >
