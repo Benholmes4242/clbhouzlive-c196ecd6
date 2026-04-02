@@ -9,13 +9,8 @@ const corsHeaders = {
 /**
  * Process Push Notification Queue
  * 
- * This edge function processes the push_notification_queue table and sends
- * notifications via OneSignal. It should be called periodically (e.g., every minute)
- * via a cron job or external scheduler.
- * 
- * Multi-profile support:
- * - Personal notifications: sent to the user's devices
- * - Business notifications: sent to all owner/admin team members' devices
+ * SDK v5: Targets users by external_id (Supabase UUID) via include_aliases
+ * instead of legacy include_player_ids.
  * 
  * Required secrets:
  * - ONESIGNAL_APP_ID
@@ -34,7 +29,7 @@ interface PushQueueItem {
 }
 
 async function sendPushToDevice(
-  deviceId: string,
+  externalId: string,
   title: string,
   body: string,
   data: Record<string, unknown>,
@@ -49,17 +44,17 @@ async function sendPushToDevice(
     },
     body: JSON.stringify({
       app_id: appId,
-      include_player_ids: [deviceId],
+      // SDK v5: target by external user ID instead of player/device ID
+      include_aliases: { external_id: [externalId] },
+      target_channel: 'push',
       headings: { en: title },
       contents: { en: body || '' },
       data: data || {},
       // iOS specific
       ios_badgeType: 'Increase',
       ios_badgeCount: 1,
-      // Android specific
-      android_channel_id: 'game_notifications',
-      priority: 10, // High priority
-      // TTL - 24 hours
+      // Priority & TTL
+      priority: 10,
       ttl: 86400,
     })
   });
@@ -166,10 +161,13 @@ serve(async (req) => {
           continue;
         }
 
-        // If item already has a device_id, send to that device directly
-        if (item.device_id) {
+        // SDK v5: Send one notification per user targeting their external ID (Supabase UUID)
+        let sentToAny = false;
+        const errors: string[] = [];
+
+        for (const userId of targetUserIds) {
           const result = await sendPushToDevice(
-            item.device_id,
+            userId, // Supabase UUID = OneSignal external ID
             item.title,
             item.body || '',
             {
@@ -184,81 +182,35 @@ serve(async (req) => {
           );
 
           if (result.success) {
-            await supabase
-              .from('push_notification_queue')
-              .update({ sent_at: new Date().toISOString() })
-              .eq('id', item.id);
-            successCount++;
+            sentToAny = true;
           } else {
-            console.error(`Push failed for ${item.id}:`, result.error);
-            await supabase
-              .from('push_notification_queue')
-              .update({ error: result.error })
-              .eq('id', item.id);
-            errorCount++;
+            errors.push(`${userId}: ${result.error}`);
           }
+        }
+
+        if (sentToAny) {
+          await supabase
+            .from('push_notification_queue')
+            .update({ sent_at: new Date().toISOString() })
+            .eq('id', item.id);
+          successCount++;
+        } else if (errors.length > 0) {
+          await supabase
+            .from('push_notification_queue')
+            .update({ error: errors.join('; ') })
+            .eq('id', item.id);
+          errorCount++;
         } else {
-          // No device_id provided - get devices for all target users and send
-          let sentToAny = false;
-          const errors: string[] = [];
-
-          for (const userId of targetUserIds) {
-            const { data: devices } = await supabase
-              .from('user_push_devices')
-              .select('provider_id')
-              .eq('user_id', userId)
-              .eq('enabled', true);
-
-            for (const device of devices || []) {
-              const result = await sendPushToDevice(
-                device.provider_id,
-                item.title,
-                item.body || '',
-                {
-                  ...item.data,
-                  ...(recipientActorType === 'business' ? {
-                    business_id: recipientActorId,
-                    notification_type: 'business',
-                  } : {}),
-                },
-                ONESIGNAL_APP_ID,
-                ONESIGNAL_API_KEY
-              );
-
-              if (result.success) {
-                sentToAny = true;
-              } else {
-                errors.push(`${device.provider_id}: ${result.error}`);
-              }
-            }
-          }
-
-          if (sentToAny) {
-            await supabase
-              .from('push_notification_queue')
-              .update({ sent_at: new Date().toISOString() })
-              .eq('id', item.id);
-            successCount++;
-          } else if (errors.length > 0) {
-            await supabase
-              .from('push_notification_queue')
-              .update({ error: errors.join('; ') })
-              .eq('id', item.id);
-            errorCount++;
-          } else {
-            // No devices found for any user
-            await supabase
-              .from('push_notification_queue')
-              .update({ error: 'No devices found for recipients' })
-              .eq('id', item.id);
-            errorCount++;
-          }
+          await supabase
+            .from('push_notification_queue')
+            .update({ error: 'No devices found for recipients' })
+            .eq('id', item.id);
+          errorCount++;
         }
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : 'Unknown error'
         console.error(`Push exception for ${item.id}:`, errorMsg)
         
-        // Log error
         await supabase
           .from('push_notification_queue')
           .update({ error: errorMsg })

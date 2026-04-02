@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Upsert: if same provider_id exists, update; else insert
+    // SDK v5: upsert by user_id since provider_id is now the user's UUID
     const { data, error } = await supabaseAdmin
       .from("user_push_devices")
       .upsert(
@@ -77,10 +77,10 @@ Deno.serve(async (req) => {
           provider_id,
           platform,
           enabled,
-          last_seen_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         },
         {
-          onConflict: "provider,provider_id",
+          onConflict: "user_id",
         }
       )
       .select()
