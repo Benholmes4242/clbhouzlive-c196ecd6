@@ -2,7 +2,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useRef, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { FeedPost, FeedRpcRow } from '../types/media';
-import { buildSuggestedFeed, deduplicatePosts, initSessionSeed } from '../utils/feedAlgorithm';
+import { deduplicatePosts, initSessionSeed } from '../utils/feedAlgorithm';
 import { mapRowToFeedPost, groupMultiMedia } from '../utils/feedMapper';
 
 const PAGE_SIZE = 60;
