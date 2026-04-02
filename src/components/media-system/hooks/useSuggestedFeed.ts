@@ -15,7 +15,9 @@ export function useSuggestedFeed(userId: string | undefined) {
     queryFn: async ({ pageParam }) => {
       if (!userId) return { posts: [] as FeedPost[], nextCursor: undefined as string | undefined };
 
-      try {
+      // Seed the session entropy for this user+hour combination
+      if (userId) initSessionSeed(userId);
+
         const cursor = typeof pageParam === 'string' ? pageParam : undefined;
 
         const { data, error } = await supabase.rpc('get_suggested_feed' as any, {
