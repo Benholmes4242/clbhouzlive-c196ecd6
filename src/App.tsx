@@ -537,6 +537,8 @@ const AppInner: React.FC = () => {
 
       const userId = session.user.id;
       os.login?.(userId);
+      // Explicitly trigger OneSignal registration after login
+      os.register?.();
 
       const { data: existing } = await supabase
         .from('user_push_devices')
