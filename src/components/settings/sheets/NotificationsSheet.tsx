@@ -105,6 +105,7 @@ export function NotificationsSheet({ open, onClose, userId }: Props) {
       <SheetContent
         side="bottom"
         className="rounded-t-[20px] bg-background border-0 px-5"
+        hideCloseButton
         style={{ paddingBottom: 'calc(var(--sab) + 24px)' }}
       >
         <div className="w-10 h-1 rounded-full bg-muted mx-auto mt-3 mb-4" />
