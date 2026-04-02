@@ -40,9 +40,10 @@ export function usePushNotifications(): UsePushNotificationsResult {
     try {
       const platform = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase()) 
         ? 'ios' : 'android';
-      await supabase.functions.invoke('register-push-device', {
+      const { error } = await supabase.functions.invoke('register-push-device', {
         body: { provider_id: userId, platform, enabled },
       });
+      if (error) console.error('[Push] registerDevice error:', error);
     } catch (e) {
       console.error('[Push] Register device error:', e);
     }
