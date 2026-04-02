@@ -1,84 +1,197 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from 'sonner';
 
-interface PushNotificationState {
-  isSupported: boolean;
-  permission: NotificationPermission | null;
-  isSubscribed: boolean;
-  isLoading: boolean;
+// Type for OneSignal SDK (injected by Median)
+interface OneSignalSDK {
+  push: (callback: () => void) => void;
+  registerForPushNotifications: () => void;
+  getUserId: (callback: (userId: string | null) => void) => void;
+  isPushNotificationsEnabled: (callback: (enabled: boolean) => void) => void;
+  setSubscription: (enabled: boolean) => void;
 }
 
-export const usePushNotifications = () => {
+const getOneSignal = (): OneSignalSDK | undefined => {
+  return (window as any).OneSignal;
+};
+
+type PushState = 'unknown' | 'unavailable' | 'prompt' | 'denied' | 'enabled' | 'disabled';
+
+interface UsePushNotificationsResult {
+  state: PushState;
+  isLoading: boolean;
+  isRegistering: boolean;
+  enable: () => Promise<boolean>;
+  disable: () => Promise<boolean>;
+  refresh: () => void;
+}
+
+export function usePushNotifications(): UsePushNotificationsResult {
   const { user } = useSupabaseSession();
-  
-  const [state, setState] = useState<PushNotificationState>({
-    isSupported: false,
-    permission: null,
-    isSubscribed: false,
-    isLoading: false,
-  });
+  const [state, setState] = useState<PushState>('unknown');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRegistering, setIsRegistering] = useState(false);
+
+  const detectPlatform = useCallback((): string => {
+    const ua = navigator.userAgent.toLowerCase();
+    if (/iphone|ipad|ipod/.test(ua)) return 'ios';
+    if (/android/.test(ua)) return 'android';
+    return 'web';
+  }, []);
+
+  const isOneSignalAvailable = useCallback((): boolean => {
+    return !!(getOneSignal() || window.median?.onesignal);
+  }, []);
+
+  const getOneSignalInfo = useCallback((): Promise<{ id: string | null; subscribed: boolean; permissionDenied: boolean }> => {
+    return new Promise((resolve) => {
+      if (window.median?.onesignal) {
+        window.median.onesignal.onesignalInfo((info: {
+          oneSignalUserId?: string;
+          oneSignalSubscribed?: boolean;
+          oneSignalPushPermissionStatus?: string;
+        }) => {
+          const permissionDenied = info.oneSignalPushPermissionStatus === 'denied';
+          resolve({
+            id: info.oneSignalUserId || null,
+            subscribed: info.oneSignalSubscribed || false,
+            permissionDenied,
+          });
+        });
+        return;
+      }
+
+      const oneSignal = getOneSignal();
+      if (oneSignal) {
+        oneSignal.push(() => {
+          oneSignal.getUserId((userId) => {
+            oneSignal.isPushNotificationsEnabled((enabled) => {
+              resolve({ id: userId, subscribed: enabled, permissionDenied: false });
+            });
+          });
+        });
+        return;
+      }
+
+      resolve({ id: null, subscribed: false, permissionDenied: false });
+    });
+  }, []);
+
+  const pollForSubscription = useCallback(async (maxWaitMs: number = 25000, intervalMs: number = 1000): Promise<{ id: string | null; subscribed: boolean; permissionDenied: boolean }> => {
+    const startTime = Date.now();
+    while (Date.now() - startTime < maxWaitMs) {
+      const info = await getOneSignalInfo();
+      if (info.id && info.subscribed) return info;
+      if (info.permissionDenied) return info;
+      await new Promise((resolve) => setTimeout(resolve, intervalMs));
+    }
+    return await getOneSignalInfo();
+  }, [getOneSignalInfo]);
+
+  const registerDevice = useCallback(async (providerId: string, enabled: boolean): Promise<boolean> => {
+    if (!user) return false;
+    const platform = detectPlatform();
+    try {
+      const { error } = await supabase.functions.invoke('register-push-device', {
+        body: { provider_id: providerId, platform, enabled },
+      });
+      if (error) return false;
+      return true;
+    } catch {
+      return false;
+    }
+  }, [user, detectPlatform]);
 
   const refresh = useCallback(async () => {
-    // Re-check browser support & permission
-    const isSupported = 'Notification' in window && 'serviceWorker' in navigator;
-    const permission = isSupported ? Notification.permission : null;
+    setIsLoading(true);
 
-    setState(prev => ({ ...prev, isSupported, permission }));
-
-    if (!user || !isSupported) return;
-
-    // If browser permission is granted, auto-register in our DB
-    if (permission === 'granted') {
-      try {
-        const { data } = await supabase
-          .from('user_profiles')
-          .select('notification_preferences')
-          .eq('id', user.id)
-          .single();
-
-        const preferences = (data?.notification_preferences as any) || {};
-        const alreadyEnabled = preferences?.push_enabled || false;
-
-        if (!alreadyEnabled) {
-          // Auto-register: permission granted but not yet stored
-          const updatedPreferences = { ...preferences, push_enabled: true };
-          await supabase
-            .from('user_profiles')
-            .update({ notification_preferences: updatedPreferences })
-            .eq('id', user.id);
-          setState(prev => ({ ...prev, isSubscribed: true }));
-        } else {
-          setState(prev => ({ ...prev, isSubscribed: true }));
-        }
-      } catch (error) {
-        console.error('Error during refresh auto-register:', error);
-      }
-    } else {
-      // Permission not granted — check DB status
-      try {
-        const { data } = await supabase
-          .from('user_profiles')
-          .select('notification_preferences')
-          .eq('id', user.id)
-          .single();
-
-        const preferences = (data?.notification_preferences as any) || {};
-        const isSubscribed = preferences?.push_enabled || false;
-        setState(prev => ({ ...prev, isSubscribed }));
-      } catch (error) {
-        console.error('Error checking subscription status:', error);
-      }
+    if (!isOneSignalAvailable()) {
+      setState('unavailable');
+      setIsLoading(false);
+      return;
     }
-  }, [user]);
 
-  // Initial check + visibilitychange listener
+    try {
+      const { id, subscribed, permissionDenied } = await getOneSignalInfo();
+
+      if (permissionDenied) {
+        setState('denied');
+      } else if (!id) {
+        setState('prompt');
+      } else if (subscribed) {
+        // Auto-register device if subscribed but user hasn't tapped toggle
+        if (user && id) {
+          registerDevice(id, true);
+        }
+        setState('enabled');
+      } else {
+        setState('disabled');
+      }
+    } catch {
+      setState('unknown');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isOneSignalAvailable, getOneSignalInfo, registerDevice, user]);
+
+  const enable = useCallback(async (): Promise<boolean> => {
+    if (!isOneSignalAvailable()) {
+      toast.error('Push notifications not available on this device');
+      return false;
+    }
+    setIsRegistering(true);
+    try {
+      if (window.median?.onesignal) {
+        window.median.onesignal.register();
+      } else {
+        const oneSignal = getOneSignal();
+        if (oneSignal) {
+          oneSignal.push(() => oneSignal.registerForPushNotifications());
+        }
+      }
+      const { id, subscribed, permissionDenied } = await pollForSubscription(25000, 1000);
+      if (permissionDenied) { setState('denied'); return false; }
+      if (!id) { setState('prompt'); return false; }
+      if (subscribed) {
+        if (user) await registerDevice(id, true);
+        setState('enabled');
+        return true;
+      }
+      setState('disabled');
+      return false;
+    } catch {
+      toast.error('Failed to enable push notifications');
+      return false;
+    } finally {
+      setIsRegistering(false);
+    }
+  }, [isOneSignalAvailable, pollForSubscription, registerDevice, user]);
+
+  const disable = useCallback(async (): Promise<boolean> => {
+    if (!isOneSignalAvailable()) return false;
+    setIsRegistering(true);
+    try {
+      if (window.median?.onesignal?.setSubscription) {
+        window.median.onesignal.setSubscription(false);
+      } else {
+        const oneSignal = getOneSignal();
+        if (oneSignal) oneSignal.push(() => oneSignal.setSubscription(false));
+      }
+      const { id } = await getOneSignalInfo();
+      if (id && user) await registerDevice(id, false);
+      setState('disabled');
+      return true;
+    } catch {
+      return false;
+    } finally {
+      setIsRegistering(false);
+    }
+  }, [isOneSignalAvailable, getOneSignalInfo, registerDevice, user]);
+
+  // Initial check + re-check on app focus
   useEffect(() => {
     refresh();
-
-    // Re-check when app comes back into focus
-    // (catches case where iOS granted permission via OS prompt)
     const handleVisibility = () => {
       if (document.visibilityState === 'visible') refresh();
     };
@@ -86,99 +199,5 @@ export const usePushNotifications = () => {
     return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, [refresh]);
 
-  const requestPermission = async (): Promise<boolean> => {
-    if (!state.isSupported) {
-      toast.error("Not Supported", { description: "Push notifications are not supported in this browser" });
-      return false;
-    }
-
-    setState(prev => ({ ...prev, isLoading: true }));
-
-    try {
-      const permission = await Notification.requestPermission();
-      setState(prev => ({ ...prev, permission }));
-
-      if (permission === 'granted') {
-        await updateSubscriptionStatus(true);
-        toast.success("Notifications enabled");
-        return true;
-      } else {
-        toast.error("Permission Denied", { description: "Push notification permission was denied" });
-        return false;
-      }
-    } catch (error) {
-      console.error('Error requesting permission:', error);
-      toast.error("Couldn't enable notifications");
-      return false;
-    } finally {
-      setState(prev => ({ ...prev, isLoading: false }));
-    }
-  };
-
-  const updateSubscriptionStatus = async (enabled: boolean) => {
-    if (!user) return;
-
-    try {
-      const { data: currentProfile } = await supabase
-        .from('user_profiles')
-        .select('notification_preferences')
-        .eq('id', user.id)
-        .single();
-
-      const currentPreferences = (currentProfile?.notification_preferences as any) || {};
-      const updatedPreferences = {
-        ...currentPreferences,
-        push_enabled: enabled,
-      };
-
-      await supabase
-        .from('user_profiles')
-        .update({ notification_preferences: updatedPreferences })
-        .eq('id', user.id);
-
-      setState(prev => ({ ...prev, isSubscribed: enabled }));
-    } catch (error) {
-      console.error('Error updating subscription status:', error);
-      throw error;
-    }
-  };
-
-  const unsubscribe = async () => {
-    setState(prev => ({ ...prev, isLoading: true }));
-    
-    try {
-      await updateSubscriptionStatus(false);
-      toast.success("Unsubscribed", { description: "Push notifications have been disabled" });
-    } catch (error) {
-      console.error('Error unsubscribing:', error);
-      toast.error("Couldn't disable notifications");
-    } finally {
-      setState(prev => ({ ...prev, isLoading: false }));
-    }
-  };
-
-  const showTestNotification = () => {
-    if (state.permission === 'granted') {
-      new Notification('Clbhouz Test', {
-        body: 'Push notifications are working!',
-        icon: '/favicon.ico',
-        badge: '/favicon.ico',
-      });
-    }
-  };
-
-  return {
-    ...state,
-    requestPermission,
-    unsubscribe,
-    showTestNotification,
-  };
-};
-
-  return {
-    ...state,
-    requestPermission,
-    unsubscribe,
-    showTestNotification,
-  };
-};
+  return { state, isLoading, isRegistering, enable, disable, refresh };
+}
