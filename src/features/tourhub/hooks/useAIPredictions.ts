@@ -196,9 +196,9 @@ async function fetchActiveTournamentPredictions(): Promise<ActiveTournamentResul
     }
   }
 
-  // Priority 2: Next scheduled tournament
+  // Priority 2: Next scheduled tournament (PGA season)
   const now = new Date().toISOString();
-  const { data: nextTournament } = await supabase
+  const { data: nextPgaTournament } = await supabase
     .from('sr_tournaments')
     .select('*')
     .eq('season_id', pgaSeasonId)
@@ -207,6 +207,36 @@ async function fetchActiveTournamentPredictions(): Promise<ActiveTournamentResul
     .order('start_date', { ascending: true })
     .limit(1)
     .maybeSingle();
+
+  // Cross-tour major check: co-sanctioned majors (e.g. Masters stored under EURO)
+  // may start sooner than the next PGA-only event.
+  const { data: crossTourMajors } = await supabase
+    .from('sr_tournaments')
+    .select('*, season:sr_seasons!inner(tour_name)')
+    .neq('season_id', pgaSeasonId)
+    .in('status', ['scheduled', 'created'])
+    .gte('start_date', now)
+    .order('start_date', { ascending: true })
+    .limit(10);
+
+  const MAJOR_KEYWORDS = ['masters tournament', 'the open championship', 'u.s. open', 'us open', 'pga championship'];
+  const nextCrossTourMajor = (crossTourMajors || []).find(t => {
+    const name = t.name.toLowerCase();
+    return MAJOR_KEYWORDS.some(k => name.includes(k)) &&
+      !name.includes('senior') &&
+      !name.includes('women') &&
+      !name.includes('bmw');
+  }) ?? null;
+
+  // Pick whichever starts first — cross-tour major or next PGA event
+  let nextTournament = nextPgaTournament;
+  if (nextCrossTourMajor) {
+    const majorDate = new Date(nextCrossTourMajor.start_date).getTime();
+    const pgaDate = nextPgaTournament ? new Date(nextPgaTournament.start_date).getTime() : Infinity;
+    if (majorDate < pgaDate) {
+      nextTournament = nextCrossTourMajor;
+    }
+  }
 
   if (nextTournament) {
     const predictions = await fetchPredictionsForTournament(nextTournament);
@@ -230,7 +260,7 @@ async function fetchNextTournamentPreview(): Promise<NextTournamentResult> {
   if (!pgaSeasonId) return { preview: null, predictions: null };
 
   const now = new Date().toISOString();
-  const { data: nextTournament } = await supabase
+  const { data: nextPgaTournament } = await supabase
     .from('sr_tournaments')
     .select('*')
     .eq('season_id', pgaSeasonId)
@@ -239,6 +269,34 @@ async function fetchNextTournamentPreview(): Promise<NextTournamentResult> {
     .order('start_date', { ascending: true })
     .limit(1)
     .maybeSingle();
+
+  // Cross-tour major check — same logic as fetchActiveTournamentPredictions
+  const { data: crossTourMajors } = await supabase
+    .from('sr_tournaments')
+    .select('*, season:sr_seasons!inner(tour_name)')
+    .neq('season_id', pgaSeasonId)
+    .in('status', ['scheduled', 'created'])
+    .gte('start_date', now)
+    .order('start_date', { ascending: true })
+    .limit(10);
+
+  const MAJOR_KEYWORDS = ['masters tournament', 'the open championship', 'u.s. open', 'us open', 'pga championship'];
+  const nextCrossTourMajor = (crossTourMajors || []).find(t => {
+    const name = t.name.toLowerCase();
+    return MAJOR_KEYWORDS.some(k => name.includes(k)) &&
+      !name.includes('senior') &&
+      !name.includes('women') &&
+      !name.includes('bmw');
+  }) ?? null;
+
+  let nextTournament = nextPgaTournament;
+  if (nextCrossTourMajor) {
+    const majorDate = new Date(nextCrossTourMajor.start_date).getTime();
+    const pgaDate = nextPgaTournament ? new Date(nextPgaTournament.start_date).getTime() : Infinity;
+    if (majorDate < pgaDate) {
+      nextTournament = nextCrossTourMajor;
+    }
+  }
 
   if (!nextTournament) return { preview: null, predictions: null };
 
