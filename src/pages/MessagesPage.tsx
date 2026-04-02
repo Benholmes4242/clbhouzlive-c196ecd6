@@ -88,7 +88,7 @@ function MessagesPageInner() {
   });
 
   const showNotificationPrompt = !pushLoading && 
-    pushState === 'prompt' && 
+    pushState === 'unknown' && 
     !notificationPromptDismissed;
 
   const debouncedSetSearch = useDebouncedCallback((value: string) => {
