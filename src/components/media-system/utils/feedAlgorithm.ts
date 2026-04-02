@@ -162,7 +162,7 @@ function applyCreatorDiversity(posts: FeedPost[]): FeedPost[] {
 function enforceEditorialGap(posts: FeedPost[]): FeedPost[] {
   const result: FeedPost[] = [];
   const editorialBuffer: FeedPost[] = [];
-  let lastEditorialPos = -MIN_EDITORIAL_GAP;
+  let lastEditorialPos = 0; // editorial cards cannot appear at position 0 (first slot)
 
   for (let i = 0; i < posts.length; i++) {
     const post = posts[i];
