@@ -191,12 +191,23 @@ function enforceEditorialGap(posts: FeedPost[]): FeedPost[] {
 
 // ── Video/Image Balance Pass ──────────────────────────────────────────────────
 function balanceMediaTypes(posts: FeedPost[]): FeedPost[] {
-  const editorials = posts.filter(p => isEditorialCard(p));
-  const reviews = posts.filter(p => isReviewPost(p) && !isEditorialCard(p));
-  const videos = posts.filter(p => !isEditorialCard(p) && !isReviewPost(p) &&
-    p.mediaItems.some(m => m.type === 'video'));
-  const images = posts.filter(p => !isEditorialCard(p) && !isReviewPost(p) &&
-    !p.mediaItems.some(m => m.type === 'video'));
+  // Separate editorials — keep their scored positions, rebuild around them
+  const editorialPositions: { idx: number; post: FeedPost }[] = [];
+  const nonEditorials: FeedPost[] = [];
+
+  posts.forEach((p, idx) => {
+    if (isEditorialCard(p)) {
+      editorialPositions.push({ idx, post: p });
+    } else {
+      nonEditorials.push(p);
+    }
+  });
+
+  const reviews = nonEditorials.filter(p => isReviewPost(p));
+  const videos = nonEditorials.filter(p =>
+    !isReviewPost(p) && p.mediaItems.some(m => m.type === 'video'));
+  const images = nonEditorials.filter(p =>
+    !isReviewPost(p) && !p.mediaItems.some(m => m.type === 'video'));
 
   const regularCount = videos.length + images.length;
   if (regularCount === 0) return posts;
@@ -223,23 +234,33 @@ function balanceMediaTypes(posts: FeedPost[]): FeedPost[] {
     else regular.push(finalVideos[vi++]);
   }
 
-  // Merge regular + reviews — reviews interleaved every 6 posts
+  // Interleave reviews every 6 regular posts
   const merged: FeedPost[] = [];
-  let ri = 0, regi = 0;
-  let slot = 1;
+  let ri = 0, regi = 0, slot = 1;
   while (regi < regular.length || ri < reviews.length) {
-    if (slot === 4 && ri < reviews.length) {
-      merged.push(reviews[ri++]);
-    } else if (regi < regular.length) {
-      merged.push(regular[regi++]);
-    } else if (ri < reviews.length) {
-      merged.push(reviews[ri++]);
-    } else break;
+    if (slot === 4 && ri < reviews.length) merged.push(reviews[ri++]);
+    else if (regi < regular.length) merged.push(regular[regi++]);
+    else if (ri < reviews.length) merged.push(reviews[ri++]);
+    else break;
     slot = slot < 6 ? slot + 1 : 1;
   }
 
-  // Re-insert editorials — they'll be gap-enforced later
-  return [...editorials, ...merged];
+  // Re-insert editorials at their proportional scored positions
+  const totalScored = posts.length;
+  const result = [...merged];
+  let insertOffset = 0;
+
+  for (const { idx, post } of editorialPositions) {
+    const proportion = totalScored > 0 ? idx / totalScored : 0;
+    const insertAt = Math.min(
+      Math.round(proportion * result.length) + insertOffset,
+      result.length
+    );
+    result.splice(insertAt, 0, post);
+    insertOffset++;
+  }
+
+  return result;
 }
 
 // ── Full Orbit Suggested Feed Pipeline ───────────────────────────────────────
