@@ -207,7 +207,9 @@ const ClubhouseContent = () => {
 
   // ── Editorial card like count for CommentsSheet ──
   const editorialCardId = ['course_of_week_card', 'history_card', 'debate_card', 'review_of_week_card'].includes(activePost?.postType ?? '')
-    ? (activePost as any)?.cardData?.cardId
+    ? (activePost?.postType === 'review_of_week_card'
+        ? (activePost as any)?.cardData?.editorialCardId
+        : (activePost as any)?.cardData?.cardId)
     : null;
 
   const { data: editorialLikeCount } = useQuery({
