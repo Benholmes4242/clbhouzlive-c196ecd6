@@ -456,7 +456,9 @@ const ClubhouseContent = () => {
                 : 'post'
             }
             editorialCardId={
-              ['course_of_week_card', 'history_card', 'debate_card', 'review_of_week_card'].includes(activePost.postType ?? '')
+              activePost.postType === 'review_of_week_card'
+                ? (activePost as any).cardData.editorialCardId
+                : ['course_of_week_card', 'history_card', 'debate_card'].includes(activePost.postType ?? '')
                 ? (activePost as any).cardData.cardId
                 : undefined
             }
