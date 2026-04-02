@@ -73,11 +73,11 @@ Deno.serve(async (req) => {
       .upsert(
         {
           user_id: user.id,
-          provider: "onesignal",
           provider_id,
+          provider: "onesignal",
           platform,
           enabled,
-          updated_at: new Date().toISOString(),
+          last_seen_at: new Date().toISOString(),
         },
         {
           onConflict: "user_id",
