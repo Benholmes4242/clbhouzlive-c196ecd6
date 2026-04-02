@@ -128,22 +128,13 @@ export function NotificationsSheet({ open, onClose, userId }: Props) {
         <button
           onClick={() => {
             const median = (window as any).median;
-            const hasMedian = !!median;
-            const hasOneSignal = !!median?.onesignal;
-            const bridgeKeys = hasMedian ? Object.keys(median).join(', ') : 'none';
-            
-            if (!hasOneSignal) {
-              toast.info(`Median: ${hasMedian} | Keys: ${bridgeKeys}`);
-              return;
+            if (!median) { toast.error('No median bridge'); return; }
+            if (!median.onesignal) { 
+              toast.error(`No onesignal. Median keys: ${Object.keys(median).join(', ')}`); 
+              return; 
             }
-
-            try {
-              median.onesignal.onesignalInfo((info: any) => {
-                toast.info(`ID: ${info?.oneSignalUserId || 'null'} | Sub: ${info?.oneSignalSubscribed} | Status: ${info?.oneSignalPushPermissionStatus}`);
-              });
-            } catch (e: any) {
-              toast.error(`Error: ${e?.message || 'unknown'}`);
-            }
+            const methods = Object.keys(median.onesignal).join(', ');
+            toast.info(`OneSignal methods: ${methods}`);
           }}
           className="text-xs text-amber-500 mt-2 py-1"
         >
