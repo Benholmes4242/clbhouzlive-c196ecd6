@@ -335,7 +335,7 @@ export const ReviewOfWeekCard: React.FC<ReviewOfWeekCardProps> = ({
               {fullText}
             </p>
             <button
-              onClick={() => navigate(`/courses/${card.course.id}?tab=reviews#review-${card.sourceRatingId ?? editorialCardId}`)}
+              onClick={() => navigate(`/courses/${card.course.id}?tab=reviews#review-${editorialCardId}`)}
               className="mt-1.5 bg-transparent border-none p-0 cursor-pointer text-[12.5px] font-semibold active:scale-[0.97] transition-transform"
               style={{ color: AMBER }}
             >
